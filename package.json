@@ -17,7 +17,9 @@
     "smoke:openai": "tsx scripts/openai-smoke.ts",
     "smoke:sovereign": "tsx scripts/sovereign-smoke.ts",
     "smoke:gateway": "tsx scripts/cloudflare-gateway-smoke.ts",
-    "smoke:worker-gateway": "tsx scripts/worker-gateway-smoke.ts"
+    "smoke:worker-gateway": "tsx scripts/worker-gateway-smoke.ts",
+    "smoke:stripe": "tsx scripts/stripe-smoke.ts",
+    "smoke:product": "tsx scripts/product-smoke.ts"
   },
   "devDependencies": {
     "@types/node": "22.12.0",

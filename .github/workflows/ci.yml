@@ -18,8 +18,13 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: corepack enable
-      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm install --frozen-lockfile
       - run: pnpm verify:foundation
+      - run: pnpm verify:migrations
+      - run: pnpm scan:secrets
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      - run: pnpm smoke:worker-gateway
+      - run: pnpm smoke:stripe
+      - run: pnpm smoke:product

@@ -11,6 +11,11 @@ export interface Env {
   OPENAI_API_KEY?: string;
   STRIPE_SECRET_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
+  STRIPE_PRICE_STANDARD?: string;
+  STRIPE_PRICE_PREMIUM?: string;
+  STRIPE_SUCCESS_URL?: string;
+  STRIPE_CANCEL_URL?: string;
+  STRIPE_PORTAL_RETURN_URL?: string;
   SOVV_INTERNAL_BASE_URL: string;
   SOVV_INTERNAL_AUTH_TOKEN: string;
   SESSION_SIGNING_SECRET: string;

@@ -63,6 +63,12 @@ jobs:
       - name: Worker Gateway smoke with local fake binding
         run: pnpm smoke:worker-gateway
 
+      - name: Stripe smoke with deterministic fake adapter
+        run: pnpm smoke:stripe
+
+      - name: Product smoke with deterministic fake providers
+        run: pnpm smoke:product
+
       - name: Live Cloudflare Gateway and Sovereign smoke
         env:
           AI_PROVIDER: cloudflare-gateway

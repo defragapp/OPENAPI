@@ -3,7 +3,7 @@ import type { Env } from './env';
 import { ThreadCoordinator } from './durable/ThreadCoordinator';
 import { requireAuth, requireSameOrigin } from './security/auth';
 import { withSecurityHeaders } from './security/headers';
-import { getEntitlements } from './db/entitlements';
+import { getEntitlements, requireFeature } from './db/entitlements';
 import { ensureThread, appendThreadEvent, recordCorrection } from './db/threads';
 import { getTurn, startTurn, updateTurnStatus } from './db/turns';
 import { assertSovereignOutputSafety } from './agent/safety';
@@ -13,6 +13,8 @@ import { handleStripeWebhook } from './routes/stripe';
 import { canUseDevelopmentFixtures, serviceUnavailable } from './runtime';
 import { createInvitation, createPerson, listPeople, requireConsent, setConsent, updateInvitationStatus, type InvitationStatus, type RelationshipMetadataInput } from './db/people';
 import { addSystemMember, analyzeSystem, cancelDeletionJob, createDeletionJob, createExportJob, createSystem, deleteUnderstanding, freeEntitlements, listSystems, listUnderstandings, saveUnderstanding, updateUnderstanding, type SystemType } from './db/product';
+import { createCheckoutSession, createPortalSession, normalizeStripeFixtureEvent, projectSubscriptionEvent, type PlanKey } from './billing/stripe';
+import { applyBiblicalLens, assertCovenantSafe, retrieveScripture } from './covenant/scripture';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 
 const app = new Hono<{ Bindings: Env }>();
@@ -196,26 +198,49 @@ app.get('/api/v1/billing/entitlements', async (context) => {
 
 app.post('/api/v1/billing/checkout', async (context) => {
   requireSameOrigin(context.req.raw);
-  await requireAuth(context.req.raw, context.env);
-  if (!context.env.STRIPE_SECRET_KEY) return context.json({ error: 'Stripe Checkout is not configured. No billing object was created.' }, 503);
-  return context.json({ error: 'Stripe Checkout session creation requires configured test-mode Stripe adapter.' }, 501);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ plan?: PlanKey; idempotencyKey?: string }>();
+  const session = await createCheckoutSession(context.env, auth.accountId, body.plan ?? 'standard', body.idempotencyKey);
+  return context.json({ checkout: session }, 201);
 });
 
 app.post('/api/v1/billing/portal', async (context) => {
   requireSameOrigin(context.req.raw);
-  await requireAuth(context.req.raw, context.env);
-  if (!context.env.STRIPE_SECRET_KEY) return context.json({ error: 'Stripe Customer Portal is not configured. No billing object was created.' }, 503);
-  return context.json({ error: 'Stripe Portal session creation requires configured test-mode Stripe adapter.' }, 501);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const session = await createPortalSession(auth.accountId);
+  return context.json({ portal: session }, 201);
+});
+
+app.post('/api/v1/billing/stripe-fixture-event', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ id?: string; type?: string; priceId?: string; status?: string; created?: number }>();
+  const fixtureEvent: { id: string; type: string; accountId: string; priceId?: string; status?: string; created?: number } = { id: body.id ?? `evt_${crypto.randomUUID()}`, type: body.type ?? 'customer.subscription.updated', accountId: auth.accountId };
+  if (body.priceId) fixtureEvent.priceId = body.priceId;
+  if (body.status) fixtureEvent.status = body.status;
+  if (body.created) fixtureEvent.created = body.created;
+  const event = normalizeStripeFixtureEvent(context.env, fixtureEvent);
+  return context.json({ projection: await projectSubscriptionEvent(context.env, event) });
 });
 
 app.post('/api/v1/threads/:threadId/covenant', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
-  const body = await context.req.json<{ enabled?: boolean; personId?: string; bibleTranslation?: string }>();
+  const body = await context.req.json<{ enabled?: boolean; personId?: string; bibleTranslation?: string; reference?: string; subject?: string }>();
   if (body.enabled && !body.bibleTranslation) return context.json({ error: 'Bible translation is required to enable Covenant.' }, 400);
+  if (body.enabled) requireFeature(await getEntitlements(context.env, auth.accountId), 'covenant.lens');
   if (body.enabled && body.personId) await requireConsent(context.env, auth.accountId, body.personId, 'covenant.include');
   await ensureThread(context.env, auth.accountId, context.req.param('threadId'));
-  return context.json({ covenantEnabled: body.enabled === true, scriptureSeparateFromInterpretation: true, certaintyAboutGodsIntent: false });
+  if (!body.enabled) return context.json({ covenantEnabled: false });
+  const passage = retrieveScripture(body.reference ?? 'James 1:5', body.bibleTranslation);
+  const lens = applyBiblicalLens(passage, body.subject ?? 'this question');
+  assertCovenantSafe(JSON.stringify(lens));
+  return context.json({ covenantEnabled: true, scriptureSeparateFromInterpretation: true, certaintyAboutGodsIntent: false, lens });
+});
+
+app.get('/api/v1/covenant/scripture/:reference', async (context) => {
+  await requireAuth(context.req.raw, context.env);
+  return context.json({ passage: retrieveScripture(context.req.param('reference'), context.req.query('translation') ?? 'WEB') });
 });
 
 app.get('/api/v1/today', async (context) => {
