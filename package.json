@@ -1,0 +1,19 @@
+{
+  "name": "sovereign-os",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm --parallel --filter './apps/*' dev",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "verify:foundation": "node scripts/verify-foundation.mjs"
+  },
+  "devDependencies": {
+    "typescript": "5.8.3"
+  }
+}
