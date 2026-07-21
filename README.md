@@ -32,6 +32,9 @@ Defrag, Alignment, and Covenant are internal capabilities of one agent. They are
 - [`docs/privacy-model.md`](docs/privacy-model.md)
 - [`docs/tool-contracts.md`](docs/tool-contracts.md)
 - [`docs/release-gates.md`](docs/release-gates.md)
+- [`docs/sovv-adapter-map.md`](docs/sovv-adapter-map.md)
+- [`docs/openai-integration.md`](docs/openai-integration.md)
+- [`docs/current-conditions-port.md`](docs/current-conditions-port.md)
 
 ## Current state
 

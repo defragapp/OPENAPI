@@ -1,0 +1,126 @@
+name: Live Sovereign Verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-sovereign-verification-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  gateway-sovereign:
+    name: Live Cloudflare Gateway and Sovereign smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Resolve pnpm store path
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify foundation
+        run: pnpm verify:foundation
+
+      - name: Verify migrations
+        run: pnpm verify:migrations
+
+      - name: Scan for secrets
+        run: pnpm scan:secrets
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Worker Gateway smoke with local fake binding
+        run: pnpm smoke:worker-gateway
+
+      - name: Live Cloudflare Gateway and Sovereign smoke
+        env:
+          AI_PROVIDER: cloudflare-gateway
+          AI_MODEL: ${{ vars.AI_MODEL || 'openai/gpt-5.6-terra' }}
+          AI_GATEWAY_ID: ${{ vars.AI_GATEWAY_ID || 'sovereign' }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID repository variable is not configured"
+            exit 1
+          fi
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN repository secret is not configured"
+            exit 1
+          fi
+          pnpm smoke:gateway
+          pnpm smoke:sovereign
+          {
+            echo "### Live verification commit"
+            echo
+            echo "- commit_sha: ${GITHUB_SHA}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  local-worker-state:
+    name: Local Worker state checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Resolve pnpm store path
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify local migrations and deterministic integration tests
+        run: |
+          set -euo pipefail
+          pnpm verify:migrations
+          pnpm --filter @sovereign/worker test
