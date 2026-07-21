@@ -1,0 +1,163 @@
+name: Preview Deploy and Verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sovereign-preview-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy-preview:
+    name: Deploy isolated Cloudflare preview
+    runs-on: ubuntu-latest
+    environment: preview
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Resolve pnpm store path
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Local verification gate
+        run: |
+          set -euo pipefail
+          pnpm verify:foundation
+          pnpm verify:migrations
+          pnpm scan:secrets
+          pnpm typecheck
+          pnpm test
+          pnpm build
+          pnpm smoke:worker-gateway
+          pnpm smoke:stripe
+          pnpm smoke:product
+          pnpm build:preview
+
+      - name: Resolve preview session secret
+        id: preview-secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          SECRET="${{ secrets.PREVIEW_SESSION_SIGNING_SECRET }}"
+          if [ -z "$SECRET" ]; then
+            SECRET="$(openssl rand -hex 32)"
+          fi
+          echo "::add-mask::$SECRET"
+          echo "secret=$SECRET" >> "$GITHUB_OUTPUT"
+
+      - name: Bootstrap resources and deploy preview
+        id: preview-deploy
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          PREVIEW_WORKER_NAME: ${{ vars.PREVIEW_WORKER_NAME || 'sovereign-openapi-preview' }}
+          PREVIEW_D1_NAME: ${{ vars.PREVIEW_D1_NAME || 'sovereign-openapi-preview-db' }}
+          PREVIEW_SESSION_SIGNING_SECRET: ${{ steps.preview-secret.outputs.secret }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER || 'cloudflare-gateway' }}
+          AI_MODEL: ${{ vars.AI_MODEL || 'openai/gpt-5.6-terra' }}
+          AI_GATEWAY_ID: ${{ vars.AI_GATEWAY_ID || 'sovereign' }}
+          SOVV_BASE_URL: ${{ vars.SOVV_BASE_URL }}
+          SCRIPTURE_TRANSLATION: ${{ vars.SCRIPTURE_TRANSLATION || 'WEB' }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          STRIPE_PRICE_SOVEREIGN_PLUS: ${{ vars.STRIPE_PRICE_SOVEREIGN_PLUS }}
+          STRIPE_SUPPORT_URL: ${{ vars.STRIPE_SUPPORT_URL }}
+          STRIPE_SUCCESS_URL: ${{ vars.STRIPE_SUCCESS_URL }}
+          STRIPE_CANCEL_URL: ${{ vars.STRIPE_CANCEL_URL }}
+          STRIPE_PORTAL_RETURN_URL: ${{ vars.STRIPE_PORTAL_RETURN_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID repository variable is not configured"
+            exit 1
+          fi
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN repository secret is not configured"
+            exit 1
+          fi
+          pnpm preview:bootstrap
+          URL="$(node -e "console.log(require('./preview-deployment.json').deployedUrl)")"
+          echo "preview_url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Create protected preview session cookie
+        id: preview-session
+        env:
+          PREVIEW_SESSION_SIGNING_SECRET: ${{ steps.preview-secret.outputs.secret }}
+          PREVIEW_SESSION_SUBJECT: preview:user:github-actions
+        run: |
+          set -euo pipefail
+          COOKIE="$(pnpm --silent preview:session)"
+          echo "::add-mask::$COOKIE"
+          echo "cookie=$COOKIE" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for preview readiness
+        env:
+          PREVIEW_URL: ${{ steps.preview-deploy.outputs.preview_url }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            if curl -fsS "$PREVIEW_URL/ready" >/tmp/ready.json; then
+              cat /tmp/ready.json | node -e "let data='';process.stdin.on('data',c=>data+=c);process.stdin.on('end',()=>{const parsed=JSON.parse(data); if (!parsed.ok || parsed.ready !== true) process.exit(1);});" && exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::Preview readiness did not become healthy"
+          exit 1
+
+      - name: Live Cloudflare Gateway verification
+        env:
+          AI_PROVIDER: cloudflare-gateway
+          AI_MODEL: ${{ vars.AI_MODEL || 'openai/gpt-5.6-terra' }}
+          AI_GATEWAY_ID: ${{ vars.AI_GATEWAY_ID || 'sovereign' }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          pnpm smoke:gateway
+          pnpm smoke:sovereign
+
+      - name: Authenticated preview product smoke
+        env:
+          PREVIEW_BASE_URL: ${{ steps.preview-deploy.outputs.preview_url }}
+          PREVIEW_SESSION_COOKIE: ${{ steps.preview-session.outputs.cookie }}
+        run: pnpm smoke:preview
+
+      - name: Sanitized preview summary
+        if: always()
+        run: |
+          {
+            echo "### Sovereign preview deployment"
+            echo
+            echo "- commit_sha: ${GITHUB_SHA}"
+            echo "- worker_name: ${{ vars.PREVIEW_WORKER_NAME || 'sovereign-openapi-preview' }}"
+            echo "- d1_name: ${{ vars.PREVIEW_D1_NAME || 'sovereign-openapi-preview-db' }}"
+            echo "- model: ${{ vars.AI_MODEL || 'openai/gpt-5.6-terra' }}"
+            echo "- gateway_id: ${{ vars.AI_GATEWAY_ID || 'sovereign' }}"
+            echo "- preview_url: ${{ steps.preview-deploy.outputs.preview_url }}"
+            echo "- local_smokes: worker-gateway, stripe, product"
+            echo "- authenticated_preview_smoke: see job result"
+          } >> "$GITHUB_STEP_SUMMARY"

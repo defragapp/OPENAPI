@@ -1,0 +1,19 @@
+{
+  "name": "@sovereign/agent-contracts",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "typescript": "5.8.3",
+    "vitest": "4.1.10"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./model-config": "./src/model-config.ts"
+  }
+}

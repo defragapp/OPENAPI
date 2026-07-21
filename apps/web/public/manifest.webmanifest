@@ -1,0 +1,11 @@
+{
+  "name": "Sovereign.OS",
+  "short_name": "Sovereign",
+  "description": "Baseline-first personal and relational intelligence.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0b0d",
+  "theme_color": "#0b0b0d",
+  "orientation": "portrait-primary",
+  "icons": []
+}
