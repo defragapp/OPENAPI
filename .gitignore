@@ -13,3 +13,6 @@ coverage/
 *.tsbuildinfo
 
 .tmp/
+
+preview-deployment.json
+apps/sovereign-worker/.wrangler.preview.generated.jsonc

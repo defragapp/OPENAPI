@@ -19,7 +19,11 @@
     "smoke:gateway": "tsx scripts/cloudflare-gateway-smoke.ts",
     "smoke:worker-gateway": "tsx scripts/worker-gateway-smoke.ts",
     "smoke:stripe": "tsx scripts/stripe-smoke.ts",
-    "smoke:product": "tsx scripts/product-smoke.ts"
+    "smoke:product": "tsx scripts/product-smoke.ts",
+    "build:preview": "node scripts/build-preview.mjs",
+    "preview:bootstrap": "node scripts/cloudflare-preview-bootstrap.mjs",
+    "smoke:preview": "tsx scripts/preview-smoke.ts",
+    "preview:session": "tsx scripts/create-preview-session.ts"
   },
   "devDependencies": {
     "@types/node": "22.12.0",

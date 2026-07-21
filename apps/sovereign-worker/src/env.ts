@@ -8,6 +8,7 @@ export interface Env {
   AI_MODEL?: string;
   AI_GATEWAY_ID?: string;
   AI?: { run: (model: string, input: unknown, options?: unknown) => Promise<unknown>; aiGatewayLogId?: string };
+  ASSETS?: { fetch: (request: Request) => Promise<Response> };
   OPENAI_API_KEY?: string;
   STRIPE_SECRET_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
@@ -16,6 +17,7 @@ export interface Env {
   STRIPE_SUCCESS_URL?: string;
   STRIPE_CANCEL_URL?: string;
   STRIPE_PORTAL_RETURN_URL?: string;
+  SCRIPTURE_TRANSLATION?: string;
   SOVV_INTERNAL_BASE_URL: string;
   SOVV_INTERNAL_AUTH_TOKEN: string;
   SESSION_SIGNING_SECRET: string;

@@ -24,9 +24,31 @@ app.use('*', async (context, next) => {
   context.res = withSecurityHeaders(context.res);
 });
 
-app.get('/healthz', async (context) => {
-  const db = await context.env.DB.prepare('SELECT 1 AS ok').first<{ ok: number }>();
-  return context.json({ ok: db?.ok === 1, version: context.env.APP_VERSION, environment: context.env.APP_ENV, dependencies: { d1: db?.ok === 1 ? 'ok' : 'degraded', ai: aiDependencyStatus(context.env), sovv: context.env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'missing', stripe: context.env.STRIPE_SECRET_KEY && context.env.STRIPE_WEBHOOK_SECRET ? 'configured' : 'missing' } });
+async function healthPayload(env: Env) {
+  const db = await env.DB.prepare('SELECT 1 AS ok').first<{ ok: number }>();
+  return {
+    ok: db?.ok === 1,
+    version: env.APP_VERSION,
+    environment: env.APP_ENV,
+    migrationVersion: '0003_product_completion',
+    dependencies: {
+      d1: db?.ok === 1 ? 'ok' : 'degraded',
+      durableObjects: env.THREADS ? 'configured' : 'missing',
+      assets: env.ASSETS ? 'configured' : 'missing',
+      ai: aiDependencyStatus(env),
+      aiGateway: env.AI_GATEWAY_ID ? 'configured' : 'missing',
+      sovv: env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'missing',
+      stripe: env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET ? 'configured' : 'fixture-or-disabled',
+      scripture: env.SCRIPTURE_TRANSLATION || 'WEB'
+    }
+  };
+}
+
+app.get('/healthz', async (context) => context.json(await healthPayload(context.env)));
+app.get('/health', async (context) => context.json(await healthPayload(context.env)));
+app.get('/ready', async (context) => {
+  const payload = await healthPayload(context.env);
+  return context.json({ ...payload, ready: payload.ok && payload.dependencies.durableObjects === 'configured' && payload.dependencies.ai !== 'missing' });
 });
 
 function aiDependencyStatus(env: Env): 'configured' | 'degraded' | 'missing' {
