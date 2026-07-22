@@ -82,9 +82,9 @@ async function main() {
   const deletion = (await json('/api/v1/deletion-jobs', { method: 'POST' }, 202)).deletionJob;
   await json(`/api/v1/deletion-jobs/${deletion.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'cancel' }) });
   await json('/api/v1/billing/entitlements');
-  await json('/api/v1/billing/stripe-fixture-event', { method: 'POST', body: JSON.stringify({ id: `evt_preview_${Date.now()}`, priceId: 'price_test_premium' }) });
+  await json('/api/v1/billing/stripe-test-event', { method: 'POST', body: JSON.stringify({ id: `evt_preview_${Date.now()}`, priceId: 'price_test_premium' }) });
   const checkout = await json('/api/v1/billing/checkout', { method: 'POST', body: JSON.stringify({ plan: 'standard', idempotencyKey: `preview-${Date.now()}` }) }, 201);
-  if (checkout.checkout?.url?.includes('billing.test')) console.log('Billing fixture mode verified; real Stripe Checkout remains pending unless Stripe test secrets are configured.');
+  if (checkout.checkout?.url?.includes('test-billing.invalid')) console.log('Billing test mode verified; real Stripe Checkout is used when Stripe test secrets are configured.');
 
   const defaultCovenant = await json('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: false }) });
   if (defaultCovenant.covenantEnabled !== false) throw new Error('Covenant must be disabled by default');
@@ -111,7 +111,7 @@ async function main() {
   if (!JSON.stringify(await duplicate.json()).includes('duplicate')) throw new Error('duplicate turn was not reported');
   await json('/api/v1/threads/preview-live/corrections', { method: 'POST', body: JSON.stringify({ correction: 'partly' }) });
 
-  console.log(`Preview smoke passed base=${origin} static=true health=true stream_chunks=${chunks} covenant=fixture-or-configured billing=fixture-or-test`);
+  console.log(`Preview smoke passed base=${origin} static=true health=true stream_chunks=${chunks} covenant=configured-or-test billing=stripe-or-test`);
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1); });

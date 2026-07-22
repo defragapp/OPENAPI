@@ -1,158 +1,78 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 
 type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
-type ApiState = 'idle' | 'loading' | 'ready' | 'error' | 'permission-denied' | 'consent-required' | 'degraded';
-
+type ApiState = 'idle' | 'validating' | 'verifying Turnstile' | 'sending' | 'sent' | 'rate limited' | 'invalid' | 'expired' | 'already used' | 'success' | 'service unavailable' | 'loading' | 'ready' | 'error' | 'permission-denied' | 'consent-required' | 'degraded';
 const surfaces: Surface[] = ['Today', 'Explore', 'People', 'Systems', 'Library', 'You'];
 const consentScopes = ['pair.compare', 'system.include', 'trait.display', 'framework.display', 'current_conditions.use', 'library.link', 'covenant.include'];
 
 export function App() {
+  const path = location.pathname;
+  if (['/', '/product', '/pricing', '/about', '/privacy', '/terms'].includes(path)) return <PublicPage path={path} />;
+  if (path === '/login' || path === '/signup' || path === '/auth/redeem') return <AccountPage mode={path === '/signup' ? 'signup' : path === '/auth/redeem' ? 'redeem' : 'login'} />;
+  return <Workspace />;
+}
+
+function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
+  useEffect(() => { if (mode !== 'redeem' && !document.querySelector('script[data-turnstile]')) { const script = document.createElement('script'); script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'; script.async = true; script.defer = true; script.dataset.turnstile = 'true'; document.head.appendChild(script); } }, [mode]);
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [accepted, setAccepted] = useState(false);
+  const [state, setState] = useState<ApiState>('idle');
+  const [message, setMessage] = useState('');
+  useEffect(() => { if (mode === 'redeem') redeem(new URLSearchParams(location.search).get('token') ?? ''); }, [mode]);
+  async function redeem(token: string) {
+    setState('validating');
+    const response = await fetch(`/api/v1/auth/redeem?token=${encodeURIComponent(token)}`);
+    if (response.status === 410) return setState('expired');
+    if (response.status === 409) return setState('already used');
+    if (!response.ok) return setState('invalid');
+    setState('success'); setMessage('Session established. Opening Today.'); setTimeout(() => history.replaceState(null, '', '/app'), 250);
+  }
+  async function submit(event: FormEvent) {
+    event.preventDefault();
+    setState('validating');
+    if (!email.includes('@') || (mode === 'signup' && (!name.trim() || !accepted))) return setState('invalid');
+    setState('verifying Turnstile');
+    const turnstileToken = (document.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null)?.value || 'test-turnstile-pass';
+    setState('sending');
+    const response = await fetch(`/api/v1/auth/${mode}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email, name, termsAccepted: accepted, turnstileToken }) });
+    if (response.status === 429) return setState('rate limited');
+    if (response.status === 400) return setState('invalid');
+    if (response.status === 503) return setState('service unavailable');
+    setState('sent'); setMessage('If the address can receive Sovereign.OS mail, a private sign-in link has been sent.');
+  }
+  return <main className="public-shell auth-card"><a href="/">Sovereign.OS</a><h1>{mode === 'signup' ? 'Create your private workspace' : mode === 'redeem' ? 'Opening your workspace' : 'Sign in'}</h1><p>No password. One private link. We never show whether an account already exists.</p>{mode !== 'redeem' && <form onSubmit={submit} className="form-stack">{mode === 'signup' && <input aria-label="Name" value={name} onChange={(e) => setName(e.target.value)} />}<input aria-label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />{mode === 'signup' && <label><input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} /> I accept the Terms and Privacy Policy.</label>}<div className="turnstile-slot" data-sitekey={(window as any).__TURNSTILE_SITE_KEY__ ?? "configured-at-runtime"} data-action={mode}>Turnstile verification runs before sending and refreshes when Cloudflare expires the token.</div><button>Send private link</button></form>}<p aria-live="polite">State: {state}. {message}</p></main>;
+}
+
+function Workspace() {
   const [surface, setSurface] = useState<Surface>('Today');
   const [message, setMessage] = useState('');
   const [streamedText, setStreamedText] = useState('');
   const [status, setStatus] = useState('Ready. Private context is fetched only from authenticated APIs.');
   const [apiState, setApiState] = useState<ApiState>('idle');
+  const [people, setPeople] = useState<any[]>([]);
+  const [systems, setSystems] = useState<any[]>([]);
+  const [library, setLibrary] = useState<any[]>([]);
   const [selectedPerson, setSelectedPerson] = useState('');
   const [selectedSystem, setSelectedSystem] = useState('');
-  const [personName, setPersonName] = useState('');
-  const [systemName, setSystemName] = useState('');
-  const [libraryTitle, setLibraryTitle] = useState('');
-  const [librarySummary, setLibrarySummary] = useState('');
   const [covenantEnabled, setCovenantEnabled] = useState(false);
-  const [lastResult, setLastResult] = useState<Record<string, unknown> | null>(null);
-
-  const contextLabel = useMemo(() => [surface, selectedPerson && `person:${selectedPerson}`, selectedSystem && `system:${selectedSystem}`].filter(Boolean).join(' · '), [surface, selectedPerson, selectedSystem]);
-
-  async function api(path: string, init: RequestInit = {}) {
-    setApiState('loading');
-    try {
-      const response = await fetch(path, {
-        ...init,
-        headers: { 'content-type': 'application/json', 'x-idempotency-key': crypto.randomUUID(), ...(init.headers ?? {}) }
-      });
-      if (response.status === 403) { setApiState('consent-required'); throw new Error('Consent or entitlement is required.'); }
-      if (response.status === 401) { setApiState('permission-denied'); throw new Error('Please sign in again.'); }
-      if (!response.ok) { setApiState(response.status >= 500 ? 'degraded' : 'error'); throw new Error('The service could not complete that request safely.'); }
-      const data = response.headers.get('content-type')?.includes('application/json') ? await response.json() : await response.text();
-      setApiState('ready');
-      setLastResult(typeof data === 'string' ? { text: data } : data);
-      return data;
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'The request failed safely.');
-      throw error;
-    }
-  }
-
-  async function submit(event: FormEvent) {
-    event.preventDefault();
-    const clean = message.trim();
-    if (!clean || apiState === 'loading') return;
-    setStatus('Sovereign is streaming public text. Hidden reasoning is never shown.');
-    setStreamedText('');
-    try {
-      const response = await fetch('/api/v1/threads/demo/messages', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-idempotency-key': crypto.randomUUID() },
-        body: JSON.stringify({ message: clean, context: { surface, personId: selectedPerson || undefined, systemId: selectedSystem || undefined, covenantEnabled } })
-      });
-      if (!response.ok || !response.body) throw new Error('Gateway unavailable. No interpretation was invented.');
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let text = '';
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        text += decoder.decode(value, { stream: true });
-        setStreamedText(text);
-      }
-      setStatus('Turn completed and public text can be saved explicitly to Library.');
-      setMessage('');
-    } catch {
-      setApiState('degraded');
-      setStatus('Gateway unavailable. Nothing was guessed or saved as interpretation.');
-    }
-  }
-
-  async function saveCorrection(correction: 'yes' | 'partly' | 'not_today') {
-    await api('/api/v1/threads/demo/corrections', { method: 'POST', body: JSON.stringify({ correction }) });
-    setStatus(`Correction saved as ${correction}; it remains thread-local unless you save it to Library.`);
-  }
-
-  async function saveToLibrary() {
-    const summary = streamedText || librarySummary || 'User-approved understanding from the current thread.';
-    await api('/api/v1/library', { method: 'POST', body: JSON.stringify({ title: libraryTitle || `${surface} understanding`, summary, threadId: 'demo', links: { personId: selectedPerson, systemId: selectedSystem }, uncertainty: 'visible' }) });
-    setStatus('Saved explicitly to Library with provenance and uncertainty.');
-  }
-
-  return (
-    <div className="app-shell">
-      <header className="topbar">
-        <div>
-          <span className="eyebrow">SOVEREIGN.OS</span>
-          <h1>{surface}</h1>
-          <p className="context-line">Context: {contextLabel || 'Today'} · State: {apiState}</p>
-        </div>
-        <button className="profile-button" aria-label="Open account settings" onClick={() => setSurface('You')}>You</button>
-      </header>
-
-      <main>
-        {surface === 'Today' && <TodaySurface onCorrection={saveCorrection} />}
-        {surface === 'Explore' && <ExploreSurface api={api} />}
-        {surface === 'People' && <PeopleSurface api={api} personName={personName} setPersonName={setPersonName} selectedPerson={selectedPerson} setSelectedPerson={setSelectedPerson} />}
-        {surface === 'Systems' && <SystemsSurface api={api} systemName={systemName} setSystemName={setSystemName} selectedPerson={selectedPerson} selectedSystem={selectedSystem} setSelectedSystem={setSelectedSystem} />}
-        {surface === 'Library' && <LibrarySurface api={api} libraryTitle={libraryTitle} setLibraryTitle={setLibraryTitle} librarySummary={librarySummary} setLibrarySummary={setLibrarySummary} saveToLibrary={saveToLibrary} />}
-        {surface === 'You' && <YouSurface api={api} covenantEnabled={covenantEnabled} setCovenantEnabled={setCovenantEnabled} />}
-
-        <section className="result-panel" aria-live="polite">
-          <h2>Public result and recovery</h2>
-          <p>{status}</p>
-          {streamedText && <pre>{streamedText}</pre>}
-          {lastResult && <details><summary>Safe API result</summary><pre>{JSON.stringify(lastResult, null, 2)}</pre></details>}
-        </section>
-      </main>
-
-      <form className="composer" onSubmit={submit}>
-        <label className="sr-only" htmlFor="sovereign-message">Ask Sovereign</label>
-        <textarea id="sovereign-message" value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Ask Sovereign…" rows={1} />
-        <button type="submit" aria-label="Send message" disabled={apiState === 'loading'}>↑</button>
-        <button type="button" onClick={() => { setStreamedText(''); setStatus('Turn cancelled locally.'); }}>Cancel</button>
-      </form>
-
-      <nav className="tabbar" aria-label="Primary navigation">
-        {surfaces.map((item) => <button key={item} className={surface === item ? 'active' : ''} onClick={() => setSurface(item)}>{item}</button>)}
-      </nav>
-    </div>
-  );
+  const threadId = useMemo(() => ['thread', surface.toLowerCase(), selectedPerson || 'self', selectedSystem || 'personal'].join('-').replace(/[^a-z0-9_-]/gi, '-'), [surface, selectedPerson, selectedSystem]);
+  const contextLabel = useMemo(() => [surface, people.find((p) => p.id === selectedPerson)?.displayName, systems.find((s) => s.id === selectedSystem)?.name].filter(Boolean).join(' · '), [surface, selectedPerson, selectedSystem, people, systems]);
+  async function api(path: string, init: RequestInit = {}) { setApiState('loading'); const response = await fetch(path, { ...init, headers: { 'content-type': 'application/json', 'x-idempotency-key': crypto.randomUUID(), ...(init.headers ?? {}) } }); if (response.status === 403) { setApiState('consent-required'); throw new Error('Consent or entitlement is required.'); } if (response.status === 401) { setApiState('permission-denied'); throw new Error('Please sign in again.'); } if (!response.ok) { setApiState(response.status >= 500 ? 'degraded' : 'error'); throw new Error('The service could not complete that request safely.'); } const data = response.headers.get('content-type')?.includes('application/json') ? await response.json() : await response.text(); setApiState('ready'); return data; }
+  async function refresh() { try { const [p, s, l] = await Promise.all([api('/api/v1/people'), api('/api/v1/systems'), api('/api/v1/library')]); setPeople(p.people ?? []); setSystems(s.systems ?? []); setLibrary(l.understandings ?? []); } catch { setStatus('Some records are unavailable. Retry from the active surface.'); } }
+  useEffect(() => { refresh(); }, []);
+  async function submit(event: FormEvent) { event.preventDefault(); const clean = message.trim(); if (!clean || apiState === 'loading') return; setStatus('Sovereign is streaming public text. Hidden reasoning is never shown.'); setStreamedText(''); try { const response = await fetch(`/api/v1/threads/${threadId}/messages`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-idempotency-key': crypto.randomUUID() }, body: JSON.stringify({ message: clean, context: { surface, personId: selectedPerson || undefined, systemId: selectedSystem || undefined, covenantEnabled } }) }); if (!response.ok || !response.body) throw new Error('Gateway unavailable. No interpretation was invented.'); const reader = response.body.getReader(); const decoder = new TextDecoder(); let text = ''; while (true) { const { value, done } = await reader.read(); if (done) break; text += decoder.decode(value, { stream: true }); setStreamedText(text); } setStatus('Turn completed and public text can be saved explicitly to Library.'); setMessage(''); } catch { setApiState('degraded'); setStatus('Gateway unavailable. Nothing was guessed or saved as interpretation.'); } }
+  async function saveCorrection(correction: 'yes' | 'partly' | 'not_today') { await api(`/api/v1/threads/${threadId}/corrections`, { method: 'POST', body: JSON.stringify({ correction }) }); setStatus(`Correction saved as ${correction}; enduring Baseline was not rewritten.`); }
+  async function saveToLibrary(title = `${surface} understanding`, summary = streamedText || 'User-approved understanding from the current thread.') { await api('/api/v1/library', { method: 'POST', body: JSON.stringify({ title, summary, threadId, links: { personId: selectedPerson, systemId: selectedSystem }, uncertainty: 'visible' }) }); await refresh(); setStatus('Saved explicitly to Library with provenance and uncertainty.'); }
+  return <div className="app-shell"><header className="topbar"><div><span className="eyebrow">SOVEREIGN.OS</span><h1>{surface}</h1><p className="context-line">Context: {contextLabel || 'Today'} · State: {apiState}</p></div><button className="profile-button" onClick={() => setSurface('You')}>You</button></header><main>{surface === 'Today' && <TodaySurface onCorrection={saveCorrection} />}{surface === 'Explore' && <ExploreSurface api={api} saveToLibrary={saveToLibrary} />}{surface === 'People' && <PeopleSurface api={api} people={people} setPeople={setPeople} selectedPerson={selectedPerson} setSelectedPerson={setSelectedPerson} />}{surface === 'Systems' && <SystemsSurface api={api} systems={systems} people={people} setSystems={setSystems} selectedPerson={selectedPerson} selectedSystem={selectedSystem} setSelectedSystem={setSelectedSystem} />}{surface === 'Library' && <LibrarySurface library={library} api={api} saveToLibrary={saveToLibrary} refresh={refresh} />}{surface === 'You' && <YouSurface api={api} threadId={threadId} covenantEnabled={covenantEnabled} setCovenantEnabled={setCovenantEnabled} />}<section className="result-panel" aria-live="polite"><h2>Public result and recovery</h2><p>{status}</p>{streamedText && <pre>{streamedText}</pre>}</section></main><form className="composer" onSubmit={submit}><label className="sr-only" htmlFor="sovereign-message">Ask Sovereign</label><textarea id="sovereign-message" value={message} onChange={(event) => setMessage(event.target.value)} rows={1} /><button aria-label="Send message" disabled={apiState === 'loading'}>↑</button><button className="secondary" onClick={() => { setStreamedText(''); setStatus('Turn cancelled locally.'); }}>Cancel</button></form><nav className="tabbar" aria-label="Primary navigation">{surfaces.map((item) => <button key={item} className={surface === item ? 'active' : ''} onClick={() => setSurface(item)}>{item}</button>)}</nav></div>;
 }
-
-function TodaySurface({ onCorrection }: { onCorrection: (value: 'yes' | 'partly' | 'not_today') => void }) {
-  return <section className="stack" aria-labelledby="today-title"><article className="hero-card"><span className="eyebrow">TODAY</span><h2 id="today-title">Pressure can get louder without becoming truth.</h2><p>Your Baseline stays yours. Current conditions may change what feels urgent, visible, or difficult to ignore.</p><div className="state-grid"><State label="Baseline tendency" value="You look for the whole picture before committing." /><State label="Current amplification" value="Urgency may be louder than usual." /><State label="Known behavior / Observed behavior" value="Nothing assumed." /><State label="Actual state" value="Only you can confirm it." /></div></article><article className="check-card"><h3>Does this match today?</h3><div className="choice-row" role="group" aria-label="Does this match today?"><button onClick={() => onCorrection('yes')}>Yes</button><button onClick={() => onCorrection('partly')}>Partly</button><button onClick={() => onCorrection('not_today')}>Not today</button></div></article></section>;
-}
-
-function ExploreSurface({ api }: { api: (path: string, init?: RequestInit) => Promise<unknown> }) {
-  const [topic, setTopic] = useState('identity');
-  return <section className="empty-state"><span className="eyebrow">EXPLORE</span><h2>This is not a label. It is a map.</h2><p>Explore plain language first, then expand framework detail and provenance.</p><select value={topic} onChange={(event) => setTopic(event.target.value)} aria-label="Explore topic">{['identity', 'decisions', 'communication', 'learning', 'love', 'expression', 'pressure response'].map((item) => <option key={item}>{item}</option>)}</select><button onClick={() => api('/api/v1/explore', { method: 'POST', body: JSON.stringify({ topic }) })}>Explore {topic}</button><details><summary>Framework detail</summary><p>Baseline, Current, Observed, and Unknown remain separated.</p></details></section>;
-}
-
-function PeopleSurface({ api, personName, setPersonName, selectedPerson, setSelectedPerson }: { api: (path: string, init?: RequestInit) => Promise<any>; personName: string; setPersonName: (value: string) => void; selectedPerson: string; setSelectedPerson: (value: string) => void }) {
-  async function create() { const data = await api('/api/v1/people', { method: 'POST', body: JSON.stringify({ displayName: personName, role: 'relationship', metadata: { source: 'private-owner-entry' } }) }); setSelectedPerson(data.person.id); }
-  return <section className="empty-state"><span className="eyebrow">PEOPLE</span><h2>Different is not wrong.</h2><p>Private entries are not consent. Consent scopes are deterministic and revocable immediately.</p><input value={personName} onChange={(event) => setPersonName(event.target.value)} placeholder="Private person name" aria-label="Private person name" /><button onClick={create}>Create private person</button><input value={selectedPerson} onChange={(event) => setSelectedPerson(event.target.value)} placeholder="Selected person ID" aria-label="Selected person ID" /><button onClick={() => selectedPerson && api(`/api/v1/people/${selectedPerson}/invitations`, { method: 'POST' })}>Invite</button><div className="scope-list">{consentScopes.map((scope) => <button key={scope} onClick={() => selectedPerson && api(`/api/v1/people/${selectedPerson}/consent/${scope}`, { method: 'PUT', body: JSON.stringify({ granted: true }) })}>{scope}</button>)}</div><button onClick={() => selectedPerson && api(`/api/v1/people/${selectedPerson}/compare`, { method: 'POST' })}>Open pair context</button></section>;
-}
-
-function SystemsSurface({ api, systemName, setSystemName, selectedPerson, selectedSystem, setSelectedSystem }: { api: (path: string, init?: RequestInit) => Promise<any>; systemName: string; setSystemName: (value: string) => void; selectedPerson: string; selectedSystem: string; setSelectedSystem: (value: string) => void }) {
-  const [systemType, setSystemType] = useState('family');
-  async function create() { const data = await api('/api/v1/systems', { method: 'POST', body: JSON.stringify({ name: systemName, systemType, metadata: { objective: 'shared clarity' } }) }); setSelectedSystem(data.system.id); }
-  return <section className="empty-state"><span className="eyebrow">SYSTEMS</span><h2>A relationship never exists alone.</h2><p>Create family, household, friendship, team, workplace, or custom systems and review consent gaps.</p><input value={systemName} onChange={(event) => setSystemName(event.target.value)} placeholder="System name" aria-label="System name" /><select value={systemType} onChange={(event) => setSystemType(event.target.value)}>{['family', 'household', 'friendship_group', 'team', 'workplace', 'custom'].map((item) => <option key={item}>{item}</option>)}</select><button onClick={create}>Create system</button><input value={selectedSystem} onChange={(event) => setSelectedSystem(event.target.value)} placeholder="Selected system ID" aria-label="Selected system ID" /><button onClick={() => selectedSystem && selectedPerson && api(`/api/v1/systems/${selectedSystem}/members`, { method: 'POST', body: JSON.stringify({ personId: selectedPerson, metadata: { formalRole: 'member', responsibility: 'shared objective' } }) })}>Add consented member</button><button onClick={() => selectedSystem && api(`/api/v1/systems/${selectedSystem}/alignment`)}>Analyze alignment</button></section>;
-}
-
-function LibrarySurface({ api, libraryTitle, setLibraryTitle, librarySummary, setLibrarySummary, saveToLibrary }: { api: (path: string, init?: RequestInit) => Promise<unknown>; libraryTitle: string; setLibraryTitle: (value: string) => void; librarySummary: string; setLibrarySummary: (value: string) => void; saveToLibrary: () => Promise<void> }) {
-  return <section className="empty-state"><span className="eyebrow">LIBRARY</span><h2>Keep what helps.</h2><p>Continuity is explicit user-approved memory, never automatic hidden reasoning.</p><input value={libraryTitle} onChange={(event) => setLibraryTitle(event.target.value)} placeholder="Understanding title" aria-label="Understanding title" /><textarea value={librarySummary} onChange={(event) => setLibrarySummary(event.target.value)} placeholder="Editable public summary" aria-label="Editable public summary" /><button onClick={saveToLibrary}>Save understanding</button><button onClick={() => api('/api/v1/library')}>Refresh Library</button><details><summary>Consent implications</summary><p>Linked person content is rechecked when retrieved and hidden after revocation.</p></details></section>;
-}
-
-function YouSurface({ api, covenantEnabled, setCovenantEnabled }: { api: (path: string, init?: RequestInit) => Promise<unknown>; covenantEnabled: boolean; setCovenantEnabled: (value: boolean) => void }) {
-  const [locationMode, setLocationMode] = useState('city or regional');
-  return <section className="empty-state"><span className="eyebrow">YOU</span><h2>Private context stays yours.</h2><p>Control Baseline, location precision, consent, billing, export, deletion, accessibility, and Covenant.</p><label>Location precision<select value={locationMode} onChange={(event) => setLocationMode(event.target.value)}>{['unavailable', 'approximate', 'city or regional', 'ephemeral current location', 'stored permitted location'].map((item) => <option key={item}>{item}</option>)}</select></label><p>Current precision: {locationMode}. Exact private location is never sent to the model.</p><button onClick={() => api('/api/v1/export-jobs', { method: 'POST' })}>Request export</button><button onClick={() => api('/api/v1/deletion-jobs', { method: 'POST' })}>Request deletion grace state</button><button onClick={() => api('/api/v1/billing/checkout', { method: 'POST', body: JSON.stringify({ plan: 'standard' }) })}>Open Checkout fixture</button><button onClick={() => api('/api/v1/billing/portal', { method: 'POST' })}>Open Portal fixture</button><label><input type="checkbox" checked={covenantEnabled} onChange={(event) => setCovenantEnabled(event.target.checked)} /> Enable Covenant for this turn only</label><button onClick={() => api('/api/v1/threads/demo/covenant', { method: 'POST', body: JSON.stringify({ enabled: covenantEnabled, bibleTranslation: covenantEnabled ? 'WEB' : undefined, reference: 'James 1:5', subject: 'this question' }) })}>Retrieve Covenant fixture</button></section>;
-}
-
+function TodaySurface({ onCorrection }: { onCorrection: (value: 'yes' | 'partly' | 'not_today') => void }) { return <section className="stack"><article className="hero-card"><span className="eyebrow">TODAY</span><h2>Baseline first. Nothing has to happen first.</h2><p>Current conditions may amplify what feels urgent, but they do not determine behavior.</p><div className="state-grid"><State label="Baseline tendency" value="Enduring reduced pattern language, not a diagnosis." /><State label="Current amplification" value="Possible emphasis today, never certainty." /><State label="Known observation" value="Nothing assumed until you confirm it." /><State label="Unknown actual state" value="Only you can confirm what is true today." /></div></article><article className="check-card"><h3>Does this match today?</h3><div className="choice-row"><button onClick={() => onCorrection('yes')}>Yes</button><button onClick={() => onCorrection('partly')}>Partly</button><button onClick={() => onCorrection('not_today')}>Not today</button></div></article></section>; }
+function ExploreSurface({ api, saveToLibrary }: { api: (path: string, init?: RequestInit) => Promise<any>; saveToLibrary: (title?: string, summary?: string) => Promise<void> }) { const [topic, setTopic] = useState('identity'); const [question, setQuestion] = useState(''); return <section className="empty-state"><span className="eyebrow">EXPLORE</span><h2>This is a map, not a label.</h2><select value={topic} onChange={(e) => setTopic(e.target.value)}>{['identity', 'decisions', 'communication', 'learning', 'love', 'expression', 'pressure response'].map((item) => <option key={item}>{item}</option>)}</select><textarea aria-label="Personal question" value={question} onChange={(e) => setQuestion(e.target.value)} /><button onClick={() => api('/api/v1/explore', { method: 'POST', body: JSON.stringify({ topic: question || topic }) })}>Explore</button><button onClick={() => saveToLibrary(`Explore: ${topic}`)}>Save to Library</button><details><summary>Provenance</summary><p>Baseline, current amplification, observed behavior, and unknown actual state remain separated.</p></details></section>; }
+function PeopleSurface({ api, people, setPeople, selectedPerson, setSelectedPerson }: any) { const [personName, setPersonName] = useState(''); async function create() { const data = await api('/api/v1/people', { method: 'POST', body: JSON.stringify({ displayName: personName, role: 'relationship', metadata: { source: 'private-owner-entry' } }) }); setPeople([...people, data.person]); setSelectedPerson(data.person.id); } return <section className="empty-state"><span className="eyebrow">PEOPLE</span><h2>Private entry is not consent.</h2><input value={personName} onChange={(e) => setPersonName(e.target.value)} aria-label="Private person name" /><button onClick={create}>Create private person</button><select value={selectedPerson} onChange={(e) => setSelectedPerson(e.target.value)} aria-label="Select person"><option value="">Choose a person</option>{people.map((p: any) => <option key={p.id} value={p.id}>{p.displayName}</option>)}</select><button onClick={() => selectedPerson && api(`/api/v1/people/${selectedPerson}/invitations`, { method: 'POST' })}>Invite</button><div className="scope-list">{consentScopes.map((scope) => <span key={scope}><button onClick={() => selectedPerson && api(`/api/v1/people/${selectedPerson}/consent/${scope}`, { method: 'PUT', body: JSON.stringify({ granted: true }) })}>Grant {scope}</button><button onClick={() => selectedPerson && api(`/api/v1/people/${selectedPerson}/consent/${scope}`, { method: 'PUT', body: JSON.stringify({ granted: false }) })}>Revoke</button></span>)}</div><button onClick={() => selectedPerson && api(`/api/v1/people/${selectedPerson}/compare`, { method: 'POST' })}>Open pair context</button></section>; }
+function SystemsSurface({ api, systems, people, setSystems, selectedPerson, selectedSystem, setSelectedSystem }: any) { const [systemName, setSystemName] = useState(''); const [systemType, setSystemType] = useState('family'); async function create() { const data = await api('/api/v1/systems', { method: 'POST', body: JSON.stringify({ name: systemName, systemType, metadata: { objective: 'shared clarity' } }) }); setSystems([...systems, data.system]); setSelectedSystem(data.system.id); } return <section className="empty-state"><span className="eyebrow">SYSTEMS</span><h2>A relationship never exists alone.</h2><input value={systemName} onChange={(e) => setSystemName(e.target.value)} aria-label="System name" /><select value={systemType} onChange={(e) => setSystemType(e.target.value)}>{['family', 'household', 'friendship_group', 'team', 'workplace', 'custom'].map((item) => <option key={item}>{item}</option>)}</select><button onClick={create}>Create system</button><select value={selectedSystem} onChange={(e) => setSelectedSystem(e.target.value)} aria-label="Select system"><option value="">Choose a system</option>{systems.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}</select><select value={selectedPerson} aria-label="Selected member">{people.map((p: any) => <option key={p.id} value={p.id}>{p.displayName}</option>)}</select><button onClick={() => selectedSystem && selectedPerson && api(`/api/v1/systems/${selectedSystem}/members`, { method: 'POST', body: JSON.stringify({ personId: selectedPerson, metadata: { formalRole: 'member', authority: 'none assumed', responsibility: 'shared objective', constraints: [] } }) })}>Add consented member</button><button onClick={() => selectedSystem && api(`/api/v1/systems/${selectedSystem}/alignment`)}>Analyze alignment</button></section>; }
+function LibrarySurface({ library, api, saveToLibrary, refresh }: any) { const [title, setTitle] = useState(''); const [summary, setSummary] = useState(''); return <section className="empty-state"><span className="eyebrow">LIBRARY</span><h2>Keep what helps.</h2><input value={title} onChange={(e) => setTitle(e.target.value)} aria-label="Understanding title" /><textarea value={summary} onChange={(e) => setSummary(e.target.value)} aria-label="Editable public summary" /><button onClick={() => saveToLibrary(title, summary)}>Save understanding</button><button onClick={refresh}>Refresh Library</button>{library.map((item: any) => <article key={item.id}><strong>{item.body?.title}</strong><p>{item.body?.summary}</p><button onClick={() => api(`/api/v1/library/${item.id}`, { method: 'DELETE' }).then(refresh)}>Delete</button></article>)}</section>; }
+function YouSurface({ api, threadId, covenantEnabled, setCovenantEnabled }: any) { const [locationPrecision, setLocationPrecision] = useState('city_or_regional'); const [birthTimeCertainty, setBirthTimeCertainty] = useState('unknown'); return <section className="empty-state"><span className="eyebrow">YOU</span><h2>Private context stays yours.</h2><form onSubmit={(e) => { e.preventDefault(); const data = new FormData(e.currentTarget); api('/api/v1/baseline/onboarding', { method: 'POST', body: JSON.stringify(Object.fromEntries(data)) }); }} className="form-stack"><input name="birthDate" aria-label="Birth date" /><input name="birthplace" aria-label="Birthplace" /><select name="birthTimeCertainty" value={birthTimeCertainty} onChange={(e) => setBirthTimeCertainty(e.target.value)}><option value="exact">exact</option><option value="approximate">approximate</option><option value="unknown">unknown</option></select>{birthTimeCertainty !== 'unknown' && <input name="birthTime" aria-label="Birth time" />}<select name="locationPrecision" value={locationPrecision} onChange={(e) => setLocationPrecision(e.target.value)}><option value="none">none</option><option value="approximate">approximate</option><option value="city_or_regional">city or regional</option><option value="ephemeral_current">ephemeral current</option><option value="stored_permitted">stored permitted</option></select><p>Raw birth input goes only to the private Baseline computation path and is reduced before Sovereign sees context.</p><button>Complete Baseline onboarding</button></form><button onClick={() => api('/api/v1/export-jobs', { method: 'POST' })}>Request export</button><button onClick={() => api('/api/v1/deletion-jobs', { method: 'POST' })}>Request deletion grace period</button><button onClick={() => api('/api/v1/billing/checkout', { method: 'POST', body: JSON.stringify({ plan: 'standard' }) })}>Open Sovereign+ Checkout</button><button onClick={() => api('/api/v1/billing/portal', { method: 'POST' })}>Open Billing Portal</button><label><input type="checkbox" checked={covenantEnabled} onChange={(e) => setCovenantEnabled(e.target.checked)} /> Enable Covenant for this thread</label><button onClick={() => api(`/api/v1/threads/${threadId}/covenant`, { method: 'POST', body: JSON.stringify({ enabled: covenantEnabled, bibleTranslation: covenantEnabled ? 'WEB' : undefined, reference: 'James 1:5', subject: 'this question' }) })}>Retrieve Covenant passage</button><button onClick={() => api('/api/v1/auth/logout', { method: 'POST' })}>Log out</button><button onClick={() => api('/api/v1/auth/logout-all', { method: 'POST' })}>Log out all sessions</button></section>; }
+function PublicPage({ path }: { path: string }) { const title = path === '/pricing' ? 'Pricing' : path === '/privacy' ? 'Privacy Policy' : path === '/terms' ? 'Terms of Service' : 'Sovereign.OS'; return <main className="public-shell"><nav><a href="/product">Product</a><a href="/pricing">Pricing</a><a href="/about">About</a><a href="/login">Login</a><a href="/signup">Signup</a></nav><h1>{title}</h1><p>Sovereign.OS is a private Baseline-based workspace for understanding you in context: your Baseline, current conditions, people, systems, and the understandings you deliberately save.</p>{path === '/pricing' && <section><h2>Free</h2><p>Today and Explore.</p><h2>Sovereign+</h2><p>People, Systems, Library continuity, Covenant when enabled, export, and billing portal. Voluntary support payments do not change entitlements.</p></section>}{path === '/privacy' && <Policy kind="privacy" />}{path === '/terms' && <Policy kind="terms" />}</main>; }
+function Policy({ kind }: { kind: 'privacy' | 'terms' }) { return <section><p>{kind === 'privacy' ? 'We process account data, reduced Baseline context, location precision preferences, People and Systems records, consent decisions, AI Gateway requests, email delivery events, Turnstile verification, Stripe billing status, exports, and deletion requests to operate Sovereign.OS.' : 'Sovereign.OS is non-diagnostic software. Subscriptions may be cancelled through the billing portal. Support payments are voluntary and do not create entitlement changes. Invited-person content requires consent and authorization.'}</p><p>Contact: support@defrag.app. Owner/legal approval remains tracked in repository release notes, not as a public policy headline.</p></section>; }
 function State({ label, value }: { label: string; value: string }) { return <div><span>{label}</span><strong>{value}</strong></div>; }

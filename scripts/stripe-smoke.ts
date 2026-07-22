@@ -10,16 +10,16 @@ function fakeEnv(): Env {
 async function main() {
   const env = fakeEnv();
   const checkout = await createCheckoutSession(env, 'acct_stripe_smoke', 'premium', 'smoke-1');
-  const portal = await createPortalSession('acct_stripe_smoke');
+  const portal = await createPortalSession(env, 'acct_stripe_smoke');
   const event = normalizeStripeFixtureEvent(env, { id: 'evt_smoke_1', type: 'customer.subscription.updated', accountId: 'acct_stripe_smoke', priceId: 'price_test_premium', status: 'active' });
   const projection = await projectSubscriptionEvent(env, event);
-  if (!checkout.url.startsWith('https://billing.test/checkout/')) throw new Error('checkout fixture URL missing');
-  if (!portal.url.startsWith('https://billing.test/portal/')) throw new Error('portal fixture URL missing');
+  if (!checkout.url.startsWith('https://test-billing.invalid/checkout/')) throw new Error('checkout test URL missing');
+  if (!portal.url.startsWith('https://test-billing.invalid/portal/')) throw new Error('portal test URL missing');
   if (projection.plan !== 'premium' || projection.features['covenant.lens'] !== true) throw new Error('premium entitlement projection failed');
   let unknownRejected = false;
   try { priceToPlan(env, 'price_unknown'); } catch { unknownRejected = true; }
   if (!unknownRejected) throw new Error('unknown price was not rejected');
-  console.log(`Stripe smoke passed plan=${projection.plan} checkout_fixture=true portal_fixture=true features=${Object.keys(projection.features).length}`);
+  console.log(`Stripe smoke passed plan=${projection.plan} checkout_test=true portal_test=true features=${Object.keys(projection.features).length}`);
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1); });
