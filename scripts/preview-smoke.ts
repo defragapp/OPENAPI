@@ -61,7 +61,7 @@ async function main() {
 
   const person = (await json('/api/v1/people', { method: 'POST', body: JSON.stringify({ displayName: 'Preview Avery', role: 'friend', metadata: { source: 'preview-smoke' } }) }, 201)).person;
   await json(`/api/v1/people/${person.id}/invitations`, { method: 'POST' }, 201);
-  for (const scope of ['pair.compare', 'trait.display', 'system.include']) await json(`/api/v1/people/${person.id}/consent/${scope}`, { method: 'PUT', body: JSON.stringify({ granted: true }) });
+  for (const scope of ['pair.compare', 'trait.display', 'system.include', 'library.link']) await json(`/api/v1/people/${person.id}/consent/${scope}`, { method: 'PUT', body: JSON.stringify({ granted: true }) });
   await json(`/api/v1/people/${person.id}/compare`, { method: 'POST' });
   await json(`/api/v1/people/${person.id}/consent/pair.compare`, { method: 'PUT', body: JSON.stringify({ granted: false }) });
   await request(`/api/v1/people/${person.id}/compare`, { method: 'POST' }, 403);
@@ -92,7 +92,7 @@ async function main() {
   if (defaultCovenant.covenantEnabled !== false) throw new Error('Covenant must be disabled by default');
   const covenant = await json('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'preview decision' }) });
   if (!covenant.scriptureSeparateFromInterpretation || !covenant.lens?.passage?.citation) throw new Error('Covenant citation separation failed');
-  await request('/api/v1/covenant/scripture/Imaginary%201:1', {}, 404);
+  await request('/api/v1/threads/preview-covenant/covenant/scripture/Imaginary%201:1', {}, 404);
 
   const turnKey = `preview-turn-${Date.now()}`;
   const messageRes = await request('/api/v1/threads/preview-live/messages', { method: 'POST', headers: { 'x-idempotency-key': turnKey }, body: JSON.stringify({ message: 'Show me Today without requiring an incident.', context: { surface: 'Today' } }) }, 202);

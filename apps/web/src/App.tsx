@@ -9,8 +9,8 @@ const consentScopes = ['pair.compare', 'system.include', 'trait.display', 'frame
 
 export function App() {
   const path = typeof window === 'undefined' ? '/app' : window.location.pathname;
-  const publicRoutes = ['/', '/product', '/studio', '/pricing', '/about', '/onboarding', '/login', '/signup', '/privacy', '/terms'];
-  if (publicRoutes.includes(path)) return <PublicSite path={path} />;
+  const publicRoutes = ['/onboarding', '/login', '/signup', '/privacy', '/terms'];
+  if (publicRoutes.includes(path)) return <AccountAccessPage path={path} />;
   const [surface, setSurface] = useState<Surface>('Today');
   const [message, setMessage] = useState('');
   const [streamedText, setStreamedText] = useState('');
@@ -159,37 +159,13 @@ function YouSurface({ api, covenantEnabled, setCovenantEnabled }: { api: (path: 
 }
 
 
-function PublicSite({ path }: { path: string }) {
-  const supportConfigured = false;
-  return (
-    <div className="public-shell">
-      <header className="public-nav">
-        <a href="/" aria-label="Sovereign.OS home">Sovereign.OS</a>
-        <nav aria-label="Public navigation"><a href="/product">Product</a><a href="/pricing">Pricing</a><a href="/about">About</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav>
-        <a className="pill" href="/signup">Create a free account</a>
-      </header>
-      <main className="public-main">
-        {path === '/privacy' ? <LegalPage kind="privacy" /> : path === '/terms' ? <LegalPage kind="terms" /> : path === '/login' || path === '/signup' || path === '/onboarding' ? <AuthPublicPage mode={path.slice(1)} /> : path === '/pricing' ? <PricingPage /> : path === '/about' ? <AboutPage /> : <HomePage />}
-      </main>
-      <footer className="public-footer"><p>No selling personal data. Stripe-hosted billing. Support payments are voluntary and do not grant entitlements.</p>{supportConfigured ? <a href="https://support.example.invalid" rel="noreferrer" target="_blank">Support the work<span className="sr-only"> (opens Stripe in a new tab)</span></a> : <span>Support the work can be enabled with STRIPE_SUPPORT_URL.</span>}</footer>
-    </div>
-  );
-}
 
-function HomePage() {
-  return <><section className="public-hero"><span className="eyebrow">ONE PRIVATE AI APPLICATION</span><h1>Live a life you’d choose to watch again.</h1><p>Sovereign helps you understand your Baseline, what may be more active today, and how you relate to the people and systems around you.</p><div className="choice-row"><a className="button-link" href="/signup">Create a free account</a><a className="button-link secondary" href="/product">See how it works</a></div></section><section className="demo-grid" aria-label="Product demonstrations"><article><h2>Today</h2><p>Baseline tendency, current amplification, unknown actual state, and a simple Yes / Partly / Not today correction.</p></article><article><h2>Explore</h2><p>How I make decisions, how I communicate, how I learn, and what becomes stronger under pressure.</p></article><article><h2>People</h2><p>Consent-aware pair comparison with two plausible perspectives and no hidden-motive claims.</p></article><article><h2>Systems</h2><p>Family and team examples show roles, authority, handoffs, responsibilities, constraints, and shared objective.</p></article><article><h2>Library</h2><p>Explicitly save an understanding when you approve it. Conversations are not silently made permanent.</p></article></section></>;
-}
-
-function PricingPage() {
-  return <section className="demo-grid pricing"><article><span className="eyebrow">FREE</span><h1>Free</h1><p>A useful personal starting point: account, Baseline, Today, limited Explore, limited Sovereign turns, personal corrections, a small Library, privacy controls, export summary, and deletion controls.</p><a className="button-link" href="/signup">Start free</a></article><article><span className="eyebrow">UPGRADE</span><h1>Sovereign+</h1><p>The full relationship, system, continuity, Covenant, full export, and expanded current-condition exploration experience. Price is configured in Stripe.</p><a className="button-link" href="/signup">Choose Sovereign+</a></article></section>;
-}
-
-function AboutPage() {
-  return <section className="public-hero"><span className="eyebrow">WHY SOVEREIGN EXISTS</span><h1>Clarity without diagnosis.</h1><p>People often lose clarity when pressure, roles, history, and interpretation become mixed together. Sovereign separates those signals without diagnosing anyone or claiming hidden certainty.</p></section>;
+function AccountAccessPage({ path }: { path: string }) {
+  return <div className="app-shell"><main>{path === '/privacy' ? <LegalPage kind="privacy" /> : path === '/terms' ? <LegalPage kind="terms" /> : <AuthPublicPage mode={path.slice(1)} />}</main></div>;
 }
 
 function AuthPublicPage({ mode }: { mode: string }) {
-  return <section className="public-hero"><span className="eyebrow">PASSWORDLESS ACCOUNT</span><h1>{mode === 'login' ? 'Sign in by email.' : mode === 'onboarding' ? 'Begin Baseline onboarding.' : 'Create a private free account.'}</h1><p>Email verification, Turnstile protection, secure signed sessions, and Baseline onboarding are handled by the Cloudflare Worker. No payment is required to begin.</p><form className="auth-form"><input aria-label="Name" placeholder="Name" /><input aria-label="Email" placeholder="Email" type="email" /><label><input type="checkbox" /> I accept the Terms and Privacy Policy.</label><button type="button">Send magic link</button></form></section>;
+  return <section className="empty-state"><span className="eyebrow">PASSWORDLESS ACCOUNT</span><h1>{mode === 'login' ? 'Sign in by email.' : mode === 'onboarding' ? 'Begin Baseline onboarding.' : 'Create a private account.'}</h1><p>Email verification, Turnstile protection, secure signed sessions, and Baseline onboarding are handled by the Cloudflare Worker. No payment is required to begin.</p><form className="auth-form"><input aria-label="Name" placeholder="Name" /><input aria-label="Email" placeholder="Email" type="email" /><label><input type="checkbox" /> I accept the Terms and Privacy Policy.</label><button type="button">Send magic link</button></form></section>;
 }
 
 function LegalPage({ kind }: { kind: 'privacy' | 'terms' }) {

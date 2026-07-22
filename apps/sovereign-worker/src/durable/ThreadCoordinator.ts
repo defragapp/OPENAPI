@@ -14,7 +14,7 @@ export class ThreadCoordinator {
     if (existing !== undefined) return Response.json({ sequence: existing, duplicate: true });
 
     const sequence = ((await this.state.storage.get<number>('sequence')) ?? 0) + 1;
-    await this.state.storage.put({ sequence, [`idempotency:${turn.idempotencyKey}`]: sequence });
+    await this.state.storage.put({ sequence: sequence + 1, [`idempotency:${turn.idempotencyKey}`]: sequence });
     return Response.json({ sequence, duplicate: false });
   }
 }

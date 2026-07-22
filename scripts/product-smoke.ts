@@ -74,6 +74,7 @@ async function main() {
   await request(env, token, `/api/v1/people/${person.id}/consent/pair.compare`, { method: 'PUT', body: JSON.stringify({ granted: true }) });
   await request(env, token, `/api/v1/people/${person.id}/consent/trait.display`, { method: 'PUT', body: JSON.stringify({ granted: true }) });
   await request(env, token, `/api/v1/people/${person.id}/consent/system.include`, { method: 'PUT', body: JSON.stringify({ granted: true }) });
+  await request(env, token, `/api/v1/people/${person.id}/consent/library.link`, { method: 'PUT', body: JSON.stringify({ granted: true }) });
   await request(env, token, `/api/v1/people/${person.id}/compare`, { method: 'POST' });
   const system = (await request(env, token, '/api/v1/systems', { method: 'POST', body: JSON.stringify({ name: 'Family care', systemType: 'family' }) })).system;
   await request(env, token, `/api/v1/systems/${system.id}/members`, { method: 'POST', body: JSON.stringify({ personId: person.id, metadata: { formalRole: 'sibling', responsibility: 'shared check-ins' } }) });

@@ -228,6 +228,7 @@ app.post('/api/v1/library', async (context) => {
   if (!body.title || !body.summary) return context.json({ error: 'title and summary required' }, 400);
   const saveInput: { title: string; summary: string; threadId?: string; links?: Record<string, string>; uncertainty?: string } = { title: body.title, summary: body.summary };
   if (body.threadId) saveInput.threadId = body.threadId;
+  if (body.links?.personId) await requireConsent(context.env, auth.accountId, body.links.personId, 'library.link');
   if (body.links) saveInput.links = body.links;
   if (body.uncertainty) saveInput.uncertainty = body.uncertainty;
   const saved = await saveUnderstanding(context.env, auth.accountId, saveInput);
@@ -324,9 +325,11 @@ app.post('/api/v1/threads/:threadId/covenant', async (context) => {
   return context.json({ covenantEnabled: true, scriptureSeparateFromInterpretation: true, certaintyAboutGodsIntent: false, lens });
 });
 
-app.get('/api/v1/covenant/scripture/:reference', async (context) => {
-  await requireAuth(context.req.raw, context.env);
-  return context.json({ passage: retrieveScripture(context.req.param('reference'), context.req.query('translation') ?? 'WEB') });
+app.get('/api/v1/threads/:threadId/covenant/scripture/:reference', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  requireFeature(await getEntitlements(context.env, auth.accountId), 'covenant.lens');
+  await ensureThread(context.env, auth.accountId, context.req.param('threadId'));
+  return context.json({ passage: retrieveScripture(context.req.param('reference'), context.req.query('translation') ?? 'WEB'), covenantEnabledForThread: true });
 });
 
 app.get('/api/v1/today', async (context) => {

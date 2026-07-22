@@ -20,12 +20,12 @@ describe('Sovereign PWA shell', () => {
     expect(app).toContain('Not today');
   });
 
-
-
-  it('contains public Sovereign positioning, Free plus Sovereign+, and no incident-first legacy copy', () => {
-    expect(app).toContain('Live a life you’d choose to watch again');
-    expect(app).toContain('Sovereign+');
-    expect(app).toContain('Support the work');
+  it('keeps account access without external marketing route shells', () => {
+    expect(app).toContain('Email verification, Turnstile protection, secure signed sessions');
+    expect(app).toContain('Baseline onboarding');
+    expect(app).not.toContain('function HomePage');
+    expect(app).not.toContain('function PricingPage');
+    expect(app).not.toContain('function AboutPage');
     expect(app).not.toContain('Describe the moment');
     expect(app).not.toContain('Core');
     expect(app).not.toContain('Studio');

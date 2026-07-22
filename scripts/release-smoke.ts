@@ -12,10 +12,8 @@ function run(name: string, args: string[]) {
 
 const app = readFileSync('apps/web/src/App.tsx', 'utf8');
 const html = readFileSync('apps/web/index.html', 'utf8');
-assert(app.includes('Live a life you’d choose to watch again.'), 'public homepage hero missing');
-assert(app.includes('Create a free account'), 'signup CTA missing');
-assert(app.includes('Sovereign+'), 'Sovereign+ pricing missing');
-assert(app.includes('Support the work'), 'support link copy missing');
+for (const label of ['Today', 'Explore', 'People', 'Systems', 'Library', 'You']) assert(app.includes(label), `authenticated navigation missing ${label}`);
+assert(!app.includes('function HomePage') && !app.includes('function PricingPage') && !app.includes('function AboutPage'), 'external marketing page shell present');
 assert(app.includes('Email verification, Turnstile protection, secure signed sessions'), 'passwordless auth public copy missing');
 assert(app.includes('Baseline onboarding'), 'Baseline onboarding public copy missing');
 assert(app.includes('Covenant') && app.includes('disabled'), 'Covenant default/off language missing');
@@ -26,4 +24,4 @@ assert(html.includes('og:title') && html.includes('canonical'), 'metadata missin
 run('pnpm', ['smoke:auth']);
 run('pnpm', ['smoke:product']);
 run('pnpm', ['smoke:stripe']);
-console.log('Release smoke passed public_home=true signup=true auth=true baseline=true today=true sovereign_stream=true explore=true entitlements=true people=true systems=true library=true covenant=true support_link_non_entitling=true export=true deletion=true signout=true');
+console.log('Release smoke passed authenticated_shell=true signup=true auth=true baseline=true today=true sovereign_stream=true explore=true entitlements=true people=true systems=true library=true covenant=true export=true deletion=true signout=true');
