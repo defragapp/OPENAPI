@@ -16,6 +16,7 @@ async function walk(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
   const output = [];
   for (const entry of entries) {
+    if (entry.isDirectory() && ['.git', '.tmp', 'node_modules', 'dist', 'coverage'].includes(entry.name)) continue;
     const path = join(dir, entry.name);
     if (entry.isDirectory()) output.push(...await walk(path));
     else output.push(path);

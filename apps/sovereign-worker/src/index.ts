@@ -297,6 +297,7 @@ app.post('/api/v1/billing/portal', async (context) => {
 
 app.post('/api/v1/billing/stripe-fixture-event', async (context) => {
   requireSameOrigin(context.req.raw);
+  if (!canUseDevelopmentFixtures(context.env)) return serviceUnavailable('Stripe fixture events are unavailable outside non-production verification.');
   const auth = await requireAuth(context.req.raw, context.env);
   const body = await context.req.json<{ id?: string; type?: string; priceId?: string; status?: string; created?: number }>();
   const fixtureEvent: { id: string; type: string; accountId: string; priceId?: string; status?: string; created?: number } = { id: body.id ?? `evt_${crypto.randomUUID()}`, type: body.type ?? 'customer.subscription.updated', accountId: auth.accountId };
