@@ -4,16 +4,19 @@ import { ThreadCoordinator } from './durable/ThreadCoordinator';
 import { requireAuth, requireSameOrigin } from './security/auth';
 import { withSecurityHeaders } from './security/headers';
 import { getEntitlements, requireFeature } from './db/entitlements';
-import { ensureThread, appendThreadEvent, recordCorrection } from './db/threads';
+import { ensureThread, appendThreadEvent, recordCorrection, setThreadCovenant } from './db/threads';
 import { getTurn, startTurn, updateTurnStatus } from './db/turns';
 import { assertSovereignOutputSafety } from './agent/safety';
 import { runSovereignStream } from './agent/sovereign';
 import { compareBaselineToCurrentConditions } from './adapters/sovv';
 import { handleStripeWebhook } from './routes/stripe';
-import { canUseDevelopmentFixtures, serviceUnavailable } from './runtime';
+import { canUseDevelopmentFixtures, runtimeMode, serviceUnavailable } from './runtime';
 import { createInvitation, createPerson, listPeople, requireConsent, setConsent, updateInvitationStatus, type InvitationStatus, type RelationshipMetadataInput } from './db/people';
 import { addSystemMember, analyzeSystem, cancelDeletionJob, createDeletionJob, createExportJob, createSystem, deleteUnderstanding, freeEntitlements, listSystems, listUnderstandings, saveUnderstanding, updateUnderstanding, type SystemType } from './db/product';
 import { createCheckoutSession, createPortalSession, normalizeStripeFixtureEvent, projectSubscriptionEvent, type PlanKey } from './billing/stripe';
+import { requestMagicLink, redeemMagicLink, logout } from './auth-public';
+import { computeCurrentConditions, getBaselineStatus, persistBaseline, type LocationPrecision } from './baseline';
+import { runDueJobs, runOneJob } from './jobs';
 import { applyBiblicalLens, assertCovenantSafe, retrieveScripture } from './covenant/scripture';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 
@@ -38,7 +41,7 @@ async function healthPayload(env: Env) {
       ai: aiDependencyStatus(env),
       aiGateway: env.AI_GATEWAY_ID ? 'configured' : 'missing',
       sovv: env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'missing',
-      stripe: env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET ? 'configured' : 'fixture-or-disabled',
+      stripe: env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET ? 'configured' : 'disabled',
       scripture: env.SCRIPTURE_TRANSLATION || 'WEB'
     }
   };
@@ -62,6 +65,14 @@ function isSovereignRuntimeReady(env: Env): boolean {
   if (config.provider === 'cloudflare-gateway') return Boolean(env.AI && env.AI_GATEWAY_ID);
   return Boolean(env.OPENAI_API_KEY);
 }
+
+app.post('/api/v1/auth/signup', async (context) => { requireSameOrigin(context.req.raw); return requestMagicLink(context.req.raw, context.env, 'signup'); });
+app.post('/api/v1/auth/login', async (context) => { requireSameOrigin(context.req.raw); return requestMagicLink(context.req.raw, context.env, 'login'); });
+app.get('/api/v1/auth/redeem', async (context) => redeemMagicLink(context.req.raw, context.env));
+app.post('/api/v1/auth/redeem', async (context) => { requireSameOrigin(context.req.raw); return redeemMagicLink(context.req.raw, context.env); });
+app.post('/api/v1/auth/logout', async (context) => { requireSameOrigin(context.req.raw); return logout(context.req.raw, context.env, false); });
+app.post('/api/v1/auth/logout-all', async (context) => { requireSameOrigin(context.req.raw); return logout(context.req.raw, context.env, true); });
+app.get('/api/v1/auth/session', async (context) => context.json({ authenticated: true, ...(await requireAuth(context.req.raw, context.env)) }));
 
 app.post('/api/v1/stripe/webhook', (context) => handleStripeWebhook(context.req.raw, context.env));
 
@@ -188,13 +199,38 @@ app.delete('/api/v1/library/:understandingId', async (context) => {
 
 app.get('/api/v1/you', async (context) => {
   const auth = await requireAuth(context.req.raw, context.env);
-  return context.json({ accountId: auth.accountId, baselineStatus: 'resolved-through-sovv-adapter', locationPermission: 'configured-by-privacy-settings', people: '/api/v1/people', systems: '/api/v1/systems', privacy: { export: '/api/v1/export-jobs', deletion: '/api/v1/deletion-jobs' }, billing: '/api/v1/billing/entitlements', accessibility: { reducedMotion: 'supported', textScaling: 'supported' } });
+  return context.json({ accountId: auth.accountId, baseline: await getBaselineStatus(context.env, auth.accountId), locationPermission: 'configured-by-privacy-settings', people: '/api/v1/people', systems: '/api/v1/systems', privacy: { export: '/api/v1/export-jobs', deletion: '/api/v1/deletion-jobs' }, billing: '/api/v1/billing/entitlements', accessibility: { reducedMotion: 'supported', textScaling: 'supported' } });
+});
+
+app.post('/api/v1/baseline/onboarding', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const result = await persistBaseline(context.env, auth.accountId, await context.req.json());
+  return context.json({ baseline: result }, 201);
+});
+
+app.get('/api/v1/baseline/status', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ baseline: await getBaselineStatus(context.env, auth.accountId) });
+});
+
+app.post('/api/v1/current-conditions', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ locationPrecision?: LocationPrecision }>();
+  return context.json({ current: await computeCurrentConditions(context.env, auth.accountId, body.locationPrecision ?? 'none') });
 });
 
 app.post('/api/v1/export-jobs', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
   return context.json({ exportJob: await createExportJob(context.env, auth.accountId) }, 202);
+});
+
+app.post('/api/v1/jobs/run', async (context) => {
+  requireSameOrigin(context.req.raw);
+  await requireAuth(context.req.raw, context.env);
+  return context.json(await runDueJobs(context.env));
 });
 
 app.post('/api/v1/deletion-jobs', async (context) => {
@@ -207,7 +243,7 @@ app.patch('/api/v1/deletion-jobs/:jobId', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
   const body = await context.req.json<{ action?: string }>();
-  if (body.action !== 'cancel') return context.json({ error: 'Only cancellation is implemented before production deletion.' }, 400);
+  if (body.action !== 'cancel') return context.json({ error: 'Only cancellation is available during the grace period.' }, 400);
   await cancelDeletionJob(context.env, auth.accountId, context.req.param('jobId'));
   return context.json({ ok: true, status: 'cancelled' });
 });
@@ -229,41 +265,40 @@ app.post('/api/v1/billing/checkout', async (context) => {
 app.post('/api/v1/billing/portal', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
-  const session = await createPortalSession(auth.accountId);
+  const session = await createPortalSession(context.env, auth.accountId);
   return context.json({ portal: session }, 201);
 });
 
-app.post('/api/v1/billing/stripe-fixture-event', async (context) => {
+app.post('/api/v1/billing/stripe-test-event', async (context) => {
+  if (runtimeMode(context.env) === 'production') return context.json({ error: 'not_found' }, 404);
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
   const body = await context.req.json<{ id?: string; type?: string; priceId?: string; status?: string; created?: number }>();
-  const fixtureEvent: { id: string; type: string; accountId: string; priceId?: string; status?: string; created?: number } = { id: body.id ?? `evt_${crypto.randomUUID()}`, type: body.type ?? 'customer.subscription.updated', accountId: auth.accountId };
-  if (body.priceId) fixtureEvent.priceId = body.priceId;
-  if (body.status) fixtureEvent.status = body.status;
-  if (body.created) fixtureEvent.created = body.created;
-  const event = normalizeStripeFixtureEvent(context.env, fixtureEvent);
+  const testEvent: { id: string; type: string; accountId: string; priceId?: string; status?: string; created?: number } = { id: body.id ?? `evt_${crypto.randomUUID()}`, type: body.type ?? 'customer.subscription.updated', accountId: auth.accountId };
+  if (body.priceId) testEvent.priceId = body.priceId;
+  if (body.status) testEvent.status = body.status;
+  if (body.created) testEvent.created = body.created;
+  const event = normalizeStripeFixtureEvent(context.env, testEvent);
   return context.json({ projection: await projectSubscriptionEvent(context.env, event) });
 });
 
 app.post('/api/v1/threads/:threadId/covenant', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
+  const threadId = context.req.param('threadId');
   const body = await context.req.json<{ enabled?: boolean; personId?: string; bibleTranslation?: string; reference?: string; subject?: string }>();
-  if (body.enabled && !body.bibleTranslation) return context.json({ error: 'Bible translation is required to enable Covenant.' }, 400);
-  if (body.enabled) requireFeature(await getEntitlements(context.env, auth.accountId), 'covenant.lens');
-  if (body.enabled && body.personId) await requireConsent(context.env, auth.accountId, body.personId, 'covenant.include');
-  await ensureThread(context.env, auth.accountId, context.req.param('threadId'));
-  if (!body.enabled) return context.json({ covenantEnabled: false });
+  if (body.enabled !== true) { await setThreadCovenant(context.env, auth.accountId, threadId, false); return context.json({ covenantEnabled: false }); }
+  if (!body.bibleTranslation) return context.json({ error: 'Bible translation is required to enable Covenant.' }, 400);
+  requireFeature(await getEntitlements(context.env, auth.accountId), 'covenant.lens');
+  if (body.personId) await requireConsent(context.env, auth.accountId, body.personId, 'covenant.include');
+  await setThreadCovenant(context.env, auth.accountId, threadId, true);
   const passage = retrieveScripture(body.reference ?? 'James 1:5', body.bibleTranslation);
   const lens = applyBiblicalLens(passage, body.subject ?? 'this question');
   assertCovenantSafe(JSON.stringify(lens));
   return context.json({ covenantEnabled: true, scriptureSeparateFromInterpretation: true, certaintyAboutGodsIntent: false, lens });
 });
 
-app.get('/api/v1/covenant/scripture/:reference', async (context) => {
-  await requireAuth(context.req.raw, context.env);
-  return context.json({ passage: retrieveScripture(context.req.param('reference'), context.req.query('translation') ?? 'WEB') });
-});
+app.get('/api/v1/covenant/scripture/:reference', async () => Response.json({ error: 'not_found' }, { status: 404 }));
 
 app.get('/api/v1/today', async (context) => {
   const auth = await requireAuth(context.req.raw, context.env);
@@ -327,9 +362,9 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
 
   if (!isSovereignRuntimeReady(context.env)) {
     if (!canUseDevelopmentFixtures(context.env)) return serviceUnavailable('Sovereign is temporarily unavailable. Cloudflare AI Gateway is not configured, and nothing was guessed or saved as an interpretation.');
-    const fallbackText = 'Development fixture only. Baseline tendency: your enduring design needs the verified SOVV adapter before personalization.\n\nCurrent amplification: no live current-condition contract is configured here, so nothing is treated as certainty.\n\nObserved behavior: nothing has been confirmed in this turn.\n\nUnknown actual state: only you can confirm what is true today. Does this match today?';
+    const fallbackText = 'Development fallback only. Baseline tendency: your enduring design needs the verified SOVV adapter before personalization.\n\nCurrent amplification: no live current-condition contract is configured here, so nothing is treated as certainty.\n\nObserved behavior: nothing has been confirmed in this turn.\n\nUnknown actual state: only you can confirm what is true today. Does this match today?';
     assertSovereignOutputSafety(fallbackText);
-    await appendThreadEvent(context.env, threadId, turn.sequence + 1, 'assistant_fixture_response', { developmentFixture: true, text: fallbackText }, traceId);
+    await appendThreadEvent(context.env, threadId, turn.sequence + 1, 'assistant_development_response', { developmentFallback: true, text: fallbackText }, traceId);
     await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'completed');
     return new Response(encodeTextStream(new ReadableStream<string>({
       start(controller) {
@@ -386,3 +421,15 @@ app.notFound((context) => context.json({ error: 'Not found' }, 404));
 
 export { ThreadCoordinator };
 export default app;
+
+export async function queue(batch: MessageBatch<{ id?: string; kind: string; accountId?: string; payload?: Record<string, unknown> }>, env: Env): Promise<void> {
+  for (const message of batch.messages) {
+    const body = message.body;
+    const result = await runOneJob(env, body.id ?? `queue_${crypto.randomUUID()}`, body.kind, body.accountId, body.payload ?? {});
+    if (result.status === 'completed') message.ack(); else message.retry();
+  }
+}
+
+export async function scheduled(_event: ScheduledEvent, env: Env): Promise<void> {
+  await runDueJobs(env, 25);
+}

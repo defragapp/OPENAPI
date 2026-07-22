@@ -27,7 +27,7 @@ async function verifySignature(unsigned: string, signature: string, secret: stri
   return crypto.subtle.verify('HMAC', key, base64UrlDecode(signature), encoder.encode(unsigned));
 }
 
-export async function createSignedSessionToken(payload: { sub: string; exp?: number }, secret: string): Promise<string> {
+export async function createSignedSessionToken(payload: { sub: string; exp?: number; sid?: string }, secret: string): Promise<string> {
   const unsigned = base64UrlEncode(encoder.encode(JSON.stringify(payload)));
   const signature = await hmacSignature(unsigned, secret);
   return `${unsigned}.${base64UrlEncode(signature)}`;
@@ -47,8 +47,13 @@ export async function requireAuth(request: Request, env: Env): Promise<AuthConte
   if (!payloadPart || !signaturePart || !env.SESSION_SIGNING_SECRET) unauthorized();
   const ok = await verifySignature(payloadPart, signaturePart, env.SESSION_SIGNING_SECRET);
   if (!ok) unauthorized();
-  const payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(payloadPart))) as { sub?: string; exp?: number };
+  const payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(payloadPart))) as { sub?: string; exp?: number; sid?: string };
   if (!payload.sub || (payload.exp && payload.exp < Math.floor(Date.now() / 1000))) unauthorized();
+  if (payload.sid) {
+    const session = await env.DB.prepare('SELECT revoked_at, expires_at FROM auth_sessions WHERE id = ?').bind(payload.sid).first<{ revoked_at?: string | null; expires_at: string }>();
+    if (!session || session.revoked_at || Date.parse(session.expires_at) < Date.now()) unauthorized();
+    await env.DB.prepare("UPDATE auth_sessions SET last_seen_at = datetime('now') WHERE id = ?").bind(payload.sid).run();
+  }
   return resolveAccount(env, payload.sub);
 }
 

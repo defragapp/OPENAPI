@@ -46,10 +46,10 @@ describe('Stripe test-mode billing adapter', () => {
   it('creates deterministic checkout and portal fixtures without live Stripe credentials', async () => {
     const { env } = envWithRecorder();
     const checkout = await createCheckoutSession(env, 'acct_1', 'premium', 'idem-1');
-    const portal = await createPortalSession('acct_1');
-    expect(checkout.url).toContain('https://billing.test/checkout/');
+    const portal = await createPortalSession(env, 'acct_1');
+    expect(checkout.url).toContain('https://test-billing.invalid/checkout/');
     expect(checkout.sessionId).toContain('premium');
-    expect(portal.url).toContain('https://billing.test/portal/');
+    expect(portal.url).toContain('https://test-billing.invalid/portal/');
     expect(resolveFeatureSet('free')['baseline.today']).toBe(true);
     expect(resolveFeatureSet('free')['people.compare']).toBe(false);
   });

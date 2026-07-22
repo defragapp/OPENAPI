@@ -23,7 +23,14 @@
     "build:preview": "node scripts/build-preview.mjs",
     "preview:bootstrap": "node scripts/cloudflare-preview-bootstrap.mjs",
     "smoke:preview": "tsx scripts/preview-smoke.ts",
-    "preview:session": "tsx scripts/create-preview-session.ts"
+    "preview:session": "tsx scripts/create-preview-session.ts",
+    "scan:production-fixtures": "node scripts/scan-production-fixtures.mjs",
+    "smoke:auth": "tsx scripts/auth-smoke.ts",
+    "smoke:release": "tsx scripts/release-smoke.ts",
+    "smoke:baseline": "tsx scripts/baseline-smoke.ts",
+    "smoke:jobs": "tsx scripts/jobs-smoke.ts",
+    "verify:release-config": "node scripts/verify-release-config.mjs",
+    "smoke:release-closure": "tsx scripts/release-closure-smoke.ts"
   },
   "devDependencies": {
     "@types/node": "22.12.0",

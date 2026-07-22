@@ -15,8 +15,8 @@ describe('Sovereign PWA shell', () => {
   it('keeps Today Baseline-first and correction-ready', () => {
     expect(app).toContain('Baseline tendency');
     expect(app).toContain('Current amplification');
-    expect(app).toContain('Known behavior');
-    expect(app).toContain('Actual state');
+    expect(app).toContain('Known observation');
+    expect(app).toContain('Unknown actual state');
     expect(app).toContain('Not today');
   });
 

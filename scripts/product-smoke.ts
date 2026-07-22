@@ -85,10 +85,10 @@ async function main() {
   await request(env, token, `/api/v1/deletion-jobs/${deletion.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'cancel' }) });
   await request(env, token, '/api/v1/billing/checkout', { method: 'POST', body: JSON.stringify({ plan: 'standard', idempotencyKey: 'product-smoke' }) });
   await request(env, token, '/api/v1/billing/portal', { method: 'POST' });
-  await request(env, token, '/api/v1/billing/stripe-fixture-event', { method: 'POST', body: JSON.stringify({ id: 'evt_product_smoke', priceId: 'price_test_premium' }) });
+  await request(env, token, '/api/v1/billing/stripe-test-event', { method: 'POST', body: JSON.stringify({ id: 'evt_product_smoke', priceId: 'price_test_premium' }) });
   const covenant = await request(env, token, '/api/v1/threads/product-smoke/covenant', { method: 'POST', body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'a decision' }) });
   if (!covenant.scriptureSeparateFromInterpretation || !covenant.lens.passage.citation) throw new Error('covenant smoke failed');
-  console.log('Product smoke passed surfaces=people,systems,library,you,billing,covenant consent_gated=true fixtures_only=true');
+  console.log('Product smoke passed surfaces=people,systems,library,you,billing,covenant consent_gated=true test_providers=true');
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1); });
