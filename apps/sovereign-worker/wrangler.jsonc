@@ -111,7 +111,73 @@
           "/healthz",
           "/ready"
         ]
-      }
+      },
+      "r2_buckets": [
+        {
+          "binding": "ARTIFACTS",
+          "bucket_name": "sovereign-openapi-preview-artifacts"
+        }
+      ],
+      "queues": {
+        "producers": [
+          {
+            "binding": "JOBS",
+            "queue": "sovereign-openapi-preview-jobs"
+          }
+        ],
+        "consumers": [
+          {
+            "queue": "sovereign-openapi-preview-jobs",
+            "max_batch_size": 10,
+            "max_batch_timeout": 30
+          }
+        ]
+      },
+      "triggers": {
+        "crons": [
+          "*/15 * * * *"
+        ]
+      },
+      "services": [
+        {
+          "binding": "BASELINE",
+          "service": "sovereign-baseline-preview",
+          "entrypoint": "BaselineEntrypoint"
+        }
+      ]
     }
-  }
+  },
+  "r2_buckets": [
+    {
+      "binding": "ARTIFACTS",
+      "bucket_name": "sovereign-openapi-artifacts"
+    }
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "JOBS",
+        "queue": "sovereign-openapi-jobs"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "sovereign-openapi-jobs",
+        "max_batch_size": 10,
+        "max_batch_timeout": 30
+      }
+    ]
+  },
+  "triggers": {
+    "crons": [
+      "*/15 * * * *"
+    ]
+  },
+  "services": [
+    {
+      "binding": "BASELINE",
+      "service": "sovereign-baseline",
+      "entrypoint": "BaselineEntrypoint"
+    }
+  ]
 }

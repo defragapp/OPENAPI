@@ -68,6 +68,6 @@ describe('authenticated Today and Explore smoke flow', () => {
     const first = await app.fetch(new Request('https://app.test/api/v1/threads/t1/messages', { method: 'POST', headers: messageHeaders, body: JSON.stringify({ message: 'Show me today without an incident.', context: { surface: 'Today' } }) }), env);
     expect(first.status).toBe(202);
     const text = await first.text();
-    expect(text).toContain('Development fixture only');
+    expect(text).toContain('Development fallback only');
   });
 });

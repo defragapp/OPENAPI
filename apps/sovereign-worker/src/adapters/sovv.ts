@@ -176,7 +176,7 @@ function normalizeBaselineStatus(status: unknown): BaselineSummary['status'] {
 function developmentBaselineFixture(focus?: string): BaselineSummary {
   return {
     status: 'degraded',
-    summary: 'Development fixture only: verified SOVV Baseline data is unavailable in this environment.',
+    summary: 'Development fallback only: verified SOVV Baseline data is unavailable in this environment.',
     dimensions: [
       { name: focus || 'pressure response', tendency: 'Fixture: pressure may make urgency louder.', supportiveMove: 'Separate urgency from truth before acting.', sourceRefs: ['OPENAPI_DEVELOPMENT_FIXTURE'] }
     ],
@@ -188,7 +188,7 @@ function developmentBaselineFixture(focus?: string): BaselineSummary {
 function developmentCurrentFixture(): CurrentConditions {
   return {
     status: 'degraded',
-    headline: 'Development fixture only: current-condition context is unavailable, so no actual state is inferred.',
+    headline: 'Development fallback only: current-condition context is unavailable, so no actual state is inferred.',
     amplifications: [{ name: 'uncertainty', effect: 'Keep current amplification separate from actual state.', certainty: 'low' }],
     unknowns: ['No verified standalone SOVV current-condition route is configured.'],
     sourceRefs: ['OPENAPI_DEVELOPMENT_FIXTURE']

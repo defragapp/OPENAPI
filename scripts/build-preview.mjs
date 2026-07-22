@@ -40,6 +40,8 @@ for (const key of ['d1_databases', 'durable_objects', 'migrations', 'ai', 'asset
 }
 if (preview.name === wrangler.name) throw new Error('Preview Worker name must not equal top-level Worker name');
 
+run(pnpm, ['--filter', '@sovereign/baseline-worker', 'exec', 'wrangler', 'types', resolve(root, '.tmp/preview-baseline-configuration.d.ts'), '--env', 'preview']);
+run(pnpm, ['--filter', '@sovereign/baseline-worker', 'exec', 'wrangler', 'deploy', '--env', 'preview', '--dry-run', '--outdir', 'dist']);
 run(pnpm, ['--filter', '@sovereign/worker', 'exec', 'wrangler', 'types', resolve(root, '.tmp/preview-worker-configuration.d.ts'), '--env', 'preview']);
 run(pnpm, ['--filter', '@sovereign/worker', 'exec', 'wrangler', 'deploy', '--env', 'preview', '--dry-run', '--outdir', 'dist']);
-console.log('Preview build verified: assets, wrangler preview environment, generated binding types, and Worker dry-run passed.');
+console.log('Preview build verified: assets, private Baseline Worker dry-run, wrangler preview environment, generated binding types, and Sovereign Worker dry-run passed.');

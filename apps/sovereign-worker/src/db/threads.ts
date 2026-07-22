@@ -9,6 +9,15 @@ export async function ensureThread(env: Env, accountId: string, threadId: string
     .run();
 }
 
+export async function getOwnedThread(env: Env, accountId: string, threadId: string) {
+  return env.DB.prepare('SELECT id, account_id, covenant_enabled FROM threads WHERE id = ? AND account_id = ?').bind(threadId, accountId).first<{ id: string; account_id: string; covenant_enabled: number }>();
+}
+
+export async function setThreadCovenant(env: Env, accountId: string, threadId: string, enabled: boolean) {
+  await ensureThread(env, accountId, threadId);
+  await env.DB.prepare("UPDATE threads SET covenant_enabled = ?, updated_at = datetime('now') WHERE id = ? AND account_id = ?").bind(enabled ? 1 : 0, threadId, accountId).run();
+}
+
 export async function appendThreadEvent(env: Env, threadId: string, seq: number, eventType: string, payload: unknown, traceId?: string): Promise<void> {
   await env.DB.prepare('INSERT OR IGNORE INTO thread_events (id, thread_id, seq, event_type, payload_json, trace_id) VALUES (?, ?, ?, ?, ?, ?)')
     .bind(crypto.randomUUID(), threadId, seq, eventType, JSON.stringify(payload), traceId ?? null)

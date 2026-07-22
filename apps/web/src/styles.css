@@ -46,12 +46,10 @@ main { padding: 36px 0; }
 .choice-row button { flex: 1; border: 1px solid #57515b; border-radius: 999px; background: transparent; color: inherit; padding: 10px 16px; }
 
 .composer {
-  position: fixed;
-  left: max(14px, calc((100vw - 980px) / 2 + 18px));
-  right: max(14px, calc((100vw - 980px) / 2 + 18px));
+  position: sticky;
   bottom: calc(env(safe-area-inset-bottom) + 72px);
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   gap: 10px;
   padding: 10px;
   border: 1px solid rgba(255,255,255,.14);
@@ -59,6 +57,7 @@ main { padding: 36px 0; }
   background: rgba(20,18,22,.94);
   backdrop-filter: blur(20px);
   z-index: 4;
+  margin-top: 18px;
 }
 .composer textarea { resize: none; border: 0; outline: 0; color: inherit; background: transparent; min-height: 44px; padding: 10px; }
 .composer button { border: 0; border-radius: 16px; background: #f4eee4; color: #141216; font-weight: 800; }
