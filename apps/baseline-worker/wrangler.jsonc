@@ -1,0 +1,38 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sovereign-baseline",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "vars": {
+    "APP_ENV": "development",
+    "APP_VERSION": "0.0.1",
+    "BASELINE_MODE": "reduced"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "ASTRO_CACHE",
+      "id": "REPLACE_WITH_ASTRO_CACHE_KV_NAMESPACE_ID"
+    }
+  ],
+  "env": {
+    "preview": {
+      "name": "sovereign-baseline-preview",
+      "compatibility_date": "2026-07-20",
+      "compatibility_flags": ["nodejs_compat"],
+      "observability": { "enabled": true },
+      "vars": {
+        "APP_ENV": "preview",
+        "APP_VERSION": "0.0.1-preview",
+        "BASELINE_MODE": "reduced"
+      },
+      "kv_namespaces": [
+        {
+          "binding": "ASTRO_CACHE",
+          "id": "REPLACE_WITH_PREVIEW_ASTRO_CACHE_KV_NAMESPACE_ID"
+        }
+      ]
+    }
+  }
+}
