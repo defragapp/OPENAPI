@@ -3,6 +3,8 @@ name: CI
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -22,9 +24,15 @@ jobs:
       - run: pnpm verify:foundation
       - run: pnpm verify:migrations
       - run: pnpm scan:secrets
+      - run: pnpm scan:production-fixtures
+      - run: pnpm verify:release-config
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      - run: pnpm smoke:auth
+      - run: pnpm smoke:baseline
+      - run: pnpm smoke:jobs
       - run: pnpm smoke:worker-gateway
       - run: pnpm smoke:stripe
       - run: pnpm smoke:product
+      - run: pnpm smoke:release-closure

@@ -54,7 +54,7 @@ export async function requireAuth(request: Request, env: Env): Promise<AuthConte
     if (!session || session.revoked_at || Date.parse(session.expires_at) < Date.now()) unauthorized();
     await env.DB.prepare("UPDATE auth_sessions SET last_seen_at = datetime('now') WHERE id = ?").bind(payload.sid).run();
   }
-  return resolveAccount(env, payload.sub);
+  return { ...(await resolveAccount(env, payload.sub)), sessionId: payload.sid };
 }
 
 function readCookie(request: Request, name: string): string | undefined {

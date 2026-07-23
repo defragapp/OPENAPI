@@ -62,11 +62,11 @@ try {
     AI_MODEL: process.env.AI_MODEL || config.env.preview.vars.AI_MODEL,
     AI_GATEWAY_ID: process.env.AI_GATEWAY_ID || config.env.preview.vars.AI_GATEWAY_ID,
     SOVV_INTERNAL_BASE_URL: process.env.SOVV_BASE_URL || '',
-    STRIPE_PRICE_STANDARD: process.env.STRIPE_PRICE_STANDARD || '',
-    STRIPE_PRICE_PREMIUM: process.env.STRIPE_PRICE_PREMIUM || '',
-    STRIPE_SUCCESS_URL: process.env.STRIPE_SUCCESS_URL || `https://${workerName}.workers.dev/you?billing=success`,
-    STRIPE_CANCEL_URL: process.env.STRIPE_CANCEL_URL || `https://${workerName}.workers.dev/you?billing=cancelled`,
-    STRIPE_PORTAL_RETURN_URL: process.env.STRIPE_PORTAL_RETURN_URL || `https://${workerName}.workers.dev/you?billing=portal`,
+    STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY: process.env.STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY || '',
+    STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL: process.env.STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL || '',
+    STRIPE_SUCCESS_URL: process.env.STRIPE_SUCCESS_URL || `https://${workerName}.workers.dev/app?billing=success`,
+    STRIPE_CANCEL_URL: process.env.STRIPE_CANCEL_URL || `https://${workerName}.workers.dev/app?billing=cancelled`,
+    STRIPE_PORTAL_RETURN_URL: process.env.STRIPE_PORTAL_RETURN_URL || `https://${workerName}.workers.dev/app?billing=portal`,
     SCRIPTURE_TRANSLATION: process.env.SCRIPTURE_TRANSLATION || 'WEB'
   };
   writeFileSync(configPath, JSON.stringify(config, null, 2));

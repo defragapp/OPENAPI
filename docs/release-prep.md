@@ -10,7 +10,7 @@ Configure preview and production separately. Do not reuse production IDs in loca
 - Durable Object: `ThreadCoordinator` for turn ordering.
 - AI binding: `AI` with `AI_PROVIDER=cloudflare-gateway`.
 - AI Gateway: `AI_GATEWAY_ID`, default recommendation `sovereign`.
-- Unified Billing model: `AI_MODEL=openai/gpt-5.6-terra`.
+- Unified Billing model: `AI_MODEL=openai/gpt-5.5`.
 - SOVV adapter: service binding or authenticated internal URL plus contract version `1`.
 - Auth: signed session migration path or verified SOVV identity cookie.
 - Stripe: test-mode secrets and price IDs only until explicit live approval.
@@ -25,13 +25,13 @@ Required secrets must be configured as platform secrets, not committed:
 - `STRIPE_WEBHOOK_SECRET`
 - GitHub Actions only: `CLOUDFLARE_API_TOKEN` for live smoke verification.
 
-`OPENAI_API_KEY` is not a production requirement. It may be used only for `AI_PROVIDER=openai-direct` diagnostics.
+No OpenAI provider key is accepted by the Worker. Cloudflare Unified Billing is the only production and preview inference path.
 
 ## Deployment runbook
 
 1. Verify the target branch and clean working tree.
 2. Run `pnpm install --frozen-lockfile`.
-3. Run `pnpm verify:foundation`, `pnpm verify:migrations`, `pnpm scan:secrets`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm smoke:worker-gateway`, `pnpm smoke:stripe`, and `pnpm smoke:product`.
+3. Run `pnpm verify:foundation`, `pnpm verify:migrations`, a fresh local D1 migration replay, `pnpm scan:secrets`, `pnpm scan:production-fixtures`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm smoke:worker-gateway`, `pnpm smoke:stripe`, and `pnpm smoke:product`.
 4. Review D1 migrations and apply to preview first.
 5. Configure Worker bindings and secrets in preview.
 6. Run authenticated preview smoke tests for Today, Explore, People, Systems, Library, You, Gateway streaming, export, deletion grace, and Stripe test entitlements.
@@ -63,7 +63,7 @@ Before release, inspect logs and traces for raw birth inputs, exact private loca
 
 ## Stripe test-mode setup
 
-Use `STRIPE_PRICE_STANDARD`, `STRIPE_PRICE_PREMIUM`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`, and `STRIPE_PORTAL_RETURN_URL` for test-mode Checkout and Portal configuration. Domain entitlement logic depends only on stable feature keys, never hard-coded Stripe product IDs.
+Use `STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY`, `STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`, and `STRIPE_PORTAL_RETURN_URL` for Stripe test-mode Checkout and Portal configuration. Domain entitlement logic depends only on stable feature keys, never hard-coded Stripe product IDs.
 
 ## Scripture provider configuration
 

@@ -34,7 +34,7 @@ function fakeEnv(): Env {
     }
   } as unknown as D1Database;
   return {
-    APP_ENV: 'test', APP_VERSION: 'test', OPENAI_API_KEY: '', STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db,
+    APP_ENV: 'test', APP_VERSION: 'test', STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db,
     THREADS: { idFromName: (name: string) => ({ name }) as DurableObjectId, get: () => ({ fetch: async () => Response.json({ sequence: ++seq, duplicate: false }) }) as unknown as DurableObjectStub } as unknown as DurableObjectNamespace
   };
 }
@@ -48,7 +48,7 @@ describe('authenticated Today and Explore smoke flow', () => {
     const res = await app.fetch(new Request('https://app.test/api/v1/today', { headers: await authHeader() }), fakeEnv());
     expect(res.status).toBe(200);
     const json = await res.json() as any;
-    expect(json.today.data.separation).toContain('Actual state is unknown unless the user confirms it.');
+    expect(json.today.separation).toContain('Actual state remains unknown unless the user confirms it.');
   });
 
   it('serves Explore in plain language with collapsed framework details', async () => {
@@ -69,5 +69,24 @@ describe('authenticated Today and Explore smoke flow', () => {
     expect(first.status).toBe(202);
     const text = await first.text();
     expect(text).toContain('Development fallback only');
+  });
+
+  it('requires idempotency keys before creating Stripe handoffs', async () => {
+    const headers = { ...(await authHeader()), origin: 'https://app.test', 'content-type': 'application/json' };
+    const checkout = await app.fetch(new Request('https://app.test/api/v1/billing/checkout', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ interval: 'monthly' })
+    }), fakeEnv());
+    const portal = await app.fetch(new Request('https://app.test/api/v1/billing/portal', {
+      method: 'POST',
+      headers,
+      body: '{}'
+    }), fakeEnv());
+
+    expect(checkout.status).toBe(400);
+    expect(portal.status).toBe(400);
+    await expect(checkout.json()).resolves.toEqual({ error: 'Idempotency key required' });
+    await expect(portal.json()).resolves.toEqual({ error: 'Idempotency key required' });
   });
 });

@@ -18,11 +18,11 @@ Deploy Sovereign.OS to an isolated Cloudflare preview Worker, not production. Th
 - `PREVIEW_WORKER_NAME` — default `sovereign-openapi-preview`
 - `PREVIEW_D1_NAME` — default `sovereign-openapi-preview-db`
 - `AI_PROVIDER` — default `cloudflare-gateway`
-- `AI_MODEL` — default `openai/gpt-5.6-terra`
+- `AI_MODEL` — reviewed default `openai/gpt-5.5`
 - `AI_GATEWAY_ID` — default `sovereign`
 - `SOVV_BASE_URL` — optional; leave empty for sanitized preview fixtures.
 - `SCRIPTURE_TRANSLATION` — default `WEB`
-- Optional Stripe test variables: `STRIPE_PRICE_STANDARD`, `STRIPE_PRICE_PREMIUM`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`, `STRIPE_PORTAL_RETURN_URL`.
+- Optional Stripe test variables: `STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY`, `STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`, `STRIPE_PORTAL_RETURN_URL`.
 
 ## Local preflight
 
@@ -67,7 +67,7 @@ Before accepting a preview run, verify:
 
 - no production custom route is attached;
 - no production D1 database or Durable Object namespace is bound;
-- no personal `OPENAI_API_KEY` is required;
+- no personal or project OpenAI provider key is accepted;
 - private APIs are not cached as static assets;
 - `/api/*`, `/health`, `/healthz`, and `/ready` run Worker code first;
 - no public preview-login route exists;

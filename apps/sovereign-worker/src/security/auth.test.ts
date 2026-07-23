@@ -5,7 +5,7 @@ import type { Env } from '../env';
 function envWithDb(secret: string): Env {
   const accounts = new Map<string, string>();
   return {
-    APP_ENV: 'test', APP_VERSION: 'test', OPENAI_API_KEY: '', STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: secret,
+    APP_ENV: 'test', APP_VERSION: 'test', STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: secret,
     THREADS: {} as DurableObjectNamespace,
     DB: {
       prepare(sql: string) {

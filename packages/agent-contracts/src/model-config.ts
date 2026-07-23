@@ -1,8 +1,7 @@
 export const DEFAULT_AI_PROVIDER = 'cloudflare-gateway';
-export const DIRECT_OPENAI_PROVIDER = 'openai-direct';
-export const DEFAULT_AI_MODEL = 'openai/gpt-5.6-terra';
+export const DEFAULT_AI_MODEL = 'openai/gpt-5.5';
 const MAX_MODEL_LENGTH = 120;
-const PROVIDERS = [DEFAULT_AI_PROVIDER, DIRECT_OPENAI_PROVIDER] as const;
+const PROVIDERS = [DEFAULT_AI_PROVIDER] as const;
 
 export type AiProvider = typeof PROVIDERS[number];
 
@@ -30,8 +29,4 @@ export function resolveAiModel(value?: unknown): string {
 
 export function resolveAiModelConfig(env: { AI_PROVIDER?: unknown; AI_MODEL?: unknown } = {}): AiModelConfig {
   return { provider: resolveAiProvider(env.AI_PROVIDER), model: resolveAiModel(env.AI_MODEL) };
-}
-
-export function toDirectOpenAIModel(model: string): string {
-  return model.startsWith('openai/') ? model.slice('openai/'.length) : model;
 }

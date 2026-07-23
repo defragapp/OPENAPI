@@ -9,7 +9,7 @@ function fakeEnv(): Env {
     async all() { return { results: [] }; },
     async run() { inserts.push(`${sql}:${JSON.stringify(args)}`); return { success: true, meta: { changes: 1 } }; }
   }; } }; } } as unknown as D1Database;
-  return { APP_ENV: 'test', APP_VERSION: 'test', DB: db, THREADS: {} as DurableObjectNamespace, OPENAI_API_KEY: '', STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret' };
+  return { APP_ENV: 'test', APP_VERSION: 'test', DB: db, THREADS: {} as DurableObjectNamespace, STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret' };
 }
 
 describe('systems, library, privacy, and entitlement helpers', () => {

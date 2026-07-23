@@ -58,7 +58,14 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   if (row.used_at) return Response.json({ status: 'already used' }, { status: 409 });
   if (Date.parse(row.expires_at!) < Date.now()) return Response.json({ status: 'expired' }, { status: 410 });
   const account = await resolveAccount(env, `email:${row.email_normalized}`);
-  await env.DB.prepare("UPDATE auth_magic_links SET used_at = datetime('now'), account_id = ? WHERE id = ? AND used_at IS NULL").bind(account.accountId, row.id).run();
+  const redeemed = await env.DB.prepare(`UPDATE auth_magic_links
+    SET used_at = datetime('now'), account_id = ?
+    WHERE id = ? AND used_at IS NULL AND expires_at > datetime('now')`)
+    .bind(account.accountId, row.id)
+    .run();
+  if ((redeemed.meta?.changes ?? 0) === 0) {
+    return Response.json({ status: 'already used' }, { status: 409 });
+  }
   const sessionId = `session_${crypto.randomUUID()}`;
   const exp = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
   const tokenValue = await createSignedSessionToken({ sub: `email:${row.email_normalized}`, exp, sid: sessionId }, env.SESSION_SIGNING_SECRET);
@@ -69,5 +76,6 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
 export async function logout(request: Request, env: Env, all = false): Promise<Response> {
   const auth = await import('./security/auth').then((m) => m.requireAuth(request, env));
   if (all) await env.DB.prepare("UPDATE auth_sessions SET revoked_at = datetime('now') WHERE account_id = ? AND revoked_at IS NULL").bind(auth.accountId).run();
+  else if (auth.sessionId) await env.DB.prepare("UPDATE auth_sessions SET revoked_at = datetime('now') WHERE id = ? AND account_id = ? AND revoked_at IS NULL").bind(auth.sessionId, auth.accountId).run();
   return Response.json({ status: 'success' }, { headers: { 'set-cookie': cookie('__Host-sovereign_session', 'deleted', 0) } });
 }

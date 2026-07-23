@@ -2,50 +2,54 @@
 
 ## Production inference path
 
-Production Sovereign inference should use Cloudflare AI Gateway Unified Billing instead of a personal OpenAI API key:
+Public Sovereign inference uses Cloudflare AI Gateway Unified Billing:
 
 ```text
-Sovereign Worker → Cloudflare AI Gateway → openai/gpt-5.6-terra
+Authenticated Sovereign Worker → AI binding → AI Gateway `sovereign` → openai/gpt-5.5
 ```
 
-The default runtime configuration is:
+The Worker does not read a personal or project OpenAI API key. Cloudflare manages the provider credential and deducts inference cost from Unified Billing credits.
+
+The reviewed runtime configuration is:
 
 ```text
 AI_PROVIDER=cloudflare-gateway
 AI_GATEWAY_ID=sovereign
-AI_MODEL=openai/gpt-5.6-terra
+AI_MODEL=openai/gpt-5.5
+AI_FREE_MONTHLY_TURNS=10
+AI_SOVEREIGN_PLUS_MONTHLY_TURNS=300
 ```
 
-Cloudflare Unified Billing handles third-party provider authentication and billing through Cloudflare credits. `OPENAI_API_KEY` is not a production requirement for user traffic.
+`openai/gpt-5.5` is used because the Cloudflare model catalog currently marks it as supporting Zero Data Retention. A model change requires a catalog/privacy check and behavior eval before release.
 
+## Worker binding and privacy
 
-## Worker AI-binding adapter
+The Worker calls `env.AI.run()` with:
 
-The Worker message route now uses the Cloudflare `AI` binding when `AI_PROVIDER=cloudflare-gateway`. Before invoking the model, server code resolves the authenticated account, obtains reduced Baseline/current-condition context through OPENAPI adapters, removes source file paths and private fields, and sends only the public-safe reduced context plus the user request to the model.
+- the configured gateway;
+- cache bypass enabled;
+- request/response logging disabled;
+- pseudonymous account metadata;
+- the effective Stripe-backed plan;
+- reduced Baseline/current context only.
 
-The adapter calls the configured model through the Worker binding with AI Gateway metadata and `skipCache: true`, then normalizes streamed, response, async-iterable, or object outputs into the same public text stream used by the existing thread persistence layer. If the binding or gateway ID is missing, production fails closed instead of using direct OpenAI or an invented interpretation.
+Raw birth input, exact private location, secrets, source paths, and raw account IDs are excluded from model input and Gateway metadata. Gateway Zero Data Retention must also be enabled at the account level; it is separate from request logging.
 
-## Development-only direct OpenAI path
+## Access and allowance boundary
 
-`AI_PROVIDER=openai-direct` may be used only for local development or temporary diagnostics. It uses the same Sovereign prompt, tools, and guardrails through the Agents SDK, but it is not the production default and must not power user traffic.
+Stripe subscription webhooks project the effective Free or Sovereign+ plan into D1. The message route then reserves one monthly AI turn atomically before inference:
 
-## Model adapter boundary
+- Free: 10 turns per UTC calendar month.
+- Sovereign+: 300 turns per UTC calendar month.
 
-Sovereign behavior remains separate from provider authentication. The app resolves model configuration through `AI_PROVIDER` and `AI_MODEL`, then selects an adapter:
+The values are environment-configurable but must be reviewed with pricing and Cloudflare spend limits before release. Stripe is a flat subscription; it is not used as metered billing for individual model calls.
 
-- `cloudflare-gateway`: preview/production path via Cloudflare AI Gateway Unified Billing.
-- `openai-direct`: local development fallback requiring `OPENAI_API_KEY`.
+## Failure behavior
 
-Model changes require eval verification before production use. Production must not silently switch models without configuration review, and pricing plus behavior must be evaluated before changing the default.
+Production and preview never fall back to direct OpenAI or synthetic interpretation. If the AI binding, Gateway, Unified Billing credits, or private Baseline provider is unavailable, the Worker returns a clear unavailable state and does not invent a result.
 
-## Agents SDK
+References:
 
-The TypeScript Agents SDK remains useful for direct local development and for preserving Sovereign's tool contracts, prompt, guardrails, and eval path. Preview/production Cloudflare Gateway execution must keep the same behavior contract while routing model authentication through Cloudflare.
-
-## ChatKit
-
-The stale scaffold dependency `@openai/chatkit` has been replaced with the supported React package `@openai/chatkit-react`. ChatKit is not yet mounted as the full product shell because the Sovereign.OS surfaces must remain custom and same-origin. The current implementation uses a compatible streamed Worker response while preserving the option to add ChatKit as the conversation layer after server-issued session/client-secret behavior is implemented.
-
-## Privacy
-
-Tracing is configured to exclude sensitive data. Tool outputs are reduced adapter envelopes and must not include raw birth inputs, exact private location, secrets, or full account datasets.
+- https://developers.cloudflare.com/ai-gateway/features/unified-billing/
+- https://developers.cloudflare.com/ai-gateway/usage/worker-binding-methods/
+- https://developers.cloudflare.com/ai-gateway/features/spend-limits/

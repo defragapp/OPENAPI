@@ -19,7 +19,7 @@ async function main() {
   assert(turnstileClosed, 'production Turnstile test bypass was accepted');
   let emailClosed = false; try { await requestMagicLink(new Request('https://app.test/api/v1/auth/login', { method: 'POST', body: JSON.stringify({ email: 'user@example.com', turnstileToken: 'x' }) }), { ...envProd, TURNSTILE_SECRET_KEY: 'secret' }); } catch { emailClosed = true; }
   assert(emailClosed, 'production email test capture or raw magic link path did not fail closed');
-  const baseline = await computeReducedBaseline({ birthDate: '1990-01-01', birthTimeCertainty: 'unknown', birthplace: 'London', locationPrecision: 'none' });
+  const baseline = await computeReducedBaseline({ birthDate: '1990-01-01', birthTimeCertainty: 'unknown', birthplace: 'London', locationPrecision: 'none' }, { allowRecordedFixture: true });
   assert(JSON.stringify(baseline.reducedContext).includes('unavailable'), 'unknown birth time did not disable unsupported precision-sensitive frameworks');
   const current = await computeCurrentConditions(envProd, 'acct_release', 'city_or_regional');
   assert(current.providerStatus === 'unavailable' && current.reduced.unknownActualState.includes('do not determine'), 'current conditions without provider did not fail closed');
