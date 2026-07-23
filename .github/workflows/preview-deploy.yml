@@ -2,6 +2,10 @@ name: Preview Deploy and Verification
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/preview-deploy.yml'
 
 permissions:
   contents: read
