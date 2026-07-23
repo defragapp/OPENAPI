@@ -1,3 +1,10 @@
+import type { BaselineInput, LocationPrecision } from './baseline';
+
+export interface BaselineService {
+  compute(input: BaselineInput): Promise<unknown>;
+  currentConditions?(input: { accountId: string; locationPrecision: LocationPrecision }): Promise<unknown>;
+}
+
 export interface Env {
   APP_ENV: string;
   APP_VERSION: string;
@@ -5,17 +12,17 @@ export interface Env {
   KV?: KVNamespace;
   ARTIFACTS?: R2Bucket;
   JOBS?: Queue;
+  BASELINE?: BaselineService;
   THREADS: DurableObjectNamespace;
   AI_PROVIDER?: string;
   AI_MODEL?: string;
   AI_GATEWAY_ID?: string;
   AI?: { run: (model: string, input: unknown, options?: unknown) => Promise<unknown>; aiGatewayLogId?: string };
   ASSETS?: { fetch: (request: Request) => Promise<Response> };
-  OPENAI_API_KEY?: string;
   STRIPE_SECRET_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
-  STRIPE_PRICE_STANDARD?: string;
-  STRIPE_PRICE_PREMIUM?: string;
+  STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY?: string;
+  STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL?: string;
   STRIPE_SUCCESS_URL?: string;
   STRIPE_CANCEL_URL?: string;
   STRIPE_PORTAL_RETURN_URL?: string;
@@ -34,10 +41,13 @@ export interface Env {
   PUBLIC_APP_URL?: string;
   ASTRONOMY_API_URL?: string;
   EMAIL_TIMEOUT_MS?: string;
+  AI_FREE_MONTHLY_TURNS?: string;
+  AI_SOVEREIGN_PLUS_MONTHLY_TURNS?: string;
 }
 
 export interface AuthContext {
   accountId: string;
   subject: string;
+  sessionId?: string | undefined;
   sovvCookieHeader?: string | undefined;
 }

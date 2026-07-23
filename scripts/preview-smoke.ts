@@ -13,6 +13,7 @@ async function request(path: string, init: RequestInit = {}, expected = 200) {
       cookie: sessionCookie,
       origin,
       'content-type': 'application/json',
+      'x-idempotency-key': crypto.randomUUID(),
       ...(init.headers ?? {})
     }
   });
@@ -50,7 +51,7 @@ async function main() {
   if (unauth.status !== 401) throw new Error(`unauthenticated private API expected 401, got ${unauth.status}`);
 
   const today = await json('/api/v1/today');
-  if (!JSON.stringify(today).includes('Baseline')) throw new Error('Today did not include Baseline context');
+  if (!Array.isArray(today.today?.separation) || !today.today.separation.some((value: string) => value.includes('Baseline'))) throw new Error('Today did not include Baseline context');
 
   for (const topic of ['identity', 'decisions', 'communication', 'pressure response']) {
     const explore = await json('/api/v1/explore', { method: 'POST', body: JSON.stringify({ topic }) });
@@ -81,15 +82,21 @@ async function main() {
   await json('/api/v1/export-jobs', { method: 'POST' }, 202);
   const deletion = (await json('/api/v1/deletion-jobs', { method: 'POST' }, 202)).deletionJob;
   await json(`/api/v1/deletion-jobs/${deletion.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'cancel' }) });
-  await json('/api/v1/billing/entitlements');
-  await json('/api/v1/billing/stripe-test-event', { method: 'POST', body: JSON.stringify({ id: `evt_preview_${Date.now()}`, priceId: 'price_test_premium' }) });
-  const checkout = await json('/api/v1/billing/checkout', { method: 'POST', body: JSON.stringify({ plan: 'standard', idempotencyKey: `preview-${Date.now()}` }) }, 201);
-  if (checkout.checkout?.url?.includes('test-billing.invalid')) console.log('Billing test mode verified; real Stripe Checkout is used when Stripe test secrets are configured.');
+  const billing = await json('/api/v1/billing/entitlements');
+  await request('/api/v1/billing/stripe-test-event', { method: 'POST', body: '{}' }, 404);
+  if (process.env.PREVIEW_EXPECT_STRIPE === '1') {
+    const checkout = await json('/api/v1/billing/checkout', { method: 'POST', body: JSON.stringify({ interval: 'monthly' }) }, 201);
+    if (!checkout.checkout?.url) throw new Error('Stripe Checkout did not return a handoff URL');
+  }
 
   const defaultCovenant = await json('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: false }) });
   if (defaultCovenant.covenantEnabled !== false) throw new Error('Covenant must be disabled by default');
-  const covenant = await json('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'preview decision' }) });
-  if (!covenant.scriptureSeparateFromInterpretation || !covenant.lens?.passage?.citation) throw new Error('Covenant citation separation failed');
+  if (billing.effective?.plan === 'sovereign_plus') {
+    const covenant = await json('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'preview decision' }) });
+    if (!covenant.scriptureSeparateFromInterpretation || !covenant.lens?.passage?.citation) throw new Error('Covenant citation separation failed');
+  } else {
+    await request('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'preview decision' }) }, 403);
+  }
   await request('/api/v1/covenant/scripture/Imaginary%201:1', {}, 404);
 
   const turnKey = `preview-turn-${Date.now()}`;
@@ -111,7 +118,7 @@ async function main() {
   if (!JSON.stringify(await duplicate.json()).includes('duplicate')) throw new Error('duplicate turn was not reported');
   await json('/api/v1/threads/preview-live/corrections', { method: 'POST', body: JSON.stringify({ correction: 'partly' }) });
 
-  console.log(`Preview smoke passed base=${origin} static=true health=true stream_chunks=${chunks} covenant=configured-or-test billing=stripe-or-test`);
+  console.log(`Preview smoke passed base=${origin} static=true health=true stream_chunks=${chunks} covenant=entitlement-gated billing=webhook-driven`);
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1); });

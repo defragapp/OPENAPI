@@ -44,8 +44,8 @@ function fakeEnv(): Env {
       if (sql.startsWith('INSERT INTO export_jobs')) return { success: true, meta: { changes: 1 } };
       if (sql.startsWith('INSERT INTO deletion_jobs')) deletionJobs.set(args[0] as string, { accountId: args[1] as string, status: args[2] as string });
       if (sql.startsWith('UPDATE deletion_jobs')) { const job = deletionJobs.get(args[1] as string); if (job && job.accountId === args[2] && job.status === args[3]) job.status = args[0] as string; }
-      if (sql.startsWith('INSERT OR IGNORE INTO webhook_events') || sql.startsWith('INSERT OR REPLACE INTO stripe_subscriptions')) return { success: true, meta: { changes: 1 } };
-      if (sql.startsWith('INSERT OR REPLACE INTO entitlement_cache')) entitlementCache.set(args[0] as string, { plan: args[1] as string, features: args[2] as string });
+      if (sql.startsWith('INSERT INTO stripe_customers') || sql.startsWith('INSERT INTO stripe_subscriptions')) return { success: true, meta: { changes: 1 } };
+      if (sql.startsWith('INSERT INTO entitlement_cache')) entitlementCache.set(args[0] as string, { plan: args[1] as string, features: args[2] as string });
       if (sql.startsWith('INSERT INTO threads')) threads.set(args[0] as string, args[1] as string);
       if (sql.startsWith('INSERT OR IGNORE INTO thread_events')) return { success: true, meta: { changes: 1 } };
       return { success: true, meta: { changes: 1 } };
@@ -57,11 +57,11 @@ function fakeEnv(): Env {
       return { results: [] };
     }
   }; } }; } } as unknown as D1Database;
-  return { APP_ENV: 'test', APP_VERSION: 'product-smoke', AI_PROVIDER: 'fixture', AI_MODEL: 'fixture', AI_GATEWAY_ID: 'sovereign', OPENAI_API_KEY: '', STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', STRIPE_PRICE_STANDARD: 'price_test_standard', STRIPE_PRICE_PREMIUM: 'price_test_premium', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db, THREADS: { idFromName: (name: string) => ({ name }) as DurableObjectId, get: () => ({ fetch: async () => Response.json({ sequence: ++seq, duplicate: false }) }) as unknown as DurableObjectStub } as unknown as DurableObjectNamespace } as Env;
+  return { APP_ENV: 'test', APP_VERSION: 'product-smoke', AI_PROVIDER: 'cloudflare-gateway', AI_MODEL: 'openai/gpt-5.5', AI_GATEWAY_ID: 'sovereign', STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY: 'price_test_sovereign_monthly', STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL: 'price_test_sovereign_annual', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db, THREADS: { idFromName: (name: string) => ({ name }) as DurableObjectId, get: () => ({ fetch: async () => Response.json({ sequence: ++seq, duplicate: false }) }) as unknown as DurableObjectStub } as unknown as DurableObjectNamespace } as Env;
 }
 
 async function request(env: Env, token: string, path: string, init: RequestInit = {}) {
-  const res = await app.fetch(new Request(`https://app.test${path}`, { ...init, headers: { authorization: `Bearer ${token}`, origin: 'https://app.test', 'content-type': 'application/json', ...(init.headers ?? {}) } }), env);
+  const res = await app.fetch(new Request(`https://app.test${path}`, { ...init, headers: { authorization: `Bearer ${token}`, origin: 'https://app.test', 'content-type': 'application/json', 'x-idempotency-key': crypto.randomUUID(), ...(init.headers ?? {}) } }), env);
   if (res.status >= 400) throw new Error(`${path} failed status=${res.status} body=${await res.text()}`);
   return res.json() as Promise<any>;
 }
@@ -83,9 +83,9 @@ async function main() {
   await request(env, token, '/api/v1/export-jobs', { method: 'POST' });
   const deletion = (await request(env, token, '/api/v1/deletion-jobs', { method: 'POST' })).deletionJob;
   await request(env, token, `/api/v1/deletion-jobs/${deletion.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'cancel' }) });
-  await request(env, token, '/api/v1/billing/checkout', { method: 'POST', body: JSON.stringify({ plan: 'standard', idempotencyKey: 'product-smoke' }) });
+  await request(env, token, '/api/v1/billing/checkout', { method: 'POST', body: JSON.stringify({ interval: 'monthly' }) });
   await request(env, token, '/api/v1/billing/portal', { method: 'POST' });
-  await request(env, token, '/api/v1/billing/stripe-test-event', { method: 'POST', body: JSON.stringify({ id: 'evt_product_smoke', priceId: 'price_test_premium' }) });
+  await request(env, token, '/api/v1/billing/stripe-test-event', { method: 'POST', body: JSON.stringify({ id: 'evt_product_smoke', priceId: 'price_test_sovereign_annual' }) });
   const covenant = await request(env, token, '/api/v1/threads/product-smoke/covenant', { method: 'POST', body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'a decision' }) });
   if (!covenant.scriptureSeparateFromInterpretation || !covenant.lens.passage.citation) throw new Error('covenant smoke failed');
   console.log('Product smoke passed surfaces=people,systems,library,you,billing,covenant consent_gated=true test_providers=true');

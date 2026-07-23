@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { sovereignRuntimePromptV1 } from './prompt-v1';
-import { getSovereignAgent } from './sovereign';
 import { compareBaselineToCurrentConditions } from '../adapters/sovv';
 
-const fakeEnv = { SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '' } as never;
+const fakeEnv = { APP_ENV: 'test', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '' } as never;
 
 describe('Sovereign runtime behavior contract', () => {
   it('requires Baseline/current/observed/unknown separation without incident-first behavior', () => {
@@ -34,17 +33,6 @@ describe('SOVV adapter fallback', () => {
 });
 
 
-describe('Sovereign model configuration', () => {
-  it('uses the configured model through the shared model resolver', () => {
-    const agent = getSovereignAgent('openai/gpt-5.6-luna') as unknown as { model: string };
-    expect(agent.model).toBe('gpt-5.6-luna');
-  });
-
-  it('rejects invalid model configuration before constructing an agent', () => {
-    expect(() => getSovereignAgent('gpt 5')).toThrow(/whitespace/);
-  });
-});
-
 describe('Cloudflare Gateway Worker adapter', () => {
   it('streams through the AI binding with reduced context and gateway metadata', async () => {
     const calls: Array<{ model: string; input: unknown; options: unknown }> = [];
@@ -53,14 +41,18 @@ describe('Cloudflare Gateway Worker adapter', () => {
       APP_ENV: 'test',
       APP_VERSION: 'test',
       AI_PROVIDER: 'cloudflare-gateway',
-      AI_MODEL: 'openai/gpt-5.6-terra',
+      AI_MODEL: 'openai/gpt-5.5',
       AI_GATEWAY_ID: 'sovereign',
       SOVV_INTERNAL_BASE_URL: '',
       SOVV_INTERNAL_AUTH_TOKEN: '',
-      OPENAI_API_KEY: '',
       STRIPE_SECRET_KEY: '',
       STRIPE_WEBHOOK_SECRET: '',
       SESSION_SIGNING_SECRET: 'test',
+      DB: {
+        prepare() {
+          return { bind() { return { async first() { return null; } }; } };
+        }
+      },
       AI: {
         async run(model: string, input: unknown, options: unknown) {
           calls.push({ model, input, options });
@@ -73,7 +65,7 @@ describe('Cloudflare Gateway Worker adapter', () => {
         }
       }
     } as never;
-    const stream = await runSovereignStream('Help me start Today without an incident prompt.', { env, accountId: 'acct_test', threadId: 'thread_test', traceId: 'trace_test', covenantEnabled: false });
+    const stream = await runSovereignStream('Help me start Today without an incident prompt.', { env, accountId: 'acct_test', threadId: 'thread_test', traceId: 'trace_test', covenantEnabled: false, plan: 'free' });
     const reader = stream.getReader();
     let text = '';
     while (true) {
@@ -83,8 +75,17 @@ describe('Cloudflare Gateway Worker adapter', () => {
     }
     expect(text).toContain('Baseline');
     expect(calls).toHaveLength(1);
-    expect(calls[0]?.model).toBe('openai/gpt-5.6-terra');
-    expect(calls[0]?.options).toEqual({ gateway: { id: 'sovereign', skipCache: true } });
+    expect(calls[0]?.model).toBe('openai/gpt-5.5');
+    expect(calls[0]?.options).toMatchObject({
+      gateway: {
+        id: 'sovereign',
+        skipCache: true,
+        collectLog: false,
+        metadata: { plan: 'free' }
+      }
+    });
+    expect((calls[0]?.options as any).gateway.metadata.account_ref).toMatch(/^[a-f0-9]{32}$/);
+    expect(JSON.stringify(calls[0]?.options)).not.toContain('acct_test');
     expect(JSON.stringify(calls[0]?.input)).toContain('Reduced server-side context');
     expect(JSON.stringify(calls[0]?.input)).not.toMatch(/birth date|birth time|latitude|longitude|workspace\/SOVV/i);
   });

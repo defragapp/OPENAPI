@@ -14,6 +14,7 @@ function fakeEnv(): Env {
       if (sql.startsWith('SELECT id, auth_subject')) { const id = accounts.get(args[0] as string); return id ? { id, auth_subject: args[0] } : null; }
       if (sql.startsWith('SELECT account_id FROM threads')) { const accountId = threads.get(args[0] as string); return accountId ? { account_id: accountId } : null; }
       if (sql.startsWith('SELECT plan')) return null;
+      if (sql.includes('INSERT INTO ai_usage_windows')) return { turns_used: 1 };
       if (sql.startsWith('SELECT thread_id')) return turns.get(`${args[0]}:${args[1]}:${args[2]}`) ?? null;
       return null;
     },
@@ -29,10 +30,10 @@ function fakeEnv(): Env {
     async all() { return { results: [] }; }
   }; } }; } } as unknown as D1Database;
   return {
-    APP_ENV: 'test', APP_VERSION: 'worker-gateway-smoke', AI_PROVIDER: 'cloudflare-gateway', AI_MODEL: 'openai/gpt-5.6-terra', AI_GATEWAY_ID: 'sovereign',
-    OPENAI_API_KEY: '', STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db,
+    APP_ENV: 'test', APP_VERSION: 'worker-gateway-smoke', AI_PROVIDER: 'cloudflare-gateway', AI_MODEL: 'openai/gpt-5.5', AI_GATEWAY_ID: 'sovereign',
+    STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db,
     THREADS: { idFromName: (name: string) => ({ name }) as DurableObjectId, get: () => ({ fetch: async () => Response.json({ sequence: ++seq, duplicate: false }) }) as unknown as DurableObjectStub } as unknown as DurableObjectNamespace,
-    AI: { async run(model: string, input: unknown, options: unknown) { if (model !== 'openai/gpt-5.6-terra') throw new Error('invalid model'); if (JSON.stringify(options) !== JSON.stringify({ gateway: { id: 'sovereign', skipCache: true } })) throw new Error('invalid gateway metadata'); if (JSON.stringify(input).match(/birth date|birth time|latitude|longitude|workspace\/SOVV/i)) throw new Error('private model input leaked'); return new ReadableStream<string>({ start(controller) { controller.enqueue('Baseline: fixture tendency.\nCurrent: fixture amplification.\nObserved: nothing confirmed.\nUnknown: actual state remains unknown.'); controller.close(); } }); } }
+    AI: { async run(model: string, input: unknown, options: unknown) { if (model !== 'openai/gpt-5.5') throw new Error('invalid model'); const gateway = (options as any)?.gateway; if (gateway?.id !== 'sovereign' || gateway?.skipCache !== true || gateway?.collectLog !== false || gateway?.metadata?.plan !== 'free' || !gateway?.metadata?.account_ref) throw new Error('invalid gateway metadata'); if (JSON.stringify(options).includes('acct_')) throw new Error('raw account id leaked'); if (JSON.stringify(input).match(/birth date|birth time|latitude|longitude|workspace\/SOVV/i)) throw new Error('private model input leaked'); return new ReadableStream<string>({ start(controller) { controller.enqueue('Baseline: fixture tendency.\nCurrent: fixture amplification.\nObserved: nothing confirmed.\nUnknown: actual state remains unknown.'); controller.close(); } }); } }
   };
 }
 
@@ -42,7 +43,7 @@ async function main(): Promise<void> {
   const text = await res.text();
   if (res.status !== 202) throw new Error(`worker gateway smoke failed status=${res.status}`);
   for (const heading of ['Baseline', 'Current', 'Observed', 'Unknown']) if (!text.includes(heading)) throw new Error(`missing ${heading}`);
-  console.log(`Worker Gateway smoke passed status=${res.status} response_chars=${text.length} provider=cloudflare-gateway model=openai/gpt-5.6-terra`);
+  console.log(`Worker Gateway smoke passed status=${res.status} response_chars=${text.length} provider=cloudflare-gateway model=openai/gpt-5.5`);
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1); });

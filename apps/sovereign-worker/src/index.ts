@@ -8,14 +8,14 @@ import { ensureThread, appendThreadEvent, recordCorrection, setThreadCovenant } 
 import { getTurn, startTurn, updateTurnStatus } from './db/turns';
 import { assertSovereignOutputSafety } from './agent/safety';
 import { runSovereignStream } from './agent/sovereign';
-import { compareBaselineToCurrentConditions } from './adapters/sovv';
 import { handleStripeWebhook } from './routes/stripe';
-import { canUseDevelopmentFixtures, runtimeMode, serviceUnavailable } from './runtime';
+import { canUseDevelopmentFixtures, serviceUnavailable } from './runtime';
 import { createInvitation, createPerson, listPeople, requireConsent, setConsent, updateInvitationStatus, type InvitationStatus, type RelationshipMetadataInput } from './db/people';
 import { addSystemMember, analyzeSystem, cancelDeletionJob, createDeletionJob, createExportJob, createSystem, deleteUnderstanding, freeEntitlements, listSystems, listUnderstandings, saveUnderstanding, updateUnderstanding, type SystemType } from './db/product';
-import { createCheckoutSession, createPortalSession, normalizeStripeFixtureEvent, projectSubscriptionEvent, type PlanKey } from './billing/stripe';
+import { createCheckoutSession, createPortalSession, normalizeStripeFixtureEvent, projectSubscriptionEvent, type BillingInterval } from './billing/stripe';
+import { getAiUsage, reserveAiTurn } from './billing/usage';
 import { requestMagicLink, redeemMagicLink, logout } from './auth-public';
-import { computeCurrentConditions, getBaselineStatus, persistBaseline, type LocationPrecision } from './baseline';
+import { computeCurrentConditions, getBaselineStatus, getModelSafeBaselineContext, persistBaseline, type LocationPrecision } from './baseline';
 import { runDueJobs, runOneJob } from './jobs';
 import { applyBiblicalLens, assertCovenantSafe, retrieveScripture } from './covenant/scripture';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
@@ -33,7 +33,7 @@ async function healthPayload(env: Env) {
     ok: db?.ok === 1,
     version: env.APP_VERSION,
     environment: env.APP_ENV,
-    migrationVersion: '0003_product_completion',
+    migrationVersion: '0007_stripe_event_ordering',
     dependencies: {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
       durableObjects: env.THREADS ? 'configured' : 'missing',
@@ -56,14 +56,12 @@ app.get('/ready', async (context) => {
 
 function aiDependencyStatus(env: Env): 'configured' | 'degraded' | 'missing' {
   const config = resolveAiModelConfig(env);
-  if (config.provider === 'cloudflare-gateway') return env.AI && env.AI_GATEWAY_ID ? 'configured' : 'missing';
-  return env.OPENAI_API_KEY ? 'degraded' : 'missing';
+  return config.provider === 'cloudflare-gateway' && env.AI && env.AI_GATEWAY_ID ? 'configured' : 'missing';
 }
 
 function isSovereignRuntimeReady(env: Env): boolean {
   const config = resolveAiModelConfig(env);
-  if (config.provider === 'cloudflare-gateway') return Boolean(env.AI && env.AI_GATEWAY_ID);
-  return Boolean(env.OPENAI_API_KEY);
+  return config.provider === 'cloudflare-gateway' && Boolean(env.AI && env.AI_GATEWAY_ID);
 }
 
 app.post('/api/v1/auth/signup', async (context) => { requireSameOrigin(context.req.raw); return requestMagicLink(context.req.raw, context.env, 'signup'); });
@@ -229,8 +227,8 @@ app.post('/api/v1/export-jobs', async (context) => {
 
 app.post('/api/v1/jobs/run', async (context) => {
   requireSameOrigin(context.req.raw);
-  await requireAuth(context.req.raw, context.env);
-  return context.json(await runDueJobs(context.env));
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json(await runDueJobs(context.env, 10, auth.accountId));
 });
 
 app.post('/api/v1/deletion-jobs', async (context) => {
@@ -251,33 +249,43 @@ app.patch('/api/v1/deletion-jobs/:jobId', async (context) => {
 app.get('/api/v1/billing/entitlements', async (context) => {
   const auth = await requireAuth(context.req.raw, context.env);
   const projected = await getEntitlements(context.env, auth.accountId);
-  return context.json({ effective: projected, fallback: freeEntitlements() });
+  return context.json({
+    effective: projected,
+    fallback: freeEntitlements(),
+    aiUsage: await getAiUsage(context.env, auth.accountId, projected.plan)
+  });
 });
 
 app.post('/api/v1/billing/checkout', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
-  const body = await context.req.json<{ plan?: PlanKey; idempotencyKey?: string }>();
-  const session = await createCheckoutSession(context.env, auth.accountId, body.plan ?? 'standard', body.idempotencyKey);
+  const idempotencyKey = context.req.header('x-idempotency-key');
+  if (!idempotencyKey) return context.json({ error: 'Idempotency key required' }, 400);
+  const body = await context.req.json<{ interval?: BillingInterval }>();
+  const session = await createCheckoutSession(context.env, auth.accountId, body.interval ?? 'monthly', idempotencyKey);
   return context.json({ checkout: session }, 201);
 });
 
 app.post('/api/v1/billing/portal', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
-  const session = await createPortalSession(context.env, auth.accountId);
+  const idempotencyKey = context.req.header('x-idempotency-key');
+  if (!idempotencyKey) return context.json({ error: 'Idempotency key required' }, 400);
+  const session = await createPortalSession(context.env, auth.accountId, idempotencyKey);
   return context.json({ portal: session }, 201);
 });
 
 app.post('/api/v1/billing/stripe-test-event', async (context) => {
-  if (runtimeMode(context.env) === 'production') return context.json({ error: 'not_found' }, 404);
+  if (!canUseDevelopmentFixtures(context.env)) return context.json({ error: 'not_found' }, 404);
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
-  const body = await context.req.json<{ id?: string; type?: string; priceId?: string; status?: string; created?: number }>();
-  const testEvent: { id: string; type: string; accountId: string; priceId?: string; status?: string; created?: number } = { id: body.id ?? `evt_${crypto.randomUUID()}`, type: body.type ?? 'customer.subscription.updated', accountId: auth.accountId };
+  const body = await context.req.json<{ id?: string; type?: string; priceId?: string; status?: string; created?: number; subscriptionId?: string; customerId?: string }>();
+  const testEvent: Parameters<typeof normalizeStripeFixtureEvent>[1] = { id: body.id ?? `evt_${crypto.randomUUID()}`, type: body.type ?? 'customer.subscription.updated', accountId: auth.accountId };
   if (body.priceId) testEvent.priceId = body.priceId;
   if (body.status) testEvent.status = body.status;
   if (body.created) testEvent.created = body.created;
+  if (body.subscriptionId) testEvent.subscriptionId = body.subscriptionId;
+  if (body.customerId) testEvent.customerId = body.customerId;
   const event = normalizeStripeFixtureEvent(context.env, testEvent);
   return context.json({ projection: await projectSubscriptionEvent(context.env, event) });
 });
@@ -302,8 +310,7 @@ app.get('/api/v1/covenant/scripture/:reference', async () => Response.json({ err
 
 app.get('/api/v1/today', async (context) => {
   const auth = await requireAuth(context.req.raw, context.env);
-  const baseline = await compareBaselineToCurrentConditions(context.env, 'self', { cookieHeader: auth.sovvCookieHeader });
-  return context.json({ accountId: auth.accountId, today: baseline });
+  return context.json({ today: await getModelSafeBaselineContext(context.env, auth.accountId) });
 });
 
 app.post('/api/v1/threads/:threadId/corrections', async (context) => {
@@ -322,9 +329,8 @@ app.post('/api/v1/explore', async (context) => {
   const auth = await requireAuth(context.req.raw, context.env);
   const body = await context.req.json<{ topic?: string }>();
   const topic = body.topic?.trim() || 'identity';
-  const baseline = await compareBaselineToCurrentConditions(context.env, 'self', { cookieHeader: auth.sovvCookieHeader });
+  const baseline = await getModelSafeBaselineContext(context.env, auth.accountId);
   return context.json({
-    accountId: auth.accountId,
     topic,
     plainLanguage: `Explore ${topic} through Baseline tendency, current amplification, observed behavior, and unknown actual state.`,
     frameworkDetailsDefault: 'collapsed',
@@ -356,12 +362,12 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
     const existing = await getTurn(context.env, auth.accountId, threadId, idempotencyKey);
     return context.json({ duplicate: true, status: existing.status, sequence: existing.seq }, existing.status === 'completed' ? 200 : 409);
   }
-  await startTurn(context.env, auth.accountId, threadId, idempotencyKey, turn.sequence);
   const traceId = crypto.randomUUID();
-  await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { redacted: true, surface: body.context?.surface ?? 'Today' }, traceId);
 
   if (!isSovereignRuntimeReady(context.env)) {
     if (!canUseDevelopmentFixtures(context.env)) return serviceUnavailable('Sovereign is temporarily unavailable. Cloudflare AI Gateway is not configured, and nothing was guessed or saved as an interpretation.');
+    await startTurn(context.env, auth.accountId, threadId, idempotencyKey, turn.sequence);
+    await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { redacted: true, surface: body.context?.surface ?? 'Today' }, traceId);
     const fallbackText = 'Development fallback only. Baseline tendency: your enduring design needs the verified SOVV adapter before personalization.\n\nCurrent amplification: no live current-condition contract is configured here, so nothing is treated as certainty.\n\nObserved behavior: nothing has been confirmed in this turn.\n\nUnknown actual state: only you can confirm what is true today. Does this match today?';
     assertSovereignOutputSafety(fallbackText);
     await appendThreadEvent(context.env, threadId, turn.sequence + 1, 'assistant_development_response', { developmentFallback: true, text: fallbackText }, traceId);
@@ -374,7 +380,16 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
     })), { status: 202, headers: { 'content-type': 'text/plain; charset=utf-8', 'x-sovereign-plan': entitlements.plan } });
   }
 
-  const stream = await runSovereignStream(message, { env: context.env, accountId: auth.accountId, threadId, traceId, covenantEnabled: false, sovvCookieHeader: auth.sovvCookieHeader });
+  const usage = await reserveAiTurn(context.env, auth.accountId, entitlements.plan);
+  await startTurn(context.env, auth.accountId, threadId, idempotencyKey, turn.sequence);
+  await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { redacted: true, surface: body.context?.surface ?? 'Today' }, traceId);
+  let stream: ReadableStream<string>;
+  try {
+    stream = await runSovereignStream(message, { env: context.env, accountId: auth.accountId, threadId, traceId, covenantEnabled: false, plan: entitlements.plan });
+  } catch (error) {
+    await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'failed', 'gateway_start_failed');
+    throw error;
+  }
   await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'streaming');
   const persistedStream = persistAssistantStream(stream, async (text) => {
     assertSovereignOutputSafety(text);
@@ -383,7 +398,14 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
   }, async () => {
     await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'failed', 'stream_failed');
   });
-  return new Response(encodeTextStream(persistedStream), { status: turn.duplicate ? 200 : 202, headers: { 'content-type': 'text/plain; charset=utf-8', 'x-sovereign-plan': entitlements.plan } });
+  return new Response(encodeTextStream(persistedStream), {
+    status: turn.duplicate ? 200 : 202,
+    headers: {
+      'content-type': 'text/plain; charset=utf-8',
+      'x-sovereign-plan': entitlements.plan,
+      'x-sovereign-ai-remaining': String(usage.remaining)
+    }
+  });
 });
 
 function encodeTextStream(stream: ReadableStream<string>): ReadableStream<Uint8Array> {

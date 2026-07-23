@@ -25,4 +25,18 @@ describe('Sovereign PWA shell', () => {
     expect(css).toContain('safe-area-inset-bottom');
     expect(css).toContain('min-height: 44px');
   });
+
+  it('keeps the responsive navigation and native Today data path', () => {
+    expect(app).toContain('className="side-rail"');
+    expect(app).toContain('className="tabbar"');
+    expect(app).toContain("api('/api/v1/today')");
+    expect(css).toContain('@media (min-width: 1040px)');
+  });
+
+  it('uses visible field labels across private forms', () => {
+    expect(app).toContain('className="field"');
+    for (const label of ['Email address', 'Area of focus', 'Person’s name', 'System name', 'Birth date', 'Sovereign+ billing']) {
+      expect(app).toContain(label);
+    }
+  });
 });

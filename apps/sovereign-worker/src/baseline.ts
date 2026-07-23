@@ -1,4 +1,5 @@
 import type { Env } from './env';
+import { canUseDevelopmentFixtures } from './runtime';
 
 export type BirthTimeCertainty = 'exact' | 'approximate' | 'unknown';
 export type LocationPrecision = 'none' | 'approximate' | 'city_or_regional' | 'ephemeral_current' | 'stored_permitted';
@@ -12,10 +13,11 @@ function assertDate(value: string) { if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || N
 function assertTime(value: string | undefined, certainty: BirthTimeCertainty) { if (certainty !== 'unknown' && !/^\d{2}:\d{2}$/.test(value ?? '')) throw new Response('Birth time required for exact or approximate certainty', { status: 400 }); }
 function frameworkAvailability(certainty: BirthTimeCertainty, providerStatus: string) { return { astrology: providerStatus === 'computed' ? 'available' : 'unavailable', humanDesign: certainty === 'unknown' || providerStatus !== 'computed' ? 'unavailable' : 'available', geneKeys: providerStatus === 'computed' ? 'available' : 'unavailable', numerology: 'available' }; }
 
-export async function computeReducedBaseline(input: BaselineInput, options: { providerAvailable?: boolean; provider?: BaselineProvider } = {}) {
+export async function computeReducedBaseline(input: BaselineInput, options: { providerAvailable?: boolean; provider?: BaselineProvider; allowRecordedFixture?: boolean } = {}) {
   const normalized = normalizeBaselineInput(input);
   if (options.providerAvailable === false) return partialBaseline(normalized.birthTimeCertainty, ['geocoder', 'astronomical-provider']);
-  const provider = options.provider ?? deterministicRecordedProvider();
+  const provider = options.provider ?? (options.allowRecordedFixture ? deterministicRecordedProvider() : undefined);
+  if (!provider) return partialBaseline(normalized.birthTimeCertainty, ['private-baseline-provider-not-configured']);
   const computed = await provider.compute(normalized).catch((error) => {
     if (error instanceof Response) throw error;
     return undefined;
@@ -56,11 +58,38 @@ function reduceComputedBaseline(certainty: BirthTimeCertainty, computed: Baselin
 function modelSafeContext(certainty: BirthTimeCertainty, providerStatus: string, availability: Record<string, string>) { return { baselineTendency: 'Enduring tendency is represented as reduced pattern language, not a diagnosis.', currentAmplification: 'Current conditions are possible amplification only, never behavioral determination.', userObservation: 'No observed behavior is assumed until supplied by the user.', interpretiveSignals: Object.entries(availability).filter(([, state]) => state === 'available').map(([name]) => name), systemInference: providerStatus === 'computed' ? 'Structured deterministic reduction is available.' : 'Structured deterministic reduction is unavailable.', uncertainty: certainty === 'unknown' ? 'high' : 'stated', unknownActualState: 'Actual state remains unknown unless the user confirms it.' }; }
 
 export async function persistBaseline(env: Env, accountId: string, input: BaselineInput) {
-  const computed = await computeReducedBaseline(input);
+  const computed = await computeConfiguredBaseline(env, input);
   const protectedInput = { birthDateHash: await sha256(input.birthDate ?? ''), birthTimeCertainty: input.birthTimeCertainty, hasBirthTime: Boolean(input.birthTime && input.birthTimeCertainty !== 'unknown'), birthplaceHash: await sha256(input.birthplace ?? ''), locationPrecision: input.locationPrecision ?? 'none' };
   const inputHash = await sha256(JSON.stringify(protectedInput));
   await env.DB.prepare(`INSERT OR REPLACE INTO baseline_onboarding (account_id, input_hash, protected_input_json, reduced_context_json, computation_version, provenance_json, status, uncertainty, last_computed_at, provider_status, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, datetime('now'))`).bind(accountId, inputHash, JSON.stringify(protectedInput), JSON.stringify(computed.reducedContext), computed.computationVersion, JSON.stringify(computed.provenance), computed.status, computed.uncertainty, computed.providerStatus).run();
   return { status: computed.status, uncertainty: computed.uncertainty, reducedContext: computed.reducedContext, provenance: computed.provenance, computationVersion: computed.computationVersion };
+}
+
+async function computeConfiguredBaseline(env: Env, input: BaselineInput) {
+  if (env.BASELINE) {
+    try {
+      const value = await env.BASELINE.compute(input);
+      if (isReducedBaseline(value)) return value;
+      return partialBaseline(input.birthTimeCertainty ?? 'unknown', ['private-baseline-provider-returned-invalid-contract']);
+    } catch {
+      return partialBaseline(input.birthTimeCertainty ?? 'unknown', ['private-baseline-provider-unavailable']);
+    }
+  }
+  return computeReducedBaseline(input, {
+    providerAvailable: canUseDevelopmentFixtures(env),
+    allowRecordedFixture: canUseDevelopmentFixtures(env)
+  });
+}
+
+function isReducedBaseline(value: unknown): value is Awaited<ReturnType<typeof computeReducedBaseline>> {
+  if (!value || typeof value !== 'object') return false;
+  const record = value as Record<string, unknown>;
+  return typeof record.status === 'string'
+    && typeof record.providerStatus === 'string'
+    && typeof record.uncertainty === 'string'
+    && typeof record.computationVersion === 'string'
+    && Boolean(record.reducedContext && typeof record.reducedContext === 'object')
+    && Boolean(record.provenance && typeof record.provenance === 'object');
 }
 
 export async function getBaselineStatus(env: Env, accountId: string) {
@@ -78,6 +107,40 @@ export async function computeCurrentConditions(env: Env, accountId: string, mode
   const person = await env.DB.prepare('SELECT id FROM persons WHERE account_id = ? ORDER BY created_at LIMIT 1').bind(accountId).first<{ id: string }>();
   if (person?.id) await env.DB.prepare('INSERT INTO current_conditions (id, person_id, computed_at, location_hash, conditions_json, source_ref, precision_used, provider_status) VALUES (?, ?, datetime(\'now\'), ?, ?, ?, ?, ?)').bind(`current_${crypto.randomUUID()}`, person.id, null, JSON.stringify(reduced), provider?.source ?? 'openapi-current-provider', precision, providerStatus).run();
   return { source: provider?.source ?? 'openapi-current-provider', computedAt: provider?.sourceTimestamp ?? new Date().toISOString(), precisionUsed: precision, providerStatus, reduced };
+}
+
+export async function getLatestCurrentConditions(env: Env, accountId: string) {
+  const row = await env.DB.prepare(`SELECT cc.computed_at, cc.conditions_json, cc.precision_used, cc.provider_status
+    FROM current_conditions cc
+    JOIN persons p ON p.id = cc.person_id
+    WHERE p.account_id = ?
+    ORDER BY cc.computed_at DESC
+    LIMIT 1`).bind(accountId).first<{ computed_at: string; conditions_json: string; precision_used: string; provider_status: string }>();
+  if (!row) return { status: 'not_started', providerStatus: 'unavailable', reduced: null };
+  return {
+    status: row.provider_status === 'computed' ? 'ready' : 'unavailable',
+    providerStatus: row.provider_status,
+    precisionUsed: row.precision_used,
+    computedAt: row.computed_at,
+    reduced: JSON.parse(row.conditions_json)
+  };
+}
+
+export async function getModelSafeBaselineContext(env: Env, accountId: string) {
+  const [baseline, current] = await Promise.all([
+    getBaselineStatus(env, accountId),
+    getLatestCurrentConditions(env, accountId)
+  ]);
+  return {
+    baseline,
+    current,
+    separation: [
+      'Baseline tendency is enduring interpretive context, not diagnosis or proof.',
+      'Current amplification is temporary context and does not determine behavior.',
+      'Observed behavior must be supplied or confirmed by the user.',
+      'Actual state remains unknown unless the user confirms it.'
+    ]
+  };
 }
 
 async function fetchCurrentConditionProvider(env: Env, precision: string): Promise<{ source: string; sourceTimestamp: string; currentAstronomy: Record<string, string> } | undefined> {
