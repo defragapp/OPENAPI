@@ -1,5 +1,8 @@
 import { readFileSync } from 'node:fs';
 const config = JSON.parse(readFileSync('apps/sovereign-worker/wrangler.jsonc', 'utf8'));
+const ciWorkflow = readFileSync('.github/workflows/ci.yml', 'utf8');
+const previewWorkflow = readFileSync('.github/workflows/preview-deploy.yml', 'utf8');
+const liveWorkflow = readFileSync('.github/workflows/live-verify.yml', 'utf8');
 function assertBinding(scope, name) {
   if (!scope?.queues?.producers?.some((item) => item.binding === 'JOBS')) throw new Error(`${name} missing JOBS queue producer`);
   if (!scope?.queues?.consumers?.length) throw new Error(`${name} missing queue consumer`);
@@ -18,4 +21,18 @@ for (const scope of [config.vars, config.env?.preview?.vars]) {
 for (const key of ['STRIPE_SUCCESS_URL', 'STRIPE_CANCEL_URL', 'STRIPE_PORTAL_RETURN_URL']) {
   if (!String(config.env?.preview?.vars?.[key] ?? '').includes('/app')) throw new Error(`${key} must return to /app`);
 }
-console.log('Release config verified queues=true consumers=true schedules=true r2=true cloudflare_only_ai=true allowances=true billing_routes=true');
+if (!ciWorkflow.includes('pull_request:')) throw new Error('CI must validate pull requests to main');
+for (const gate of ['scan:production-fixtures', 'verify:release-config', 'smoke:auth', 'smoke:baseline', 'smoke:jobs', 'smoke:release-closure']) {
+  if (!ciWorkflow.includes(gate)) throw new Error(`CI is missing release gate ${gate}`);
+}
+for (const workflow of [previewWorkflow, liveWorkflow]) {
+  if (workflow.includes('openai/gpt-5.6-terra')) throw new Error('workflow still uses the unapproved model fallback');
+  if (!workflow.includes("openai/gpt-5.5")) throw new Error('workflow is missing the approved ZDR-cataloged model');
+}
+for (const key of ['STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY', 'STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL']) {
+  if (!previewWorkflow.includes(key)) throw new Error(`preview workflow is missing ${key}`);
+}
+for (const stale of ['STRIPE_PRICE_STANDARD', 'STRIPE_PRICE_PREMIUM']) {
+  if (previewWorkflow.includes(stale)) throw new Error(`preview workflow still references ${stale}`);
+}
+console.log('Release config verified queues=true consumers=true schedules=true r2=true cloudflare_only_ai=true allowances=true billing_routes=true pr_ci=true workflows_current=true');

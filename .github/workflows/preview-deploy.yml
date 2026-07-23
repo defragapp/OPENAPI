@@ -49,12 +49,18 @@ jobs:
           pnpm verify:foundation
           pnpm verify:migrations
           pnpm scan:secrets
+          pnpm scan:production-fixtures
+          pnpm verify:release-config
           pnpm typecheck
           pnpm test
           pnpm build
+          pnpm smoke:auth
+          pnpm smoke:baseline
+          pnpm smoke:jobs
           pnpm smoke:worker-gateway
           pnpm smoke:stripe
           pnpm smoke:product
+          pnpm smoke:release-closure
           pnpm build:preview
 
       - name: Resolve preview session secret
@@ -78,14 +84,14 @@ jobs:
           PREVIEW_D1_NAME: ${{ vars.PREVIEW_D1_NAME || 'sovereign-openapi-preview-db' }}
           PREVIEW_SESSION_SIGNING_SECRET: ${{ steps.preview-secret.outputs.secret }}
           AI_PROVIDER: ${{ vars.AI_PROVIDER || 'cloudflare-gateway' }}
-          AI_MODEL: ${{ vars.AI_MODEL || 'openai/gpt-5.6-terra' }}
+          AI_MODEL: ${{ vars.AI_MODEL || 'openai/gpt-5.5' }}
           AI_GATEWAY_ID: ${{ vars.AI_GATEWAY_ID || 'sovereign' }}
           SOVV_BASE_URL: ${{ vars.SOVV_BASE_URL }}
           SCRIPTURE_TRANSLATION: ${{ vars.SCRIPTURE_TRANSLATION || 'WEB' }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-          STRIPE_PRICE_STANDARD: ${{ vars.STRIPE_PRICE_STANDARD }}
-          STRIPE_PRICE_PREMIUM: ${{ vars.STRIPE_PRICE_PREMIUM }}
+          STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY: ${{ vars.STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY }}
+          STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL: ${{ vars.STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL }}
           STRIPE_SUCCESS_URL: ${{ vars.STRIPE_SUCCESS_URL }}
           STRIPE_CANCEL_URL: ${{ vars.STRIPE_CANCEL_URL }}
           STRIPE_PORTAL_RETURN_URL: ${{ vars.STRIPE_PORTAL_RETURN_URL }}
@@ -131,7 +137,7 @@ jobs:
       - name: Live Cloudflare Gateway verification
         env:
           AI_PROVIDER: cloudflare-gateway
-          AI_MODEL: ${{ vars.AI_MODEL || 'openai/gpt-5.6-terra' }}
+          AI_MODEL: ${{ vars.AI_MODEL || 'openai/gpt-5.5' }}
           AI_GATEWAY_ID: ${{ vars.AI_GATEWAY_ID || 'sovereign' }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -155,7 +161,7 @@ jobs:
             echo "- commit_sha: ${GITHUB_SHA}"
             echo "- worker_name: ${{ vars.PREVIEW_WORKER_NAME || 'sovereign-openapi-preview' }}"
             echo "- d1_name: ${{ vars.PREVIEW_D1_NAME || 'sovereign-openapi-preview-db' }}"
-            echo "- model: ${{ vars.AI_MODEL || 'openai/gpt-5.6-terra' }}"
+            echo "- model: ${{ vars.AI_MODEL || 'openai/gpt-5.5' }}"
             echo "- gateway_id: ${{ vars.AI_GATEWAY_ID || 'sovereign' }}"
             echo "- preview_url: ${{ steps.preview-deploy.outputs.preview_url }}"
             echo "- local_smokes: worker-gateway, stripe, product"
