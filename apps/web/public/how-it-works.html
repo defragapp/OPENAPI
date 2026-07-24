@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a0c" />
+    <meta name="description" content="See how Sovereign.OS Inner Recognition turns a difficult moment into one useful question and one clear next step." />
+    <title>How Inner Recognition works · Sovereign.OS</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0a0a0c;
+        color: #f5f1e9;
+        font-size: 17px;
+        line-height: 1.6;
+        --ink: #f5f1e9;
+        --muted: #b6aea3;
+        --faint: #817a73;
+        --line: rgba(255,255,255,.12);
+        --panel: rgba(20,19,22,.84);
+        --accent: #d6ff72;
+        --accent-ink: #13150b;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-width: 320px; min-height: 100%; }
+      body {
+        background:
+          radial-gradient(circle at 78% -8%, rgba(123,87,137,.24), transparent 35rem),
+          radial-gradient(circle at 8% 32%, rgba(80,101,77,.14), transparent 31rem),
+          #0a0a0c;
+      }
+      a { color: inherit; }
+      p { margin: 0; }
+      h1, h2 {
+        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+        font-weight: 500;
+        letter-spacing: -.05em;
+        text-wrap: balance;
+      }
+      h1 { max-width: 14ch; margin: 16px 0 24px; font-size: clamp(3rem, 8vw, 6.2rem); line-height: .93; }
+      h2 { max-width: 15ch; margin: 8px 0 18px; font-size: clamp(2.1rem, 5.5vw, 4.2rem); line-height: 1; }
+      h3 { margin: 0 0 10px; font-size: 1.08rem; }
+      .shell { width: min(100%, 1160px); margin: 0 auto; padding: calc(env(safe-area-inset-top) + 24px) 18px calc(env(safe-area-inset-bottom) + 70px); }
+      .nav { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+      .wordmark { font-size: .78rem; font-weight: 800; letter-spacing: .2em; text-decoration: none; }
+      .nav-links { display: flex; align-items: center; gap: 10px; }
+      .nav-links a { min-height: 44px; display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 12px; color: var(--muted); text-decoration: none; }
+      .nav-links a:last-child { border: 1px solid var(--line); color: var(--ink); }
+      .hero { min-height: 82vh; display: grid; align-content: center; padding: 12vh 0 8vh; }
+      .eyebrow { color: var(--muted); font-size: .72rem; font-weight: 750; letter-spacing: .18em; }
+      .lede { max-width: 62ch; color: #cbc3b8; font-size: clamp(1.05rem, 2.3vw, 1.28rem); }
+      .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+      .button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; padding: 10px 18px; border-radius: 14px; font-weight: 750; text-decoration: none; }
+      .primary { background: var(--accent); color: var(--accent-ink); }
+      .secondary { border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+      .trust-line { margin-top: 28px; color: var(--faint); font-size: .8rem; letter-spacing: .04em; }
+      .section { padding: clamp(66px, 10vw, 130px) 0; border-top: 1px solid var(--line); }
+      .section-intro { max-width: 66ch; color: #cbc3b8; font-size: 1.08rem; }
+      .steps, .cards { display: grid; gap: 14px; margin-top: 34px; }
+      .card { padding: clamp(22px, 4vw, 36px); border: 1px solid var(--line); border-radius: 24px; background: var(--panel); box-shadow: 0 30px 90px rgba(0,0,0,.2); }
+      .number { color: var(--accent); font-size: .72rem; font-weight: 800; letter-spacing: .16em; }
+      .card p { color: var(--muted); }
+      .example { margin-top: 18px; padding: 16px 18px; border-left: 2px solid var(--accent); background: rgba(214,255,114,.05); color: var(--ink) !important; }
+      .split { display: grid; gap: 20px; align-items: start; }
+      .plain-list { display: grid; gap: 10px; margin: 26px 0 0; padding: 0; list-style: none; }
+      .plain-list li { padding: 13px 0; border-bottom: 1px solid var(--line); color: #d9d1c7; }
+      .basis { margin-top: 24px; padding: 20px; border: 1px solid rgba(214,255,114,.25); border-radius: 18px; background: rgba(214,255,114,.045); }
+      .basis strong { display: block; margin-bottom: 8px; color: var(--accent); font-size: .78rem; letter-spacing: .1em; }
+      .basis code { color: var(--ink); white-space: normal; font-size: .95rem; }
+      .closing { text-align: left; }
+      .closing h2 { max-width: 17ch; }
+      footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; padding-top: 30px; border-top: 1px solid var(--line); color: var(--faint); font-size: .78rem; }
+      footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
+      @media (min-width: 760px) {
+        .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .cards, .split { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="nav">
+        <a class="wordmark" href="/">SOVEREIGN.OS</a>
+        <nav class="nav-links" aria-label="Account">
+          <a href="/login">Sign in</a>
+          <a href="/signup">Create workspace</a>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <p class="eyebrow">INNER RECOGNITION</p>
+        <h1>Understand what this moment is bringing up in you.</h1>
+        <p class="lede">Sovereign.OS helps you slow down a difficult interaction, notice what is happening inside you, and find one clear next step. Your Baseline Design and current timing work quietly in the background to make the guidance more personal.</p>
+        <div class="actions">
+          <a class="button primary" href="/signup">Talk it through</a>
+          <a class="button secondary" href="#how">See how it works</a>
+        </div>
+        <p class="trust-line">You do not need to understand the systems behind it.</p>
+      </section>
+
+      <section class="section" id="how">
+        <p class="eyebrow">HOW IT WORKS</p>
+        <h2>One useful question at a time.</h2>
+        <p class="section-intro">You describe what happened. Sovereign.OS helps you notice what changed inside you, what the reaction may be trying to protect, and what you can do next. The goal is not endless self-analysis. The goal is a clearer response.</p>
+        <div class="steps">
+          <article class="card">
+            <p class="number">01 · START</p>
+            <h3>Tell it what happened</h3>
+            <p>Begin with an argument, an unanswered message, a decision, a family issue, or something you cannot fully explain yet. You do not need to organize the story perfectly.</p>
+            <p class="example">“I know what I want to say, but I keep avoiding the conversation.”</p>
+          </article>
+          <article class="card">
+            <p class="number">02 · RECOGNIZE</p>
+            <h3>Find what is underneath</h3>
+            <p>Sovereign.OS does not rush to label the reaction. It asks one clear question that helps you recognize what the moment may be touching.</p>
+            <p class="example">“What do you think will happen after you give the honest answer?”</p>
+          </article>
+          <article class="card">
+            <p class="number">03 · CHOOSE</p>
+            <h3>Decide what works now</h3>
+            <p>Once the real concern is clearer, Sovereign.OS turns it into one practical choice: ask directly, request time, state a limit, give a clear answer, or stop repeating the same explanation.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section split">
+        <div>
+          <p class="eyebrow">PERSONAL BY DESIGN</p>
+          <h2>The systems stay in the background.</h2>
+          <p class="section-intro">Sovereign.OS can use verified astrology, Human Design, Gene Keys, numerology, live timing, relationship context, and insights you chose to save. This information helps the AI decide which question may be most useful. It does not define you, prove what another person thinks, or decide what you should do.</p>
+        </div>
+        <div class="card">
+          <h3>What you receive</h3>
+          <ul class="plain-list">
+            <li>One clear observation</li>
+            <li>One useful inward question</li>
+            <li>One practical next step</li>
+            <li>One optional reflection to save</li>
+            <li>A compact view of the exact data used</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="eyebrow">RELATIONSHIPS & FAMILIES</p>
+        <h2>Understand the interaction without deciding who is wrong.</h2>
+        <div class="cards">
+          <article class="card">
+            <h3>Relationship context</h3>
+            <p>Two people can experience the same moment differently. One may seek more information when things feel unclear. The other may say less when the conversation becomes difficult. Sovereign.OS helps identify what happens first and what each person can change without controlling the other.</p>
+            <p class="example">“Which part happens first here?”</p>
+          </article>
+          <article class="card">
+            <h3>Family roles</h3>
+            <p>Families often develop roles without naming them: keeping everyone calm, carrying the feelings, solving the practical problem, staying quiet, or becoming responsible for repair. Sovereign.OS helps you see the role you enter and decide whether it still fits.</p>
+            <p class="example">“What are you expected to carry here?”</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section split">
+        <div>
+          <p class="eyebrow">TRANSPARENT SUPPORT</p>
+          <h2>See what supported the response.</h2>
+          <p class="section-intro">A short Basis line can show the exact verified data points that helped shape a question or suggestion. Missing fields are omitted. Shared framework evidence appears only with specific permission.</p>
+          <div class="basis">
+            <strong>EXAMPLE BASIS</strong>
+            <code>HD 5/1 · 13–33 | GK 16.1 · 9.1 | LIVE ♃☌☉</code>
+          </div>
+        </div>
+        <article class="card">
+          <h3>What the Basis line is not</h3>
+          <ul class="plain-list">
+            <li>Not a score</li>
+            <li>Not a diagnosis</li>
+            <li>Not proof that an interpretation is correct</li>
+            <li>Not permission to expose another person’s private data</li>
+          </ul>
+          <p class="example">The data supports the question. You decide whether the answer fits.</p>
+        </article>
+      </section>
+
+      <section class="section split">
+        <article class="card">
+          <p class="eyebrow">INSIGHT LIBRARY</p>
+          <h2>Save the insight—not the whole conversation.</h2>
+          <p>When something important becomes clear, Sovereign.OS can offer a short private reflection containing the recognition, a question to return to, a clearer response, and the verified Basis used. Nothing is saved without your choice.</p>
+        </article>
+        <article class="card">
+          <p class="eyebrow">MEANING & GROUNDING</p>
+          <h2>Explore meaning without losing your footing.</h2>
+          <p>Spiritual experiences, symbolic dreams, intuition, and identity shifts can be explored without treating every feeling, sign, or coincidence as proof. Meaning is welcome. Certainty is not forced. Daily life still matters.</p>
+        </article>
+      </section>
+
+      <section class="section closing">
+        <p class="eyebrow">START WHERE YOU ARE</p>
+        <h2>You are more than the reaction.</h2>
+        <p class="section-intro">Sovereign.OS helps you understand what the reaction may be protecting—so you can decide what comes next.</p>
+        <div class="actions">
+          <a class="button primary" href="/signup">Understand this moment</a>
+          <a class="button secondary" href="/login">Return to your workspace</a>
+        </div>
+      </section>
+
+      <footer>
+        <span>Non-diagnostic · Consent-aware · Private by design</span>
+        <nav aria-label="Legal">
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+        </nav>
+      </footer>
+    </main>
+  </body>
+</html>
