@@ -139,6 +139,13 @@ function secure(response: Response): Response {
   return withSecurityHeaders(response);
 }
 
+function encodeVisualStoryHeader(value: unknown): string {
+  const bytes = new TextEncoder().encode(JSON.stringify(value));
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
 async function handleRecognitionMessage(request: Request, env: Env, threadId: string): Promise<Response> {
   requireSameOrigin(request);
   const auth = await requireAuth(request, env);
@@ -189,7 +196,10 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       'x-sovereign-plan': entitlements.plan,
       'x-sovereign-ai-remaining': String(usage.remaining),
       'x-sovereign-response-phase': result.plan.response_phase,
-      'x-sovereign-module-offer': result.plan.module_suggestion.should_offer ? '1' : '0'
+      'x-sovereign-module-offer': result.plan.module_suggestion.should_offer ? '1' : '0',
+      'x-sovereign-visual-story': result.plan.visual_story.should_show
+        ? encodeVisualStoryHeader({ story: result.plan.visual_story, basis: result.plan.basis })
+        : ''
     });
     if (result.plan.module_suggestion.should_offer && result.plan.module_suggestion.title) headers.set('x-sovereign-module-title', encodeURIComponent(result.plan.module_suggestion.title));
     return new Response(result.text, { status: 202, headers });
