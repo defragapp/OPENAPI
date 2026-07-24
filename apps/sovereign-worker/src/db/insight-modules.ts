@@ -37,10 +37,16 @@ export async function saveLatestInsightModule(env: Env, accountId: string, threa
   const id = `module_${event.id}`;
   await env.DB.prepare('INSERT OR IGNORE INTO saved_understandings (id, account_id, thread_id, kind, body_json) VALUES (?, ?, ?, ?, ?)')
     .bind(id, accountId, threadId, 'insight_module', JSON.stringify(module)).run();
-  return { id, module };
+  const stored = await env.DB.prepare('SELECT body_json FROM saved_understandings WHERE id = ? AND account_id = ? AND kind = ?')
+    .bind(id, accountId, 'insight_module')
+    .first<{ body_json: string }>();
+  if (!stored) throw new Response('The Insight Module could not be saved.', { status: 500 });
+  return { id, module: safeJson(stored.body_json) };
 }
 
-function safeJson(value: string): Record<string, unknown> {
+function safeJson(value: unknown): Record<string, unknown> {
+  if (value && typeof value === 'object') return value as Record<string, unknown>;
+  if (typeof value !== 'string') return {};
   try {
     const parsed = JSON.parse(value);
     return parsed && typeof parsed === 'object' ? parsed as Record<string, unknown> : {};
