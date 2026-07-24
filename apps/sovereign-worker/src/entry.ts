@@ -64,30 +64,41 @@ app.get('/api/v1/systems/:systemId/analysis', async (context) => {
 
 const worker = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
-    const url = new URL(request.url);
-    const pairMatch = url.pathname.match(/^\/api\/v1\/people\/([^/]+)\/compare$/);
-    if (request.method === 'POST' && pairMatch) {
-      requireSameOrigin(request);
-      const auth = await requireAuth(request, env);
-      return Response.json({ comparison: await buildPairComparison(env, auth.accountId, decodeURIComponent(pairMatch[1]!)) });
-    }
+    try {
+      const url = new URL(request.url);
+      const pairMatch = url.pathname.match(/^\/api\/v1\/people\/([^/]+)\/compare$/);
+      if (request.method === 'POST' && pairMatch) {
+        requireSameOrigin(request);
+        const auth = await requireAuth(request, env);
+        return Response.json({ comparison: await buildPairComparison(env, auth.accountId, decodeURIComponent(pairMatch[1]!)) });
+      }
 
-    const memberMatch = url.pathname.match(/^\/api\/v1\/systems\/([^/]+)\/members$/);
-    if (request.method === 'POST' && memberMatch) {
-      requireSameOrigin(request);
-      const auth = await requireAuth(request, env);
-      const body = await request.json().catch(() => ({})) as { personId?: string; metadata?: Record<string, unknown> };
-      if (!body.personId) return Response.json({ error: 'personId required' }, { status: 400 });
-      return Response.json({ membership: await addConsentedSystemMember(env, auth.accountId, decodeURIComponent(memberMatch[1]!), body.personId, body.metadata ?? {}) }, { status: 201 });
-    }
+      const memberMatch = url.pathname.match(/^\/api\/v1\/systems\/([^/]+)\/members$/);
+      if (request.method === 'POST' && memberMatch) {
+        requireSameOrigin(request);
+        const auth = await requireAuth(request, env);
+        const body = await request.json().catch(() => ({})) as { personId?: string; metadata?: Record<string, unknown> };
+        if (!body.personId) return Response.json({ error: 'personId required' }, { status: 400 });
+        return Response.json({ membership: await addConsentedSystemMember(env, auth.accountId, decodeURIComponent(memberMatch[1]!), body.personId, body.metadata ?? {}) }, { status: 201 });
+      }
 
-    const alignmentMatch = url.pathname.match(/^\/api\/v1\/systems\/([^/]+)\/alignment$/);
-    if (request.method === 'GET' && alignmentMatch) {
-      const auth = await requireAuth(request, env);
-      return Response.json({ analysis: await buildSystemAnalysis(env, auth.accountId, decodeURIComponent(alignmentMatch[1]!)) });
-    }
+      const alignmentMatch = url.pathname.match(/^\/api\/v1\/systems\/([^/]+)\/alignment$/);
+      if (request.method === 'GET' && alignmentMatch) {
+        const auth = await requireAuth(request, env);
+        return Response.json({ analysis: await buildSystemAnalysis(env, auth.accountId, decodeURIComponent(alignmentMatch[1]!)) });
+      }
 
-    return app.fetch(request, env, executionContext);
+      const response = await app.fetch(request, env, executionContext);
+      if (request.method === 'GET' && ['/health', '/healthz', '/ready'].includes(url.pathname) && response.headers.get('content-type')?.includes('application/json')) {
+        const payload = await response.json<Record<string, unknown>>();
+        return Response.json({ ...payload, migrationVersion: '0008_identity_bound_invitations' }, { status: response.status, headers: response.headers });
+      }
+      return response;
+    } catch (error) {
+      if (error instanceof Response) return error;
+      console.error('identity_route_failure', { error: error instanceof Error ? error.name : 'unknown' });
+      return Response.json({ error: 'Internal error' }, { status: 500 });
+    }
   }
 };
 
