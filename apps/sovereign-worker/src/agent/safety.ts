@@ -26,6 +26,8 @@ export function assertSovereignOutputSafety(output: string): void {
   const questionPhase = output.includes('WHAT I NOTICE') && output.includes('LOOK INWARD');
   const integrationPhase = output.includes('WHAT THIS MAY BE SHOWING') && output.includes('A CLEARER FORM') && output.includes('WHAT TO DO');
   if (!questionPhase && !integrationPhase) throw new Error('Sovereign output is missing the recognition response structure');
-  if ((output.match(/\?/g) ?? []).length > 1) throw new Error('Sovereign output asks more than one question');
+  const questionCount = (output.match(/\?/g) ?? []).length;
+  if (questionPhase && questionCount !== 1) throw new Error('Question-phase output must ask exactly one question');
+  if (integrationPhase && questionCount > 1) throw new Error('Integration output asks more than one question');
   if (/\b(HD|GK|REL|LIVE|N)\b/.test(output) && !output.includes('BASIS ·')) throw new Error('Framework data must remain in the Basis footer');
 }
