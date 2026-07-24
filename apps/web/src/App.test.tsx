@@ -5,6 +5,7 @@ describe('Sovereign PWA shell', () => {
   const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
   const css = readFileSync(new URL('./styles.css', import.meta.url), 'utf8');
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const consent = readFileSync(new URL('../public/consent.html', import.meta.url), 'utf8');
 
   it('contains all authenticated surfaces', () => {
     for (const label of ['Today', 'Explore', 'People', 'Systems', 'Library', 'You']) {
@@ -38,5 +39,13 @@ describe('Sovereign PWA shell', () => {
     for (const label of ['Email address', 'Area of focus', 'Person’s name', 'System name', 'Birth date', 'Sovereign+ billing']) {
       expect(app).toContain(label);
     }
+  });
+
+  it('keeps consent under the invited person’s control', () => {
+    expect(app).toContain('Send private invitation');
+    expect(app).toContain('You decide what may be shared.');
+    expect(app).not.toContain('>Grant</button>');
+    expect(consent).toContain('Your permissions remain yours.');
+    expect(consent).toContain('Do not allow');
   });
 });
