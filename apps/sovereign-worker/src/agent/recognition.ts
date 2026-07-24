@@ -116,23 +116,55 @@ function plainKey(value: string): string { return value.replace(/([a-z])([A-Z])/
 
 export function parseRecognitionPlan(raw: string, available: AvailableBasis): RecognitionPlan {
   const parsed = recognitionPlanSchema.parse(JSON.parse(extractJson(raw)));
+  parsed.recognition = parsed.recognition.trim();
+  parsed.inward_question = normalizeQuestion(parsed.inward_question);
+  parsed.candidate_hidden_expectation = parsed.candidate_hidden_expectation.trim();
+  parsed.protected_need = parsed.protected_need.trim();
+  parsed.clearer_form = parsed.clearer_form.trim();
+  parsed.practical_action = parsed.practical_action.trim();
+  parsed.module_suggestion.title = parsed.module_suggestion.title.trim();
+  parsed.module_suggestion.reason = parsed.module_suggestion.reason.trim();
+
   for (const key of Object.keys(available) as BasisKey[]) {
     const allowed = new Set(available[key]);
     if (parsed.basis[key].some((value) => !allowed.has(value))) throw new Error(`Recognition plan selected unverified ${key} data`);
   }
-  parsed.inward_question = normalizeQuestion(parsed.inward_question);
+
   if (parsed.response_phase === 'question') {
     parsed.candidate_hidden_expectation = '';
     parsed.protected_need = '';
     parsed.clearer_form = '';
     parsed.practical_action = '';
     parsed.module_suggestion.should_offer = false;
+    parsed.module_suggestion.title = '';
+    parsed.module_suggestion.reason = '';
+    parsed.basis.user_confirmed = false;
+    return parsed;
   }
+
+  for (const [field, value] of [
+    ['candidate_hidden_expectation', parsed.candidate_hidden_expectation],
+    ['protected_need', parsed.protected_need],
+    ['clearer_form', parsed.clearer_form],
+    ['practical_action', parsed.practical_action]
+  ] as const) {
+    if (!value) throw new Error(`Recognition integration is missing ${field}`);
+  }
+
+  if (parsed.safety_mode !== 'standard') {
+    parsed.module_suggestion.should_offer = false;
+    parsed.module_suggestion.title = '';
+    parsed.module_suggestion.reason = '';
+  } else if (parsed.module_suggestion.should_offer && (!parsed.module_suggestion.title || !parsed.module_suggestion.reason)) {
+    throw new Error('Insight Module offer requires a title and reason');
+  }
+
   return parsed;
 }
 
 function normalizeQuestion(value: string): string {
-  const clean = value.trim().replace(/[?]+$/g, '');
+  const clean = value.trim().replace(/[?]+$/g, '').trim();
+  if (clean.length < 3) throw new Error('Recognition planner returned an empty inward question');
   return `${clean}?`;
 }
 
@@ -153,7 +185,7 @@ export function composeRecognitionResponse(plan: RecognitionPlan): string {
   const moduleLine = plan.module_suggestion.should_offer && plan.module_suggestion.title
     ? `\n\nEXPLORE LATER\n\n${plan.module_suggestion.title}`
     : '';
-  return `WHAT THIS MAY BE SHOWING\n\n${plan.candidate_hidden_expectation || plan.recognition}\n\nA CLEARER FORM\n\n${plan.clearer_form}\n\nWHAT TO DO\n\n${plan.practical_action}${moduleLine}${footer ? `\n\n${footer}` : ''}`;
+  return `WHAT THIS MAY BE SHOWING\n\n${plan.candidate_hidden_expectation}\n\nA CLEARER FORM\n\n${plan.clearer_form}\n\nWHAT TO DO\n\n${plan.practical_action}${moduleLine}${footer ? `\n\n${footer}` : ''}`;
 }
 
 export function renderBasisFooter(basis: BasisSelection): string {
@@ -176,11 +208,11 @@ export function recognitionJsonContract(_available: AvailableBasis): string {
   return JSON.stringify({
     response_phase: 'question | integration',
     recognition: 'plain-language observation',
-    inward_question: 'exactly one question',
-    candidate_hidden_expectation: 'empty in question phase',
-    protected_need: 'empty in question phase',
-    clearer_form: 'empty in question phase',
-    practical_action: 'empty in question phase',
+    inward_question: 'exactly one meaningful question',
+    candidate_hidden_expectation: 'required in integration; empty in question phase',
+    protected_need: 'required in integration; empty in question phase',
+    clearer_form: 'required in integration; empty in question phase',
+    practical_action: 'required in integration; empty in question phase',
     module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
     basis: { user_confirmed: false, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
     confidence: 'confirmed | supported | exploratory',
