@@ -3,62 +3,78 @@ import { readFileSync } from 'node:fs';
 
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const recognition = readFileSync(new URL('../public/recognition-ui.js', import.meta.url), 'utf8');
-const mirror = readFileSync(new URL('../public/mirror-surface.js', import.meta.url), 'utf8');
 const styles = readFileSync(new URL('../public/mirror-ui.css', import.meta.url), 'utf8');
 
-describe('separate archetype visual workspace', () => {
-  it('loads after the AI thread enhancements without embedding inside Today', () => {
+describe('animated archetype visualization inside the AI thread', () => {
+  it('keeps the existing AI workspace primary and removes the standalone Mirror surface', () => {
+    expect(index).toContain('/recognition-ui.js');
     expect(index).toContain('/mirror-ui.css');
-    expect(index).toContain('/mirror-surface.js');
-    expect(index.indexOf('/mirror-surface.js')).toBeGreaterThan(index.indexOf('/recognition-ui.js'));
-    expect(recognition).not.toContain('renderMirrorExperience');
-    expect(mirror).toContain("workspace.dataset.mirrorContract = 'interpretation-first-visual-second'");
-    expect(styles).toContain('.app-shell.mirror-surface-open .workspace-frame{display:none}');
-    expect(styles).toContain('.app-shell.mirror-surface-open>.tabbar{display:none}');
+    expect(index).not.toContain('/mirror-surface.js');
+    expect(recognition).toContain("panel.querySelector('.streamed-copy')");
+    expect(recognition).toContain("section.dataset.visualContract = 'interpretation-first-artwork-second'");
+    expect(styles).not.toContain('mirror-surface-open');
+    expect(styles).not.toContain('.mirror-visual-workspace');
   });
 
-  it('keeps interpretation and card artwork as separate data layers', () => {
-    expect(mirror).toContain('interpretation:');
-    expect(mirror).toContain('visualArchetype:');
-    expect(mirror).toContain('The visual archetype can explain the result, but it can never create the result by itself.');
-    expect(mirror).toContain('today?.today?.mirrorVisual');
-    expect(mirror).not.toMatch(/tarot determines|card proves|draw determines/i);
+  it('renders only validated visual metadata returned with an AI response', () => {
+    expect(recognition).toContain("response.headers.get('x-sovereign-visual-story')");
+    expect(recognition).toContain('decodeVisualPayload');
+    expect(recognition).toContain('normalizeVisualPayload');
+    expect(recognition).toContain('story?.should_show');
+    expect(recognition).toContain('The interpretation was completed first');
+    expect(recognition).toContain('Interpreted first · Illustrated second');
+    expect(recognition).not.toMatch(/tarot determines|card proves|draw determines/i);
   });
 
-  it('presents past protection, shadow, and gift without turning the archetype into identity', () => {
-    for (const copy of ['Past protection', 'Shadow', 'Gift', 'WHAT MAY BE ACTIVE NOW', 'THE GIFT INSIDE IT']) {
-      expect(mirror).toContain(copy);
+  it('shows past protection, shadow, and gift as views of one grounded role', () => {
+    for (const phrase of ['Past protection', 'Shadow', 'Gift', 'WHAT THIS ROLE MAY HAVE LEARNED', 'THE CAPACITY INSIDE THE ROLE']) {
+      expect(recognition).toContain(phrase);
     }
-    expect(mirror).not.toMatch(/you are the fool|you are the magician|this card proves/i);
+    expect(recognition).toContain("visualPhase = latestVisual?.story?.primary?.phase || 'shadow'");
+    expect(recognition).toContain('data-visual-phase');
     expect(styles).toContain('[data-phase="origin"]');
     expect(styles).toContain('[data-phase="shadow"]');
     expect(styles).toContain('[data-phase="gift"]');
   });
 
-  it('supports self, consented interaction, and family-role visual stories', () => {
-    for (const mode of ['self', 'interaction', 'family']) expect(mirror).toContain(mode);
-    expect(mirror).toContain('Each person confirms their own role.');
-    expect(mirror).toContain('Both cards require identity-bound, active permission.');
-    expect(mirror).toContain('Other people appear only when their permitted context is available.');
-    expect(styles).toContain('.mirror-pair-stage');
-    expect(styles).toContain('.mirror-family-stage');
+  it('supports self, consented interaction, and family-system layouts without changing the chat flow', () => {
+    for (const mode of ['self', 'interaction', 'family']) expect(recognition).toContain(mode);
+    expect(recognition).toContain("story.mode !== 'self'");
+    expect(recognition).toContain('Permitted relationship context');
+    expect(styles).toContain('.thread-card-stage-interaction');
+    expect(styles).toContain('.thread-card-stage-family');
+    expect(styles).toContain('.thread-role-connection');
   });
 
-  it('is ready for animated artwork without requiring generated video at runtime', () => {
-    expect(mirror).toContain('data-motion-engine="rive-ready"');
-    expect(styles).toContain('.mirror-motion-echo');
-    expect(styles).toContain('@keyframes mirror-breathe');
-    expect(styles).toContain('@media(prefers-reduced-motion:reduce)');
+  it('uses original layered SVG art with deterministic character motion', () => {
+    for (const archetype of ['fool', 'magician', 'three_of_cups', 'hermit', 'strength', 'tower']) {
+      expect(recognition).toContain(archetype);
+    }
+    expect(recognition).toContain('data-motion-engine="layered-svg"');
+    expect(recognition).toContain('<svg viewBox="0 0 300 430"');
+    expect(styles).toContain('@keyframes visual-fool-step');
+    expect(styles).toContain('@keyframes visual-magician-arm');
+    expect(styles).toContain('@keyframes visual-cups-toast');
+    expect(styles).toContain('@keyframes visual-tower-flash');
   });
 
-  it('supports premium iPhone and desktop interaction', () => {
-    for (const selector of ['.mirror-visual-workspace', '.mirror-archetype-card', '.mirror-role-shelf', '.mirror-view-switcher']) {
+  it('keeps corrections inside the existing thread and preserves user authority', () => {
+    expect(recognition).toContain('/corrections');
+    expect(recognition).toContain("saveVisualCorrection('yes'");
+    expect(recognition).toContain("saveVisualCorrection('partly'");
+    expect(recognition).toContain("saveVisualCorrection('not_today'");
+    expect(recognition).toContain('Your enduring Baseline was not rewritten.');
+    expect(recognition).toContain('temporary visual role, not an identity or a source of truth');
+  });
+
+  it('is premium, iPhone-safe, and reduced-motion aware', () => {
+    for (const selector of ['.thread-visual-story', '.thread-visual-card', '.thread-phase-control', '.thread-visual-basis']) {
       expect(styles).toContain(selector);
     }
-    expect(styles).toContain('@media(min-width:1040px)');
-    expect(styles).toContain('@media(max-width:680px)');
-    expect(styles).toContain('safe-area-inset-top');
-    expect(styles).toContain('min-height:48px');
-    expect(styles).toContain('scroll-snap-type:x mandatory');
+    expect(styles).toContain('@media (max-width: 680px)');
+    expect(styles).toContain('safe-area-inset-bottom');
+    expect(styles).toContain('min-height: 48px');
+    expect(styles).toContain('scroll-snap-type: x mandatory');
+    expect(styles).toContain('@media (prefers-reduced-motion: reduce)');
   });
 });
