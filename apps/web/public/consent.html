@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Your permissions · Sovereign.OS</title>
+  <style>
+    :root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #f5f2eb; background: #0c0d0f; font-size: 17px; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top, #202126 0, #0c0d0f 46%); }
+    main { width: min(860px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 72px; }
+    a { color: inherit; }
+    .wordmark { display: inline-block; margin-bottom: 56px; font-weight: 760; letter-spacing: .12em; text-decoration: none; }
+    .eyebrow { color: #bbb6aa; font-size: .78rem; font-weight: 760; letter-spacing: .14em; }
+    h1 { max-width: 720px; margin: 12px 0 16px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.4rem, 8vw, 5rem); line-height: .98; font-weight: 500; }
+    .lede { max-width: 680px; color: #d0cbc0; font-size: 1.08rem; line-height: 1.65; }
+    #status { min-height: 28px; margin: 24px 0; color: #d8d2c5; }
+    .invitation { margin-top: 24px; padding: clamp(20px, 5vw, 34px); border: 1px solid #3c3d42; border-radius: 24px; background: rgba(24, 25, 29, .88); }
+    .invitation h2 { margin: 0 0 6px; font-size: 1.45rem; }
+    .scope { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 18px 0; border-top: 1px solid #34353a; }
+    .scope:first-of-type { margin-top: 20px; }
+    .scope strong, .scope small { display: block; }
+    .scope small { margin-top: 5px; color: #aaa59b; font-size: .85rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+    button, .button { min-height: 44px; padding: 10px 16px; border: 1px solid #66676d; border-radius: 999px; background: #f0ece3; color: #141518; font: inherit; font-weight: 700; cursor: pointer; }
+    button.secondary { background: transparent; color: #f0ece3; }
+    button:disabled { opacity: .45; cursor: wait; }
+    .empty { padding: 24px; border: 1px solid #3c3d42; border-radius: 20px; color: #c8c2b7; }
+    footer { margin-top: 40px; color: #aaa59b; line-height: 1.6; }
+    @media (max-width: 620px) { .scope { grid-template-columns: 1fr; } .actions { justify-content: flex-start; } .wordmark { margin-bottom: 40px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="wordmark" href="/app">SOVEREIGN.OS</a>
+    <p class="eyebrow">PRIVATE CONSENT</p>
+    <h1>Your permissions remain yours.</h1>
+    <p class="lede">Review every relationship invitation connected to your identity. You can allow a requested use, deny it, or revoke an earlier permission. Changes apply to future pair and system analysis immediately.</p>
+    <p id="status" role="status" aria-live="polite">Loading your permissions…</p>
+    <section id="invitations"></section>
+    <footer>No raw birth input or exact private location is shown here or shared with the inviting account. <a href="/privacy">Read the Privacy Policy</a>.</footer>
+  </main>
+  <script type="module">
+    const labels = {
+      'pair.compare': 'Compare your reduced Baselines',
+      'system.include': 'Include you in a family, household, or team',
+      'trait.display': 'Use shared plain-language Baseline traits',
+      'framework.display': 'Show optional source-framework detail',
+      'current_conditions.use': 'Use your separately permitted current context',
+      'library.link': 'Link a saved understanding',
+      'covenant.include': 'Include your context in an explicit Scripture lens'
+    };
+    const status = document.querySelector('#status');
+    const container = document.querySelector('#invitations');
+
+    async function load() {
+      const response = await fetch('/api/v1/invitations/mine', { headers: { accept: 'application/json' } });
+      if (response.status === 401) {
+        status.textContent = 'Sign in to review your permissions.';
+        container.innerHTML = '<p class="empty"><a class="button" href="/login">Sign in</a></p>';
+        return;
+      }
+      if (!response.ok) {
+        status.textContent = 'Your permissions could not be loaded safely.';
+        return;
+      }
+      const data = await response.json();
+      render(data.invitations || []);
+    }
+
+    function render(invitations) {
+      container.replaceChildren();
+      if (!invitations.length) {
+        status.textContent = 'No accepted invitations are connected to this account.';
+        container.innerHTML = '<p class="empty">When you accept a Sovereign.OS invitation, its permissions will appear here.</p>';
+        return;
+      }
+      status.textContent = 'Choose each permission independently.';
+      for (const invitation of invitations) {
+        const article = document.createElement('article');
+        article.className = 'invitation';
+        const heading = document.createElement('h2');
+        heading.textContent = invitation.displayName || 'Shared relationship';
+        article.append(heading);
+        const note = document.createElement('p');
+        note.textContent = `Policy ${invitation.policyVersion}. The inviting account cannot change these decisions.`;
+        article.append(note);
+        for (const scope of invitation.requestedScopes || []) article.append(scopeRow(invitation, scope));
+        container.append(article);
+      }
+    }
+
+    function scopeRow(invitation, scope) {
+      const row = document.createElement('div');
+      row.className = 'scope';
+      const copy = document.createElement('span');
+      const title = document.createElement('strong');
+      title.textContent = labels[scope] || scope;
+      const detail = document.createElement('small');
+      detail.textContent = invitation.decisions?.[scope] ? `Current decision: ${invitation.decisions[scope]}` : 'No decision recorded';
+      copy.append(title, detail);
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const allow = document.createElement('button');
+      allow.textContent = invitation.decisions?.[scope] === 'granted' ? 'Allowed' : 'Allow';
+      allow.disabled = invitation.decisions?.[scope] === 'granted';
+      allow.addEventListener('click', () => decide(invitation.id, scope, true, row));
+      const deny = document.createElement('button');
+      deny.className = 'secondary';
+      deny.textContent = invitation.decisions?.[scope] === 'denied' ? 'Not allowed' : 'Do not allow';
+      deny.disabled = invitation.decisions?.[scope] === 'denied';
+      deny.addEventListener('click', () => decide(invitation.id, scope, false, row));
+      actions.append(allow, deny);
+      row.append(copy, actions);
+      return row;
+    }
+
+    async function decide(invitationId, scope, granted, row) {
+      for (const button of row.querySelectorAll('button')) button.disabled = true;
+      status.textContent = granted ? 'Saving permission…' : 'Revoking permission…';
+      const response = await fetch(`/api/v1/invitations/${encodeURIComponent(invitationId)}/consent/${encodeURIComponent(scope)}`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ granted })
+      });
+      if (!response.ok) {
+        status.textContent = 'That decision could not be saved safely.';
+        for (const button of row.querySelectorAll('button')) button.disabled = false;
+        return;
+      }
+      status.textContent = granted ? 'Permission allowed for future use.' : 'Permission revoked for future use.';
+      await load();
+    }
+
+    load().catch(() => { status.textContent = 'Your permissions could not be loaded safely.'; });
+  </script>
+</body>
+</html>
