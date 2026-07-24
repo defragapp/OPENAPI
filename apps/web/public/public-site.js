@@ -9,6 +9,10 @@ function enhanceLanding() {
   if (!shell || !hero || hero.dataset.innerRecognitionLanding === 'true') return;
 
   hero.dataset.innerRecognitionLanding = 'true';
+  document.title = 'Sovereign.OS · Inner Recognition';
+  const description = document.querySelector('meta[name="description"]');
+  description?.setAttribute('content', 'Sovereign.OS helps you understand what a moment is bringing up in you—so you can respond with more clarity.');
+
   const eyebrow = hero.querySelector('.eyebrow');
   const heading = hero.querySelector('h1');
   const lede = hero.querySelector('.lede');
