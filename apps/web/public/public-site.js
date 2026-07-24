@@ -11,10 +11,10 @@ function renderMarketingHome() {
 
   shell.dataset.sovereignMarketing = 'true';
   shell.className = 'marketing-page marketing-home';
-  document.title = 'Sovereign.OS — Personal AI built around your Baseline';
+  document.title = 'Sovereign.OS — Personal AI that starts with context';
   document.querySelector('meta[name="description"]')?.setAttribute(
     'content',
-    'Sovereign.OS uses your private Baseline, what is current, the people you choose, and what you save to make AI guidance more relevant from the start.'
+    'Create one private Baseline. Sovereign uses it to make guidance for today, decisions, relationships, and groups more relevant from the start.'
   );
 
   ensureMarketingStyles();
@@ -30,242 +30,165 @@ function renderMarketingHome() {
         </nav>
       </header>
 
-      <section class="marketing-hero">
-        <div class="marketing-hero-copy reveal">
-          <p class="marketing-kicker">Personal AI, built around your Baseline</p>
-          <h1 class="marketing-display">Start with context. <em>Not a blank box.</em></h1>
-          <p class="marketing-lede">
-            Sovereign starts with your private Baseline, adds what is current and what you choose to save,
-            then shows what may be useful now.
-          </p>
-          <div class="marketing-actions">
-            <a class="marketing-button primary" href="/signup">Create my Baseline</a>
-            <a class="marketing-button secondary" href="#capabilities">See what it can do</a>
+      <main>
+        <section class="hero-v4">
+          <div class="hero-v4-copy reveal">
+            <p class="marketing-kicker">Personal AI with a better starting point</p>
+            <h1>Personal AI that doesn’t make you start over.</h1>
+            <p class="hero-v4-lede">
+              Create one private Baseline of how you tend to decide, communicate, learn, and handle pressure.
+              Sovereign uses it to make today’s guidance more relevant—without asking you to explain everything again.
+            </p>
+            <div class="marketing-actions">
+              <a class="marketing-button primary" href="/signup">Create my Baseline</a>
+              <a class="marketing-button secondary" href="#experience">See a real example</a>
+            </div>
+            <div class="trust-row" aria-label="Product principles">
+              <span>Private by default</span>
+              <span>Sharing needs permission</span>
+              <span>Save only what you choose</span>
+            </div>
           </div>
-          <ul class="marketing-trust" aria-label="Product principles">
-            <li>Private by design</li>
-            <li>Nothing shared without permission</li>
-            <li>You decide what fits</li>
-          </ul>
-        </div>
 
-        <div class="product-preview-wrap reveal" aria-label="Preview of the Sovereign Today experience">
-          <div class="product-device">
-            <div class="product-screen">
-              <div class="product-status">
-                <span>9:41</span>
-                <span class="product-status-icons" aria-hidden="true">● ● <i></i></span>
-              </div>
-              <div class="product-topbar">
+          <div class="hero-product reveal" aria-label="Preview of the Sovereign Today screen">
+            <div class="app-frame app-frame-phone">
+              <div class="app-frame-bar">
                 <strong>SOVEREIGN</strong>
-                <span class="product-avatar">CO</span>
+                <span class="app-avatar">CO</span>
               </div>
-              <div class="product-content">
-                <p class="product-date">Today · Friday</p>
-                <h2 class="product-title">A fast answer may feel clearer than it is.</h2>
-                <p class="product-summary">
-                  You usually reach better decisions after seeing how the pieces connect. Today may make the
-                  first complete answer feel final before you have checked the whole picture.
+              <div class="app-frame-body">
+                <p class="app-overline">Today · Friday</p>
+                <h2>A fast answer may feel clearer than it is.</h2>
+                <p class="app-intro">
+                  Your Baseline suggests that seeing the whole picture may help you decide. Today may make the
+                  first complete answer feel final too quickly.
                 </p>
-                <section class="product-focus">
-                  <span class="product-focus-label">A better next move</span>
+                <article class="app-primary-card">
+                  <span>Try this</span>
                   <h3>Give the decision one more pass.</h3>
-                  <p>Notice what changes after the pressure to finish has passed.</p>
-                </section>
-                <div class="product-details">
-                  <article class="product-detail">
-                    <span>What stays true</span>
-                    <strong>You work best when the full picture is visible.</strong>
-                  </article>
-                  <article class="product-detail warm">
-                    <span>What may be stronger today</span>
-                    <strong>The need to reach a conclusion quickly.</strong>
-                  </article>
+                  <p>Return after the pressure to finish has eased.</p>
+                </article>
+                <div class="app-state-grid">
+                  <article><span>Baseline tendency</span><strong>Clarity improves when the full picture is visible.</strong></article>
+                  <article class="warm"><span>Current amplification</span><strong>The need to finish may feel stronger today.</strong></article>
                 </div>
+                <p class="app-uncertainty">Unknown actual state · You decide whether this fits.</p>
               </div>
-              <nav class="product-bottom-nav" aria-label="Preview navigation">
-                <span class="active">Today</span>
-                <span>Explore</span>
-                <span>People</span>
-                <span>Library</span>
-                <span>You</span>
+              <nav class="app-frame-nav" aria-label="Product preview navigation">
+                <span class="active">Today</span><span>Explore</span><span>People</span><span>Systems</span><span>Library</span>
               </nav>
             </div>
           </div>
-          <aside class="product-caption">
-            <strong>Useful before you ask.</strong>
-            Open Sovereign and see what may deserve your attention today.
-          </aside>
-        </div>
-      </section>
+        </section>
+
+        <section class="showcase-section" id="experience">
+          <div class="section-heading reveal">
+            <p class="marketing-kicker">See it work</p>
+            <h2>One private starting point. Different kinds of help.</h2>
+            <p>Choose a view to see how the same Baseline can support today, a decision, another person, or a group.</p>
+          </div>
+
+          <div class="showcase-layout reveal">
+            <div class="showcase-tabs" role="tablist" aria-label="Sovereign examples">
+              <button class="showcase-tab active" type="button" role="tab" aria-selected="true" data-view="today">
+                <span>Today</span><strong>What may deserve attention now</strong>
+              </button>
+              <button class="showcase-tab" type="button" role="tab" aria-selected="false" data-view="decision">
+                <span>Decisions</span><strong>Separate the choice from the pressure</strong>
+              </button>
+              <button class="showcase-tab" type="button" role="tab" aria-selected="false" data-view="people">
+                <span>People</span><strong>Understand where two approaches differ</strong>
+              </button>
+              <button class="showcase-tab" type="button" role="tab" aria-selected="false" data-view="systems">
+                <span>Groups</span><strong>See the role you are expected to play</strong>
+              </button>
+            </div>
+
+            <div class="showcase-product">
+              <div class="desktop-app">
+                <aside class="desktop-app-nav">
+                  <strong>S</strong>
+                  <span class="active">Today</span>
+                  <span>Explore</span>
+                  <span>People</span>
+                  <span>Systems</span>
+                  <span>Library</span>
+                </aside>
+                <article class="desktop-app-main" aria-live="polite">
+                  <div class="desktop-app-topline">
+                    <span data-view-label>Today · Current view</span>
+                    <span>Private workspace</span>
+                  </div>
+                  <h3 data-view-title>A fast answer may feel clearer than it is.</h3>
+                  <p data-view-summary>
+                    Your Baseline suggests that seeing the whole picture may help you decide. Today may make the
+                    first complete answer feel final too quickly.
+                  </p>
+                  <article class="desktop-app-action">
+                    <span>Try this</span>
+                    <strong data-view-action>Give the decision one more pass after the pressure has eased.</strong>
+                  </article>
+                  <div class="desktop-app-states">
+                    <article><span data-state-one-label>Baseline tendency</span><strong data-state-one>Clarity improves when the full picture is visible.</strong></article>
+                    <article class="warm"><span data-state-two-label>Current amplification</span><strong data-state-two>The need to finish may feel stronger today.</strong></article>
+                    <article class="quiet"><span>Unknown actual state</span><strong data-state-three>You decide whether this description fits.</strong></article>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
 
-    <section class="marketing-band">
-      <div class="marketing-shell marketing-band-inner">
-        <div class="reveal">
-          <p class="marketing-kicker">A better starting point</p>
-          <h2 class="marketing-section-title">It already has a place to begin.</h2>
-        </div>
-        <div class="marketing-section-copy reveal">
+    <section class="baseline-section">
+      <div class="marketing-shell baseline-layout">
+        <div class="baseline-copy reveal">
+          <p class="marketing-kicker dark">Your Baseline</p>
+          <h2>Set it up once. Use it whenever you need clarity.</h2>
           <p>
-            Most AI starts with whatever you type into an empty box. Sovereign.OS starts with the private
-            information you chose to build around yourself. That means it can show useful themes before you
-            explain a problem from the beginning.
+            Your Baseline is a private description of how you tend to work. It gives Sovereign a consistent
+            place to begin, while leaving room for change, context, and your own judgment.
           </p>
-          <div class="context-stack">
-            <div class="context-row"><span>Your Baseline</span><p>How you tend to decide, communicate, learn, connect, and handle pressure.</p></div>
-            <div class="context-row"><span>Today</span><p>What may feel stronger, easier, or harder right now.</p></div>
-            <div class="context-row"><span>People</span><p>Differences between two people, only when both people have chosen to share.</p></div>
-            <div class="context-row"><span>Groups</span><p>Roles and expectations inside a family, household, friendship, or team.</p></div>
-            <div class="context-row"><span>What you save</span><p>Only the useful understanding you choose to keep for later.</p></div>
-          </div>
+        </div>
+        <div class="baseline-list reveal">
+          <article><span>01</span><strong>Decisions</strong><p>How clarity tends to arrive for you.</p></article>
+          <article><span>02</span><strong>Communication</strong><p>How you take in information and express what matters.</p></article>
+          <article><span>03</span><strong>Connection</strong><p>What helps you work well with other people.</p></article>
+          <article><span>04</span><strong>Pressure</strong><p>What can change when time, expectations, or emotion rise.</p></article>
         </div>
       </div>
     </section>
 
     <div class="marketing-shell">
-      <section class="marketing-section" id="capabilities">
-        <header class="marketing-section-head reveal">
-          <div>
-            <p class="marketing-kicker">What Sovereign can help with</p>
-            <h2 class="marketing-section-title">Clearer decisions. Better conversations. Less guesswork.</h2>
-          </div>
-          <p>
-            Sovereign turns a large amount of private context into plain language. It does not tell you what
-            must be true. It gives you a useful place to look and keeps the final choice with you.
-          </p>
-        </header>
-
-        <div class="capability-layout reveal">
-          <div class="capability-tabs" role="tablist" aria-label="Sovereign capabilities">
-            <button class="capability-tab active" type="button" data-capability="today" role="tab" aria-selected="true">
-              <span>Today</span><strong>What matters now</strong>
-            </button>
-            <button class="capability-tab" type="button" data-capability="decision" role="tab" aria-selected="false">
-              <span>Decisions</span><strong>Act, wait, or clarify</strong>
-            </button>
-            <button class="capability-tab" type="button" data-capability="people" role="tab" aria-selected="false">
-              <span>People</span><strong>Understand the difference</strong>
-            </button>
-            <button class="capability-tab" type="button" data-capability="groups" role="tab" aria-selected="false">
-              <span>Groups</span><strong>See the role you carry</strong>
-            </button>
-          </div>
-          <article class="capability-output" aria-live="polite">
-            <span class="capability-output-label" data-capability-label>Example · Today</span>
-            <blockquote class="capability-output-copy" data-capability-copy>
-              The urge to finish may be stronger than the need to be certain.
-            </blockquote>
-            <div>
-              <p class="capability-output-action" data-capability-action>
-                Give the decision one more pass after the pressure has settled.
-              </p>
-              <div class="capability-output-meta" data-capability-meta>
-                <span>Your usual approach</span><span>What is current</span><span>Your choice stays yours</span>
-              </div>
-            </div>
-          </article>
+      <section class="control-section">
+        <div class="section-heading reveal">
+          <p class="marketing-kicker">Your information</p>
+          <h2>Your information stays under your control.</h2>
+          <p>Private context is useful only when the rules are clear.</p>
+        </div>
+        <div class="control-grid reveal">
+          <article><span>Private details</span><h3>Reduced before AI use.</h3><p>The model receives only the relevant result, not the raw details used to create it.</p></article>
+          <article><span>Other people</span><h3>Included only with permission.</h3><p>Each person chooses what may be shared and can remove access later.</p></article>
+          <article><span>Your Library</span><h3>Saved only when you choose.</h3><p>Keep the useful understanding without keeping every private conversation forever.</p></article>
         </div>
       </section>
 
-      <section class="marketing-section">
-        <header class="marketing-section-head reveal">
-          <div>
-            <p class="marketing-kicker">One product. Five useful views.</p>
-            <h2 class="marketing-section-title">Built for the parts of life that are hard to read.</h2>
-          </div>
-          <p>
-            Every part of Sovereign uses the same private context. You do not have to rebuild the story each
-            time you move from a decision to a relationship or from one day to the next.
-          </p>
-        </header>
-
-        <div class="feature-rail">
-          <article class="feature-row reveal">
-            <span>01 · TODAY</span>
-            <h3>See what may deserve your attention now.</h3>
-            <p>Separate what is usually true for you from what may feel unusually strong today.</p>
-          </article>
-          <article class="feature-row reveal">
-            <span>02 · EXPLORE</span>
-            <h3>Understand how you work at your best.</h3>
-            <p>Look at decisions, communication, learning, work, connection, pressure, and recovery in ordinary language.</p>
-          </article>
-          <article class="feature-row reveal">
-            <span>03 · PEOPLE</span>
-            <h3>See why the same moment can feel different to two people.</h3>
-            <p>Compare only what each person has chosen to share. No blame, hidden motives, or labels.</p>
-          </article>
-          <article class="feature-row reveal">
-            <span>04 · GROUPS</span>
-            <h3>Notice the role you are being pulled into.</h3>
-            <p>See who is expected to calm, fix, explain, decide, or carry the pressure in a family or team.</p>
-          </article>
-          <article class="feature-row reveal">
-            <span>05 · LIBRARY</span>
-            <h3>Keep the useful part. Leave the rest behind.</h3>
-            <p>Save a short understanding, next step, card, audio, or visual only when you choose to keep it.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="marketing-section">
-        <header class="marketing-section-head reveal">
-          <div>
-            <p class="marketing-kicker">Why it feels different</p>
-            <h2 class="marketing-section-title">You should not have to explain yourself from zero every time.</h2>
-          </div>
-        </header>
-        <div class="value-split reveal">
-          <article class="value-column">
-            <span class="value-label">Most AI</span>
-            <h3>Starts with the latest message.</h3>
-            <ul class="value-list">
-              <li>You repeat the background.</li>
-              <li>The answer depends on one version of the story.</li>
-              <li>Relationships are viewed from one side.</li>
-              <li>Useful understanding is buried in chat history.</li>
-            </ul>
-          </article>
-          <article class="value-column">
-            <span class="value-label">Sovereign.OS</span>
-            <h3>Starts with the context you chose to build.</h3>
-            <ul class="value-list">
-              <li>Your Baseline is ready when you open the app.</li>
-              <li>Today is kept separate from what is usually true.</li>
-              <li>Other people stay private until they give permission.</li>
-              <li>You decide what becomes part of your Library.</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <section class="marketing-section">
-        <p class="marketing-statement reveal">See more clearly, <em>from the start.</em></p>
-      </section>
-
-      <section class="marketing-closing">
-        <div class="reveal">
+      <section class="closing-v4">
+        <div class="closing-v4-inner reveal">
           <p class="marketing-kicker">Sovereign.OS</p>
-          <h2 class="marketing-statement">Live a life you would choose to watch again.</h2>
-          <p>
-            Create your Baseline once. Use it to make better sense of today, your choices, your relationships,
-            and the groups around you.
-          </p>
-          <div class="marketing-actions">
+          <h2>Give your personal AI a better place to begin.</h2>
+          <p>Create your private Baseline, then use it across today, decisions, relationships, and groups.</p>
+          <div class="marketing-actions centered">
             <a class="marketing-button primary" href="/signup">Create my Baseline</a>
-            <a class="marketing-button secondary" href="/how-it-works.html">See how Sovereign works</a>
+            <a class="marketing-button secondary" href="/how-it-works.html">See how it works</a>
           </div>
         </div>
       </section>
 
       <footer class="marketing-footer">
-        <span>Private by design · Permission before sharing · Clear human language</span>
-        <nav aria-label="Legal">
-          <a href="/privacy">Privacy</a>
-          <a href="/terms">Terms</a>
-          <a href="/login">Sign in</a>
-        </nav>
+        <span>Private by default · Permission before sharing · Clear human language</span>
+        <nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/login">Sign in</a></nav>
       </footer>
     </div>
   `;
@@ -283,71 +206,93 @@ function ensureMarketingStyles() {
 }
 
 function activateMarketingInteractions() {
-  const capabilities = {
+  const examples = {
     today: {
-      label: 'Example · Today',
-      copy: 'The urge to finish may be stronger than the need to be certain.',
-      action: 'Give the decision one more pass after the pressure has settled.',
-      meta: ['Your usual approach', 'What is current', 'Your choice stays yours']
+      label: 'Today · Current view',
+      title: 'A fast answer may feel clearer than it is.',
+      summary: 'Your Baseline suggests that seeing the whole picture may help you decide. Today may make the first complete answer feel final too quickly.',
+      action: 'Give the decision one more pass after the pressure has eased.',
+      oneLabel: 'Baseline tendency',
+      one: 'Clarity improves when the full picture is visible.',
+      twoLabel: 'Current amplification',
+      two: 'The need to finish may feel stronger today.',
+      three: 'You decide whether this description fits.'
     },
     decision: {
-      label: 'Example · Decisions',
-      copy: 'You may already know the answer. The pressure is about acting before you feel ready.',
-      action: 'Separate the choice itself from the timing of the choice.',
-      meta: ['How you decide', 'What creates pressure', 'A practical next step']
+      label: 'Decision · Current question',
+      title: 'The choice may be clear. The timing may not be.',
+      summary: 'Your Baseline suggests that a settled answer matters more than a fast one. Outside pressure may be asking you to move before your own reasoning is complete.',
+      action: 'Name what changes if the answer waits until tomorrow.',
+      oneLabel: 'What usually helps',
+      one: 'Time to compare the choice with the whole picture.',
+      twoLabel: 'What may be adding pressure',
+      two: 'The wish to stop carrying the open question.',
+      three: 'Sovereign cannot know whether you are ready until you decide.'
     },
     people: {
-      label: 'Example · People',
-      copy: 'One person may want a clear answer while the other still needs time to understand the question.',
-      action: 'Agree on when to return to the conversation instead of forcing the same pace.',
-      meta: ['Both people included', 'Permission checked', 'No motive assumed']
+      label: 'People · Shared with permission',
+      title: 'You may be solving the conversation at different speeds.',
+      summary: 'One person may want a clear answer now. The other may need more time before speaking. Difference in pace does not prove a difference in care.',
+      action: 'Agree on when the conversation will continue instead of forcing an answer now.',
+      oneLabel: 'Your usual approach',
+      one: 'Understanding improves through a complete conversation.',
+      twoLabel: 'Their shared approach',
+      two: 'Clarity may arrive after private processing time.',
+      three: 'Neither person’s exact feelings or motives are assumed.'
     },
-    groups: {
-      label: 'Example · Groups',
-      copy: 'You may be expected to fix the tension because you have done it before.',
-      action: 'Name what belongs to you and what the group needs to carry together.',
-      meta: ['Roles', 'Shared pressure', 'Responsibility kept separate']
+    systems: {
+      label: 'Groups · Family or team',
+      title: 'You may be doing the work because everyone expects you to.',
+      summary: 'A group can become used to one person calming, fixing, explaining, or deciding. That expectation can continue even when it no longer works.',
+      action: 'Choose one part that can be returned to the person or group it belongs to.',
+      oneLabel: 'Role you often take',
+      one: 'Turning uncertainty into a workable next step.',
+      twoLabel: 'What the group may expect',
+      two: 'That you will carry the unfinished part.',
+      three: 'The group is not labeled, and responsibility stays separate.'
     }
   };
 
-  const tabs = [...document.querySelectorAll('.capability-tab')];
-  const label = document.querySelector('[data-capability-label]');
-  const copy = document.querySelector('[data-capability-copy]');
-  const action = document.querySelector('[data-capability-action]');
-  const meta = document.querySelector('[data-capability-meta]');
+  const tabs = [...document.querySelectorAll('.showcase-tab')];
+  const bindings = {
+    label: document.querySelector('[data-view-label]'),
+    title: document.querySelector('[data-view-title]'),
+    summary: document.querySelector('[data-view-summary]'),
+    action: document.querySelector('[data-view-action]'),
+    oneLabel: document.querySelector('[data-state-one-label]'),
+    one: document.querySelector('[data-state-one]'),
+    twoLabel: document.querySelector('[data-state-two-label]'),
+    two: document.querySelector('[data-state-two]'),
+    three: document.querySelector('[data-state-three]')
+  };
 
   for (const tab of tabs) {
     tab.addEventListener('click', () => {
-      const key = tab.getAttribute('data-capability');
-      const item = key ? capabilities[key] : null;
-      if (!item || !label || !copy || !action || !meta) return;
-      for (const candidate of tabs) {
-        const active = candidate === tab;
-        candidate.classList.toggle('active', active);
-        candidate.setAttribute('aria-selected', String(active));
+      const key = tab.dataset.view;
+      const example = key ? examples[key] : null;
+      if (!example) return;
+      for (const item of tabs) {
+        const active = item === tab;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-selected', String(active));
       }
-      label.textContent = item.label;
-      copy.textContent = item.copy;
-      action.textContent = item.action;
-      meta.innerHTML = item.meta.map((value) => `<span>${value}</span>`).join('');
+      for (const [name, node] of Object.entries(bindings)) {
+        if (node) node.textContent = example[name];
+      }
     });
   }
 
   const reveal = [...document.querySelectorAll('.reveal')];
   if (!('IntersectionObserver' in window)) {
-    reveal.forEach((element) => element.classList.add('is-visible'));
+    reveal.forEach((item) => item.classList.add('is-visible'));
     return;
   }
-
-  const revealObserver = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        entry.target.classList.add('is-visible');
-        revealObserver.unobserve(entry.target);
-      }
-    },
-    { threshold: 0.12 }
-  );
-  reveal.forEach((element) => revealObserver.observe(element));
+  const revealObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add('is-visible');
+      revealObserver.unobserve(entry.target);
+    }
+  }, { threshold: 0.12 });
+  reveal.forEach((item) => revealObserver.observe(item));
 }
