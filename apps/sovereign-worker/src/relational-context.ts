@@ -90,15 +90,16 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
   const members = await env.DB.prepare(`SELECT p.id, p.display_name, p.role, p.source_of_truth, p.bound_account_id, sm.metadata_json
     FROM system_memberships sm JOIN persons p ON p.id = sm.person_id
     WHERE sm.system_id = ? AND p.account_id = ? ORDER BY sm.created_at`).bind(systemId, accountId).all<Record<string, string | null>>();
-  if ((members.results ?? []).length < 2) throw new Response('At least two consented members are required for a system analysis.', { status: 409 });
+  if ((members.results ?? []).length < 1) throw new Response('At least one consented invited member is required for a system analysis.', { status: 409 });
 
-  const participants: ReducedParticipant[] = [];
+  const ownerBaseline = await loadReducedBaseline(env, accountId);
+  const participants: ReducedParticipant[] = [participant('self', 'You', 'self', ownerBaseline)];
   for (const member of members.results ?? []) {
     const personId = member.id ?? '';
     await requireConsent(env, accountId, personId, 'system.include');
     await requireConsent(env, accountId, personId, 'trait.display');
     const boundAccountId = member.bound_account_id;
-    if (!boundAccountId) throw new Response('Every member must have a bound identity and Baseline.', { status: 409 });
+    if (!boundAccountId) throw new Response('Every invited member must have a bound identity and Baseline.', { status: 409 });
     const baseline = await loadReducedBaseline(env, boundAccountId);
     participants.push(participant(personId, member.display_name ?? 'Member', member.role ?? 'member', baseline));
   }
