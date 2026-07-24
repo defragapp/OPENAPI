@@ -6,6 +6,7 @@ describe('Sovereign PWA shell', () => {
   const css = readFileSync(new URL('./styles.css', import.meta.url), 'utf8');
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const consent = readFileSync(new URL('../public/consent.html', import.meta.url), 'utf8');
+  const recognitionUi = readFileSync(new URL('../public/recognition-ui.js', import.meta.url), 'utf8');
 
   it('contains all authenticated surfaces', () => {
     for (const label of ['Today', 'Explore', 'People', 'Systems', 'Library', 'You']) {
@@ -47,5 +48,13 @@ describe('Sovereign PWA shell', () => {
     expect(app).not.toContain('>Grant</button>');
     expect(consent).toContain('Your permissions remain yours.');
     expect(consent).toContain('Do not allow');
+  });
+
+  it('shows an Insight Module save action only after a server offer and explicit approval', () => {
+    expect(html).toContain('/recognition-ui.js');
+    expect(recognitionUi).toContain('x-sovereign-module-offer');
+    expect(recognitionUi).toContain('Save reflection');
+    expect(recognitionUi).toContain('approved: true');
+    expect(recognitionUi).toContain('/modules/latest');
   });
 });
