@@ -52,7 +52,12 @@ export async function requireAuth(request: Request, env: Env): Promise<AuthConte
   if (payload.sid) {
     const session = await env.DB.prepare('SELECT revoked_at, expires_at FROM auth_sessions WHERE id = ?').bind(payload.sid).first<{ revoked_at?: string | null; expires_at: string }>();
     if (!session || session.revoked_at || Date.parse(session.expires_at) < Date.now()) unauthorized();
-    await env.DB.prepare("UPDATE auth_sessions SET last_seen_at = datetime('now') WHERE id = ?").bind(payload.sid).run();
+    await env.DB.prepare(`UPDATE auth_sessions
+      SET last_seen_at = datetime('now')
+      WHERE id = ?
+        AND (last_seen_at IS NULL OR last_seen_at < datetime('now', '-15 minutes'))`)
+      .bind(payload.sid)
+      .run();
   }
   return { ...(await resolveAccount(env, payload.sub)), sessionId: payload.sid };
 }
