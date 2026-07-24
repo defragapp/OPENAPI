@@ -43,6 +43,8 @@ export interface Env {
   EMAIL_TIMEOUT_MS?: string;
   AI_FREE_MONTHLY_TURNS?: string;
   AI_SOVEREIGN_PLUS_MONTHLY_TURNS?: string;
+  THREAD_RETENTION_DAYS?: string;
+  AUDIT_RETENTION_DAYS?: string;
 }
 
 export interface AuthContext {
