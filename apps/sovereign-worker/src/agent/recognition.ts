@@ -166,7 +166,7 @@ function addPart(parts: string[], label: string, values: string[]): void {
   if (values.length) parts.push(`${label} ${values.join(' · ')}`);
 }
 
-export function recognitionJsonContract(available: AvailableBasis): string {
+export function recognitionJsonContract(_available: AvailableBasis): string {
   return JSON.stringify({
     response_phase: 'question | integration',
     recognition: 'plain-language observation',
@@ -176,7 +176,7 @@ export function recognitionJsonContract(available: AvailableBasis): string {
     clearer_form: 'empty in question phase',
     practical_action: 'empty in question phase',
     module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
-    basis: { user_confirmed: false, ...available },
+    basis: { user_confirmed: false, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
     confidence: 'confirmed | supported | exploratory',
     safety_mode: 'standard | grounded | escalate'
   }, null, 2);
