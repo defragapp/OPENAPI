@@ -12,7 +12,7 @@ describe('separate archetype visual workspace', () => {
     expect(index).toContain('/mirror-surface.js');
     expect(index.indexOf('/mirror-surface.js')).toBeGreaterThan(index.indexOf('/recognition-ui.js'));
     expect(recognition).not.toContain('renderMirrorExperience');
-    expect(mirror).toContain("data.mirrorContract = 'interpretation-first-visual-second'");
+    expect(mirror).toContain("workspace.dataset.mirrorContract = 'interpretation-first-visual-second'");
     expect(styles).toContain('.app-shell.mirror-surface-open .workspace-frame{display:none}');
     expect(styles).toContain('.app-shell.mirror-surface-open>.tabbar{display:none}');
   });
