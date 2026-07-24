@@ -35,9 +35,8 @@ function renderMarketingHome() {
           <p class="marketing-kicker">Personal AI, built around your Baseline</p>
           <h1 class="marketing-display">Start with context. <em>Not a blank box.</em></h1>
           <p class="marketing-lede">
-            Sovereign.OS starts with a private picture of how you make decisions, communicate, learn,
-            connect, and respond to pressure. It adds what is current, the people you choose to include,
-            and what you decide to save—then shows what may be useful now.
+            Sovereign starts with your private Baseline, adds what is current and what you choose to save,
+            then shows what may be useful now.
           </p>
           <div class="marketing-actions">
             <a class="marketing-button primary" href="/signup">Create my Baseline</a>
