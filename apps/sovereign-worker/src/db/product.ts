@@ -66,10 +66,8 @@ export async function createExportJob(env: Env, accountId: string) {
   const id = `export_${crypto.randomUUID()}`;
   const backgroundJobId = `job_${crypto.randomUUID()}`;
   const payload = { exportJobId: id };
-  await env.DB.batch([
-    env.DB.prepare('INSERT INTO export_jobs (id, account_id, status, expires_at) VALUES (?, ?, ?, datetime(\'now\', \'+7 days\'))').bind(id, accountId, 'queued'),
-    env.DB.prepare('INSERT INTO background_jobs (id, account_id, kind, status, payload_json) VALUES (?, ?, ?, ?, ?)').bind(backgroundJobId, accountId, 'export.generate', 'queued', JSON.stringify(payload))
-  ]);
+  await env.DB.prepare('INSERT INTO export_jobs (id, account_id, status, expires_at) VALUES (?, ?, ?, datetime(\'now\', \'+7 days\'))').bind(id, accountId, 'queued').run();
+  await env.DB.prepare('INSERT INTO background_jobs (id, account_id, kind, status, payload_json) VALUES (?, ?, ?, ?, ?)').bind(backgroundJobId, accountId, 'export.generate', 'queued', JSON.stringify(payload)).run();
   try {
     await env.JOBS?.send({ id: backgroundJobId, kind: 'export.generate', accountId, payload });
   } catch {
