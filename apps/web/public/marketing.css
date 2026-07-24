@@ -147,7 +147,7 @@ button, input, select, textarea { font: inherit; }
 .marketing-statement em { color: var(--warm); font-style: normal; }
 
 .marketing-lede {
-  max-width: 62ch;
+  max-width: 56ch;
   margin: clamp(26px, 4vw, 40px) 0 0;
   color: #d0cbc4;
   font-size: clamp(1.04rem, 1.5vw, 1.30rem);
@@ -492,14 +492,14 @@ button, input, select, textarea { font: inherit; }
   .marketing-wordmark { font-size: 0.69rem; letter-spacing: 0.14em; }
   .marketing-nav-links a:not(.nav-cta) { display: none; }
   .marketing-nav-links .nav-cta { min-height: 42px; padding: 8px 12px; font-size: 0.76rem; }
-  .marketing-hero { gap: 30px; padding-block: 64px 84px; }
-  .marketing-display { max-width: 9.5ch; font-size: clamp(3.75rem,18vw,5.7rem); }
-  .marketing-lede { font-size: 1.01rem; line-height: 1.58; }
-  .marketing-actions { display: grid; grid-template-columns: 1fr; }
+  .marketing-hero { gap: 24px; padding-block: 58px 82px; }
+  .marketing-display { max-width: 9.5ch; font-size: clamp(3.65rem,17.4vw,5.45rem); }
+  .marketing-lede { max-width: 34ch; font-size: 1.01rem; line-height: 1.56; }
+  .marketing-actions { display: grid; grid-template-columns: 1fr; margin-top: 28px; }
   .marketing-button { width: 100%; min-height: 54px; }
-  .marketing-trust { display: grid; gap: 8px; }
+  .marketing-trust { display: none; }
 
-  .product-preview-wrap { min-height: auto; margin: 0 -9px; }
+  .product-preview-wrap { min-height: auto; margin: 2px -9px 0; }
   .product-preview-wrap::before { width: 112%; }
   .product-device { width: 100%; padding: 7px; border-radius: 34px; animation: none; }
   .product-screen { min-height: 640px; border-radius: 28px; }
