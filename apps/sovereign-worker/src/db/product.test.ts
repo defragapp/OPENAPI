@@ -29,9 +29,11 @@ describe('systems, library, privacy, and entitlement helpers', () => {
     expect(JSON.stringify(saved)).not.toMatch(/hidden reasoning|latitude|longitude|birth time/i);
   });
 
-  it('creates export and deletion grace jobs without executing irreversible deletion', async () => {
+  it('creates an executable export job and a non-executing deletion grace record', async () => {
     const env = fakeEnv();
-    expect((await createExportJob(env, 'acct_1')).excludes).toContain('hidden reasoning');
+    const exportJob = await createExportJob(env, 'acct_1');
+    expect(exportJob.excludes).toContain('hidden reasoning');
+    expect(exportJob.backgroundJobId).toMatch(/^job_/);
     expect((await createDeletionJob(env, 'acct_1')).status).toBe('grace');
   });
 
