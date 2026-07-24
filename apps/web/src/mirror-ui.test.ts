@@ -25,7 +25,7 @@ describe('separate archetype visual workspace', () => {
     expect(mirror).not.toMatch(/tarot determines|card proves|draw determines/i);
   });
 
-  it('presents origin, shadow, and gift without turning the archetype into identity', () => {
+  it('presents past protection, shadow, and gift without turning the archetype into identity', () => {
     for (const copy of ['Past protection', 'Shadow', 'Gift', 'WHAT MAY BE ACTIVE NOW', 'THE GIFT INSIDE IT']) {
       expect(mirror).toContain(copy);
     }
