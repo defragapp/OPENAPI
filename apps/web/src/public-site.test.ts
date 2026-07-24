@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const landingScript = readFileSync(new URL('../public/public-site.js', import.meta.url), 'utf8');
 const howItWorks = readFileSync(new URL('../public/how-it-works.html', import.meta.url), 'utf8');
+const recognitionCss = readFileSync(new URL('../public/recognition-ui.css', import.meta.url), 'utf8');
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
 describe('public Inner Recognition experience', () => {
@@ -27,11 +28,21 @@ describe('public Inner Recognition experience', () => {
 
   it('connects the current landing page without creating another application shell', () => {
     expect(index).toContain('/public-site.js');
+    expect(index).toContain('/recognition-ui.css');
+    expect(index).toContain('<title>Sovereign.OS</title>');
     expect(landingScript).toContain("location.pathname !== '/'");
+    expect(landingScript).toContain("document.title = 'Sovereign.OS · Inner Recognition'");
     expect(landingScript).toContain("'/how-it-works.html'");
     expect(landingScript).toContain('Talk it through');
     expect(landingScript).toContain('See how it works');
     expect(landingScript).toContain('Sign in');
+  });
+
+  it('keeps optional exact-data consent readable and explicit', () => {
+    expect(recognitionCss).toContain('.scope-list > label');
+    expect(recognitionCss).toContain('min-height: 58px');
+    expect(recognitionCss).toContain('width: 24px');
+    expect(recognitionCss).toContain('[data-recognition-module-offer]');
   });
 
   it('keeps the support footer compact and secondary', () => {
