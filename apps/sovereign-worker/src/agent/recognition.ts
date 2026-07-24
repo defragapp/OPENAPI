@@ -120,6 +120,7 @@ export function parseRecognitionPlan(raw: string, available: AvailableBasis): Re
     const allowed = new Set(available[key]);
     if (parsed.basis[key].some((value) => !allowed.has(value))) throw new Error(`Recognition plan selected unverified ${key} data`);
   }
+  parsed.inward_question = normalizeQuestion(parsed.inward_question);
   if (parsed.response_phase === 'question') {
     parsed.candidate_hidden_expectation = '';
     parsed.protected_need = '';
@@ -128,6 +129,11 @@ export function parseRecognitionPlan(raw: string, available: AvailableBasis): Re
     parsed.module_suggestion.should_offer = false;
   }
   return parsed;
+}
+
+function normalizeQuestion(value: string): string {
+  const clean = value.trim().replace(/[?]+$/g, '');
+  return `${clean}?`;
 }
 
 function extractJson(raw: string): string {
