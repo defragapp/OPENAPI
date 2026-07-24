@@ -6,10 +6,9 @@ app.post('/api/v1/people/:personId/invitations/send', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
   const body = await context.req.json<{ email?: string; requestedScopes?: string[] }>();
-  const invitation = await sendInvitation(context.req.raw, context.env, auth.accountId, context.req.param('personId'), auth.subject, {
-    email: body.email ?? '',
-    requestedScopes: body.requestedScopes
-  });
+  const input: { email: string; requestedScopes?: string[] } = { email: body.email ?? '' };
+  if (body.requestedScopes) input.requestedScopes = body.requestedScopes;
+  const invitation = await sendInvitation(context.req.raw, context.env, auth.accountId, context.req.param('personId'), auth.subject, input);
   return context.json({ invitation }, 201);
 });
 
