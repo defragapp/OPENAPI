@@ -1,6 +1,7 @@
 import app, { ThreadCoordinator, queue as queueHandler, scheduled as scheduledHandler } from './index';
 import type { Env } from './env';
 import { requireAuth, requireSameOrigin } from './security/auth';
+import { withSecurityHeaders } from './security/headers';
 import { decideInviteeConsent, listInviteeInvitations, previewInvitation, redeemInvitation, sendInvitation } from './invitation-service';
 import { addConsentedSystemMember, buildPairComparison, buildSystemAnalysis } from './relational-context';
 import { ensureThread, appendThreadEvent } from './db/threads';
@@ -74,24 +75,31 @@ const worker = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
     try {
       const url = new URL(request.url);
+      let response: Response;
 
       const messageMatch = url.pathname.match(/^\/api\/v1\/threads\/([^/]+)\/messages$/);
-      if (request.method === 'POST' && messageMatch) return handleRecognitionMessage(request, env, decodeURIComponent(messageMatch[1]!));
+      if (request.method === 'POST' && messageMatch) {
+        response = await handleRecognitionMessage(request, env, decodeURIComponent(messageMatch[1]!));
+        return secure(response);
+      }
 
       const moduleMatch = url.pathname.match(/^\/api\/v1\/threads\/([^/]+)\/modules\/latest$/);
       if (request.method === 'POST' && moduleMatch) {
         requireSameOrigin(request);
         const auth = await requireAuth(request, env);
         const body = await request.json().catch(() => ({})) as { approved?: boolean };
-        if (body.approved !== true) return Response.json({ error: 'Explicit approval is required.' }, { status: 400 });
-        return Response.json({ saved: await saveLatestInsightModule(env, auth.accountId, decodeURIComponent(moduleMatch[1]!)) }, { status: 201 });
+        response = body.approved === true
+          ? Response.json({ saved: await saveLatestInsightModule(env, auth.accountId, decodeURIComponent(moduleMatch[1]!)) }, { status: 201 })
+          : Response.json({ error: 'Explicit approval is required.' }, { status: 400 });
+        return secure(response);
       }
 
       const pairMatch = url.pathname.match(/^\/api\/v1\/people\/([^/]+)\/compare$/);
       if (request.method === 'POST' && pairMatch) {
         requireSameOrigin(request);
         const auth = await requireAuth(request, env);
-        return Response.json({ comparison: await buildPairComparison(env, auth.accountId, decodeURIComponent(pairMatch[1]!)) });
+        response = Response.json({ comparison: await buildPairComparison(env, auth.accountId, decodeURIComponent(pairMatch[1]!)) });
+        return secure(response);
       }
 
       const memberMatch = url.pathname.match(/^\/api\/v1\/systems\/([^/]+)\/members$/);
@@ -99,31 +107,37 @@ const worker = {
         requireSameOrigin(request);
         const auth = await requireAuth(request, env);
         const body = await request.json().catch(() => ({})) as { personId?: string; metadata?: Record<string, unknown> };
-        if (!body.personId) return Response.json({ error: 'personId required' }, { status: 400 });
-        return Response.json({ membership: await addConsentedSystemMember(env, auth.accountId, decodeURIComponent(memberMatch[1]!), body.personId, body.metadata ?? {}) }, { status: 201 });
+        response = body.personId
+          ? Response.json({ membership: await addConsentedSystemMember(env, auth.accountId, decodeURIComponent(memberMatch[1]!), body.personId, body.metadata ?? {}) }, { status: 201 })
+          : Response.json({ error: 'personId required' }, { status: 400 });
+        return secure(response);
       }
 
       const alignmentMatch = url.pathname.match(/^\/api\/v1\/systems\/([^/]+)\/alignment$/);
       if (request.method === 'GET' && alignmentMatch) {
         const auth = await requireAuth(request, env);
-        return Response.json({ analysis: await buildSystemAnalysis(env, auth.accountId, decodeURIComponent(alignmentMatch[1]!)) });
+        response = Response.json({ analysis: await buildSystemAnalysis(env, auth.accountId, decodeURIComponent(alignmentMatch[1]!)) });
+        return secure(response);
       }
 
-      const response = await app.fetch(request, env, executionContext);
+      response = await app.fetch(request, env, executionContext);
       if (request.method === 'GET' && ['/health', '/healthz', '/ready'].includes(url.pathname) && response.headers.get('content-type')?.includes('application/json')) {
         const payload = await response.json() as Record<string, unknown>;
         const headers = new Headers(response.headers);
         headers.delete('content-length');
-        return Response.json({ ...payload, migrationVersion: '0008_identity_bound_invitations', recognitionContract: 'inner-recognition-v1' }, { status: response.status, headers });
+        response = Response.json({ ...payload, migrationVersion: '0008_identity_bound_invitations', recognitionContract: 'inner-recognition-v1' }, { status: response.status, headers });
       }
-      return response;
+      return secure(response);
     } catch (error) {
-      if (error instanceof Response) return error;
-      console.error('sovereign_entry_failure', { error: error instanceof Error ? error.name : 'unknown' });
-      return Response.json({ error: 'Internal error' }, { status: 500 });
+      if (!(error instanceof Response)) console.error('sovereign_entry_failure', { error: error instanceof Error ? error.name : 'unknown' });
+      return secure(error instanceof Response ? error : Response.json({ error: 'Internal error' }, { status: 500 }));
     }
   }
 };
+
+function secure(response: Response): Response {
+  return withSecurityHeaders(response);
+}
 
 async function handleRecognitionMessage(request: Request, env: Env, threadId: string): Promise<Response> {
   requireSameOrigin(request);
