@@ -10,12 +10,15 @@ const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60;
 const CONSENT_POLICY_VERSION = '2026-07-24';
 const DEFAULT_INVITATION_SCOPES: ConsentScope[] = ['pair.compare', 'trait.display'];
 
+type ConsentDecision = 'granted' | 'denied';
+
 export interface InvitationRecord {
   id: string;
   personId: string;
   displayName: string;
   status: InvitationStatus;
   requestedScopes: ConsentScope[];
+  decisions: Partial<Record<ConsentScope, ConsentDecision>>;
   expiresAt: string;
   policyVersion: string;
 }
@@ -95,6 +98,7 @@ export async function previewInvitation(request: Request, env: Env): Promise<Inv
     displayName: row.display_name ?? 'Shared relationship',
     status: 'pending',
     requestedScopes: parseScopes(row.requested_scopes_json),
+    decisions: {},
     expiresAt: row.expires_at,
     policyVersion: row.policy_version ?? CONSENT_POLICY_VERSION
   };
@@ -134,6 +138,7 @@ export async function redeemInvitation(request: Request, env: Env): Promise<Resp
       personId: row.invited_person_id,
       displayName: row.display_name,
       requestedScopes: parseScopes(row.requested_scopes_json),
+      decisions: {},
       policyVersion: row.policy_version ?? CONSENT_POLICY_VERSION
     }
   }, { headers: { 'set-cookie': sessionCookie(sessionToken) } });
@@ -143,15 +148,21 @@ export async function listInviteeInvitations(env: Env, accountId: string): Promi
   const rows = await env.DB.prepare(`SELECT i.id, i.invited_person_id, i.status, i.expires_at, i.requested_scopes_json, i.policy_version, p.display_name
     FROM invitations i JOIN persons p ON p.id = i.invited_person_id
     WHERE i.accepted_by_account_id = ? AND i.status = 'accepted' ORDER BY i.accepted_at DESC`).bind(accountId).all<Record<string, string | null>>();
-  return (rows.results ?? []).map((row) => ({
-    id: row.id ?? '',
-    personId: row.invited_person_id ?? '',
-    displayName: row.display_name ?? 'Shared relationship',
-    status: 'accepted',
-    requestedScopes: parseScopes(row.requested_scopes_json),
-    expiresAt: row.expires_at ?? '',
-    policyVersion: row.policy_version ?? CONSENT_POLICY_VERSION
-  }));
+  const invitations: InvitationRecord[] = [];
+  for (const row of rows.results ?? []) {
+    const id = row.id ?? '';
+    invitations.push({
+      id,
+      personId: row.invited_person_id ?? '',
+      displayName: row.display_name ?? 'Shared relationship',
+      status: 'accepted',
+      requestedScopes: parseScopes(row.requested_scopes_json),
+      decisions: await currentDecisions(env, id, accountId),
+      expiresAt: row.expires_at ?? '',
+      policyVersion: row.policy_version ?? CONSENT_POLICY_VERSION
+    });
+  }
+  return invitations;
 }
 
 export async function decideInviteeConsent(env: Env, accountId: string, invitationId: string, scope: string, granted: boolean, actor: string, reason?: string): Promise<{ scope: ConsentScope; granted: boolean; policyVersion: string }> {
@@ -176,6 +187,24 @@ export async function decideInviteeConsent(env: Env, accountId: string, invitati
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(`consentv_${crypto.randomUUID()}`, personId, scope, (previous?.version ?? 0) + 1, granted ? 'granted' : 'denied', actor, reason ?? null, invitationId, accountId, policyVersion).run();
   await env.DB.prepare("UPDATE persons SET consent_status = 'decision_recorded', updated_at = datetime('now') WHERE id = ? AND bound_account_id = ?").bind(personId, accountId).run();
   return { scope, granted, policyVersion };
+}
+
+async function currentDecisions(env: Env, invitationId: string, accountId: string): Promise<Partial<Record<ConsentScope, ConsentDecision>>> {
+  const rows = await env.DB.prepare(`SELECT cv.scope, cv.decision FROM consent_versions cv
+    JOIN (
+      SELECT scope, MAX(version) AS version FROM consent_versions
+      WHERE invitation_id = ? AND decided_by_account_id = ? GROUP BY scope
+    ) latest ON latest.scope = cv.scope AND latest.version = cv.version
+    WHERE cv.invitation_id = ? AND cv.decided_by_account_id = ?`)
+    .bind(invitationId, accountId, invitationId, accountId)
+    .all<{ scope: string; decision: string }>();
+  const decisions: Partial<Record<ConsentScope, ConsentDecision>> = {};
+  for (const row of rows.results ?? []) {
+    if ((CONSENT_SCOPES as readonly string[]).includes(row.scope) && (row.decision === 'granted' || row.decision === 'denied')) {
+      decisions[row.scope as ConsentScope] = row.decision;
+    }
+  }
+  return decisions;
 }
 
 function invitationToken(request: Request): string {
