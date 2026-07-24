@@ -58,28 +58,34 @@ export async function createInvitation(env: Env, accountId: string, personId: st
 }
 
 export async function updateInvitationStatus(env: Env, accountId: string, invitationId: string, status: InvitationStatus): Promise<void> {
-  if (!['accepted', 'declined', 'expired', 'revoked'].includes(status)) throw new Response('Invalid invitation status', { status: 400 });
-  const column = status === 'accepted' ? 'accepted_at' : 'revoked_at';
-  const result = await env.DB.prepare(`UPDATE invitations SET status = ?, ${column} = datetime('now') WHERE id = ? AND account_id = ?`).bind(status, invitationId, accountId).run();
-  if (result.meta?.changes === 0) throw new Response('Invitation not found', { status: 404 });
+  if (status !== 'revoked') {
+    throw new Response('Only the invited person may accept or decline an invitation. Invitation expiry is handled by the system.', { status: 403 });
+  }
+  const result = await env.DB.prepare("UPDATE invitations SET status = 'revoked', revoked_at = datetime('now') WHERE id = ? AND account_id = ? AND status = 'pending'")
+    .bind(invitationId, accountId)
+    .run();
+  if (result.meta?.changes === 0) throw new Response('Pending invitation not found', { status: 404 });
 }
 
-export async function setConsent(env: Env, accountId: string, personId: string, scope: string, granted: boolean, actor: string, reason?: string): Promise<{ scope: ConsentScope; granted: boolean }> {
+export async function setConsent(env: Env, accountId: string, personId: string, scope: string, granted: boolean, actor: string, reason?: string): Promise<{ scope: ConsentScope; granted: false }> {
   assertConsentScope(scope);
   await assertPersonOwned(env, accountId, personId);
-  await env.DB.prepare('UPDATE consent_grants SET revoked_at = datetime(\'now\') WHERE person_id = ? AND scope = ? AND revoked_at IS NULL').bind(personId, scope).run();
-  if (granted) await env.DB.prepare('INSERT INTO consent_grants (id, person_id, scope, granted_at, granted_by) VALUES (?, ?, ?, datetime(\'now\'), ?)').bind(`consent_${crypto.randomUUID()}`, personId, scope, actor).run();
+  if (granted) {
+    throw new Response('Only the authenticated invited person may grant consent.', { status: 403 });
+  }
+
+  await env.DB.prepare("UPDATE consent_grants SET revoked_at = datetime('now') WHERE person_id = ? AND scope = ? AND revoked_at IS NULL").bind(personId, scope).run();
   const previous = await env.DB.prepare('SELECT MAX(version) AS version FROM consent_versions WHERE person_id = ? AND scope = ?').bind(personId, scope).first<{ version: number | null }>();
   await env.DB.prepare('INSERT INTO consent_versions (id, person_id, scope, version, decision, decided_by, reason) VALUES (?, ?, ?, ?, ?, ?, ?)')
-    .bind(`consentv_${crypto.randomUUID()}`, personId, scope, (previous?.version ?? 0) + 1, granted ? 'granted' : 'revoked', actor, reason ?? null).run();
-  await env.DB.prepare('UPDATE persons SET consent_status = ?, updated_at = datetime(\'now\') WHERE id = ? AND account_id = ?').bind(granted ? 'granted_partial' : 'revoked', personId, accountId).run();
-  return { scope, granted };
+    .bind(`consentv_${crypto.randomUUID()}`, personId, scope, (previous?.version ?? 0) + 1, 'owner_stopped_use', actor, reason ?? 'Workspace owner stopped using this scope.').run();
+  await env.DB.prepare("UPDATE persons SET consent_status = 'owner_stopped_use', updated_at = datetime('now') WHERE id = ? AND account_id = ?").bind(personId, accountId).run();
+  return { scope, granted: false };
 }
 
 export async function hasConsent(env: Env, accountId: string, personId: string, scope: string): Promise<boolean> {
   assertConsentScope(scope);
   await assertPersonOwned(env, accountId, personId);
-  const row = await env.DB.prepare('SELECT cg.id FROM consent_grants cg JOIN persons p ON p.id = cg.person_id WHERE p.account_id = ? AND cg.person_id = ? AND cg.scope = ? AND cg.granted_at IS NOT NULL AND cg.revoked_at IS NULL LIMIT 1').bind(accountId, personId, scope).first<{ id: string }>();
+  const row = await env.DB.prepare("SELECT cg.id FROM consent_grants cg JOIN persons p ON p.id = cg.person_id WHERE p.account_id = ? AND cg.person_id = ? AND cg.scope = ? AND cg.granted_at IS NOT NULL AND cg.revoked_at IS NULL AND cg.granted_by LIKE 'invitee:%' LIMIT 1").bind(accountId, personId, scope).first<{ id: string }>();
   return Boolean(row);
 }
 
