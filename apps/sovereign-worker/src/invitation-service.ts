@@ -42,13 +42,15 @@ function normalizeScopes(scopes?: string[]): ConsentScope[] {
   return normalized as ConsentScope[];
 }
 
-async function assertPersonOwned(env: Env, accountId: string, personId: string): Promise<void> {
-  const row = await env.DB.prepare('SELECT id FROM persons WHERE id = ? AND account_id = ?').bind(personId, accountId).first<{ id: string }>();
+async function getOwnedPerson(env: Env, accountId: string, personId: string): Promise<{ id: string; bound_account_id: string | null }> {
+  const row = await env.DB.prepare('SELECT id, bound_account_id FROM persons WHERE id = ? AND account_id = ?').bind(personId, accountId).first<{ id: string; bound_account_id: string | null }>();
   if (!row) throw new Response('Person not found', { status: 404 });
+  return row;
 }
 
 export async function sendInvitation(request: Request, env: Env, accountId: string, personId: string, actor: string, input: { email: string; requestedScopes?: string[] }): Promise<{ id: string; status: InvitationStatus; requestedScopes: ConsentScope[]; expiresInDays: number }> {
-  await assertPersonOwned(env, accountId, personId);
+  const person = await getOwnedPerson(env, accountId, personId);
+  if (person.bound_account_id) throw new Response('This person is already bound to a verified account. Remove the relationship before inviting a different identity.', { status: 409 });
   const email = normalizeEmail(input.email);
   if (!validEmail(email)) throw new Response('Valid invitation email required', { status: 400 });
   if (actor === `email:${email}`) throw new Response('Invite another person, not your own account.', { status: 400 });
@@ -65,12 +67,14 @@ export async function sendInvitation(request: Request, env: Env, accountId: stri
       VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, datetime('now', '+${INVITATION_TTL_DAYS} days'), ?, ?)`)
     .bind(id, accountId, personId, emailHash, actor, email, tokenHash, JSON.stringify(requestedScopes), CONSENT_POLICY_VERSION).run();
 
-  const url = `${publicBaseUrl(request, env)}/invitation?token=${encodeURIComponent(token)}`;
+  const baseUrl = publicBaseUrl(request, env);
+  const url = `${baseUrl}/invitation?token=${encodeURIComponent(token)}`;
+  const manageUrl = `${baseUrl}/consent.html`;
   try {
     await sendOperationalEmail(env, {
       to: email,
       subject: 'A private Sovereign.OS invitation',
-      text: `You were invited to share selected Baseline context in Sovereign.OS. Review the request and decide each scope yourself. This one-time link expires in ${INVITATION_TTL_DAYS} days: ${url}`,
+      text: `You were invited to share selected Baseline context in Sovereign.OS. Review the request and decide each scope yourself. This one-time link expires in ${INVITATION_TTL_DAYS} days: ${url}\n\nAfter accepting, you can review or revoke every permission at any time: ${manageUrl}`,
       idempotencyKey: id
     });
   } catch (error) {
@@ -107,10 +111,11 @@ export async function previewInvitation(request: Request, env: Env): Promise<Inv
 export async function redeemInvitation(request: Request, env: Env): Promise<Response> {
   const token = invitationToken(request);
   const tokenHash = await sha256(token);
-  const row = await env.DB.prepare(`SELECT i.id, i.invited_person_id, i.invited_email_normalized, i.status, i.expires_at, i.requested_scopes_json, i.policy_version, p.display_name
+  const row = await env.DB.prepare(`SELECT i.id, i.invited_person_id, i.invited_email_normalized, i.status, i.expires_at, i.requested_scopes_json, i.policy_version, p.display_name, p.bound_account_id
     FROM invitations i JOIN persons p ON p.id = i.invited_person_id WHERE i.token_hash = ?`).bind(tokenHash).first<Record<string, string | null>>();
   if (!row) return Response.json({ status: 'invalid' }, { status: 400 });
   if (row.status !== 'pending') return Response.json({ status: 'already used' }, { status: 409 });
+  if (row.bound_account_id) return Response.json({ status: 'identity already bound' }, { status: 409 });
   if (!row.expires_at || sqliteTime(row.expires_at) <= Date.now()) {
     await env.DB.prepare("UPDATE invitations SET status = 'expired', token_hash = NULL WHERE id = ? AND status = 'pending'").bind(row.id).run();
     return Response.json({ status: 'expired' }, { status: 410 });
@@ -123,8 +128,12 @@ export async function redeemInvitation(request: Request, env: Env): Promise<Resp
     WHERE id = ? AND token_hash = ? AND status = 'pending' AND expires_at > datetime('now')`)
     .bind(account.accountId, subject, row.id, tokenHash).run();
   if ((redeemed.meta?.changes ?? 0) === 0) return Response.json({ status: 'already used' }, { status: 409 });
-  await env.DB.prepare("UPDATE persons SET bound_account_id = ?, consent_status = 'awaiting_decision', updated_at = datetime('now') WHERE id = ?")
+  const bound = await env.DB.prepare("UPDATE persons SET bound_account_id = ?, consent_status = 'awaiting_decision', updated_at = datetime('now') WHERE id = ? AND bound_account_id IS NULL")
     .bind(account.accountId, row.invited_person_id).run();
+  if ((bound.meta?.changes ?? 0) === 0) {
+    await env.DB.prepare("UPDATE invitations SET status = 'revoked', revoked_at = datetime('now') WHERE id = ? AND accepted_by_account_id = ?").bind(row.id, account.accountId).run();
+    return Response.json({ status: 'identity already bound' }, { status: 409 });
+  }
 
   const sessionId = `session_${crypto.randomUUID()}`;
   const exp = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
