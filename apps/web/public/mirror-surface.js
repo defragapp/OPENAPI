@@ -327,14 +327,21 @@ function currentRole() {
   const fallback = previewRoles[mirrorState.roleIndex] || previewRoles[0];
   const interpretation = mirrorState.data?.interpretation;
   if (!interpretation || interpretation.roleId !== fallback.id) return fallback;
-  return { ...fallback, ...interpretation, visualArchetypeId: mirrorState.data.visualArchetype?.id || fallback.visualArchetypeId };
+  return {
+    ...fallback,
+    ...Object.fromEntries(Object.entries(interpretation).filter(([, value]) => typeof value === 'string' && value.trim())),
+    visualArchetypeId: mirrorState.data.visualArchetype?.id || fallback.visualArchetypeId
+  };
 }
 
 function currentArtwork(role) {
   const fallback = archetypeArtwork[role.visualArchetypeId] || archetypeArtwork.fool;
   const provided = mirrorState.data?.visualArchetype;
   if (!provided || provided.id !== role.visualArchetypeId) return fallback;
-  return { ...fallback, ...provided };
+  return {
+    ...fallback,
+    ...Object.fromEntries(Object.entries(provided).filter(([, value]) => typeof value === 'string' && value.trim()))
+  };
 }
 
 function normalizeVisualMirror(value) {
