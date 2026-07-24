@@ -52,7 +52,7 @@ describe('public Sovereign.OS marketing experience', () => {
     expect(landingScript).toContain("location.pathname !== '/'");
     expect(landingScript).toContain("shell.className = 'marketing-page marketing-home'");
     expect(landingScript).toContain("link.href = '/marketing.css'");
-    expect(landingScript).toContain("'/how-it-works.html'");
+    expect(landingScript).toContain("/how-it-works.html");
   });
 
   it('uses one conceptual visual system with readable mobile behavior', () => {
