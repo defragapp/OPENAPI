@@ -11,7 +11,7 @@ describe('Baseline mirror visual experience', () => {
     expect(index.indexOf('/mirror-ui.css')).toBeGreaterThan(index.indexOf('/premium-ui.css'));
     expect(script).toContain('renderMirrorExperience');
     expect(script).toContain("currentSurface !== 'Today'");
-    expect(script).toContain("data.mirrorContract = 'baseline-current-user-confirmed'");
+    expect(script).toContain("section.dataset.mirrorContract = 'baseline-current-user-confirmed'");
   });
 
   it('presents six potential roles without turning them into identities', () => {
