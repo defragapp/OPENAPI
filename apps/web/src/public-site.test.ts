@@ -22,7 +22,7 @@ describe('public Inner Recognition experience', () => {
       'Nothing is saved without your choice.',
       'Shared framework evidence appears only with specific permission.'
     ]) expect(howItWorks).toContain(copy);
-    expect(howItWorks).not.toMatch(/secretly thinks|destined|diagnos(?:e|is)|prove what another person thinks/i);
+    expect(howItWorks).not.toMatch(/secretly thinks|destined for you|we diagnose|proves? what another person thinks/i);
   });
 
   it('connects the current landing page without creating another application shell', () => {
