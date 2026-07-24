@@ -1,6 +1,7 @@
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import type { Env } from '../env';
 import { getModelSafeBaselineContext } from '../baseline';
+import { buildPairComparison, buildSystemAnalysis } from '../relational-context';
 import { sovereignRuntimePromptV1 } from './prompt-v1';
 import { assertSafeUserInput, assertSovereignOutputSafety } from './safety';
 
@@ -14,16 +15,17 @@ export interface SovereignContext {
 }
 
 export async function runSovereignText(input: string, context: SovereignContext): Promise<string> {
-  const output = await collectTextStream(await runSovereignStream(input, context));
-  assertSovereignOutputSafety(output);
-  return output;
+  return collectTextStream(await runSovereignStream(input, context));
 }
 
 export async function runSovereignStream(input: string, context: SovereignContext): Promise<globalThis.ReadableStream<string>> {
   assertSafeUserInput(input);
   const aiConfig = resolveAiModelConfig(context.env);
   if (aiConfig.provider !== 'cloudflare-gateway') throw new Error('Only Cloudflare AI Gateway is supported.');
-  return runCloudflareGatewayStream(input, context, aiConfig.model);
+  const unvalidated = await runCloudflareGatewayStream(input, context, aiConfig.model);
+  const publicOutput = await collectTextStream(unvalidated);
+  assertSovereignOutputSafety(publicOutput);
+  return oneChunkStream(Promise.resolve(publicOutput));
 }
 
 async function runCloudflareGatewayStream(input: string, context: SovereignContext, model: string): Promise<globalThis.ReadableStream<string>> {
@@ -32,7 +34,7 @@ async function runCloudflareGatewayStream(input: string, context: SovereignConte
   const prompt = await buildCloudflareGatewayPrompt(input, context);
   const result = await context.env.AI.run(
     model,
-    { input: prompt, max_output_tokens: 700, stream: true },
+    { input: prompt, max_output_tokens: 900, stream: true },
     {
       gateway: {
         id: context.env.AI_GATEWAY_ID,
@@ -49,16 +51,48 @@ async function runCloudflareGatewayStream(input: string, context: SovereignConte
 }
 
 async function buildCloudflareGatewayPrompt(input: string, context: SovereignContext): Promise<string> {
-  const reducedContext = await getModelSafeBaselineContext(context.env, context.accountId);
+  const [authorizedContext, covenantEnabled] = await Promise.all([
+    resolveAuthorizedContext(context),
+    isCovenantEnabledForThread(context)
+  ]);
+  const covenantInstruction = covenantEnabled
+    ? 'Covenant was explicitly enabled for this thread. The grounded answer must remain complete first. You may add one short, clearly optional suggestion to explore the issue through Scripture, but do not invent, quote, or cite a passage that was not retrieved by the approved Scripture service.'
+    : 'Covenant is off for this thread. Do not apply biblical metaphor or Scripture automatically.';
   return `${sovereignRuntimePromptV1}
 
-Reduced server-side context, already authorization-checked and stripped of raw birth inputs, exact location, secrets, source paths, and private identifiers:
-${JSON.stringify(reducedContext)}
+Authorization-checked server context, stripped of raw birth inputs, exact private location, secrets, source paths, and private identifiers:
+${JSON.stringify(authorizedContext)}
 
 User request:
 ${input}
 
-Return only a public user-facing answer. Use these headings exactly: Baseline, Current, Observed, Unknown. Covenant is unavailable unless explicitly enabled, and it is not enabled for this turn.`;
+Return only a public user-facing answer. Use these headings exactly: Baseline, Current, Observed, Unknown. Keep each participant separate. Do not infer hidden motive, diagnosis, moral status, future behavior, or God’s exact intent.
+
+${covenantInstruction}`;
+}
+
+async function resolveAuthorizedContext(context: SovereignContext): Promise<unknown> {
+  const systems = await context.env.DB.prepare('SELECT id FROM systems WHERE account_id = ?').bind(context.accountId).all<{ id: string }>();
+  const selectedSystem = (systems.results ?? []).find((item) => threadContainsId(context.threadId, item.id));
+  if (selectedSystem) return buildSystemAnalysis(context.env, context.accountId, selectedSystem.id);
+
+  const people = await context.env.DB.prepare("SELECT id FROM persons WHERE account_id = ? AND role <> 'self'").bind(context.accountId).all<{ id: string }>();
+  const selectedPerson = (people.results ?? []).find((item) => threadContainsId(context.threadId, item.id));
+  if (selectedPerson) return buildPairComparison(context.env, context.accountId, selectedPerson.id);
+
+  return getModelSafeBaselineContext(context.env, context.accountId);
+}
+
+async function isCovenantEnabledForThread(context: SovereignContext): Promise<boolean> {
+  const row = await context.env.DB.prepare('SELECT covenant_enabled FROM threads WHERE id = ? AND account_id = ?')
+    .bind(context.threadId, context.accountId)
+    .first<{ covenant_enabled: number }>();
+  return row?.covenant_enabled === 1;
+}
+
+function threadContainsId(threadId: string, id: string): boolean {
+  const normalized = id.replace(/[^a-z0-9_-]/gi, '-');
+  return threadId.includes(normalized);
 }
 
 async function pseudonymousAccountRef(context: SovereignContext): Promise<string> {
