@@ -21,7 +21,7 @@ The founder-approved public approval boundary is defined in [`docs/launch-produc
 
 - TypeScript monorepo
 - OpenAI Agents SDK
-- ChatKit-compatible streamed conversation contract
+- ChatKit-compatible conversation contract
 - Cloudflare Workers
 - D1 canonical storage
 - Durable Objects for thread coordination
@@ -41,4 +41,6 @@ The founder-approved public approval boundary is defined in [`docs/launch-produc
 
 ## Current state
 
-The repository foundation is scaffolded. It includes the app shell, Worker shell, initial D1 schema, thread Durable Object, security primitives, Stripe webhook verification, domain contracts, and CI checks. Cloudflare bindings, production secrets, live SOVV adapters, authenticated invited-person consent, real multi-user overlays, and deployment are not yet verified for the approval candidate.
+The repository now includes the app and Worker shells, D1 schema and migrations, Durable Object thread coordination, security primitives, Stripe billing foundations, export job execution, identity-bound email invitations, invitee-controlled scope decisions and revocation, reduced-Baseline pair and system context, and authorization-checked relational context for Sovereign AI turns.
+
+This is **implemented, not yet approved for production**. Remaining approval evidence includes a green CI run, configured production Baseline and email services, protected Cloudflare preview, migration replay, authenticated browser and iPhone smoke tests, retention execution, load testing, reviewed Terms and Privacy documents, and explicit founder approval. No production deployment is implied by the code state.
