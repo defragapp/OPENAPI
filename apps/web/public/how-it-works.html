@@ -1,216 +1,284 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="js">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a0a0c" />
-    <meta name="description" content="See how Sovereign.OS Inner Recognition turns a difficult moment into one useful question and one clear next step." />
-    <title>How Inner Recognition works · Sovereign.OS</title>
-    <style>
-      :root {
-        color-scheme: dark;
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #0a0a0c;
-        color: #f5f1e9;
-        font-size: 17px;
-        line-height: 1.6;
-        --ink: #f5f1e9;
-        --muted: #b6aea3;
-        --faint: #817a73;
-        --line: rgba(255,255,255,.12);
-        --panel: rgba(20,19,22,.84);
-        --accent: #d6ff72;
-        --accent-ink: #13150b;
-      }
-      * { box-sizing: border-box; }
-      html, body { margin: 0; min-width: 320px; min-height: 100%; }
-      body {
-        background:
-          radial-gradient(circle at 78% -8%, rgba(123,87,137,.24), transparent 35rem),
-          radial-gradient(circle at 8% 32%, rgba(80,101,77,.14), transparent 31rem),
-          #0a0a0c;
-      }
-      a { color: inherit; }
-      p { margin: 0; }
-      h1, h2 {
-        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-        font-weight: 500;
-        letter-spacing: -.05em;
-        text-wrap: balance;
-      }
-      h1 { max-width: 14ch; margin: 16px 0 24px; font-size: clamp(3rem, 8vw, 6.2rem); line-height: .93; }
-      h2 { max-width: 15ch; margin: 8px 0 18px; font-size: clamp(2.1rem, 5.5vw, 4.2rem); line-height: 1; }
-      h3 { margin: 0 0 10px; font-size: 1.08rem; }
-      .shell { width: min(100%, 1160px); margin: 0 auto; padding: calc(env(safe-area-inset-top) + 24px) 18px calc(env(safe-area-inset-bottom) + 70px); }
-      .nav { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-      .wordmark { font-size: .78rem; font-weight: 800; letter-spacing: .2em; text-decoration: none; }
-      .nav-links { display: flex; align-items: center; gap: 10px; }
-      .nav-links a { min-height: 44px; display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 12px; color: var(--muted); text-decoration: none; }
-      .nav-links a:last-child { border: 1px solid var(--line); color: var(--ink); }
-      .hero { min-height: 82vh; display: grid; align-content: center; padding: 12vh 0 8vh; }
-      .eyebrow { color: var(--muted); font-size: .72rem; font-weight: 750; letter-spacing: .18em; }
-      .lede { max-width: 62ch; color: #cbc3b8; font-size: clamp(1.05rem, 2.3vw, 1.28rem); }
-      .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
-      .button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; padding: 10px 18px; border-radius: 14px; font-weight: 750; text-decoration: none; }
-      .primary { background: var(--accent); color: var(--accent-ink); }
-      .secondary { border: 1px solid var(--line); background: rgba(255,255,255,.035); }
-      .trust-line { margin-top: 28px; color: var(--faint); font-size: .8rem; letter-spacing: .04em; }
-      .section { padding: clamp(66px, 10vw, 130px) 0; border-top: 1px solid var(--line); }
-      .section-intro { max-width: 66ch; color: #cbc3b8; font-size: 1.08rem; }
-      .steps, .cards { display: grid; gap: 14px; margin-top: 34px; }
-      .card { padding: clamp(22px, 4vw, 36px); border: 1px solid var(--line); border-radius: 24px; background: var(--panel); box-shadow: 0 30px 90px rgba(0,0,0,.2); }
-      .number { color: var(--accent); font-size: .72rem; font-weight: 800; letter-spacing: .16em; }
-      .card p { color: var(--muted); }
-      .example { margin-top: 18px; padding: 16px 18px; border-left: 2px solid var(--accent); background: rgba(214,255,114,.05); color: var(--ink) !important; }
-      .split { display: grid; gap: 20px; align-items: start; }
-      .plain-list { display: grid; gap: 10px; margin: 26px 0 0; padding: 0; list-style: none; }
-      .plain-list li { padding: 13px 0; border-bottom: 1px solid var(--line); color: #d9d1c7; }
-      .basis { margin-top: 24px; padding: 20px; border: 1px solid rgba(214,255,114,.25); border-radius: 18px; background: rgba(214,255,114,.045); }
-      .basis strong { display: block; margin-bottom: 8px; color: var(--accent); font-size: .78rem; letter-spacing: .1em; }
-      .basis code { color: var(--ink); white-space: normal; font-size: .95rem; }
-      .closing { text-align: left; }
-      .closing h2 { max-width: 17ch; }
-      footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; padding-top: 30px; border-top: 1px solid var(--line); color: var(--faint); font-size: .78rem; }
-      footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
-      @media (min-width: 760px) {
-        .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-        .cards, .split { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      }
-    </style>
+    <meta name="theme-color" content="#080806" />
+    <meta name="description" content="See how Sovereign.OS turns Baseline Design, current conditions, consented relationships, systems, and saved understanding into clear human guidance." />
+    <link rel="stylesheet" href="/marketing.css" />
+    <title>How Sovereign.OS works</title>
   </head>
-  <body>
-    <main class="shell">
-      <header class="nav">
-        <a class="wordmark" href="/">SOVEREIGN.OS</a>
-        <nav class="nav-links" aria-label="Account">
+  <body class="marketing-document">
+    <div class="marketing-shell">
+      <header class="marketing-nav">
+        <a class="marketing-wordmark" href="/" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
+        <nav class="marketing-nav-links" aria-label="Public navigation">
+          <a href="/">Overview</a>
           <a href="/login">Sign in</a>
-          <a href="/signup">Create workspace</a>
+          <a class="nav-cta" href="/signup">Enter Sovereign</a>
         </nav>
       </header>
 
-      <section class="hero">
-        <p class="eyebrow">INNER RECOGNITION</p>
-        <h1>Understand what this moment is bringing up in you.</h1>
-        <p class="lede">Sovereign.OS helps you slow down a difficult interaction, notice what is happening inside you, and find one clear next step. Your Baseline Design and current timing work quietly in the background to make the guidance more personal.</p>
-        <div class="actions">
-          <a class="button primary" href="/signup">Talk it through</a>
-          <a class="button secondary" href="#how">See how it works</a>
-        </div>
-        <p class="trust-line">You do not need to understand the systems behind it.</p>
-      </section>
-
-      <section class="section" id="how">
-        <p class="eyebrow">HOW IT WORKS</p>
-        <h2>One useful question at a time.</h2>
-        <p class="section-intro">You describe what happened. Sovereign.OS helps you notice what changed inside you, what the reaction may be trying to protect, and what you can do next. The goal is not endless self-analysis. The goal is a clearer response.</p>
-        <div class="steps">
-          <article class="card">
-            <p class="number">01 · START</p>
-            <h3>Tell it what happened</h3>
-            <p>Begin with an argument, an unanswered message, a decision, a family issue, or something you cannot fully explain yet. You do not need to organize the story perfectly.</p>
-            <p class="example">“I know what I want to say, but I keep avoiding the conversation.”</p>
-          </article>
-          <article class="card">
-            <p class="number">02 · RECOGNIZE</p>
-            <h3>Find what is underneath</h3>
-            <p>Sovereign.OS does not rush to label the reaction. It asks one clear question that helps you recognize what the moment may be touching.</p>
-            <p class="example">“What do you think will happen after you give the honest answer?”</p>
-          </article>
-          <article class="card">
-            <p class="number">03 · CHOOSE</p>
-            <h3>Decide what works now</h3>
-            <p>Once the real concern is clearer, Sovereign.OS turns it into one practical choice: ask directly, request time, state a limit, give a clear answer, or stop repeating the same explanation.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section split">
-        <div>
-          <p class="eyebrow">PERSONAL BY DESIGN</p>
-          <h2>The systems stay in the background.</h2>
-          <p class="section-intro">Sovereign.OS can use verified astrology, Human Design, Gene Keys, numerology, live timing, relationship context, and insights you chose to save. This information helps the AI decide which question may be most useful. It does not define you, prove what another person thinks, or decide what you should do.</p>
-        </div>
-        <div class="card">
-          <h3>What you receive</h3>
-          <ul class="plain-list">
-            <li>One clear observation</li>
-            <li>One useful inward question</li>
-            <li>One practical next step</li>
-            <li>One optional reflection to save</li>
-            <li>A compact view of the exact data used</li>
-          </ul>
-        </div>
-      </section>
-
-      <section class="section">
-        <p class="eyebrow">RELATIONSHIPS & FAMILIES</p>
-        <h2>Understand the interaction without deciding who is wrong.</h2>
-        <div class="cards">
-          <article class="card">
-            <h3>Relationship context</h3>
-            <p>Two people can experience the same moment differently. One may seek more information when things feel unclear. The other may say less when the conversation becomes difficult. Sovereign.OS helps identify what happens first and what each person can change without controlling the other.</p>
-            <p class="example">“Which part happens first here?”</p>
-          </article>
-          <article class="card">
-            <h3>Family roles</h3>
-            <p>Families often develop roles without naming them: keeping everyone calm, carrying the feelings, solving the practical problem, staying quiet, or becoming responsible for repair. Sovereign.OS helps you see the role you enter and decide whether it still fits.</p>
-            <p class="example">“What are you expected to carry here?”</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section split">
-        <div>
-          <p class="eyebrow">TRANSPARENT SUPPORT</p>
-          <h2>See what supported the response.</h2>
-          <p class="section-intro">A short Basis line can show the exact verified data points that helped shape a question or suggestion. Missing fields are omitted. Shared framework evidence appears only with specific permission.</p>
-          <div class="basis">
-            <strong>EXAMPLE BASIS</strong>
-            <code>HD 5/1 · 13–33 | GK 16.1 · 9.1 | LIVE ♃☌☉</code>
+      <main>
+        <section class="product-hero">
+          <div class="reveal">
+            <p class="marketing-kicker">How it works</p>
+            <h1 class="marketing-display">It begins before the conversation.</h1>
+            <p class="marketing-lede">
+              Sovereign.OS is useful before you explain a problem. Your Baseline Design, current conditions,
+              consented relationships, system roles, and saved understanding form a private living context.
+              Sovereign reads that context and brings forward what may matter now.
+            </p>
+            <div class="marketing-actions">
+              <a class="marketing-button primary" href="/signup">Create my Baseline</a>
+              <a class="marketing-button secondary" href="#flow">See the flow</a>
+            </div>
           </div>
-        </div>
-        <article class="card">
-          <h3>What the Basis line is not</h3>
-          <ul class="plain-list">
-            <li>Not a score</li>
-            <li>Not a diagnosis</li>
-            <li>Not proof that an interpretation is correct</li>
-            <li>Not permission to expose another person’s private data</li>
-          </ul>
-          <p class="example">The data supports the question. You decide whether the answer fits.</p>
-        </article>
-      </section>
+        </section>
 
-      <section class="section split">
-        <article class="card">
-          <p class="eyebrow">INSIGHT LIBRARY</p>
-          <h2>Save the insight—not the whole conversation.</h2>
-          <p>When something important becomes clear, Sovereign.OS can offer a short private reflection containing the recognition, a question to return to, a clearer response, and the verified Basis used. Nothing is saved without your choice.</p>
-        </article>
-        <article class="card">
-          <p class="eyebrow">MEANING & GROUNDING</p>
-          <h2>Explore meaning without losing your footing.</h2>
-          <p>Spiritual experiences, symbolic dreams, intuition, and identity shifts can be explored without treating every feeling, sign, or coincidence as proof. Meaning is welcome. Certainty is not forced. Daily life still matters.</p>
-        </article>
-      </section>
+        <section class="marketing-section" id="flow">
+          <header class="marketing-section-head reveal">
+            <div>
+              <p class="marketing-kicker">The intelligence flow</p>
+              <h2 class="marketing-section-title">A large private context becomes one clear view.</h2>
+            </div>
+            <p>
+              The product does not show every calculation at once. It reduces the available context to the
+              smallest useful explanation, keeps uncertainty visible, and lets you correct what does not fit.
+            </p>
+          </header>
 
-      <section class="section closing">
-        <p class="eyebrow">START WHERE YOU ARE</p>
-        <h2>You are more than the reaction.</h2>
-        <p class="section-intro">Sovereign.OS helps you understand what the reaction may be protecting—so you can decide what comes next.</p>
-        <div class="actions">
-          <a class="button primary" href="/signup">Understand this moment</a>
-          <a class="button secondary" href="/login">Return to your workspace</a>
-        </div>
-      </section>
+          <div class="flow-diagram reveal">
+            <article class="flow-step">
+              <span>01 · Baseline</span>
+              <h3>Your enduring design</h3>
+              <p>How you tend to decide, communicate, learn, connect, express, and return to clarity.</p>
+            </article>
+            <article class="flow-step">
+              <span>02 · Live</span>
+              <h3>What may be louder now</h3>
+              <p>Current conditions are treated as possible amplification—not destiny or proof.</p>
+            </article>
+            <article class="flow-step">
+              <span>03 · Context</span>
+              <h3>People and systems</h3>
+              <p>Only identity-bound, permissioned relationship and group context is available for comparison.</p>
+            </article>
+            <article class="flow-step">
+              <span>04 · Sovereign</span>
+              <h3>Relevant context only</h3>
+              <p>The agent selects the smallest verified set needed for the current view.</p>
+            </article>
+            <article class="flow-step">
+              <span>05 · Output</span>
+              <h3>Clear human guidance</h3>
+              <p>One recognition, one useful direction, and a transparent view of what supported it.</p>
+            </article>
+          </div>
+        </section>
 
-      <footer>
+        <section class="marketing-band">
+          <div class="marketing-shell marketing-band-inner">
+            <div class="reveal">
+              <p class="marketing-kicker">The first screen</p>
+              <h2 class="marketing-section-title">Open Sovereign and see what is already active.</h2>
+            </div>
+            <div class="marketing-section-copy reveal">
+              <p>
+                The authenticated experience should not open with an empty request for a story.
+                It should open with a <strong>living Today view</strong>: what appears stable, what may be amplified,
+                what remains unknown, and where attention may be most useful.
+              </p>
+              <div class="context-stack">
+                <div class="context-row"><span>Stable</span><p>Your enduring Baseline remains separate from temporary pressure.</p></div>
+                <div class="context-row"><span>Active</span><p>Current conditions may make certain strengths, reactions, or decisions more noticeable.</p></div>
+                <div class="context-row"><span>Unknown</span><p>The system never claims your exact state—or another person’s—without confirmation.</p></div>
+                <div class="context-row"><span>Available</span><p>Sovereign shows a useful direction without deciding what must be true.</p></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="marketing-section">
+          <header class="marketing-section-head reveal">
+            <div>
+              <p class="marketing-kicker">The private workspace</p>
+              <h2 class="marketing-section-title">One operating system for the life you are already living.</h2>
+            </div>
+            <p>
+              Each surface changes the question the system can answer. None of them starts from a blank identity.
+            </p>
+          </header>
+
+          <div class="lens-grid">
+            <article class="lens-item is-accent reveal">
+              <span class="lens-number">TODAY</span>
+              <h3>What is particularly active now?</h3>
+              <p>Separate today’s pressure from your enduring design and see where a second look may change the choice.</p>
+            </article>
+            <article class="lens-item reveal">
+              <span class="lens-number">EXPLORE</span>
+              <h3>How do I work when I am most myself?</h3>
+              <p>Explore decisions, learning, expression, communication, love, boundaries, and pressure response.</p>
+            </article>
+            <article class="lens-item reveal">
+              <span class="lens-number">PEOPLE</span>
+              <h3>Where do our natural approaches differ?</h3>
+              <p>Compare two consented Baselines while keeping motive, emotion, and responsibility separate.</p>
+            </article>
+            <article class="lens-item is-accent reveal">
+              <span class="lens-number">SYSTEMS</span>
+              <h3>What has this group learned to expect from me?</h3>
+              <p>See roles, authority, dependence, shared constraints, and pressure distribution across a family or team.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="marketing-section">
+          <header class="marketing-section-head reveal">
+            <div>
+              <p class="marketing-kicker">Example output</p>
+              <h2 class="marketing-section-title">The answer sounds human because the complexity stays behind it.</h2>
+            </div>
+          </header>
+
+          <div class="intelligence-layout reveal">
+            <div class="intelligence-tabs" aria-hidden="true">
+              <div class="intelligence-tab active"><span>Context</span><strong>Baseline + Today</strong></div>
+              <div class="intelligence-tab"><span>Focus</span><strong>Decision pressure</strong></div>
+              <div class="intelligence-tab"><span>Boundary</span><strong>Unknown state</strong></div>
+              <div class="intelligence-tab"><span>Output</span><strong>One clean move</strong></div>
+            </div>
+            <article class="intelligence-output">
+              <span class="intelligence-label">Example · Today</span>
+              <blockquote class="intelligence-quote">
+                You usually reach clarity by seeing how the parts connect. Today may make the conclusion feel urgent before the picture is complete.
+              </blockquote>
+              <div class="intelligence-meta">
+                <span>Try this</span>
+                <span>Return after one more pass</span>
+                <span>Keep the final choice yours</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="marketing-section">
+          <div class="source-view reveal">
+            <article class="source-copy">
+              <p class="marketing-kicker">Source view</p>
+              <h3>Transparency without turning the product into a chart.</h3>
+              <p>
+                The main answer must work on its own. Users who deliberately open Source View can inspect the
+                relevant verified Basis values, current conditions, consent status, and uncertainty behind it.
+                Missing data is omitted rather than invented.
+              </p>
+            </article>
+            <div class="source-panel">
+              <div class="source-line"><span>Baseline</span><strong>Decision style · communication pattern · pressure response</strong></div>
+              <div class="source-line"><span>Live</span><strong>Current amplification available · certainty limited</strong></div>
+              <div class="source-line"><span>People</span><strong>Not used in this response</strong></div>
+              <div class="source-line"><span>Confidence</span><strong>Supported, not confirmed</strong></div>
+              <div class="source-line"><span>Privacy</span><strong>No raw birth input or exact location sent to the model</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="marketing-band">
+          <div class="marketing-shell marketing-band-inner">
+            <div class="reveal">
+              <p class="marketing-kicker">Relationships</p>
+              <h2 class="marketing-section-title">Permission comes before comparison.</h2>
+            </div>
+            <div class="marketing-section-copy reveal">
+              <p>
+                A person is not a second chart added to your account. They are an identity with their own
+                Baseline, choices, consent, and right to revoke access. Sovereign rechecks permission whenever
+                shared context is used.
+              </p>
+              <div class="context-stack">
+                <div class="context-row"><span>Invite</span><p>The person receives a private, time-limited invitation.</p></div>
+                <div class="context-row"><span>Choose</span><p>They decide each permission separately.</p></div>
+                <div class="context-row"><span>Use</span><p>Only the reduced context required for the selected view is available.</p></div>
+                <div class="context-row"><span>Revoke</span><p>Future use stops immediately when permission is withdrawn.</p></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="marketing-section">
+          <header class="marketing-section-head reveal">
+            <div>
+              <p class="marketing-kicker">Continuity by choice</p>
+              <h2 class="marketing-section-title">Save the understanding—not every private word.</h2>
+            </div>
+            <p>
+              Sovereign can offer a compact reflection when something becomes useful enough to keep. Nothing
+              enters the Library unless you approve it.
+            </p>
+          </header>
+          <div class="comparison reveal">
+            <article class="comparison-column">
+              <span class="comparison-label">Unsaved</span>
+              <h3>Conversation context expires.</h3>
+              <ul class="comparison-list">
+                <li>Unsaved thread content follows the 30-day retention policy.</li>
+                <li>Operational metadata remains separate from conversation content.</li>
+                <li>You can leave a thought without turning it into a permanent profile.</li>
+              </ul>
+            </article>
+            <article class="comparison-column">
+              <span class="comparison-label">Saved</span>
+              <h3>Your Library keeps what you chose.</h3>
+              <ul class="comparison-list">
+                <li>A recognition you want to remember.</li>
+                <li>A clearer way to respond next time.</li>
+                <li>A short audio, card, visual, or learning module when available.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="marketing-closing">
+          <div class="reveal">
+            <p class="marketing-kicker">Begin once. Keep discovering.</p>
+            <h2 class="marketing-statement">Your Baseline is not the answer. It is where a better question begins.</h2>
+            <p>
+              Sovereign.OS turns private context into a living way to understand yourself, your relationships,
+              and the systems around you.
+            </p>
+            <div class="marketing-actions">
+              <a class="marketing-button primary" href="/signup">Build my Baseline</a>
+              <a class="marketing-button secondary" href="/">Return to overview</a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="marketing-footer">
         <span>Non-diagnostic · Consent-aware · Private by design</span>
         <nav aria-label="Legal">
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
+          <a href="/login">Sign in</a>
         </nav>
       </footer>
-    </main>
+    </div>
+
+    <script>
+      const reveal = [...document.querySelectorAll('.reveal')];
+      if (!('IntersectionObserver' in window)) {
+        reveal.forEach((element) => element.classList.add('is-visible'));
+      } else {
+        const observer = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        }, { threshold: 0.12 });
+        reveal.forEach((element) => observer.observe(element));
+      }
+    </script>
   </body>
 </html>
