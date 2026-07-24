@@ -6,81 +6,99 @@ const howItWorks = readFileSync(new URL('../public/how-it-works.html', import.me
 const marketingCss = readFileSync(new URL('../public/marketing.css', import.meta.url), 'utf8');
 const recognitionCss = readFileSync(new URL('../public/recognition-ui.css', import.meta.url), 'utf8');
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const publicCopy = `${landingScript}\n${howItWorks}`;
 
 describe('public Sovereign.OS marketing experience', () => {
-  it('positions Sovereign as Baseline-aware intelligence rather than incident-first chat', () => {
+  it('starts with personal context instead of an incident or empty chat prompt', () => {
     for (const copy of [
-      'An AI that already knows <em>where to begin.</em>',
-      'Most AI waits for a prompt. Sovereign begins with a map.',
-      'Stop starting from zero.',
-      'Your life is not divided into separate apps.',
-      'Live a life you would choose to watch again.'
+      'Start with context. <em>Not a blank box.</em>',
+      'It already has a place to begin.',
+      'Create my Baseline',
+      'Useful before you ask.',
+      'Open the app and see something useful.'
+    ]) expect(publicCopy).toContain(copy);
+
+    expect(publicCopy).not.toMatch(/tell it what happened|describe what happened|what happened\?|start with what happened|talk it through/i);
+  });
+
+  it('uses simple universal language without clinical, spiritual, or self-help identity', () => {
+    expect(publicCopy).not.toMatch(/observatory|signal|orbit|map|trauma|shadow work|healing journey|spiritual|scripture|astrology|human design|gene keys|numerology|diagnos|therapy|therapeutic/i);
+    for (const copy of [
+      'how you make decisions, communicate, learn',
+      'what may be stronger now',
+      'the people you choose to include',
+      'groups around you',
+      'You decide what fits'
+    ]) expect(publicCopy).toContain(copy);
+  });
+
+  it('shows a real product experience rather than an abstract diagram', () => {
+    for (const copy of [
+      'product-device',
+      'product-screen',
+      'A fast answer may feel clearer than it is.',
+      'Give the decision one more pass.',
+      'What stays true',
+      'What may be stronger today'
     ]) expect(landingScript).toContain(copy);
 
-    expect(landingScript).not.toMatch(/tell it what happened|describe what happened|what happened\?|start with what happened/i);
-    expect(howItWorks).not.toMatch(/tell it what happened|describe what happened|what happened\?|start with what happened/i);
+    expect(marketingCss).toContain('.product-device');
+    expect(marketingCss).toContain('.product-bottom-nav');
+    expect(marketingCss).not.toMatch(/\.signal-|\.orbit|\.observatory/);
   });
 
-  it('markets outputs and living context while keeping frameworks secondary', () => {
+  it('explains useful capabilities in ordinary language', () => {
     for (const copy of [
-      'Baseline Design',
-      'what is active now',
-      'consented relationships',
-      'systems',
-      'saved understanding',
-      'clear human guidance'
-    ]) expect(`${landingScript}\n${howItWorks}`).toContain(copy);
-
-    expect(landingScript).toContain('The systems remain in the');
-    expect(howItWorks).toContain('Transparency without turning the product into a chart.');
+      'What Sovereign can help with',
+      'Clearer decisions. Better conversations. Less guesswork.',
+      'Act, wait, or clarify',
+      'Understand the difference',
+      'See the role you carry',
+      'Keep the useful part. Leave the rest behind.'
+    ]) expect(landingScript).toContain(copy);
   });
 
-  it('explains privacy, consent, uncertainty, and optional continuity without certainty claims', () => {
+  it('keeps privacy, permission, uncertainty, and saving choices understandable', () => {
     for (const copy of [
-      'Permission comes before comparison.',
-      'Nothing enters the Library unless you approve it.',
-      'Current conditions are treated as possible amplification—not destiny or proof.',
-      'The system never claims your exact state—or another person’s—without confirmation.'
-    ]) expect(howItWorks).toContain(copy);
+      'Nothing shared without permission',
+      'No claim is made about your exact state without your input.',
+      'Sharing is a choice, not a shortcut.',
+      'Saved only when you choose.'
+    ]) expect(publicCopy).toContain(copy);
 
-    expect(`${landingScript}\n${howItWorks}`).not.toMatch(/secretly thinks|unlock your destiny|we diagnose|proves? what another person thinks/i);
+    expect(publicCopy).not.toMatch(/secretly thinks|destined|proves? what another person thinks|must be true/i);
   });
 
-  it('loads the real marketing surface without changing the authenticated app shell', () => {
+  it('loads the marketing surface without altering authenticated routes', () => {
     expect(index).toContain('/public-site.js');
     expect(index).toContain('/recognition-ui.css');
     expect(landingScript).toContain("location.pathname !== '/'");
     expect(landingScript).toContain("shell.className = 'marketing-page marketing-home'");
     expect(landingScript).toContain("link.href = '/marketing.css'");
-    expect(landingScript).toContain("/how-it-works.html");
+    expect(landingScript).toContain('/how-it-works.html');
   });
 
-  it('uses one conceptual visual system with readable mobile behavior', () => {
+  it('is designed for iPhone and desktop without hover-only controls', () => {
     for (const selector of [
-      '.signal-orbit',
-      '.intelligence-layout',
-      '.lens-grid',
-      '.comparison',
-      '@media (max-width:700px)'
+      '.product-device',
+      '.capability-layout',
+      '.feature-rail',
+      '.value-split',
+      '.demo-window',
+      '@media (max-width: 720px)'
     ]) expect(marketingCss).toContain(selector);
 
-    expect(marketingCss).toContain('.marketing-nav-links a:not(.nav-cta)');
-    expect(marketingCss).toContain('display:none');
-    expect(marketingCss).toContain('min-height:44px');
+    expect(marketingCss).toContain('safe-area-inset-top');
+    expect(marketingCss).toContain('safe-area-inset-bottom');
+    expect(marketingCss).toContain('min-height: 44px');
     expect(marketingCss).toContain('prefers-reduced-motion');
+    expect(marketingCss).toContain('-webkit-backdrop-filter');
   });
 
-  it('keeps optional exact-data consent readable and explicit', () => {
+  it('keeps optional exact-data consent readable and explicit inside the app', () => {
     expect(recognitionCss).toContain('.scope-list > label');
     expect(recognitionCss).toContain('min-height: 58px');
     expect(recognitionCss).toContain('width: 24px');
     expect(recognitionCss).toContain('[data-recognition-module-offer]');
-  });
-
-  it('keeps the highest-value entry actions clear', () => {
-    expect(landingScript).toContain('Build my Baseline');
-    expect(landingScript).toContain('Enter Sovereign');
-    expect(landingScript).toContain('See the intelligence');
-    expect(howItWorks).toContain('Create my Baseline');
   });
 });
