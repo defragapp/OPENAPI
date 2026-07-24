@@ -90,8 +90,10 @@ const worker = {
 
       const response = await app.fetch(request, env, executionContext);
       if (request.method === 'GET' && ['/health', '/healthz', '/ready'].includes(url.pathname) && response.headers.get('content-type')?.includes('application/json')) {
-        const payload = await response.json<Record<string, unknown>>();
-        return Response.json({ ...payload, migrationVersion: '0008_identity_bound_invitations' }, { status: response.status, headers: response.headers });
+        const payload = await response.json() as Record<string, unknown>;
+        const headers = new Headers(response.headers);
+        headers.delete('content-length');
+        return Response.json({ ...payload, migrationVersion: '0008_identity_bound_invitations' }, { status: response.status, headers });
       }
       return response;
     } catch (error) {
