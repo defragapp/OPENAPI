@@ -15,6 +15,8 @@ Sovereign.OS is a Baseline-first personal, relational, and system intelligence p
 
 Defrag, Alignment, and Covenant are internal capabilities of one agent. They are not separate top-level applications.
 
+The founder-approved public approval boundary is defined in [`docs/launch-product-contract.md`](docs/launch-product-contract.md). Implementation and release work must not guess or silently change those decisions.
+
 ## Initial stack
 
 - TypeScript monorepo
@@ -28,6 +30,7 @@ Defrag, Alignment, and Covenant are internal capabilities of one agent. They are
 
 ## Start here
 
+- [`docs/launch-product-contract.md`](docs/launch-product-contract.md)
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/privacy-model.md`](docs/privacy-model.md)
 - [`docs/tool-contracts.md`](docs/tool-contracts.md)
@@ -38,4 +41,4 @@ Defrag, Alignment, and Covenant are internal capabilities of one agent. They are
 
 ## Current state
 
-The repository foundation is scaffolded. It includes the app shell, Worker shell, initial D1 schema, thread Durable Object, security primitives, Stripe webhook verification, domain contracts, and CI checks. Cloudflare bindings, production secrets, live SOVV adapters, and deployment are intentionally not configured in source control.
+The repository foundation is scaffolded. It includes the app shell, Worker shell, initial D1 schema, thread Durable Object, security primitives, Stripe webhook verification, domain contracts, and CI checks. Cloudflare bindings, production secrets, live SOVV adapters, authenticated invited-person consent, real multi-user overlays, and deployment are not yet verified for the approval candidate.
