@@ -38,6 +38,7 @@ export async function enqueueJob(env: Env, kind: string, accountId?: string, pay
 }
 
 export async function runDueJobs(env: Env, limit = 10, accountId?: string) {
+  if (!accountId) await cleanupExpired(env);
   const scopedSql = accountId
     ? `SELECT id, account_id, kind, payload_json, attempts, status FROM background_jobs
        WHERE account_id = ? AND status = 'queued' AND run_after <= datetime('now')
@@ -188,13 +189,43 @@ export async function cancelDeletion(env: Env, accountId: string, jobId: string)
 }
 
 export async function cleanupExpired(env: Env) {
-  const artifacts = await env.DB.prepare(`SELECT r2_key FROM export_artifacts WHERE expires_at < datetime('now')`)
+  const threadDays = retentionDays(env.THREAD_RETENTION_DAYS, 30, 7, 365);
+  const auditDays = retentionDays(env.AUDIT_RETENTION_DAYS, 90, threadDays, 730);
+  const threadCutoff = `-${threadDays} days`;
+  const auditCutoff = `-${auditDays} days`;
+
+  const artifacts = await env.DB.prepare('SELECT r2_key FROM export_artifacts WHERE expires_at < datetime(\'now\')')
     .all<{ r2_key: string }>();
   for (const artifact of artifacts.results ?? []) await env.ARTIFACTS?.delete?.(artifact.r2_key);
-  await env.DB.prepare(`DELETE FROM auth_magic_links WHERE expires_at < datetime('now') AND used_at IS NULL`).run();
-  await env.DB.prepare(`UPDATE auth_sessions SET revoked_at = datetime('now')
-    WHERE expires_at < datetime('now') AND revoked_at IS NULL`).run();
-  await env.DB.prepare(`DELETE FROM export_artifacts WHERE expires_at < datetime('now')`).run();
+
+  const threadEvents = await env.DB.prepare("DELETE FROM thread_events WHERE created_at < datetime('now', ?)").bind(threadCutoff).run();
+  const correctionNotes = await env.DB.prepare("UPDATE user_corrections SET note = NULL WHERE note IS NOT NULL AND created_at < datetime('now', ?)").bind(threadCutoff).run();
+  const turnStates = await env.DB.prepare("DELETE FROM thread_turn_states WHERE updated_at < datetime('now', ?) AND status IN ('completed','failed','interrupted')").bind(auditCutoff).run();
+  const auditEvents = await env.DB.prepare("DELETE FROM tool_audit_events WHERE created_at < datetime('now', ?)").bind(auditCutoff).run();
+  const magicLinks = await env.DB.prepare("DELETE FROM auth_magic_links WHERE created_at < datetime('now', ?)").bind(threadCutoff).run();
+  const sessions = await env.DB.prepare("DELETE FROM auth_sessions WHERE revoked_at IS NOT NULL AND created_at < datetime('now', ?)").bind(auditCutoff).run();
+  const oldJobs = await env.DB.prepare("DELETE FROM background_jobs WHERE status IN ('completed','failed') AND updated_at < datetime('now', ?)").bind(auditCutoff).run();
+  await env.DB.prepare("UPDATE auth_sessions SET revoked_at = datetime('now') WHERE expires_at < datetime('now') AND revoked_at IS NULL").run();
+  await env.DB.prepare("DELETE FROM export_artifacts WHERE expires_at < datetime('now')").run();
+
+  const counts = {
+    threadEvents: threadEvents.meta?.changes ?? 0,
+    correctionNotes: correctionNotes.meta?.changes ?? 0,
+    turnStates: turnStates.meta?.changes ?? 0,
+    auditEvents: auditEvents.meta?.changes ?? 0,
+    magicLinks: magicLinks.meta?.changes ?? 0,
+    sessions: sessions.meta?.changes ?? 0,
+    oldJobs: oldJobs.meta?.changes ?? 0,
+    exportArtifacts: artifacts.results?.length ?? 0
+  };
+  console.info('retention_cleanup', { threadDays, auditDays, counts });
+  return { threadDays, auditDays, counts };
+}
+
+function retentionDays(value: string | undefined, fallback: number, minimum: number, maximum: number): number {
+  const parsed = Number(value ?? fallback);
+  if (!Number.isInteger(parsed) || parsed < minimum || parsed > maximum) return fallback;
+  return parsed;
 }
 
 export function deletionInventory(): string[] {
