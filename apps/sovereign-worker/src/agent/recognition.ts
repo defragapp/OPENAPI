@@ -10,6 +10,42 @@ export const basisSelectionSchema = z.object({
   numerology: z.array(z.string().min(1)).max(6)
 });
 
+const archetypeIdSchema = z.enum(['fool', 'magician', 'three_of_cups', 'hermit', 'strength', 'tower']);
+const visualPhaseSchema = z.enum(['origin', 'shadow', 'gift']);
+const visualCardSchema = z.object({
+  archetype: archetypeIdSchema,
+  title: z.string().max(120),
+  phase: visualPhaseSchema
+});
+
+const emptyVisualStory = () => ({
+  should_show: false,
+  mode: 'self' as const,
+  primary: { archetype: 'fool' as const, title: '', phase: 'shadow' as const },
+  secondary: null,
+  tertiary: null,
+  origin: '',
+  shadow: '',
+  gift: '',
+  current: '',
+  next_step: '',
+  visual_reason: ''
+});
+
+export const visualStorySchema = z.object({
+  should_show: z.boolean(),
+  mode: z.enum(['self', 'interaction', 'family']),
+  primary: visualCardSchema,
+  secondary: visualCardSchema.nullable().optional().default(null),
+  tertiary: visualCardSchema.nullable().optional().default(null),
+  origin: z.string().max(360),
+  shadow: z.string().max(360),
+  gift: z.string().max(360),
+  current: z.string().max(360),
+  next_step: z.string().max(280),
+  visual_reason: z.string().max(240)
+}).optional().default(emptyVisualStory);
+
 export const recognitionPlanSchema = z.object({
   response_phase: z.enum(['question', 'integration']),
   recognition: z.string().min(1).max(420),
@@ -24,6 +60,7 @@ export const recognitionPlanSchema = z.object({
     reason: z.string().max(240),
     format: z.enum(['audio', 'card', 'reflection', 'video', 'article'])
   }),
+  visual_story: visualStorySchema,
   basis: basisSelectionSchema,
   confidence: z.enum(['confirmed', 'supported', 'exploratory']),
   safety_mode: z.enum(['standard', 'grounded', 'escalate'])
@@ -31,6 +68,11 @@ export const recognitionPlanSchema = z.object({
 
 export type RecognitionPlan = z.infer<typeof recognitionPlanSchema>;
 export type BasisSelection = z.infer<typeof basisSelectionSchema>;
+
+export type VisualStoryPayload = {
+  story: RecognitionPlan['visual_story'];
+  basis: BasisSelection;
+};
 
 type BasisKey = Exclude<keyof BasisSelection, 'user_confirmed'>;
 export type AvailableBasis = Record<BasisKey, string[]>;
@@ -124,6 +166,7 @@ export function parseRecognitionPlan(raw: string, available: AvailableBasis): Re
   parsed.practical_action = parsed.practical_action.trim();
   parsed.module_suggestion.title = parsed.module_suggestion.title.trim();
   parsed.module_suggestion.reason = parsed.module_suggestion.reason.trim();
+  trimVisualStory(parsed.visual_story);
 
   for (const key of Object.keys(available) as BasisKey[]) {
     const allowed = new Set(available[key]);
@@ -139,6 +182,7 @@ export function parseRecognitionPlan(raw: string, available: AvailableBasis): Re
     parsed.module_suggestion.title = '';
     parsed.module_suggestion.reason = '';
     parsed.basis.user_confirmed = false;
+    suppressVisualStory(parsed);
     return parsed;
   }
 
@@ -155,11 +199,41 @@ export function parseRecognitionPlan(raw: string, available: AvailableBasis): Re
     parsed.module_suggestion.should_offer = false;
     parsed.module_suggestion.title = '';
     parsed.module_suggestion.reason = '';
+    suppressVisualStory(parsed);
   } else if (parsed.module_suggestion.should_offer && (!parsed.module_suggestion.title || !parsed.module_suggestion.reason)) {
     throw new Error('Insight Module offer requires a title and reason');
   }
 
+  validateOrSuppressVisualStory(parsed);
   return parsed;
+}
+
+function trimVisualStory(story: RecognitionPlan['visual_story']): void {
+  story.primary.title = story.primary.title.trim();
+  if (story.secondary) story.secondary.title = story.secondary.title.trim();
+  if (story.tertiary) story.tertiary.title = story.tertiary.title.trim();
+  story.origin = story.origin.trim();
+  story.shadow = story.shadow.trim();
+  story.gift = story.gift.trim();
+  story.current = story.current.trim();
+  story.next_step = story.next_step.trim();
+  story.visual_reason = story.visual_reason.trim();
+}
+
+function validateOrSuppressVisualStory(plan: RecognitionPlan): void {
+  const story = plan.visual_story;
+  if (!story.should_show) return;
+  if (!plan.basis.user_confirmed || plan.safety_mode !== 'standard') return suppressVisualStory(plan);
+  if (![story.primary.title, story.origin, story.shadow, story.gift, story.current, story.next_step, story.visual_reason].every(Boolean)) {
+    return suppressVisualStory(plan);
+  }
+  if (story.mode !== 'self' && plan.basis.relationship.length === 0) return suppressVisualStory(plan);
+  if (story.mode === 'interaction' && !story.secondary) return suppressVisualStory(plan);
+  if (story.mode === 'family' && (!story.secondary || !story.tertiary)) return suppressVisualStory(plan);
+}
+
+function suppressVisualStory(plan: RecognitionPlan): void {
+  plan.visual_story = emptyVisualStory();
 }
 
 function normalizeQuestion(value: string): string {
@@ -214,6 +288,19 @@ export function recognitionJsonContract(_available: AvailableBasis): string {
     clearer_form: 'required in integration; empty in question phase',
     practical_action: 'required in integration; empty in question phase',
     module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
+    visual_story: {
+      should_show: false,
+      mode: 'self | interaction | family',
+      primary: { archetype: 'fool | magician | three_of_cups | hermit | strength | tower', title: '', phase: 'origin | shadow | gift' },
+      secondary: null,
+      tertiary: null,
+      origin: '',
+      shadow: '',
+      gift: '',
+      current: '',
+      next_step: '',
+      visual_reason: ''
+    },
     basis: { user_confirmed: false, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
     confidence: 'confirmed | supported | exploratory',
     safety_mode: 'standard | grounded | escalate'
