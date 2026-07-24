@@ -4,23 +4,26 @@ import type { FormEvent, ReactNode } from 'react';
 type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
 type ApiState = 'idle' | 'loading' | 'ready' | 'error' | 'permission-denied' | 'consent-required' | 'degraded';
 type ApiCall = (path: string, init?: RequestInit) => Promise<any>;
+type ConsentDecision = 'granted' | 'denied';
 
 const surfaces: Surface[] = ['Today', 'Explore', 'People', 'Systems', 'Library', 'You'];
 const consentScopes = [
   ['pair.compare', 'Compare together'],
   ['system.include', 'Include in a system'],
-  ['trait.display', 'Show shared traits'],
-  ['framework.display', 'Show framework detail'],
+  ['trait.display', 'Use shared Baseline traits'],
+  ['framework.display', 'Show optional source detail'],
   ['current_conditions.use', 'Use current conditions'],
-  ['library.link', 'Link saved understanding'],
-  ['covenant.include', 'Include in Covenant']
+  ['library.link', 'Link a saved understanding'],
+  ['covenant.include', 'Include in a Scripture lens']
 ] as const;
+const ownerSelectableScopes = consentScopes.filter(([scope]) => scope !== 'framework.display');
 
 export function App() {
   const path = location.pathname;
   if (path === '/login' || path === '/signup' || path === '/auth/redeem') {
     return <AccountPage mode={path === '/signup' ? 'signup' : path === '/auth/redeem' ? 'redeem' : 'login'} />;
   }
+  if (path === '/invitation') return <InvitationPage />;
   if (path === '/' || path === '/privacy' || path === '/terms') return <PublicPage path={path} />;
   return <Workspace />;
 }
@@ -120,6 +123,108 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
   );
 }
 
+function InvitationPage() {
+  const token = useMemo(() => new URLSearchParams(location.search).get('token') ?? '', []);
+  const [invitation, setInvitation] = useState<any>(null);
+  const [state, setState] = useState('Checking invitation');
+  const [accepted, setAccepted] = useState(false);
+  const [decisions, setDecisions] = useState<Record<string, ConsentDecision>>({});
+
+  useEffect(() => {
+    if (!token) {
+      setState('This invitation link is invalid.');
+      return;
+    }
+    fetch(`/api/v1/invitations/preview?token=${encodeURIComponent(token)}`)
+      .then(async (response) => {
+        if (!response.ok) throw new Error(response.status === 410 ? 'This invitation expired.' : 'This invitation is no longer available.');
+        return response.json();
+      })
+      .then((data) => { setInvitation(data.invitation); setState('Review what is being requested.'); })
+      .catch((error) => setState(error instanceof Error ? error.message : 'This invitation is unavailable.'));
+  }, [token]);
+
+  async function acceptInvitation() {
+    setState('Binding this invitation to your private account.');
+    const response = await fetch(`/api/v1/invitations/redeem?token=${encodeURIComponent(token)}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: '{}'
+    });
+    if (!response.ok) {
+      setState(response.status === 409 ? 'This invitation was already used.' : 'The invitation could not be accepted.');
+      return;
+    }
+    const data = await response.json();
+    setInvitation(data.invitation);
+    setAccepted(true);
+    setState('Your identity is verified. Decide each permission separately.');
+  }
+
+  async function decide(scope: string, granted: boolean) {
+    if (!invitation?.id) return;
+    setState(`Saving your ${granted ? 'permission' : 'decision not to share'}…`);
+    const response = await fetch(`/api/v1/invitations/${invitation.id}/consent/${encodeURIComponent(scope)}`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ granted })
+    });
+    if (!response.ok) {
+      setState('That decision could not be saved safely.');
+      return;
+    }
+    setDecisions((current) => ({ ...current, [scope]: granted ? 'granted' : 'denied' }));
+    setState('Decision saved. You can change it later.');
+  }
+
+  const requestedScopes: string[] = invitation?.requestedScopes ?? [];
+  const completed = requestedScopes.length > 0 && requestedScopes.every((scope) => decisions[scope]);
+
+  return (
+    <main className="account-shell">
+      <a className="wordmark" href="/">SOVEREIGN.OS</a>
+      <section className="auth-panel">
+        <p className="eyebrow">PRIVATE CONSENT</p>
+        <h1>You decide what may be shared.</h1>
+        <p className="lede">An invitation never gives another person blanket access to you. Each requested use is separate and revocable.</p>
+        <div className="status-note" aria-live="polite"><span>{state}</span></div>
+        {invitation && !accepted && (
+          <div className="form-stack">
+            <div className="usage-card">
+              <div><span>Shared relationship record</span><strong>{invitation.displayName}</strong></div>
+              <p>No raw birth input or exact private location is shared with the other account.</p>
+            </div>
+            <section className="scope-panel">
+              <div><p className="eyebrow">REQUESTED USES</p><h3>Review before accepting.</h3></div>
+              <div className="scope-list">
+                {requestedScopes.map((scope) => <div key={scope}><span><strong>{scopeLabel(scope)}</strong><small>{scope}</small></span></div>)}
+              </div>
+            </section>
+            <button className="primary-button" onClick={acceptInvitation}>Verify me and review each choice</button>
+          </div>
+        )}
+        {invitation && accepted && (
+          <section className="scope-panel">
+            <div><p className="eyebrow">YOUR DECISIONS</p><h3>Choose independently.</h3></div>
+            <div className="scope-list">
+              {requestedScopes.map((scope) => (
+                <div key={scope}>
+                  <span><strong>{scopeLabel(scope)}</strong><small>{decisions[scope] ? `Saved: ${decisions[scope]}` : 'No decision yet'}</small></span>
+                  <div>
+                    <button onClick={() => decide(scope, true)}>Allow</button>
+                    <button onClick={() => decide(scope, false)}>Do not allow</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button className="primary-button" disabled={!completed} onClick={() => location.assign('/app')}>Open my workspace</button>
+          </section>
+        )}
+      </section>
+    </main>
+  );
+}
+
 function Workspace() {
   const [surface, setSurface] = useState<Surface>('Today');
   const [message, setMessage] = useState('');
@@ -165,9 +270,9 @@ function Workspace() {
       throw new Error('Please sign in again.');
     }
     if (!response.ok) {
-      const problem = await response.json().catch(() => ({})) as { message?: string };
+      const problem = await response.json().catch(() => ({})) as { message?: string; error?: string };
       setApiState(response.status >= 500 ? 'degraded' : 'error');
-      throw new Error(problem.message || 'The service could not complete that request safely.');
+      throw new Error(problem.message || problem.error || 'The service could not complete that request safely.');
     }
     const data = response.headers.get('content-type')?.includes('application/json')
       ? await response.json()
@@ -214,8 +319,8 @@ function Workspace() {
         })
       });
       if (!response.ok || !response.body) {
-        const problem = await response.json().catch(() => ({})) as { message?: string };
-        throw new Error(problem.message || 'Sovereign is temporarily unavailable.');
+        const problem = await response.json().catch(() => ({})) as { message?: string; error?: string };
+        throw new Error(problem.message || problem.error || 'Sovereign is temporarily unavailable.');
       }
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -293,6 +398,7 @@ function Workspace() {
               setPeople={setPeople}
               selectedPerson={selectedPerson}
               setSelectedPerson={setSelectedPerson}
+              refresh={refresh}
             />
           )}
           {surface === 'Systems' && (
@@ -362,25 +468,14 @@ function TodaySurface({ api, onCorrection }: { api: ApiCall; onCorrection: (valu
         <h2>Start with what is steady.</h2>
         <p className="lede">Current conditions may make something louder. They do not decide what you feel, mean, or do.</p>
         <div className="state-grid">
-          <State
-            label="Baseline tendency"
-            value={baseline?.status === 'completed' ? 'Your reduced Baseline is ready.' : 'Not set up yet. No personal tendency is being assumed.'}
-            tone={baseline?.status === 'completed' ? 'ready' : 'quiet'}
-          />
-          <State
-            label="Current amplification"
-            value={current?.status === 'ready' ? 'A permitted current-condition reading is available.' : 'No verified current condition is active.'}
-            tone={current?.status === 'ready' ? 'ready' : 'quiet'}
-          />
+          <State label="Baseline tendency" value={baseline?.status === 'completed' ? 'Your reduced Baseline is ready.' : 'Not set up yet. No personal tendency is being assumed.'} tone={baseline?.status === 'completed' ? 'ready' : 'quiet'} />
+          <State label="Current amplification" value={current?.status === 'ready' ? 'A permitted current-condition reading is available.' : 'No verified current condition is active.'} tone={current?.status === 'ready' ? 'ready' : 'quiet'} />
           <State label="Known observation" value="Nothing about today is treated as fact until you confirm it." tone="known" />
           <State label="Unknown actual state" value="Your actual experience remains yours to name." tone="unknown" />
         </div>
       </article>
       <article className="check-card">
-        <div>
-          <p className="eyebrow">YOUR CORRECTION MATTERS</p>
-          <h3>Does this match today?</h3>
-        </div>
+        <div><p className="eyebrow">YOUR CORRECTION MATTERS</p><h3>Does this match today?</h3></div>
         <div className="choice-row">
           <button onClick={() => onCorrection('yes')}>Yes</button>
           <button onClick={() => onCorrection('partly')}>Partly</button>
@@ -409,9 +504,7 @@ function ExploreSurface({ api, saveToLibrary }: { api: ApiCall; saveToLibrary: (
             {['identity', 'decisions', 'communication', 'learning', 'love', 'expression', 'pressure response'].map((item) => <option key={item}>{item}</option>)}
           </select>
         </Field>
-        <Field label="What do you want clearer?">
-          <textarea value={question} onChange={(event) => setQuestion(event.target.value)} rows={4} />
-        </Field>
+        <Field label="What do you want clearer?"><textarea value={question} onChange={(event) => setQuestion(event.target.value)} rows={4} /></Field>
       </div>
       <div className="action-row">
         <button className="primary-button" onClick={explore}>Explore this</button>
@@ -423,8 +516,12 @@ function ExploreSurface({ api, saveToLibrary }: { api: ApiCall; saveToLibrary: (
   );
 }
 
-function PeopleSurface({ api, people, setPeople, selectedPerson, setSelectedPerson }: any) {
+function PeopleSurface({ api, people, setPeople, selectedPerson, setSelectedPerson, refresh }: any) {
   const [personName, setPersonName] = useState('');
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [requestedScopes, setRequestedScopes] = useState<string[]>(['pair.compare', 'trait.display']);
+  const [notice, setNotice] = useState('');
+  const selected = people.find((person: any) => person.id === selectedPerson);
 
   async function create() {
     if (!personName.trim()) return;
@@ -437,14 +534,30 @@ function PeopleSurface({ api, people, setPeople, selectedPerson, setSelectedPers
     setPersonName('');
   }
 
+  async function invite() {
+    if (!selectedPerson || !inviteEmail.includes('@') || requestedScopes.length === 0) {
+      setNotice('Choose a person, enter their email, and select at least one specific use.');
+      return;
+    }
+    const data = await api(`/api/v1/people/${selectedPerson}/invitations/send`, {
+      method: 'POST',
+      body: JSON.stringify({ email: inviteEmail, requestedScopes })
+    });
+    setNotice(`Private invitation sent. It expires in ${data.invitation.expiresInDays} days.`);
+    setInviteEmail('');
+    await refresh();
+  }
+
+  function toggleScope(scope: string) {
+    setRequestedScopes((current) => current.includes(scope) ? current.filter((item) => item !== scope) : [...current, scope]);
+  }
+
   return (
-    <SurfaceCard eyebrow="PEOPLE" title="Private entry is not consent." intro="You can organize your own context privately. Shared comparison becomes available only after the other person grants the required scopes.">
+    <SurfaceCard eyebrow="PEOPLE" title="Private entry is not consent." intro="Add someone to your own workspace, then invite them to decide exactly which reduced context may be used.">
       <div className="split-grid">
         <section className="control-group">
           <h3>Add private context</h3>
-          <Field label="Person’s name">
-            <input value={personName} onChange={(event) => setPersonName(event.target.value)} />
-          </Field>
+          <Field label="Person’s name"><input value={personName} onChange={(event) => setPersonName(event.target.value)} /></Field>
           <button className="primary-button" onClick={create}>Create private person</button>
         </section>
         <section className="control-group">
@@ -455,27 +568,32 @@ function PeopleSurface({ api, people, setPeople, selectedPerson, setSelectedPers
               {people.map((person: any) => <option key={person.id} value={person.id}>{person.displayName}</option>)}
             </select>
           </Field>
-          <button className="secondary-button" disabled={!selectedPerson} onClick={() => api(`/api/v1/people/${selectedPerson}/invitations`, { method: 'POST' })}>Invite for consent</button>
+          {selected && (
+            <div className="usage-card">
+              <div><span>Invitation</span><strong>{selected.invitationStatus ?? 'not sent'}</strong></div>
+              <div><span>Identity</span><strong>{selected.identityBound ? 'verified' : 'not bound'}</strong></div>
+              <div><span>Baseline</span><strong>{selected.baselineStatus}</strong></div>
+            </div>
+          )}
         </section>
       </div>
+
       <section className="scope-panel">
-        <div>
-          <p className="eyebrow">CONSENT SCOPES</p>
-          <h3>Specific permission, not blanket access.</h3>
-        </div>
+        <div><p className="eyebrow">INVITE FOR SPECIFIC CONSENT</p><h3>No blanket access.</h3></div>
+        <Field label="Their email address"><input type="email" value={inviteEmail} onChange={(event) => setInviteEmail(event.target.value)} /></Field>
         <div className="scope-list">
-          {consentScopes.map(([scope, label]) => (
-            <div key={scope}>
+          {ownerSelectableScopes.map(([scope, label]) => (
+            <label key={scope}>
               <span><strong>{label}</strong><small>{scope}</small></span>
-              <div>
-                <button disabled={!selectedPerson} onClick={() => api(`/api/v1/people/${selectedPerson}/consent/${scope}`, { method: 'PUT', body: JSON.stringify({ granted: true }) })}>Grant</button>
-                <button disabled={!selectedPerson} onClick={() => api(`/api/v1/people/${selectedPerson}/consent/${scope}`, { method: 'PUT', body: JSON.stringify({ granted: false }) })}>Revoke</button>
-              </div>
-            </div>
+              <input type="checkbox" checked={requestedScopes.includes(scope)} onChange={() => toggleScope(scope)} />
+            </label>
           ))}
         </div>
+        <button className="secondary-button" disabled={!selectedPerson} onClick={invite}>Send private invitation</button>
+        {notice && <p className="result-status" aria-live="polite">{notice}</p>}
       </section>
-      <button className="primary-button" disabled={!selectedPerson} onClick={() => api(`/api/v1/people/${selectedPerson}/compare`, { method: 'POST' })}>Open consented pair context</button>
+
+      <button className="primary-button" disabled={!selectedPerson || !selected?.identityBound} onClick={() => api(`/api/v1/people/${selectedPerson}/compare`, { method: 'POST' })}>Open consented pair context</button>
     </SurfaceCard>
   );
 }
@@ -483,6 +601,7 @@ function PeopleSurface({ api, people, setPeople, selectedPerson, setSelectedPers
 function SystemsSurface({ api, systems, people, setSystems, selectedPerson, setSelectedPerson, selectedSystem, setSelectedSystem }: any) {
   const [systemName, setSystemName] = useState('');
   const [systemType, setSystemType] = useState('family');
+  const eligiblePeople = people.filter((person: any) => person.identityBound);
 
   async function create() {
     if (!systemName.trim()) return;
@@ -496,7 +615,7 @@ function SystemsSurface({ api, systems, people, setSystems, selectedPerson, setS
   }
 
   return (
-    <SurfaceCard eyebrow="SYSTEMS" title="No relationship exists alone." intro="See roles, expectations, pressure, and responsibility without assigning motives to anyone.">
+    <SurfaceCard eyebrow="SYSTEMS" title="No relationship exists alone." intro="Build a family, household, team, or other group only from identity-bound members whose required scopes remain active.">
       <div className="split-grid">
         <section className="control-group">
           <h3>Create a system</h3>
@@ -516,10 +635,10 @@ function SystemsSurface({ api, systems, people, setSystems, selectedPerson, setS
               {systems.map((system: any) => <option key={system.id} value={system.id}>{system.name}</option>)}
             </select>
           </Field>
-          <Field label="Consented member">
+          <Field label="Identity-bound member">
             <select value={selectedPerson} onChange={(event) => setSelectedPerson(event.target.value)}>
               <option value="">No person selected</option>
-              {people.map((person: any) => <option key={person.id} value={person.id}>{person.displayName}</option>)}
+              {eligiblePeople.map((person: any) => <option key={person.id} value={person.id}>{person.displayName}</option>)}
             </select>
           </Field>
           <button className="secondary-button" disabled={!selectedSystem || !selectedPerson} onClick={() => api(`/api/v1/systems/${selectedSystem}/members`, { method: 'POST', body: JSON.stringify({ personId: selectedPerson, metadata: { formalRole: 'member', authority: 'none assumed', responsibility: 'shared objective', constraints: [] } }) })}>Add consented member</button>
@@ -671,22 +790,31 @@ function PublicPage({ path }: { path: string }) {
 function Policy({ kind }: { kind: 'privacy' | 'terms' }) {
   return (
     <section className="policy-copy">
-      <p>{kind === 'privacy'
-        ? 'We process account data, reduced Baseline context, location-precision preferences, consent decisions, Cloudflare AI Gateway requests, Stripe billing status, exports, and deletion requests only to operate Sovereign.OS.'
-        : 'Sovereign.OS is non-diagnostic software. Subscriptions can be managed through Stripe. Invited-person content requires specific consent and authorization.'}</p>
-      <p>Raw birth inputs and exact private location are not sent to the language model. Contact: support@defrag.app.</p>
+      {kind === 'privacy' ? (
+        <>
+          <p>We process account data, reduced Baseline context, location-precision preferences, consent decisions, Cloudflare AI Gateway requests, Stripe billing status, exports, and deletion requests only to operate Sovereign.OS.</p>
+          <p>Unsaved thread content and complete AI responses are scheduled for deletion after 30 days. Minimal security and operational metadata that does not contain conversation content is retained for up to 90 days. Understandings you explicitly save remain until you delete them or close the account.</p>
+          <p>Raw birth inputs and exact private location are not sent to the language model or another invited account. Contact: support@defrag.app.</p>
+        </>
+      ) : (
+        <>
+          <p>Sovereign.OS is non-diagnostic software and does not establish another person’s motive, mental state, future behavior, or God’s exact intent. You remain responsible for decisions and professional support where appropriate.</p>
+          <p>Free includes 10 AI turns per UTC calendar month. Sovereign+ subscriptions are managed through Stripe. Invited-person content requires identity-bound, scope-specific permission that can be denied or revoked.</p>
+          <p>Covenant is an explicit optional Scripture lens. It does not automatically require contact, estrangement, reconciliation, forgiveness, submission, or continued exposure to harm. Contact: support@defrag.app.</p>
+        </>
+      )}
     </section>
   );
+}
+
+function scopeLabel(scope: string): string {
+  return consentScopes.find(([value]) => value === scope)?.[1] ?? scope;
 }
 
 function SurfaceCard({ eyebrow, title, intro, children }: { eyebrow: string; title: string; intro: string; children: ReactNode }) {
   return (
     <section className="surface-card">
-      <header>
-        <p className="eyebrow">{eyebrow}</p>
-        <h2>{title}</h2>
-        <p className="lede">{intro}</p>
-      </header>
+      <header><p className="eyebrow">{eyebrow}</p><h2>{title}</h2><p className="lede">{intro}</p></header>
       {children}
     </section>
   );
