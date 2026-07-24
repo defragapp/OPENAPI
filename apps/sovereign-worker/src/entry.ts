@@ -1,4 +1,5 @@
 import app, { ThreadCoordinator, queue as queueHandler, scheduled as scheduledHandler } from './index';
+import type { Env } from './env';
 import { requireAuth, requireSameOrigin } from './security/auth';
 import { decideInviteeConsent, listInviteeInvitations, previewInvitation, redeemInvitation, sendInvitation } from './invitation-service';
 import { addConsentedSystemMember, buildPairComparison, buildSystemAnalysis } from './relational-context';
@@ -61,7 +62,36 @@ app.get('/api/v1/systems/:systemId/analysis', async (context) => {
   return context.json({ analysis: await buildSystemAnalysis(context.env, auth.accountId, context.req.param('systemId')) });
 });
 
+const worker = {
+  async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    const pairMatch = url.pathname.match(/^\/api\/v1\/people\/([^/]+)\/compare$/);
+    if (request.method === 'POST' && pairMatch) {
+      requireSameOrigin(request);
+      const auth = await requireAuth(request, env);
+      return Response.json({ comparison: await buildPairComparison(env, auth.accountId, decodeURIComponent(pairMatch[1]!)) });
+    }
+
+    const memberMatch = url.pathname.match(/^\/api\/v1\/systems\/([^/]+)\/members$/);
+    if (request.method === 'POST' && memberMatch) {
+      requireSameOrigin(request);
+      const auth = await requireAuth(request, env);
+      const body = await request.json().catch(() => ({})) as { personId?: string; metadata?: Record<string, unknown> };
+      if (!body.personId) return Response.json({ error: 'personId required' }, { status: 400 });
+      return Response.json({ membership: await addConsentedSystemMember(env, auth.accountId, decodeURIComponent(memberMatch[1]!), body.personId, body.metadata ?? {}) }, { status: 201 });
+    }
+
+    const alignmentMatch = url.pathname.match(/^\/api\/v1\/systems\/([^/]+)\/alignment$/);
+    if (request.method === 'GET' && alignmentMatch) {
+      const auth = await requireAuth(request, env);
+      return Response.json({ analysis: await buildSystemAnalysis(env, auth.accountId, decodeURIComponent(alignmentMatch[1]!)) });
+    }
+
+    return app.fetch(request, env, executionContext);
+  }
+};
+
 export { ThreadCoordinator };
 export const queue = queueHandler;
 export const scheduled = scheduledHandler;
-export default app;
+export default worker;
