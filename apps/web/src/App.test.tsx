@@ -50,6 +50,14 @@ describe('Sovereign PWA shell', () => {
     expect(consent).toContain('Do not allow');
   });
 
+  it('requires a visible opt-in before exact shared framework evidence is requested', () => {
+    expect(recognitionUi).toContain('Show exact supporting data');
+    expect(recognitionUi).toContain('framework.display · optional and revocable');
+    expect(recognitionUi).toContain('shareFrameworkEvidence');
+    expect(recognitionUi).toContain("!url.includes('/invitations/send') || !shareFrameworkEvidence");
+    expect(recognitionUi).toContain("body.requestedScopes = [...new Set([...requestedScopes, 'framework.display'])]");
+  });
+
   it('shows an Insight Module save action only after a server offer and explicit approval', () => {
     expect(html).toContain('/recognition-ui.js');
     expect(recognitionUi).toContain('x-sovereign-module-offer');
