@@ -64,8 +64,18 @@ export async function deleteUnderstanding(env: Env, accountId: string, id: strin
 
 export async function createExportJob(env: Env, accountId: string) {
   const id = `export_${crypto.randomUUID()}`;
-  await env.DB.prepare('INSERT INTO export_jobs (id, account_id, status, expires_at) VALUES (?, ?, ?, datetime(\'now\', \'+7 days\'))').bind(id, accountId, 'queued').run();
-  return { id, status: 'queued', excludes: ['secrets', 'authorization material', 'hidden reasoning', 'unconsented protected data', 'raw provider payloads', 'exact private location'] };
+  const backgroundJobId = `job_${crypto.randomUUID()}`;
+  const payload = { exportJobId: id };
+  await env.DB.batch([
+    env.DB.prepare('INSERT INTO export_jobs (id, account_id, status, expires_at) VALUES (?, ?, ?, datetime(\'now\', \'+7 days\'))').bind(id, accountId, 'queued'),
+    env.DB.prepare('INSERT INTO background_jobs (id, account_id, kind, status, payload_json) VALUES (?, ?, ?, ?, ?)').bind(backgroundJobId, accountId, 'export.generate', 'queued', JSON.stringify(payload))
+  ]);
+  try {
+    await env.JOBS?.send({ id: backgroundJobId, kind: 'export.generate', accountId, payload });
+  } catch {
+    // The durable D1 job remains queued for the scheduled worker to pick up.
+  }
+  return { id, status: 'queued', backgroundJobId, excludes: ['secrets', 'authorization material', 'hidden reasoning', 'unconsented protected data', 'raw provider payloads', 'exact private location'] };
 }
 
 export async function createDeletionJob(env: Env, accountId: string, graceDays = 14) {
