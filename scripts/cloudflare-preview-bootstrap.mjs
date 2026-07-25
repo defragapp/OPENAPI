@@ -16,6 +16,7 @@ const accountSubdomain = String(process.env.CLOUDFLARE_WORKERS_SUBDOMAIN || '').
 const previewBaseUrl =
   configuredPreviewBaseUrl ||
   (accountSubdomain ? `https://${workerName}.${accountSubdomain}.workers.dev` : '');
+const previewHostname = previewBaseUrl ? new URL(previewBaseUrl).hostname : '';
 const env = { ...process.env };
 
 if (accountId) env.CLOUDFLARE_ACCOUNT_ID = accountId;
@@ -35,7 +36,9 @@ const sensitiveValues = [
   process.env.PREVIEW_SESSION_SIGNING_SECRET,
   process.env.STRIPE_SECRET_KEY,
   process.env.STRIPE_WEBHOOK_SECRET,
-  process.env.SOVV_INTERNAL_AUTH_TOKEN
+  process.env.SOVV_INTERNAL_AUTH_TOKEN,
+  process.env.TURNSTILE_SECRET_KEY,
+  process.env.EMAIL_API_TOKEN
 ].filter(Boolean);
 
 function sanitize(value) {
@@ -117,6 +120,7 @@ try {
     ...config.env.preview.vars,
     APP_ENV: 'preview',
     APP_VERSION: commitSha,
+    PUBLIC_APP_URL: previewBaseUrl,
     AI_PROVIDER: process.env.AI_PROVIDER || config.env.preview.vars.AI_PROVIDER,
     AI_MODEL: process.env.AI_MODEL || config.env.preview.vars.AI_MODEL,
     AI_GATEWAY_ID: process.env.AI_GATEWAY_ID || config.env.preview.vars.AI_GATEWAY_ID,
@@ -128,8 +132,16 @@ try {
     STRIPE_SUCCESS_URL: previewBaseUrl ? `${previewBaseUrl}/app?billing=success` : '',
     STRIPE_CANCEL_URL: previewBaseUrl ? `${previewBaseUrl}/app?billing=cancelled` : '',
     STRIPE_PORTAL_RETURN_URL: previewBaseUrl ? `${previewBaseUrl}/app?billing=portal` : '',
+    TURNSTILE_EXPECTED_HOSTNAME: process.env.TURNSTILE_EXPECTED_HOSTNAME || previewHostname,
+    EMAIL_API_URL: process.env.EMAIL_API_URL || '',
+    EMAIL_FROM: process.env.EMAIL_FROM || '',
+    EMAIL_TIMEOUT_MS: process.env.EMAIL_TIMEOUT_MS || '2500',
+    ASTRONOMY_API_URL: process.env.ASTRONOMY_API_URL || '',
     SCRIPTURE_TRANSLATION: process.env.SCRIPTURE_TRANSLATION || 'WEB'
   };
+  // One preview serves both signup and login, so do not set a single global
+  // TURNSTILE_EXPECTED_ACTION unless the verifier is changed to accept both actions.
+  delete config.env.preview.vars.TURNSTILE_EXPECTED_ACTION;
   writeFileSync(configPath, JSON.stringify(config, null, 2));
 
   try {
@@ -149,7 +161,9 @@ try {
       SESSION_SIGNING_SECRET: process.env.PREVIEW_SESSION_SIGNING_SECRET,
       STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
       STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-      SOVV_INTERNAL_AUTH_TOKEN: process.env.SOVV_INTERNAL_AUTH_TOKEN
+      SOVV_INTERNAL_AUTH_TOKEN: process.env.SOVV_INTERNAL_AUTH_TOKEN,
+      TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
+      EMAIL_API_TOKEN: process.env.EMAIL_API_TOKEN
     }).filter(([, value]) => Boolean(value))
   );
 
@@ -181,7 +195,13 @@ try {
     previewBaseUrl: deployedUrl,
     databaseIdSource: 'cloudflare-api',
     commitSha,
-    buildUuid: process.env.WORKERS_CI_BUILD_UUID || null
+    buildUuid: process.env.WORKERS_CI_BUILD_UUID || null,
+    configuredIntegrations: {
+      turnstile: Boolean(process.env.VITE_TURNSTILE_SITE_KEY && process.env.TURNSTILE_SECRET_KEY),
+      email: Boolean(process.env.EMAIL_API_URL && process.env.EMAIL_API_TOKEN && process.env.EMAIL_FROM),
+      baseline: Boolean(process.env.SOVV_BASE_URL),
+      stripeTest: Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET)
+    }
   };
   writeFileSync(resolve(root, 'preview-deployment.json'), JSON.stringify(metadata, null, 2));
   console.log(JSON.stringify({ ...metadata, databaseIdSource: 'resolved-not-printed' }, null, 2));
