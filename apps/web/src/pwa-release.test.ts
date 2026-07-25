@@ -26,6 +26,12 @@ describe('release PWA surface', () => {
     expect(serviceWorker).not.toMatch(/PUBLIC_SHELL[^;]+\/signup/);
   });
 
+  it('limits runtime caching to declared public and compiled assets', () => {
+    expect(serviceWorker).toContain('PUBLIC_ASSETS.has(url.pathname)');
+    expect(serviceWorker).toContain("url.pathname.startsWith('/assets/')");
+    expect(serviceWorker).not.toContain('request.destination');
+  });
+
   it('refreshes public navigation before using an offline fallback', () => {
     expect(serviceWorker).toContain('networkFirst(request)');
     expect(serviceWorker).toContain('staleWhileRevalidate(request)');
