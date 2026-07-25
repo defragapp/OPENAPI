@@ -6,47 +6,57 @@ const recognition = readFileSync(new URL('../public/recognition-ui.js', import.m
 const styles = readFileSync(new URL('../public/mirror-ui.css', import.meta.url), 'utf8');
 
 describe('animated archetype visualization inside the AI thread', () => {
-  it('keeps the existing AI workspace primary and removes the standalone Mirror surface', () => {
+  it('keeps the AI workspace primary and targets the latest completed response', () => {
     expect(index).toContain('/recognition-ui.js');
     expect(index).toContain('/mirror-ui.css');
     expect(index).not.toContain('/mirror-surface.js');
     expect(recognition).toContain("panel.querySelector('.streamed-copy')");
+    expect(recognition).toContain('latestResultPanel');
     expect(recognition).toContain("section.dataset.visualContract = 'interpretation-first-artwork-second'");
     expect(styles).not.toContain('mirror-surface-open');
-    expect(styles).not.toContain('.mirror-visual-workspace');
   });
 
-  it('renders only validated visual metadata returned with an AI response', () => {
+  it('avoids mutation-driven rerender loops and pauses offscreen animation', () => {
+    expect(recognition).toContain('scheduleEnhancements');
+    expect(recognition).toContain('requestAnimationFrame(renderEnhancements)');
+    expect(recognition).toContain('section.dataset.renderKey !== renderKey');
+    expect(recognition).toContain('IntersectionObserver');
+    expect(styles).toContain('.visual-story-offscreen');
+    expect(styles).toContain('animation-play-state: paused');
+  });
+
+  it('renders only validated response metadata after user confirmation', () => {
     expect(recognition).toContain("response.headers.get('x-sovereign-visual-story')");
     expect(recognition).toContain('decodeVisualPayload');
     expect(recognition).toContain('normalizeVisualPayload');
     expect(recognition).toContain('story?.should_show');
-    expect(recognition).toContain('The interpretation was completed first');
-    expect(recognition).toContain('Interpreted first · Illustrated second');
+    expect(recognition).toContain('if (!basis.user_confirmed) return null');
+    expect(recognition).toContain('Answer first · Art second');
     expect(recognition).not.toMatch(/tarot determines|card proves|draw determines/i);
   });
 
-  it('shows past protection, shadow, and gift as views of one grounded role', () => {
-    for (const phrase of ['Past protection', 'Shadow', 'Gift', 'WHAT THIS ROLE MAY HAVE LEARNED', 'THE CAPACITY INSIDE THE ROLE']) {
+  it('shows one role moving through past protection, pressure, and clear expression', () => {
+    for (const phrase of ['Past protection', 'Under pressure', 'Clear expression', 'WHAT THIS ROLE MAY HAVE LEARNED', 'THE CAPACITY INSIDE THE ROLE']) {
       expect(recognition).toContain(phrase);
     }
-    expect(recognition).toContain("visualPhase = latestVisual?.story?.primary?.phase || 'shadow'");
-    expect(recognition).toContain('data-visual-phase');
+    expect(recognition).toContain("const phases = ['origin', 'shadow', 'gift']");
+    expect(recognition).toContain('Play the movement');
+    expect(recognition).toContain('aria-pressed');
     expect(styles).toContain('[data-phase="origin"]');
     expect(styles).toContain('[data-phase="shadow"]');
     expect(styles).toContain('[data-phase="gift"]');
   });
 
-  it('supports self, consented interaction, and family-system layouts without changing the chat flow', () => {
+  it('supports self, consented interaction, and family layouts without changing chat flow', () => {
     for (const mode of ['self', 'interaction', 'family']) expect(recognition).toContain(mode);
-    expect(recognition).toContain("story.mode !== 'self'");
+    expect(recognition).toContain("normalized.mode !== 'self' && basis.relationship.length === 0");
     expect(recognition).toContain('Permitted relationship context');
     expect(styles).toContain('.thread-card-stage-interaction');
     expect(styles).toContain('.thread-card-stage-family');
     expect(styles).toContain('.thread-role-connection');
   });
 
-  it('uses original layered SVG art with deterministic character motion', () => {
+  it('uses original layered SVG art with archetype-specific motion', () => {
     for (const archetype of ['fool', 'magician', 'three_of_cups', 'hermit', 'strength', 'tower']) {
       expect(recognition).toContain(archetype);
     }
@@ -58,17 +68,17 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(styles).toContain('@keyframes visual-tower-flash');
   });
 
-  it('keeps corrections inside the existing thread and preserves user authority', () => {
+  it('keeps corrections in the current thread and preserves user authority', () => {
     expect(recognition).toContain('/corrections');
-    expect(recognition).toContain("saveVisualCorrection('yes'");
-    expect(recognition).toContain("saveVisualCorrection('partly'");
-    expect(recognition).toContain("saveVisualCorrection('not_today'");
+    expect(recognition).toContain("saveVisualCorrection('yes')");
+    expect(recognition).toContain("saveVisualCorrection('partly')");
+    expect(recognition).toContain("saveVisualCorrection('not_today')");
     expect(recognition).toContain('Your enduring Baseline was not rewritten.');
-    expect(recognition).toContain('temporary visual role, not an identity or a source of truth');
+    expect(recognition).toContain('not an identity, diagnosis, prediction, or source of truth');
   });
 
-  it('is premium, iPhone-safe, and reduced-motion aware', () => {
-    for (const selector of ['.thread-visual-story', '.thread-visual-card', '.thread-phase-control', '.thread-visual-basis']) {
+  it('is compact, iPhone-safe, and reduced-motion aware', () => {
+    for (const selector of ['.thread-visual-story', '.thread-visual-card', '.thread-phase-control', '.thread-play-button', '.thread-visual-basis']) {
       expect(styles).toContain(selector);
     }
     expect(styles).toContain('@media (max-width: 680px)');
@@ -76,5 +86,6 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(styles).toContain('min-height: 48px');
     expect(styles).toContain('scroll-snap-type: x mandatory');
     expect(styles).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(styles).toContain('.thread-play-button { display: none; }');
   });
 });
