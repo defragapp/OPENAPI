@@ -1,0 +1,242 @@
+.app-shell .thread-card-frame {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .10);
+  border-radius: 25px;
+  background: #19181a;
+}
+
+.app-shell .thread-card-heading {
+  position: absolute;
+  z-index: 5;
+  top: 11px;
+  right: 11px;
+  left: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 999px;
+  background: rgba(18, 18, 21, .68);
+  color: #f7f2ea;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .20);
+}
+
+.app-shell .thread-card-heading span {
+  color: var(--phase-accent);
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: .94rem;
+}
+
+.app-shell .thread-card-heading strong {
+  font-size: .57rem;
+  font-weight: 760;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.app-shell .thread-card-art {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #d7c6a8;
+}
+
+.app-shell .thread-card-caption {
+  position: absolute;
+  z-index: 5;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  padding: 13px 14px 14px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 17px;
+  background: linear-gradient(145deg, rgba(17, 17, 20, .84), rgba(26, 22, 21, .76));
+  color: #f7f2ea;
+  backdrop-filter: blur(15px) saturate(1.12);
+  box-shadow: 0 16px 36px rgba(0,0,0,.28);
+}
+
+.app-shell .thread-card-caption > span {
+  color: color-mix(in srgb, var(--phase-accent) 82%, #fff 8%);
+  font-size: .54rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.app-shell .thread-card-caption h5 {
+  margin: 5px 0 3px;
+  color: #fffaf2;
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: clamp(1.34rem, 2vw, 1.78rem);
+  font-weight: 520;
+  letter-spacing: -.045em;
+  line-height: .98;
+}
+
+.app-shell .thread-card-caption p {
+  margin: 0;
+  color: #b9b1a8;
+  font-size: .63rem;
+  line-height: 1.4;
+}
+
+.app-shell .thread-phase-control button {
+  grid-template-rows: 44px auto auto;
+  align-content: start;
+}
+
+.app-shell .thread-phase-control button b {
+  color: inherit;
+  font-size: .74rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.app-shell .thread-phase-control button small {
+  color: #615c57;
+  font-size: .5rem;
+  font-weight: 780;
+  letter-spacing: .11em;
+  line-height: 1.1;
+}
+
+.app-shell .thread-phase-control button.active small {
+  color: color-mix(in srgb, var(--phase-accent) 70%, #b7afa6 30%);
+}
+
+.app-shell .thread-visual-summary-grid[data-role-map="true"] {
+  grid-template-columns: .72fr 1.18fr 1.1fr;
+}
+
+.app-shell .thread-visual-summary-grid[data-role-map="true"] article {
+  min-height: 134px;
+}
+
+.app-shell .thread-visual-summary-grid [data-role-summary] {
+  border-color: color-mix(in srgb, var(--phase-accent) 32%, transparent);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--phase-accent) 10%, transparent), transparent 72%),
+    rgba(255,255,255,.025);
+}
+
+.app-shell .thread-visual-summary-grid [data-role-summary] p {
+  color: #f5efe7;
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
+  letter-spacing: -.035em;
+  line-height: 1.03;
+}
+
+.app-shell .thread-visual-state[data-state-name]::after {
+  content: attr(data-state-name);
+  justify-self: start;
+  margin-top: 2px;
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--phase-accent) 28%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--phase-accent) 7%, transparent);
+  color: color-mix(in srgb, var(--phase-accent) 76%, #fff 12%);
+  font-size: .55rem;
+  font-weight: 760;
+  letter-spacing: .1em;
+}
+
+@media (max-width: 1040px) {
+  .app-shell .thread-visual-summary-grid[data-role-map="true"] {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .app-shell .thread-visual-summary-grid [data-role-summary] {
+    grid-column: 1 / -1;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 820px) {
+  .app-shell .thread-card-column { order: 1; }
+  .app-shell .thread-visual-copy { order: 2; }
+
+  .app-shell .thread-card-stage {
+    min-height: 320px;
+  }
+
+  .app-shell .thread-visual-card-primary {
+    width: min(68vw, 224px);
+  }
+
+  .app-shell .thread-card-context {
+    max-width: 31ch;
+  }
+}
+
+@media (max-width: 680px) {
+  .app-shell .thread-card-heading {
+    top: 9px;
+    right: 9px;
+    left: 9px;
+    min-height: 32px;
+    padding: 6px 10px;
+  }
+
+  .app-shell .thread-card-caption {
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    padding: 11px 12px 12px;
+  }
+
+  .app-shell .thread-card-caption h5 {
+    font-size: 1.35rem;
+  }
+
+  .app-shell .thread-phase-control button {
+    grid-template-rows: 40px auto auto;
+    min-height: 82px;
+  }
+
+  .app-shell .thread-phase-control button b {
+    font-size: .67rem;
+  }
+
+  .app-shell .thread-phase-control button small {
+    font-size: .46rem;
+  }
+
+  .app-shell .thread-visual-summary-grid[data-role-map="true"] {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(78%, 1fr);
+    grid-template-columns: none;
+    gap: 9px;
+    overflow-x: auto;
+    padding-bottom: 7px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-shell .thread-visual-summary-grid[data-role-map="true"] article,
+  .app-shell .thread-visual-summary-grid [data-role-summary] {
+    grid-column: auto;
+    min-height: 132px;
+    scroll-snap-align: start;
+  }
+
+  .app-shell .thread-visual-summary-grid[data-role-map="true"]::-webkit-scrollbar {
+    height: 3px;
+  }
+
+  .app-shell .thread-visual-summary-grid[data-role-map="true"]::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(255,255,255,.16);
+  }
+}
