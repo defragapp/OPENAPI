@@ -19,6 +19,7 @@ function renderLaunchHome() {
   document.querySelector('meta[name="description"]')?.setAttribute('content', 'Create one private Baseline. Use it for today, decisions, relationships, and groups without starting from zero each time.');
   ensureStyle('/marketing.css', 'sovereign-marketing');
   ensureStyle('/launch.css', 'sovereign-launch');
+  ensureStyle('/launch-polish.css', 'sovereign-launch-polish');
 
   shell.innerHTML = `
     <div class="launch-shell">
@@ -100,6 +101,7 @@ function renderPolicyPage() {
   if (!shell || shell.dataset.launchPolicy === 'true') return;
   ensureStyle('/marketing.css', 'sovereign-marketing');
   ensureStyle('/launch.css', 'sovereign-launch');
+  ensureStyle('/launch-polish.css', 'sovereign-launch-polish');
   shell.dataset.launchPolicy = 'true';
   shell.classList.add('launch-page', 'launch-shell', 'launch-policy');
   shell.querySelector('.wordmark')?.remove();
