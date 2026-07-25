@@ -34,6 +34,7 @@ The staged AI response and exact-data footer contract is defined in [`docs/inner
 
 - [`docs/launch-product-contract.md`](docs/launch-product-contract.md)
 - [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md)
+- [`docs/cloudflare-workers-builds.md`](docs/cloudflare-workers-builds.md)
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/privacy-model.md`](docs/privacy-model.md)
 - [`docs/tool-contracts.md`](docs/tool-contracts.md)
@@ -42,8 +43,21 @@ The staged AI response and exact-data footer contract is defined in [`docs/inner
 - [`docs/openai-integration.md`](docs/openai-integration.md)
 - [`docs/current-conditions-port.md`](docs/current-conditions-port.md)
 
+## Free-plan build and preview deployment
+
+GitHub Actions is optional. The supported release path for this public repository is Cloudflare Workers Builds connected directly to `defragapp/OPENAPI`.
+
+Use these Cloudflare build settings:
+
+- Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
+- Deploy command: `pnpm preview:bootstrap`
+- Production branch: `main`
+- Non-production branch builds: disabled
+
+The deploy command targets the isolated `sovereign-openapi-preview` Worker rather than the production Worker. See [`docs/cloudflare-workers-builds.md`](docs/cloudflare-workers-builds.md) for required build secrets and the Cloudflare Access protection step.
+
 ## Current state
 
-The repository now includes the app and Worker shells, D1 schema and migrations, Durable Object thread coordination, security primitives, Stripe billing foundations, export job execution, identity-bound email invitations, invitee-controlled scope decisions and revocation, reduced-Baseline pair and system context, authorization-checked relational context, staged Inner Recognition planning, exact verified Basis selection, pre-display response safety, and explicit Insight Module approval.
+The repository now includes the app and Worker shells, D1 schema and migrations, Durable Object thread coordination, security primitives, Stripe billing foundations, export job execution, identity-bound email invitations, invitee-controlled scope decisions and revocation, reduced-Baseline pair and system context, authorization-checked relational context, staged Inner Recognition planning, exact verified Basis selection, pre-display response safety, explicit Insight Module approval, and a Cloudflare-native build/deployment path.
 
-This is **implemented, not yet approved for production**. Remaining approval evidence includes a green CI run, configured production Baseline and email services, protected Cloudflare preview, migration replay, authenticated browser and iPhone smoke tests, load testing, reviewed Terms and Privacy documents, and explicit founder approval. No production deployment is implied by the code state.
+This is **implemented, not yet verified as a protected live deployment**. Remaining approval evidence includes a successful Cloudflare build, configured production Baseline and email services, protected Cloudflare preview, migration replay, authenticated browser and iPhone smoke tests, load testing, reviewed Terms and Privacy documents, and explicit founder approval. No production deployment is implied by the code state.
