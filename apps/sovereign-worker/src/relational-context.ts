@@ -93,7 +93,9 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
   const members = await env.DB.prepare(`SELECT p.id, p.display_name, p.role, p.source_of_truth, p.bound_account_id, sm.metadata_json
     FROM system_memberships sm JOIN persons p ON p.id = sm.person_id
     WHERE sm.system_id = ? AND p.account_id = ? ORDER BY sm.created_at`).bind(systemId, accountId).all<Record<string, string | null>>();
-  if ((members.results ?? []).length < 1) throw new Response('At least one consented invited member is required for a system analysis.', { status: 409 });
+  if ((members.results ?? []).length < 2) {
+    throw new Response('A reviewable system requires the owner and at least two consented invited members.', { status: 409 });
+  }
 
   const ownerBaseline = await loadReducedBaseline(env, accountId);
   const participants: ReducedParticipant[] = [participant('self', 'You', 'self', ownerBaseline, true)];
@@ -105,7 +107,13 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
     const boundAccountId = member.bound_account_id;
     if (!boundAccountId) throw new Response('Every invited member must have a bound identity and Baseline.', { status: 409 });
     const baseline = await loadReducedBaseline(env, boundAccountId);
-    participants.push(participant(personId, member.display_name ?? 'Member', member.role ?? 'member', baseline, frameworkAllowed));
+    const roleMetadata = { ...safeJson(member.source_of_truth), membership: safeJson(member.metadata_json) };
+    participants.push({
+      ...participant(personId, member.display_name ?? 'Member', member.role ?? 'member', baseline, frameworkAllowed),
+      role: String(roleMetadata.membership && typeof roleMetadata.membership === 'object' && 'formalRole' in roleMetadata.membership
+        ? (roleMetadata.membership as Record<string, unknown>).formalRole ?? member.role ?? 'member'
+        : member.role ?? 'member')
+    });
   }
 
   return {
@@ -200,8 +208,8 @@ function buildEdges(participants: ReducedParticipant[]) {
   for (let index = 0; index < participants.length; index += 1) {
     for (let next = index + 1; next < participants.length; next += 1) {
       edges.push({
-        from: participants[index]!.personId,
-        to: participants[next]!.personId,
+        from: participants[index]!.label,
+        to: participants[next]!.label,
         interpretation: 'Possible interaction difference only; direct observation and current state are still required.',
         certainty: 'limited'
       });
