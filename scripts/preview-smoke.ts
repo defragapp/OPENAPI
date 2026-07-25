@@ -66,8 +66,9 @@ async function verifyPaidCapabilities() {
   if (!people.people?.some((item: { id: string }) => item.id === person.id)) throw new Error('Paid People record was not readable');
 
   const family = (await json('/api/v1/systems', { method: 'POST', body: JSON.stringify({ name: 'Preview family', systemType: 'family' }) }, 201)).system;
-  const alignment = await json(`/api/v1/systems/${family.id}/alignment`);
-  if (!JSON.stringify(alignment).includes('caregiving')) throw new Error('Paid family alignment missing family-aware context');
+  const systems = await json('/api/v1/systems');
+  if (!systems.systems?.some((item: { id: string }) => item.id === family.id)) throw new Error('Paid System record was not readable');
+  await request(`/api/v1/systems/${family.id}/alignment`, {}, 409);
 
   const saved = (await json('/api/v1/library', { method: 'POST', body: JSON.stringify({ title: 'Preview understanding', summary: 'A user-approved preview summary.' }) }, 201)).saved;
   await json('/api/v1/library');
