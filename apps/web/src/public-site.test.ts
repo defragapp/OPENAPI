@@ -67,6 +67,7 @@ describe('Sovereign.OS launch surface', () => {
     expect(launchCss).toContain('min-height:44px');
     expect(marketingCss).toContain('safe-area-inset-top');
     expect(marketingCss).toContain('prefers-reduced-motion');
+    expect(landing).toContain("ensureStyle('/launch-polish.css', 'sovereign-launch-polish')");
   });
 
   it('keeps sign-in and account creation reachable on mobile', () => {
