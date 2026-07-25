@@ -3,6 +3,37 @@ import { useEffect, useMemo, useState } from 'react';
 const RELATIONAL_EVENT = 'sovereign:relational-result';
 let runtimeInstalled = false;
 
+const scopeCopy: Record<string, { title: string; description: string }> = {
+  'pair.compare': {
+    title: 'Compare together',
+    description: 'Use both reduced Baselines in a private two-person comparison.'
+  },
+  'system.include': {
+    title: 'Include in a system',
+    description: 'Include this person in a consented family, household, friendship, or team view.'
+  },
+  'trait.display': {
+    title: 'Use shared Baseline traits',
+    description: 'Use the reduced plain-language traits needed for the requested view.'
+  },
+  'framework.display': {
+    title: 'Show optional source detail',
+    description: 'Allow exact supporting framework detail to appear only when specifically requested.'
+  },
+  'current_conditions.use': {
+    title: 'Use current conditions',
+    description: 'Include current timing only for this person when permission is active.'
+  },
+  'library.link': {
+    title: 'Link a saved understanding',
+    description: 'Use a deliberately saved understanding as shared context.'
+  },
+  'covenant.include': {
+    title: 'Include in a Scripture lens',
+    description: 'Include this person only when the optional Covenant lens is explicitly enabled.'
+  }
+};
+
 interface PersonRecord {
   id: string;
   displayName: string;
@@ -112,6 +143,22 @@ export function ProductCompletionLayer() {
     return () => window.removeEventListener(RELATIONAL_EVENT, listener);
   }, []);
 
+  useEffect(() => {
+    if (!controlsOpen && !result) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      if (controlsOpen) setControlsOpen(false);
+      else setResult(null);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [controlsOpen, result]);
+
   async function api(path: string, init: RequestInit = {}) {
     const response = await fetch(path, {
       ...init,
@@ -169,7 +216,12 @@ export function ProductCompletionLayer() {
   return (
     <>
       {workspace && (
-        <button className="shared-context-trigger" onClick={openControls}>
+        <button
+          className="shared-context-trigger"
+          onClick={openControls}
+          aria-haspopup="dialog"
+          aria-expanded={controlsOpen}
+        >
           Shared context
         </button>
       )}
@@ -180,15 +232,20 @@ export function ProductCompletionLayer() {
         <div className="completion-backdrop" role="presentation" onMouseDown={(event) => {
           if (event.target === event.currentTarget) setControlsOpen(false);
         }}>
-          <section className="completion-dialog consent-review-dialog" role="dialog" aria-modal="true" aria-label="Shared context controls">
+          <section
+            className="completion-dialog consent-review-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="shared-context-title"
+          >
             <header className="completion-dialog-header">
               <div>
                 <p className="eyebrow">SHARED CONTEXT</p>
-                <h2>Consent stays changeable.</h2>
+                <h2 id="shared-context-title">Consent stays changeable.</h2>
               </div>
-              <button className="quiet-button" onClick={() => setControlsOpen(false)}>Close</button>
+              <button className="quiet-button" onClick={() => setControlsOpen(false)} autoFocus>Close</button>
             </header>
-            <p className="result-status" aria-live="polite">{status}</p>
+            <p className="result-status" role="status" aria-live="polite">{status}</p>
 
             <section className="completion-section">
               <h3>People in your workspace</h3>
@@ -198,27 +255,28 @@ export function ProductCompletionLayer() {
                   <div className="consent-person-heading">
                     <div>
                       <strong>{person.displayName}</strong>
-                      <small>{person.identityBound ? 'Verified identity' : 'Private entry only'} · Baseline {person.baselineStatus}</small>
+                      <small>{person.identityBound ? 'Verified identity' : 'Private entry only'} · Baseline {humanStatus(person.baselineStatus)}</small>
                     </div>
-                    <span>{person.invitationStatus ?? 'not invited'}</span>
+                    <span>{humanStatus(person.invitationStatus ?? 'not invited')}</span>
                   </div>
                   {person.activeScopes.length > 0 ? (
-                    <div className="scope-chip-list">
+                    <div className="scope-chip-list" aria-label={`Active permissions for ${person.displayName}`}>
                       {person.activeScopes.map((scope) => (
                         <button
                           key={scope}
                           disabled={loading}
+                          title={scopeDescription(scope)}
                           onClick={() => mutate(
-                            `Stopping use of ${scope}…`,
+                            `Stopping use of ${scopeTitle(scope)}…`,
                             `/api/v1/people/${encodeURIComponent(person.id)}/consent/${encodeURIComponent(scope)}`,
                             { method: 'PUT', body: JSON.stringify({ granted: false, reason: 'Workspace owner stopped using this scope.' }) }
                           )}
                         >
-                          {scope} · stop using
+                          {scopeTitle(scope)} · stop using
                         </button>
                       ))}
                     </div>
-                  ) : <p className="empty-copy">No active consent scopes.</p>}
+                  ) : <p className="empty-copy">No active permissions are being used.</p>}
                   <div className="completion-actions">
                     {person.invitationStatus === 'pending' && person.invitationId && (
                       <button
@@ -259,26 +317,44 @@ export function ProductCompletionLayer() {
                 <article className="consent-person-card" key={invitation.id}>
                   <div className="consent-person-heading">
                     <div><strong>{invitation.displayName}</strong><small>You control each requested use.</small></div>
-                    <span>{invitation.status}</span>
+                    <span>{humanStatus(invitation.status)}</span>
                   </div>
                   <div className="invitee-decision-list">
-                    {invitation.requestedScopes.map((scope) => (
-                      <div key={scope}>
-                        <span><strong>{scope}</strong><small>{invitation.decisions?.[scope] ?? 'no decision'}</small></span>
-                        <div>
-                          <button disabled={loading} onClick={() => mutate(
-                            `Allowing ${scope}…`,
-                            `/api/v1/invitations/${encodeURIComponent(invitation.id)}/consent/${encodeURIComponent(scope)}`,
-                            { method: 'PUT', body: JSON.stringify({ granted: true }) }
-                          )}>Allow</button>
-                          <button disabled={loading} onClick={() => mutate(
-                            `Revoking ${scope}…`,
-                            `/api/v1/invitations/${encodeURIComponent(invitation.id)}/consent/${encodeURIComponent(scope)}`,
-                            { method: 'PUT', body: JSON.stringify({ granted: false }) }
-                          )}>Do not allow</button>
+                    {invitation.requestedScopes.map((scope) => {
+                      const decision = invitation.decisions?.[scope];
+                      return (
+                        <div key={scope}>
+                          <span>
+                            <strong>{scopeTitle(scope)}</strong>
+                            <small>{scopeDescription(scope)} · {decisionLabel(decision)}</small>
+                          </span>
+                          <div className="decision-choice" role="group" aria-label={`${scopeTitle(scope)} decision`}>
+                            <button
+                              disabled={loading}
+                              aria-pressed={decision === 'granted'}
+                              onClick={() => mutate(
+                                `Allowing ${scopeTitle(scope)}…`,
+                                `/api/v1/invitations/${encodeURIComponent(invitation.id)}/consent/${encodeURIComponent(scope)}`,
+                                { method: 'PUT', body: JSON.stringify({ granted: true }) }
+                              )}
+                            >
+                              Allow
+                            </button>
+                            <button
+                              disabled={loading}
+                              aria-pressed={decision === 'denied'}
+                              onClick={() => mutate(
+                                `Stopping ${scopeTitle(scope)}…`,
+                                `/api/v1/invitations/${encodeURIComponent(invitation.id)}/consent/${encodeURIComponent(scope)}`,
+                                { method: 'PUT', body: JSON.stringify({ granted: false }) }
+                              )}
+                            >
+                              Do not allow
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </article>
               ))}
@@ -298,22 +374,27 @@ function RelationalResultDialog({ payload, onClose }: { payload: RelationalPaylo
     <div className="completion-backdrop" role="presentation" onMouseDown={(event) => {
       if (event.target === event.currentTarget) onClose();
     }}>
-      <section className="completion-dialog" role="dialog" aria-modal="true" aria-label="Relational context result">
+      <section
+        className="completion-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="relational-result-title"
+      >
         <header className="completion-dialog-header">
           <div>
             <p className="eyebrow">{isSystem ? 'SYSTEM CONTEXT' : 'CONSENTED PAIR CONTEXT'}</p>
-            <h2>{isSystem ? result.system?.name ?? 'System review' : 'Two people, kept distinct.'}</h2>
+            <h2 id="relational-result-title">{isSystem ? result.system?.name ?? 'System review' : 'Two people, kept distinct.'}</h2>
           </div>
-          <button className="quiet-button" onClick={onClose}>Close</button>
+          <button className="quiet-button" onClick={onClose} autoFocus>Close</button>
         </header>
 
         <div className="participant-grid">
           {participants.map((participant: any) => (
             <article key={participant.personId} className="participant-card">
-              <span>{participant.role}</span>
+              <span>{humanStatus(participant.role ?? 'participant')}</span>
               <h3>{participant.label}</h3>
               <DefinitionList value={participant.baseline ?? {}} />
-              <p><strong>Uncertainty:</strong> {participant.uncertainty ?? 'unknown'}</p>
+              <p><strong>Uncertainty:</strong> {humanStatus(participant.uncertainty ?? 'unknown')}</p>
               <p>{participant.unknownActualState}</p>
               {participant.basis && Object.keys(participant.basis).length > 0 && (
                 <details><summary>Consented source detail</summary><DefinitionList value={participant.basis} /></details>
@@ -329,7 +410,8 @@ function RelationalResultDialog({ payload, onClose }: { payload: RelationalPaylo
             <h3>What may differ</h3>
             <StringList values={result.interaction.possibleFriction} />
             <p><strong>Responsibility boundary:</strong> {result.interaction.responsibilityBoundary}</p>
-            <p><strong>Unknown actual state:</strong> {result.interaction.prohibitedInference}</p>
+            <p><strong>What this does not establish:</strong> {result.interaction.prohibitedInference}</p>
+            <h3>What is still missing</h3>
             <StringList values={result.interaction.missingInformation} />
           </section>
         )}
@@ -349,11 +431,11 @@ function RelationalResultDialog({ payload, onClose }: { payload: RelationalPaylo
           </section>
         )}
 
-        <footer className="completion-provenance">
+        <footer className="completion-provenance" aria-label="Privacy and consent verification">
           <strong>Verified boundary</strong>
-          <span>Raw birth input shared: {String(result.provenance?.rawBirthInputShared ?? false)}</span>
-          <span>Exact private location shared: {String(result.provenance?.exactPrivateLocationShared ?? false)}</span>
-          <span>Consent checked: {result.provenance?.consentCheckedAt ?? 'during this request'}</span>
+          <span>Raw birth details shared: {yesNo(result.provenance?.rawBirthInputShared)}</span>
+          <span>Exact private location shared: {yesNo(result.provenance?.exactPrivateLocationShared)}</span>
+          <span>Consent checked: {readableValue(result.provenance?.consentCheckedAt ?? 'during this request')}</span>
         </footer>
       </section>
     </div>
@@ -372,13 +454,48 @@ function DefinitionList({ value }: { value: Record<string, unknown> }) {
       {Object.entries(value).map(([key, item]) => (
         <div key={key}>
           <dt>{plainKey(key)}</dt>
-          <dd>{typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean' ? String(item) : JSON.stringify(item)}</dd>
+          <dd>{readableValue(item)}</dd>
         </div>
       ))}
     </dl>
   );
 }
 
+function scopeTitle(scope: string): string {
+  return scopeCopy[scope]?.title ?? plainKey(scope);
+}
+
+function scopeDescription(scope: string): string {
+  return scopeCopy[scope]?.description ?? 'Use only the context covered by this specific permission.';
+}
+
+function decisionLabel(decision?: 'granted' | 'denied'): string {
+  if (decision === 'granted') return 'Currently allowed';
+  if (decision === 'denied') return 'Not allowed';
+  return 'No decision yet';
+}
+
+function humanStatus(value: string): string {
+  const clean = plainKey(value).trim();
+  return clean ? clean.charAt(0).toUpperCase() + clean.slice(1) : 'Unknown';
+}
+
+function yesNo(value: unknown): string {
+  return value === true ? 'Yes' : 'No';
+}
+
+function readableValue(value: unknown): string {
+  if (value === null || value === undefined || value === '') return 'Not available';
+  if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+  if (Array.isArray(value)) return value.map(readableValue).join(' · ');
+  if (typeof value === 'object') {
+    return Object.entries(value as Record<string, unknown>)
+      .map(([key, item]) => `${plainKey(key)}: ${readableValue(item)}`)
+      .join(' · ');
+  }
+  return String(value);
+}
+
 function plainKey(value: string): string {
-  return value.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ').toLowerCase();
+  return value.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[._-]/g, ' ').toLowerCase();
 }
