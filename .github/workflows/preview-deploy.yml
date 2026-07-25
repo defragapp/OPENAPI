@@ -28,28 +28,29 @@ jobs:
     environment: preview
     timeout-minutes: 40
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout exact commit without marketplace actions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth=1 origin "${GITHUB_SHA}"
+          git checkout --detach FETCH_HEAD
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+      - name: Select preinstalled Node 22
+        run: |
+          set -euo pipefail
+          NODE22="$(find /opt/hostedtoolcache/node -mindepth 1 -maxdepth 1 -type d -name '22.*' | sort -V | tail -1)"
+          if [ -z "$NODE22" ] || [ ! -x "$NODE22/x64/bin/node" ]; then
+            echo "::error::Node 22 is not available in the hosted tool cache"
+            exit 1
+          fi
+          echo "$NODE22/x64/bin" >> "$GITHUB_PATH"
+          "$NODE22/x64/bin/node" --version
 
       - name: Enable Corepack
         run: corepack enable
-
-      - name: Resolve pnpm store path
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -186,7 +187,7 @@ jobs:
       - name: Authenticated protected-preview product smoke
         env:
           PREVIEW_BASE_URL: ${{ steps.preview-deploy.outputs.preview_url }}
-          PREVIEW_SESSION_COOKIE: ${{ steps.preview-session.outputs.cookie }}
+          PREVIEW_SESSION_COOKIE: ${{ steps.preview-session.outputs.secret }}
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
           PREVIEW_EXPECT_STRIPE: ${{ vars.PREVIEW_EXPECT_STRIPE || '0' }}
