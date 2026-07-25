@@ -2,6 +2,8 @@
 
 This repository does not require GitHub Actions for build or deployment. The supported free-plan path is Cloudflare Workers Builds connected directly to the public GitHub repository.
 
+`defragapp/OPENAPI` is the only application source. `defragapp/SOVV` is read-only reference material and is not built, modified, deployed, or required as a runtime Baseline dependency.
+
 ## Connect the repository
 
 In Cloudflare:
@@ -20,7 +22,7 @@ Use these commands exactly:
 - Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
 - Deploy command: `pnpm preview:bootstrap`
 
-The deploy command creates or reuses the isolated preview D1 database, applies all remote migrations, deploys the dedicated `sovereign-openapi-preview` Worker, provisions its draft R2 and Queue bindings, uploads configured runtime secrets in one bulk operation, performs a final exact-commit deployment, and records the Cloudflare build UUID and Git commit SHA.
+The deploy command creates or reuses the isolated preview D1 database, applies all remote migrations, deploys the dedicated `sovereign-openapi-preview` Worker, provisions its R2 and Queue bindings, uploads configured runtime secrets in one bulk operation, performs a final exact-commit deployment, and records the Cloudflare build UUID and Git commit SHA.
 
 ## Build token permissions
 
@@ -70,7 +72,7 @@ Authentication review requires:
 - `EMAIL_API_TOKEN` — secret Bearer token for that endpoint.
 - `EMAIL_FROM` — verified sender address.
 
-Do not set one global `TURNSTILE_EXPECTED_ACTION`: the same preview handles both `login` and `signup` actions. The server verifies the secret and hostname; the action remains present in the Turnstile result and can be tightened later with per-route verification.
+Do not set one global `TURNSTILE_EXPECTED_ACTION`: the same preview handles both `login` and `signup` actions. The server verifies the secret and hostname; route-specific action validation can be added separately.
 
 Cloudflare automatically supplies:
 
@@ -86,16 +88,38 @@ Stripe test-mode variables and secrets for billing verification:
 - `STRIPE_SECRET_KEY` — test-mode secret only
 - `STRIPE_WEBHOOK_SECRET` — test endpoint secret only
 
-Baseline integration remains a named architecture gate. The repository has verified read-only SOVV Baseline routes, but no verified production contract for creating a new Baseline from OPENAPI onboarding. Do not invent that API. Configure one of these only after its exact contract is approved:
+## OPENAPI-owned Baseline engine
 
-- a Cloudflare service binding named `BASELINE` implementing `compute(input)` and returning the reduced Baseline contract; or
-- a new authenticated SOVV HTTP compute route documented in `docs/sovv-adapter-map.md` and implemented in `apps/sovereign-worker/src/baseline.ts`.
+Baseline onboarding is computed inside `apps/sovereign-worker` and requires no SOVV deployment, SOVV service binding, shared SOVV secret, or personal OpenAI API key.
 
-Existing optional values:
+The Worker configuration supplies these non-secret provider endpoints:
+
+- `BASELINE_GEOCODER_URL=https://nominatim.openstreetmap.org/search`
+- `BASELINE_TIMEZONE_URL=https://timeapi.io/api/TimeZone/coordinate`
+- `BASELINE_HORIZONS_URL=https://ssd.jpl.nasa.gov/api/horizons.api`
+- `BASELINE_PROVIDER_TIMEOUT_MS=8000`
+
+The engine:
+
+- geocodes birth place server-side;
+- resolves the IANA timezone server-side;
+- converts local birth time to UTC;
+- retrieves natal ecliptic positions from NASA/JPL Horizons;
+- computes major aspects, numerology, and explicitly partial personality-gate activation references;
+- does not claim a complete Human Design bodygraph, authority, type, design-side calculation, houses, or complete Gene Keys profile;
+- stores only hashed input metadata and reduced context in D1;
+- never sends raw birth input or exact private location to the AI model;
+- never depends on SOVV at runtime.
+
+Provider URLs may be replaced with account-controlled equivalents after contract review. Do not place credentials in these public variables. Any future authenticated provider token must be stored as an encrypted Worker secret.
+
+Optional legacy transition values remain available only for read-only identity or Library adapters:
 
 - `SOVV_BASE_URL`
 - `SOVV_INTERNAL_AUTH_TOKEN`
 - `ASTRONOMY_API_URL`
+
+They are not required for new OPENAPI Baseline onboarding.
 
 Never place secret values in GitHub files, public issue comments, build summaries, screenshots, or unencrypted runtime variables.
 
@@ -113,6 +137,8 @@ One successful deploy must produce or reuse exactly these preview resources:
 - Durable Object binding: `THREADS`
 - Workers AI binding: `AI`
 - static assets binding: `ASSETS`
+
+No SOVV Worker service binding should exist in this preview configuration.
 
 Do not create duplicate resources when the named preview resource already exists.
 
