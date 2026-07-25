@@ -63,7 +63,7 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(clarity).toContain('<span>ROLE</span>');
     expect(clarity).toContain('PRESSURE NOW');
     expect(clarity).toContain('NEXT MOVEMENT');
-    expect(clarity).toContain('data.roleMap');
+    expect(clarity).toContain('dataset.roleMap');
     expect(clarityStyles).toContain('[data-role-map="true"]');
     expect(clarityStyles).toContain('[data-role-summary]');
   });
