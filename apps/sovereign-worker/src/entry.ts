@@ -4,6 +4,7 @@ import { requireAuth, requireSameOrigin } from './security/auth';
 import { withSecurityHeaders } from './security/headers';
 import { decideInviteeConsent, listInviteeInvitations, previewInvitation, redeemInvitation, sendInvitation } from './invitation-service';
 import { addConsentedSystemMember, buildPairComparison, buildSystemAnalysis } from './relational-context';
+import { removePerson } from './db/people';
 import { ensureThread, appendThreadEvent } from './db/threads';
 import { getTurn, startTurn, updateTurnStatus } from './db/turns';
 import { getEntitlements } from './db/entitlements';
@@ -21,6 +22,13 @@ app.post('/api/v1/people/:personId/invitations/send', async (context) => {
   if (body.requestedScopes) input.requestedScopes = body.requestedScopes;
   const invitation = await sendInvitation(context.req.raw, context.env, auth.accountId, context.req.param('personId'), auth.subject, input);
   return context.json({ invitation }, 201);
+});
+
+app.delete('/api/v1/people/:personId', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  await removePerson(context.env, auth.accountId, context.req.param('personId'));
+  return context.json({ ok: true, removed: context.req.param('personId') });
 });
 
 app.get('/api/v1/invitations/preview', async (context) => context.json({ invitation: await previewInvitation(context.req.raw, context.env) }));
