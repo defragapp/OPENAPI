@@ -1,4 +1,5 @@
 import type { Env } from '../env';
+import { getEntitlements, requireFeature } from './entitlements';
 
 export const CONSENT_SCOPES = ['pair.compare', 'system.include', 'trait.display', 'framework.display', 'current_conditions.use', 'library.link', 'covenant.include'] as const;
 export type ConsentScope = typeof CONSENT_SCOPES[number];
@@ -34,12 +35,27 @@ function assertConsentScope(scope: string): asserts scope is ConsentScope {
   if (!(CONSENT_SCOPES as readonly string[]).includes(scope)) throw new Response('Unknown consent scope', { status: 400 });
 }
 
+async function requirePeopleFeature(env: Env, accountId: string): Promise<void> {
+  requireFeature(await getEntitlements(env, accountId), 'people.compare');
+}
+
+async function requireScopeFeature(env: Env, accountId: string, scope: ConsentScope): Promise<void> {
+  const feature = ({
+    'pair.compare': 'people.compare',
+    'trait.display': 'people.compare',
+    'library.link': 'library.continuity',
+    'covenant.include': 'covenant.lens'
+  } as Partial<Record<ConsentScope, string>>)[scope];
+  if (feature) requireFeature(await getEntitlements(env, accountId), feature);
+}
+
 async function assertPersonOwned(env: Env, accountId: string, personId: string): Promise<void> {
   const row = await env.DB.prepare('SELECT id FROM persons WHERE id = ? AND account_id = ?').bind(personId, accountId).first<{ id: string }>();
   if (!row) throw new Response('Person not found', { status: 404 });
 }
 
 export async function listPeople(env: Env, accountId: string): Promise<PersonRecord[]> {
+  await requirePeopleFeature(env, accountId);
   const rows = await env.DB.prepare(`SELECT p.id, p.role, p.display_name, p.consent_status, p.baseline_status, p.source_of_truth, p.bound_account_id,
       (SELECT i.status FROM invitations i WHERE i.invited_person_id = p.id ORDER BY i.created_at DESC LIMIT 1) AS invitation_status,
       (SELECT i.expires_at FROM invitations i WHERE i.invited_person_id = p.id ORDER BY i.created_at DESC LIMIT 1) AS invitation_expires_at,
@@ -61,6 +77,7 @@ export async function listPeople(env: Env, accountId: string): Promise<PersonRec
 }
 
 export async function createPerson(env: Env, accountId: string, input: { displayName: string; role: string; metadata?: RelationshipMetadataInput }): Promise<PersonRecord> {
+  await requirePeopleFeature(env, accountId);
   const displayName = input.displayName.trim();
   if (!displayName) throw new Response('Display name required', { status: 400 });
   const id = `person_${crypto.randomUUID()}`;
@@ -112,6 +129,7 @@ export async function hasConsent(env: Env, accountId: string, personId: string, 
 }
 
 export async function requireConsent(env: Env, accountId: string, personId: string, scope: ConsentScope): Promise<void> {
+  await requireScopeFeature(env, accountId, scope);
   if (!(await hasConsent(env, accountId, personId, scope))) throw new Response('Consent denied', { status: 403 });
 }
 
