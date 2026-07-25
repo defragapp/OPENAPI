@@ -10,6 +10,8 @@ const webMain = readFileSync('apps/web/src/main.tsx', 'utf8');
 const completionLayer = readFileSync('apps/web/src/ProductCompletionLayer.tsx', 'utf8');
 const peopleDb = readFileSync('apps/sovereign-worker/src/db/people.ts', 'utf8');
 const relationalContext = readFileSync('apps/sovereign-worker/src/relational-context.ts', 'utf8');
+const workerIndex = readFileSync('apps/sovereign-worker/src/index.ts', 'utf8');
+const workerEntry = readFileSync('apps/sovereign-worker/src/entry.ts', 'utf8');
 const baselineSource = readFileSync('apps/sovereign-worker/src/baseline.ts', 'utf8');
 const baselineEngine = readFileSync('apps/sovereign-worker/src/baseline-engine.ts', 'utf8');
 const baselineTests = readFileSync('apps/sovereign-worker/src/baseline-engine.test.ts', 'utf8');
@@ -177,6 +179,42 @@ for (const required of ['Unexpected Horizons API signature', "not.toContain('Upl
   if (!baselineTests.includes(required)) throw new Error(`Baseline engine tests are missing ${required}`);
 }
 
+for (const required of ['baselineEngine', 'legacySovvAdapter', "payload.dependencies.baselineEngine === 'configured'", 'OPENAPI-owned Baseline engine']) {
+  if (!workerIndex.includes(required)) throw new Error(`active Worker readiness is missing ${required}`);
+}
+if (workerIndex.includes('verified SOVV adapter before personalization')) {
+  throw new Error('active Worker still requires the legacy SOVV Baseline adapter');
+}
+
+for (const required of [
+  "url.pathname === '/api/v1/current-conditions'",
+  'computeCurrentConditions(',
+  'locationPrecision',
+  'latitude',
+  'longitude',
+  'CurrentLocationInput'
+]) {
+  if (!workerEntry.includes(required)) throw new Error(`active current-condition route is missing ${required}`);
+}
+
+for (const required of ['sanitizeBaselineForModel', 'sanitizeCurrentForModel', 'rawBirthInputReturned: false', 'sovvRuntimeDependency: false']) {
+  if (!baselineSource.includes(required)) throw new Error(`model context boundary is missing ${required}`);
+}
+const baselineSanitizer = baselineSource.slice(
+  baselineSource.indexOf('function sanitizeBaselineForModel'),
+  baselineSource.indexOf('function sanitizeCurrentForModel')
+);
+for (const forbidden of ['timezone:', 'geocodePrecision:', 'currentAstronomy:', 'houses:', 'referenceFiles']) {
+  if (baselineSanitizer.includes(forbidden)) throw new Error(`model Baseline sanitizer exposes ${forbidden}`);
+}
+const currentSanitizer = baselineSource.slice(
+  baselineSource.indexOf('function sanitizeCurrentForModel'),
+  baselineSource.indexOf('function asRecord')
+);
+for (const forbidden of ['latitude', 'longitude', 'referenceFiles', 'locationHash']) {
+  if (currentSanitizer.includes(forbidden)) throw new Error(`model current-condition sanitizer exposes ${forbidden}`);
+}
+
 for (const required of [
   'installProductRuntime()',
   '<ProductCompletionLayer />'
@@ -222,5 +260,5 @@ for (const path of ['.github/workflows/preview-deploy.yml', '.github/workflows/l
 }
 
 console.log(
-  'Release config verified cloudflare_build=true d1=true durable_objects=true queues=true schedules=true r2=true ai=true assets=true openapi_baseline_engine=true sovv_runtime_dependency=false canonical_preview_url=true runtime_secret_order=true auth_config=true relational_results=true revocation_ui=true three_person_system=true tier_smoke=true'
+  'Release config verified cloudflare_build=true d1=true durable_objects=true queues=true schedules=true r2=true ai=true assets=true openapi_baseline_engine=true model_context_sanitized=true ephemeral_current_location=true sovv_runtime_dependency=false canonical_preview_url=true runtime_secret_order=true auth_config=true relational_results=true revocation_ui=true three_person_system=true tier_smoke=true'
 );
