@@ -1,10 +1,3 @@
-import type { BaselineInput, LocationPrecision } from './baseline';
-
-export interface BaselineService {
-  compute(input: BaselineInput): Promise<unknown>;
-  currentConditions?(input: { accountId: string; locationPrecision: LocationPrecision }): Promise<unknown>;
-}
-
 export interface Env {
   APP_ENV: string;
   APP_VERSION: string;
@@ -12,7 +5,6 @@ export interface Env {
   KV?: KVNamespace;
   ARTIFACTS?: R2Bucket;
   JOBS?: Queue;
-  BASELINE?: BaselineService;
   THREADS: DurableObjectNamespace;
   AI_PROVIDER?: string;
   AI_MODEL?: string;
@@ -27,8 +19,8 @@ export interface Env {
   STRIPE_CANCEL_URL?: string;
   STRIPE_PORTAL_RETURN_URL?: string;
   SCRIPTURE_TRANSLATION?: string;
-  SOVV_INTERNAL_BASE_URL: string;
-  SOVV_INTERNAL_AUTH_TOKEN: string;
+  SOVV_INTERNAL_BASE_URL?: string;
+  SOVV_INTERNAL_AUTH_TOKEN?: string;
   SESSION_SIGNING_SECRET: string;
   CURRENT_CONDITIONS_LAT?: string;
   CURRENT_CONDITIONS_LNG?: string;
@@ -45,6 +37,10 @@ export interface Env {
   AI_SOVEREIGN_PLUS_MONTHLY_TURNS?: string;
   THREAD_RETENTION_DAYS?: string;
   AUDIT_RETENTION_DAYS?: string;
+  BASELINE_GEOCODER_URL?: string;
+  BASELINE_TIMEZONE_URL?: string;
+  BASELINE_HORIZONS_URL?: string;
+  BASELINE_PROVIDER_TIMEOUT_MS?: string;
 }
 
 export interface AuthContext {
