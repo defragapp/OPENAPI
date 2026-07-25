@@ -202,7 +202,7 @@
 }
 
 @media (min-width: 860px) {
-  .shared-context-trigger { bottom: 116px; }
+  .shared-context-trigger { bottom: 176px; }
 }
 
 @media (max-width: 620px) {
