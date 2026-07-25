@@ -53,6 +53,6 @@ describe('product completion layer', () => {
     expect(css).toContain('@media (max-width: 620px)');
     expect(css).toContain('max-height: calc(100dvh - 32px)');
     expect(css).toContain('bottom: calc(176px + env(safe-area-inset-bottom))');
-    expect(css).toContain('.shared-context-trigger { bottom: 116px; }');
+    expect(css).toContain('.shared-context-trigger { bottom: 176px; }');
   });
 });
