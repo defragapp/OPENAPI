@@ -1,8 +1,6 @@
 import type { Env } from './env';
 import type { BaselineProvider, BaselineProviderOutput, normalizeBaselineInput } from './baseline';
 
-const DEFAULT_GEOCODER_URL = 'https://nominatim.openstreetmap.org/search';
-const DEFAULT_TIMEZONE_URL = 'https://timeapi.io/api/TimeZone/coordinate';
 const DEFAULT_HORIZONS_URL = 'https://ssd.jpl.nasa.gov/api/horizons.api';
 const CACHE_TTL_SECONDS = 60 * 60 * 24 * 365;
 const REFERENCE_COMMIT = 'a3db94bccc75089723bef0cf5ff36c47064bd789';
@@ -56,13 +54,6 @@ export interface HorizonsPayload {
   message?: string;
 }
 
-interface GeocodeResult {
-  latitude: number;
-  longitude: number;
-  timezone: string;
-  precision: 'city_or_regional';
-}
-
 interface BodyPosition {
   longitude: number;
   latitude: number;
@@ -78,20 +69,19 @@ export function createOpenApiBaselineProvider(env: Env, fetchImpl: FetchLike = f
   return {
     async compute(input) {
       const normalized = input as NormalizedBaselineInput;
-      const cacheKey = `baseline-engine:v1:${await hashJson({
+      const cacheKey = `baseline-engine:v2:${await hashJson({
         birthDate: normalized.birthDate,
         birthTime: normalized.birthTime ?? null,
         birthTimeCertainty: normalized.birthTimeCertainty,
-        birthplace: normalized.birthplace.toLowerCase(),
-        locationPrecision: normalized.locationPrecision
+        birthTimezone: normalized.birthTimezone,
+        birthplaceHash: await sha256(normalized.birthplace.toLowerCase())
       })}`;
       const cached = await env.KV?.get(cacheKey, 'json') as BaselineProviderOutput | null;
       if (cached) return cached;
 
-      const geo = await geocodeBirthplace(env, normalized.birthplace, fetchImpl);
       const localTime = normalized.birthTime ?? '12:00';
-      const birthInstant = localCivilTimeToUtc(normalized.birthDate, localTime, geo.timezone);
-      const positions = await computeNatalPositions(env, birthInstant, geo, fetchImpl);
+      const birthInstant = localCivilTimeToUtc(normalized.birthDate, localTime, normalized.birthTimezone);
+      const positions = await computeNatalPositions(env, birthInstant, fetchImpl);
       if (!positions.sun || !positions.moon) throw new Error('Required natal positions were unavailable');
 
       const placements = Object.fromEntries(
@@ -112,8 +102,6 @@ export function createOpenApiBaselineProvider(env: Env, fetchImpl: FetchLike = f
       ].filter((value): value is string => Boolean(value));
 
       const output: BaselineProviderOutput = {
-        timezone: geo.timezone,
-        geocodePrecision: geo.precision,
         natalPlacements: placements,
         houses: null,
         aspects,
@@ -133,9 +121,12 @@ export function createOpenApiBaselineProvider(env: Env, fetchImpl: FetchLike = f
         interpretiveSignals,
         sourceTimestamp: new Date().toISOString(),
         provenance: {
-          engine: 'openapi-cloudflare-baseline-engine-v1',
+          engine: 'openapi-cloudflare-baseline-engine-v2',
           referenceCommit: REFERENCE_COMMIT,
           astronomySource: 'NASA/JPL Horizons API',
+          observerCenter: 'Earth geocenter 500@399',
+          timezoneSource: 'user-selected IANA timezone',
+          birthplaceSentToExternalProvider: false,
           rawBirthInputReturned: false,
           completeHumanDesignClaimed: false,
           completeGeneKeysClaimed: false,
@@ -149,44 +140,11 @@ export function createOpenApiBaselineProvider(env: Env, fetchImpl: FetchLike = f
   };
 }
 
-async function geocodeBirthplace(env: Env, birthplace: string, fetchImpl: FetchLike): Promise<GeocodeResult> {
-  const locationHash = await sha256(birthplace.trim().toLowerCase());
-  const cacheKey = `baseline-geocode:v1:${locationHash}`;
-  const cached = await env.KV?.get(cacheKey, 'json') as GeocodeResult | null;
-  if (cached) return cached;
-
-  const geocoder = new URL(env.BASELINE_GEOCODER_URL || DEFAULT_GEOCODER_URL);
-  geocoder.searchParams.set('q', birthplace);
-  geocoder.searchParams.set('format', 'jsonv2');
-  geocoder.searchParams.set('limit', '1');
-  const response = await timedFetch(fetchImpl, geocoder, {
-    headers: { 'User-Agent': 'Sovereign.OS OPENAPI Baseline Engine/1.0' }
-  }, timeoutMs(env));
-  if (!response.ok) throw new Error(`Geocoder unavailable (${response.status})`);
-  const rows = await response.json() as Array<{ lat?: string; lon?: string }>;
-  const latitude = Number(rows[0]?.lat);
-  const longitude = Number(rows[0]?.lon);
-  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) throw new Error('Birthplace could not be resolved');
-
-  const timezoneUrl = new URL(env.BASELINE_TIMEZONE_URL || DEFAULT_TIMEZONE_URL);
-  timezoneUrl.searchParams.set('latitude', String(latitude));
-  timezoneUrl.searchParams.set('longitude', String(longitude));
-  const timezoneResponse = await timedFetch(fetchImpl, timezoneUrl, {}, timeoutMs(env));
-  if (!timezoneResponse.ok) throw new Error(`Timezone provider unavailable (${timezoneResponse.status})`);
-  const timezoneData = await timezoneResponse.json() as { timeZone?: string; timeZoneId?: string };
-  const timezone = timezoneData.timeZone || timezoneData.timeZoneId;
-  if (!timezone || !isValidTimeZone(timezone)) throw new Error('Timezone could not be resolved');
-
-  const result: GeocodeResult = { latitude, longitude, timezone, precision: 'city_or_regional' };
-  await env.KV?.put(cacheKey, JSON.stringify(result), { expirationTtl: CACHE_TTL_SECONDS });
-  return result;
-}
-
-async function computeNatalPositions(env: Env, instant: Date, geo: GeocodeResult, fetchImpl: FetchLike): Promise<Record<string, BodyPosition>> {
+async function computeNatalPositions(env: Env, instant: Date, fetchImpl: FetchLike): Promise<Record<string, BodyPosition>> {
   const positions: Record<string, BodyPosition> = {};
   for (const [body, targetId] of Object.entries(PLANET_IDS)) {
     if (Object.keys(positions).length > 0) await delay(125);
-    const rows = await fetchHorizonsRows(env, targetId, instant, geo, fetchImpl);
+    const rows = await fetchHorizonsRows(env, targetId, instant, fetchImpl);
     if (!rows.length) continue;
     const first = rows[0]!;
     const second = rows[1];
@@ -202,7 +160,7 @@ async function computeNatalPositions(env: Env, instant: Date, geo: GeocodeResult
   return positions;
 }
 
-async function fetchHorizonsRows(env: Env, targetId: string, instant: Date, geo: GeocodeResult, fetchImpl: FetchLike) {
+async function fetchHorizonsRows(env: Env, targetId: string, instant: Date, fetchImpl: FetchLike) {
   const stop = new Date(instant.getTime() + 12 * 60 * 60 * 1000);
   const url = new URL(env.BASELINE_HORIZONS_URL || DEFAULT_HORIZONS_URL);
   const params: Record<string, string> = {
@@ -211,9 +169,7 @@ async function fetchHorizonsRows(env: Env, targetId: string, instant: Date, geo:
     OBJ_DATA: 'NO',
     MAKE_EPHEM: 'YES',
     EPHEM_TYPE: 'OBSERVER',
-    CENTER: 'coord@399',
-    COORD_TYPE: 'GEODETIC',
-    SITE_COORD: `'${geo.longitude.toFixed(4)},${geo.latitude.toFixed(4)},0'`,
+    CENTER: `'500@399'`,
     START_TIME: `'${horizonsDate(instant)}'`,
     STOP_TIME: `'${horizonsDate(stop)}'`,
     STEP_SIZE: `'6 h'`,
@@ -225,7 +181,7 @@ async function fetchHorizonsRows(env: Env, targetId: string, instant: Date, geo:
   };
   for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
   const response = await timedFetch(fetchImpl, url, {
-    headers: { 'User-Agent': 'Sovereign.OS OPENAPI Baseline Engine/1.0' }
+    headers: { 'User-Agent': 'Sovereign.OS OPENAPI Baseline Engine/2.0' }
   }, timeoutMs(env));
   if (!response.ok) throw new Error(`Horizons unavailable (${response.status})`);
   return parseHorizonsJson(await response.json() as HorizonsPayload);
@@ -341,7 +297,8 @@ function signedLongitudeDelta(from: number, to: number) {
   return ((to - from + 540) % 360) - 180;
 }
 
-function localCivilTimeToUtc(date: string, time: string, timezone: string): Date {
+export function localCivilTimeToUtc(date: string, time: string, timezone: string): Date {
+  if (!isValidTimeZone(timezone)) throw new Response('Invalid birthplace timezone', { status: 400 });
   const [year, month, day] = date.split('-').map(Number);
   const [hour, minute] = time.split(':').map(Number);
   const desiredUtc = Date.UTC(year!, month! - 1, day!, hour!, minute!);
@@ -363,7 +320,7 @@ function localCivilTimeToUtc(date: string, time: string, timezone: string): Date
   return new Date(candidate);
 }
 
-function isValidTimeZone(timezone: string) {
+export function isValidTimeZone(timezone: string) {
   try {
     new Intl.DateTimeFormat('en-US', { timeZone: timezone }).format();
     return true;
