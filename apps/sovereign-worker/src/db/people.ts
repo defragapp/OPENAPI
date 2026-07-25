@@ -17,6 +17,7 @@ export interface RelationshipMetadataInput {
   dependence?: string;
   contactExpectations?: string;
   userNotes?: string;
+  source?: string;
 }
 
 export interface PersonRecord {
@@ -25,9 +26,11 @@ export interface PersonRecord {
   displayName: string;
   consentStatus: string;
   baselineStatus: string;
+  invitationId?: string | undefined;
   invitationStatus?: InvitationStatus | undefined;
   invitationExpiresAt?: string | undefined;
   identityBound: boolean;
+  activeScopes: ConsentScope[];
   metadata: RelationshipMetadataInput;
 }
 
@@ -56,21 +59,42 @@ async function assertPersonOwned(env: Env, accountId: string, personId: string):
 
 export async function listPeople(env: Env, accountId: string): Promise<PersonRecord[]> {
   const rows = await env.DB.prepare(`SELECT p.id, p.role, p.display_name, p.consent_status, p.baseline_status, p.source_of_truth, p.bound_account_id,
+      (SELECT i.id FROM invitations i WHERE i.invited_person_id = p.id ORDER BY i.created_at DESC LIMIT 1) AS invitation_id,
       (SELECT i.status FROM invitations i WHERE i.invited_person_id = p.id ORDER BY i.created_at DESC LIMIT 1) AS invitation_status,
       (SELECT i.expires_at FROM invitations i WHERE i.invited_person_id = p.id ORDER BY i.created_at DESC LIMIT 1) AS invitation_expires_at,
       CASE WHEN p.bound_account_id IS NOT NULL AND EXISTS (
-        SELECT 1 FROM baseline_onboarding bo WHERE bo.account_id = p.bound_account_id AND bo.status = 'ready'
+        SELECT 1 FROM baseline_onboarding bo WHERE bo.account_id = p.bound_account_id AND bo.status IN ('ready', 'completed')
       ) THEN 'ready' ELSE p.baseline_status END AS effective_baseline_status
     FROM persons p WHERE p.account_id = ? ORDER BY p.updated_at DESC`).bind(accountId).all<Record<string, string | null>>();
+
+  const activeRows = await env.DB.prepare(`SELECT cg.person_id, cg.scope FROM consent_grants cg
+      JOIN persons p ON p.id = cg.person_id
+      JOIN invitations i ON i.id = cg.invitation_id
+      WHERE p.account_id = ? AND p.bound_account_id IS NOT NULL
+        AND cg.granted_by_account_id = p.bound_account_id
+        AND i.accepted_by_account_id = p.bound_account_id
+        AND i.status = 'accepted'
+        AND cg.granted_at IS NOT NULL AND cg.revoked_at IS NULL
+      ORDER BY cg.person_id, cg.scope`).bind(accountId).all<{ person_id: string; scope: string }>();
+  const scopesByPerson = new Map<string, ConsentScope[]>();
+  for (const grant of activeRows.results ?? []) {
+    if (!(CONSENT_SCOPES as readonly string[]).includes(grant.scope)) continue;
+    const current = scopesByPerson.get(grant.person_id) ?? [];
+    current.push(grant.scope as ConsentScope);
+    scopesByPerson.set(grant.person_id, current);
+  }
+
   return (rows.results ?? []).map((row) => ({
     id: row.id ?? '',
     role: row.role ?? 'relationship',
     displayName: row.display_name ?? 'Unnamed person',
     consentStatus: row.consent_status ?? 'not_requested',
     baselineStatus: row.effective_baseline_status ?? row.baseline_status ?? 'pending',
+    invitationId: row.invitation_id ?? undefined,
     invitationStatus: (row.invitation_status as InvitationStatus | null) ?? undefined,
     invitationExpiresAt: row.invitation_expires_at ?? undefined,
     identityBound: Boolean(row.bound_account_id),
+    activeScopes: scopesByPerson.get(row.id ?? '') ?? [],
     metadata: safeJson(row.source_of_truth ?? '{}')
   }));
 }
@@ -83,7 +107,12 @@ export async function createPerson(env: Env, accountId: string, input: { display
   const metadata = input.metadata ?? {};
   await env.DB.prepare('INSERT INTO persons (id, account_id, role, display_name, source_of_truth, consent_status, baseline_status) VALUES (?, ?, ?, ?, ?, ?, ?)')
     .bind(id, accountId, input.role || 'relationship', displayName, JSON.stringify(metadata), 'not_requested', 'pending').run();
-  return { id, role: input.role || 'relationship', displayName, consentStatus: 'not_requested', baselineStatus: 'pending', identityBound: false, metadata };
+  return { id, role: input.role || 'relationship', displayName, consentStatus: 'not_requested', baselineStatus: 'pending', identityBound: false, activeScopes: [], metadata };
+}
+
+export async function removePerson(env: Env, accountId: string, personId: string): Promise<void> {
+  const result = await env.DB.prepare('DELETE FROM persons WHERE id = ? AND account_id = ?').bind(personId, accountId).run();
+  if ((result.meta?.changes ?? 0) === 0) throw new Response('Person not found', { status: 404 });
 }
 
 export async function createInvitation(_env: Env, _accountId: string, _personId: string, _actor: string): Promise<{ id: string; status: InvitationStatus }> {
@@ -94,7 +123,7 @@ export async function updateInvitationStatus(env: Env, accountId: string, invita
   if (status !== 'revoked') throw new Response('Only the invited person may accept or decline an invitation. Invitation expiry is handled by the system.', { status: 403 });
   const result = await env.DB.prepare("UPDATE invitations SET status = 'revoked', revoked_at = datetime('now'), token_hash = NULL WHERE id = ? AND account_id = ? AND status = 'pending'")
     .bind(invitationId, accountId).run();
-  if (result.meta?.changes === 0) throw new Response('Pending invitation not found', { status: 404 });
+  if ((result.meta?.changes ?? 0) === 0) throw new Response('Pending invitation not found', { status: 404 });
 }
 
 export async function setConsent(env: Env, accountId: string, personId: string, scope: string, granted: boolean, actor: string, reason?: string): Promise<{ scope: ConsentScope; granted: false }> {
