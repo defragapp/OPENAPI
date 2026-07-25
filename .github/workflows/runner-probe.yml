@@ -1,0 +1,29 @@
+name: Runner Probe
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm Linux runner
+        run: echo "linux runner available"
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - name: Confirm macOS runner
+        run: echo "macos runner available"
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Confirm Windows runner
+        shell: pwsh
+        run: Write-Output "windows runner available"
