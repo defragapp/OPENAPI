@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 const auth = readFileSync(new URL('../security/auth.ts', import.meta.url), 'utf8');
 const people = readFileSync(new URL('../db/people.ts', import.meta.url), 'utf8');
 const product = readFileSync(new URL('../db/product.ts', import.meta.url), 'utf8');
+const insightModules = readFileSync(new URL('../db/insight-modules.ts', import.meta.url), 'utf8');
 const billing = readFileSync(new URL('./stripe.ts', import.meta.url), 'utf8');
 
 describe('launch plan enforcement', () => {
@@ -28,6 +29,7 @@ describe('launch plan enforcement', () => {
     expect(product).toMatch(/createSystem[\s\S]{0,220}requireSystemAccess/);
     expect(product).toMatch(/saveUnderstanding[\s\S]{0,220}requireLibraryAccess/);
     expect(product).toMatch(/createExportJob[\s\S]{0,220}export\.full/);
+    expect(insightModules).toMatch(/saveLatestInsightModule[\s\S]{0,240}library\.continuity/);
   });
 
   it('uses hosted Checkout and Portal with configured price IDs', () => {
