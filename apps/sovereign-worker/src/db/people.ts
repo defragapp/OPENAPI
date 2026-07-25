@@ -55,7 +55,6 @@ async function assertPersonOwned(env: Env, accountId: string, personId: string):
 }
 
 export async function listPeople(env: Env, accountId: string): Promise<PersonRecord[]> {
-  await requirePeopleFeature(env, accountId);
   const rows = await env.DB.prepare(`SELECT p.id, p.role, p.display_name, p.consent_status, p.baseline_status, p.source_of_truth, p.bound_account_id,
       (SELECT i.status FROM invitations i WHERE i.invited_person_id = p.id ORDER BY i.created_at DESC LIMIT 1) AS invitation_status,
       (SELECT i.expires_at FROM invitations i WHERE i.invited_person_id = p.id ORDER BY i.created_at DESC LIMIT 1) AS invitation_expires_at,
