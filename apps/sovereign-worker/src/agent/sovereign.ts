@@ -194,7 +194,7 @@ function extractText(value: unknown): string {
     if (record.message) return extractText(record.message);
     if (record.content) return extractText(record.content);
   }
-  return JSON.stringify(value ?? '');
+  return JSON.stringify(value ?? '') ?? '';
 }
 
 function extractStreamChunkText(text: string): string {
