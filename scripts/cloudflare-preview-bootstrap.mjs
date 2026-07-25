@@ -8,14 +8,29 @@ const workerName = process.env.PREVIEW_WORKER_NAME || 'sovereign-openapi-preview
 const d1Name = process.env.PREVIEW_D1_NAME || 'sovereign-openapi-preview-db';
 const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
 const token = process.env.CLOUDFLARE_API_TOKEN;
+const commitSha = process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || 'local';
+const env = { ...process.env };
 
-if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required for preview bootstrap');
-if (!token) throw new Error('CLOUDFLARE_API_TOKEN is required for preview bootstrap');
+// Cloudflare Workers Builds supplies Wrangler authentication internally. Preserve
+// explicit credentials when this script is run from another CI system or locally.
+if (accountId) env.CLOUDFLARE_ACCOUNT_ID = accountId;
+if (token) env.CLOUDFLARE_API_TOKEN = token;
 
-const env = { ...process.env, CLOUDFLARE_ACCOUNT_ID: accountId, CLOUDFLARE_API_TOKEN: token };
+if (process.env.WORKERS_CI === '1' && !process.env.PREVIEW_SESSION_SIGNING_SECRET) {
+  throw new Error('PREVIEW_SESSION_SIGNING_SECRET is required in Cloudflare Workers Builds');
+}
 
 function run(args, options = {}) {
-  const result = spawnSync('pnpm', ['--filter', '@sovereign/worker', 'exec', 'wrangler', ...args], { cwd: root, encoding: 'utf8', stdio: options.capture ? ['ignore', 'pipe', 'pipe'] : 'inherit', env });
+  const result = spawnSync(
+    'pnpm',
+    ['--filter', '@sovereign/worker', 'exec', 'wrangler', ...args],
+    {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: options.capture ? ['ignore', 'pipe', 'pipe'] : 'inherit',
+      env
+    }
+  );
   if (result.status !== 0) {
     const detail = options.capture ? sanitize(result.stderr || result.stdout) : 'see Wrangler output';
     throw new Error(`wrangler ${args.join(' ')} failed: ${detail}`);
@@ -24,13 +39,16 @@ function run(args, options = {}) {
 }
 
 function sanitize(value) {
-  return String(value).replaceAll(token, '[redacted-cloudflare-token]');
+  let sanitized = String(value);
+  if (token) sanitized = sanitized.replaceAll(token, '[redacted-cloudflare-token]');
+  return sanitized;
 }
 
 function parseJsonOutput(output) {
   const trimmed = output.trim();
-  const start = Math.min(...[trimmed.indexOf('{'), trimmed.indexOf('[')].filter((index) => index >= 0));
-  return JSON.parse(start >= 0 ? trimmed.slice(start) : trimmed);
+  const starts = [trimmed.indexOf('{'), trimmed.indexOf('[')].filter((index) => index >= 0);
+  if (starts.length === 0) throw new Error(`Expected JSON from Wrangler, received: ${sanitize(trimmed)}`);
+  return JSON.parse(trimmed.slice(Math.min(...starts)));
 }
 
 function findDatabaseId(listJson) {
@@ -53,20 +71,27 @@ try {
   const config = JSON.parse(readFileSync(resolve(workerDir, 'wrangler.jsonc'), 'utf8'));
   config.name = workerName;
   config.env.preview.name = workerName;
-  config.env.preview.d1_databases = [{ binding: 'DB', database_name: d1Name, database_id: databaseId }];
+  config.env.preview.workers_dev = true;
+  config.env.preview.preview_urls = false;
+  config.env.preview.d1_databases = [
+    { binding: 'DB', database_name: d1Name, database_id: databaseId }
+  ];
   config.env.preview.vars = {
     ...config.env.preview.vars,
     APP_ENV: 'preview',
-    APP_VERSION: process.env.GITHUB_SHA || config.env.preview.vars.APP_VERSION,
+    APP_VERSION: commitSha,
     AI_PROVIDER: process.env.AI_PROVIDER || config.env.preview.vars.AI_PROVIDER,
     AI_MODEL: process.env.AI_MODEL || config.env.preview.vars.AI_MODEL,
     AI_GATEWAY_ID: process.env.AI_GATEWAY_ID || config.env.preview.vars.AI_GATEWAY_ID,
     SOVV_INTERNAL_BASE_URL: process.env.SOVV_BASE_URL || '',
     STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY: process.env.STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY || '',
     STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL: process.env.STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL || '',
-    STRIPE_SUCCESS_URL: process.env.STRIPE_SUCCESS_URL || `https://${workerName}.workers.dev/app?billing=success`,
-    STRIPE_CANCEL_URL: process.env.STRIPE_CANCEL_URL || `https://${workerName}.workers.dev/app?billing=cancelled`,
-    STRIPE_PORTAL_RETURN_URL: process.env.STRIPE_PORTAL_RETURN_URL || `https://${workerName}.workers.dev/app?billing=portal`,
+    STRIPE_SUCCESS_URL:
+      process.env.STRIPE_SUCCESS_URL || `https://${workerName}.workers.dev/app?billing=success`,
+    STRIPE_CANCEL_URL:
+      process.env.STRIPE_CANCEL_URL || `https://${workerName}.workers.dev/app?billing=cancelled`,
+    STRIPE_PORTAL_RETURN_URL:
+      process.env.STRIPE_PORTAL_RETURN_URL || `https://${workerName}.workers.dev/app?billing=portal`,
     SCRIPTURE_TRANSLATION: process.env.SCRIPTURE_TRANSLATION || 'WEB'
   };
   writeFileSync(configPath, JSON.stringify(config, null, 2));
@@ -81,13 +106,40 @@ try {
   };
   for (const [name, value] of Object.entries(secrets)) {
     if (!value) continue;
-    const result = spawnSync('pnpm', ['--filter', '@sovereign/worker', 'exec', 'wrangler', 'secret', 'put', name, '--env', 'preview', '--config', configPath], { cwd: root, input: value, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], env });
-    if (result.status !== 0) throw new Error(`wrangler secret put ${name} failed: ${sanitize(result.stderr || result.stdout)}`);
+    const result = spawnSync(
+      'pnpm',
+      [
+        '--filter',
+        '@sovereign/worker',
+        'exec',
+        'wrangler',
+        'secret',
+        'put',
+        name,
+        '--env',
+        'preview',
+        '--config',
+        configPath
+      ],
+      { cwd: root, input: value, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], env }
+    );
+    if (result.status !== 0) {
+      throw new Error(`wrangler secret put ${name} failed: ${sanitize(result.stderr || result.stdout)}`);
+    }
   }
 
   const deployOutput = run(['deploy', '--env', 'preview', '--config', configPath], { capture: true });
-  const deployedUrl = deployOutput.match(/https:\/\/[^\s]+\.workers\.dev/)?.[0] ?? `https://${workerName}.workers.dev`;
-  const metadata = { workerName, d1Name, createdDatabase, deployedUrl, databaseIdSource: 'cloudflare-api', commitSha: process.env.GITHUB_SHA ?? 'local' };
+  const deployedUrl =
+    deployOutput.match(/https:\/\/[^\s]+\.workers\.dev/)?.[0] ??
+    `https://${workerName}.workers.dev`;
+  const metadata = {
+    workerName,
+    d1Name,
+    createdDatabase,
+    deployedUrl,
+    databaseIdSource: 'cloudflare-api',
+    commitSha
+  };
   writeFileSync(resolve(root, 'preview-deployment.json'), JSON.stringify(metadata, null, 2));
   console.log(JSON.stringify({ ...metadata, databaseIdSource: 'resolved-not-printed' }, null, 2));
 } finally {
