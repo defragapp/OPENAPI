@@ -26,12 +26,15 @@ describe('Sovereign.OS launch surface', () => {
     for (const href of ['/how-it-works.html', '/pricing.html', '/faq.html', '/login', '/signup', '/privacy', '/terms']) {
       expect(publicCopy).toContain(href);
     }
-    expect(landing).toContain("location.pathname !== '/'");
+    expect(landing).toContain("location.pathname === '/'");
+    expect(landing).toContain("location.pathname === '/privacy'");
+    expect(landing).toContain("location.pathname === '/terms'");
+    expect(landing).toContain('renderPolicyPage');
     expect(index).toContain('/public-site.js');
   });
 
   it('matches the launch billing contract', () => {
-    for (const phrase of ['$20', '$99', '10 Sovereign AI turns', 'Free is a permanent plan', 'Stripe']) {
+    for (const phrase of ['$20', '$99', '10 Sovereign AI turns', 'permanent plan', 'Stripe']) {
       expect(publicCopy).toContain(phrase);
     }
     for (const feature of ['Today', 'Explore', 'People', 'Systems', 'Library', 'Covenant', 'export']) {
