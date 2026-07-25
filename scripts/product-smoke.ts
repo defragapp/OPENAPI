@@ -85,7 +85,7 @@ function fakeEnv(): Env {
               return { success: true, meta: { changes: 1 } };
             },
             async all() {
-              if (sql.startsWith('SELECT id, role')) {
+              if (sql.startsWith('SELECT p.id, p.role')) {
                 return {
                   results: [...people.entries()]
                     .filter(([, person]) => person.accountId === args[0])
