@@ -3,6 +3,7 @@ const config = JSON.parse(readFileSync('apps/sovereign-worker/wrangler.jsonc', '
 const ciWorkflow = readFileSync('.github/workflows/ci.yml', 'utf8');
 const previewWorkflow = readFileSync('.github/workflows/preview-deploy.yml', 'utf8');
 const liveWorkflow = readFileSync('.github/workflows/live-verify.yml', 'utf8');
+const previewSmoke = readFileSync('scripts/preview-smoke.ts', 'utf8');
 function assertBinding(scope, name) {
   if (!scope?.queues?.producers?.some((item) => item.binding === 'JOBS')) throw new Error(`${name} missing JOBS queue producer`);
   if (!scope?.queues?.consumers?.length) throw new Error(`${name} missing queue consumer`);
@@ -27,7 +28,7 @@ for (const gate of ['scan:production-fixtures', 'verify:release-config', 'smoke:
 }
 for (const workflow of [previewWorkflow, liveWorkflow]) {
   if (workflow.includes('openai/gpt-5.6-terra')) throw new Error('workflow still uses the unapproved model fallback');
-  if (!workflow.includes("openai/gpt-5.5")) throw new Error('workflow is missing the approved ZDR-cataloged model');
+  if (!workflow.includes('openai/gpt-5.5')) throw new Error('workflow is missing the approved ZDR-cataloged model');
 }
 for (const key of ['STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY', 'STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL']) {
   if (!previewWorkflow.includes(key)) throw new Error(`preview workflow is missing ${key}`);
@@ -35,4 +36,11 @@ for (const key of ['STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY', 'STRIPE_PRICE_SOVEREIG
 for (const stale of ['STRIPE_PRICE_STANDARD', 'STRIPE_PRICE_PREMIUM']) {
   if (previewWorkflow.includes(stale)) throw new Error(`preview workflow still references ${stale}`);
 }
-console.log('Release config verified queues=true consumers=true schedules=true r2=true cloudflare_only_ai=true allowances=true billing_routes=true pr_ci=true workflows_current=true');
+for (const accessGate of ['verify:preview-access', 'CF_ACCESS_CLIENT_ID', 'CF_ACCESS_CLIENT_SECRET', 'Access service-token secrets are required']) {
+  if (!previewWorkflow.includes(accessGate)) throw new Error(`preview workflow is missing protected-access gate ${accessGate}`);
+}
+if (!previewWorkflow.includes('PREVIEW_BASE_URL')) throw new Error('preview workflow cannot target a configured protected hostname');
+if (!previewSmoke.includes('verifyFreeGates') || !previewSmoke.includes('verifyPaidCapabilities')) throw new Error('preview smoke does not separate Free and paid behavior');
+if (!previewSmoke.includes("expected 403") && !previewSmoke.includes(", 403")) throw new Error('preview smoke does not verify paid feature denial on Free');
+if (/consent\/.+granted:\s*true/s.test(previewSmoke)) throw new Error('preview smoke attempts to grant another person consent from the workspace owner');
+console.log('Release config verified queues=true consumers=true schedules=true r2=true cloudflare_only_ai=true allowances=true billing_routes=true access_preview=true tier_smoke=true pr_ci=true workflows_current=true');

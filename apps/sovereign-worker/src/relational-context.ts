@@ -1,5 +1,5 @@
 import type { Env } from './env';
-import { requireConsent } from './db/people';
+import { hasConsent, requireConsent } from './db/people';
 
 interface BaselineRow {
   status: string;
@@ -23,6 +23,7 @@ interface ReducedParticipant {
   label: string;
   role: string;
   baseline: Record<string, unknown>;
+  basis?: Record<string, unknown>;
   uncertainty: string;
   providerStatus: string;
   lastComputedAt: string;
@@ -33,6 +34,7 @@ interface ReducedParticipant {
 export async function buildPairComparison(env: Env, accountId: string, personId: string) {
   await requireConsent(env, accountId, personId, 'pair.compare');
   await requireConsent(env, accountId, personId, 'trait.display');
+  const frameworkAllowed = await hasConsent(env, accountId, personId, 'framework.display');
   const person = await env.DB.prepare('SELECT id, display_name, role, source_of_truth, bound_account_id FROM persons WHERE id = ? AND account_id = ?')
     .bind(personId, accountId)
     .first<PersonRow>();
@@ -48,8 +50,8 @@ export async function buildPairComparison(env: Env, accountId: string, personId:
     kind: 'pair',
     personId,
     participants: [
-      participant('self', 'You', 'self', ownerBaseline),
-      participant(person.id, person.display_name, person.role, invitedBaseline)
+      participant('self', 'You', 'self', ownerBaseline, true),
+      participant(person.id, person.display_name, person.role, invitedBaseline, frameworkAllowed)
     ],
     interaction: {
       possibleAlignment: sharedSignals(ownerBaseline.context, invitedBaseline.context),
@@ -62,6 +64,7 @@ export async function buildPairComparison(env: Env, accountId: string, personId:
     provenance: {
       ownerComputationVersion: ownerBaseline.computationVersion,
       invitedComputationVersion: invitedBaseline.computationVersion,
+      frameworkDetailShared: frameworkAllowed,
       consentCheckedAt: new Date().toISOString(),
       rawBirthInputShared: false,
       exactPrivateLocationShared: false
@@ -93,15 +96,16 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
   if ((members.results ?? []).length < 1) throw new Response('At least one consented invited member is required for a system analysis.', { status: 409 });
 
   const ownerBaseline = await loadReducedBaseline(env, accountId);
-  const participants: ReducedParticipant[] = [participant('self', 'You', 'self', ownerBaseline)];
+  const participants: ReducedParticipant[] = [participant('self', 'You', 'self', ownerBaseline, true)];
   for (const member of members.results ?? []) {
     const personId = member.id ?? '';
     await requireConsent(env, accountId, personId, 'system.include');
     await requireConsent(env, accountId, personId, 'trait.display');
+    const frameworkAllowed = await hasConsent(env, accountId, personId, 'framework.display');
     const boundAccountId = member.bound_account_id;
     if (!boundAccountId) throw new Response('Every invited member must have a bound identity and Baseline.', { status: 409 });
     const baseline = await loadReducedBaseline(env, boundAccountId);
-    participants.push(participant(personId, member.display_name ?? 'Member', member.role ?? 'member', baseline));
+    participants.push(participant(personId, member.display_name ?? 'Member', member.role ?? 'member', baseline, frameworkAllowed));
   }
 
   return {
@@ -126,13 +130,15 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
   };
 }
 
-async function loadReducedBaseline(env: Env, accountId: string): Promise<{ context: Record<string, unknown>; uncertainty: string; providerStatus: string; computationVersion: string; lastComputedAt: string }> {
+async function loadReducedBaseline(env: Env, accountId: string): Promise<{ context: Record<string, unknown>; exactBasis: Record<string, unknown>; uncertainty: string; providerStatus: string; computationVersion: string; lastComputedAt: string }> {
   const row = await env.DB.prepare('SELECT status, uncertainty, reduced_context_json, computation_version, provider_status, last_computed_at FROM baseline_onboarding WHERE account_id = ?')
     .bind(accountId)
     .first<BaselineRow>();
   if (!row || !['completed', 'ready'].includes(row.status)) throw new Response('A completed reduced Baseline is required.', { status: 409 });
+  const reduced = safeJson(row.reduced_context_json);
   return {
-    context: publicBaseline(safeJson(row.reduced_context_json)),
+    context: publicBaseline(reduced),
+    exactBasis: exactFrameworkBasis(reduced),
     uncertainty: row.uncertainty,
     providerStatus: row.provider_status,
     computationVersion: row.computation_version,
@@ -151,8 +157,20 @@ function publicBaseline(context: Record<string, unknown>): Record<string, unknow
   };
 }
 
-function participant(personId: string, label: string, role: string, baseline: Awaited<ReturnType<typeof loadReducedBaseline>>): ReducedParticipant {
-  return {
+function exactFrameworkBasis(context: Record<string, unknown>): Record<string, unknown> {
+  const calculation = context.deterministicCalculation;
+  if (!calculation || typeof calculation !== 'object') return {};
+  const source = calculation as Record<string, unknown>;
+  const output: Record<string, unknown> = {};
+  for (const key of ['humanDesign', 'geneKeys', 'natalPlacements', 'numerology', 'currentAstronomy']) {
+    const value = source[key];
+    if (value && typeof value === 'object') output[key] = value;
+  }
+  return output;
+}
+
+function participant(personId: string, label: string, role: string, baseline: Awaited<ReturnType<typeof loadReducedBaseline>>, frameworkAllowed: boolean): ReducedParticipant {
+  const output: ReducedParticipant = {
     personId,
     label,
     role,
@@ -163,6 +181,8 @@ function participant(personId: string, label: string, role: string, baseline: Aw
     observedState: 'not_confirmed',
     unknownActualState: 'Actual emotion, motive, and present experience remain unknown unless this person confirms them.'
   };
+  if (frameworkAllowed && Object.keys(baseline.exactBasis).length) output.basis = baseline.exactBasis;
+  return output;
 }
 
 function sharedSignals(first: Record<string, unknown>, second: Record<string, unknown>): string[] {

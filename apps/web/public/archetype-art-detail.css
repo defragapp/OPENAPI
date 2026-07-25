@@ -1,0 +1,75 @@
+.app-shell .thread-card-art .visual-detail {
+  pointer-events: none;
+  opacity: .9;
+  mix-blend-mode: multiply;
+  transition: opacity 320ms ease, filter 320ms ease, transform 520ms cubic-bezier(.16,1,.3,1);
+}
+
+.app-shell .thread-visual-story[data-phase="origin"] .thread-card-art .visual-detail {
+  opacity: .68;
+}
+
+.app-shell .thread-visual-story[data-phase="shadow"] .thread-card-art .visual-detail {
+  opacity: .94;
+  filter: contrast(1.03);
+}
+
+.app-shell .thread-visual-story[data-phase="gift"] .thread-card-art .visual-detail {
+  opacity: 1;
+  filter: saturate(1.06);
+}
+
+.app-shell .thread-card-art .detail-folds,
+.app-shell .thread-card-art .detail-robe,
+.app-shell .thread-card-art .detail-cloak,
+.app-shell .thread-card-art .detail-dress,
+.app-shell .thread-card-art .detail-bricks {
+  stroke-dasharray: 180;
+  stroke-dashoffset: 0;
+}
+
+.app-shell .thread-visual-story[data-phase="shadow"] .detail-folds,
+.app-shell .thread-visual-story[data-phase="shadow"] .detail-robe,
+.app-shell .thread-visual-story[data-phase="shadow"] .detail-cloak,
+.app-shell .thread-visual-story[data-phase="shadow"] .detail-dress {
+  animation: visual-detail-tighten 5.2s ease-in-out infinite;
+}
+
+.app-shell .thread-visual-story[data-phase="gift"] .detail-garden,
+.app-shell .thread-visual-story[data-phase="gift"] .detail-sun-rays,
+.app-shell .thread-visual-story[data-phase="gift"] .detail-lantern-rays {
+  animation: visual-detail-open 5.6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.app-shell .thread-visual-story[data-phase="shadow"] .detail-clouds,
+.app-shell .thread-visual-story[data-phase="shadow"] .detail-flame {
+  animation: visual-detail-pressure 4.8s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.app-shell .thread-card-art svg[data-house-detail="v1"] {
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,.12));
+}
+
+@keyframes visual-detail-tighten {
+  0%, 100% { transform: scaleX(1); opacity: .78; }
+  50% { transform: scaleX(.992); opacity: 1; }
+}
+
+@keyframes visual-detail-open {
+  0%, 100% { transform: scale(.99); opacity: .72; }
+  50% { transform: scale(1.025); opacity: 1; }
+}
+
+@keyframes visual-detail-pressure {
+  0%, 100% { transform: translate(0,0); opacity: .72; }
+  50% { transform: translate(1px,-1px); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell .thread-card-art .visual-detail {
+    animation: none !important;
+    transition: none !important;
+  }
+}

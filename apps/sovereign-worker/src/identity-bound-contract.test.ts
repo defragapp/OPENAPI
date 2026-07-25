@@ -17,7 +17,7 @@ describe('identity-bound multi-user contract', () => {
     expect(migration).toContain('accepted_by_account_id TEXT');
     expect(migration).toContain('bound_account_id TEXT');
     expect(invitationService).toContain('const tokenHash = await sha256(token)');
-    expect(invitationService).toContain("token_hash = NULL");
+    expect(invitationService).toContain('token_hash = NULL');
     expect(invitationService).not.toContain('INSERT INTO invitations (id, account_id, invited_person_id, status');
   });
 
@@ -31,13 +31,20 @@ describe('identity-bound multi-user contract', () => {
   });
 
   it('builds real pair and system contexts from separate reduced Baselines', () => {
-    expect(relational).toContain("participant('self', 'You', 'self', ownerBaseline)");
+    expect(relational).toContain("participant('self', 'You', 'self', ownerBaseline, true)");
     expect(relational).toContain('loadReducedBaseline(env, person.bound_account_id)');
     expect(relational).toContain("await requireConsent(env, accountId, personId, 'pair.compare')");
     expect(relational).toContain("await requireConsent(env, accountId, personId, 'system.include')");
     expect(relational).toContain('rawBirthInputShared: false');
     expect(relational).toContain('exactPrivateLocationShared: false');
     expect(relational).not.toContain('twoPlausiblePerspectives');
+  });
+
+  it('requires separate framework permission before invited exact Basis values enter shared context', () => {
+    expect(relational).toContain("hasConsent(env, accountId, personId, 'framework.display')");
+    expect(relational).toContain('frameworkDetailShared: frameworkAllowed');
+    expect(relational).toContain('if (frameworkAllowed && Object.keys(baseline.exactBasis).length)');
+    expect(relational).toContain("['humanDesign', 'geneKeys', 'natalPlacements', 'numerology', 'currentAstronomy']");
   });
 
   it('removes owner-side granting and exposes invitee revocation controls', () => {
@@ -54,7 +61,9 @@ describe('identity-bound multi-user contract', () => {
     expect(entry).toContain('/people\\/([^/]+)\\/compare');
     expect(entry).toContain('/systems\\/([^/]+)\\/members');
     expect(entry).toContain('/systems\\/([^/]+)\\/alignment');
+    expect(entry).toContain('/threads\\/([^/]+)\\/messages');
     expect(entry).toContain('buildPairComparison');
     expect(entry).toContain('buildSystemAnalysis');
+    expect(entry).toContain('runSovereignResult');
   });
 });

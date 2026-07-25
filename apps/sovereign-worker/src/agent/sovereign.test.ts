@@ -5,19 +5,18 @@ import { compareBaselineToCurrentConditions } from '../adapters/sovv';
 const fakeEnv = { APP_ENV: 'test', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '' } as never;
 
 describe('Sovereign runtime behavior contract', () => {
-  it('requires Baseline/current/observed/unknown separation without incident-first behavior', () => {
-    expect(sovereignRuntimePromptV1).toContain('useful without requiring the user to describe an incident');
-    expect(sovereignRuntimePromptV1).toContain('Enduring Baseline tendency');
-    expect(sovereignRuntimePromptV1).toContain('Current amplification');
-    expect(sovereignRuntimePromptV1).toContain('Observed behavior');
-    expect(sovereignRuntimePromptV1).toContain('Unknown actual state');
+  it('uses authority order and asks one inward question before a long explanation', () => {
+    expect(sovereignRuntimePromptV1).toContain('User-confirmed experience');
+    expect(sovereignRuntimePromptV1).toContain('choose response_phase "question"');
+    expect(sovereignRuntimePromptV1).toContain('exactly one inward question');
+    expect(sovereignRuntimePromptV1).toContain('Symbolic data may suggest where to look. It is never proof.');
   });
 
-  it('blocks diagnosis, hidden intent, deterministic proof, and Covenant by default', () => {
-    expect(sovereignRuntimePromptV1).toContain('Do not diagnose');
-    expect(sovereignRuntimePromptV1).toContain('Do not claim hidden intent');
-    expect(sovereignRuntimePromptV1).toContain('biblical interpretation into proof');
-    expect(sovereignRuntimePromptV1).toContain('Covenant is unavailable unless explicitly enabled');
+  it('blocks diagnosis, hidden motive, destiny, spiritual certainty, and invented fields', () => {
+    expect(sovereignRuntimePromptV1).toContain('Never diagnose');
+    expect(sovereignRuntimePromptV1).toContain('Never claim hidden motives');
+    expect(sovereignRuntimePromptV1).toContain('Never fill missing data');
+    expect(sovereignRuntimePromptV1).toContain('Covenant is off');
   });
 });
 
@@ -32,9 +31,8 @@ describe('SOVV adapter fallback', () => {
   });
 });
 
-
-describe('Cloudflare Gateway Worker adapter', () => {
-  it('streams through the AI binding with reduced context and gateway metadata', async () => {
+describe('Cloudflare Gateway recognition adapter', () => {
+  it('validates JSON, composes the public question, and keeps account identity pseudonymous', async () => {
     const calls: Array<{ model: string; input: unknown; options: unknown }> = [];
     const { runSovereignStream } = await import('./sovereign');
     const env = {
@@ -50,22 +48,34 @@ describe('Cloudflare Gateway Worker adapter', () => {
       SESSION_SIGNING_SECRET: 'test',
       DB: {
         prepare() {
-          return { bind() { return { async first() { return null; } }; } };
+          return { bind() { return {
+            async first() { return null; },
+            async all() { return { results: [] }; }
+          }; } };
         }
       },
       AI: {
         async run(model: string, input: unknown, options: unknown) {
           calls.push({ model, input, options });
-          return new ReadableStream<string>({
-            start(controller) {
-              controller.enqueue('Baseline: fixture tendency.\nCurrent: fixture amplification.\nObserved: nothing confirmed.\nUnknown: actual state remains unknown.');
-              controller.close();
-            }
-          });
+          return {
+            response: JSON.stringify({
+              response_phase: 'question',
+              recognition: 'You may be trying to solve the uncertainty before you know what is actually available.',
+              inward_question: 'What are you hoping the next message will make certain?',
+              candidate_hidden_expectation: '',
+              protected_need: '',
+              clearer_form: '',
+              practical_action: '',
+              module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
+              basis: { user_confirmed: false, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
+              confidence: 'exploratory',
+              safety_mode: 'standard'
+            })
+          };
         }
       }
     } as never;
-    const stream = await runSovereignStream('Help me start Today without an incident prompt.', { env, accountId: 'acct_test', threadId: 'thread_test', traceId: 'trace_test', covenantEnabled: false, plan: 'free' });
+    const stream = await runSovereignStream('I already sent three messages, but I still want to explain it better.', { env, accountId: 'acct_test', threadId: 'thread_test', traceId: 'trace_test', covenantEnabled: false, plan: 'free' });
     const reader = stream.getReader();
     let text = '';
     while (true) {
@@ -73,7 +83,9 @@ describe('Cloudflare Gateway Worker adapter', () => {
       if (done) break;
       text += value;
     }
-    expect(text).toContain('Baseline');
+    expect(text).toContain('WHAT I NOTICE');
+    expect(text).toContain('LOOK INWARD');
+    expect(text.match(/\?/g)).toHaveLength(1);
     expect(calls).toHaveLength(1);
     expect(calls[0]?.model).toBe('openai/gpt-5.5');
     expect(calls[0]?.options).toMatchObject({
@@ -81,12 +93,12 @@ describe('Cloudflare Gateway Worker adapter', () => {
         id: 'sovereign',
         skipCache: true,
         collectLog: false,
-        metadata: { plan: 'free' }
+        metadata: { plan: 'free', response_contract: 'inner-recognition-v1' }
       }
     });
     expect((calls[0]?.options as any).gateway.metadata.account_ref).toMatch(/^[a-f0-9]{32}$/);
     expect(JSON.stringify(calls[0]?.options)).not.toContain('acct_test');
-    expect(JSON.stringify(calls[0]?.input)).toContain('Reduced server-side context');
+    expect(JSON.stringify(calls[0]?.input)).toContain('Available exact Basis values');
     expect(JSON.stringify(calls[0]?.input)).not.toMatch(/birth date|birth time|latitude|longitude|workspace\/SOVV/i);
   });
 });

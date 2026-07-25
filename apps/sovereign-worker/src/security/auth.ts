@@ -1,5 +1,6 @@
 import type { AuthContext, Env } from '../env';
 import { resolveAccount } from '../db/accounts';
+import { getEntitlements, requireFeature } from '../db/entitlements';
 import { resolveExistingIdentity } from '../adapters/sovv';
 
 const encoder = new TextEncoder();
@@ -37,7 +38,9 @@ export async function requireAuth(request: Request, env: Env): Promise<AuthConte
   const sovvCookie = readCookie(request, '__sov_session');
   if (sovvCookie && env.SOVV_INTERNAL_BASE_URL) {
     const identity = await resolveExistingIdentity(env, `__sov_session=${sovvCookie}`);
-    return { ...(await resolveAccount(env, identity.data.subject)), sovvCookieHeader: `__sov_session=${sovvCookie}` };
+    const context = { ...(await resolveAccount(env, identity.data.subject)), sovvCookieHeader: `__sov_session=${sovvCookie}` };
+    await requireRouteEntitlement(request, env, context.accountId);
+    return context;
   }
 
   const header = request.headers.get('authorization');
@@ -59,7 +62,27 @@ export async function requireAuth(request: Request, env: Env): Promise<AuthConte
       .bind(payload.sid)
       .run();
   }
-  return { ...(await resolveAccount(env, payload.sub)), sessionId: payload.sid };
+  const context = { ...(await resolveAccount(env, payload.sub)), sessionId: payload.sid };
+  await requireRouteEntitlement(request, env, context.accountId);
+  return context;
+}
+
+async function requireRouteEntitlement(request: Request, env: Env, accountId: string): Promise<void> {
+  const { pathname } = new URL(request.url);
+  const method = request.method.toUpperCase();
+  let feature: string | undefined;
+
+  if (/^\/api\/v1\/people\/[^/]+\/(compare|invitations\/send)$/.test(pathname)) feature = 'people.compare';
+  else if (pathname === '/api/v1/people' && method === 'POST') feature = 'people.compare';
+  else if (/^\/api\/v1\/systems(?:\/|$)/.test(pathname) && method !== 'GET') feature = 'systems.family';
+  else if (/^\/api\/v1\/systems\/[^/]+\/(alignment|analysis)$/.test(pathname)) feature = 'systems.family';
+  else if (/^\/api\/v1\/library(?:\/|$)/.test(pathname) && ['POST', 'PATCH', 'PUT'].includes(method)) feature = 'library.continuity';
+  else if (pathname === '/api/v1/export-jobs' && method === 'POST') feature = 'export.full';
+
+  if (!feature) return;
+  const entitlements = await getEntitlements(env, accountId);
+  if (feature === 'systems.family' && (entitlements.features.includes('systems.family') || entitlements.features.includes('systems.team'))) return;
+  requireFeature(entitlements, feature);
 }
 
 function readCookie(request: Request, name: string): string | undefined {

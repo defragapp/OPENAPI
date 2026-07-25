@@ -13,7 +13,8 @@ export class ThreadCoordinator {
     const existing = await this.state.storage.get<number>(`idempotency:${turn.idempotencyKey}`);
     if (existing !== undefined) return Response.json({ sequence: existing, duplicate: true });
 
-    const sequence = ((await this.state.storage.get<number>('sequence')) ?? 0) + 1;
+    // One turn reserves user, plan, and public-response event positions.
+    const sequence = ((await this.state.storage.get<number>('sequence')) ?? -2) + 3;
     await this.state.storage.put({ sequence, [`idempotency:${turn.idempotencyKey}`]: sequence });
     return Response.json({ sequence, duplicate: false });
   }

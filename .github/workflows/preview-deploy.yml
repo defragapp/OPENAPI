@@ -3,9 +3,16 @@ name: Preview Deploy and Verification
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
+      - codex/inner-recognition-intelligence
     paths:
       - '.github/workflows/preview-deploy.yml'
+      - 'apps/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
 
 permissions:
   contents: read
@@ -16,33 +23,34 @@ concurrency:
 
 jobs:
   deploy-preview:
-    name: Deploy isolated Cloudflare preview
+    name: Deploy protected Cloudflare preview
     runs-on: ubuntu-latest
     environment: preview
     timeout-minutes: 40
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout exact commit without marketplace actions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth=1 origin "${GITHUB_SHA}"
+          git checkout --detach FETCH_HEAD
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+      - name: Select preinstalled Node 22
+        run: |
+          set -euo pipefail
+          NODE22="$(find /opt/hostedtoolcache/node -mindepth 1 -maxdepth 1 -type d -name '22.*' | sort -V | tail -1)"
+          if [ -z "$NODE22" ] || [ ! -x "$NODE22/x64/bin/node" ]; then
+            echo "::error::Node 22 is not available in the hosted tool cache"
+            exit 1
+          fi
+          echo "$NODE22/x64/bin" >> "$GITHUB_PATH"
+          "$NODE22/x64/bin/node" --version
 
       - name: Enable Corepack
         run: corepack enable
-
-      - name: Resolve pnpm store path
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -67,6 +75,17 @@ jobs:
           pnpm smoke:release-closure
           pnpm build:preview
 
+      - name: Require preview protection configuration
+        env:
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CF_ACCESS_CLIENT_ID:-}" ] || [ -z "${CF_ACCESS_CLIENT_SECRET:-}" ]; then
+            echo "::error::Cloudflare Access service-token secrets are required for preview verification"
+            exit 1
+          fi
+
       - name: Resolve preview session secret
         id: preview-secret
         shell: bash
@@ -86,6 +105,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           PREVIEW_WORKER_NAME: ${{ vars.PREVIEW_WORKER_NAME || 'sovereign-openapi-preview' }}
           PREVIEW_D1_NAME: ${{ vars.PREVIEW_D1_NAME || 'sovereign-openapi-preview-db' }}
+          CONFIGURED_PREVIEW_BASE_URL: ${{ vars.PREVIEW_BASE_URL }}
           PREVIEW_SESSION_SIGNING_SECRET: ${{ steps.preview-secret.outputs.secret }}
           AI_PROVIDER: ${{ vars.AI_PROVIDER || 'cloudflare-gateway' }}
           AI_MODEL: ${{ vars.AI_MODEL || 'openai/gpt-5.5' }}
@@ -110,8 +130,17 @@ jobs:
             exit 1
           fi
           pnpm preview:bootstrap
-          URL="$(node -e "console.log(require('./preview-deployment.json').deployedUrl)")"
+          DEPLOYED_URL="$(node -e "console.log(require('./preview-deployment.json').deployedUrl)")"
+          URL="${CONFIGURED_PREVIEW_BASE_URL:-$DEPLOYED_URL}"
+          echo "deployed_url=$DEPLOYED_URL" >> "$GITHUB_OUTPUT"
           echo "preview_url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Verify Cloudflare Access perimeter
+        env:
+          PREVIEW_BASE_URL: ${{ steps.preview-deploy.outputs.preview_url }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: pnpm verify:preview-access
 
       - name: Create protected preview session cookie
         id: preview-session
@@ -124,18 +153,23 @@ jobs:
           echo "::add-mask::$COOKIE"
           echo "cookie=$COOKIE" >> "$GITHUB_OUTPUT"
 
-      - name: Wait for preview readiness
+      - name: Wait for protected preview readiness
         env:
           PREVIEW_URL: ${{ steps.preview-deploy.outputs.preview_url }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
           set -euo pipefail
           for attempt in $(seq 1 30); do
-            if curl -fsS "$PREVIEW_URL/ready" >/tmp/ready.json; then
+            if curl -fsS \
+              -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
+              -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
+              "$PREVIEW_URL/ready" >/tmp/ready.json; then
               cat /tmp/ready.json | node -e "let data='';process.stdin.on('data',c=>data+=c);process.stdin.on('end',()=>{const parsed=JSON.parse(data); if (!parsed.ok) process.exit(1);});" && exit 0
             fi
             sleep 2
           done
-          echo "::error::Preview readiness did not become healthy"
+          echo "::error::Protected preview readiness did not become healthy"
           exit 1
 
       - name: Live Cloudflare Gateway verification
@@ -150,24 +184,28 @@ jobs:
           pnpm smoke:gateway
           pnpm smoke:sovereign
 
-      - name: Authenticated preview product smoke
+      - name: Authenticated protected-preview product smoke
         env:
           PREVIEW_BASE_URL: ${{ steps.preview-deploy.outputs.preview_url }}
           PREVIEW_SESSION_COOKIE: ${{ steps.preview-session.outputs.cookie }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          PREVIEW_EXPECT_STRIPE: ${{ vars.PREVIEW_EXPECT_STRIPE || '0' }}
         run: pnpm smoke:preview
 
       - name: Sanitized preview summary
         if: always()
         run: |
           {
-            echo "### Sovereign preview deployment"
+            echo "### Sovereign protected preview deployment"
             echo
             echo "- commit_sha: ${GITHUB_SHA}"
             echo "- worker_name: ${{ vars.PREVIEW_WORKER_NAME || 'sovereign-openapi-preview' }}"
             echo "- d1_name: ${{ vars.PREVIEW_D1_NAME || 'sovereign-openapi-preview-db' }}"
             echo "- model: ${{ vars.AI_MODEL || 'openai/gpt-5.5' }}"
             echo "- gateway_id: ${{ vars.AI_GATEWAY_ID || 'sovereign' }}"
-            echo "- preview_url: ${{ steps.preview-deploy.outputs.preview_url }}"
-            echo "- local_smokes: worker-gateway, stripe, product"
-            echo "- authenticated_preview_smoke: see job result"
+            echo "- protected_preview_url: ${{ steps.preview-deploy.outputs.preview_url }}"
+            echo "- deployed_worker_url: ${{ steps.preview-deploy.outputs.deployed_url }}"
+            echo "- access_perimeter: required and verified"
+            echo "- remote_smoke: public pages, app auth, plan gates, AI stream"
           } >> "$GITHUB_STEP_SUMMARY"

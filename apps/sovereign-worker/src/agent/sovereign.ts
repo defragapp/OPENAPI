@@ -4,6 +4,13 @@ import { getModelSafeBaselineContext } from '../baseline';
 import { buildPairComparison, buildSystemAnalysis } from '../relational-context';
 import { sovereignRuntimePromptV1 } from './prompt-v1';
 import { assertSafeUserInput, assertSovereignOutputSafety } from './safety';
+import {
+  composeRecognitionResponse,
+  deriveAvailableBasis,
+  parseRecognitionPlan,
+  recognitionJsonContract,
+  type RecognitionPlan
+} from './recognition';
 
 export interface SovereignContext {
   env: Env;
@@ -14,27 +21,38 @@ export interface SovereignContext {
   plan: string;
 }
 
+export interface SovereignResult {
+  text: string;
+  plan: RecognitionPlan;
+}
+
 export async function runSovereignText(input: string, context: SovereignContext): Promise<string> {
-  return collectTextStream(await runSovereignStream(input, context));
+  return (await runSovereignResult(input, context)).text;
 }
 
 export async function runSovereignStream(input: string, context: SovereignContext): Promise<globalThis.ReadableStream<string>> {
+  return oneChunkStream(Promise.resolve((await runSovereignResult(input, context)).text));
+}
+
+export async function runSovereignResult(input: string, context: SovereignContext): Promise<SovereignResult> {
   assertSafeUserInput(input);
   const aiConfig = resolveAiModelConfig(context.env);
   if (aiConfig.provider !== 'cloudflare-gateway') throw new Error('Only Cloudflare AI Gateway is supported.');
-  const unvalidated = await runCloudflareGatewayStream(input, context, aiConfig.model);
-  const publicOutput = await collectTextStream(unvalidated);
-  assertSovereignOutputSafety(publicOutput);
-  return oneChunkStream(Promise.resolve(publicOutput));
+
+  const { prompt, availableBasis } = await buildCloudflareGatewayPrompt(input, context);
+  const raw = await runCloudflareGateway(prompt, context, aiConfig.model);
+  const plan = parseRecognitionPlan(raw, availableBasis);
+  const text = composeRecognitionResponse(plan);
+  assertSovereignOutputSafety(text);
+  return { text, plan };
 }
 
-async function runCloudflareGatewayStream(input: string, context: SovereignContext, model: string): Promise<globalThis.ReadableStream<string>> {
+async function runCloudflareGateway(prompt: string, context: SovereignContext, model: string): Promise<string> {
   if (!context.env.AI) throw new Error('Cloudflare AI binding is not configured.');
   if (!context.env.AI_GATEWAY_ID) throw new Error('AI_GATEWAY_ID is not configured.');
-  const prompt = await buildCloudflareGatewayPrompt(input, context);
   const result = await context.env.AI.run(
     model,
-    { input: prompt, max_output_tokens: 900, stream: true },
+    { input: prompt, max_output_tokens: 1_200 },
     {
       gateway: {
         id: context.env.AI_GATEWAY_ID,
@@ -42,33 +60,47 @@ async function runCloudflareGatewayStream(input: string, context: SovereignConte
         collectLog: false,
         metadata: {
           plan: context.plan === 'sovereign_plus' ? 'sovereign_plus' : 'free',
-          account_ref: await pseudonymousAccountRef(context)
+          account_ref: await pseudonymousAccountRef(context),
+          response_contract: 'inner-recognition-v1'
         }
       }
     }
   );
-  return normalizeAiRunResultToTextStream(result);
+  if (result instanceof Response) return result.text();
+  if (result instanceof ReadableStream) return collectTextStream(decodeTextStream(result as ReadableStream<string | Uint8Array>));
+  if (isAsyncIterable(result)) return collectTextStream(asyncIterableToTextStream(result));
+  return extractText(result);
 }
 
-async function buildCloudflareGatewayPrompt(input: string, context: SovereignContext): Promise<string> {
-  const [authorizedContext, covenantEnabled] = await Promise.all([
+async function buildCloudflareGatewayPrompt(input: string, context: SovereignContext): Promise<{ prompt: string; availableBasis: ReturnType<typeof deriveAvailableBasis> }> {
+  const [authorizedContext, continuity, covenantEnabled] = await Promise.all([
     resolveAuthorizedContext(context),
+    loadRecognitionContinuity(context),
     isCovenantEnabledForThread(context)
   ]);
+  const availableBasis = deriveAvailableBasis(authorizedContext);
   const covenantInstruction = covenantEnabled
-    ? 'Covenant was explicitly enabled for this thread. The grounded answer must remain complete first. You may add one short, clearly optional suggestion to explore the issue through Scripture, but do not invent, quote, or cite a passage that was not retrieved by the approved Scripture service.'
-    : 'Covenant is off for this thread. Do not apply biblical metaphor or Scripture automatically.';
-  return `${sovereignRuntimePromptV1}
+    ? 'Covenant was explicitly enabled for this thread. Keep the grounded recognition complete on its own. A module may optionally suggest a separate Scripture exploration, but do not invent or quote a passage that was not retrieved by the approved Scripture service.'
+    : 'Covenant is off. Do not apply Scripture or biblical metaphor automatically.';
+  const prompt = `${sovereignRuntimePromptV1}
 
 Authorization-checked server context, stripped of raw birth inputs, exact private location, secrets, source paths, and private identifiers:
 ${JSON.stringify(authorizedContext)}
 
-User request:
+Recent thread continuity. Assistant text and user corrections only; no hidden reasoning:
+${JSON.stringify(continuity)}
+
+Available exact Basis values. The basis arrays in your JSON must select verbatim from these lists only:
+${JSON.stringify(availableBasis)}
+
+Required JSON shape:
+${recognitionJsonContract(availableBasis)}
+
+Current user message:
 ${input}
 
-Return only a public user-facing answer. Use these headings exactly: Baseline, Current, Observed, Unknown. Keep each participant separate. Do not infer hidden motive, diagnosis, moral status, future behavior, or God’s exact intent.
-
 ${covenantInstruction}`;
+  return { prompt, availableBasis };
 }
 
 async function resolveAuthorizedContext(context: SovereignContext): Promise<unknown> {
@@ -81,6 +113,19 @@ async function resolveAuthorizedContext(context: SovereignContext): Promise<unkn
   if (selectedPerson) return buildPairComparison(context.env, context.accountId, selectedPerson.id);
 
   return getModelSafeBaselineContext(context.env, context.accountId);
+}
+
+async function loadRecognitionContinuity(context: SovereignContext): Promise<unknown> {
+  const events = await context.env.DB.prepare(`SELECT te.event_type, te.payload_json, te.created_at
+    FROM thread_events te JOIN threads t ON t.id = te.thread_id
+    WHERE te.thread_id = ? AND t.account_id = ? AND te.event_type IN ('assistant_response','assistant_development_response')
+    ORDER BY te.seq DESC LIMIT 3`).bind(context.threadId, context.accountId).all<Record<string, string>>();
+  const corrections = await context.env.DB.prepare(`SELECT correction, note, created_at FROM user_corrections
+    WHERE thread_id = ? AND account_id = ? ORDER BY created_at DESC LIMIT 3`).bind(context.threadId, context.accountId).all<Record<string, string | null>>();
+  return {
+    recentAssistantResponses: (events.results ?? []).map((row) => safeJson(row.payload_json)),
+    userCorrections: corrections.results ?? []
+  };
 }
 
 async function isCovenantEnabledForThread(context: SovereignContext): Promise<boolean> {
@@ -106,16 +151,6 @@ async function pseudonymousAccountRef(context: SovereignContext): Promise<string
   );
   const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(context.accountId));
   return [...new Uint8Array(signature)].slice(0, 16).map((byte) => byte.toString(16).padStart(2, '0')).join('');
-}
-
-function normalizeAiRunResultToTextStream(result: unknown): globalThis.ReadableStream<string> {
-  if (result instanceof ReadableStream) return decodeTextStream(result as ReadableStream<string | Uint8Array>);
-  if (result instanceof Response) {
-    if (result.body) return decodeTextStream(result.body as ReadableStream<Uint8Array>);
-    return oneChunkStream(result.text());
-  }
-  if (isAsyncIterable(result)) return asyncIterableToTextStream(result);
-  return oneChunkStream(Promise.resolve(extractText(result)));
 }
 
 function decodeTextStream(stream: ReadableStream<string | Uint8Array>): globalThis.ReadableStream<string> {
@@ -159,7 +194,7 @@ function extractText(value: unknown): string {
     if (record.message) return extractText(record.message);
     if (record.content) return extractText(record.content);
   }
-  return JSON.stringify(value ?? '');
+  return JSON.stringify(value ?? '') ?? '';
 }
 
 function extractStreamChunkText(text: string): string {
@@ -188,4 +223,8 @@ async function collectTextStream(stream: ReadableStream<string>): Promise<string
     output += value;
   }
   return output;
+}
+
+function safeJson(value: string): unknown {
+  try { return JSON.parse(value); } catch { return {}; }
 }

@@ -1,32 +1,44 @@
-# Preview deployment and live verification
+# Protected Cloudflare preview
 
 ## Objective
 
-Deploy Sovereign.OS to an isolated Cloudflare preview Worker, not production. The preview Worker serves the Vite PWA and `/api/*` routes from one same-origin Worker, applies preview D1 migrations, uses a preview Durable Object namespace, and verifies Cloudflare AI Gateway through the Worker AI binding.
+Deploy Sovereign.OS to an isolated Cloudflare preview Worker and protect the entire preview hostname with Cloudflare Access. The preview is for founder and reviewer approval only. It is not production and must not use production D1, Durable Objects, Stripe mode, secrets, routes, or customer records.
 
 ## Required GitHub configuration
 
-### Secret
+### Secrets
 
-- `CLOUDFLARE_API_TOKEN` — scoped to the Cloudflare account used for preview deployment and verification.
-- Optional `PREVIEW_SESSION_SIGNING_SECRET` — if absent, the workflow generates an ephemeral preview session secret for the run.
-- Optional Stripe test-mode secrets: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`.
+- `CLOUDFLARE_API_TOKEN`
+- optional `PREVIEW_SESSION_SIGNING_SECRET`
+- optional Stripe test-mode `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`
+- optional Cloudflare Access service-token values `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET`
 
 ### Variables
 
 - `CLOUDFLARE_ACCOUNT_ID`
 - `PREVIEW_WORKER_NAME` — default `sovereign-openapi-preview`
 - `PREVIEW_D1_NAME` — default `sovereign-openapi-preview-db`
-- `AI_PROVIDER` — default `cloudflare-gateway`
-- `AI_MODEL` — reviewed default `openai/gpt-5.5`
-- `AI_GATEWAY_ID` — default `sovereign`
-- `SOVV_BASE_URL` — optional; leave empty for sanitized preview fixtures.
-- `SCRIPTURE_TRANSLATION` — default `WEB`
-- Optional Stripe test variables: `STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY`, `STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`, `STRIPE_PORTAL_RETURN_URL`.
+- `PREVIEW_BASE_URL`
+- `AI_PROVIDER` — `cloudflare-gateway`
+- `AI_GATEWAY_ID`
+- reviewed `AI_MODEL`
+- optional sanitized `SOVV_BASE_URL`
+- optional Stripe test price and return URL variables
+
+## Cloudflare Access application
+
+Before the preview is accepted:
+
+1. Create a self-hosted Access application for the entire preview hostname.
+2. Allow only founder/reviewer identities and the dedicated CI service token.
+3. Do not add a public bypass policy.
+4. Keep the public production landing hostname outside this preview application.
+5. Verify the unauthenticated preview redirects to or is denied by Access.
+6. Verify authenticated landing and health responses with `pnpm verify:preview-access`.
+
+Cloudflare Access is the preview perimeter. It does not replace Sovereign account sessions, consent checks, or Stripe entitlements.
 
 ## Local preflight
-
-Run:
 
 ```bash
 pnpm install --frozen-lockfile
@@ -42,49 +54,49 @@ pnpm smoke:product
 pnpm build:preview
 ```
 
-`pnpm build:preview` builds web assets, validates the Wrangler preview environment, generates preview binding types into `.tmp/`, and performs a preview Worker dry-run with static assets.
+## Preview bootstrap
 
-## Preview bootstrap behavior
+`pnpm preview:bootstrap` resolves or creates the isolated preview D1 database, writes a temporary Wrangler configuration, applies remote migrations, uploads only preview secrets, deploys the preview Worker, writes sanitized deployment metadata, and removes the temporary configuration.
 
-`pnpm preview:bootstrap` is idempotent. It resolves or creates the exact preview D1 database name, generates a temporary Wrangler config containing the resolved preview database ID, applies remote migrations, uploads only configured preview secrets, deploys the preview Worker, writes sanitized `preview-deployment.json`, and deletes the temporary config.
+The script must not be used for production. It must not attach a production route or delete preview state.
 
-The script must not be used for production. It does not delete or reset preview state.
+## Verification
 
-## Authenticated preview smoke
-
-`pnpm smoke:preview` requires:
+Run the Access perimeter check:
 
 ```bash
-PREVIEW_BASE_URL=https://<preview-worker>.workers.dev
-PREVIEW_SESSION_COOKIE='__Host-sovereign_session=...; Path=/; Secure; HttpOnly; SameSite=Lax'
+PREVIEW_BASE_URL=https://<protected-preview-host> pnpm verify:preview-access
 ```
 
-The cookie is generated inside GitHub Actions with `pnpm preview:session` and must never be logged. The smoke verifies static app delivery, health/readiness, unauthenticated 401 behavior, Today, Explore, People consent, Systems alignment, Library continuity, export/deletion grace, billing fixture/test state, Covenant retrieval, and streamed Sovereign turn behavior.
+For the authenticated content check, also provide the CI service-token values without logging them.
+
+Run the application smoke with an ephemeral preview application session after Access admits the request. The smoke must cover:
+
+- landing and supporting public pages;
+- health and readiness;
+- unauthenticated application 401 behavior;
+- account access;
+- Baseline onboarding;
+- Today and Explore;
+- identity-bound invitation, consent, comparison, revocation, and blocked-after-revocation;
+- a three-member family or team system;
+- Library save and deletion;
+- Free usage enforcement;
+- Stripe test-mode Checkout, webhook, Portal, cancellation, and fallback to Free;
+- export and deletion grace;
+- optional Covenant enablement;
+- streamed response and inline visual behavior.
 
 ## Security checks
 
-Before accepting a preview run, verify:
+Reject the preview when any of the following is true:
 
-- no production custom route is attached;
-- no production D1 database or Durable Object namespace is bound;
-- no personal or project OpenAI provider key is accepted;
-- private APIs are not cached as static assets;
-- `/api/*`, `/health`, `/healthz`, and `/ready` run Worker code first;
-- no public preview-login route exists;
-- health/readiness output contains no secrets, account records, raw prompts, raw birth data, exact coordinates, provider payloads, or stack traces.
+- the hostname is publicly reachable without Access;
+- a production route, D1 database, Durable Object namespace, Stripe key, or customer record is attached;
+- private APIs are cached as assets;
+- a public preview-login route exists;
+- secrets, raw prompts, raw birth input, exact coordinates, hidden reasoning, or provider payloads appear in logs or health output.
 
-## Rollback
+## Rollback and cleanup
 
-Rollback redeploys a previous Worker version or commit to the preview Worker. D1 and Durable Object state do not roll back with Worker code, so use forward-repair migrations for data issues. Do not delete preview D1 or Durable Object state during rollback.
-
-## Manual cleanup
-
-Cleanup is never automatic. To destroy preview resources, require explicit destructive confirmation and then remove, in order:
-
-1. preview Worker routes and Worker deployment;
-2. preview Worker secrets;
-3. preview D1 database after exporting any needed diagnostic state;
-4. dedicated preview AI Gateway configuration if one was created;
-5. preview test records or fixtures.
-
-Never run cleanup against production names.
+Rollback redeploys a previous preview Worker version. D1 and Durable Object state require forward-repair migrations. Cleanup is manual and destructive only after explicit approval; never target production names.

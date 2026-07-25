@@ -17,6 +17,8 @@ Defrag, Alignment, and Covenant are internal capabilities of one agent. They are
 
 The founder-approved public approval boundary is defined in [`docs/launch-product-contract.md`](docs/launch-product-contract.md). Implementation and release work must not guess or silently change those decisions.
 
+The staged AI response and exact-data footer contract is defined in [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md).
+
 ## Initial stack
 
 - TypeScript monorepo
@@ -31,6 +33,7 @@ The founder-approved public approval boundary is defined in [`docs/launch-produc
 ## Start here
 
 - [`docs/launch-product-contract.md`](docs/launch-product-contract.md)
+- [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md)
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/privacy-model.md`](docs/privacy-model.md)
 - [`docs/tool-contracts.md`](docs/tool-contracts.md)
@@ -41,6 +44,6 @@ The founder-approved public approval boundary is defined in [`docs/launch-produc
 
 ## Current state
 
-The repository now includes the app and Worker shells, D1 schema and migrations, Durable Object thread coordination, security primitives, Stripe billing foundations, export job execution, identity-bound email invitations, invitee-controlled scope decisions and revocation, reduced-Baseline pair and system context, and authorization-checked relational context for Sovereign AI turns.
+The repository now includes the app and Worker shells, D1 schema and migrations, Durable Object thread coordination, security primitives, Stripe billing foundations, export job execution, identity-bound email invitations, invitee-controlled scope decisions and revocation, reduced-Baseline pair and system context, authorization-checked relational context, staged Inner Recognition planning, exact verified Basis selection, pre-display response safety, and explicit Insight Module approval.
 
-This is **implemented, not yet approved for production**. Remaining approval evidence includes a green CI run, configured production Baseline and email services, protected Cloudflare preview, migration replay, authenticated browser and iPhone smoke tests, retention execution, load testing, reviewed Terms and Privacy documents, and explicit founder approval. No production deployment is implied by the code state.
+This is **implemented, not yet approved for production**. Remaining approval evidence includes a green CI run, configured production Baseline and email services, protected Cloudflare preview, migration replay, authenticated browser and iPhone smoke tests, load testing, reviewed Terms and Privacy documents, and explicit founder approval. No production deployment is implied by the code state.
