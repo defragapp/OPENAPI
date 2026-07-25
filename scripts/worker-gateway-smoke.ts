@@ -33,7 +33,7 @@ function fakeEnv(): Env {
     APP_ENV: 'test', APP_VERSION: 'worker-gateway-smoke', AI_PROVIDER: 'cloudflare-gateway', AI_MODEL: 'openai/gpt-5.5', AI_GATEWAY_ID: 'sovereign',
     STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db,
     THREADS: { idFromName: (name: string) => ({ name }) as DurableObjectId, get: () => ({ fetch: async () => Response.json({ sequence: ++seq, duplicate: false }) }) as unknown as DurableObjectStub } as unknown as DurableObjectNamespace,
-    AI: { async run(model: string, input: unknown, options: unknown) {
+    AI: { async run(model: string, input: unknown, options?: unknown) {
       if (model !== 'openai/gpt-5.5') throw new Error('invalid model');
       const gateway = (options as any)?.gateway;
       if (gateway?.id !== 'sovereign' || gateway?.skipCache !== true || gateway?.collectLog !== false || gateway?.metadata?.plan !== 'free' || gateway?.metadata?.response_contract !== 'inner-recognition-v1' || !gateway?.metadata?.account_ref) throw new Error('invalid gateway metadata');
