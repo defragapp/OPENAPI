@@ -1,0 +1,22 @@
+name: Self-hosted Runner Probe
+
+on:
+  push:
+    branches:
+      - codex/inner-recognition-intelligence
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: [self-hosted, linux]
+    timeout-minutes: 5
+    steps:
+      - name: Confirm self-hosted runner
+        run: |
+          set -euo pipefail
+          echo "runner available"
+          uname -a
+          node --version || true
