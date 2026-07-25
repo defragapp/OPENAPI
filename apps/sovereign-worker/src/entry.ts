@@ -146,6 +146,33 @@ function encodeVisualStoryHeader(value: unknown): string {
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
 
+function compactVisualStoryPayload(plan: {
+  visual_story: unknown;
+  basis: {
+    user_confirmed: boolean;
+    human_design: string[];
+    gene_keys: string[];
+    astrology: string[];
+    relationship: string[];
+    live: string[];
+    numerology: string[];
+  };
+}): unknown {
+  const compact = (values: string[]) => values.slice(0, 2).map((value) => value.slice(0, 96));
+  return {
+    story: plan.visual_story,
+    basis: {
+      user_confirmed: plan.basis.user_confirmed,
+      human_design: compact(plan.basis.human_design),
+      gene_keys: compact(plan.basis.gene_keys),
+      astrology: compact(plan.basis.astrology),
+      relationship: compact(plan.basis.relationship),
+      live: compact(plan.basis.live),
+      numerology: compact(plan.basis.numerology)
+    }
+  };
+}
+
 async function handleRecognitionMessage(request: Request, env: Env, threadId: string): Promise<Response> {
   requireSameOrigin(request);
   const auth = await requireAuth(request, env);
@@ -182,7 +209,15 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
     const fallback = 'WHAT I NOTICE\n\nThe private Baseline provider is not available in this development environment, so I will not guess what this moment means.\n\nLOOK INWARD\n\nWhat changed inside you when this happened?';
     await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_development_response', { developmentFallback: true, text: fallback }, traceId);
     await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'completed');
-    return new Response(fallback, { status: 202, headers: { 'content-type': 'text/plain; charset=utf-8', 'x-sovereign-plan': entitlements.plan, 'x-sovereign-response-phase': 'question' } });
+    return new Response(fallback, {
+      status: 202,
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'cache-control': 'private, no-store',
+        'x-sovereign-plan': entitlements.plan,
+        'x-sovereign-response-phase': 'question'
+      }
+    });
   }
 
   const usage = await reserveAiTurn(env, auth.accountId, entitlements.plan);
@@ -193,12 +228,13 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
     await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'completed');
     const headers = new Headers({
       'content-type': 'text/plain; charset=utf-8',
+      'cache-control': 'private, no-store',
       'x-sovereign-plan': entitlements.plan,
       'x-sovereign-ai-remaining': String(usage.remaining),
       'x-sovereign-response-phase': result.plan.response_phase,
       'x-sovereign-module-offer': result.plan.module_suggestion.should_offer ? '1' : '0',
       'x-sovereign-visual-story': result.plan.visual_story.should_show
-        ? encodeVisualStoryHeader({ story: result.plan.visual_story, basis: result.plan.basis })
+        ? encodeVisualStoryHeader(compactVisualStoryPayload(result.plan))
         : ''
     });
     if (result.plan.module_suggestion.should_offer && result.plan.module_suggestion.title) headers.set('x-sovereign-module-title', encodeURIComponent(result.plan.module_suggestion.title));
