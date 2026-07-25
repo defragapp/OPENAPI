@@ -13,6 +13,7 @@
     "typecheck": "pnpm -r typecheck",
     "verify:foundation": "node scripts/verify-foundation.mjs",
     "verify:migrations": "node scripts/validate-migrations.mjs",
+    "verify:preview-access": "node scripts/verify-preview-access.mjs",
     "scan:secrets": "node scripts/scan-secrets.mjs",
     "smoke:sovereign": "tsx scripts/worker-gateway-smoke.ts",
     "smoke:gateway": "tsx scripts/cloudflare-gateway-smoke.ts",
