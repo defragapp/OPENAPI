@@ -1,21 +1,43 @@
 .app-shell .thread-visual-story {
-  --visual-ivory: #f2ead9;
-  --visual-paper: #e4d5b8;
+  --visual-ivory: #f5efe4;
+  --visual-paper: #e5d6b8;
   --visual-ink: #281d18;
-  --visual-copper: #d99c6b;
-  --visual-green: #87977b;
+  --visual-copper: #d89b69;
+  --visual-green: #87967b;
+  --visual-muted: #a79f95;
+  position: relative;
   display: grid;
-  gap: 26px;
+  gap: 24px;
   margin-top: 26px;
-  padding: clamp(20px, 3vw, 34px);
-  overflow: hidden;
-  border: 1px solid rgba(230, 190, 154, .18);
+  padding: clamp(20px, 3vw, 32px);
+  overflow: clip;
+  border: 1px solid rgba(229, 190, 154, .19);
   border-radius: 28px;
   background:
-    radial-gradient(circle at 12% 0%, rgba(217, 156, 107, .13), transparent 28rem),
-    linear-gradient(145deg, rgba(26, 23, 22, .96), rgba(12, 12, 15, .96));
-  box-shadow: 0 28px 84px rgba(0, 0, 0, .36), inset 0 1px 0 rgba(255, 255, 255, .045);
-  animation: visual-card-enter 560ms cubic-bezier(.16, 1, .3, 1) both;
+    radial-gradient(circle at 9% 0%, rgba(216, 155, 105, .14), transparent 25rem),
+    radial-gradient(circle at 92% 92%, rgba(93, 111, 93, .08), transparent 27rem),
+    linear-gradient(145deg, rgba(27, 24, 23, .97), rgba(12, 12, 15, .98));
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .36), inset 0 1px 0 rgba(255, 255, 255, .045);
+  content-visibility: auto;
+  contain-intrinsic-size: 980px;
+  animation: visual-story-enter 520ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.app-shell .thread-visual-story::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, transparent 0 43%, rgba(255, 255, 255, .025) 49%, transparent 55%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.014) 0 1px, transparent 1px 56px);
+  opacity: .42;
+}
+
+.app-shell .thread-visual-header,
+.app-shell .thread-visual-layout {
+  position: relative;
+  z-index: 1;
 }
 
 .app-shell .thread-visual-header {
@@ -23,110 +45,128 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 24px;
   align-items: end;
-  padding-bottom: 22px;
+  padding-bottom: 21px;
   border-bottom: 1px solid rgba(255, 255, 255, .09);
 }
 
 .app-shell .thread-visual-header h3 {
+  max-width: 13ch;
   margin: 7px 0 9px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
-  font-size: clamp(2rem, 4vw, 3.9rem);
-  font-weight: 650;
-  letter-spacing: -.055em;
-  line-height: .96;
+  font-size: clamp(2rem, 4vw, 3.75rem);
+  font-weight: 660;
+  letter-spacing: -.056em;
+  line-height: .95;
 }
 
 .app-shell .thread-visual-header p:last-child {
-  max-width: 68ch;
+  max-width: 67ch;
   margin: 0;
-  color: #aaa39a;
-  line-height: 1.68;
+  color: var(--visual-muted);
+  line-height: 1.66;
 }
 
 .app-shell .thread-visual-rule {
   align-self: start;
   padding: 10px 13px;
-  border: 1px solid rgba(217, 156, 107, .2);
+  border: 1px solid rgba(216, 155, 105, .24);
   border-radius: 999px;
-  background: rgba(217, 156, 107, .07);
-  color: #dcb28e;
-  font-size: .67rem;
-  font-weight: 720;
+  background: rgba(216, 155, 105, .075);
+  color: #ddb48f;
+  font-size: .66rem;
+  font-weight: 740;
   letter-spacing: .08em;
   white-space: nowrap;
 }
 
 .app-shell .thread-visual-layout {
   display: grid;
-  grid-template-columns: minmax(270px, .78fr) minmax(0, 1.22fr);
-  gap: clamp(26px, 4vw, 56px);
+  grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr);
+  gap: clamp(28px, 4.5vw, 58px);
   align-items: center;
+}
+
+.app-shell .thread-card-column {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.app-shell .thread-card-context {
+  max-width: 34ch;
+  margin: 0;
+  color: #837d75;
+  font-size: .72rem;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .app-shell .thread-card-stage {
   position: relative;
   display: grid;
-  min-height: 500px;
+  width: 100%;
+  min-height: 468px;
   place-items: center;
   perspective: 1400px;
+  isolation: isolate;
 }
 
 .app-shell .thread-card-stage-interaction {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  min-height: 400px;
+  gap: 12px;
+  min-height: 390px;
 }
 
 .app-shell .thread-card-stage-family {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 9px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
   min-height: 330px;
+  overflow-x: auto;
+  padding: 18px 10px 26px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
 .app-shell .thread-visual-card {
   position: relative;
-  width: min(100%, 350px);
+  width: min(100%, 338px);
   aspect-ratio: 5 / 7;
   padding: 7px;
-  border: 1px solid rgba(235, 202, 170, .32);
-  border-radius: 29px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .025));
-  box-shadow: 0 34px 86px rgba(0, 0, 0, .5), 0 0 0 1px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .13);
+  border: 1px solid rgba(235, 203, 171, .34);
+  border-radius: 28px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .15), rgba(255, 255, 255, .025));
+  box-shadow: 0 34px 84px rgba(0, 0, 0, .5), 0 0 0 1px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .14);
   transform-origin: 50% 78%;
-  transition: transform 620ms cubic-bezier(.16, 1, .3, 1), filter 340ms ease, opacity 340ms ease;
+  transition: transform 620ms cubic-bezier(.16, 1, .3, 1), filter 360ms ease, opacity 360ms ease;
+  will-change: transform;
 }
 
-.app-shell .thread-visual-card-pair {
-  width: min(100%, 245px);
-}
-
-.app-shell .thread-visual-card-family {
-  width: min(100%, 180px);
-}
-
+.app-shell .thread-visual-card-pair { width: min(100%, 232px); }
+.app-shell .thread-visual-card-family { flex: 0 0 172px; width: 172px; scroll-snap-align: center; }
 .app-shell .thread-visual-card[data-card-index="0"] { z-index: 3; }
 .app-shell .thread-visual-card[data-card-index="1"] { z-index: 2; }
 .app-shell .thread-visual-card[data-card-index="2"] { z-index: 1; }
-
-.app-shell .thread-card-stage-interaction .thread-visual-card:first-child { transform: rotate(-2.6deg) translateY(7px); }
-.app-shell .thread-card-stage-interaction .thread-visual-card:nth-child(2) { transform: rotate(2.8deg) translateY(5px); }
-.app-shell .thread-card-stage-family .thread-visual-card:first-child { transform: rotate(-4deg) translateY(16px); }
-.app-shell .thread-card-stage-family .thread-visual-card:nth-child(2) { transform: translateY(-8px); }
-.app-shell .thread-card-stage-family .thread-visual-card:nth-child(3) { transform: rotate(4deg) translateY(16px); }
+.app-shell .thread-card-stage-interaction .thread-visual-card:first-child { transform: rotate(-2.4deg) translateY(6px); }
+.app-shell .thread-card-stage-interaction .thread-visual-card:nth-child(2) { transform: rotate(2.4deg) translateY(5px); }
+.app-shell .thread-card-stage-family .thread-visual-card:first-child { transform: rotate(-4deg) translateY(14px); }
+.app-shell .thread-card-stage-family .thread-visual-card:nth-child(2) { transform: translateY(-7px); }
+.app-shell .thread-card-stage-family .thread-visual-card:nth-child(3) { transform: rotate(4deg) translateY(14px); }
 
 .app-shell .thread-visual-card[data-phase="origin"] {
-  filter: saturate(.76) sepia(.08) brightness(.9);
-  transform: rotate(-2.5deg) translateY(5px);
+  filter: saturate(.73) sepia(.1) brightness(.88);
+  transform: rotate(-2.2deg) translateY(5px) scale(.985);
 }
 
 .app-shell .thread-visual-card[data-phase="shadow"] {
-  filter: saturate(.88) contrast(1.05) brightness(.94);
-  transform: rotate(2.2deg) translateY(7px);
+  filter: saturate(.88) contrast(1.055) brightness(.93);
+  transform: rotate(1.8deg) translateY(6px) scale(.995);
 }
 
 .app-shell .thread-visual-card[data-phase="gift"] {
-  filter: saturate(1.04) brightness(1.04);
-  transform: rotate(-.4deg) translateY(-3px);
+  filter: saturate(1.035) brightness(1.045);
+  transform: rotate(-.35deg) translateY(-3px) scale(1.008);
 }
 
 .app-shell .thread-card-frame {
@@ -134,8 +174,8 @@
   height: 100%;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(49, 34, 27, .7);
-  border-radius: 23px;
+  border: 1px solid rgba(49, 34, 27, .72);
+  border-radius: 22px;
   background: #d9c9ab;
 }
 
@@ -144,99 +184,69 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 13px 16px 10px;
+  min-height: 43px;
+  padding: 11px 15px 9px;
   border-bottom: 1px solid rgba(45, 31, 25, .32);
-  background: linear-gradient(180deg, #eadfc8, #ddcfb5);
+  background: linear-gradient(180deg, #eee3cc, #ddcfb5);
   color: var(--visual-ink);
   font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
 }
 
-.app-shell .thread-card-heading span {
-  font-size: 1.05rem;
-}
-
-.app-shell .thread-card-heading strong {
-  font-size: .67rem;
-  font-weight: 720;
-  letter-spacing: .13em;
-  text-transform: uppercase;
-}
+.app-shell .thread-card-heading span { font-size: 1.02rem; }
+.app-shell .thread-card-heading strong { font-size: .66rem; font-weight: 740; letter-spacing: .13em; text-transform: uppercase; }
 
 .app-shell .thread-card-art {
   position: relative;
   flex: 1;
-  min-height: 270px;
+  min-height: 252px;
   overflow: hidden;
   background: #d8c6a8;
 }
 
-.app-shell .thread-card-art svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  transform: scale(1.018);
-}
+.app-shell .thread-card-art svg { display: block; width: 100%; height: 100%; transform: scale(1.018); }
+.app-shell .thread-card-light,
+.app-shell .thread-card-vignette { position: absolute; inset: 0; pointer-events: none; }
 
 .app-shell .thread-card-light {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
   background:
-    linear-gradient(112deg, transparent 24%, rgba(255, 246, 218, .22) 45%, transparent 64%),
-    radial-gradient(circle at 50% 20%, rgba(255, 226, 158, .13), transparent 42%);
+    linear-gradient(112deg, transparent 24%, rgba(255, 246, 218, .24) 45%, transparent 64%),
+    radial-gradient(circle at 50% 20%, rgba(255, 226, 158, .14), transparent 42%);
   mix-blend-mode: screen;
   opacity: .42;
-  transform: translateX(-45%);
-  animation: visual-light-pass 8s ease-in-out infinite;
+  transform: translateX(-48%);
+  animation: visual-light-pass 8.2s ease-in-out infinite;
 }
+
+.app-shell .thread-card-vignette {
+  background: linear-gradient(180deg, transparent 58%, rgba(59, 39, 28, .13)), radial-gradient(circle at 50% 48%, transparent 55%, rgba(51, 34, 26, .19));
+  transition: opacity 360ms ease;
+}
+
+.app-shell .thread-visual-card[data-phase="origin"] .thread-card-vignette { opacity: .62; }
+.app-shell .thread-visual-card[data-phase="shadow"] .thread-card-vignette { opacity: .85; }
+.app-shell .thread-visual-card[data-phase="gift"] .thread-card-vignette { opacity: .22; }
 
 .app-shell .thread-card-caption {
   position: relative;
   z-index: 2;
-  padding: 16px 18px 18px;
+  padding: 15px 17px 17px;
   border-top: 1px solid rgba(49, 34, 27, .35);
-  background: linear-gradient(180deg, #e6dac2, #d3bea0);
+  background: linear-gradient(180deg, #e7dbc3, #d3bea0);
   color: var(--visual-ink);
 }
 
-.app-shell .thread-card-caption > span {
-  color: #8f4f35;
-  font-size: .58rem;
-  font-weight: 780;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-}
-
-.app-shell .thread-card-caption h5 {
-  margin: 6px 0 5px;
-  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-  font-size: clamp(1.55rem, 2.5vw, 2.35rem);
-  font-weight: 520;
-  letter-spacing: -.04em;
-  line-height: .96;
-}
-
-.app-shell .thread-card-caption p {
-  margin: 0;
-  color: #6d594a;
-  font-size: .72rem;
-  line-height: 1.45;
-}
-
-.app-shell .thread-visual-card-family .thread-card-caption {
-  padding: 12px 13px 14px;
-}
-
-.app-shell .thread-visual-card-family .thread-card-caption h5 {
-  font-size: 1.25rem;
-}
+.app-shell .thread-card-caption > span { color: #8f4f35; font-size: .57rem; font-weight: 790; letter-spacing: .14em; text-transform: uppercase; }
+.app-shell .thread-card-caption h5 { margin: 6px 0 5px; font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif; font-size: clamp(1.5rem, 2.35vw, 2.2rem); font-weight: 520; letter-spacing: -.04em; line-height: .96; }
+.app-shell .thread-card-caption p { margin: 0; color: #6d594a; font-size: .71rem; line-height: 1.44; }
+.app-shell .thread-visual-card-family .thread-card-caption { padding: 11px 12px 13px; }
+.app-shell .thread-visual-card-family .thread-card-caption h5 { font-size: 1.18rem; }
 
 .app-shell .thread-role-connection {
   position: absolute;
-  inset: 50% 12% auto;
+  inset: 50% 11% auto;
   z-index: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(217, 156, 107, .48), transparent);
+  background: linear-gradient(90deg, transparent, rgba(216, 155, 105, .5), transparent);
 }
 
 .app-shell .thread-role-connection i {
@@ -244,20 +254,35 @@
   top: -3px;
   width: 7px;
   height: 7px;
-  border: 1px solid rgba(217, 156, 107, .6);
+  border: 1px solid rgba(216, 155, 105, .65);
   border-radius: 50%;
   background: #151416;
   animation: visual-connection 4.8s ease-in-out infinite;
 }
 
 .app-shell .thread-role-connection i:nth-child(1) { left: 20%; }
-.app-shell .thread-role-connection i:nth-child(2) { left: 50%; animation-delay: .5s; }
-.app-shell .thread-role-connection i:nth-child(3) { left: 80%; animation-delay: 1s; }
+.app-shell .thread-role-connection i:nth-child(2) { left: 50%; animation-delay: .55s; }
+.app-shell .thread-role-connection i:nth-child(3) { left: 80%; animation-delay: 1.1s; }
 
-.app-shell .thread-visual-copy {
-  display: grid;
-  gap: 20px;
+.app-shell .thread-visual-copy { display: grid; gap: 18px; min-width: 0; }
+.app-shell .thread-movement-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+.app-shell .thread-play-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  border: 1px solid rgba(216, 155, 105, .25);
+  border-radius: 999px;
+  background: rgba(216, 155, 105, .075);
+  color: #f2e9dd;
+  padding: 9px 15px;
+  font-weight: 720;
 }
+
+.app-shell .thread-play-button span { color: var(--visual-copper); font-size: .72rem; }
+.app-shell .thread-phase-progress { color: #878179; font-size: .72rem; font-weight: 650; }
 
 .app-shell .thread-phase-control {
   display: grid;
@@ -270,325 +295,166 @@
 }
 
 .app-shell .thread-phase-control button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   min-height: 48px;
   border: 0;
   border-radius: 12px;
   background: transparent;
   color: #858079;
   padding: 8px 10px;
-  font-weight: 680;
+  font-weight: 690;
 }
 
-.app-shell .thread-phase-control button.active {
-  background: rgba(255, 255, 255, .09);
-  color: #f7f5f1;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+.app-shell .thread-phase-control button > span {
+  display: grid;
+  width: 21px;
+  height: 21px;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 50%;
+  color: #736d66;
+  font-size: .62rem;
 }
 
-.app-shell .thread-visual-state {
-  padding-bottom: 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, .09);
-}
+.app-shell .thread-phase-control button.active { background: rgba(255, 255, 255, .09); color: #f7f5f1; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04); }
+.app-shell .thread-phase-control button.active > span { border-color: rgba(216, 155, 105, .34); background: rgba(216, 155, 105, .1); color: var(--visual-copper); }
 
+.app-shell .thread-visual-state { padding-bottom: 17px; border-bottom: 1px solid rgba(255, 255, 255, .09); }
 .app-shell .thread-visual-state > span,
-.app-shell .thread-visual-summary-grid span {
-  color: #867f77;
-  font-size: .6rem;
-  font-weight: 780;
-  letter-spacing: .13em;
-}
+.app-shell .thread-visual-summary-grid span { color: #867f77; font-size: .59rem; font-weight: 790; letter-spacing: .13em; }
 
 .app-shell .thread-visual-state h4 {
   max-width: 13ch;
-  margin: 10px 0 12px;
+  margin: 9px 0 11px;
   font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-  font-size: clamp(2.55rem, 5vw, 5.2rem);
+  font-size: clamp(2.45rem, 5vw, 5rem);
   font-weight: 500;
   letter-spacing: -.055em;
   line-height: .94;
 }
 
-.app-shell .thread-visual-state p {
-  max-width: 48ch;
-  margin: 0;
-  color: #cbc4bb;
-  font-size: 1rem;
-  line-height: 1.68;
-}
+.app-shell .thread-visual-state p { max-width: 49ch; margin: 0; color: #cbc4bb; font-size: 1rem; line-height: 1.66; }
+.app-shell .thread-visual-summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.app-shell .thread-visual-summary-grid article { min-height: 132px; padding: 17px; border: 1px solid rgba(255, 255, 255, .09); border-radius: 17px; background: rgba(255, 255, 255, .028); }
+.app-shell .thread-visual-summary-grid p { margin: 11px 0 0; color: #c3bcb3; line-height: 1.6; }
+.app-shell .thread-visual-summary-grid .thread-next-step { border-color: rgba(216, 155, 105, .24); background: rgba(216, 155, 105, .07); }
 
-.app-shell .thread-visual-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
+.app-shell .thread-visual-basis { margin: 0; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, .09); }
+.app-shell .thread-visual-basis summary { cursor: pointer; color: #f0ece5; font-weight: 670; }
+.app-shell .thread-visual-basis > p { max-width: 60ch; margin: 12px 0 0; color: #9b958e; line-height: 1.58; }
+.app-shell .thread-visual-basis > div { display: grid; margin-top: 13px; }
+.app-shell .thread-visual-basis article { display: grid; grid-template-columns: minmax(132px, .34fr) 1fr; gap: 18px; padding: 13px 0; border-top: 1px solid rgba(255, 255, 255, .075); }
+.app-shell .thread-visual-basis article span { color: #817b75; font-size: .72rem; }
+.app-shell .thread-visual-basis article strong { font-size: .82rem; font-weight: 560; line-height: 1.5; }
 
-.app-shell .thread-visual-summary-grid article {
-  min-height: 140px;
-  padding: 18px;
-  border: 1px solid rgba(255, 255, 255, .09);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, .028);
-}
+.app-shell .thread-visual-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.app-shell .thread-visual-actions button { min-height: 48px; }
+.app-shell .thread-visual-actions button:disabled { cursor: wait; opacity: .56; }
+.app-shell .thread-visual-status { margin: -7px 0 0; color: #817b75; font-size: .74rem; line-height: 1.5; }
+.app-shell .thread-visual-story[data-feedback="confirmed"] { border-color: rgba(135, 150, 123, .28); }
+.app-shell .thread-visual-story[data-feedback="confirmed"] .thread-next-step { border-color: rgba(135, 150, 123, .3); background: rgba(135, 150, 123, .08); }
 
-.app-shell .thread-visual-summary-grid p {
-  margin: 12px 0 0;
-  color: #c3bcb3;
-  line-height: 1.62;
-}
-
-.app-shell .thread-visual-summary-grid .thread-next-step {
-  border-color: rgba(217, 156, 107, .24);
-  background: rgba(217, 156, 107, .07);
-}
-
-.app-shell .thread-visual-basis {
-  margin: 0;
-  padding-top: 17px;
-  border-top: 1px solid rgba(255, 255, 255, .09);
-}
-
-.app-shell .thread-visual-basis summary {
-  cursor: pointer;
-  color: #f0ece5;
-  font-weight: 660;
-}
-
-.app-shell .thread-visual-basis > p {
-  max-width: 60ch;
-  margin: 12px 0 0;
-  color: #9b958e;
-  line-height: 1.6;
-}
-
-.app-shell .thread-visual-basis > div {
-  display: grid;
-  margin-top: 14px;
-}
-
-.app-shell .thread-visual-basis article {
-  display: grid;
-  grid-template-columns: minmax(135px, .34fr) 1fr;
-  gap: 18px;
-  padding: 13px 0;
-  border-top: 1px solid rgba(255, 255, 255, .075);
-}
-
-.app-shell .thread-visual-basis article span {
-  color: #817b75;
-  font-size: .72rem;
-}
-
-.app-shell .thread-visual-basis article strong {
-  font-size: .82rem;
-  font-weight: 560;
-  line-height: 1.5;
-}
-
-.app-shell .thread-visual-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.app-shell .thread-visual-actions button {
-  min-height: 48px;
-}
-
-.app-shell .thread-visual-status {
-  margin: -8px 0 0;
-  color: #817b75;
-  font-size: .76rem;
-  line-height: 1.5;
-}
-
-/* Layered SVG motion: deliberately subtle and deterministic. */
-.app-shell .thread-visual-card .visual-figure,
-.app-shell .thread-visual-card .visual-secondary,
-.app-shell .thread-visual-card .visual-prop,
-.app-shell .thread-visual-card .visual-halo,
-.app-shell .thread-visual-card .visual-ground {
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
-.app-shell .thread-visual-card .visual-figure { animation: visual-breathe 5.8s ease-in-out infinite; }
-.app-shell .thread-visual-card .visual-halo { animation: visual-halo 6.4s ease-in-out infinite; }
+.app-shell .thread-visual-card .visual-figure { transform-origin: 50% 72%; animation: visual-breathe 5.8s ease-in-out infinite; }
+.app-shell .thread-visual-card .visual-symbol { transform-origin: center; animation: visual-symbol-float 4.8s ease-in-out infinite; }
+.app-shell .thread-visual-card .visual-secondary { transform-origin: center; animation: visual-secondary-shift 6.4s ease-in-out infinite; }
+.app-shell .thread-visual-card .visual-halo { transform-origin: center; animation: visual-halo-pulse 5.2s ease-in-out infinite; }
+.app-shell .thread-visual-card[data-phase="origin"] .visual-figure { animation-duration: 7.4s; transform: translateY(3px) scale(.988); }
+.app-shell .thread-visual-card[data-phase="shadow"] .visual-figure { animation-name: visual-shadow-hold; animation-duration: 4.7s; }
+.app-shell .thread-visual-card[data-phase="gift"] .visual-figure { animation-name: visual-gift-open; animation-duration: 5.6s; }
+.app-shell .thread-visual-card[data-phase="gift"] .visual-halo { opacity: .95; animation-duration: 4.3s; }
 .app-shell .thread-visual-card[data-archetype="fool"] .visual-figure { animation-name: visual-fool-step; }
-.app-shell .thread-visual-card[data-archetype="fool"] .visual-prop { animation: visual-prop-sway 4.6s ease-in-out infinite; }
-.app-shell .thread-visual-card[data-archetype="magician"] .visual-wand-arm { animation: visual-magician-arm 5s ease-in-out infinite; transform-box: fill-box; transform-origin: 15% 85%; }
-.app-shell .thread-visual-card[data-archetype="magician"] .visual-wand { animation: visual-wand-pulse 2.8s ease-in-out infinite; }
-.app-shell .thread-visual-card[data-archetype="magician"] .visual-prop { animation: visual-prop-float 4.2s ease-in-out infinite; }
-.app-shell .thread-visual-card[data-archetype="three_of_cups"] .visual-cups { animation: visual-cups-toast 4.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center bottom; }
-.app-shell .thread-visual-card[data-archetype="three_of_cups"] .visual-figure { animation-name: visual-group-sway; }
-.app-shell .thread-visual-card[data-archetype="hermit"] .visual-lantern { animation: visual-lantern 3.6s ease-in-out infinite; transform-box: fill-box; transform-origin: top center; }
-.app-shell .thread-visual-card[data-archetype="strength"] .visual-secondary { animation: visual-strength-calm 5.4s ease-in-out infinite; }
-.app-shell .thread-visual-card[data-archetype="tower"] .visual-lightning { animation: visual-tower-flash 5.5s ease-in-out infinite; }
-.app-shell .thread-visual-card[data-archetype="tower"] .visual-debris { animation: visual-debris 5.5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.app-shell .thread-visual-card[data-archetype="fool"] .visual-symbol { animation-name: visual-fool-bundle; }
+.app-shell .thread-visual-card[data-archetype="magician"] .visual-symbol,
+.app-shell .thread-visual-card[data-archetype="magician"] .visual-wand { transform-origin: 210px 157px; animation: visual-magician-arm 4.6s ease-in-out infinite; }
+.app-shell .thread-visual-card[data-archetype="three_of_cups"] .visual-symbol { transform-origin: 150px 130px; animation-name: visual-cups-toast; }
+.app-shell .thread-visual-card[data-archetype="hermit"] .visual-symbol { animation-name: visual-lantern-glow; }
+.app-shell .thread-visual-card[data-archetype="strength"] .visual-secondary { animation-name: visual-strength-settle; }
+.app-shell .thread-visual-card[data-archetype="tower"] .visual-lightning { animation: visual-tower-flash 5.8s ease-in-out infinite; }
+.app-shell .thread-visual-card[data-archetype="tower"] .visual-debris { animation: visual-tower-debris 4.9s ease-in-out infinite; }
+.app-shell .visual-story-offscreen *,
+.app-shell .visual-story-offscreen *::before,
+.app-shell .visual-story-offscreen *::after { animation-play-state: paused !important; }
 
-.app-shell .thread-visual-card[data-phase="origin"] .visual-figure { animation-duration: 7.5s; }
-.app-shell .thread-visual-card[data-phase="shadow"] .visual-figure { animation-duration: 4.6s; }
-.app-shell .thread-visual-card[data-phase="gift"] .visual-halo { animation-duration: 4.2s; }
-
-@keyframes visual-card-enter {
-  from { opacity: 0; transform: translateY(18px) scale(.985); }
-  to { opacity: 1; transform: none; }
-}
-
-@keyframes visual-light-pass {
-  0%, 18% { transform: translateX(-55%); opacity: 0; }
-  40% { opacity: .45; }
-  63%, 100% { transform: translateX(65%); opacity: 0; }
-}
-
-@keyframes visual-breathe {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-2px) scale(1.006); }
-}
-
-@keyframes visual-halo {
-  0%, 100% { opacity: .72; transform: scale(.96); }
-  50% { opacity: 1; transform: scale(1.06); }
-}
-
-@keyframes visual-fool-step {
-  0%, 100% { transform: translate(0, 0) rotate(0); }
-  50% { transform: translate(3px, -3px) rotate(.8deg); }
-}
-
-@keyframes visual-prop-sway {
-  0%, 100% { transform: rotate(-1deg); }
-  50% { transform: rotate(3deg) translateY(-2px); }
-}
-
-@keyframes visual-magician-arm {
-  0%, 100% { transform: rotate(0); }
-  50% { transform: rotate(-2.6deg); }
-}
-
-@keyframes visual-wand-pulse {
-  0%, 100% { opacity: .82; stroke-width: 7px; }
-  50% { opacity: 1; stroke-width: 9px; }
-}
-
-@keyframes visual-prop-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
-@keyframes visual-cups-toast {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-5px) scale(1.012); }
-}
-
-@keyframes visual-group-sway {
-  0%, 100% { transform: rotate(-.3deg); }
-  50% { transform: rotate(.7deg) translateY(-1px); }
-}
-
-@keyframes visual-lantern {
-  0%, 100% { transform: rotate(-1.5deg); filter: brightness(.95); }
-  50% { transform: rotate(2deg); filter: brightness(1.15); }
-}
-
-@keyframes visual-strength-calm {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(1px) scale(1.01); }
-}
-
-@keyframes visual-tower-flash {
-  0%, 76%, 100% { opacity: .72; filter: brightness(1); }
-  80% { opacity: 1; filter: brightness(1.55); }
-  84% { opacity: .82; filter: brightness(1.12); }
-}
-
-@keyframes visual-debris {
-  0%, 72%, 100% { transform: translate(0, 0); }
-  82% { transform: translate(3px, 4px); }
-}
-
-@keyframes visual-connection {
-  0%, 100% { opacity: .28; transform: scale(.75); }
-  50% { opacity: 1; transform: scale(1.15); }
-}
+@keyframes visual-story-enter { from { opacity: 0; transform: translateY(14px) scale(.994); } to { opacity: 1; transform: none; } }
+@keyframes visual-light-pass { 0%, 18% { transform: translateX(-52%); opacity: 0; } 40% { opacity: .46; } 64%, 100% { transform: translateX(68%); opacity: 0; } }
+@keyframes visual-connection { 0%, 100% { transform: translateX(-8px); opacity: .28; } 50% { transform: translateX(8px); opacity: .9; } }
+@keyframes visual-breathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-2px) scale(1.006); } }
+@keyframes visual-shadow-hold { 0%, 100% { transform: translateY(1px) scale(.995); } 50% { transform: translateY(3px) scale(.99); } }
+@keyframes visual-gift-open { 0%, 100% { transform: translateY(0) scale(1.004); } 50% { transform: translateY(-3px) scale(1.012); } }
+@keyframes visual-symbol-float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-3px) rotate(.8deg); } }
+@keyframes visual-secondary-shift { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(2px); } }
+@keyframes visual-halo-pulse { 0%, 100% { opacity: .48; transform: scale(.97); } 50% { opacity: .9; transform: scale(1.025); } }
+@keyframes visual-fool-step { 0%, 100% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(3px, -3px) rotate(.65deg); } }
+@keyframes visual-fool-bundle { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(3deg) translateY(-2px); } }
+@keyframes visual-magician-arm { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-2.2deg) translateY(-2px); } }
+@keyframes visual-cups-toast { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.012); } }
+@keyframes visual-lantern-glow { 0%, 100% { opacity: .72; transform: scale(.96); } 50% { opacity: 1; transform: scale(1.08); } }
+@keyframes visual-strength-settle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(2px); } }
+@keyframes visual-tower-flash { 0%, 82%, 100% { opacity: .78; filter: brightness(1); } 86% { opacity: 1; filter: brightness(1.55); } 90% { opacity: .72; filter: brightness(1); } }
+@keyframes visual-tower-debris { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(2px, 3px); } }
 
 @media (max-width: 980px) {
-  .app-shell .thread-visual-layout { grid-template-columns: 1fr; }
-  .app-shell .thread-card-stage { min-height: 460px; }
-  .app-shell .thread-card-stage-interaction { min-height: 360px; }
-  .app-shell .thread-card-stage-family { min-height: 300px; }
+  .app-shell .thread-visual-layout { grid-template-columns: 1fr; gap: 24px; }
+  .app-shell .thread-card-stage { min-height: 430px; }
   .app-shell .thread-visual-state h4 { max-width: 18ch; }
+  .app-shell .thread-card-context { max-width: 46ch; }
 }
 
 @media (max-width: 680px) {
   .app-shell .thread-visual-story {
-    gap: 22px;
-    margin: 22px -4px 0;
-    padding: 20px 14px calc(env(safe-area-inset-bottom) + 20px);
+    gap: 19px;
+    margin-top: 19px;
+    margin-inline: -2px;
+    padding: 18px 13px calc(18px + env(safe-area-inset-bottom));
     border-radius: 24px;
+    contain-intrinsic-size: 860px;
   }
 
-  .app-shell .thread-visual-header {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    padding-bottom: 19px;
-  }
-
-  .app-shell .thread-visual-header h3 { font-size: 2.55rem; }
-  .app-shell .thread-visual-rule { justify-self: start; white-space: normal; }
-  .app-shell .thread-visual-layout { gap: 22px; }
-  .app-shell .thread-card-stage { min-height: 425px; }
-  .app-shell .thread-visual-card-primary { width: min(88vw, 320px); }
-
-  .app-shell .thread-card-stage-interaction {
-    display: flex;
-    min-height: 350px;
-    justify-content: flex-start;
-    gap: 12px;
-    overflow-x: auto;
-    padding: 8px 8px 24px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .app-shell .thread-card-stage-family {
-    display: flex;
-    min-height: 320px;
-    justify-content: flex-start;
-    gap: 10px;
-    overflow-x: auto;
-    padding: 8px 8px 24px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .app-shell .thread-visual-card-pair {
-    flex: 0 0 235px;
-    scroll-snap-align: center;
-  }
-
-  .app-shell .thread-visual-card-family {
-    flex: 0 0 190px;
-    scroll-snap-align: center;
-  }
-
+  .app-shell .thread-visual-header { grid-template-columns: 1fr; gap: 13px; padding-bottom: 17px; }
+  .app-shell .thread-visual-header h3 { max-width: 12ch; margin: 5px 0 7px; font-size: 2.35rem; }
+  .app-shell .thread-visual-header p:last-child { font-size: .91rem; line-height: 1.58; }
+  .app-shell .thread-visual-rule { justify-self: start; padding: 8px 11px; white-space: normal; }
+  .app-shell .thread-card-stage { min-height: 356px; }
+  .app-shell .thread-visual-card { width: min(78vw, 262px); border-radius: 24px; }
+  .app-shell .thread-card-frame { border-radius: 19px; }
+  .app-shell .thread-card-art { min-height: 210px; }
+  .app-shell .thread-card-caption { padding: 13px 14px 14px; }
+  .app-shell .thread-card-caption h5 { font-size: 1.65rem; }
+  .app-shell .thread-card-stage-interaction { display: flex; min-height: 330px; justify-content: flex-start; overflow-x: auto; padding: 15px 28px 24px; scroll-snap-type: x mandatory; }
+  .app-shell .thread-card-stage-interaction .thread-visual-card { flex: 0 0 220px; width: 220px; scroll-snap-align: center; }
+  .app-shell .thread-card-stage-family { justify-content: flex-start; min-height: 315px; padding-inline: 28px; }
   .app-shell .thread-role-connection { display: none; }
-  .app-shell .thread-phase-control { grid-template-columns: 1fr; }
-  .app-shell .thread-phase-control button { min-height: 48px; }
-  .app-shell .thread-visual-state h4 { font-size: 3rem; }
+  .app-shell .thread-movement-toolbar { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .app-shell .thread-play-button { width: 100%; min-height: 48px; }
+  .app-shell .thread-phase-control { grid-template-columns: 1fr; gap: 4px; }
+  .app-shell .thread-phase-control button { justify-content: flex-start; min-height: 48px; padding-inline: 13px; }
+  .app-shell .thread-visual-state h4 { max-width: 13ch; font-size: 2.75rem; }
+  .app-shell .thread-visual-state p { font-size: .95rem; }
   .app-shell .thread-visual-summary-grid { grid-template-columns: 1fr; }
-  .app-shell .thread-visual-summary-grid article { min-height: 0; }
+  .app-shell .thread-visual-summary-grid article { min-height: auto; }
   .app-shell .thread-visual-basis article { grid-template-columns: 1fr; gap: 5px; }
   .app-shell .thread-visual-actions { display: grid; grid-template-columns: 1fr 1fr; }
   .app-shell .thread-visual-actions .quiet-button { grid-column: 1 / -1; }
 }
 
+@media (max-width: 420px) {
+  .app-shell .thread-visual-card { width: min(76vw, 248px); }
+  .app-shell .thread-card-stage { min-height: 340px; }
+  .app-shell .thread-visual-header h3 { font-size: 2.18rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .app-shell .thread-visual-story,
-  .app-shell .thread-visual-card,
-  .app-shell .thread-card-light,
-  .app-shell .thread-visual-card *,
-  .app-shell .thread-role-connection i {
+  .app-shell .thread-visual-story *,
+  .app-shell .thread-visual-story *::before,
+  .app-shell .thread-visual-story *::after {
+    scroll-behavior: auto !important;
     animation: none !important;
-    transition: none !important;
+    transition-duration: .01ms !important;
   }
+
+  .app-shell .thread-play-button { display: none; }
 }
