@@ -170,7 +170,59 @@ export async function getLatestCurrentConditions(env: Env, accountId: string) {
 
 export async function getModelSafeBaselineContext(env: Env, accountId: string) {
   const [baseline, current] = await Promise.all([getBaselineStatus(env, accountId), getLatestCurrentConditions(env, accountId)]);
-  return { baseline, current, separation: ['Baseline tendency is enduring interpretive context, not diagnosis or proof.', 'Current amplification is temporary context and does not determine behavior.', 'Observed behavior must be supplied or confirmed by the user.', 'Actual state remains unknown unless the user confirms it.'] };
+  return {
+    baseline: sanitizeBaselineForModel(baseline),
+    current,
+    separation: [
+      'Baseline tendency is enduring interpretive context, not diagnosis or proof.',
+      'Current amplification is temporary context and does not determine behavior.',
+      'Observed behavior must be supplied or confirmed by the user.',
+      'Actual state remains unknown unless the user confirms it.'
+    ]
+  };
+}
+
+function sanitizeBaselineForModel(value: unknown) {
+  const baseline = asRecord(value);
+  const reduced = asRecord(baseline.reducedContext);
+  const calculation = asRecord(reduced.deterministicCalculation);
+  const provenance = asRecord(baseline.provenance);
+  if (baseline.status === 'not_started') return { status: 'not_started' };
+  return {
+    status: baseline.status,
+    uncertainty: baseline.uncertainty,
+    providerStatus: baseline.providerStatus,
+    computationVersion: baseline.computationVersion,
+    lastComputedAt: baseline.lastComputedAt,
+    provenance: {
+      deterministicCalculation: provenance.deterministicCalculation,
+      engine: provenance.engine,
+      interpretiveFrameworks: provenance.interpretiveFrameworks,
+      rawBirthInputReturned: false,
+      sovvRuntimeDependency: false
+    },
+    reducedContext: {
+      baselineTendency: reduced.baselineTendency,
+      currentAmplification: reduced.currentAmplification,
+      userObservation: reduced.userObservation,
+      interpretiveSignals: reduced.interpretiveSignals,
+      systemInference: reduced.systemInference,
+      uncertainty: reduced.uncertainty,
+      unknownActualState: reduced.unknownActualState,
+      deterministicCalculation: {
+        natalPlacements: calculation.natalPlacements,
+        aspects: calculation.aspects,
+        humanDesign: calculation.humanDesign,
+        geneKeys: calculation.geneKeys,
+        numerology: calculation.numerology
+      },
+      interpretiveFramework: reduced.interpretiveFramework
+    }
+  };
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' ? value as Record<string, unknown> : {};
 }
 
 async function fetchCurrentConditionProvider(env: Env, precision: string): Promise<{ source: string; sourceTimestamp: string; currentAstronomy: Record<string, string> } | undefined> {
