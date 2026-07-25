@@ -1,46 +1,143 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+
 const config = JSON.parse(readFileSync('apps/sovereign-worker/wrangler.jsonc', 'utf8'));
-const ciWorkflow = readFileSync('.github/workflows/ci.yml', 'utf8');
-const previewWorkflow = readFileSync('.github/workflows/preview-deploy.yml', 'utf8');
-const liveWorkflow = readFileSync('.github/workflows/live-verify.yml', 'utf8');
+const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 const previewSmoke = readFileSync('scripts/preview-smoke.ts', 'utf8');
+const previewBootstrap = readFileSync('scripts/cloudflare-preview-bootstrap.mjs', 'utf8');
+const cloudflareGuide = readFileSync('docs/cloudflare-workers-builds.md', 'utf8');
+
 function assertBinding(scope, name) {
-  if (!scope?.queues?.producers?.some((item) => item.binding === 'JOBS')) throw new Error(`${name} missing JOBS queue producer`);
+  if (!scope?.queues?.producers?.some((item) => item.binding === 'JOBS')) {
+    throw new Error(`${name} missing JOBS queue producer`);
+  }
   if (!scope?.queues?.consumers?.length) throw new Error(`${name} missing queue consumer`);
   if (!scope?.triggers?.crons?.length) throw new Error(`${name} missing scheduled cleanup trigger`);
-  if (!scope?.r2_buckets?.some((item) => item.binding === 'ARTIFACTS')) throw new Error(`${name} missing ARTIFACTS R2 binding`);
+  if (!scope?.r2_buckets?.some((item) => item.binding === 'ARTIFACTS')) {
+    throw new Error(`${name} missing ARTIFACTS R2 binding`);
+  }
+  if (!scope?.d1_databases?.some((item) => item.binding === 'DB')) {
+    throw new Error(`${name} missing DB D1 binding`);
+  }
+  if (!scope?.durable_objects?.bindings?.some((item) => item.name === 'THREADS')) {
+    throw new Error(`${name} missing THREADS Durable Object binding`);
+  }
+  if (scope?.ai?.binding !== 'AI') throw new Error(`${name} missing Workers AI binding`);
+  if (scope?.assets?.binding !== 'ASSETS') throw new Error(`${name} missing ASSETS binding`);
 }
+
 assertBinding(config, 'default');
 assertBinding(config.env?.preview, 'preview');
-if (config.vars?.APP_ENV !== 'production') throw new Error('default Worker environment must fail closed as production');
-if (config.env?.preview?.vars?.APP_ENV !== 'preview') throw new Error('preview environment must be explicitly preview');
+
+if (config.vars?.APP_ENV !== 'production') {
+  throw new Error('default Worker environment must fail closed as production');
+}
+if (config.env?.preview?.vars?.APP_ENV !== 'preview') {
+  throw new Error('preview environment must be explicitly preview');
+}
+if (config.env?.preview?.name !== 'sovereign-openapi-preview') {
+  throw new Error('preview Worker name must remain sovereign-openapi-preview');
+}
+if (config.env?.preview?.workers_dev !== true || config.env?.preview?.preview_urls !== false) {
+  throw new Error('preview must use one dedicated workers.dev route with versioned preview URLs disabled');
+}
+
 for (const scope of [config.vars, config.env?.preview?.vars]) {
-  if (scope?.AI_PROVIDER !== 'cloudflare-gateway') throw new Error('AI provider must be Cloudflare Gateway');
-  if (scope?.AI_MODEL !== 'openai/gpt-5.5') throw new Error('AI model must be the approved ZDR-cataloged model');
-  if (scope?.AI_FREE_MONTHLY_TURNS !== '10' || scope?.AI_SOVEREIGN_PLUS_MONTHLY_TURNS !== '300') throw new Error('AI allowances do not match the review contract');
+  if (scope?.AI_PROVIDER !== 'cloudflare-gateway') {
+    throw new Error('AI provider must be Cloudflare Gateway');
+  }
+  if (scope?.AI_MODEL !== 'openai/gpt-5.5') {
+    throw new Error('AI model must be the approved ZDR-cataloged model');
+  }
+  if (
+    scope?.AI_FREE_MONTHLY_TURNS !== '10' ||
+    scope?.AI_SOVEREIGN_PLUS_MONTHLY_TURNS !== '300'
+  ) {
+    throw new Error('AI allowances do not match the review contract');
+  }
 }
+
 for (const key of ['STRIPE_SUCCESS_URL', 'STRIPE_CANCEL_URL', 'STRIPE_PORTAL_RETURN_URL']) {
-  if (!String(config.env?.preview?.vars?.[key] ?? '').includes('/app')) throw new Error(`${key} must return to /app`);
+  const value = String(config.env?.preview?.vars?.[key] ?? '');
+  if (!value.startsWith('https://sovereign-openapi-preview.sovereign-os-api.workers.dev/app')) {
+    throw new Error(`${key} must use the canonical account-scoped preview URL`);
+  }
 }
-if (!ciWorkflow.includes('pull_request:')) throw new Error('CI must validate pull requests to main');
-for (const gate of ['scan:production-fixtures', 'verify:release-config', 'smoke:auth', 'smoke:baseline', 'smoke:jobs', 'smoke:release-closure']) {
-  if (!ciWorkflow.includes(gate)) throw new Error(`CI is missing release gate ${gate}`);
+
+const cloudflareBuildCommand = packageJson.scripts?.['verify:cloudflare-build'];
+if (!cloudflareBuildCommand) throw new Error('package.json is missing verify:cloudflare-build');
+for (const gate of [
+  'verify:foundation',
+  'verify:migrations',
+  'scan:secrets',
+  'scan:production-fixtures',
+  'verify:release-config',
+  'typecheck',
+  'test',
+  'build',
+  'smoke:auth',
+  'smoke:baseline',
+  'smoke:jobs',
+  'smoke:worker-gateway',
+  'smoke:stripe',
+  'smoke:product',
+  'smoke:release-closure'
+]) {
+  if (!cloudflareBuildCommand.includes(gate)) {
+    throw new Error(`Cloudflare build verification is missing release gate ${gate}`);
+  }
 }
-for (const workflow of [previewWorkflow, liveWorkflow]) {
-  if (workflow.includes('openai/gpt-5.6-terra')) throw new Error('workflow still uses the unapproved model fallback');
-  if (!workflow.includes('openai/gpt-5.5')) throw new Error('workflow is missing the approved ZDR-cataloged model');
+
+for (const required of [
+  'WORKERS_CI_COMMIT_SHA',
+  'WORKERS_CI_BUILD_UUID',
+  'PREVIEW_BASE_URL',
+  'PREVIEW_SESSION_SIGNING_SECRET',
+  "['secret', 'bulk'",
+  "['deploy', '--env', 'preview'"
+]) {
+  if (!previewBootstrap.includes(required)) {
+    throw new Error(`Cloudflare preview bootstrap is missing ${required}`);
+  }
 }
-for (const key of ['STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY', 'STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL']) {
-  if (!previewWorkflow.includes(key)) throw new Error(`preview workflow is missing ${key}`);
+if (previewBootstrap.indexOf("['deploy', '--env', 'preview'") > previewBootstrap.indexOf("['secret', 'bulk'")) {
+  throw new Error('preview bootstrap must create the Worker before attaching runtime secrets');
 }
-for (const stale of ['STRIPE_PRICE_STANDARD', 'STRIPE_PRICE_PREMIUM']) {
-  if (previewWorkflow.includes(stale)) throw new Error(`preview workflow still references ${stale}`);
+
+for (const required of [
+  'PREVIEW_BASE_URL',
+  'PREVIEW_SESSION_SIGNING_SECRET',
+  'D1 Edit',
+  'Queues Edit',
+  'Workers R2 Storage Edit',
+  'Workers Scripts Edit'
+]) {
+  if (!cloudflareGuide.includes(required)) {
+    throw new Error(`Cloudflare build guide is missing ${required}`);
+  }
 }
-for (const accessGate of ['verify:preview-access', 'CF_ACCESS_CLIENT_ID', 'CF_ACCESS_CLIENT_SECRET', 'Access service-token secrets are required']) {
-  if (!previewWorkflow.includes(accessGate)) throw new Error(`preview workflow is missing protected-access gate ${accessGate}`);
+
+if (!previewSmoke.includes('verifyFreeGates') || !previewSmoke.includes('verifyPaidCapabilities')) {
+  throw new Error('preview smoke does not separate Free and paid behavior');
 }
-if (!previewWorkflow.includes('PREVIEW_BASE_URL')) throw new Error('preview workflow cannot target a configured protected hostname');
-if (!previewSmoke.includes('verifyFreeGates') || !previewSmoke.includes('verifyPaidCapabilities')) throw new Error('preview smoke does not separate Free and paid behavior');
-if (!previewSmoke.includes("expected 403") && !previewSmoke.includes(", 403")) throw new Error('preview smoke does not verify paid feature denial on Free');
-if (/consent\/.+granted:\s*true/s.test(previewSmoke)) throw new Error('preview smoke attempts to grant another person consent from the workspace owner');
-console.log('Release config verified queues=true consumers=true schedules=true r2=true cloudflare_only_ai=true allowances=true billing_routes=true access_preview=true tier_smoke=true pr_ci=true workflows_current=true');
+if (!previewSmoke.includes('expected 403') && !previewSmoke.includes(', 403')) {
+  throw new Error('preview smoke does not verify paid feature denial on Free');
+}
+if (/consent\/.+granted:\s*true/s.test(previewSmoke)) {
+  throw new Error('preview smoke attempts to grant another person consent from the workspace owner');
+}
+
+// GitHub workflows remain optional secondary verification. When present, ensure they do not drift.
+for (const path of ['.github/workflows/preview-deploy.yml', '.github/workflows/live-verify.yml']) {
+  if (!existsSync(path)) continue;
+  const workflow = readFileSync(path, 'utf8');
+  if (workflow.includes('openai/gpt-5.6-terra')) {
+    throw new Error(`${path} still uses the unapproved model fallback`);
+  }
+  if (!workflow.includes('openai/gpt-5.5')) {
+    throw new Error(`${path} is missing the approved ZDR-cataloged model`);
+  }
+}
+
+console.log(
+  'Release config verified cloudflare_build=true d1=true durable_objects=true queues=true schedules=true r2=true ai=true assets=true canonical_preview_url=true runtime_secret_order=true tier_smoke=true'
+);
