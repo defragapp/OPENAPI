@@ -5,6 +5,7 @@ import { ProductCompletionLayer, installProductRuntime } from './ProductCompleti
 import { installBaselineInputRuntime } from './BaselineInputRuntime';
 import './styles.css';
 import './product-completion.css';
+import './visual-polish.css';
 
 installProductRuntime();
 installBaselineInputRuntime();
