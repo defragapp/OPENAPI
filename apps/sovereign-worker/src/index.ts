@@ -40,7 +40,8 @@ async function healthPayload(env: Env) {
       assets: env.ASSETS ? 'configured' : 'missing',
       ai: aiDependencyStatus(env),
       aiGateway: env.AI_GATEWAY_ID ? 'configured' : 'missing',
-      sovv: env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'missing',
+      baselineEngine: baselineDependencyStatus(env),
+      legacySovvAdapter: env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'disabled',
       stripe: env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET ? 'configured' : 'disabled',
       scripture: env.SCRIPTURE_TRANSLATION || 'WEB'
     }
@@ -51,12 +52,24 @@ app.get('/healthz', async (context) => context.json(await healthPayload(context.
 app.get('/health', async (context) => context.json(await healthPayload(context.env)));
 app.get('/ready', async (context) => {
   const payload = await healthPayload(context.env);
-  return context.json({ ...payload, ready: payload.ok && payload.dependencies.durableObjects === 'configured' && payload.dependencies.ai !== 'missing' });
+  return context.json({
+    ...payload,
+    ready: payload.ok
+      && payload.dependencies.durableObjects === 'configured'
+      && payload.dependencies.ai !== 'missing'
+      && payload.dependencies.baselineEngine === 'configured'
+  });
 });
 
-function aiDependencyStatus(env: Env): 'configured' | 'degraded' | 'missing' {
+function aiDependencyStatus(env: Env): 'configured' | 'missing' {
   const config = resolveAiModelConfig(env);
   return config.provider === 'cloudflare-gateway' && env.AI && env.AI_GATEWAY_ID ? 'configured' : 'missing';
+}
+
+function baselineDependencyStatus(env: Env): 'configured' | 'missing' {
+  return env.BASELINE_GEOCODER_URL && env.BASELINE_TIMEZONE_URL && env.BASELINE_HORIZONS_URL
+    ? 'configured'
+    : 'missing';
 }
 
 function isSovereignRuntimeReady(env: Env): boolean {
@@ -129,7 +142,6 @@ app.post('/api/v1/people/:personId/compare', async (context) => {
     }
   });
 });
-
 
 app.get('/api/v1/systems', async (context) => {
   const auth = await requireAuth(context.req.raw, context.env);
@@ -368,7 +380,7 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
     if (!canUseDevelopmentFixtures(context.env)) return serviceUnavailable('Sovereign is temporarily unavailable. Cloudflare AI Gateway is not configured, and nothing was guessed or saved as an interpretation.');
     await startTurn(context.env, auth.accountId, threadId, idempotencyKey, turn.sequence);
     await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { redacted: true, surface: body.context?.surface ?? 'Today' }, traceId);
-    const fallbackText = 'Development fallback only. Baseline tendency: your enduring design needs the verified SOVV adapter before personalization.\n\nCurrent amplification: no live current-condition contract is configured here, so nothing is treated as certainty.\n\nObserved behavior: nothing has been confirmed in this turn.\n\nUnknown actual state: only you can confirm what is true today. Does this match today?';
+    const fallbackText = 'Development fallback only. The OPENAPI-owned Baseline engine is available only after its provider calls complete.\n\nCurrent amplification: no live current-condition result is available here, so nothing is treated as certainty.\n\nObserved behavior: nothing has been confirmed in this turn.\n\nUnknown actual state: only you can confirm what is true today. Does this match today?';
     assertSovereignOutputSafety(fallbackText);
     await appendThreadEvent(context.env, threadId, turn.sequence + 1, 'assistant_development_response', { developmentFallback: true, text: fallbackText }, traceId);
     await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'completed');
