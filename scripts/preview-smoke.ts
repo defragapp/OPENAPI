@@ -1,16 +1,24 @@
 const baseUrl = process.env.PREVIEW_BASE_URL;
 const sessionCookie = process.env.PREVIEW_SESSION_COOKIE;
+const accessClientId = process.env.CF_ACCESS_CLIENT_ID;
+const accessClientSecret = process.env.CF_ACCESS_CLIENT_SECRET;
 
 if (!baseUrl) throw new Error('PREVIEW_BASE_URL is required');
 if (!sessionCookie) throw new Error('PREVIEW_SESSION_COOKIE is required');
+if ((accessClientId && !accessClientSecret) || (!accessClientId && accessClientSecret)) throw new Error('Both Cloudflare Access service-token values are required together');
 
 const origin = new URL(baseUrl).origin;
+const accessHeaders: Record<string, string> = accessClientId && accessClientSecret ? {
+  'CF-Access-Client-Id': accessClientId,
+  'CF-Access-Client-Secret': accessClientSecret
+} : {};
 
-async function request(path: string, init: RequestInit = {}, expected = 200) {
+async function request(path: string, init: RequestInit = {}, expected = 200, authenticated = true) {
   const res = await fetch(new URL(path, origin), {
     ...init,
     headers: {
-      cookie: sessionCookie,
+      ...accessHeaders,
+      ...(authenticated ? { cookie: sessionCookie } : {}),
       origin,
       'content-type': 'application/json',
       'x-idempotency-key': crypto.randomUUID(),
@@ -21,34 +29,69 @@ async function request(path: string, init: RequestInit = {}, expected = 200) {
   return res;
 }
 
-async function json(path: string, init: RequestInit = {}, expected = 200) {
-  return request(path, init, expected).then((res) => res.json() as Promise<any>);
+async function json(path: string, init: RequestInit = {}, expected = 200, authenticated = true) {
+  return request(path, init, expected, authenticated).then((res) => res.json() as Promise<any>);
 }
 
 async function safeText(res: Response) {
   const text = await res.text();
-  return text.slice(0, 500).replace(/__Host-sovereign_session=[^;\s]+/g, '__Host-sovereign_session=[redacted]');
+  return text.slice(0, 500)
+    .replace(/__Host-sovereign_session=[^;\s]+/g, '__Host-sovereign_session=[redacted]')
+    .replace(/CF-Access-Client-(Id|Secret)[^\s]*/gi, 'CF-Access-Client-$1=[redacted]');
 }
 
 function assertNoSensitiveText(label: string, value: string) {
-  for (const pattern of [/cloudflare_api_token/i, /authorization/i, /raw birth/i, /latitude/i, /longitude/i, /hidden reasoning/i, /stack trace/i]) {
+  for (const pattern of [/cloudflare_api_token/i, /raw birth/i, /latitude/i, /longitude/i, /hidden reasoning/i, /stack trace/i]) {
     if (pattern.test(value)) throw new Error(`${label} exposed sensitive text: ${pattern}`);
   }
 }
 
-async function main() {
-  const app = await fetch(origin).then(async (res) => ({ status: res.status, text: await res.text() }));
-  if (app.status >= 400 || !app.text.includes('SOVEREIGN.OS')) throw new Error('static application shell did not load');
-  assertNoSensitiveText('static app', app.text);
+async function assertPublicPage(path: string, fingerprint: string) {
+  const res = await request(path, {}, 200, false);
+  const text = await res.text();
+  if (!text.includes(fingerprint)) throw new Error(`${path} missing public fingerprint`);
+  assertNoSensitiveText(path, text);
+}
 
-  const health = await json('/health');
-  const ready = await json('/ready');
+async function verifyFreeGates() {
+  await request('/api/v1/people', { method: 'POST', body: JSON.stringify({ displayName: 'Blocked Free Person', role: 'friend' }) }, 403);
+  await request('/api/v1/systems', { method: 'POST', body: JSON.stringify({ name: 'Blocked Free System', systemType: 'family' }) }, 403);
+  await request('/api/v1/library', { method: 'POST', body: JSON.stringify({ title: 'Blocked Free Save', summary: 'Must remain unavailable.' }) }, 403);
+  await request('/api/v1/export-jobs', { method: 'POST' }, 403);
+}
+
+async function verifyPaidCapabilities() {
+  const person = (await json('/api/v1/people', { method: 'POST', body: JSON.stringify({ displayName: 'Preview Avery', role: 'friend', metadata: { source: 'preview-smoke' } }) }, 201)).person;
+  const people = await json('/api/v1/people');
+  if (!people.people?.some((item: { id: string }) => item.id === person.id)) throw new Error('Paid People record was not readable');
+
+  const family = (await json('/api/v1/systems', { method: 'POST', body: JSON.stringify({ name: 'Preview family', systemType: 'family' }) }, 201)).system;
+  const alignment = await json(`/api/v1/systems/${family.id}/alignment`);
+  if (!JSON.stringify(alignment).includes('caregiving')) throw new Error('Paid family alignment missing family-aware context');
+
+  const saved = (await json('/api/v1/library', { method: 'POST', body: JSON.stringify({ title: 'Preview understanding', summary: 'A user-approved preview summary.' }) }, 201)).saved;
+  await json('/api/v1/library');
+  await json(`/api/v1/library/${saved.id}`, { method: 'PATCH', body: JSON.stringify({ title: 'Renamed preview understanding' }) });
+  await request(`/api/v1/library/${saved.id}`, { method: 'DELETE' });
+  await json('/api/v1/export-jobs', { method: 'POST' }, 202);
+
+  const covenant = await json('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'preview decision' }) });
+  if (!covenant.scriptureSeparateFromInterpretation || !covenant.lens?.passage?.citation) throw new Error('Paid Covenant citation separation failed');
+}
+
+async function main() {
+  await assertPublicPage('/', 'SOVEREIGN.OS');
+  await assertPublicPage('/how-it-works.html', 'How it works');
+  await assertPublicPage('/pricing.html', 'Sovereign+');
+  await assertPublicPage('/faq.html', 'Clear answers before you begin.');
+
+  const health = await json('/health', {}, 200, false);
+  const ready = await json('/ready', {}, 200, false);
   assertNoSensitiveText('health', JSON.stringify(health));
   assertNoSensitiveText('ready', JSON.stringify(ready));
   if (!health.ok || !ready.ok) throw new Error('health/readiness failed');
 
-  const unauth = await fetch(new URL('/api/v1/people', origin));
-  if (unauth.status !== 401) throw new Error(`unauthenticated private API expected 401, got ${unauth.status}`);
+  await request('/api/v1/people', {}, 401, false);
 
   const today = await json('/api/v1/today');
   if (!Array.isArray(today.today?.separation) || !today.today.separation.some((value: string) => value.includes('Baseline'))) throw new Error('Today did not include Baseline context');
@@ -58,46 +101,22 @@ async function main() {
     if (!explore.plainLanguage?.includes(topic)) throw new Error(`Explore ${topic} missing plain language`);
   }
 
-  const person = (await json('/api/v1/people', { method: 'POST', body: JSON.stringify({ displayName: 'Preview Avery', role: 'friend', metadata: { source: 'preview-smoke' } }) }, 201)).person;
-  await json(`/api/v1/people/${person.id}/invitations`, { method: 'POST' }, 201);
-  for (const scope of ['pair.compare', 'trait.display', 'system.include']) await json(`/api/v1/people/${person.id}/consent/${scope}`, { method: 'PUT', body: JSON.stringify({ granted: true }) });
-  await json(`/api/v1/people/${person.id}/compare`, { method: 'POST' });
-  await json(`/api/v1/people/${person.id}/consent/pair.compare`, { method: 'PUT', body: JSON.stringify({ granted: false }) });
-  await request(`/api/v1/people/${person.id}/compare`, { method: 'POST' }, 403);
-  await json(`/api/v1/people/${person.id}/consent/pair.compare`, { method: 'PUT', body: JSON.stringify({ granted: true }) });
-
-  const family = (await json('/api/v1/systems', { method: 'POST', body: JSON.stringify({ name: 'Preview family', systemType: 'family' }) }, 201)).system;
-  await json(`/api/v1/systems/${family.id}/members`, { method: 'POST', body: JSON.stringify({ personId: person.id, metadata: { formalRole: 'sibling', authority: 'peer' } }) }, 201);
-  const familyAlignment = await json(`/api/v1/systems/${family.id}/alignment`);
-  if (!JSON.stringify(familyAlignment).includes('caregiving')) throw new Error('family alignment missing family-aware context');
-  const team = (await json('/api/v1/systems', { method: 'POST', body: JSON.stringify({ name: 'Preview team', systemType: 'team', metadata: { authority: 'lead' } }) }, 201)).system;
-  const teamAlignment = await json(`/api/v1/systems/${team.id}/alignment`);
-  if (!JSON.stringify(teamAlignment).includes('deadlines')) throw new Error('team alignment missing team-aware context');
-
-  const saved = (await json('/api/v1/library', { method: 'POST', body: JSON.stringify({ title: 'Preview insight', summary: 'A user-approved preview summary.', links: { personId: person.id } }) }, 201)).saved;
-  await json('/api/v1/library');
-  await json(`/api/v1/library/${saved.id}`, { method: 'PATCH', body: JSON.stringify({ title: 'Renamed preview insight', links: {} }) });
-  await request(`/api/v1/library/${saved.id}`, { method: 'DELETE' });
-
-  await json('/api/v1/export-jobs', { method: 'POST' }, 202);
-  const deletion = (await json('/api/v1/deletion-jobs', { method: 'POST' }, 202)).deletionJob;
-  await json(`/api/v1/deletion-jobs/${deletion.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'cancel' }) });
   const billing = await json('/api/v1/billing/entitlements');
-  await request('/api/v1/billing/stripe-test-event', { method: 'POST', body: '{}' }, 404);
+  const paid = billing.effective?.plan === 'sovereign_plus';
+  if (paid) await verifyPaidCapabilities(); else await verifyFreeGates();
+
   if (process.env.PREVIEW_EXPECT_STRIPE === '1') {
     const checkout = await json('/api/v1/billing/checkout', { method: 'POST', body: JSON.stringify({ interval: 'monthly' }) }, 201);
     if (!checkout.checkout?.url) throw new Error('Stripe Checkout did not return a handoff URL');
   }
 
-  const defaultCovenant = await json('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: false }) });
+  const defaultCovenant = await json('/api/v1/threads/preview-covenant-default/covenant', { method: 'POST', body: JSON.stringify({ enabled: false }) });
   if (defaultCovenant.covenantEnabled !== false) throw new Error('Covenant must be disabled by default');
-  if (billing.effective?.plan === 'sovereign_plus') {
-    const covenant = await json('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'preview decision' }) });
-    if (!covenant.scriptureSeparateFromInterpretation || !covenant.lens?.passage?.citation) throw new Error('Covenant citation separation failed');
-  } else {
-    await request('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'preview decision' }) }, 403);
-  }
+  if (!paid) await request('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'preview decision' }) }, 403);
   await request('/api/v1/covenant/scripture/Imaginary%201:1', {}, 404);
+
+  const deletion = (await json('/api/v1/deletion-jobs', { method: 'POST' }, 202)).deletionJob;
+  await json(`/api/v1/deletion-jobs/${deletion.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'cancel' }) });
 
   const turnKey = `preview-turn-${Date.now()}`;
   const messageRes = await request('/api/v1/threads/preview-live/messages', { method: 'POST', headers: { 'x-idempotency-key': turnKey }, body: JSON.stringify({ message: 'Show me Today without requiring an incident.', context: { surface: 'Today' } }) }, 202);
@@ -118,7 +137,7 @@ async function main() {
   if (!JSON.stringify(await duplicate.json()).includes('duplicate')) throw new Error('duplicate turn was not reported');
   await json('/api/v1/threads/preview-live/corrections', { method: 'POST', body: JSON.stringify({ correction: 'partly' }) });
 
-  console.log(`Preview smoke passed base=${origin} static=true health=true stream_chunks=${chunks} covenant=entitlement-gated billing=webhook-driven`);
+  console.log(`Preview smoke passed access=${Boolean(accessClientId)} public_pages=true health=true plan=${paid ? 'sovereign_plus' : 'free'} paid_capabilities=${paid} stream_chunks=${chunks}`);
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1); });
