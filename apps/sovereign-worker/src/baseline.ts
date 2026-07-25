@@ -1,13 +1,13 @@
 import type { Env } from './env';
 import { canUseDevelopmentFixtures } from './runtime';
-import { createOpenApiBaselineProvider } from './baseline-engine';
+import { createOpenApiBaselineProvider, isValidTimeZone } from './baseline-engine';
 import { computeReducedCurrentConditions } from './current-conditions/current';
 
 export type BirthTimeCertainty = 'exact' | 'approximate' | 'unknown';
 export type LocationPrecision = 'none' | 'approximate' | 'city_or_regional' | 'ephemeral_current' | 'stored_permitted';
-export interface BaselineInput { birthDate?: string; birthTime?: string; birthTimeCertainty?: BirthTimeCertainty; birthplace?: string; locationPrecision?: LocationPrecision; }
+export interface BaselineInput { birthDate?: string; birthTime?: string; birthTimeCertainty?: BirthTimeCertainty; birthplace?: string; birthTimezone?: string; locationPrecision?: LocationPrecision; }
 export interface CurrentLocationInput { latitude?: number; longitude?: number; }
-const VERSION = 'openapi-baseline-engine-v1';
+const VERSION = 'openapi-baseline-engine-v2';
 const SOVV_REFERENCE_COMMIT = 'a3db94bccc75089723bef0cf5ff36c47064bd789';
 const encoder = new TextEncoder();
 
@@ -18,7 +18,7 @@ function frameworkAvailability(certainty: BirthTimeCertainty, providerStatus: st
 
 export async function computeReducedBaseline(input: BaselineInput, options: { providerAvailable?: boolean; provider?: BaselineProvider; allowRecordedFixture?: boolean } = {}) {
   const normalized = normalizeBaselineInput(input);
-  if (options.providerAvailable === false) return partialBaseline(normalized.birthTimeCertainty, ['geocoder', 'timezone-provider', 'astronomical-provider']);
+  if (options.providerAvailable === false) return partialBaseline(normalized.birthTimeCertainty, ['astronomical-provider']);
   const provider = options.provider ?? (options.allowRecordedFixture ? deterministicRecordedProvider() : undefined);
   if (!provider) return partialBaseline(normalized.birthTimeCertainty, ['openapi-baseline-engine-not-configured']);
   const computed = await provider.compute(normalized).catch((error) => {
@@ -32,16 +32,16 @@ export async function computeReducedBaseline(input: BaselineInput, options: { pr
 export function normalizeBaselineInput(input: BaselineInput) {
   const birthDate = input.birthDate?.trim() ?? '';
   const birthplace = input.birthplace?.trim() ?? '';
+  const birthTimezone = input.birthTimezone?.trim() ?? '';
   const birthTimeCertainty = input.birthTimeCertainty ?? 'unknown';
   assertDate(birthDate);
-  if (birthplace.length < 2 || /failed geocoding/i.test(birthplace)) throw new Response('Invalid birthplace', { status: 400 });
+  if (birthplace.length < 2) throw new Response('Invalid birthplace', { status: 400 });
+  if (!birthTimezone || !isValidTimeZone(birthTimezone)) throw new Response('Valid birthplace timezone required', { status: 400 });
   assertTime(input.birthTime, birthTimeCertainty);
-  return { birthDate, birthTime: birthTimeCertainty === 'unknown' ? undefined : input.birthTime, birthTimeCertainty, birthplace, locationPrecision: input.locationPrecision ?? 'city_or_regional' };
+  return { birthDate, birthTime: birthTimeCertainty === 'unknown' ? undefined : input.birthTime, birthTimeCertainty, birthplace, birthTimezone, locationPrecision: input.locationPrecision ?? 'city_or_regional' };
 }
 
 export interface BaselineProviderOutput {
-  timezone: string;
-  geocodePrecision: string;
   natalPlacements: Record<string, unknown>;
   houses: Record<string, unknown> | null;
   aspects: string[];
@@ -65,8 +65,6 @@ export function deterministicRecordedProvider(): BaselineProvider {
     const moon = signs[(day + month) % 12]!;
     const ascendant = input.birthTimeCertainty === 'unknown' ? undefined : signs[(Number((input.birthTime ?? '12:00').slice(0, 2)) + day) % 12];
     return {
-      timezone: input.locationPrecision === 'none' ? 'unavailable' : 'UTC',
-      geocodePrecision: input.locationPrecision === 'none' ? 'none' : input.locationPrecision,
       natalPlacements: { sun, moon, ...(ascendant ? { ascendant } : {}) },
       houses: null,
       aspects: ascendant ? [`Sun ${sun} square Ascendant ${ascendant}`] : [],
@@ -77,13 +75,13 @@ export function deterministicRecordedProvider(): BaselineProvider {
       baselineTendency: 'Development fixture only: a reduced interpretive tendency is available.',
       interpretiveSignals: [`Sun in ${sun}`, `Moon in ${moon}`],
       sourceTimestamp: new Date().toISOString(),
-      provenance: { fixture: true, rawBirthInputReturned: false }
+      provenance: { fixture: true, rawBirthInputReturned: false, birthplaceSentToExternalProvider: false }
     };
   } };
 }
 
 function reduceNumber(value: number): number { let current = value; while (current > 9) current = String(current).split('').reduce((sum, character) => sum + Number(character), 0); return current; }
-function partialBaseline(certainty: BirthTimeCertainty, unavailable: string[]) { return { status: 'partial', providerStatus: 'unavailable', uncertainty: 'high', computationVersion: VERSION, provenance: { deterministicCalculation: false, engine: 'openapi-owned', sovvReferenceCommit: SOVV_REFERENCE_COMMIT, sovvRuntimeDependency: false, unavailable }, reducedContext: modelSafeContext(certainty, 'unavailable', frameworkAvailability(certainty, 'unavailable')) }; }
+function partialBaseline(certainty: BirthTimeCertainty, unavailable: string[]) { return { status: 'partial', providerStatus: 'unavailable', uncertainty: 'high', computationVersion: VERSION, provenance: { deterministicCalculation: false, engine: 'openapi-owned', sovvReferenceCommit: SOVV_REFERENCE_COMMIT, sovvRuntimeDependency: false, birthplaceSentToExternalProvider: false, unavailable }, reducedContext: modelSafeContext(certainty, 'unavailable', frameworkAvailability(certainty, 'unavailable')) }; }
 function reduceComputedBaseline(certainty: BirthTimeCertainty, computed: BaselineProviderOutput) {
   const availability = frameworkAvailability(certainty, 'computed');
   return {
@@ -99,6 +97,7 @@ function reduceComputedBaseline(certainty: BirthTimeCertainty, computed: Baselin
       sourceTimestamp: computed.sourceTimestamp,
       sovvReferenceCommit: SOVV_REFERENCE_COMMIT,
       sovvRuntimeDependency: false,
+      birthplaceSentToExternalProvider: false,
       rawBirthInputReturned: false,
       ...computed.provenance
     },
@@ -113,9 +112,7 @@ function reduceComputedBaseline(certainty: BirthTimeCertainty, computed: Baselin
         humanDesign: certainty === 'unknown' ? null : computed.humanDesign,
         geneKeys: certainty === 'unknown' ? {} : computed.geneKeys,
         numerology: computed.numerology,
-        currentAstronomy: computed.currentAstronomy,
-        timezone: computed.timezone,
-        geocodePrecision: computed.geocodePrecision
+        currentAstronomy: computed.currentAstronomy
       },
       interpretiveFramework: {
         disclaimer: 'Astrology, Human Design, Gene Keys, and numerology are interpretive frameworks, not scientifically verified psychological measurement.',
@@ -128,7 +125,14 @@ function modelSafeContext(certainty: BirthTimeCertainty, providerStatus: string,
 
 export async function persistBaseline(env: Env, accountId: string, input: BaselineInput) {
   const computed = await computeConfiguredBaseline(env, input);
-  const protectedInput = { birthDateHash: await sha256(input.birthDate ?? ''), birthTimeCertainty: input.birthTimeCertainty, hasBirthTime: Boolean(input.birthTime && input.birthTimeCertainty !== 'unknown'), birthplaceHash: await sha256(input.birthplace ?? ''), locationPrecision: input.locationPrecision ?? 'city_or_regional' };
+  const protectedInput = {
+    birthDateHash: await sha256(input.birthDate ?? ''),
+    birthTimeCertainty: input.birthTimeCertainty,
+    hasBirthTime: Boolean(input.birthTime && input.birthTimeCertainty !== 'unknown'),
+    birthplaceHash: await sha256(input.birthplace ?? ''),
+    birthTimezoneHash: await sha256(input.birthTimezone ?? ''),
+    locationPrecision: input.locationPrecision ?? 'city_or_regional'
+  };
   const inputHash = await sha256(JSON.stringify(protectedInput));
   await env.DB.prepare(`INSERT OR REPLACE INTO baseline_onboarding (account_id, input_hash, protected_input_json, reduced_context_json, computation_version, provenance_json, status, uncertainty, last_computed_at, provider_status, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, datetime('now'))`).bind(accountId, inputHash, JSON.stringify(protectedInput), JSON.stringify(computed.reducedContext), computed.computationVersion, JSON.stringify(computed.provenance), computed.status, computed.uncertainty, computed.providerStatus).run();
   return { status: computed.status, uncertainty: computed.uncertainty, reducedContext: computed.reducedContext, provenance: computed.provenance, computationVersion: computed.computationVersion };
@@ -157,10 +161,7 @@ export async function computeCurrentConditions(env: Env, accountId: string, mode
   }
   const precision = mode === 'ephemeral_current' ? 'ephemeral' : mode === 'approximate' ? 'region' : 'city';
   try {
-    const current = await computeReducedCurrentConditions(env, {
-      accountId,
-      location: { latitude, longitude, precision }
-    });
+    const current = await computeReducedCurrentConditions(env, { accountId, location: { latitude, longitude, precision } });
     const person = await env.DB.prepare('SELECT id FROM persons WHERE account_id = ? ORDER BY created_at LIMIT 1').bind(accountId).first<{ id: string }>();
     if (person?.id) {
       await env.DB.prepare('INSERT INTO current_conditions (id, person_id, computed_at, location_hash, conditions_json, source_ref, precision_used, provider_status) VALUES (?, ?, datetime(\'now\'), ?, ?, ?, ?, ?)')
@@ -173,18 +174,7 @@ export async function computeCurrentConditions(env: Env, accountId: string, mode
 }
 
 function unavailableCurrentConditions(mode: LocationPrecision, reason: string) {
-  return {
-    source: 'openapi-current-conditions',
-    computedAt: new Date().toISOString(),
-    precisionUsed: mode,
-    providerStatus: 'unavailable',
-    reduced: {
-      baselineTendency: 'Baseline unchanged.',
-      possibleCurrentAmplification: reason,
-      knownObservation: 'No observed behavior supplied.',
-      unknownActualState: 'Current conditions do not determine behavior.'
-    }
-  };
+  return { source: 'openapi-current-conditions', computedAt: new Date().toISOString(), precisionUsed: mode, providerStatus: 'unavailable', reduced: { baselineTendency: 'Baseline unchanged.', possibleCurrentAmplification: reason, knownObservation: 'No observed behavior supplied.', unknownActualState: 'Current conditions do not determine behavior.' } };
 }
 
 export async function getLatestCurrentConditions(env: Env, accountId: string) {
@@ -229,6 +219,7 @@ function sanitizeBaselineForModel(value: unknown) {
       engine: provenance.engine,
       interpretiveFrameworks: provenance.interpretiveFrameworks,
       rawBirthInputReturned: false,
+      birthplaceSentToExternalProvider: false,
       sovvRuntimeDependency: false
     },
     reducedContext: {
