@@ -137,6 +137,10 @@ try {
     EMAIL_FROM: process.env.EMAIL_FROM || '',
     EMAIL_TIMEOUT_MS: process.env.EMAIL_TIMEOUT_MS || '2500',
     ASTRONOMY_API_URL: process.env.ASTRONOMY_API_URL || '',
+    BASELINE_HORIZONS_URL:
+      process.env.BASELINE_HORIZONS_URL || config.env.preview.vars.BASELINE_HORIZONS_URL,
+    BASELINE_PROVIDER_TIMEOUT_MS:
+      process.env.BASELINE_PROVIDER_TIMEOUT_MS || config.env.preview.vars.BASELINE_PROVIDER_TIMEOUT_MS,
     SCRIPTURE_TRANSLATION: process.env.SCRIPTURE_TRANSLATION || 'WEB'
   };
   // One preview serves both signup and login, so do not set a single global
@@ -199,7 +203,12 @@ try {
     configuredIntegrations: {
       turnstile: Boolean(process.env.VITE_TURNSTILE_SITE_KEY && process.env.TURNSTILE_SECRET_KEY),
       email: Boolean(process.env.EMAIL_API_URL && process.env.EMAIL_API_TOKEN && process.env.EMAIL_FROM),
-      baseline: Boolean(process.env.SOVV_BASE_URL),
+      baseline: {
+        configured: Boolean(config.env.preview.vars.BASELINE_HORIZONS_URL),
+        mode: 'openapi-owned-geocentric-v2',
+        birthplaceGeocoder: 'disabled'
+      },
+      legacySovv: Boolean(process.env.SOVV_BASE_URL),
       stripeTest: Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET)
     }
   };
