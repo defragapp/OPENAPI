@@ -1,8 +1,10 @@
 import type { Env } from '../env';
 import { recognitionPlanSchema } from '../agent/recognition';
+import { getEntitlements, requireFeature } from './entitlements';
 import { ensureThread } from './threads';
 
 export async function saveLatestInsightModule(env: Env, accountId: string, threadId: string): Promise<{ id: string; module: Record<string, unknown> }> {
+  requireFeature(await getEntitlements(env, accountId), 'library.continuity');
   await ensureThread(env, accountId, threadId);
   const event = await env.DB.prepare(`SELECT te.id, te.payload_json
     FROM thread_events te JOIN threads t ON t.id = te.thread_id
