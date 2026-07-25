@@ -1,4 +1,5 @@
 import type { Env } from '../env';
+import { parseHorizonsJson, type HorizonsPayload } from '../baseline-engine';
 
 export interface CurrentConditionInput {
   accountId: string;
@@ -120,8 +121,8 @@ async function fetchCurrentBodies(env: Env, computedAt: string, location?: Curre
   const entries = Object.entries(PLANET_IDS);
   const bodies: Record<string, { longitude: number; latitude: number; retrograde?: boolean }> = {};
   for (const [name, targetId] of entries) {
-    if (Object.keys(bodies).length > 0) await new Promise((resolve) => setTimeout(resolve, 150));
-    const position = await fetchHorizonsPosition(targetId, computedAt, location.latitude, location.longitude);
+    if (Object.keys(bodies).length > 0) await new Promise((resolve) => setTimeout(resolve, 125));
+    const position = await fetchHorizonsPosition(env, targetId, computedAt, location.latitude, location.longitude);
     if (position) bodies[name] = position;
   }
   if (!Object.keys(bodies).length) throw new Error('No Horizons current-condition bodies returned');
@@ -129,29 +130,58 @@ async function fetchCurrentBodies(env: Env, computedAt: string, location?: Curre
   return bodies;
 }
 
-async function fetchHorizonsPosition(targetId: string, computedAt: string, lat: number, lng: number): Promise<{ longitude: number; latitude: number; retrograde: boolean } | null> {
+async function fetchHorizonsPosition(env: Env, targetId: string, computedAt: string, latitude: number, longitude: number): Promise<{ longitude: number; latitude: number; retrograde: boolean } | null> {
   const startDate = new Date(computedAt);
-  const stopDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
-  const start = horizonsDate(startDate);
-  const stop = horizonsDate(stopDate);
-  const params = new URLSearchParams({
-    format: 'json', COMMAND: `'${targetId}'`, OBJ_DATA: 'NO', MAKE_EPHEM: 'YES', EPHEM_TYPE: 'OBSERVER', CENTER: 'coord@399', COORD_TYPE: 'GEODETIC',
-    SITE_COORD: `'${lng.toFixed(4)},${lat.toFixed(4)},0'`, START_TIME: `'${start}'`, STOP_TIME: `'${stop}'`, STEP_SIZE: '1d', QUANTITIES: '31', CSV_FORMAT: 'NO'
+  const stopDate = new Date(startDate.getTime() + 12 * 60 * 60 * 1000);
+  const endpoint = new URL(env.BASELINE_HORIZONS_URL || 'https://ssd.jpl.nasa.gov/api/horizons.api');
+  const params: Record<string, string> = {
+    format: 'json',
+    COMMAND: `'${targetId}'`,
+    OBJ_DATA: 'NO',
+    MAKE_EPHEM: 'YES',
+    EPHEM_TYPE: 'OBSERVER',
+    CENTER: 'coord@399',
+    COORD_TYPE: 'GEODETIC',
+    SITE_COORD: `'${longitude.toFixed(4)},${latitude.toFixed(4)},0'`,
+    START_TIME: `'${horizonsDate(startDate)}'`,
+    STOP_TIME: `'${horizonsDate(stopDate)}'`,
+    STEP_SIZE: `'6 h'`,
+    QUANTITIES: `'31'`,
+    CSV_FORMAT: 'YES',
+    CAL_FORMAT: 'CAL',
+    CAL_TYPE: 'GREGORIAN',
+    EXTRA_PREC: 'YES'
+  };
+  for (const [key, value] of Object.entries(params)) endpoint.searchParams.set(key, value);
+  const timeout = Number(env.BASELINE_PROVIDER_TIMEOUT_MS ?? 8000);
+  const response = await fetch(endpoint, {
+    headers: { 'User-Agent': 'Sovereign.OS OPENAPI Current Conditions/1.0' },
+    signal: AbortSignal.timeout(Number.isFinite(timeout) ? timeout : 8000)
   });
-  const response = await fetch(`https://ssd.jpl.nasa.gov/api/horizons.api?${params}`, { headers: { 'User-Agent': 'SovereignOS/1.0 openapi-current-conditions' }, signal: AbortSignal.timeout(8000) });
   if (!response.ok) return null;
-  const text = await response.text();
-  const soeMatch = text.match(/\$\$SOE([\s\S]*?)\$\$EOE/);
-  if (!soeMatch?.[1]) return null;
-  const dataLine = soeMatch[1].trim().split('\n')[0] ?? '';
-  const numbers = dataLine.match(/-?\d+\.\d+/g);
-  if (!numbers || numbers.length < 2) return null;
-  return { longitude: parseFloat(numbers[0] ?? '0'), latitude: parseFloat(numbers[1] ?? '0'), retrograde: text.includes('R') && dataLine.includes('R') };
+  let rows: Array<{ longitude: number; latitude: number }>;
+  try {
+    rows = parseHorizonsJson(await response.json() as HorizonsPayload);
+  } catch {
+    return null;
+  }
+  const first = rows[0];
+  if (!first) return null;
+  const second = rows[1];
+  return {
+    longitude: first.longitude,
+    latitude: first.latitude,
+    retrograde: Boolean(second && signedLongitudeDelta(first.longitude, second.longitude) < 0)
+  };
 }
 
 function horizonsDate(date: Date): string {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return `${date.getUTCFullYear()}-${months[date.getUTCMonth()]}-${String(date.getUTCDate()).padStart(2, '0')} ${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
+}
+
+function signedLongitudeDelta(from: number, to: number) {
+  return ((to - from + 540) % 360) - 180;
 }
 
 function title(value: string): string {
@@ -173,13 +203,13 @@ function strengthForBody(body: string, retrograde: boolean): number {
 }
 
 function affectedDimensions(bodies: string[]): ReducedCurrentCondition['affectedBaselineDimensions'] {
-  const out = new Set<ReducedCurrentCondition['affectedBaselineDimensions'][number]>();
-  if (bodies.includes('mercury')) out.add('communication').add('learning').add('decisions');
-  if (bodies.includes('venus')) out.add('love').add('expression');
-  if (bodies.includes('mars') || bodies.includes('saturn') || bodies.includes('pluto')) out.add('pressure_response').add('decisions');
-  if (bodies.includes('sun') || bodies.includes('moon')) out.add('identity').add('expression');
-  if (!out.size) out.add('identity');
-  return [...out];
+  const output = new Set<ReducedCurrentCondition['affectedBaselineDimensions'][number]>();
+  if (bodies.includes('mercury')) output.add('communication').add('learning').add('decisions');
+  if (bodies.includes('venus')) output.add('love').add('expression');
+  if (bodies.includes('mars') || bodies.includes('saturn') || bodies.includes('pluto')) output.add('pressure_response').add('decisions');
+  if (bodies.includes('sun') || bodies.includes('moon')) output.add('identity').add('expression');
+  if (!output.size) output.add('identity');
+  return [...output];
 }
 
 function summarizeQuality(qualities: ReducedCurrentCondition['activeFactors'][number]['quality'][]): string {
