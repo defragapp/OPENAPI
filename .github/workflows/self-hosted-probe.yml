@@ -1,4 +1,4 @@
-name: Self-hosted Runner Probe
+name: Release Runner Probe
 
 on:
   push:
@@ -13,13 +13,32 @@ permissions:
   contents: read
 
 jobs:
-  probe:
+  self-hosted:
     runs-on: [self-hosted, linux]
     timeout-minutes: 5
     steps:
       - name: Confirm self-hosted runner
         run: |
           set -euo pipefail
-          echo "runner available"
+          echo "self-hosted runner available"
           uname -a
-          node --version || true
+
+  ubuntu-slim:
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    steps:
+      - name: Confirm slim runner
+        run: |
+          set -euo pipefail
+          echo "ubuntu-slim runner available"
+          uname -a
+
+  ubuntu-arm:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 5
+    steps:
+      - name: Confirm ARM runner
+        run: |
+          set -euo pipefail
+          echo "ubuntu ARM runner available"
+          uname -a
