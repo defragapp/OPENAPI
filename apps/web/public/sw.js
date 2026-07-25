@@ -10,6 +10,7 @@ const PUBLIC_SHELL = [
   '/launch.css',
   '/launch-polish.css'
 ];
+const PUBLIC_ASSETS = new Set(PUBLIC_SHELL.filter((path) => path !== '/'));
 const PUBLIC_NAVIGATION = new Set(['/', '/how-it-works.html', '/pricing.html', '/faq.html', '/privacy', '/terms']);
 
 self.addEventListener('install', (event) => {
@@ -39,7 +40,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (['style', 'script', 'image', 'font', 'manifest'].includes(request.destination)) {
+  if (PUBLIC_ASSETS.has(url.pathname) || url.pathname.startsWith('/assets/')) {
     event.respondWith(staleWhileRevalidate(request));
   }
 });
