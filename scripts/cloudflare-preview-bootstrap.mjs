@@ -1,54 +1,81 @@
 import { readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
-const root = resolve(new URL('..', import.meta.url).pathname);
+const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const workerDir = resolve(root, 'apps/sovereign-worker');
 const workerName = process.env.PREVIEW_WORKER_NAME || 'sovereign-openapi-preview';
 const d1Name = process.env.PREVIEW_D1_NAME || 'sovereign-openapi-preview-db';
 const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
 const token = process.env.CLOUDFLARE_API_TOKEN;
 const commitSha = process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || 'local';
+const workersCi = process.env.WORKERS_CI === '1';
+const configuredPreviewBaseUrl = String(process.env.PREVIEW_BASE_URL || '').replace(/\/+$/, '');
+const accountSubdomain = String(process.env.CLOUDFLARE_WORKERS_SUBDOMAIN || '').trim();
+const previewBaseUrl =
+  configuredPreviewBaseUrl ||
+  (accountSubdomain ? `https://${workerName}.${accountSubdomain}.workers.dev` : '');
 const env = { ...process.env };
 
-// Cloudflare Workers Builds supplies Wrangler authentication internally. Preserve
-// explicit credentials when this script is run from another CI system or locally.
 if (accountId) env.CLOUDFLARE_ACCOUNT_ID = accountId;
 if (token) env.CLOUDFLARE_API_TOKEN = token;
 
-if (process.env.WORKERS_CI === '1' && !process.env.PREVIEW_SESSION_SIGNING_SECRET) {
+if (workersCi && !process.env.PREVIEW_SESSION_SIGNING_SECRET) {
   throw new Error('PREVIEW_SESSION_SIGNING_SECRET is required in Cloudflare Workers Builds');
+}
+if (workersCi && !previewBaseUrl) {
+  throw new Error(
+    'PREVIEW_BASE_URL or CLOUDFLARE_WORKERS_SUBDOMAIN is required in Cloudflare Workers Builds'
+  );
+}
+
+const sensitiveValues = [
+  token,
+  process.env.PREVIEW_SESSION_SIGNING_SECRET,
+  process.env.STRIPE_SECRET_KEY,
+  process.env.STRIPE_WEBHOOK_SECRET,
+  process.env.SOVV_INTERNAL_AUTH_TOKEN
+].filter(Boolean);
+
+function sanitize(value) {
+  let sanitized = String(value ?? '');
+  for (const secret of sensitiveValues) sanitized = sanitized.replaceAll(secret, '[redacted]');
+  return sanitized;
 }
 
 function run(args, options = {}) {
+  const hasInput = options.input !== undefined;
+  const capture = Boolean(options.capture || hasInput);
   const result = spawnSync(
     'pnpm',
     ['--filter', '@sovereign/worker', 'exec', 'wrangler', ...args],
     {
       cwd: root,
       encoding: 'utf8',
-      stdio: options.capture ? ['ignore', 'pipe', 'pipe'] : 'inherit',
+      input: options.input,
+      stdio: capture ? ['pipe', 'pipe', 'pipe'] : 'inherit',
       env
     }
   );
   if (result.status !== 0) {
-    const detail = options.capture ? sanitize(result.stderr || result.stdout) : 'see Wrangler output';
+    const detail = capture ? sanitize(result.stderr || result.stdout) : 'see Wrangler output above';
     throw new Error(`wrangler ${args.join(' ')} failed: ${detail}`);
   }
   return result.stdout ?? '';
 }
 
-function sanitize(value) {
-  let sanitized = String(value);
-  if (token) sanitized = sanitized.replaceAll(token, '[redacted-cloudflare-token]');
-  return sanitized;
-}
-
 function parseJsonOutput(output) {
   const trimmed = output.trim();
-  const starts = [trimmed.indexOf('{'), trimmed.indexOf('[')].filter((index) => index >= 0);
-  if (starts.length === 0) throw new Error(`Expected JSON from Wrangler, received: ${sanitize(trimmed)}`);
-  return JSON.parse(trimmed.slice(Math.min(...starts)));
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    const starts = [trimmed.indexOf('{'), trimmed.indexOf('[')].filter((index) => index >= 0);
+    if (starts.length === 0) {
+      throw new Error(`Expected JSON from Wrangler, received: ${sanitize(trimmed)}`);
+    }
+    return JSON.parse(trimmed.slice(Math.min(...starts)));
+  }
 }
 
 function findDatabaseId(listJson) {
@@ -57,10 +84,20 @@ function findDatabaseId(listJson) {
   return match?.uuid ?? match?.id ?? match?.database_id;
 }
 
-let databaseId = findDatabaseId(parseJsonOutput(run(['d1', 'list', '--json'], { capture: true })));
+function runD1Json(args) {
+  try {
+    return parseJsonOutput(run(args, { capture: true }));
+  } catch (error) {
+    throw new Error(
+      `Cloudflare build token must include Account D1 Edit permission. ${sanitize(error.message)}`
+    );
+  }
+}
+
+let databaseId = findDatabaseId(runD1Json(['d1', 'list', '--json']));
 let createdDatabase = false;
 if (!databaseId) {
-  const created = parseJsonOutput(run(['d1', 'create', d1Name, '--json'], { capture: true }));
+  const created = runD1Json(['d1', 'create', d1Name, '--json']);
   databaseId = created.uuid ?? created.id ?? created.result?.uuid ?? created.result?.id;
   createdDatabase = true;
 }
@@ -84,61 +121,67 @@ try {
     AI_MODEL: process.env.AI_MODEL || config.env.preview.vars.AI_MODEL,
     AI_GATEWAY_ID: process.env.AI_GATEWAY_ID || config.env.preview.vars.AI_GATEWAY_ID,
     SOVV_INTERNAL_BASE_URL: process.env.SOVV_BASE_URL || '',
-    STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY: process.env.STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY || '',
-    STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL: process.env.STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL || '',
-    STRIPE_SUCCESS_URL:
-      process.env.STRIPE_SUCCESS_URL || `https://${workerName}.workers.dev/app?billing=success`,
-    STRIPE_CANCEL_URL:
-      process.env.STRIPE_CANCEL_URL || `https://${workerName}.workers.dev/app?billing=cancelled`,
-    STRIPE_PORTAL_RETURN_URL:
-      process.env.STRIPE_PORTAL_RETURN_URL || `https://${workerName}.workers.dev/app?billing=portal`,
+    STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY:
+      process.env.STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY || '',
+    STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL:
+      process.env.STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL || '',
+    STRIPE_SUCCESS_URL: previewBaseUrl ? `${previewBaseUrl}/app?billing=success` : '',
+    STRIPE_CANCEL_URL: previewBaseUrl ? `${previewBaseUrl}/app?billing=cancelled` : '',
+    STRIPE_PORTAL_RETURN_URL: previewBaseUrl ? `${previewBaseUrl}/app?billing=portal` : '',
     SCRIPTURE_TRANSLATION: process.env.SCRIPTURE_TRANSLATION || 'WEB'
   };
   writeFileSync(configPath, JSON.stringify(config, null, 2));
 
-  run(['d1', 'migrations', 'apply', d1Name, '--remote', '--env', 'preview', '--config', configPath]);
-
-  const secrets = {
-    SESSION_SIGNING_SECRET: process.env.PREVIEW_SESSION_SIGNING_SECRET,
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-    SOVV_INTERNAL_AUTH_TOKEN: process.env.SOVV_INTERNAL_AUTH_TOKEN
-  };
-  for (const [name, value] of Object.entries(secrets)) {
-    if (!value) continue;
-    const result = spawnSync(
-      'pnpm',
-      [
-        '--filter',
-        '@sovereign/worker',
-        'exec',
-        'wrangler',
-        'secret',
-        'put',
-        name,
-        '--env',
-        'preview',
-        '--config',
-        configPath
-      ],
-      { cwd: root, input: value, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], env }
+  try {
+    run(['d1', 'migrations', 'apply', d1Name, '--remote', '--env', 'preview', '--config', configPath]);
+  } catch (error) {
+    throw new Error(
+      `Remote D1 migration failed. Confirm the build token has D1 Edit permission. ${sanitize(error.message)}`
     );
-    if (result.status !== 0) {
-      throw new Error(`wrangler secret put ${name} failed: ${sanitize(result.stderr || result.stdout)}`);
+  }
+
+  // The Worker must exist before runtime secrets can be attached. This first deploy
+  // also provisions draft R2 and Queue bindings when the build token has permission.
+  run(['deploy', '--env', 'preview', '--config', configPath]);
+
+  const secrets = Object.fromEntries(
+    Object.entries({
+      SESSION_SIGNING_SECRET: process.env.PREVIEW_SESSION_SIGNING_SECRET,
+      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+      SOVV_INTERNAL_AUTH_TOKEN: process.env.SOVV_INTERNAL_AUTH_TOKEN
+    }).filter(([, value]) => Boolean(value))
+  );
+
+  if (Object.keys(secrets).length > 0) {
+    try {
+      run(['secret', 'bulk', '--env', 'preview', '--config', configPath], {
+        input: JSON.stringify(secrets)
+      });
+    } catch (error) {
+      throw new Error(`Runtime secret upload failed after initial deploy. ${sanitize(error.message)}`);
     }
   }
 
-  const deployOutput = run(['deploy', '--env', 'preview', '--config', configPath], { capture: true });
+  // Final deploy guarantees the exact commit/config is active after secret updates.
+  const deployOutput = run(['deploy', '--env', 'preview', '--config', configPath], {
+    capture: true
+  });
   const deployedUrl =
-    deployOutput.match(/https:\/\/[^\s]+\.workers\.dev/)?.[0] ??
-    `https://${workerName}.workers.dev`;
+    deployOutput.match(/https:\/\/[^\s]+\.workers\.dev/)?.[0] || previewBaseUrl;
+  if (!deployedUrl) {
+    throw new Error('Wrangler did not report a workers.dev URL and PREVIEW_BASE_URL is not set');
+  }
+
   const metadata = {
     workerName,
     d1Name,
     createdDatabase,
     deployedUrl,
+    previewBaseUrl: deployedUrl,
     databaseIdSource: 'cloudflare-api',
-    commitSha
+    commitSha,
+    buildUuid: process.env.WORKERS_CI_BUILD_UUID || null
   };
   writeFileSync(resolve(root, 'preview-deployment.json'), JSON.stringify(metadata, null, 2));
   console.log(JSON.stringify({ ...metadata, databaseIdSource: 'resolved-not-printed' }, null, 2));
