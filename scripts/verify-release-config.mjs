@@ -132,7 +132,7 @@ for (const required of [
   'BASELINE_GEOCODER_URL',
   'BASELINE_TIMEZONE_URL',
   'BASELINE_HORIZONS_URL',
-  'SOVV is read-only reference material',
+  '`defragapp/SOVV` is read-only reference material',
   'D1 Edit',
   'Queues Edit',
   'Workers R2 Storage Edit',
@@ -173,7 +173,7 @@ for (const forbidden of ['SOVV_INTERNAL_AUTH_TOKEN', 'sovereign-os-api-service-b
     throw new Error(`OPENAPI Baseline engine retained forbidden cross-repository dependency ${forbidden}`);
   }
 }
-for (const required of ['Unexpected Horizons API signature', 'not.toContain(\'Upland\')', 'withholds time-dependent framework activations']) {
+for (const required of ['Unexpected Horizons API signature', "not.toContain('Upland')", 'withholds time-dependent framework activations']) {
   if (!baselineTests.includes(required)) throw new Error(`Baseline engine tests are missing ${required}`);
 }
 
@@ -210,7 +210,6 @@ if (/consent\/.+granted:\s*true/s.test(previewSmoke)) {
   throw new Error('preview smoke attempts to grant another person consent from the workspace owner');
 }
 
-// GitHub workflows remain optional secondary verification. When present, ensure they do not drift.
 for (const path of ['.github/workflows/preview-deploy.yml', '.github/workflows/live-verify.yml']) {
   if (!existsSync(path)) continue;
   const workflow = readFileSync(path, 'utf8');
