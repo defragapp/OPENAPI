@@ -1,10 +1,12 @@
 import type { Env } from './env';
 import { canUseDevelopmentFixtures } from './runtime';
 import { createOpenApiBaselineProvider } from './baseline-engine';
+import { computeReducedCurrentConditions } from './current-conditions/current';
 
 export type BirthTimeCertainty = 'exact' | 'approximate' | 'unknown';
 export type LocationPrecision = 'none' | 'approximate' | 'city_or_regional' | 'ephemeral_current' | 'stored_permitted';
 export interface BaselineInput { birthDate?: string; birthTime?: string; birthTimeCertainty?: BirthTimeCertainty; birthplace?: string; locationPrecision?: LocationPrecision; }
+export interface CurrentLocationInput { latitude?: number; longitude?: number; }
 const VERSION = 'openapi-baseline-engine-v1';
 const SOVV_REFERENCE_COMMIT = 'a3db94bccc75089723bef0cf5ff36c47064bd789';
 const encoder = new TextEncoder();
@@ -146,15 +148,43 @@ export async function getBaselineStatus(env: Env, accountId: string) {
   return { status: row.status, uncertainty: row.uncertainty, reducedContext: JSON.parse(row.reduced_context_json), provenance: JSON.parse(row.provenance_json), computationVersion: row.computation_version, lastComputedAt: row.last_computed_at, providerStatus: row.provider_status };
 }
 
-export async function computeCurrentConditions(env: Env, accountId: string, mode: LocationPrecision) {
-  const precision = mode === 'ephemeral_current' ? 'approximate' : mode;
-  const unavailable = mode === 'none';
-  const provider = unavailable ? undefined : await fetchCurrentConditionProvider(env, precision);
-  const providerStatus = provider ? 'computed' : 'unavailable';
-  const reduced = { baselineTendency: 'Baseline unchanged.', possibleCurrentAmplification: provider ? `${provider.currentAstronomy.sun} and ${provider.currentAstronomy.moon} may be noticeable today.` : 'Unavailable without a configured permitted provider.', knownObservation: 'No observed behavior supplied.', unknownActualState: 'Current conditions do not determine behavior.' };
-  const person = await env.DB.prepare('SELECT id FROM persons WHERE account_id = ? ORDER BY created_at LIMIT 1').bind(accountId).first<{ id: string }>();
-  if (person?.id) await env.DB.prepare('INSERT INTO current_conditions (id, person_id, computed_at, location_hash, conditions_json, source_ref, precision_used, provider_status) VALUES (?, ?, datetime(\'now\'), ?, ?, ?, ?, ?)').bind(`current_${crypto.randomUUID()}`, person.id, null, JSON.stringify(reduced), provider?.source ?? 'openapi-current-provider', precision, providerStatus).run();
-  return { source: provider?.source ?? 'openapi-current-provider', computedAt: provider?.sourceTimestamp ?? new Date().toISOString(), precisionUsed: precision, providerStatus, reduced };
+export async function computeCurrentConditions(env: Env, accountId: string, mode: LocationPrecision, input: CurrentLocationInput = {}) {
+  if (mode === 'none') return unavailableCurrentConditions(mode, 'Location permission is not enabled.');
+  const latitude = Number(input.latitude ?? env.CURRENT_CONDITIONS_LAT);
+  const longitude = Number(input.longitude ?? env.CURRENT_CONDITIONS_LNG);
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+    return unavailableCurrentConditions(mode, 'A permitted current location is required.');
+  }
+  const precision = mode === 'ephemeral_current' ? 'ephemeral' : mode === 'approximate' ? 'region' : 'city';
+  try {
+    const current = await computeReducedCurrentConditions(env, {
+      accountId,
+      location: { latitude, longitude, precision }
+    });
+    const person = await env.DB.prepare('SELECT id FROM persons WHERE account_id = ? ORDER BY created_at LIMIT 1').bind(accountId).first<{ id: string }>();
+    if (person?.id) {
+      await env.DB.prepare('INSERT INTO current_conditions (id, person_id, computed_at, location_hash, conditions_json, source_ref, precision_used, provider_status) VALUES (?, ?, datetime(\'now\'), ?, ?, ?, ?, ?)')
+        .bind(`current_${crypto.randomUUID()}`, person.id, null, JSON.stringify(current), current.source, mode, 'computed').run();
+    }
+    return { source: current.source, computedAt: current.computedAt, precisionUsed: mode, providerStatus: 'computed', reduced: current };
+  } catch {
+    return unavailableCurrentConditions(mode, 'Current astronomy is temporarily unavailable.');
+  }
+}
+
+function unavailableCurrentConditions(mode: LocationPrecision, reason: string) {
+  return {
+    source: 'openapi-current-conditions',
+    computedAt: new Date().toISOString(),
+    precisionUsed: mode,
+    providerStatus: 'unavailable',
+    reduced: {
+      baselineTendency: 'Baseline unchanged.',
+      possibleCurrentAmplification: reason,
+      knownObservation: 'No observed behavior supplied.',
+      unknownActualState: 'Current conditions do not determine behavior.'
+    }
+  };
 }
 
 export async function getLatestCurrentConditions(env: Env, accountId: string) {
@@ -172,7 +202,7 @@ export async function getModelSafeBaselineContext(env: Env, accountId: string) {
   const [baseline, current] = await Promise.all([getBaselineStatus(env, accountId), getLatestCurrentConditions(env, accountId)]);
   return {
     baseline: sanitizeBaselineForModel(baseline),
-    current,
+    current: sanitizeCurrentForModel(current),
     separation: [
       'Baseline tendency is enduring interpretive context, not diagnosis or proof.',
       'Current amplification is temporary context and does not determine behavior.',
@@ -221,12 +251,35 @@ function sanitizeBaselineForModel(value: unknown) {
   };
 }
 
-function asRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' ? value as Record<string, unknown> : {};
+function sanitizeCurrentForModel(value: unknown) {
+  const current = asRecord(value);
+  const reduced = asRecord(current.reduced);
+  if (current.status === 'not_started') return { status: 'not_started', providerStatus: 'unavailable' };
+  return {
+    status: current.status,
+    providerStatus: current.providerStatus,
+    precisionUsed: current.precisionUsed,
+    computedAt: current.computedAt,
+    reduced: {
+      version: reduced.version,
+      computedAt: reduced.computedAt,
+      expiresAt: reduced.expiresAt,
+      source: reduced.source,
+      locationPrecisionUsed: reduced.locationPrecisionUsed,
+      activeFactors: reduced.activeFactors,
+      affectedBaselineDimensions: reduced.affectedBaselineDimensions,
+      amplification: reduced.amplification,
+      uncertainty: reduced.uncertainty,
+      safeLabels: reduced.safeLabels,
+      separations: reduced.separations,
+      baselineTendency: reduced.baselineTendency,
+      possibleCurrentAmplification: reduced.possibleCurrentAmplification,
+      knownObservation: reduced.knownObservation,
+      unknownActualState: reduced.unknownActualState
+    }
+  };
 }
 
-async function fetchCurrentConditionProvider(env: Env, precision: string): Promise<{ source: string; sourceTimestamp: string; currentAstronomy: Record<string, string> } | undefined> {
-  if (!env.ASTRONOMY_API_URL) return undefined;
-  const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 2500);
-  try { const response = await fetch(`${env.ASTRONOMY_API_URL}?precision=${encodeURIComponent(precision)}`, { signal: controller.signal }); if (!response.ok) return undefined; const data = await response.json() as { currentAstronomy?: Record<string, string>; sourceTimestamp?: string }; if (!data.currentAstronomy?.sun || !data.currentAstronomy?.moon) return undefined; return { source: 'configured-astronomy-provider', sourceTimestamp: data.sourceTimestamp ?? new Date().toISOString(), currentAstronomy: data.currentAstronomy }; } catch { return undefined; } finally { clearTimeout(timeout); }
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' ? value as Record<string, unknown> : {};
 }
