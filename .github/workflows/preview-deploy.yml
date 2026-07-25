@@ -187,7 +187,7 @@ jobs:
       - name: Authenticated protected-preview product smoke
         env:
           PREVIEW_BASE_URL: ${{ steps.preview-deploy.outputs.preview_url }}
-          PREVIEW_SESSION_COOKIE: ${{ steps.preview-session.outputs.secret }}
+          PREVIEW_SESSION_COOKIE: ${{ steps.preview-session.outputs.cookie }}
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
           PREVIEW_EXPECT_STRIPE: ${{ vars.PREVIEW_EXPECT_STRIPE || '0' }}
