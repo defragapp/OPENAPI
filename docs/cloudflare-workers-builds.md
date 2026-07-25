@@ -90,28 +90,29 @@ Stripe test-mode variables and secrets for billing verification:
 
 ## OPENAPI-owned Baseline engine
 
-Baseline onboarding is computed inside `apps/sovereign-worker` and requires no SOVV deployment, SOVV service binding, shared SOVV secret, or personal OpenAI API key.
+Baseline onboarding is computed inside `apps/sovereign-worker` and requires no SOVV deployment, SOVV service binding, shared SOVV secret, public birthplace geocoder, or personal OpenAI API key.
 
-The Worker configuration supplies these non-secret provider endpoints:
+The browser adds a required `birthTimezone` field to the existing Baseline form. The user selects the IANA timezone used at the birthplace. The birthplace itself remains inside Sovereign.OS and is never sent to a public geocoder.
 
-- `BASELINE_GEOCODER_URL=https://nominatim.openstreetmap.org/search`
-- `BASELINE_TIMEZONE_URL=https://timeapi.io/api/TimeZone/coordinate`
+The Worker configuration supplies only:
+
 - `BASELINE_HORIZONS_URL=https://ssd.jpl.nasa.gov/api/horizons.api`
 - `BASELINE_PROVIDER_TIMEOUT_MS=8000`
 
 The engine:
 
-- geocodes birth place server-side;
-- resolves the IANA timezone server-side;
-- converts local birth time to UTC;
-- retrieves natal ecliptic positions from NASA/JPL Horizons;
+- validates the user-selected IANA birthplace timezone;
+- converts the local civil birth time to UTC using the selected timezone;
+- uses NASA/JPL Horizons with the Earth-geocenter observer `500@399`;
+- retrieves natal ecliptic positions without birth coordinates;
 - computes major aspects, numerology, and explicitly partial personality-gate activation references;
-- does not claim a complete Human Design bodygraph, authority, type, design-side calculation, houses, or complete Gene Keys profile;
-- stores only hashed input metadata and reduced context in D1;
-- never sends raw birth input or exact private location to the AI model;
+- does not claim a complete Human Design bodygraph, authority, type, design-side calculation, houses, ascendant, or complete Gene Keys profile;
+- stores only hashed birth date, birthplace, and timezone metadata plus reduced context in D1;
+- never sends raw birth input, birthplace, timezone, or exact private location to the language model;
+- never sends birthplace to an external geocoder;
 - never depends on SOVV at runtime.
 
-Provider URLs may be replaced with account-controlled equivalents after contract review. Do not place credentials in these public variables. Any future authenticated provider token must be stored as an encrypted Worker secret.
+The official Horizons API returns JSON content in the `result` field and identifies the API version in `signature`. The engine validates both before parsing.
 
 Optional legacy transition values remain available only for read-only identity or Library adapters:
 
