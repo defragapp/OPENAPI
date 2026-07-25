@@ -6,6 +6,8 @@ const recognition = readFileSync(new URL('../public/recognition-ui.js', import.m
 const styles = readFileSync(new URL('../public/mirror-ui.css', import.meta.url), 'utf8');
 const clarity = readFileSync(new URL('../public/archetype-clarity.js', import.meta.url), 'utf8');
 const clarityStyles = readFileSync(new URL('../public/archetype-clarity.css', import.meta.url), 'utf8');
+const artDetail = readFileSync(new URL('../public/archetype-art-detail.js', import.meta.url), 'utf8');
+const artDetailStyles = readFileSync(new URL('../public/archetype-art-detail.css', import.meta.url), 'utf8');
 
 describe('animated archetype visualization inside the AI thread', () => {
   it('keeps the AI workspace primary and targets the latest completed response', () => {
@@ -13,7 +15,10 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(index).toContain('/mirror-ui.css');
     expect(index).toContain('/archetype-clarity.js');
     expect(index).toContain('/archetype-clarity.css');
+    expect(index).toContain('/archetype-art-detail.js');
+    expect(index).toContain('/archetype-art-detail.css');
     expect(index.indexOf('/archetype-clarity.js')).toBeGreaterThan(index.indexOf('/recognition-ui.js'));
+    expect(index.indexOf('/archetype-art-detail.js')).toBeGreaterThan(index.indexOf('/archetype-clarity.js'));
     expect(index).not.toContain('/mirror-surface.js');
     expect(recognition).toContain("panel.querySelector('.streamed-copy')");
     expect(recognition).toContain('latestResultPanel');
@@ -30,6 +35,8 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(styles).toContain('animation-play-state: paused');
     expect(clarity).toContain('requestAnimationFrame(enhanceArchetypeStories)');
     expect(clarity).toContain('section.dataset.clarityKey === key');
+    expect(artDetail).toContain('requestAnimationFrame(applyArchetypeDetails)');
+    expect(artDetail).toContain("svg.dataset.houseDetail === 'v1'");
   });
 
   it('renders only validated response metadata after user confirmation', () => {
@@ -77,9 +84,10 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(styles).toContain('.thread-role-connection');
   });
 
-  it('uses original layered SVG art with archetype-specific motion', () => {
+  it('uses original layered SVG art with archetype-specific motion and detailed house overlays', () => {
     for (const archetype of ['fool', 'magician', 'three_of_cups', 'hermit', 'strength', 'tower']) {
       expect(recognition).toContain(archetype);
+      expect(artDetail).toContain(archetype);
     }
     expect(recognition).toContain('data-motion-engine="layered-svg"');
     expect(recognition).toContain('<svg viewBox="0 0 300 430"');
@@ -88,6 +96,13 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(styles).toContain('@keyframes visual-cups-toast');
     expect(styles).toContain('@keyframes visual-tower-flash');
     expect(clarityStyles).toContain('backdrop-filter: blur(15px)');
+    expect(artDetail).toContain('visual-detail detail-three-cups');
+    expect(artDetail).toContain('detail-garment');
+    expect(artDetail).toContain('detail-lantern-rays');
+    expect(artDetail).toContain('detail-mane');
+    expect(artDetail).toContain('detail-bricks');
+    expect(artDetailStyles).toContain('mix-blend-mode: multiply');
+    expect(artDetailStyles).toContain('@keyframes visual-detail-open');
   });
 
   it('keeps corrections in the current thread and preserves user authority', () => {
@@ -112,5 +127,6 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(styles).toContain('.thread-play-button { display: none; }');
     expect(clarityStyles).toContain('grid-auto-columns: minmax(78%, 1fr)');
     expect(clarityStyles).toContain('scroll-snap-type: x mandatory');
+    expect(artDetailStyles).toContain('@media (prefers-reduced-motion: reduce)');
   });
 });
