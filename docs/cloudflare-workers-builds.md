@@ -46,16 +46,13 @@ Without **D1 Edit**, the bootstrap cannot create or migrate the preview database
 
 Add these under the Worker's **Settings > Build > Variables and secrets**.
 
-Required secret:
+Core required secret:
 
 - `PREVIEW_SESSION_SIGNING_SECRET` — a long random value used only by the preview application.
 
-Required build variable:
+Core required build variables:
 
 - `PREVIEW_BASE_URL=https://sovereign-openapi-preview.sovereign-os-api.workers.dev`
-
-Recommended build variables:
-
 - `PREVIEW_WORKER_NAME=sovereign-openapi-preview`
 - `PREVIEW_D1_NAME=sovereign-openapi-preview-db`
 - `CLOUDFLARE_WORKERS_SUBDOMAIN=sovereign-os-api`
@@ -63,6 +60,17 @@ Recommended build variables:
 - `AI_MODEL=openai/gpt-5.5`
 - `AI_GATEWAY_ID=sovereign`
 - `SCRIPTURE_TRANSLATION=WEB`
+
+Authentication review requires:
+
+- `VITE_TURNSTILE_SITE_KEY` — public Turnstile site key used by the built React client.
+- `TURNSTILE_SECRET_KEY` — secret paired with the site key and uploaded to the runtime Worker.
+- `TURNSTILE_EXPECTED_HOSTNAME=sovereign-openapi-preview.sovereign-os-api.workers.dev`
+- `EMAIL_API_URL` — HTTPS endpoint accepting Bearer authentication and JSON `{from,to,subject,text,html}`.
+- `EMAIL_API_TOKEN` — secret Bearer token for that endpoint.
+- `EMAIL_FROM` — verified sender address.
+
+Do not set one global `TURNSTILE_EXPECTED_ACTION`: the same preview handles both `login` and `signup` actions. The server verifies the secret and hostname; the action remains present in the Turnstile result and can be tightened later with per-route verification.
 
 Cloudflare automatically supplies:
 
@@ -78,12 +86,18 @@ Stripe test-mode variables and secrets for billing verification:
 - `STRIPE_SECRET_KEY` — test-mode secret only
 - `STRIPE_WEBHOOK_SECRET` — test endpoint secret only
 
-Optional integration values:
+Baseline integration remains a named architecture gate. The repository has verified read-only SOVV Baseline routes, but no verified production contract for creating a new Baseline from OPENAPI onboarding. Do not invent that API. Configure one of these only after its exact contract is approved:
+
+- a Cloudflare service binding named `BASELINE` implementing `compute(input)` and returning the reduced Baseline contract; or
+- a new authenticated SOVV HTTP compute route documented in `docs/sovv-adapter-map.md` and implemented in `apps/sovereign-worker/src/baseline.ts`.
+
+Existing optional values:
 
 - `SOVV_BASE_URL`
 - `SOVV_INTERNAL_AUTH_TOKEN`
+- `ASTRONOMY_API_URL`
 
-Never place these values in GitHub files, public issue comments, build summaries, or unencrypted runtime variables.
+Never place secret values in GitHub files, public issue comments, build summaries, screenshots, or unencrypted runtime variables.
 
 ## Expected preview resources
 
@@ -131,4 +145,4 @@ A release is not complete until one exact `main` commit has all of the following
 - real invitation, consent, revocation, and multi-person System verification;
 - Stripe test-mode Checkout, webhook, Portal, cancellation, and fallback-to-Free verification.
 
-GitHub Actions may remain as optional secondary verification, but no GitHub Actions quota or paid GitHub plan is required.
+GitHub Actions may remain optional secondary verification, but no GitHub Actions quota or paid GitHub plan is required.
