@@ -9,12 +9,8 @@ function systemFeature(type: string): 'systems.family' | 'systems.team' {
   return ['family', 'household', 'friendship_group'].includes(type) ? 'systems.family' : 'systems.team';
 }
 
-async function requireSystemAccess(env: Env, accountId: string, type?: string): Promise<void> {
-  const entitlements = await getEntitlements(env, accountId);
-  if (type) return requireFeature(entitlements, systemFeature(type));
-  if (!entitlements.features.includes('systems.family') && !entitlements.features.includes('systems.team')) {
-    throw new Response('Feature unavailable', { status: 403 });
-  }
+async function requireSystemAccess(env: Env, accountId: string, type: string): Promise<void> {
+  requireFeature(await getEntitlements(env, accountId), systemFeature(type));
 }
 
 async function requireLibraryAccess(env: Env, accountId: string): Promise<void> {
@@ -32,7 +28,6 @@ export async function createSystem(env: Env, accountId: string, input: { name: s
 }
 
 export async function listSystems(env: Env, accountId: string) {
-  await requireSystemAccess(env, accountId);
   const rows = await env.DB.prepare('SELECT id, system_type, name, metadata_json FROM systems WHERE account_id = ? ORDER BY updated_at DESC').bind(accountId).all<Record<string, string>>();
   return (rows.results ?? []).map((row) => ({ id: row.id, systemType: row.system_type, name: row.name, metadata: parseJson(row.metadata_json) }));
 }
@@ -60,7 +55,6 @@ export function analyzeSystem(type: string) {
 }
 
 export async function listUnderstandings(env: Env, accountId: string) {
-  await requireLibraryAccess(env, accountId);
   const rows = await env.DB.prepare('SELECT id, thread_id, kind, body_json, created_at, updated_at FROM saved_understandings WHERE account_id = ? ORDER BY updated_at DESC').bind(accountId).all<Record<string, string>>();
   return (rows.results ?? []).map((row) => ({ id: row.id, threadId: row.thread_id, kind: row.kind, body: parseJson(row.body_json), createdAt: row.created_at, updatedAt: row.updated_at }));
 }
@@ -81,7 +75,6 @@ export async function updateUnderstanding(env: Env, accountId: string, id: strin
 }
 
 export async function deleteUnderstanding(env: Env, accountId: string, id: string) {
-  await requireLibraryAccess(env, accountId);
   const result = await env.DB.prepare('DELETE FROM saved_understandings WHERE id = ? AND account_id = ?').bind(id, accountId).run();
   if (result.meta?.changes === 0) throw new Response('Understanding not found', { status: 404 });
 }
