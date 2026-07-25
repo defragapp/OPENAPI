@@ -5,6 +5,10 @@ const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 const previewSmoke = readFileSync('scripts/preview-smoke.ts', 'utf8');
 const previewBootstrap = readFileSync('scripts/cloudflare-preview-bootstrap.mjs', 'utf8');
 const cloudflareGuide = readFileSync('docs/cloudflare-workers-builds.md', 'utf8');
+const webMain = readFileSync('apps/web/src/main.tsx', 'utf8');
+const completionLayer = readFileSync('apps/web/src/ProductCompletionLayer.tsx', 'utf8');
+const peopleDb = readFileSync('apps/sovereign-worker/src/db/people.ts', 'utf8');
+const relationalContext = readFileSync('apps/sovereign-worker/src/relational-context.ts', 'utf8');
 
 function assertBinding(scope, name) {
   if (!scope?.queues?.producers?.some((item) => item.binding === 'JOBS')) {
@@ -92,6 +96,10 @@ for (const required of [
   'WORKERS_CI_BUILD_UUID',
   'PREVIEW_BASE_URL',
   'PREVIEW_SESSION_SIGNING_SECRET',
+  'TURNSTILE_SECRET_KEY',
+  'EMAIL_API_TOKEN',
+  'PUBLIC_APP_URL',
+  'TURNSTILE_EXPECTED_HOSTNAME',
   "['secret', 'bulk'",
   "['deploy', '--env', 'preview'"
 ]) {
@@ -106,6 +114,11 @@ if (previewBootstrap.indexOf("['deploy', '--env', 'preview'") > previewBootstrap
 for (const required of [
   'PREVIEW_BASE_URL',
   'PREVIEW_SESSION_SIGNING_SECRET',
+  'VITE_TURNSTILE_SITE_KEY',
+  'TURNSTILE_SECRET_KEY',
+  'EMAIL_API_URL',
+  'EMAIL_API_TOKEN',
+  'EMAIL_FROM',
   'D1 Edit',
   'Queues Edit',
   'Workers R2 Storage Edit',
@@ -114,6 +127,29 @@ for (const required of [
   if (!cloudflareGuide.includes(required)) {
     throw new Error(`Cloudflare build guide is missing ${required}`);
   }
+}
+
+for (const required of [
+  'installProductRuntime()',
+  '<ProductCompletionLayer />'
+]) {
+  if (!webMain.includes(required)) throw new Error(`web entrypoint is missing ${required}`);
+}
+for (const required of [
+  'VITE_TURNSTILE_SITE_KEY',
+  'sovereign:relational-result',
+  '/api/v1/invitations/mine',
+  'Cancel invitation',
+  'Remove from workspace',
+  'Do not allow'
+]) {
+  if (!completionLayer.includes(required)) throw new Error(`product completion layer is missing ${required}`);
+}
+if (!peopleDb.includes('activeScopes') || !peopleDb.includes('export async function removePerson')) {
+  throw new Error('people records must expose active scopes and safe removal');
+}
+if (!relationalContext.includes('at least two consented invited members')) {
+  throw new Error('system review must require the owner plus two consented invited members');
 }
 
 if (!previewSmoke.includes('verifyFreeGates') || !previewSmoke.includes('verifyPaidCapabilities')) {
@@ -139,5 +175,5 @@ for (const path of ['.github/workflows/preview-deploy.yml', '.github/workflows/l
 }
 
 console.log(
-  'Release config verified cloudflare_build=true d1=true durable_objects=true queues=true schedules=true r2=true ai=true assets=true canonical_preview_url=true runtime_secret_order=true tier_smoke=true'
+  'Release config verified cloudflare_build=true d1=true durable_objects=true queues=true schedules=true r2=true ai=true assets=true canonical_preview_url=true runtime_secret_order=true auth_config=true relational_results=true revocation_ui=true three_person_system=true tier_smoke=true'
 );
