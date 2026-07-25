@@ -12,6 +12,7 @@ import { reserveAiTurn } from './billing/usage';
 import { runSovereignResult } from './agent/sovereign';
 import { saveLatestInsightModule } from './db/insight-modules';
 import { canUseDevelopmentFixtures } from './runtime';
+import { computeCurrentConditions, type CurrentLocationInput, type LocationPrecision } from './baseline';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 
 app.post('/api/v1/people/:personId/invitations/send', async (context) => {
@@ -128,6 +129,28 @@ const worker = {
         return secure(response);
       }
 
+      if (request.method === 'POST' && url.pathname === '/api/v1/current-conditions') {
+        requireSameOrigin(request);
+        const auth = await requireAuth(request, env);
+        const body = await request.json().catch(() => ({})) as {
+          locationPrecision?: LocationPrecision;
+          latitude?: number;
+          longitude?: number;
+        };
+        const location: CurrentLocationInput = {};
+        if (typeof body.latitude === 'number') location.latitude = body.latitude;
+        if (typeof body.longitude === 'number') location.longitude = body.longitude;
+        response = Response.json({
+          current: await computeCurrentConditions(
+            env,
+            auth.accountId,
+            body.locationPrecision ?? 'none',
+            location
+          )
+        });
+        return secure(response);
+      }
+
       response = await app.fetch(request, env, executionContext);
       if (request.method === 'GET' && ['/health', '/healthz', '/ready'].includes(url.pathname) && response.headers.get('content-type')?.includes('application/json')) {
         const payload = await response.json() as Record<string, unknown>;
@@ -214,7 +237,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'failed', 'gateway_unavailable');
       return Response.json({ error: 'Sovereign is temporarily unavailable. Nothing was guessed or saved.' }, { status: 503 });
     }
-    const fallback = 'WHAT I NOTICE\n\nThe private Baseline provider is not available in this development environment, so I will not guess what this moment means.\n\nLOOK INWARD\n\nWhat changed inside you when this happened?';
+    const fallback = 'WHAT I NOTICE\n\nThe OPENAPI Baseline fixture is available for development checks, but live provider output is not assumed here.\n\nLOOK INWARD\n\nWhat changed inside you when this happened?';
     await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_development_response', { developmentFallback: true, text: fallback }, traceId);
     await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'completed');
     return new Response(fallback, {
