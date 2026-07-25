@@ -1,11 +1,15 @@
 document.documentElement.classList.add('js');
 
-const publicObserver = new MutationObserver(renderLaunchHome);
+const publicObserver = new MutationObserver(renderPublicSurface);
 publicObserver.observe(document.documentElement, { childList: true, subtree: true });
-renderLaunchHome();
+renderPublicSurface();
+
+function renderPublicSurface() {
+  if (location.pathname === '/') renderLaunchHome();
+  else if (location.pathname === '/privacy' || location.pathname === '/terms') renderPolicyPage();
+}
 
 function renderLaunchHome() {
-  if (location.pathname !== '/') return;
   const shell = document.querySelector('.entry-shell');
   if (!shell || shell.dataset.sovereignMarketing === 'true') return;
 
@@ -89,6 +93,32 @@ function renderLaunchHome() {
   `;
 
   activateReveal();
+}
+
+function renderPolicyPage() {
+  const shell = document.querySelector('.policy-shell');
+  if (!shell || shell.dataset.launchPolicy === 'true') return;
+  ensureStyle('/marketing.css', 'sovereign-marketing');
+  ensureStyle('/launch.css', 'sovereign-launch');
+  shell.dataset.launchPolicy = 'true';
+  shell.classList.add('launch-page', 'launch-shell', 'launch-policy');
+  shell.querySelector('.wordmark')?.remove();
+  const active = location.pathname === '/privacy' ? 'Privacy' : 'Terms';
+  shell.insertAdjacentHTML('afterbegin', `
+    <header class="launch-nav">
+      <a class="launch-wordmark" href="/">SOVEREIGN.OS</a>
+      <nav class="launch-links" aria-label="Public navigation">
+        <a href="/how-it-works.html">How it works</a>
+        <a href="/pricing.html">Pricing</a>
+        <a href="/faq.html">FAQ</a>
+        <a aria-current="page" href="${location.pathname}">${active}</a>
+        <a class="launch-cta" href="/login">Sign in</a>
+      </nav>
+    </header>
+  `);
+  shell.insertAdjacentHTML('beforeend', `
+    <footer class="launch-footer"><span>Questions: support@defrag.app</span><nav><a href="/">Overview</a><a href="/faq.html">FAQ</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav></footer>
+  `);
 }
 
 function ensureStyle(href, key) {
