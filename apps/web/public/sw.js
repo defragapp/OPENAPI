@@ -1,8 +1,24 @@
-const CACHE_NAME = 'sovereign-shell-v1';
-const SHELL = ['/', '/manifest.webmanifest'];
+const CACHE_NAME = 'sovereign-public-v2';
+const PUBLIC_SHELL = [
+  '/',
+  '/how-it-works.html',
+  '/pricing.html',
+  '/faq.html',
+  '/manifest.webmanifest',
+  '/app-icon.svg',
+  '/marketing.css',
+  '/launch.css',
+  '/launch-polish.css'
+];
+const PUBLIC_ASSETS = new Set(PUBLIC_SHELL.filter((path) => path !== '/'));
+const PUBLIC_NAVIGATION = new Set(['/', '/how-it-works.html', '/pricing.html', '/faq.html', '/privacy', '/terms']);
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL)));
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(async (cache) => {
+      await Promise.allSettled(PUBLIC_SHELL.map((path) => cache.add(path)));
+    })
+  );
   self.skipWaiting();
 });
 
@@ -16,6 +32,40 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
-  if (request.method !== 'GET' || url.pathname.startsWith('/api/')) return;
-  event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
+  if (request.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
+
+  if (request.mode === 'navigate') {
+    if (!PUBLIC_NAVIGATION.has(url.pathname)) return;
+    event.respondWith(networkFirst(request));
+    return;
+  }
+
+  if (PUBLIC_ASSETS.has(url.pathname) || url.pathname.startsWith('/assets/')) {
+    event.respondWith(staleWhileRevalidate(request));
+  }
 });
+
+async function networkFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  try {
+    const response = await fetch(request);
+    if (isCacheable(response)) await cache.put(request, response.clone());
+    return response;
+  } catch {
+    return (await cache.match(request)) || (await cache.match('/')) || Response.error();
+  }
+}
+
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
+  const refresh = fetch(request).then(async (response) => {
+    if (isCacheable(response)) await cache.put(request, response.clone());
+    return response;
+  }).catch(() => undefined);
+  return cached || (await refresh) || Response.error();
+}
+
+function isCacheable(response) {
+  return response.ok && response.type !== 'opaque' && !/no-store|private/i.test(response.headers.get('cache-control') || '');
+}

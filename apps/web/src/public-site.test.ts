@@ -6,6 +6,7 @@ const how = readFileSync(new URL('../public/how-it-works.html', import.meta.url)
 const pricing = readFileSync(new URL('../public/pricing.html', import.meta.url), 'utf8');
 const faq = readFileSync(new URL('../public/faq.html', import.meta.url), 'utf8');
 const launchCss = readFileSync(new URL('../public/launch.css', import.meta.url), 'utf8');
+const launchPolish = readFileSync(new URL('../public/launch-polish.css', import.meta.url), 'utf8');
 const marketingCss = readFileSync(new URL('../public/marketing.css', import.meta.url), 'utf8');
 const recognitionCss = readFileSync(new URL('../public/recognition-ui.css', import.meta.url), 'utf8');
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -66,6 +67,15 @@ describe('Sovereign.OS launch surface', () => {
     expect(launchCss).toContain('min-height:44px');
     expect(marketingCss).toContain('safe-area-inset-top');
     expect(marketingCss).toContain('prefers-reduced-motion');
+    expect(landing).toContain("ensureStyle('/launch-polish.css', 'sovereign-launch-polish')");
+  });
+
+  it('keeps sign-in and account creation reachable on mobile', () => {
+    for (const document of [how, pricing, faq, index]) expect(document).toContain('/launch-polish.css');
+    expect(launchPolish).toContain('.launch-links a[href="/login"]');
+    expect(launchPolish).toContain('display: inline-flex');
+    expect(launchPolish).toContain(':focus-visible');
+    expect(launchPolish).toContain('prefers-reduced-motion');
   });
 
   it('keeps authenticated recognition controls separate from marketing', () => {

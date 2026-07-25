@@ -1,10 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
+import { AppErrorBoundary } from './AppErrorBoundary';
 import { ProductCompletionLayer, installProductRuntime } from './ProductCompletionLayer';
 import { installBaselineInputRuntime } from './BaselineInputRuntime';
 import './styles.css';
 import './product-completion.css';
+import './visual-polish.css';
 
 installProductRuntime();
 installBaselineInputRuntime();
@@ -15,7 +17,9 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ProductCompletionLayer />
-    <App />
+    <AppErrorBoundary>
+      <ProductCompletionLayer />
+      <App />
+    </AppErrorBoundary>
   </React.StrictMode>
 );
