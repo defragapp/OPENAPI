@@ -1,28 +1,29 @@
 import type { Env } from './env';
 import { canUseDevelopmentFixtures } from './runtime';
+import { createOpenApiBaselineProvider } from './baseline-engine';
 
 export type BirthTimeCertainty = 'exact' | 'approximate' | 'unknown';
 export type LocationPrecision = 'none' | 'approximate' | 'city_or_regional' | 'ephemeral_current' | 'stored_permitted';
 export interface BaselineInput { birthDate?: string; birthTime?: string; birthTimeCertainty?: BirthTimeCertainty; birthplace?: string; locationPrecision?: LocationPrecision; }
-const VERSION = 'openapi-baseline-deterministic-v3-sovv-a3db94b';
-const SOVV_COMMIT = 'a3db94bccc75089723bef0cf5ff36c47064bd789';
+const VERSION = 'openapi-baseline-engine-v1';
+const SOVV_REFERENCE_COMMIT = 'a3db94bccc75089723bef0cf5ff36c47064bd789';
 const encoder = new TextEncoder();
 
-async function sha256(value: string) { const hash = await crypto.subtle.digest('SHA-256', encoder.encode(value)); return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, '0')).join(''); }
+async function sha256(value: string) { const hash = await crypto.subtle.digest('SHA-256', encoder.encode(value)); return [...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, '0')).join(''); }
 function assertDate(value: string) { if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00Z`))) throw new Response('Invalid birth date', { status: 400 }); }
-function assertTime(value: string | undefined, certainty: BirthTimeCertainty) { if (certainty !== 'unknown' && !/^\d{2}:\d{2}$/.test(value ?? '')) throw new Response('Birth time required for exact or approximate certainty', { status: 400 }); }
-function frameworkAvailability(certainty: BirthTimeCertainty, providerStatus: string) { return { astrology: providerStatus === 'computed' ? 'available' : 'unavailable', humanDesign: certainty === 'unknown' || providerStatus !== 'computed' ? 'unavailable' : 'available', geneKeys: providerStatus === 'computed' ? 'available' : 'unavailable', numerology: 'available' }; }
+function assertTime(value: string | undefined, certainty: BirthTimeCertainty) { if (certainty !== 'unknown' && !/^([01]\d|2[0-3]):[0-5]\d$/.test(value ?? '')) throw new Response('Birth time required for exact or approximate certainty', { status: 400 }); }
+function frameworkAvailability(certainty: BirthTimeCertainty, providerStatus: string) { return { astrology: providerStatus === 'computed' ? 'available' : 'unavailable', humanDesign: certainty === 'unknown' || providerStatus !== 'computed' ? 'unavailable' : 'partial', geneKeys: certainty === 'unknown' || providerStatus !== 'computed' ? 'unavailable' : 'partial', numerology: 'available', houses: 'unavailable' }; }
 
 export async function computeReducedBaseline(input: BaselineInput, options: { providerAvailable?: boolean; provider?: BaselineProvider; allowRecordedFixture?: boolean } = {}) {
   const normalized = normalizeBaselineInput(input);
-  if (options.providerAvailable === false) return partialBaseline(normalized.birthTimeCertainty, ['geocoder', 'astronomical-provider']);
+  if (options.providerAvailable === false) return partialBaseline(normalized.birthTimeCertainty, ['geocoder', 'timezone-provider', 'astronomical-provider']);
   const provider = options.provider ?? (options.allowRecordedFixture ? deterministicRecordedProvider() : undefined);
-  if (!provider) return partialBaseline(normalized.birthTimeCertainty, ['private-baseline-provider-not-configured']);
+  if (!provider) return partialBaseline(normalized.birthTimeCertainty, ['openapi-baseline-engine-not-configured']);
   const computed = await provider.compute(normalized).catch((error) => {
     if (error instanceof Response) throw error;
     return undefined;
   });
-  if (!computed) return partialBaseline(normalized.birthTimeCertainty, ['provider-timeout-or-unavailable']);
+  if (!computed) return partialBaseline(normalized.birthTimeCertainty, ['openapi-baseline-engine-unavailable']);
   return reduceComputedBaseline(normalized.birthTimeCertainty, computed);
 }
 
@@ -33,10 +34,24 @@ export function normalizeBaselineInput(input: BaselineInput) {
   assertDate(birthDate);
   if (birthplace.length < 2 || /failed geocoding/i.test(birthplace)) throw new Response('Invalid birthplace', { status: 400 });
   assertTime(input.birthTime, birthTimeCertainty);
-  return { birthDate, birthTime: birthTimeCertainty === 'unknown' ? undefined : input.birthTime, birthTimeCertainty, birthplace, locationPrecision: input.locationPrecision ?? 'none' };
+  return { birthDate, birthTime: birthTimeCertainty === 'unknown' ? undefined : input.birthTime, birthTimeCertainty, birthplace, locationPrecision: input.locationPrecision ?? 'city_or_regional' };
 }
 
-export interface BaselineProviderOutput { timezone: string; geocodePrecision: string; natalPlacements: Record<string, string>; houses: Record<string, string> | null; aspects: string[]; humanDesign: Record<string, string> | null; geneKeys: Record<string, string>; numerology: Record<string, number>; currentAstronomy: Record<string, string>; sourceTimestamp: string; }
+export interface BaselineProviderOutput {
+  timezone: string;
+  geocodePrecision: string;
+  natalPlacements: Record<string, unknown>;
+  houses: Record<string, unknown> | null;
+  aspects: string[];
+  humanDesign: Record<string, unknown> | null;
+  geneKeys: Record<string, unknown>;
+  numerology: Record<string, number>;
+  currentAstronomy: Record<string, string>;
+  baselineTendency: string;
+  interpretiveSignals: string[];
+  sourceTimestamp: string;
+  provenance?: Record<string, unknown>;
+}
 export interface BaselineProvider { compute(input: ReturnType<typeof normalizeBaselineInput>): Promise<BaselineProviderOutput> }
 
 export function deterministicRecordedProvider(): BaselineProvider {
@@ -46,50 +61,83 @@ export function deterministicRecordedProvider(): BaselineProvider {
     const signs = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
     const sun = signs[Math.floor(((month - 1) * 30 + Math.min(day, 30)) / 30) % 12]!;
     const moon = signs[(day + month) % 12]!;
-    const asc = input.birthTimeCertainty === 'unknown' ? undefined : signs[(Number((input.birthTime ?? '12:00').slice(0, 2)) + day) % 12];
-    return { timezone: input.locationPrecision === 'none' ? 'unavailable' : timezoneForPlace(input.birthplace), geocodePrecision: input.locationPrecision === 'none' ? 'none' : input.locationPrecision, natalPlacements: { sun, moon, ...(asc ? { ascendant: asc } : {}) }, houses: asc ? { first: asc, fourth: signs[(signs.indexOf(asc) + 3) % 12]! } : null, aspects: asc ? [`Sun ${sun} square Ascendant ${asc}`] : [], humanDesign: asc ? { type: ['Generator','Projector','Manifestor','Reflector'][day % 4]!, authority: ['emotional','sacral','splenic'][month % 3]! } : null, geneKeys: { lifeWork: String(((month * 6 + day) % 64) + 1), evolution: String(((day * 3) % 64) + 1) }, numerology: { lifePath: reduceNumber(year + month + day), day }, currentAstronomy: { sun: signs[new Date().getUTCMonth()]!, moon: signs[new Date().getUTCDate() % 12]! }, sourceTimestamp: new Date().toISOString() };
+    const ascendant = input.birthTimeCertainty === 'unknown' ? undefined : signs[(Number((input.birthTime ?? '12:00').slice(0, 2)) + day) % 12];
+    return {
+      timezone: input.locationPrecision === 'none' ? 'unavailable' : 'UTC',
+      geocodePrecision: input.locationPrecision === 'none' ? 'none' : input.locationPrecision,
+      natalPlacements: { sun, moon, ...(ascendant ? { ascendant } : {}) },
+      houses: null,
+      aspects: ascendant ? [`Sun ${sun} square Ascendant ${ascendant}`] : [],
+      humanDesign: ascendant ? { status: 'fixture-only', gate: day } : null,
+      geneKeys: input.birthTimeCertainty === 'unknown' ? {} : { status: 'fixture-only', activation: ((month * 6 + day) % 64) + 1 },
+      numerology: { lifePath: reduceNumber(year + month + day), birthDay: reduceNumber(day) },
+      currentAstronomy: {},
+      baselineTendency: 'Development fixture only: a reduced interpretive tendency is available.',
+      interpretiveSignals: [`Sun in ${sun}`, `Moon in ${moon}`],
+      sourceTimestamp: new Date().toISOString(),
+      provenance: { fixture: true, rawBirthInputReturned: false }
+    };
   } };
 }
 
-function timezoneForPlace(place: string) { if (/paris|france/i.test(place)) return 'Europe/Paris'; if (/austin|tx|new york|usa/i.test(place)) return 'America/Chicago'; if (/london|uk/i.test(place)) return 'Europe/London'; return 'UTC'; }
-function reduceNumber(value: number): number { let current = value; while (current > 9) current = String(current).split('').reduce((sum, char) => sum + Number(char), 0); return current; }
-function partialBaseline(certainty: BirthTimeCertainty, unavailable: string[]) { return { status: 'partial', providerStatus: 'unavailable', uncertainty: 'high', computationVersion: VERSION, provenance: { deterministicCalculation: false, sovvCommitInspected: SOVV_COMMIT, parity: 'complete-for-recorded-openapi-fixtures', unavailable }, reducedContext: modelSafeContext(certainty, 'unavailable', frameworkAvailability(certainty, 'unavailable')) }; }
-function reduceComputedBaseline(certainty: BirthTimeCertainty, computed: BaselineProviderOutput) { const availability = frameworkAvailability(certainty, 'computed'); return { status: 'completed', providerStatus: 'computed', uncertainty: certainty === 'unknown' ? 'high' : certainty === 'approximate' ? 'medium' : 'low', computationVersion: VERSION, provenance: { deterministicCalculation: true, interpretiveFrameworks: ['astrology', 'human-design', 'gene-keys', 'numerology'], provider: 'recorded-deterministic-provider-compatible-with-sovv-a3db94b', sourceTimestamp: computed.sourceTimestamp, sovvCommitInspected: SOVV_COMMIT, parity: 'complete-for-recorded-openapi-fixtures' }, reducedContext: { ...modelSafeContext(certainty, 'computed', availability), deterministicCalculation: { natalPlacements: computed.natalPlacements, houses: computed.houses, aspects: computed.aspects, humanDesign: computed.humanDesign, geneKeys: computed.geneKeys, numerology: computed.numerology, currentAstronomy: computed.currentAstronomy, timezone: computed.timezone, geocodePrecision: computed.geocodePrecision }, interpretiveFramework: { disclaimer: 'Astrology, Human Design, Gene Keys, and numerology are interpretive frameworks, not scientifically verified psychological measurement.', availability } } }; }
-function modelSafeContext(certainty: BirthTimeCertainty, providerStatus: string, availability: Record<string, string>) { return { baselineTendency: 'Enduring tendency is represented as reduced pattern language, not a diagnosis.', currentAmplification: 'Current conditions are possible amplification only, never behavioral determination.', userObservation: 'No observed behavior is assumed until supplied by the user.', interpretiveSignals: Object.entries(availability).filter(([, state]) => state === 'available').map(([name]) => name), systemInference: providerStatus === 'computed' ? 'Structured deterministic reduction is available.' : 'Structured deterministic reduction is unavailable.', uncertainty: certainty === 'unknown' ? 'high' : 'stated', unknownActualState: 'Actual state remains unknown unless the user confirms it.' }; }
+function reduceNumber(value: number): number { let current = value; while (current > 9) current = String(current).split('').reduce((sum, character) => sum + Number(character), 0); return current; }
+function partialBaseline(certainty: BirthTimeCertainty, unavailable: string[]) { return { status: 'partial', providerStatus: 'unavailable', uncertainty: 'high', computationVersion: VERSION, provenance: { deterministicCalculation: false, engine: 'openapi-owned', sovvReferenceCommit: SOVV_REFERENCE_COMMIT, sovvRuntimeDependency: false, unavailable }, reducedContext: modelSafeContext(certainty, 'unavailable', frameworkAvailability(certainty, 'unavailable')) }; }
+function reduceComputedBaseline(certainty: BirthTimeCertainty, computed: BaselineProviderOutput) {
+  const availability = frameworkAvailability(certainty, 'computed');
+  return {
+    status: 'completed',
+    providerStatus: 'computed',
+    uncertainty: certainty === 'unknown' ? 'high' : certainty === 'approximate' ? 'medium' : 'low',
+    computationVersion: VERSION,
+    provenance: {
+      deterministicCalculation: true,
+      engine: 'openapi-cloudflare-baseline-engine',
+      interpretiveFrameworks: ['astrology', 'human-design-partial', 'gene-keys-partial', 'numerology'],
+      provider: 'openapi-owned-server-side-provider',
+      sourceTimestamp: computed.sourceTimestamp,
+      sovvReferenceCommit: SOVV_REFERENCE_COMMIT,
+      sovvRuntimeDependency: false,
+      rawBirthInputReturned: false,
+      ...computed.provenance
+    },
+    reducedContext: {
+      ...modelSafeContext(certainty, 'computed', availability),
+      baselineTendency: computed.baselineTendency,
+      interpretiveSignals: computed.interpretiveSignals,
+      deterministicCalculation: {
+        natalPlacements: computed.natalPlacements,
+        houses: computed.houses,
+        aspects: computed.aspects,
+        humanDesign: certainty === 'unknown' ? null : computed.humanDesign,
+        geneKeys: certainty === 'unknown' ? {} : computed.geneKeys,
+        numerology: computed.numerology,
+        currentAstronomy: computed.currentAstronomy,
+        timezone: computed.timezone,
+        geocodePrecision: computed.geocodePrecision
+      },
+      interpretiveFramework: {
+        disclaimer: 'Astrology, Human Design, Gene Keys, and numerology are interpretive frameworks, not scientifically verified psychological measurement.',
+        availability
+      }
+    }
+  };
+}
+function modelSafeContext(certainty: BirthTimeCertainty, providerStatus: string, availability: Record<string, string>) { return { baselineTendency: 'Enduring tendency is represented as reduced interpretive language, not a diagnosis.', currentAmplification: 'Current conditions are computed separately and never determine behavior.', userObservation: 'No observed behavior is assumed until supplied by the user.', interpretiveSignals: Object.entries(availability).filter(([, state]) => state === 'available' || state === 'partial').map(([name]) => name), systemInference: providerStatus === 'computed' ? 'Structured deterministic reduction is available.' : 'Structured deterministic reduction is unavailable.', uncertainty: certainty === 'unknown' ? 'high' : 'stated', unknownActualState: 'Actual state remains unknown unless the user confirms it.' }; }
 
 export async function persistBaseline(env: Env, accountId: string, input: BaselineInput) {
   const computed = await computeConfiguredBaseline(env, input);
-  const protectedInput = { birthDateHash: await sha256(input.birthDate ?? ''), birthTimeCertainty: input.birthTimeCertainty, hasBirthTime: Boolean(input.birthTime && input.birthTimeCertainty !== 'unknown'), birthplaceHash: await sha256(input.birthplace ?? ''), locationPrecision: input.locationPrecision ?? 'none' };
+  const protectedInput = { birthDateHash: await sha256(input.birthDate ?? ''), birthTimeCertainty: input.birthTimeCertainty, hasBirthTime: Boolean(input.birthTime && input.birthTimeCertainty !== 'unknown'), birthplaceHash: await sha256(input.birthplace ?? ''), locationPrecision: input.locationPrecision ?? 'city_or_regional' };
   const inputHash = await sha256(JSON.stringify(protectedInput));
   await env.DB.prepare(`INSERT OR REPLACE INTO baseline_onboarding (account_id, input_hash, protected_input_json, reduced_context_json, computation_version, provenance_json, status, uncertainty, last_computed_at, provider_status, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, datetime('now'))`).bind(accountId, inputHash, JSON.stringify(protectedInput), JSON.stringify(computed.reducedContext), computed.computationVersion, JSON.stringify(computed.provenance), computed.status, computed.uncertainty, computed.providerStatus).run();
   return { status: computed.status, uncertainty: computed.uncertainty, reducedContext: computed.reducedContext, provenance: computed.provenance, computationVersion: computed.computationVersion };
 }
 
-async function computeConfiguredBaseline(env: Env, input: BaselineInput) {
-  if (env.BASELINE) {
-    try {
-      const value = await env.BASELINE.compute(input);
-      if (isReducedBaseline(value)) return value;
-      return partialBaseline(input.birthTimeCertainty ?? 'unknown', ['private-baseline-provider-returned-invalid-contract']);
-    } catch {
-      return partialBaseline(input.birthTimeCertainty ?? 'unknown', ['private-baseline-provider-unavailable']);
-    }
+export async function computeConfiguredBaseline(env: Env, input: BaselineInput) {
+  normalizeBaselineInput(input);
+  if (canUseDevelopmentFixtures(env)) {
+    return computeReducedBaseline(input, { provider: deterministicRecordedProvider(), allowRecordedFixture: true });
   }
-  return computeReducedBaseline(input, {
-    providerAvailable: canUseDevelopmentFixtures(env),
-    allowRecordedFixture: canUseDevelopmentFixtures(env)
-  });
-}
-
-function isReducedBaseline(value: unknown): value is Awaited<ReturnType<typeof computeReducedBaseline>> {
-  if (!value || typeof value !== 'object') return false;
-  const record = value as Record<string, unknown>;
-  return typeof record.status === 'string'
-    && typeof record.providerStatus === 'string'
-    && typeof record.uncertainty === 'string'
-    && typeof record.computationVersion === 'string'
-    && Boolean(record.reducedContext && typeof record.reducedContext === 'object')
-    && Boolean(record.provenance && typeof record.provenance === 'object');
+  return computeReducedBaseline(input, { provider: createOpenApiBaselineProvider(env) });
 }
 
 export async function getBaselineStatus(env: Env, accountId: string) {
@@ -117,30 +165,12 @@ export async function getLatestCurrentConditions(env: Env, accountId: string) {
     ORDER BY cc.computed_at DESC
     LIMIT 1`).bind(accountId).first<{ computed_at: string; conditions_json: string; precision_used: string; provider_status: string }>();
   if (!row) return { status: 'not_started', providerStatus: 'unavailable', reduced: null };
-  return {
-    status: row.provider_status === 'computed' ? 'ready' : 'unavailable',
-    providerStatus: row.provider_status,
-    precisionUsed: row.precision_used,
-    computedAt: row.computed_at,
-    reduced: JSON.parse(row.conditions_json)
-  };
+  return { status: row.provider_status === 'computed' ? 'ready' : 'unavailable', providerStatus: row.provider_status, precisionUsed: row.precision_used, computedAt: row.computed_at, reduced: JSON.parse(row.conditions_json) };
 }
 
 export async function getModelSafeBaselineContext(env: Env, accountId: string) {
-  const [baseline, current] = await Promise.all([
-    getBaselineStatus(env, accountId),
-    getLatestCurrentConditions(env, accountId)
-  ]);
-  return {
-    baseline,
-    current,
-    separation: [
-      'Baseline tendency is enduring interpretive context, not diagnosis or proof.',
-      'Current amplification is temporary context and does not determine behavior.',
-      'Observed behavior must be supplied or confirmed by the user.',
-      'Actual state remains unknown unless the user confirms it.'
-    ]
-  };
+  const [baseline, current] = await Promise.all([getBaselineStatus(env, accountId), getLatestCurrentConditions(env, accountId)]);
+  return { baseline, current, separation: ['Baseline tendency is enduring interpretive context, not diagnosis or proof.', 'Current amplification is temporary context and does not determine behavior.', 'Observed behavior must be supplied or confirmed by the user.', 'Actual state remains unknown unless the user confirms it.'] };
 }
 
 async function fetchCurrentConditionProvider(env: Env, precision: string): Promise<{ source: string; sourceTimestamp: string; currentAstronomy: Record<string, string> } | undefined> {
