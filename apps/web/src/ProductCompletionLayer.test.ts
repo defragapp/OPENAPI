@@ -25,11 +25,14 @@ describe('product completion layer', () => {
     expect(layer).toContain('/(alignment|analysis)');
     expect(layer).toContain('result.participants');
     expect(layer).toContain('Responsibility boundaries');
-    expect(layer).toContain('Raw birth input shared');
+    expect(layer).toContain('Raw birth details shared');
+    expect(layer).toContain('Exact private location shared');
   });
 
-  it('provides owner and invitee revocation controls', () => {
+  it('provides owner and invitee revocation controls in plain language', () => {
     expect(layer).toContain('/api/v1/invitations/mine');
+    expect(layer).toContain('Compare together');
+    expect(layer).toContain('Include in a system');
     expect(layer).toContain('stop using');
     expect(layer).toContain('Cancel invitation');
     expect(layer).toContain('Remove from workspace');
@@ -37,9 +40,19 @@ describe('product completion layer', () => {
     expect(layer).not.toContain('grant on behalf');
   });
 
-  it('keeps the review layer usable on small screens', () => {
+  it('keeps dialogs keyboard-closable and prevents background scrolling', () => {
+    expect(layer).toContain("event.key !== 'Escape'");
+    expect(layer).toContain("document.body.style.overflow = 'hidden'");
+    expect(layer).toContain('aria-labelledby="shared-context-title"');
+    expect(layer).toContain('aria-labelledby="relational-result-title"');
+    expect(layer).toContain('aria-pressed={decision');
+  });
+
+  it('keeps the review layer usable without covering the composer', () => {
     expect(css).toContain('safe-area-inset-bottom');
     expect(css).toContain('@media (max-width: 620px)');
     expect(css).toContain('max-height: calc(100dvh - 32px)');
+    expect(css).toContain('bottom: calc(176px + env(safe-area-inset-bottom))');
+    expect(css).toContain('.shared-context-trigger { bottom: 116px; }');
   });
 });
