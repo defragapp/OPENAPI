@@ -6,6 +6,7 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "preview_urls": false,
   "observability": {
     "enabled": true
   },
@@ -22,9 +23,7 @@
   },
   "d1_databases": [
     {
-      "binding": "DB",
-      "database_name": "sovereign-os",
-      "database_id": "REPLACE_IN_CLOUDFLARE"
+      "binding": "DB"
     }
   ],
   "durable_objects": {
@@ -64,6 +63,8 @@
       "compatibility_flags": [
         "nodejs_compat"
       ],
+      "workers_dev": true,
+      "preview_urls": false,
       "observability": {
         "enabled": true
       },
@@ -85,9 +86,7 @@
       },
       "d1_databases": [
         {
-          "binding": "DB",
-          "database_name": "sovereign-openapi-preview-db",
-          "database_id": "REPLACE_WITH_PREVIEW_D1_DATABASE_ID"
+          "binding": "DB"
         }
       ],
       "durable_objects": {
@@ -122,8 +121,7 @@
       },
       "r2_buckets": [
         {
-          "binding": "ARTIFACTS",
-          "bucket_name": "sovereign-openapi-preview-artifacts"
+          "binding": "ARTIFACTS"
         }
       ],
       "queues": {
@@ -150,8 +148,7 @@
   },
   "r2_buckets": [
     {
-      "binding": "ARTIFACTS",
-      "bucket_name": "sovereign-openapi-artifacts"
+      "binding": "ARTIFACTS"
     }
   ],
   "queues": {
