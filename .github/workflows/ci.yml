@@ -18,12 +18,14 @@ jobs:
       - name: Checkout exact commit without marketplace actions
         env:
           GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --depth=1 origin "${GITHUB_SHA}"
+          git fetch --depth=1 origin "${TARGET_SHA}"
           git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "${TARGET_SHA}"
 
       - name: Select preinstalled Node 22
         run: |
