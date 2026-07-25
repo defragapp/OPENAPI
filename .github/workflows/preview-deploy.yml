@@ -3,9 +3,16 @@ name: Preview Deploy and Verification
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
+      - codex/inner-recognition-intelligence
     paths:
       - '.github/workflows/preview-deploy.yml'
+      - 'apps/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
 
 permissions:
   contents: read
