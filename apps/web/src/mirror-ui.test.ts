@@ -4,11 +4,16 @@ import { readFileSync } from 'node:fs';
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const recognition = readFileSync(new URL('../public/recognition-ui.js', import.meta.url), 'utf8');
 const styles = readFileSync(new URL('../public/mirror-ui.css', import.meta.url), 'utf8');
+const clarity = readFileSync(new URL('../public/archetype-clarity.js', import.meta.url), 'utf8');
+const clarityStyles = readFileSync(new URL('../public/archetype-clarity.css', import.meta.url), 'utf8');
 
 describe('animated archetype visualization inside the AI thread', () => {
   it('keeps the AI workspace primary and targets the latest completed response', () => {
     expect(index).toContain('/recognition-ui.js');
     expect(index).toContain('/mirror-ui.css');
+    expect(index).toContain('/archetype-clarity.js');
+    expect(index).toContain('/archetype-clarity.css');
+    expect(index.indexOf('/archetype-clarity.js')).toBeGreaterThan(index.indexOf('/recognition-ui.js'));
     expect(index).not.toContain('/mirror-surface.js');
     expect(recognition).toContain("panel.querySelector('.streamed-copy')");
     expect(recognition).toContain('latestResultPanel');
@@ -23,6 +28,8 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(recognition).toContain('IntersectionObserver');
     expect(styles).toContain('.visual-story-offscreen');
     expect(styles).toContain('animation-play-state: paused');
+    expect(clarity).toContain('requestAnimationFrame(enhanceArchetypeStories)');
+    expect(clarity).toContain('section.dataset.clarityKey === key');
   });
 
   it('renders only validated response metadata after user confirmation', () => {
@@ -33,18 +40,32 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(recognition).toContain('if (!basis.user_confirmed) return null');
     expect(recognition).toContain('Answer first · Art second');
     expect(recognition).not.toMatch(/tarot determines|card proves|draw determines/i);
+    expect(clarity).toContain('Baseline → timing → visual');
   });
 
-  it('shows one role moving through past protection, pressure, and clear expression', () => {
-    for (const phrase of ['Past protection', 'Under pressure', 'Clear expression', 'WHAT THIS ROLE MAY HAVE LEARNED', 'THE CAPACITY INSIDE THE ROLE']) {
-      expect(recognition).toContain(phrase);
+  it('makes the wound, shadow, and gift movement explicit in the visible UI', () => {
+    for (const phrase of ['PAST PROTECTION', 'WOUND / HISTORY', 'SHADOW', 'UNDER PRESSURE', 'GIFT', 'CLEAR EXPRESSION']) {
+      expect(clarity).toContain(phrase);
     }
+    expect(clarity).toContain('One role. Three expressions.');
+    expect(clarity).toContain('WHAT THIS ROLE LEARNED TO PROTECT');
+    expect(clarity).toContain('HOW THE ROLE TIGHTENS UNDER PRESSURE');
+    expect(clarity).toContain('HOW THE SAME ENERGY BECOMES USEFUL');
     expect(recognition).toContain("const phases = ['origin', 'shadow', 'gift']");
     expect(recognition).toContain('Play the movement');
     expect(recognition).toContain('aria-pressed');
     expect(styles).toContain('[data-phase="origin"]');
     expect(styles).toContain('[data-phase="shadow"]');
     expect(styles).toContain('[data-phase="gift"]');
+  });
+
+  it('defines the visual result as role, pressure, and movement', () => {
+    expect(clarity).toContain('<span>ROLE</span>');
+    expect(clarity).toContain('PRESSURE NOW');
+    expect(clarity).toContain('NEXT MOVEMENT');
+    expect(clarity).toContain('data.roleMap');
+    expect(clarityStyles).toContain('[data-role-map="true"]');
+    expect(clarityStyles).toContain('[data-role-summary]');
   });
 
   it('supports self, consented interaction, and family layouts without changing chat flow', () => {
@@ -66,6 +87,7 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(styles).toContain('@keyframes visual-magician-arm');
     expect(styles).toContain('@keyframes visual-cups-toast');
     expect(styles).toContain('@keyframes visual-tower-flash');
+    expect(clarityStyles).toContain('backdrop-filter: blur(15px)');
   });
 
   it('keeps corrections in the current thread and preserves user authority', () => {
@@ -75,6 +97,7 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(recognition).toContain("saveVisualCorrection('not_today')");
     expect(recognition).toContain('Your enduring Baseline was not rewritten.');
     expect(recognition).toContain('not an identity, diagnosis, prediction, or source of truth');
+    expect(clarity).toContain('one possible role, not a fixed identity');
   });
 
   it('is compact, iPhone-safe, and reduced-motion aware', () => {
@@ -87,5 +110,7 @@ describe('animated archetype visualization inside the AI thread', () => {
     expect(styles).toContain('scroll-snap-type: x mandatory');
     expect(styles).toContain('@media (prefers-reduced-motion: reduce)');
     expect(styles).toContain('.thread-play-button { display: none; }');
+    expect(clarityStyles).toContain('grid-auto-columns: minmax(78%, 1fr)');
+    expect(clarityStyles).toContain('scroll-snap-type: x mandatory');
   });
 });
