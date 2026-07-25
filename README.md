@@ -56,6 +56,8 @@ Use these Cloudflare build settings:
 
 The deploy command targets the isolated `sovereign-openapi-preview` Worker rather than the production Worker. See [`docs/cloudflare-workers-builds.md`](docs/cloudflare-workers-builds.md) for required build secrets and the Cloudflare Access protection step.
 
+Preview target: [`sovereign-openapi-preview.sovereign-os-api.workers.dev`](https://sovereign-openapi-preview.sovereign-os-api.workers.dev). This link identifies the isolated review target only; availability and readiness must be verified from the exact deployed commit before approval.
+
 ## Current state
 
 The repository now includes the app and Worker shells, D1 schema and migrations, Durable Object thread coordination, security primitives, Stripe billing foundations, export job execution, identity-bound email invitations, invitee-controlled scope decisions and revocation, reduced-Baseline pair and system context, authorization-checked relational context, staged Inner Recognition planning, exact verified Basis selection, pre-display response safety, explicit Insight Module approval, and a Cloudflare-native build/deployment path.
