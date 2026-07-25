@@ -133,7 +133,9 @@ async function main() {
     streamed += decoder.decode(value, { stream: true });
   }
   assertNoSensitiveText('streamed Sovereign response', streamed);
-  if (chunks < 1 || !streamed.includes('Baseline')) throw new Error('Sovereign streaming response missing Baseline text');
+  const questionResponse = streamed.includes('WHAT I NOTICE') && streamed.includes('LOOK INWARD');
+  const integrationResponse = streamed.includes('WHAT THIS MAY BE SHOWING') && streamed.includes('A CLEARER FORM') && streamed.includes('WHAT TO DO');
+  if (chunks < 1 || (!questionResponse && !integrationResponse)) throw new Error('Sovereign streamed response did not match the validated recognition contract');
   const duplicate = await request('/api/v1/threads/preview-live/messages', { method: 'POST', headers: { 'x-idempotency-key': turnKey }, body: JSON.stringify({ message: 'Duplicate turn', context: { surface: 'Today' } }) }, 200);
   if (!JSON.stringify(await duplicate.json()).includes('duplicate')) throw new Error('duplicate turn was not reported');
   await json('/api/v1/threads/preview-live/corrections', { method: 'POST', body: JSON.stringify({ correction: 'partly' }) });
