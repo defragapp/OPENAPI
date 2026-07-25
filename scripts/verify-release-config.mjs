@@ -5,10 +5,14 @@ const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 const previewSmoke = readFileSync('scripts/preview-smoke.ts', 'utf8');
 const previewBootstrap = readFileSync('scripts/cloudflare-preview-bootstrap.mjs', 'utf8');
 const cloudflareGuide = readFileSync('docs/cloudflare-workers-builds.md', 'utf8');
+const architecture = readFileSync('docs/architecture.md', 'utf8');
 const webMain = readFileSync('apps/web/src/main.tsx', 'utf8');
 const completionLayer = readFileSync('apps/web/src/ProductCompletionLayer.tsx', 'utf8');
 const peopleDb = readFileSync('apps/sovereign-worker/src/db/people.ts', 'utf8');
 const relationalContext = readFileSync('apps/sovereign-worker/src/relational-context.ts', 'utf8');
+const baselineSource = readFileSync('apps/sovereign-worker/src/baseline.ts', 'utf8');
+const baselineEngine = readFileSync('apps/sovereign-worker/src/baseline-engine.ts', 'utf8');
+const baselineTests = readFileSync('apps/sovereign-worker/src/baseline-engine.test.ts', 'utf8');
 
 function assertBinding(scope, name) {
   if (!scope?.queues?.producers?.some((item) => item.binding === 'JOBS')) {
@@ -27,6 +31,9 @@ function assertBinding(scope, name) {
   }
   if (scope?.ai?.binding !== 'AI') throw new Error(`${name} missing Workers AI binding`);
   if (scope?.assets?.binding !== 'ASSETS') throw new Error(`${name} missing ASSETS binding`);
+  if (scope?.services?.some((item) => item.binding === 'BASELINE' || item.service === 'sovereign-os-api')) {
+    throw new Error(`${name} must not depend on a SOVV Baseline service binding`);
+  }
 }
 
 assertBinding(config, 'default');
@@ -57,6 +64,9 @@ for (const scope of [config.vars, config.env?.preview?.vars]) {
     scope?.AI_SOVEREIGN_PLUS_MONTHLY_TURNS !== '300'
   ) {
     throw new Error('AI allowances do not match the review contract');
+  }
+  for (const key of ['BASELINE_GEOCODER_URL', 'BASELINE_TIMEZONE_URL', 'BASELINE_HORIZONS_URL', 'BASELINE_PROVIDER_TIMEOUT_MS']) {
+    if (!scope?.[key]) throw new Error(`OPENAPI Baseline engine is missing ${key}`);
   }
 }
 
@@ -119,6 +129,10 @@ for (const required of [
   'EMAIL_API_URL',
   'EMAIL_API_TOKEN',
   'EMAIL_FROM',
+  'BASELINE_GEOCODER_URL',
+  'BASELINE_TIMEZONE_URL',
+  'BASELINE_HORIZONS_URL',
+  'SOVV is read-only reference material',
   'D1 Edit',
   'Queues Edit',
   'Workers R2 Storage Edit',
@@ -127,6 +141,40 @@ for (const required of [
   if (!cloudflareGuide.includes(required)) {
     throw new Error(`Cloudflare build guide is missing ${required}`);
   }
+}
+
+if (!architecture.includes('The new product is assembled entirely in OPENAPI')) {
+  throw new Error('architecture must keep OPENAPI as the sole product implementation');
+}
+if (!architecture.includes('`defragapp/SOVV` remains read-only')) {
+  throw new Error('architecture must keep SOVV read-only');
+}
+
+for (const required of ['createOpenApiBaselineProvider', 'sovvRuntimeDependency: false', 'openapi-cloudflare-baseline-engine']) {
+  if (!baselineSource.includes(required)) throw new Error(`Baseline source is missing ${required}`);
+}
+if (baselineSource.includes('env.BASELINE')) {
+  throw new Error('OPENAPI Baseline must not call a SOVV service binding');
+}
+for (const required of [
+  'NASA/JPL Horizons API',
+  'parseHorizonsJson',
+  'rawBirthInputReturned: false',
+  'completeHumanDesignClaimed: false',
+  'completeGeneKeysClaimed: false',
+  'housesClaimed: false',
+  'baseline-geocode:v1:',
+  'baseline-engine:v1:'
+]) {
+  if (!baselineEngine.includes(required)) throw new Error(`OPENAPI Baseline engine is missing ${required}`);
+}
+for (const forbidden of ['SOVV_INTERNAL_AUTH_TOKEN', 'sovereign-os-api-service-binding', 'OpenApiBaselineService']) {
+  if (baselineEngine.includes(forbidden) || baselineSource.includes(forbidden)) {
+    throw new Error(`OPENAPI Baseline engine retained forbidden cross-repository dependency ${forbidden}`);
+  }
+}
+for (const required of ['Unexpected Horizons API signature', 'not.toContain(\'Upland\')', 'withholds time-dependent framework activations']) {
+  if (!baselineTests.includes(required)) throw new Error(`Baseline engine tests are missing ${required}`);
 }
 
 for (const required of [
@@ -175,5 +223,5 @@ for (const path of ['.github/workflows/preview-deploy.yml', '.github/workflows/l
 }
 
 console.log(
-  'Release config verified cloudflare_build=true d1=true durable_objects=true queues=true schedules=true r2=true ai=true assets=true canonical_preview_url=true runtime_secret_order=true auth_config=true relational_results=true revocation_ui=true three_person_system=true tier_smoke=true'
+  'Release config verified cloudflare_build=true d1=true durable_objects=true queues=true schedules=true r2=true ai=true assets=true openapi_baseline_engine=true sovv_runtime_dependency=false canonical_preview_url=true runtime_secret_order=true auth_config=true relational_results=true revocation_ui=true three_person_system=true tier_smoke=true'
 );
