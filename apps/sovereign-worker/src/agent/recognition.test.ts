@@ -2,6 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { composeRecognitionResponse, deriveAvailableBasis, parseRecognitionPlan, renderBasisFooter } from './recognition';
 
 const emptyBasis = { human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] };
+const hiddenVisualStory = {
+  should_show: false,
+  mode: 'self' as const,
+  primary: { archetype: 'fool' as const, title: '', phase: 'shadow' as const },
+  secondary: null,
+  tertiary: null,
+  origin: '',
+  shadow: '',
+  gift: '',
+  current: '',
+  next_step: '',
+  visual_reason: ''
+};
 
 describe('inner recognition structured output', () => {
   it('derives exact verified values and renders the compact footer', () => {
@@ -97,6 +110,7 @@ describe('inner recognition structured output', () => {
       candidate_hidden_expectation: 'The fear is making it hard to know what is directly observable.', protected_need: 'safety',
       clearer_form: 'Focus on immediate safety and one trusted person.', practical_action: 'Contact someone you trust and stay with them while you seek appropriate support.',
       module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
+      visual_story: hiddenVisualStory,
       basis: { user_confirmed: true, human_design: ['5/1'], gene_keys: ['16.1'], astrology: ['☾ Scorpio'], relationship: [], live: ['♃ Leo'], numerology: [] },
       confidence: 'confirmed', safety_mode: 'grounded'
     });
