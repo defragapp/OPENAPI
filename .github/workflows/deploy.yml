@@ -12,6 +12,7 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
+      - 'wrangler.jsonc'
       - 'wrangler.production-direct.jsonc'
   workflow_dispatch:
 
