@@ -17,6 +17,9 @@ const browserRuntime = readFileSync('apps/web/src/ProductionRuntime.ts', 'utf8')
 const appUi = readFileSync('apps/web/src/App.tsx', 'utf8');
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const pricing = readFileSync('apps/web/public/pricing.html', 'utf8');
+const consent = readFileSync('apps/web/public/consent.html', 'utf8');
+const consentCss = readFileSync('apps/web/public/consent.css', 'utf8');
+const consentJs = readFileSync('apps/web/public/consent.js', 'utf8');
 const staticHeaders = readFileSync('apps/web/public/_headers', 'utf8');
 const workerHeaders = readFileSync('apps/sovereign-worker/src/security/headers.ts', 'utf8');
 
@@ -52,6 +55,14 @@ for (const required of [
   "'STRIPE_SECRET_KEY'",
   "'STRIPE_WEBHOOK_SECRET'",
   'verifyLiveProduction()',
+  'assertContainsAll',
+  'howClean',
+  'pricingClean',
+  'faqClean',
+  'publicConsent',
+  'compiledCopy',
+  'consentCss',
+  'consentJs',
   'concurrentHealth',
   'stripeSignatureRejection',
   'exportsDisabled',
@@ -91,6 +102,7 @@ for (const required of [
   '"/signup"',
   '"/app/*"',
   '"/auth/*"',
+  '"/consent.html"',
   '"/pricing.html"',
   'price_1Te0g9Bk78yJ8Hww8fFZCqhm',
   'price_1Tq6nPBk78yJ8Hwwm0pxg4hH'
@@ -109,6 +121,7 @@ for (const required of [
   "'/api/stripe/webhook'",
   "'/api/webhooks/stripe'",
   "'/api/v1/export-jobs'",
+  "pathname === '/consent.html'",
   'documentResponse(await env.ASSETS.fetch(request)',
   "headers.set('x-robots-tag', 'noindex, nofollow')",
   'isNavigationAssetPath',
@@ -217,7 +230,7 @@ if (env.includes('ARTIFACTS') || env.includes('R2Bucket')) throw new Error('Work
 if (!env.includes('RESEND_API_KEY')) throw new Error('Worker Env must preserve transactional email fallback');
 if (product.includes("'export.full'")) throw new Error('Product entitlements must not include export.full');
 if (!product.includes('Private export is not available')) throw new Error('Private export endpoint must fail closed');
-if (!product.includes("kind, status, payload_json, run_after")) throw new Error('Deletion requests must schedule a D1 job');
+if (!product.includes('kind, status, payload_json, run_after')) throw new Error('Deletion requests must schedule a D1 job');
 
 for (const required of [
   'installProductionRuntime()',
@@ -256,4 +269,29 @@ if (/donate\.stripe\.com|Support Sovereign\.OS|Support the platform/i.test(`${pr
   throw new Error('Unapproved support placement is present');
 }
 
-console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0009 d1_scale_indexes=true durable_objects=true durable_object_sharding=account_thread workers_ai=true ai_capacity_backpressure=true ai_allowance_retry_after=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true app_service_worker=false signup_only_account_creation=true policy_acceptance_persisted=true malformed_magic_links_rejected=true trusted_stripe_handoffs=true remote_stripe_subscription_discovery=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true support_placement=false private_exports=false public_share=true live_gate=true concurrency_probe=20');
+for (const required of [
+  '/launch.css?v=20260726-platform-r2',
+  '/consent.css?v=20260726-consent-r1',
+  '/consent.js?v=20260726-consent-r1',
+  'You decide what another account may use.',
+  'The inviting account cannot make or change these decisions for you.',
+  'noindex,nofollow'
+]) {
+  if (!consent.includes(required)) throw new Error(`Consent page is missing ${required}`);
+}
+if (consent.includes('<style>') || consent.includes('const labels =')) {
+  throw new Error('Consent page must not rely on inline style or script under production CSP');
+}
+for (const required of ['.consent-hero', '.consent-panel', '@media (max-width: 680px)']) {
+  if (!consentCss.includes(required)) throw new Error(`Consent stylesheet is missing ${required}`);
+}
+for (const required of [
+  "fetch('/api/v1/invitations/mine'",
+  'Choose each permission independently.',
+  'Permission allowed for future use.',
+  'Permission revoked for future use.'
+]) {
+  if (!consentJs.includes(required)) throw new Error(`Consent controls are missing ${required}`);
+}
+
+console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0009 d1_scale_indexes=true durable_objects=true durable_object_sharding=account_thread workers_ai=true ai_capacity_backpressure=true ai_allowance_retry_after=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true consent_csp_safe=true full_live_copy_gate=true signup_only_account_creation=true policy_acceptance_persisted=true malformed_magic_links_rejected=true trusted_stripe_handoffs=true remote_stripe_subscription_discovery=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true support_placement=false private_exports=false public_share=true live_gate=true concurrency_probe=20');
