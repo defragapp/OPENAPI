@@ -78,7 +78,8 @@ for (const required of [
 for (const required of [
   'production version is uploaded without receiving traffic',
   'exact uploaded version ID',
-  'rollback version ID'
+  'rollback version ID',
+  'reject missing approval before Cloudflare resource reads or writes'
 ]) {
   if (!gates.includes(required)) throw new Error(`Release gates are missing ${required}`);
 }
