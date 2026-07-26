@@ -67,6 +67,7 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Migration compatibility and D1 backup evidence are recorded separately from Worker version promotion.
 - Rollback instructions, the previous Worker version, and its rollback version ID are documented.
 - Production promotion is bound to the exact uploaded version ID and exact approved commit SHA.
+- Production candidate, migration, promotion, and rollback commands reject missing approval before Cloudflare resource reads or writes.
 
 ## UX
 
