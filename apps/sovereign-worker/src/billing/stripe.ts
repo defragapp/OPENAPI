@@ -8,6 +8,7 @@ export interface PortalResult { url: string; sessionId: string; }
 
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set(['active', 'trialing']);
 const TERMINAL_SUBSCRIPTION_STATUSES = new Set(['canceled', 'incomplete_expired', 'retained_billing_record']);
+const PRODUCTION_HANDOFF_HOSTS = new Set(['checkout.stripe.com', 'billing.stripe.com']);
 
 function stripeConfigured(env: Env): boolean {
   return Boolean(env.STRIPE_SECRET_KEY && env.STRIPE_SUCCESS_URL && env.STRIPE_CANCEL_URL);
@@ -23,6 +24,22 @@ function requireIdempotencyKey(value: string): string {
     throw new Response('A valid idempotency key is required', { status: 400 });
   }
   return key;
+}
+
+function requireAccountSearchKey(accountId: string): string {
+  if (!/^[A-Za-z0-9_-]{1,128}$/.test(accountId)) throw new Error('invalid_account_search_key');
+  return accountId;
+}
+
+function requireStripeHandoffUrl(env: Env, value: string | undefined, kind: 'checkout' | 'portal'): string {
+  if (!value || value.length > 2048) throw new Response(`Stripe did not return a ${kind} URL`, { status: 502 });
+  let url: URL;
+  try { url = new URL(value); } catch { throw new Response('Stripe returned an invalid billing URL', { status: 502 }); }
+  const testAllowed = allowTestBilling(env) && (url.hostname.endsWith('.stripe.test') || url.hostname === 'test-billing.invalid');
+  if (url.protocol !== 'https:' || url.username || url.password || (!PRODUCTION_HANDOFF_HOSTS.has(url.hostname) && !testAllowed)) {
+    throw new Response('Stripe returned an untrusted billing URL', { status: 502 });
+  }
+  return url.toString();
 }
 
 async function stripeRequest<T>(env: Env, path: string, body: URLSearchParams, idempotencyKey: string): Promise<T> {
@@ -51,6 +68,43 @@ async function cancelStripeSubscription(env: Env, subscriptionId: string, idempo
   });
   if (response.ok || response.status === 404) return;
   throw new Error(`stripe_subscription_cancel_${response.status}`);
+}
+
+interface StripeSubscriptionSearchRow { id: string; status: string; }
+interface StripeSubscriptionSearchResult {
+  data?: StripeSubscriptionSearchRow[];
+  has_more?: boolean;
+  next_page?: string;
+}
+
+async function searchStripeSubscriptionsByAccount(env: Env, accountId: string): Promise<StripeSubscriptionSearchRow[]> {
+  if (!env.STRIPE_SECRET_KEY) throw new Error('stripe_secret_missing');
+  const safeAccountId = requireAccountSearchKey(accountId);
+  const found = new Map<string, StripeSubscriptionSearchRow>();
+  let page: string | undefined;
+
+  for (let requestNumber = 0; requestNumber < 10; requestNumber += 1) {
+    const params = new URLSearchParams({
+      query: `metadata["account_id"]:"${safeAccountId}"`,
+      limit: '100'
+    });
+    if (page) params.set('page', page);
+    const response = await fetch(`https://api.stripe.com/v1/subscriptions/search?${params.toString()}`, {
+      method: 'GET',
+      headers: { authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
+      signal: AbortSignal.timeout(10_000)
+    });
+    const payload = await response.json().catch(() => ({})) as StripeSubscriptionSearchResult;
+    if (!response.ok) throw new Error(`stripe_subscription_search_${response.status}`);
+    for (const row of payload.data ?? []) {
+      if (/^sub_[A-Za-z0-9_]+$/.test(row.id) && typeof row.status === 'string') found.set(row.id, row);
+    }
+    if (!payload.has_more) return [...found.values()];
+    if (!payload.next_page) throw new Error('stripe_subscription_search_cursor_missing');
+    page = payload.next_page;
+  }
+
+  throw new Error('stripe_subscription_search_page_limit');
 }
 
 function testBillingUrl(kind: 'checkout' | 'portal', sessionId: string): string {
@@ -130,8 +184,12 @@ export async function createCheckoutSession(env: Env, accountId: string, interva
     const customer = await linkedStripeCustomerId(env, accountId);
     if (customer) body.set('customer', customer);
     const session = await stripeRequest<{ id: string; url?: string }>(env, '/checkout/sessions', body, stableKey);
-    if (!session.url) throw new Response('Stripe did not return a Checkout URL', { status: 502 });
-    return { sessionId: session.id, plan: 'sovereign_plus', interval, url: session.url };
+    return {
+      sessionId: session.id,
+      plan: 'sovereign_plus',
+      interval,
+      url: requireStripeHandoffUrl(env, session.url, 'checkout')
+    };
   }
 
   if (!allowTestBilling(env)) throw new Response('Stripe is not configured', { status: 503 });
@@ -148,8 +206,7 @@ export async function createPortalSession(env: Env, accountId: string, idempoten
     body.set('customer', customer);
     body.set('return_url', env.STRIPE_PORTAL_RETURN_URL);
     const session = await stripeRequest<{ id: string; url?: string }>(env, '/billing_portal/sessions', body, stableKey);
-    if (!session.url) throw new Response('Stripe did not return a Portal URL', { status: 502 });
-    return { sessionId: session.id, url: session.url };
+    return { sessionId: session.id, url: requireStripeHandoffUrl(env, session.url, 'portal') };
   }
   if (!allowTestBilling(env)) throw new Response('Stripe portal is not configured', { status: 503 });
   const sessionId = `bps_test_${accountId}_${stableKey}`.replace(/[^a-zA-Z0-9_]/g, '_');
@@ -157,21 +214,26 @@ export async function createPortalSession(env: Env, accountId: string, idempoten
 }
 
 export async function cancelAccountSubscriptions(env: Env, accountId: string, deletionJobId: string): Promise<{ cancelled: number }> {
-  const rows = await env.DB.prepare(`SELECT stripe_subscription_id, status FROM stripe_subscriptions
+  const local = await env.DB.prepare(`SELECT stripe_subscription_id, status FROM stripe_subscriptions
     WHERE account_id = ? AND stripe_subscription_id IS NOT NULL
     ORDER BY updated_at DESC`)
     .bind(accountId)
     .all<{ stripe_subscription_id: string; status: string }>();
-  const cancellable = (rows.results ?? []).filter((row) => !TERMINAL_SUBSCRIPTION_STATUSES.has(row.status));
-  if (cancellable.length > 0 && !env.STRIPE_SECRET_KEY) throw new Error('stripe_secret_missing');
 
-  for (const row of cancellable) {
-    const key = `delete-${deletionJobId}-${row.stripe_subscription_id}`.slice(0, 255);
-    await cancelStripeSubscription(env, row.stripe_subscription_id, key);
+  const candidates = new Map<string, string>();
+  for (const row of local.results ?? []) candidates.set(row.stripe_subscription_id, row.status);
+  for (const row of await searchStripeSubscriptionsByAccount(env, accountId)) {
+    if (!candidates.has(row.id)) candidates.set(row.id, row.status);
+  }
+  const cancellable = [...candidates.entries()].filter(([, status]) => !TERMINAL_SUBSCRIPTION_STATUSES.has(status));
+
+  for (const [subscriptionId] of cancellable) {
+    const key = `delete-${deletionJobId}-${subscriptionId}`.slice(0, 255);
+    await cancelStripeSubscription(env, subscriptionId, key);
     await env.DB.prepare(`UPDATE stripe_subscriptions
       SET status = 'canceled', cancel_at_period_end = 0, updated_at = datetime('now')
       WHERE account_id = ? AND stripe_subscription_id = ?`)
-      .bind(accountId, row.stripe_subscription_id)
+      .bind(accountId, subscriptionId)
       .run();
   }
 
