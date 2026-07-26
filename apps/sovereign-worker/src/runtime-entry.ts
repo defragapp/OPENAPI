@@ -16,6 +16,7 @@ const PARENT_HOSTS = new Set(['defrag.app', 'www.defrag.app']);
 const PUBLIC_HOST = 'sovereign.defrag.app';
 const APP_HOST = 'app.defrag.app';
 const PUBLIC_PATHS = new Set(['/privacy', '/terms', '/pricing.html', '/faq.html', '/how-it-works.html']);
+const THREAD_MESSAGE_PATH = /^\/api\/v1\/threads\/[^/]+\/messages$/;
 
 const runtime = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
@@ -57,9 +58,22 @@ const runtime = {
       return documentResponse(await env.ASSETS.fetch(request), url.hostname.toLowerCase());
     }
 
-    return worker.fetch(request, env, executionContext);
+    return applicationResponse(request, url.pathname, env, executionContext);
   }
 };
+
+async function applicationResponse(request: Request, pathname: string, env: Env, executionContext: ExecutionContext): Promise<Response> {
+  const response = await worker.fetch(request, env, executionContext);
+  if (response.status !== 500 || request.method !== 'POST' || !THREAD_MESSAGE_PATH.test(pathname)) return response;
+  return withSecurityHeaders(Response.json({
+    error: 'sovereign_capacity_unavailable',
+    message: 'Sovereign is temporarily unavailable. Nothing was guessed or saved as a completed interpretation.',
+    retryable: true
+  }, {
+    status: 503,
+    headers: { 'retry-after': '60' }
+  }));
+}
 
 function documentResponse(response: Response, hostname: string): Response {
   const secured = withDocumentSecurityHeaders(response);
