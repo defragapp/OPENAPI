@@ -129,6 +129,12 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+function assertContainsAll(label, text, fingerprints) {
+  for (const fingerprint of fingerprints) {
+    assert(text.includes(fingerprint), `${label} is missing: ${fingerprint}`);
+  }
+}
+
 function headerIncludes(response, name, fragment) {
   return String(response.headers.get(name) || '').toLowerCase().includes(String(fragment).toLowerCase());
 }
@@ -155,48 +161,145 @@ async function verifyLiveProduction() {
     }
   }
 
-  const [home, pricing, login, signup, health, ready] = await Promise.all([
+  const [
+    home,
+    how,
+    howClean,
+    pricing,
+    pricingClean,
+    faq,
+    faqClean,
+    privacy,
+    terms,
+    login,
+    signup,
+    appPage,
+    invitation,
+    consent,
+    health,
+    ready
+  ] = await Promise.all([
     readText(`${publicBase}/`),
+    readText(`${publicBase}/how-it-works.html`),
+    readText(`${publicBase}/how-it-works`),
     readText(`${publicBase}/pricing.html`),
+    readText(`${publicBase}/pricing`),
+    readText(`${publicBase}/faq.html`),
+    readText(`${publicBase}/faq`),
+    readText(`${publicBase}/privacy`),
+    readText(`${publicBase}/terms`),
     readText(`${appBase}/login`),
     readText(`${appBase}/signup`),
+    readText(`${appBase}/app`),
+    readText(`${appBase}/invitation`),
+    readText(`${appBase}/consent.html`),
     readJson(`${appBase}/health`),
     readJson(`${appBase}/ready`)
   ]);
 
   assert(home.response.ok, `public home returned ${home.response.status}`);
-  assert(/Sovereign\.OS/i.test(home.text), 'public home does not identify Sovereign.OS');
-  assert(home.text.includes('Understand your life in context'), 'platform public home fingerprint is missing');
-  assert(pricing.response.ok, `pricing returned ${pricing.response.status}`);
-  assert(pricing.text.includes('$20') && pricing.text.includes('$99'), 'launch pricing is missing');
+  assertContainsAll('public home', home.text, ['Sovereign.OS', 'Understand your life in context']);
+
+  assert(how.response.ok && howClean.response.ok, 'How it works page or clean URL is unavailable');
+  assertContainsAll('How it works', how.text, [
+    'One starting map. Better questions at every level.',
+    'THE PRODUCT IN FOUR STEPS',
+    'Build a Baseline',
+    'Choose a next move'
+  ]);
+  assertContainsAll('How it works clean URL', howClean.text, [
+    'One starting map. Better questions at every level.',
+    'Build the Baseline before bringing the big question.'
+  ]);
+
+  assert(pricing.response.ok && pricingClean.response.ok, 'pricing page or clean URL is unavailable');
+  assertContainsAll('pricing', pricing.text, [
+    '$20',
+    '$99',
+    '10 Sovereign responses each month',
+    '300 Sovereign responses each month',
+    'Consent-aware invitations and sharing controls'
+  ]);
+  assertContainsAll('pricing clean URL', pricingClean.text, ['$20', '$99', 'Start with your own context.']);
   assert(!pricing.text.includes('$29') && !pricing.text.includes('$79'), 'legacy pricing is still visible');
-  assert(pricing.text.includes('Consent-aware invitations and sharing'), 'share-first plan copy is missing');
   assert(!/donate\.stripe\.com|Support Sovereign\.OS|Support the platform/i.test(pricing.text), 'unapproved support placement is public');
-  assert(!/full account export|export features/i.test(`${home.text}\n${pricing.text}`), 'export promise is still public');
+
+  assert(faq.response.ok && faqClean.response.ok, 'Questions page or clean URL is unavailable');
+  assertContainsAll('Questions', faq.text, [
+    'What it is. What it does. What it does not pretend to know.',
+    'What is Sovereign.OS?',
+    'Can Sovereign know why another person did something?',
+    'Is Sovereign therapy or professional advice?'
+  ]);
+  assertContainsAll('Questions clean URL', faqClean.text, ['What is Sovereign.OS?', 'What does Sovereign+ include?']);
+
+  assert(privacy.response.ok && terms.response.ok, 'privacy or terms page is unavailable');
   assert(login.response.ok && signup.response.ok, 'login or signup page is unavailable');
-  assert(/SOVEREIGN\.OS/i.test(login.text) && /SOVEREIGN\.OS/i.test(signup.text), 'account pages do not identify Sovereign.OS');
+  assert(appPage.response.ok, `workspace shell returned ${appPage.response.status}`);
+  assert(invitation.response.ok, `invitation page returned ${invitation.response.status}`);
+  assert(consent.response.ok, `consent page returned ${consent.response.status}`);
+  assertContainsAll('consent page', consent.text, [
+    'You decide what another account may use.',
+    'The inviting account cannot make or change these decisions for you.',
+    '/consent.css?v=20260726-consent-r1',
+    '/consent.js?v=20260726-consent-r1'
+  ]);
+  assert(!consent.text.includes('<style>'), 'consent page still carries the retired inline visual layer');
+  assert(!consent.text.includes('const labels ='), 'consent controls are still inline and blocked by CSP');
+  assert(!/full account export|export features/i.test(`${home.text}\n${pricing.text}\n${faq.text}`), 'export promise is still public');
+
   assert(health.response.ok && health.json?.ok === true, 'health is not healthy');
   assert(health.json?.version === commitSha, 'health is not serving the deployed commit');
   assert(health.json?.migrationVersion === migrationVersion, 'health is not serving migration 0009');
   assert(ready.json?.ready === true && ready.json?.version === commitSha, 'ready is not serving the deployed commit');
 
-  for (const page of [home.response, login.response, signup.response]) {
+  const publicDocuments = [home.response, how.response, howClean.response, pricing.response, pricingClean.response, faq.response, faqClean.response, privacy.response, terms.response];
+  const appDocuments = [login.response, signup.response, appPage.response, invitation.response, consent.response];
+  for (const page of [...publicDocuments, ...appDocuments]) {
     assert(headerIncludes(page, 'strict-transport-security', 'max-age=31536000'), 'HSTS is missing from a document');
     assert(headerIncludes(page, 'x-content-type-options', 'nosniff'), 'nosniff is missing from a document');
     assert(headerIncludes(page, 'x-frame-options', 'deny'), 'frame denial is missing from a document');
     assert(headerIncludes(page, 'content-security-policy', "frame-ancestors 'none'"), 'document frame CSP is missing');
   }
   assert(headerIncludes(login.response, 'content-security-policy', 'challenges.cloudflare.com'), 'Turnstile CSP is missing');
-  assert(headerIncludes(login.response, 'x-robots-tag', 'noindex'), 'authenticated hostname is indexable');
+  for (const page of appDocuments) {
+    assert(headerIncludes(page, 'x-robots-tag', 'noindex'), 'an app-host document is indexable');
+  }
 
-  const [appRoot, publicLogin, appPricing, publicApi] = await Promise.all([
+  const jsAssetPath = home.text.match(/src=["'](\/assets\/[^"']+\.js)["']/)?.[1];
+  assert(jsAssetPath, 'compiled JavaScript fingerprint is missing from the public document');
+  const jsAsset = await readText(`${publicBase}${jsAssetPath}`);
+  assert(jsAsset.response.ok, `compiled JavaScript returned ${jsAsset.response.status}`);
+  assert(headerIncludes(jsAsset.response, 'cache-control', 'immutable'), 'compiled JavaScript is not immutable');
+  assertContainsAll('compiled application copy', jsAsset.text, [
+    'How Sovereign.OS handles your information.',
+    'Terms for using Sovereign.OS.',
+    'Welcome back.',
+    'Create your account.',
+    'Choose what this connection may use.',
+    'Your context for today.',
+    'Work through one real question.',
+    'Understand the relationship—not just the latest moment.',
+    'See the structure around the group.',
+    'Return to what was worth keeping.',
+    'Build your starting map.',
+    'Your workspace, under your control.'
+  ]);
+
+  const consentCss = await request(`${appBase}/consent.css?v=20260726-consent-r1`);
+  const consentJs = await request(`${appBase}/consent.js?v=20260726-consent-r1`);
+  assert(consentCss.ok && consentJs.ok, 'consent page assets are unavailable');
+
+  const [appRoot, publicLogin, publicConsent, appPricing, publicApi] = await Promise.all([
     request(`${appBase}/`, { redirect: 'manual' }),
     request(`${publicBase}/login`, { redirect: 'manual' }),
+    request(`${publicBase}/consent.html`, { redirect: 'manual' }),
     request(`${appBase}/pricing.html`, { redirect: 'manual' }),
     request(`${publicBase}/api/v1/auth/session`, { redirect: 'manual' })
   ]);
   assert(appRoot.status === 308 && appRoot.headers.get('location')?.startsWith(`${appBase}/app`), 'app root redirect is incorrect');
   assert(publicLogin.status === 308 && publicLogin.headers.get('location')?.startsWith(`${appBase}/login`), 'public login redirect is incorrect');
+  assert(publicConsent.status === 308 && publicConsent.headers.get('location')?.startsWith(`${appBase}/consent.html`), 'public consent redirect is incorrect');
   assert(appPricing.status === 308 && appPricing.headers.get('location')?.startsWith(`${publicBase}/pricing.html`), 'app pricing redirect is incorrect');
   assert(publicApi.status === 308 && publicApi.headers.get('location')?.startsWith(`${appBase}/api/v1/auth/session`), 'public API redirect is incorrect');
 
@@ -258,12 +361,6 @@ async function verifyLiveProduction() {
   assert(headerIncludes(health.response, 'x-frame-options', 'deny'), 'health frame denial is missing');
   assert(headerIncludes(health.response, 'content-security-policy', "default-src 'none'"), 'API CSP is missing');
 
-  const assetPath = home.text.match(/(?:src|href)=["'](\/assets\/[^"']+\.(?:js|css))["']/)?.[1];
-  assert(assetPath, 'compiled asset fingerprint is missing from the public document');
-  const asset = await request(`${publicBase}${assetPath}`);
-  assert(asset.ok, `compiled asset returned ${asset.status}`);
-  assert(headerIncludes(asset, 'cache-control', 'immutable'), 'compiled asset is not immutable');
-
   const concurrent = await Promise.all(Array.from({ length: 20 }, () => readJson(`${appBase}/health`)));
   assert(concurrent.every((item) => item.response.ok && item.json?.version === commitSha), 'concurrent health probe failed');
 
@@ -274,7 +371,17 @@ async function verifyLiveProduction() {
     ready: ready.json,
     probes: {
       publicHome: 'passed',
-      pricing: 'passed',
+      howItWorks: 'html-and-clean-url-passed',
+      pricing: 'html-and-clean-url-passed',
+      questions: 'html-and-clean-url-passed',
+      privacy: 'passed',
+      terms: 'passed',
+      login: 'passed',
+      signup: 'passed',
+      workspaceShell: 'passed',
+      invitation: 'passed',
+      consent: 'page-assets-and-csp-passed',
+      compiledCopy: 'all-user-facing-fingerprints-passed',
       supportPlacementExcluded: 'passed',
       hostnameSeparation: 'passed',
       unauthenticatedAccess: 'passed',
@@ -284,7 +391,7 @@ async function verifyLiveProduction() {
       documentSecurityHeaders: 'passed',
       apiSecurityHeaders: 'passed',
       appNoIndex: 'passed',
-      immutableAsset: assetPath,
+      immutableAsset: jsAssetPath,
       concurrentHealth: '20/20'
     }
   };
