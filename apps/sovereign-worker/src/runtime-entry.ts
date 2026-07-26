@@ -27,7 +27,12 @@ const runtime = {
       target.hostname = APP_HOST;
       target.port = '';
       target.pathname = '/api/v1/stripe/webhook';
-      return worker.fetch(new Request(target, request), env, executionContext);
+      const forwarded = new Request(target.toString(), {
+        method: request.method,
+        headers: request.headers,
+        body: request.body
+      });
+      return worker.fetch(forwarded, env, executionContext);
     }
 
     const routed = routeHostname(request, url);
