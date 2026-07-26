@@ -29,7 +29,10 @@ concurrency:
 
 jobs:
   deploy-production:
-    if: github.event_name != 'issues' || (github.event.issue.number == 24 && contains(github.event.issue.body, 'dispatch: production'))
+    if: >-
+      github.event_name != 'issues' ||
+      (github.event.issue.number == 24 &&
+      contains(github.event.issue.body, 'dispatch: production'))
     name: Build, migrate, and deploy OPENAPI to sovv-web
     runs-on: ubuntu-latest
     timeout-minutes: 45
