@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -190,15 +190,18 @@ function verifyRuntimeSecrets(configPath) {
     'TURNSTILE_SECRET_KEY',
     'EMAIL_API_TOKEN'
   ];
-  const listed = parseJsonOutput(runWrangler(['secret', 'list', '--config', configPath, '--json']));
+  const listed = parseJsonOutput(runWrangler(['secret', 'list', '--config', configPath, '--format', 'json']));
   const names = new Set(rows(listed).map((item) => item.name));
   const missing = requiredSecrets.filter((name) => !names.has(name));
   if (missing.length) throw new Error(`Production Worker is missing runtime secrets: ${missing.join(', ')}`);
 }
 
 function wranglerOutput(args, configPath) {
-  const outputPath = resolve(root, `.tmp/wrangler-${mode}-${Date.now()}.jsonl`);
-  const stdout = runWrangler([...args, '--config', configPath], {
+  const tmpDir = resolve(root, '.tmp');
+  mkdirSync(tmpDir, { recursive: true });
+  const outputPath = resolve(tmpDir, `wrangler-${mode}-${Date.now()}.jsonl`);
+  const wranglerArgs = configPath ? [...args, '--config', configPath] : args;
+  const stdout = runWrangler(wranglerArgs, {
     extraEnv: { WRANGLER_OUTPUT_FILE: outputPath }
   });
   let entries = [];
@@ -248,7 +251,7 @@ if (mode === 'promote') {
     '--version-id', versionId,
     '--percentage', '100',
     '--message', `Sovereign.OS ${commitSha}`
-  ], resolve(workerDir, 'wrangler.jsonc'));
+  ]);
   console.log(JSON.stringify({ mode, workerName, commitSha, versionId, deployedVersionId: versionIdFrom(result) || versionId }, null, 2));
   process.exit(0);
 }
