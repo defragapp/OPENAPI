@@ -21,6 +21,7 @@ const env = {
   CLOUDFLARE_ACCOUNT_ID: accountId,
   CLOUDFLARE_API_TOKEN: token
 };
+const noProvisionFlags = ['--experimental-provision=false', '--experimental-auto-create=false'];
 const sensitiveValues = [
   token,
   process.env.PRODUCTION_RELEASE_APPROVAL
@@ -119,7 +120,7 @@ function ensureTrackedTreeIsClean() {
 }
 
 function findD1DatabaseId(name) {
-  const listed = parseJsonOutput(runWrangler(['d1', 'list', '--json']));
+  const listed = parseJsonOutput(runWrangler(['d1', 'list', '--json', ...noProvisionFlags]));
   const match = rows(listed).find((item) => item.name === name || item.database_name === name);
   const id = match?.uuid ?? match?.id ?? match?.database_id;
   if (!id) throw new Error(`Production D1 database ${name} does not exist; this release tool never creates production storage`);
@@ -190,7 +191,7 @@ function verifyRuntimeSecrets(configPath) {
     'TURNSTILE_SECRET_KEY',
     'EMAIL_API_TOKEN'
   ];
-  const listed = parseJsonOutput(runWrangler(['secret', 'list', '--config', configPath, '--format', 'json']));
+  const listed = parseJsonOutput(runWrangler(['secret', 'list', '--config', configPath, '--format', 'json', ...noProvisionFlags]));
   const names = new Set(rows(listed).map((item) => item.name));
   const missing = requiredSecrets.filter((name) => !names.has(name));
   if (missing.length) throw new Error(`Production Worker is missing runtime secrets: ${missing.join(', ')}`);
@@ -228,7 +229,11 @@ ensureTrackedTreeIsClean();
 if (mode === 'rollback') {
   const rollbackVersion = required('PRODUCTION_ROLLBACK_VERSION_ID');
   requireApproval('rollback', rollbackVersion);
-  const output = runWrangler(['rollback', rollbackVersion, '--name', workerName]);
+  const output = runWrangler([
+    'rollback', rollbackVersion,
+    '--name', workerName,
+    '--message', `Rollback Sovereign.OS to ${rollbackVersion}`
+  ]);
   console.log(JSON.stringify({ mode, workerName, rollbackVersion, output: sanitize(output.trim()) }, null, 2));
   process.exit(0);
 }
@@ -250,7 +255,9 @@ if (mode === 'promote') {
     '--name', workerName,
     '--version-id', versionId,
     '--percentage', '100',
-    '--message', `Sovereign.OS ${commitSha}`
+    '--message', `Sovereign.OS ${commitSha}`,
+    '--yes',
+    ...noProvisionFlags
   ]);
   console.log(JSON.stringify({ mode, workerName, commitSha, versionId, deployedVersionId: versionIdFrom(result) || versionId }, null, 2));
   process.exit(0);
@@ -263,8 +270,8 @@ try {
     if (process.env.PRODUCTION_MIGRATIONS_BACKWARD_COMPATIBLE !== 'YES') {
       throw new Error('PRODUCTION_MIGRATIONS_BACKWARD_COMPATIBLE must equal YES');
     }
-    const before = runWrangler(['d1', 'migrations', 'list', generated.d1Name, '--remote', '--config', generated.configPath]);
-    runWrangler(['d1', 'migrations', 'apply', generated.d1Name, '--remote', '--config', generated.configPath], { capture: false });
+    const before = runWrangler(['d1', 'migrations', 'list', generated.d1Name, '--remote', '--config', generated.configPath, ...noProvisionFlags]);
+    runWrangler(['d1', 'migrations', 'apply', generated.d1Name, '--remote', '--config', generated.configPath, ...noProvisionFlags], { capture: false });
     console.log(JSON.stringify({ mode, commitSha, d1Name: generated.d1Name, automaticBackup: true, migrationPlan: sanitize(before.trim()) }, null, 2));
     process.exit(0);
   }
@@ -274,7 +281,8 @@ try {
   const result = wranglerOutput([
     'versions', 'upload',
     '--message', `Sovereign.OS release candidate ${commitSha}`,
-    '--tag', `release-${shortSha}`
+    '--tag', `release-${shortSha}`,
+    ...noProvisionFlags
   ], generated.configPath);
   const versionId = versionIdFrom(result);
   if (!versionId) throw new Error('Wrangler did not report the uploaded production version ID');
