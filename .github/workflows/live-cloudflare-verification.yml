@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 concurrency:
   group: live-cloudflare-verification-${{ github.ref }}
@@ -23,6 +24,13 @@ jobs:
       PUBLIC_BASE: https://sovereign.defrag.app
       APP_BASE: https://app.defrag.app
     steps:
+      - name: Publish pending production status
+        if: github.event_name == 'push'
+        continue-on-error: true
+        shell: bash
+        run: |
+          curl --fail-with-body --silent --show-error --request POST --header "Authorization: Bearer ${{ github.token }}" --header "Accept: application/vnd.github+json" --header "X-GitHub-Api-Version: 2022-11-28" "${{ github.api_url }}/repos/${{ github.repository }}/statuses/${{ github.sha }}" --data '{"state":"pending","context":"production/live-cloudflare","description":"Waiting for Cloudflare production convergence","target_url":"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'
+
       - name: Verify deployed commit, auth boundaries, billing safety, and production pages
         shell: bash
         run: |
@@ -261,3 +269,17 @@ jobs:
               'intelligenceAssets': 'passed'
           }, indent=2))
           PY
+
+      - name: Publish successful production status
+        if: success() && github.event_name == 'push'
+        continue-on-error: true
+        shell: bash
+        run: |
+          curl --fail-with-body --silent --show-error --request POST --header "Authorization: Bearer ${{ github.token }}" --header "Accept: application/vnd.github+json" --header "X-GitHub-Api-Version: 2022-11-28" "${{ github.api_url }}/repos/${{ github.repository }}/statuses/${{ github.sha }}" --data '{"state":"success","context":"production/live-cloudflare","description":"Exact commit is live; auth and Stripe boundaries passed","target_url":"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'
+
+      - name: Publish failed production status
+        if: failure() && github.event_name == 'push'
+        continue-on-error: true
+        shell: bash
+        run: |
+          curl --fail-with-body --silent --show-error --request POST --header "Authorization: Bearer ${{ github.token }}" --header "Accept: application/vnd.github+json" --header "X-GitHub-Api-Version: 2022-11-28" "${{ github.api_url }}/repos/${{ github.repository }}/statuses/${{ github.sha }}" --data '{"state":"failure","context":"production/live-cloudflare","description":"Cloudflare convergence or live verification failed","target_url":"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'
