@@ -10,6 +10,8 @@ const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60;
 const MAX_EMAIL_LENGTH = 320;
 const MAX_NAME_LENGTH = 120;
 const MAX_MAGIC_LINKS_PER_IP_WINDOW = 10;
+const TERMS_VERSION = '2026-07-26';
+const PRIVACY_VERSION = '2026-07-26';
 
 export function normalizeEmail(email: string): string { return email.trim().toLowerCase(); }
 function validEmail(email: string): boolean { return email.length <= MAX_EMAIL_LENGTH && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
@@ -17,7 +19,7 @@ async function sha256(value: string) { const hash = await crypto.subtle.digest('
 function base64Url(bytes: Uint8Array) { return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 function newToken(): string { const bytes = new Uint8Array(32); crypto.getRandomValues(bytes); return base64Url(bytes); }
 function publicBaseUrl(request: Request, env: Env): string { return env.PUBLIC_APP_URL || new URL(request.url).origin; }
-function cookie(name: string, value: string, maxAge = SESSION_TTL_SECONDS) { return `${name}=${value}; Path=/; Max-Age=${maxAge}; HttpOnly; Secure; SameSite=Lax`; }
+function cookie(name: string, value: string, maxAge = SESSION_TTL_SECONDS) { return `${name}=${value}; Path=/; Max-Age=${maxAge}; HttpOnly; Secure; SameSite=Lax; Priority=High`; }
 
 export async function verifyTurnstile(env: Env, token?: string, ip?: string, expectedAction?: string): Promise<void> {
   if (runtimeMode(env) === 'test' && token === 'test-turnstile-pass') return;
@@ -64,12 +66,19 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
     .first<{ count: number }>();
   if (recent || Number(recentIp?.count ?? 0) >= MAX_MAGIC_LINKS_PER_IP_WINDOW) return Response.json({ status: 'rate limited' }, { status: 429 });
 
+  const existing = await env.DB.prepare('SELECT id FROM accounts WHERE auth_subject = ?')
+    .bind(`email:${email}`)
+    .first<{ id: string }>();
+  if (kind === 'login' && !existing) {
+    return Response.json({ status: 'sent' });
+  }
+
   const token = newToken();
   const tokenHash = await sha256(token);
-  const existing = await env.DB.prepare('SELECT id FROM accounts WHERE auth_subject = ?').bind(`email:${email}`).first<{ id: string }>();
   const id = `magic_${crypto.randomUUID()}`;
+  const acceptedAt = kind === 'signup' ? new Date().toISOString() : null;
   await env.DB.prepare("INSERT INTO auth_magic_links (id, email_normalized, account_id, purpose, token_hash, name, terms_accepted_at, expires_at, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now', '+15 minutes'), ?, ?)")
-    .bind(id, email, existing?.id ?? null, kind, tokenHash, kind === 'signup' ? name : null, kind === 'signup' ? new Date().toISOString() : null, ipHash, userAgentHash)
+    .bind(id, email, existing?.id ?? null, kind, tokenHash, kind === 'signup' ? name : null, acceptedAt, ipHash, userAgentHash)
     .run();
 
   const url = `${publicBaseUrl(request, env)}/auth/redeem?token=${encodeURIComponent(token)}`;
@@ -92,25 +101,48 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   const token = url.searchParams.get('token') || (await request.json().catch(() => ({})) as { token?: string }).token;
   if (!token || token.length < 32 || token.length > 512) return Response.json({ status: 'invalid' }, { status: 400 });
   const tokenHash = await sha256(token);
-  const row = await env.DB.prepare("SELECT id, email_normalized, account_id, purpose, name, expires_at, used_at FROM auth_magic_links WHERE token_hash = ?").bind(tokenHash).first<Record<string, string | null>>();
+  const row = await env.DB.prepare("SELECT id, email_normalized, account_id, purpose, name, terms_accepted_at, expires_at, used_at FROM auth_magic_links WHERE token_hash = ?")
+    .bind(tokenHash)
+    .first<Record<string, string | null>>();
   if (!row) return Response.json({ status: 'invalid' }, { status: 400 });
   if (row.used_at) return Response.json({ status: 'already used' }, { status: 409 });
   if (!row.expires_at || Date.parse(row.expires_at) < Date.now()) return Response.json({ status: 'expired' }, { status: 410 });
+  if (row.purpose === 'login' && !row.account_id) return Response.json({ status: 'invalid' }, { status: 400 });
+  if (row.purpose === 'signup' && !row.terms_accepted_at) return Response.json({ status: 'invalid' }, { status: 400 });
 
-  const account = await resolveAccount(env, `email:${row.email_normalized}`);
+  const subject = `email:${row.email_normalized}`;
+  let accountId: string;
+  if (row.account_id) {
+    const account = await env.DB.prepare('SELECT id, auth_subject FROM accounts WHERE id = ?')
+      .bind(row.account_id)
+      .first<{ id: string; auth_subject: string }>();
+    if (!account || account.auth_subject !== subject) return Response.json({ status: 'invalid' }, { status: 400 });
+    accountId = account.id;
+  } else {
+    if (row.purpose !== 'signup') return Response.json({ status: 'invalid' }, { status: 400 });
+    accountId = (await resolveAccount(env, subject)).accountId;
+  }
+
   const redeemed = await env.DB.prepare(`UPDATE auth_magic_links
     SET used_at = datetime('now'), account_id = ?
     WHERE id = ? AND used_at IS NULL AND expires_at > datetime('now')`)
-    .bind(account.accountId, row.id)
+    .bind(accountId, row.id)
     .run();
   if ((redeemed.meta?.changes ?? 0) === 0) return Response.json({ status: 'already used' }, { status: 409 });
 
+  if (row.purpose === 'signup') {
+    await env.DB.prepare(`UPDATE accounts SET
+      terms_accepted_at = ?, terms_version = ?, privacy_version = ?, updated_at = datetime('now')
+      WHERE id = ? AND auth_subject = ?`)
+      .bind(row.terms_accepted_at, TERMS_VERSION, PRIVACY_VERSION, accountId, subject)
+      .run();
+  }
+
   const sessionId = `session_${crypto.randomUUID()}`;
   const exp = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
-  const subject = `email:${row.email_normalized}`;
   const tokenValue = await createSignedSessionToken({ sub: subject, exp, sid: sessionId }, env.SESSION_SIGNING_SECRET);
   await env.DB.prepare("INSERT INTO auth_sessions (id, account_id, subject, session_hash, expires_at) VALUES (?, ?, ?, ?, datetime('now', '+30 days'))")
-    .bind(sessionId, account.accountId, subject, await sha256(tokenValue))
+    .bind(sessionId, accountId, subject, await sha256(tokenValue))
     .run();
   return Response.json({ status: 'success' }, { headers: { 'set-cookie': cookie('__Host-sovereign_session', tokenValue) } });
 }
