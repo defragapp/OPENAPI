@@ -6,7 +6,7 @@ let runtimeInstalled = false;
 const scopeCopy: Record<string, { title: string; description: string }> = {
   'pair.compare': {
     title: 'Compare together',
-    description: 'Use both reduced Baselines in a private two-person comparison.'
+    description: 'Use the Baseline themes each person agreed to share in a two-person comparison.'
   },
   'system.include': {
     title: 'Include in a system',
@@ -222,7 +222,7 @@ export function ProductCompletionLayer() {
           aria-haspopup="dialog"
           aria-expanded={controlsOpen}
         >
-          Shared context
+          People & permissions
         </button>
       )}
 
@@ -240,22 +240,23 @@ export function ProductCompletionLayer() {
           >
             <header className="completion-dialog-header">
               <div>
-                <p className="eyebrow">SHARED CONTEXT</p>
-                <h2 id="shared-context-title">Consent stays changeable.</h2>
+                <p className="eyebrow">PEOPLE & PERMISSIONS</p>
+                <h2 id="shared-context-title">Manage what others may use.</h2>
               </div>
               <button className="quiet-button" onClick={() => setControlsOpen(false)} autoFocus>Close</button>
             </header>
+            <p className="completion-intro">A connection never creates blanket access. Review active permissions, stop a specific use, cancel a pending invitation, or remove a person from your workspace.</p>
             <p className="result-status" role="status" aria-live="polite">{status}</p>
 
             <section className="completion-section">
-              <h3>People in your workspace</h3>
+              <h3>People you added</h3>
               {people.length === 0 && <p className="empty-copy">No people have been added.</p>}
               {people.map((person) => (
                 <article className="consent-person-card" key={person.id}>
                   <div className="consent-person-heading">
                     <div>
                       <strong>{person.displayName}</strong>
-                      <small>{person.identityBound ? 'Verified identity' : 'Private entry only'} · Baseline {humanStatus(person.baselineStatus)}</small>
+                      <small>{person.identityBound ? 'Connected to their own account' : 'Private name only'} · Shared Baseline {humanStatus(person.baselineStatus)}</small>
                     </div>
                     <span>{humanStatus(person.invitationStatus ?? 'not invited')}</span>
                   </div>
@@ -276,7 +277,7 @@ export function ProductCompletionLayer() {
                         </button>
                       ))}
                     </div>
-                  ) : <p className="empty-copy">No active permissions are being used.</p>}
+                  ) : <p className="empty-copy">This person has not allowed any shared use.</p>}
                   <div className="completion-actions">
                     {person.invitationStatus === 'pending' && person.invitationId && (
                       <button
@@ -311,12 +312,12 @@ export function ProductCompletionLayer() {
             </section>
 
             <section className="completion-section">
-              <h3>Permissions you granted</h3>
+              <h3>Invitations you accepted</h3>
               {invitations.length === 0 && <p className="empty-copy">No accepted invitations are linked to this account.</p>}
               {invitations.map((invitation) => (
                 <article className="consent-person-card" key={invitation.id}>
                   <div className="consent-person-heading">
-                    <div><strong>{invitation.displayName}</strong><small>You control each requested use.</small></div>
+                    <div><strong>{invitation.displayName}</strong><small>You control each use independently and can change it here.</small></div>
                     <span>{humanStatus(invitation.status)}</span>
                   </div>
                   <div className="invitee-decision-list">
@@ -382,8 +383,8 @@ function RelationalResultDialog({ payload, onClose }: { payload: RelationalPaylo
       >
         <header className="completion-dialog-header">
           <div>
-            <p className="eyebrow">{isSystem ? 'SYSTEM CONTEXT' : 'CONSENTED PAIR CONTEXT'}</p>
-            <h2 id="relational-result-title">{isSystem ? result.system?.name ?? 'System review' : 'Two people, kept distinct.'}</h2>
+            <p className="eyebrow">{isSystem ? 'GROUP CONTEXT' : 'RELATIONSHIP CONTEXT'}</p>
+            <h2 id="relational-result-title">{isSystem ? result.system?.name ?? 'Group review' : 'Two people, not one story.'}</h2>
           </div>
           <button className="quiet-button" onClick={onClose} autoFocus>Close</button>
         </header>
@@ -405,37 +406,37 @@ function RelationalResultDialog({ payload, onClose }: { payload: RelationalPaylo
 
         {!isSystem && result.interaction && (
           <section className="completion-section">
-            <h3>What may align</h3>
+            <h3>Where you may work similarly</h3>
             <StringList values={result.interaction.possibleAlignment} />
-            <h3>What may differ</h3>
+            <h3>Where timing or needs may differ</h3>
             <StringList values={result.interaction.possibleFriction} />
-            <p><strong>Responsibility boundary:</strong> {result.interaction.responsibilityBoundary}</p>
-            <p><strong>What this does not establish:</strong> {result.interaction.prohibitedInference}</p>
-            <h3>What is still missing</h3>
+            <p><strong>What remains each person’s responsibility:</strong> {result.interaction.responsibilityBoundary}</p>
+            <p><strong>What this comparison cannot tell you:</strong> {result.interaction.prohibitedInference}</p>
+            <h3>What you still need to learn directly</h3>
             <StringList values={result.interaction.missingInformation} />
           </section>
         )}
 
         {isSystem && (
           <section className="completion-section">
-            <h3>Interaction map</h3>
+            <h3>How the group may be interacting</h3>
             {(result.interactionEdges ?? []).map((edge: any, index: number) => (
               <p key={`${edge.from}-${edge.to}-${index}`}><strong>{edge.from} → {edge.to}:</strong> {edge.interpretation}</p>
             ))}
-            <h3>Responsibility boundaries</h3>
+            <h3>Who is responsible for what</h3>
             <StringList values={result.responsibilityBoundaries} />
-            <h3>What is still missing</h3>
+            <h3>What you still need to learn directly</h3>
             <StringList values={result.missingInformation} />
-            <h3>Grounded next steps</h3>
+            <h3>Practical next steps</h3>
             <StringList values={result.supportiveNextSteps} />
           </section>
         )}
 
         <footer className="completion-provenance" aria-label="Privacy and consent verification">
-          <strong>Verified boundary</strong>
-          <span>Raw birth details shared: {yesNo(result.provenance?.rawBirthInputShared)}</span>
-          <span>Exact private location shared: {yesNo(result.provenance?.exactPrivateLocationShared)}</span>
-          <span>Consent checked: {readableValue(result.provenance?.consentCheckedAt ?? 'during this request')}</span>
+          <strong>Privacy check for this result</strong>
+          <span>Raw birth details stayed private: {yesNo(result.provenance?.rawBirthInputShared === false)}</span>
+          <span>Exact private location stayed private: {yesNo(result.provenance?.exactPrivateLocationShared === false)}</span>
+          <span>Permissions checked: {readableValue(result.provenance?.consentCheckedAt ?? 'during this request')}</span>
         </footer>
       </section>
     </div>
@@ -453,7 +454,7 @@ function DefinitionList({ value }: { value: Record<string, unknown> }) {
     <dl className="completion-definitions">
       {Object.entries(value).map(([key, item]) => (
         <div key={key}>
-          <dt>{plainKey(key)}</dt>
+          <dt>{definitionLabel(key)}</dt>
           <dd>{readableValue(item)}</dd>
         </div>
       ))}
@@ -498,4 +499,21 @@ function readableValue(value: unknown): string {
 
 function plainKey(value: string): string {
   return value.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[._-]/g, ' ').toLowerCase();
+}
+
+function definitionLabel(value: string): string {
+  const labels: Record<string, string> = {
+    baselineTendency: 'Your Baseline',
+    currentAmplification: 'What may be louder now',
+    possibleCurrentAmplification: 'What may be louder now',
+    userObservation: 'What the person confirmed',
+    knownObservation: 'What you confirmed',
+    unknownActualState: 'What remains unknown',
+    uncertainty: 'Confidence limit',
+    communication: 'Communication',
+    decisions: 'Decisions',
+    connection: 'Connection',
+    pressureResponse: 'Pressure response'
+  };
+  return labels[value] ?? humanStatus(value);
 }

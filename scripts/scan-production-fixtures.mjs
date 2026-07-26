@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const scopes = ['apps/web/src', 'apps/sovereign-worker/src'];
 const forbidden = [
@@ -21,7 +21,7 @@ const fixtureAllowed = /\.test\.tsx?$|scripts\/|docs\/|fixtureAllowed|canUseDeve
 const files = spawnSync('git', ['ls-files', ...scopes], { encoding: 'utf8' }).stdout.split('\n').filter(Boolean);
 const violations = [];
 for (const file of files) {
-  if (fixtureAllowed.test(file)) continue;
+  if (fixtureAllowed.test(file) || !existsSync(file)) continue;
   const text = readFileSync(file, 'utf8');
   text.split('\n').forEach((line, index) => {
     if (fixtureAllowed.test(line)) return;

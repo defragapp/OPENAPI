@@ -9,9 +9,7 @@ import { PublicLanding } from './PublicLanding';
 import { PublicPolicy } from './PublicPolicy';
 import './styles.css';
 import './product-completion.css';
-import './visual-polish.css';
 import './public-landing.css';
-import './public-landing-release.css';
 
 installProductionRuntime();
 installProductRuntime();

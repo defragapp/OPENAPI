@@ -15,10 +15,12 @@ describe('Sovereign PWA shell', () => {
   });
 
   it('keeps Today Baseline-first and correction-ready', () => {
-    expect(app).toContain('Baseline tendency');
-    expect(app).toContain('Current amplification');
-    expect(app).toContain('Known observation');
-    expect(app).toContain('Unknown actual state');
+    expect(app).toContain('Your Baseline');
+    expect(app).toContain('What may be louder now');
+    expect(app).toContain('What you confirmed');
+    expect(app).toContain('What remains unknown');
+    expect(app).toContain('baseline?.reducedContext?.baselineTendency');
+    expect(app).toContain('current?.reduced?.possibleCurrentAmplification');
     expect(app).toContain('Not today');
   });
 
@@ -32,7 +34,7 @@ describe('Sovereign PWA shell', () => {
     expect(app).toContain('className="side-rail"');
     expect(app).toContain('className="tabbar"');
     expect(app).toContain("api('/api/v1/today')");
-    expect(css).toContain('@media (min-width: 1040px)');
+    expect(css).toContain('@media (max-width: 680px)');
   });
 
   it('uses visible field labels across private forms', () => {
@@ -44,15 +46,29 @@ describe('Sovereign PWA shell', () => {
 
   it('keeps consent under the invited person’s control', () => {
     expect(app).toContain('Send private invitation');
-    expect(app).toContain('You decide what may be shared.');
+    expect(app).toContain('Choose what this connection may use.');
     expect(app).not.toContain('>Grant</button>');
-    expect(consent).toContain('Your permissions remain yours.');
+    expect(consent).toContain('Manage what others may use.');
     expect(consent).toContain('Do not allow');
+  });
+
+  it('uses direct account language without exposing security implementation copy', () => {
+    expect(app).toContain('Understand your life in context.');
+    expect(app).toContain('Welcome back.');
+    expect(app).toContain('Check your email for the private sign-in link.');
+    expect(app).not.toMatch(/never reveal whether|whether or not an account exists|if this address can receive|no password/i);
+  });
+
+  it('keeps Library to explicitly saved understandings rather than blank composition', () => {
+    expect(app).toContain('Return to what was worth keeping.');
+    expect(app).toContain('Your Library is a collection of chosen insights');
+    expect(app).not.toContain('Understanding title');
+    expect(app).not.toContain('Editable summary');
   });
 
   it('requires a visible opt-in before exact shared framework evidence is requested', () => {
     expect(recognitionUi).toContain('Show exact supporting data');
-    expect(recognitionUi).toContain('framework.display · optional and revocable');
+    expect(recognitionUi).toContain('Optional. You can turn this off later.');
     expect(recognitionUi).toContain('shareFrameworkEvidence');
     expect(recognitionUi).toContain("!url.includes('/invitations/send') || !shareFrameworkEvidence");
     expect(recognitionUi).toContain("body.requestedScopes = [...new Set([...requestedScopes, 'framework.display'])]");

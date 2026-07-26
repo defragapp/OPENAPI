@@ -50,9 +50,9 @@ describe('identity-bound multi-user contract', () => {
 
   it('removes owner-side granting and exposes invitee revocation controls', () => {
     expect(app).toContain('Send private invitation');
-    expect(app).toContain('You decide what may be shared.');
+    expect(app).toContain('Choose what this connection may use.');
     expect(app).not.toContain('>Grant</button>');
-    expect(consentPage).toContain('Your permissions remain yours.');
+    expect(consentPage).toContain('Manage what others may use.');
     expect(consentPage).toContain('Do not allow');
     expect(consentPage).toContain('/api/v1/invitations/mine');
   });

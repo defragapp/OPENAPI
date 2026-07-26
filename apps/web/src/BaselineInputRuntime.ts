@@ -41,7 +41,7 @@ export function installBaselineInputRuntime(): void {
 
       const help = document.createElement('small');
       help.id = 'birth-timezone-help';
-      help.textContent = 'Choose the timezone used at your birthplace. Your birthplace stays inside Sovereign.OS and is not sent to a public geocoder.';
+      help.textContent = 'Choose the timezone in effect at your birthplace. This keeps the calculation accurate without sending your birthplace to a public geocoder.';
 
       label.append(caption, select, help);
       const submit = form.querySelector('button[type="submit"], button.primary-button');
