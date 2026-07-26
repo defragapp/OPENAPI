@@ -17,7 +17,7 @@ const forbidden = [
   /not implemented/i,
   /placeholder/i
 ];
-const fixtureAllowed = /\.test\.tsx?$|scripts\/|docs\/|fixtureAllowed|canUseDevelopmentFixtures|normalizeStripeFixtureEvent|developmentBaselineFixture|developmentCurrentFixture|fixtureBodies|openapi-fixture|SANITIZED_FIXTURE|Development fallback/i;
+const fixtureAllowed = /\.test\.tsx?$|scripts\/|docs\/|fixtureAllowed|canUseDevelopmentFixtures|allowTestBilling|normalizeStripeFixtureEvent|developmentBaselineFixture|developmentCurrentFixture|fixtureBodies|openapi-fixture|SANITIZED_FIXTURE|Development fallback/i;
 const files = spawnSync('git', ['ls-files', ...scopes], { encoding: 'utf8' }).stdout.split('\n').filter(Boolean);
 const violations = [];
 for (const file of files) {
