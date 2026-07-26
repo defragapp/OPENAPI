@@ -24,7 +24,6 @@ jobs:
           import json
           import os
           import re
-          import sys
           import time
           import urllib.error
           import urllib.request
@@ -83,20 +82,23 @@ jobs:
 
           static_expectations = {
               'public:/how-it-works.html': [
-                  'Know yourself. Understand the system. Choose what fits.',
-                  'Explore the person, the relationship, and the system.',
-                  'Shadow and light'
+                  'One Baseline. An entire life in context.',
+                  'THE PLATFORM IN FOUR PARTS',
+                  'Shadow and light',
+                  '/launch-polish.css?v=20260726-final-r1'
               ],
               'public:/pricing.html': [
-                  'Start with self-understanding. Expand into relationships and systems.',
-                  'Complete personal Baseline Design',
-                  'Optional Covenant Christian and biblical lens'
+                  'Begin with yourself. Expand to every relationship and system your life includes.',
+                  'Complete private Baseline Design',
+                  'Optional Covenant lens with Christian teaching and biblical scripture',
+                  '/launch-polish.css?v=20260726-final-r1'
               ],
               'public:/faq.html': [
                   'What it is. What you can explore. What it never pretends to know.',
                   'What do shadow and light mean?',
                   'What does alignment mean?',
-                  'What is Covenant?'
+                  'What is Covenant?',
+                  '/launch-polish.css?v=20260726-final-r1'
               ]
           }
 
@@ -116,7 +118,7 @@ jobs:
 
           bundle_fingerprints = [
               'Know yourself. Understand the system. Choose what fits.',
-              'Explore shadow and light',
+              'shadow and light',
               'See the relationship from both sides.',
               'Understand the whole system.',
               'Meet your Baseline Design.',
@@ -125,6 +127,10 @@ jobs:
           for fingerprint in bundle_fingerprints:
               if fingerprint not in asset_body:
                   raise SystemExit(f'Compiled application is missing: {fingerprint}')
+
+          polish_status, _, polish_body = fetch(f'{public_base}/launch-polish.css?v=20260726-final-r1')
+          if polish_status != 200 or 'prefers-reduced-motion' not in polish_body or 'animation-timeline: view()' not in polish_body:
+              raise SystemExit('Public polish stylesheet is unavailable or incomplete')
 
           for page, (headers, _) in pages.items():
               required_headers = {
@@ -151,6 +157,7 @@ jobs:
                   output.write(f'- Public routes checked: {len(public_routes)}\n')
                   output.write(f'- App routes checked: {len(app_routes)}\n')
                   output.write('- Product-language fingerprints: passed\n')
+                  output.write('- Motion and reduced-motion assets: passed\n')
                   output.write('- Security headers and immutable assets: passed\n')
 
           print(json.dumps({

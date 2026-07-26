@@ -1,0 +1,376 @@
+/* Cohesive refinement for public support pages. Existing structure and content remain intact. */
+
+body.launch-page {
+  overflow-x: hidden;
+}
+
+.launch-nav {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  margin-inline: calc(50% - 50vw);
+  padding-inline: max(28px, calc((100vw - 1180px) / 2));
+  border-bottom: 1px solid rgba(23,32,29,.09);
+  background: rgba(243,239,231,.86);
+  backdrop-filter: blur(20px);
+}
+
+.launch-wordmark::before {
+  box-shadow: 0 0 0 8px rgba(185,111,72,.06);
+}
+
+.launch-links a,
+.launch-button,
+.launch-card,
+.use-case-card,
+.price-card,
+.launch-summary,
+.faq-list details,
+.journey-steps article,
+.plan-guidance article {
+  transition:
+    transform 210ms cubic-bezier(.2,.7,.2,1),
+    border-color 210ms ease,
+    background-color 210ms ease,
+    box-shadow 210ms ease;
+}
+
+.launch-links .launch-cta,
+.launch-button.primary {
+  box-shadow: 0 12px 30px rgba(23,32,29,.14);
+}
+
+.launch-links .launch-cta:hover,
+.launch-button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 42px rgba(23,32,29,.18);
+}
+
+.launch-hero {
+  position: relative;
+  padding-block: 78px 82px;
+}
+
+.launch-hero::before,
+.launch-hero::after {
+  position: absolute;
+  z-index: -1;
+  border: 1px solid rgba(185,111,72,.13);
+  border-radius: 50%;
+  content: "";
+}
+
+.launch-hero::before {
+  top: 18px;
+  right: -110px;
+  width: 340px;
+  height: 340px;
+  animation: launch-orbit 26s linear infinite;
+}
+
+.launch-hero::after {
+  top: 116px;
+  right: -22px;
+  width: 160px;
+  height: 160px;
+  box-shadow: inset 0 0 60px rgba(185,111,72,.06);
+  animation: launch-orbit 18s linear infinite reverse;
+}
+
+.launch-hero > p,
+.launch-hero > div > p:not(.launch-kicker) {
+  max-width: 58ch;
+  line-height: 1.58;
+}
+
+.launch-summary {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(23,32,29,.09);
+}
+
+.launch-summary::after {
+  position: absolute;
+  right: -56px;
+  bottom: -62px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid rgba(185,111,72,.15);
+  border-radius: 50%;
+  content: "";
+}
+
+.launch-section,
+.launch-band {
+  padding-block: 72px;
+}
+
+.launch-heading {
+  margin-bottom: 32px;
+}
+
+.launch-heading > p,
+.launch-section > p {
+  max-width: 50ch;
+  line-height: 1.58;
+}
+
+.journey-steps {
+  position: relative;
+}
+
+.journey-steps::before {
+  position: absolute;
+  z-index: 2;
+  top: 31px;
+  right: 6%;
+  left: 6%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(214,154,118,.72), transparent);
+  content: "";
+}
+
+.journey-steps article {
+  position: relative;
+  min-height: 230px;
+  overflow: hidden;
+}
+
+.journey-steps article::after {
+  position: absolute;
+  top: 26px;
+  left: 24px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #d69a76;
+  box-shadow: 0 0 0 8px rgba(214,154,118,.09), 0 0 22px rgba(214,154,118,.28);
+  content: "";
+}
+
+.journey-steps article:hover {
+  background: rgba(255,255,255,.035);
+  transform: translateY(-4px);
+}
+
+.launch-card,
+.use-case-card,
+.price-card,
+.plan-guidance article {
+  position: relative;
+  overflow: hidden;
+}
+
+.launch-card::after,
+.use-case-card::after,
+.price-card::after,
+.plan-guidance article::after {
+  position: absolute;
+  right: -54px;
+  bottom: -60px;
+  width: 138px;
+  height: 138px;
+  border: 1px solid rgba(185,111,72,.12);
+  border-radius: 50%;
+  content: "";
+}
+
+.launch-card:hover,
+.use-case-card:hover,
+.price-card:hover,
+.plan-guidance article:hover {
+  border-color: rgba(185,111,72,.30);
+  box-shadow: 0 24px 64px rgba(23,32,29,.10);
+  transform: translateY(-5px);
+}
+
+.definition-list > div {
+  position: relative;
+  padding-right: 110px;
+}
+
+.definition-list > div::after {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 72px;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(185,111,72,.18), rgba(185,111,72,.80));
+  content: "";
+  transform: translateY(-50%);
+}
+
+.definition-list > div:nth-child(2)::after { width: 92px; }
+.definition-list > div:nth-child(3)::after { width: 58px; }
+.definition-list > div:nth-child(4)::after { width: 80px; }
+
+.faq-list {
+  display: grid;
+  gap: 10px;
+}
+
+.faq-list details {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: rgba(255,253,248,.58);
+}
+
+.faq-list details:hover,
+.faq-list details[open] {
+  border-color: rgba(185,111,72,.30);
+  background: rgba(255,253,248,.88);
+  box-shadow: 0 15px 42px rgba(23,32,29,.07);
+}
+
+.faq-list summary {
+  position: relative;
+  min-height: 64px;
+  padding: 19px 54px 19px 20px;
+  list-style: none;
+}
+
+.faq-list summary::-webkit-details-marker { display: none; }
+
+.faq-list summary::after {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--copper);
+  content: "+";
+  display: grid;
+  place-items: center;
+  transform: translateY(-50%);
+  transition: transform 180ms ease, background-color 180ms ease;
+}
+
+.faq-list details[open] summary::after {
+  background: var(--forest);
+  color: var(--white);
+  content: "−";
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.faq-list details > p {
+  max-width: 68ch;
+  margin: 0;
+  padding: 0 20px 22px;
+  line-height: 1.58;
+}
+
+.price-card.featured {
+  box-shadow: 0 28px 80px rgba(23,32,29,.12);
+}
+
+.price-options {
+  position: relative;
+  z-index: 2;
+}
+
+.feature-list li {
+  position: relative;
+  padding-left: 21px;
+}
+
+.feature-list li::before {
+  position: absolute;
+  top: .58em;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--copper);
+  box-shadow: 0 0 0 5px rgba(185,111,72,.08);
+  content: "";
+}
+
+.launch-callout {
+  position: relative;
+  overflow: hidden;
+}
+
+.launch-callout::after {
+  position: absolute;
+  right: -90px;
+  width: 240px;
+  height: 240px;
+  border: 1px solid rgba(185,111,72,.14);
+  border-radius: 50%;
+  content: "";
+  animation: launch-orbit 22s linear infinite;
+}
+
+@supports (animation-timeline: view()) {
+  .launch-band,
+  .launch-section,
+  .launch-callout {
+    animation: launch-reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 6% cover 28%;
+  }
+}
+
+@keyframes launch-orbit {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes launch-reveal {
+  from { opacity: .2; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 820px) {
+  .launch-shell {
+    width: min(100% - 32px, 1180px);
+  }
+
+  .launch-nav {
+    min-height: 70px;
+    padding-inline: 16px;
+  }
+
+  .launch-links {
+    gap: 14px;
+  }
+
+  .launch-links a:not(.launch-cta) {
+    display: none;
+  }
+
+  .launch-hero {
+    padding-block: 56px 64px;
+  }
+
+  .launch-section,
+  .launch-band {
+    padding-block: 58px;
+  }
+
+  .journey-steps::before {
+    display: none;
+  }
+
+  .definition-list > div {
+    padding-right: 0;
+  }
+
+  .definition-list > div::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}

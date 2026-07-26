@@ -50,7 +50,14 @@ const replacements = new Map<string, string>([
   ['Free includes the complete personal Baseline experience. Sovereign+ adds more conversations, permission-based relationship comparisons, group views, and saved continuity.', 'Free includes the complete personal Baseline Design experience. Sovereign+ adds deeper relationship comparisons, family and team systems, Library continuity, Covenant, and more conversations.'],
   ['Optional Scripture lens. Off unless you enable it for this thread.', 'Optional Christian and biblical lens. Off unless you enable it for this thread.'],
   ['Save Covenant choice for this thread', 'Save Covenant for this thread'],
-  ['Build my Baseline', 'Explore my Baseline']
+  ['Build my Baseline', 'Explore my Baseline'],
+  ['Explore your archetypal qualities, shadow and light, decisions, behaviors, and relationships—then bring multiple Baseline Designs together to understand families, teams, and the human systems around you.', 'Explore who you are, check what fits, and see how people shape the systems around you.'],
+  ['One person is complex. A relationship is more complex. A family is an entire system. Sovereign.OS helps make all three understandable without reducing anyone to a label.', 'Understand yourself. See the other side. Map the whole system—without reducing anyone to a label.'],
+  ['Baseline Design translates the platform’s natal-data framework into a personal understanding of your archetypal qualities, natural roles, strengths, tensions, communication, decisions, relationships, and responses under pressure.', 'Baseline Design turns your natal framework into a clear view of your qualities, roles, strengths, tensions, choices, and relationships.'],
+  ['Explore each part in plain language, examine its shadow and light expressions, and consider how it appears across the choices and relationships that make up your actual life.', 'Explore each part through shadow and light, alignment, and the life you are actually living.'],
+  ['Bring a decision, relationship, behavior, family role, or part of yourself you want to understand. Sovereign connects the question to the deeper framework already present in your Baseline Design.', 'Apply your Baseline to a decision, relationship, behavior, family role, or part of yourself.'],
+  ['Bring two Baseline Designs together to understand different needs and perspectives. Add more people to map the roles, pressures, loyalties, authority, and responsibility shaping an entire family, household, team, or community.', 'Compare two permitted Baseline Designs or map the roles and pressures shaping a family, team, or community.'],
+  ['Explore your Baseline Design, examine what fits, and see how people function together inside the relationships and systems that shape your life.', 'Explore your design. Check what fits. Understand the people and systems shaping your life.']
 ]);
 
 function replaceTextNode(node: Text): void {

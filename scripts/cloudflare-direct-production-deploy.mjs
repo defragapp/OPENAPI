@@ -108,7 +108,7 @@ async function request(url, options = {}) {
     method: options.method ?? 'GET',
     headers: options.headers,
     body: options.body,
-    signal: AbortSignal.timeout(options.timeoutMs ?? 10_000)
+    signal: AbortSignal.timeout(options.timeoutMs ?? 12_000)
   });
 }
 
@@ -143,16 +143,16 @@ async function verifyLiveProduction() {
   let lastError;
   for (let attempt = 1; attempt <= 24; attempt += 1) {
     try {
-      const ready = await readJson(`${appBase}/ready`);
-      assert(ready.response.ok, `ready returned ${ready.response.status}`);
-      assert(ready.json?.ready === true, `ready=false: ${ready.text.slice(0, 500)}`);
-      assert(ready.json?.version === commitSha, `ready version mismatch: ${ready.json?.version ?? 'missing'}`);
-      assert(ready.json?.migrationVersion === migrationVersion, `migration mismatch: ${ready.json?.migrationVersion ?? 'missing'}`);
-      assert(ready.json?.dependencies?.authentication === 'configured', 'authentication dependency is not configured');
-      assert(ready.json?.dependencies?.transactionalEmail !== 'missing', 'transactional email is not configured');
-      assert(ready.json?.dependencies?.stripe === 'configured', 'Stripe dependency is not configured');
-      assert(ready.json?.dependencies?.privateExports === 'disabled', 'private exports are not disabled');
-      assert(ready.json?.dependencies?.sharing === 'public-link-only', 'sharing contract is incorrect');
+      const readyProbe = await readJson(`${appBase}/ready`);
+      assert(readyProbe.response.ok, `ready returned ${readyProbe.response.status}`);
+      assert(readyProbe.json?.ready === true, `ready=false: ${readyProbe.text.slice(0, 500)}`);
+      assert(readyProbe.json?.version === commitSha, `ready version mismatch: ${readyProbe.json?.version ?? 'missing'}`);
+      assert(readyProbe.json?.migrationVersion === migrationVersion, `migration mismatch: ${readyProbe.json?.migrationVersion ?? 'missing'}`);
+      assert(readyProbe.json?.dependencies?.authentication === 'configured', 'authentication dependency is not configured');
+      assert(readyProbe.json?.dependencies?.transactionalEmail !== 'missing', 'transactional email is not configured');
+      assert(readyProbe.json?.dependencies?.stripe === 'configured', 'Stripe dependency is not configured');
+      assert(readyProbe.json?.dependencies?.privateExports === 'disabled', 'private exports are not disabled');
+      assert(readyProbe.json?.dependencies?.sharing === 'public-link-only', 'sharing contract is incorrect');
       break;
     } catch (error) {
       lastError = error;
@@ -198,18 +198,18 @@ async function verifyLiveProduction() {
   ]);
 
   assert(home.response.ok, `public home returned ${home.response.status}`);
-  assertContainsAll('public home', home.text, ['Sovereign.OS', 'Understand your life in context']);
+  assertContainsAll('public home', home.text, ['Sovereign.OS', 'Know yourself. Understand the system.']);
 
   assert(how.response.ok && howClean.response.ok, 'How it works page or clean URL is unavailable');
   assertContainsAll('How it works', how.text, [
-    'One starting map. Better questions at every level.',
-    'THE PRODUCT IN FOUR STEPS',
-    'Build a Baseline',
-    'Choose a next move'
+    'One Baseline. An entire life in context.',
+    'THE PLATFORM IN FOUR PARTS',
+    'Explore shadow and light',
+    '/launch-polish.css?v=20260726-final-r1'
   ]);
   assertContainsAll('How it works clean URL', howClean.text, [
-    'One starting map. Better questions at every level.',
-    'Build the Baseline before bringing the big question.'
+    'One Baseline. An entire life in context.',
+    'See yourself, the relationship, and the whole system.'
   ]);
 
   assert(pricing.response.ok && pricingClean.response.ok, 'pricing page or clean URL is unavailable');
@@ -218,18 +218,26 @@ async function verifyLiveProduction() {
     '$99',
     '10 Sovereign responses each month',
     '300 Sovereign responses each month',
-    'Consent-aware invitations and sharing controls'
+    'Consent-aware invitations and sharing controls',
+    '/launch-polish.css?v=20260726-final-r1'
   ]);
-  assertContainsAll('pricing clean URL', pricingClean.text, ['$20', '$99', 'Start with your own context.']);
+  assertContainsAll('pricing clean URL', pricingClean.text, [
+    '$20',
+    '$99',
+    'Begin with yourself. Expand to every relationship and system your life includes.'
+  ]);
   assert(!pricing.text.includes('$29') && !pricing.text.includes('$79'), 'legacy pricing is still visible');
   assert(!/donate\.stripe\.com|Support Sovereign\.OS|Support the platform/i.test(pricing.text), 'unapproved support placement is public');
 
   assert(faq.response.ok && faqClean.response.ok, 'Questions page or clean URL is unavailable');
   assertContainsAll('Questions', faq.text, [
-    'What it is. What it does. What it does not pretend to know.',
+    'What it is. What you can explore. What it never pretends to know.',
     'What is Sovereign.OS?',
+    'What do shadow and light mean?',
+    'What does alignment mean?',
     'Can Sovereign know why another person did something?',
-    'Is Sovereign therapy or professional advice?'
+    'What is Covenant?',
+    '/launch-polish.css?v=20260726-final-r1'
   ]);
   assertContainsAll('Questions clean URL', faqClean.text, ['What is Sovereign.OS?', 'What does Sovereign+ include?']);
 
@@ -271,19 +279,42 @@ async function verifyLiveProduction() {
   const jsAsset = await readText(`${publicBase}${jsAssetPath}`);
   assert(jsAsset.response.ok, `compiled JavaScript returned ${jsAsset.response.status}`);
   assert(headerIncludes(jsAsset.response, 'cache-control', 'immutable'), 'compiled JavaScript is not immutable');
-  assertContainsAll('compiled application copy', jsAsset.text, [
+
+  const compiledCopy = jsAsset.text;
+  assertContainsAll('compiled application copy', compiledCopy, [
     'How Sovereign.OS handles your information.',
     'Terms for using Sovereign.OS.',
     'Welcome back.',
     'Create your account.',
     'Choose what this connection may use.',
-    'Your context for today.',
-    'Work through one real question.',
-    'Understand the relationship—not just the latest moment.',
-    'See the structure around the group.',
-    'Return to what was worth keeping.',
-    'Build your starting map.',
-    'Your workspace, under your control.'
+    'What is active in your life now.',
+    'Explore any part of who you are.',
+    'See the relationship from both sides.',
+    'Understand the whole system.',
+    'Return to what changed your understanding.',
+    'Meet your Baseline Design.',
+    'Your workspace, under your control.',
+    'Know yourself. Understand the system. Choose what fits.',
+    'Optional Christian and biblical lens.'
+  ]);
+
+  const cssAssetPaths = [...home.text.matchAll(/href=["'](\/assets\/[^"']+\.css)["']/g)].map((match) => match[1]);
+  assert(cssAssetPaths.length > 0, 'compiled CSS fingerprint is missing from the public document');
+  const cssAssets = await Promise.all(cssAssetPaths.map((path) => readText(`${publicBase}${path}`)));
+  assert(cssAssets.every((asset) => asset.response.ok), 'a compiled CSS asset is unavailable');
+  const compiledCss = cssAssets.map((asset) => asset.text).join('\n');
+  assertContainsAll('compiled visual polish', compiledCss, [
+    'polish-reveal',
+    'polish-signal',
+    'prefers-reduced-motion'
+  ]);
+
+  const launchPolish = await readText(`${publicBase}/launch-polish.css?v=20260726-final-r1`);
+  assert(launchPolish.response.ok, 'public launch polish stylesheet is unavailable');
+  assertContainsAll('public launch polish', launchPolish.text, [
+    'launch-reveal',
+    'animation-timeline: view()',
+    'prefers-reduced-motion'
   ]);
 
   const consentCss = await request(`${appBase}/consent.css?v=20260726-consent-r1`);
@@ -346,6 +377,7 @@ async function verifyLiveProduction() {
       redirect: 'manual'
     })
   ]);
+
   assert(session.status === 401, `unauthenticated session returned ${session.status}`);
   assert(you.status === 401, `unauthenticated account returned ${you.status}`);
   assert(checkout.status === 401, `unauthenticated checkout returned ${checkout.status}`);
@@ -354,6 +386,11 @@ async function verifyLiveProduction() {
   assert(disabledExport.status === 404, `disabled export returned ${disabledExport.status}`);
   assert(signupWithoutTurnstile.status === 400, `signup without Turnstile returned ${signupWithoutTurnstile.status}`);
 
+  const stripeSignatureRejection = webhook.status === 400 && legacyWebhook.status === 400;
+  const exportsDisabled = disabledExport.status === 404;
+  assert(stripeSignatureRejection, 'Stripe signature rejection contract failed');
+  assert(exportsDisabled, 'private export contract failed');
+
   const securityHeaders = health.response.headers;
   assert(securityHeaders.get('cache-control') === 'no-store', 'health cache-control is not no-store');
   assert(headerIncludes(health.response, 'strict-transport-security', 'max-age=31536000'), 'health HSTS is missing');
@@ -361,8 +398,8 @@ async function verifyLiveProduction() {
   assert(headerIncludes(health.response, 'x-frame-options', 'deny'), 'health frame denial is missing');
   assert(headerIncludes(health.response, 'content-security-policy', "default-src 'none'"), 'API CSP is missing');
 
-  const concurrent = await Promise.all(Array.from({ length: 20 }, () => readJson(`${appBase}/health`)));
-  assert(concurrent.every((item) => item.response.ok && item.json?.version === commitSha), 'concurrent health probe failed');
+  const concurrentHealth = await Promise.all(Array.from({ length: 20 }, () => readJson(`${appBase}/health`)));
+  assert(concurrentHealth.every((item) => item.response.ok && item.json?.version === commitSha), 'concurrent health probe failed');
 
   return {
     publicUrl: publicBase,
@@ -382,6 +419,7 @@ async function verifyLiveProduction() {
       invitation: 'passed',
       consent: 'page-assets-and-csp-passed',
       compiledCopy: 'all-user-facing-fingerprints-passed',
+      visualPolish: 'motion-and-reduced-motion-passed',
       supportPlacementExcluded: 'passed',
       hostnameSeparation: 'passed',
       unauthenticatedAccess: 'passed',
@@ -480,6 +518,7 @@ try {
     stripeConfigured: configuredSecrets.has('STRIPE_SECRET_KEY') && configuredSecrets.has('STRIPE_WEBHOOK_SECRET'),
     verification
   };
+
   writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
   console.log(JSON.stringify(metadata, null, 2));
 } finally {
