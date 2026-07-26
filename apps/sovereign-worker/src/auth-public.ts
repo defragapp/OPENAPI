@@ -5,7 +5,6 @@ import { createSignedSessionToken } from './security/auth';
 import { resolveAccount } from './db/accounts';
 
 const encoder = new TextEncoder();
-const LINK_TTL_SECONDS = 15 * 60;
 const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60;
 const MAX_EMAIL_LENGTH = 320;
 const MAX_NAME_LENGTH = 120;
@@ -104,7 +103,9 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   const row = await env.DB.prepare("SELECT id, email_normalized, account_id, purpose, name, terms_accepted_at, expires_at, used_at FROM auth_magic_links WHERE token_hash = ?")
     .bind(tokenHash)
     .first<Record<string, string | null>>();
-  if (!row) return Response.json({ status: 'invalid' }, { status: 400 });
+  if (!row || !row.email_normalized || !validEmail(row.email_normalized) || !['signup', 'login'].includes(row.purpose ?? '')) {
+    return Response.json({ status: 'invalid' }, { status: 400 });
+  }
   if (row.used_at) return Response.json({ status: 'already used' }, { status: 409 });
   if (!row.expires_at || Date.parse(row.expires_at) < Date.now()) return Response.json({ status: 'expired' }, { status: 410 });
   if (row.purpose === 'login' && !row.account_id) return Response.json({ status: 'invalid' }, { status: 400 });
