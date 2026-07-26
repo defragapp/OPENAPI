@@ -5,11 +5,13 @@ import { compareBaselineToCurrentConditions } from '../adapters/sovv';
 const fakeEnv = { APP_ENV: 'test', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '' } as never;
 
 describe('Sovereign runtime behavior contract', () => {
-  it('uses authority order and asks one inward question before a long explanation', () => {
-    expect(sovereignRuntimePromptV1).toContain('User-confirmed experience');
-    expect(sovereignRuntimePromptV1).toContain('choose response_phase "question"');
-    expect(sovereignRuntimePromptV1).toContain('exactly one inward question');
-    expect(sovereignRuntimePromptV1).toContain('Symbolic data may suggest where to look. It is never proof.');
+  it('uses Baseline and Live Sky first and asks only for materially missing context', () => {
+    expect(sovereignRuntimePromptV1).toContain('FOUNDATION ORDER');
+    expect(sovereignRuntimePromptV1).toContain('BASELINE-FIRST FLOW');
+    expect(sovereignRuntimePromptV1).toContain('Begin with what the available Baseline and Live Sky context already provides.');
+    expect(sovereignRuntimePromptV1).toContain('choose response_phase "integration" and give a clear answer now');
+    expect(sovereignRuntimePromptV1).toContain('Use response_phase "question" only when one missing fact materially prevents a responsible answer');
+    expect(sovereignRuntimePromptV1).toContain('The user’s story shows where the computed framework may be appearing');
   });
 
   it('blocks diagnosis, hidden motive, destiny, spiritual certainty, and invented fields', () => {
@@ -32,7 +34,7 @@ describe('SOVV adapter fallback', () => {
 });
 
 describe('Cloudflare Gateway recognition adapter', () => {
-  it('validates JSON, composes the public question, and keeps account identity pseudonymous', async () => {
+  it('validates JSON, composes a focused question when material context is missing, and keeps account identity pseudonymous', async () => {
     const calls: Array<{ model: string; input: unknown; options: unknown }> = [];
     const { runSovereignStream } = await import('./sovereign');
     const env = {
@@ -64,8 +66,8 @@ describe('Cloudflare Gateway recognition adapter', () => {
                 type: 'output_text',
                 text: JSON.stringify({
                   response_phase: 'question',
-                  recognition: 'You may be trying to solve the uncertainty before you know what is actually available.',
-                  inward_question: 'What are you hoping the next message will make certain?',
+                  recognition: 'Your Baseline may make clarity especially important when the available information is incomplete.',
+                  inward_question: 'What information would materially change this decision?',
                   candidate_hidden_expectation: '',
                   protected_need: '',
                   clearer_form: '',
@@ -81,7 +83,7 @@ describe('Cloudflare Gateway recognition adapter', () => {
         }
       }
     } as never;
-    const stream = await runSovereignStream('I already sent three messages, but I still want to explain it better.', { env, accountId: 'acct_test', threadId: 'thread_test', traceId: 'trace_test', covenantEnabled: false, plan: 'free' });
+    const stream = await runSovereignStream('I have not described which information is missing from this decision.', { env, accountId: 'acct_test', threadId: 'thread_test', traceId: 'trace_test', covenantEnabled: false, plan: 'free' });
     const reader = stream.getReader();
     let text = '';
     while (true) {

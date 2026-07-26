@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sovereign-public-v5';
+const CACHE_NAME = 'sovereign-public-v6';
 const PUBLIC_SHELL = [
   '/',
   '/how-it-works.html',
@@ -7,7 +7,9 @@ const PUBLIC_SHELL = [
   '/manifest.webmanifest',
   '/app-icon.svg',
   '/launch.css',
-  '/launch-polish.css'
+  '/launch-polish.css',
+  '/intelligence-ui.css',
+  '/intelligence-ui.js'
 ];
 const PUBLIC_ASSETS = new Set(PUBLIC_SHELL.filter((path) => path !== '/'));
 const PUBLIC_NAVIGATION = new Set(['/', '/how-it-works.html', '/pricing.html', '/faq.html', '/privacy', '/terms']);

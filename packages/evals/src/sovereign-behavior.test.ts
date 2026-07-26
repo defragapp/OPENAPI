@@ -2,14 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { sovereignRuntimePromptV1 } from '../../../apps/sovereign-worker/src/agent/prompt-v1';
 import { assertSovereignOutputSafety } from '../../../apps/sovereign-worker/src/agent/safety';
 
-describe('Sovereign behavior evals', () => {
-  const safeQuestion = 'WHAT I NOTICE\n\nYou may be trying to make the outcome certain before you know what is available.\n\nLOOK INWARD\n\nWhat are you hoping the next message will make certain?\n\nBASIS · HD 5/1';
+const safeQuestion = 'WHAT I NOTICE\n\nYour Baseline may make clarity especially important when the available information is incomplete.\n\nLOOK INWARD\n\nWhat information would materially change this decision?\n\nBASIS · HD 5/1';
 
-  it('prioritizes one-question recognition before explanation', () => {
-    expect(sovereignRuntimePromptV1).toContain('User-confirmed experience');
-    expect(sovereignRuntimePromptV1).toContain('response_phase "question"');
-    expect(sovereignRuntimePromptV1).toContain('exactly one inward question');
-    expect(sovereignRuntimePromptV1).toContain("The user's experience always matters more than a chart match");
+describe('Sovereign behavior evals', () => {
+  it('starts from Baseline and Live Sky while preserving user authority', () => {
+    expect(sovereignRuntimePromptV1).toContain('BASELINE-FIRST FLOW');
+    expect(sovereignRuntimePromptV1).toContain('Deterministically computed, normalized Baseline Design');
+    expect(sovereignRuntimePromptV1).toContain('Deterministically computed Live Sky');
+    expect(sovereignRuntimePromptV1).toContain('choose response_phase "integration" and give a clear answer now');
+    expect(sovereignRuntimePromptV1).toContain("The user's lived experience remains authoritative");
+    expect(sovereignRuntimePromptV1).toContain('Use response_phase "question" only when one missing fact materially prevents a responsible answer');
   });
 
   it('rejects diagnosis, hidden intent, deterministic prediction, and stigma', () => {
