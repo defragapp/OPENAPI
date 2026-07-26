@@ -23,7 +23,7 @@ function webhookEnv() {
   const env = {
     APP_ENV: 'production',
     APP_VERSION: 'test',
-    STRIPE_WEBHOOK_SECRET: 'whsec_test_retry',
+    STRIPE_WEBHOOK_SECRET: 'test_webhook_hmac_retry',
     STRIPE_SECRET_KEY: 'sk_test',
     STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY: 'price_monthly',
     STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL: 'price_annual',
