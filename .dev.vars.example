@@ -1,11 +1,6 @@
-# Required: generate a new random value for this isolated preview.
+# Required for the initial isolated visual-review deployment.
+# Generate a new random value and do not reuse a production secret.
 SESSION_SIGNING_SECRET=
 
-# Optional until authentication is enabled for preview review.
-TURNSTILE_SECRET_KEY=
-EMAIL_API_TOKEN=
-SOVV_INTERNAL_AUTH_TOKEN=
-
-# Stripe test mode only. Never paste live Stripe credentials into preview.
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
+# Add Turnstile, email, and Stripe test-mode secrets later through
+# Worker Settings → Variables and Secrets before testing those flows.

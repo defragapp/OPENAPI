@@ -35,11 +35,15 @@ requireValue(deploy.includes('wrangler deploy --config ../../wrangler.jsonc'), '
 requireValue(packageJson.scripts?.build === 'pnpm verify:cloudflare-build', 'Cloudflare build must run the full verification contract');
 requireValue(packageJson.scripts?.['verify:cloudflare-build']?.includes('verify:one-click-deploy'), 'canonical verification must include the one-click contract');
 
-for (const name of ['SESSION_SIGNING_SECRET', 'TURNSTILE_SECRET_KEY', 'EMAIL_API_TOKEN', 'STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET']) {
-  requireValue(secretsExample.includes(`${name}=`), `.dev.vars.example is missing ${name}`);
+const deployBindings = Object.keys(packageJson.cloudflare?.bindings ?? {});
+requireValue(deployBindings.length === 1 && deployBindings[0] === 'SESSION_SIGNING_SECRET', 'first visual-review deploy must require only SESSION_SIGNING_SECRET');
+requireValue(secretsExample.includes('SESSION_SIGNING_SECRET='), '.dev.vars.example is missing SESSION_SIGNING_SECRET');
+for (const optionalName of ['TURNSTILE_SECRET_KEY', 'EMAIL_API_TOKEN', 'SOVV_INTERNAL_AUTH_TOKEN', 'STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET']) {
+  requireValue(!secretsExample.includes(`${optionalName}=`), `.dev.vars.example must not block the first deploy on optional ${optionalName}`);
+  requireValue(!deployBindings.includes(optionalName), `Deploy to Cloudflare form must not require optional ${optionalName}`);
 }
 
 requireValue(readme.includes('deploy.workers.cloudflare.com/?url=https://github.com/defragapp/OPENAPI'), 'README is missing the Deploy to Cloudflare link');
 requireValue(!readme.includes('defrag.app)') || readme.includes('Production promotion'), 'one-click preview must not be presented as production');
 
-console.log('One-click Cloudflare preview contract verified: isolated Worker, D1, R2, Queue, Durable Object, Workers AI, migrations, secrets, and no production routes.');
+console.log('One-click Cloudflare preview contract verified: isolated Worker, automatic resources, full build, only session secret required initially, and no production routes.');

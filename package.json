@@ -46,21 +46,6 @@
     "bindings": {
       "SESSION_SIGNING_SECRET": {
         "description": "Required. Generate a new random secret for signing sessions in this isolated preview. Do not reuse a production secret."
-      },
-      "TURNSTILE_SECRET_KEY": {
-        "description": "Optional for the first visual review. Add the secret for the preview Turnstile widget before testing signup and login."
-      },
-      "EMAIL_API_TOKEN": {
-        "description": "Optional for the first visual review. Add the transactional email provider token before testing magic-link authentication."
-      },
-      "SOVV_INTERNAL_AUTH_TOKEN": {
-        "description": "Optional legacy adapter token. Leave blank unless the reviewed preview intentionally enables the read-only SOVV adapter."
-      },
-      "STRIPE_SECRET_KEY": {
-        "description": "Optional for the first visual review. Use a Stripe test-mode secret only. Never use a live key in preview."
-      },
-      "STRIPE_WEBHOOK_SECRET": {
-        "description": "Optional for the first visual review. Use the signing secret for the Stripe test-mode preview webhook only."
       }
     }
   },
