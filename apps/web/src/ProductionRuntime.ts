@@ -2,6 +2,7 @@ const SUPPORT_URL = 'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02';
 const PUBLIC_SHARE_URL = 'https://sovereign.defrag.app';
 const TERMS_URL = `${PUBLIC_SHARE_URL}/terms`;
 const PRIVACY_URL = `${PUBLIC_SHARE_URL}/privacy`;
+const STRIPE_HANDOFF_HOSTS = new Set(['checkout.stripe.com', 'billing.stripe.com']);
 
 type TurnstileApi = {
   render: (container: HTMLElement, options: Record<string, unknown>) => string;
@@ -86,10 +87,39 @@ function installFetchObserver(): void {
       if (response.ok && requestUrl.pathname.startsWith('/api/v1/auth/logout')) {
         setTimeout(() => location.assign('/login'), 50);
       }
+
+      if (response.ok && isBillingHandoffPath(requestUrl.pathname)) {
+        const payload = await response.clone().json().catch(() => ({})) as {
+          checkout?: { url?: unknown };
+          portal?: { url?: unknown };
+        };
+        const handoff = payload.checkout?.url ?? payload.portal?.url;
+        if (!isTrustedStripeHandoff(handoff)) {
+          showNotice('Billing handoff was blocked because it did not point to Stripe.');
+          return Response.json({
+            error: 'untrusted_billing_handoff',
+            message: 'Billing is temporarily unavailable. No payment page was opened.'
+          }, { status: 502, headers: { 'cache-control': 'no-store' } });
+        }
+      }
     }
 
     return response;
   }) as typeof window.fetch;
+}
+
+function isBillingHandoffPath(pathname: string): boolean {
+  return pathname === '/api/v1/billing/checkout' || pathname === '/api/v1/billing/portal';
+}
+
+function isTrustedStripeHandoff(value: unknown): boolean {
+  if (typeof value !== 'string' || value.length > 2048) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && STRIPE_HANDOFF_HOSTS.has(url.hostname) && !url.username && !url.password;
+  } catch {
+    return false;
+  }
 }
 
 function installUtilityLinks(): void {
