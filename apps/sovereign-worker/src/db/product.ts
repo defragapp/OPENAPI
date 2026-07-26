@@ -84,14 +84,39 @@ export async function createExportJob(_env: Env, _accountId: string): Promise<ne
 }
 
 export async function createDeletionJob(env: Env, accountId: string, graceDays = 14) {
+  const existing = await env.DB.prepare(`SELECT id FROM deletion_jobs
+    WHERE account_id = ? AND status IN ('grace','queued','running')
+    ORDER BY requested_at DESC LIMIT 1`)
+    .bind(accountId)
+    .first<{ id: string }>();
+  if (existing) throw new Response('A deletion request is already active', { status: 409 });
+
   const id = `delete_${crypto.randomUUID()}`;
-  await env.DB.prepare('INSERT INTO deletion_jobs (id, account_id, status, scheduled_for) VALUES (?, ?, ?, datetime(\'now\', ?))').bind(id, accountId, 'grace', `+${graceDays} days`).run();
-  return { id, status: 'grace', graceDays };
+  const backgroundJobId = `job_${crypto.randomUUID()}`;
+  const offset = `+${graceDays} days`;
+  const payload = JSON.stringify({ deletionJobId: id });
+
+  await env.DB.prepare('INSERT INTO deletion_jobs (id, account_id, status, scheduled_for) VALUES (?, ?, ?, datetime(\'now\', ?))')
+    .bind(id, accountId, 'grace', offset)
+    .run();
+  await env.DB.prepare(`INSERT INTO background_jobs (id, account_id, kind, status, payload_json, run_after)
+    VALUES (?, ?, 'deletion.execute', 'queued', ?, datetime('now', ?))`)
+    .bind(backgroundJobId, accountId, payload, offset)
+    .run();
+
+  return { id, status: 'grace', graceDays, backgroundJobId };
 }
 
 export async function cancelDeletionJob(env: Env, accountId: string, id: string) {
-  const result = await env.DB.prepare('UPDATE deletion_jobs SET status = ? WHERE id = ? AND account_id = ? AND status = ?').bind('cancelled', id, accountId, 'grace').run();
+  const result = await env.DB.prepare('UPDATE deletion_jobs SET status = ? WHERE id = ? AND account_id = ? AND status = ?')
+    .bind('cancelled', id, accountId, 'grace')
+    .run();
   if (result.meta?.changes === 0) throw new Response('Deletion job not cancellable', { status: 404 });
+
+  await env.DB.prepare(`UPDATE background_jobs SET status = 'cancelled', updated_at = datetime('now')
+    WHERE account_id = ? AND kind = 'deletion.execute' AND status = 'queued' AND payload_json = ?`)
+    .bind(accountId, JSON.stringify({ deletionJobId: id }))
+    .run();
 }
 
 export function freeEntitlements() {
