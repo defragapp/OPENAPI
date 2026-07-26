@@ -263,10 +263,11 @@ if (mode === 'promote') {
   process.exit(0);
 }
 
+if (mode === 'candidate' || mode === 'migrate') requireApproval(mode);
+
 const generated = buildProductionConfig();
 try {
   if (mode === 'migrate') {
-    requireApproval('migrate');
     if (process.env.PRODUCTION_MIGRATIONS_BACKWARD_COMPATIBLE !== 'YES') {
       throw new Error('PRODUCTION_MIGRATIONS_BACKWARD_COMPATIBLE must equal YES');
     }
@@ -276,7 +277,6 @@ try {
     process.exit(0);
   }
 
-  requireApproval('candidate');
   verifyRuntimeSecrets(generated.configPath);
   const result = wranglerOutput([
     'versions', 'upload',
