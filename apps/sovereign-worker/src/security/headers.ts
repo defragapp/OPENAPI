@@ -1,14 +1,37 @@
-export const securityHeaders = {
-  'content-security-policy': "default-src 'none'; frame-ancestors 'none'; base-uri 'none'",
-  'referrer-policy': 'no-referrer',
+const sharedSecurityHeaders = {
+  'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
   'x-content-type-options': 'nosniff',
   'x-frame-options': 'DENY',
+  'cross-origin-opener-policy': 'same-origin',
+  'cross-origin-resource-policy': 'same-origin'
+} as const;
+
+export const securityHeaders = {
+  ...sharedSecurityHeaders,
+  'content-security-policy': "default-src 'none'; frame-ancestors 'none'; base-uri 'none'",
+  'referrer-policy': 'no-referrer',
   'permissions-policy': 'camera=(), microphone=(), geolocation=()'
 } as const;
 
-export function withSecurityHeaders(response: Response): Response {
+export const documentSecurityHeaders = {
+  ...sharedSecurityHeaders,
+  'content-security-policy': "default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
+  'referrer-policy': 'strict-origin-when-cross-origin',
+  'permissions-policy': 'camera=(), microphone=(), geolocation=(self)'
+} as const;
+
+function applyHeaders(response: Response, values: Record<string, string>, cacheControl: string): Response {
   const headers = new Headers(response.headers);
-  for (const [name, value] of Object.entries(securityHeaders)) headers.set(name, value);
-  headers.set('cache-control', 'no-store');
+  for (const [name, value] of Object.entries(values)) headers.set(name, value);
+  headers.set('cache-control', cacheControl);
+  headers.delete('content-length');
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+export function withSecurityHeaders(response: Response): Response {
+  return applyHeaders(response, securityHeaders, 'no-store');
+}
+
+export function withDocumentSecurityHeaders(response: Response): Response {
+  return applyHeaders(response, documentSecurityHeaders, 'no-cache');
 }
