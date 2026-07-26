@@ -101,8 +101,10 @@ let databaseId;
 try {
   databaseId = findDatabaseId(parseJsonOutput(runWrangler(['d1', 'list', '--json'])));
   if (!databaseId) {
-    const created = parseJsonOutput(runWrangler(['d1', 'create', d1Name, '--json']));
-    databaseId = created.uuid ?? created.id ?? created.result?.uuid ?? created.result?.id;
+    // Wrangler 4.112 supports JSON output for `d1 list`, but not for `d1 create`.
+    // Create without `--json`, then resolve the new database ID from a fresh list.
+    runWrangler(['d1', 'create', d1Name], { capture: false });
+    databaseId = findDatabaseId(parseJsonOutput(runWrangler(['d1', 'list', '--json'])));
     createdDatabase = true;
   }
   if (!databaseId) throw new Error(`Unable to resolve D1 database ${d1Name}`);
