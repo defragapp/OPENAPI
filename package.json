@@ -6,9 +6,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "pnpm verify:cloudflare-build",
-    "build:app": "pnpm -r --filter './packages/*' build && pnpm --filter @sovereign/web build && pnpm --filter @sovereign/worker build",
-    "deploy": "pnpm --filter @sovereign/worker exec wrangler d1 migrations apply DB --remote --config ../../wrangler.jsonc && pnpm --filter @sovereign/worker exec wrangler deploy --config ../../wrangler.jsonc",
+    "build": "pnpm -r --filter './packages/*' build && pnpm --filter @sovereign/web build && pnpm --filter @sovereign/worker build",
     "dev": "pnpm --parallel --filter './apps/*' dev",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
@@ -16,8 +14,7 @@
     "verify:foundation": "node scripts/verify-foundation.mjs",
     "verify:migrations": "node scripts/validate-migrations.mjs",
     "verify:preview-access": "node scripts/verify-preview-access.mjs",
-    "verify:cloudflare-build": "pnpm verify:foundation && pnpm verify:migrations && pnpm scan:secrets && pnpm scan:production-fixtures && pnpm verify:one-click-deploy && pnpm verify:release-config && pnpm verify:cloudflare-dashboard-prompt && pnpm verify:production-release && pnpm typecheck && pnpm test && pnpm build:app && pnpm smoke:auth && pnpm smoke:baseline && pnpm smoke:jobs && pnpm smoke:worker-gateway && pnpm smoke:stripe && pnpm smoke:product && pnpm smoke:release-closure",
-    "verify:one-click-deploy": "node scripts/verify-one-click-deploy.mjs",
+    "verify:cloudflare-build": "pnpm verify:foundation && pnpm verify:migrations && pnpm scan:secrets && pnpm scan:production-fixtures && pnpm verify:release-config && pnpm verify:cloudflare-dashboard-prompt && pnpm verify:production-release && pnpm typecheck && pnpm test && pnpm build && pnpm smoke:auth && pnpm smoke:baseline && pnpm smoke:jobs && pnpm smoke:worker-gateway && pnpm smoke:stripe && pnpm smoke:product && pnpm smoke:release-closure",
     "verify:production-release": "node scripts/verify-production-release.mjs",
     "verify:cloudflare-dashboard-prompt": "node scripts/verify-cloudflare-dashboard-prompt.mjs",
     "scan:secrets": "node scripts/scan-secrets.mjs",
@@ -41,13 +38,6 @@
     "smoke:jobs": "tsx scripts/jobs-smoke.ts",
     "verify:release-config": "node scripts/verify-release-config.mjs",
     "smoke:release-closure": "tsx scripts/release-closure-smoke.ts"
-  },
-  "cloudflare": {
-    "bindings": {
-      "SESSION_SIGNING_SECRET": {
-        "description": "Required. Generate a new random secret for signing sessions in this isolated preview. Do not reuse a production secret."
-      }
-    }
   },
   "devDependencies": {
     "@types/node": "22.12.0",
