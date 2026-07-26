@@ -10,15 +10,16 @@ The production release tool:
 
 - operates only on a full 40-character commit SHA matching the checked-out Git HEAD;
 - refuses tracked working-tree changes;
-- requires a commit-bound approval value for every mutating action;
+- requires a commit-bound approval value for every mutating action before remote preflight;
 - uses existing production D1, R2, Queue, Worker, route, and secret configuration;
 - never creates production storage;
 - never uploads secret values;
+- disables automatic Wrangler resource provisioning;
 - uploads a Worker version without sending traffic to it;
 - applies D1 migrations only through a separate approval;
 - promotes only the exact uploaded version ID;
 - records the candidate commit and version in `production-candidate.json`;
-- provides an explicit rollback command.
+- provides an explicit non-interactive rollback command.
 
 Cloudflare Worker versions do not roll back D1 or R2 state. Database compatibility and rollback must therefore be reviewed independently from Worker code rollback.
 
