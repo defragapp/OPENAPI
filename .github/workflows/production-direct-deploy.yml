@@ -1,3 +1,4 @@
+# Production deployment explicitly authorized by the repository owner.
 name: Direct OPENAPI production deploy
 
 on:
