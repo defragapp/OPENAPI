@@ -46,6 +46,10 @@ const runtime = {
       return healthResponse(url.pathname, env);
     }
 
+    if (request.method === 'GET' && url.pathname === '/api/v1/you') {
+      return shareFirstAccountResponse(request, env, executionContext);
+    }
+
     if ((request.method === 'GET' || request.method === 'HEAD') && isNavigationAssetPath(url.pathname)) {
       if (!env.ASSETS) {
         return withSecurityHeaders(Response.json({ error: 'assets_unavailable' }, { status: 503 }));
@@ -56,6 +60,27 @@ const runtime = {
     return worker.fetch(request, env, executionContext);
   }
 };
+
+async function shareFirstAccountResponse(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
+  const response = await worker.fetch(request, env, executionContext);
+  if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) return response;
+
+  const payload = await response.json() as Record<string, unknown>;
+  const headers = new Headers(response.headers);
+  headers.delete('content-length');
+  return withSecurityHeaders(Response.json({
+    ...payload,
+    privacy: {
+      deletion: '/api/v1/deletion-jobs',
+      privateExport: 'disabled',
+      sharing: {
+        mode: 'public-link-only',
+        url: `https://${PUBLIC_HOST}`,
+        includesPrivateWorkspaceData: false
+      }
+    }
+  }, { status: response.status, headers }));
+}
 
 async function healthResponse(pathname: string, env: Env): Promise<Response> {
   try {
