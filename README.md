@@ -35,6 +35,7 @@ The staged AI response and exact-data footer contract is defined in [`docs/inner
 - [`docs/launch-product-contract.md`](docs/launch-product-contract.md)
 - [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md)
 - [`docs/cloudflare-workers-builds.md`](docs/cloudflare-workers-builds.md)
+- [`docs/cloudflare-dashboard-preview-prompt.md`](docs/cloudflare-dashboard-preview-prompt.md)
 - [`docs/production-release.md`](docs/production-release.md)
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/privacy-model.md`](docs/privacy-model.md)
@@ -55,7 +56,7 @@ Use these Cloudflare build settings:
 - Production branch: `main`
 - Non-production branch builds: disabled
 
-The deploy command targets the isolated `sovereign-openapi-preview` Worker rather than the production Worker. See [`docs/cloudflare-workers-builds.md`](docs/cloudflare-workers-builds.md) for required build secrets and the Cloudflare Access protection step.
+The deploy command targets the isolated `sovereign-openapi-preview` Worker rather than the production Worker. See [`docs/cloudflare-workers-builds.md`](docs/cloudflare-workers-builds.md) for required build secrets and the Cloudflare Access protection step. When dashboard assistance is available, use the exact bounded prompt in [`docs/cloudflare-dashboard-preview-prompt.md`](docs/cloudflare-dashboard-preview-prompt.md).
 
 Preview target: [`sovereign-openapi-preview.sovereign-os-api.workers.dev`](https://sovereign-openapi-preview.sovereign-os-api.workers.dev). This link identifies the isolated review target only; availability and readiness must be verified from the exact deployed commit before approval.
 
