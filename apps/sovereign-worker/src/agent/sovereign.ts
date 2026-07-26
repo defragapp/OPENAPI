@@ -225,6 +225,7 @@ async function collectTextStream(stream: ReadableStream<string>): Promise<string
   return output;
 }
 
-function safeJson(value: string): unknown {
+function safeJson(value: string | undefined): unknown {
+  if (!value) return {};
   try { return JSON.parse(value); } catch { return {}; }
 }
