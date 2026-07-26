@@ -9,6 +9,7 @@ const product = readFileSync('apps/sovereign-worker/src/db/product.ts', 'utf8');
 const browserRuntime = readFileSync('apps/web/src/ProductionRuntime.ts', 'utf8');
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const pricing = readFileSync('apps/web/public/pricing.html', 'utf8');
+const staticHeaders = readFileSync('apps/web/public/_headers', 'utf8');
 
 const cloudflareGate = packageJson.scripts?.['verify:cloudflare-build'] ?? '';
 for (const required of [
@@ -67,6 +68,12 @@ for (const required of [
   '"binding": "AI"',
   '"directory": "apps/web/dist"',
   '"crons": ["*/15 * * * *"]',
+  '"/api/*"',
+  '"/login"',
+  '"/signup"',
+  '"/app/*"',
+  '"/auth/*"',
+  '"/pricing.html"',
   'price_1Te0g9Bk78yJ8Hww8fFZCqhm',
   'price_1Tq6nPBk78yJ8Hwwm0pxg4hH'
 ]) {
@@ -83,9 +90,24 @@ for (const required of [
   "'/api/v1/stripe/webhook'",
   "'/api/stripe/webhook'",
   "'/api/webhooks/stripe'",
-  "'/api/v1/export-jobs'"
+  "'/api/v1/export-jobs'",
+  'env.ASSETS.fetch(request)',
+  'isNavigationAssetPath',
+  "target.pathname = '/app'"
 ]) {
   if (!runtime.includes(required)) throw new Error(`Runtime production contract is missing ${required}`);
+}
+
+for (const required of [
+  'Content-Security-Policy:',
+  "frame-ancestors 'none'",
+  'X-Content-Type-Options: nosniff',
+  'X-Frame-Options: DENY',
+  'Permissions-Policy:',
+  '/assets/*',
+  'max-age=31536000, immutable'
+]) {
+  if (!staticHeaders.includes(required)) throw new Error(`Static security headers are missing ${required}`);
 }
 
 if (env.includes('ARTIFACTS') || env.includes('R2Bucket')) throw new Error('Worker Env must not expose R2');
@@ -120,4 +142,4 @@ for (const required of [
 }
 if (/full account export|export features/i.test(pricing)) throw new Error('Pricing still promises private export');
 
-console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true legacy_apex_preserved=true d1=true durable_objects=true workers_ai=true static_assets=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_compat=true donation=true private_exports=false public_share=true live_gate=true concurrency_probe=20');
+console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true d1=true durable_objects=true workers_ai=true static_assets=true static_security_headers=true immutable_bundles=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_compat=true donation=true private_exports=false public_share=true live_gate=true concurrency_probe=20');
