@@ -80,6 +80,7 @@
       "/app/*",
       "/auth/*",
       "/invitation",
+      "/consent.html",
       "/privacy",
       "/terms",
       "/pricing.html",
