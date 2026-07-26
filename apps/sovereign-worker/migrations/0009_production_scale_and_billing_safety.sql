@@ -1,5 +1,9 @@
 PRAGMA foreign_keys = ON;
 
+ALTER TABLE accounts ADD COLUMN terms_accepted_at TEXT;
+ALTER TABLE accounts ADD COLUMN terms_version TEXT;
+ALTER TABLE accounts ADD COLUMN privacy_version TEXT;
+
 CREATE INDEX auth_magic_links_ip_created_idx
   ON auth_magic_links(requested_ip_hash, created_at DESC);
 
