@@ -14,7 +14,7 @@ const apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_T
 const workerName = 'sovv-web';
 const d1Name = 'sovereign-openapi-db';
 const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT_SHA || '').trim();
-const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '').trim();
+const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAADhGIF8-iOLIg8MU').trim();
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
 const donationUrl = 'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02';
@@ -26,7 +26,8 @@ if (!turnstileSiteKey) throw new Error('VITE_TURNSTILE_SITE_KEY is required for 
 
 const env = {
   ...process.env,
-  CLOUDFLARE_ACCOUNT_ID: accountId
+  CLOUDFLARE_ACCOUNT_ID: accountId,
+  VITE_TURNSTILE_SITE_KEY: turnstileSiteKey
 };
 if (apiToken) env.CLOUDFLARE_API_TOKEN = apiToken;
 
