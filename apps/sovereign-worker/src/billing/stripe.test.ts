@@ -83,8 +83,9 @@ describe('Stripe launch billing adapter', () => {
     });
     const projection = await projectSubscriptionEvent(env, event);
     expect(projection).toMatchObject({ applied: true, plan: 'sovereign_plus' });
-    expect('features' in projection && projection.features?.['people.compare']).toBe(true);
-    expect('features' in projection && projection.features?.['covenant.lens']).toBe(true);
+    const features = 'features' in projection ? projection.features : undefined;
+    expect(features?.['people.compare']).toBe(true);
+    expect(features?.['covenant.lens']).toBe(true);
     expect(writes.some((write) => String(write[0]).includes('entitlement_cache'))).toBe(true);
   });
 
@@ -128,7 +129,7 @@ describe('Stripe launch billing adapter', () => {
       ]
     });
     Object.assign(env, { STRIPE_SECRET_KEY: 'sk_fixture' });
-    const requests: Array<{ url: string; method?: string; idempotency: string | null }> = [];
+    const requests: Array<{ url: string; method: string | undefined; idempotency: string | null }> = [];
     vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
       requests.push({ url, method: init?.method, idempotency: new Headers(init?.headers).get('idempotency-key') });
       return Response.json({ id: 'sub_active_1', status: 'canceled' });
