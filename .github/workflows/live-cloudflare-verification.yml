@@ -1,0 +1,163 @@
+name: Live Cloudflare Verification
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      EXPECTED_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+      PUBLIC_BASE: https://sovereign.defrag.app
+      APP_BASE: https://app.defrag.app
+    steps:
+      - name: Verify deployed commit and every production page
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import re
+          import sys
+          import time
+          import urllib.error
+          import urllib.request
+
+          expected = os.environ['EXPECTED_SHA'].strip()
+          public_base = os.environ['PUBLIC_BASE'].rstrip('/')
+          app_base = os.environ['APP_BASE'].rstrip('/')
+
+          def fetch(url, follow=True):
+              class NoRedirect(urllib.request.HTTPRedirectHandler):
+                  def redirect_request(self, req, fp, code, msg, headers, newurl):
+                      return None
+              opener = urllib.request.build_opener() if follow else urllib.request.build_opener(NoRedirect())
+              request = urllib.request.Request(url, headers={'User-Agent': 'Sovereign.OS production verifier'})
+              try:
+                  with opener.open(request, timeout=20) as response:
+                      return response.status, {k.lower(): v for k, v in response.headers.items()}, response.read().decode('utf-8', 'replace')
+              except urllib.error.HTTPError as error:
+                  return error.code, {k.lower(): v for k, v in error.headers.items()}, error.read().decode('utf-8', 'replace')
+
+          ready_payload = None
+          last_ready = ''
+          for attempt in range(24):
+              status, headers, body = fetch(f'{app_base}/ready')
+              last_ready = f'status={status} body={body[:500]}'
+              try:
+                  payload = json.loads(body)
+              except json.JSONDecodeError:
+                  payload = {}
+              if status == 200 and payload.get('ready') is True and payload.get('version') == expected:
+                  ready_payload = payload
+                  break
+              time.sleep(10)
+
+          if ready_payload is None:
+              raise SystemExit(f'Cloudflare did not converge to {expected}: {last_ready}')
+
+          public_routes = [
+              '/', '/how-it-works.html', '/how-it-works', '/pricing.html', '/pricing',
+              '/faq.html', '/faq', '/privacy', '/terms'
+          ]
+          app_routes = ['/login', '/signup', '/app', '/invitation', '/consent.html']
+          pages = {}
+
+          for route in public_routes:
+              status, headers, body = fetch(f'{public_base}{route}')
+              if status != 200:
+                  raise SystemExit(f'{public_base}{route} returned {status}')
+              pages[f'public:{route}'] = (headers, body)
+
+          for route in app_routes:
+              status, headers, body = fetch(f'{app_base}{route}')
+              if status != 200:
+                  raise SystemExit(f'{app_base}{route} returned {status}')
+              pages[f'app:{route}'] = (headers, body)
+
+          static_expectations = {
+              'public:/how-it-works.html': [
+                  'Know yourself. Understand the system. Choose what fits.',
+                  'Explore the person, the relationship, and the system.',
+                  'Shadow and light'
+              ],
+              'public:/pricing.html': [
+                  'Start with self-understanding. Expand into relationships and systems.',
+                  'Complete personal Baseline Design',
+                  'Optional Covenant Christian and biblical lens'
+              ],
+              'public:/faq.html': [
+                  'What it is. What you can explore. What it never pretends to know.',
+                  'What do shadow and light mean?',
+                  'What does alignment mean?',
+                  'What is Covenant?'
+              ]
+          }
+
+          for page, fingerprints in static_expectations.items():
+              body = pages[page][1]
+              for fingerprint in fingerprints:
+                  if fingerprint not in body:
+                      raise SystemExit(f'{page} is missing copy fingerprint: {fingerprint}')
+
+          home = pages['public:/'][1]
+          match = re.search(r'src=["\'](/assets/[^"\']+\.js)["\']', home)
+          if not match:
+              raise SystemExit('Public home does not expose a compiled JavaScript asset')
+          asset_status, asset_headers, asset_body = fetch(f'{public_base}{match.group(1)}')
+          if asset_status != 200:
+              raise SystemExit(f'Compiled JavaScript asset returned {asset_status}')
+
+          bundle_fingerprints = [
+              'Know yourself. Understand the system. Choose what fits.',
+              'Explore shadow and light',
+              'See the relationship from both sides.',
+              'Understand the whole system.',
+              'Meet your Baseline Design.',
+              'Optional Christian and biblical lens.'
+          ]
+          for fingerprint in bundle_fingerprints:
+              if fingerprint not in asset_body:
+                  raise SystemExit(f'Compiled application is missing: {fingerprint}')
+
+          for page, (headers, _) in pages.items():
+              required_headers = {
+                  'strict-transport-security': 'max-age=31536000',
+                  'x-content-type-options': 'nosniff',
+                  'x-frame-options': 'deny',
+                  'content-security-policy': "frame-ancestors 'none'"
+              }
+              for name, fragment in required_headers.items():
+                  if fragment.lower() not in headers.get(name, '').lower():
+                      raise SystemExit(f'{page} is missing {name}: {fragment}')
+              if page.startswith('app:') and 'noindex' not in headers.get('x-robots-tag', '').lower():
+                  raise SystemExit(f'{page} is indexable')
+
+          if 'immutable' not in asset_headers.get('cache-control', '').lower():
+              raise SystemExit('Compiled JavaScript is not served with immutable caching')
+
+          summary = os.environ.get('GITHUB_STEP_SUMMARY')
+          if summary:
+              with open(summary, 'a', encoding='utf-8') as output:
+                  output.write('## Sovereign.OS live verification\n\n')
+                  output.write(f'- Deployed commit: `{ready_payload.get("version")}`\n')
+                  output.write(f'- Migration: `{ready_payload.get("migrationVersion")}`\n')
+                  output.write(f'- Public routes checked: {len(public_routes)}\n')
+                  output.write(f'- App routes checked: {len(app_routes)}\n')
+                  output.write('- Product-language fingerprints: passed\n')
+                  output.write('- Security headers and immutable assets: passed\n')
+
+          print(json.dumps({
+              'ready': True,
+              'version': ready_payload.get('version'),
+              'migrationVersion': ready_payload.get('migrationVersion'),
+              'publicRoutes': len(public_routes),
+              'appRoutes': len(app_routes)
+          }, indent=2))
+          PY
