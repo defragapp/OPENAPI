@@ -3,6 +3,15 @@ import app from './entry';
 import { createSignedSessionToken } from './security/auth';
 import type { Env } from './env';
 
+const executionContext = {
+  waitUntil: (_promise: Promise<unknown>) => undefined,
+  passThroughOnException: () => undefined
+} as unknown as ExecutionContext;
+
+function dispatch(request: Request, env: Env): Promise<Response> {
+  return app.fetch(request, env, executionContext);
+}
+
 function fakeEnv(): Env {
   const accounts = new Map<string, string>();
   const threads = new Map<string, string>();
@@ -89,14 +98,14 @@ async function authHeader(): Promise<Record<string, string>> {
 
 describe('authenticated Today and Explore smoke flow', () => {
   it('serves Today without incident input and keeps separation categories', async () => {
-    const res = await app.fetch(new Request('https://app.test/api/v1/today', { headers: await authHeader() }), fakeEnv());
+    const res = await dispatch(new Request('https://app.test/api/v1/today', { headers: await authHeader() }), fakeEnv());
     expect(res.status).toBe(200);
     const json = await res.json() as any;
     expect(json.today.separation).toContain('Actual state remains unknown unless the user confirms it.');
   });
 
   it('serves Explore in plain language with collapsed framework details', async () => {
-    const res = await app.fetch(new Request('https://app.test/api/v1/explore', {
+    const res = await dispatch(new Request('https://app.test/api/v1/explore', {
       method: 'POST',
       headers: { ...(await authHeader()), origin: 'https://app.test', 'content-type': 'application/json' },
       body: JSON.stringify({ topic: 'communication' })
@@ -110,7 +119,7 @@ describe('authenticated Today and Explore smoke flow', () => {
   it('captures correction feedback and rejects duplicate turns', async () => {
     const env = fakeEnv();
     const headers = { ...(await authHeader()), origin: 'https://app.test', 'content-type': 'application/json' };
-    const correction = await app.fetch(new Request('https://app.test/api/v1/threads/t1/corrections', {
+    const correction = await dispatch(new Request('https://app.test/api/v1/threads/t1/corrections', {
       method: 'POST',
       headers,
       body: JSON.stringify({ correction: 'partly' })
@@ -125,23 +134,23 @@ describe('authenticated Today and Explore smoke flow', () => {
       body: JSON.stringify({ message: 'Show me today without an incident.', context: { surface: 'Today' } })
     });
 
-    const first = await app.fetch(request(), env);
+    const first = await dispatch(request(), env);
     expect(first.status).toBe(202);
     expect(await first.text()).toContain('OPENAPI Baseline fixture is available for development checks');
 
-    const duplicate = await app.fetch(request(), env);
+    const duplicate = await dispatch(request(), env);
     expect(duplicate.status).toBe(200);
     await expect(duplicate.json()).resolves.toEqual({ duplicate: true, status: 'completed', sequence: 1 });
   });
 
   it('requires idempotency keys before creating Stripe handoffs', async () => {
     const headers = { ...(await authHeader()), origin: 'https://app.test', 'content-type': 'application/json' };
-    const checkout = await app.fetch(new Request('https://app.test/api/v1/billing/checkout', {
+    const checkout = await dispatch(new Request('https://app.test/api/v1/billing/checkout', {
       method: 'POST',
       headers,
       body: JSON.stringify({ interval: 'monthly' })
     }), fakeEnv());
-    const portal = await app.fetch(new Request('https://app.test/api/v1/billing/portal', {
+    const portal = await dispatch(new Request('https://app.test/api/v1/billing/portal', {
       method: 'POST',
       headers,
       body: '{}'
