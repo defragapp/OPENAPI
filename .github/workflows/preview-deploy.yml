@@ -5,12 +5,12 @@ on:
   push:
     branches:
       - main
-      - codex/inner-recognition-intelligence
     paths:
       - '.github/workflows/preview-deploy.yml'
       - 'apps/**'
       - 'packages/**'
       - 'scripts/**'
+      - 'docs/cloudflare-dashboard-preview-prompt.md'
       - 'pnpm-lock.yaml'
       - 'package.json'
 
@@ -55,36 +55,36 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Local verification gate
+      - name: Full repository verification gate
+        env:
+          VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
         run: |
           set -euo pipefail
-          pnpm verify:foundation
-          pnpm verify:migrations
-          pnpm scan:secrets
-          pnpm scan:production-fixtures
-          pnpm verify:release-config
-          pnpm typecheck
-          pnpm test
-          pnpm build
-          pnpm smoke:auth
-          pnpm smoke:baseline
-          pnpm smoke:jobs
-          pnpm smoke:worker-gateway
-          pnpm smoke:stripe
-          pnpm smoke:product
-          pnpm smoke:release-closure
+          pnpm verify:cloudflare-build
           pnpm build:preview
 
-      - name: Require preview protection configuration
+      - name: Require Cloudflare and preview-protection configuration
         env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          PREVIEW_BASE_URL: ${{ vars.PREVIEW_BASE_URL }}
+          CLOUDFLARE_WORKERS_SUBDOMAIN: ${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}
         run: |
           set -euo pipefail
-          if [ -z "${CF_ACCESS_CLIENT_ID:-}" ] || [ -z "${CF_ACCESS_CLIENT_SECRET:-}" ]; then
-            echo "::error::Cloudflare Access service-token secrets are required for preview verification"
-            exit 1
+          missing=0
+          for name in CLOUDFLARE_ACCOUNT_ID CLOUDFLARE_API_TOKEN CF_ACCESS_CLIENT_ID CF_ACCESS_CLIENT_SECRET; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::$name is required for protected preview deployment"
+              missing=1
+            fi
+          done
+          if [ -z "${PREVIEW_BASE_URL:-}" ] && [ -z "${CLOUDFLARE_WORKERS_SUBDOMAIN:-}" ]; then
+            echo "::error::PREVIEW_BASE_URL or CLOUDFLARE_WORKERS_SUBDOMAIN is required"
+            missing=1
           fi
+          exit "$missing"
 
       - name: Resolve preview session secret
         id: preview-secret
@@ -105,33 +105,36 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           PREVIEW_WORKER_NAME: ${{ vars.PREVIEW_WORKER_NAME || 'sovereign-openapi-preview' }}
           PREVIEW_D1_NAME: ${{ vars.PREVIEW_D1_NAME || 'sovereign-openapi-preview-db' }}
-          CONFIGURED_PREVIEW_BASE_URL: ${{ vars.PREVIEW_BASE_URL }}
+          PREVIEW_BASE_URL: ${{ vars.PREVIEW_BASE_URL }}
+          CLOUDFLARE_WORKERS_SUBDOMAIN: ${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}
           PREVIEW_SESSION_SIGNING_SECRET: ${{ steps.preview-secret.outputs.secret }}
+          WORKERS_CI_COMMIT_SHA: ${{ github.sha }}
+          WORKERS_CI_BUILD_UUID: github-actions-${{ github.run_id }}-${{ github.run_attempt }}
           AI_PROVIDER: ${{ vars.AI_PROVIDER || 'cloudflare-gateway' }}
           AI_MODEL: ${{ vars.AI_MODEL || 'openai/gpt-5.5' }}
           AI_GATEWAY_ID: ${{ vars.AI_GATEWAY_ID || 'sovereign' }}
           SOVV_BASE_URL: ${{ vars.SOVV_BASE_URL }}
+          SOVV_INTERNAL_AUTH_TOKEN: ${{ secrets.SOVV_INTERNAL_AUTH_TOKEN }}
           SCRIPTURE_TRANSLATION: ${{ vars.SCRIPTURE_TRANSLATION || 'WEB' }}
+          VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          TURNSTILE_EXPECTED_HOSTNAME: ${{ vars.TURNSTILE_EXPECTED_HOSTNAME }}
+          EMAIL_API_URL: ${{ vars.EMAIL_API_URL }}
+          EMAIL_API_TOKEN: ${{ secrets.EMAIL_API_TOKEN }}
+          EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+          EMAIL_TIMEOUT_MS: ${{ vars.EMAIL_TIMEOUT_MS || '2500' }}
+          ASTRONOMY_API_URL: ${{ vars.ASTRONOMY_API_URL }}
+          BASELINE_HORIZONS_URL: ${{ vars.BASELINE_HORIZONS_URL || 'https://ssd.jpl.nasa.gov/api/horizons.api' }}
+          BASELINE_PROVIDER_TIMEOUT_MS: ${{ vars.BASELINE_PROVIDER_TIMEOUT_MS || '8000' }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY: ${{ vars.STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY }}
           STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL: ${{ vars.STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL }}
-          STRIPE_SUCCESS_URL: ${{ vars.STRIPE_SUCCESS_URL }}
-          STRIPE_CANCEL_URL: ${{ vars.STRIPE_CANCEL_URL }}
-          STRIPE_PORTAL_RETURN_URL: ${{ vars.STRIPE_PORTAL_RETURN_URL }}
         run: |
           set -euo pipefail
-          if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
-            echo "::error::CLOUDFLARE_ACCOUNT_ID repository variable is not configured"
-            exit 1
-          fi
-          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
-            echo "::error::CLOUDFLARE_API_TOKEN repository secret is not configured"
-            exit 1
-          fi
           pnpm preview:bootstrap
           DEPLOYED_URL="$(node -e "console.log(require('./preview-deployment.json').deployedUrl)")"
-          URL="${CONFIGURED_PREVIEW_BASE_URL:-$DEPLOYED_URL}"
+          URL="${PREVIEW_BASE_URL:-$DEPLOYED_URL}"
           echo "deployed_url=$DEPLOYED_URL" >> "$GITHUB_OUTPUT"
           echo "preview_url=$URL" >> "$GITHUB_OUTPUT"
 
@@ -200,12 +203,13 @@ jobs:
             echo "### Sovereign protected preview deployment"
             echo
             echo "- commit_sha: ${GITHUB_SHA}"
+            echo "- github_run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
             echo "- worker_name: ${{ vars.PREVIEW_WORKER_NAME || 'sovereign-openapi-preview' }}"
             echo "- d1_name: ${{ vars.PREVIEW_D1_NAME || 'sovereign-openapi-preview-db' }}"
             echo "- model: ${{ vars.AI_MODEL || 'openai/gpt-5.5' }}"
             echo "- gateway_id: ${{ vars.AI_GATEWAY_ID || 'sovereign' }}"
             echo "- protected_preview_url: ${{ steps.preview-deploy.outputs.preview_url }}"
             echo "- deployed_worker_url: ${{ steps.preview-deploy.outputs.deployed_url }}"
-            echo "- access_perimeter: required and verified"
+            echo "- access_perimeter: required and verified before success"
             echo "- remote_smoke: public pages, app auth, plan gates, AI stream"
           } >> "$GITHUB_STEP_SUMMARY"
