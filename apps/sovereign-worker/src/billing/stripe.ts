@@ -7,6 +7,7 @@ export interface CheckoutResult { url: string; sessionId: string; plan: 'soverei
 export interface PortalResult { url: string; sessionId: string; }
 
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set(['active', 'trialing']);
+const TERMINAL_SUBSCRIPTION_STATUSES = new Set(['canceled', 'incomplete_expired', 'retained_billing_record']);
 
 function stripeConfigured(env: Env): boolean {
   return Boolean(env.STRIPE_SECRET_KEY && env.STRIPE_SUCCESS_URL && env.STRIPE_CANCEL_URL);
@@ -31,10 +32,25 @@ async function stripeRequest<T>(env: Env, path: string, body: URLSearchParams, i
     'content-type': 'application/x-www-form-urlencoded',
     'idempotency-key': requireIdempotencyKey(idempotencyKey)
   });
-  const response = await fetch(`https://api.stripe.com/v1${path}`, { method: 'POST', headers, body });
+  const response = await fetch(`https://api.stripe.com/v1${path}`, { method: 'POST', headers, body, signal: AbortSignal.timeout(10_000) });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Response('Stripe request failed', { status: 502 });
   return data as T;
+}
+
+async function cancelStripeSubscription(env: Env, subscriptionId: string, idempotencyKey: string): Promise<void> {
+  if (!env.STRIPE_SECRET_KEY) throw new Error('stripe_secret_missing');
+  if (!/^sub_[A-Za-z0-9_]+$/.test(subscriptionId)) throw new Error('invalid_stripe_subscription_id');
+  const response = await fetch(`https://api.stripe.com/v1/subscriptions/${encodeURIComponent(subscriptionId)}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+      'idempotency-key': requireIdempotencyKey(idempotencyKey)
+    },
+    signal: AbortSignal.timeout(10_000)
+  });
+  if (response.ok || response.status === 404) return;
+  throw new Error(`stripe_subscription_cancel_${response.status}`);
 }
 
 function testBillingUrl(kind: 'checkout' | 'portal', sessionId: string): string {
@@ -140,6 +156,38 @@ export async function createPortalSession(env: Env, accountId: string, idempoten
   return { sessionId, url: testBillingUrl('portal', sessionId) };
 }
 
+export async function cancelAccountSubscriptions(env: Env, accountId: string, deletionJobId: string): Promise<{ cancelled: number }> {
+  const rows = await env.DB.prepare(`SELECT stripe_subscription_id, status FROM stripe_subscriptions
+    WHERE account_id = ? AND stripe_subscription_id IS NOT NULL
+    ORDER BY updated_at DESC`)
+    .bind(accountId)
+    .all<{ stripe_subscription_id: string; status: string }>();
+  const cancellable = (rows.results ?? []).filter((row) => !TERMINAL_SUBSCRIPTION_STATUSES.has(row.status));
+  if (cancellable.length > 0 && !env.STRIPE_SECRET_KEY) throw new Error('stripe_secret_missing');
+
+  for (const row of cancellable) {
+    const key = `delete-${deletionJobId}-${row.stripe_subscription_id}`.slice(0, 255);
+    await cancelStripeSubscription(env, row.stripe_subscription_id, key);
+    await env.DB.prepare(`UPDATE stripe_subscriptions
+      SET status = 'canceled', cancel_at_period_end = 0, updated_at = datetime('now')
+      WHERE account_id = ? AND stripe_subscription_id = ?`)
+      .bind(accountId, row.stripe_subscription_id)
+      .run();
+  }
+
+  if (cancellable.length > 0) {
+    await env.DB.prepare(`INSERT INTO entitlement_cache (account_id, plan, features_json, as_of, source_event_id, updated_at)
+      VALUES (?, 'free', ?, datetime('now'), ?, datetime('now'))
+      ON CONFLICT(account_id) DO UPDATE SET
+        plan = 'free', features_json = excluded.features_json, as_of = excluded.as_of,
+        source_event_id = excluded.source_event_id, updated_at = excluded.updated_at`)
+      .bind(accountId, JSON.stringify(enabledFeatureKeys('free')), `deletion:${deletionJobId}`)
+      .run();
+  }
+
+  return { cancelled: cancellable.length };
+}
+
 export interface NormalizedStripeEvent {
   id: string;
   type: string;
@@ -183,6 +231,19 @@ export function normalizeStripeFixtureEvent(env: Env, event: {
 }
 
 export async function projectSubscriptionEvent(env: Env, event: NormalizedStripeEvent) {
+  const account = await env.DB.prepare('SELECT auth_subject FROM accounts WHERE id = ?')
+    .bind(event.accountId)
+    .first<{ auth_subject: string }>();
+  if (!account) throw new Error('subscription_account_missing');
+  if (account.auth_subject.startsWith('deleted:')) {
+    await env.DB.prepare(`UPDATE stripe_subscriptions SET
+      status = 'retained_billing_record', source_event_id = ?, last_event_created = ?, last_event_id = ?, updated_at = datetime('now')
+      WHERE account_id = ? AND stripe_subscription_id = ?`)
+      .bind(event.id, event.created, event.id, event.accountId, event.subscriptionId)
+      .run();
+    return { applied: false, stale: false, deletedAccount: true, plan: 'free' as const };
+  }
+
   if (event.customerId) {
     await env.DB.prepare(`INSERT INTO stripe_customers (account_id, stripe_customer_id, updated_at)
       VALUES (?, ?, datetime('now'))
