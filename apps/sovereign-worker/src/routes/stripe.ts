@@ -80,17 +80,30 @@ export async function handleStripeWebhook(request: Request, env: Env): Promise<R
   const valid = await verifyStripeSignature({ body, header: signature, secret: env.STRIPE_WEBHOOK_SECRET });
   if (!valid) return new Response('Invalid signature', { status: 400 });
 
-  const event = JSON.parse(body) as StripeEvent;
+  let event: StripeEvent;
+  try {
+    event = JSON.parse(body) as StripeEvent;
+  } catch {
+    return new Response('Invalid event', { status: 400 });
+  }
   if (!event.id || !event.type || !event.data?.object) return new Response('Invalid event', { status: 400 });
+
   const inserted = await env.DB.prepare(
     `INSERT INTO webhook_events(provider, event_id, event_type, received_at)
      VALUES('stripe', ?, ?, datetime('now'))
      ON CONFLICT(provider, event_id) DO NOTHING`
   ).bind(event.id, event.type).run();
-  if ((inserted.meta.changes ?? 0) === 0) return Response.json({ received: true, duplicate: true });
+
+  if ((inserted.meta?.changes ?? 0) === 0) {
+    const existing = await env.DB.prepare(`SELECT processed_at, error_code FROM webhook_events
+      WHERE provider = 'stripe' AND event_id = ?`)
+      .bind(event.id)
+      .first<{ processed_at?: string | null; error_code?: string | null }>();
+    if (existing?.processed_at) return Response.json({ received: true, duplicate: true, processed: true });
+  }
 
   if (!SUBSCRIPTION_EVENTS.has(event.type)) {
-    await env.DB.prepare(`UPDATE webhook_events SET processed_at = datetime('now')
+    await env.DB.prepare(`UPDATE webhook_events SET processed_at = datetime('now'), error_code = NULL
       WHERE provider = 'stripe' AND event_id = ?`).bind(event.id).run();
     return Response.json({ received: true, projected: false });
   }
@@ -99,14 +112,20 @@ export async function handleStripeWebhook(request: Request, env: Env): Promise<R
     const projection = await projectSubscriptionEvent(env, await normalizeSubscriptionEvent(env, event));
     await env.DB.prepare(`UPDATE webhook_events SET processed_at = datetime('now'), error_code = NULL
       WHERE provider = 'stripe' AND event_id = ?`).bind(event.id).run();
-    return Response.json({ received: true, projected: projection.applied, stale: projection.stale });
+    return Response.json({
+      received: true,
+      projected: projection.applied,
+      stale: projection.stale,
+      retried: (inserted.meta?.changes ?? 0) === 0,
+      deletedAccount: 'deletedAccount' in projection && projection.deletedAccount === true
+    });
   } catch (error) {
     const code = error instanceof Response
       ? `stripe_projection_http_${error.status}`
       : error instanceof Error
         ? error.message.replace(/[^a-z0-9_-]/gi, '_').slice(0, 80)
         : 'stripe_projection_failed';
-    await env.DB.prepare(`UPDATE webhook_events SET error_code = ?
+    await env.DB.prepare(`UPDATE webhook_events SET processed_at = NULL, error_code = ?
       WHERE provider = 'stripe' AND event_id = ?`).bind(code, event.id).run();
     return Response.json({ received: true, projected: false, retryable: true }, { status: 500 });
   }
