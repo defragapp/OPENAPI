@@ -3,7 +3,6 @@ export interface Env {
   APP_VERSION: string;
   DB: D1Database;
   KV?: KVNamespace;
-  ARTIFACTS?: R2Bucket;
   JOBS?: Queue;
   THREADS: DurableObjectNamespace;
   AI_PROVIDER?: string;
@@ -11,6 +10,8 @@ export interface Env {
   AI_GATEWAY_ID?: string;
   AI?: { run: (model: string, input: unknown, options?: unknown) => Promise<unknown>; aiGatewayLogId?: string };
   ASSETS?: { fetch: (request: Request) => Promise<Response> };
+  EMAIL?: { send: (message: { from: string; to: string; subject: string; text?: string; html?: string }) => Promise<unknown> };
+  RESEND_API_KEY?: string;
   STRIPE_SECRET_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
   STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY?: string;
@@ -27,12 +28,8 @@ export interface Env {
   TURNSTILE_SECRET_KEY?: string;
   TURNSTILE_EXPECTED_HOSTNAME?: string;
   TURNSTILE_EXPECTED_ACTION?: string;
-  EMAIL_API_URL?: string;
-  EMAIL_API_TOKEN?: string;
-  EMAIL_FROM?: string;
   PUBLIC_APP_URL?: string;
   ASTRONOMY_API_URL?: string;
-  EMAIL_TIMEOUT_MS?: string;
   AI_FREE_MONTHLY_TURNS?: string;
   AI_SOVEREIGN_PLUS_MONTHLY_TURNS?: string;
   THREAD_RETENTION_DAYS?: string;
