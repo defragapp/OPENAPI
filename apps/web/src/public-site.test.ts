@@ -102,7 +102,7 @@ describe('Sovereign.OS launch surface', () => {
     expect(landingCss).toContain('@media (max-width: 760px)');
     expect(landingCss).toContain('prefers-reduced-motion');
     for (const page of [how, pricing, faq]) {
-      expect(page).toContain('/launch.css?v=20260726-platform');
+      expect(page).toContain('/launch.css?v=20260726-platform-r2');
       expect(page).not.toContain('/marketing.css');
       expect(page).not.toContain('/launch-polish.css');
     }
