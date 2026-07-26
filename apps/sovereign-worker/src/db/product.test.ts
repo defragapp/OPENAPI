@@ -29,11 +29,9 @@ describe('systems, library, privacy, and entitlement helpers', () => {
     expect(JSON.stringify(saved)).not.toMatch(/hidden reasoning|latitude|longitude|birth time/i);
   });
 
-  it('creates an executable export job and a non-executing deletion grace record', async () => {
+  it('disables private exports while preserving a cancellable deletion grace record', async () => {
     const env = fakeEnv();
-    const exportJob = await createExportJob(env, 'acct_1');
-    expect(exportJob.excludes).toContain('hidden reasoning');
-    expect(exportJob.backgroundJobId).toMatch(/^job_/);
+    await expect(createExportJob(env, 'acct_1')).rejects.toMatchObject({ status: 404 });
     expect((await createDeletionJob(env, 'acct_1')).status).toBe('grace');
   });
 
@@ -41,6 +39,6 @@ describe('systems, library, privacy, and entitlement helpers', () => {
     const entitlements = freeEntitlements();
     expect(entitlements.features['baseline.today']).toBe(true);
     expect(entitlements.features['people.compare']).toBe(false);
-    expect(Object.keys(entitlements.features)).toContain('export.full');
+    expect(Object.keys(entitlements.features)).not.toContain('export.full');
   });
 });
