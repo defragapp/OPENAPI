@@ -64,18 +64,18 @@ jobs:
 
       - name: Require Cloudflare deployment credentials
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
         run: |
           set -euo pipefail
           if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
-            echo "::error::GitHub secret CLOUDFLARE_API_TOKEN is missing"
+            echo "::error::GitHub secret CLOUDFLARE_API_TOKEN or CF_API_TOKEN is missing"
             exit 1
           fi
 
       - name: Provision OPENAPI production resources and deploy sovv-web
         env:
           CLOUDFLARE_ACCOUNT_ID: 8b1954d216d65077c6480d62583fe2c2
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
           VITE_TURNSTILE_SITE_KEY: 0x4AAAAAADhGIF8-iOLIg8MU
           GITHUB_SHA: ${{ github.sha }}
         run: |
