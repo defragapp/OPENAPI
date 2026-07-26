@@ -4,6 +4,7 @@ import { withSecurityHeaders } from './security/headers';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 
 const HEALTH_PATHS = new Set(['/health', '/healthz', '/ready']);
+const DISABLED_PATH_PREFIXES = ['/api/v1/export-jobs'];
 const PARENT_HOSTS = new Set(['defrag.app', 'www.defrag.app']);
 const PUBLIC_HOST = 'sovereign.defrag.app';
 const APP_HOST = 'app.defrag.app';
@@ -15,6 +16,10 @@ const runtime = {
     const routed = routeHostname(request, url);
     if (routed) return routed;
 
+    if (DISABLED_PATH_PREFIXES.some((prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`))) {
+      return withSecurityHeaders(Response.json({ error: 'not_found' }, { status: 404 }));
+    }
+
     if (request.method !== 'GET' || !HEALTH_PATHS.has(url.pathname)) {
       return worker.fetch(request, env, executionContext);
     }
@@ -22,6 +27,22 @@ const runtime = {
     try {
       const db = await env.DB.prepare('SELECT 1 AS ok').first<{ ok: number }>();
       const aiConfig = resolveAiModelConfig(env);
+      const authConfigured = Boolean(
+        env.SESSION_SIGNING_SECRET
+        && env.TURNSTILE_SECRET_KEY
+        && env.EMAIL_API_URL
+        && env.EMAIL_API_TOKEN
+        && env.EMAIL_FROM
+      );
+      const stripeConfigured = Boolean(
+        env.STRIPE_SECRET_KEY
+        && env.STRIPE_WEBHOOK_SECRET
+        && env.STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY
+        && env.STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL
+        && env.STRIPE_SUCCESS_URL
+        && env.STRIPE_CANCEL_URL
+        && env.STRIPE_PORTAL_RETURN_URL
+      );
       const dependencies = {
         d1: db?.ok === 1 ? 'ok' : 'degraded',
         durableObjects: env.THREADS ? 'configured' : 'missing',
@@ -31,16 +52,21 @@ const runtime = {
         baselineEngine: env.BASELINE_HORIZONS_URL ? 'configured' : 'missing',
         baselineObserver: 'Earth geocenter 500@399',
         birthplaceGeocoder: 'disabled',
+        authentication: authConfigured ? 'configured' : 'missing',
         legacySovvAdapter: env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'disabled',
-        stripe: env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET ? 'configured' : 'disabled',
-        scripture: env.SCRIPTURE_TRANSLATION || 'WEB'
+        stripe: stripeConfigured ? 'configured' : 'missing',
+        scripture: env.SCRIPTURE_TRANSLATION || 'WEB',
+        privateExports: 'disabled',
+        sharing: 'public-link-only'
       };
       const ok = db?.ok === 1;
       const ready = ok
         && dependencies.durableObjects === 'configured'
         && dependencies.assets === 'configured'
         && dependencies.ai === 'configured'
-        && dependencies.baselineEngine === 'configured';
+        && dependencies.baselineEngine === 'configured'
+        && dependencies.authentication === 'configured'
+        && dependencies.stripe === 'configured';
       return withSecurityHeaders(Response.json({
         ok,
         ...(url.pathname === '/ready' ? { ready } : {}),
