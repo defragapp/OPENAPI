@@ -75,8 +75,8 @@ function findDatabaseId(value) {
 }
 
 async function resolveTurnstileSecret() {
-  // Cloudflare Workers Builds authenticates Wrangler internally without exposing
-  // its token to the build. Preserve the existing Worker secret in that mode.
+  // Workers Builds authenticates Wrangler internally without necessarily exposing
+  // an API token to the build process. Preserve the existing Worker secret in that mode.
   if (!turnstileSiteKey || !apiToken) return undefined;
   try {
     const response = await fetch(
@@ -124,14 +124,12 @@ try {
     '--config', generatedConfigPath
   ], { capture: false });
 
-  // The first deployment provisions Queue, Durable Object, Workers AI and assets.
-  // Existing encrypted secrets on sovv-web are preserved by Wrangler.
-  runWrangler(['deploy', '--config', generatedConfigPath], { capture: false });
-
+  // sovv-web already exists, so missing runtime secrets can be prepared before
+  // the single application upload. Existing encrypted secrets remain untouched.
   const existingSecrets = new Set(
     rows(parseJsonOutput(runWrangler([
       'secret', 'list',
-      '--config', generatedConfigPath,
+      '--name', workerName,
       '--format', 'json'
     ]))).map((item) => item.name)
   );
@@ -148,13 +146,14 @@ try {
 
   if (Object.keys(secrets).length) {
     for (const value of Object.values(secrets)) sensitiveValues.push(value);
-    runWrangler(['secret', 'bulk', '--config', generatedConfigPath], {
+    runWrangler(['secret', 'bulk', '--name', workerName], {
       input: JSON.stringify(secrets)
     });
   }
 
-  const finalDeployOutput = runWrangler(['deploy', '--config', generatedConfigPath]);
-  const workersDevUrl = finalDeployOutput.match(/https:\/\/[^\s]+\.workers\.dev/)?.[0] || null;
+  // One code upload provisions Queue, Durable Object, Workers AI and assets.
+  const deployOutput = runWrangler(['deploy', '--config', generatedConfigPath]);
+  const workersDevUrl = deployOutput.match(/https:\/\/[^\s]+\.workers\.dev/)?.[0] || null;
 
   const metadata = {
     workerName,
