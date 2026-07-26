@@ -17,13 +17,13 @@ const baselineSource = readFileSync('apps/sovereign-worker/src/baseline.ts', 'ut
 const baselineEngine = readFileSync('apps/sovereign-worker/src/baseline-engine.ts', 'utf8');
 const baselineTests = readFileSync('apps/sovereign-worker/src/baseline-engine.test.ts', 'utf8');
 
-function assertBinding(scope, name) {
+function assertBinding(scope, name, { requireR2 }) {
   if (!scope?.queues?.producers?.some((item) => item.binding === 'JOBS')) {
     throw new Error(`${name} missing JOBS queue producer`);
   }
   if (!scope?.queues?.consumers?.length) throw new Error(`${name} missing queue consumer`);
   if (!scope?.triggers?.crons?.length) throw new Error(`${name} missing scheduled cleanup trigger`);
-  if (!scope?.r2_buckets?.some((item) => item.binding === 'ARTIFACTS')) {
+  if (requireR2 && !scope?.r2_buckets?.some((item) => item.binding === 'ARTIFACTS')) {
     throw new Error(`${name} missing ARTIFACTS R2 binding`);
   }
   if (!scope?.d1_databases?.some((item) => item.binding === 'DB')) {
@@ -39,8 +39,9 @@ function assertBinding(scope, name) {
   }
 }
 
-assertBinding(config, 'default');
-assertBinding(config.env?.preview, 'preview');
+assertBinding(config, 'default', { requireR2: true });
+assertBinding(config.env?.preview, 'preview', { requireR2: false });
+if (config.env?.preview?.r2_buckets?.length) throw new Error('visual-review preview must not enable R2');
 
 if (config.main !== 'src/runtime-entry.ts') throw new Error('Wrangler must use the corrected OPENAPI runtime entrypoint');
 if (config.vars?.APP_ENV !== 'production') throw new Error('default Worker environment must fail closed as production');
@@ -76,7 +77,7 @@ for (const required of ['WORKERS_CI_COMMIT_SHA','WORKERS_CI_BUILD_UUID','PREVIEW
 }
 if (previewBootstrap.indexOf("['deploy', '--env', 'preview'") > previewBootstrap.indexOf("['secret', 'bulk'")) throw new Error('preview bootstrap must create the Worker before attaching runtime secrets');
 
-for (const required of ['PREVIEW_BASE_URL','PREVIEW_SESSION_SIGNING_SECRET','VITE_TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY','EMAIL_API_URL','EMAIL_API_TOKEN','EMAIL_FROM','BASELINE_HORIZONS_URL','birthTimezone','Earth-geocenter observer `500@399`','never sent to a public geocoder','`defragapp/SOVV` is read-only reference material','D1 Edit','Queues Edit','Workers R2 Storage Edit','Workers Scripts Edit']) {
+for (const required of ['PREVIEW_BASE_URL','PREVIEW_SESSION_SIGNING_SECRET','VITE_TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY','EMAIL_API_URL','EMAIL_API_TOKEN','EMAIL_FROM','BASELINE_HORIZONS_URL','birthTimezone','Earth-geocenter observer `500@399`','never sent to a public geocoder','`defragapp/SOVV` is read-only reference material','D1 Edit','Queues Edit','Workers Scripts Edit','R2 is intentionally disabled for the visual-review preview']) {
   if (!cloudflareGuide.includes(required)) throw new Error(`Cloudflare build guide is missing ${required}`);
 }
 
@@ -142,4 +143,4 @@ for (const path of ['.github/workflows/preview-deploy.yml', '.github/workflows/l
   if (!workflow.includes('openai/gpt-5.5')) throw new Error(`${path} is missing the approved ZDR-cataloged model`);
 }
 
-console.log('Release config verified cloudflare_build=true d1=true durable_objects=true queues=true schedules=true r2=true ai=true assets=true openapi_baseline_engine_v2=true birthplace_external=false geocentric_observer=true model_context_sanitized=true ephemeral_current_location=true sovv_runtime_dependency=false canonical_preview_url=true runtime_secret_order=true auth_config=true relational_results=true revocation_ui=true three_person_system=true tier_smoke=true');
+console.log('Release config verified cloudflare_build=true d1=true durable_objects=true queues=true schedules=true production_r2=true preview_r2=false ai=true assets=true openapi_baseline_engine_v2=true birthplace_external=false geocentric_observer=true model_context_sanitized=true ephemeral_current_location=true sovv_runtime_dependency=false canonical_preview_url=true runtime_secret_order=true auth_config=true relational_results=true revocation_ui=true three_person_system=true tier_smoke=true');
