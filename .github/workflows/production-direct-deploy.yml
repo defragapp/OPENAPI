@@ -18,6 +18,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: sovereign-openapi-production
@@ -29,7 +30,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
+      - name: Mark deployment running
+        id: telemetry_start
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          BODY=$(cat <<EOF
+          Automated deployment telemetry for the current Sovereign.OS production release.
+
+          Status: running
+          Commit: ${GITHUB_SHA}
+          Run ID: ${GITHUB_RUN_ID}
+          Run attempt: ${GITHUB_RUN_ATTEMPT}
+          Workflow: ${GITHUB_WORKFLOW}
+          EOF
+          )
+          gh api --method PATCH "repos/${GITHUB_REPOSITORY}/issues/24" -f body="$BODY" -f state=open >/dev/null
+
       - name: Checkout exact commit without marketplace actions
+        id: checkout
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -40,6 +60,7 @@ jobs:
           git checkout --detach FETCH_HEAD
 
       - name: Select preinstalled Node 22
+        id: node
         run: |
           set -euo pipefail
           NODE22="$(find /opt/hostedtoolcache/node -mindepth 1 -maxdepth 1 -type d -name '22.*' | sort -V | tail -1)"
@@ -51,12 +72,14 @@ jobs:
           "$NODE22/x64/bin/node" --version
 
       - name: Enable Corepack and install dependencies
+        id: install
         run: |
           set -euo pipefail
           corepack enable
           pnpm install --frozen-lockfile
 
       - name: Verify and build exact production commit
+        id: verify
         env:
           VITE_TURNSTILE_SITE_KEY: 0x4AAAAAADhGIF8-iOLIg8MU
         run: |
@@ -64,6 +87,7 @@ jobs:
           pnpm verify:cloudflare-build
 
       - name: Require Cloudflare deployment credentials
+        id: credentials
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
         run: |
@@ -74,6 +98,7 @@ jobs:
           fi
 
       - name: Provision OPENAPI production resources and deploy sovv-web
+        id: deploy
         env:
           CLOUDFLARE_ACCOUNT_ID: 8b1954d216d65077c6480d62583fe2c2
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
@@ -84,6 +109,7 @@ jobs:
           node scripts/cloudflare-direct-production-deploy.mjs
 
       - name: Verify live production routes
+        id: live
         env:
           EXPECTED_SHA: ${{ github.sha }}
         run: |
@@ -107,6 +133,7 @@ jobs:
           exit 1
 
       - name: Deployment evidence
+        id: evidence
         if: always()
         run: |
           {
@@ -114,6 +141,7 @@ jobs:
             echo
             echo "- repository: ${GITHUB_REPOSITORY}"
             echo "- commit_sha: ${GITHUB_SHA}"
+            echo "- run_id: ${GITHUB_RUN_ID}"
             echo "- worker: sovv-web"
             echo "- public_url: https://sovereign.defrag.app"
             echo "- app_url: https://app.defrag.app"
@@ -130,3 +158,49 @@ jobs:
               echo '```'
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish deployment telemetry
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+          CHECKOUT_OUTCOME: ${{ steps.checkout.outcome }}
+          NODE_OUTCOME: ${{ steps.node.outcome }}
+          INSTALL_OUTCOME: ${{ steps.install.outcome }}
+          VERIFY_OUTCOME: ${{ steps.verify.outcome }}
+          CREDENTIALS_OUTCOME: ${{ steps.credentials.outcome }}
+          DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
+          LIVE_OUTCOME: ${{ steps.live.outcome }}
+        run: |
+          set -euo pipefail
+          BODY=$(cat <<EOF
+          Automated deployment telemetry for the current Sovereign.OS production release.
+
+          Status: ${JOB_STATUS}
+          Commit: ${GITHUB_SHA}
+          Run ID: ${GITHUB_RUN_ID}
+          Run attempt: ${GITHUB_RUN_ATTEMPT}
+
+          Step outcomes:
+          - checkout: ${CHECKOUT_OUTCOME}
+          - node: ${NODE_OUTCOME}
+          - install: ${INSTALL_OUTCOME}
+          - verify: ${VERIFY_OUTCOME}
+          - credentials: ${CREDENTIALS_OUTCOME}
+          - deploy: ${DEPLOY_OUTCOME}
+          - live verification: ${LIVE_OUTCOME}
+
+          Runtime contract:
+          - worker: sovv-web
+          - D1: sovereign-openapi-db
+          - Queue: disabled
+          - R2: disabled
+          - private exports: disabled
+          - sharing: public-link-only
+          EOF
+          )
+          if [ "$JOB_STATUS" = "success" ]; then
+            gh api --method PATCH "repos/${GITHUB_REPOSITORY}/issues/24" -f body="$BODY" -f state=closed -f state_reason=completed >/dev/null
+          else
+            gh api --method PATCH "repos/${GITHUB_REPOSITORY}/issues/24" -f body="$BODY" -f state=open >/dev/null
+          fi
