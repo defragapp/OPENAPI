@@ -4,6 +4,7 @@ import { getEntitlements, requireFeature } from '../db/entitlements';
 import { resolveExistingIdentity } from '../adapters/sovv';
 
 const encoder = new TextEncoder();
+const MAX_SESSION_TOKEN_LENGTH = 4096;
 
 function unauthorized(): never {
   throw new Response('Unauthorized', { status: 401 });
@@ -45,13 +46,23 @@ export async function requireAuth(request: Request, env: Env): Promise<AuthConte
 
   const header = request.headers.get('authorization');
   const token = header?.startsWith('Bearer ') ? header.slice('Bearer '.length) : readCookie(request, '__Host-sovereign_session');
-  if (!token) unauthorized();
-  const [payloadPart, signaturePart] = token.split('.');
-  if (!payloadPart || !signaturePart || !env.SESSION_SIGNING_SECRET) unauthorized();
-  const ok = await verifySignature(payloadPart, signaturePart, env.SESSION_SIGNING_SECRET);
-  if (!ok) unauthorized();
-  const payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(payloadPart))) as { sub?: string; exp?: number; sid?: string };
-  if (!payload.sub || (payload.exp && payload.exp < Math.floor(Date.now() / 1000))) unauthorized();
+  if (!token || token.length > MAX_SESSION_TOKEN_LENGTH || !env.SESSION_SIGNING_SECRET) unauthorized();
+
+  let payload: { sub?: string; exp?: number; sid?: string };
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 2) unauthorized();
+    const [payloadPart, signaturePart] = parts;
+    if (!payloadPart || !signaturePart) unauthorized();
+    const ok = await verifySignature(payloadPart, signaturePart, env.SESSION_SIGNING_SECRET);
+    if (!ok) unauthorized();
+    payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(payloadPart))) as { sub?: string; exp?: number; sid?: string };
+  } catch (error) {
+    if (error instanceof Response) throw error;
+    unauthorized();
+  }
+
+  if (!payload.sub || typeof payload.sub !== 'string' || (payload.exp && payload.exp < Math.floor(Date.now() / 1000))) unauthorized();
   if (payload.sid) {
     const session = await env.DB.prepare('SELECT revoked_at, expires_at FROM auth_sessions WHERE id = ?').bind(payload.sid).first<{ revoked_at?: string | null; expires_at: string }>();
     if (!session || session.revoked_at || Date.parse(session.expires_at) < Date.now()) unauthorized();
@@ -77,7 +88,6 @@ async function requireRouteEntitlement(request: Request, env: Env, accountId: st
   else if (/^\/api\/v1\/systems(?:\/|$)/.test(pathname) && method !== 'GET') feature = 'systems.family';
   else if (/^\/api\/v1\/systems\/[^/]+\/(alignment|analysis)$/.test(pathname)) feature = 'systems.family';
   else if (/^\/api\/v1\/library(?:\/|$)/.test(pathname) && ['POST', 'PATCH', 'PUT'].includes(method)) feature = 'library.continuity';
-  else if (pathname === '/api/v1/export-jobs' && method === 'POST') feature = 'export.full';
 
   if (!feature) return;
   const entitlements = await getEntitlements(env, accountId);
