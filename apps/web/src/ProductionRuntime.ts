@@ -2,6 +2,7 @@ const SUPPORT_URL = 'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02';
 const PUBLIC_SHARE_URL = 'https://sovereign.defrag.app';
 const TERMS_URL = `${PUBLIC_SHARE_URL}/terms`;
 const PRIVACY_URL = `${PUBLIC_SHARE_URL}/privacy`;
+const PRODUCTION_TURNSTILE_SITE_KEY = '0x4AAAAAADhGIF8-iOLIg8MU';
 const STRIPE_HANDOFF_HOSTS = new Set(['checkout.stripe.com', 'billing.stripe.com']);
 
 type TurnstileApi = {
@@ -22,7 +23,7 @@ export function installProductionRuntime(): void {
 }
 
 function installTurnstile(): void {
-  const siteKey = String(import.meta.env.VITE_TURNSTILE_SITE_KEY || '').trim();
+  const siteKey = String(import.meta.env.VITE_TURNSTILE_SITE_KEY || PRODUCTION_TURNSTILE_SITE_KEY).trim();
   if (!siteKey) {
     if (import.meta.env.PROD) queueMicrotask(() => showNotice('Sign-in protection is not configured.'));
     return;
