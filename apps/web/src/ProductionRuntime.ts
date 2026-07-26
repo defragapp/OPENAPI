@@ -1,6 +1,5 @@
 const SUPPORT_URL = 'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02';
-const EXPORT_POLL_INTERVAL_MS = 2_000;
-const EXPORT_POLL_ATTEMPTS = 30;
+const PUBLIC_SHARE_URL = 'https://sovereign.defrag.app';
 
 type TurnstileApi = {
   render: (container: HTMLElement, options: Record<string, unknown>) => string;
@@ -16,7 +15,7 @@ declare global {
 export function installProductionRuntime(): void {
   installTurnstile();
   installFetchObserver();
-  installSupportLinks();
+  installUtilityLinks();
 }
 
 function installTurnstile(): void {
@@ -76,7 +75,6 @@ function installFetchObserver(): void {
   window.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const response = await nativeFetch(input, init);
     const requestUrl = resolveRequestUrl(input);
-    const method = String(init?.method || (input instanceof Request ? input.method : 'GET')).toUpperCase();
 
     if (requestUrl.origin === location.origin && requestUrl.pathname.startsWith('/api/')) {
       if (response.status === 401 && isWorkspaceLocation()) {
@@ -86,43 +84,13 @@ function installFetchObserver(): void {
       if (response.ok && requestUrl.pathname.startsWith('/api/v1/auth/logout')) {
         setTimeout(() => location.assign('/login'), 50);
       }
-
-      if (response.ok && method === 'POST' && requestUrl.pathname === '/api/v1/export-jobs') {
-        void response.clone().json()
-          .then((payload: { exportJob?: { id?: string } }) => {
-            const jobId = payload.exportJob?.id;
-            if (jobId) void monitorExport(nativeFetch, jobId);
-          })
-          .catch(() => undefined);
-      }
     }
 
     return response;
   }) as typeof window.fetch;
 }
 
-async function monitorExport(nativeFetch: typeof window.fetch, jobId: string): Promise<void> {
-  showNotice('Preparing your private export…');
-  for (let attempt = 0; attempt < EXPORT_POLL_ATTEMPTS; attempt += 1) {
-    await delay(EXPORT_POLL_INTERVAL_MS);
-    const response = await nativeFetch(`/api/v1/export-jobs/${encodeURIComponent(jobId)}`, {
-      headers: { accept: 'application/json' }
-    });
-    if (!response.ok) continue;
-    const payload = await response.json() as { exportJob?: { status?: string; downloadUrl?: string } };
-    if (payload.exportJob?.status === 'completed' && payload.exportJob.downloadUrl) {
-      showNotice('Your export is ready.', payload.exportJob.downloadUrl, 'Download private export');
-      return;
-    }
-    if (payload.exportJob?.status === 'failed') {
-      showNotice('The export could not be completed. Try again later.');
-      return;
-    }
-  }
-  showNotice('Your export is still processing. You can request it again from You → Control.');
-}
-
-function installSupportLinks(): void {
+function installUtilityLinks(): void {
   const render = () => {
     const footerNav = document.querySelector<HTMLElement>('.launch-footer nav');
     if (footerNav && !footerNav.querySelector('[data-sovereign-support]')) {
@@ -130,18 +98,68 @@ function installSupportLinks(): void {
     }
 
     document.querySelectorAll<HTMLElement>('.surface-card').forEach((card) => {
-      if (card.querySelector('.eyebrow')?.textContent?.trim() !== 'PLAN & USAGE') return;
-      const actions = card.querySelector<HTMLElement>('.action-row');
-      if (actions && !actions.querySelector('[data-sovereign-support]')) {
-        const link = createSupportLink('Support development');
-        link.className = 'secondary-button';
-        actions.appendChild(link);
-      }
+      const eyebrow = card.querySelector('.eyebrow')?.textContent?.trim();
+      if (eyebrow === 'PLAN & USAGE') installWorkspaceSupportLink(card);
+      if (eyebrow === 'CONTROL') replaceExportWithShare(card);
     });
   };
 
   new MutationObserver(render).observe(document.documentElement, { childList: true, subtree: true });
   render();
+}
+
+function installWorkspaceSupportLink(card: HTMLElement): void {
+  const actions = card.querySelector<HTMLElement>('.action-row');
+  if (!actions || actions.querySelector('[data-sovereign-support]')) return;
+  const link = createSupportLink('Support development');
+  link.className = 'secondary-button';
+  actions.appendChild(link);
+}
+
+function replaceExportWithShare(card: HTMLElement): void {
+  if (card.querySelector('[data-sovereign-share]')) return;
+  const rows = [...card.querySelectorAll<HTMLElement>('.settings-list > div')];
+  const exportRow = rows.find((row) => row.querySelector('strong')?.textContent?.trim() === 'Export');
+  if (!exportRow) return;
+
+  const row = document.createElement('div');
+  row.dataset.sovereignShare = 'true';
+
+  const description = document.createElement('span');
+  const title = document.createElement('strong');
+  const detail = document.createElement('small');
+  title.textContent = 'Share';
+  detail.textContent = 'Share the public Sovereign.OS link. No private workspace data is included.';
+  description.append(title, detail);
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = 'Share';
+  button.addEventListener('click', () => void sharePublicPlatform());
+
+  row.append(description, button);
+  exportRow.replaceWith(row);
+}
+
+async function sharePublicPlatform(): Promise<void> {
+  const data = {
+    title: 'Sovereign.OS',
+    text: 'See what is really happening without losing yourself inside it.',
+    url: PUBLIC_SHARE_URL
+  };
+
+  try {
+    if (navigator.share) {
+      await navigator.share(data);
+      showNotice('Sovereign.OS shared. No private workspace data was included.');
+      return;
+    }
+    await navigator.clipboard.writeText(PUBLIC_SHARE_URL);
+    showNotice('Public Sovereign.OS link copied. No private workspace data was included.');
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') return;
+    showNotice('Sharing is unavailable in this browser.', PUBLIC_SHARE_URL, 'Open public site');
+  }
 }
 
 function createSupportLink(label: string): HTMLAnchorElement {
@@ -200,8 +218,4 @@ function isWorkspaceLocation(): boolean {
   return location.pathname === '/app'
     || location.pathname.startsWith('/app/')
     || !['/', '/login', '/signup', '/auth/redeem', '/invitation', '/privacy', '/terms'].includes(location.pathname);
-}
-
-function delay(milliseconds: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
