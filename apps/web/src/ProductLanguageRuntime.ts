@@ -53,22 +53,23 @@ const replacements = new Map<string, string>([
   ['Build my Baseline', 'Explore my Baseline']
 ]);
 
+function replaceTextNode(node: Text): void {
+  const raw = node.nodeValue ?? '';
+  const trimmed = raw.trim();
+  const replacement = replacements.get(trimmed);
+  if (!replacement) return;
+  const start = raw.indexOf(trimmed);
+  node.nodeValue = `${raw.slice(0, start)}${replacement}${raw.slice(start + trimmed.length)}`;
+}
+
 function replaceText(root: Node): void {
+  if (root.nodeType === Node.TEXT_NODE) replaceTextNode(root as Text);
+
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  const nodes: Text[] = [];
   let current = walker.nextNode();
   while (current) {
-    nodes.push(current as Text);
+    replaceTextNode(current as Text);
     current = walker.nextNode();
-  }
-
-  for (const node of nodes) {
-    const raw = node.nodeValue ?? '';
-    const trimmed = raw.trim();
-    const replacement = replacements.get(trimmed);
-    if (!replacement) continue;
-    const start = raw.indexOf(trimmed);
-    node.nodeValue = `${raw.slice(0, start)}${replacement}${raw.slice(start + trimmed.length)}`;
   }
 }
 
