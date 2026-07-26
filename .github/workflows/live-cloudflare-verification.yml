@@ -1,6 +1,8 @@
 name: Live Cloudflare Verification
 
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -8,16 +10,20 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: live-cloudflare-verification-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify-live:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     env:
       EXPECTED_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
       PUBLIC_BASE: https://sovereign.defrag.app
       APP_BASE: https://app.defrag.app
     steps:
-      - name: Verify deployed commit and every production page
+      - name: Verify deployed commit, auth boundaries, billing safety, and production pages
         shell: bash
         run: |
           python - <<'PY'
@@ -32,22 +38,26 @@ jobs:
           public_base = os.environ['PUBLIC_BASE'].rstrip('/')
           app_base = os.environ['APP_BASE'].rstrip('/')
 
-          def fetch(url, follow=True):
+          def fetch(url, *, follow=True, method='GET', headers=None, body=None):
               class NoRedirect(urllib.request.HTTPRedirectHandler):
-                  def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  def redirect_request(self, req, fp, code, msg, response_headers, newurl):
                       return None
               opener = urllib.request.build_opener() if follow else urllib.request.build_opener(NoRedirect())
-              request = urllib.request.Request(url, headers={'User-Agent': 'Sovereign.OS production verifier'})
+              request_headers = {'User-Agent': 'Sovereign.OS production verifier', **(headers or {})}
+              payload = body.encode('utf-8') if isinstance(body, str) else body
+              request = urllib.request.Request(url, data=payload, headers=request_headers, method=method)
               try:
                   with opener.open(request, timeout=20) as response:
                       return response.status, {k.lower(): v for k, v in response.headers.items()}, response.read().decode('utf-8', 'replace')
               except urllib.error.HTTPError as error:
                   return error.code, {k.lower(): v for k, v in error.headers.items()}, error.read().decode('utf-8', 'replace')
+              except urllib.error.URLError as error:
+                  return 0, {}, str(error.reason)
 
           ready_payload = None
           last_ready = ''
-          for attempt in range(24):
-              status, headers, body = fetch(f'{app_base}/ready')
+          for attempt in range(60):
+              status, _, body = fetch(f'{app_base}/ready')
               last_ready = f'status={status} body={body[:500]}'
               try:
                   payload = json.loads(body)
@@ -60,6 +70,18 @@ jobs:
 
           if ready_payload is None:
               raise SystemExit(f'Cloudflare did not converge to {expected}: {last_ready}')
+
+          health_status, health_headers, health_body = fetch(f'{app_base}/health')
+          if health_status != 200:
+              raise SystemExit(f'Health returned {health_status}: {health_body[:500]}')
+          try:
+              health_payload = json.loads(health_body)
+          except json.JSONDecodeError as error:
+              raise SystemExit(f'Health returned invalid JSON: {error}')
+          if health_payload.get('version') != expected:
+              raise SystemExit(f'Health version mismatch: {health_payload.get("version")}')
+          if health_payload.get('ok') is not True:
+              raise SystemExit(f'Health is not ok: {health_body[:500]}')
 
           public_routes = [
               '/', '/how-it-works.html', '/how-it-works', '/pricing.html', '/pricing',
@@ -90,6 +112,8 @@ jobs:
               'public:/pricing.html': [
                   'Begin with yourself. Expand to every relationship and system your life includes.',
                   'Complete private Baseline Design',
+                  '$20',
+                  '$99',
                   'Optional Covenant lens with Christian teaching and biblical scripture',
                   '/launch-polish.css?v=20260726-final-r1'
               ],
@@ -128,6 +152,25 @@ jobs:
               if fingerprint not in asset_body:
                   raise SystemExit(f'Compiled application is missing: {fingerprint}')
 
+          intelligence_js_status, _, intelligence_js = fetch(f'{app_base}/intelligence-ui.js?v=20260726-baseline-first-r1')
+          intelligence_css_status, _, intelligence_css = fetch(f'{app_base}/intelligence-ui.css?v=20260726-baseline-first-r1')
+          if intelligence_js_status != 200 or intelligence_css_status != 200:
+              raise SystemExit('Baseline-first intelligence assets are unavailable')
+          for fingerprint in [
+              'YOUR BASELINE, ALIVE TODAY',
+              'ALIGNMENT NEEDLE',
+              'SHADOW–LIGHT RAIL',
+              'TWO PEOPLE · TWO BASELINES',
+              'SEE THE WHOLE SYSTEM',
+              'sovereign-context-bar',
+              'structured-response-card'
+          ]:
+              if fingerprint not in intelligence_js:
+                  raise SystemExit(f'Intelligence runtime is missing: {fingerprint}')
+          for fingerprint in ['prefers-reduced-motion', 'prefers-contrast: more', '@media (max-width: 720px)']:
+              if fingerprint not in intelligence_css:
+                  raise SystemExit(f'Intelligence stylesheet is missing: {fingerprint}')
+
           polish_status, _, polish_body = fetch(f'{public_base}/launch-polish.css?v=20260726-final-r1')
           if polish_status != 200 or 'prefers-reduced-motion' not in polish_body or 'animation-timeline: view()' not in polish_body:
               raise SystemExit('Public polish stylesheet is unavailable or incomplete')
@@ -147,6 +190,51 @@ jobs:
 
           if 'immutable' not in asset_headers.get('cache-control', '').lower():
               raise SystemExit('Compiled JavaScript is not served with immutable caching')
+          if 'no-store' not in health_headers.get('cache-control', '').lower():
+              raise SystemExit('Health is not served with no-store caching')
+
+          session_status, _, _ = fetch(f'{app_base}/api/v1/auth/session', follow=False)
+          account_status, _, _ = fetch(f'{app_base}/api/v1/you', follow=False)
+          checkout_status, _, _ = fetch(
+              f'{app_base}/api/v1/billing/checkout',
+              follow=False,
+              method='POST',
+              headers={
+                  'origin': app_base,
+                  'content-type': 'application/json',
+                  'x-idempotency-key': f'live-verifier-{expected[:16]}'
+              },
+              body=json.dumps({'interval': 'monthly'})
+          )
+          webhook_status, _, _ = fetch(
+              f'{app_base}/api/v1/stripe/webhook',
+              follow=False,
+              method='POST',
+              headers={'content-type': 'application/json', 'stripe-signature': 't=0,v1=invalid'},
+              body=json.dumps({'id': 'evt_live_verifier_invalid', 'type': 'customer.subscription.updated', 'data': {'object': {}}})
+          )
+          signup_status, _, _ = fetch(
+              f'{app_base}/api/v1/auth/signup',
+              follow=False,
+              method='POST',
+              headers={'origin': app_base, 'content-type': 'application/json'},
+              body=json.dumps({
+                  'email': f'live-verifier-{expected[:12]}@example.invalid',
+                  'name': 'Production Verifier',
+                  'termsAccepted': True
+              })
+          )
+
+          if session_status != 401:
+              raise SystemExit(f'Unauthenticated session returned {session_status}')
+          if account_status != 401:
+              raise SystemExit(f'Unauthenticated account returned {account_status}')
+          if checkout_status != 401:
+              raise SystemExit(f'Unauthenticated checkout returned {checkout_status}')
+          if webhook_status != 400:
+              raise SystemExit(f'Invalid Stripe signature returned {webhook_status}')
+          if signup_status != 400:
+              raise SystemExit(f'Signup without Turnstile returned {signup_status}')
 
           summary = os.environ.get('GITHUB_STEP_SUMMARY')
           if summary:
@@ -156,8 +244,10 @@ jobs:
                   output.write(f'- Migration: `{ready_payload.get("migrationVersion")}`\n')
                   output.write(f'- Public routes checked: {len(public_routes)}\n')
                   output.write(f'- App routes checked: {len(app_routes)}\n')
-                  output.write('- Product-language fingerprints: passed\n')
-                  output.write('- Motion and reduced-motion assets: passed\n')
+                  output.write('- Authentication boundaries: passed\n')
+                  output.write('- Stripe signature and checkout boundary: passed\n')
+                  output.write('- Baseline-first intelligence assets: passed\n')
+                  output.write('- Product language, motion, and reduced-motion assets: passed\n')
                   output.write('- Security headers and immutable assets: passed\n')
 
           print(json.dumps({
@@ -165,6 +255,9 @@ jobs:
               'version': ready_payload.get('version'),
               'migrationVersion': ready_payload.get('migrationVersion'),
               'publicRoutes': len(public_routes),
-              'appRoutes': len(app_routes)
+              'appRoutes': len(app_routes),
+              'authBoundaries': 'passed',
+              'stripeBoundary': 'passed',
+              'intelligenceAssets': 'passed'
           }, indent=2))
           PY
