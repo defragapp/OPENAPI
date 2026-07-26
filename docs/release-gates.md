@@ -55,7 +55,7 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 
 ## Reliability
 
-- CI is green for the exact preview commit.
+- CI or Cloudflare Workers Builds is green for the exact preview commit.
 - D1 migrations apply locally and remotely.
 - Thread ordering survives concurrent requests.
 - Invitation redemption and consent decisions are race-safe and one-time.
@@ -63,7 +63,10 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Traces correlate by thread and request ID.
 - Request rate limits, bounded pagination, provider timeouts, and spend limits are verified.
 - Scheduled retention cleanup is tested at the 30-day and 90-day boundaries.
-- Rollback instructions and the previous Worker version are documented.
+- A production version is uploaded without receiving traffic before promotion.
+- Migration compatibility and D1 backup evidence are recorded separately from Worker version promotion.
+- Rollback instructions, the previous Worker version, and its rollback version ID are documented.
+- Production promotion is bound to the exact uploaded version ID and exact approved commit SHA.
 
 ## UX
 
@@ -88,4 +91,7 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Free allowance, paid upgrade, cancellation, and Free fallback smoke evidence.
 - Export, deletion grace, immediate thread deletion, and scheduled retention evidence.
 - Reviewed Terms and Privacy documents matching actual behavior.
+- Production candidate metadata containing the exact uploaded version ID.
+- Previous stable Worker and rollback version ID.
+- Migration list and D1 backup confirmation for the exact commit.
 - Explicit founder approval before production deployment.
