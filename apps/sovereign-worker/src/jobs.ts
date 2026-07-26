@@ -1,4 +1,5 @@
 import type { Env } from './env';
+import { cancelAccountSubscriptions } from './billing/stripe';
 
 const ACCOUNT_TABLE_DELETES = [
   'auth_magic_links',
@@ -81,14 +82,21 @@ export async function runOneJob(env: Env, id: string, expectedKind?: string, exp
   if ((claimed.meta?.changes ?? 0) === 0) return { id, status: 'skipped' };
 
   try {
-    if (row.kind === 'export.generate') throw new Error('private_export_disabled');
-    if (row.kind === 'deletion.execute') await executeDeletion(env, requiredAccount(accountId), String(payload.deletionJobId ?? ''));
-    if (row.kind === 'cleanup.expired') await cleanupExpired(env);
-    if (row.kind === 'stripe.retry') {
-      await env.DB.prepare(`UPDATE webhook_events SET processed_at = COALESCE(processed_at, datetime('now'))
-        WHERE provider = 'stripe' AND event_id = ?`).bind(String(payload.eventId)).run();
+    switch (row.kind) {
+      case 'deletion.execute':
+        await executeDeletion(env, requiredAccount(accountId), String(payload.deletionJobId ?? ''));
+        break;
+      case 'cleanup.expired':
+        await cleanupExpired(env);
+        break;
+      case 'export.generate':
+        throw new Error('private_export_disabled');
+      case 'stripe.retry':
+        throw new Error('stripe_retry_requires_original_signed_delivery');
+      default:
+        throw new Error('unsupported_background_job');
     }
-    await env.DB.prepare(`UPDATE background_jobs SET status = 'completed', updated_at = datetime('now')
+    await env.DB.prepare(`UPDATE background_jobs SET status = 'completed', last_error = NULL, updated_at = datetime('now')
       WHERE id = ?`).bind(id).run();
     return { id, status: 'completed' };
   } catch (error) {
@@ -109,14 +117,24 @@ function requiredAccount(accountId?: string) {
 }
 
 export async function executeDeletion(env: Env, accountId: string, deletionJobId?: string) {
-  const claimed = await env.DB.prepare(`UPDATE deletion_jobs SET status = 'running'
+  const deletion = await env.DB.prepare(`SELECT id, status FROM deletion_jobs
     WHERE account_id = ?
-      AND status = 'grace'
+      AND status IN ('grace','running')
       AND scheduled_for <= datetime('now')
-      AND (? = '' OR id = ?)`)
+      AND (? = '' OR id = ?)
+    ORDER BY requested_at DESC LIMIT 1`)
     .bind(accountId, deletionJobId ?? '', deletionJobId ?? '')
-    .run();
-  if ((claimed.meta?.changes ?? 0) === 0) throw new Error('deletion_not_due_or_cancelled');
+    .first<{ id: string; status: string }>();
+  if (!deletion) throw new Error('deletion_not_due_or_cancelled');
+
+  if (deletion.status === 'grace') {
+    await cancelAccountSubscriptions(env, accountId, deletion.id);
+    const claimed = await env.DB.prepare(`UPDATE deletion_jobs SET status = 'running'
+      WHERE id = ? AND account_id = ? AND status = 'grace' AND scheduled_for <= datetime('now')`)
+      .bind(deletion.id, accountId)
+      .run();
+    if ((claimed.meta?.changes ?? 0) === 0) throw new Error('deletion_claim_lost');
+  }
 
   await env.DB.prepare(`UPDATE stripe_subscriptions SET status = 'retained_billing_record', updated_at = datetime('now')
     WHERE account_id = ?`).bind(accountId).run();
@@ -132,7 +150,7 @@ export async function executeDeletion(env: Env, accountId: string, deletionJobId
     .bind(accountId)
     .run();
   await env.DB.prepare(`UPDATE deletion_jobs SET status = 'completed', completed_at = datetime('now')
-    WHERE account_id = ? AND status = 'running'`).bind(accountId).run();
+    WHERE id = ? AND account_id = ? AND status = 'running'`).bind(deletion.id, accountId).run();
 }
 
 export async function cancelDeletion(env: Env, accountId: string, jobId: string) {
@@ -187,7 +205,7 @@ export function deletionInventory(): string[] {
     'consent_grants:cascade-via-persons',
     'system_memberships:cascade-via-persons-and-systems',
     'thread_events:cascade-via-threads',
-    'stripe_subscriptions:retained-with-opaque-account-key',
+    'stripe_subscriptions:cancelled-before-retention',
     'stripe_customers:email-removed',
     'background_jobs:minimized'
   ];
