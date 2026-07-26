@@ -1,6 +1,0 @@
-# Required for the initial isolated visual-review deployment.
-# Generate a new random value and do not reuse a production secret.
-SESSION_SIGNING_SECRET=
-
-# Add Turnstile, email, and Stripe test-mode secrets later through
-# Worker Settings → Variables and Secrets before testing those flows.
