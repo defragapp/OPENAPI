@@ -15,4 +15,6 @@ coverage/
 .tmp/
 
 preview-deployment.json
+production-candidate.json
 apps/sovereign-worker/.wrangler.preview.generated.jsonc
+apps/sovereign-worker/.wrangler.production.generated.jsonc
