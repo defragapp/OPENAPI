@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  cancelAccountSubscriptions,
   createCheckoutSession,
   createPortalSession,
   normalizeStripeFixtureEvent,
@@ -9,7 +10,12 @@ import {
 } from './stripe';
 import type { Env } from '../env';
 
-function envWithRecorder(options: { customerId?: string; lastEventCreated?: number } = {}) {
+function envWithRecorder(options: {
+  customerId?: string;
+  lastEventCreated?: number;
+  authSubject?: string;
+  subscriptions?: Array<{ stripe_subscription_id: string; status: string }>;
+} = {}) {
   const writes: unknown[][] = [];
   let lastEventCreated = options.lastEventCreated ?? -1;
   const env = {
@@ -31,13 +37,21 @@ function envWithRecorder(options: { customerId?: string; lastEventCreated?: numb
                 return { success: true, meta: { changes: 1 } };
               },
               async first() {
+                if (sql.startsWith('SELECT auth_subject FROM accounts')) {
+                  return { auth_subject: options.authSubject ?? 'email:user@example.com' };
+                }
                 if (sql.includes("status IN ('active','trialing')")) return null;
                 if (sql.startsWith('SELECT stripe_customer_id')) {
                   return options.customerId ? { stripe_customer_id: options.customerId } : null;
                 }
                 return null;
               },
-              async all() { return { results: [] }; }
+              async all() {
+                if (sql.includes('SELECT stripe_subscription_id, status FROM stripe_subscriptions')) {
+                  return { results: options.subscriptions ?? [] };
+                }
+                return { results: [] };
+              }
             };
           }
         };
@@ -69,8 +83,8 @@ describe('Stripe launch billing adapter', () => {
     });
     const projection = await projectSubscriptionEvent(env, event);
     expect(projection).toMatchObject({ applied: true, plan: 'sovereign_plus' });
-    expect(projection.features?.['people.compare']).toBe(true);
-    expect(projection.features?.['covenant.lens']).toBe(true);
+    expect('features' in projection && projection.features?.['people.compare']).toBe(true);
+    expect('features' in projection && projection.features?.['covenant.lens']).toBe(true);
     expect(writes.some((write) => String(write[0]).includes('entitlement_cache'))).toBe(true);
   });
 
@@ -89,6 +103,43 @@ describe('Stripe launch billing adapter', () => {
     expect(await projectSubscriptionEvent(env, older)).toEqual({ applied: false, stale: true });
     const entitlementWrites = writes.filter((write) => String(write[0]).includes('entitlement_cache'));
     expect(entitlementWrites).toHaveLength(1);
+  });
+
+  it('never restores entitlements for an account already deleted', async () => {
+    const { env, writes } = envWithRecorder({ authSubject: 'deleted:acct_1' });
+    const event = normalizeStripeFixtureEvent(env, {
+      id: 'evt_delayed',
+      type: 'customer.subscription.updated',
+      accountId: 'acct_1',
+      priceId: 'price_test_sovereign_monthly',
+      status: 'active',
+      created: 300
+    });
+    expect(await projectSubscriptionEvent(env, event)).toMatchObject({ applied: false, deletedAccount: true, plan: 'free' });
+    expect(writes.some((write) => String(write[0]).includes('entitlement_cache'))).toBe(false);
+    expect(writes.some((write) => String(write[0]).includes('retained_billing_record'))).toBe(true);
+  });
+
+  it('cancels nonterminal Stripe subscriptions idempotently before deletion', async () => {
+    const { env, writes } = envWithRecorder({
+      subscriptions: [
+        { stripe_subscription_id: 'sub_active_1', status: 'active' },
+        { stripe_subscription_id: 'sub_done_1', status: 'canceled' }
+      ]
+    });
+    Object.assign(env, { STRIPE_SECRET_KEY: 'sk_fixture' });
+    const requests: Array<{ url: string; method?: string; idempotency: string | null }> = [];
+    vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
+      requests.push({ url, method: init?.method, idempotency: new Headers(init?.headers).get('idempotency-key') });
+      return Response.json({ id: 'sub_active_1', status: 'canceled' });
+    }));
+
+    expect(await cancelAccountSubscriptions(env, 'acct_1', 'delete_1')).toEqual({ cancelled: 1 });
+    expect(requests).toHaveLength(1);
+    expect(requests[0]).toMatchObject({ method: 'DELETE' });
+    expect(requests[0]?.url).toContain('/subscriptions/sub_active_1');
+    expect(requests[0]?.idempotency).toContain('delete-delete_1-sub_active_1');
+    expect(writes.some((write) => String(write[0]).includes("plan = 'free'"))).toBe(true);
   });
 
   it('creates deterministic local Checkout and Portal handoffs', async () => {
