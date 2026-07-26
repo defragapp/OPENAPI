@@ -31,7 +31,10 @@ for (const required of [
   "'versions', 'deploy'",
   "['rollback', rollbackVersion",
   "['secret', 'list'",
+  "'--format', 'json'",
   "['d1', 'migrations', 'apply'",
+  'mkdirSync(tmpDir, { recursive: true })',
+  'const wranglerArgs = configPath ? [...args, \'--config\', configPath] : args',
   'trafficPromoted: false',
   'this release tool never creates production storage',
   'Production release requires an exact clean commit',
@@ -44,7 +47,8 @@ for (const forbidden of [
   "d1', 'create'",
   "secret', 'bulk'",
   'STRIPE_SECRET_KEY: process.env',
-  'SESSION_SIGNING_SECRET: process.env'
+  'SESSION_SIGNING_SECRET: process.env',
+  "], resolve(workerDir, 'wrangler.jsonc'))"
 ]) {
   if (script.includes(forbidden)) throw new Error(`Production release script contains unsafe operation ${forbidden}`);
 }
@@ -78,4 +82,4 @@ for (const required of [
   if (!ignore.includes(required)) throw new Error(`.gitignore is missing ${required}`);
 }
 
-console.log('Production release path verified candidate_upload=true traffic_promotion_separate=true commit_bound_approval=true migration_gate=true existing_resources_only=true secret_values_not_uploaded=true rollback_recorded=true');
+console.log('Production release path verified candidate_upload=true traffic_promotion_separate=true commit_bound_approval=true migration_gate=true existing_resources_only=true secret_values_not_uploaded=true rollback_recorded=true current_wrangler_cli=true');
