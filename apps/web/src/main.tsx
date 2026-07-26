@@ -5,6 +5,7 @@ import { AppErrorBoundary } from './AppErrorBoundary';
 import { ProductCompletionLayer, installProductRuntime } from './ProductCompletionLayer';
 import { installBaselineInputRuntime } from './BaselineInputRuntime';
 import { installProductionRuntime } from './ProductionRuntime';
+import { installProductLanguageRuntime } from './ProductLanguageRuntime';
 import { PublicLanding } from './PublicLanding';
 import { PublicPolicy } from './PublicPolicy';
 import './styles.css';
@@ -14,6 +15,7 @@ import './public-landing.css';
 installProductionRuntime();
 installProductRuntime();
 installBaselineInputRuntime();
+installProductLanguageRuntime();
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   if (location.hostname === 'sovereign.defrag.app') {
