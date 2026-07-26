@@ -30,9 +30,12 @@ for (const required of [
   "['versions', 'upload'",
   "'versions', 'deploy'",
   "['rollback', rollbackVersion",
+  "'--message', `Rollback Sovereign.OS to ${rollbackVersion}`",
   "['secret', 'list'",
   "'--format', 'json'",
   "['d1', 'migrations', 'apply'",
+  "const noProvisionFlags = ['--experimental-provision=false', '--experimental-auto-create=false']",
+  "'--yes'",
   'mkdirSync(tmpDir, { recursive: true })',
   'const wranglerArgs = configPath ? [...args, \'--config\', configPath] : args',
   'trafficPromoted: false',
@@ -64,7 +67,8 @@ for (const required of [
   'PRODUCTION_RELEASE_APPROVAL=promote:<40-character-commit-sha>:<version-id>',
   'PRODUCTION_RELEASE_APPROVAL=rollback:<version-id>',
   'Cloudflare Worker versions do not roll back D1 or R2 state',
-  'Do not use a gradual traffic split for this static-asset application unless version affinity is configured'
+  'Do not use a gradual traffic split for this static-asset application unless version affinity is configured',
+  'automatic resource provisioning disabled'
 ]) {
   if (!guide.includes(required)) throw new Error(`Production release guide is missing ${required}`);
 }
@@ -82,4 +86,4 @@ for (const required of [
   if (!ignore.includes(required)) throw new Error(`.gitignore is missing ${required}`);
 }
 
-console.log('Production release path verified candidate_upload=true traffic_promotion_separate=true commit_bound_approval=true migration_gate=true existing_resources_only=true secret_values_not_uploaded=true rollback_recorded=true current_wrangler_cli=true');
+console.log('Production release path verified candidate_upload=true traffic_promotion_separate=true commit_bound_approval=true migration_gate=true existing_resources_only=true automatic_provisioning=false secret_values_not_uploaded=true rollback_recorded=true current_wrangler_cli=true non_interactive=true');
