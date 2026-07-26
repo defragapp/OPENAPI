@@ -92,6 +92,8 @@ function installFetchObserver(): void {
 
 function installUtilityLinks(): void {
   const render = () => {
+    replaceLegacyExportCopy();
+
     const footerNav = document.querySelector<HTMLElement>('.launch-footer nav');
     if (footerNav && !footerNav.querySelector('[data-sovereign-support]')) {
       footerNav.appendChild(createSupportLink('Support Sovereign.OS'));
@@ -106,6 +108,14 @@ function installUtilityLinks(): void {
 
   new MutationObserver(render).observe(document.documentElement, { childList: true, subtree: true });
   render();
+}
+
+function replaceLegacyExportCopy(): void {
+  document.querySelectorAll<HTMLElement>('.launch-callout p').forEach((paragraph) => {
+    const copy = paragraph.textContent ?? '';
+    if (!copy.includes('Covenant, and export for')) return;
+    paragraph.textContent = copy.replace('Covenant, and export for', 'Covenant, and consent-aware sharing for');
+  });
 }
 
 function installWorkspaceSupportLink(card: HTMLElement): void {
