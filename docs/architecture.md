@@ -8,6 +8,19 @@ The production architecture is a TypeScript-first monorepo in `defragapp/OPENAPI
 
 The first release is Baseline-first. It must become useful without asking the user to explain an incident. The system begins with the authenticated user's Baseline Design, permitted location and current-sky context, and then allows natural-language exploration across self, people, relationships, and systems.
 
+## Deployment authority
+
+Production deployment uses Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` on `main`.
+
+- Worker: `sovv-web`
+- Root: repository root
+- Build: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
+- Deploy: `node scripts/cloudflare-direct-production-deploy.mjs`
+
+GitHub Actions is not part of the supported build, verification, preview, or deployment path. Cloudflare must deploy into the existing `sovv-web` Worker and must not create a Pages project, repository fork, duplicate production Worker, or `sovereign-openapi-preview` Worker.
+
+The release is complete only after D1 migrations succeed and live health, readiness, public, login, and application probes verify the deployed commit.
+
 ## Product contract
 
 Sovereign.OS must:
@@ -56,7 +69,6 @@ OPENAPI/
     evals/
   docs/
   scripts/
-  .github/workflows/
 ```
 
 ## Runtime responsibilities
@@ -300,7 +312,7 @@ The first release is ready only when:
 
 ### Phase 1: foundation
 
-Monorepo, shared TypeScript configuration, web shell, Worker shell, D1 migration, thread Durable Object, health route, and CI validation.
+Monorepo, shared TypeScript configuration, web shell, Worker shell, D1 migration, thread Durable Object, health route, and Cloudflare-native validation.
 
 ### Phase 2: personal intelligence
 
