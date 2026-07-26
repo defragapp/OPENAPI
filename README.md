@@ -66,7 +66,7 @@ The preview must not attach `defrag.app`, create a custom domain, modify `sovv-w
 
 - [`docs/launch-product-contract.md`](docs/launch-product-contract.md)
 - [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md)
-- [`docs/cloudflare-workers-builds.md`](docs/cloudflare-workers-builds.md)
+- [`docs/direct-cloudflare-preview.md`](docs/direct-cloudflare-preview.md)
 - [`docs/production-release.md`](docs/production-release.md)
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/privacy-model.md`](docs/privacy-model.md)
