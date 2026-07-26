@@ -9,6 +9,16 @@
   "observability": {
     "enabled": true
   },
+  "routes": [
+    {
+      "pattern": "defrag.app/*",
+      "zone_name": "defrag.app"
+    },
+    {
+      "pattern": "www.defrag.app/*",
+      "zone_name": "defrag.app"
+    }
+  ],
   "vars": {
     "APP_ENV": "production",
     "APP_VERSION": "__APP_VERSION__",
