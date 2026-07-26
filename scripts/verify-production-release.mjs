@@ -8,6 +8,7 @@ const env = readFileSync('apps/sovereign-worker/src/env.ts', 'utf8');
 const auth = readFileSync('apps/sovereign-worker/src/auth-public.ts', 'utf8');
 const product = readFileSync('apps/sovereign-worker/src/db/product.ts', 'utf8');
 const jobs = readFileSync('apps/sovereign-worker/src/jobs.ts', 'utf8');
+const usage = readFileSync('apps/sovereign-worker/src/billing/usage.ts', 'utf8');
 const stripe = readFileSync('apps/sovereign-worker/src/billing/stripe.ts', 'utf8');
 const stripeRoute = readFileSync('apps/sovereign-worker/src/routes/stripe.ts', 'utf8');
 const scaleMigration = readFileSync('apps/sovereign-worker/migrations/0009_production_scale_and_billing_safety.sql', 'utf8');
@@ -102,7 +103,10 @@ for (const required of [
   'isNavigationAssetPath',
   "target.pathname = '/app'",
   "migrationVersion: '0009_production_scale_and_billing_safety'",
-  "includesPrivateWorkspaceData: false"
+  "includesPrivateWorkspaceData: false",
+  'sovereign_capacity_unavailable',
+  "headers: { 'retry-after': '60' }",
+  'THREAD_MESSAGE_PATH'
 ]) {
   if (!runtime.includes(required)) throw new Error(`Runtime production contract is missing ${required}`);
 }
@@ -136,7 +140,13 @@ for (const required of [
   "method: 'DELETE'",
   "status = 'canceled'",
   "account.auth_subject.startsWith('deleted:')",
-  "status = 'retained_billing_record'"
+  "status = 'retained_billing_record'",
+  '/v1/subscriptions/search?',
+  'metadata["account_id"]',
+  'stripe_subscription_search_page_limit',
+  'requireStripeHandoffUrl',
+  "'checkout.stripe.com'",
+  "'billing.stripe.com'"
 ]) {
   if (!stripe.includes(required)) throw new Error(`Stripe billing safety is missing ${required}`);
 }
@@ -176,9 +186,18 @@ for (const required of [
   "if (row.purpose !== 'signup')",
   'terms_accepted_at = ?, terms_version = ?, privacy_version = ?',
   "account.auth_subject !== subject",
-  'SameSite=Lax; Priority=High'
+  'SameSite=Lax; Priority=High',
+  "!validEmail(row.email_normalized)",
+  "!['signup', 'login'].includes(row.purpose ?? '')"
 ]) {
   if (!auth.includes(required)) throw new Error(`Account creation safety is missing ${required}`);
+}
+for (const required of [
+  'monthly_allowance_reached',
+  "'retry-after': String(retryAfterSeconds)",
+  'Date.parse(resetsAt)'
+]) {
+  if (!usage.includes(required)) throw new Error(`AI usage backpressure is missing ${required}`);
 }
 
 if (env.includes('ARTIFACTS') || env.includes('R2Bucket')) throw new Error('Worker Env must not expose R2');
@@ -222,4 +241,4 @@ for (const required of [
 }
 if (/full account export|export features/i.test(pricing)) throw new Error('Pricing still promises private export');
 
-console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0009 d1_scale_indexes=true durable_objects=true workers_ai=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true app_service_worker=false signup_only_account_creation=true policy_acceptance_persisted=true trusted_stripe_handoffs=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true donation=true private_exports=false public_share=true live_gate=true concurrency_probe=20');
+console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0009 d1_scale_indexes=true durable_objects=true durable_object_sharding=account_thread workers_ai=true ai_capacity_backpressure=true ai_allowance_retry_after=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true app_service_worker=false signup_only_account_creation=true policy_acceptance_persisted=true malformed_magic_links_rejected=true trusted_stripe_handoffs=true remote_stripe_subscription_discovery=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true donation=true private_exports=false public_share=true live_gate=true concurrency_probe=20');
