@@ -2,6 +2,18 @@
 name: Direct OPENAPI production deploy
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/production-direct-deploy.yml'
+      - 'apps/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'wrangler.production-direct.jsonc'
   workflow_dispatch:
 
 permissions:
@@ -77,17 +89,19 @@ jobs:
         run: |
           set -euo pipefail
           for attempt in $(seq 1 40); do
-            ROOT_STATUS="$(curl -sS -o /tmp/root.html -w '%{http_code}' https://defrag.app/ || true)"
-            HEALTH_STATUS="$(curl -sS -o /tmp/health.json -w '%{http_code}' https://defrag.app/health || true)"
-            READY_STATUS="$(curl -sS -o /tmp/ready.json -w '%{http_code}' https://defrag.app/ready || true)"
-            if [ "$ROOT_STATUS" = "200" ] && [ "$HEALTH_STATUS" = "200" ] && [ "$READY_STATUS" = "200" ]; then
-              node -e "const fs=require('fs');const health=JSON.parse(fs.readFileSync('/tmp/health.json','utf8'));const ready=JSON.parse(fs.readFileSync('/tmp/ready.json','utf8'));if(!health.ok||!ready.ok||!ready.ready)process.exit(1);console.log(JSON.stringify({health,ready},null,2));"
+            PUBLIC_STATUS="$(curl -L -sS -o /tmp/public.html -w '%{http_code}' https://sovereign.defrag.app/ || true)"
+            LOGIN_STATUS="$(curl -L -sS -o /tmp/login.html -w '%{http_code}' https://app.defrag.app/login || true)"
+            HEALTH_STATUS="$(curl -L -sS -o /tmp/health.json -w '%{http_code}' https://app.defrag.app/health || true)"
+            READY_STATUS="$(curl -L -sS -o /tmp/ready.json -w '%{http_code}' https://app.defrag.app/ready || true)"
+            if [ "$PUBLIC_STATUS" = "200" ] && [ "$LOGIN_STATUS" = "200" ] && [ "$HEALTH_STATUS" = "200" ] && [ "$READY_STATUS" = "200" ]; then
+              node -e "const fs=require('fs');const expected=process.env.EXPECTED_SHA;const publicHtml=fs.readFileSync('/tmp/public.html','utf8');const loginHtml=fs.readFileSync('/tmp/login.html','utf8');const health=JSON.parse(fs.readFileSync('/tmp/health.json','utf8'));const ready=JSON.parse(fs.readFileSync('/tmp/ready.json','utf8'));if(!publicHtml.includes('See what is really happening'))throw new Error('public fingerprint missing');if(!/SOVEREIGN\\.OS/i.test(loginHtml))throw new Error('login fingerprint missing');if(!health.ok||!ready.ok||!ready.ready)throw new Error('health or readiness failed');if(health.version!==expected||ready.version!==expected)throw new Error('deployed commit mismatch');if(ready.dependencies?.privateExports!=='disabled')throw new Error('private exports are not disabled');console.log(JSON.stringify({health,ready},null,2));"
               exit 0
             fi
             sleep 3
           done
-          echo "::error::defrag.app did not become healthy after deployment"
-          echo "root_status=$(curl -sS -o /dev/null -w '%{http_code}' https://defrag.app/ || true)"
+          echo "::error::Sovereign.OS production routes did not become healthy after deployment"
+          echo "public_status=$(curl -L -sS -o /dev/null -w '%{http_code}' https://sovereign.defrag.app/ || true)"
+          echo "login_status=$(curl -L -sS -o /dev/null -w '%{http_code}' https://app.defrag.app/login || true)"
           echo "health_response=$(cat /tmp/health.json 2>/dev/null || true)"
           echo "ready_response=$(cat /tmp/ready.json 2>/dev/null || true)"
           exit 1
@@ -101,10 +115,14 @@ jobs:
             echo "- repository: ${GITHUB_REPOSITORY}"
             echo "- commit_sha: ${GITHUB_SHA}"
             echo "- worker: sovv-web"
-            echo "- public_url: https://defrag.app"
+            echo "- public_url: https://sovereign.defrag.app"
+            echo "- app_url: https://app.defrag.app"
+            echo "- parent_url: https://defrag.app"
             echo "- d1: sovereign-openapi-db"
-            echo "- queue: sovereign-openapi-jobs"
+            echo "- queue: disabled"
             echo "- r2: disabled"
+            echo "- private_exports: disabled"
+            echo "- sharing: public-link-only"
             if [ -f production-deployment.json ]; then
               echo
               echo '```json'
