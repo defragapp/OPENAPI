@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import app from './index';
+import app from './entry';
 import { createSignedSessionToken } from './security/auth';
 import type { Env } from './env';
 
@@ -7,35 +7,79 @@ function fakeEnv(): Env {
   const accounts = new Map<string, string>();
   const threads = new Map<string, string>();
   const turns = new Map<string, any>();
-  const corrections: any[] = [];
+  const corrections: unknown[][] = [];
+  const coordinatedTurns = new Map<string, number>();
   let seq = 0;
+
   const db = {
     prepare(sql: string) {
-      return { bind(...args: unknown[]) { return {
-        async first() {
-          if (sql.includes('SELECT 1 AS ok')) return { ok: 1 };
-          if (sql.startsWith('SELECT id, auth_subject')) { const id = accounts.get(args[0] as string); return id ? { id, auth_subject: args[0] } : null; }
-          if (sql.startsWith('SELECT account_id FROM threads')) { const accountId = threads.get(args[0] as string); return accountId ? { account_id: accountId } : null; }
-          if (sql.startsWith('SELECT plan')) return null;
-          if (sql.startsWith('SELECT thread_id')) return turns.get(`${args[0]}:${args[1]}:${args[2]}`) ?? null;
-          return null;
-        },
-        async run() {
-          if (sql.startsWith('INSERT INTO accounts')) accounts.set(args[1] as string, args[0] as string);
-          if (sql.startsWith('INSERT INTO persons')) return { success: true };
-          if (sql.startsWith('INSERT INTO threads')) threads.set(args[0] as string, args[1] as string);
-          if (sql.startsWith('INSERT OR IGNORE INTO thread_events')) return { success: true };
-          if (sql.startsWith('INSERT INTO user_corrections')) corrections.push(args);
-          if (sql.startsWith('INSERT OR IGNORE INTO thread_turn_states')) turns.set(`${args[2]}:${args[1]}:${args[3]}`, { thread_id: args[1], account_id: args[2], idempotency_key: args[3], seq: args[4], status: args[5] });
-          if (sql.startsWith('UPDATE thread_turn_states')) { const turn = turns.get(`${args[3]}:${args[4]}:${args[5]}`); if (turn) turn.status = args[0]; }
-          return { success: true };
+      return {
+        bind(...args: unknown[]) {
+          return {
+            async first() {
+              if (sql.includes('SELECT 1 AS ok')) return { ok: 1 };
+              if (sql.startsWith('SELECT id, auth_subject')) {
+                const id = accounts.get(args[0] as string);
+                return id ? { id, auth_subject: args[0] } : null;
+              }
+              if (sql.startsWith('SELECT account_id FROM threads')) {
+                const accountId = threads.get(args[0] as string);
+                return accountId ? { account_id: accountId } : null;
+              }
+              if (sql.startsWith('SELECT plan')) return null;
+              if (sql.startsWith('SELECT thread_id')) return turns.get(`${args[0]}:${args[1]}:${args[2]}`) ?? null;
+              return null;
+            },
+            async run() {
+              if (sql.startsWith('INSERT INTO accounts')) accounts.set(args[1] as string, args[0] as string);
+              if (sql.startsWith('INSERT INTO persons')) return { success: true };
+              if (sql.startsWith('INSERT INTO threads')) threads.set(args[0] as string, args[1] as string);
+              if (sql.startsWith('INSERT OR IGNORE INTO thread_events')) return { success: true };
+              if (sql.startsWith('INSERT INTO user_corrections')) corrections.push(args);
+              if (sql.startsWith('INSERT OR IGNORE INTO thread_turn_states')) {
+                turns.set(`${args[2]}:${args[1]}:${args[3]}`, {
+                  thread_id: args[1],
+                  account_id: args[2],
+                  idempotency_key: args[3],
+                  seq: args[4],
+                  status: args[5]
+                });
+              }
+              if (sql.startsWith('UPDATE thread_turn_states')) {
+                const turn = turns.get(`${args[3]}:${args[4]}:${args[5]}`);
+                if (turn) turn.status = args[0];
+              }
+              return { success: true };
+            }
+          };
         }
-      }; } };
+      };
     }
   } as unknown as D1Database;
+
   return {
-    APP_ENV: 'test', APP_VERSION: 'test', STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db,
-    THREADS: { idFromName: (name: string) => ({ name }) as DurableObjectId, get: () => ({ fetch: async () => Response.json({ sequence: ++seq, duplicate: false }) }) as unknown as DurableObjectStub } as unknown as DurableObjectNamespace
+    APP_ENV: 'test',
+    APP_VERSION: 'test',
+    STRIPE_SECRET_KEY: '',
+    STRIPE_WEBHOOK_SECRET: '',
+    SOVV_INTERNAL_BASE_URL: '',
+    SOVV_INTERNAL_AUTH_TOKEN: '',
+    SESSION_SIGNING_SECRET: 'secret',
+    DB: db,
+    THREADS: {
+      idFromName: (name: string) => ({ name }) as DurableObjectId,
+      get: () => ({
+        fetch: async (_input: RequestInfo | URL, init?: RequestInit) => {
+          const payload = JSON.parse(String(init?.body ?? '{}')) as { idempotencyKey?: string };
+          const key = payload.idempotencyKey ?? '';
+          const existing = coordinatedTurns.get(key);
+          if (existing) return Response.json({ sequence: existing, duplicate: true });
+          const sequence = ++seq;
+          coordinatedTurns.set(key, sequence);
+          return Response.json({ sequence, duplicate: false });
+        }
+      }) as unknown as DurableObjectStub
+    } as unknown as DurableObjectNamespace
   };
 }
 
@@ -52,7 +96,11 @@ describe('authenticated Today and Explore smoke flow', () => {
   });
 
   it('serves Explore in plain language with collapsed framework details', async () => {
-    const res = await app.fetch(new Request('https://app.test/api/v1/explore', { method: 'POST', headers: { ...(await authHeader()), origin: 'https://app.test', 'content-type': 'application/json' }, body: JSON.stringify({ topic: 'communication' }) }), fakeEnv());
+    const res = await app.fetch(new Request('https://app.test/api/v1/explore', {
+      method: 'POST',
+      headers: { ...(await authHeader()), origin: 'https://app.test', 'content-type': 'application/json' },
+      body: JSON.stringify({ topic: 'communication' })
+    }), fakeEnv());
     expect(res.status).toBe(200);
     const json = await res.json() as any;
     expect(json.topic).toBe('communication');
@@ -62,13 +110,28 @@ describe('authenticated Today and Explore smoke flow', () => {
   it('captures correction feedback and rejects duplicate turns', async () => {
     const env = fakeEnv();
     const headers = { ...(await authHeader()), origin: 'https://app.test', 'content-type': 'application/json' };
-    const correction = await app.fetch(new Request('https://app.test/api/v1/threads/t1/corrections', { method: 'POST', headers, body: JSON.stringify({ correction: 'partly' }) }), env);
+    const correction = await app.fetch(new Request('https://app.test/api/v1/threads/t1/corrections', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ correction: 'partly' })
+    }), env);
     expect(correction.status).toBe(200);
+    await expect(correction.json()).resolves.toEqual({ ok: true, savedToThread: true, savedToLibrary: false });
+
     const messageHeaders = { ...headers, 'x-idempotency-key': 'idem-1' };
-    const first = await app.fetch(new Request('https://app.test/api/v1/threads/t1/messages', { method: 'POST', headers: messageHeaders, body: JSON.stringify({ message: 'Show me today without an incident.', context: { surface: 'Today' } }) }), env);
+    const request = () => new Request('https://app.test/api/v1/threads/t1/messages', {
+      method: 'POST',
+      headers: messageHeaders,
+      body: JSON.stringify({ message: 'Show me today without an incident.', context: { surface: 'Today' } })
+    });
+
+    const first = await app.fetch(request(), env);
     expect(first.status).toBe(202);
-    const text = await first.text();
-    expect(text).toContain('Development fallback only');
+    expect(await first.text()).toContain('OPENAPI Baseline fixture is available for development checks');
+
+    const duplicate = await app.fetch(request(), env);
+    expect(duplicate.status).toBe(200);
+    await expect(duplicate.json()).resolves.toEqual({ duplicate: true, status: 'completed', sequence: 1 });
   });
 
   it('requires idempotency keys before creating Stripe handoffs', async () => {

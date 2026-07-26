@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sovereign-public-v2';
+const CACHE_NAME = 'sovereign-public-v3';
 const PUBLIC_SHELL = [
   '/',
   '/how-it-works.html',

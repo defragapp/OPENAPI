@@ -6,10 +6,12 @@ import { ProductCompletionLayer, installProductRuntime } from './ProductCompleti
 import { installBaselineInputRuntime } from './BaselineInputRuntime';
 import { installProductionRuntime } from './ProductionRuntime';
 import { PublicLanding } from './PublicLanding';
+import { PublicPolicy } from './PublicPolicy';
 import './styles.css';
 import './product-completion.css';
 import './visual-polish.css';
 import './public-landing.css';
+import './public-landing-release.css';
 
 installProductionRuntime();
 installProductRuntime();
@@ -28,12 +30,22 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 }
 
 const isPublicHome = location.pathname === '/';
+const publicPolicyKind = location.pathname === '/privacy'
+  ? 'privacy'
+  : location.pathname === '/terms'
+    ? 'terms'
+    : null;
+const isDirectPublicSurface = isPublicHome || publicPolicyKind !== null;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AppErrorBoundary>
-      {!isPublicHome && <ProductCompletionLayer />}
-      {isPublicHome ? <PublicLanding /> : <App />}
+      {!isDirectPublicSurface && <ProductCompletionLayer />}
+      {isPublicHome
+        ? <PublicLanding />
+        : publicPolicyKind
+          ? <PublicPolicy kind={publicPolicyKind} />
+          : <App />}
     </AppErrorBoundary>
   </React.StrictMode>
 );

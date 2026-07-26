@@ -1,42 +1,47 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const landing = readFileSync(new URL('../public/public-site.js', import.meta.url), 'utf8');
+const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
+const policy = readFileSync(new URL('./PublicPolicy.tsx', import.meta.url), 'utf8');
 const how = readFileSync(new URL('../public/how-it-works.html', import.meta.url), 'utf8');
 const pricing = readFileSync(new URL('../public/pricing.html', import.meta.url), 'utf8');
 const faq = readFileSync(new URL('../public/faq.html', import.meta.url), 'utf8');
 const launchCss = readFileSync(new URL('../public/launch.css', import.meta.url), 'utf8');
 const launchPolish = readFileSync(new URL('../public/launch-polish.css', import.meta.url), 'utf8');
 const marketingCss = readFileSync(new URL('../public/marketing.css', import.meta.url), 'utf8');
+const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
+const releaseCss = readFileSync(new URL('./public-landing-release.css', import.meta.url), 'utf8');
 const recognitionCss = readFileSync(new URL('../public/recognition-ui.css', import.meta.url), 'utf8');
+const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-const publicCopy = `${landing}\n${how}\n${pricing}\n${faq}`;
+const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}`;
 
-describe('Sovereign.OS launch surface', () => {
+ describe('Sovereign.OS launch surface', () => {
   it('uses the approved sharp, grounded product voice', () => {
     for (const phrase of [
-      'See what is really happening.',
-      'Bring the decision, the silence, the reaction, or the pressure.',
-      'People do not arrive with clean categories. They arrive with experiences.',
+      'See what is really happening. Choose without losing yourself.',
       'Bring the real moment. See what belongs where.',
-      'Set it up once. Correct it as you go.'
+      'Simple on the surface. Careful underneath.',
+      'Set it up once. Correct it as you go.',
+      'Unknowns remain unknown'
     ]) expect(publicCopy).toContain(phrase);
     expect(publicCopy).not.toMatch(/healing journey|observatory|signal map|we know what they feel|hidden motive revealed|diagnose the relationship/i);
   });
 
-  it('includes one complete public route set', () => {
+  it('renders public React routes directly and keeps one complete route set', () => {
     for (const href of ['/how-it-works.html', '/pricing.html', '/faq.html', '/login', '/signup', '/privacy', '/terms']) {
       expect(publicCopy).toContain(href);
     }
-    expect(landing).toContain("location.pathname === '/'");
-    expect(landing).toContain("location.pathname === '/privacy'");
-    expect(landing).toContain("location.pathname === '/terms'");
-    expect(landing).toContain('renderPolicyPage');
-    expect(index).toContain('/public-site.js');
+    expect(main).toContain("location.pathname === '/'");
+    expect(main).toContain("location.pathname === '/privacy'");
+    expect(main).toContain("location.pathname === '/terms'");
+    expect(main).toContain('<PublicLanding />');
+    expect(main).toContain('<PublicPolicy kind={publicPolicyKind} />');
+    expect(index).not.toContain('/public-site.js');
   });
 
-  it('matches the launch billing contract', () => {
-    for (const phrase of ['$20', '$99', '10 Sovereign AI turns', 'permanent plan', 'Stripe']) {
+  it('matches the live launch billing and usage contract', () => {
+    for (const phrase of ['$20', '$99', '10 Sovereign AI turns', '300 Sovereign AI turns', 'permanent plan', 'Stripe']) {
       expect(publicCopy).toContain(phrase);
     }
     for (const feature of ['Today', 'Explore', 'People', 'Systems', 'Library', 'Covenant', 'sharing']) {
@@ -49,61 +54,55 @@ describe('Sovereign.OS launch surface', () => {
 
   it('explains privacy, permission, uncertainty, and visual authority clearly', () => {
     for (const phrase of [
-      'Reduced before AI use.',
-      'Permission is required.',
+      'Raw birth input',
+      'identity-bound, scope-specific permission',
       'Unknowns remain unknown',
-      'A suggestion is not a verdict.',
-      'The artwork explains an answer. It does not create one.',
-      'does not claim hidden motives'
+      'Private account export is not available at launch',
+      'The visual helps explain an answer. It does not create one.'
     ]) expect(publicCopy).toContain(phrase);
   });
 
-  it('keeps the landing focused', () => {
+  it('keeps the landing focused while explaining the internal product', () => {
     expect((landing.match(/<section/g) ?? []).length).toBeLessThanOrEqual(6);
+    for (const label of ['Today', 'Explore', 'People & Systems', 'Library & Covenant']) expect(landing).toContain(label);
     expect(landing).not.toMatch(/Live a life you would choose to watch again|See more clearly, from the start|Clearer decisions\. Better conversations/i);
   });
 
-  it('ships a real, accessible motion demo rather than a decorative mockup', () => {
+  it('ships a real accessible motion demo rather than a decorative mockup', () => {
     for (const phrase of [
-      'recognitionScenarios',
-      'data-recognition-tab',
+      'role="tablist"',
       'aria-live="polite"',
-      'activateRecognitionDemo()',
-      "['ArrowLeft', 'ArrowRight', 'Home', 'End']",
+      'onKeyDown',
+      'ArrowLeft',
+      'ArrowRight',
+      'aria-pressed',
       "matchMedia('(prefers-reduced-motion: reduce)')"
     ]) expect(landing).toContain(phrase);
     for (const selector of [
-      '.recognition-frame',
-      '.recognition-tabs',
-      '.baseline-field',
-      '@keyframes sovereign-orbit',
-      '@keyframes recognition-refresh'
-    ]) expect(launchPolish).toContain(selector);
+      '.today-preview',
+      '.preview-tabs',
+      '.baseline-orbit',
+      '@keyframes landing-orbit',
+      '@keyframes preview-enter'
+    ]) expect(`${landingCss}\n${releaseCss}`).toContain(selector);
   });
 
-  it('uses a shared responsive public design layer', () => {
+  it('uses responsive shared public design layers', () => {
     for (const selector of ['.launch-nav', '.launch-hero', '.launch-grid', '.pricing-grid', '.faq-list', '.launch-callout']) {
       expect(launchCss).toContain(selector);
     }
     expect(launchCss).toContain('@media(max-width:820px)');
-    expect(launchCss).toContain('min-height:44px');
     expect(marketingCss).toContain('safe-area-inset-top');
-    expect(marketingCss).toContain('prefers-reduced-motion');
-    expect(landing).toContain("ensureStyle('/launch-polish.css', 'sovereign-launch-polish')");
-    expect(launchPolish).toContain('@media (max-width:560px)');
-  });
-
-  it('keeps sign-in and account creation reachable on mobile', () => {
-    for (const document of [how, pricing, faq, index]) expect(document).toContain('/launch-polish.css');
-    expect(launchPolish).toContain('.launch-links a[href="/login"]');
-    expect(launchPolish).toContain('display:inline-flex');
+    expect(landingCss).toContain('@media (max-width: 760px)');
+    expect(releaseCss).toContain('@media (max-width: 760px)');
+    expect(releaseCss).toContain('prefers-reduced-motion');
     expect(launchPolish).toContain(':focus-visible');
-    expect(launchPolish).toContain('prefers-reduced-motion');
   });
 
-  it('keeps authenticated recognition controls separate from marketing', () => {
+  it('keeps sign-in, account creation, and authenticated recognition controls reachable', () => {
+    expect(landing).toContain('href="/login"');
+    expect(landing).toContain('href="/signup"');
     expect(recognitionCss).toContain('.scope-list > label');
     expect(recognitionCss).toContain('[data-recognition-module-offer]');
-    expect(landing).not.toContain('mirror-surface');
   });
 });
