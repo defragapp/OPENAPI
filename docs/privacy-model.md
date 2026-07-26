@@ -41,4 +41,4 @@ Every invited-person scope defaults to denied. Revocation takes effect immediate
 
 ## Audit events
 
-Record privacy-safe events for consent grant, consent revocation, tool access decision, saved understanding, export request, deletion request, billing access change, and webhook processing. Do not log raw prompt text by default.
+Record privacy-safe events for consent grant, consent revocation, tool access decision, saved understanding, public-link sharing, deletion request, billing access change, and webhook processing. Do not log raw prompt text by default.

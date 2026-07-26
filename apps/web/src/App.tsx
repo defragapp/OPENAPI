@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
+import { sharePublicPlatform } from './ProductionRuntime';
 
 type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
 type ApiState = 'idle' | 'loading' | 'ready' | 'error' | 'permission-denied' | 'consent-required' | 'degraded';
@@ -743,9 +744,9 @@ function YouSurface({ api, threadId, covenantEnabled, setCovenantEnabled }: any)
         </div>
       </SurfaceCard>
 
-      <SurfaceCard eyebrow="CONTROL" title="Your data. Your permissions." intro="Export what belongs to you, begin a deletion grace period, or control optional Covenant context.">
+      <SurfaceCard eyebrow="CONTROL" title="Your data. Your permissions." intro="Share the public platform without exposing private workspace data, begin a deletion grace period, or control optional Covenant context.">
         <div className="settings-list">
-          <div><span><strong>Export</strong><small>Create a seven-day private download.</small></span><button onClick={() => api('/api/v1/export-jobs', { method: 'POST' })}>Request</button></div>
+          <div><span><strong>Share</strong><small>Share the public Sovereign.OS link. No private workspace data is included.</small></span><button type="button" onClick={() => void sharePublicPlatform()}>Share</button></div>
           <div><span><strong>Deletion</strong><small>Begin a cancellable grace period.</small></span><button onClick={() => api('/api/v1/deletion-jobs', { method: 'POST' })}>Begin</button></div>
           <label><span><strong>Covenant</strong><small>Off unless you enable it for this thread.</small></span><input type="checkbox" checked={covenantEnabled} onChange={(event) => setCovenantEnabled(event.target.checked)} /></label>
         </div>

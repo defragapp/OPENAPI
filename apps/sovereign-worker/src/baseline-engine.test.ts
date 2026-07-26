@@ -6,7 +6,7 @@ import { createOpenApiBaselineProvider, localCivilTimeToUtc, parseHorizonsJson, 
 function horizonsPayload(longitude = 123.456, latitude = -1.25): HorizonsPayload {
   return {
     signature: { source: 'NASA/JPL Horizons API', version: '1.3' },
-    result: `Header\n$$SOE\n"1993-Jul-27 03:00", ${longitude}, ${latitude},\n"1993-Jul-27 09:00", ${longitude + 0.15}, ${latitude + 0.01},\n$$EOE\nFooter`
+    result: `Header\n$$SOE\n"1993-Jul-27 03:00", ${longitude}, ${latitude},\n"1993-Jul-27 09:00", ${(longitude + 0.15).toFixed(6)}, ${(latitude + 0.01).toFixed(6)},\n$$EOE\nFooter`
   };
 }
 

@@ -1,6 +1,7 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
+const workerPackageJson = JSON.parse(readFileSync('apps/sovereign-worker/package.json', 'utf8'));
 const deploy = readFileSync('scripts/cloudflare-direct-production-deploy.mjs', 'utf8');
 const config = readFileSync('wrangler.production-direct.jsonc', 'utf8');
 const runtime = readFileSync('apps/sovereign-worker/src/runtime-entry.ts', 'utf8');
@@ -13,6 +14,7 @@ const stripe = readFileSync('apps/sovereign-worker/src/billing/stripe.ts', 'utf8
 const stripeRoute = readFileSync('apps/sovereign-worker/src/routes/stripe.ts', 'utf8');
 const scaleMigration = readFileSync('apps/sovereign-worker/migrations/0009_production_scale_and_billing_safety.sql', 'utf8');
 const browserRuntime = readFileSync('apps/web/src/ProductionRuntime.ts', 'utf8');
+const appUi = readFileSync('apps/web/src/App.tsx', 'utf8');
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const pricing = readFileSync('apps/web/public/pricing.html', 'utf8');
 const staticHeaders = readFileSync('apps/web/public/_headers', 'utf8');
@@ -20,6 +22,7 @@ const workerHeaders = readFileSync('apps/sovereign-worker/src/security/headers.t
 
 const cloudflareGate = packageJson.scripts?.['verify:cloudflare-build'] ?? '';
 for (const required of [
+  'verify:release-config',
   'verify:production-release',
   'pnpm typecheck',
   'pnpm --filter @sovereign/worker test',
@@ -27,6 +30,14 @@ for (const required of [
   'pnpm build'
 ]) {
   if (!cloudflareGate.includes(required)) throw new Error(`Cloudflare build gate is missing ${required}`);
+}
+for (const retired of ['production:candidate', 'production:migrate', 'production:promote', 'production:rollback']) {
+  if (packageJson.scripts?.[retired]) throw new Error(`Retired alternate release command remains: ${retired}`);
+}
+if (workerPackageJson.scripts?.deploy) throw new Error('Worker package must not expose a direct deploy command');
+if (existsSync('scripts/cloudflare-production-release.mjs')) throw new Error('Retired alternate production release tool remains');
+if (!workerPackageJson.scripts?.build?.includes('--config ../../wrangler.jsonc')) {
+  throw new Error('Worker build must validate the authoritative root production config');
 }
 
 for (const required of [
@@ -145,6 +156,8 @@ for (const required of [
   'metadata["account_id"]',
   'stripe_subscription_search_page_limit',
   'requireStripeHandoffUrl',
+  'integration_identifier',
+  "'stripe-version': STRIPE_API_VERSION",
   "'checkout.stripe.com'",
   "'billing.stripe.com'"
 ]) {
@@ -218,8 +231,6 @@ for (const required of [
 for (const required of [
   'VITE_TURNSTILE_SITE_KEY',
   'navigator.share',
-  'No private workspace data is included',
-  'Support Sovereign.OS',
   'STRIPE_HANDOFF_HOSTS',
   "'checkout.stripe.com'",
   "'billing.stripe.com'",
@@ -229,16 +240,20 @@ for (const required of [
 ]) {
   if (!browserRuntime.includes(required)) throw new Error(`Browser production runtime is missing ${required}`);
 }
+if (!appUi.includes('No private workspace data is included')) {
+  throw new Error('Workspace sharing control is missing its private-data boundary');
+}
 
 for (const required of [
   '$20',
   '$99',
-  'Consent-aware invitations and sharing',
-  'does not grant subscription access',
-  'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02'
+  'Consent-aware invitations and sharing'
 ]) {
   if (!pricing.includes(required)) throw new Error(`Pricing contract is missing ${required}`);
 }
 if (/full account export|export features/i.test(pricing)) throw new Error('Pricing still promises private export');
+if (/donate\.stripe\.com|Support Sovereign\.OS|Support the platform/i.test(`${pricing}\n${browserRuntime}\n${appUi}`)) {
+  throw new Error('Unapproved support placement is present');
+}
 
-console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0009 d1_scale_indexes=true durable_objects=true durable_object_sharding=account_thread workers_ai=true ai_capacity_backpressure=true ai_allowance_retry_after=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true app_service_worker=false signup_only_account_creation=true policy_acceptance_persisted=true malformed_magic_links_rejected=true trusted_stripe_handoffs=true remote_stripe_subscription_discovery=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true donation=true private_exports=false public_share=true live_gate=true concurrency_probe=20');
+console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0009 d1_scale_indexes=true durable_objects=true durable_object_sharding=account_thread workers_ai=true ai_capacity_backpressure=true ai_allowance_retry_after=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true app_service_worker=false signup_only_account_creation=true policy_acceptance_persisted=true malformed_magic_links_rejected=true trusted_stripe_handoffs=true remote_stripe_subscription_discovery=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true support_placement=false private_exports=false public_share=true live_gate=true concurrency_probe=20');

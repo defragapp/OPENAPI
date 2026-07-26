@@ -1,42 +1,31 @@
 # Direct Cloudflare preview
 
-Use Cloudflare Workers Builds with the existing repository `defragapp/OPENAPI`.
+Use the existing `defragapp/OPENAPI` repository. Do not use the Deploy to Cloudflare template flow or create a repository copy.
 
-Do not use the Deploy to Cloudflare template flow. It creates a repository copy and is not the approved path.
+The repository-root `wrangler.jsonc` is the authoritative production configuration for `sovv-web`. Isolated review previews use `apps/sovereign-worker/wrangler.jsonc` with its `preview` environment and the `pnpm preview:bootstrap` command.
 
-## Cloudflare project
+## Preview target
 
-- Repository: `defragapp/OPENAPI`
-- Branch: `main`
-- Project name: `sovereign-openapi-preview`
-- Root directory: repository root
-- Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
-- Deploy command: `pnpm preview:bootstrap`
+- Worker: `sovereign-openapi-preview`
+- URL: `https://sovereign-openapi-preview.sovereign-os-api.workers.dev`
+- D1: `sovereign-openapi-preview-db`
+- Durable Object: `ThreadCoordinator`
+- AI: Workers AI binding through AI Gateway
+- Assets: compiled Sovereign.OS web application
+- Background cleanup: scheduled D1 work
+- R2 and Queue: disabled
 
-The repository-root `wrangler.jsonc` exists only to give Workers Builds an exact matching Worker identity and preview resource contract. It targets `sovereign-openapi-preview`, contains no custom domains, and contains no R2 binding.
+The preview must not attach a production custom domain, production D1 database, live Stripe credentials, or production customer records.
 
-## Build token
+## Required Cloudflare configuration
 
-Select a user-scoped Workers Builds token that can perform the bootstrap operations. It needs:
+Provide a user-scoped token with the minimum permissions needed for Workers Scripts, D1, Workers AI, account membership, and read-only account details. Queue, R2, and Workers Routes permissions are not required.
 
-- Account Settings Read
-- Workers Scripts Edit
-- D1 Edit
-- Queues Edit
-- Workers AI Read
-- User Details Read
-- Memberships Read
+Configure:
 
-R2 permission and Workers Routes permission are not required for this preview.
-
-## Required first-deploy configuration
-
-Add one secret:
-
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_API_TOKEN`
 - `PREVIEW_SESSION_SIGNING_SECRET`
-
-Add these build variables:
-
 - `PREVIEW_BASE_URL=https://sovereign-openapi-preview.sovereign-os-api.workers.dev`
 - `PREVIEW_WORKER_NAME=sovereign-openapi-preview`
 - `PREVIEW_D1_NAME=sovereign-openapi-preview-db`
@@ -45,21 +34,19 @@ Add these build variables:
 - `AI_MODEL=openai/gpt-5.5`
 - `AI_GATEWAY_ID=sovereign`
 
-The preview uses D1, SQLite Durable Objects, Cloudflare Queues, Workers AI, and static assets.
+Turnstile, email, and Stripe test-mode settings may be added for authenticated acceptance testing. Never attach live Stripe credentials to preview.
 
-R2 is intentionally disabled for the visual-review preview. No R2 subscription or R2 permission is required. Downloadable exports remain unavailable until storage is separately approved.
+## Deploy and verify
 
-Turnstile, email, and Stripe test-mode settings can be added after the visual preview is live.
+Run:
 
-## Safety boundary
+```bash
+corepack enable
+pnpm install --frozen-lockfile
+pnpm verify:cloudflare-build
+pnpm preview:bootstrap
+```
 
-The preview must not:
+Protect the entire preview hostname with Cloudflare Access before accepting it as founder-review evidence. Then verify `/health`, `/healthz`, `/ready`, the public pages, authenticated product surfaces, the disabled private-export boundary, and test-mode billing.
 
-- create another GitHub repository;
-- attach `defrag.app` or any custom domain;
-- modify `sovv-web` or `sovereign-os-api`;
-- modify production D1 storage;
-- use live Stripe credentials;
-- enable R2.
-
-After deployment, verify `/health`, `/healthz`, and `/ready`, then enable Cloudflare Access on the dedicated `workers.dev` route.
+The preview may be removed only after explicit approval. Never target `sovv-web`, `sovereign-openapi-db`, `sovereign.defrag.app`, or `app.defrag.app` during preview cleanup.

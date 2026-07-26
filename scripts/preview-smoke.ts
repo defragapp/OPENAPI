@@ -57,7 +57,7 @@ async function verifyFreeGates() {
   await request('/api/v1/people', { method: 'POST', body: JSON.stringify({ displayName: 'Blocked Free Person', role: 'friend' }) }, 403);
   await request('/api/v1/systems', { method: 'POST', body: JSON.stringify({ name: 'Blocked Free System', systemType: 'family' }) }, 403);
   await request('/api/v1/library', { method: 'POST', body: JSON.stringify({ title: 'Blocked Free Save', summary: 'Must remain unavailable.' }) }, 403);
-  await request('/api/v1/export-jobs', { method: 'POST' }, 403);
+  await request('/api/v1/export-jobs', { method: 'POST' }, 404);
 }
 
 async function verifyPaidCapabilities() {
@@ -74,7 +74,7 @@ async function verifyPaidCapabilities() {
   await json('/api/v1/library');
   await json(`/api/v1/library/${saved.id}`, { method: 'PATCH', body: JSON.stringify({ title: 'Renamed preview understanding' }) });
   await request(`/api/v1/library/${saved.id}`, { method: 'DELETE' });
-  await json('/api/v1/export-jobs', { method: 'POST' }, 202);
+  await request('/api/v1/export-jobs', { method: 'POST' }, 404);
 
   const covenant = await json('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'preview decision' }) });
   if (!covenant.scriptureSeparateFromInterpretation || !covenant.lens?.passage?.citation) throw new Error('Paid Covenant citation separation failed');

@@ -1,213 +1,98 @@
 # Production release procedure
 
-This document defines the only supported production promotion path for Sovereign.OS.
+Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the only supported production deployment path for Sovereign.OS.
 
-Production is not deployed directly from a source branch. One exact commit must first pass the isolated Cloudflare preview and every applicable gate in [`release-gates.md`](release-gates.md). The production release then separates version creation, database migration, traffic promotion, and rollback into individually approved actions.
+Production is released from one exact commit on `main`. Non-production branch builds remain disabled. Do not run an alternate GitHub Actions deploy, a repository-template deploy, or the retired candidate/migrate/promote scripts.
 
-## Safety model
+## Production target
 
-The production release tool:
+- Worker: `sovv-web`
+- Public site: `https://sovereign.defrag.app`
+- Authenticated app and API: `https://app.defrag.app`
+- D1: `sovereign-openapi-db`
+- Durable Object: `ThreadCoordinator`
+- AI: Workers AI through AI Gateway with Unified Billing
+- Assets: compiled web application
+- Background cleanup: scheduled D1 work every 15 minutes
+- R2 and Queue: disabled
 
-- operates only on a full 40-character commit SHA matching the checked-out Git HEAD;
-- refuses tracked working-tree changes;
-- requires a commit-bound approval value for every mutating action before remote preflight;
-- uses existing production D1, R2, Queue, Worker, route, and secret configuration;
-- never creates production storage;
-- never uploads secret values;
-- disables automatic Wrangler resource provisioning;
-- uploads a Worker version without sending traffic to it;
-- applies D1 migrations only through a separate approval;
-- promotes only the exact uploaded version ID;
-- records the candidate commit and version in `production-candidate.json`;
-- provides an explicit non-interactive rollback command.
+Private account export is disabled for launch. Sharing sends only the public Sovereign.OS link and includes no private workspace data.
 
-Cloudflare Worker versions do not roll back D1 or R2 state. Database compatibility and rollback must therefore be reviewed independently from Worker code rollback.
-
-Do not use a gradual traffic split for this static-asset application unless version affinity is configured. The web build uses content-hashed assets; serving HTML and assets from different Worker versions can break a session. After the isolated preview is approved, promote the exact production version atomically to 100% traffic.
-
-## Production prerequisites
-
-Create and verify these resources before release. The release tool will fail rather than create them:
-
-- production Worker;
-- production D1 database;
-- production R2 bucket;
-- production Queue and consumer;
-- Durable Object namespace and migration history;
-- Workers AI binding and AI Gateway;
-- production custom domain or route;
-- Turnstile production site;
-- production email sender and delivery endpoint;
-- Stripe live-mode products, prices, webhook endpoint, and Customer Portal configuration.
-
-The Worker must already contain these runtime secret names:
+## Required encrypted Worker secrets
 
 - `SESSION_SIGNING_SECRET`
+- `TURNSTILE_SECRET_KEY`
+- `RESEND_API_KEY`
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
-- `TURNSTILE_SECRET_KEY`
-- `EMAIL_API_TOKEN`
 
-The release tool checks names only. It never reads or prints secret values.
+Secret values stay in Cloudflare. Never copy them into repository files, build output, issues, or chat.
 
-## Required environment
+## Build configuration
 
-Control-plane authentication:
-
-- `CLOUDFLARE_ACCOUNT_ID`
-- `CLOUDFLARE_API_TOKEN`
-
-Exact release identity:
-
-- `RELEASE_COMMIT_SHA`
-- `PRODUCTION_WORKER_NAME`
-- `PRODUCTION_BASE_URL`
-- `PRODUCTION_D1_NAME`
-- `PRODUCTION_R2_BUCKET_NAME`
-- `PRODUCTION_QUEUE_NAME`
-
-Public/runtime configuration:
-
-- `AI_PROVIDER=cloudflare-gateway`
-- `AI_MODEL=openai/gpt-5.5`
-- `AI_GATEWAY_ID=sovereign`
-- `VITE_TURNSTILE_SITE_KEY`
-- `TURNSTILE_EXPECTED_HOSTNAME`
-- `EMAIL_API_URL`
-- `EMAIL_FROM`
-- `STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY`
-- `STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL`
-- `BASELINE_HORIZONS_URL=https://ssd.jpl.nasa.gov/api/horizons.api`
-- `BASELINE_PROVIDER_TIMEOUT_MS=8000`
-- `SCRIPTURE_TRANSLATION=WEB`
-
-`PRODUCTION_BASE_URL` must be an HTTPS origin and must not be the isolated preview hostname. `TURNSTILE_EXPECTED_HOSTNAME` must exactly match its hostname.
-
-## 1. Verify the exact commit
-
-Run the complete repository verification before creating a production candidate:
+- Production branch: `main`
+- Root directory: repository root
+- Build command:
 
 ```bash
-corepack enable
-pnpm install --frozen-lockfile
-pnpm verify:cloudflare-build
+VITE_TURNSTILE_SITE_KEY=0x4AAAAAADhGIF8-iOLIg8MU corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build
 ```
 
-The isolated preview must then verify:
-
-- Cloudflare build UUID and exact commit SHA;
-- remote migration replay;
-- protected preview perimeter;
-- authentication and Turnstile;
-- Baseline onboarding and current conditions;
-- invite, redeem, independent consent, pair comparison, revocation, and blocked reuse;
-- a real three-person System;
-- Stripe test-mode Checkout, webhook, Portal, cancellation, payment failure, and fallback to Free;
-- desktop and physical-iPhone review;
-- Privacy and Terms review.
-
-## 2. Upload without traffic
-
-Set:
-
-```text
-PRODUCTION_RELEASE_APPROVAL=candidate:<40-character-commit-sha>
-```
-
-Run:
+- Deploy command:
 
 ```bash
-pnpm production:candidate
+node scripts/cloudflare-direct-production-deploy.mjs
 ```
 
-This command verifies the production resource names and runtime secret names, builds an ephemeral Wrangler configuration, and runs `wrangler versions upload`. It does not run `wrangler deploy` and does not promote traffic. Candidate upload runs with automatic resource provisioning disabled, so a missing D1 database, R2 bucket, Queue, binding, or Worker fails closed instead of creating production infrastructure.
+The build gate verifies the release configuration, migrations, secret scan, production-fixture scan, release contract, type checks, worker and web tests, and production build.
 
-Save the emitted `versionId` and the generated `production-candidate.json` with the release evidence. Do not commit that file.
+The deploy command requires the exact Cloudflare build commit SHA. It resolves the existing D1 database, applies forward-only migrations, preserves encrypted Worker secrets, deploys that exact commit, and runs live probes. It fails closed when required secrets or runtime dependencies are missing.
 
-## 3. Apply migrations separately
+## Approval boundary
 
-Review every unapplied migration for backward compatibility with the currently active Worker. Set:
+Do not merge a release branch to `main` until the exact branch commit has:
 
-```text
-PRODUCTION_MIGRATIONS_BACKWARD_COMPATIBLE=YES
-PRODUCTION_RELEASE_APPROVAL=migrate:<40-character-commit-sha>
-```
+- green repository and Cloudflare preview checks;
+- protected preview evidence;
+- authenticated desktop and iPhone review;
+- reviewed Privacy and Terms;
+- test-mode Checkout, webhook, Portal, cancellation, and Free fallback evidence;
+- explicit founder approval for that commit SHA.
 
-Run:
+Merging the approved commit to `main` authorizes Cloudflare Workers Builds to execute the configured production deployment. A branch push or draft pull request does not authorize production.
 
-```bash
-pnpm production:migrate
-```
+## Live verification
 
-Wrangler applies migrations to the named production D1 database with `--remote`. Cloudflare captures a D1 backup when migrations are applied, but the release record must still include the migration list and the intended recovery procedure.
+The deploy command must confirm:
 
-After successful application, record:
+- the public and app hostnames serve the exact commit;
+- health and readiness report D1, authentication, AI Gateway, email, Stripe, scheduled cleanup, and the disabled private-export boundary correctly;
+- pricing shows Free, $20 monthly, and $99 annual without legacy export or unapproved support placement;
+- unauthenticated protected routes fail closed;
+- invalid Stripe signatures are rejected;
+- signup requires Turnstile;
+- security headers and app `noindex` behavior are present;
+- compiled assets are immutable;
+- concurrent health probes pass.
 
-```text
-PRODUCTION_MIGRATIONS_APPLIED_SHA=<40-character-commit-sha>
-```
+A deploy command that does not complete these probes is not a completed release.
 
-## 4. Promote the exact version
+## Rollback
 
-Set:
+Record the previously stable Worker version before merging the approved commit. If rollback is required, use Cloudflare’s version/deployment controls to restore that exact version after explicit approval.
 
-```text
-PRODUCTION_VERSION_ID=<uploaded-version-id>
-PRODUCTION_PREVIEW_APPROVED_SHA=<40-character-commit-sha>
-PRODUCTION_MIGRATIONS_APPLIED_SHA=<40-character-commit-sha>
-PRODUCTION_APPROVAL_EVIDENCE_URL=<https-url-to-reviewed-evidence>
-PRODUCTION_RELEASE_APPROVAL=promote:<40-character-commit-sha>:<version-id>
-```
-
-Run:
-
-```bash
-pnpm production:promote
-```
-
-The command uses `wrangler versions deploy` to promote that exact version to 100% traffic. It cannot substitute a branch name, latest version, or different commit.
-
-Immediately verify:
-
-- public landing and static assets;
-- `/health`, `/healthz`, and `/ready` report the release commit;
-- signup, login, logout, and account recovery;
-- one Free response and server-side allowance enforcement;
-- one Sovereign+ entitlement check;
-- queue production and consumption;
-- scheduled retention trigger visibility;
-- error rate, CPU time, request latency, D1 errors, Queue errors, AI errors, email errors, and Stripe webhook errors.
-
-## 5. Rollback
-
-Record the previously active Worker version before promotion. Set:
-
-```text
-PRODUCTION_ROLLBACK_VERSION_ID=<previous-stable-version-id>
-PRODUCTION_RELEASE_APPROVAL=rollback:<version-id>
-```
-
-Run:
-
-```bash
-pnpm production:rollback
-```
-
-Rollback changes the active Worker version. It does not reverse D1 migrations, R2 writes, Queue messages, Stripe events, or external email delivery. Confirm data compatibility before executing it.
+Worker rollback does not reverse D1 migrations or external Stripe and email events. Use forward-repair migrations and confirm database compatibility before restoring an older Worker.
 
 ## Release evidence
 
-A complete production release record contains:
+Keep:
 
-- commit SHA;
+- exact commit SHA;
 - Cloudflare build UUID;
-- isolated preview URL;
-- build and smoke results;
-- reviewed screenshots;
-- production candidate version ID and tag;
-- previous stable version ID;
+- protected preview URL and screenshots;
+- test and smoke results;
 - migration list and D1 backup confirmation;
-- approval evidence URL;
-- production deployment output;
-- post-deploy health and product smoke results;
-- rollback decision and outcome, when applicable.
+- prior stable Worker version;
+- sanitized `production-deployment.json`;
+- explicit founder approval;
+- post-deploy probe results and any rollback decision.

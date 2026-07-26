@@ -39,5 +39,7 @@ describe('launch plan enforcement', () => {
     expect(billing).toContain('STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY');
     expect(billing).toContain('STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL');
     expect(billing).toContain('A Sovereign+ subscription is already active');
+    expect(billing).toContain('integration_identifier');
+    expect(billing).not.toContain('payment_method_types');
   });
 });

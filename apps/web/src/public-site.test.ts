@@ -49,7 +49,7 @@ const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}`;
     }
     expect(publicCopy).not.toMatch(/full account export|export features/i);
     expect(pricing).toContain('Your workspace is not deleted when a paid subscription ends.');
-    expect(pricing).toContain('does not grant subscription access');
+    expect(publicCopy).not.toMatch(/donate\.stripe\.com|Support Sovereign\.OS|Support the platform/i);
   });
 
   it('explains privacy, permission, uncertainty, and visual authority clearly', () => {

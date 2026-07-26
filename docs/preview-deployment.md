@@ -83,7 +83,7 @@ Run the application smoke with an ephemeral preview application session after Ac
 - Library save and deletion;
 - Free usage enforcement;
 - Stripe test-mode Checkout, webhook, Portal, cancellation, and fallback to Free;
-- export and deletion grace;
+- disabled private-export boundary and deletion grace;
 - optional Covenant enablement;
 - streamed response and inline visual behavior.
 

@@ -10,7 +10,12 @@ function env(): Env & { _writes: string[] } {
           return {
             async run() { writes.push(`${sql} ${JSON.stringify(args)}`); return { success: true, meta: { changes: 1 } }; },
             async all() { writes.push(`${sql} ${JSON.stringify(args)}`); return { results: [] }; },
-            async first() { return null; }
+            async first() {
+              if (sql.startsWith('SELECT id, status FROM deletion_jobs')) {
+                return { id: 'delete_jobs', status: 'running' };
+              }
+              return null;
+            }
           };
         },
         async run() { writes.push(sql); return { success: true, meta: { changes: 1 } }; },

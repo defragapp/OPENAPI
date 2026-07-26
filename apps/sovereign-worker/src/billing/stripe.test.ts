@@ -188,11 +188,12 @@ describe('Stripe launch billing adapter', () => {
       STRIPE_SUCCESS_URL: 'https://app.test/app?billing=success',
       STRIPE_CANCEL_URL: 'https://app.test/app?billing=cancelled'
     });
-    const requests: Array<{ body: string; idempotency: string | null }> = [];
+    const requests: Array<{ body: string; idempotency: string | null; apiVersion: string | null }> = [];
     vi.stubGlobal('fetch', vi.fn(async (_url: string, init?: RequestInit) => {
       requests.push({
         body: String(init?.body),
-        idempotency: new Headers(init?.headers).get('idempotency-key')
+        idempotency: new Headers(init?.headers).get('idempotency-key'),
+        apiVersion: new Headers(init?.headers).get('stripe-version')
       });
       return Response.json({ id: 'cs_same', url: 'https://checkout.stripe.test/same' });
     }));
@@ -201,5 +202,8 @@ describe('Stripe launch billing adapter', () => {
     expect(requests).toHaveLength(2);
     expect(requests[0]).toEqual(requests[1]);
     expect(requests[0]?.body).toContain('customer=cus_existing');
+    expect(requests[0]?.body).toMatch(/integration_identifier=sovereign_checkout_[a-z]{8}/);
+    expect(requests[0]?.body).not.toContain('payment_method_types');
+    expect(requests[0]?.apiVersion).toBe('2026-06-24.dahlia');
   });
 });

@@ -184,11 +184,14 @@ function oneChunkStream(text: Promise<string>): globalThis.ReadableStream<string
 
 function extractText(value: unknown): string {
   if (typeof value === 'string') return extractStreamChunkText(value);
+  if (Array.isArray(value)) return value.map(extractText).join('');
   if (value && typeof value === 'object') {
     const record = value as Record<string, unknown>;
     if (typeof record.output_text === 'string') return record.output_text;
-    if (typeof record.response === 'string') return record.response;
     if (typeof record.text === 'string') return record.text;
+    if (record.result) return extractText(record.result);
+    if (record.response) return extractText(record.response);
+    if (Array.isArray(record.output)) return extractText(record.output);
     if (Array.isArray(record.choices)) return record.choices.map(extractText).join('');
     if (record.delta) return extractText(record.delta);
     if (record.message) return extractText(record.message);

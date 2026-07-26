@@ -58,19 +58,25 @@ describe('Cloudflare Gateway recognition adapter', () => {
         async run(model: string, input: unknown, options: unknown) {
           calls.push({ model, input, options });
           return {
-            response: JSON.stringify({
-              response_phase: 'question',
-              recognition: 'You may be trying to solve the uncertainty before you know what is actually available.',
-              inward_question: 'What are you hoping the next message will make certain?',
-              candidate_hidden_expectation: '',
-              protected_need: '',
-              clearer_form: '',
-              practical_action: '',
-              module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
-              basis: { user_confirmed: false, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
-              confidence: 'exploratory',
-              safety_mode: 'standard'
-            })
+            output: [{
+              type: 'message',
+              content: [{
+                type: 'output_text',
+                text: JSON.stringify({
+                  response_phase: 'question',
+                  recognition: 'You may be trying to solve the uncertainty before you know what is actually available.',
+                  inward_question: 'What are you hoping the next message will make certain?',
+                  candidate_hidden_expectation: '',
+                  protected_need: '',
+                  clearer_form: '',
+                  practical_action: '',
+                  module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
+                  basis: { user_confirmed: false, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
+                  confidence: 'exploratory',
+                  safety_mode: 'standard'
+                })
+              }]
+            }]
           };
         }
       }

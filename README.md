@@ -65,7 +65,6 @@ Secret values belong only in Cloudflare and must never be copied into repository
 - Free: permanent plan with 10 Sovereign AI turns per UTC month
 - Sovereign+ monthly: $20/month
 - Sovereign+ annual: $99/year
-- Voluntary Stripe support link: does not grant subscription access or change entitlements
 
 Account deletion uses a 14-day grace period. When execution becomes due, every nonterminal Stripe subscription is cancelled first. Local private data is deleted only after Stripe cancellation succeeds.
 

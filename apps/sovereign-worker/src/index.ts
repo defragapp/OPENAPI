@@ -209,7 +209,24 @@ app.delete('/api/v1/library/:understandingId', async (context) => {
 
 app.get('/api/v1/you', async (context) => {
   const auth = await requireAuth(context.req.raw, context.env);
-  return context.json({ accountId: auth.accountId, baseline: await getBaselineStatus(context.env, auth.accountId), locationPermission: 'configured-by-privacy-settings', people: '/api/v1/people', systems: '/api/v1/systems', privacy: { export: '/api/v1/export-jobs', deletion: '/api/v1/deletion-jobs' }, billing: '/api/v1/billing/entitlements', accessibility: { reducedMotion: 'supported', textScaling: 'supported' } });
+  return context.json({
+    accountId: auth.accountId,
+    baseline: await getBaselineStatus(context.env, auth.accountId),
+    locationPermission: 'configured-by-privacy-settings',
+    people: '/api/v1/people',
+    systems: '/api/v1/systems',
+    privacy: {
+      deletion: '/api/v1/deletion-jobs',
+      privateExport: 'disabled',
+      sharing: {
+        mode: 'public-link-only',
+        url: 'https://sovereign.defrag.app',
+        includesPrivateWorkspaceData: false
+      }
+    },
+    billing: '/api/v1/billing/entitlements',
+    accessibility: { reducedMotion: 'supported', textScaling: 'supported' }
+  });
 });
 
 app.post('/api/v1/baseline/onboarding', async (context) => {

@@ -28,7 +28,7 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Webhooks and thread turns are idempotent.
 - All D1 queries use bound parameters.
 - Secrets exist only in Worker bindings or CI secrets.
-- Export and deletion are tested.
+- The disabled private-export boundary, public-link sharing, and deletion are tested.
 - Unsaved thread content expires after 30 days.
 - Minimal security and operational audit metadata without conversation content expires after 90 days unless a documented incident or legal hold applies.
 - Explicitly saved Library understandings remain until user deletion or account closure.
@@ -59,15 +59,14 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - D1 migrations apply locally and remotely.
 - Thread ordering survives concurrent requests.
 - Invitation redemption and consent decisions are race-safe and one-time.
-- Health checks cover code version, D1, Durable Objects, AI Gateway, Baseline provider, email, queues, Stripe, and adapter readiness without exposing secrets.
+- Health checks cover code version, D1, Durable Objects, AI Gateway, Baseline provider, email, scheduled cleanup, Stripe, and adapter readiness without exposing secrets.
 - Traces correlate by thread and request ID.
 - Request rate limits, bounded pagination, provider timeouts, and spend limits are verified.
 - Scheduled retention cleanup is tested at the 30-day and 90-day boundaries.
-- A production version is uploaded without receiving traffic before promotion.
-- Migration compatibility and D1 backup evidence are recorded separately from Worker version promotion.
-- Rollback instructions, the previous Worker version, and its rollback version ID are documented.
-- Production promotion is bound to the exact uploaded version ID and exact approved commit SHA.
-- Production candidate, migration, promotion, and rollback commands reject missing approval before Cloudflare resource reads or writes.
+- Cloudflare Workers Builds verifies and deploys only the exact approved `main` commit.
+- Migration compatibility and D1 backup evidence are recorded before the build deploys.
+- Rollback instructions and the previous stable Worker version are documented.
+- The production build is bound to the exact approved commit SHA and fails closed if live probes do not converge.
 
 ## UX
 
@@ -90,9 +89,9 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Browser smoke for invite, redeem, grant, compare, system overlay, revoke, and blocked-after-revocation.
 - A three-person family or team overlay using consented reduced Baseline fixtures.
 - Free allowance, paid upgrade, cancellation, and Free fallback smoke evidence.
-- Export, deletion grace, immediate thread deletion, and scheduled retention evidence.
+- Disabled private-export, public-link sharing, deletion grace, immediate thread deletion, and scheduled retention evidence.
 - Reviewed Terms and Privacy documents matching actual behavior.
-- Production candidate metadata containing the exact uploaded version ID.
-- Previous stable Worker and rollback version ID.
+- Cloudflare build UUID and post-deploy metadata for the exact commit.
+- Previous stable Worker version.
 - Migration list and D1 backup confirmation for the exact commit.
 - Explicit founder approval before production deployment.

@@ -5,7 +5,16 @@ import type { Env } from '../env';
 function fakeEnv(): Env {
   const inserts: string[] = [];
   const db = { prepare(sql: string) { return { bind(...args: unknown[]) { return {
-    async first() { return null; },
+    async first() {
+      if (sql.startsWith('SELECT plan, features_json')) {
+        return {
+          plan: 'sovereign_plus',
+          features_json: JSON.stringify(['baseline.today', 'baseline.explore', 'people.compare', 'systems.family', 'systems.team', 'library.continuity', 'covenant.lens']),
+          as_of: new Date(0).toISOString()
+        };
+      }
+      return null;
+    },
     async all() { return { results: [] }; },
     async run() { inserts.push(`${sql}:${JSON.stringify(args)}`); return { success: true, meta: { changes: 1 } }; }
   }; } }; } } as unknown as D1Database;

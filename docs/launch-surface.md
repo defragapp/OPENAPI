@@ -63,7 +63,9 @@ Cloudflare Access must not be used as the Sovereign+ paywall. Access policies do
 - family, household, friendship group, workplace, and team Systems;
 - Library continuity;
 - optional Covenant lens;
-- full account export.
+- consent-aware invitations and public-link sharing that never includes private workspace data.
+
+Private account export is not part of the launch product.
 
 The application must use configured price IDs and never infer entitlement from a price amount or public page copy.
 
