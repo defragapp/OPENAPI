@@ -4,30 +4,30 @@ import type { KeyboardEvent } from 'react';
 const examples = [
   {
     label: 'A decision',
-    prompt: 'I have two good job offers. Why does choosing one feel impossible?',
-    notice: 'The deadline may be asking you to feel certain before the information is complete.',
-    question: 'Which missing fact would actually change your choice?',
-    answer: 'I need to know how much authority I would have in the new role.',
-    result: 'The decision may be less about choosing the perfect company and more about whether the role gives you enough autonomy.',
-    move: 'Ask both hiring managers the same direct question about decision authority, then compare the answers.'
+    prompt: 'I have two good opportunities. Which one is more aligned with who I am?',
+    notice: 'One option may reward your natural independence while the other offers security through a role that asks you to defer more often.',
+    question: 'Which part of yourself would each option strengthen—and which part would it ask you to silence?',
+    answer: 'I keep calling the safer option practical, but I would have very little authority there.',
+    result: 'The tension may not be between a good choice and a bad one. It may be between security and the level of self-direction your Baseline consistently needs.',
+    move: 'Compare the real tradeoffs without treating fear as wisdom or freedom as recklessness.'
   },
   {
     label: 'A relationship',
-    prompt: 'We both think we are being clear. Why do we keep missing each other?',
-    notice: 'You may be trying to reach clarity through conversation while the other person needs time before responding.',
-    question: 'What would let the conversation pause without feeling abandoned?',
-    answer: 'Knowing when we will return to it would help.',
-    result: 'The conflict may be less about whether either person cares and more about two different ways of reaching clarity.',
-    move: 'Agree on a return time before taking space, so silence does not have to carry the whole meaning.'
+    prompt: 'Is this relationship asking me to grow, or asking me to become less like myself?',
+    notice: 'Your Baseline may need directness and mutual responsibility, while this relationship repeatedly asks you to carry uncertainty alone.',
+    question: 'What becomes stronger in you here—and what becomes smaller?',
+    answer: 'I am more compassionate, but I also doubt myself and avoid saying what I need.',
+    result: 'Growth can be uncomfortable, but alignment should not require permanent self-erasure. The relationship may be developing one strength while suppressing another essential part of you.',
+    move: 'Separate the discomfort of honest growth from the cost of repeatedly abandoning your own boundaries.'
   },
   {
-    label: 'A system',
-    prompt: 'Everyone calls me when something goes wrong, but no one follows my decisions.',
-    notice: 'Responsibility may be landing with you while decision authority remains somewhere else.',
-    question: 'Which decisions are you expected to carry without the authority to make?',
-    answer: 'I handle every crisis, but my manager makes the final call.',
-    result: 'The strain may be coming from a role mismatch—not from a personal failure to lead.',
-    move: 'Name the decisions you own, the decisions your manager owns, and what happens when an urgent call cannot wait.'
+    label: 'A family system',
+    prompt: 'Why does everyone depend on me, then resist me when I stop fixing everything?',
+    notice: 'Your family may rely on you as the stabilizer while also depending on you to preserve roles that keep everyone else from changing.',
+    question: 'What does the system avoid facing when you continue carrying the pressure?',
+    answer: 'Other people would have to make decisions, tolerate conflict, and take responsibility for their part.',
+    result: 'The resistance may be less about one disagreement and more about what your changed role requires from the entire family.',
+    move: 'Clarify what belongs to you, what belongs to others, and what the family must now learn to hold together.'
   }
 ] as const;
 
@@ -35,31 +35,31 @@ const intelligenceLevels = [
   {
     number: '01',
     label: 'PERSONAL',
-    title: 'Understand your own response.',
-    prompt: 'Why does this decision feel harder for me than it looks?',
-    copy: 'Sovereign separates your steady tendencies from temporary pressure and the facts of the situation.'
+    title: 'Understand the whole person.',
+    prompt: 'What are the light and shadow expressions of this part of me?',
+    copy: 'Explore your archetypal qualities, strengths, protective responses, choices, relationships, and development through your Baseline Design.'
   },
   {
     number: '02',
     label: 'RELATIONAL',
-    title: 'See two perspectives at once.',
-    prompt: 'Why do we both think we are being clear?',
-    copy: 'With permission from both people, Sovereign compares how each person may process the same interaction.'
+    title: 'See the relationship from both sides.',
+    prompt: 'What are we each bringing into this connection?',
+    copy: 'With permission from both people, Sovereign compares needs, roles, communication, tension, compatibility, and mutual influence.'
   },
   {
     number: '03',
     label: 'SYSTEM',
-    title: 'See the structure around the conflict.',
-    prompt: 'Why does responsibility keep falling to one person?',
-    copy: 'Family, household, friendship, and team views add roles, authority, dependence, and shared goals.'
+    title: 'Understand how the whole group functions.',
+    prompt: 'What role does each person occupy in this family?',
+    copy: 'Map families, households, teams, and communities to understand roles, pressure, authority, responsibility, and how one person’s change affects everyone.'
   }
 ] as const;
 
 const baselineDimensions = [
-  ['Decision style', 'What you may need before a choice feels settled.'],
-  ['Communication', 'How you tend to find and express clarity.'],
-  ['Connection', 'What supports trust, closeness, and repair.'],
-  ['Pressure response', 'What may become louder when the stakes rise.']
+  ['Core qualities', 'The archetypal strengths, needs, and orientations that shape how you move through life.'],
+  ['Shadow & light', 'How the same quality can protect, limit, distort, mature, or become a strength.'],
+  ['Alignment', 'What supports your deeper design across decisions, behaviors, relationships, and direction.'],
+  ['Current emphasis', 'Which roles, qualities, or inner tensions may be becoming more relevant now.']
 ] as const;
 
 export function PublicLanding() {
@@ -91,57 +91,55 @@ export function PublicLanding() {
           <a href="/pricing.html">Pricing</a>
           <a href="/faq.html">Questions</a>
           <a href="/login">Sign in</a>
-          <a className="landing-nav-cta" href="/signup">Build my Baseline</a>
+          <a className="landing-nav-cta" href="/signup">Explore my Baseline</a>
         </nav>
       </header>
 
       <section className="landing-hero">
         <div className="landing-copy">
           <p className="landing-kicker">PERSONAL · RELATIONAL · SYSTEM INTELLIGENCE</p>
-          <h1>Understand your life in context.</h1>
+          <h1>Know yourself. Understand the system. Choose what fits.</h1>
           <p className="landing-lede">
-            Sovereign.OS is a private intelligence platform for understanding yourself, your relationships,
-            and the groups you live and work inside.
+            Sovereign.OS is a personal and relational intelligence platform powered by Baseline Design.
           </p>
           <p className="landing-support">
-            It begins with Baseline Design—a starting map of how you tend to decide, communicate, connect,
-            and respond under pressure—then adds the moment, people, and facts you choose.
+            Explore your archetypal qualities, shadow and light, decisions, behaviors, and relationships—then bring multiple Baseline Designs together to understand families, teams, and the human systems around you.
           </p>
           <div className="landing-actions">
-            <a className="landing-button landing-button-primary" href="/signup">Build my Baseline</a>
-            <a className="landing-button landing-button-secondary" href="#product-example">See how it helps</a>
+            <a className="landing-button landing-button-primary" href="/signup">Explore my Baseline</a>
+            <a className="landing-button landing-button-secondary" href="#product-example">Discover the platform</a>
           </div>
           <div className="landing-trust">
             <span>Start free</span>
-            <span>Useful before you explain a problem</span>
-            <span>You decide what carries forward</span>
+            <span>Useful across your whole life</span>
+            <span>You control what is shared</span>
           </div>
         </div>
 
-        <div className="context-console" aria-label="Example of Sovereign.OS using Baseline and current context">
+        <div className="context-console" aria-label="Example of Baseline Design applied to personal alignment">
           <header>
-            <div><span className="console-mark">S</span><strong>TODAY</strong></div>
-            <span>EXAMPLE · NOT YOUR READING</span>
+            <div><span className="console-mark">S</span><strong>YOUR BASELINE</strong></div>
+            <span>EXAMPLE · YOUR EXPERIENCE WILL DIFFER</span>
           </header>
           <div className="context-map" aria-hidden="true">
             <div className="context-ring context-ring-outer" />
             <div className="context-ring context-ring-inner" />
-            <div className="context-node context-node-baseline"><span>BASELINE</span><strong>Decision style</strong></div>
-            <div className="context-node context-node-current"><span>CURRENT</span><strong>Deadline pressure</strong></div>
-            <div className="context-node context-node-known"><span>KNOWN</span><strong>Offer expires Friday</strong></div>
-            <div className="context-core"><span>YOU</span><strong>Context stays distinct</strong></div>
+            <div className="context-node context-node-baseline"><span>CORE</span><strong>Self-direction</strong></div>
+            <div className="context-node context-node-current"><span>LIGHT</span><strong>Clear leadership</strong></div>
+            <div className="context-node context-node-known"><span>SHADOW</span><strong>Carrying everything</strong></div>
+            <div className="context-core"><span>YOU</span><strong>One quality · many expressions</strong></div>
           </div>
           <article className="console-question">
-            <span>YOU ASK</span>
-            <p>Why can’t I choose when both options are good?</p>
+            <span>YOU EXPLORE</span>
+            <p>How do I know when independence is aligned—and when it has become isolation?</p>
           </article>
           <article className="console-answer">
-            <span>SOVEREIGN NOTICES</span>
-            <p>The deadline may be forcing certainty before the information is complete.</p>
-            <strong>Which missing fact would actually change your choice?</strong>
+            <span>SOVEREIGN CONNECTS</span>
+            <p>Your need for self-direction can support courage and leadership. Under pressure, the same quality may make receiving support feel unsafe.</p>
+            <strong>What changes when support does not require surrendering authority?</strong>
           </article>
           <footer>
-            <span>Baseline</span><i>+</i><span>current pressure</span><i>+</i><span>confirmed facts</span>
+            <span>Baseline</span><i>+</i><span>shadow &amp; light</span><i>+</i><span>real-life context</span>
           </footer>
         </div>
       </section>
@@ -150,11 +148,10 @@ export function PublicLanding() {
         <div className="landing-section-heading">
           <div>
             <p className="landing-kicker">ONE PLATFORM · THREE LEVELS</p>
-            <h2 id="intelligence-title">See the person, the interaction, and the system.</h2>
+            <h2 id="intelligence-title">See yourself, the other side, and the whole system.</h2>
           </div>
           <p>
-            Most advice sees only the sentence you typed. Sovereign can keep your individual context,
-            another person’s permitted context, and the structure around both of you visible at the same time.
+            One person is complex. A relationship is more complex. A family is an entire system. Sovereign.OS helps make all three understandable without reducing anyone to a label.
           </p>
         </div>
         <div className="intelligence-grid">
@@ -172,43 +169,39 @@ export function PublicLanding() {
       <section className="baseline-section" aria-labelledby="baseline-title">
         <div className="baseline-copy">
           <p className="landing-kicker">BASELINE DESIGN</p>
-          <h2 id="baseline-title">A starting map—not a verdict about who you are.</h2>
+          <h2 id="baseline-title">More than personality. A framework for how you move through life.</h2>
           <p>
-            You enter your birth date, birthplace, and birth time if known. Sovereign.OS uses astronomical
-            positions and selected symbolic frameworks to build an interpretive Baseline, then translates it
-            into ordinary language.
+            Baseline Design translates the platform’s natal-data framework into a personal understanding of your archetypal qualities, natural roles, strengths, tensions, communication, decisions, relationships, and responses under pressure.
           </p>
           <p>
-            The frameworks stay in the supporting layer. The product shows what may be useful for reflection,
-            keeps the present moment separate, and asks you to confirm what actually fits.
+            Explore each part in plain language, examine its shadow and light expressions, and consider how it appears across the choices and relationships that make up your actual life.
           </p>
-          <a href="/how-it-works.html">See the complete process <span aria-hidden="true">→</span></a>
+          <a href="/how-it-works.html">See everything you can explore <span aria-hidden="true">→</span></a>
         </div>
         <div className="baseline-card">
-          <header><span>EXAMPLE BASELINE</span><strong>Ready before the first question</strong></header>
+          <header><span>YOUR BASELINE DESIGN</span><strong>A connected understanding of you</strong></header>
           {baselineDimensions.map(([label, copy], index) => (
             <article key={label}>
               <span>{String(index + 1).padStart(2, '0')}</span>
               <div><strong>{label}</strong><p>{copy}</p></div>
             </article>
           ))}
-          <footer>Interpretive · correctable · private by default</footer>
+          <footer>Personal · explorable · correctable · private by default</footer>
         </div>
       </section>
 
       <section className="conversation-section" aria-labelledby="conversation-title">
         <div className="landing-section-heading">
           <div>
-            <p className="landing-kicker">WHAT USING IT FEELS LIKE</p>
-            <h2 id="conversation-title">Bring a real question. Leave with a clearer next move.</h2>
+            <p className="landing-kicker">APPLY IT ANYWHERE</p>
+            <h2 id="conversation-title">Explore yourself. Examine alignment. Understand what happens between people.</h2>
           </div>
           <p>
-            Sovereign does not begin with a lecture or a verdict. It notices one useful distinction,
-            asks one inward question, and develops the answer after you respond.
+            Bring a decision, relationship, behavior, family role, or part of yourself you want to understand. Sovereign connects the question to the deeper framework already present in your Baseline Design.
           </p>
         </div>
 
-        <div className="example-tabs" role="tablist" aria-label="Example conversations">
+        <div className="example-tabs" role="tablist" aria-label="Example explorations">
           {examples.map((item, index) => (
             <button
               key={item.label}
@@ -238,57 +231,56 @@ export function PublicLanding() {
             <span>01</span><i /><span>02</span><i /><span>03</span>
           </div>
           <article className="example-user">
-            <span>YOUR QUESTION</span>
+            <span>YOU EXPLORE</span>
             <p>“{example.prompt}”</p>
           </article>
           <article className="example-sovereign">
-            <div><span>WHAT I NOTICE</span><p>{example.notice}</p></div>
-            <div><span>LOOK INWARD</span><strong>{example.question}</strong></div>
+            <div><span>WHAT MAY BE INTERACTING</span><p>{example.notice}</p></div>
+            <div><span>LOOK DEEPER</span><strong>{example.question}</strong></div>
           </article>
           <article className="example-user-answer">
-            <span>YOU ANSWER</span>
+            <span>YOU RECOGNIZE</span>
             <p>“{example.answer}”</p>
           </article>
           <article className="example-integration">
-            <div><span>WHAT THIS MAY BE SHOWING</span><p>{example.result}</p></div>
-            <div><span>ONE NEXT MOVE</span><strong>{example.move}</strong></div>
+            <div><span>A WIDER UNDERSTANDING</span><p>{example.result}</p></div>
+            <div><span>WHAT ALIGNMENT MAY LOOK LIKE</span><strong>{example.move}</strong></div>
           </article>
-          <footer>Example only. Your answer uses your permitted context and the facts you provide.</footer>
+          <footer>Examples show possibilities, not verdicts. Your experience remains yours to confirm and correct.</footer>
         </div>
       </section>
 
       <section className="permission-section" aria-labelledby="permission-title">
         <div>
-          <p className="landing-kicker">PEOPLE AND SYSTEMS</p>
-          <h2 id="permission-title">More context never means less agency.</h2>
+          <p className="landing-kicker">RELATIONSHIPS · FAMILIES · TEAMS</p>
+          <h2 id="permission-title">See the other side without losing your own.</h2>
           <p>
-            Add a person privately, invite them when you want to compare perspectives, and let them choose what
-            their Baseline may contribute. Families and teams keep every person, role, and unknown distinct.
+            Bring two Baseline Designs together to understand different needs and perspectives. Add more people to map the roles, pressures, loyalties, authority, and responsibility shaping an entire family, household, team, or community.
           </p>
         </div>
-        <div className="permission-visual" aria-label="Example permission-based relationship comparison">
+        <div className="permission-visual" aria-label="Example permission-based relationship and system comparison">
           <article><span>YOU</span><strong>Clarity through conversation</strong><small>Baseline shared</small></article>
-          <div><i /><strong>PERMISSION ACTIVE</strong><i /></div>
+          <div><i /><strong>CONSENT ACTIVE</strong><i /></div>
           <article><span>ALEX</span><strong>Clarity through reflection</strong><small>Baseline shared</small></article>
-          <p><strong>POSSIBLE FRICTION</strong> One person asks sooner while the other answers later.</p>
-          <p><strong>STILL UNKNOWN</strong> Why either person is quiet and what either person will choose.</p>
+          <p><strong>RELATIONSHIP</strong> One person seeks connection sooner while the other needs time to organize what they feel.</p>
+          <p><strong>SYSTEM</strong> Both responses may be shaped by the roles each person learned to occupy in the family.</p>
         </div>
       </section>
 
-      <section className="control-section" aria-label="Privacy and control">
-        <article><span>01</span><h3>Your inputs stay behind the calculation boundary.</h3><p>Raw birth details and exact private location do not enter the language model.</p></article>
-        <article><span>02</span><h3>Another person controls their own context.</h3><p>Adding a name is not permission. Shared analysis starts only after they choose.</p></article>
-        <article><span>03</span><h3>Nothing becomes memory by accident.</h3><p>Correct the moment freely. Save an understanding only when you want it to carry forward.</p></article>
+      <section className="control-section" aria-label="Choice, faith, privacy, and control">
+        <article><span>01</span><h3>Your private inputs stay protected.</h3><p>Raw birth details and exact private location do not enter the language model.</p></article>
+        <article><span>02</span><h3>Every person controls their own context.</h3><p>Adding a name is not permission. Shared comparisons use only what each person agrees to contribute.</p></article>
+        <article><span>03</span><h3>Bring faith in when it belongs.</h3><p>Choose the optional Covenant lens to explore personal and relational questions through Christian teachings and clearly cited biblical scripture.</p></article>
       </section>
 
       <section className="landing-final-callout">
         <div>
-          <p className="landing-kicker">START WITH YOU</p>
-          <h2>Live a life you’d choose to watch again.</h2>
-          <p>Build your Baseline, open Today, and bring the next decision, relationship, or pressure point.</p>
+          <p className="landing-kicker">START WITH YOU · EXPAND WHEN READY</p>
+          <h2>A deeper understanding of you—and everyone your life includes.</h2>
+          <p>Explore your Baseline Design, examine what fits, and see how people function together inside the relationships and systems that shape your life.</p>
         </div>
         <div className="landing-actions">
-          <a className="landing-button landing-button-primary" href="/signup">Build my Baseline</a>
+          <a className="landing-button landing-button-primary" href="/signup">Explore my Baseline</a>
           <a className="landing-button landing-button-secondary" href="/pricing.html">Compare plans</a>
         </div>
       </section>
