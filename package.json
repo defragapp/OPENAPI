@@ -36,7 +36,7 @@
     "smoke:release": "tsx scripts/release-smoke.ts",
     "smoke:baseline": "tsx scripts/baseline-smoke.ts",
     "smoke:jobs": "tsx scripts/jobs-smoke.ts",
-    "verify:release-config": "node scripts/verify-release-config.mjs",
+    "verify:release-config": "node scripts/verify-direct-preview-config.mjs",
     "smoke:release-closure": "tsx scripts/release-closure-smoke.ts"
   },
   "devDependencies": {
