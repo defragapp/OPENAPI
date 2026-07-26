@@ -42,11 +42,20 @@ export async function reserveAiTurn(env: Env, accountId: string, plan: string, n
     RETURNING turns_used`)
     .bind(accountId, periodKey, allowance)
     .first<{ turns_used: number }>();
-  if (!row) throw Response.json({
-    error: 'monthly_allowance_reached',
-    message: 'Your monthly Sovereign AI allowance has been used. Your saved workspace remains available.',
-    allowance,
-    resetsAt
-  }, { status: 429, headers: { 'cache-control': 'no-store' } });
+  if (!row) {
+    const retryAfterSeconds = Math.max(1, Math.ceil((Date.parse(resetsAt) - now.getTime()) / 1000));
+    throw Response.json({
+      error: 'monthly_allowance_reached',
+      message: 'Your monthly Sovereign AI allowance has been used. Your saved workspace remains available.',
+      allowance,
+      resetsAt
+    }, {
+      status: 429,
+      headers: {
+        'cache-control': 'no-store',
+        'retry-after': String(retryAfterSeconds)
+      }
+    });
+  }
   return { periodKey, used: row.turns_used, allowance, remaining: Math.max(allowance - row.turns_used, 0), resetsAt };
 }
