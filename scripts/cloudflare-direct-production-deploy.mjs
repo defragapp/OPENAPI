@@ -17,7 +17,6 @@ const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT
 const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '').trim();
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
-const parentBase = 'https://defrag.app';
 const donationUrl = 'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02';
 
 if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required');
@@ -171,13 +170,7 @@ async function verifyLiveProduction() {
   assert(health.json?.version === commitSha, 'health is not serving the deployed commit');
   assert(ready.json?.ready === true && ready.json?.version === commitSha, 'ready is not serving the deployed commit');
 
-  const [parentRoot, parentLogin, appRoot] = await Promise.all([
-    request(`${parentBase}/`, { redirect: 'manual' }),
-    request(`${parentBase}/login`, { redirect: 'manual' }),
-    request(`${appBase}/`, { redirect: 'manual' })
-  ]);
-  assert(parentRoot.status === 308 && parentRoot.headers.get('location')?.startsWith(publicBase), 'parent root redirect is incorrect');
-  assert(parentLogin.status === 308 && parentLogin.headers.get('location')?.startsWith(`${appBase}/login`), 'parent login redirect is incorrect');
+  const appRoot = await request(`${appBase}/`, { redirect: 'manual' });
   assert(appRoot.status === 308 && appRoot.headers.get('location')?.startsWith(`${appBase}/app`), 'app root redirect is incorrect');
 
   const [session, checkout, webhook, disabledExport] = await Promise.all([
@@ -218,14 +211,13 @@ async function verifyLiveProduction() {
   return {
     publicUrl: publicBase,
     appUrl: appBase,
-    parentUrl: parentBase,
     health: health.json,
     ready: ready.json,
     probes: {
       publicHome: 'passed',
       pricing: 'passed',
       donationLinkPresent: 'passed',
-      redirects: 'passed',
+      appRedirect: 'passed',
       unauthenticatedAccess: 'passed',
       stripeSignatureRejection: 'passed',
       exportsDisabled: 'passed',
@@ -305,7 +297,8 @@ try {
     workersDevUrl,
     publicUrl: publicBase,
     appUrl: appBase,
-    parentUrl: parentBase,
+    legacyParentUrl: 'https://defrag.app',
+    legacyParentPreserved: true,
     r2Enabled: false,
     queueEnabled: false,
     privateExports: 'disabled',
