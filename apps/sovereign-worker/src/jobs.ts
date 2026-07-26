@@ -33,7 +33,7 @@ export async function enqueueJob(env: Env, kind: string, accountId?: string, pay
   await env.DB.prepare('INSERT INTO background_jobs (id, account_id, kind, status, payload_json) VALUES (?, ?, ?, ?, ?)')
     .bind(id, accountId ?? null, kind, 'queued', JSON.stringify(payload))
     .run();
-  await env.JOBS?.send?.({ id, kind, accountId, payload });
+  try { await env.JOBS?.send?.({ id, kind, accountId, payload }); } catch { /* D1 cron remains authoritative. */ }
   return { id, kind, status: 'queued' };
 }
 
@@ -57,7 +57,7 @@ export async function runDueJobs(env: Env, limit = 10, accountId?: string) {
       String(row.id),
       String(row.kind),
       row.account_id ? String(row.account_id) : undefined,
-      JSON.parse(String(row.payload_json || '{}'))
+      safeJson(String(row.payload_json || '{}'))
     ));
   }
   return { processed: results.length, results };
@@ -71,7 +71,7 @@ export async function runOneJob(env: Env, id: string, expectedKind?: string, exp
   const accountId = row.account_id ?? undefined;
   if (expectedKind && expectedKind !== row.kind) return { id, status: 'rejected' };
   if (expectedAccountId && expectedAccountId !== accountId) return { id, status: 'rejected' };
-  const payload = Object.keys(expectedPayload).length ? expectedPayload : JSON.parse(row.payload_json || '{}');
+  const payload = Object.keys(expectedPayload).length ? expectedPayload : safeJson(row.payload_json);
 
   const claimed = await env.DB.prepare(`UPDATE background_jobs
     SET status = 'running', attempts = attempts + 1, updated_at = datetime('now')
@@ -81,8 +81,8 @@ export async function runOneJob(env: Env, id: string, expectedKind?: string, exp
   if ((claimed.meta?.changes ?? 0) === 0) return { id, status: 'skipped' };
 
   try {
-    if (row.kind === 'export.generate') await generateExport(env, requiredAccount(accountId), String(payload.exportJobId));
-    if (row.kind === 'deletion.execute') await executeDeletion(env, requiredAccount(accountId));
+    if (row.kind === 'export.generate') throw new Error('private_export_disabled');
+    if (row.kind === 'deletion.execute') await executeDeletion(env, requiredAccount(accountId), String(payload.deletionJobId ?? ''));
     if (row.kind === 'cleanup.expired') await cleanupExpired(env);
     if (row.kind === 'stripe.retry') {
       await env.DB.prepare(`UPDATE webhook_events SET processed_at = COALESCE(processed_at, datetime('now'))
@@ -108,62 +108,15 @@ function requiredAccount(accountId?: string) {
   return accountId;
 }
 
-async function rows<T = Record<string, unknown>>(env: Env, sql: string, ...args: unknown[]): Promise<T[]> {
-  const result = await env.DB.prepare(sql).bind(...args).all<T>();
-  return result.results ?? [];
-}
-
-export async function collectAccountExport(env: Env, accountId: string) {
-  const artifacts = await rows<{ r2_key: string; byte_size: number; expires_at: string }>(
-    env,
-    'SELECT r2_key, byte_size, expires_at FROM export_artifacts WHERE account_id = ?',
-    accountId
-  );
-  return {
-    generatedAt: new Date().toISOString(),
-    categories: ['account', 'sessions', 'baseline-reduced', 'current-conditions', 'people', 'consent', 'systems', 'threads', 'corrections', 'library', 'exports', 'deletion-status', 'billing-status'],
-    excludes: ['secrets', 'authorization headers', 'raw birth input', 'exact private location', 'hidden reasoning', 'other accounts', 'magic-link tokens', 'session token hashes'],
-    data: {
-      account: await env.DB.prepare('SELECT id, created_at, updated_at FROM accounts WHERE id = ?').bind(accountId).first(),
-      sessions: await rows(env, 'SELECT id, expires_at, revoked_at, created_at, last_seen_at FROM auth_sessions WHERE account_id = ?', accountId),
-      baseline: await rows(env, 'SELECT status, uncertainty, reduced_context_json, computation_version, provenance_json, provider_status, last_computed_at FROM baseline_onboarding WHERE account_id = ?', accountId),
-      people: await rows(env, 'SELECT id, role, display_name, source_of_truth, baseline_status, consent_status, created_at, updated_at FROM persons WHERE account_id = ?', accountId),
-      relationships: await rows(env, 'SELECT id, source_person_id, target_person_id, relationship_type, directionality, system_id, metadata_json, created_at, updated_at FROM relationships WHERE account_id = ?', accountId),
-      systems: await rows(env, 'SELECT id, system_type, name, metadata_json, created_at, updated_at FROM systems WHERE account_id = ?', accountId),
-      threads: await rows(env, 'SELECT id, context_kind, context_ref_id, title, status, covenant_enabled, created_at, updated_at FROM threads WHERE account_id = ?', accountId),
-      corrections: await rows(env, 'SELECT id, thread_id, correction, note, saved_to_library, created_at FROM user_corrections WHERE account_id = ?', accountId),
-      library: await rows(env, 'SELECT id, thread_id, kind, body_json, created_at, updated_at FROM saved_understandings WHERE account_id = ?', accountId),
-      exportJobs: await rows(env, 'SELECT id, status, requested_at, completed_at, expires_at FROM export_jobs WHERE account_id = ?', accountId),
-      deletionJobs: await rows(env, 'SELECT id, status, requested_at, scheduled_for, completed_at FROM deletion_jobs WHERE account_id = ?', accountId),
-      billing: {
-        subscriptions: await rows(env, 'SELECT id, plan_key, status, current_period_end, cancel_at_period_end, created_at, updated_at FROM stripe_subscriptions WHERE account_id = ?', accountId),
-        entitlements: await rows(env, 'SELECT plan, features_json, as_of, updated_at FROM entitlement_cache WHERE account_id = ?', accountId)
-      },
-      artifactKeys: artifacts
-    }
-  };
-}
-
-export async function generateExport(env: Env, accountId: string, exportJobId: string) {
-  const payload = await collectAccountExport(env, accountId);
-  const key = `exports/${accountId}/${exportJobId}.json`;
-  const body = JSON.stringify(payload, null, 2);
-  await env.ARTIFACTS?.put(key, body, { httpMetadata: { contentType: 'application/json' } });
-  await env.DB.prepare(`UPDATE export_jobs SET status = 'completed', completed_at = datetime('now'), expires_at = datetime('now', '+7 days')
-    WHERE id = ? AND account_id = ?`).bind(exportJobId, accountId).run();
-  await env.DB.prepare(`INSERT INTO export_artifacts (id, job_id, account_id, r2_key, byte_size, expires_at)
-    VALUES (?, ?, ?, ?, ?, datetime('now', '+7 days'))`)
-    .bind(`artifact_${crypto.randomUUID()}`, exportJobId, accountId, key, body.length)
+export async function executeDeletion(env: Env, accountId: string, deletionJobId?: string) {
+  const claimed = await env.DB.prepare(`UPDATE deletion_jobs SET status = 'running'
+    WHERE account_id = ?
+      AND status = 'grace'
+      AND scheduled_for <= datetime('now')
+      AND (? = '' OR id = ?)`)
+    .bind(accountId, deletionJobId ?? '', deletionJobId ?? '')
     .run();
-}
-
-export async function executeDeletion(env: Env, accountId: string) {
-  await env.DB.prepare(`UPDATE deletion_jobs SET status = 'running'
-    WHERE account_id = ? AND status IN ('grace','queued')`).bind(accountId).run();
-  const artifacts = await env.DB.prepare('SELECT r2_key FROM export_artifacts WHERE account_id = ?')
-    .bind(accountId)
-    .all<{ r2_key: string }>();
-  for (const artifact of artifacts.results ?? []) await env.ARTIFACTS?.delete?.(artifact.r2_key);
+  if ((claimed.meta?.changes ?? 0) === 0) throw new Error('deletion_not_due_or_cancelled');
 
   await env.DB.prepare(`UPDATE stripe_subscriptions SET status = 'retained_billing_record', updated_at = datetime('now')
     WHERE account_id = ?`).bind(accountId).run();
@@ -194,17 +147,13 @@ export async function cleanupExpired(env: Env) {
   const threadCutoff = `-${threadDays} days`;
   const auditCutoff = `-${auditDays} days`;
 
-  const artifacts = await env.DB.prepare('SELECT r2_key FROM export_artifacts WHERE expires_at < datetime(\'now\')')
-    .all<{ r2_key: string }>();
-  for (const artifact of artifacts.results ?? []) await env.ARTIFACTS?.delete?.(artifact.r2_key);
-
   const threadEvents = await env.DB.prepare("DELETE FROM thread_events WHERE created_at < datetime('now', ?)").bind(threadCutoff).run();
   const correctionNotes = await env.DB.prepare("UPDATE user_corrections SET note = NULL WHERE note IS NOT NULL AND created_at < datetime('now', ?)").bind(threadCutoff).run();
   const turnStates = await env.DB.prepare("DELETE FROM thread_turn_states WHERE updated_at < datetime('now', ?) AND status IN ('completed','failed','interrupted')").bind(auditCutoff).run();
   const auditEvents = await env.DB.prepare("DELETE FROM tool_audit_events WHERE created_at < datetime('now', ?)").bind(auditCutoff).run();
   const magicLinks = await env.DB.prepare("DELETE FROM auth_magic_links WHERE created_at < datetime('now', ?)").bind(threadCutoff).run();
   const sessions = await env.DB.prepare("DELETE FROM auth_sessions WHERE revoked_at IS NOT NULL AND created_at < datetime('now', ?)").bind(auditCutoff).run();
-  const oldJobs = await env.DB.prepare("DELETE FROM background_jobs WHERE status IN ('completed','failed') AND updated_at < datetime('now', ?)").bind(auditCutoff).run();
+  const oldJobs = await env.DB.prepare("DELETE FROM background_jobs WHERE status IN ('completed','failed','cancelled') AND updated_at < datetime('now', ?)").bind(auditCutoff).run();
   await env.DB.prepare("UPDATE auth_sessions SET revoked_at = datetime('now') WHERE expires_at < datetime('now') AND revoked_at IS NULL").run();
   await env.DB.prepare("DELETE FROM export_artifacts WHERE expires_at < datetime('now')").run();
 
@@ -215,8 +164,7 @@ export async function cleanupExpired(env: Env) {
     auditEvents: auditEvents.meta?.changes ?? 0,
     magicLinks: magicLinks.meta?.changes ?? 0,
     sessions: sessions.meta?.changes ?? 0,
-    oldJobs: oldJobs.meta?.changes ?? 0,
-    exportArtifacts: artifacts.results?.length ?? 0
+    oldJobs: oldJobs.meta?.changes ?? 0
   };
   console.info('retention_cleanup', { threadDays, auditDays, counts });
   return { threadDays, auditDays, counts };
@@ -228,6 +176,10 @@ function retentionDays(value: string | undefined, fallback: number, minimum: num
   return parsed;
 }
 
+function safeJson(value?: string): Record<string, unknown> {
+  try { return value ? JSON.parse(value) as Record<string, unknown> : {}; } catch { return {}; }
+}
+
 export function deletionInventory(): string[] {
   return [
     ...ACCOUNT_TABLE_DELETES,
@@ -237,7 +189,6 @@ export function deletionInventory(): string[] {
     'thread_events:cascade-via-threads',
     'stripe_subscriptions:retained-with-opaque-account-key',
     'stripe_customers:email-removed',
-    'background_jobs:minimized',
-    'R2:exports/account/*'
+    'background_jobs:minimized'
   ];
 }
