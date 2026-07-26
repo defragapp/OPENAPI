@@ -13,6 +13,7 @@ const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || '8b1954d216d65077c
 const apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
 const workerName = 'sovv-web';
 const d1Name = 'sovereign-openapi-db';
+const queueName = 'sovereign-openapi-jobs';
 const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT_SHA || '').trim();
 const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '').trim();
 
@@ -33,9 +34,9 @@ function sanitize(value) {
   return output;
 }
 
-function runWrangler(args, options = {}) {
+function executeWrangler(args, options = {}) {
   const capture = options.capture !== false;
-  const result = spawnSync(
+  return spawnSync(
     'pnpm',
     ['--filter', '@sovereign/worker', 'exec', 'wrangler', ...args],
     {
@@ -46,6 +47,10 @@ function runWrangler(args, options = {}) {
       env
     }
   );
+}
+
+function runWrangler(args, options = {}) {
+  const result = executeWrangler(args, options);
   if (result.status !== 0) {
     throw new Error(`wrangler ${args.join(' ')} failed: ${sanitize(result.stderr || result.stdout)}`);
   }
@@ -74,6 +79,29 @@ function findDatabaseId(value) {
   return match?.uuid ?? match?.id ?? match?.database_id;
 }
 
+function queueAppearsInList(output) {
+  return String(output || '').includes(queueName);
+}
+
+function ensureQueue() {
+  if (queueAppearsInList(runWrangler(['queues', 'list']))) return false;
+
+  const created = executeWrangler(['queues', 'create', queueName], { capture: false });
+  if (created.status !== 0) {
+    const refreshed = runWrangler(['queues', 'list']);
+    if (!queueAppearsInList(refreshed)) {
+      throw new Error(`wrangler queues create ${queueName} failed`);
+    }
+    return false;
+  }
+
+  const refreshed = runWrangler(['queues', 'list']);
+  if (!queueAppearsInList(refreshed)) {
+    throw new Error(`Queue ${queueName} was not visible after creation`);
+  }
+  return true;
+}
+
 async function resolveTurnstileSecret() {
   // Workers Builds authenticates Wrangler internally without necessarily exposing
   // an API token to the build process. Preserve the existing Worker secret in that mode.
@@ -96,13 +124,13 @@ async function resolveTurnstileSecret() {
 }
 
 let createdDatabase = false;
+let queueCreated = false;
 let databaseId;
 
 try {
   databaseId = findDatabaseId(parseJsonOutput(runWrangler(['d1', 'list', '--json'])));
   if (!databaseId) {
     // Wrangler 4.112 supports JSON output for `d1 list`, but not for `d1 create`.
-    // Create without `--json`, then resolve the new database ID from a fresh list.
     runWrangler(['d1', 'create', d1Name], { capture: false });
     databaseId = findDatabaseId(parseJsonOutput(runWrangler(['d1', 'list', '--json'])));
     createdDatabase = true;
@@ -125,6 +153,8 @@ try {
     '--remote',
     '--config', generatedConfigPath
   ], { capture: false });
+
+  queueCreated = ensureQueue();
 
   // sovv-web already exists, so missing runtime secrets can be prepared before
   // the single application upload. Existing encrypted secrets remain untouched.
@@ -153,7 +183,8 @@ try {
     });
   }
 
-  // One code upload provisions Queue, Durable Object, Workers AI and assets.
+  // The Worker upload attaches the Queue producer/consumer and applies the
+  // configured SQLite Durable Object migration for ThreadCoordinator.
   const deployOutput = runWrangler(['deploy', '--config', generatedConfigPath]);
   const workersDevUrl = deployOutput.match(/https:\/\/[^\s]+\.workers\.dev/)?.[0] || null;
 
@@ -162,7 +193,8 @@ try {
     commitSha,
     d1Name,
     createdDatabase,
-    queueName: 'sovereign-openapi-jobs',
+    queueName,
+    queueCreated,
     workersDevUrl,
     publicUrl: 'https://defrag.app',
     r2Enabled: false,
