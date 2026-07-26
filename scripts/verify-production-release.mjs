@@ -5,6 +5,7 @@ const deploy = readFileSync('scripts/cloudflare-direct-production-deploy.mjs', '
 const config = readFileSync('wrangler.production-direct.jsonc', 'utf8');
 const runtime = readFileSync('apps/sovereign-worker/src/runtime-entry.ts', 'utf8');
 const env = readFileSync('apps/sovereign-worker/src/env.ts', 'utf8');
+const auth = readFileSync('apps/sovereign-worker/src/auth-public.ts', 'utf8');
 const product = readFileSync('apps/sovereign-worker/src/db/product.ts', 'utf8');
 const jobs = readFileSync('apps/sovereign-worker/src/jobs.ts', 'utf8');
 const stripe = readFileSync('apps/sovereign-worker/src/billing/stripe.ts', 'utf8');
@@ -159,9 +160,24 @@ for (const required of [
   'auth_magic_links_ip_created_idx',
   'webhook_events_pending_idx',
   'background_jobs_account_kind_due_idx',
-  'deletion_jobs_due_idx'
+  'deletion_jobs_due_idx',
+  'ALTER TABLE accounts ADD COLUMN terms_accepted_at',
+  'ALTER TABLE accounts ADD COLUMN terms_version',
+  'ALTER TABLE accounts ADD COLUMN privacy_version'
 ]) {
   if (!scaleMigration.includes(required)) throw new Error(`Production scale migration is missing ${required}`);
+}
+
+for (const required of [
+  "if (kind === 'login' && !existing)",
+  "if (row.purpose === 'login' && !row.account_id)",
+  "if (row.purpose === 'signup' && !row.terms_accepted_at)",
+  "if (row.purpose !== 'signup')",
+  'terms_accepted_at = ?, terms_version = ?, privacy_version = ?',
+  "account.auth_subject !== subject",
+  'SameSite=Lax; Priority=High'
+]) {
+  if (!auth.includes(required)) throw new Error(`Account creation safety is missing ${required}`);
 }
 
 if (env.includes('ARTIFACTS') || env.includes('R2Bucket')) throw new Error('Worker Env must not expose R2');
@@ -183,7 +199,13 @@ for (const required of [
   'VITE_TURNSTILE_SITE_KEY',
   'navigator.share',
   'No private workspace data is included',
-  'Support Sovereign.OS'
+  'Support Sovereign.OS',
+  'STRIPE_HANDOFF_HOSTS',
+  "'checkout.stripe.com'",
+  "'billing.stripe.com'",
+  'untrusted_billing_handoff',
+  'TERMS_URL',
+  'PRIVACY_URL'
 ]) {
   if (!browserRuntime.includes(required)) throw new Error(`Browser production runtime is missing ${required}`);
 }
@@ -199,4 +221,4 @@ for (const required of [
 }
 if (/full account export|export features/i.test(pricing)) throw new Error('Pricing still promises private export');
 
-console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0009 d1_scale_indexes=true durable_objects=true workers_ai=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true app_service_worker=false cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true donation=true private_exports=false public_share=true live_gate=true concurrency_probe=20');
+console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0009 d1_scale_indexes=true durable_objects=true workers_ai=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true app_service_worker=false signup_only_account_creation=true policy_acceptance_persisted=true trusted_stripe_handoffs=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true donation=true private_exports=false public_share=true live_gate=true concurrency_probe=20');
