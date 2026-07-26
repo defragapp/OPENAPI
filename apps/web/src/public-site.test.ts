@@ -39,10 +39,12 @@ describe('Sovereign.OS launch surface', () => {
     for (const phrase of ['$20', '$99', '10 Sovereign AI turns', 'permanent plan', 'Stripe']) {
       expect(publicCopy).toContain(phrase);
     }
-    for (const feature of ['Today', 'Explore', 'People', 'Systems', 'Library', 'Covenant', 'export']) {
+    for (const feature of ['Today', 'Explore', 'People', 'Systems', 'Library', 'Covenant', 'sharing']) {
       expect(publicCopy).toContain(feature);
     }
+    expect(publicCopy).not.toMatch(/full account export|export features/i);
     expect(pricing).toContain('Your workspace is not deleted when a paid subscription ends.');
+    expect(pricing).toContain('does not grant subscription access');
   });
 
   it('explains privacy, permission, uncertainty, and visual authority clearly', () => {
