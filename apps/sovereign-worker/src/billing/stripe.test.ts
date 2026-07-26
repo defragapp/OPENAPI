@@ -121,7 +121,7 @@ describe('Stripe launch billing adapter', () => {
     expect(writes.some((write) => String(write[0]).includes('retained_billing_record'))).toBe(true);
   });
 
-  it('cancels nonterminal Stripe subscriptions idempotently before deletion', async () => {
+  it('deduplicates D1 and remote subscriptions before cancellation', async () => {
     const { env, writes } = envWithRecorder({
       subscriptions: [
         { stripe_subscription_id: 'sub_active_1', status: 'active' },
@@ -131,16 +131,43 @@ describe('Stripe launch billing adapter', () => {
     Object.assign(env, { STRIPE_SECRET_KEY: 'sk_fixture' });
     const requests: Array<{ url: string; method: string | undefined; idempotency: string | null }> = [];
     vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
-      requests.push({ url, method: init?.method, idempotency: new Headers(init?.headers).get('idempotency-key') });
+      const method = init?.method;
+      requests.push({ url, method, idempotency: new Headers(init?.headers).get('idempotency-key') });
+      if (method === 'GET') {
+        return Response.json({
+          data: [
+            { id: 'sub_active_1', status: 'active' },
+            { id: 'sub_done_1', status: 'canceled' }
+          ],
+          has_more: false
+        });
+      }
       return Response.json({ id: 'sub_active_1', status: 'canceled' });
     }));
 
     expect(await cancelAccountSubscriptions(env, 'acct_1', 'delete_1')).toEqual({ cancelled: 1 });
-    expect(requests).toHaveLength(1);
-    expect(requests[0]).toMatchObject({ method: 'DELETE' });
-    expect(requests[0]?.url).toContain('/subscriptions/sub_active_1');
-    expect(requests[0]?.idempotency).toContain('delete-delete_1-sub_active_1');
+    const deletes = requests.filter((request) => request.method === 'DELETE');
+    expect(deletes).toHaveLength(1);
+    expect(deletes[0]?.url).toContain('/subscriptions/sub_active_1');
+    expect(deletes[0]?.idempotency).toContain('delete-delete_1-sub_active_1');
     expect(writes.some((write) => String(write[0]).includes("plan = 'free'"))).toBe(true);
+  });
+
+  it('cancels a remote subscription even when its webhook never reached D1', async () => {
+    const { env } = envWithRecorder();
+    Object.assign(env, { STRIPE_SECRET_KEY: 'sk_fixture' });
+    const requests: Array<{ url: string; method: string | undefined }> = [];
+    vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
+      requests.push({ url, method: init?.method });
+      if (init?.method === 'GET') {
+        return Response.json({ data: [{ id: 'sub_remote_1', status: 'past_due' }], has_more: false });
+      }
+      return Response.json({ id: 'sub_remote_1', status: 'canceled' });
+    }));
+
+    expect(await cancelAccountSubscriptions(env, 'acct_1', 'delete_remote')).toEqual({ cancelled: 1 });
+    expect(requests.some((request) => request.url.includes('/subscriptions/search?'))).toBe(true);
+    expect(requests.some((request) => request.method === 'DELETE' && request.url.includes('/subscriptions/sub_remote_1'))).toBe(true);
   });
 
   it('creates deterministic local Checkout and Portal handoffs', async () => {
