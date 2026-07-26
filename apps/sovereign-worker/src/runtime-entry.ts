@@ -30,9 +30,7 @@ const runtime = {
       const authConfigured = Boolean(
         env.SESSION_SIGNING_SECRET
         && env.TURNSTILE_SECRET_KEY
-        && env.EMAIL_API_URL
-        && env.EMAIL_API_TOKEN
-        && env.EMAIL_FROM
+        && (env.EMAIL || env.RESEND_API_KEY)
       );
       const stripeConfigured = Boolean(
         env.STRIPE_SECRET_KEY
@@ -53,6 +51,7 @@ const runtime = {
         baselineObserver: 'Earth geocenter 500@399',
         birthplaceGeocoder: 'disabled',
         authentication: authConfigured ? 'configured' : 'missing',
+        transactionalEmail: env.EMAIL ? 'cloudflare-binding' : env.RESEND_API_KEY ? 'resend' : 'missing',
         legacySovvAdapter: env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'disabled',
         stripe: stripeConfigured ? 'configured' : 'missing',
         scripture: env.SCRIPTURE_TRANSLATION || 'WEB',
