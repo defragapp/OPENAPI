@@ -159,7 +159,7 @@ function policyLink(label: string, href: string): HTMLAnchorElement {
 export async function sharePublicPlatform(): Promise<void> {
   const data = {
     title: 'Sovereign.OS',
-    text: 'See what is really happening without losing yourself inside it.',
+    text: 'Understand yourself, your relationships, and the systems around you—in context.',
     url: PUBLIC_SHARE_URL
   };
 

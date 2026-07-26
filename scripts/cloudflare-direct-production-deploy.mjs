@@ -166,7 +166,7 @@ async function verifyLiveProduction() {
 
   assert(home.response.ok, `public home returned ${home.response.status}`);
   assert(/Sovereign\.OS/i.test(home.text), 'public home does not identify Sovereign.OS');
-  assert(home.text.includes('See what is really happening'), 'public home fingerprint is missing');
+  assert(home.text.includes('Understand your life in context'), 'platform public home fingerprint is missing');
   assert(pricing.response.ok, `pricing returned ${pricing.response.status}`);
   assert(pricing.text.includes('$20') && pricing.text.includes('$99'), 'launch pricing is missing');
   assert(!pricing.text.includes('$29') && !pricing.text.includes('$79'), 'legacy pricing is still visible');

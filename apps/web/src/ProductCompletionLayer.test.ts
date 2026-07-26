@@ -24,9 +24,10 @@ describe('product completion layer', () => {
     expect(layer).toContain('/(compare|comparison)');
     expect(layer).toContain('/(alignment|analysis)');
     expect(layer).toContain('result.participants');
-    expect(layer).toContain('Responsibility boundaries');
-    expect(layer).toContain('Raw birth details shared');
-    expect(layer).toContain('Exact private location shared');
+    expect(layer).toContain('Who is responsible for what');
+    expect(layer).toContain('Raw birth details stayed private');
+    expect(layer).toContain('Exact private location stayed private');
+    expect(layer).toContain('Two people, not one story.');
   });
 
   it('provides owner and invitee revocation controls in plain language', () => {

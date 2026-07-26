@@ -1,247 +1,305 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import type { KeyboardEvent } from 'react';
 
-const moments = [
+const examples = [
   {
-    label: 'The decision',
-    prompt: '“I need to decide today, but every option feels wrong.”',
-    baseline: 'You tend to decide better once the whole picture is visible.',
-    pressure: 'Urgency may be louder than clarity right now.',
-    move: 'Name what truly expires today. Pause everything else.'
+    label: 'A decision',
+    prompt: 'I have two good job offers. Why does choosing one feel impossible?',
+    notice: 'The deadline may be asking you to feel certain before the information is complete.',
+    question: 'Which missing fact would actually change your choice?',
+    answer: 'I need to know how much authority I would have in the new role.',
+    result: 'The decision may be less about choosing the perfect company and more about whether the role gives you enough autonomy.',
+    move: 'Ask both hiring managers the same direct question about decision authority, then compare the answers.'
   },
   {
-    label: 'The silence',
-    prompt: '“I asked what was wrong. They said nothing, then went quiet.”',
-    baseline: 'You may move toward reassurance when connection feels uncertain.',
-    pressure: 'Their need for space and your need for clarity may be raising pressure in opposite directions.',
-    move: 'Lower the demand for an immediate answer without abandoning the conversation.'
+    label: 'A relationship',
+    prompt: 'We both think we are being clear. Why do we keep missing each other?',
+    notice: 'You may be trying to reach clarity through conversation while the other person needs time before responding.',
+    question: 'What would let the conversation pause without feeling abandoned?',
+    answer: 'Knowing when we will return to it would help.',
+    result: 'The conflict may be less about whether either person cares and more about two different ways of reaching clarity.',
+    move: 'Agree on a return time before taking space, so silence does not have to carry the whole meaning.'
   },
   {
-    label: 'The reaction',
-    prompt: '“I know this is small. Why did it land so hard?”',
-    baseline: 'Certain meanings may matter more to you than the surface event suggests.',
-    pressure: 'Today’s context may be amplifying the speed or intensity of your response.',
-    move: 'Separate what happened, what it meant to you, and what remains unknown.'
+    label: 'A system',
+    prompt: 'Everyone calls me when something goes wrong, but no one follows my decisions.',
+    notice: 'Responsibility may be landing with you while decision authority remains somewhere else.',
+    question: 'Which decisions are you expected to carry without the authority to make?',
+    answer: 'I handle every crisis, but my manager makes the final call.',
+    result: 'The strain may be coming from a role mismatch—not from a personal failure to lead.',
+    move: 'Name the decisions you own, the decisions your manager owns, and what happens when an urgent call cannot wait.'
   }
 ] as const;
 
-const workspaceAreas = [
+const intelligenceLevels = [
   {
-    label: 'Today',
-    title: 'Start with a useful read of now.',
-    copy: 'See your enduring Baseline beside current pressure, confirmed observations, and the parts nobody can honestly know yet.'
+    number: '01',
+    label: 'PERSONAL',
+    title: 'Understand your own response.',
+    prompt: 'Why does this decision feel harder for me than it looks?',
+    copy: 'Sovereign separates your steady tendencies from temporary pressure and the facts of the situation.'
   },
   {
-    label: 'Explore',
-    title: 'Ask in ordinary language.',
-    copy: 'Work through decisions, communication, learning, love, expression, identity, or pressure without decoding a framework first.'
+    number: '02',
+    label: 'RELATIONAL',
+    title: 'See two perspectives at once.',
+    prompt: 'Why do we both think we are being clear?',
+    copy: 'With permission from both people, Sovereign compares how each person may process the same interaction.'
   },
   {
-    label: 'People & Systems',
-    title: 'Understand what happens between you.',
-    copy: 'Use identity-bound consent to compare people or examine families, households, friendships, workplaces, and teams.'
-  },
-  {
-    label: 'Library & Covenant',
-    title: 'Keep only what you choose.',
-    copy: 'Save useful understanding deliberately. Add the optional biblical Covenant lens only when you explicitly invite it.'
+    number: '03',
+    label: 'SYSTEM',
+    title: 'See the structure around the conflict.',
+    prompt: 'Why does responsibility keep falling to one person?',
+    copy: 'Family, household, friendship, and team views add roles, authority, dependence, and shared goals.'
   }
 ] as const;
 
-type Feedback = 'yes' | 'partly' | 'not_today';
-
-const feedbackCopy: Record<Feedback, string> = {
-  yes: 'Marked as fitting this example.',
-  partly: 'Marked as partly fitting. A real answer would ask what needs correction.',
-  not_today: 'Marked as not fitting today. Sovereign is built to accept correction.'
-};
+const baselineDimensions = [
+  ['Decision style', 'What you may need before a choice feels settled.'],
+  ['Communication', 'How you tend to find and express clarity.'],
+  ['Connection', 'What supports trust, closeness, and repair.'],
+  ['Pressure response', 'What may become louder when the stakes rise.']
+] as const;
 
 export function PublicLanding() {
-  const [activeMoment, setActiveMoment] = useState(0);
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const moment = moments[activeMoment]!;
+  const [activeExample, setActiveExample] = useState(0);
+  const example = examples[activeExample]!;
 
-  useEffect(() => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reducedMotion) return;
-    const timer = window.setInterval(() => {
-      setActiveMoment((current) => (current + 1) % moments.length);
-      setFeedback(null);
-    }, 7200);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  function selectMoment(index: number, focus = false) {
-    setActiveMoment(index);
-    setFeedback(null);
-    if (focus) queueMicrotask(() => tabRefs.current[index]?.focus());
-  }
-
-  function handleTabKey(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+  function moveExample(event: KeyboardEvent<HTMLButtonElement>, index: number) {
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
     event.preventDefault();
     const next = event.key === 'Home'
       ? 0
       : event.key === 'End'
-        ? moments.length - 1
-        : (index + (event.key === 'ArrowRight' ? 1 : -1) + moments.length) % moments.length;
-    selectMoment(next, true);
+        ? examples.length - 1
+        : (index + (event.key === 'ArrowRight' ? 1 : -1) + examples.length) % examples.length;
+    setActiveExample(next);
+    const tabs = event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+    tabs?.[next]?.focus();
   }
 
   return (
     <main className="sovereign-landing">
-      <div className="landing-atmosphere" aria-hidden="true">
-        <span className="landing-glow landing-glow-one" />
-        <span className="landing-glow landing-glow-two" />
-      </div>
-
       <header className="landing-nav">
         <a className="landing-wordmark" href="/" aria-label="Sovereign.OS home">
-          <span className="landing-mark" aria-hidden="true">S</span>
-          <span>SOVEREIGN.OS</span>
+          <span aria-hidden="true">S</span>
+          <strong>SOVEREIGN.OS</strong>
         </a>
         <nav aria-label="Public navigation">
           <a href="/how-it-works.html">How it works</a>
           <a href="/pricing.html">Pricing</a>
-          <a href="/faq.html">FAQ</a>
+          <a href="/faq.html">Questions</a>
           <a href="/login">Sign in</a>
-          <a className="landing-nav-cta" href="/signup">Start free</a>
+          <a className="landing-nav-cta" href="/signup">Build my Baseline</a>
         </nav>
       </header>
 
       <section className="landing-hero">
         <div className="landing-copy">
-          <p className="landing-kicker"><span /> PRIVATE DECISION INTELLIGENCE</p>
-          <h1>See what is really happening. Choose without losing yourself.</h1>
+          <p className="landing-kicker">PERSONAL · RELATIONAL · SYSTEM INTELLIGENCE</p>
+          <h1>Understand your life in context.</h1>
           <p className="landing-lede">
-            Sovereign starts with your private Baseline, separates enduring tendencies from today’s pressure,
-            and keeps unknowns visible—so your next move can be clearer without turning an interpretation into a verdict.
+            Sovereign.OS is a private intelligence platform for understanding yourself, your relationships,
+            and the groups you live and work inside.
+          </p>
+          <p className="landing-support">
+            It begins with Baseline Design—a starting map of how you tend to decide, communicate, connect,
+            and respond under pressure—then adds the moment, people, and facts you choose.
           </p>
           <div className="landing-actions">
             <a className="landing-button landing-button-primary" href="/signup">Build my Baseline</a>
-            <a className="landing-button landing-button-secondary" href="#product-preview">See it work</a>
+            <a className="landing-button landing-button-secondary" href="#product-example">See how it helps</a>
           </div>
-          <div className="landing-trust" aria-label="Product principles">
+          <div className="landing-trust">
             <span>Start free</span>
-            <span>Private by design</span>
-            <span>Non-diagnostic</span>
+            <span>Useful before you explain a problem</span>
+            <span>You decide what carries forward</span>
           </div>
         </div>
 
-        <div className="landing-product" id="product-preview">
-          <div className="baseline-orbit" aria-hidden="true">
-            <span className="orbit orbit-one" />
-            <span className="orbit orbit-two" />
-            <span className="orbit orbit-three" />
-            <span className="orbit-node node-one" />
-            <span className="orbit-node node-two" />
-            <span className="orbit-core" />
+        <div className="context-console" aria-label="Example of Sovereign.OS using Baseline and current context">
+          <header>
+            <div><span className="console-mark">S</span><strong>TODAY</strong></div>
+            <span>EXAMPLE · NOT YOUR READING</span>
+          </header>
+          <div className="context-map" aria-hidden="true">
+            <div className="context-ring context-ring-outer" />
+            <div className="context-ring context-ring-inner" />
+            <div className="context-node context-node-baseline"><span>BASELINE</span><strong>Decision style</strong></div>
+            <div className="context-node context-node-current"><span>CURRENT</span><strong>Deadline pressure</strong></div>
+            <div className="context-node context-node-known"><span>KNOWN</span><strong>Offer expires Friday</strong></div>
+            <div className="context-core"><span>YOU</span><strong>Context stays distinct</strong></div>
           </div>
-
-          <section className="today-preview" aria-label="Sovereign Today example">
-            <header className="preview-bar">
-              <div><span className="preview-status" /> <strong>SOVEREIGN · TODAY</strong></div>
-              <span>PRIVATE</span>
-            </header>
-
-            <div className="preview-tabs" role="tablist" aria-label="Example moments">
-              {moments.map((item, index) => (
-                <button
-                  key={item.label}
-                  ref={(element) => { tabRefs.current[index] = element; }}
-                  type="button"
-                  role="tab"
-                  tabIndex={activeMoment === index ? 0 : -1}
-                  aria-selected={activeMoment === index}
-                  className={activeMoment === index ? 'active' : ''}
-                  onClick={() => selectMoment(index)}
-                  onKeyDown={(event) => handleTabKey(event, index)}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="preview-content" key={activeMoment} aria-live="polite">
-              <p className="preview-prompt">{moment.prompt}</p>
-              <div className="preview-reading">
-                <article>
-                  <span>YOUR BASELINE</span>
-                  <p>{moment.baseline}</p>
-                </article>
-                <article>
-                  <span>CURRENT PRESSURE</span>
-                  <p>{moment.pressure}</p>
-                </article>
-                <article className="preview-next">
-                  <span>CLEANEST NEXT MOVE</span>
-                  <p>{moment.move}</p>
-                </article>
-              </div>
-              <footer className="preview-footer">
-                <span>Unknowns remain unknown</span>
-                <div aria-label="Does this example fit?">
-                  <button className={feedback === 'yes' ? 'active' : ''} aria-pressed={feedback === 'yes'} type="button" onClick={() => setFeedback('yes')}>Yes</button>
-                  <button className={feedback === 'partly' ? 'active' : ''} aria-pressed={feedback === 'partly'} type="button" onClick={() => setFeedback('partly')}>Partly</button>
-                  <button className={feedback === 'not_today' ? 'active' : ''} aria-pressed={feedback === 'not_today'} type="button" onClick={() => setFeedback('not_today')}>Not today</button>
-                </div>
-              </footer>
-              <p className="preview-feedback-note" role="status">{feedback ? feedbackCopy[feedback] : 'Confirm it, correct it, or reject it.'}</p>
-            </div>
-          </section>
+          <article className="console-question">
+            <span>YOU ASK</span>
+            <p>Why can’t I choose when both options are good?</p>
+          </article>
+          <article className="console-answer">
+            <span>SOVEREIGN NOTICES</span>
+            <p>The deadline may be forcing certainty before the information is complete.</p>
+            <strong>Which missing fact would actually change your choice?</strong>
+          </article>
+          <footer>
+            <span>Baseline</span><i>+</i><span>current pressure</span><i>+</i><span>confirmed facts</span>
+          </footer>
         </div>
       </section>
 
-      <section className="landing-workspace" aria-labelledby="workspace-title">
+      <section className="intelligence-section" id="product-example" aria-labelledby="intelligence-title">
         <div className="landing-section-heading">
           <div>
-            <p className="landing-kicker"><span /> ONE PRIVATE WORKSPACE</p>
-            <h2 id="workspace-title">Set it up once. Correct it as you go.</h2>
+            <p className="landing-kicker">ONE PLATFORM · THREE LEVELS</p>
+            <h2 id="intelligence-title">See the person, the interaction, and the system.</h2>
           </div>
-          <p>One Baseline can support the day, the decision, the relationship, and the system without flattening them into the same answer.</p>
+          <p>
+            Most advice sees only the sentence you typed. Sovereign can keep your individual context,
+            another person’s permitted context, and the structure around both of you visible at the same time.
+          </p>
         </div>
-        <div className="landing-module-grid">
-          {workspaceAreas.map((area, index) => (
-            <article key={area.label}>
-              <span>{String(index + 1).padStart(2, '0')} · {area.label}</span>
-              <h3>{area.title}</h3>
-              <p>{area.copy}</p>
+        <div className="intelligence-grid">
+          {intelligenceLevels.map((level) => (
+            <article key={level.label}>
+              <div><span>{level.number}</span><strong>{level.label}</strong></div>
+              <h3>{level.title}</h3>
+              <blockquote>{level.prompt}</blockquote>
+              <p>{level.copy}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="landing-principles" aria-label="How Sovereign works">
-        <article>
-          <span>01</span>
-          <div><h2>Begin with you.</h2><p>Your Baseline is a private starting point, not a fixed identity or public label.</p></div>
-        </article>
-        <article>
-          <span>02</span>
-          <div><h2>Add context carefully.</h2><p>Today, people, and systems are layered in without pretending the unknown is known.</p></div>
-        </article>
-        <article>
-          <span>03</span>
-          <div><h2>Keep only what helps.</h2><p>Nothing becomes lasting memory unless you deliberately save it.</p></div>
-        </article>
+      <section className="baseline-section" aria-labelledby="baseline-title">
+        <div className="baseline-copy">
+          <p className="landing-kicker">BASELINE DESIGN</p>
+          <h2 id="baseline-title">A starting map—not a verdict about who you are.</h2>
+          <p>
+            You enter your birth date, birthplace, and birth time if known. Sovereign.OS uses astronomical
+            positions and selected symbolic frameworks to build an interpretive Baseline, then translates it
+            into ordinary language.
+          </p>
+          <p>
+            The frameworks stay in the supporting layer. The product shows what may be useful for reflection,
+            keeps the present moment separate, and asks you to confirm what actually fits.
+          </p>
+          <a href="/how-it-works.html">See the complete process <span aria-hidden="true">→</span></a>
+        </div>
+        <div className="baseline-card">
+          <header><span>EXAMPLE BASELINE</span><strong>Ready before the first question</strong></header>
+          {baselineDimensions.map(([label, copy], index) => (
+            <article key={label}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <div><strong>{label}</strong><p>{copy}</p></div>
+            </article>
+          ))}
+          <footer>Interpretive · correctable · private by default</footer>
+        </div>
+      </section>
+
+      <section className="conversation-section" aria-labelledby="conversation-title">
+        <div className="landing-section-heading">
+          <div>
+            <p className="landing-kicker">WHAT USING IT FEELS LIKE</p>
+            <h2 id="conversation-title">Bring a real question. Leave with a clearer next move.</h2>
+          </div>
+          <p>
+            Sovereign does not begin with a lecture or a verdict. It notices one useful distinction,
+            asks one inward question, and develops the answer after you respond.
+          </p>
+        </div>
+
+        <div className="example-tabs" role="tablist" aria-label="Example conversations">
+          {examples.map((item, index) => (
+            <button
+              key={item.label}
+              type="button"
+              role="tab"
+              id={`example-tab-${index}`}
+              aria-controls="example-panel"
+              aria-selected={activeExample === index}
+              className={activeExample === index ? 'active' : ''}
+              onClick={() => setActiveExample(index)}
+              onKeyDown={(event) => moveExample(event, index)}
+              tabIndex={activeExample === index ? 0 : -1}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div
+          className="example-thread"
+          id="example-panel"
+          role="tabpanel"
+          aria-labelledby={`example-tab-${activeExample}`}
+          aria-live="polite"
+        >
+          <div className="example-thread-rail">
+            <span>01</span><i /><span>02</span><i /><span>03</span>
+          </div>
+          <article className="example-user">
+            <span>YOUR QUESTION</span>
+            <p>“{example.prompt}”</p>
+          </article>
+          <article className="example-sovereign">
+            <div><span>WHAT I NOTICE</span><p>{example.notice}</p></div>
+            <div><span>LOOK INWARD</span><strong>{example.question}</strong></div>
+          </article>
+          <article className="example-user-answer">
+            <span>YOU ANSWER</span>
+            <p>“{example.answer}”</p>
+          </article>
+          <article className="example-integration">
+            <div><span>WHAT THIS MAY BE SHOWING</span><p>{example.result}</p></div>
+            <div><span>ONE NEXT MOVE</span><strong>{example.move}</strong></div>
+          </article>
+          <footer>Example only. Your answer uses your permitted context and the facts you provide.</footer>
+        </div>
+      </section>
+
+      <section className="permission-section" aria-labelledby="permission-title">
+        <div>
+          <p className="landing-kicker">PEOPLE AND SYSTEMS</p>
+          <h2 id="permission-title">More context never means less agency.</h2>
+          <p>
+            Add a person privately, invite them when you want to compare perspectives, and let them choose what
+            their Baseline may contribute. Families and teams keep every person, role, and unknown distinct.
+          </p>
+        </div>
+        <div className="permission-visual" aria-label="Example permission-based relationship comparison">
+          <article><span>YOU</span><strong>Clarity through conversation</strong><small>Baseline shared</small></article>
+          <div><i /><strong>PERMISSION ACTIVE</strong><i /></div>
+          <article><span>ALEX</span><strong>Clarity through reflection</strong><small>Baseline shared</small></article>
+          <p><strong>POSSIBLE FRICTION</strong> One person asks sooner while the other answers later.</p>
+          <p><strong>STILL UNKNOWN</strong> Why either person is quiet and what either person will choose.</p>
+        </div>
+      </section>
+
+      <section className="control-section" aria-label="Privacy and control">
+        <article><span>01</span><h3>Your inputs stay behind the calculation boundary.</h3><p>Raw birth details and exact private location do not enter the language model.</p></article>
+        <article><span>02</span><h3>Another person controls their own context.</h3><p>Adding a name is not permission. Shared analysis starts only after they choose.</p></article>
+        <article><span>03</span><h3>Nothing becomes memory by accident.</h3><p>Correct the moment freely. Save an understanding only when you want it to carry forward.</p></article>
       </section>
 
       <section className="landing-final-callout">
         <div>
-          <p className="landing-kicker"><span /> START WITH A REAL MOMENT</p>
-          <h2>Free begins with Baseline, Today, Explore, and 10 AI turns each month.</h2>
-          <p>Sovereign+ adds 300 monthly AI turns, consented People and Systems, Library continuity, and the optional Covenant lens for $20 monthly or $99 annually.</p>
+          <p className="landing-kicker">START WITH YOU</p>
+          <h2>Live a life you’d choose to watch again.</h2>
+          <p>Build your Baseline, open Today, and bring the next decision, relationship, or pressure point.</p>
         </div>
         <div className="landing-actions">
-          <a className="landing-button landing-button-primary" href="/signup">Start free</a>
+          <a className="landing-button landing-button-primary" href="/signup">Build my Baseline</a>
           <a className="landing-button landing-button-secondary" href="/pricing.html">Compare plans</a>
         </div>
       </section>
 
       <footer className="landing-footer">
-        <span>Consent-aware · Private by default · Built for correction</span>
-        <nav aria-label="Footer navigation"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/pricing.html">Pricing</a></nav>
+        <span>Sovereign.OS · Personal, relational, and system intelligence</span>
+        <nav aria-label="Footer navigation">
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/faq.html">Questions</a>
+        </nav>
       </footer>
     </main>
   );

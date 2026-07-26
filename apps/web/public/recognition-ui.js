@@ -392,7 +392,7 @@ function renderFrameworkConsentControl() {
   const title = document.createElement('strong');
   title.textContent = 'Show exact supporting data';
   const detail = document.createElement('small');
-  detail.textContent = 'framework.display · optional and revocable';
+  detail.textContent = 'Optional. You can turn this off later.';
   copy.append(title, detail);
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
