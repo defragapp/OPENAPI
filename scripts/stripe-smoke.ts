@@ -3,7 +3,25 @@ import type { Env } from '../apps/sovereign-worker/src/env';
 
 function fakeEnv(): Env {
   const writes: unknown[][] = [];
-  const db = { prepare(sql: string) { return { bind(...args: unknown[]) { return { async run() { writes.push([sql, ...args]); return { success: true, meta: { changes: 1 } }; }, async first() { return null; }, async all() { return { results: [] }; } }; } }; } } as unknown as D1Database;
+  const db = {
+    prepare(sql: string) {
+      return {
+        bind(...args: unknown[]) {
+          return {
+            async run() {
+              writes.push([sql, ...args]);
+              return { success: true, meta: { changes: 1 } };
+            },
+            async first() {
+              if (sql.startsWith('SELECT auth_subject FROM accounts')) return { auth_subject: 'user:stripe-smoke' };
+              return null;
+            },
+            async all() { return { results: [] }; }
+          };
+        }
+      };
+    }
+  } as unknown as D1Database;
   return { APP_ENV: 'test', APP_VERSION: 'stripe-smoke', AI_PROVIDER: 'cloudflare-gateway', AI_MODEL: 'openai/gpt-5.5', AI_GATEWAY_ID: 'sovereign', STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY: 'price_test_sovereign_monthly', STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL: 'price_test_sovereign_annual', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db, THREADS: {} as DurableObjectNamespace } as Env;
 }
 

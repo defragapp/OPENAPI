@@ -116,6 +116,21 @@ describe('authenticated Today and Explore smoke flow', () => {
     expect(json.frameworkDetailsDefault).toBe('collapsed');
   });
 
+  it('exposes public-link sharing without a private export route', async () => {
+    const res = await dispatch(new Request('https://app.test/api/v1/you', { headers: await authHeader() }), fakeEnv());
+    expect(res.status).toBe(200);
+    const json = await res.json() as any;
+    expect(json.privacy).toEqual({
+      deletion: '/api/v1/deletion-jobs',
+      privateExport: 'disabled',
+      sharing: {
+        mode: 'public-link-only',
+        url: 'https://sovereign.defrag.app',
+        includesPrivateWorkspaceData: false
+      }
+    });
+  });
+
   it('captures correction feedback and rejects duplicate turns', async () => {
     const env = fakeEnv();
     const headers = { ...(await authHeader()), origin: 'https://app.test', 'content-type': 'application/json' };

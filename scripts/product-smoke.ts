@@ -22,6 +22,9 @@ function fakeEnv(): Env {
                 const id = accounts.get(args[0] as string);
                 return id ? { id, auth_subject: args[0] } : null;
               }
+              if (sql.startsWith('SELECT auth_subject FROM accounts')) {
+                return [...accounts.values()].includes(args[0] as string) ? { auth_subject: 'user:product-smoke' } : null;
+              }
               if (sql.startsWith('SELECT id FROM persons')) {
                 const person = people.get(args[0] as string);
                 return person?.accountId === args[1] ? { id: args[0] } : null;
@@ -144,16 +147,22 @@ function fakeEnv(): Env {
 }
 
 async function request(env: Env, token: string, path: string, init: RequestInit = {}, expected = 200) {
-  const response = await app.fetch(new Request(`https://app.test${path}`, {
-    ...init,
-    headers: {
-      authorization: `Bearer ${token}`,
-      origin: 'https://app.test',
-      'content-type': 'application/json',
-      'x-idempotency-key': crypto.randomUUID(),
-      ...(init.headers ?? {})
-    }
-  }), env);
+  let response: Response;
+  try {
+    response = await app.fetch(new Request(`https://app.test${path}`, {
+      ...init,
+      headers: {
+        authorization: `Bearer ${token}`,
+        origin: 'https://app.test',
+        'content-type': 'application/json',
+        'x-idempotency-key': crypto.randomUUID(),
+        ...(init.headers ?? {})
+      }
+    }), env);
+  } catch (error) {
+    if (!(error instanceof Response)) throw error;
+    response = error;
+  }
   if (response.status !== expected) throw new Error(`${path} expected ${expected}, got ${response.status}: ${await response.text()}`);
   return response;
 }
@@ -209,7 +218,7 @@ async function main() {
   await json(env, token, '/api/v1/library');
   await json(env, token, `/api/v1/library/${saved.id}`, { method: 'DELETE' });
 
-  await json(env, token, '/api/v1/export-jobs', { method: 'POST' }, 202);
+  await request(env, token, '/api/v1/export-jobs', { method: 'POST' }, 404);
   const deletion = (await json(env, token, '/api/v1/deletion-jobs', { method: 'POST' }, 202)).deletionJob;
   await json(env, token, `/api/v1/deletion-jobs/${deletion.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'cancel' }) });
 
@@ -219,10 +228,14 @@ async function main() {
   });
   if (!covenant.scriptureSeparateFromInterpretation || !covenant.lens?.passage?.citation) throw new Error('Covenant smoke failed');
 
-  console.log('Product smoke passed billing=stripe-projected paid_surfaces=people,systems,library,export,covenant owner_granted_consent=blocked');
+  console.log('Product smoke passed billing=stripe-projected paid_surfaces=people,systems,library,covenant private_export=disabled owner_granted_consent=blocked');
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : String(error));
+main().catch(async (error) => {
+  if (error instanceof Response) {
+    console.error(`Product smoke received HTTP ${error.status}: ${await error.text()}`);
+  } else {
+    console.error(error instanceof Error ? error.message : String(error));
+  }
   process.exit(1);
 });

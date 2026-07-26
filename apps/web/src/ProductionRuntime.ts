@@ -1,4 +1,3 @@
-const SUPPORT_URL = 'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02';
 const PUBLIC_SHARE_URL = 'https://sovereign.defrag.app';
 const TERMS_URL = `${PUBLIC_SHARE_URL}/terms`;
 const PRIVACY_URL = `${PUBLIC_SHARE_URL}/privacy`;
@@ -125,19 +124,7 @@ function isTrustedStripeHandoff(value: unknown): boolean {
 
 function installUtilityLinks(): void {
   const render = () => {
-    replaceLegacyExportCopy();
     installAccountNavigation();
-
-    const footerNav = document.querySelector<HTMLElement>('.launch-footer nav');
-    if (footerNav && !footerNav.querySelector('[data-sovereign-support]')) {
-      footerNav.appendChild(createSupportLink('Support Sovereign.OS'));
-    }
-
-    document.querySelectorAll<HTMLElement>('.surface-card').forEach((card) => {
-      const eyebrow = card.querySelector('.eyebrow')?.textContent?.trim();
-      if (eyebrow === 'PLAN & USAGE') installWorkspaceSupportLink(card);
-      if (eyebrow === 'CONTROL') replaceExportWithShare(card);
-    });
   };
 
   new MutationObserver(render).observe(document.documentElement, { childList: true, subtree: true });
@@ -169,48 +156,7 @@ function policyLink(label: string, href: string): HTMLAnchorElement {
   return link;
 }
 
-function replaceLegacyExportCopy(): void {
-  document.querySelectorAll<HTMLElement>('.launch-callout p').forEach((paragraph) => {
-    const copy = paragraph.textContent ?? '';
-    if (!copy.includes('Covenant, and export for')) return;
-    paragraph.textContent = copy.replace('Covenant, and export for', 'Covenant, and consent-aware sharing for');
-  });
-}
-
-function installWorkspaceSupportLink(card: HTMLElement): void {
-  const actions = card.querySelector<HTMLElement>('.action-row');
-  if (!actions || actions.querySelector('[data-sovereign-support]')) return;
-  const link = createSupportLink('Support development');
-  link.className = 'secondary-button';
-  actions.appendChild(link);
-}
-
-function replaceExportWithShare(card: HTMLElement): void {
-  if (card.querySelector('[data-sovereign-share]')) return;
-  const rows = [...card.querySelectorAll<HTMLElement>('.settings-list > div')];
-  const exportRow = rows.find((row) => row.querySelector('strong')?.textContent?.trim() === 'Export');
-  if (!exportRow) return;
-
-  const row = document.createElement('div');
-  row.dataset.sovereignShare = 'true';
-
-  const description = document.createElement('span');
-  const title = document.createElement('strong');
-  const detail = document.createElement('small');
-  title.textContent = 'Share';
-  detail.textContent = 'Share the public Sovereign.OS link. No private workspace data is included.';
-  description.append(title, detail);
-
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.textContent = 'Share';
-  button.addEventListener('click', () => void sharePublicPlatform());
-
-  row.append(description, button);
-  exportRow.replaceWith(row);
-}
-
-async function sharePublicPlatform(): Promise<void> {
+export async function sharePublicPlatform(): Promise<void> {
   const data = {
     title: 'Sovereign.OS',
     text: 'See what is really happening without losing yourself inside it.',
@@ -229,17 +175,6 @@ async function sharePublicPlatform(): Promise<void> {
     if (error instanceof DOMException && error.name === 'AbortError') return;
     showNotice('Sharing is unavailable in this browser.', PUBLIC_SHARE_URL, 'Open public site');
   }
-}
-
-function createSupportLink(label: string): HTMLAnchorElement {
-  const link = document.createElement('a');
-  link.href = SUPPORT_URL;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  link.dataset.sovereignSupport = 'true';
-  link.textContent = label;
-  link.title = 'Voluntary support does not grant subscription access.';
-  return link;
 }
 
 function showNotice(message: string, href?: string, linkLabel?: string): void {

@@ -9,6 +9,7 @@ export interface PortalResult { url: string; sessionId: string; }
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set(['active', 'trialing']);
 const TERMINAL_SUBSCRIPTION_STATUSES = new Set(['canceled', 'incomplete_expired', 'retained_billing_record']);
 const PRODUCTION_HANDOFF_HOSTS = new Set(['checkout.stripe.com', 'billing.stripe.com']);
+const STRIPE_API_VERSION = '2026-06-24.dahlia';
 
 function stripeConfigured(env: Env): boolean {
   return Boolean(env.STRIPE_SECRET_KEY && env.STRIPE_SUCCESS_URL && env.STRIPE_CANCEL_URL);
@@ -47,7 +48,8 @@ async function stripeRequest<T>(env: Env, path: string, body: URLSearchParams, i
   const headers = new Headers({
     authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
     'content-type': 'application/x-www-form-urlencoded',
-    'idempotency-key': requireIdempotencyKey(idempotencyKey)
+    'idempotency-key': requireIdempotencyKey(idempotencyKey),
+    'stripe-version': STRIPE_API_VERSION
   });
   const response = await fetch(`https://api.stripe.com/v1${path}`, { method: 'POST', headers, body, signal: AbortSignal.timeout(10_000) });
   const data = await response.json().catch(() => ({}));
@@ -62,7 +64,8 @@ async function cancelStripeSubscription(env: Env, subscriptionId: string, idempo
     method: 'DELETE',
     headers: {
       authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
-      'idempotency-key': requireIdempotencyKey(idempotencyKey)
+      'idempotency-key': requireIdempotencyKey(idempotencyKey),
+      'stripe-version': STRIPE_API_VERSION
     },
     signal: AbortSignal.timeout(10_000)
   });
@@ -91,7 +94,10 @@ async function searchStripeSubscriptionsByAccount(env: Env, accountId: string): 
     if (page) params.set('page', page);
     const response = await fetch(`https://api.stripe.com/v1/subscriptions/search?${params.toString()}`, {
       method: 'GET',
-      headers: { authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
+      headers: {
+        authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+        'stripe-version': STRIPE_API_VERSION
+      },
       signal: AbortSignal.timeout(10_000)
     });
     const payload = await response.json().catch(() => ({})) as StripeSubscriptionSearchResult;
@@ -145,6 +151,12 @@ function configuredPrice(env: Env, interval: BillingInterval): string | undefine
   return interval === 'monthly' ? env.STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY : env.STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL;
 }
 
+async function checkoutIntegrationIdentifier(idempotencyKey: string): Promise<string> {
+  const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(idempotencyKey)));
+  const suffix = [...digest.slice(0, 8)].map((value) => String.fromCharCode(97 + (value % 26))).join('');
+  return `sovereign_checkout_${suffix}`;
+}
+
 async function activeSubscription(env: Env, accountId: string) {
   return env.DB.prepare(`SELECT id, status FROM stripe_subscriptions
     WHERE account_id = ? AND plan_key = 'sovereign_plus' AND status IN ('active','trialing')
@@ -181,6 +193,7 @@ export async function createCheckoutSession(env: Env, accountId: string, interva
     body.set('line_items[0][price]', price);
     body.set('line_items[0][quantity]', '1');
     body.set('allow_promotion_codes', 'true');
+    body.set('integration_identifier', await checkoutIntegrationIdentifier(stableKey));
     const customer = await linkedStripeCustomerId(env, accountId);
     if (customer) body.set('customer', customer);
     const session = await stripeRequest<{ id: string; url?: string }>(env, '/checkout/sessions', body, stableKey);

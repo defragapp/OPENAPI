@@ -156,8 +156,8 @@ try {
     );
   }
 
-  // The Worker must exist before runtime secrets can be attached. This first deploy
-  // also provisions draft R2 and Queue bindings when the build token has permission.
+  // The Worker must exist before runtime secrets can be attached. The isolated
+  // preview intentionally uses D1 plus the scheduled cleanup path, without R2 or Queue.
   run(['deploy', '--env', 'preview', '--config', configPath]);
 
   const secrets = Object.fromEntries(

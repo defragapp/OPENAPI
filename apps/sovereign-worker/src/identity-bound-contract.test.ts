@@ -5,6 +5,7 @@ const invitationService = readFileSync(new URL('./invitation-service.ts', import
 const people = readFileSync(new URL('./db/people.ts', import.meta.url), 'utf8');
 const relational = readFileSync(new URL('./relational-context.ts', import.meta.url), 'utf8');
 const entry = readFileSync(new URL('./entry.ts', import.meta.url), 'utf8');
+const runtimeEntry = readFileSync(new URL('./runtime-entry.ts', import.meta.url), 'utf8');
 const migration = readFileSync(new URL('../migrations/0008_identity_bound_invitations.sql', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../../web/src/App.tsx', import.meta.url), 'utf8');
 const consentPage = readFileSync(new URL('../../web/public/consent.html', import.meta.url), 'utf8');
@@ -57,7 +58,8 @@ describe('identity-bound multi-user contract', () => {
   });
 
   it('routes Cloudflare through the hardened entry and keeps legacy UI paths protected', () => {
-    expect(wrangler).toContain('"main": "src/entry.ts"');
+    expect(wrangler).toContain('"main": "src/runtime-entry.ts"');
+    expect(runtimeEntry).toContain("from './entry'");
     expect(entry).toContain('/people\\/([^/]+)\\/compare');
     expect(entry).toContain('/systems\\/([^/]+)\\/members');
     expect(entry).toContain('/systems\\/([^/]+)\\/alignment');

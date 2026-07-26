@@ -34,7 +34,7 @@ const termsSections = [
   },
   {
     title: 'Billing and cancellation',
-    copy: 'Stripe manages checkout, payment methods, subscriptions, and the billing portal. Ending Sovereign+ returns paid features to Free without deleting the workspace. Voluntary support does not grant subscription access.'
+    copy: 'Stripe manages checkout, payment methods, subscriptions, and the billing portal. Ending Sovereign+ returns paid features to Free without deleting the workspace.'
   },
   {
     title: 'Covenant remains optional',

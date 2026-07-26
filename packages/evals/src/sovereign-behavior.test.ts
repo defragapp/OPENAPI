@@ -9,7 +9,7 @@ describe('Sovereign behavior evals', () => {
     expect(sovereignRuntimePromptV1).toContain('User-confirmed experience');
     expect(sovereignRuntimePromptV1).toContain('response_phase "question"');
     expect(sovereignRuntimePromptV1).toContain('exactly one inward question');
-    expect(sovereignRuntimePromptV1).toContain('user experience always matters more than a chart match');
+    expect(sovereignRuntimePromptV1).toContain("The user's experience always matters more than a chart match");
   });
 
   it('rejects diagnosis, hidden intent, deterministic prediction, and stigma', () => {

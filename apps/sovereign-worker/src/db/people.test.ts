@@ -5,8 +5,12 @@ import type { Env } from '../env';
 function fakeEnv(): Env {
   const people = new Map<string, { accountId: string; displayName: string; role: string; source: string; consentStatus: string; baselineStatus: string }>();
   const versions = new Map<string, number>();
+  const paidFeatures = ['baseline.today', 'baseline.explore', 'people.compare', 'systems.family', 'systems.team', 'library.continuity', 'covenant.lens'];
   const db = { prepare(sql: string) { return { bind(...args: unknown[]) { return {
     async first() {
+      if (sql.startsWith('SELECT plan, features_json')) {
+        return { plan: 'sovereign_plus', features_json: JSON.stringify(paidFeatures), as_of: new Date(0).toISOString() };
+      }
       if (sql.startsWith('SELECT id FROM persons')) {
         const person = people.get(args[0] as string);
         return person?.accountId === args[1] ? { id: args[0] } : null;

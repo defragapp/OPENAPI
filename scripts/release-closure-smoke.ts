@@ -12,20 +12,28 @@ async function main() {
   assert(worker.includes("requireFeature(await getEntitlements") && worker.includes("'covenant.lens'"), 'missing Covenant entitlement gate');
   assert(worker.includes("requireConsent(context.env, auth.accountId, body.personId, 'covenant.include')"), 'missing Covenant person consent gate');
   assert(worker.includes("app.get('/api/v1/covenant/scripture/:reference', async () => Response.json({ error: 'not_found' }, { status: 404 }))"), 'direct scripture retrieval must be unavailable');
-  assert(worker.includes('export async function queue'), 'missing Queue consumer export');
+  assert(worker.includes('export async function queue'), 'missing optional background-message handler');
   assert(worker.includes('export async function scheduled'), 'missing scheduled cleanup export');
   const envProd = { APP_ENV: 'production', APP_VERSION: 'closure', DB: fakeDb(), THREADS: {} as DurableObjectNamespace, STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret' } as Env;
   let turnstileClosed = false; try { await verifyTurnstile(envProd, 'test-turnstile-pass'); } catch (error) { turnstileClosed = error instanceof Response && error.status === 503; }
   assert(turnstileClosed, 'production Turnstile test bypass was accepted');
   let emailClosed = false; try { await requestMagicLink(new Request('https://app.test/api/v1/auth/login', { method: 'POST', body: JSON.stringify({ email: 'user@example.com', turnstileToken: 'x' }) }), { ...envProd, TURNSTILE_SECRET_KEY: 'secret' }); } catch { emailClosed = true; }
   assert(emailClosed, 'production email test capture or raw magic link path did not fail closed');
-  const baseline = await computeReducedBaseline({ birthDate: '1990-01-01', birthTimeCertainty: 'unknown', birthplace: 'London', locationPrecision: 'none' }, { allowRecordedFixture: true });
+  const baseline = await computeReducedBaseline({ birthDate: '1990-01-01', birthTimeCertainty: 'unknown', birthplace: 'London', birthTimezone: 'Europe/London', locationPrecision: 'none' }, { allowRecordedFixture: true });
   assert(JSON.stringify(baseline.reducedContext).includes('unavailable'), 'unknown birth time did not disable unsupported precision-sensitive frameworks');
   const current = await computeCurrentConditions(envProd, 'acct_release', 'city_or_regional');
   assert(current.providerStatus === 'unavailable' && current.reduced.unknownActualState.includes('do not determine'), 'current conditions without provider did not fail closed');
-  const required = ['auth_magic_links','auth_sessions','baseline_onboarding','current_conditions','relationships','consent_grants','system_memberships','thread_events','user_corrections','R2:exports/account/*'];
+  const required = ['auth_magic_links','auth_sessions','baseline_onboarding','current_conditions','relationships','consent_grants','system_memberships','thread_events','user_corrections'];
   const inventory = deletionInventory().join('\n');
   for (const item of required) assert(inventory.includes(item), `deletion inventory missing ${item}`);
-  console.log('Release closure smoke passed queues=true covenant_matrix=true turnstile_closed=true email_closed=true baseline_frameworks=true current_fails_closed=true deletion_inventory=true');
+  assert(!/R2:exports/.test(inventory), 'disabled R2 private-export storage remained in deletion inventory');
+  console.log('Release closure smoke passed scheduled_cleanup=true optional_message_handler=true covenant_matrix=true turnstile_closed=true email_closed=true baseline_frameworks=true current_fails_closed=true deletion_inventory=true private_exports=false');
 }
-main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1); });
+main().catch(async (error) => {
+  if (error instanceof Response) {
+    console.error(`Release closure smoke received HTTP ${error.status}: ${await error.text()}`);
+  } else {
+    console.error(error instanceof Error ? error.message : String(error));
+  }
+  process.exit(1);
+});

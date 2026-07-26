@@ -39,7 +39,7 @@ function fakeEnv(): Env {
       if (gateway?.id !== 'sovereign' || gateway?.skipCache !== true || gateway?.collectLog !== false || gateway?.metadata?.plan !== 'free' || gateway?.metadata?.response_contract !== 'inner-recognition-v1' || !gateway?.metadata?.account_ref) throw new Error('invalid gateway metadata');
       if (JSON.stringify(options).includes('acct_')) throw new Error('raw account id leaked');
       if (JSON.stringify(input).match(/birth date|birth time|latitude|longitude|workspace\/SOVV/i)) throw new Error('private model input leaked');
-      return { response: JSON.stringify({
+      return { result: { output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({
         response_phase: 'question',
         recognition: 'You may be trying to solve the uncertainty before you know what is available.',
         inward_question: 'What are you hoping the next message will make certain?',
@@ -47,7 +47,7 @@ function fakeEnv(): Env {
         module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
         basis: { user_confirmed: false, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
         confidence: 'exploratory', safety_mode: 'standard'
-      }) };
+      }) }] }] } };
     } }
   };
 }

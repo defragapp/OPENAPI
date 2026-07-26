@@ -152,7 +152,7 @@ Library stores user-approved continuity only. The agent may retrieve prior under
 
 ### You
 
-The user controls Baseline, location permission, people, consent, systems, privacy, billing, export, deletion, and accessibility.
+The user controls Baseline, location permission, people, consent, systems, privacy, billing, public-link sharing, deletion, and accessibility. Private account export is disabled for launch.
 
 ## Domain model
 
@@ -243,7 +243,7 @@ Separate data into three zones:
 
 1. Raw sensitive input: never sent to the model.
 2. Reduced machine context: sent only when a typed tool requires it.
-3. User-visible output: inspectable, savable, exportable, and deletable.
+3. User-visible output: inspectable, explicitly savable, and deletable. Private account export is not available at launch.
 
 Initial consent scopes:
 
@@ -257,7 +257,7 @@ Initial consent scopes:
 
 Every scope is off by default for invited people, revocable, and visible in the UI.
 
-Required controls include same-origin authenticated APIs, HTTP-only secure sessions or verified bearer identity, CSRF protection for cookie mutations, strict origin validation, rate limits, replay protection, webhook verification, idempotency, prepared D1 statements, Worker secret bindings, privacy-safe logs, and export/deletion.
+Required controls include same-origin authenticated APIs, HTTP-only secure sessions or verified bearer identity, CSRF protection for cookie mutations, strict origin validation, rate limits, replay protection, webhook verification, idempotency, prepared D1 statements, Worker secret bindings, privacy-safe logs, a fail-closed private-export boundary, and deletion.
 
 ## Stripe feature model
 
@@ -270,7 +270,6 @@ Stable internal feature keys:
 - `systems.team`
 - `library.continuity`
 - `covenant.lens`
-- `export.full`
 
 Do not hard-code Stripe product or price IDs in domain logic.
 
@@ -332,7 +331,7 @@ Library, Checkout, Customer Portal, webhooks, and entitlements.
 
 ### Phase 6: Covenant and hardening
 
-Scripture retrieval, biblical lens, evals, deletion/export, rate limits, observability, and production runbooks.
+Scripture retrieval, biblical lens, evals, deletion and public-link sharing, rate limits, observability, and production runbooks.
 
 ## Non-negotiable repository rule
 

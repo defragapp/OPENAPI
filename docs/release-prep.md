@@ -34,7 +34,7 @@ No OpenAI provider key is accepted by the Worker. Cloudflare Unified Billing is 
 3. Run `pnpm verify:foundation`, `pnpm verify:migrations`, a fresh local D1 migration replay, `pnpm scan:secrets`, `pnpm scan:production-fixtures`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm smoke:worker-gateway`, `pnpm smoke:stripe`, and `pnpm smoke:product`.
 4. Review D1 migrations and apply to preview first.
 5. Configure Worker bindings and secrets in preview.
-6. Run authenticated preview smoke tests for Today, Explore, People, Systems, Library, You, Gateway streaming, export, deletion grace, and Stripe test entitlements.
+6. Run authenticated preview smoke tests for Today, Explore, People, Systems, Library, You, Gateway streaming, the disabled private-export boundary, deletion grace, and Stripe test entitlements.
 7. Verify health output reports degraded dependencies safely and no secrets.
 8. Promote to production only after explicit approval.
 
@@ -58,7 +58,7 @@ Before release, inspect logs and traces for raw birth inputs, exact private loca
 
 - `pnpm smoke:worker-gateway` verifies Worker-to-Gateway streaming through a fake Cloudflare AI binding without credentials.
 - `pnpm smoke:stripe` verifies Checkout, Portal, fixture webhooks, subscription projection, and entitlement resolution through the deterministic Stripe adapter.
-- `pnpm smoke:product` verifies authenticated People, consent, Systems, Library, export/deletion grace, billing fixtures, and Covenant Scripture retrieval with fake external providers.
+- `pnpm smoke:product` verifies authenticated People, consent, Systems, Library, the disabled private-export boundary, deletion grace, billing fixtures, and Covenant Scripture retrieval with fake external providers.
 - `pnpm smoke:gateway` and `pnpm smoke:sovereign` are live-only and require Cloudflare account variables plus the scoped `CLOUDFLARE_API_TOKEN` GitHub secret.
 
 ## Stripe test-mode setup
@@ -69,9 +69,9 @@ Use `STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY`, `STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL`,
 
 Covenant is opt-in per turn. The local fixture provider supports the configured `WEB` translation for deterministic tests and keeps retrieved passage text, citation metadata, and Sovereign interpretation separate. Production Scripture retrieval must use an approved configured provider and must not allow fabricated citations.
 
-## Export and deletion
+## Sharing and deletion
 
-Exports must include only user-owned or currently consented records and must exclude secrets, authorization material, hidden reasoning, raw provider payloads, raw birth inputs, and exact private location. Deletion enters a grace state and should be executed only by tested jobs with auditable completion records.
+Private account export is disabled for launch. Public sharing includes only the Sovereign.OS public link and no private workspace data. Deletion enters a grace state and should be executed only by tested jobs with auditable completion records.
 
 ## Incident response notes
 

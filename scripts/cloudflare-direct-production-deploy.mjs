@@ -17,7 +17,6 @@ const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT
 const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAADhGIF8-iOLIg8MU').trim();
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
-const donationUrl = 'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02';
 const migrationVersion = '0009_production_scale_and_billing_safety';
 
 if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required');
@@ -172,7 +171,7 @@ async function verifyLiveProduction() {
   assert(pricing.text.includes('$20') && pricing.text.includes('$99'), 'launch pricing is missing');
   assert(!pricing.text.includes('$29') && !pricing.text.includes('$79'), 'legacy pricing is still visible');
   assert(pricing.text.includes('Consent-aware invitations and sharing'), 'share-first plan copy is missing');
-  assert(pricing.text.includes(donationUrl), 'donation link is missing from pricing');
+  assert(!/donate\.stripe\.com|Support Sovereign\.OS|Support the platform/i.test(pricing.text), 'unapproved support placement is public');
   assert(!/full account export|export features/i.test(`${home.text}\n${pricing.text}`), 'export promise is still public');
   assert(login.response.ok && signup.response.ok, 'login or signup page is unavailable');
   assert(/SOVEREIGN\.OS/i.test(login.text) && /SOVEREIGN\.OS/i.test(signup.text), 'account pages do not identify Sovereign.OS');
@@ -276,7 +275,7 @@ async function verifyLiveProduction() {
     probes: {
       publicHome: 'passed',
       pricing: 'passed',
-      donationLinkPresent: 'passed',
+      supportPlacementExcluded: 'passed',
       hostnameSeparation: 'passed',
       unauthenticatedAccess: 'passed',
       turnstileRequired: 'passed',
@@ -368,7 +367,6 @@ try {
     queueEnabled: false,
     privateExports: 'disabled',
     sharing: 'public-link-only',
-    donationUrl,
     sessionSecretCreated: Object.hasOwn(secrets, 'SESSION_SIGNING_SECRET'),
     turnstileSecretConfigured: configuredSecrets.has('TURNSTILE_SECRET_KEY'),
     resendConfigured: configuredSecrets.has('RESEND_API_KEY'),
