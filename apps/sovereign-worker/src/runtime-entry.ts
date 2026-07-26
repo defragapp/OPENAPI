@@ -1,6 +1,6 @@
 import worker, { ThreadCoordinator, queue, scheduled } from './entry';
 import type { Env } from './env';
-import { withSecurityHeaders } from './security/headers';
+import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/headers';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 
 const HEALTH_PATHS = new Set(['/health', '/healthz', '/ready']);
@@ -54,7 +54,7 @@ const runtime = {
       if (!env.ASSETS) {
         return withSecurityHeaders(Response.json({ error: 'assets_unavailable' }, { status: 503 }));
       }
-      return env.ASSETS.fetch(request);
+      return withDocumentSecurityHeaders(await env.ASSETS.fetch(request));
     }
 
     return worker.fetch(request, env, executionContext);
@@ -131,7 +131,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       ...(pathname === '/ready' ? { ready } : {}),
       version: env.APP_VERSION,
       environment: env.APP_ENV,
-      migrationVersion: '0008_identity_bound_invitations',
+      migrationVersion: '0009_production_scale_and_billing_safety',
       recognitionContract: 'inner-recognition-v1',
       baselineContract: 'openapi-baseline-engine-v2',
       dependencies
