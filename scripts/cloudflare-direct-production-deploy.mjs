@@ -9,23 +9,23 @@ const sourceConfigPath = resolve(root, 'wrangler.production-direct.jsonc');
 const generatedConfigPath = resolve(root, '.wrangler.production-direct.generated.jsonc');
 const metadataPath = resolve(root, 'production-deployment.json');
 
-const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || '').trim();
-const apiToken = String(process.env.CLOUDFLARE_API_TOKEN || '').trim();
+const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || '8b1954d216d65077c6480d62583fe2c2').trim();
+const apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
 const workerName = 'sovv-web';
 const d1Name = 'sovereign-openapi-db';
 const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT_SHA || '').trim();
 const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '').trim();
 
 if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required');
-if (!apiToken) throw new Error('CLOUDFLARE_API_TOKEN is required');
 if (!/^[0-9a-f]{40}$/i.test(commitSha)) throw new Error('A full 40-character commit SHA is required');
 
 const env = {
   ...process.env,
-  CLOUDFLARE_ACCOUNT_ID: accountId,
-  CLOUDFLARE_API_TOKEN: apiToken
+  CLOUDFLARE_ACCOUNT_ID: accountId
 };
-const sensitiveValues = [apiToken];
+if (apiToken) env.CLOUDFLARE_API_TOKEN = apiToken;
+
+const sensitiveValues = [apiToken].filter(Boolean);
 
 function sanitize(value) {
   let output = String(value ?? '');
@@ -75,7 +75,9 @@ function findDatabaseId(value) {
 }
 
 async function resolveTurnstileSecret() {
-  if (!turnstileSiteKey) return undefined;
+  // Cloudflare Workers Builds authenticates Wrangler internally without exposing
+  // its token to the build. Preserve the existing Worker secret in that mode.
+  if (!turnstileSiteKey || !apiToken) return undefined;
   try {
     const response = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${accountId}/challenges/widgets/${encodeURIComponent(turnstileSiteKey)}`,
@@ -122,6 +124,8 @@ try {
     '--config', generatedConfigPath
   ], { capture: false });
 
+  // The first deployment provisions Queue, Durable Object, Workers AI and assets.
+  // Existing encrypted secrets on sovv-web are preserved by Wrangler.
   runWrangler(['deploy', '--config', generatedConfigPath], { capture: false });
 
   const existingSecrets = new Set(
