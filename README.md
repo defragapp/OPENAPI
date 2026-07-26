@@ -61,7 +61,7 @@ Preview target: [`sovereign-openapi-preview.sovereign-os-api.workers.dev`](https
 
 ## Production promotion
 
-Production uses a guarded four-stage command path: upload an immutable candidate without traffic, apply reviewed D1 migrations separately, promote the exact approved version, and retain an explicit rollback target. The process, required evidence, and commit-bound approval values are defined in [`docs/production-release.md`](docs/production-release.md).
+Production uses a guarded four-stage command path: upload an immutable candidate without traffic, apply reviewed D1 migrations separately, promote the exact approved version, and retain an explicit rollback target. Every mutating command requires an exact commit- or version-bound approval before remote preflight. The process and evidence requirements are defined in [`docs/production-release.md`](docs/production-release.md).
 
 ## Current state
 
