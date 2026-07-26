@@ -4,6 +4,13 @@ import { withSecurityHeaders } from './security/headers';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 
 const HEALTH_PATHS = new Set(['/health', '/healthz', '/ready']);
+const STRIPE_WEBHOOK_PATHS = new Set([
+  '/api/v1/stripe/webhook',
+  '/api/stripe/webhook',
+  '/api/webhooks/stripe',
+  '/stripe/webhook',
+  '/webhooks/stripe'
+]);
 const DISABLED_PATH_PREFIXES = ['/api/v1/export-jobs'];
 const PARENT_HOSTS = new Set(['defrag.app', 'www.defrag.app']);
 const PUBLIC_HOST = 'sovereign.defrag.app';
@@ -13,6 +20,16 @@ const PUBLIC_PATHS = new Set(['/privacy', '/terms', '/pricing.html', '/faq.html'
 const runtime = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    if (request.method === 'POST' && STRIPE_WEBHOOK_PATHS.has(url.pathname)) {
+      const target = new URL(request.url);
+      target.protocol = 'https:';
+      target.hostname = APP_HOST;
+      target.port = '';
+      target.pathname = '/api/v1/stripe/webhook';
+      return worker.fetch(new Request(target, request), env, executionContext);
+    }
+
     const routed = routeHostname(request, url);
     if (routed) return routed;
 
@@ -54,6 +71,7 @@ const runtime = {
         transactionalEmail: env.EMAIL ? 'cloudflare-binding' : env.RESEND_API_KEY ? 'resend' : 'missing',
         legacySovvAdapter: env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'disabled',
         stripe: stripeConfigured ? 'configured' : 'missing',
+        stripeWebhookPaths: [...STRIPE_WEBHOOK_PATHS],
         scripture: env.SCRIPTURE_TRANSLATION || 'WEB',
         privateExports: 'disabled',
         sharing: 'public-link-only'
