@@ -209,6 +209,7 @@ function isApplicationPagePath(pathname: string): boolean {
     || pathname === '/login'
     || pathname === '/signup'
     || pathname === '/invitation'
+    || pathname === '/consent.html'
     || pathname.startsWith('/auth/');
 }
 

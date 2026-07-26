@@ -1,0 +1,241 @@
+.consent-page {
+  min-height: 100vh;
+}
+
+.consent-main {
+  padding: 72px 0 96px;
+}
+
+.consent-hero {
+  display: grid;
+  grid-template-columns: minmax(0, .85fr) minmax(320px, 1.15fr);
+  gap: clamp(44px, 8vw, 110px);
+  align-items: start;
+}
+
+.consent-intro h1 {
+  max-width: 11ch;
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: clamp(3.1rem, 5.4vw, 4.4rem);
+  font-weight: 500;
+  letter-spacing: -.055em;
+  line-height: .96;
+}
+
+.consent-intro .consent-lede {
+  max-width: 640px;
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: 1.06rem;
+  line-height: 1.68;
+}
+
+.consent-boundary {
+  display: grid;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.consent-boundary article {
+  display: grid;
+  grid-template-columns: 108px 1fr;
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+
+.consent-boundary span,
+.consent-card-label {
+  color: var(--copper);
+  font-size: .66rem;
+  font-weight: 820;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.consent-boundary p {
+  margin: 0;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+.consent-panel {
+  padding: clamp(26px, 4vw, 40px);
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: rgba(255, 253, 248, .74);
+  box-shadow: 0 24px 70px rgba(23, 32, 29, .08);
+}
+
+.consent-panel > header {
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.consent-panel h2 {
+  margin: 10px 0 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  font-weight: 500;
+  letter-spacing: -.045em;
+  line-height: 1;
+}
+
+.consent-panel > header p {
+  margin: 16px 0 0;
+  color: var(--muted);
+  line-height: 1.62;
+}
+
+.consent-status {
+  min-height: 54px;
+  margin: 22px 0 0;
+  padding: 15px 17px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--paper);
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.consent-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.consent-empty,
+.consent-invitation {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 19px;
+  background: var(--white);
+}
+
+.consent-empty {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.consent-invitation h3 {
+  margin: 0;
+  font-size: 1.22rem;
+  letter-spacing: -.025em;
+}
+
+.consent-invitation > p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.55;
+}
+
+.consent-scope {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 22px;
+  align-items: center;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+}
+
+.consent-scope:first-of-type {
+  margin-top: 20px;
+}
+
+.consent-scope strong,
+.consent-scope small {
+  display: block;
+}
+
+.consent-scope small {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: .84rem;
+  line-height: 1.45;
+}
+
+.consent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.consent-actions button {
+  min-height: 42px;
+  padding: 10px 15px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--forest);
+  color: var(--white);
+  font-weight: 740;
+  cursor: pointer;
+}
+
+.consent-actions button.secondary {
+  background: transparent;
+  color: var(--ink);
+}
+
+.consent-actions button:disabled {
+  opacity: .52;
+  cursor: default;
+}
+
+.consent-support {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: .84rem;
+  line-height: 1.55;
+}
+
+.consent-support a {
+  font-weight: 720;
+  text-decoration: none;
+}
+
+@media (max-width: 900px) {
+  .consent-hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .consent-main {
+    padding: 54px 0 72px;
+  }
+
+  .consent-intro h1 {
+    font-size: clamp(2.65rem, 12vw, 3rem);
+  }
+
+  .consent-boundary article,
+  .consent-scope {
+    grid-template-columns: 1fr;
+  }
+
+  .consent-actions {
+    justify-content: flex-start;
+  }
+
+  .consent-support {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto;
+  }
+}

@@ -6,12 +6,14 @@ const policy = readFileSync(new URL('./PublicPolicy.tsx', import.meta.url), 'utf
 const how = readFileSync(new URL('../public/how-it-works.html', import.meta.url), 'utf8');
 const pricing = readFileSync(new URL('../public/pricing.html', import.meta.url), 'utf8');
 const faq = readFileSync(new URL('../public/faq.html', import.meta.url), 'utf8');
+const consent = readFileSync(new URL('../public/consent.html', import.meta.url), 'utf8');
+const consentCss = readFileSync(new URL('../public/consent.css', import.meta.url), 'utf8');
 const launchCss = readFileSync(new URL('../public/launch.css', import.meta.url), 'utf8');
 const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
 const recognitionCss = readFileSync(new URL('../public/recognition-ui.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}`;
+const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
 describe('Sovereign.OS launch surface', () => {
   it('explains the product, Baseline, and response sequence in direct language', () => {
@@ -106,6 +108,17 @@ describe('Sovereign.OS launch surface', () => {
       expect(page).not.toContain('/marketing.css');
       expect(page).not.toContain('/launch-polish.css');
     }
+  });
+
+  it('keeps consent management inside the current product and permission language', () => {
+    expect(consent).toContain('/launch.css?v=20260726-platform-r2');
+    expect(consent).toContain('/consent.css?v=20260726-consent-r1');
+    expect(consent).toContain('You decide what another account may use.');
+    expect(consent).toContain('The inviting account cannot make or change these decisions for you.');
+    expect(consent).toContain('noindex,nofollow');
+    expect(consent).not.toContain('<style>');
+    expect(consentCss).toContain('.consent-hero');
+    expect(consentCss).toContain('@media (max-width: 680px)');
   });
 
   it('numbers the four-step product summary from 01 through 04', () => {
