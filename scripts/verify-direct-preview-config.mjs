@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 
+const rootConfig = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'));
 const workerConfig = JSON.parse(readFileSync('apps/sovereign-worker/wrangler.jsonc', 'utf8'));
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 const readme = readFileSync('README.md', 'utf8');
@@ -9,6 +10,20 @@ const preview = workerConfig.env?.preview;
 function requireValue(condition, message) {
   if (!condition) throw new Error(message);
 }
+
+requireValue(rootConfig.name === 'sovereign-openapi-preview', 'Root Worker name must match the Cloudflare project');
+requireValue(rootConfig.main === 'apps/sovereign-worker/src/runtime-entry.ts', 'Root config must use the active OPENAPI runtime');
+requireValue(rootConfig.workers_dev === true, 'Root preview must use workers.dev');
+requireValue(rootConfig.preview_urls === false, 'Root versioned preview URLs must remain disabled');
+requireValue(rootConfig.vars?.APP_ENV === 'preview', 'Root config must remain preview-only');
+requireValue(rootConfig.d1_databases?.some((item) => item.binding === 'DB'), 'Root config is missing D1');
+requireValue(rootConfig.durable_objects?.bindings?.some((item) => item.name === 'THREADS'), 'Root config is missing Durable Object coordination');
+requireValue(rootConfig.queues?.producers?.some((item) => item.binding === 'JOBS'), 'Root config is missing Queue producer');
+requireValue(rootConfig.queues?.consumers?.length, 'Root config is missing Queue consumer');
+requireValue(rootConfig.ai?.binding === 'AI', 'Root config is missing Workers AI');
+requireValue(rootConfig.assets?.binding === 'ASSETS', 'Root config is missing static assets');
+requireValue(!rootConfig.r2_buckets?.length, 'Root preview must not enable R2');
+requireValue(!rootConfig.routes && !rootConfig.custom_domains, 'Root preview must not attach production routes');
 
 requireValue(workerConfig.main === 'src/runtime-entry.ts', 'Worker must use the active OPENAPI runtime entry');
 requireValue(preview?.name === 'sovereign-openapi-preview', 'Preview Worker name drifted');
@@ -27,7 +42,6 @@ requireValue(packageJson.scripts?.['verify:cloudflare-build']?.includes('verify:
 requireValue(packageJson.scripts?.['verify:release-config'] === 'node scripts/verify-direct-preview-config.mjs', 'Release verifier must use direct preview contract');
 requireValue(packageJson.scripts?.['preview:bootstrap'] === 'node scripts/cloudflare-preview-bootstrap.mjs', 'Preview bootstrap command drifted');
 
-requireValue(!existsSync('wrangler.jsonc'), 'Fork-oriented root Wrangler config must not exist');
 requireValue(!existsSync('.dev.vars.example'), 'Deploy-template secret form must not exist');
 requireValue(!existsSync('scripts/verify-one-click-deploy.mjs'), 'One-click fork verifier must not exist');
 requireValue(!readme.includes('deploy.workers.cloudflare.com'), 'README must not use Deploy to Cloudflare');
@@ -38,4 +52,4 @@ for (const required of ['PREVIEW_BASE_URL', 'PREVIEW_SESSION_SIGNING_SECRET', "[
   requireValue(bootstrap.includes(required), `Preview bootstrap is missing ${required}`);
 }
 
-console.log('Direct Cloudflare preview verified existing_repo=true fork=false r2=false d1=true durable_objects=true queues=true ai=true assets=true');
+console.log('Direct Cloudflare preview verified existing_repo=true root_config=true fork=false r2=false d1=true durable_objects=true queues=true ai=true assets=true');
