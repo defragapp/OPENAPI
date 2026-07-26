@@ -108,6 +108,12 @@ describe('Sovereign.OS launch surface', () => {
     }
   });
 
+  it('numbers the four-step product summary from 01 through 04', () => {
+    expect(launchCss).toContain('counter-reset: summary-step');
+    expect(launchCss).toContain('counter-increment: summary-step');
+    expect(launchCss).toContain('counter(summary-step, decimal-leading-zero)');
+  });
+
   it('keeps sign-in, account creation, and authenticated recognition controls reachable', () => {
     expect(landing).toContain('href="/login"');
     expect(landing).toContain('href="/signup"');
