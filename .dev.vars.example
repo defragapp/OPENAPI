@@ -1,0 +1,11 @@
+# Required: generate a new random value for this isolated preview.
+SESSION_SIGNING_SECRET=
+
+# Optional until authentication is enabled for preview review.
+TURNSTILE_SECRET_KEY=
+EMAIL_API_TOKEN=
+SOVV_INTERNAL_AUTH_TOKEN=
+
+# Stripe test mode only. Never paste live Stripe credentials into preview.
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
