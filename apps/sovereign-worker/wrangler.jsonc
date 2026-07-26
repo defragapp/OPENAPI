@@ -123,11 +123,6 @@
           "/ready"
         ]
       },
-      "r2_buckets": [
-        {
-          "binding": "ARTIFACTS"
-        }
-      ],
       "queues": {
         "producers": [
           {
