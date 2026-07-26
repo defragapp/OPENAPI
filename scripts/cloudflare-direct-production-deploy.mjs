@@ -18,6 +18,7 @@ const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '').trim(
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
 const donationUrl = 'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02';
+const migrationVersion = '0009_production_scale_and_billing_safety';
 
 if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required');
 if (!/^[0-9a-f]{40}$/i.test(commitSha)) throw new Error('A full 40-character commit SHA is required');
@@ -128,6 +129,10 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+function headerIncludes(response, name, fragment) {
+  return String(response.headers.get(name) || '').toLowerCase().includes(String(fragment).toLowerCase());
+}
+
 async function verifyLiveProduction() {
   let lastError;
   for (let attempt = 1; attempt <= 24; attempt += 1) {
@@ -136,9 +141,12 @@ async function verifyLiveProduction() {
       assert(ready.response.ok, `ready returned ${ready.response.status}`);
       assert(ready.json?.ready === true, `ready=false: ${ready.text.slice(0, 500)}`);
       assert(ready.json?.version === commitSha, `ready version mismatch: ${ready.json?.version ?? 'missing'}`);
+      assert(ready.json?.migrationVersion === migrationVersion, `migration mismatch: ${ready.json?.migrationVersion ?? 'missing'}`);
       assert(ready.json?.dependencies?.authentication === 'configured', 'authentication dependency is not configured');
+      assert(ready.json?.dependencies?.transactionalEmail !== 'missing', 'transactional email is not configured');
       assert(ready.json?.dependencies?.stripe === 'configured', 'Stripe dependency is not configured');
       assert(ready.json?.dependencies?.privateExports === 'disabled', 'private exports are not disabled');
+      assert(ready.json?.dependencies?.sharing === 'public-link-only', 'sharing contract is incorrect');
       break;
     } catch (error) {
       lastError = error;
@@ -147,10 +155,11 @@ async function verifyLiveProduction() {
     }
   }
 
-  const [home, pricing, login, health, ready] = await Promise.all([
+  const [home, pricing, login, signup, health, ready] = await Promise.all([
     readText(`${publicBase}/`),
     readText(`${publicBase}/pricing.html`),
     readText(`${appBase}/login`),
+    readText(`${appBase}/signup`),
     readJson(`${appBase}/health`),
     readJson(`${appBase}/ready`)
   ]);
@@ -164,17 +173,41 @@ async function verifyLiveProduction() {
   assert(pricing.text.includes('Consent-aware invitations and sharing'), 'share-first plan copy is missing');
   assert(pricing.text.includes(donationUrl), 'donation link is missing from pricing');
   assert(!/full account export|export features/i.test(`${home.text}\n${pricing.text}`), 'export promise is still public');
-  assert(login.response.ok, `login returned ${login.response.status}`);
-  assert(/SOVEREIGN\.OS/i.test(login.text), 'login does not identify Sovereign.OS');
+  assert(login.response.ok && signup.response.ok, 'login or signup page is unavailable');
+  assert(/SOVEREIGN\.OS/i.test(login.text) && /SOVEREIGN\.OS/i.test(signup.text), 'account pages do not identify Sovereign.OS');
   assert(health.response.ok && health.json?.ok === true, 'health is not healthy');
   assert(health.json?.version === commitSha, 'health is not serving the deployed commit');
+  assert(health.json?.migrationVersion === migrationVersion, 'health is not serving migration 0009');
   assert(ready.json?.ready === true && ready.json?.version === commitSha, 'ready is not serving the deployed commit');
 
-  const appRoot = await request(`${appBase}/`, { redirect: 'manual' });
-  assert(appRoot.status === 308 && appRoot.headers.get('location')?.startsWith(`${appBase}/app`), 'app root redirect is incorrect');
+  for (const page of [home.response, login.response, signup.response]) {
+    assert(headerIncludes(page, 'strict-transport-security', 'max-age=31536000'), 'HSTS is missing from a document');
+    assert(headerIncludes(page, 'x-content-type-options', 'nosniff'), 'nosniff is missing from a document');
+    assert(headerIncludes(page, 'x-frame-options', 'deny'), 'frame denial is missing from a document');
+    assert(headerIncludes(page, 'content-security-policy', "frame-ancestors 'none'"), 'document frame CSP is missing');
+  }
+  assert(headerIncludes(login.response, 'content-security-policy', 'challenges.cloudflare.com'), 'Turnstile CSP is missing');
+  assert(headerIncludes(login.response, 'x-robots-tag', 'noindex'), 'authenticated hostname is indexable');
 
-  const [session, checkout, webhook, disabledExport] = await Promise.all([
+  const [appRoot, publicLogin, appPricing, publicApi] = await Promise.all([
+    request(`${appBase}/`, { redirect: 'manual' }),
+    request(`${publicBase}/login`, { redirect: 'manual' }),
+    request(`${appBase}/pricing.html`, { redirect: 'manual' }),
+    request(`${publicBase}/api/v1/auth/session`, { redirect: 'manual' })
+  ]);
+  assert(appRoot.status === 308 && appRoot.headers.get('location')?.startsWith(`${appBase}/app`), 'app root redirect is incorrect');
+  assert(publicLogin.status === 308 && publicLogin.headers.get('location')?.startsWith(`${appBase}/login`), 'public login redirect is incorrect');
+  assert(appPricing.status === 308 && appPricing.headers.get('location')?.startsWith(`${publicBase}/pricing.html`), 'app pricing redirect is incorrect');
+  assert(publicApi.status === 308 && publicApi.headers.get('location')?.startsWith(`${appBase}/api/v1/auth/session`), 'public API redirect is incorrect');
+
+  const invalidWebhookBody = JSON.stringify({
+    id: 'evt_smoke_invalid',
+    type: 'customer.subscription.updated',
+    data: { object: {} }
+  });
+  const [session, you, checkout, webhook, legacyWebhook, disabledExport, signupWithoutTurnstile] = await Promise.all([
     request(`${appBase}/api/v1/auth/session`, { redirect: 'manual' }),
+    request(`${appBase}/api/v1/you`, { redirect: 'manual' }),
     request(`${appBase}/api/v1/billing/checkout`, {
       method: 'POST',
       headers: { origin: appBase, 'content-type': 'application/json', 'x-idempotency-key': `smoke-${commitSha}` },
@@ -184,7 +217,13 @@ async function verifyLiveProduction() {
     request(`${appBase}/api/v1/stripe/webhook`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'stripe-signature': 't=0,v1=invalid' },
-      body: JSON.stringify({ id: 'evt_smoke_invalid', type: 'customer.subscription.updated', data: { object: {} } }),
+      body: invalidWebhookBody,
+      redirect: 'manual'
+    }),
+    request(`${appBase}/api/stripe/webhook`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'stripe-signature': 't=0,v1=invalid' },
+      body: invalidWebhookBody,
       redirect: 'manual'
     }),
     request(`${appBase}/api/v1/export-jobs`, {
@@ -192,18 +231,38 @@ async function verifyLiveProduction() {
       headers: { origin: appBase, 'content-type': 'application/json' },
       body: '{}',
       redirect: 'manual'
+    }),
+    request(`${appBase}/api/v1/auth/signup`, {
+      method: 'POST',
+      headers: { origin: appBase, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        email: `deploy-smoke-${commitSha.slice(0, 12)}@example.invalid`,
+        name: 'Deployment Probe',
+        termsAccepted: true
+      }),
+      redirect: 'manual'
     })
   ]);
   assert(session.status === 401, `unauthenticated session returned ${session.status}`);
+  assert(you.status === 401, `unauthenticated account returned ${you.status}`);
   assert(checkout.status === 401, `unauthenticated checkout returned ${checkout.status}`);
-  assert(webhook.status === 400, `invalid Stripe signature returned ${webhook.status}`);
+  assert(webhook.status === 400, `invalid current Stripe signature returned ${webhook.status}`);
+  assert(legacyWebhook.status === 400, `invalid legacy Stripe signature returned ${legacyWebhook.status}`);
   assert(disabledExport.status === 404, `disabled export returned ${disabledExport.status}`);
+  assert(signupWithoutTurnstile.status === 400, `signup without Turnstile returned ${signupWithoutTurnstile.status}`);
 
   const securityHeaders = health.response.headers;
   assert(securityHeaders.get('cache-control') === 'no-store', 'health cache-control is not no-store');
-  assert(securityHeaders.get('x-content-type-options') === 'nosniff', 'nosniff header is missing');
-  assert(securityHeaders.get('x-frame-options') === 'DENY', 'frame denial header is missing');
-  assert(securityHeaders.get('content-security-policy')?.includes("frame-ancestors 'none'"), 'CSP frame protection is missing');
+  assert(headerIncludes(health.response, 'strict-transport-security', 'max-age=31536000'), 'health HSTS is missing');
+  assert(headerIncludes(health.response, 'x-content-type-options', 'nosniff'), 'health nosniff is missing');
+  assert(headerIncludes(health.response, 'x-frame-options', 'deny'), 'health frame denial is missing');
+  assert(headerIncludes(health.response, 'content-security-policy', "default-src 'none'"), 'API CSP is missing');
+
+  const assetPath = home.text.match(/(?:src|href)=["'](\/assets\/[^"']+\.(?:js|css))["']/)?.[1];
+  assert(assetPath, 'compiled asset fingerprint is missing from the public document');
+  const asset = await request(`${publicBase}${assetPath}`);
+  assert(asset.ok, `compiled asset returned ${asset.status}`);
+  assert(headerIncludes(asset, 'cache-control', 'immutable'), 'compiled asset is not immutable');
 
   const concurrent = await Promise.all(Array.from({ length: 20 }, () => readJson(`${appBase}/health`)));
   assert(concurrent.every((item) => item.response.ok && item.json?.version === commitSha), 'concurrent health probe failed');
@@ -217,11 +276,15 @@ async function verifyLiveProduction() {
       publicHome: 'passed',
       pricing: 'passed',
       donationLinkPresent: 'passed',
-      appRedirect: 'passed',
+      hostnameSeparation: 'passed',
       unauthenticatedAccess: 'passed',
-      stripeSignatureRejection: 'passed',
+      turnstileRequired: 'passed',
+      stripeSignatureRejection: 'current-and-legacy-passed',
       exportsDisabled: 'passed',
-      securityHeaders: 'passed',
+      documentSecurityHeaders: 'passed',
+      apiSecurityHeaders: 'passed',
+      appNoIndex: 'passed',
+      immutableAsset: assetPath,
       concurrentHealth: '20/20'
     }
   };
@@ -292,6 +355,7 @@ try {
   const metadata = {
     workerName,
     commitSha,
+    migrationVersion,
     d1Name,
     createdDatabase,
     workersDevUrl,
