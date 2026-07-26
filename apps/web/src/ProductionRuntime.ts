@@ -1,5 +1,7 @@
 const SUPPORT_URL = 'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02';
 const PUBLIC_SHARE_URL = 'https://sovereign.defrag.app';
+const TERMS_URL = `${PUBLIC_SHARE_URL}/terms`;
+const PRIVACY_URL = `${PUBLIC_SHARE_URL}/privacy`;
 
 type TurnstileApi = {
   render: (container: HTMLElement, options: Record<string, unknown>) => string;
@@ -93,6 +95,7 @@ function installFetchObserver(): void {
 function installUtilityLinks(): void {
   const render = () => {
     replaceLegacyExportCopy();
+    installAccountNavigation();
 
     const footerNav = document.querySelector<HTMLElement>('.launch-footer nav');
     if (footerNav && !footerNav.querySelector('[data-sovereign-support]')) {
@@ -108,6 +111,31 @@ function installUtilityLinks(): void {
 
   new MutationObserver(render).observe(document.documentElement, { childList: true, subtree: true });
   render();
+}
+
+function installAccountNavigation(): void {
+  document.querySelectorAll<HTMLAnchorElement>('.account-shell .wordmark').forEach((link) => {
+    link.href = PUBLIC_SHARE_URL;
+    link.title = 'Open the public Sovereign.OS site';
+  });
+
+  document.querySelectorAll<HTMLElement>('.account-shell .check-line span').forEach((label) => {
+    if (label.dataset.policyLinks === 'true') return;
+    label.dataset.policyLinks = 'true';
+    const terms = policyLink('Terms', TERMS_URL);
+    const privacy = policyLink('Privacy Policy', PRIVACY_URL);
+    label.replaceChildren(document.createTextNode('I accept the '), terms, document.createTextNode(' and '), privacy, document.createTextNode('.'));
+  });
+}
+
+function policyLink(label: string, href: string): HTMLAnchorElement {
+  const link = document.createElement('a');
+  link.href = href;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = label;
+  link.addEventListener('click', (event) => event.stopPropagation());
+  return link;
 }
 
 function replaceLegacyExportCopy(): void {
