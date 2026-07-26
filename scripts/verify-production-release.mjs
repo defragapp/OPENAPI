@@ -6,10 +6,15 @@ const config = readFileSync('wrangler.production-direct.jsonc', 'utf8');
 const runtime = readFileSync('apps/sovereign-worker/src/runtime-entry.ts', 'utf8');
 const env = readFileSync('apps/sovereign-worker/src/env.ts', 'utf8');
 const product = readFileSync('apps/sovereign-worker/src/db/product.ts', 'utf8');
+const jobs = readFileSync('apps/sovereign-worker/src/jobs.ts', 'utf8');
+const stripe = readFileSync('apps/sovereign-worker/src/billing/stripe.ts', 'utf8');
+const stripeRoute = readFileSync('apps/sovereign-worker/src/routes/stripe.ts', 'utf8');
+const scaleMigration = readFileSync('apps/sovereign-worker/migrations/0009_production_scale_and_billing_safety.sql', 'utf8');
 const browserRuntime = readFileSync('apps/web/src/ProductionRuntime.ts', 'utf8');
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const pricing = readFileSync('apps/web/public/pricing.html', 'utf8');
 const staticHeaders = readFileSync('apps/web/public/_headers', 'utf8');
+const workerHeaders = readFileSync('apps/sovereign-worker/src/security/headers.ts', 'utf8');
 
 const cloudflareGate = packageJson.scripts?.['verify:cloudflare-build'] ?? '';
 for (const required of [
@@ -91,9 +96,11 @@ for (const required of [
   "'/api/stripe/webhook'",
   "'/api/webhooks/stripe'",
   "'/api/v1/export-jobs'",
-  'env.ASSETS.fetch(request)',
+  'withDocumentSecurityHeaders(await env.ASSETS.fetch(request))',
   'isNavigationAssetPath',
-  "target.pathname = '/app'"
+  "target.pathname = '/app'",
+  "migrationVersion: '0009_production_scale_and_billing_safety'",
+  "includesPrivateWorkspaceData: false"
 ]) {
   if (!runtime.includes(required)) throw new Error(`Runtime production contract is missing ${required}`);
 }
@@ -101,13 +108,60 @@ for (const required of [
 for (const required of [
   'Content-Security-Policy:',
   "frame-ancestors 'none'",
+  'Strict-Transport-Security:',
+  'Cross-Origin-Opener-Policy: same-origin',
   'X-Content-Type-Options: nosniff',
   'X-Frame-Options: DENY',
   'Permissions-Policy:',
+  'https://app.defrag.app/*',
+  'X-Robots-Tag: noindex, nofollow',
   '/assets/*',
   'max-age=31536000, immutable'
 ]) {
   if (!staticHeaders.includes(required)) throw new Error(`Static security headers are missing ${required}`);
+}
+for (const required of [
+  'strict-transport-security',
+  'documentSecurityHeaders',
+  "script-src 'self' https://challenges.cloudflare.com",
+  'withDocumentSecurityHeaders'
+]) {
+  if (!workerHeaders.includes(required)) throw new Error(`Worker security headers are missing ${required}`);
+}
+
+for (const required of [
+  'cancelAccountSubscriptions',
+  "method: 'DELETE'",
+  "status = 'canceled'",
+  "account.auth_subject.startsWith('deleted:')",
+  "status = 'retained_billing_record'"
+]) {
+  if (!stripe.includes(required)) throw new Error(`Stripe billing safety is missing ${required}`);
+}
+for (const required of [
+  'SELECT processed_at, error_code FROM webhook_events',
+  'processed_at = NULL, error_code = ?',
+  'retried:',
+  'duplicate: true, processed: true'
+]) {
+  if (!stripeRoute.includes(required)) throw new Error(`Stripe retry recovery is missing ${required}`);
+}
+for (const required of [
+  "status IN ('grace','running')",
+  'await cancelAccountSubscriptions',
+  "case 'stripe.retry'",
+  'stripe_retry_requires_original_signed_delivery',
+  'stripe_subscriptions:cancelled-before-retention'
+]) {
+  if (!jobs.includes(required)) throw new Error(`Deletion lifecycle safety is missing ${required}`);
+}
+for (const required of [
+  'auth_magic_links_ip_created_idx',
+  'webhook_events_pending_idx',
+  'background_jobs_account_kind_due_idx',
+  'deletion_jobs_due_idx'
+]) {
+  if (!scaleMigration.includes(required)) throw new Error(`Production scale migration is missing ${required}`);
 }
 
 if (env.includes('ARTIFACTS') || env.includes('R2Bucket')) throw new Error('Worker Env must not expose R2');
@@ -118,7 +172,10 @@ if (!product.includes("kind, status, payload_json, run_after")) throw new Error(
 
 for (const required of [
   'installProductionRuntime()',
-  "from './ProductionRuntime'"
+  "from './ProductionRuntime'",
+  "location.hostname === 'sovereign.defrag.app'",
+  'navigator.serviceWorker.getRegistrations()',
+  'registration.unregister()'
 ]) {
   if (!main.includes(required)) throw new Error(`Web entry is missing ${required}`);
 }
@@ -142,4 +199,4 @@ for (const required of [
 }
 if (/full account export|export features/i.test(pricing)) throw new Error('Pricing still promises private export');
 
-console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true d1=true durable_objects=true workers_ai=true static_assets=true static_security_headers=true immutable_bundles=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_compat=true donation=true private_exports=false public_share=true live_gate=true concurrency_probe=20');
+console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0009 d1_scale_indexes=true durable_objects=true workers_ai=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true app_service_worker=false cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true donation=true private_exports=false public_share=true live_gate=true concurrency_probe=20');
