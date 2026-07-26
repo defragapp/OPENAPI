@@ -119,7 +119,7 @@ Run:
 pnpm production:candidate
 ```
 
-This command verifies the production resource names and runtime secret names, builds an ephemeral Wrangler configuration, and runs `wrangler versions upload`. It does not run `wrangler deploy` and does not promote traffic.
+This command verifies the production resource names and runtime secret names, builds an ephemeral Wrangler configuration, and runs `wrangler versions upload`. It does not run `wrangler deploy` and does not promote traffic. Candidate upload runs with automatic resource provisioning disabled, so a missing D1 database, R2 bucket, Queue, binding, or Worker fails closed instead of creating production infrastructure.
 
 Save the emitted `versionId` and the generated `production-candidate.json` with the release evidence. Do not commit that file.
 
