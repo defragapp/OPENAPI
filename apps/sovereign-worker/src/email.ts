@@ -2,7 +2,11 @@ import type { Env } from './env';
 import { runtimeMode } from './runtime';
 
 export interface EmailMessage { to: string; subject: string; text: string; html?: string; idempotencyKey?: string }
-function validRecipient(to: string): boolean { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to); }
+
+const FROM = 'Sovereign.OS <info@defrag.app>';
+const REPLY_TO = 'info@defrag.app';
+
+function validRecipient(to: string): boolean { return to.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to); }
 function redact(value: string): string { return value.replace(/token=[^\s]+/g, 'token=[redacted]'); }
 
 export async function sendOperationalEmail(env: Env, message: EmailMessage): Promise<{ provider: string; id: string; retryable: boolean }> {
@@ -11,15 +15,55 @@ export async function sendOperationalEmail(env: Env, message: EmailMessage): Pro
     await env.KV?.put?.(`test-email:${crypto.randomUUID()}`, JSON.stringify({ to: message.to, subject: message.subject, text: message.text }), { expirationTtl: 3600 });
     return { provider: 'test-capture', id: `email_${crypto.randomUUID()}`, retryable: false };
   }
-  if (!env.EMAIL_API_URL || !env.EMAIL_API_TOKEN || !env.EMAIL_FROM) throw new Response('Email delivery unavailable', { status: 503 });
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), Number(env.EMAIL_TIMEOUT_MS ?? 2500));
+
   try {
-    const response = await fetch(env.EMAIL_API_URL, { method: 'POST', signal: controller.signal, headers: { authorization: `Bearer ${env.EMAIL_API_TOKEN}`, 'content-type': 'application/json', 'idempotency-key': message.idempotencyKey ?? crypto.randomUUID() }, body: JSON.stringify({ from: env.EMAIL_FROM, to: message.to, subject: message.subject, text: message.text, html: message.html }) });
-    if (!response.ok) throw new Response('Email delivery unavailable', { status: response.status >= 500 || response.status === 429 ? 503 : 502 });
-    return { provider: 'configured-http-email', id: response.headers.get('x-request-id') ?? `email_${crypto.randomUUID()}`, retryable: false };
+    if (env.EMAIL) {
+      const result = await env.EMAIL.send({
+        from: FROM,
+        to: message.to,
+        subject: message.subject,
+        text: message.text,
+        html: message.html
+      });
+      return { provider: 'cloudflare-email-binding', id: requestId(result), retryable: false };
+    }
+
+    if (env.RESEND_API_KEY) {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        signal: AbortSignal.timeout(8_000),
+        headers: {
+          authorization: `Bearer ${env.RESEND_API_KEY}`,
+          'content-type': 'application/json',
+          'idempotency-key': message.idempotencyKey ?? crypto.randomUUID()
+        },
+        body: JSON.stringify({
+          from: FROM,
+          reply_to: REPLY_TO,
+          to: [message.to],
+          subject: message.subject,
+          text: message.text,
+          ...(message.html ? { html: message.html } : {})
+        })
+      });
+      const payload = await response.json().catch(() => ({})) as { id?: string };
+      if (!response.ok) throw new Error(`resend_${response.status}`);
+      return { provider: 'resend', id: payload.id ?? `email_${crypto.randomUUID()}`, retryable: false };
+    }
+
+    throw new Error('provider_missing');
   } catch (error) {
-    console.warn('email_delivery_failed', { reason: error instanceof Error ? error.name : 'response', subject: message.subject, toHashOnly: true, body: redact(message.text).slice(0, 24) });
+    console.warn('email_delivery_failed', {
+      reason: error instanceof Error ? error.message.slice(0, 48) : 'response',
+      subject: message.subject,
+      toHashOnly: true,
+      body: redact(message.text).slice(0, 24)
+    });
     throw new Response('Email delivery unavailable', { status: 503 });
-  } finally { clearTimeout(timeout); }
+  }
+}
+
+function requestId(value: unknown): string {
+  if (value && typeof value === 'object' && 'messageId' in value && typeof value.messageId === 'string') return value.messageId;
+  return `email_${crypto.randomUUID()}`;
 }
