@@ -13,12 +13,16 @@ const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || '8b1954d216d65077c
 const apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
 const workerName = 'sovv-web';
 const d1Name = 'sovereign-openapi-db';
-const queueName = 'sovereign-openapi-jobs';
 const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT_SHA || '').trim();
 const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '').trim();
+const publicBase = 'https://sovereign.defrag.app';
+const appBase = 'https://app.defrag.app';
+const parentBase = 'https://defrag.app';
+const donationUrl = 'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02';
 
 if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required');
 if (!/^[0-9a-f]{40}$/i.test(commitSha)) throw new Error('A full 40-character commit SHA is required');
+if (!turnstileSiteKey) throw new Error('VITE_TURNSTILE_SITE_KEY is required for production authentication');
 
 const env = {
   ...process.env,
@@ -79,37 +83,12 @@ function findDatabaseId(value) {
   return match?.uuid ?? match?.id ?? match?.database_id;
 }
 
-function queueAppearsInList(output) {
-  return String(output || '').includes(queueName);
-}
-
-function ensureQueue() {
-  if (queueAppearsInList(runWrangler(['queues', 'list']))) return false;
-
-  const created = executeWrangler(['queues', 'create', queueName], { capture: false });
-  if (created.status !== 0) {
-    const refreshed = runWrangler(['queues', 'list']);
-    if (!queueAppearsInList(refreshed)) {
-      throw new Error(`wrangler queues create ${queueName} failed`);
-    }
-    return false;
-  }
-
-  const refreshed = runWrangler(['queues', 'list']);
-  if (!queueAppearsInList(refreshed)) {
-    throw new Error(`Queue ${queueName} was not visible after creation`);
-  }
-  return true;
-}
-
 async function resolveTurnstileSecret() {
-  // Workers Builds authenticates Wrangler internally without necessarily exposing
-  // an API token to the build process. Preserve the existing Worker secret in that mode.
-  if (!turnstileSiteKey || !apiToken) return undefined;
+  if (!apiToken) return undefined;
   try {
     const response = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${accountId}/challenges/widgets/${encodeURIComponent(turnstileSiteKey)}`,
-      { headers: { authorization: `Bearer ${apiToken}` } }
+      { headers: { authorization: `Bearer ${apiToken}` }, signal: AbortSignal.timeout(8_000) }
     );
     if (!response.ok) {
       console.warn(`Turnstile widget lookup skipped (${response.status}).`);
@@ -123,14 +102,145 @@ async function resolveTurnstileSecret() {
   }
 }
 
+async function request(url, options = {}) {
+  return fetch(url, {
+    redirect: options.redirect ?? 'follow',
+    method: options.method ?? 'GET',
+    headers: options.headers,
+    body: options.body,
+    signal: AbortSignal.timeout(options.timeoutMs ?? 10_000)
+  });
+}
+
+async function readText(url, options) {
+  const response = await request(url, options);
+  return { response, text: await response.text() };
+}
+
+async function readJson(url, options) {
+  const response = await request(url, options);
+  const text = await response.text();
+  let json;
+  try { json = JSON.parse(text); } catch { json = undefined; }
+  return { response, json, text };
+}
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+async function verifyLiveProduction() {
+  let lastError;
+  for (let attempt = 1; attempt <= 24; attempt += 1) {
+    try {
+      const ready = await readJson(`${appBase}/ready`);
+      assert(ready.response.ok, `ready returned ${ready.response.status}`);
+      assert(ready.json?.ready === true, `ready=false: ${ready.text.slice(0, 500)}`);
+      assert(ready.json?.version === commitSha, `ready version mismatch: ${ready.json?.version ?? 'missing'}`);
+      assert(ready.json?.dependencies?.authentication === 'configured', 'authentication dependency is not configured');
+      assert(ready.json?.dependencies?.stripe === 'configured', 'Stripe dependency is not configured');
+      assert(ready.json?.dependencies?.privateExports === 'disabled', 'private exports are not disabled');
+      break;
+    } catch (error) {
+      lastError = error;
+      if (attempt === 24) throw new Error(`Live readiness did not converge: ${sanitize(lastError?.message || lastError)}`);
+      await new Promise((resolveDelay) => setTimeout(resolveDelay, 5_000));
+    }
+  }
+
+  const [home, pricing, login, health, ready] = await Promise.all([
+    readText(`${publicBase}/`),
+    readText(`${publicBase}/pricing.html`),
+    readText(`${appBase}/login`),
+    readJson(`${appBase}/health`),
+    readJson(`${appBase}/ready`)
+  ]);
+
+  assert(home.response.ok, `public home returned ${home.response.status}`);
+  assert(/Sovereign\.OS/i.test(home.text), 'public home does not identify Sovereign.OS');
+  assert(home.text.includes('See what is really happening'), 'public home fingerprint is missing');
+  assert(pricing.response.ok, `pricing returned ${pricing.response.status}`);
+  assert(pricing.text.includes('$20') && pricing.text.includes('$99'), 'launch pricing is missing');
+  assert(!pricing.text.includes('$29') && !pricing.text.includes('$79'), 'legacy pricing is still visible');
+  assert(pricing.text.includes('Consent-aware invitations and sharing'), 'share-first plan copy is missing');
+  assert(pricing.text.includes(donationUrl), 'donation link is missing from pricing');
+  assert(!/full account export|export features/i.test(`${home.text}\n${pricing.text}`), 'export promise is still public');
+  assert(login.response.ok, `login returned ${login.response.status}`);
+  assert(/SOVEREIGN\.OS/i.test(login.text), 'login does not identify Sovereign.OS');
+  assert(health.response.ok && health.json?.ok === true, 'health is not healthy');
+  assert(health.json?.version === commitSha, 'health is not serving the deployed commit');
+  assert(ready.json?.ready === true && ready.json?.version === commitSha, 'ready is not serving the deployed commit');
+
+  const [parentRoot, parentLogin, appRoot] = await Promise.all([
+    request(`${parentBase}/`, { redirect: 'manual' }),
+    request(`${parentBase}/login`, { redirect: 'manual' }),
+    request(`${appBase}/`, { redirect: 'manual' })
+  ]);
+  assert(parentRoot.status === 308 && parentRoot.headers.get('location')?.startsWith(publicBase), 'parent root redirect is incorrect');
+  assert(parentLogin.status === 308 && parentLogin.headers.get('location')?.startsWith(`${appBase}/login`), 'parent login redirect is incorrect');
+  assert(appRoot.status === 308 && appRoot.headers.get('location')?.startsWith(`${appBase}/app`), 'app root redirect is incorrect');
+
+  const [session, checkout, webhook, disabledExport] = await Promise.all([
+    request(`${appBase}/api/v1/auth/session`, { redirect: 'manual' }),
+    request(`${appBase}/api/v1/billing/checkout`, {
+      method: 'POST',
+      headers: { origin: appBase, 'content-type': 'application/json', 'x-idempotency-key': `smoke-${commitSha}` },
+      body: JSON.stringify({ interval: 'monthly' }),
+      redirect: 'manual'
+    }),
+    request(`${appBase}/api/v1/stripe/webhook`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'stripe-signature': 't=0,v1=invalid' },
+      body: JSON.stringify({ id: 'evt_smoke_invalid', type: 'customer.subscription.updated', data: { object: {} } }),
+      redirect: 'manual'
+    }),
+    request(`${appBase}/api/v1/export-jobs`, {
+      method: 'POST',
+      headers: { origin: appBase, 'content-type': 'application/json' },
+      body: '{}',
+      redirect: 'manual'
+    })
+  ]);
+  assert(session.status === 401, `unauthenticated session returned ${session.status}`);
+  assert(checkout.status === 401, `unauthenticated checkout returned ${checkout.status}`);
+  assert(webhook.status === 400, `invalid Stripe signature returned ${webhook.status}`);
+  assert(disabledExport.status === 404, `disabled export returned ${disabledExport.status}`);
+
+  const securityHeaders = health.response.headers;
+  assert(securityHeaders.get('cache-control') === 'no-store', 'health cache-control is not no-store');
+  assert(securityHeaders.get('x-content-type-options') === 'nosniff', 'nosniff header is missing');
+  assert(securityHeaders.get('x-frame-options') === 'DENY', 'frame denial header is missing');
+  assert(securityHeaders.get('content-security-policy')?.includes("frame-ancestors 'none'"), 'CSP frame protection is missing');
+
+  const concurrent = await Promise.all(Array.from({ length: 20 }, () => readJson(`${appBase}/health`)));
+  assert(concurrent.every((item) => item.response.ok && item.json?.version === commitSha), 'concurrent health probe failed');
+
+  return {
+    publicUrl: publicBase,
+    appUrl: appBase,
+    parentUrl: parentBase,
+    health: health.json,
+    ready: ready.json,
+    probes: {
+      publicHome: 'passed',
+      pricing: 'passed',
+      donationLinkPresent: 'passed',
+      redirects: 'passed',
+      unauthenticatedAccess: 'passed',
+      stripeSignatureRejection: 'passed',
+      exportsDisabled: 'passed',
+      securityHeaders: 'passed',
+      concurrentHealth: '20/20'
+    }
+  };
+}
+
 let createdDatabase = false;
-let queueCreated = false;
 let databaseId;
 
 try {
   databaseId = findDatabaseId(parseJsonOutput(runWrangler(['d1', 'list', '--json'])));
   if (!databaseId) {
-    // Wrangler 4.112 supports JSON output for `d1 list`, but not for `d1 create`.
     runWrangler(['d1', 'create', d1Name], { capture: false });
     databaseId = findDatabaseId(parseJsonOutput(runWrangler(['d1', 'list', '--json'])));
     createdDatabase = true;
@@ -154,10 +264,6 @@ try {
     '--config', generatedConfigPath
   ], { capture: false });
 
-  queueCreated = ensureQueue();
-
-  // sovv-web already exists, so missing runtime secrets can be prepared before
-  // the single application upload. Existing encrypted secrets remain untouched.
   const existingSecrets = new Set(
     rows(parseJsonOutput(runWrangler([
       'secret', 'list',
@@ -170,7 +276,6 @@ try {
   if (!existingSecrets.has('SESSION_SIGNING_SECRET')) {
     secrets.SESSION_SIGNING_SECRET = randomBytes(48).toString('base64url');
   }
-
   if (!existingSecrets.has('TURNSTILE_SECRET_KEY')) {
     const turnstileSecret = await resolveTurnstileSecret();
     if (turnstileSecret) secrets.TURNSTILE_SECRET_KEY = turnstileSecret;
@@ -178,28 +283,39 @@ try {
 
   if (Object.keys(secrets).length) {
     for (const value of Object.values(secrets)) sensitiveValues.push(value);
-    runWrangler(['secret', 'bulk', '--name', workerName], {
-      input: JSON.stringify(secrets)
-    });
+    runWrangler(['secret', 'bulk', '--name', workerName], { input: JSON.stringify(secrets) });
   }
 
-  // The Worker upload attaches the Queue producer/consumer and applies the
-  // configured SQLite Durable Object migration for ThreadCoordinator.
+  const configuredSecrets = new Set([...existingSecrets, ...Object.keys(secrets)]);
+  const requiredSecrets = ['SESSION_SIGNING_SECRET', 'TURNSTILE_SECRET_KEY', 'RESEND_API_KEY', 'STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'];
+  const missingSecrets = requiredSecrets.filter((name) => !configuredSecrets.has(name));
+  if (missingSecrets.length) {
+    throw new Error(`Production secrets are missing from ${workerName}: ${missingSecrets.join(', ')}`);
+  }
+
   const deployOutput = runWrangler(['deploy', '--config', generatedConfigPath]);
   const workersDevUrl = deployOutput.match(/https:\/\/[^\s]+\.workers\.dev/)?.[0] || null;
+  const verification = await verifyLiveProduction();
 
   const metadata = {
     workerName,
     commitSha,
     d1Name,
     createdDatabase,
-    queueName,
-    queueCreated,
     workersDevUrl,
-    publicUrl: 'https://defrag.app',
+    publicUrl: publicBase,
+    appUrl: appBase,
+    parentUrl: parentBase,
     r2Enabled: false,
+    queueEnabled: false,
+    privateExports: 'disabled',
+    sharing: 'public-link-only',
+    donationUrl,
     sessionSecretCreated: Object.hasOwn(secrets, 'SESSION_SIGNING_SECRET'),
-    turnstileSecretConfigured: existingSecrets.has('TURNSTILE_SECRET_KEY') || Object.hasOwn(secrets, 'TURNSTILE_SECRET_KEY')
+    turnstileSecretConfigured: configuredSecrets.has('TURNSTILE_SECRET_KEY'),
+    resendConfigured: configuredSecrets.has('RESEND_API_KEY'),
+    stripeConfigured: configuredSecrets.has('STRIPE_SECRET_KEY') && configuredSecrets.has('STRIPE_WEBHOOK_SECRET'),
+    verification
   };
   writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
   console.log(JSON.stringify(metadata, null, 2));
