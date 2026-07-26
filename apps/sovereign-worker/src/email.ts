@@ -23,7 +23,7 @@ export async function sendOperationalEmail(env: Env, message: EmailMessage): Pro
         to: message.to,
         subject: message.subject,
         text: message.text,
-        html: message.html
+        ...(message.html ? { html: message.html } : {})
       });
       return { provider: 'cloudflare-email-binding', id: requestId(result), retryable: false };
     }
