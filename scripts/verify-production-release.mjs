@@ -24,7 +24,6 @@ for (const required of [
 for (const required of [
   "const publicBase = 'https://sovereign.defrag.app'",
   "const appBase = 'https://app.defrag.app'",
-  "const parentBase = 'https://defrag.app'",
   "const d1Name = 'sovereign-openapi-db'",
   "'d1', 'migrations', 'apply'",
   "'secret', 'list'",
@@ -55,8 +54,11 @@ for (const forbidden of [
   if (deploy.toLowerCase().includes(forbidden.toLowerCase())) throw new Error(`Direct production deploy contains forbidden dependency ${forbidden}`);
 }
 
-for (const domain of ['defrag.app', 'www.defrag.app', 'sovereign.defrag.app', 'app.defrag.app']) {
+for (const domain of ['sovereign.defrag.app', 'app.defrag.app']) {
   if (!config.includes(`"pattern": "${domain}"`)) throw new Error(`Production config is missing ${domain}`);
+}
+for (const legacyDomain of ['"pattern": "defrag.app"', '"pattern": "www.defrag.app"']) {
+  if (config.includes(legacyDomain)) throw new Error(`Production config must not claim legacy domain ${legacyDomain}`);
 }
 for (const required of [
   '"custom_domain": true',
@@ -118,4 +120,4 @@ for (const required of [
 }
 if (/full account export|export features/i.test(pricing)) throw new Error('Pricing still promises private export');
 
-console.log('Production release verified direct_cloudflare=true custom_domains=true d1=true durable_objects=true workers_ai=true static_assets=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_compat=true donation=true private_exports=false public_share=true live_gate=true concurrency_probe=20');
+console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true legacy_apex_preserved=true d1=true durable_objects=true workers_ai=true static_assets=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_compat=true donation=true private_exports=false public_share=true live_gate=true concurrency_probe=20');
