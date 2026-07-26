@@ -1,0 +1,81 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sovv-web",
+  "main": "apps/sovereign-worker/src/runtime-entry.ts",
+  "compatibility_date": "2026-07-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "APP_ENV": "production",
+    "APP_VERSION": "__APP_VERSION__",
+    "PUBLIC_APP_URL": "https://defrag.app",
+    "AI_PROVIDER": "cloudflare-gateway",
+    "AI_MODEL": "openai/gpt-5.5",
+    "AI_GATEWAY_ID": "sovereign",
+    "AI_FREE_MONTHLY_TURNS": "10",
+    "AI_SOVEREIGN_PLUS_MONTHLY_TURNS": "300",
+    "THREAD_RETENTION_DAYS": "30",
+    "AUDIT_RETENTION_DAYS": "90",
+    "STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY": "price_1Te0g9Bk78yJ8Hww8fFZCqhm",
+    "STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL": "price_1Tq6nPBk78yJ8Hwwm0pxg4hH",
+    "STRIPE_SUCCESS_URL": "https://defrag.app/app?billing=success",
+    "STRIPE_CANCEL_URL": "https://defrag.app/app?billing=cancelled",
+    "STRIPE_PORTAL_RETURN_URL": "https://defrag.app/app?billing=portal",
+    "TURNSTILE_EXPECTED_HOSTNAME": "defrag.app",
+    "SCRIPTURE_TRANSLATION": "WEB",
+    "BASELINE_HORIZONS_URL": "https://ssd.jpl.nasa.gov/api/horizons.api",
+    "BASELINE_PROVIDER_TIMEOUT_MS": "8000"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "sovereign-openapi-db",
+      "migrations_dir": "apps/sovereign-worker/migrations"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "THREADS",
+        "class_name": "ThreadCoordinator"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "openapi-production-v1",
+      "new_sqlite_classes": ["ThreadCoordinator"]
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "assets": {
+    "directory": "apps/web/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/health", "/healthz", "/ready"]
+  },
+  "queues": {
+    "producers": [
+      {
+        "binding": "JOBS",
+        "queue": "sovereign-openapi-jobs"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "sovereign-openapi-jobs",
+        "max_batch_size": 10,
+        "max_batch_timeout": 30
+      }
+    ]
+  },
+  "triggers": {
+    "crons": ["*/15 * * * *"]
+  }
+}
