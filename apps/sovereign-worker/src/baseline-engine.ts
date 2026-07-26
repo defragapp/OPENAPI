@@ -204,7 +204,9 @@ export function parseHorizonsJson(payload: HorizonsPayload): Array<{ longitude: 
     if (!line) continue;
     const fields = parseCsvLine(line);
     const numeric = fields
-      .map((field) => Number(field.trim()))
+      .map((field) => field.trim())
+      .filter((field) => field.length > 0)
+      .map((field) => Number(field))
       .filter((value) => Number.isFinite(value));
     if (numeric.length < 2) continue;
     const longitude = numeric[numeric.length - 2]!;
