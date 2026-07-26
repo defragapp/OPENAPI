@@ -9,9 +9,10 @@ const billing = readFileSync(new URL('./stripe.ts', import.meta.url), 'utf8');
 
 describe('launch plan enforcement', () => {
   it('keeps Free deterministic and maps paid routes to server-side features', () => {
-    for (const feature of ['people.compare', 'systems.family', 'library.continuity', 'export.full']) {
+    for (const feature of ['people.compare', 'systems.family', 'library.continuity']) {
       expect(auth).toContain(feature);
     }
+    expect(auth).not.toContain('export.full');
     expect(auth).toContain('requireRouteEntitlement');
     expect(product).toContain("['baseline.today', 'baseline.explore'].includes(feature)");
   });
@@ -23,12 +24,12 @@ describe('launch plan enforcement', () => {
     expect(product).not.toMatch(/deleteUnderstanding[\s\S]{0,160}requireLibraryAccess/);
   });
 
-  it('requires paid access to create or use paid capabilities', () => {
+  it('requires paid access to create or use paid capabilities and keeps export unavailable', () => {
     expect(people).toMatch(/createPerson[\s\S]{0,220}requirePeopleFeature/);
     expect(people).toMatch(/requireConsent[\s\S]{0,220}requireScopeFeature/);
     expect(product).toMatch(/createSystem[\s\S]{0,220}requireSystemAccess/);
     expect(product).toMatch(/saveUnderstanding[\s\S]{0,220}requireLibraryAccess/);
-    expect(product).toMatch(/createExportJob[\s\S]{0,220}export\.full/);
+    expect(product).toMatch(/createExportJob[\s\S]{0,220}Private export is not available/);
     expect(insightModules).toMatch(/saveLatestInsightModule[\s\S]{0,240}library\.continuity/);
   });
 
