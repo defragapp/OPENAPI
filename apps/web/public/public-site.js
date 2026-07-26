@@ -1,5 +1,26 @@
 document.documentElement.classList.add('js');
 
+const recognitionScenarios = [
+  {
+    tab: 'The silence',
+    input: '“I asked if something was wrong. They said they were fine, then went quiet.”',
+    insight: 'You may be moving toward reassurance while they move toward space. The silence does not prove rejection; it does show pressure rising in different directions.',
+    next: 'Lower the pressure: “I noticed the distance. We do not have to solve it right now. I am open when you are.”'
+  },
+  {
+    tab: 'The decision',
+    input: '“I need to decide today, but every option feels wrong.”',
+    insight: 'Urgency may be louder than clarity. Your Baseline suggests that decisions improve after the whole picture is visible—not while the need to finish is in control.',
+    next: 'Name what truly expires today. Pause everything else until the pressure drops.'
+  },
+  {
+    tab: 'The same fight',
+    input: '“We keep arguing about the same small thing.”',
+    insight: 'The subject may be small while the roles underneath it are familiar: one person presses for resolution, the other protects space. The loop matters more than choosing a villain.',
+    next: 'Name the loop before debating the subject: “I push when I feel distance. You pull back when you feel pressured.”'
+  }
+];
+
 const publicObserver = new MutationObserver(renderPublicSurface);
 publicObserver.observe(document.documentElement, { childList: true, subtree: true });
 renderPublicSurface();
@@ -15,8 +36,8 @@ function renderLaunchHome() {
 
   shell.dataset.sovereignMarketing = 'true';
   shell.className = 'marketing-page marketing-home launch-page';
-  document.title = 'Sovereign.OS — Personal AI with context';
-  document.querySelector('meta[name="description"]')?.setAttribute('content', 'Create one private Baseline. Use it for today, decisions, relationships, and groups without starting from zero each time.');
+  document.title = 'Sovereign.OS — See what is really happening';
+  document.querySelector('meta[name="description"]')?.setAttribute('content', 'Bring the decision, the silence, the reaction, or the pressure. Sovereign starts with one private Baseline and helps you choose a cleaner next move.');
   ensureStyle('/marketing.css', 'sovereign-marketing');
   ensureStyle('/launch.css', 'sovereign-launch');
   ensureStyle('/launch-polish.css', 'sovereign-launch-polish');
@@ -35,65 +56,156 @@ function renderLaunchHome() {
       </header>
 
       <main>
-        <section class="hero-v4 launch-hero-main">
+        <section class="hero-v4 launch-hero-main sovereign-hero">
           <div class="hero-v4-copy reveal">
-            <p class="marketing-kicker">Personal AI with context</p>
-            <h1>Start with who you are. Not a blank box.</h1>
-            <p class="hero-v4-lede">Create one private Baseline. Sovereign uses it to help with decisions, conversations, relationships, and groups—without making you explain yourself from the beginning each time.</p>
+            <p class="marketing-kicker">Sovereign.OS · Human understanding system</p>
+            <h1>See what is really happening.</h1>
+            <p class="hero-v4-lede">Bring the decision, the silence, the reaction, or the pressure. Sovereign starts with your private Baseline, separates what is known from what is assumed, and helps you choose a cleaner next move.</p>
             <div class="marketing-actions">
-              <a class="marketing-button primary" href="/signup">Create free account</a>
-              <a class="marketing-button secondary" href="#product">See the product</a>
+              <a class="marketing-button primary" href="/signup">Build my Baseline</a>
+              <a class="marketing-button secondary" href="#recognition-demo">See it work</a>
             </div>
-            <div class="trust-row"><span>Free plan available</span><span>Permission before sharing</span><span>Save only what helps</span></div>
+            <div class="trust-row"><span>Start free</span><span>Private by design</span><span>No decoding required</span></div>
           </div>
 
-          <div class="hero-product reveal" id="product" aria-label="Sovereign product preview">
-            <div class="app-frame app-frame-phone">
-              <div class="app-frame-bar"><strong>SOVEREIGN</strong><span class="app-avatar">YOU</span></div>
-              <div class="app-frame-body">
-                <p class="app-overline">Today · Current view</p>
-                <h2>The answer may feel urgent before it feels settled.</h2>
-                <p class="app-intro">Your Baseline suggests that clarity improves when the whole picture is visible. Today may make finishing feel more important than checking the choice.</p>
-                <article class="app-primary-card"><span>Next move</span><h3>Give the decision one more pass.</h3><p>Return after the pressure to finish has eased.</p></article>
-                <div class="app-state-grid"><article><span>Usually true</span><strong>You decide better with the full picture.</strong></article><article class="warm"><span>Stronger now</span><strong>The need to finish may be louder today.</strong></article></div>
-                <p class="app-uncertainty">Still unknown · You decide whether this fits.</p>
+          <div class="hero-product reveal" id="recognition-demo" aria-label="Interactive Sovereign product example">
+            <div class="baseline-field" aria-hidden="true">
+              <span class="baseline-ring ring-one"></span>
+              <span class="baseline-ring ring-two"></span>
+              <span class="baseline-ring ring-three"></span>
+              <span class="baseline-axis axis-one"></span>
+              <span class="baseline-axis axis-two"></span>
+              <span class="baseline-core"></span>
+              <span class="baseline-node node-one"></span>
+              <span class="baseline-node node-two"></span>
+              <span class="baseline-node node-three"></span>
+            </div>
+
+            <div class="recognition-frame">
+              <div class="recognition-bar">
+                <div><span class="recognition-status"></span><strong>SOVEREIGN · LIVE UNDERSTANDING</strong></div>
+                <span>PRIVATE</span>
               </div>
-              <nav class="app-frame-nav"><span class="active">Today</span><span>Explore</span><span>People</span><span>Systems</span><span>Library</span></nav>
+
+              <div class="recognition-tabs" role="tablist" aria-label="Example moments">
+                ${recognitionScenarios.map((scenario, index) => `<button type="button" role="tab" data-recognition-tab="${index}" aria-selected="${index === 0 ? 'true' : 'false'}" class="${index === 0 ? 'active' : ''}">${scenario.tab}</button>`).join('')}
+              </div>
+
+              <div class="recognition-body" data-recognition-panel aria-live="polite">
+                <article class="recognition-input">
+                  <span>What you described</span>
+                  <p data-recognition-input>${recognitionScenarios[0].input}</p>
+                </article>
+                <article class="recognition-read">
+                  <span>What may be happening</span>
+                  <p data-recognition-insight>${recognitionScenarios[0].insight}</p>
+                </article>
+                <article class="recognition-next">
+                  <span>Cleanest next move</span>
+                  <p data-recognition-next>${recognitionScenarios[0].next}</p>
+                </article>
+                <footer class="recognition-basis"><span>Based on · Your Baseline + this moment</span><span>Unknowns remain unknown</span></footer>
+              </div>
             </div>
           </div>
         </section>
 
-        <section class="launch-section">
-          <div class="launch-heading reveal"><div><p class="launch-kicker">One workspace</p><h2>Use the same context in four ways.</h2></div><p>The source stays private. The visible answer stays short, useful, and open to correction.</p></div>
-          <div class="launch-grid reveal">
-            <article class="launch-card"><span>Today</span><h3>See what may matter now.</h3><p>Separate what is usually true from what may feel unusually strong today.</p></article>
-            <article class="launch-card"><span>Decisions</span><h3>Separate clarity from pressure.</h3><p>Check whether the choice is settled or simply urgent.</p></article>
-            <article class="launch-card"><span>People & systems</span><h3>See differences and roles.</h3><p>Use only consented information. Keep motives, responsibility, and unknowns separate.</p></article>
+        <section class="launch-section experience-section">
+          <div class="launch-heading reveal"><div><p class="launch-kicker">Start with the lived moment</p><h2>People do not arrive with clean categories. They arrive with experiences.</h2></div><p>Sovereign turns the confusing moment into a grounded read of pressure, roles, responsibility, and what remains unknown.</p></div>
+          <div class="experience-grid reveal">
+            <article class="experience-card"><span>01</span><h3>Why do I keep reacting this way?</h3><p>Separate your Baseline tendency from the pressure that may be amplifying it now.</p></article>
+            <article class="experience-card"><span>02</span><h3>Why did that land so hard?</h3><p>Look at the meaning, timing, and older context without turning one interpretation into certainty.</p></article>
+            <article class="experience-card"><span>03</span><h3>Why do we keep having the same fight?</h3><p>Map the loop, the roles, and the point where each person begins protecting something different.</p></article>
+          </div>
+        </section>
+
+        <section class="launch-section journey-section">
+          <div class="launch-heading reveal"><div><p class="launch-kicker">One Sovereign workspace</p><h2>Understanding should move with you.</h2></div><p>The same private context supports the day, the decision, the relationship, and the system—without flattening them into the same answer.</p></div>
+          <div class="journey-grid reveal">
+            <article><span>01 · Baseline</span><h3>Who am I before the pressure?</h3><p>Build the private starting point for how you tend to decide, communicate, connect, and respond.</p></article>
+            <article><span>02 · Today & Explore</span><h3>What is louder right now?</h3><p>Separate what is steady from what may be temporarily amplified.</p></article>
+            <article><span>03 · People & Systems</span><h3>What happens between us?</h3><p>Use consented context to see differences, roles, friction, and repair without assigning hidden motives.</p></article>
+            <article><span>04 · Library & Covenant</span><h3>What is worth carrying forward?</h3><p>Save only the understanding you choose. Explore agreements or Scripture only when you explicitly invite that lens.</p></article>
           </div>
         </section>
       </main>
     </div>
 
-    <section class="baseline-section">
+    <section class="baseline-section baseline-story">
       <div class="marketing-shell baseline-layout">
-        <div class="baseline-copy reveal"><p class="marketing-kicker dark">How it works</p><h2>Set it up once. Correct it as you go.</h2><p>Your Baseline gives Sovereign a steady place to begin. Your answers, corrections, current timing, and chosen Library items add context without turning you into a fixed type.</p></div>
-        <div class="baseline-list reveal"><article><span>01</span><strong>Create</strong><p>Build a private Baseline.</p></article><article><span>02</span><strong>Use</strong><p>Open Today or ask a direct question.</p></article><article><span>03</span><strong>Correct</strong><p>Confirm, adjust, or reject what does not fit.</p></article><article><span>04</span><strong>Keep</strong><p>Save only the understanding you choose.</p></article></div>
+        <div class="baseline-copy reveal"><p class="marketing-kicker dark">Your Baseline</p><h2>Set it up once. Correct it as you go.</h2><p>Sovereign begins with a private model of your tendencies—not a fixed identity. Your corrections, current timing, and chosen Library items make the guidance more useful over time.</p></div>
+        <div class="baseline-list reveal"><article><span>01</span><strong>Create</strong><p>Build one private Baseline.</p></article><article><span>02</span><strong>Bring</strong><p>Open Today or bring the real moment.</p></article><article><span>03</span><strong>Clarify</strong><p>Separate what is known, possible, and still unknown.</p></article><article><span>04</span><strong>Choose</strong><p>Leave with words, timing, a boundary, a repair, or a pause.</p></article></div>
       </div>
     </section>
 
     <div class="launch-shell">
-      <section class="launch-section">
-        <div class="launch-heading reveal"><div><p class="launch-kicker">Your control</p><h2>Private context has clear limits.</h2></div><p>Useful context should not require unlimited storage or access to another person.</p></div>
-        <div class="launch-grid reveal"><article class="launch-card"><span>Private details</span><h3>Reduced before AI use.</h3><p>Raw birth input and exact private location stay outside the language model.</p></article><article class="launch-card"><span>Other people</span><h3>Permission is required.</h3><p>Each invited person chooses what may be used and can revoke it later.</p></article><article class="launch-card"><span>Your Library</span><h3>Nothing saves itself.</h3><p>Keep a short understanding only when you deliberately choose to save it.</p></article></div>
+      <section class="launch-section control-story">
+        <div class="launch-heading reveal"><div><p class="launch-kicker">Useful without overreach</p><h2>Clear enough to use. Careful enough to trust.</h2></div><p>Sovereign is built to help you see more—not to claim another person’s mind, diagnose a relationship, or save everything forever.</p></div>
+        <div class="launch-grid reveal"><article class="launch-card"><span>Private details</span><h3>Reduced before AI use.</h3><p>Raw birth input and exact private location stay outside the language model.</p></article><article class="launch-card"><span>Other people</span><h3>Permission is required.</h3><p>Each invited person chooses what may be used and can revoke it later.</p></article><article class="launch-card"><span>Your authority</span><h3>A suggestion is not a verdict.</h3><p>Confirm, correct, or reject what does not fit. Unknowns remain visible.</p></article></div>
       </section>
 
-      <section class="launch-section"><div class="launch-callout reveal"><div><p class="launch-kicker">Plans</p><h2>Start free. Add more when it becomes useful.</h2><p>Free includes Baseline, Today, Explore, and 10 AI turns each month. Sovereign+ adds People, Systems, Library continuity, Covenant, and export for $20 monthly or $99 annually.</p></div><div class="launch-actions"><a class="launch-button primary" href="/signup">Create free account</a><a class="launch-button" href="/pricing.html">Compare plans</a></div></div></section>
+      <section class="launch-section"><div class="launch-callout reveal"><div><p class="launch-kicker">Start here</p><h2>Bring the real moment. Leave with a cleaner next move.</h2><p>Free includes Baseline, Today, Explore, and 10 AI turns each month. Sovereign+ adds consented People, Systems, Library continuity, Covenant, and export for $20 monthly or $99 annually.</p></div><div class="launch-actions"><a class="launch-button primary" href="/signup">Build my Baseline</a><a class="launch-button" href="/pricing.html">Compare plans</a></div></div></section>
 
       <footer class="launch-footer"><span>Private by default · Non-diagnostic · Permission before sharing</span><nav><a href="/how-it-works.html">How it works</a><a href="/pricing.html">Pricing</a><a href="/faq.html">FAQ</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav></footer>
     </div>
   `;
 
   activateReveal();
+  activateRecognitionDemo();
+}
+
+function activateRecognitionDemo() {
+  const panel = document.querySelector('[data-recognition-panel]');
+  const tabs = [...document.querySelectorAll('[data-recognition-tab]')];
+  if (!panel || tabs.length === 0) return;
+
+  let activeIndex = 0;
+  let rotationTimer;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function renderScenario(index, shouldFocus = false) {
+    const scenario = recognitionScenarios[index];
+    if (!scenario) return;
+    activeIndex = index;
+    panel.classList.remove('is-refreshing');
+    void panel.offsetWidth;
+    panel.classList.add('is-refreshing');
+    panel.querySelector('[data-recognition-input]').textContent = scenario.input;
+    panel.querySelector('[data-recognition-insight]').textContent = scenario.insight;
+    panel.querySelector('[data-recognition-next]').textContent = scenario.next;
+    tabs.forEach((tab, tabIndex) => {
+      const selected = tabIndex === index;
+      tab.classList.toggle('active', selected);
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+    });
+    if (shouldFocus) tabs[index]?.focus();
+  }
+
+  function restartRotation() {
+    clearInterval(rotationTimer);
+    if (reducedMotion) return;
+    rotationTimer = setInterval(() => renderScenario((activeIndex + 1) % recognitionScenarios.length), 6800);
+  }
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => {
+      renderScenario(index);
+      restartRotation();
+    });
+    tab.addEventListener('keydown', (event) => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+      renderScenario(next, true);
+      restartRotation();
+    });
+  });
+
+  panel.closest('.recognition-frame')?.addEventListener('mouseenter', () => clearInterval(rotationTimer));
+  panel.closest('.recognition-frame')?.addEventListener('mouseleave', restartRotation);
+  document.addEventListener('visibilitychange', () => document.hidden ? clearInterval(rotationTimer) : restartRotation());
+  restartRotation();
 }
 
 function renderPolicyPage() {
