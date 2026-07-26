@@ -4,10 +4,17 @@ import { withSecurityHeaders } from './security/headers';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 
 const HEALTH_PATHS = new Set(['/health', '/healthz', '/ready']);
+const PARENT_HOSTS = new Set(['defrag.app', 'www.defrag.app']);
+const PUBLIC_HOST = 'sovereign.defrag.app';
+const APP_HOST = 'app.defrag.app';
+const PUBLIC_PATHS = new Set(['/privacy', '/terms', '/pricing.html', '/faq.html', '/how-it-works.html']);
 
 const runtime = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    const routed = routeHostname(request, url);
+    if (routed) return routed;
+
     if (request.method !== 'GET' || !HEALTH_PATHS.has(url.pathname)) {
       return worker.fetch(request, env, executionContext);
     }
@@ -55,6 +62,49 @@ const runtime = {
     }
   }
 };
+
+function routeHostname(request: Request, url: URL): Response | undefined {
+  const host = url.hostname.toLowerCase();
+  const isNavigation = request.method === 'GET' || request.method === 'HEAD';
+
+  if (PARENT_HOSTS.has(host)) {
+    if (HEALTH_PATHS.has(url.pathname)) return undefined;
+    return redirectTo(isApplicationPath(url.pathname) ? APP_HOST : PUBLIC_HOST, url);
+  }
+
+  if (host === PUBLIC_HOST && isApplicationPath(url.pathname)) {
+    return redirectTo(APP_HOST, url);
+  }
+
+  if (host === APP_HOST && isNavigation) {
+    if (url.pathname === '/') {
+      const target = new URL(url);
+      target.pathname = '/app';
+      return redirectTo(APP_HOST, target);
+    }
+    if (PUBLIC_PATHS.has(url.pathname)) return redirectTo(PUBLIC_HOST, url);
+  }
+
+  return undefined;
+}
+
+function isApplicationPath(pathname: string): boolean {
+  return pathname === '/app'
+    || pathname.startsWith('/app/')
+    || pathname === '/login'
+    || pathname === '/signup'
+    || pathname === '/invitation'
+    || pathname.startsWith('/auth/')
+    || pathname.startsWith('/api/');
+}
+
+function redirectTo(hostname: string, source: URL): Response {
+  const target = new URL(source);
+  target.protocol = 'https:';
+  target.hostname = hostname;
+  target.port = '';
+  return withSecurityHeaders(Response.redirect(target.toString(), 308));
+}
 
 export { ThreadCoordinator, queue, scheduled };
 export default runtime;
