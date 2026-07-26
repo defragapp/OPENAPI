@@ -92,13 +92,7 @@ jobs:
             HEALTH_STATUS="$(curl -sS -o /tmp/health.json -w '%{http_code}' https://defrag.app/health || true)"
             READY_STATUS="$(curl -sS -o /tmp/ready.json -w '%{http_code}' https://defrag.app/ready || true)"
             if [ "$ROOT_STATUS" = "200" ] && [ "$HEALTH_STATUS" = "200" ] && [ "$READY_STATUS" = "200" ]; then
-              node - <<'NODE'
-const fs = require('fs');
-const health = JSON.parse(fs.readFileSync('/tmp/health.json', 'utf8'));
-const ready = JSON.parse(fs.readFileSync('/tmp/ready.json', 'utf8'));
-if (!health.ok || !ready.ok || !ready.ready) process.exit(1);
-console.log(JSON.stringify({ health, ready }, null, 2));
-NODE
+              node -e "const fs=require('fs');const health=JSON.parse(fs.readFileSync('/tmp/health.json','utf8'));const ready=JSON.parse(fs.readFileSync('/tmp/ready.json','utf8'));if(!health.ok||!ready.ok||!ready.ready)process.exit(1);console.log(JSON.stringify({health,ready},null,2));"
               exit 0
             fi
             sleep 3
