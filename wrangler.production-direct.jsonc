@@ -11,12 +11,12 @@
   },
   "routes": [
     {
-      "pattern": "defrag.app/*",
-      "zone_name": "defrag.app"
+      "pattern": "defrag.app",
+      "custom_domain": true
     },
     {
-      "pattern": "www.defrag.app/*",
-      "zone_name": "defrag.app"
+      "pattern": "www.defrag.app",
+      "custom_domain": true
     }
   ],
   "vars": {
