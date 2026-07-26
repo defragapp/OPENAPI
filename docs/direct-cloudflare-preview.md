@@ -13,6 +13,22 @@ Do not use the Deploy to Cloudflare template flow. It creates a repository copy 
 - Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
 - Deploy command: `pnpm preview:bootstrap`
 
+The repository-root `wrangler.jsonc` exists only to give Workers Builds an exact matching Worker identity and preview resource contract. It targets `sovereign-openapi-preview`, contains no custom domains, and contains no R2 binding.
+
+## Build token
+
+Select a user-scoped Workers Builds token that can perform the bootstrap operations. It needs:
+
+- Account Settings Read
+- Workers Scripts Edit
+- D1 Edit
+- Queues Edit
+- Workers AI Read
+- User Details Read
+- Memberships Read
+
+R2 permission and Workers Routes permission are not required for this preview.
+
 ## Required first-deploy configuration
 
 Add one secret:
