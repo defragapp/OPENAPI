@@ -35,6 +35,7 @@ The staged AI response and exact-data footer contract is defined in [`docs/inner
 - [`docs/launch-product-contract.md`](docs/launch-product-contract.md)
 - [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md)
 - [`docs/cloudflare-workers-builds.md`](docs/cloudflare-workers-builds.md)
+- [`docs/production-release.md`](docs/production-release.md)
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/privacy-model.md`](docs/privacy-model.md)
 - [`docs/tool-contracts.md`](docs/tool-contracts.md)
@@ -58,8 +59,12 @@ The deploy command targets the isolated `sovereign-openapi-preview` Worker rathe
 
 Preview target: [`sovereign-openapi-preview.sovereign-os-api.workers.dev`](https://sovereign-openapi-preview.sovereign-os-api.workers.dev). This link identifies the isolated review target only; availability and readiness must be verified from the exact deployed commit before approval.
 
+## Production promotion
+
+Production uses a guarded four-stage command path: upload an immutable candidate without traffic, apply reviewed D1 migrations separately, promote the exact approved version, and retain an explicit rollback target. The process, required evidence, and commit-bound approval values are defined in [`docs/production-release.md`](docs/production-release.md).
+
 ## Current state
 
-The repository now includes the app and Worker shells, D1 schema and migrations, Durable Object thread coordination, security primitives, Stripe billing foundations, export job execution, identity-bound email invitations, invitee-controlled scope decisions and revocation, reduced-Baseline pair and system context, authorization-checked relational context, staged Inner Recognition planning, exact verified Basis selection, pre-display response safety, explicit Insight Module approval, and a Cloudflare-native build/deployment path.
+The repository now includes the app and Worker shells, D1 schema and migrations, Durable Object thread coordination, security primitives, Stripe billing foundations, export job execution, identity-bound email invitations, invitee-controlled scope decisions and revocation, reduced-Baseline pair and system context, authorization-checked relational context, staged Inner Recognition planning, exact verified Basis selection, pre-display response safety, explicit Insight Module approval, Cloudflare-native preview deployment, and a fail-closed production promotion path.
 
 This is **implemented, not yet verified as a protected live deployment**. Remaining approval evidence includes a successful Cloudflare build, configured production Baseline and email services, protected Cloudflare preview, migration replay, authenticated browser and iPhone smoke tests, load testing, reviewed Terms and Privacy documents, and explicit founder approval. No production deployment is implied by the code state.
