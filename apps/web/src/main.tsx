@@ -14,7 +14,15 @@ installProductRuntime();
 installBaselineInputRuntime();
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+  if (location.hostname === 'sovereign.defrag.app') {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+  } else {
+    window.addEventListener('load', () => {
+      void navigator.serviceWorker.getRegistrations().then((registrations) =>
+        Promise.all(registrations.map((registration) => registration.unregister()))
+      );
+    });
+  }
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
