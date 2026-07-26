@@ -1,0 +1,130 @@
+name: Direct OPENAPI production deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/production-direct-deploy.yml'
+      - 'wrangler.production-direct.jsonc'
+      - 'apps/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sovereign-openapi-production
+  cancel-in-progress: false
+
+jobs:
+  deploy-production:
+    name: Build, migrate, and deploy OPENAPI to sovv-web
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact commit without marketplace actions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth=1 origin "${GITHUB_SHA}"
+          git checkout --detach FETCH_HEAD
+
+      - name: Select preinstalled Node 22
+        run: |
+          set -euo pipefail
+          NODE22="$(find /opt/hostedtoolcache/node -mindepth 1 -maxdepth 1 -type d -name '22.*' | sort -V | tail -1)"
+          if [ -z "$NODE22" ] || [ ! -x "$NODE22/x64/bin/node" ]; then
+            echo "::error::Node 22 is not available in the hosted tool cache"
+            exit 1
+          fi
+          echo "$NODE22/x64/bin" >> "$GITHUB_PATH"
+          "$NODE22/x64/bin/node" --version
+
+      - name: Enable Corepack and install dependencies
+        run: |
+          set -euo pipefail
+          corepack enable
+          pnpm install --frozen-lockfile
+
+      - name: Verify and build exact production commit
+        env:
+          VITE_TURNSTILE_SITE_KEY: 0x4AAAAAADhGIF8-iOLIg8MU
+        run: |
+          set -euo pipefail
+          pnpm verify:cloudflare-build
+
+      - name: Require Cloudflare deployment credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "::error::GitHub secret CLOUDFLARE_API_TOKEN is missing"
+            exit 1
+          fi
+
+      - name: Provision OPENAPI production resources and deploy sovv-web
+        env:
+          CLOUDFLARE_ACCOUNT_ID: 8b1954d216d65077c6480d62583fe2c2
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          VITE_TURNSTILE_SITE_KEY: 0x4AAAAAADhGIF8-iOLIg8MU
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          node scripts/cloudflare-direct-production-deploy.mjs
+
+      - name: Verify live production routes
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 40); do
+            ROOT_STATUS="$(curl -sS -o /tmp/root.html -w '%{http_code}' https://defrag.app/ || true)"
+            HEALTH_STATUS="$(curl -sS -o /tmp/health.json -w '%{http_code}' https://defrag.app/health || true)"
+            READY_STATUS="$(curl -sS -o /tmp/ready.json -w '%{http_code}' https://defrag.app/ready || true)"
+            if [ "$ROOT_STATUS" = "200" ] && [ "$HEALTH_STATUS" = "200" ] && [ "$READY_STATUS" = "200" ]; then
+              node - <<'NODE'
+const fs = require('fs');
+const health = JSON.parse(fs.readFileSync('/tmp/health.json', 'utf8'));
+const ready = JSON.parse(fs.readFileSync('/tmp/ready.json', 'utf8'));
+if (!health.ok || !ready.ok || !ready.ready) process.exit(1);
+console.log(JSON.stringify({ health, ready }, null, 2));
+NODE
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "::error::defrag.app did not become healthy after deployment"
+          echo "root_status=$(curl -sS -o /dev/null -w '%{http_code}' https://defrag.app/ || true)"
+          echo "health_response=$(cat /tmp/health.json 2>/dev/null || true)"
+          echo "ready_response=$(cat /tmp/ready.json 2>/dev/null || true)"
+          exit 1
+
+      - name: Deployment evidence
+        if: always()
+        run: |
+          {
+            echo "### Direct OPENAPI production deployment"
+            echo
+            echo "- repository: ${GITHUB_REPOSITORY}"
+            echo "- commit_sha: ${GITHUB_SHA}"
+            echo "- worker: sovv-web"
+            echo "- public_url: https://defrag.app"
+            echo "- d1: sovereign-openapi-db"
+            echo "- queue: sovereign-openapi-jobs"
+            echo "- r2: disabled"
+            if [ -f production-deployment.json ]; then
+              echo
+              echo '```json'
+              cat production-deployment.json
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
