@@ -4,10 +4,12 @@ import { App } from './App';
 import { AppErrorBoundary } from './AppErrorBoundary';
 import { ProductCompletionLayer, installProductRuntime } from './ProductCompletionLayer';
 import { installBaselineInputRuntime } from './BaselineInputRuntime';
+import { installProductionRuntime } from './ProductionRuntime';
 import './styles.css';
 import './product-completion.css';
 import './visual-polish.css';
 
+installProductionRuntime();
 installProductRuntime();
 installBaselineInputRuntime();
 
