@@ -27,6 +27,7 @@ for (const required of [
   'PRODUCTION_MIGRATIONS_APPLIED_SHA',
   'PRODUCTION_APPROVAL_EVIDENCE_URL',
   'PRODUCTION_MIGRATIONS_BACKWARD_COMPATIBLE',
+  "if (mode === 'candidate' || mode === 'migrate') requireApproval(mode);",
   "'versions', 'upload'",
   "'versions', 'deploy'",
   "'rollback', rollbackVersion",
