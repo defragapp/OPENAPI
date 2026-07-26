@@ -54,12 +54,25 @@ const runtime = {
       if (!env.ASSETS) {
         return withSecurityHeaders(Response.json({ error: 'assets_unavailable' }, { status: 503 }));
       }
-      return withDocumentSecurityHeaders(await env.ASSETS.fetch(request));
+      return documentResponse(await env.ASSETS.fetch(request), url.hostname.toLowerCase());
     }
 
     return worker.fetch(request, env, executionContext);
   }
 };
+
+function documentResponse(response: Response, hostname: string): Response {
+  const secured = withDocumentSecurityHeaders(response);
+  if (hostname !== APP_HOST) return secured;
+  const headers = new Headers(secured.headers);
+  headers.set('x-robots-tag', 'noindex, nofollow');
+  headers.delete('content-length');
+  return new Response(secured.body, {
+    status: secured.status,
+    statusText: secured.statusText,
+    headers
+  });
+}
 
 async function shareFirstAccountResponse(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
   const response = await worker.fetch(request, env, executionContext);
