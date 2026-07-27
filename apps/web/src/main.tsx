@@ -7,12 +7,14 @@ import { installBaselineInputRuntime } from './BaselineInputRuntime';
 import { installProductionRuntime } from './ProductionRuntime';
 import { PublicLanding } from './PublicLanding';
 import { PublicPolicy } from './PublicPolicy';
+import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
 import './styles.css';
 import './product-completion.css';
 import './public-landing.css';
 import './production-polish.css';
 import './baseline-orbit.css';
 import './workspace-chat.css';
+import './visual-intelligence.css';
 
 installProductionRuntime();
 installProductRuntime();
@@ -37,6 +39,7 @@ const publicPolicyKind = location.pathname === '/privacy'
     ? 'terms'
     : null;
 const isDirectPublicSurface = isPublicHome || publicPolicyKind !== null;
+const isAuthenticatedWorkspace = location.pathname === '/app' || location.pathname.startsWith('/app/');
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -46,7 +49,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         ? <PublicLanding />
         : publicPolicyKind
           ? <PublicPolicy kind={publicPolicyKind} />
-          : <App />}
+          : isAuthenticatedWorkspace
+            ? <SovereignIntelligenceWorkspace />
+            : <App />}
     </AppErrorBoundary>
   </React.StrictMode>
 );
