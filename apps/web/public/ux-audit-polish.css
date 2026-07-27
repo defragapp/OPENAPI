@@ -9,6 +9,14 @@
   --faint: #aaa299;
   --line: rgba(255,250,242,.18);
   --line-strong: rgba(255,250,242,.30);
+  min-height: 100svh;
+  min-height: 100dvh;
+  overscroll-behavior-y: none;
+}
+
+.app-shell button,
+.app-shell [role="button"] {
+  touch-action: manipulation;
 }
 
 .surface-card,
@@ -268,16 +276,128 @@
   max-width: 64ch;
 }
 
+@media (min-width: 1180px) {
+  .workspace-frame {
+    width: min(calc(100% - 220px), 1320px);
+    margin-left: max(220px, calc((100vw - 1320px + 220px) / 2));
+    padding-inline: clamp(34px, 3vw, 52px);
+  }
+
+  .composer {
+    right: max(52px, calc((100vw - 1320px - 220px) / 2 + 52px));
+    left: max(272px, calc((100vw - 1320px + 220px) / 2 + 52px));
+  }
+
+  .mode-object-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .you-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .you-grid > .surface-card:first-child {
+    grid-row: span 2;
+  }
+}
+
 @media (max-width: 900px) {
   .first-run-guide { grid-template-columns: 1fr; }
   .first-run-guide .primary-button { justify-self: start; }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 680px) {
+  .workspace-frame {
+    padding-inline: max(14px, env(safe-area-inset-left)) max(14px, env(safe-area-inset-right));
+  }
+
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar-actions {
+    min-width: 108px;
+  }
+
+  .surface-card,
+  .hero-card,
+  .intelligence-canvas,
+  .result-panel {
+    box-shadow: 0 12px 34px rgba(0,0,0,.22);
+  }
+
   .term-definition-row { display: grid; }
   .term-definition-row span { border-radius: 12px; }
   .mode-object { min-height: 150px; }
   .empty-library-steps { display: grid; }
+
+  .perspective-split article,
+  .perspective-split > div,
+  .system-node {
+    min-height: 124px;
+  }
+
+  .composer {
+    right: max(10px, env(safe-area-inset-right));
+    left: max(10px, env(safe-area-inset-left));
+  }
+
+  .composer textarea,
+  .app-shell input:not([type="checkbox"]):not([type="radio"]),
+  .app-shell select {
+    font-size: 16px;
+  }
+
+  .tabbar {
+    right: max(8px, env(safe-area-inset-right));
+    left: max(8px, env(safe-area-inset-left));
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .tabbar button {
+    min-width: 0;
+    padding-inline: 3px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 390px) {
+  .workspace-frame {
+    padding-top: calc(env(safe-area-inset-top) + 12px);
+  }
+
+  .topbar h1 {
+    font-size: 2rem;
+  }
+
+  .profile-button {
+    padding-inline: 10px;
+  }
+
+  .tabbar button {
+    font-size: .61rem;
+    letter-spacing: -.01em;
+  }
+
+  .first-run-guide,
+  .control-group,
+  .scope-panel {
+    padding: 16px;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  .app-shell {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .composer,
+  .tabbar {
+    -webkit-backdrop-filter: blur(22px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
