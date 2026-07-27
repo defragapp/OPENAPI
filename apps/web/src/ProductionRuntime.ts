@@ -3,9 +3,14 @@ const TERMS_URL = `${PUBLIC_SHARE_URL}/terms`;
 const PRIVACY_URL = `${PUBLIC_SHARE_URL}/privacy`;
 const PRODUCTION_TURNSTILE_SITE_KEY = '0x4AAAAAADhGIF8-iOLIg8MU';
 const STRIPE_HANDOFF_HOSTS = new Set(['checkout.stripe.com', 'billing.stripe.com']);
+const TURNSTILE_STATE_EVENT = 'sovereign:turnstile-state';
+const TURNSTILE_RESET_EVENT = 'sovereign:turnstile-reset';
 
+type TurnstileState = 'loading' | 'ready' | 'verified' | 'expired' | 'error' | 'unsupported';
 type TurnstileApi = {
   render: (container: HTMLElement, options: Record<string, unknown>) => string;
+  reset: (widgetId?: string | HTMLElement) => void;
+  getResponse: (widgetId?: string | HTMLElement) => string | undefined;
 };
 
 declare global {
@@ -30,34 +35,83 @@ function installTurnstile(): void {
 
   window.__TURNSTILE_SITE_KEY__ = siteKey;
 
+  const updateState = (container: HTMLElement, state: TurnstileState, message: string) => {
+    const frame = container.closest<HTMLElement>('.turnstile-frame');
+    if (frame) frame.dataset.state = state;
+    const caption = frame?.querySelector<HTMLElement>('[data-turnstile-caption]');
+    if (caption) caption.textContent = message;
+    window.dispatchEvent(new CustomEvent(TURNSTILE_STATE_EVENT, {
+      detail: { state, action: container.dataset.action || 'login' }
+    }));
+  };
+
+  const resetWidget = (container: HTMLElement, message = 'Refreshing the private security check…') => {
+    const widgetId = container.dataset.turnstileWidgetId;
+    if (!widgetId || !window.turnstile) return;
+    updateState(container, 'loading', message);
+    window.turnstile.reset(widgetId);
+  };
+
   const renderWidgets = () => {
     if (!window.turnstile) return;
     document.querySelectorAll<HTMLElement>('.turnstile-slot').forEach((container) => {
       if (container.dataset.turnstileRendered === 'true') return;
       container.dataset.turnstileRendered = 'true';
       container.textContent = '';
+      updateState(container, 'loading', 'Preparing the private security check…');
       try {
-        window.turnstile?.render(container, {
+        const widgetId = window.turnstile?.render(container, {
           sitekey: siteKey,
           action: container.dataset.action || 'login',
-          theme: 'auto',
+          theme: 'dark',
+          size: 'flexible',
+          appearance: 'always',
+          retry: 'auto',
+          'retry-interval': 8_000,
           'response-field': true,
           'response-field-name': 'cf-turnstile-response',
-          'error-callback': () => {
-            container.dataset.turnstileRendered = 'false';
-            container.textContent = 'Verification could not load. Refresh and try again.';
+          callback: () => updateState(container, 'verified', 'Security check complete.'),
+          'before-interactive-callback': () => updateState(container, 'ready', 'Complete the private security check to continue.'),
+          'after-interactive-callback': () => {
+            const response = container.dataset.turnstileWidgetId ? window.turnstile?.getResponse(container.dataset.turnstileWidgetId) : undefined;
+            if (!response) updateState(container, 'ready', 'Complete the private security check to continue.');
+          },
+          'expired-callback': () => {
+            updateState(container, 'expired', 'The security check expired. Refreshing it now…');
+            setTimeout(() => resetWidget(container), 300);
+          },
+          'timeout-callback': () => {
+            updateState(container, 'expired', 'The security check timed out. Refreshing it now…');
+            setTimeout(() => resetWidget(container), 300);
+          },
+          'unsupported-callback': () => updateState(container, 'unsupported', 'This browser cannot complete the security check. Update the browser or try another device.'),
+          'error-callback': (errorCode: unknown) => {
+            container.dataset.turnstileErrorCode = typeof errorCode === 'string' ? errorCode.slice(0, 24) : 'unknown';
+            updateState(container, 'error', 'The security check could not finish. It will retry automatically.');
           }
         });
+        if (widgetId) container.dataset.turnstileWidgetId = widgetId;
       } catch {
         container.dataset.turnstileRendered = 'false';
-        container.textContent = 'Verification could not load. Refresh and try again.';
+        updateState(container, 'error', 'The security check could not load. Refresh the page and try again.');
       }
     });
   };
 
+  window.addEventListener(TURNSTILE_RESET_EVENT, (event) => {
+    const action = (event as CustomEvent<{ action?: string }>).detail?.action;
+    document.querySelectorAll<HTMLElement>('.turnstile-slot').forEach((container) => {
+      if (!action || (container.dataset.action || 'login') === action) resetWidget(container);
+    });
+  });
+
   const existing = document.querySelector<HTMLScriptElement>('script[data-turnstile]');
   if (existing) {
-    existing.addEventListener('load', renderWidgets, { once: true });
+    if (window.turnstile) renderWidgets();
+    else existing.addEventListener('load', renderWidgets, { once: true });
+    existing.addEventListener('error', () => {
+      document.querySelectorAll<HTMLElement>('.turnstile-slot').forEach((container) => updateState(container, 'error', 'The security check could not load. Refresh the page and try again.'));
+    }, { once: true });
   } else {
     const script = document.createElement('script');
     script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
@@ -65,6 +119,9 @@ function installTurnstile(): void {
     script.defer = true;
     script.dataset.turnstile = 'true';
     script.addEventListener('load', renderWidgets, { once: true });
+    script.addEventListener('error', () => {
+      document.querySelectorAll<HTMLElement>('.turnstile-slot').forEach((container) => updateState(container, 'error', 'The security check could not load. Refresh the page and try again.'));
+    }, { once: true });
     document.head.appendChild(script);
   }
 
