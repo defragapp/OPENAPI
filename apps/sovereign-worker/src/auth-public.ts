@@ -8,6 +8,7 @@ const encoder = new TextEncoder();
 const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60;
 const MAX_EMAIL_LENGTH = 320;
 const MAX_NAME_LENGTH = 120;
+const MAX_RETURN_TO_LENGTH = 512;
 const MAX_MAGIC_LINKS_PER_IP_WINDOW = 10;
 const TERMS_VERSION = '2026-07-26';
 const PRIVACY_VERSION = '2026-07-26';
@@ -19,6 +20,19 @@ function base64Url(bytes: Uint8Array) { return btoa(String.fromCharCode(...bytes
 function newToken(): string { const bytes = new Uint8Array(32); crypto.getRandomValues(bytes); return base64Url(bytes); }
 function publicBaseUrl(request: Request, env: Env): string { return env.PUBLIC_APP_URL || new URL(request.url).origin; }
 function cookie(name: string, value: string, maxAge = SESSION_TTL_SECONDS) { return `${name}=${value}; Path=/; Max-Age=${maxAge}; HttpOnly; Secure; SameSite=Lax; Priority=High`; }
+
+export function safeReturnTo(value: unknown): string | null {
+  if (typeof value !== 'string' || !value || value.length > MAX_RETURN_TO_LENGTH) return null;
+  if (!value.startsWith('/') || value.startsWith('//') || value.includes('\\') || /[\u0000-\u001f]/.test(value)) return null;
+  try {
+    const parsed = new URL(value, 'https://sovereign.invalid');
+    if (parsed.origin !== 'https://sovereign.invalid') return null;
+    if (['/login', '/signup', '/auth/redeem'].includes(parsed.pathname)) return null;
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch {
+    return null;
+  }
+}
 
 export async function verifyTurnstile(env: Env, token?: string, ip?: string, expectedAction?: string): Promise<void> {
   if (runtimeMode(env) === 'test' && token === 'test-turnstile-pass') return;
@@ -44,9 +58,10 @@ export async function verifyTurnstile(env: Env, token?: string, ip?: string, exp
 }
 
 export async function requestMagicLink(request: Request, env: Env, kind: 'signup' | 'login'): Promise<Response> {
-  const body = await request.json().catch(() => ({})) as { email?: string; name?: string; termsAccepted?: boolean; turnstileToken?: string };
+  const body = await request.json().catch(() => ({})) as { email?: string; name?: string; termsAccepted?: boolean; turnstileToken?: string; returnTo?: string };
   const email = normalizeEmail(body.email ?? '');
   const name = body.name?.trim() ?? '';
+  const returnTo = safeReturnTo(body.returnTo);
   if (!validEmail(email)) return Response.json({ status: 'invalid' }, { status: 400 });
   if (kind === 'signup' && (!name || name.length > MAX_NAME_LENGTH || body.termsAccepted !== true)) return Response.json({ status: 'invalid' }, { status: 400 });
 
@@ -80,7 +95,10 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
     .bind(id, email, existing?.id ?? null, kind, tokenHash, kind === 'signup' ? name : null, acceptedAt, ipHash, userAgentHash)
     .run();
 
-  const url = `${publicBaseUrl(request, env)}/auth/redeem?token=${encodeURIComponent(token)}`;
+  const redeem = new URL('/auth/redeem', publicBaseUrl(request, env));
+  redeem.searchParams.set('token', token);
+  if (returnTo) redeem.searchParams.set('returnTo', returnTo);
+  const url = redeem.toString();
   try {
     await sendOperationalEmail(env, {
       to: email,
@@ -97,7 +115,9 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
 
 export async function redeemMagicLink(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
-  const token = url.searchParams.get('token') || (await request.json().catch(() => ({})) as { token?: string }).token;
+  const body = request.method === 'POST' ? await request.json().catch(() => ({})) as { token?: string; returnTo?: string } : {};
+  const token = url.searchParams.get('token') || body.token;
+  const returnTo = safeReturnTo(url.searchParams.get('returnTo') ?? body.returnTo);
   if (!token || token.length < 32 || token.length > 512) return Response.json({ status: 'invalid' }, { status: 400 });
   const tokenHash = await sha256(token);
   const row = await env.DB.prepare("SELECT id, email_normalized, account_id, purpose, name, terms_accepted_at, expires_at, used_at FROM auth_magic_links WHERE token_hash = ?")
@@ -160,7 +180,7 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   return Response.json({
     status: 'success',
     createdAccount,
-    next: onboarding?.onboarding_completed_at ? '/app' : '/onboarding'
+    next: onboarding?.onboarding_completed_at ? returnTo ?? '/app' : '/onboarding'
   }, { headers: { 'set-cookie': cookie('__Host-sovereign_session', tokenValue) } });
 }
 
