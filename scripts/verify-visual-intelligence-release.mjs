@@ -43,7 +43,9 @@ requireAll('visual intelligence workspace', workspace, [
   "api('/api/v1/billing/entitlements')",
   "api('/api/v1/threads')",
   'Does this fit?',
-  "saveCorrection('partly')",
+  "async function saveCorrection(correction: 'yes' | 'partly' | 'not_today')",
+  "onCorrection={(value) => void saveCorrection(value)}",
+  "onCorrection('partly')",
   "bibleTranslation: enabled ? 'WEB' : undefined",
   'No compatibility score. No winner and loser.'
 ]);
