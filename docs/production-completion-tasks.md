@@ -4,11 +4,11 @@ Updated after each completed implementation tranche.
 
 ## Current release baseline
 
-- Last fully verified production SHA: `c96ccd6966c6dbab3f0a336fa90b4fce591e7a5a`
-- Account-access release merged to `main`: `0000ce5a2355a0ef981ed85103b325584dff6fcb`; Cloudflare promotion is pending exact-SHA verification.
-- Active review branch: `fix/unified-entry-context-integrity`
+- Last fully verified production SHA: `c96ccd6966c6dbab3f0a336fa90b4fce591e7a5a`.
+- Unified account access and signed-in entry are merged to `main` at `67723c9285685a98338bdc66443348e44d729468`; Cloudflare promotion is pending exact-SHA verification.
+- Active implementation branch: `feat/public-support-and-structured-intelligence`.
 - GitHub-hosted Actions currently fail before allocating a runner or executing the first zero-dependency step. Cloudflare’s connected production build remains the full executable release gate until that runner issue is resolved.
-- Remaining work is concentrated in structured intelligence, deeper user controls, visual identity, recovery, billing support, discoverability, and full end-to-end QA.
+- Remaining work is concentrated in structured response projection, deeper user controls, visual identity, recovery, discoverability, and full end-to-end QA.
 
 ## Account access and communication — merged, pending live release verification
 
@@ -21,7 +21,7 @@ Updated after each completed implementation tranche.
 - [x] Keep private relationship labels, raw birth details, exact location, account history, and internal identifiers out of invitation emails.
 - [x] Replace pattern-heavy and generic authentication copy with approved Baseline-first Sovereign.OS language.
 - [x] Add focused tests for return routing, branded email rendering and escaping, Turnstile lifecycle, account copy, field errors, and visual containment.
-- [ ] Confirm the connected Cloudflare build, live email flow, and exact `0000ce5a…` health/readiness response.
+- [ ] Confirm the connected Cloudflare build, live email flow, and exact current-main health/readiness response.
 
 ## Product integrity — one Sovereign intelligence
 
@@ -39,12 +39,13 @@ Updated after each completed implementation tranche.
 
 ## Structured intelligence and visual truth
 
-- [ ] Implement a validated structured `SovereignResponse` contract.
-- [ ] Separate deterministic Baseline and Live Sky data from model interpretation.
-- [ ] Replace alignment keyword scoring and response-length confidence with structured factors and explicit uncertainty.
+- [x] Validate the server-side recognition plan with a strict schema and verified source-basis selection.
+- [ ] Project the validated recognition plan into a public `SovereignResponse` interface contract.
+- [ ] Separate deterministic Baseline and Live Sky data from model interpretation in every rendered response.
+- [ ] Replace alignment keyword scoring and response-length confidence with validated plan confidence, basis, safety mode, and explicit uncertainty.
 - [ ] Render Baseline, shadow/light, alignment, relationship, system, Covenant, unknowns, and continuation options as distinct components.
-- [ ] Preserve a plain-language fallback when structured validation fails without duplicate billing or usage.
-- [ ] Add tests for motive uncertainty, non-diagnostic language, schema fallback, Covenant separation, and confidence semantics.
+- [ ] Preserve a plain-language fallback when structured validation or projection fails without duplicate billing or usage.
+- [ ] Add tests for motive uncertainty, non-diagnostic language, schema fallback, Covenant separation, basis integrity, and confidence semantics.
 
 ## User control and continuity
 
@@ -88,8 +89,13 @@ Updated after each completed implementation tranche.
 
 - [ ] Re-verify Free and Sovereign+ entitlements against public pricing and Terms.
 - [ ] Verify checkout, success, cancellation, customer portal, downgrade, and webhook idempotency end to end.
-- [ ] Add a clearly separate development-support/donation option to appropriate static pages only after provider, tax language, refund language, and non-entitlement wording are confirmed.
-- [ ] Never imply that a donation purchases product access, influence, or future features.
+- [x] Create a separate live Stripe development-support product and customer-chosen one-time USD price.
+- [x] Configure support amounts from $5 to $500, preset at $25, without recurring billing or account provisioning.
+- [x] Publish the support link only on explanatory static pages while keeping the subscription Pricing page entitlement-only.
+- [x] State that support does not purchase access, create entitlements, grant ownership or influence, promise features, or claim tax-deductible status.
+- [x] Publish payment-support and refund-request contact context and add source tests for the separation and disclosures.
+- [x] Keep support PaymentIntent metadata explicitly marked `grants_entitlement=false` so contribution payments cannot enter subscription entitlement logic.
+- [ ] Verify the Stripe-hosted support page and a real low-value payment/refund lifecycle in live QA.
 
 ## Security and operational hardening
 
@@ -97,7 +103,7 @@ Updated after each completed implementation tranche.
 - [x] Preserve generic account-enumeration-safe responses while giving the current user useful local guidance.
 - [x] Preserve 15-minute magic-link expiry, one-time redemption, and allowlisted post-auth return routing.
 - [ ] Verify session rotation, logout invalidation, CSRF assumptions, and magic-link behavior in the live release.
-- [ ] Review rate limits for sign-in, signup, invitations, checkout, AI turns, and consent changes.
+- [ ] Review rate limits for sign-in, signup, invitations, checkout, AI turns, consent changes, and support-payment abuse.
 - [ ] Add abuse-safe audit events without storing message content or secrets.
 - [ ] Verify CSP, HSTS, frame denial, noindex rules, caching, and custom-domain redirects after each release.
 
