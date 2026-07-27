@@ -33,6 +33,7 @@ export interface ThreadMessage {
   context?: Record<string, unknown>;
   plan?: Record<string, unknown>;
   correction?: ThreadCorrection;
+  correctionHistory?: ThreadCorrection[];
   interfaceActions?: Record<string, unknown>;
   visualStory?: Record<string, unknown>;
   moduleOffer?: Record<string, unknown>;
@@ -65,7 +66,7 @@ export async function listThreads(env: Env, accountId: string): Promise<ThreadSu
 export async function listThreadMessages(env: Env, accountId: string, threadId: string): Promise<ThreadMessage[]> {
   const owned = await getOwnedThread(env, accountId, threadId);
   if (!owned) throw new Response('Thread not found', { status: 404 });
-  const [rows, latestCorrection] = await Promise.all([
+  const [rows, correctionRows] = await Promise.all([
     env.DB.prepare(`SELECT id, seq, event_type, payload_json, created_at
       FROM thread_events
       WHERE thread_id = ?
@@ -74,9 +75,9 @@ export async function listThreadMessages(env: Env, accountId: string, threadId: 
       .bind(threadId)
       .all<Record<string, string | number>>(),
     env.DB.prepare(`SELECT correction, note, created_at FROM user_corrections
-      WHERE thread_id = ? AND account_id = ? ORDER BY created_at DESC LIMIT 1`)
+      WHERE thread_id = ? AND account_id = ? ORDER BY created_at DESC LIMIT 20`)
       .bind(threadId, accountId)
-      .first<{ correction: string; note: string | null; created_at: string }>()
+      .all<{ correction: string; note: string | null; created_at: string }>()
   ]);
 
   const messages: ThreadMessage[] = [];
@@ -106,10 +107,16 @@ export async function listThreadMessages(env: Env, accountId: string, threadId: 
     });
     if (role === 'assistant') pendingPlan = undefined;
   }
-  const correction = normalizeCorrection(latestCorrection);
-  if (correction) {
+
+  const correctionHistory = (correctionRows.results ?? [])
+    .map((row) => normalizeCorrection(row))
+    .filter((item): item is ThreadCorrection => Boolean(item));
+  if (correctionHistory.length) {
     const latestAssistant = [...messages].reverse().find((message) => message.role === 'assistant');
-    if (latestAssistant) latestAssistant.correction = correction;
+    if (latestAssistant) {
+      latestAssistant.correction = correctionHistory[0]!;
+      latestAssistant.correctionHistory = correctionHistory;
+    }
   }
   return messages;
 }
