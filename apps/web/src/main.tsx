@@ -8,6 +8,7 @@ import { installProductionRuntime } from './ProductionRuntime';
 import { PublicLanding } from './PublicLanding';
 import { PublicPolicy } from './PublicPolicy';
 import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
+import { SystemMembershipManager } from './SystemMembershipManager';
 import './styles.css';
 import './product-completion.css';
 import './public-landing.css';
@@ -15,6 +16,7 @@ import './production-polish.css';
 import './baseline-orbit.css';
 import './workspace-chat.css';
 import './visual-intelligence.css';
+import './system-membership.css';
 
 installProductionRuntime();
 installProductRuntime();
@@ -50,7 +52,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         : publicPolicyKind
           ? <PublicPolicy kind={publicPolicyKind} />
           : isAuthenticatedWorkspace
-            ? <SovereignIntelligenceWorkspace />
+            ? <><SovereignIntelligenceWorkspace /><SystemMembershipManager /></>
             : <App />}
     </AppErrorBoundary>
   </React.StrictMode>
