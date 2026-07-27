@@ -13,6 +13,7 @@ import {
   recognitionJsonContract,
   type RecognitionPlan
 } from './recognition';
+import { alignmentJsonContract, parseAlignmentResult, type AlignmentResult } from './alignment-contract';
 
 export interface SovereignContext {
   env: Env;
@@ -29,6 +30,7 @@ export interface SovereignContext {
 export interface SovereignResult {
   text: string;
   plan: RecognitionPlan;
+  alignment: AlignmentResult;
 }
 
 export async function runSovereignText(input: string, context: SovereignContext): Promise<string> {
@@ -40,19 +42,21 @@ export async function runSovereignStream(input: string, context: SovereignContex
 }
 
 export async function runSovereignResult(input: string, context: SovereignContext): Promise<SovereignResult> {
-  assertSafeUserInput(input);
+  const cleanInput = input.trim();
+  assertSafeUserInput(cleanInput);
   const aiConfig = resolveAiModelConfig(context.env);
   if (aiConfig.provider !== 'cloudflare-gateway') throw new Error('Only Cloudflare AI Gateway is supported.');
 
-  const { prompt, availableBasis } = await buildCloudflareGatewayPrompt(input, context);
+  const { prompt, availableBasis } = await buildCloudflareGatewayPrompt(cleanInput, context);
   const raw = await runCloudflareGateway(prompt, context, aiConfig.model);
   const plan = parseRecognitionPlan(raw, availableBasis);
-  const allowFrameworkLabels = asksForFrameworkDetail(input);
+  const alignment = parseAlignmentResult(raw);
+  const allowFrameworkLabels = asksForFrameworkDetail(cleanInput);
   sanitizeRecognitionPlanLanguage(plan, allowFrameworkLabels);
   const review = reviewSovereignOutputSafety(composeRecognitionResponse(plan), { allowFrameworkLabels });
   const text = review.text;
   assertSovereignOutputSafety(text, { phase: plan.response_phase, allowFrameworkLabels });
-  return { text, plan };
+  return { text: encodeResponseMetadata(text, alignment, plan), plan, alignment };
 }
 
 async function runCloudflareGateway(prompt: string, context: SovereignContext, model: string): Promise<string> {
@@ -60,7 +64,7 @@ async function runCloudflareGateway(prompt: string, context: SovereignContext, m
   if (!context.env.AI_GATEWAY_ID) throw new Error('AI_GATEWAY_ID is not configured.');
   const result = await context.env.AI.run(
     model,
-    { input: prompt, max_output_tokens: 1_200 },
+    { input: prompt, max_output_tokens: 1_400 },
     {
       gateway: {
         id: context.env.AI_GATEWAY_ID,
@@ -69,7 +73,7 @@ async function runCloudflareGateway(prompt: string, context: SovereignContext, m
         metadata: {
           plan: context.plan === 'sovereign_plus' ? 'sovereign_plus' : 'free',
           account_ref: await pseudonymousAccountRef(context),
-          response_contract: 'inner-recognition-v1'
+          response_contract: 'inner-recognition-v2'
         }
       }
     }
@@ -106,6 +110,9 @@ ${groundedIntelligencePrompt(input)}
 Required JSON shape:
 ${recognitionJsonContract(availableBasis)}
 
+Add this validated alignment object at the top level of the same JSON. Do not infer direction from answer length or keywords. Keep it neutral when the question is not an alignment assessment or when context is incomplete:
+${alignmentJsonContract()}
+
 Current user message:
 ${input}
 
@@ -117,7 +124,6 @@ async function resolveAuthorizedContext(context: SovereignContext): Promise<unkn
   if (context.authorizedContext !== undefined) return projectModelSafeConversationContext(context.authorizedContext);
   if (context.systemId) return projectModelSafeConversationContext(await buildSystemAnalysis(context.env, context.accountId, context.systemId));
   if (context.personId) return projectModelSafeConversationContext(await buildPairComparison(context.env, context.accountId, context.personId));
-
   return getModelSafeBaselineContext(context.env, context.accountId);
 }
 
@@ -129,7 +135,7 @@ async function loadRecognitionContinuity(context: SovereignContext): Promise<unk
   const corrections = await context.env.DB.prepare(`SELECT correction, note, created_at FROM user_corrections
     WHERE thread_id = ? AND account_id = ? ORDER BY created_at DESC LIMIT 3`).bind(context.threadId, context.accountId).all<Record<string, string | null>>();
   return {
-    recentAssistantResponses: (events.results ?? []).map((row) => safeJson(row.payload_json)),
+    recentAssistantResponses: (events.results ?? []).map((row) => stripStoredResponseMetadata(safeJson(row.payload_json))),
     userCorrections: corrections.results ?? []
   };
 }
@@ -257,4 +263,34 @@ async function collectTextStream(stream: ReadableStream<string>): Promise<string
 function safeJson(value: string | undefined): unknown {
   if (!value) return {};
   try { return JSON.parse(value); } catch { return {}; }
+}
+
+function encodeResponseMetadata(text: string, alignment: AlignmentResult, plan: RecognitionPlan): string {
+  const metadata = {
+    alignment: {
+      applicable: alignment.applicable,
+      direction: alignment.direction,
+      confidence: alignment.confidence,
+      supportingFactors: alignment.supporting_factors,
+      counterFactors: alignment.counter_factors,
+      missingContext: alignment.missing_context,
+      explanation: alignment.explanation
+    },
+    response: { phase: plan.response_phase, confidence: plan.confidence, safetyMode: plan.safety_mode }
+  };
+  const bytes = new TextEncoder().encode(JSON.stringify(metadata));
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  const encoded = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  return `[[SOVEREIGN_META_V1:${encoded}]]\n${text}`;
+}
+
+function stripStoredResponseMetadata(value: unknown): unknown {
+  if (!value || typeof value !== 'object') return value;
+  const record = { ...(value as Record<string, unknown>) };
+  if (typeof record.text === 'string' && record.text.startsWith('[[SOVEREIGN_META_V1:')) {
+    const end = record.text.indexOf(']]');
+    if (end >= 0) record.text = record.text.slice(end + 2).replace(/^\r?\n/, '');
+  }
+  return record;
 }
