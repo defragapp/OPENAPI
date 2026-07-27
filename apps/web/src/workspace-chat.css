@@ -525,6 +525,33 @@
   color: var(--muted);
 }
 
+.consent-purpose-fieldset {
+  display: grid;
+  gap: 9px;
+  margin: 4px 0 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.consent-purpose-fieldset legend {
+  padding: 0 5px;
+  color: var(--muted);
+  font-size: .7rem;
+}
+
+.consent-purpose-fieldset label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--muted);
+  font-size: .72rem;
+}
+
+.danger-button {
+  color: var(--danger);
+}
+
 .response-actions button {
   min-height: 32px;
   padding: 5px 9px;

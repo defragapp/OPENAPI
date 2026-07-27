@@ -1,6 +1,6 @@
 import type { Env } from './env';
 import { buildPairComparison, buildSystemAnalysis } from './relational-context';
-import { getEntitlements, requireFeature } from './db/entitlements';
+import { requireFeature, type EntitlementSet } from './db/entitlements';
 
 export interface ConversationContextSelection {
   surface?: string;
@@ -25,14 +25,57 @@ export function parseConversationContext(value: unknown): ConversationContextSel
   };
 }
 
-export async function authorizeConversationContext(env: Env, accountId: string, selection: ConversationContextSelection): Promise<unknown | undefined> {
-  if (selection.personId) return buildPairComparison(env, accountId, selection.personId);
+export async function authorizeConversationContext(
+  env: Env,
+  accountId: string,
+  selection: ConversationContextSelection,
+  entitlements: EntitlementSet
+): Promise<unknown | undefined> {
+  requireConversationContextEntitlement(selection, entitlements);
+  if (selection.personId) return projectModelSafeConversationContext(await buildPairComparison(env, accountId, selection.personId));
   if (selection.systemId) {
-    const entitlements = await getEntitlements(env, accountId);
-    if (!entitlements.features.includes('systems.family') && !entitlements.features.includes('systems.team')) requireFeature(entitlements, 'systems.family');
-    return buildSystemAnalysis(env, accountId, selection.systemId);
+    return projectModelSafeConversationContext(await buildSystemAnalysis(env, accountId, selection.systemId));
   }
   return undefined;
+}
+
+export function requireConversationContextEntitlement(selection: ConversationContextSelection, entitlements: EntitlementSet): void {
+  if (selection.personId) requireFeature(entitlements, 'people.compare');
+  if (selection.systemId && !entitlements.features.includes('systems.family') && !entitlements.features.includes('systems.team')) {
+    requireFeature(entitlements, 'systems.family');
+  }
+}
+
+export function projectModelSafeConversationContext(value: unknown): unknown {
+  return project(value);
+}
+
+function project(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map((item) => project(item));
+  if (!value || typeof value !== 'object') return value;
+  const output: Record<string, unknown> = {};
+  for (const [childKey, childValue] of Object.entries(value as Record<string, unknown>)) {
+    if (isPrivateIdentifierKey(childKey)) continue;
+    if (childKey === 'label') {
+      output.label = childValue === 'You' ? 'You' : 'Other person';
+      continue;
+    }
+    if (childKey === 'from' || childKey === 'to') {
+      output[childKey] = childValue === 'You' ? 'You' : 'Other person';
+      continue;
+    }
+    output[childKey] = project(childValue);
+  }
+  return output;
+}
+
+function isPrivateIdentifierKey(key: string): boolean {
+  return /(?:^|_)(?:id|account|subject|email|token|trace)(?:$|_)/i.test(key)
+    || /(?:Id|Account|Subject|Email|Token|Trace)$/i.test(key)
+    || key === 'name'
+    || key === 'displayName'
+    || key === 'consentCheckedAt'
+    || key === 'lastComputedAt';
 }
 
 function parseIdentifier(value: unknown, field: string): string | undefined {

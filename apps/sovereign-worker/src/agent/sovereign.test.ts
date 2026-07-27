@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { sovereignRuntimePromptV1 } from './prompt-v1';
 import { compareBaselineToCurrentConditions } from '../adapters/sovv';
+import type { RecognitionPlan } from './recognition';
 
 const fakeEnv = { APP_ENV: 'test', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '' } as never;
 
@@ -83,7 +84,19 @@ describe('Cloudflare Gateway recognition adapter', () => {
         }
       }
     } as never;
-    const stream = await runSovereignStream('I feel responsible for everyone and keep stepping in to fix everything, but I have not described what is actually mine to carry.', { env, accountId: 'acct_test', threadId: 'thread_test', traceId: 'trace_test', covenantEnabled: false, plan: 'free' });
+    const stream = await runSovereignStream('I feel responsible for everyone and keep stepping in to fix everything, but I have not described what is actually mine to carry.', {
+      env,
+      accountId: 'acct_test',
+      threadId: 'thread_test',
+      traceId: 'trace_test',
+      covenantEnabled: false,
+      plan: 'free',
+      authorizedContext: {
+        kind: 'pair',
+        personId: 'person_private',
+        participants: [{ personId: 'person_private', label: 'Private Name', baseline: { baselineTendency: 'reflective' } }]
+      }
+    });
     const reader = stream.getReader();
     let text = '';
     while (true) {
@@ -112,5 +125,42 @@ describe('Cloudflare Gateway recognition adapter', () => {
     expect(JSON.stringify(calls[0]?.input)).toContain('Do not force a psychological explanation');
     expect(JSON.stringify(calls[0]?.input)).not.toContain('Your Baseline proves');
     expect(JSON.stringify(calls[0]?.input)).not.toMatch(/birth date|birth time|latitude|longitude|workspace\/SOVV/i);
+    expect(JSON.stringify(calls[0]?.input)).not.toMatch(/person_private|Private Name/);
+    expect(JSON.stringify(calls[0]?.input)).toContain('Other person');
+  });
+});
+
+describe('externally visible plan metadata', () => {
+  it('safety-reviews module and visual-card titles before they leave the private plan', async () => {
+    const { sanitizeRecognitionPlanLanguage } = await import('./sovereign');
+    const plan = {
+      recognition: 'A direct answer.',
+      inward_question: 'What fits now?',
+      candidate_hidden_expectation: 'One possibility.',
+      protected_need: 'clarity',
+      clearer_form: 'Keep what is known separate.',
+      practical_action: 'Name one observed fact.',
+      module_suggestion: { should_offer: true, title: 'You are the overfunctioner', reason: 'Your mother is trying to control you.', format: 'reflection' },
+      visual_story: {
+        should_show: true,
+        mode: 'self',
+        primary: { archetype: 'fool', title: 'You are the overfunctioner', phase: 'shadow' },
+        secondary: null,
+        tertiary: null,
+        origin: 'Past protection.',
+        shadow: 'Current pressure.',
+        gift: 'Clear expression.',
+        current: 'Something is active.',
+        next_step: 'Name one fact.',
+        visual_reason: 'The user confirmed it.'
+      },
+      basis: { user_confirmed: true, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
+      confidence: 'supported',
+      safety_mode: 'standard',
+      response_phase: 'integration'
+    } as unknown as RecognitionPlan;
+    sanitizeRecognitionPlanLanguage(plan, true);
+    expect(JSON.stringify(plan.module_suggestion)).not.toMatch(/overfunctioner|trying to control/i);
+    expect(plan.visual_story.primary.title).not.toContain('overfunctioner');
   });
 });

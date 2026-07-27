@@ -186,9 +186,10 @@ export interface RoutedGroundedConcept {
   usefulFor: string[];
   cannotInfer: string[];
   safeGuidance: string;
+  source?: { title: string; url: string };
 }
 
-export function routeGroundedIntelligence(input: string, limit = 2): RoutedGroundedConcept[] {
+export function routeGroundedIntelligence(input: string, limit = 2, includeSources = false): RoutedGroundedConcept[] {
   return groundedConcepts
     .map((concept, index) => ({ concept, index, score: concept.signals.reduce((score, signal) => score + (signal.test(input) ? 1 : 0), 0) }))
     .filter(({ score }) => score > 0)
@@ -199,12 +200,14 @@ export function routeGroundedIntelligence(input: string, limit = 2): RoutedGroun
       plainLanguage: concept.plainLanguage,
       usefulFor: concept.usefulFor,
       cannotInfer: concept.cannotInfer,
-      safeGuidance: concept.safeExamples[0]!
+      safeGuidance: concept.safeExamples[0]!,
+      ...(includeSources ? { source: concept.source } : {})
     }));
 }
 
 export function groundedIntelligencePrompt(input: string): string {
-  const selected = routeGroundedIntelligence(input);
+  const includeSources = /\b(?:sources?|research|evidence|stud(?:y|ies))\b/i.test(input);
+  const selected = routeGroundedIntelligence(input, 2, includeSources);
   if (!selected.length) return 'No grounded relational concept was selected. Do not force a psychological explanation.';
-  return `Private reasoning aids (never name these labels unless the user explicitly asks):\n${JSON.stringify(selected)}\nUse them only as possibilities supported by the available facts. Do not force a psychological explanation.`;
+  return `Private reasoning aids (never name these labels unless the user explicitly asks):\n${JSON.stringify(selected)}\nUse them only as possibilities supported by the available facts. Do not force a psychological explanation.${includeSources ? ' The included title and URL are the only approved source details for this answer.' : ' Do not make source claims unless approved source details are included.'}`;
 }

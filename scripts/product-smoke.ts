@@ -219,7 +219,7 @@ async function main() {
   await json(env, token, `/api/v1/library/${saved.id}`, { method: 'DELETE' });
 
   await request(env, token, '/api/v1/export-jobs', { method: 'POST' }, 404);
-  const deletion = (await json(env, token, '/api/v1/deletion-jobs', { method: 'POST' }, 202)).deletionJob;
+  const deletion = (await json(env, token, '/api/v1/deletion-jobs', { method: 'POST', body: JSON.stringify({ approved: true }) }, 202)).deletionJob;
   await json(env, token, `/api/v1/deletion-jobs/${deletion.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'cancel' }) });
 
   const covenant = await json(env, token, '/api/v1/threads/product-smoke/covenant', {

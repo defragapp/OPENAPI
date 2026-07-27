@@ -97,6 +97,26 @@ describe('inner recognition structured output', () => {
     expect(response).toContain('You can care without taking ownership');
   });
 
+  it('keeps the direct recognition in guided integrations when the compatibility field is empty', () => {
+    const response = composeRecognitionResponse({
+      response_shape: 'guided',
+      response_phase: 'integration',
+      recognition: 'You can care without taking ownership of every outcome.',
+      inward_question: 'What is yours to choose?',
+      candidate_hidden_expectation: '',
+      protected_need: '',
+      clearer_form: 'Keep the care and return each responsibility to the person who controls it.',
+      practical_action: 'Name one choice that is yours and one outcome that is not.',
+      module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
+      visual_story: hiddenVisualStory,
+      basis: { user_confirmed: true, ...emptyBasis },
+      confidence: 'supported',
+      safety_mode: 'standard'
+    });
+    expect(response).toContain('WHAT THIS MAY BE SHOWING');
+    expect(response).toContain('You can care without taking ownership of every outcome.');
+  });
+
   it('requires a complete module offer and removes offers during grounding', () => {
     const missingReason = JSON.stringify({
       response_phase: 'integration', recognition: 'The answer matters.', inward_question: 'What fits now?',

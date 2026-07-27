@@ -264,7 +264,7 @@ export function composeRecognitionResponse(plan: RecognitionPlan): string {
   const moduleLine = plan.module_suggestion.should_offer && plan.module_suggestion.title
     ? `\n\nEXPLORE LATER\n\n${plan.module_suggestion.title}`
     : '';
-  return `WHAT THIS MAY BE SHOWING\n\n${plan.candidate_hidden_expectation}\n\nA CLEARER FORM\n\n${plan.clearer_form}\n\nWHAT TO DO\n\n${plan.practical_action}${moduleLine}${footer ? `\n\n${footer}` : ''}`;
+  return `WHAT THIS MAY BE SHOWING\n\n${plan.candidate_hidden_expectation || plan.recognition}\n\nA CLEARER FORM\n\n${plan.clearer_form}\n\nWHAT TO DO\n\n${plan.practical_action}${moduleLine}${footer ? `\n\n${footer}` : ''}`;
 }
 
 export function renderBasisFooter(basis: BasisSelection): string {

@@ -208,8 +208,10 @@ export function SovereignWorkspace() {
       setMessages(data.messages ?? []);
       const restored = [...(data.messages ?? [])].reverse().find((item: ChatMessage) =>
         item.context || item.interfaceActions || item.visualStory || item.moduleOffer);
-      if (restored?.context?.personId) { setSelectedPerson(restored.context.personId); setSelectedSystem(''); }
-      if (restored?.context?.systemId) { setSelectedSystem(restored.context.systemId); setSelectedPerson(''); }
+      const restoredPerson = validClientId(restored?.context?.personId) ? restored.context.personId : '';
+      const restoredSystem = validClientId(restored?.context?.systemId) ? restored.context.systemId : '';
+      setSelectedPerson(restoredSystem ? '' : restoredPerson);
+      setSelectedSystem(restoredPerson ? '' : restoredSystem);
       setInterfaceActions(validActionEnvelope(restored?.interfaceActions));
       const restoredVisual = validVisualStoryPayload(restored?.visualStory);
       setVisualStory(restoredVisual);
@@ -274,7 +276,6 @@ export function SovereignWorkspace() {
       setVisualStory(nextVisualStory);
       setVisualPhase(nextVisualStory?.story.primary.phase ?? 'shadow');
       setModuleOffer(nextModuleOffer);
-      if (actions?.primary && isReversibleAction(actions.primary)) openInterfaceAction(actions.primary);
       setStatus('Complete');
       const threadData = await api('/api/v1/threads');
       setThreads(threadData.threads ?? []);
@@ -466,7 +467,7 @@ export function SovereignWorkspace() {
             <PeoplePanel api={api} people={people} setPeople={setPeople} selectedPerson={selectedPerson} setSelectedPerson={(id: string) => { setSelectedPerson(id); if (id) setSelectedSystem(''); }} refresh={refreshWorkspace} />
           )}
           {surface === 'Systems' && (
-            <SystemsPanel api={api} systems={systems} setSystems={setSystems} people={people} selectedPerson={selectedPerson} setSelectedPerson={setSelectedPerson} selectedSystem={selectedSystem} setSelectedSystem={(id: string) => { setSelectedSystem(id); if (id) setSelectedPerson(''); }} />
+            <SystemsPanel api={api} systems={systems} setSystems={setSystems} people={people} selectedSystem={selectedSystem} setSelectedSystem={(id: string) => { setSelectedSystem(id); if (id) setSelectedPerson(''); }} />
           )}
           {surface === 'Library' && <LibraryPanel library={library} api={api} refresh={refreshWorkspace} onUse={(text: string) => { setDraft(text); setPanelOpen(false); }} />}
           {surface === 'You' && (
@@ -515,6 +516,7 @@ function PeoplePanel({ api, people, setPeople, selectedPerson, setSelectedPerson
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [notice, setNotice] = useState('');
+  const [requestedScopes, setRequestedScopes] = useState<string[]>(['pair.compare', 'trait.display']);
   const selected = people.find((person: any) => person.id === selectedPerson);
 
   async function addPerson() {
@@ -530,7 +532,7 @@ function PeoplePanel({ api, people, setPeople, selectedPerson, setSelectedPerson
     if (!window.confirm(`Send a private invitation to ${email.trim()}?`)) return;
     await api(`/api/v1/people/${selectedPerson}/invitations/send`, {
       method: 'POST',
-      body: JSON.stringify({ email, requestedScopes: ['pair.compare', 'trait.display'] })
+      body: JSON.stringify({ email, requestedScopes })
     });
     setEmail('');
     setNotice('Private invitation sent. They choose what to allow.');
@@ -557,6 +559,12 @@ function PeoplePanel({ api, people, setPeople, selectedPerson, setSelectedPerson
       {selected && !selected.identityBound && (
         <>
           <Field label="Invitation email"><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></Field>
+          <fieldset className="consent-purpose-fieldset">
+            <legend>What may they choose to allow?</legend>
+            <label><input type="checkbox" checked disabled /> Relationship comparison</label>
+            <label><input type="checkbox" checked={requestedScopes.includes('system.include')} onChange={(event) => setOptionalScope(requestedScopes, setRequestedScopes, 'system.include', event.target.checked)} /> Include in a family, group, or team</label>
+            <label><input type="checkbox" checked={requestedScopes.includes('covenant.include')} onChange={(event) => setOptionalScope(requestedScopes, setRequestedScopes, 'covenant.include', event.target.checked)} /> Include in the optional Covenant lens</label>
+          </fieldset>
           <button className="primary-button" onClick={() => void invite()}>Send private invitation</button>
         </>
       )}
@@ -568,10 +576,11 @@ function PeoplePanel({ api, people, setPeople, selectedPerson, setSelectedPerson
   );
 }
 
-function SystemsPanel({ api, systems, setSystems, people, selectedPerson, setSelectedPerson, selectedSystem, setSelectedSystem }: any) {
+function SystemsPanel({ api, systems, setSystems, people, selectedSystem, setSelectedSystem }: any) {
   const [name, setName] = useState('');
   const [type, setType] = useState('family');
-  const eligible = people.filter((person: any) => person.identityBound);
+  const [memberId, setMemberId] = useState('');
+  const eligible = people.filter((person: any) => person.identityBound && person.activeScopes?.includes('system.include'));
 
   async function createSystem() {
     if (!name.trim()) return;
@@ -582,11 +591,12 @@ function SystemsPanel({ api, systems, setSystems, people, selectedPerson, setSel
   }
 
   async function addMember() {
-    if (!selectedSystem || !selectedPerson) return;
+    if (!selectedSystem || !memberId) return;
     await api(`/api/v1/systems/${selectedSystem}/members`, {
       method: 'POST',
-      body: JSON.stringify({ personId: selectedPerson, metadata: { formalRole: 'member', authority: 'none assumed', responsibility: 'shared objective', constraints: [] } })
+      body: JSON.stringify({ personId: memberId, metadata: { formalRole: 'member', authority: 'none assumed', responsibility: 'shared objective', constraints: [] } })
     });
+    setMemberId('');
   }
 
   return (
@@ -608,12 +618,12 @@ function SystemsPanel({ api, systems, setSystems, people, selectedPerson, setSel
       {selectedSystem && (
         <>
           <Field label="Add a permitted person">
-            <select value={selectedPerson} onChange={(event) => setSelectedPerson(event.target.value)}>
+            <select value={memberId} onChange={(event) => setMemberId(event.target.value)}>
               <option value="">Choose a person</option>
               {eligible.map((person: any) => <option key={person.id} value={person.id}>{person.displayName}</option>)}
             </select>
           </Field>
-          <button className="primary-button" disabled={!selectedPerson} onClick={() => void addMember()}>Add to system</button>
+          <button className="primary-button" disabled={!memberId} onClick={() => void addMember()}>Add to system</button>
         </>
       )}
     </PanelStack>
@@ -641,6 +651,13 @@ function LibraryPanel({ library, api, refresh, onUse }: any) {
 function YouPanel({ api, billing, covenantEnabled, changeCovenant, refresh }: any) {
   const [certainty, setCertainty] = useState('unknown');
   const [interval, setInterval] = useState<'monthly' | 'annual'>('annual');
+  const [deletionJob, setDeletionJob] = useState<{ id: string; status: string; scheduledFor?: string } | null>(null);
+
+  useEffect(() => {
+    void api('/api/v1/deletion-jobs')
+      .then((data: any) => setDeletionJob(data.deletionJob ?? null))
+      .catch(() => setDeletionJob(null));
+  }, []);
 
   async function buildBaseline(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -653,6 +670,21 @@ function YouPanel({ api, billing, covenantEnabled, changeCovenant, refresh }: an
     const data = await api(path, { method: 'POST', body: JSON.stringify(body) });
     const url = data.checkout?.url ?? data.portal?.url;
     if (url) location.assign(url);
+  }
+
+  async function requestDeletion() {
+    if (!window.confirm('Request deletion of this account and its private data after the 14-day grace period? You can cancel during that period.')) return;
+    const data = await api('/api/v1/deletion-jobs', { method: 'POST', body: JSON.stringify({ approved: true }) });
+    setDeletionJob(data.deletionJob);
+  }
+
+  async function cancelDeletion() {
+    if (!deletionJob || !window.confirm('Cancel this account deletion request?')) return;
+    await api(`/api/v1/deletion-jobs/${encodeURIComponent(deletionJob.id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ action: 'cancel' })
+    });
+    setDeletionJob(null);
   }
 
   return (
@@ -697,6 +729,9 @@ function YouPanel({ api, billing, covenantEnabled, changeCovenant, refresh }: an
         <label className="setting-row"><span><strong>Covenant</strong><small>Optional Christian and biblical lens for this conversation.</small></span><input type="checkbox" checked={covenantEnabled} onChange={(event) => void changeCovenant(event.target.checked)} /></label>
         <p className="panel-note">Sharing sends the public Sovereign.OS link. No private workspace data is included.</p>
         <button className="secondary-button" onClick={() => { if (window.confirm('Open your device sharing options for the public Sovereign.OS link?')) void sharePublicPlatform(); }}>Share Sovereign.OS</button>
+        {deletionJob
+          ? <button className="secondary-button" onClick={() => void cancelDeletion()}>Cancel account deletion</button>
+          : <button className="secondary-button danger-button" onClick={() => void requestDeletion()}>Request account deletion</button>}
         <button className="secondary-button" onClick={() => api('/api/v1/auth/logout', { method: 'POST' })}>Log out</button>
       </section>
     </PanelStack>
@@ -761,10 +796,6 @@ function validClientId(value: unknown): value is string {
   return typeof value === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(value);
 }
 
-function isReversibleAction(action: InterfaceAction): boolean {
-  return ['open_baseline', 'open_person', 'open_system', 'open_decision'].includes(action.type);
-}
-
 function actionLabel(action: InterfaceAction): string {
   if (action.type === 'open_baseline') return 'Show Baseline detail';
   if (action.type === 'open_person') return 'Open relationship context';
@@ -772,6 +803,10 @@ function actionLabel(action: InterfaceAction): string {
   if (action.type === 'open_decision') return 'Open Decision Check';
   if (action.type === 'open_optional_lens') return 'Review optional Covenant lens';
   return 'View plan details';
+}
+
+function setOptionalScope(current: string[], setCurrent: (next: string[]) => void, scope: string, enabled: boolean) {
+  setCurrent(enabled ? [...new Set([...current, scope])] : current.filter((item) => item !== scope));
 }
 
 function VisualStoryCard({ payload, phase, setPhase }: {

@@ -58,6 +58,7 @@ describe('conversation-first Baseline intelligence', () => {
     expect(workspace).toContain("['open_baseline', 'open_person', 'open_system', 'open_decision', 'open_optional_lens', 'show_plan']");
     expect(workspace).toContain("window.confirm('Save this response to your private Library?')");
     expect(workspace).toContain('Send a private invitation to');
+    expect(workspace).not.toContain('isReversibleAction(actions.primary)');
     expect(workspace).not.toContain('MutationObserver');
   });
 
@@ -70,6 +71,22 @@ describe('conversation-first Baseline intelligence', () => {
     expect(workspace).toContain('<VisualStoryCard');
     expect(workspace).toContain('/modules/latest');
     expect(workspace).toContain('window.confirm(`Save “${moduleOffer.title}” to your private Library?`)');
+  });
+
+  it('keeps personal and system-member selection isolated and restores explicit personal context', () => {
+    expect(workspace).toContain("setSelectedPerson(restoredSystem ? '' : restoredPerson)");
+    expect(workspace).toContain("setSelectedSystem(restoredPerson ? '' : restoredSystem)");
+    expect(workspace).toContain("const [memberId, setMemberId] = useState('')");
+    expect(workspace).toContain("person.activeScopes?.includes('system.include')");
+    expect(workspace).not.toContain('if (actions?.primary &&');
+  });
+
+  it('restores user-controlled deletion and purpose-specific invitation scopes', () => {
+    expect(workspace).toContain("api('/api/v1/deletion-jobs')");
+    expect(workspace).toContain('Request account deletion');
+    expect(workspace).toContain('Cancel account deletion');
+    expect(workspace).toContain("'system.include'");
+    expect(workspace).toContain("'covenant.include'");
   });
 
   it('advances the public cache without caching private workspace assets', () => {

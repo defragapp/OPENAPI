@@ -32,4 +32,11 @@ describe('private grounded-intelligence routing', () => {
     expect(routeGroundedIntelligence('What time is my appointment?')).toEqual([]);
     expect(groundedIntelligencePrompt('What time is my appointment?')).toContain('Do not force a psychological explanation');
   });
+
+  it('includes approved source details only when the user asks for them', () => {
+    expect(groundedIntelligencePrompt('Why do I keep feeling responsible for everyone?')).not.toContain('thebowencenter.org');
+    const sourced = groundedIntelligencePrompt('What research or sources explain feeling responsible for everyone?');
+    expect(sourced).toContain('thebowencenter.org');
+    expect(sourced).toContain('only approved source details');
+  });
 });

@@ -11,7 +11,7 @@ import { runSovereignStream } from './agent/sovereign';
 import { handleStripeWebhook } from './routes/stripe';
 import { canUseDevelopmentFixtures, serviceUnavailable } from './runtime';
 import { createInvitation, createPerson, listPeople, requireConsent, setConsent, updateInvitationStatus, type InvitationStatus, type RelationshipMetadataInput } from './db/people';
-import { addSystemMember, analyzeSystem, cancelDeletionJob, createDeletionJob, createExportJob, createSystem, deleteUnderstanding, freeEntitlements, listSystems, listUnderstandings, saveUnderstanding, updateUnderstanding, type SystemType } from './db/product';
+import { addSystemMember, analyzeSystem, cancelDeletionJob, createDeletionJob, createExportJob, createSystem, deleteUnderstanding, freeEntitlements, getActiveDeletionJob, listSystems, listUnderstandings, saveUnderstanding, updateUnderstanding, type SystemType } from './db/product';
 import { createCheckoutSession, createPortalSession, normalizeStripeFixtureEvent, projectSubscriptionEvent, type BillingInterval } from './billing/stripe';
 import { getAiUsage, reserveAiTurn } from './billing/usage';
 import { requestMagicLink, redeemMagicLink, logout } from './auth-public';
@@ -289,7 +289,14 @@ app.post('/api/v1/jobs/run', async (context) => {
 app.post('/api/v1/deletion-jobs', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ approved?: boolean }>().catch((): { approved?: boolean } => ({}));
+  if (body.approved !== true) return context.json({ error: 'Explicit approval is required.' }, 400);
   return context.json({ deletionJob: await createDeletionJob(context.env, auth.accountId) }, 202);
+});
+
+app.get('/api/v1/deletion-jobs', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ deletionJob: await getActiveDeletionJob(context.env, auth.accountId) });
 });
 
 app.patch('/api/v1/deletion-jobs/:jobId', async (context) => {

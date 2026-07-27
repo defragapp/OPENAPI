@@ -5,6 +5,7 @@ import { buildPairComparison, buildSystemAnalysis } from '../relational-context'
 import { sovereignRuntimePromptV1 } from './prompt-v1';
 import { groundedIntelligencePrompt } from './grounded-intelligence';
 import { assertSafeUserInput, assertSovereignOutputSafety, reviewSovereignOutputSafety } from './safety';
+import { projectModelSafeConversationContext } from '../conversation-context';
 import {
   composeRecognitionResponse,
   deriveAvailableBasis,
@@ -47,7 +48,7 @@ export async function runSovereignResult(input: string, context: SovereignContex
   const raw = await runCloudflareGateway(prompt, context, aiConfig.model);
   const plan = parseRecognitionPlan(raw, availableBasis);
   const allowFrameworkLabels = asksForFrameworkDetail(input);
-  reviewPlanLanguage(plan, allowFrameworkLabels);
+  sanitizeRecognitionPlanLanguage(plan, allowFrameworkLabels);
   const review = reviewSovereignOutputSafety(composeRecognitionResponse(plan), { allowFrameworkLabels });
   const text = review.text;
   assertSovereignOutputSafety(text, { phase: plan.response_phase, allowFrameworkLabels });
@@ -113,9 +114,9 @@ ${covenantInstruction}`;
 }
 
 async function resolveAuthorizedContext(context: SovereignContext): Promise<unknown> {
-  if (context.authorizedContext !== undefined) return context.authorizedContext;
-  if (context.systemId) return buildSystemAnalysis(context.env, context.accountId, context.systemId);
-  if (context.personId) return buildPairComparison(context.env, context.accountId, context.personId);
+  if (context.authorizedContext !== undefined) return projectModelSafeConversationContext(context.authorizedContext);
+  if (context.systemId) return projectModelSafeConversationContext(await buildSystemAnalysis(context.env, context.accountId, context.systemId));
+  if (context.personId) return projectModelSafeConversationContext(await buildPairComparison(context.env, context.accountId, context.personId));
 
   return getModelSafeBaselineContext(context.env, context.accountId);
 }
@@ -144,7 +145,7 @@ function asksForFrameworkDetail(input: string): boolean {
   return /\b(?:Bowen|IFS|internal family systems|attachment theory|psychological framework|sources?|research)\b/i.test(input);
 }
 
-function reviewPlanLanguage(plan: RecognitionPlan, allowFrameworkLabels: boolean): void {
+export function sanitizeRecognitionPlanLanguage(plan: RecognitionPlan, allowFrameworkLabels: boolean): void {
   const rewrite = (value: string) => reviewSovereignOutputSafety(value, { allowFrameworkLabels }).text;
   plan.recognition = rewrite(plan.recognition);
   plan.inward_question = rewrite(plan.inward_question);
@@ -152,6 +153,11 @@ function reviewPlanLanguage(plan: RecognitionPlan, allowFrameworkLabels: boolean
   plan.protected_need = rewrite(plan.protected_need);
   plan.clearer_form = rewrite(plan.clearer_form);
   plan.practical_action = rewrite(plan.practical_action);
+  plan.module_suggestion.title = rewrite(plan.module_suggestion.title);
+  plan.module_suggestion.reason = rewrite(plan.module_suggestion.reason);
+  plan.visual_story.primary.title = rewrite(plan.visual_story.primary.title);
+  if (plan.visual_story.secondary) plan.visual_story.secondary.title = rewrite(plan.visual_story.secondary.title);
+  if (plan.visual_story.tertiary) plan.visual_story.tertiary.title = rewrite(plan.visual_story.tertiary.title);
   plan.visual_story.origin = rewrite(plan.visual_story.origin);
   plan.visual_story.shadow = rewrite(plan.visual_story.shadow);
   plan.visual_story.gift = rewrite(plan.visual_story.gift);

@@ -74,7 +74,7 @@ describe('identity-bound multi-user contract', () => {
     expect(entry).toContain('buildSystemAnalysis');
     expect(entry).toContain('runSovereignResult');
     expect(entry).toContain('parseConversationContext(body.context)');
-    expect(entry).toContain('authorizeConversationContext(env, auth.accountId, selection)');
+    expect(entry).toContain('authorizeConversationContext(env, auth.accountId, selection, entitlements)');
     expect(conversationContext).toContain('buildPairComparison(env, accountId, selection.personId)');
     expect(conversationContext).toContain('buildSystemAnalysis(env, accountId, selection.systemId)');
   });

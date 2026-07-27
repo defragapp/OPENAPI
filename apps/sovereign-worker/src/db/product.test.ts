@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { analyzeSystem, createDeletionJob, createExportJob, createSystem, freeEntitlements, saveUnderstanding } from './product';
+import { analyzeSystem, createDeletionJob, createExportJob, createSystem, freeEntitlements, getActiveDeletionJob, saveUnderstanding } from './product';
 import type { Env } from '../env';
 
 function fakeEnv(): Env {
@@ -41,6 +41,7 @@ describe('systems, library, privacy, and entitlement helpers', () => {
   it('disables private exports while preserving a cancellable deletion grace record', async () => {
     const env = fakeEnv();
     await expect(createExportJob(env, 'acct_1')).rejects.toMatchObject({ status: 404 });
+    await expect(getActiveDeletionJob(env, 'acct_1')).resolves.toBeNull();
     expect((await createDeletionJob(env, 'acct_1')).status).toBe('grace');
   });
 

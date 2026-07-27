@@ -217,7 +217,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
 
   const entitlements = await getEntitlements(env, auth.accountId);
   const selection = parseConversationContext(body.context);
-  const authorizedContext = await authorizeConversationContext(env, auth.accountId, selection);
+  const authorizedContext = await authorizeConversationContext(env, auth.accountId, selection, entitlements);
   await ensureThread(env, auth.accountId, threadId, selection.surface?.toLowerCase() ?? 'personal');
   await touchThread(env, auth.accountId, threadId, message);
   const coordinator = env.THREADS.get(env.THREADS.idFromName(`${auth.accountId}:${threadId}`));
@@ -240,7 +240,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
   if (aiConfig.provider !== 'cloudflare-gateway' || !env.AI || !env.AI_GATEWAY_ID) {
     if (!canUseDevelopmentFixtures(env)) {
       await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'failed', 'gateway_unavailable');
-      return Response.json({ error: 'Sovereign is temporarily unavailable. Nothing was guessed or saved.' }, { status: 503 });
+      return Response.json({ error: 'Sovereign is temporarily unavailable. Your message remains in this private conversation, but no response was generated.' }, { status: 503 });
     }
     const fallback = 'WHAT I NOTICE\n\nThe OPENAPI Baseline fixture is available for development checks, but live provider output is not assumed here.\n\nLOOK INWARD\n\nWhat changed inside you when this happened?';
     await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_development_response', { developmentFallback: true, text: fallback }, traceId);
