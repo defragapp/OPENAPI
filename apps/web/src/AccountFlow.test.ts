@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 const flow = readFileSync(new URL('./AccountFlow.tsx', import.meta.url), 'utf8');
+const passwordKey = readFileSync(new URL('./PasswordKey.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const css = readFileSync(new URL('./account-flow.css', import.meta.url), 'utf8');
 const pricing = readFileSync(new URL('../public/pricing.html', import.meta.url), 'utf8');
@@ -22,6 +23,24 @@ describe('Sovereign.OS account and onboarding funnel', () => {
     expect(flow).toContain('Continue with Google');
     expect(flow).toContain('autoComplete="current-password"');
     expect(flow).toContain('Forgot password?');
+  });
+
+  it('keeps password stretching and private-key encryption in the browser', () => {
+    for (const required of [
+      "name: 'PBKDF2'",
+      '600_000',
+      "name: 'AES-GCM'",
+      "name: 'Ed25519'",
+      'encryptedPrivateKey',
+      'passwordProofMessage'
+    ]) {
+      expect(passwordKey).toContain(required);
+    }
+    expect(flow).toContain("createPasswordEnvelope(password)");
+    expect(flow).toContain("postJson('/api/v1/auth/password/challenge'");
+    expect(flow).toContain('signPasswordChallenge(email, password, challenge)');
+    expect(flow).toContain('challengeId: challenge.challengeId');
+    expect(flow).toContain('signature,');
   });
 
   it('preserves paid intent through signup sign-in and onboarding', () => {
