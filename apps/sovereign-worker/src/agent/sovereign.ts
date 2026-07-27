@@ -3,7 +3,8 @@ import type { Env } from '../env';
 import { getModelSafeBaselineContext } from '../baseline';
 import { buildPairComparison, buildSystemAnalysis } from '../relational-context';
 import { sovereignRuntimePromptV1 } from './prompt-v1';
-import { assertSafeUserInput, assertSovereignOutputSafety } from './safety';
+import { groundedIntelligencePrompt } from './grounded-intelligence';
+import { assertSafeUserInput, assertSovereignOutputSafety, reviewSovereignOutputSafety } from './safety';
 import {
   composeRecognitionResponse,
   deriveAvailableBasis,
@@ -42,8 +43,11 @@ export async function runSovereignResult(input: string, context: SovereignContex
   const { prompt, availableBasis } = await buildCloudflareGatewayPrompt(input, context);
   const raw = await runCloudflareGateway(prompt, context, aiConfig.model);
   const plan = parseRecognitionPlan(raw, availableBasis);
-  const text = composeRecognitionResponse(plan);
-  assertSovereignOutputSafety(text);
+  const allowFrameworkLabels = asksForFrameworkDetail(input);
+  reviewPlanLanguage(plan, allowFrameworkLabels);
+  const review = reviewSovereignOutputSafety(composeRecognitionResponse(plan), { allowFrameworkLabels });
+  const text = review.text;
+  assertSovereignOutputSafety(text, { phase: plan.response_phase, allowFrameworkLabels });
   return { text, plan };
 }
 
@@ -93,6 +97,8 @@ ${JSON.stringify(continuity)}
 Available exact Basis values. The basis arrays in your JSON must select verbatim from these lists only:
 ${JSON.stringify(availableBasis)}
 
+${groundedIntelligencePrompt(input)}
+
 Required JSON shape:
 ${recognitionJsonContract(availableBasis)}
 
@@ -138,6 +144,26 @@ async function isCovenantEnabledForThread(context: SovereignContext): Promise<bo
 function threadContainsId(threadId: string, id: string): boolean {
   const normalized = id.replace(/[^a-z0-9_-]/gi, '-');
   return threadId.includes(normalized);
+}
+
+function asksForFrameworkDetail(input: string): boolean {
+  return /\b(?:Bowen|IFS|internal family systems|attachment theory|psychological framework|sources?|research)\b/i.test(input);
+}
+
+function reviewPlanLanguage(plan: RecognitionPlan, allowFrameworkLabels: boolean): void {
+  const rewrite = (value: string) => reviewSovereignOutputSafety(value, { allowFrameworkLabels }).text;
+  plan.recognition = rewrite(plan.recognition);
+  plan.inward_question = rewrite(plan.inward_question);
+  plan.candidate_hidden_expectation = rewrite(plan.candidate_hidden_expectation);
+  plan.protected_need = rewrite(plan.protected_need);
+  plan.clearer_form = rewrite(plan.clearer_form);
+  plan.practical_action = rewrite(plan.practical_action);
+  plan.visual_story.origin = rewrite(plan.visual_story.origin);
+  plan.visual_story.shadow = rewrite(plan.visual_story.shadow);
+  plan.visual_story.gift = rewrite(plan.visual_story.gift);
+  plan.visual_story.current = rewrite(plan.visual_story.current);
+  plan.visual_story.next_step = rewrite(plan.visual_story.next_step);
+  plan.visual_story.visual_reason = rewrite(plan.visual_story.visual_reason);
 }
 
 async function pseudonymousAccountRef(context: SovereignContext): Promise<string> {

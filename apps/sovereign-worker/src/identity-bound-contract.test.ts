@@ -8,6 +8,7 @@ const entry = readFileSync(new URL('./entry.ts', import.meta.url), 'utf8');
 const runtimeEntry = readFileSync(new URL('./runtime-entry.ts', import.meta.url), 'utf8');
 const migration = readFileSync(new URL('../migrations/0008_identity_bound_invitations.sql', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../../web/src/App.tsx', import.meta.url), 'utf8');
+const workspace = readFileSync(new URL('../../web/src/SovereignWorkspace.tsx', import.meta.url), 'utf8');
 const consentPage = readFileSync(new URL('../../web/public/consent.html', import.meta.url), 'utf8');
 const consentRuntime = readFileSync(new URL('../../web/public/consent.js', import.meta.url), 'utf8');
 const wrangler = readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8');
@@ -50,7 +51,7 @@ describe('identity-bound multi-user contract', () => {
   });
 
   it('removes owner-side granting and exposes invitee revocation controls', () => {
-    expect(app).toContain('Send private invitation');
+    expect(workspace).toContain('Send private invitation');
     expect(app).toContain('Choose what this connection may use.');
     expect(app).not.toContain('>Grant</button>');
     expect(consentPage).toContain('Manage requested uses.');

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const RELATIONAL_EVENT = 'sovereign:relational-result';
 let runtimeInstalled = false;
@@ -135,12 +135,20 @@ export function ProductCompletionLayer() {
   const [invitations, setInvitations] = useState<InvitationRecord[]>([]);
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
-  const workspace = useMemo(() => window.location.pathname === '/app', []);
 
   useEffect(() => {
     const listener = (event: Event) => setResult((event as CustomEvent<RelationalPayload>).detail);
     window.addEventListener(RELATIONAL_EVENT, listener);
     return () => window.removeEventListener(RELATIONAL_EVENT, listener);
+  }, []);
+
+  useEffect(() => {
+    const open = () => {
+      setControlsOpen(true);
+      void refreshControls();
+    };
+    window.addEventListener('sovereign:open-consent-controls', open);
+    return () => window.removeEventListener('sovereign:open-consent-controls', open);
   }, []);
 
   useEffect(() => {
@@ -208,24 +216,8 @@ export function ProductCompletionLayer() {
     }
   }
 
-  function openControls() {
-    setControlsOpen(true);
-    void refreshControls();
-  }
-
   return (
     <>
-      {workspace && (
-        <button
-          className="shared-context-trigger"
-          onClick={openControls}
-          aria-haspopup="dialog"
-          aria-expanded={controlsOpen}
-        >
-          People & permissions
-        </button>
-      )}
-
       {result && <RelationalResultDialog payload={result} onClose={() => setResult(null)} />}
 
       {controlsOpen && (

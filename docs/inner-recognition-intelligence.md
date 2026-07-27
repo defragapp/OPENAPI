@@ -4,7 +4,7 @@
 
 **Clear guidance first. Exact data support second. Visual explanation third.**
 
-Sovereign uses verified Baseline, live, relational, and user-confirmed context to choose the most useful inward question. It does not make the user decode those systems, and it does not treat symbolic data or card artwork as proof.
+Sovereign uses verified Baseline, live, relational, and user-confirmed context to answer the user’s actual question. Baseline Design personalizes the answer. A small private grounded-intelligence layer may improve the reasoning. Sovereign translates both into simple language, and the user decides what fits. It does not make the user decode those systems, and it does not treat symbolic data, relational theory, or card artwork as proof.
 
 ## User experience
 
@@ -33,6 +33,7 @@ After the user answers or clearly confirms the direction:
 
 The model returns a private JSON plan with:
 
+- `response_shape`
 - `response_phase`
 - `recognition`
 - `inward_question`
@@ -47,6 +48,27 @@ The model returns a private JSON plan with:
 - `safety_mode`
 
 The server validates this plan before composing any user-facing text or returning any visual metadata.
+
+`response_shape` is `natural` by default for new turns. `guided` preserves the existing heading-based rendering when headings materially improve clarity or safety. Older saved plans without this field remain compatible and render with the established guided shape.
+
+`candidate_hidden_expectation` remains in the contract for saved-plan compatibility. It no longer requires or authorizes an invented hidden expectation. At runtime it means an optional possible pressure, learned expectation, responsibility tension, competing need, or system role, and it may be empty.
+
+## Private grounded-intelligence layer
+
+The source-controlled concept library contains a precise internal definition, plain-language translation, appropriate uses, prohibited inferences, safe and unsafe examples, and an authoritative source reference for each approved concept. The initial library covers differentiation, system anxiety, triangles, overfunctioning and underfunctioning, multigenerational transmission, emotional cutoff, learned beliefs and expectations, boundaries and responsibility, competing internal needs, protective reactions, burdens, polarization, and projection.
+
+A deterministic router examines only the current user message and selects at most two relevant concepts. Only compact plain-language guidance and explicit inference limits for those concepts enter the model prompt. When nothing is relevant, the router explicitly tells the model not to force a psychological explanation. Framework names stay private unless the user asks for theory, research, or sources.
+
+The reasoning order is:
+
+1. understand the user’s actual question;
+2. use only verified Baseline information;
+3. separate observations from interpretations;
+4. consider at most two relevant grounded explanations;
+5. preserve uncertainty about absent people, motives, and causes;
+6. distinguish the user’s responsibility from outcomes controlled by others;
+7. connect the answer to the user’s values, needs, boundaries, and meaning of alignment;
+8. offer one useful distinction, question, or realistic next step when appropriate.
 
 ## Inline visual story contract
 
@@ -180,6 +202,8 @@ The output validator rejects:
 - more than one question
 - responses that do not match question or integration structure
 
+Before final validation, a deterministic quality review inspects both the private plan fields and the composed response. It detects diagnosis, absent-person profiling, claimed motives, projection presented as proven, fixed family roles, blame, literal spiritual causation, Baseline-as-proof claims, unnecessary clinical terminology, therapy claims, unsupported relationship commands, and cold institutional phrasing. One affected passage is rewritten into a controlled plain-language alternative, then the complete response is validated again. Crisis, abuse, coercion, self-harm, immediate-danger, and urgent-medical handling continue through the established grounded or escalate path.
+
 Grounded or escalate mode is used for severe fear, little sleep, inability to function, feeling watched or controlled, confusion about reality, immediate harm, abuse, coercion, or urgent medical concerns. In this mode the system prioritizes concrete safety and trusted human support, removes visual symbolism, and reduces symbolic interpretation.
 
 ## Runtime sequence
@@ -187,8 +211,10 @@ Grounded or escalate mode is used for severe fear, little sleep, inability to fu
 Each turn reserves three event positions:
 
 1. redacted user event;
-2. validated private recognition plan, including any suppressed or approved visual plan;
-3. safety-checked public response.
+2. evidence-checked private recognition plan, including any suppressed or approved visual plan;
+3. deterministic language review of private plan fields;
+4. composed natural or guided response;
+5. deterministic rewrite when needed and final safety validation.
 
 The public response is not streamed token-by-token. The complete model result is parsed, evidence-checked, composed, and safety-validated before display.
 

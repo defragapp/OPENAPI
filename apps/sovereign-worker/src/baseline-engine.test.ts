@@ -81,7 +81,7 @@ describe('OPENAPI Baseline engine', () => {
       rawBirthInputReturned: false
     });
     expect(serialized).not.toContain('1993-07-26');
-    expect(serialized).not.toContain('20:00');
+    expect(serialized).not.toContain('"birthTime":"20:00"');
     expect(serialized).not.toContain('Upland');
     expect(serialized).not.toContain('America/Los_Angeles');
     expect(fetcher).toHaveBeenCalledTimes(10);

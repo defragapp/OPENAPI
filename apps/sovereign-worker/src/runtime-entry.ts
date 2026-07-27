@@ -160,7 +160,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       ...(pathname === '/ready' ? { ready } : {}),
       version: env.APP_VERSION,
       environment: env.APP_ENV,
-      migrationVersion: '0009_production_scale_and_billing_safety',
+      migrationVersion: '0010_account_onboarding_and_chat_history',
       recognitionContract: 'inner-recognition-v1',
       baselineContract: 'openapi-baseline-engine-v2',
       dependencies
@@ -210,6 +210,7 @@ function isApplicationPagePath(pathname: string): boolean {
     || pathname.startsWith('/app/')
     || pathname === '/login'
     || pathname === '/signup'
+    || pathname === '/onboarding'
     || pathname === '/invitation'
     || pathname === '/consent.html'
     || pathname.startsWith('/auth/');

@@ -84,6 +84,19 @@ describe('inner recognition structured output', () => {
     expect(() => parseRecognitionPlan(integration, emptyBasis)).toThrow(/missing clearer_form/);
   });
 
+  it('preserves the compatibility field without forcing an invented hidden expectation', () => {
+    const plan = parseRecognitionPlan(JSON.stringify({
+      response_shape: 'natural', response_phase: 'integration', recognition: 'You can care without taking ownership of every outcome.', inward_question: 'What is yours to choose?',
+      candidate_hidden_expectation: '', protected_need: '', clearer_form: 'Keep the care and return each responsibility to the person who controls it.', practical_action: 'Name one choice that is yours and one outcome that is not.',
+      module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
+      basis: { user_confirmed: true, ...emptyBasis }, confidence: 'supported', safety_mode: 'standard'
+    }), emptyBasis);
+    const response = composeRecognitionResponse(plan);
+    expect(plan.candidate_hidden_expectation).toBe('');
+    expect(response).not.toContain('WHAT THIS MAY BE SHOWING');
+    expect(response).toContain('You can care without taking ownership');
+  });
+
   it('requires a complete module offer and removes offers during grounding', () => {
     const missingReason = JSON.stringify({
       response_phase: 'integration', recognition: 'The answer matters.', inward_question: 'What fits now?',

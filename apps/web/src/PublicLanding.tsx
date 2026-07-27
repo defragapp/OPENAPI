@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { KeyboardEvent } from 'react';
+import { BaselineOrbit } from './BaselineOrbit';
 
 const examples = [
   {
@@ -37,21 +38,21 @@ const intelligenceLevels = [
     label: 'PERSONAL',
     title: 'Understand the whole person.',
     prompt: 'What are the light and shadow expressions of this part of me?',
-    copy: 'Explore your archetypal qualities, strengths, protective responses, choices, relationships, and development through your Baseline Design.'
+    copy: 'Explore your qualities, strengths, protective responses, choices, relationships, and growth.'
   },
   {
     number: '02',
     label: 'RELATIONAL',
     title: 'See the relationship from both sides.',
     prompt: 'What are we each bringing into this connection?',
-    copy: 'With permission from both people, Sovereign compares needs, roles, communication, tension, compatibility, and mutual influence.'
+    copy: 'With permission from both people, compare needs, roles, communication, tension, and mutual influence.'
   },
   {
     number: '03',
     label: 'SYSTEM',
     title: 'Understand how the whole group functions.',
     prompt: 'What role does each person occupy in this family?',
-    copy: 'Map families, households, teams, and communities to understand roles, pressure, authority, responsibility, and how one person’s change affects everyone.'
+    copy: 'Map roles, pressure, authority, and responsibility across a family, household, team, or community.'
   }
 ] as const;
 
@@ -98,12 +99,12 @@ export function PublicLanding() {
       <section className="landing-hero">
         <div className="landing-copy">
           <p className="landing-kicker">PERSONAL · RELATIONAL · SYSTEM INTELLIGENCE</p>
-          <h1>Know yourself. Understand the system. Choose what fits.</h1>
+          <h1>Understand yourself—and everyone your life includes.</h1>
           <p className="landing-lede">
-            Sovereign.OS is a personal and relational intelligence platform powered by Baseline Design.
+            Sovereign.OS turns your Baseline Design into a private AI for personal, relationship, and system intelligence.
           </p>
           <p className="landing-support">
-            Explore your archetypal qualities, shadow and light, decisions, behaviors, and relationships—then bring multiple Baseline Designs together to understand families, teams, and the human systems around you.
+            Explore who you are, check the fit of a choice or relationship, and see how people function together.
           </p>
           <div className="landing-actions">
             <a className="landing-button landing-button-primary" href="/signup">Explore my Baseline</a>
@@ -116,42 +117,17 @@ export function PublicLanding() {
           </div>
         </div>
 
-        <div className="context-console" aria-label="Example of Baseline Design applied to personal alignment">
-          <header>
-            <div><span className="console-mark">S</span><strong>YOUR BASELINE</strong></div>
-            <span>EXAMPLE · YOUR EXPERIENCE WILL DIFFER</span>
-          </header>
-          <div className="context-map" aria-hidden="true">
-            <div className="context-ring context-ring-outer" />
-            <div className="context-ring context-ring-inner" />
-            <div className="context-node context-node-baseline"><span>CORE</span><strong>Self-direction</strong></div>
-            <div className="context-node context-node-current"><span>LIGHT</span><strong>Clear leadership</strong></div>
-            <div className="context-node context-node-known"><span>SHADOW</span><strong>Carrying everything</strong></div>
-            <div className="context-core"><span>YOU</span><strong>One quality · many expressions</strong></div>
-          </div>
-          <article className="console-question">
-            <span>YOU EXPLORE</span>
-            <p>How do I know when independence is aligned—and when it has become isolation?</p>
-          </article>
-          <article className="console-answer">
-            <span>SOVEREIGN CONNECTS</span>
-            <p>Your need for self-direction can support courage and leadership. Under pressure, the same quality may make receiving support feel unsafe.</p>
-            <strong>What changes when support does not require surrendering authority?</strong>
-          </article>
-          <footer>
-            <span>Baseline</span><i>+</i><span>shadow &amp; light</span><i>+</i><span>real-life context</span>
-          </footer>
-        </div>
+        <BaselineOrbit />
       </section>
 
       <section className="intelligence-section" id="product-example" aria-labelledby="intelligence-title">
         <div className="landing-section-heading">
           <div>
             <p className="landing-kicker">ONE PLATFORM · THREE LEVELS</p>
-            <h2 id="intelligence-title">See yourself, the other side, and the whole system.</h2>
+            <h2 id="intelligence-title">One platform. Three levels of understanding.</h2>
           </div>
           <p>
-            One person is complex. A relationship is more complex. A family is an entire system. Sovereign.OS helps make all three understandable without reducing anyone to a label.
+            Understand yourself. See the other side. Map the whole system—without reducing anyone to a label.
           </p>
         </div>
         <div className="intelligence-grid">
@@ -169,12 +145,9 @@ export function PublicLanding() {
       <section className="baseline-section" aria-labelledby="baseline-title">
         <div className="baseline-copy">
           <p className="landing-kicker">BASELINE DESIGN</p>
-          <h2 id="baseline-title">More than personality. A framework for how you move through life.</h2>
+          <h2 id="baseline-title">Your starting point for every question.</h2>
           <p>
-            Baseline Design translates the platform’s natal-data framework into a personal understanding of your archetypal qualities, natural roles, strengths, tensions, communication, decisions, relationships, and responses under pressure.
-          </p>
-          <p>
-            Explore each part in plain language, examine its shadow and light expressions, and consider how it appears across the choices and relationships that make up your actual life.
+            Baseline Design turns your natal framework into a clear view of your qualities, roles, strengths, tensions, choices, and relationships. Explore each part through shadow and light, alignment, and the life you are actually living.
           </p>
           <a href="/how-it-works.html">See everything you can explore <span aria-hidden="true">→</span></a>
         </div>
@@ -194,10 +167,10 @@ export function PublicLanding() {
         <div className="landing-section-heading">
           <div>
             <p className="landing-kicker">APPLY IT ANYWHERE</p>
-            <h2 id="conversation-title">Explore yourself. Examine alignment. Understand what happens between people.</h2>
+            <h2 id="conversation-title">Ask naturally. Sovereign brings the right context.</h2>
           </div>
           <p>
-            Bring a decision, relationship, behavior, family role, or part of yourself you want to understand. Sovereign connects the question to the deeper framework already present in your Baseline Design.
+            Ask about a decision, relationship, behavior, family role, or part of yourself. Your Baseline stays underneath the conversation.
           </p>
         </div>
 
@@ -253,9 +226,9 @@ export function PublicLanding() {
       <section className="permission-section" aria-labelledby="permission-title">
         <div>
           <p className="landing-kicker">RELATIONSHIPS · FAMILIES · TEAMS</p>
-          <h2 id="permission-title">See the other side without losing your own.</h2>
+          <h2 id="permission-title">Bring people together—with permission.</h2>
           <p>
-            Bring two Baseline Designs together to understand different needs and perspectives. Add more people to map the roles, pressures, loyalties, authority, and responsibility shaping an entire family, household, team, or community.
+            Compare two permitted Baselines or map the roles and pressure shaping a family, team, or community.
           </p>
         </div>
         <div className="permission-visual" aria-label="Example permission-based relationship and system comparison">
@@ -276,8 +249,8 @@ export function PublicLanding() {
       <section className="landing-final-callout">
         <div>
           <p className="landing-kicker">START WITH YOU · EXPAND WHEN READY</p>
-          <h2>A deeper understanding of you—and everyone your life includes.</h2>
-          <p>Explore your Baseline Design, examine what fits, and see how people function together inside the relationships and systems that shape your life.</p>
+          <h2>Start with you. Expand when the wider system matters.</h2>
+          <p>Explore your design, check what fits, and understand the people and systems shaping your life.</p>
         </div>
         <div className="landing-actions">
           <a className="landing-button landing-button-primary" href="/signup">Explore my Baseline</a>

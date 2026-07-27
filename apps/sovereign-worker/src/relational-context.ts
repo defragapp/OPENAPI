@@ -57,8 +57,10 @@ export async function buildPairComparison(env: Env, accountId: string, personId:
       possibleAlignment: sharedSignals(ownerBaseline.context, invitedBaseline.context),
       possibleFriction: differingSignals(ownerBaseline.context, invitedBaseline.context),
       roleContext: safeJson(person.source_of_truth),
+      observationRule: 'Keep user-supplied observations separate from interpretations about why they happened.',
+      perspectiveRule: 'Offer more than one plausible interaction explanation without deciding who is right.',
       responsibilityBoundary: 'Each person remains responsible for their own choices, communication, and confirmed experience.',
-      prohibitedInference: 'This comparison does not establish emotion, motive, diagnosis, moral status, or future behavior.',
+      prohibitedInference: 'This comparison does not establish a psychological profile, emotion, motive, diagnosis, moral status, or future behavior.',
       missingInformation: ['What each person is experiencing now', 'What each person has directly observed', 'Material constraints not supplied by the users']
     },
     provenance: {
@@ -133,7 +135,7 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
       'Separate shared facts from interpretations.',
       'Name one responsibility each person actually controls.'
     ],
-    prohibitedInferences: ['hidden motive', 'diagnosis', 'villain assignment', 'predicted behavior', 'God’s exact intent'],
+    prohibitedInferences: ['psychological profile', 'hidden motive', 'diagnosis', 'villain assignment', 'right-or-wrong verdict', 'predicted behavior', 'God’s exact intent'],
     provenance: { consentCheckedAt: new Date().toISOString(), rawBirthInputShared: false, exactPrivateLocationShared: false }
   };
 }

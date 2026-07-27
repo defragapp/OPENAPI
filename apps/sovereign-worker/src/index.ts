@@ -4,7 +4,7 @@ import { ThreadCoordinator } from './durable/ThreadCoordinator';
 import { requireAuth, requireSameOrigin } from './security/auth';
 import { withSecurityHeaders } from './security/headers';
 import { getEntitlements, requireFeature } from './db/entitlements';
-import { ensureThread, appendThreadEvent, recordCorrection, setThreadCovenant } from './db/threads';
+import { ensureThread, appendThreadEvent, listThreadMessages, listThreads, recordCorrection, setThreadCovenant, touchThread } from './db/threads';
 import { getTurn, startTurn, updateTurnStatus } from './db/turns';
 import { assertSovereignOutputSafety } from './agent/safety';
 import { runSovereignStream } from './agent/sovereign';
@@ -33,7 +33,7 @@ async function healthPayload(env: Env) {
     ok: db?.ok === 1,
     version: env.APP_VERSION,
     environment: env.APP_ENV,
-    migrationVersion: '0007_stripe_event_ordering',
+    migrationVersion: '0010_account_onboarding_and_chat_history',
     dependencies: {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
       durableObjects: env.THREADS ? 'configured' : 'missing',
@@ -86,6 +86,32 @@ app.post('/api/v1/auth/logout-all', async (context) => { requireSameOrigin(conte
 app.get('/api/v1/auth/session', async (context) => context.json({ authenticated: true, ...(await requireAuth(context.req.raw, context.env)) }));
 
 app.post('/api/v1/stripe/webhook', (context) => handleStripeWebhook(context.req.raw, context.env));
+
+app.get('/api/v1/account/onboarding', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  const account = await context.env.DB.prepare('SELECT onboarding_completed_at, plan_intent FROM accounts WHERE id = ?')
+    .bind(auth.accountId)
+    .first<{ onboarding_completed_at?: string | null; plan_intent?: string | null }>();
+  const entitlements = await getEntitlements(context.env, auth.accountId);
+  return context.json({
+    completed: Boolean(account?.onboarding_completed_at),
+    planIntent: account?.plan_intent === 'sovereign_plus' ? 'sovereign_plus' : 'free',
+    effectivePlan: entitlements.plan
+  });
+});
+
+app.post('/api/v1/account/onboarding', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ plan?: 'free' | 'sovereign_plus' }>();
+  if (!body.plan || !['free', 'sovereign_plus'].includes(body.plan)) return context.json({ error: 'Valid plan required' }, 400);
+  await context.env.DB.prepare(`UPDATE accounts
+    SET plan_intent = ?, onboarding_completed_at = COALESCE(onboarding_completed_at, datetime('now')), updated_at = datetime('now')
+    WHERE id = ?`)
+    .bind(body.plan, auth.accountId)
+    .run();
+  return context.json({ completed: true, planIntent: body.plan });
+});
 
 app.get('/api/v1/people', async (context) => {
   const auth = await requireAuth(context.req.raw, context.env);
@@ -342,6 +368,19 @@ app.get('/api/v1/today', async (context) => {
   return context.json({ today: await getModelSafeBaselineContext(context.env, auth.accountId) });
 });
 
+app.get('/api/v1/threads', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ threads: await listThreads(context.env, auth.accountId) });
+});
+
+app.get('/api/v1/threads/:threadId', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({
+    threadId: context.req.param('threadId'),
+    messages: await listThreadMessages(context.env, auth.accountId, context.req.param('threadId'))
+  });
+});
+
 app.post('/api/v1/threads/:threadId/corrections', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
@@ -380,6 +419,7 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
   const entitlements = await getEntitlements(context.env, auth.accountId);
   const threadId = context.req.param('threadId');
   await ensureThread(context.env, auth.accountId, threadId, body.context?.surface?.toLowerCase() ?? 'personal');
+  await touchThread(context.env, auth.accountId, threadId, message);
   const coordinator = context.env.THREADS.get(context.env.THREADS.idFromName(`${auth.accountId}:${threadId}`));
   const coordination = await coordinator.fetch('https://thread.internal/turn', {
     method: 'POST',
@@ -396,7 +436,7 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
   if (!isSovereignRuntimeReady(context.env)) {
     if (!canUseDevelopmentFixtures(context.env)) return serviceUnavailable('Sovereign is temporarily unavailable. Cloudflare AI Gateway is not configured, and nothing was guessed or saved as an interpretation.');
     await startTurn(context.env, auth.accountId, threadId, idempotencyKey, turn.sequence);
-    await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { redacted: true, surface: body.context?.surface ?? 'Today' }, traceId);
+    await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { text: message, surface: body.context?.surface ?? 'Today' }, traceId);
     const fallbackText = 'Development fallback only. The OPENAPI-owned Baseline engine is available only after its provider calls complete.\n\nCurrent amplification: no live current-condition result is available here, so nothing is treated as certainty.\n\nObserved behavior: nothing has been confirmed in this turn.\n\nUnknown actual state: only you can confirm what is true today. Does this match today?';
     assertSovereignOutputSafety(fallbackText);
     await appendThreadEvent(context.env, threadId, turn.sequence + 1, 'assistant_development_response', { developmentFallback: true, text: fallbackText }, traceId);
@@ -411,7 +451,7 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
 
   const usage = await reserveAiTurn(context.env, auth.accountId, entitlements.plan);
   await startTurn(context.env, auth.accountId, threadId, idempotencyKey, turn.sequence);
-  await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { redacted: true, surface: body.context?.surface ?? 'Today' }, traceId);
+  await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { text: message, surface: body.context?.surface ?? 'Today' }, traceId);
   let stream: ReadableStream<string>;
   try {
     stream = await runSovereignStream(message, { env: context.env, accountId: auth.accountId, threadId, traceId, covenantEnabled: false, plan: entitlements.plan });

@@ -83,7 +83,7 @@ describe('Cloudflare Gateway recognition adapter', () => {
         }
       }
     } as never;
-    const stream = await runSovereignStream('I have not described which information is missing from this decision.', { env, accountId: 'acct_test', threadId: 'thread_test', traceId: 'trace_test', covenantEnabled: false, plan: 'free' });
+    const stream = await runSovereignStream('I feel responsible for everyone and keep stepping in to fix everything, but I have not described what is actually mine to carry.', { env, accountId: 'acct_test', threadId: 'thread_test', traceId: 'trace_test', covenantEnabled: false, plan: 'free' });
     const reader = stream.getReader();
     let text = '';
     while (true) {
@@ -107,6 +107,10 @@ describe('Cloudflare Gateway recognition adapter', () => {
     expect((calls[0]?.options as any).gateway.metadata.account_ref).toMatch(/^[a-f0-9]{32}$/);
     expect(JSON.stringify(calls[0]?.options)).not.toContain('acct_test');
     expect(JSON.stringify(calls[0]?.input)).toContain('Available exact Basis values');
+    expect(JSON.stringify(calls[0]?.input)).toContain('overfunctioning_underfunctioning');
+    expect(JSON.stringify(calls[0]?.input)).toContain('cannotInfer');
+    expect(JSON.stringify(calls[0]?.input)).toContain('Do not force a psychological explanation');
+    expect(JSON.stringify(calls[0]?.input)).not.toContain('Your Baseline proves');
     expect(JSON.stringify(calls[0]?.input)).not.toMatch(/birth date|birth time|latitude|longitude|workspace\/SOVV/i);
   });
 });

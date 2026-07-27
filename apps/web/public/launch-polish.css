@@ -1,5 +1,29 @@
 /* Cohesive refinement for public support pages. Existing structure and content remain intact. */
 
+/* Compact public-page hierarchy */
+.launch-hero-compact {
+  min-height: auto;
+  padding-block: clamp(76px, 9vw, 118px) clamp(60px, 7vw, 90px);
+}
+
+.launch-hero-compact h1 {
+  max-width: 15ch;
+  font-size: clamp(3.2rem, 6vw, 5.7rem);
+}
+
+.launch-hero-compact > p:last-child {
+  max-width: 58ch;
+}
+
+.launch-hero-split > div > h1 {
+  max-width: 11ch;
+}
+
+.pricing-section,
+.faq-section {
+  padding-top: clamp(40px, 5vw, 70px);
+}
+
 body.launch-page {
   overflow-x: hidden;
 }
