@@ -287,15 +287,16 @@ async function verifyLiveProduction() {
     'Welcome back.',
     'Create your account.',
     'Choose what this connection may use.',
-    'What is active in your life now.',
-    'Explore any part of who you are.',
+    'What do you want to understand?',
+    'Ask about yourself, a decision, a relationship, or the system around you. Sovereign brings in only the context that belongs.',
+    'YOUR BASELINE · AVAILABLE IN EVERY CONVERSATION',
+    'Your Baseline stays steady.',
+    'Explore my Baseline',
     'See the relationship from both sides.',
-    'Understand the whole system.',
-    'Return to what changed your understanding.',
-    'Meet your Baseline Design.',
-    'Your workspace, under your control.',
-    'Know yourself. Understand the system. Choose what fits.',
-    'Optional Christian and biblical lens.'
+    'What role does each person occupy in this system?',
+    'Only understandings you deliberately save appear here.',
+    'Build once. Explore continuously.',
+    'Optional Christian and biblical lens for this conversation.'
   ]);
 
   const cssAssetPaths = [...home.text.matchAll(/href=["'](\/assets\/[^"']+\.css)["']/g)].map((match) => match[1]);
