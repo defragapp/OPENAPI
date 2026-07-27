@@ -2,7 +2,7 @@
 
 Status: implementation contract for the Cloudflare production application.
 
-This repository uses React/Vite, a Cloudflare Worker, Hono, D1, Resend, Turnstile, and Stripe. It does not use Next.js or Supabase. The account funnel is therefore implemented inside the existing Worker and D1 architecture rather than introducing a second application stack.
+This repository uses React/Vite, a Cloudflare Worker, Hono, D1, Resend, Turnstile, and Stripe. It does not use Next.js or Supabase. The account funnel is implemented inside the existing Worker and D1 architecture rather than introducing a second application stack.
 
 ## User flow
 
@@ -29,7 +29,8 @@ This repository uses React/Vite, a Cloudflare Worker, Hono, D1, Resend, Turnstil
 2. The API gives the same public result whether an account exists or not.
 3. For a matching account, Resend sends a single-use reset link that expires in 30 minutes.
 4. The reset token is stored only as a SHA-256 hash.
-5. Saving a new password revokes existing sessions and creates a fresh session.
+5. The browser creates a replacement encrypted credential from the new password.
+6. Saving it revokes existing sessions and creates a fresh session.
 
 ## Primary interface copy
 
@@ -67,18 +68,45 @@ This repository uses React/Vite, a Cloudflare Worker, Hono, D1, Resend, Turnstil
 
 **Body:** Reset your Sovereign.OS password using the secure link in this email. The link expires in 30 minutes. If you did not request this, you can ignore the email.
 
-## Security and data handling
+## Password protocol: `browser-key-v1`
 
-- Passwords use PBKDF2-HMAC-SHA-256 with a unique random salt and a versioned iteration count.
-- Password verification performs a dummy derivation for unknown accounts to reduce account-discovery timing differences.
-- Failed password attempts are rate-limited by hashed email and hashed IP address.
-- Turnstile is required for signup, login, and password-recovery requests.
+Cloudflare Workers Free permits very little CPU time per request. Password stretching therefore runs in the user’s browser rather than inside the Worker.
+
+### Account creation
+
+1. The browser validates the password length.
+2. The browser generates an Ed25519 signing key pair.
+3. The browser derives a 256-bit AES-GCM key from the password with PBKDF2-HMAC-SHA-256, a random salt, and 600,000 iterations.
+4. The browser encrypts the PKCS#8 private key with AES-GCM and a random IV.
+5. The browser sends the public key, encrypted private key, salt, IV, iteration count, and credential version to the Worker.
+6. The raw password and unencrypted private key never leave the browser.
+
+### Sign-in
+
+1. After Turnstile verification, the Worker creates a random one-time challenge that expires after five minutes.
+2. The Worker returns the challenge and the encrypted private-key envelope. An unknown email receives a same-shaped dummy envelope.
+3. The browser derives the AES key from the entered password and attempts to decrypt the private key.
+4. The browser signs the challenge with Ed25519.
+5. The Worker claims the challenge once, verifies the signature with the stored public key, and creates the session only after successful verification.
+
+The signed message includes the normalized email, challenge ID, and challenge value. Challenges are single-use, short-lived, rate-limited by hashed email and hashed IP address, and removed by scheduled cleanup.
+
+### Security boundary
+
+`browser-key-v1` avoids running an expensive password KDF inside the Worker and keeps the password out of the request body. It does not make weak passwords safe. A copy of the encrypted credential can still be tested offline by someone who has stolen the database, so password strength and the 600,000-iteration KDF remain important. This is a repository-owned protocol and must receive focused security review before a public production release. Apple and Google remain preferable account options when configured.
+
+## Other security and data handling
+
+- Failed password challenge attempts are limited by hashed email and hashed IP address.
+- Turnstile is required for signup, password-challenge creation, and password recovery.
 - OAuth state and nonce values are random and stored only as hashes.
+- OAuth state is also bound to the initiating browser with a short-lived HttpOnly, Secure cookie.
 - Google and Apple ID tokens are checked for signature, issuer, audience, expiry, verified email, and nonce before account linking.
 - Session cookies remain HttpOnly, Secure, SameSite=Lax, and server-revocable.
 - Stripe Checkout remains server-created and must return an approved Stripe host before the browser follows it.
-- Scheduled cleanup removes expired OAuth state, password-reset records, and login-attempt records.
+- Scheduled cleanup removes expired password challenges, OAuth state, password-reset records, and login-attempt records.
 - Existing magic-link redemption remains available for accounts created during the earlier release, but it is no longer the primary public account flow.
+- An earlier magic-link account can establish a password by using the password-recovery flow.
 
 ## Cloudflare production configuration
 
@@ -107,7 +135,7 @@ The exact callback URL must also be registered in the Google OAuth client.
 
 The Services ID and return URL must be registered in Apple Developer. The private key must be stored as a Cloudflare secret, never in the repository.
 
-Provider buttons are shown only when the corresponding production configuration is complete. Email and password remain available independently.
+Provider buttons are shown only when the corresponding production configuration is complete. Email and password remain available independently in current browsers with Ed25519 WebCrypto support.
 
 ## Release verification
 
@@ -115,10 +143,11 @@ Before merging and deployment:
 
 1. Apply D1 migration `0010_auth_password_oauth_onboarding` in the target environment.
 2. Run the repository Cloudflare build gate, Worker tests, web tests, typecheck, migration validation, and secret scan.
-3. Verify email/password signup, login failure, login rate limiting, logout, password recovery, reset expiry, and session revocation.
-4. Verify Google and Apple callback registration and real provider login when their credentials are configured.
-5. Verify Free setup reaches `/app` without Stripe.
-6. Verify monthly and annual pricing links preserve their exact selection through signup and sign-in.
-7. Verify Sovereign+ creates the correct Stripe Checkout Session and a canceled Checkout returns to onboarding.
-8. Verify the Baseline form works at desktop and iPhone widths with visible labels and no horizontal overflow.
-9. Confirm `/health` reports each authentication mode accurately and the live Worker reports the exact deployed commit.
+3. Complete an independent review of `browser-key-v1`, including challenge replay, offline credential testing, account enumeration, browser compatibility, reset, and session revocation.
+4. Verify email/password signup, correct and incorrect password login, challenge expiry, challenge reuse rejection, rate limiting, logout, password recovery, reset expiry, and session revocation.
+5. Verify Google and Apple callback registration and real provider login when their credentials are configured.
+6. Verify Free setup reaches `/app` without Stripe.
+7. Verify monthly and annual pricing links preserve their exact selection through signup and sign-in.
+8. Verify Sovereign+ creates the correct Stripe Checkout Session and a canceled Checkout returns to onboarding.
+9. Verify the Baseline form works at desktop and iPhone widths with visible labels and no horizontal overflow.
+10. Confirm `/health` reports each authentication mode accurately and the live Worker reports the exact deployed commit.
