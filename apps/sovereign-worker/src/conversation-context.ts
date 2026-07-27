@@ -2,24 +2,30 @@ import type { Env } from './env';
 import { buildPairComparison, buildSystemAnalysis } from './relational-context';
 import { requireFeature, type EntitlementSet } from './db/entitlements';
 
+export type SovereignMode = 'defrag' | 'alignment';
+export type SovereignSurface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
+
 export interface ConversationContextSelection {
-  surface?: string;
+  surface?: SovereignSurface;
+  mode: SovereignMode;
   personId?: string;
   systemId?: string;
 }
 
 const identifier = /^[A-Za-z0-9_-]{1,128}$/;
+const surfaces = new Set<SovereignSurface>(['Today', 'Explore', 'People', 'Systems', 'Library', 'You']);
 
 export function parseConversationContext(value: unknown): ConversationContextSelection {
-  if (value === undefined) return {};
+  if (value === undefined) return { mode: 'defrag' };
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Response('Invalid conversation context', { status: 400 });
   const input = value as Record<string, unknown>;
-  const surface = typeof input.surface === 'string' ? input.surface.slice(0, 32) : undefined;
+  const surface = parseSurface(input.surface);
   const personId = parseIdentifier(input.personId, 'personId');
   const systemId = parseIdentifier(input.systemId, 'systemId');
   if (personId && systemId) throw new Response('Choose either a person or a system for this turn', { status: 400 });
   return {
     ...(surface ? { surface } : {}),
+    mode: surface === 'Explore' ? 'alignment' : 'defrag',
     ...(personId ? { personId } : {}),
     ...(systemId ? { systemId } : {})
   };
@@ -39,7 +45,7 @@ export async function authorizeConversationContext(
   return undefined;
 }
 
-export function requireConversationContextEntitlement(selection: ConversationContextSelection, entitlements: EntitlementSet): void {
+export function requireConversationContextEntitlement(selection: Pick<ConversationContextSelection, 'personId' | 'systemId'>, entitlements: EntitlementSet): void {
   if (selection.personId) requireFeature(entitlements, 'people.compare');
   if (selection.systemId && !entitlements.features.includes('systems.family') && !entitlements.features.includes('systems.team')) {
     requireFeature(entitlements, 'systems.family');
@@ -76,6 +82,12 @@ function isPrivateIdentifierKey(key: string): boolean {
     || key === 'displayName'
     || key === 'consentCheckedAt'
     || key === 'lastComputedAt';
+}
+
+function parseSurface(value: unknown): SovereignSurface | undefined {
+  if (value === undefined || value === '') return undefined;
+  if (typeof value !== 'string' || !surfaces.has(value as SovereignSurface)) throw new Response('Invalid surface', { status: 400 });
+  return value as SovereignSurface;
 }
 
 function parseIdentifier(value: unknown, field: string): string | undefined {
