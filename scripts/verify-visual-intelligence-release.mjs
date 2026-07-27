@@ -44,7 +44,8 @@ requireAll('visual intelligence workspace', workspace, [
   "api('/api/v1/threads')",
   'Does this fit?',
   "saveCorrection('partly')",
-  "bibleTranslation: enabled ? 'WEB' : undefined"
+  "bibleTranslation: enabled ? 'WEB' : undefined",
+  'No compatibility score. No winner and loser.'
 ]);
 
 requireAll('visual intelligence accessibility', workspaceCss, [
@@ -90,11 +91,10 @@ requireAll('consent-safe system projection', product, [
 ]);
 
 for (const forbidden of [
-  'compatibility percentage',
-  'compatibility score',
   'God is telling you',
   'They secretly want',
-  'This proves'
+  'This proves',
+  'You are incompatible'
 ]) {
   if (workspace.toLowerCase().includes(forbidden.toLowerCase())) {
     throw new Error(`Visual intelligence workspace contains prohibited framing: ${forbidden}`);
