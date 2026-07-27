@@ -35,6 +35,7 @@ type StructuredDetail = {
   covenantEnabled: boolean;
   plan: SovereignPlan;
   correction?: FitCorrection;
+  correctionHistory: FitCorrection[];
 };
 
 type Json = Record<string, any>;
@@ -97,7 +98,10 @@ function emitLatest(threadId: string, payload: Json, covenantEnabled: boolean): 
   if (!latest) return;
   const surface = validSurface(latest.context?.surface) ? latest.context.surface : 'Today';
   const mode = latest.context?.mode === 'alignment' || surface === 'Explore' ? 'alignment' : 'defrag';
-  const correction = validCorrection(latest.correction) ? latest.correction : undefined;
+  const correctionHistory = Array.isArray(latest.correctionHistory)
+    ? latest.correctionHistory.filter((item: unknown): item is FitCorrection => validCorrection(item)).slice(0, 20)
+    : validCorrection(latest.correction) ? [latest.correction] : [];
+  const correction = correctionHistory[0];
   const detail: StructuredDetail = {
     threadId,
     messageId: String(latest.id ?? `${threadId}-latest`),
@@ -105,6 +109,7 @@ function emitLatest(threadId: string, payload: Json, covenantEnabled: boolean): 
     mode,
     covenantEnabled,
     plan: latest.plan,
+    correctionHistory,
     ...(correction ? { correction } : {})
   };
   window.dispatchEvent(new CustomEvent<StructuredDetail>(STRUCTURED_RESPONSE_EVENT, { detail }));
@@ -148,6 +153,7 @@ export function StructuredIntelligenceLayer() {
 
         <div className="structured-plan-scroll">
           {detail.correction && <section className="structured-fit"><p>YOUR SAVED FIT</p><h3>{fitTitle(detail.correction.value)}</h3><span>Saved {new Date(detail.correction.createdAt).toLocaleString()}.{detail.correction.note ? ` ${detail.correction.note}` : ' You can choose a different fit below the conversation whenever your experience changes.'}</span></section>}
+          {detail.correctionHistory.length > 1 && <details className="structured-correction-history"><summary>Fit correction history · {detail.correctionHistory.length}</summary><ol>{detail.correctionHistory.map((item, index) => <li key={`${item.createdAt}-${index}`}><div><strong>{fitLabel(item.value)}</strong><time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleString()}</time></div>{item.note && <p>{item.note}</p>}</li>)}</ol></details>}
           <PlanSection label="WHAT SOVEREIGN NOTICED" value={plan.recognition} />
           {plan.response_phase === 'question' ? <PlanSection label="LOOK INWARD" value={plan.inward_question} featured /> : <><PlanSection label="WHAT THIS MAY BE SHOWING" value={plan.candidate_hidden_expectation || plan.recognition} /><PlanSection label="WHAT MAY BE PROTECTED" value={plan.protected_need} /><PlanSection label="A CLEARER FORM" value={plan.clearer_form} featured /><PlanSection label="PRACTICAL NEXT ACTION" value={plan.practical_action} /></>}
 
@@ -175,7 +181,7 @@ function validPlan(value: unknown): value is SovereignPlan {
 function validCorrection(value: unknown): value is FitCorrection {
   if (!value || typeof value !== 'object') return false;
   const correction = value as Record<string, unknown>;
-  return ['yes', 'partly', 'not_today'].includes(String(correction.value)) && typeof correction.createdAt === 'string';
+  return ['yes', 'partly', 'not_today'].includes(String(correction.value)) && typeof correction.createdAt === 'string' && (correction.note === undefined || typeof correction.note === 'string');
 }
 
 function validSurface(value: unknown): value is string { return typeof value === 'string' && ['Today', 'Explore', 'People', 'Systems', 'Library', 'You'].includes(value); }
