@@ -20,13 +20,14 @@ describe('thread account ownership', () => {
     await expect(ensureThread(envWithThreads({ threadId: 't1', accountId: 'a1' }), 'a1', 't1')).resolves.toBeUndefined();
   });
 
-  it('returns account-scoped summaries in recent-first order', async () => {
+  it('returns account-scoped summaries with an explicit public surface', async () => {
     const env = historyEnv();
     await expect(listThreads(env, 'a1')).resolves.toEqual([
       {
         id: 't1',
         title: 'A decision about work',
         contextKind: 'explore',
+        surface: 'Explore',
         covenantEnabled: false,
         createdAt: '2026-07-25 10:00:00',
         updatedAt: '2026-07-26 10:00:00'
@@ -34,7 +35,7 @@ describe('thread account ownership', () => {
     ]);
   });
 
-  it('restores user-visible messages and validated presentation metadata for an owned thread', async () => {
+  it('restores user-visible messages and the validated plan used for the answer', async () => {
     const messages = await listThreadMessages(historyEnv(), 'a1', 't1');
     expect(messages).toEqual([
       { id: 'e1', role: 'user', text: 'Help me understand this choice.', createdAt: '2026-07-26 10:00:00' },
@@ -43,7 +44,13 @@ describe('thread account ownership', () => {
         role: 'assistant',
         text: 'Two needs may be interacting.',
         createdAt: '2026-07-26 10:00:02',
-        context: { personId: 'person_1' },
+        context: { surface: 'Explore', personId: 'person_1' },
+        plan: {
+          response_phase: 'integration',
+          confidence: 'supported',
+          safety_mode: 'standard',
+          clearer_form: 'Protect agency while accepting support.'
+        },
         interfaceActions: { version: 1 },
         visualStory: { story: { should_show: true } },
         moduleOffer: { title: 'Two needs in one decision' }
@@ -85,12 +92,19 @@ function historyEnv(): Env {
                 }
                 if (sql.includes('FROM thread_events')) {
                   return { results: [
-                    { id: 'e1', event_type: 'user_message', payload_json: '{"text":"Help me understand this choice."}', created_at: '2026-07-26 10:00:00' },
-                    { id: 'e2', event_type: 'assistant_plan', payload_json: '{"hidden":"not returned"}', created_at: '2026-07-26 10:00:01' },
+                    { id: 'e1', seq: 1, event_type: 'user_message', payload_json: '{"text":"Help me understand this choice."}', created_at: '2026-07-26 10:00:00' },
+                    {
+                      id: 'e2',
+                      seq: 2,
+                      event_type: 'assistant_plan',
+                      payload_json: '{"plan":{"response_phase":"integration","confidence":"supported","safety_mode":"standard","clearer_form":"Protect agency while accepting support."}}',
+                      created_at: '2026-07-26 10:00:01'
+                    },
                     {
                       id: 'e3',
+                      seq: 3,
                       event_type: 'assistant_response',
-                      payload_json: '{"text":"Two needs may be interacting.","context":{"personId":"person_1"},"interfaceActions":{"version":1},"visualStory":{"story":{"should_show":true}},"moduleOffer":{"title":"Two needs in one decision"}}',
+                      payload_json: '{"text":"Two needs may be interacting.","context":{"surface":"Explore","personId":"person_1"},"interfaceActions":{"version":1},"visualStory":{"story":{"should_show":true}},"moduleOffer":{"title":"Two needs in one decision"}}',
                       created_at: '2026-07-26 10:00:02'
                     }
                   ] };
