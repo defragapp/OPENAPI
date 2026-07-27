@@ -10,6 +10,7 @@ import { installProductionRuntime } from './ProductionRuntime';
 import { PublicLanding } from './PublicLanding';
 import { PublicPolicy } from './PublicPolicy';
 import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
+import { StructuredIntelligenceLayer, installStructuredIntelligenceRuntime } from './StructuredIntelligenceLayer';
 import { SystemMembershipManager } from './SystemMembershipManager';
 import './styles.css';
 import './product-completion.css';
@@ -22,9 +23,11 @@ import './system-membership.css';
 import './auth-polish.css';
 import './unified-entry.css';
 import './account-control.css';
+import './structured-intelligence.css';
 
 installProductionRuntime();
 installProductRuntime();
+installStructuredIntelligenceRuntime();
 installBaselineInputRuntime();
 installDialogAccessibility();
 
@@ -58,7 +61,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         : publicPolicyKind
           ? <PublicPolicy kind={publicPolicyKind} />
           : isAuthenticatedWorkspace
-            ? <><SovereignIntelligenceWorkspace /><AccountControlCenter /><SystemMembershipManager /></>
+            ? <><SovereignIntelligenceWorkspace /><StructuredIntelligenceLayer /><AccountControlCenter /><SystemMembershipManager /></>
             : <App />}
     </AppErrorBoundary>
   </React.StrictMode>
