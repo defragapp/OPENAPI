@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "sovv-web",
-  "main": "apps/sovereign-worker/src/runtime-entry.ts",
+  "main": "apps/sovereign-worker/src/runtime-auth-entry.ts",
   "compatibility_date": "2026-07-20",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
@@ -36,6 +36,8 @@
     "STRIPE_CANCEL_URL": "https://app.defrag.app/app?billing=cancelled",
     "STRIPE_PORTAL_RETURN_URL": "https://app.defrag.app/app?billing=portal",
     "TURNSTILE_EXPECTED_HOSTNAME": "app.defrag.app",
+    "APPLE_REDIRECT_URI": "https://app.defrag.app/api/v1/auth/oauth/apple/callback",
+    "GOOGLE_REDIRECT_URI": "https://app.defrag.app/api/v1/auth/oauth/google/callback",
     "SCRIPTURE_TRANSLATION": "WEB",
     "BASELINE_HORIZONS_URL": "https://ssd.jpl.nasa.gov/api/horizons.api",
     "BASELINE_PROVIDER_TIMEOUT_MS": "8000"
@@ -76,6 +78,9 @@
       "/",
       "/login",
       "/signup",
+      "/forgot-password",
+      "/reset-password",
+      "/onboarding",
       "/app",
       "/app/*",
       "/auth/*",
