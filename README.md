@@ -38,17 +38,17 @@ Cloudflare Queue and R2 are intentionally disabled. Private export is not part o
 
 ## Cloudflare Workers Builds
 
-Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the authoritative production deployment path. GitHub Actions is optional and must not be treated as release evidence.
+Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the only supported production build and deployment path. GitHub Actions is not supported for this repository and workflow files must not exist.
 
 Use:
 
 - Production branch: `main`
 - Root directory: repository root
-- Build command: `VITE_TURNSTILE_SITE_KEY=0x4AAAAAADhGIF8-iOLIg8MU corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
-- Deploy command: `node scripts/cloudflare-direct-production-deploy.mjs`
+- Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
+- Deploy command: `pnpm production:deploy`
 - Non-production branch builds: disabled
 
-The deployment script applies D1 migrations, preserves existing encrypted Worker secrets, deploys the exact commit, and then tests the public site, app, health/readiness, pricing, unauthenticated boundaries, Stripe signature rejection, disabled export route, security headers, and concurrent health requests. A deploy command that fails these checks is not a completed release.
+The deployment script receives the exact Cloudflare Git commit through `WORKERS_CI_COMMIT_SHA`, applies D1 migrations, preserves existing encrypted Worker secrets, stamps `APP_VERSION`, deploys `sovv-web`, and then tests the public site, app, health/readiness, pricing, unauthenticated boundaries, Stripe signature rejection, disabled export route, security headers, and concurrent health requests. A deploy command that fails these checks is not a completed release.
 
 Required encrypted Worker secrets:
 
@@ -79,4 +79,4 @@ Account deletion uses a 14-day grace period. When execution becomes due, every n
 
 ## Release status
 
-The repository is production-hardened code, but a release is verified only when Cloudflare Workers Builds succeeds for the exact `main` commit and the live deployment script completes all probes against `sovereign.defrag.app` and `app.defrag.app`.
+The repository is production-hardened code, but a release is verified only when Cloudflare Workers Builds succeeds for the exact `main` commit and `pnpm production:deploy` completes every live probe against `sovereign.defrag.app` and `app.defrag.app`.
