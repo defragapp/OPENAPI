@@ -32,13 +32,13 @@ function escapeHtml(value: string): string {
 function safeActionUrl(value: string): string {
   if (value.length > 2048) throw new Error('email_action_url_too_long');
   const url = new URL(value);
-  if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) throw new Error('email_action_url_invalid');
+  if (url.protocol !== 'https:' || url.username || url.password) throw new Error('email_action_url_invalid');
   return url.toString();
 }
 
 export function buildSovereignEmail(template: SovereignEmailTemplate): { text: string; html: string } {
   const actionUrl = safeActionUrl(template.actionUrl);
-  const details = (template.details ?? []).map((detail) => detail.trim()).filter(Boolean).slice(0, 6);
+  const details = (template.details ?? []).map((detail) => detail.trim()).filter(Boolean).slice(0, 10);
   const footer = template.footer?.trim() || 'You control what enters your Sovereign.OS workspace and what may be shared.';
   const text = [
     'SOVEREIGN.OS',
