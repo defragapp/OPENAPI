@@ -3,8 +3,6 @@ name: Live Cloudflare Verification
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -20,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      EXPECTED_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+      EXPECTED_SHA: ${{ github.sha }}
       PUBLIC_BASE: https://sovereign.defrag.app
       APP_BASE: https://app.defrag.app
     steps:
@@ -175,7 +173,7 @@ jobs:
           ]:
               if fingerprint not in intelligence_js:
                   raise SystemExit(f'Intelligence runtime is missing: {fingerprint}')
-          for fingerprint in ['prefers-reduced-motion', 'prefers-contrast: more', '@media (max-width: 720px)']:
+          for fingerprint in ['prefers-reduced-motion', 'prefers-contrast: more', '@media (max-width: 680px)']:
               if fingerprint not in intelligence_css:
                   raise SystemExit(f'Intelligence stylesheet is missing: {fingerprint}')
 

@@ -16,34 +16,34 @@ export function installBaselineInputRuntime(): void {
       const caption = document.createElement('span');
       caption.textContent = 'Birthplace timezone';
 
-      const select = document.createElement('select');
-      select.name = 'birthTimezone';
-      select.required = true;
-      select.autocomplete = 'off';
-      select.setAttribute('aria-describedby', 'birth-timezone-help');
+      const input = document.createElement('input');
+      const listId = `birth-timezone-options-${crypto.randomUUID()}`;
+      input.name = 'birthTimezone';
+      input.type = 'search';
+      input.required = true;
+      input.autocomplete = 'off';
+      input.spellcheck = false;
+      input.setAttribute('list', listId);
+      input.setAttribute('aria-describedby', 'birth-timezone-help');
+      input.setAttribute('placeholder', 'Search a city or timezone, such as Los Angeles');
 
       const current = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-      const supported = supportedTimeZones();
-      for (const timezone of supported) {
+      input.value = current;
+
+      const datalist = document.createElement('datalist');
+      datalist.id = listId;
+      for (const timezone of supportedTimeZones()) {
         const option = document.createElement('option');
         option.value = timezone;
-        option.textContent = timezone.replaceAll('_', ' ');
-        option.selected = timezone === current;
-        select.appendChild(option);
-      }
-      if (!supported.includes(current)) {
-        const option = document.createElement('option');
-        option.value = current;
-        option.textContent = current.replaceAll('_', ' ');
-        option.selected = true;
-        select.prepend(option);
+        option.label = timezone.replaceAll('_', ' ').replaceAll('/', ' · ');
+        datalist.appendChild(option);
       }
 
       const help = document.createElement('small');
       help.id = 'birth-timezone-help';
-      help.textContent = 'Choose the timezone in effect at your birthplace. This keeps the calculation accurate without sending your birthplace to a public geocoder.';
+      help.textContent = 'Start typing a city or timezone, then choose the closest match. This keeps the calculation accurate without sending your birthplace to a public geocoder.';
 
-      label.append(caption, select, help);
+      label.append(caption, input, datalist, help);
       const submit = form.querySelector('button[type="submit"], button.primary-button');
       form.insertBefore(label, submit ?? null);
     });
