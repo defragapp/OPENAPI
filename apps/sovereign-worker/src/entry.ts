@@ -268,8 +268,18 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       ...(authorizedContext !== undefined ? { authorizedContext } : {})
     });
     const interfaceActions = buildInterfaceActions(message, selection, entitlements);
+    const visualStory = result.plan.visual_story.should_show ? compactVisualStoryPayload(result.plan) : null;
+    const moduleOffer = result.plan.module_suggestion.should_offer && result.plan.module_suggestion.title
+      ? { title: result.plan.module_suggestion.title }
+      : null;
     await appendThreadEvent(env, threadId, turn.sequence + 1, 'assistant_plan', { plan: result.plan }, traceId);
-    await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_response', { text: result.text, context: selection, interfaceActions }, traceId);
+    await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_response', {
+      text: result.text,
+      context: selection,
+      interfaceActions,
+      ...(visualStory ? { visualStory } : {}),
+      ...(moduleOffer ? { moduleOffer } : {})
+    }, traceId);
     await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'completed');
     const headers = new Headers({
       'content-type': 'text/plain; charset=utf-8',
@@ -279,9 +289,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       'x-sovereign-response-phase': result.plan.response_phase,
       'x-sovereign-module-offer': result.plan.module_suggestion.should_offer ? '1' : '0',
       'x-sovereign-interface-actions': encodeVisualStoryHeader(interfaceActions),
-      'x-sovereign-visual-story': result.plan.visual_story.should_show
-        ? encodeVisualStoryHeader(compactVisualStoryPayload(result.plan))
-        : ''
+      'x-sovereign-visual-story': visualStory ? encodeVisualStoryHeader(visualStory) : ''
     });
     if (result.plan.module_suggestion.should_offer && result.plan.module_suggestion.title) headers.set('x-sovereign-module-title', encodeURIComponent(result.plan.module_suggestion.title));
     return new Response(result.text, { status: 202, headers });

@@ -5,7 +5,43 @@ import { sharePublicPlatform } from './ProductionRuntime';
 
 type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
 type ApiState = 'idle' | 'loading' | 'ready' | 'error';
-type ChatMessage = { id: string; role: 'user' | 'assistant'; text: string; createdAt?: string };
+type VisualPhase = 'origin' | 'shadow' | 'gift';
+type VisualCard = { archetype: 'fool' | 'magician' | 'three_of_cups' | 'hermit' | 'strength' | 'tower'; title: string; phase: VisualPhase };
+type VisualStoryPayload = {
+  story: {
+    should_show: true;
+    mode: 'self' | 'interaction' | 'family';
+    primary: VisualCard;
+    secondary: VisualCard | null;
+    tertiary: VisualCard | null;
+    origin: string;
+    shadow: string;
+    gift: string;
+    current: string;
+    next_step: string;
+    visual_reason: string;
+  };
+  basis: {
+    user_confirmed: boolean;
+    human_design: string[];
+    gene_keys: string[];
+    astrology: string[];
+    relationship: string[];
+    live: string[];
+    numerology: string[];
+  };
+};
+type ModuleOffer = { title: string };
+type ChatMessage = {
+  id: string;
+  role: 'user' | 'assistant';
+  text: string;
+  createdAt?: string;
+  context?: Record<string, unknown>;
+  interfaceActions?: Record<string, unknown>;
+  visualStory?: Record<string, unknown>;
+  moduleOffer?: Record<string, unknown>;
+};
 type ThreadSummary = { id: string; title: string; contextKind: string; covenantEnabled: boolean; updatedAt: string };
 type InterfaceAction =
   | { type: 'open_baseline'; args: { facet: string } }
@@ -83,6 +119,9 @@ export function SovereignWorkspace() {
   const [selectedSystem, setSelectedSystem] = useState('');
   const [covenantEnabled, setCovenantEnabled] = useState(false);
   const [interfaceActions, setInterfaceActions] = useState<InterfaceActionEnvelope | null>(null);
+  const [visualStory, setVisualStory] = useState<VisualStoryPayload | null>(null);
+  const [visualPhase, setVisualPhase] = useState<VisualPhase>('shadow');
+  const [moduleOffer, setModuleOffer] = useState<ModuleOffer | null>(null);
 
   const contextLabel = useMemo(() => {
     const person = people.find((item) => item.id === selectedPerson)?.displayName;
@@ -153,6 +192,9 @@ export function SovereignWorkspace() {
     setMessages([]);
     setDraft('');
     setCovenantEnabled(false);
+    setInterfaceActions(null);
+    setVisualStory(null);
+    setModuleOffer(null);
     setStatus('Ready');
     setApiState('idle');
     setNavOpen(false);
@@ -164,10 +206,15 @@ export function SovereignWorkspace() {
       const data = await api(`/api/v1/threads/${encodeURIComponent(id)}`);
       setThreadId(id);
       setMessages(data.messages ?? []);
-      const restored = [...(data.messages ?? [])].reverse().find((item: any) => item.context || item.interfaceActions);
+      const restored = [...(data.messages ?? [])].reverse().find((item: ChatMessage) =>
+        item.context || item.interfaceActions || item.visualStory || item.moduleOffer);
       if (restored?.context?.personId) { setSelectedPerson(restored.context.personId); setSelectedSystem(''); }
       if (restored?.context?.systemId) { setSelectedSystem(restored.context.systemId); setSelectedPerson(''); }
       setInterfaceActions(validActionEnvelope(restored?.interfaceActions));
+      const restoredVisual = validVisualStoryPayload(restored?.visualStory);
+      setVisualStory(restoredVisual);
+      setVisualPhase(restoredVisual?.story.primary.phase ?? 'shadow');
+      setModuleOffer(validModuleOffer(restored?.moduleOffer));
       setCovenantEnabled(threads.find((thread) => thread.id === id)?.covenantEnabled === true);
       setPanelOpen(false);
       setStatus('Conversation restored.');
@@ -209,6 +256,10 @@ export function SovereignWorkspace() {
         throw new Error(problem.message || problem.error || 'Sovereign is temporarily unavailable.');
       }
       const actions = decodeActionEnvelope(response.headers.get('x-sovereign-interface-actions'));
+      const nextVisualStory = decodeVisualStoryPayload(response.headers.get('x-sovereign-visual-story'));
+      const nextModuleOffer = response.headers.get('x-sovereign-module-offer') === '1'
+        ? validModuleOffer({ title: decodeHeaderTitle(response.headers.get('x-sovereign-module-title')) })
+        : null;
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let text = '';
@@ -220,6 +271,9 @@ export function SovereignWorkspace() {
       }
       setApiState('ready');
       setInterfaceActions(actions);
+      setVisualStory(nextVisualStory);
+      setVisualPhase(nextVisualStory?.story.primary.phase ?? 'shadow');
+      setModuleOffer(nextModuleOffer);
       if (actions?.primary && isReversibleAction(actions.primary)) openInterfaceAction(actions.primary);
       setStatus('Complete');
       const threadData = await api('/api/v1/threads');
@@ -257,6 +311,17 @@ export function SovereignWorkspace() {
       body: JSON.stringify({ correction })
     });
     setStatus(correction === 'yes' ? 'Marked as fitting.' : correction === 'partly' ? 'Marked as partly fitting.' : 'Marked as not fitting today.');
+  }
+
+  async function saveModuleOffer() {
+    if (!moduleOffer || !window.confirm(`Save “${moduleOffer.title}” to your private Library?`)) return;
+    await api(`/api/v1/threads/${encodeURIComponent(threadId)}/modules/latest`, {
+      method: 'POST',
+      body: JSON.stringify({ approved: true })
+    });
+    setModuleOffer(null);
+    await refreshWorkspace();
+    setStatus('Insight Module saved to Library.');
   }
 
   async function changeCovenant(enabled: boolean) {
@@ -350,15 +415,19 @@ export function SovereignWorkspace() {
                 </article>
               ))}
               {messages.some((item) => item.role === 'assistant' && item.text.trim()) && (
-                <div className="response-actions">
-                  {interfaceActions?.primary && <button onClick={() => openInterfaceAction(interfaceActions.primary!)}>{actionLabel(interfaceActions.primary)}</button>}
-                  {interfaceActions?.suggestions.map((action) => <button key={`${action.type}-${JSON.stringify(action.args)}`} onClick={() => openInterfaceAction(action)}>{actionLabel(action)}</button>)}
-                  <button onClick={() => void saveLatest()}>Save to Library</button>
-                  <span>Does this fit?</span>
-                  <button onClick={() => void saveCorrection('yes')}>Yes</button>
-                  <button onClick={() => void saveCorrection('partly')}>Partly</button>
-                  <button onClick={() => void saveCorrection('not_today')}>Not today</button>
-                </div>
+                <>
+                  {visualStory && <VisualStoryCard payload={visualStory} phase={visualPhase} setPhase={setVisualPhase} />}
+                  <div className="response-actions">
+                    {interfaceActions?.primary && <button onClick={() => openInterfaceAction(interfaceActions.primary!)}>{actionLabel(interfaceActions.primary)}</button>}
+                    {interfaceActions?.suggestions.map((action) => <button key={`${action.type}-${JSON.stringify(action.args)}`} onClick={() => openInterfaceAction(action)}>{actionLabel(action)}</button>)}
+                    {moduleOffer && <button onClick={() => void saveModuleOffer()}>Save “{moduleOffer.title}”</button>}
+                    <button onClick={() => void saveLatest()}>Save to Library</button>
+                    <span>Does this fit?</span>
+                    <button onClick={() => void saveCorrection('yes')}>Yes</button>
+                    <button onClick={() => void saveCorrection('partly')}>Partly</button>
+                    <button onClick={() => void saveCorrection('not_today')}>Not today</button>
+                  </div>
+                </>
               )}
             </div>
           )}
@@ -703,6 +772,117 @@ function actionLabel(action: InterfaceAction): string {
   if (action.type === 'open_decision') return 'Open Decision Check';
   if (action.type === 'open_optional_lens') return 'Review optional Covenant lens';
   return 'View plan details';
+}
+
+function VisualStoryCard({ payload, phase, setPhase }: {
+  payload: VisualStoryPayload;
+  phase: VisualPhase;
+  setPhase: (phase: VisualPhase) => void;
+}) {
+  const cards = [payload.story.primary, payload.story.secondary, payload.story.tertiary].filter((card): card is VisualCard => card !== null);
+  const phaseLabels: Record<VisualPhase, string> = { origin: 'Past protection', shadow: 'Under pressure', gift: 'Clear expression' };
+  return (
+    <section className="visual-story-card" aria-label="Archetype in motion">
+      <header>
+        <div><p className="eyebrow">ARCHETYPE IN MOTION</p><h3>See how the role moves.</h3></div>
+        <span>{payload.story.mode === 'self' ? 'Personal' : payload.story.mode === 'interaction' ? 'Consented relationship' : 'Permitted system'}</span>
+      </header>
+      <div className="visual-story-body">
+        <div className="visual-story-archetypes" aria-label="Available archetypes">
+          {cards.map((card) => <article key={`${card.archetype}-${card.title}`}><i aria-hidden="true">{archetypeMark(card.archetype)}</i><strong>{card.title}</strong></article>)}
+        </div>
+        <div>
+          <div className="visual-phase-tabs" aria-label="View three expressions of this role">
+            {(['origin', 'shadow', 'gift'] as const).map((item) => (
+              <button key={item} className={phase === item ? 'active' : ''} aria-pressed={phase === item} onClick={() => setPhase(item)}>{phaseLabels[item]}</button>
+            ))}
+          </div>
+          <p className="visual-phase-copy">{payload.story[phase]}</p>
+          <dl>
+            <div><dt>Active now</dt><dd>{payload.story.current}</dd></div>
+            <div><dt>One next step</dt><dd>{payload.story.next_step}</dd></div>
+          </dl>
+          <details><summary>What shaped this view</summary><p>{payload.story.visual_reason}</p></details>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function decodeVisualStoryPayload(value: string | null): VisualStoryPayload | null {
+  return validVisualStoryPayload(decodeBase64Json(value));
+}
+
+function decodeBase64Json(value: string | null): unknown {
+  if (!value) return null;
+  try {
+    const normalized = value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=');
+    return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(normalized), (character) => character.charCodeAt(0))));
+  } catch {
+    return null;
+  }
+}
+
+function validVisualStoryPayload(value: unknown): VisualStoryPayload | null {
+  if (!value || typeof value !== 'object') return null;
+  const payload = value as Record<string, unknown>;
+  if (!payload.story || typeof payload.story !== 'object' || !payload.basis || typeof payload.basis !== 'object') return null;
+  const story = payload.story as Record<string, unknown>;
+  const basis = payload.basis as Record<string, unknown>;
+  const primary = validVisualCard(story.primary);
+  const secondary = story.secondary == null ? null : validVisualCard(story.secondary);
+  const tertiary = story.tertiary == null ? null : validVisualCard(story.tertiary);
+  if (story.should_show !== true || !['self', 'interaction', 'family'].includes(String(story.mode)) || !primary) return null;
+  if ((story.mode === 'interaction' && !secondary) || (story.mode === 'family' && (!secondary || !tertiary))) return null;
+  for (const key of ['origin', 'shadow', 'gift', 'current', 'next_step', 'visual_reason']) {
+    if (typeof story[key] !== 'string' || !story[key].trim()) return null;
+  }
+  const basisKeys = ['human_design', 'gene_keys', 'astrology', 'relationship', 'live', 'numerology'] as const;
+  if (basis.user_confirmed !== true || basisKeys.some((key) => !Array.isArray(basis[key]) || !(basis[key] as unknown[]).every((item) => typeof item === 'string'))) return null;
+  return {
+    story: {
+      should_show: true,
+      mode: story.mode as VisualStoryPayload['story']['mode'],
+      primary,
+      secondary,
+      tertiary,
+      origin: story.origin as string,
+      shadow: story.shadow as string,
+      gift: story.gift as string,
+      current: story.current as string,
+      next_step: story.next_step as string,
+      visual_reason: story.visual_reason as string
+    },
+    basis: basis as VisualStoryPayload['basis']
+  };
+}
+
+function validVisualCard(value: unknown): VisualCard | null {
+  if (!value || typeof value !== 'object') return null;
+  const card = value as Record<string, unknown>;
+  const archetypes = ['fool', 'magician', 'three_of_cups', 'hermit', 'strength', 'tower'];
+  const phases = ['origin', 'shadow', 'gift'];
+  if (!archetypes.includes(String(card.archetype)) || typeof card.title !== 'string' || !card.title.trim() || !phases.includes(String(card.phase))) return null;
+  return card as VisualCard;
+}
+
+function validModuleOffer(value: unknown): ModuleOffer | null {
+  if (!value || typeof value !== 'object') return null;
+  const title = (value as Record<string, unknown>).title;
+  return typeof title === 'string' && title.trim() && title.length <= 140 ? { title: title.trim() } : null;
+}
+
+function decodeHeaderTitle(value: string | null): string {
+  if (!value) return '';
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return '';
+  }
+}
+
+function archetypeMark(archetype: VisualCard['archetype']): string {
+  return ({ fool: '0', magician: 'I', three_of_cups: 'III', hermit: 'IX', strength: 'VIII', tower: 'XVI' })[archetype];
 }
 
 function textOr(value: unknown, fallback: string) {

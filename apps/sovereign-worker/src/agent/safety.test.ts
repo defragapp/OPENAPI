@@ -42,4 +42,16 @@ describe('Sovereign output safety guardrail', () => {
       expect(reviewed.text).not.toBe(unsafe);
     }
   });
+
+  it('allows requested framework names without allowing fixed labels for people', () => {
+    const frameworkDetail = 'WHAT THIS MAY BE SHOWING\n\nBowen theory offers one way to examine the pressure.\n\nA CLEARER FORM\n\nIt remains one possibility.\n\nWHAT TO DO\n\nCompare it with what you directly observed.';
+    expect(() => assertSovereignOutputSafety(frameworkDetail, { allowFrameworkLabels: true })).not.toThrow();
+
+    const fixedLabel = 'WHAT THIS MAY BE SHOWING\n\nYou are the overfunctioner.\n\nA CLEARER FORM\n\nIt explains your role.\n\nWHAT TO DO\n\nNotice the pressure.';
+    const reviewed = reviewSovereignOutputSafety(fixedLabel, { allowFrameworkLabels: true });
+    expect(reviewed.rewritten).toBe(true);
+    expect(reviewed.issues).toContain('clinical_jargon');
+    expect(reviewed.text).not.toContain('overfunctioner');
+    expect(() => assertSovereignOutputSafety(fixedLabel, { allowFrameworkLabels: true })).toThrow(/clinical_jargon/);
+  });
 });

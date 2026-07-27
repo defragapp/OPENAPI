@@ -61,6 +61,17 @@ describe('conversation-first Baseline intelligence', () => {
     expect(workspace).not.toContain('MutationObserver');
   });
 
+  it('renders and restores validated visual stories and explicit module offers', () => {
+    expect(workspace).toContain("response.headers.get('x-sovereign-visual-story')");
+    expect(workspace).toContain("response.headers.get('x-sovereign-module-offer')");
+    expect(workspace).toContain("response.headers.get('x-sovereign-module-title')");
+    expect(workspace).toContain('validVisualStoryPayload(restored?.visualStory)');
+    expect(workspace).toContain('validModuleOffer(restored?.moduleOffer)');
+    expect(workspace).toContain('<VisualStoryCard');
+    expect(workspace).toContain('/modules/latest');
+    expect(workspace).toContain('window.confirm(`Save “${moduleOffer.title}” to your private Library?`)');
+  });
+
   it('advances the public cache without caching private workspace assets', () => {
     expect(serviceWorker).toContain("sovereign-public-v8");
     expect(serviceWorker).not.toContain("'/intelligence-ui.js'");

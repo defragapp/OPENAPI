@@ -30,7 +30,7 @@ export type SovereignSafetyIssue =
   | 'excessive_disclaimer'
   | 'institutional_tone';
 
-const reviewPatterns: Array<{ issue: SovereignSafetyIssue; pattern: RegExp }> = [
+const reviewPatterns: Array<{ issue: SovereignSafetyIssue; pattern: RegExp; neutralFrameworkName?: boolean }> = [
   { issue: 'diagnosis', pattern: /\b(?:diagnos(?:e|is|tic)|narcissist(?:ic)?|borderline|bipolar|psychopath(?:ic)?|personality disorder)\b/i },
   { issue: 'claimed_motive', pattern: /\b(?:they|he|she|your (?:mother|father|parent|partner|family)) (?:really |secretly )?(?:wants?|intends?|is trying|feels?)\b/i },
   { issue: 'absent_person_profile', pattern: /\b(?:you|they|he|she|your (?:mother|father|parent|partner)) (?:is|are) (?:avoidant|dysregulated|traumatized|controlling|toxic|insecure)\b|\byour trauma is causing\b/i },
@@ -39,7 +39,8 @@ const reviewPatterns: Array<{ issue: SovereignSafetyIssue; pattern: RegExp }> = 
   { issue: 'family_blame', pattern: /\b(?:your (?:parents?|family|mother|father)|past generations) (?:caused|made|created|gave you) (?:your|this|the)\b/i },
   { issue: 'spiritual_causation', pattern: /\b(?:literal|real|ancestral|generational) curse\b|\b(?:God|the universe|your bloodline) (?:caused|is causing|is forcing|wants)\b|\blow frequency\b/i },
   { issue: 'baseline_as_proof', pattern: /\b(?:your (?:baseline|design|chart) (?:proves|confirms|shows that|means|says)|because of your baseline|this transit means)\b/i },
-  { issue: 'clinical_jargon', pattern: /\b(?:overfunction(?:ing|er)|underfunction(?:ing|er)|system anxiety|emotional cutoff|polarized parts?|burdened protector|Bowen theory|IFS part|your shadow is controlling|your inner child is wounded)\b/i },
+  { issue: 'clinical_jargon', pattern: /\b(?:overfunction(?:ing|er)|underfunction(?:ing|er)|system anxiety|emotional cutoff|polarized parts?|burdened protector|your shadow is controlling|your inner child is wounded)\b/i },
+  { issue: 'clinical_jargon', pattern: /\b(?:Bowen theory|Internal Family Systems|IFS)\b/i, neutralFrameworkName: true },
   { issue: 'therapy_claim', pattern: /\b(?:as your therapist|therapy will|this will heal your trauma|I can treat)\b/i },
   { issue: 'unsupported_directive', pattern: /\b(?:you (?:must|need to|should)|go) (?:confront|leave|reconcile|expose|forgive|cut (?:them|him|her) off)\b/i },
   { issue: 'excessive_disclaimer', pattern: /\bI (?:cannot|can’t)[^.!?]{0,160}[.!?]\s*I (?:cannot|can’t)\b/i },
@@ -62,7 +63,7 @@ export function reviewSovereignOutputSafety(output: string, options: { allowFram
   const text = paragraphs.map((paragraph) => {
     if (!paragraph.trim() || /^\n+$/.test(paragraph) || /^(?:WHAT I NOTICE|LOOK INWARD|WHAT THIS MAY BE SHOWING|A CLEARER FORM|WHAT TO DO|EXPLORE LATER|BASIS ·)/.test(paragraph)) return paragraph;
     const found = reviewPatterns
-      .filter(({ issue, pattern }) => !(options.allowFrameworkLabels && issue === 'clinical_jargon') && pattern.test(paragraph))
+      .filter(({ pattern, neutralFrameworkName }) => !(options.allowFrameworkLabels && neutralFrameworkName) && pattern.test(paragraph))
       .map(({ issue }) => issue);
     if (!found.length) return paragraph;
     found.forEach((issue) => issues.add(issue));
@@ -94,8 +95,8 @@ export function assertSovereignOutputSafety(output: string, options: { phase?: '
   for (const pattern of forbidden) {
     if (pattern.test(output)) throw new Error('Sovereign output failed safety validation');
   }
-  for (const { issue, pattern } of reviewPatterns) {
-    if (options.allowFrameworkLabels && issue === 'clinical_jargon') continue;
+  for (const { issue, pattern, neutralFrameworkName } of reviewPatterns) {
+    if (options.allowFrameworkLabels && neutralFrameworkName) continue;
     if (pattern.test(output)) throw new Error(`Sovereign output failed safety validation: ${issue}`);
   }
   const questionPhase = options.phase === 'question' || (output.includes('WHAT I NOTICE') && output.includes('LOOK INWARD'));
