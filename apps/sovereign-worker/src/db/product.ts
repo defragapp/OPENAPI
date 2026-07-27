@@ -24,12 +24,56 @@ export async function createSystem(env: Env, accountId: string, input: { name: s
   const id = `system_${crypto.randomUUID()}`;
   await env.DB.prepare('INSERT INTO systems (id, account_id, system_type, name, metadata_json) VALUES (?, ?, ?, ?, ?)')
     .bind(id, accountId, input.systemType, name, JSON.stringify(input.metadata ?? {})).run();
-  return { id, name, systemType: input.systemType, metadata: input.metadata ?? {} };
+  return { id, name, systemType: input.systemType, metadata: input.metadata ?? {}, members: [] };
 }
 
 export async function listSystems(env: Env, accountId: string) {
-  const rows = await env.DB.prepare('SELECT id, system_type, name, metadata_json FROM systems WHERE account_id = ? ORDER BY updated_at DESC').bind(accountId).all<Record<string, string>>();
-  return (rows.results ?? []).map((row) => ({ id: row.id, systemType: row.system_type, name: row.name, metadata: parseJson(row.metadata_json) }));
+  const rows = await env.DB.prepare('SELECT id, system_type, name, metadata_json FROM systems WHERE account_id = ? ORDER BY updated_at DESC')
+    .bind(accountId)
+    .all<Record<string, string>>();
+  const memberRows = await env.DB.prepare(`SELECT sm.system_id, sm.person_id, sm.role_label, sm.is_primary, sm.metadata_json,
+      p.display_name, p.bound_account_id
+    FROM system_memberships sm
+    JOIN systems s ON s.id = sm.system_id
+    JOIN persons p ON p.id = sm.person_id AND p.account_id = s.account_id
+    WHERE s.account_id = ?
+      AND p.bound_account_id IS NOT NULL
+      AND EXISTS (
+        SELECT 1 FROM consent_grants cg
+        JOIN invitations i ON i.id = cg.invitation_id AND i.invited_person_id = p.id
+        WHERE cg.person_id = p.id AND cg.scope = 'system.include'
+          AND cg.granted_by_account_id = p.bound_account_id
+          AND i.accepted_by_account_id = p.bound_account_id
+          AND i.status = 'accepted'
+          AND cg.granted_at IS NOT NULL AND cg.revoked_at IS NULL
+      )
+    ORDER BY sm.is_primary DESC, p.display_name ASC`)
+    .bind(accountId)
+    .all<Record<string, string | number | null>>();
+
+  const membersBySystem = new Map<string, Array<Record<string, unknown>>>();
+  for (const row of memberRows.results ?? []) {
+    const systemId = String(row.system_id ?? '');
+    if (!systemId) continue;
+    const members = membersBySystem.get(systemId) ?? [];
+    members.push({
+      personId: String(row.person_id ?? ''),
+      displayName: String(row.display_name ?? 'Permitted person'),
+      roleLabel: String(row.role_label ?? 'member'),
+      isPrimary: Number(row.is_primary ?? 0) === 1,
+      identityBound: Boolean(row.bound_account_id),
+      metadata: parseJson(typeof row.metadata_json === 'string' ? row.metadata_json : null)
+    });
+    membersBySystem.set(systemId, members);
+  }
+
+  return (rows.results ?? []).map((row) => ({
+    id: row.id,
+    systemType: row.system_type,
+    name: row.name,
+    metadata: parseJson(row.metadata_json),
+    members: membersBySystem.get(row.id) ?? []
+  }));
 }
 
 export async function addSystemMember(env: Env, accountId: string, systemId: string, personId: string, metadata: Record<string, unknown>) {
