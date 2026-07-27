@@ -40,9 +40,9 @@ function installTurnstile(): void {
     if (frame) frame.dataset.state = state;
     const caption = frame?.querySelector<HTMLElement>('[data-turnstile-caption]');
     if (caption) caption.textContent = message;
-    window.dispatchEvent(new CustomEvent(TURNSTILE_STATE_EVENT, {
-      detail: { state, action: container.dataset.action || 'login' }
-    }));
+    const detail = { state, action: container.dataset.action || 'login' };
+    window.dispatchEvent(new CustomEvent(TURNSTILE_STATE_EVENT, { detail }));
+    setTimeout(() => window.dispatchEvent(new CustomEvent(TURNSTILE_STATE_EVENT, { detail })), 0);
   };
 
   const resetWidget = (container: HTMLElement, message = 'Refreshing the private security check…') => {
