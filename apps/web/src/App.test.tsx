@@ -6,6 +6,7 @@ describe('Sovereign PWA shell', () => {
   const css = readFileSync(new URL('./styles.css', import.meta.url), 'utf8');
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const consent = readFileSync(new URL('../public/consent.html', import.meta.url), 'utf8');
+  const consentRuntime = readFileSync(new URL('../public/consent.js', import.meta.url), 'utf8');
   const recognitionUi = readFileSync(new URL('../public/recognition-ui.js', import.meta.url), 'utf8');
 
   it('contains all authenticated surfaces', () => {
@@ -48,8 +49,10 @@ describe('Sovereign PWA shell', () => {
     expect(app).toContain('Send private invitation');
     expect(app).toContain('Choose what this connection may use.');
     expect(app).not.toContain('>Grant</button>');
-    expect(consent).toContain('Manage what others may use.');
-    expect(consent).toContain('Do not allow');
+    expect(consent).toContain('Manage requested uses.');
+    expect(consentRuntime).toContain("fetch('/api/v1/invitations/mine'");
+    expect(consentRuntime).toContain("deny.textContent = decision === 'denied' ? 'Not allowed' : 'Do not allow'");
+    expect(consentRuntime).toContain('Permission revoked for future use.');
   });
 
   it('uses direct account language without exposing security implementation copy', () => {
