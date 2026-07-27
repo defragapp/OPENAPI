@@ -113,6 +113,7 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
 
   const subject = `email:${row.email_normalized}`;
   let accountId: string;
+  let createdAccount = false;
   if (row.account_id) {
     const account = await env.DB.prepare('SELECT id, auth_subject FROM accounts WHERE id = ?')
       .bind(row.account_id)
@@ -122,6 +123,7 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   } else {
     if (row.purpose !== 'signup') return Response.json({ status: 'invalid' }, { status: 400 });
     accountId = (await resolveAccount(env, subject)).accountId;
+    createdAccount = true;
   }
 
   const redeemed = await env.DB.prepare(`UPDATE auth_magic_links
@@ -137,6 +139,13 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
       WHERE id = ? AND auth_subject = ?`)
       .bind(row.terms_accepted_at, TERMS_VERSION, PRIVACY_VERSION, accountId, subject)
       .run();
+    if (row.name?.trim()) {
+      await env.DB.prepare(`UPDATE persons
+        SET display_name = ?, updated_at = datetime('now')
+        WHERE account_id = ? AND role = 'self'`)
+        .bind(row.name.trim().slice(0, MAX_NAME_LENGTH), accountId)
+        .run();
+    }
   }
 
   const sessionId = `session_${crypto.randomUUID()}`;
@@ -145,7 +154,14 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   await env.DB.prepare("INSERT INTO auth_sessions (id, account_id, subject, session_hash, expires_at) VALUES (?, ?, ?, ?, datetime('now', '+30 days'))")
     .bind(sessionId, accountId, subject, await sha256(tokenValue))
     .run();
-  return Response.json({ status: 'success' }, { headers: { 'set-cookie': cookie('__Host-sovereign_session', tokenValue) } });
+  const onboarding = await env.DB.prepare('SELECT onboarding_completed_at FROM accounts WHERE id = ?')
+    .bind(accountId)
+    .first<{ onboarding_completed_at?: string | null }>();
+  return Response.json({
+    status: 'success',
+    createdAccount,
+    next: onboarding?.onboarding_completed_at ? '/app' : '/onboarding'
+  }, { headers: { 'set-cookie': cookie('__Host-sovereign_session', tokenValue) } });
 }
 
 export async function logout(request: Request, env: Env, all = false): Promise<Response> {

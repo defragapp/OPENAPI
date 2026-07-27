@@ -17,7 +17,7 @@ const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT
 const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAADhGIF8-iOLIg8MU').trim();
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
-const migrationVersion = '0009_production_scale_and_billing_safety';
+const migrationVersion = '0010_account_onboarding_and_chat_history';
 
 if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required');
 if (!/^[0-9a-f]{40}$/i.test(commitSha)) throw new Error('A full 40-character commit SHA is required');
@@ -258,7 +258,7 @@ async function verifyLiveProduction() {
 
   assert(health.response.ok && health.json?.ok === true, 'health is not healthy');
   assert(health.json?.version === commitSha, 'health is not serving the deployed commit');
-  assert(health.json?.migrationVersion === migrationVersion, 'health is not serving migration 0009');
+  assert(health.json?.migrationVersion === migrationVersion, 'health is not serving the current migration');
   assert(ready.json?.ready === true && ready.json?.version === commitSha, 'ready is not serving the deployed commit');
 
   const publicDocuments = [home.response, how.response, howClean.response, pricing.response, pricingClean.response, faq.response, faqClean.response, privacy.response, terms.response];

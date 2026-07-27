@@ -14,6 +14,8 @@ describe('public retention contract', () => {
 
   it('deletes expired conversation events while preserving saved Library records', () => {
     expect(jobs).toContain('DELETE FROM thread_events');
+    expect(jobs).toContain('DELETE FROM threads');
+    expect(jobs).toContain('SELECT thread_id FROM saved_understandings');
     expect(jobs).toContain('UPDATE user_corrections SET note = NULL');
     expect(jobs).toContain('DELETE FROM tool_audit_events');
     expect(jobs).not.toContain('DELETE FROM saved_understandings WHERE created_at');

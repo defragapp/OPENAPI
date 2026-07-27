@@ -13,8 +13,10 @@ const usage = readFileSync('apps/sovereign-worker/src/billing/usage.ts', 'utf8')
 const stripe = readFileSync('apps/sovereign-worker/src/billing/stripe.ts', 'utf8');
 const stripeRoute = readFileSync('apps/sovereign-worker/src/routes/stripe.ts', 'utf8');
 const scaleMigration = readFileSync('apps/sovereign-worker/migrations/0009_production_scale_and_billing_safety.sql', 'utf8');
+const workspaceMigration = readFileSync('apps/sovereign-worker/migrations/0010_account_onboarding_and_chat_history.sql', 'utf8');
 const browserRuntime = readFileSync('apps/web/src/ProductionRuntime.ts', 'utf8');
 const appUi = readFileSync('apps/web/src/App.tsx', 'utf8');
+const workspaceUi = readFileSync('apps/web/src/SovereignWorkspace.tsx', 'utf8');
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const pricing = readFileSync('apps/web/public/pricing.html', 'utf8');
 const consent = readFileSync('apps/web/public/consent.html', 'utf8');
@@ -100,6 +102,7 @@ for (const required of [
   '"/api/*"',
   '"/login"',
   '"/signup"',
+  '"/onboarding"',
   '"/app/*"',
   '"/auth/*"',
   '"/consent.html"',
@@ -126,7 +129,7 @@ for (const required of [
   "headers.set('x-robots-tag', 'noindex, nofollow')",
   'isNavigationAssetPath',
   "target.pathname = '/app'",
-  "migrationVersion: '0009_production_scale_and_billing_safety'",
+  "migrationVersion: '0010_account_onboarding_and_chat_history'",
   "includesPrivateWorkspaceData: false",
   'sovereign_capacity_unavailable',
   "headers: { 'retry-after': '60' }",
@@ -204,6 +207,13 @@ for (const required of [
 ]) {
   if (!scaleMigration.includes(required)) throw new Error(`Production scale migration is missing ${required}`);
 }
+for (const required of [
+  'ALTER TABLE accounts ADD COLUMN onboarding_completed_at',
+  "ALTER TABLE accounts ADD COLUMN plan_intent TEXT NOT NULL DEFAULT 'free'",
+  'accounts_onboarding_idx'
+]) {
+  if (!workspaceMigration.includes(required)) throw new Error(`Workspace migration is missing ${required}`);
+}
 
 for (const required of [
   "if (kind === 'login' && !existing)",
@@ -253,7 +263,7 @@ for (const required of [
 ]) {
   if (!browserRuntime.includes(required)) throw new Error(`Browser production runtime is missing ${required}`);
 }
-if (!appUi.includes('No private workspace data is included')) {
+if (!`${appUi}\n${workspaceUi}`.includes('No private workspace data is included')) {
   throw new Error('Workspace sharing control is missing its private-data boundary');
 }
 
@@ -294,4 +304,4 @@ for (const required of [
   if (!consentJs.includes(required)) throw new Error(`Consent controls are missing ${required}`);
 }
 
-console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0009 d1_scale_indexes=true durable_objects=true durable_object_sharding=account_thread workers_ai=true ai_capacity_backpressure=true ai_allowance_retry_after=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true consent_csp_safe=true full_live_copy_gate=true signup_only_account_creation=true policy_acceptance_persisted=true malformed_magic_links_rejected=true trusted_stripe_handoffs=true remote_stripe_subscription_discovery=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true support_placement=false private_exports=false public_share=true live_gate=true concurrency_probe=20');
+console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0010 account_onboarding=true conversation_history=true d1_scale_indexes=true durable_objects=true durable_object_sharding=account_thread workers_ai=true ai_capacity_backpressure=true ai_allowance_retry_after=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true consent_csp_safe=true full_live_copy_gate=true signup_only_account_creation=true policy_acceptance_persisted=true malformed_magic_links_rejected=true trusted_stripe_handoffs=true remote_stripe_subscription_discovery=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true support_placement=false private_exports=false public_share=true live_gate=true concurrency_probe=20');

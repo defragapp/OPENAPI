@@ -99,9 +99,9 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
         <div>
           <p className="landing-kicker"><span /> QUESTIONS OR REQUESTS</p>
           <h2>Talk to a person.</h2>
-          <p>Send privacy requests, account questions, billing concerns, or safety feedback to support@defrag.app.</p>
+          <p>Send privacy requests, account questions, billing concerns, or safety feedback to info@sovereign.os or info@defrag.app.</p>
         </div>
-        <a className="landing-button landing-button-primary" href="mailto:support@defrag.app">Email support</a>
+        <a className="landing-button landing-button-primary" href="mailto:info@sovereign.os">Email Sovereign.OS</a>
       </section>
 
       <footer className="landing-footer">

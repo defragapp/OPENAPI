@@ -166,6 +166,11 @@ export async function cleanupExpired(env: Env) {
   const auditCutoff = `-${auditDays} days`;
 
   const threadEvents = await env.DB.prepare("DELETE FROM thread_events WHERE created_at < datetime('now', ?)").bind(threadCutoff).run();
+  const expiredThreads = await env.DB.prepare(`DELETE FROM threads
+    WHERE updated_at < datetime('now', ?)
+      AND id NOT IN (SELECT thread_id FROM saved_understandings WHERE thread_id IS NOT NULL)`)
+    .bind(threadCutoff)
+    .run();
   const correctionNotes = await env.DB.prepare("UPDATE user_corrections SET note = NULL WHERE note IS NOT NULL AND created_at < datetime('now', ?)").bind(threadCutoff).run();
   const turnStates = await env.DB.prepare("DELETE FROM thread_turn_states WHERE updated_at < datetime('now', ?) AND status IN ('completed','failed','interrupted')").bind(auditCutoff).run();
   const auditEvents = await env.DB.prepare("DELETE FROM tool_audit_events WHERE created_at < datetime('now', ?)").bind(auditCutoff).run();
@@ -177,6 +182,7 @@ export async function cleanupExpired(env: Env) {
 
   const counts = {
     threadEvents: threadEvents.meta?.changes ?? 0,
+    expiredThreads: expiredThreads.meta?.changes ?? 0,
     correctionNotes: correctionNotes.meta?.changes ?? 0,
     turnStates: turnStates.meta?.changes ?? 0,
     auditEvents: auditEvents.meta?.changes ?? 0,

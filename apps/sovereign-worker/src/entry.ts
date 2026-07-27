@@ -5,7 +5,7 @@ import { withSecurityHeaders } from './security/headers';
 import { decideInviteeConsent, listInviteeInvitations, previewInvitation, redeemInvitation, sendInvitation } from './invitation-service';
 import { addConsentedSystemMember, buildPairComparison, buildSystemAnalysis } from './relational-context';
 import { removePerson } from './db/people';
-import { ensureThread, appendThreadEvent } from './db/threads';
+import { ensureThread, appendThreadEvent, getOwnedThread, touchThread } from './db/threads';
 import { getTurn, startTurn, updateTurnStatus } from './db/turns';
 import { getEntitlements } from './db/entitlements';
 import { reserveAiTurn } from './billing/usage';
@@ -156,7 +156,7 @@ const worker = {
         const payload = await response.json() as Record<string, unknown>;
         const headers = new Headers(response.headers);
         headers.delete('content-length');
-        response = Response.json({ ...payload, migrationVersion: '0008_identity_bound_invitations', recognitionContract: 'inner-recognition-v1' }, { status: response.status, headers });
+        response = Response.json({ ...payload, migrationVersion: '0010_account_onboarding_and_chat_history', recognitionContract: 'inner-recognition-v1' }, { status: response.status, headers });
       }
       return secure(response);
     } catch (error) {
@@ -215,6 +215,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
 
   const entitlements = await getEntitlements(env, auth.accountId);
   await ensureThread(env, auth.accountId, threadId, body.context?.surface?.toLowerCase() ?? 'personal');
+  await touchThread(env, auth.accountId, threadId, message);
   const coordinator = env.THREADS.get(env.THREADS.idFromName(`${auth.accountId}:${threadId}`));
   const coordination = await coordinator.fetch('https://thread.internal/turn', {
     method: 'POST',
@@ -229,7 +230,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
 
   const traceId = crypto.randomUUID();
   await startTurn(env, auth.accountId, threadId, idempotencyKey, turn.sequence);
-  await appendThreadEvent(env, threadId, turn.sequence, 'user_message', { redacted: true, surface: body.context?.surface ?? 'Today' }, traceId);
+  await appendThreadEvent(env, threadId, turn.sequence, 'user_message', { text: message, surface: body.context?.surface ?? 'Today' }, traceId);
 
   const aiConfig = resolveAiModelConfig(env);
   if (aiConfig.provider !== 'cloudflare-gateway' || !env.AI || !env.AI_GATEWAY_ID) {
@@ -253,7 +254,8 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
 
   const usage = await reserveAiTurn(env, auth.accountId, entitlements.plan);
   try {
-    const result = await runSovereignResult(message, { env, accountId: auth.accountId, threadId, traceId, covenantEnabled: false, plan: entitlements.plan });
+    const thread = await getOwnedThread(env, auth.accountId, threadId);
+    const result = await runSovereignResult(message, { env, accountId: auth.accountId, threadId, traceId, covenantEnabled: thread?.covenant_enabled === 1, plan: entitlements.plan });
     await appendThreadEvent(env, threadId, turn.sequence + 1, 'assistant_plan', { plan: result.plan }, traceId);
     await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_response', { redacted: true, text: result.text }, traceId);
     await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'completed');

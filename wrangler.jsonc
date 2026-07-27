@@ -84,6 +84,7 @@
       "/",
       "/login",
       "/signup",
+      "/onboarding",
       "/app",
       "/app/*",
       "/auth/*",

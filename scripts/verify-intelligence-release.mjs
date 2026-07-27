@@ -12,42 +12,53 @@ const containsAll = (label, text, values) => {
 };
 
 const index = read('apps/web/index.html');
-const ui = read('apps/web/public/intelligence-ui.js');
-const css = read('apps/web/public/intelligence-ui.css');
+const workspace = read('apps/web/src/SovereignWorkspace.tsx');
+const workspaceCss = read('apps/web/src/workspace-chat.css');
+const orbit = read('apps/web/src/BaselineOrbit.tsx');
+const orbitCss = read('apps/web/src/baseline-orbit.css');
 const serviceWorker = read('apps/web/public/sw.js');
 const prompt = read('apps/sovereign-worker/src/agent/prompt-v1.ts');
 
-new Function(ui);
+containsAll('web index', index, ['/src/main.tsx']);
+for (const retired of ['intelligence-ui.js', 'ux-audit-runtime.js', 'recognition-ui.js', 'archetype-clarity.js']) {
+  assert(!index.includes(retired), `Legacy DOM runtime remains active: ${retired}`);
+}
 
-containsAll('web index', index, [
-  '/intelligence-ui.css?v=20260726-baseline-first-r1',
-  '/intelligence-ui.js?v=20260726-baseline-first-r1',
-  '/recognition-ui.js',
-  '/archetype-clarity.js'
+containsAll('conversation-first workspace', workspace, [
+  "api('/api/v1/today')",
+  "api('/api/v1/threads')",
+  'YOUR BASELINE · AVAILABLE IN EVERY CONVERSATION',
+  'What do you want to understand?',
+  'className="conversation-shell"',
+  'className="chat-composer"',
+  'Save to Library',
+  'Does this fit?',
+  'Manage permissions',
+  'Optional Christian and biblical lens for this conversation.'
 ]);
 
-containsAll('visual intelligence runtime', ui, [
-  "fetch('/api/v1/today'",
-  'YOUR BASELINE, ALIVE TODAY',
-  'baseline-core-object',
-  'live-sky-halo',
-  'ALIGNMENT NEEDLE',
-  'SHADOW–LIGHT RAIL',
-  'perspective-split',
-  'system-map-preview',
-  'structured-response-grid',
-  'sovereign-context-bar'
-]);
-
-containsAll('visual intelligence stylesheet', css, [
-  '.baseline-orbit',
-  '.alignment-instrument',
-  '.shadow-light-instrument',
-  '.perspective-split',
-  '.system-map-preview',
-  '.structured-response-grid',
-  '@media (max-width: 680px)',
+containsAll('workspace stylesheet', workspaceCss, [
+  '.chat-sidebar',
+  '.conversation-shell',
+  '.workspace-context-panel',
+  '.chat-composer',
+  '@media (max-width: 800px)',
   '@media (prefers-contrast: more)',
+  '@media (prefers-reduced-motion: reduce)'
+]);
+
+containsAll('Baseline visual', orbit, [
+  'YOUR BASELINE',
+  'SHADOW',
+  'LIGHT',
+  'ALIGNED',
+  'One quality'
+]);
+containsAll('Baseline visual stylesheet', orbitCss, [
+  '.baseline-orbit',
+  '.orbit-node-core',
+  '.orbit-node-aligned',
+  '@media (max-width: 700px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
 
@@ -65,19 +76,21 @@ containsAll('Baseline-first agent prompt', prompt, [
 ]);
 
 assert(!prompt.includes('Unless the current message clearly answers a prior inward question'), 'Incident-first prompt language remains active.');
-assert(!ui.match(/compatibility percentage|numerical score|private thoughts are known/i), 'Disallowed certainty or scoring language is present.');
-assert(serviceWorker.includes("sovereign-public-v6"), 'Service worker cache version was not advanced.');
-assert(serviceWorker.includes("'/intelligence-ui.css'"), 'Visual intelligence CSS is not cached.');
-assert(serviceWorker.includes("'/intelligence-ui.js'"), 'Visual intelligence JS is not cached.');
+assert(!workspace.match(/compatibility percentage|numerical score|private thoughts are known/i), 'Disallowed certainty or scoring language is present.');
+assert(serviceWorker.includes('sovereign-public-v8'), 'Service worker cache version was not advanced.');
+assert(!serviceWorker.includes("'/app'"), 'Private workspace navigation must not be cached.');
+assert(!serviceWorker.includes("'/intelligence-ui.js'"), 'Retired visual runtime remains cached.');
 
-const openBraces = (css.match(/{/g) ?? []).length;
-const closeBraces = (css.match(/}/g) ?? []).length;
-assert(openBraces === closeBraces, `Visual intelligence CSS has unbalanced braces (${openBraces}/${closeBraces}).`);
+for (const [label, css] of [['workspace', workspaceCss], ['Baseline visual', orbitCss]]) {
+  const openBraces = (css.match(/{/g) ?? []).length;
+  const closeBraces = (css.match(/}/g) ?? []).length;
+  assert(openBraces === closeBraces, `${label} CSS has unbalanced braces (${openBraces}/${closeBraces}).`);
+}
 
 console.log(JSON.stringify({
   ok: true,
-  contract: 'baseline-first-visual-intelligence-v1',
-  assets: ['intelligence-ui.js', 'intelligence-ui.css'],
+  contract: 'conversation-first-baseline-intelligence-v2',
+  assets: ['SovereignWorkspace.tsx', 'BaselineOrbit.tsx'],
   agentFlow: 'baseline-first',
   responsive: true,
   reducedMotion: true,
