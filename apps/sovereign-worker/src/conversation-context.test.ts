@@ -2,11 +2,18 @@ import { describe, expect, it } from 'vitest';
 import { parseConversationContext, projectModelSafeConversationContext, requireConversationContextEntitlement } from './conversation-context';
 
 describe('conversation context input', () => {
-  it('accepts typed person or system identifiers and rejects ambiguous or unsafe input', () => {
-    expect(parseConversationContext({ surface: 'People', personId: 'person_1' })).toEqual({ surface: 'People', personId: 'person_1' });
-    expect(parseConversationContext({ systemId: 'system-1' })).toEqual({ systemId: 'system-1' });
+  it('routes user-facing surfaces into internal Defrag or Alignment modes', () => {
+    expect(parseConversationContext({ surface: 'People', personId: 'person_1' })).toEqual({ surface: 'People', mode: 'defrag', personId: 'person_1' });
+    expect(parseConversationContext({ surface: 'Explore' })).toEqual({ surface: 'Explore', mode: 'alignment' });
+    expect(parseConversationContext({ systemId: 'system-1' })).toEqual({ mode: 'defrag', systemId: 'system-1' });
+    expect(parseConversationContext(undefined)).toEqual({ mode: 'defrag' });
+  });
+
+  it('rejects ambiguous identifiers, unsafe identifiers, and invented surfaces', () => {
     expect(() => parseConversationContext({ personId: '../other' })).toThrow();
     expect(() => parseConversationContext({ personId: 'p1', systemId: 's1' })).toThrow();
+    expect(() => parseConversationContext({ surface: 'Workspace' })).toThrow();
+    expect(() => parseConversationContext({ surface: 'Covenant' })).toThrow();
   });
 
   it('enforces paid relational context after a plan downgrade', () => {
