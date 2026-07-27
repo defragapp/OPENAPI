@@ -8,7 +8,7 @@ Updated after each completed implementation tranche.
 - Unified account access and signed-in entry are merged to `main` at `67723c9285685a98338bdc66443348e44d729468`; Cloudflare promotion is pending exact-SHA verification.
 - Active implementation branch: `feat/public-support-and-structured-intelligence`.
 - GitHub-hosted Actions currently fail before allocating a runner or executing the first zero-dependency step. Cloudflare’s connected production build remains the executable release gate until that runner issue is resolved.
-- Remaining work is concentrated in recovery methods, live provider/domain verification, static-page canonical parity, broader screenshot QA, and exact-SHA production promotion.
+- Remaining work is concentrated in passkey/provider readiness, live provider/domain verification, broader screenshot QA, and exact-SHA production promotion.
 
 ## Account access and communication
 
@@ -16,12 +16,15 @@ Updated after each completed implementation tranche.
 - [x] Center and contain Cloudflare Turnstile across desktop and mobile.
 - [x] Make Turnstile loading, verified, expired, unsupported, and failure states visible and actionable.
 - [x] Preserve an allowlisted `returnTo` through link creation and redemption.
-- [x] Add branded HTML and plain-text templates for sign-in, signup, and relationship invitations.
+- [x] Add branded HTML and plain-text templates for sign-in, signup, relationship invitations, and invitation resend.
 - [x] Keep email actions on HTTPS Sovereign.OS hosts and include expiry, one-time use, privacy, support, and do-not-forward context.
 - [x] Keep private labels, raw birth details, exact location, account history, and internal identifiers out of invitation emails.
 - [x] Replace pattern-heavy and generic authentication copy with approved Baseline-first language.
-- [x] Add focused auth, email, Turnstile, link-safety, and routing tests.
-- [ ] Confirm the connected Cloudflare build, live email flow, and exact current-main health/readiness response.
+- [x] Add focused auth, email, Turnstile, link-safety, routing, invitation-resend, and email-code tests.
+- [x] Add a six-digit email one-time-code fallback to the existing verified login request and redemption endpoint.
+- [x] Keep missing, invalid, expired, replayed, or locked code responses browser-indistinguishable while enforcing attempt limits server-side.
+- [x] Store only code hashes, expire codes after 10 minutes, lock after five failures, invalidate older codes, and invalidate the unused recovery method after either link or code succeeds.
+- [ ] Confirm the connected Cloudflare build, live link/code email flow, and exact current-main health/readiness response.
 
 ## Product integrity — one Sovereign intelligence
 
@@ -46,19 +49,20 @@ Updated after each completed implementation tranche.
 - [x] Keep the plain-language answer available when structured projection cannot load; no second model call or duplicate usage occurs.
 - [x] Keep hidden motive, exact emotion, diagnosis, future behavior, and divine certainty outside the structured result.
 - [x] Add structured projection, basis integrity, mode, Covenant, uncertainty, and fallback tests.
-- [ ] Remove the retired keyword-scoring helper from source after the Cloudflare build proves no remaining verifier depends on it.
+- [ ] Remove the retired keyword-scoring helper from source after the Cloudflare build proves no remaining release verifier depends on it.
 
 ## User control and continuity
 
 - [x] Expose People & Permissions from the mounted People, You, and account-control experiences.
 - [x] Support invitation review, cancellation, secure resend, scope review, revocation, and relationship removal.
 - [x] Replace a resent invitation’s one-time token, refresh its seven-day expiry, and enforce a two-minute server resend limit.
+- [x] Persist a replacement invitation token before delivery and invalidate it if email delivery fails.
 - [x] Add one mounted Account & Library control center for invitations, permissions, billing, privacy, terms, support, Library, and deletion.
 - [x] Add Library rename and delete without deleting the original conversation.
 - [x] Return and visibly restore the latest fit correction and optional note with the thread.
+- [x] Return and render up to 20 account-scoped fit corrections as a correction-history timeline.
 - [x] Add visible account deletion with an explicit 14-day grace period and cancellation.
 - [x] Add reusable modal focus trapping, first-focus placement, Escape behavior, and focus restoration.
-- [ ] Add a dedicated correction-history timeline rather than returning only the latest correction.
 
 ## Premium visual and brand system
 
@@ -68,16 +72,15 @@ Updated after each completed implementation tranche.
 - [x] Preserve the signature Baseline Orbit, Relationship Perspective, and System Intelligence visuals.
 - [x] Keep new body/supporting text and controls within the 17 px, 14 px, and 44 px accessibility targets where practical.
 - [x] Add controlled Open Graph metadata and a branded 1200×630 social asset.
-- [x] Add canonical root metadata, sitemap, and robots guidance with private account/auth/API routes excluded.
-- [x] Add a complete horizontally accessible mobile public navigation on the primary landing page instead of hiding non-CTA links.
-- [ ] Add canonical/social metadata parity and complete mobile navigation to every static support page.
+- [x] Add canonical metadata, sitemap, and robots guidance with private account/auth/API routes excluded.
+- [x] Add complete horizontally accessible mobile navigation to the React landing page and all static support pages.
 - [ ] Run screenshot QA across all required widths before declaring the visual system final.
 
 ## Account access and recovery roadmap
 
-- [ ] Add passkeys/WebAuthn as the preferred passwordless return path.
+- [ ] Add passkeys/WebAuthn as the preferred passwordless return path after the email-code release is verified and the RP ID/origin contract is exercised on the live custom domain.
 - [ ] Evaluate and document Google and Apple sign-in prerequisites before introducing additional identity providers.
-- [ ] Add an email one-time-code fallback for clients that break magic-link continuity.
+- [x] Add an email one-time-code fallback for clients that break magic-link continuity.
 - [x] Keep SMS out of the release until abuse controls, verified ownership, provider cost, consent, compliance, and threat modeling exist.
 - [x] Never use SMS as the sole recovery factor.
 
@@ -88,7 +91,7 @@ Updated after each completed implementation tranche.
 - [x] Add branded sign-in, signup, invitation, and resend templates.
 - [ ] Add branded permission-change, billing, cancellation, and account-deletion notifications.
 - [x] Keep security tokens only in the required private action URL and exclude private context and identifiers.
-- [x] Add content tests for HTML/text variants, escaping, unsafe URLs, and resend privacy.
+- [x] Add content tests for HTML/text variants, escaping, unsafe URLs, resend privacy, and email-code privacy.
 
 ## Billing and public support
 
@@ -107,8 +110,9 @@ Updated after each completed implementation tranche.
 - [x] Validate Turnstile hostname/action, classify expiration/reuse, reset rejected tokens, and record privacy-safe mismatch events.
 - [x] Preserve account-enumeration-safe responses with useful local guidance.
 - [x] Preserve 15-minute magic-link expiry, one-time redemption, and allowlisted post-auth routing.
-- [x] Add server-side invitation resend rate limiting and token replacement.
-- [ ] Verify session rotation, logout invalidation, CSRF assumptions, and magic-link behavior in the live release.
+- [x] Add hashed, expiring, one-use email codes with generic failure behavior and safe return routing.
+- [x] Add server-side invitation resend rate limiting, token replacement, and delivery-failure invalidation.
+- [ ] Verify session rotation, logout invalidation, CSRF assumptions, and link/code behavior in the live release.
 - [ ] Review live limits for sign-in, signup, invitations, checkout, AI turns, consent changes, and support-payment abuse.
 - [ ] Add additional abuse-safe audit events without storing message content or secrets.
 - [ ] Verify CSP, HSTS, frame denial, noindex rules, caching, and custom-domain redirects after deployment.
