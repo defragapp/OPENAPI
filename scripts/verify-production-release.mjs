@@ -27,6 +27,7 @@ const staticHeaders = readFileSync('apps/web/public/_headers', 'utf8');
 const workerHeaders = readFileSync('apps/sovereign-worker/src/security/headers.ts', 'utf8');
 
 const currentApplicationFingerprints = [
+  'Understand yourself—and everyone your life includes.',
   'What do you want to understand?',
   'Ask about yourself, a decision, a relationship, or the system around you. Sovereign brings in only the context that belongs.',
   'YOUR BASELINE · AVAILABLE IN EVERY CONVERSATION',

@@ -198,7 +198,7 @@ async function verifyLiveProduction() {
   ]);
 
   assert(home.response.ok, `public home returned ${home.response.status}`);
-  assertContainsAll('public home', home.text, ['Sovereign.OS', 'Know yourself. Understand the system.']);
+  assertContainsAll('public home', home.text, ['Sovereign.OS', 'Understand yourself—and everyone your life includes.']);
 
   assert(how.response.ok && howClean.response.ok, 'How it works page or clean URL is unavailable');
   assertContainsAll('How it works', how.text, [
