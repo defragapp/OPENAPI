@@ -52,7 +52,7 @@ describe('identity-bound multi-user contract', () => {
     expect(app).toContain('Send private invitation');
     expect(app).toContain('Choose what this connection may use.');
     expect(app).not.toContain('>Grant</button>');
-    expect(consentPage).toContain('Manage what others may use.');
+    expect(consentPage).toContain('Manage requested uses.');
     expect(consentPage).toContain('Do not allow');
     expect(consentPage).toContain('/api/v1/invitations/mine');
   });
