@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+Allow: /how-it-works.html
+Allow: /pricing.html
+Allow: /faq.html
+Allow: /privacy
+Allow: /terms
+Disallow: /app
+Disallow: /app/
+Disallow: /login
+Disallow: /signup
+Disallow: /onboarding
+Disallow: /auth/
+Disallow: /invitation
+Disallow: /consent.html
+Disallow: /api/
+
+Sitemap: https://sovereign.defrag.app/sitemap.xml

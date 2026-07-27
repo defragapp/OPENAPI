@@ -14,7 +14,9 @@ const stripe = readFileSync('apps/sovereign-worker/src/billing/stripe.ts', 'utf8
 const stripeRoute = readFileSync('apps/sovereign-worker/src/routes/stripe.ts', 'utf8');
 const scaleMigration = readFileSync('apps/sovereign-worker/migrations/0009_production_scale_and_billing_safety.sql', 'utf8');
 const workspaceMigration = readFileSync('apps/sovereign-worker/migrations/0010_account_onboarding_and_chat_history.sql', 'utf8');
+const recoveryMigration = readFileSync('apps/sovereign-worker/migrations/0011_email_code_recovery.sql', 'utf8');
 const browserRuntime = readFileSync('apps/web/src/ProductionRuntime.ts', 'utf8');
+const recoveryUi = readFileSync('apps/web/src/EmailCodeFallback.tsx', 'utf8');
 const appHtml = readFileSync('apps/web/index.html', 'utf8');
 const appUi = readFileSync('apps/web/src/App.tsx', 'utf8');
 const publicLandingUi = readFileSync('apps/web/src/PublicLanding.tsx', 'utf8');
@@ -160,7 +162,7 @@ for (const required of [
   "headers.set('x-robots-tag', 'noindex, nofollow')",
   'isNavigationAssetPath',
   "target.pathname = '/app'",
-  "migrationVersion: '0010_account_onboarding_and_chat_history'",
+  "migrationVersion: '0011_email_code_recovery'",
   "includesPrivateWorkspaceData: false",
   'sovereign_capacity_unavailable',
   "headers: { 'retry-after': '60' }",
@@ -245,6 +247,17 @@ for (const required of [
 ]) {
   if (!workspaceMigration.includes(required)) throw new Error(`Workspace migration is missing ${required}`);
 }
+for (const required of [
+  'CREATE TABLE IF NOT EXISTS auth_email_codes',
+  'code_hash TEXT NOT NULL',
+  'attempts INTEGER NOT NULL DEFAULT 0',
+  'max_attempts INTEGER NOT NULL DEFAULT 5',
+  'auth_email_codes_email_created_idx',
+  'auth_email_codes_account_active_idx',
+  'auth_email_codes_ip_created_idx'
+]) {
+  if (!recoveryMigration.includes(required)) throw new Error(`Email code recovery migration is missing ${required}`);
+}
 
 for (const required of [
   "if (kind === 'login' && !existing)",
@@ -254,10 +267,27 @@ for (const required of [
   'terms_accepted_at = ?, terms_version = ?, privacy_version = ?',
   "account.auth_subject !== subject",
   'SameSite=Lax; Priority=High',
-  "!validEmail(row.email_normalized)",
-  "!['signup', 'login'].includes(row.purpose ?? '')"
+  '!validEmail(row.email_normalized)',
+  "!['signup', 'login'].includes(row.purpose ?? '')",
+  'newEmailCode()',
+  'EMAIL_CODE_MAX_ATTEMPTS = 5',
+  "datetime('now', '+10 minutes')",
+  'constantTimeEqual',
+  'invalidCodeResponse()',
+  'UPDATE auth_email_codes SET used_at',
+  "recovery: kind === 'login' ? 'link_or_code' : 'link'"
 ]) {
-  if (!auth.includes(required)) throw new Error(`Account creation safety is missing ${required}`);
+  if (!auth.includes(required)) throw new Error(`Account creation or recovery safety is missing ${required}`);
+}
+for (const required of [
+  "url.pathname === '/api/v1/auth/login'",
+  "autoComplete=\"one-time-code\"",
+  'inputMode="numeric"',
+  "fetch('/api/v1/auth/redeem'",
+  'invalid or expired',
+  'safeReturnTo'
+]) {
+  if (!recoveryUi.includes(required)) throw new Error(`Email code recovery interface is missing ${required}`);
 }
 for (const required of [
   'monthly_allowance_reached',
@@ -278,7 +308,9 @@ for (const required of [
   "from './ProductionRuntime'",
   "location.hostname === 'sovereign.defrag.app'",
   'navigator.serviceWorker.getRegistrations()',
-  'registration.unregister()'
+  'registration.unregister()',
+  'installEmailCodeFallbackRuntime()',
+  '<EmailCodeFallback />'
 ]) {
   if (!main.includes(required)) throw new Error(`Web entry is missing ${required}`);
 }
@@ -335,4 +367,4 @@ for (const required of [
   if (!consentJs.includes(required)) throw new Error(`Consent controls are missing ${required}`);
 }
 
-console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0010 account_onboarding=true conversation_history=true d1_scale_indexes=true durable_objects=true durable_object_sharding=account_thread workers_ai=true ai_capacity_backpressure=true ai_allowance_retry_after=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true consent_csp_safe=true full_live_copy_gate=true signup_only_account_creation=true policy_acceptance_persisted=true malformed_magic_links_rejected=true trusted_stripe_handoffs=true remote_stripe_subscription_discovery=true cron=true r2=false queues=false turnstile=true magic_link_email=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true support_placement=false private_exports=false public_share=true live_gate=true concurrency_probe=20');
+console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0011 email_code_recovery=true account_onboarding=true conversation_history=true d1_scale_indexes=true durable_objects=true durable_object_sharding=account_thread workers_ai=true ai_capacity_backpressure=true ai_allowance_retry_after=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true consent_csp_safe=true full_live_copy_gate=true signup_only_account_creation=true policy_acceptance_persisted=true malformed_magic_links_rejected=true trusted_stripe_handoffs=true remote_stripe_subscription_discovery=true cron=true r2=false queues=false turnstile=true magic_link_email=true email_code_fallback=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true support_placement=false private_exports=false public_share=true live_gate=true concurrency_probe=20');

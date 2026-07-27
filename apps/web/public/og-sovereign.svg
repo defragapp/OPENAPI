@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Sovereign.OS</title>
+  <desc id="desc">Personal, relationship, and system intelligence powered by Baseline Design.</desc>
+  <defs>
+    <radialGradient id="bg" cx="82%" cy="7%" r="94%"><stop offset="0" stop-color="#2b211c"/><stop offset=".48" stop-color="#151516"/><stop offset="1" stop-color="#09090a"/></radialGradient>
+    <linearGradient id="orbit" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f2ede5"/><stop offset=".55" stop-color="#dda273"/><stop offset="1" stop-color="#98a18c"/></linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="930" cy="315" r="202" fill="none" stroke="#ffffff" stroke-opacity=".08" stroke-width="2"/>
+  <circle cx="930" cy="315" r="132" fill="none" stroke="#dda273" stroke-opacity=".22" stroke-width="2"/>
+  <path d="M1014 224c-19-23-47-36-82-36-52 0-90 27-90 68 0 38 29 56 86 69 46 11 63 21 63 42 0 24-23 38-60 38-39 0-70-15-91-42" fill="none" stroke="url(#orbit)" stroke-width="28" stroke-linecap="round" filter="url(#glow)"/>
+  <circle cx="1020" cy="218" r="9" fill="#98a18c"/><circle cx="835" cy="371" r="9" fill="#dda273"/>
+  <text x="90" y="112" fill="#dda273" font-family="Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="5">SOVEREIGN.OS</text>
+  <text x="90" y="236" fill="#f2ede5" font-family="Georgia, serif" font-size="72" letter-spacing="-3">Know yourself.</text>
+  <text x="90" y="318" fill="#f2ede5" font-family="Georgia, serif" font-size="72" letter-spacing="-3">Understand the system.</text>
+  <text x="90" y="400" fill="#f2ede5" font-family="Georgia, serif" font-size="72" letter-spacing="-3">Choose what fits.</text>
+  <text x="94" y="492" fill="#b9b1a7" font-family="Arial, sans-serif" font-size="25">Personal · relationship · system intelligence powered by Baseline Design</text>
+</svg>

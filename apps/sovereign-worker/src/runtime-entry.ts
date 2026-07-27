@@ -160,7 +160,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       ...(pathname === '/ready' ? { ready } : {}),
       version: env.APP_VERSION,
       environment: env.APP_ENV,
-      migrationVersion: '0010_account_onboarding_and_chat_history',
+      migrationVersion: '0011_email_code_recovery',
       recognitionContract: 'inner-recognition-v1',
       baselineContract: 'openapi-baseline-engine-v2',
       dependencies

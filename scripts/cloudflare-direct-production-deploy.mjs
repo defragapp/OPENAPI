@@ -17,7 +17,7 @@ const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT
 const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAADhGIF8-iOLIg8MU').trim();
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
-const migrationVersion = '0010_account_onboarding_and_chat_history';
+const migrationVersion = '0011_email_code_recovery';
 
 if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required');
 if (!/^[0-9a-f]{40}$/i.test(commitSha)) throw new Error('A full 40-character commit SHA is required');

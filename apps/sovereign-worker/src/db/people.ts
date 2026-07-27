@@ -1,4 +1,5 @@
 import type { Env } from '../env';
+import { buildSovereignEmail, sendOperationalEmail } from '../email';
 import { getEntitlements, requireFeature } from './entitlements';
 
 export const CONSENT_SCOPES = ['pair.compare', 'system.include', 'trait.display', 'framework.display', 'current_conditions.use', 'library.link', 'covenant.include'] as const;
@@ -6,6 +7,9 @@ export type ConsentScope = typeof CONSENT_SCOPES[number];
 export type InvitationStatus = 'pending' | 'accepted' | 'declined' | 'expired' | 'revoked';
 
 const CONSENT_POLICY_VERSION = '2026-07-24';
+const INVITATION_TTL_DAYS = 7;
+const INVITATION_RESEND_SECONDS = 120;
+const encoder = new TextEncoder();
 
 export interface RelationshipMetadataInput {
   relationshipType?: string;
@@ -120,6 +124,10 @@ export async function createInvitation(_env: Env, _accountId: string, _personId:
 }
 
 export async function updateInvitationStatus(env: Env, accountId: string, invitationId: string, status: InvitationStatus): Promise<void> {
+  if (status === 'pending') {
+    await resendPendingInvitation(env, accountId, invitationId);
+    return;
+  }
   if (status !== 'revoked') throw new Response('Only the invited person may accept or decline an invitation. Invitation expiry is handled by the system.', { status: 403 });
   const result = await env.DB.prepare("UPDATE invitations SET status = 'revoked', revoked_at = datetime('now'), token_hash = NULL WHERE id = ? AND account_id = ? AND status = 'pending'")
     .bind(invitationId, accountId).run();
@@ -135,7 +143,7 @@ export async function setConsent(env: Env, accountId: string, personId: string, 
   const previous = await env.DB.prepare('SELECT MAX(version) AS version FROM consent_versions WHERE person_id = ? AND scope = ?').bind(personId, scope).first<{ version: number | null }>();
   await env.DB.prepare(`INSERT INTO consent_versions
     (id, person_id, scope, version, decision, decided_by, reason, decided_by_account_id, policy_version)
-    VALUES (?, ?, ?, ?, 'owner_stopped_use', ?, ?, ?, ?)`).bind(`consentv_${crypto.randomUUID()}`, personId, scope, (previous?.version ?? 0) + 1, actor, reason ?? 'Workspace owner stopped using this scope.', accountId, CONSENT_POLICY_VERSION).run();
+    VALUES (?, ?, ?, ?, 'owner_stopped_use', ?, ?, ?, ?)`).bind(`consentv_${crypto.randomUUID()}`, personId, scope, (previous?.version ?? 0) + 1, actor, reason ?? 'Account owner stopped using this scope.', accountId, CONSENT_POLICY_VERSION).run();
   await env.DB.prepare("UPDATE persons SET consent_status = 'owner_stopped_use', updated_at = datetime('now') WHERE id = ? AND account_id = ?").bind(personId, accountId).run();
   return { scope, granted: false };
 }
@@ -159,6 +167,68 @@ export async function hasConsent(env: Env, accountId: string, personId: string, 
 export async function requireConsent(env: Env, accountId: string, personId: string, scope: ConsentScope): Promise<void> {
   await requireScopeFeature(env, accountId, scope);
   if (!(await hasConsent(env, accountId, personId, scope))) throw new Response('Consent denied', { status: 403 });
+}
+
+async function resendPendingInvitation(env: Env, accountId: string, invitationId: string): Promise<void> {
+  const row = await env.DB.prepare(`SELECT i.id, i.invited_email_normalized, i.requested_scopes_json, i.created_at
+    FROM invitations i JOIN persons p ON p.id = i.invited_person_id
+    WHERE i.id = ? AND i.account_id = ? AND p.account_id = ? AND i.status = 'pending'`)
+    .bind(invitationId, accountId, accountId)
+    .first<{ id: string; invited_email_normalized: string | null; requested_scopes_json: string | null; created_at: string }>();
+  if (!row) throw new Response('Pending invitation not found', { status: 404 });
+  const createdAt = Date.parse(row.created_at.replace(' ', 'T') + 'Z');
+  const retryAfter = Math.max(0, INVITATION_RESEND_SECONDS - Math.floor((Date.now() - createdAt) / 1000));
+  if (retryAfter > 0) throw Response.json({ error: 'Invitation was sent recently.', retryAfterSeconds: retryAfter }, { status: 429, headers: { 'retry-after': String(retryAfter) } });
+  const email = row.invited_email_normalized?.trim().toLowerCase() ?? '';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Response('Invitation email is unavailable', { status: 409 });
+  const requestedScopes = parseScopes(row.requested_scopes_json);
+  const token = newToken();
+  const tokenHash = await sha256(token);
+  const invitationUrl = new URL('/invitation', env.PUBLIC_APP_URL || 'https://app.defrag.app');
+  invitationUrl.searchParams.set('token', token);
+  const template = buildSovereignEmail({
+    eyebrow: 'Private relationship invitation',
+    title: 'You decide what this connection may use.',
+    intro: 'A Sovereign.OS user resent a private relationship invitation. Accepting does not grant blanket access. You decide each requested use separately.',
+    actionLabel: 'Review the private invitation',
+    actionUrl: invitationUrl.toString(),
+    details: [
+      `This new link expires in ${INVITATION_TTL_DAYS} days and replaces the previous link.`,
+      'Raw birth details, exact private location, and the sender’s private notes are not included in this email.',
+      ...requestedScopes.map((scope) => scope.replace(/[._]/g, ' '))
+    ],
+    footer: 'You can deny any requested use and revoke an active permission later from your own Sovereign.OS controls.'
+  });
+  await sendOperationalEmail(env, {
+    to: email,
+    subject: 'Review a private Sovereign.OS invitation',
+    ...template,
+    idempotencyKey: `${invitationId}:resend:${tokenHash.slice(0, 16)}`
+  });
+  await env.DB.prepare(`UPDATE invitations SET token_hash = ?, expires_at = datetime('now', '+${INVITATION_TTL_DAYS} days'), created_at = datetime('now'), revoked_at = NULL
+    WHERE id = ? AND account_id = ? AND status = 'pending'`)
+    .bind(tokenHash, invitationId, accountId)
+    .run();
+}
+
+function newToken(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function sha256(value: string): Promise<string> {
+  const hash = await crypto.subtle.digest('SHA-256', encoder.encode(value));
+  return [...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function parseScopes(value?: string | null): ConsentScope[] {
+  try {
+    const parsed = value ? JSON.parse(value) : [];
+    return Array.isArray(parsed) ? parsed.filter((scope): scope is ConsentScope => (CONSENT_SCOPES as readonly string[]).includes(String(scope))) : [];
+  } catch {
+    return [];
+  }
 }
 
 function safeJson(value: string): RelationshipMetadataInput {
