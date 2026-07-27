@@ -19,6 +19,12 @@ export interface ThreadSummary {
   updatedAt: string;
 }
 
+export interface ThreadCorrection {
+  value: 'yes' | 'partly' | 'not_today';
+  note?: string;
+  createdAt: string;
+}
+
 export interface ThreadMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -26,6 +32,7 @@ export interface ThreadMessage {
   createdAt: string;
   context?: Record<string, unknown>;
   plan?: Record<string, unknown>;
+  correction?: ThreadCorrection;
   interfaceActions?: Record<string, unknown>;
   visualStory?: Record<string, unknown>;
   moduleOffer?: Record<string, unknown>;
@@ -58,13 +65,19 @@ export async function listThreads(env: Env, accountId: string): Promise<ThreadSu
 export async function listThreadMessages(env: Env, accountId: string, threadId: string): Promise<ThreadMessage[]> {
   const owned = await getOwnedThread(env, accountId, threadId);
   if (!owned) throw new Response('Thread not found', { status: 404 });
-  const rows = await env.DB.prepare(`SELECT id, seq, event_type, payload_json, created_at
-    FROM thread_events
-    WHERE thread_id = ?
-      AND event_type IN ('user_message', 'assistant_plan', 'assistant_response', 'assistant_development_response')
-    ORDER BY seq ASC`)
-    .bind(threadId)
-    .all<Record<string, string | number>>();
+  const [rows, latestCorrection] = await Promise.all([
+    env.DB.prepare(`SELECT id, seq, event_type, payload_json, created_at
+      FROM thread_events
+      WHERE thread_id = ?
+        AND event_type IN ('user_message', 'assistant_plan', 'assistant_response', 'assistant_development_response')
+      ORDER BY seq ASC`)
+      .bind(threadId)
+      .all<Record<string, string | number>>(),
+    env.DB.prepare(`SELECT correction, note, created_at FROM user_corrections
+      WHERE thread_id = ? AND account_id = ? ORDER BY created_at DESC LIMIT 1`)
+      .bind(threadId, accountId)
+      .first<{ correction: string; note: string | null; created_at: string }>()
+  ]);
 
   const messages: ThreadMessage[] = [];
   let pendingPlan: Record<string, unknown> | undefined;
@@ -92,6 +105,11 @@ export async function listThreadMessages(env: Env, accountId: string, threadId: 
       ...(payload.moduleOffer && typeof payload.moduleOffer === 'object' ? { moduleOffer: payload.moduleOffer as Record<string, unknown> } : {})
     });
     if (role === 'assistant') pendingPlan = undefined;
+  }
+  const correction = normalizeCorrection(latestCorrection);
+  if (correction) {
+    const latestAssistant = [...messages].reverse().find((message) => message.role === 'assistant');
+    if (latestAssistant) latestAssistant.correction = correction;
   }
   return messages;
 }
@@ -129,6 +147,15 @@ export async function recordCorrection(env: Env, accountId: string, threadId: st
   await env.DB.prepare('INSERT INTO user_corrections (id, account_id, thread_id, correction, note) VALUES (?, ?, ?, ?, ?)')
     .bind(crypto.randomUUID(), accountId, threadId, correction, note ?? null)
     .run();
+}
+
+function normalizeCorrection(row?: { correction: string; note: string | null; created_at: string } | null): ThreadCorrection | undefined {
+  if (!row || !['yes', 'partly', 'not_today'].includes(row.correction)) return undefined;
+  return {
+    value: row.correction as ThreadCorrection['value'],
+    ...(row.note?.trim() ? { note: row.note.trim().slice(0, 500) } : {}),
+    createdAt: row.created_at
+  };
 }
 
 function surfaceFromContextKind(value: string): ThreadSummary['surface'] {
