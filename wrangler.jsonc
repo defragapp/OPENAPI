@@ -17,6 +17,14 @@
     {
       "pattern": "app.defrag.app",
       "custom_domain": true
+    },
+    {
+      "pattern": "defrag.app/*",
+      "zone_name": "defrag.app"
+    },
+    {
+      "pattern": "www.defrag.app/*",
+      "zone_name": "defrag.app"
     }
   ],
   "vars": {
@@ -80,6 +88,7 @@
       "/app/*",
       "/auth/*",
       "/invitation",
+      "/consent.html",
       "/privacy",
       "/terms",
       "/pricing.html",
