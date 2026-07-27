@@ -16,6 +16,7 @@ const scaleMigration = readFileSync('apps/sovereign-worker/migrations/0009_produ
 const workspaceMigration = readFileSync('apps/sovereign-worker/migrations/0010_account_onboarding_and_chat_history.sql', 'utf8');
 const browserRuntime = readFileSync('apps/web/src/ProductionRuntime.ts', 'utf8');
 const appUi = readFileSync('apps/web/src/App.tsx', 'utf8');
+const publicLandingUi = readFileSync('apps/web/src/PublicLanding.tsx', 'utf8');
 const workspaceUi = readFileSync('apps/web/src/SovereignWorkspace.tsx', 'utf8');
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const pricing = readFileSync('apps/web/public/pricing.html', 'utf8');
@@ -24,6 +25,25 @@ const consentCss = readFileSync('apps/web/public/consent.css', 'utf8');
 const consentJs = readFileSync('apps/web/public/consent.js', 'utf8');
 const staticHeaders = readFileSync('apps/web/public/_headers', 'utf8');
 const workerHeaders = readFileSync('apps/sovereign-worker/src/security/headers.ts', 'utf8');
+
+const currentApplicationFingerprints = [
+  'What do you want to understand?',
+  'Ask about yourself, a decision, a relationship, or the system around you. Sovereign brings in only the context that belongs.',
+  'YOUR BASELINE · AVAILABLE IN EVERY CONVERSATION',
+  'Your Baseline stays steady.',
+  'Explore my Baseline',
+  'See the relationship from both sides.',
+  'What role does each person occupy in this system?',
+  'Only understandings you deliberately save appear here.',
+  'Build once. Explore continuously.',
+  'Optional Christian and biblical lens for this conversation.'
+];
+for (const fingerprint of currentApplicationFingerprints) {
+  if (!deploy.includes(fingerprint)) throw new Error(`Direct production deploy is missing current application fingerprint: ${fingerprint}`);
+  if (!`${appUi}\n${publicLandingUi}\n${workspaceUi}`.includes(fingerprint)) {
+    throw new Error(`Production application source is missing verifier fingerprint: ${fingerprint}`);
+  }
+}
 
 const cloudflareGate = packageJson.scripts?.['verify:cloudflare-build'] ?? '';
 for (const required of [
