@@ -2,6 +2,8 @@
 
 Production repository for the Sovereign.OS platform.
 
+Canonical repository: `defragapp/OPENAPI`.
+
 ## Repository boundary
 
 - All current product work belongs in this repository on `main`.
