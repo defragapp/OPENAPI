@@ -1,6 +1,7 @@
 export type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
 
 export interface RequestContext {
+  version?: 1;
   surface: Surface;
   personId?: string;
   systemId?: string;
