@@ -38,6 +38,14 @@ export interface Env {
   BASELINE_TIMEZONE_URL?: string;
   BASELINE_HORIZONS_URL?: string;
   BASELINE_PROVIDER_TIMEOUT_MS?: string;
+  APPLE_CLIENT_ID?: string;
+  APPLE_TEAM_ID?: string;
+  APPLE_KEY_ID?: string;
+  APPLE_PRIVATE_KEY?: string;
+  APPLE_REDIRECT_URI?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  GOOGLE_REDIRECT_URI?: string;
 }
 
 export interface AuthContext {
