@@ -132,15 +132,15 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
   } : {
     eyebrow: 'Private sign-in',
     title: 'Return to your Sovereign.OS.',
-    intro: 'Open the private workspace where your Baseline, chosen conversations, people, systems, and saved understandings remain connected.',
+    intro: 'Open the private Sovereign.OS where your Baseline, chosen conversations, people, systems, and saved understandings remain connected.',
     actionLabel: 'Open Sovereign.OS',
     actionUrl: redeemUrl.toString(),
-    details: ['This link expires in 15 minutes.', 'It can be used only once.', 'No password or private workspace information is included in this message.']
+    details: ['This link expires in 15 minutes.', 'It can be used only once.', 'No password or private Sovereign.OS information is included in this message.']
   });
   try {
     await sendOperationalEmail(env, {
       to: email,
-      subject: kind === 'signup' ? 'Open your Sovereign.OS account' : 'Open your Sovereign.OS workspace',
+      subject: kind === 'signup' ? 'Open your Sovereign.OS account' : 'Return to Sovereign.OS',
       ...emailTemplate,
       idempotencyKey: id
     });
