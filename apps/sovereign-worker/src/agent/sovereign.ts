@@ -3,7 +3,9 @@ import type { Env } from '../env';
 import { getModelSafeBaselineContext } from '../baseline';
 import { buildPairComparison, buildSystemAnalysis } from '../relational-context';
 import { sovereignRuntimePromptV1 } from './prompt-v1';
-import { assertSafeUserInput, assertSovereignOutputSafety } from './safety';
+import { groundedIntelligencePrompt } from './grounded-intelligence';
+import { assertSafeUserInput, assertSovereignOutputSafety, reviewSovereignOutputSafety } from './safety';
+import { projectModelSafeConversationContext } from '../conversation-context';
 import {
   composeRecognitionResponse,
   deriveAvailableBasis,
@@ -19,6 +21,9 @@ export interface SovereignContext {
   traceId: string;
   covenantEnabled: boolean;
   plan: string;
+  personId?: string;
+  systemId?: string;
+  authorizedContext?: unknown;
 }
 
 export interface SovereignResult {
@@ -42,8 +47,11 @@ export async function runSovereignResult(input: string, context: SovereignContex
   const { prompt, availableBasis } = await buildCloudflareGatewayPrompt(input, context);
   const raw = await runCloudflareGateway(prompt, context, aiConfig.model);
   const plan = parseRecognitionPlan(raw, availableBasis);
-  const text = composeRecognitionResponse(plan);
-  assertSovereignOutputSafety(text);
+  const allowFrameworkLabels = asksForFrameworkDetail(input);
+  sanitizeRecognitionPlanLanguage(plan, allowFrameworkLabels);
+  const review = reviewSovereignOutputSafety(composeRecognitionResponse(plan), { allowFrameworkLabels });
+  const text = review.text;
+  assertSovereignOutputSafety(text, { phase: plan.response_phase, allowFrameworkLabels });
   return { text, plan };
 }
 
@@ -93,6 +101,8 @@ ${JSON.stringify(continuity)}
 Available exact Basis values. The basis arrays in your JSON must select verbatim from these lists only:
 ${JSON.stringify(availableBasis)}
 
+${groundedIntelligencePrompt(input)}
+
 Required JSON shape:
 ${recognitionJsonContract(availableBasis)}
 
@@ -104,13 +114,9 @@ ${covenantInstruction}`;
 }
 
 async function resolveAuthorizedContext(context: SovereignContext): Promise<unknown> {
-  const systems = await context.env.DB.prepare('SELECT id FROM systems WHERE account_id = ?').bind(context.accountId).all<{ id: string }>();
-  const selectedSystem = (systems.results ?? []).find((item) => threadContainsId(context.threadId, item.id));
-  if (selectedSystem) return buildSystemAnalysis(context.env, context.accountId, selectedSystem.id);
-
-  const people = await context.env.DB.prepare("SELECT id FROM persons WHERE account_id = ? AND role <> 'self'").bind(context.accountId).all<{ id: string }>();
-  const selectedPerson = (people.results ?? []).find((item) => threadContainsId(context.threadId, item.id));
-  if (selectedPerson) return buildPairComparison(context.env, context.accountId, selectedPerson.id);
+  if (context.authorizedContext !== undefined) return projectModelSafeConversationContext(context.authorizedContext);
+  if (context.systemId) return projectModelSafeConversationContext(await buildSystemAnalysis(context.env, context.accountId, context.systemId));
+  if (context.personId) return projectModelSafeConversationContext(await buildPairComparison(context.env, context.accountId, context.personId));
 
   return getModelSafeBaselineContext(context.env, context.accountId);
 }
@@ -135,9 +141,29 @@ async function isCovenantEnabledForThread(context: SovereignContext): Promise<bo
   return row?.covenant_enabled === 1;
 }
 
-function threadContainsId(threadId: string, id: string): boolean {
-  const normalized = id.replace(/[^a-z0-9_-]/gi, '-');
-  return threadId.includes(normalized);
+function asksForFrameworkDetail(input: string): boolean {
+  return /\b(?:Bowen|IFS|internal family systems|attachment theory|psychological framework|sources?|research)\b/i.test(input);
+}
+
+export function sanitizeRecognitionPlanLanguage(plan: RecognitionPlan, allowFrameworkLabels: boolean): void {
+  const rewrite = (value: string) => reviewSovereignOutputSafety(value, { allowFrameworkLabels }).text;
+  plan.recognition = rewrite(plan.recognition);
+  plan.inward_question = rewrite(plan.inward_question);
+  plan.candidate_hidden_expectation = rewrite(plan.candidate_hidden_expectation);
+  plan.protected_need = rewrite(plan.protected_need);
+  plan.clearer_form = rewrite(plan.clearer_form);
+  plan.practical_action = rewrite(plan.practical_action);
+  plan.module_suggestion.title = rewrite(plan.module_suggestion.title);
+  plan.module_suggestion.reason = rewrite(plan.module_suggestion.reason);
+  plan.visual_story.primary.title = rewrite(plan.visual_story.primary.title);
+  if (plan.visual_story.secondary) plan.visual_story.secondary.title = rewrite(plan.visual_story.secondary.title);
+  if (plan.visual_story.tertiary) plan.visual_story.tertiary.title = rewrite(plan.visual_story.tertiary.title);
+  plan.visual_story.origin = rewrite(plan.visual_story.origin);
+  plan.visual_story.shadow = rewrite(plan.visual_story.shadow);
+  plan.visual_story.gift = rewrite(plan.visual_story.gift);
+  plan.visual_story.current = rewrite(plan.visual_story.current);
+  plan.visual_story.next_step = rewrite(plan.visual_story.next_step);
+  plan.visual_story.visual_reason = rewrite(plan.visual_story.visual_reason);
 }
 
 async function pseudonymousAccountRef(context: SovereignContext): Promise<string> {

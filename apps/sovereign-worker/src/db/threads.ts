@@ -23,6 +23,10 @@ export interface ThreadMessage {
   role: 'user' | 'assistant';
   text: string;
   createdAt: string;
+  context?: Record<string, unknown>;
+  interfaceActions?: Record<string, unknown>;
+  visualStory?: Record<string, unknown>;
+  moduleOffer?: Record<string, unknown>;
 }
 
 export async function listThreads(env: Env, accountId: string): Promise<ThreadSummary[]> {
@@ -64,7 +68,11 @@ export async function listThreadMessages(env: Env, accountId: string, threadId: 
       id: String(row.id),
       role: row.event_type === 'user_message' ? 'user' as const : 'assistant' as const,
       text,
-      createdAt: String(row.created_at)
+      createdAt: String(row.created_at),
+      ...(payload.context && typeof payload.context === 'object' ? { context: payload.context as Record<string, unknown> } : {}),
+      ...(payload.interfaceActions && typeof payload.interfaceActions === 'object' ? { interfaceActions: payload.interfaceActions as Record<string, unknown> } : {}),
+      ...(payload.visualStory && typeof payload.visualStory === 'object' ? { visualStory: payload.visualStory as Record<string, unknown> } : {}),
+      ...(payload.moduleOffer && typeof payload.moduleOffer === 'object' ? { moduleOffer: payload.moduleOffer as Record<string, unknown> } : {})
     }];
   });
 }

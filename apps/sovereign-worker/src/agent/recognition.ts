@@ -47,6 +47,7 @@ export const visualStorySchema = z.object({
 }).optional().default(emptyVisualStory);
 
 export const recognitionPlanSchema = z.object({
+  response_shape: z.enum(['natural', 'guided']).optional(),
   response_phase: z.enum(['question', 'integration']),
   recognition: z.string().min(1).max(420),
   inward_question: z.string().min(1).max(240),
@@ -187,8 +188,6 @@ export function parseRecognitionPlan(raw: string, available: AvailableBasis): Re
   }
 
   for (const [field, value] of [
-    ['candidate_hidden_expectation', parsed.candidate_hidden_expectation],
-    ['protected_need', parsed.protected_need],
     ['clearer_form', parsed.clearer_form],
     ['practical_action', parsed.practical_action]
   ] as const) {
@@ -253,13 +252,19 @@ function extractJson(raw: string): string {
 export function composeRecognitionResponse(plan: RecognitionPlan): string {
   const safeBasis = plan.safety_mode === 'standard' ? plan.basis : { ...plan.basis, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] };
   const footer = renderBasisFooter(safeBasis);
+  if (plan.response_shape === 'natural') {
+    const body = plan.response_phase === 'question'
+      ? [plan.recognition, plan.inward_question]
+      : [plan.recognition, plan.candidate_hidden_expectation, plan.clearer_form, plan.practical_action].filter(Boolean);
+    return `${body.join('\n\n')}${footer ? `\n\n${footer}` : ''}`;
+  }
   if (plan.response_phase === 'question') {
     return `WHAT I NOTICE\n\n${plan.recognition}\n\nLOOK INWARD\n\n${plan.inward_question}${footer ? `\n\n${footer}` : ''}`;
   }
   const moduleLine = plan.module_suggestion.should_offer && plan.module_suggestion.title
     ? `\n\nEXPLORE LATER\n\n${plan.module_suggestion.title}`
     : '';
-  return `WHAT THIS MAY BE SHOWING\n\n${plan.candidate_hidden_expectation}\n\nA CLEARER FORM\n\n${plan.clearer_form}\n\nWHAT TO DO\n\n${plan.practical_action}${moduleLine}${footer ? `\n\n${footer}` : ''}`;
+  return `WHAT THIS MAY BE SHOWING\n\n${plan.candidate_hidden_expectation || plan.recognition}\n\nA CLEARER FORM\n\n${plan.clearer_form}\n\nWHAT TO DO\n\n${plan.practical_action}${moduleLine}${footer ? `\n\n${footer}` : ''}`;
 }
 
 export function renderBasisFooter(basis: BasisSelection): string {
@@ -280,11 +285,12 @@ function addPart(parts: string[], label: string, values: string[]): void {
 
 export function recognitionJsonContract(_available: AvailableBasis): string {
   return JSON.stringify({
+    response_shape: 'natural | guided; use natural unless headings materially improve clarity or safety',
     response_phase: 'question | integration',
     recognition: 'plain-language observation',
     inward_question: 'exactly one meaningful question',
-    candidate_hidden_expectation: 'required in integration; empty in question phase',
-    protected_need: 'required in integration; empty in question phase',
+    candidate_hidden_expectation: 'optional compatibility field for possible pressure, learned expectation, responsibility tension, competing need, or system role; never an invented hidden motive',
+    protected_need: 'optional valid need or value; never an invented wound',
     clearer_form: 'required in integration; empty in question phase',
     practical_action: 'required in integration; empty in question phase',
     module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },

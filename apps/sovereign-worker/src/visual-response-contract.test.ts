@@ -12,7 +12,10 @@ describe('private inline visual response transport', () => {
     expect(entry).toContain('compactVisualStoryPayload');
     expect(entry).toContain('values.slice(0, 2)');
     expect(entry).toContain('value.slice(0, 96)');
-    expect(entry).toContain('encodeVisualStoryHeader(compactVisualStoryPayload(result.plan))');
+    expect(entry).toContain('const visualStory = result.plan.visual_story.should_show ? compactVisualStoryPayload(result.plan) : null');
+    expect(entry).toContain("'x-sovereign-visual-story': visualStory ? encodeVisualStoryHeader(visualStory) : ''");
+    expect(entry).toContain('...(visualStory ? { visualStory } : {})');
+    expect(entry).toContain('...(moduleOffer ? { moduleOffer } : {})');
   });
 
   it('does not emit visual metadata for a suppressed story', () => {

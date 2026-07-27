@@ -34,11 +34,20 @@ describe('thread account ownership', () => {
     ]);
   });
 
-  it('restores only user and assistant text for an owned thread', async () => {
+  it('restores user-visible messages and validated presentation metadata for an owned thread', async () => {
     const messages = await listThreadMessages(historyEnv(), 'a1', 't1');
     expect(messages).toEqual([
       { id: 'e1', role: 'user', text: 'Help me understand this choice.', createdAt: '2026-07-26 10:00:00' },
-      { id: 'e3', role: 'assistant', text: 'Two needs may be interacting.', createdAt: '2026-07-26 10:00:02' }
+      {
+        id: 'e3',
+        role: 'assistant',
+        text: 'Two needs may be interacting.',
+        createdAt: '2026-07-26 10:00:02',
+        context: { personId: 'person_1' },
+        interfaceActions: { version: 1 },
+        visualStory: { story: { should_show: true } },
+        moduleOffer: { title: 'Two needs in one decision' }
+      }
     ]);
   });
 
@@ -78,7 +87,12 @@ function historyEnv(): Env {
                   return { results: [
                     { id: 'e1', event_type: 'user_message', payload_json: '{"text":"Help me understand this choice."}', created_at: '2026-07-26 10:00:00' },
                     { id: 'e2', event_type: 'assistant_plan', payload_json: '{"hidden":"not returned"}', created_at: '2026-07-26 10:00:01' },
-                    { id: 'e3', event_type: 'assistant_response', payload_json: '{"text":"Two needs may be interacting."}', created_at: '2026-07-26 10:00:02' }
+                    {
+                      id: 'e3',
+                      event_type: 'assistant_response',
+                      payload_json: '{"text":"Two needs may be interacting.","context":{"personId":"person_1"},"interfaceActions":{"version":1},"visualStory":{"story":{"should_show":true}},"moduleOffer":{"title":"Two needs in one decision"}}',
+                      created_at: '2026-07-26 10:00:02'
+                    }
                   ] };
                 }
                 return { results: [] };

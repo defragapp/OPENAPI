@@ -5,8 +5,52 @@ import { sharePublicPlatform } from './ProductionRuntime';
 
 type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
 type ApiState = 'idle' | 'loading' | 'ready' | 'error';
-type ChatMessage = { id: string; role: 'user' | 'assistant'; text: string; createdAt?: string };
+type VisualPhase = 'origin' | 'shadow' | 'gift';
+type VisualCard = { archetype: 'fool' | 'magician' | 'three_of_cups' | 'hermit' | 'strength' | 'tower'; title: string; phase: VisualPhase };
+type VisualStoryPayload = {
+  story: {
+    should_show: true;
+    mode: 'self' | 'interaction' | 'family';
+    primary: VisualCard;
+    secondary: VisualCard | null;
+    tertiary: VisualCard | null;
+    origin: string;
+    shadow: string;
+    gift: string;
+    current: string;
+    next_step: string;
+    visual_reason: string;
+  };
+  basis: {
+    user_confirmed: boolean;
+    human_design: string[];
+    gene_keys: string[];
+    astrology: string[];
+    relationship: string[];
+    live: string[];
+    numerology: string[];
+  };
+};
+type ModuleOffer = { title: string };
+type ChatMessage = {
+  id: string;
+  role: 'user' | 'assistant';
+  text: string;
+  createdAt?: string;
+  context?: Record<string, unknown>;
+  interfaceActions?: Record<string, unknown>;
+  visualStory?: Record<string, unknown>;
+  moduleOffer?: Record<string, unknown>;
+};
 type ThreadSummary = { id: string; title: string; contextKind: string; covenantEnabled: boolean; updatedAt: string };
+type InterfaceAction =
+  | { type: 'open_baseline'; args: { facet: string } }
+  | { type: 'open_person'; args: { personId: string } }
+  | { type: 'open_system'; args: { systemId: string } }
+  | { type: 'open_decision'; args: Record<string, never> }
+  | { type: 'open_optional_lens'; args: { lens: 'covenant' } }
+  | { type: 'show_plan'; args: { feature: string } };
+type InterfaceActionEnvelope = { version: 1; primary: InterfaceAction | null; suggestions: InterfaceAction[]; confirmationRequired: true };
 
 const surfaces: Array<{ name: Surface; label: string }> = [
   { name: 'Today', label: 'Today' },
@@ -74,6 +118,10 @@ export function SovereignWorkspace() {
   const [selectedPerson, setSelectedPerson] = useState('');
   const [selectedSystem, setSelectedSystem] = useState('');
   const [covenantEnabled, setCovenantEnabled] = useState(false);
+  const [interfaceActions, setInterfaceActions] = useState<InterfaceActionEnvelope | null>(null);
+  const [visualStory, setVisualStory] = useState<VisualStoryPayload | null>(null);
+  const [visualPhase, setVisualPhase] = useState<VisualPhase>('shadow');
+  const [moduleOffer, setModuleOffer] = useState<ModuleOffer | null>(null);
 
   const contextLabel = useMemo(() => {
     const person = people.find((item) => item.id === selectedPerson)?.displayName;
@@ -144,6 +192,9 @@ export function SovereignWorkspace() {
     setMessages([]);
     setDraft('');
     setCovenantEnabled(false);
+    setInterfaceActions(null);
+    setVisualStory(null);
+    setModuleOffer(null);
     setStatus('Ready');
     setApiState('idle');
     setNavOpen(false);
@@ -155,6 +206,17 @@ export function SovereignWorkspace() {
       const data = await api(`/api/v1/threads/${encodeURIComponent(id)}`);
       setThreadId(id);
       setMessages(data.messages ?? []);
+      const restored = [...(data.messages ?? [])].reverse().find((item: ChatMessage) =>
+        item.context || item.interfaceActions || item.visualStory || item.moduleOffer);
+      const restoredPerson = validClientId(restored?.context?.personId) ? restored.context.personId : '';
+      const restoredSystem = validClientId(restored?.context?.systemId) ? restored.context.systemId : '';
+      setSelectedPerson(restoredSystem ? '' : restoredPerson);
+      setSelectedSystem(restoredPerson ? '' : restoredSystem);
+      setInterfaceActions(validActionEnvelope(restored?.interfaceActions));
+      const restoredVisual = validVisualStoryPayload(restored?.visualStory);
+      setVisualStory(restoredVisual);
+      setVisualPhase(restoredVisual?.story.primary.phase ?? 'shadow');
+      setModuleOffer(validModuleOffer(restored?.moduleOffer));
       setCovenantEnabled(threads.find((thread) => thread.id === id)?.covenantEnabled === true);
       setPanelOpen(false);
       setStatus('Conversation restored.');
@@ -195,6 +257,11 @@ export function SovereignWorkspace() {
         const problem = await response.json().catch(() => ({})) as { message?: string; error?: string };
         throw new Error(problem.message || problem.error || 'Sovereign is temporarily unavailable.');
       }
+      const actions = decodeActionEnvelope(response.headers.get('x-sovereign-interface-actions'));
+      const nextVisualStory = decodeVisualStoryPayload(response.headers.get('x-sovereign-visual-story'));
+      const nextModuleOffer = response.headers.get('x-sovereign-module-offer') === '1'
+        ? validModuleOffer({ title: decodeHeaderTitle(response.headers.get('x-sovereign-module-title')) })
+        : null;
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let text = '';
@@ -205,6 +272,10 @@ export function SovereignWorkspace() {
         setMessages((current) => current.map((item) => item.id === assistantId ? { ...item, text } : item));
       }
       setApiState('ready');
+      setInterfaceActions(actions);
+      setVisualStory(nextVisualStory);
+      setVisualPhase(nextVisualStory?.story.primary.phase ?? 'shadow');
+      setModuleOffer(nextModuleOffer);
       setStatus('Complete');
       const threadData = await api('/api/v1/threads');
       setThreads(threadData.threads ?? []);
@@ -220,6 +291,7 @@ export function SovereignWorkspace() {
   async function saveLatest() {
     const last = [...messages].reverse().find((item) => item.role === 'assistant' && item.text.trim());
     if (!last) return;
+    if (!window.confirm('Save this response to your private Library?')) return;
     await api('/api/v1/library', {
       method: 'POST',
       body: JSON.stringify({
@@ -242,7 +314,19 @@ export function SovereignWorkspace() {
     setStatus(correction === 'yes' ? 'Marked as fitting.' : correction === 'partly' ? 'Marked as partly fitting.' : 'Marked as not fitting today.');
   }
 
+  async function saveModuleOffer() {
+    if (!moduleOffer || !window.confirm(`Save “${moduleOffer.title}” to your private Library?`)) return;
+    await api(`/api/v1/threads/${encodeURIComponent(threadId)}/modules/latest`, {
+      method: 'POST',
+      body: JSON.stringify({ approved: true })
+    });
+    setModuleOffer(null);
+    await refreshWorkspace();
+    setStatus('Insight Module saved to Library.');
+  }
+
   async function changeCovenant(enabled: boolean) {
+    if (!window.confirm(`${enabled ? 'Enable' : 'Disable'} the optional Covenant lens for this conversation?`)) return;
     await api(`/api/v1/threads/${encodeURIComponent(threadId)}/covenant`, {
       method: 'POST',
       body: JSON.stringify({
@@ -254,6 +338,14 @@ export function SovereignWorkspace() {
     });
     setCovenantEnabled(enabled);
     setStatus(enabled ? 'Covenant is on for this conversation.' : 'Covenant is off for this conversation.');
+  }
+
+  function openInterfaceAction(action: InterfaceAction) {
+    if (action.type === 'open_person') { setSelectedPerson(action.args.personId); setSelectedSystem(''); openSurface('People'); }
+    else if (action.type === 'open_system') { setSelectedSystem(action.args.systemId); setSelectedPerson(''); openSurface('Systems'); }
+    else if (action.type === 'open_baseline') openSurface('You');
+    else if (action.type === 'open_decision') openSurface('Explore');
+    else if (action.type === 'open_optional_lens' || action.type === 'show_plan') openSurface('You');
   }
 
   return (
@@ -324,13 +416,19 @@ export function SovereignWorkspace() {
                 </article>
               ))}
               {messages.some((item) => item.role === 'assistant' && item.text.trim()) && (
-                <div className="response-actions">
-                  <button onClick={() => void saveLatest()}>Save to Library</button>
-                  <span>Does this fit?</span>
-                  <button onClick={() => void saveCorrection('yes')}>Yes</button>
-                  <button onClick={() => void saveCorrection('partly')}>Partly</button>
-                  <button onClick={() => void saveCorrection('not_today')}>Not today</button>
-                </div>
+                <>
+                  {visualStory && <VisualStoryCard payload={visualStory} phase={visualPhase} setPhase={setVisualPhase} />}
+                  <div className="response-actions">
+                    {interfaceActions?.primary && <button onClick={() => openInterfaceAction(interfaceActions.primary!)}>{actionLabel(interfaceActions.primary)}</button>}
+                    {interfaceActions?.suggestions.map((action) => <button key={`${action.type}-${JSON.stringify(action.args)}`} onClick={() => openInterfaceAction(action)}>{actionLabel(action)}</button>)}
+                    {moduleOffer && <button onClick={() => void saveModuleOffer()}>Save “{moduleOffer.title}”</button>}
+                    <button onClick={() => void saveLatest()}>Save to Library</button>
+                    <span>Does this fit?</span>
+                    <button onClick={() => void saveCorrection('yes')}>Yes</button>
+                    <button onClick={() => void saveCorrection('partly')}>Partly</button>
+                    <button onClick={() => void saveCorrection('not_today')}>Not today</button>
+                  </div>
+                </>
               )}
             </div>
           )}
@@ -366,10 +464,10 @@ export function SovereignWorkspace() {
           {surface === 'Today' && <TodayPanel today={today} onOpenBaseline={() => openSurface('You')} />}
           {surface === 'Explore' && <ExplorePanel onPrompt={(prompt) => { setDraft(prompt); setPanelOpen(false); }} />}
           {surface === 'People' && (
-            <PeoplePanel api={api} people={people} setPeople={setPeople} selectedPerson={selectedPerson} setSelectedPerson={setSelectedPerson} refresh={refreshWorkspace} />
+            <PeoplePanel api={api} people={people} setPeople={setPeople} selectedPerson={selectedPerson} setSelectedPerson={(id: string) => { setSelectedPerson(id); if (id) setSelectedSystem(''); }} refresh={refreshWorkspace} />
           )}
           {surface === 'Systems' && (
-            <SystemsPanel api={api} systems={systems} setSystems={setSystems} people={people} selectedPerson={selectedPerson} setSelectedPerson={setSelectedPerson} selectedSystem={selectedSystem} setSelectedSystem={setSelectedSystem} />
+            <SystemsPanel api={api} systems={systems} setSystems={setSystems} people={people} selectedSystem={selectedSystem} setSelectedSystem={(id: string) => { setSelectedSystem(id); if (id) setSelectedPerson(''); }} />
           )}
           {surface === 'Library' && <LibraryPanel library={library} api={api} refresh={refreshWorkspace} onUse={(text: string) => { setDraft(text); setPanelOpen(false); }} />}
           {surface === 'You' && (
@@ -418,6 +516,7 @@ function PeoplePanel({ api, people, setPeople, selectedPerson, setSelectedPerson
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [notice, setNotice] = useState('');
+  const [requestedScopes, setRequestedScopes] = useState<string[]>(['pair.compare', 'trait.display']);
   const selected = people.find((person: any) => person.id === selectedPerson);
 
   async function addPerson() {
@@ -430,9 +529,10 @@ function PeoplePanel({ api, people, setPeople, selectedPerson, setSelectedPerson
 
   async function invite() {
     if (!selectedPerson || !email.includes('@')) return;
+    if (!window.confirm(`Send a private invitation to ${email.trim()}?`)) return;
     await api(`/api/v1/people/${selectedPerson}/invitations/send`, {
       method: 'POST',
-      body: JSON.stringify({ email, requestedScopes: ['pair.compare', 'trait.display'] })
+      body: JSON.stringify({ email, requestedScopes })
     });
     setEmail('');
     setNotice('Private invitation sent. They choose what to allow.');
@@ -459,6 +559,12 @@ function PeoplePanel({ api, people, setPeople, selectedPerson, setSelectedPerson
       {selected && !selected.identityBound && (
         <>
           <Field label="Invitation email"><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></Field>
+          <fieldset className="consent-purpose-fieldset">
+            <legend>What may they choose to allow?</legend>
+            <label><input type="checkbox" checked disabled /> Relationship comparison</label>
+            <label><input type="checkbox" checked={requestedScopes.includes('system.include')} onChange={(event) => setOptionalScope(requestedScopes, setRequestedScopes, 'system.include', event.target.checked)} /> Include in a family, group, or team</label>
+            <label><input type="checkbox" checked={requestedScopes.includes('covenant.include')} onChange={(event) => setOptionalScope(requestedScopes, setRequestedScopes, 'covenant.include', event.target.checked)} /> Include in the optional Covenant lens</label>
+          </fieldset>
           <button className="primary-button" onClick={() => void invite()}>Send private invitation</button>
         </>
       )}
@@ -470,10 +576,11 @@ function PeoplePanel({ api, people, setPeople, selectedPerson, setSelectedPerson
   );
 }
 
-function SystemsPanel({ api, systems, setSystems, people, selectedPerson, setSelectedPerson, selectedSystem, setSelectedSystem }: any) {
+function SystemsPanel({ api, systems, setSystems, people, selectedSystem, setSelectedSystem }: any) {
   const [name, setName] = useState('');
   const [type, setType] = useState('family');
-  const eligible = people.filter((person: any) => person.identityBound);
+  const [memberId, setMemberId] = useState('');
+  const eligible = people.filter((person: any) => person.identityBound && person.activeScopes?.includes('system.include'));
 
   async function createSystem() {
     if (!name.trim()) return;
@@ -484,11 +591,12 @@ function SystemsPanel({ api, systems, setSystems, people, selectedPerson, setSel
   }
 
   async function addMember() {
-    if (!selectedSystem || !selectedPerson) return;
+    if (!selectedSystem || !memberId) return;
     await api(`/api/v1/systems/${selectedSystem}/members`, {
       method: 'POST',
-      body: JSON.stringify({ personId: selectedPerson, metadata: { formalRole: 'member', authority: 'none assumed', responsibility: 'shared objective', constraints: [] } })
+      body: JSON.stringify({ personId: memberId, metadata: { formalRole: 'member', authority: 'none assumed', responsibility: 'shared objective', constraints: [] } })
     });
+    setMemberId('');
   }
 
   return (
@@ -510,12 +618,12 @@ function SystemsPanel({ api, systems, setSystems, people, selectedPerson, setSel
       {selectedSystem && (
         <>
           <Field label="Add a permitted person">
-            <select value={selectedPerson} onChange={(event) => setSelectedPerson(event.target.value)}>
+            <select value={memberId} onChange={(event) => setMemberId(event.target.value)}>
               <option value="">Choose a person</option>
               {eligible.map((person: any) => <option key={person.id} value={person.id}>{person.displayName}</option>)}
             </select>
           </Field>
-          <button className="primary-button" disabled={!selectedPerson} onClick={() => void addMember()}>Add to system</button>
+          <button className="primary-button" disabled={!memberId} onClick={() => void addMember()}>Add to system</button>
         </>
       )}
     </PanelStack>
@@ -543,6 +651,13 @@ function LibraryPanel({ library, api, refresh, onUse }: any) {
 function YouPanel({ api, billing, covenantEnabled, changeCovenant, refresh }: any) {
   const [certainty, setCertainty] = useState('unknown');
   const [interval, setInterval] = useState<'monthly' | 'annual'>('annual');
+  const [deletionJob, setDeletionJob] = useState<{ id: string; status: string; scheduledFor?: string } | null>(null);
+
+  useEffect(() => {
+    void api('/api/v1/deletion-jobs')
+      .then((data: any) => setDeletionJob(data.deletionJob ?? null))
+      .catch(() => setDeletionJob(null));
+  }, []);
 
   async function buildBaseline(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -555,6 +670,21 @@ function YouPanel({ api, billing, covenantEnabled, changeCovenant, refresh }: an
     const data = await api(path, { method: 'POST', body: JSON.stringify(body) });
     const url = data.checkout?.url ?? data.portal?.url;
     if (url) location.assign(url);
+  }
+
+  async function requestDeletion() {
+    if (!window.confirm('Request deletion of this account and its private data after the 14-day grace period? You can cancel during that period.')) return;
+    const data = await api('/api/v1/deletion-jobs', { method: 'POST', body: JSON.stringify({ approved: true }) });
+    setDeletionJob(data.deletionJob);
+  }
+
+  async function cancelDeletion() {
+    if (!deletionJob || !window.confirm('Cancel this account deletion request?')) return;
+    await api(`/api/v1/deletion-jobs/${encodeURIComponent(deletionJob.id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ action: 'cancel' })
+    });
+    setDeletionJob(null);
   }
 
   return (
@@ -589,7 +719,7 @@ function YouPanel({ api, billing, covenantEnabled, changeCovenant, refresh }: an
               <button className={interval === 'annual' ? 'active' : ''} onClick={() => setInterval('annual')}>$99 yearly</button>
               <button className={interval === 'monthly' ? 'active' : ''} onClick={() => setInterval('monthly')}>$20 monthly</button>
             </div>
-            <button className="primary-button" onClick={() => void handoff('/api/v1/billing/checkout', { interval })}>Choose Sovereign+</button>
+            <button className="primary-button" onClick={() => { if (window.confirm(`Continue to Stripe for the ${interval} Sovereign+ plan?`)) void handoff('/api/v1/billing/checkout', { interval }); }}>Choose Sovereign+</button>
           </>
         )}
         <button className="secondary-button" onClick={() => void handoff('/api/v1/billing/portal')}>Manage billing</button>
@@ -598,7 +728,10 @@ function YouPanel({ api, billing, covenantEnabled, changeCovenant, refresh }: an
         <p className="eyebrow">CONTROL</p>
         <label className="setting-row"><span><strong>Covenant</strong><small>Optional Christian and biblical lens for this conversation.</small></span><input type="checkbox" checked={covenantEnabled} onChange={(event) => void changeCovenant(event.target.checked)} /></label>
         <p className="panel-note">Sharing sends the public Sovereign.OS link. No private workspace data is included.</p>
-        <button className="secondary-button" onClick={() => void sharePublicPlatform()}>Share Sovereign.OS</button>
+        <button className="secondary-button" onClick={() => { if (window.confirm('Open your device sharing options for the public Sovereign.OS link?')) void sharePublicPlatform(); }}>Share Sovereign.OS</button>
+        {deletionJob
+          ? <button className="secondary-button" onClick={() => void cancelDeletion()}>Cancel account deletion</button>
+          : <button className="secondary-button danger-button" onClick={() => void requestDeletion()}>Request account deletion</button>}
         <button className="secondary-button" onClick={() => api('/api/v1/auth/logout', { method: 'POST' })}>Log out</button>
       </section>
     </PanelStack>
@@ -627,6 +760,164 @@ function newThreadId(surface: Surface, personId = '', systemId = '') {
     .filter(Boolean)
     .join('-')
     .replace(/[^a-z0-9_-]/gi, '-');
+}
+
+function decodeActionEnvelope(value: string | null): InterfaceActionEnvelope | null {
+  if (!value) return null;
+  try {
+    const normalized = value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=');
+    return validActionEnvelope(JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(normalized), (character) => character.charCodeAt(0)))));
+  } catch {
+    return null;
+  }
+}
+
+function validActionEnvelope(value: unknown): InterfaceActionEnvelope | null {
+  if (!value || typeof value !== 'object') return null;
+  const envelope = value as Record<string, unknown>;
+  if (envelope.version !== 1 || envelope.confirmationRequired !== true) return null;
+  const primary = validAction(envelope.primary);
+  const suggestions = Array.isArray(envelope.suggestions) ? envelope.suggestions.map(validAction).filter((item): item is InterfaceAction => item !== null).slice(0, 2) : [];
+  return { version: 1, primary, suggestions, confirmationRequired: true };
+}
+
+function validAction(value: unknown): InterfaceAction | null {
+  if (!value || typeof value !== 'object') return null;
+  const action = value as { type?: unknown; args?: unknown };
+  if (!['open_baseline', 'open_person', 'open_system', 'open_decision', 'open_optional_lens', 'show_plan'].includes(String(action.type)) || !action.args || typeof action.args !== 'object') return null;
+  const args = action.args as Record<string, unknown>;
+  if (action.type === 'open_person' && !validClientId(args.personId)) return null;
+  if (action.type === 'open_system' && !validClientId(args.systemId)) return null;
+  if (action.type === 'open_optional_lens' && args.lens !== 'covenant') return null;
+  return action as InterfaceAction;
+}
+
+function validClientId(value: unknown): value is string {
+  return typeof value === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(value);
+}
+
+function actionLabel(action: InterfaceAction): string {
+  if (action.type === 'open_baseline') return 'Show Baseline detail';
+  if (action.type === 'open_person') return 'Open relationship context';
+  if (action.type === 'open_system') return 'Open system context';
+  if (action.type === 'open_decision') return 'Open Decision Check';
+  if (action.type === 'open_optional_lens') return 'Review optional Covenant lens';
+  return 'View plan details';
+}
+
+function setOptionalScope(current: string[], setCurrent: (next: string[]) => void, scope: string, enabled: boolean) {
+  setCurrent(enabled ? [...new Set([...current, scope])] : current.filter((item) => item !== scope));
+}
+
+function VisualStoryCard({ payload, phase, setPhase }: {
+  payload: VisualStoryPayload;
+  phase: VisualPhase;
+  setPhase: (phase: VisualPhase) => void;
+}) {
+  const cards = [payload.story.primary, payload.story.secondary, payload.story.tertiary].filter((card): card is VisualCard => card !== null);
+  const phaseLabels: Record<VisualPhase, string> = { origin: 'Past protection', shadow: 'Under pressure', gift: 'Clear expression' };
+  return (
+    <section className="visual-story-card" aria-label="Archetype in motion">
+      <header>
+        <div><p className="eyebrow">ARCHETYPE IN MOTION</p><h3>See how the role moves.</h3></div>
+        <span>{payload.story.mode === 'self' ? 'Personal' : payload.story.mode === 'interaction' ? 'Consented relationship' : 'Permitted system'}</span>
+      </header>
+      <div className="visual-story-body">
+        <div className="visual-story-archetypes" aria-label="Available archetypes">
+          {cards.map((card) => <article key={`${card.archetype}-${card.title}`}><i aria-hidden="true">{archetypeMark(card.archetype)}</i><strong>{card.title}</strong></article>)}
+        </div>
+        <div>
+          <div className="visual-phase-tabs" aria-label="View three expressions of this role">
+            {(['origin', 'shadow', 'gift'] as const).map((item) => (
+              <button key={item} className={phase === item ? 'active' : ''} aria-pressed={phase === item} onClick={() => setPhase(item)}>{phaseLabels[item]}</button>
+            ))}
+          </div>
+          <p className="visual-phase-copy">{payload.story[phase]}</p>
+          <dl>
+            <div><dt>Active now</dt><dd>{payload.story.current}</dd></div>
+            <div><dt>One next step</dt><dd>{payload.story.next_step}</dd></div>
+          </dl>
+          <details><summary>What shaped this view</summary><p>{payload.story.visual_reason}</p></details>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function decodeVisualStoryPayload(value: string | null): VisualStoryPayload | null {
+  return validVisualStoryPayload(decodeBase64Json(value));
+}
+
+function decodeBase64Json(value: string | null): unknown {
+  if (!value) return null;
+  try {
+    const normalized = value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=');
+    return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(normalized), (character) => character.charCodeAt(0))));
+  } catch {
+    return null;
+  }
+}
+
+function validVisualStoryPayload(value: unknown): VisualStoryPayload | null {
+  if (!value || typeof value !== 'object') return null;
+  const payload = value as Record<string, unknown>;
+  if (!payload.story || typeof payload.story !== 'object' || !payload.basis || typeof payload.basis !== 'object') return null;
+  const story = payload.story as Record<string, unknown>;
+  const basis = payload.basis as Record<string, unknown>;
+  const primary = validVisualCard(story.primary);
+  const secondary = story.secondary == null ? null : validVisualCard(story.secondary);
+  const tertiary = story.tertiary == null ? null : validVisualCard(story.tertiary);
+  if (story.should_show !== true || !['self', 'interaction', 'family'].includes(String(story.mode)) || !primary) return null;
+  if ((story.mode === 'interaction' && !secondary) || (story.mode === 'family' && (!secondary || !tertiary))) return null;
+  for (const key of ['origin', 'shadow', 'gift', 'current', 'next_step', 'visual_reason']) {
+    if (typeof story[key] !== 'string' || !story[key].trim()) return null;
+  }
+  const basisKeys = ['human_design', 'gene_keys', 'astrology', 'relationship', 'live', 'numerology'] as const;
+  if (basis.user_confirmed !== true || basisKeys.some((key) => !Array.isArray(basis[key]) || !(basis[key] as unknown[]).every((item) => typeof item === 'string'))) return null;
+  return {
+    story: {
+      should_show: true,
+      mode: story.mode as VisualStoryPayload['story']['mode'],
+      primary,
+      secondary,
+      tertiary,
+      origin: story.origin as string,
+      shadow: story.shadow as string,
+      gift: story.gift as string,
+      current: story.current as string,
+      next_step: story.next_step as string,
+      visual_reason: story.visual_reason as string
+    },
+    basis: basis as VisualStoryPayload['basis']
+  };
+}
+
+function validVisualCard(value: unknown): VisualCard | null {
+  if (!value || typeof value !== 'object') return null;
+  const card = value as Record<string, unknown>;
+  const archetypes = ['fool', 'magician', 'three_of_cups', 'hermit', 'strength', 'tower'];
+  const phases = ['origin', 'shadow', 'gift'];
+  if (!archetypes.includes(String(card.archetype)) || typeof card.title !== 'string' || !card.title.trim() || !phases.includes(String(card.phase))) return null;
+  return card as VisualCard;
+}
+
+function validModuleOffer(value: unknown): ModuleOffer | null {
+  if (!value || typeof value !== 'object') return null;
+  const title = (value as Record<string, unknown>).title;
+  return typeof title === 'string' && title.trim() && title.length <= 140 ? { title: title.trim() } : null;
+}
+
+function decodeHeaderTitle(value: string | null): string {
+  if (!value) return '';
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return '';
+  }
+}
+
+function archetypeMark(archetype: VisualCard['archetype']): string {
+  return ({ fool: '0', magician: 'I', three_of_cups: 'III', hermit: 'IX', strength: 'VIII', tower: 'XVI' })[archetype];
 }
 
 function textOr(value: unknown, fallback: string) {

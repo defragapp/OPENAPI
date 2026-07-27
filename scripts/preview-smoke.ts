@@ -116,7 +116,7 @@ async function main() {
   if (!paid) await request('/api/v1/threads/preview-covenant/covenant', { method: 'POST', body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'preview decision' }) }, 403);
   await request('/api/v1/covenant/scripture/Imaginary%201:1', {}, 404);
 
-  const deletion = (await json('/api/v1/deletion-jobs', { method: 'POST' }, 202)).deletionJob;
+  const deletion = (await json('/api/v1/deletion-jobs', { method: 'POST', body: JSON.stringify({ approved: true }) }, 202)).deletionJob;
   await json(`/api/v1/deletion-jobs/${deletion.id}`, { method: 'PATCH', body: JSON.stringify({ action: 'cancel' }) });
 
   const turnKey = `preview-turn-${Date.now()}`;

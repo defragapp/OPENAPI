@@ -107,6 +107,21 @@ export async function createDeletionJob(env: Env, accountId: string, graceDays =
   return { id, status: 'grace', graceDays, backgroundJobId };
 }
 
+export async function getActiveDeletionJob(env: Env, accountId: string) {
+  const row = await env.DB.prepare(`SELECT id, status, requested_at, scheduled_for
+    FROM deletion_jobs
+    WHERE account_id = ? AND status IN ('grace','queued','running')
+    ORDER BY requested_at DESC LIMIT 1`)
+    .bind(accountId)
+    .first<{ id: string; status: string; requested_at: string; scheduled_for: string }>();
+  return row ? {
+    id: row.id,
+    status: row.status,
+    requestedAt: row.requested_at,
+    scheduledFor: row.scheduled_for
+  } : null;
+}
+
 export async function cancelDeletionJob(env: Env, accountId: string, id: string) {
   const result = await env.DB.prepare('UPDATE deletion_jobs SET status = ? WHERE id = ? AND account_id = ? AND status = ?')
     .bind('cancelled', id, accountId, 'grace')

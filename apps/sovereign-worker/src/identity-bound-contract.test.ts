@@ -12,6 +12,7 @@ const workspace = readFileSync(new URL('../../web/src/SovereignWorkspace.tsx', i
 const consentPage = readFileSync(new URL('../../web/public/consent.html', import.meta.url), 'utf8');
 const consentRuntime = readFileSync(new URL('../../web/public/consent.js', import.meta.url), 'utf8');
 const wrangler = readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8');
+const conversationContext = readFileSync(new URL('./conversation-context.ts', import.meta.url), 'utf8');
 
 describe('identity-bound multi-user contract', () => {
   it('stores only a hashed one-time invitation token with expiry and accepted identity', () => {
@@ -72,5 +73,9 @@ describe('identity-bound multi-user contract', () => {
     expect(entry).toContain('buildPairComparison');
     expect(entry).toContain('buildSystemAnalysis');
     expect(entry).toContain('runSovereignResult');
+    expect(entry).toContain('parseConversationContext(body.context)');
+    expect(entry).toContain('authorizeConversationContext(env, auth.accountId, selection, entitlements)');
+    expect(conversationContext).toContain('buildPairComparison(env, accountId, selection.personId)');
+    expect(conversationContext).toContain('buildSystemAnalysis(env, accountId, selection.systemId)');
   });
 });
