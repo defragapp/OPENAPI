@@ -26,6 +26,18 @@ CREATE INDEX auth_password_resets_expiry_idx
 CREATE INDEX auth_password_resets_ip_created_idx
   ON auth_password_resets(requested_ip_hash, created_at DESC);
 
+CREATE TABLE auth_login_attempts (
+  id TEXT PRIMARY KEY,
+  email_hash TEXT NOT NULL,
+  ip_hash TEXT NOT NULL,
+  succeeded INTEGER NOT NULL CHECK(succeeded IN (0, 1)),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX auth_login_attempts_email_created_idx
+  ON auth_login_attempts(email_hash, created_at DESC);
+CREATE INDEX auth_login_attempts_ip_created_idx
+  ON auth_login_attempts(ip_hash, created_at DESC);
+
 CREATE TABLE auth_external_identities (
   provider TEXT NOT NULL CHECK(provider IN ('apple', 'google')),
   provider_subject TEXT NOT NULL,
