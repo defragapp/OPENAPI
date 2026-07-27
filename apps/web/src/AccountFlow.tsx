@@ -16,6 +16,11 @@ interface OnboardingStatus {
   effectivePlan: PlanKey;
 }
 
+interface AuthenticationModes {
+  apple: boolean;
+  google: boolean;
+}
+
 export function AccountFlow() {
   const path = location.pathname;
   if (path === '/onboarding') return <OnboardingPage />;
@@ -33,10 +38,26 @@ function AuthPage({ mode }: { mode: AuthMode }) {
   const [accepted, setAccepted] = useState(false);
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
+  const [providers, setProviders] = useState<AuthenticationModes>({ apple: false, google: false });
   const plan: PlanKey = params.get('plan') === 'sovereign_plus' ? 'sovereign_plus' : 'free';
   const interval: BillingInterval = params.get('interval') === 'annual' ? 'annual' : 'monthly';
   const resetToken = params.get('token') ?? '';
   const error = oauthError(params.get('error'));
+  const hasOAuth = providers.apple || providers.google;
+
+  useEffect(() => {
+    if (mode !== 'signup' && mode !== 'login') return;
+    fetch('/health', { headers: { accept: 'application/json' } })
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload: any) => {
+        const modes = payload?.authenticationModes;
+        setProviders({
+          apple: modes?.apple === 'configured',
+          google: modes?.google === 'configured'
+        });
+      })
+      .catch(() => setProviders({ apple: false, google: false }));
+  }, [mode]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -61,7 +82,9 @@ function AuthPage({ mode }: { mode: AuthMode }) {
         const data = await postJson('/api/v1/auth/password/login', {
           email,
           password,
-          turnstileToken: turnstileToken()
+          turnstileToken: turnstileToken(),
+          plan,
+          interval
         });
         location.assign(String(data.next || '/app'));
         return;
@@ -104,7 +127,7 @@ function AuthPage({ mode }: { mode: AuthMode }) {
   const intro = mode === 'signup'
     ? 'Create your account first. Then choose Free or Sovereign+ and build your Baseline.'
     : mode === 'login'
-      ? 'Open your workspace with Apple, Google, or your email and password.'
+      ? 'Open your private workspace securely.'
       : mode === 'forgot'
         ? 'Enter your email. We will send a secure reset link that expires in 30 minutes.'
         : 'Use the link from your email and choose a password of at least 10 characters.';
@@ -134,11 +157,11 @@ function AuthPage({ mode }: { mode: AuthMode }) {
           <h2 id="account-flow-title">{mode === 'signup' ? 'Begin securely.' : mode === 'login' ? 'Open your workspace.' : title}</h2>
           {(error || status) && <div className="account-flow-notice" role="status">{status || error}</div>}
 
-          {(mode === 'signup' || mode === 'login') && (
+          {(mode === 'signup' || mode === 'login') && hasOAuth && (
             <>
               <div className="oauth-stack">
-                <button type="button" onClick={() => beginOAuth('apple')}><span className="oauth-mark"></span>Continue with Apple</button>
-                <button type="button" onClick={() => beginOAuth('google')}><span className="oauth-mark google-mark">G</span>Continue with Google</button>
+                {providers.apple && <button type="button" onClick={() => beginOAuth('apple')}><span className="oauth-mark"></span>Continue with Apple</button>}
+                {providers.google && <button type="button" onClick={() => beginOAuth('google')}><span className="oauth-mark google-mark">G</span>Continue with Google</button>}
               </div>
               <div className="account-flow-divider"><span>or use email</span></div>
             </>
@@ -181,7 +204,7 @@ function AuthPage({ mode }: { mode: AuthMode }) {
                 : mode === 'signup'
                   ? 'Create account and continue'
                   : mode === 'login'
-                    ? 'Sign in'
+                    ? plan === 'sovereign_plus' ? 'Sign in and continue to Sovereign+' : 'Sign in'
                     : mode === 'forgot'
                       ? 'Send reset link'
                       : 'Save new password'}
@@ -189,9 +212,9 @@ function AuthPage({ mode }: { mode: AuthMode }) {
           </form>
 
           <div className="account-flow-links">
-            {mode === 'login' && <><a href="/forgot-password">Forgot password?</a><a href={`/signup?plan=${plan}&interval=${interval}`}>Create an account</a></>}
-            {mode === 'signup' && <a href="/login">Already have an account? Sign in</a>}
-            {(mode === 'forgot' || mode === 'reset') && <a href="/login">Return to sign in</a>}
+            {mode === 'login' && <><a href={`/forgot-password?plan=${plan}&interval=${interval}`}>Forgot password?</a><a href={`/signup?plan=${plan}&interval=${interval}`}>Create an account</a></>}
+            {mode === 'signup' && <a href={`/login?plan=${plan}&interval=${interval}`}>Already have an account? Sign in</a>}
+            {(mode === 'forgot' || mode === 'reset') && <a href={`/login?plan=${plan}&interval=${interval}`}>Return to sign in</a>}
           </div>
         </section>
       </div>
@@ -206,8 +229,10 @@ function OnboardingPage() {
   const [interval, setInterval] = useState<BillingInterval>(params.get('interval') === 'annual' ? 'annual' : 'monthly');
   const [status, setStatus] = useState('Loading your setup…');
   const [busy, setBusy] = useState(false);
+  const [baselineReady, setBaselineReady] = useState(false);
   const [birthTimeCertainty, setBirthTimeCertainty] = useState('unknown');
   const defaultTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Los_Angeles';
+  const billingCancelled = params.get('billing') === 'cancelled';
 
   useEffect(() => {
     fetch('/api/v1/onboarding/status', { headers: { accept: 'application/json' } })
@@ -221,9 +246,16 @@ function OnboardingPage() {
       })
       .then((data) => {
         if (!data) return;
+        const ready = ['completed', 'partial'].includes(String(data.baseline.status));
+        setBaselineReady(ready);
         if (data.onboarding.selectedPlan) setPlan(data.onboarding.selectedPlan);
         if (data.onboarding.billingInterval) setInterval(data.onboarding.billingInterval);
-        if (data.onboarding.stage === 'complete' && ['completed', 'partial'].includes(String(data.baseline.status))) {
+        if (billingCancelled) {
+          setStep('plan');
+          setStatus('Checkout was canceled. No charge was made. Choose Free or try Sovereign+ again.');
+          return;
+        }
+        if (data.onboarding.stage === 'complete' && ready) {
           location.assign('/app');
           return;
         }
@@ -234,15 +266,32 @@ function OnboardingPage() {
         setStep('plan');
         setStatus(caught instanceof Error ? caught.message : 'Setup could not be loaded.');
       });
-  }, []);
+  }, [billingCancelled]);
+
+  async function openCheckout() {
+    setStatus('Opening secure Stripe checkout…');
+    const checkout = await postJson('/api/v1/billing/checkout', { interval, source: 'onboarding' }, true);
+    const url = checkout.checkout?.url;
+    if (!url) throw new Error('Stripe checkout is temporarily unavailable.');
+    location.assign(String(url));
+  }
 
   async function savePlan() {
     setBusy(true);
     setStatus('Saving your plan…');
     try {
       await postJson('/api/v1/onboarding/plan', { plan, interval });
-      setStep('baseline');
-      setStatus('');
+      if (!baselineReady) {
+        setStep('baseline');
+        setStatus('');
+        return;
+      }
+      const completed = await postJson('/api/v1/onboarding/complete', {});
+      if (completed.checkoutRequired) {
+        await openCheckout();
+        return;
+      }
+      location.assign('/app');
     } catch (caught) {
       setStatus(caught instanceof Error ? caught.message : 'Your plan could not be saved.');
     } finally {
@@ -258,13 +307,10 @@ function OnboardingPage() {
     try {
       const form = new FormData(event.currentTarget);
       await postJson('/api/v1/baseline/onboarding', Object.fromEntries(form));
+      setBaselineReady(true);
       const completed = await postJson('/api/v1/onboarding/complete', {});
       if (completed.checkoutRequired) {
-        setStatus('Opening secure Stripe checkout…');
-        const checkout = await postJson('/api/v1/billing/checkout', { interval }, true);
-        const url = checkout.checkout?.url;
-        if (!url) throw new Error('Stripe checkout is temporarily unavailable.');
-        location.assign(String(url));
+        await openCheckout();
         return;
       }
       location.assign('/app');
@@ -273,6 +319,10 @@ function OnboardingPage() {
       setBusy(false);
     }
   }
+
+  const planButtonCopy = baselineReady
+    ? plan === 'sovereign_plus' ? 'Continue to secure checkout' : 'Continue with Free'
+    : 'Continue to my Baseline';
 
   return (
     <main className="account-flow-shell onboarding-shell">
@@ -283,7 +333,7 @@ function OnboardingPage() {
           <div className="onboarding-progress" aria-label="Setup progress">
             <span className={step === 'plan' ? 'active' : 'complete'}><b>1</b>Plan</span>
             <i />
-            <span className={step === 'baseline' ? 'active' : ''}><b>2</b>Baseline</span>
+            <span className={step === 'baseline' ? 'active' : baselineReady ? 'complete' : ''}><b>2</b>Baseline</span>
           </div>
         </header>
 
@@ -311,7 +361,7 @@ function OnboardingPage() {
                 </div>
               </button>
             </div>
-            <button className="account-flow-primary onboarding-continue" onClick={savePlan} disabled={busy}>Continue to my Baseline</button>
+            <button className="account-flow-primary onboarding-continue" onClick={savePlan} disabled={busy}>{busy ? 'Working…' : planButtonCopy}</button>
           </section>
         )}
 
