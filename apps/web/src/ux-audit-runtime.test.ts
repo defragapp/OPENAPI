@@ -27,7 +27,7 @@ describe('first-run accessibility and dashboard UX pass', () => {
 
   it('raises contrast and gives fields and cards explicit interaction states', () => {
     expect(css).toContain('--muted: #d1c9bf');
-    expect(css).toContain('input:focus');
+    expect(css).toContain('.app-shell input:not([type="checkbox"]):not([type="radio"]):focus');
     expect(css).toContain('.mode-object:hover');
     expect(css).toContain('.ux-interactive-object:focus-visible');
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');
