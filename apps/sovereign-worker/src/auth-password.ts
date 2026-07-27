@@ -11,6 +11,8 @@ const PASSWORD_MAX_LENGTH = 128;
 const RESET_TTL_MINUTES = 30;
 const TERMS_VERSION = '2026-07-26';
 const PRIVACY_VERSION = '2026-07-26';
+const MAX_FAILED_EMAIL_ATTEMPTS = 8;
+const MAX_FAILED_IP_ATTEMPTS = 30;
 const DUMMY_PASSWORD_RECORD = {
   hash: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   salt: 'AAAAAAAAAAAAAAAAAAAAAA',
@@ -115,6 +117,35 @@ async function nextForExistingAccount(env: Env, accountId: string, plan?: unknow
   return baseline && ['completed', 'partial'].includes(baseline.status) ? '/app' : '/onboarding';
 }
 
+async function loginAttemptKeys(request: Request, email: string): Promise<{ emailHash: string; ipHash: string }> {
+  const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
+  const [emailHash, ipHash] = await Promise.all([sha256(email), sha256(ip)]);
+  return { emailHash, ipHash };
+}
+
+async function assertLoginAllowed(env: Env, emailHash: string, ipHash: string): Promise<void> {
+  const [emailFailures, ipFailures] = await Promise.all([
+    env.DB.prepare("SELECT COUNT(*) AS count FROM auth_login_attempts WHERE email_hash = ? AND succeeded = 0 AND created_at > datetime('now', '-15 minutes')")
+      .bind(emailHash)
+      .first<{ count: number }>(),
+    env.DB.prepare("SELECT COUNT(*) AS count FROM auth_login_attempts WHERE ip_hash = ? AND succeeded = 0 AND created_at > datetime('now', '-15 minutes')")
+      .bind(ipHash)
+      .first<{ count: number }>()
+  ]);
+  if (Number(emailFailures?.count ?? 0) >= MAX_FAILED_EMAIL_ATTEMPTS || Number(ipFailures?.count ?? 0) >= MAX_FAILED_IP_ATTEMPTS) {
+    throw new Response('Too many sign-in attempts. Wait 15 minutes and try again.', {
+      status: 429,
+      headers: { 'retry-after': '900' }
+    });
+  }
+}
+
+async function recordLoginAttempt(env: Env, emailHash: string, ipHash: string, succeeded: boolean): Promise<void> {
+  await env.DB.prepare('INSERT INTO auth_login_attempts (id, email_hash, ip_hash, succeeded) VALUES (?, ?, ?, ?)')
+    .bind(`login_${crypto.randomUUID()}`, emailHash, ipHash, succeeded ? 1 : 0)
+    .run();
+}
+
 export async function passwordSignup(request: Request, env: Env): Promise<Response> {
   const body = await request.json().catch(() => ({})) as {
     name?: string;
@@ -175,6 +206,9 @@ export async function passwordLogin(request: Request, env: Env): Promise<Respons
   const email = normalizeEmail(body.email ?? '');
   const password = body.password ?? '';
   if (!validEmail(email) || !validPassword(password)) return Response.json({ error: 'Email or password is incorrect.' }, { status: 401 });
+
+  const { emailHash, ipHash } = await loginAttemptKeys(request, email);
+  await assertLoginAllowed(env, emailHash, ipHash);
   await verifyTurnstile(env, body.turnstileToken, request.headers.get('cf-connecting-ip') ?? undefined, 'login');
 
   const credential = await env.DB.prepare(`SELECT c.account_id, c.password_hash, c.password_salt, c.password_iterations, a.auth_subject
@@ -188,6 +222,7 @@ export async function passwordLogin(request: Request, env: Env): Promise<Respons
     ? { hash: credential.password_hash, salt: credential.password_salt, iterations: credential.password_iterations }
     : DUMMY_PASSWORD_RECORD;
   const valid = await verifyPasswordRecord(password, record);
+  await recordLoginAttempt(env, emailHash, ipHash, Boolean(credential && valid));
   if (!credential || !valid) return Response.json({ error: 'Email or password is incorrect.' }, { status: 401 });
 
   const session = await issueAccountSession(env, credential.account_id, credential.auth_subject);
@@ -208,10 +243,15 @@ export async function requestPasswordReset(request: Request, env: Env): Promise<
   if (!account) return Response.json({ status: 'sent' });
 
   const ipHash = await sha256(ip);
-  const recent = await env.DB.prepare("SELECT COUNT(*) AS count FROM auth_password_resets WHERE requested_ip_hash = ? AND created_at > datetime('now', '-15 minutes')")
-    .bind(ipHash)
-    .first<{ count: number }>();
-  if (Number(recent?.count ?? 0) >= 10) return Response.json({ status: 'sent' });
+  const [recentIp, recentAccount] = await Promise.all([
+    env.DB.prepare("SELECT COUNT(*) AS count FROM auth_password_resets WHERE requested_ip_hash = ? AND created_at > datetime('now', '-15 minutes')")
+      .bind(ipHash)
+      .first<{ count: number }>(),
+    env.DB.prepare("SELECT id FROM auth_password_resets WHERE account_id = ? AND created_at > datetime('now', '-2 minutes')")
+      .bind(account.id)
+      .first<{ id: string }>()
+  ]);
+  if (Number(recentIp?.count ?? 0) >= 10 || recentAccount) return Response.json({ status: 'sent' });
 
   const token = randomToken();
   const id = `reset_${crypto.randomUUID()}`;
