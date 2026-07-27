@@ -5,6 +5,7 @@ const workerConfig = JSON.parse(readFileSync('apps/sovereign-worker/wrangler.jso
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 const readme = readFileSync('README.md', 'utf8');
 const bootstrap = readFileSync('scripts/cloudflare-preview-bootstrap.mjs', 'utf8');
+const productionDeploy = readFileSync('scripts/cloudflare-direct-production-deploy.mjs', 'utf8');
 const preview = workerConfig.env?.preview;
 
 function requireValue(condition, message) {
@@ -44,18 +45,26 @@ requireValue(!preview?.queues?.producers?.length && !preview?.queues?.consumers?
 requireValue(!workerConfig.r2_buckets?.length, 'Package-level Worker config must not declare R2');
 requireValue(!workerConfig.queues?.producers?.length && !workerConfig.queues?.consumers?.length, 'Queue must remain disabled for package-level Worker');
 
+requireValue(!existsSync('.github/workflows'), 'GitHub Actions workflows are forbidden; Cloudflare Workers Builds is the sole release path');
 requireValue(packageJson.scripts?.['verify:cloudflare-build']?.includes('verify:release-config'), 'Canonical build must retain release verification');
-requireValue(packageJson.scripts?.['verify:release-config'] === 'node scripts/verify-direct-preview-config.mjs', 'Release verifier must use direct preview contract');
+requireValue(packageJson.scripts?.['verify:release-config'] === 'node scripts/verify-direct-preview-config.mjs', 'Release verifier must use the direct Cloudflare contract');
 requireValue(packageJson.scripts?.['preview:bootstrap'] === 'node scripts/cloudflare-preview-bootstrap.mjs', 'Preview bootstrap command drifted');
+requireValue(packageJson.scripts?.['production:deploy'] === 'node scripts/cloudflare-direct-production-deploy.mjs', 'Production deploy command drifted');
 
 requireValue(!existsSync('.dev.vars.example'), 'Deploy-template secret form must not exist');
 requireValue(!existsSync('scripts/verify-one-click-deploy.mjs'), 'One-click fork verifier must not exist');
 requireValue(!readme.includes('deploy.workers.cloudflare.com'), 'README must not use Deploy to Cloudflare');
 requireValue(readme.includes('defragapp/OPENAPI'), 'README must name the canonical repository');
 requireValue(readme.includes('Cloudflare Queue and R2 are intentionally disabled'), 'README must document the no-Queue, no-R2 launch architecture');
+requireValue(readme.includes('GitHub Actions is not supported for this repository'), 'README must explicitly prohibit GitHub Actions');
+requireValue(readme.includes('Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`'), 'README Cloudflare build command drifted');
+requireValue(readme.includes('Deploy command: `pnpm production:deploy`'), 'README Cloudflare deploy command drifted');
 
+for (const required of ['WORKERS_CI_COMMIT_SHA', 'APP_VERSION', "'d1', 'migrations', 'apply'", "'deploy', '--config'", 'verifyLiveProduction']) {
+  requireValue(productionDeploy.includes(required), `Production deploy is missing ${required}`);
+}
 for (const required of ['PREVIEW_BASE_URL', 'PREVIEW_SESSION_SIGNING_SECRET', "['deploy', '--env', 'preview'", 'sovereign-openapi-preview-db']) {
   requireValue(bootstrap.includes(required), `Preview bootstrap is missing ${required}`);
 }
 
-console.log('Direct Cloudflare release config verified existing_repo=true production_root=true modern_auth_entry=true isolated_preview=true fork=false r2=false queues=false d1=true durable_objects=true ai=true assets=true');
+console.log('Direct Cloudflare release config verified existing_repo=true production_root=true modern_auth_entry=true cloudflare_builds_only=true github_actions=false isolated_preview=true fork=false r2=false queues=false d1=true durable_objects=true ai=true assets=true');
