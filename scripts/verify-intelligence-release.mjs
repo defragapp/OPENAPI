@@ -31,7 +31,7 @@ containsAll('visual intelligence runtime', ui, [
   'YOUR BASELINE, ALIVE TODAY',
   'baseline-core-object',
   'live-sky-halo',
-  'Alignment Needle',
+  'ALIGNMENT NEEDLE',
   'SHADOW–LIGHT RAIL',
   'perspective-split',
   'system-map-preview',
