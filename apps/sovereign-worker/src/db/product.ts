@@ -67,13 +67,15 @@ export async function listSystems(env: Env, accountId: string) {
     membersBySystem.set(systemId, members);
   }
 
-  return (rows.results ?? []).map((row) => ({
-    id: row.id,
-    systemType: row.system_type,
-    name: row.name,
-    metadata: parseJson(row.metadata_json),
-    members: membersBySystem.get(row.id) ?? []
-  }));
+  return (rows.results ?? [])
+    .filter((row): row is Record<string, string> & { id: string } => typeof row.id === 'string' && row.id.length > 0)
+    .map((row) => ({
+      id: row.id,
+      systemType: row.system_type,
+      name: row.name,
+      metadata: parseJson(row.metadata_json),
+      members: membersBySystem.get(row.id) ?? []
+    }));
 }
 
 export async function addSystemMember(env: Env, accountId: string, systemId: string, personId: string, metadata: Record<string, unknown>) {
