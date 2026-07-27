@@ -1,4 +1,4 @@
-:root {
+.app-shell {
   --page: #09090a;
   --page-soft: #101012;
   --panel: #19191b;
@@ -40,9 +40,9 @@
   color: var(--ink);
 }
 
-input,
-textarea,
-select {
+.app-shell input:not([type="checkbox"]):not([type="radio"]),
+.app-shell textarea,
+.app-shell select {
   min-height: 48px;
   border: 1px solid rgba(255,250,242,.28);
   background: #101012;
@@ -50,22 +50,22 @@ select {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
 }
 
-input::placeholder,
-textarea::placeholder {
+.app-shell input::placeholder,
+.app-shell textarea::placeholder {
   color: #aaa299;
   opacity: 1;
 }
 
-input:hover,
-textarea:hover,
-select:hover {
+.app-shell input:not([type="checkbox"]):not([type="radio"]):hover,
+.app-shell textarea:hover,
+.app-shell select:hover {
   border-color: rgba(222,160,116,.56);
   background: #141416;
 }
 
-input:focus,
-textarea:focus,
-select:focus {
+.app-shell input:not([type="checkbox"]):not([type="radio"]):focus,
+.app-shell textarea:focus,
+.app-shell select:focus {
   border-color: var(--clay-light);
   box-shadow: 0 0 0 3px rgba(222,160,116,.14);
 }
