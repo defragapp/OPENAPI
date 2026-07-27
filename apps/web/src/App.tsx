@@ -4,6 +4,8 @@ import { PlanOnboarding } from './PlanOnboarding';
 import { SovereignWorkspace } from './SovereignWorkspace';
 
 type ConsentDecision = 'granted' | 'denied';
+type TurnstileState = 'loading' | 'ready' | 'verified' | 'expired' | 'error' | 'unsupported';
+type FieldErrors = Partial<Record<'email' | 'name' | 'terms' | 'turnstile', string>>;
 
 const consentScopes = [
   ['pair.compare', 'Compare together'],
@@ -41,53 +43,137 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
   const [accepted, setAccepted] = useState(false);
   const [state, setState] = useState('Ready');
   const [message, setMessage] = useState('');
+  const [statusTone, setStatusTone] = useState<'neutral' | 'success' | 'error'>('neutral');
+  const [turnstileState, setTurnstileState] = useState<TurnstileState>('loading');
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [linkSent, setLinkSent] = useState(false);
+  const requestedReturnTo = useMemo(() => safeClientReturnTo(new URLSearchParams(location.search).get('returnTo')), []);
 
   useEffect(() => {
-    if (mode === 'redeem' || document.querySelector('script[data-turnstile]')) return;
-    const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-    script.async = true;
-    script.defer = true;
-    script.dataset.turnstile = 'true';
-    document.head.appendChild(script);
+    if (mode === 'redeem') return;
+    const listener = (event: Event) => {
+      const detail = (event as CustomEvent<{ state?: TurnstileState; action?: string }>).detail;
+      if (detail?.action === mode && detail.state) {
+        setTurnstileState(detail.state);
+        if (detail.state === 'verified') setFieldErrors((current) => ({ ...current, turnstile: undefined }));
+      }
+    };
+    window.addEventListener('sovereign:turnstile-state', listener);
+    return () => window.removeEventListener('sovereign:turnstile-state', listener);
   }, [mode]);
 
   useEffect(() => {
     if (mode !== 'redeem') return;
-    void redeem(new URLSearchParams(location.search).get('token') ?? '');
+    const parameters = new URLSearchParams(location.search);
+    void redeem(parameters.get('token') ?? '', parameters.get('returnTo'));
   }, [mode]);
 
-  async function redeem(token: string) {
+  async function redeem(token: string, returnTo: string | null) {
     setState('Checking link');
-    const response = await fetch(`/api/v1/auth/redeem?token=${encodeURIComponent(token)}`);
-    if (response.status === 410) return setState('This link expired');
-    if (response.status === 409) return setState('This link was already used');
-    if (!response.ok) return setState('This link is invalid');
+    setStatusTone('neutral');
+    const parameters = new URLSearchParams({ token });
+    parameters.set('returnTo', safeClientReturnTo(returnTo));
+    const response = await fetch(`/api/v1/auth/redeem?${parameters.toString()}`);
+    if (response.status === 410) {
+      setStatusTone('error');
+      setMessage('Request a new private link from the sign-in page.');
+      return setState('This link expired');
+    }
+    if (response.status === 409) {
+      setStatusTone('error');
+      setMessage('For your protection, each link can open Sovereign.OS only once.');
+      return setState('This link was already used');
+    }
+    if (!response.ok) {
+      setStatusTone('error');
+      setMessage('Request a new private link. Nothing was changed in your account.');
+      return setState('This link is invalid');
+    }
     const payload = await response.json().catch(() => ({})) as { next?: string };
+    const next = safeClientReturnTo(payload.next, '/app');
     setState('Signed in');
+    setStatusTone('success');
     setMessage('Opening Sovereign.OS.');
-    setTimeout(() => location.assign(payload.next === '/onboarding' ? '/onboarding' : '/app'), 300);
+    setTimeout(() => location.assign(next), 300);
+  }
+
+  function resetTurnstile() {
+    setTurnstileState('loading');
+    window.dispatchEvent(new CustomEvent('sovereign:turnstile-reset', { detail: { action: mode } }));
   }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (!email.includes('@') || (mode === 'signup' && (!name.trim() || !accepted))) {
-      setState('Check the highlighted details');
+    if (submitting || linkSent) return;
+
+    const nextErrors: FieldErrors = {};
+    if (!email.includes('@')) nextErrors.email = 'Enter a complete email address.';
+    if (mode === 'signup' && !name.trim()) nextErrors.name = 'Enter the name you want Sovereign.OS to use.';
+    if (mode === 'signup' && !accepted) nextErrors.terms = 'Review and accept the Terms and Privacy Policy.';
+    if (turnstileState !== 'verified') nextErrors.turnstile = turnstileState === 'error' || turnstileState === 'unsupported'
+      ? 'The security check is unavailable. Refresh the page or try another browser.'
+      : 'Complete the private security check before continuing.';
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length) {
+      setState('Review the details below');
+      setMessage('Your account was not changed.');
+      setStatusTone('error');
       return;
     }
-    setState('Verifying');
+
+    setSubmitting(true);
+    setState('Sending private link');
+    setMessage('Keep this page open while the request completes.');
+    setStatusTone('neutral');
     const turnstileToken = (document.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null)?.value ?? '';
-    const response = await fetch(`/api/v1/auth/${mode}`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email, name, termsAccepted: accepted, turnstileToken })
-    });
-    if (response.status === 429) return setState('Please wait before requesting another link');
-    if (response.status === 503) return setState('Sign-in is temporarily unavailable');
-    if (!response.ok) return setState('Check the details and try again');
-    setState('Link sent');
-    setMessage('Check your email for the private sign-in link.');
+    try {
+      const response = await fetch(`/api/v1/auth/${mode}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email, name, termsAccepted: accepted, turnstileToken, returnTo: requestedReturnTo })
+      });
+      const problem = await response.clone().json().catch(() => ({})) as { reason?: string; field?: keyof FieldErrors };
+      if (!response.ok) {
+        if (problem.field) setFieldErrors((current) => ({ ...current, [problem.field!]: problem.field === 'email' ? 'Enter a complete email address.' : problem.field === 'name' ? 'Enter the name you want Sovereign.OS to use.' : 'Review and accept the Terms and Privacy Policy.' }));
+        if (response.status === 429) {
+          setState('A link was requested recently');
+          setMessage('Wait two minutes, then complete a fresh security check and try again.');
+        } else if (response.status === 503) {
+          setState('Sign-in is temporarily unavailable');
+          setMessage('No account change was made. Try again in a moment.');
+        } else if (problem.reason === 'expired_or_used') {
+          setState('The security check expired');
+          setMessage('A fresh check is loading now. Complete it, then send the link again.');
+        } else if (problem.reason === 'hostname_mismatch' || problem.reason === 'action_mismatch') {
+          setState('The security check did not match this page');
+          setMessage('Refresh this page before trying again.');
+        } else if (problem.reason === 'required' || problem.reason === 'invalid') {
+          setState('Complete a fresh security check');
+          setMessage('The previous check could not be verified.');
+        } else {
+          setState('Review the details and try again');
+          setMessage('No account change was made.');
+        }
+        setStatusTone('error');
+        resetTurnstile();
+        return;
+      }
+      setState('Private link sent');
+      setMessage('Check your inbox. The link expires in 15 minutes and can be used once.');
+      setStatusTone('success');
+      setLinkSent(true);
+    } catch {
+      setState('The request could not reach Sovereign.OS');
+      setMessage('Check your connection, then complete a fresh security check and try again.');
+      setStatusTone('error');
+      resetTurnstile();
+    } finally {
+      setSubmitting(false);
+    }
   }
+
+  const buttonDisabled = submitting || linkSent || turnstileState !== 'verified';
 
   return (
     <main className="account-shell">
@@ -101,7 +187,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
       </header>
       <div className={`account-layout ${mode === 'redeem' ? 'redeem-layout' : ''}`}>
         <section className="account-intro">
-          <p className="eyebrow">{mode === 'login' ? 'YOUR WORKSPACE' : 'START WITH YOUR BASELINE'}</p>
+          <p className="eyebrow">{mode === 'login' ? 'YOUR SOVEREIGN.OS' : 'START WITH YOUR BASELINE'}</p>
           <h1>
             {mode === 'signup'
               ? 'Understand your life in context.'
@@ -111,59 +197,64 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
           </h1>
           <p className="lede">
             {mode === 'signup'
-              ? 'Create your account, then build a starting map for decisions, relationships, and the groups around you.'
+              ? 'Create your account, choose how you want to begin, and build the personal foundation beneath every exploration.'
               : mode === 'redeem'
-                ? 'Your workspace will open in a moment.'
-                : 'Return to Today, your conversations, and the insights you chose to save.'}
+                ? 'Your private Sovereign.OS will open in a moment.'
+                : 'Return to your Baseline, the questions you were exploring, and the understandings you chose to keep.'}
           </p>
           {mode !== 'redeem' && (
             <ul className="account-points">
-              <li>Work through a decision with your own patterns in view</li>
-              <li>Prepare for a difficult conversation without guessing motives</li>
-              <li>See how roles and responsibility shape a family or team</li>
+              <li>Bring a decision into view with your Baseline underneath it</li>
+              <li>Understand a relationship without guessing another person’s motives</li>
+              <li>See roles and responsibility across a family, household, or team</li>
             </ul>
           )}
         </section>
 
         <section className="auth-panel">
           <p className="eyebrow">{mode === 'signup' ? 'START FREE' : mode === 'redeem' ? 'OPENING' : 'SIGN IN'}</p>
-          <h2>{mode === 'signup' ? 'Create your account.' : mode === 'redeem' ? 'One moment.' : 'Open your workspace.'}</h2>
+          <h2>{mode === 'signup' ? 'Create your account.' : mode === 'redeem' ? 'One moment.' : 'Continue into Sovereign.OS.'}</h2>
           <p className="auth-explainer">
             {mode === 'signup'
-              ? 'Create your account, choose Free or Sovereign+, then enter your private workspace.'
+              ? 'Confirm your email, choose Free or Sovereign+, and enter your private personal intelligence environment.'
               : mode === 'redeem'
                 ? 'This should take only a moment.'
-                : 'Enter your email and we will send the link that opens your workspace.'}
+                : 'Enter your email. We will send a private, one-time link that returns you to Sovereign.OS.'}
           </p>
           {mode !== 'redeem' && (
-            <form onSubmit={submit} className="form-stack">
+            <form onSubmit={submit} className="form-stack" noValidate>
               {mode === 'signup' && (
-                <Field label="Your name">
-                  <input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" />
+                <Field label="Your name" error={fieldErrors.name}>
+                  <input value={name} onChange={(event) => { setName(event.target.value); setFieldErrors((current) => ({ ...current, name: undefined })); }} autoComplete="name" aria-invalid={Boolean(fieldErrors.name)} />
                 </Field>
               )}
-              <Field label="Email address">
-                <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" />
+              <Field label="Email address" error={fieldErrors.email}>
+                <input type="email" value={email} onChange={(event) => { setEmail(event.target.value); setFieldErrors((current) => ({ ...current, email: undefined })); }} autoComplete="email" inputMode="email" aria-invalid={Boolean(fieldErrors.email)} />
               </Field>
               {mode === 'signup' && (
-                <label className="check-line">
-                  <input type="checkbox" checked={accepted} onChange={(event) => setAccepted(event.target.checked)} />
+                <label className={`check-line ${fieldErrors.terms ? 'has-error' : ''}`}>
+                  <input type="checkbox" checked={accepted} onChange={(event) => { setAccepted(event.target.checked); setFieldErrors((current) => ({ ...current, terms: undefined })); }} aria-invalid={Boolean(fieldErrors.terms)} />
                   <span>I accept the Terms and Privacy Policy.</span>
                 </label>
               )}
-              <div
-                className="turnstile-slot"
-                data-sitekey={(window as any).__TURNSTILE_SITE_KEY__ ?? 'configured-at-runtime'}
-                data-action={mode}
-              >
-                Protected by Cloudflare Turnstile
+              {fieldErrors.terms && <p className="field-error">{fieldErrors.terms}</p>}
+              <div className="turnstile-frame" data-state={turnstileState}>
+                <div
+                  className="turnstile-slot"
+                  data-sitekey={(window as any).__TURNSTILE_SITE_KEY__ ?? 'configured-at-runtime'}
+                  data-action={mode}
+                />
+                <p data-turnstile-caption aria-live="polite">
+                  {turnstileState === 'verified' ? 'Security check complete.' : 'Preparing the private security check…'}
+                </p>
               </div>
-              <button className="primary-button">
-                {mode === 'signup' ? 'Create account' : 'Email my sign-in link'}
+              {fieldErrors.turnstile && <p className="field-error">{fieldErrors.turnstile}</p>}
+              <button className="primary-button" disabled={buttonDisabled}>
+                {submitting ? 'Sending…' : linkSent ? 'Check your inbox' : mode === 'signup' ? 'Create account' : 'Email my private link'}
               </button>
             </form>
           )}
-          <div className="status-note" aria-live="polite">
+          <div className={`status-note ${statusTone}`} aria-live="polite">
             <span>{state}</span>
             {message && <p>{message}</p>}
           </div>
@@ -275,12 +366,23 @@ function InvitationPage() {
                 </div>
               ))}
             </div>
-            <button className="primary-button" disabled={!completed} onClick={() => location.assign('/app')}>Open my workspace</button>
+            <button className="primary-button" disabled={!completed} onClick={() => location.assign('/app')}>Open Sovereign.OS</button>
           </section>
         )}
       </section>
     </main>
   );
+}
+
+function safeClientReturnTo(value: unknown, fallback = '/app'): string {
+  if (typeof value !== 'string' || value.length > 512 || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback;
+  try {
+    const parsed = new URL(value, location.origin);
+    const allowed = parsed.pathname === '/app' || parsed.pathname.startsWith('/app/') || parsed.pathname === '/onboarding';
+    return allowed ? `${parsed.pathname}${parsed.search}` : fallback;
+  } catch {
+    return fallback;
+  }
 }
 
 function scopeLabel(scope: string): string {
@@ -291,6 +393,6 @@ function scopeDescription(scope: string): string {
   return consentScopeDescriptions[scope] ?? 'Use only the context covered by this permission.';
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return <label className="field"><span>{label}</span>{children}</label>;
+function Field({ label, children, error }: { label: string; children: ReactNode; error?: string }) {
+  return <label className={`field ${error ? 'has-error' : ''}`}><span>{label}</span>{children}{error && <small className="field-error">{error}</small>}</label>;
 }

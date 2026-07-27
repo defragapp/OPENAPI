@@ -2,16 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
-const workspace = readFileSync(new URL('./SovereignWorkspace.tsx', import.meta.url), 'utf8');
+const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
+const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
-const styles = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
+const styles = readFileSync(new URL('./visual-intelligence.css', import.meta.url), 'utf8');
 
 describe('authenticated product flow', () => {
-  it('routes account creation through plan confirmation into one workspace', () => {
+  it('routes account creation through plan confirmation into one Sovereign intelligence experience', () => {
     expect(app).toContain("path === '/onboarding'");
     expect(app).toContain('<PlanOnboarding />');
-    expect(app).toContain('<SovereignWorkspace />');
-    expect(app).toContain("payload.next === '/onboarding'");
+    expect(app).toContain('safeClientReturnTo');
+    expect(main).toContain('<SovereignIntelligenceWorkspace />');
     expect(onboarding).toContain('Choose a plan');
     expect(onboarding).toContain("location.assign('/app')");
   });
@@ -31,11 +32,11 @@ describe('authenticated product flow', () => {
     expect(workspace).toContain('Save to Library');
   });
 
-  it('keeps the conversation primary on desktop and mobile', () => {
-    expect(styles).toContain('.chat-sidebar');
-    expect(styles).toContain('.conversation-shell');
-    expect(styles).toContain('.chat-composer');
-    expect(styles).toContain('@media (max-width: 800px)');
+  it('keeps the intelligence canvas primary on desktop and mobile', () => {
+    expect(styles).toContain('.intelligence-sidebar');
+    expect(styles).toContain('.intelligence-main');
+    expect(styles).toContain('.sovereign-composer');
+    expect(styles).toContain('@media (max-width: 820px)');
     expect(styles).toContain('min-height: 44px');
   });
 });

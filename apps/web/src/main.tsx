@@ -17,6 +17,7 @@ import './baseline-orbit.css';
 import './workspace-chat.css';
 import './visual-intelligence.css';
 import './system-membership.css';
+import './auth-polish.css';
 
 installProductionRuntime();
 installProductRuntime();

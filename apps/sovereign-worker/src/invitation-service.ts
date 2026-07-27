@@ -1,5 +1,5 @@
 import type { Env } from './env';
-import { sendOperationalEmail } from './email';
+import { buildSovereignEmail, sendOperationalEmail } from './email';
 import { resolveAccount } from './db/accounts';
 import { createSignedSessionToken } from './security/auth';
 import { CONSENT_SCOPES, type ConsentScope, type InvitationStatus } from './db/people';
@@ -9,6 +9,16 @@ const INVITATION_TTL_DAYS = 7;
 const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60;
 const CONSENT_POLICY_VERSION = '2026-07-24';
 const DEFAULT_INVITATION_SCOPES: ConsentScope[] = ['pair.compare', 'trait.display'];
+
+const consentScopeEmailLabels: Record<ConsentScope, string> = {
+  'pair.compare': 'Compare two permitted Baselines while keeping each person distinct.',
+  'system.include': 'Include your permitted context in a family, household, friendship, or team view.',
+  'trait.display': 'Use only the plain-language Baseline themes you choose to share.',
+  'framework.display': 'Show optional supporting framework detail.',
+  'current_conditions.use': 'Include temporary current context while permission remains active.',
+  'library.link': 'Use a deliberately saved understanding as shared context.',
+  'covenant.include': 'Include your permitted context only when the optional Covenant lens is selected.'
+};
 
 type ConsentDecision = 'granted' | 'denied';
 
@@ -68,13 +78,26 @@ export async function sendInvitation(request: Request, env: Env, accountId: stri
     .bind(id, accountId, personId, emailHash, actor, email, tokenHash, JSON.stringify(requestedScopes), CONSENT_POLICY_VERSION).run();
 
   const baseUrl = publicBaseUrl(request, env);
-  const url = `${baseUrl}/invitation?token=${encodeURIComponent(token)}`;
-  const manageUrl = `${baseUrl}/consent.html`;
+  const invitationUrl = new URL('/invitation', baseUrl);
+  invitationUrl.searchParams.set('token', token);
+  const emailTemplate = buildSovereignEmail({
+    eyebrow: 'Private relationship invitation',
+    title: 'You decide what this connection may use.',
+    intro: 'A Sovereign.OS user invited you to review a private relationship connection. Accepting does not grant blanket access. You decide each requested use separately.',
+    actionLabel: 'Review the private invitation',
+    actionUrl: invitationUrl.toString(),
+    details: [
+      `The invitation expires in ${INVITATION_TTL_DAYS} days.`,
+      'Raw birth details, exact private location, and the sender’s private notes are not included in this email.',
+      ...requestedScopes.map((scope) => consentScopeEmailLabels[scope])
+    ],
+    footer: 'You can deny any requested use and revoke an active permission later from your own Sovereign.OS controls.'
+  });
   try {
     await sendOperationalEmail(env, {
       to: email,
-      subject: 'A private Sovereign.OS invitation',
-      text: `You were invited to share selected Baseline context in Sovereign.OS. Review the request and decide each scope yourself. This one-time link expires in ${INVITATION_TTL_DAYS} days: ${url}\n\nAfter accepting, you can review or revoke every permission at any time: ${manageUrl}`,
+      subject: 'Review a private Sovereign.OS invitation',
+      ...emailTemplate,
       idempotencyKey: id
     });
   } catch (error) {
