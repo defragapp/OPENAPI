@@ -28,9 +28,10 @@ describe('Sovereign account and workspace shell', () => {
     expect(workspace).toContain('Not today');
   });
 
-  it('routes signup through explicit tier confirmation', () => {
-    expect(app).toContain('Create your account, choose Free or Sovereign+, then enter your private workspace.');
-    expect(app).toContain("payload.next === '/onboarding'");
+  it('routes signup through explicit tier confirmation and preserves safe return context', () => {
+    expect(app).toContain('Confirm your email, choose Free or Sovereign+, and enter your private personal intelligence environment.');
+    expect(app).toContain('safeClientReturnTo');
+    expect(app).toContain('returnTo: requestedReturnTo');
     expect(onboarding).toContain('Your plan is confirmed before the workspace opens.');
     expect(onboarding).toContain('/api/v1/account/onboarding');
     expect(onboarding).toContain('/api/v1/billing/checkout');
@@ -58,10 +59,11 @@ describe('Sovereign account and workspace shell', () => {
     expect(consentRuntime).toContain('Permission revoked for future use.');
   });
 
-  it('uses direct auth language without exposing security implementation detail', () => {
+  it('uses direct auth language with visible, enumeration-safe guidance', () => {
     expect(app).toContain('Understand your life in context.');
     expect(app).toContain('Welcome back.');
-    expect(app).toContain('Check your email for the private sign-in link.');
+    expect(app).toContain('Check your inbox. The link expires in 15 minutes and can be used once.');
+    expect(app).toContain('No account change was made.');
     expect(app).not.toMatch(/never reveal whether|whether or not an account exists|no password/i);
   });
 
