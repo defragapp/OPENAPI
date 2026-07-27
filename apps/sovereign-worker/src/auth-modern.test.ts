@@ -18,7 +18,7 @@ describe('modern account access', () => {
     await expect(verifyPasswordRecord('A different private password 2026', record)).resolves.toBe(false);
   });
 
-  it('verifies provider tokens before linking an identity', () => {
+  it('verifies provider tokens and browser-bound state before linking an identity', () => {
     for (const required of [
       "header.alg !== 'RS256'",
       'issuers.includes(claims.iss)',
@@ -27,7 +27,10 @@ describe('modern account access', () => {
       'crypto.subtle.verify',
       'state.nonce_hash',
       'email_verified',
-      'auth_external_identities'
+      'auth_external_identities',
+      "readCookie(request, OAUTH_STATE_COOKIE)",
+      "await sha256(browserState) !== stateHash",
+      'HttpOnly; Secure; SameSite=None'
     ]) {
       expect(oauth).toContain(required);
     }
