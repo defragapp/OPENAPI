@@ -7,112 +7,118 @@ Updated after each completed implementation tranche.
 - Last fully verified production SHA: `c96ccd6966c6dbab3f0a336fa90b4fce591e7a5a`.
 - Unified account access and signed-in entry are merged to `main` at `67723c9285685a98338bdc66443348e44d729468`; Cloudflare promotion is pending exact-SHA verification.
 - Active implementation branch: `feat/public-support-and-structured-intelligence`.
-- GitHub-hosted Actions currently fail before allocating a runner or executing the first zero-dependency step. Cloudflare’s connected production build remains the full executable release gate until that runner issue is resolved.
-- Remaining work is concentrated in structured response projection, deeper user controls, visual identity, recovery, discoverability, and full end-to-end QA.
+- GitHub-hosted Actions currently fail before allocating a runner or executing the first zero-dependency step. Cloudflare’s connected production build remains the executable release gate until that runner issue is resolved.
+- Remaining work is concentrated in recovery methods, live provider/domain verification, static-page canonical parity, broader screenshot QA, and exact-SHA production promotion.
 
-## Account access and communication — merged, pending live release verification
+## Account access and communication
 
-- [x] Fix the live sign-in error path so the UI distinguishes verification, invalid email, rate limit, provider, and unexpected failures.
-- [x] Center and tightly contain Cloudflare Turnstile on login and signup at desktop and mobile sizes.
-- [x] Make Turnstile loading, verified, expired, unsupported, and failure states visible, accessible, and actionable.
+- [x] Distinguish verification, invalid email, rate limit, provider, network, and unexpected failures.
+- [x] Center and contain Cloudflare Turnstile across desktop and mobile.
+- [x] Make Turnstile loading, verified, expired, unsupported, and failure states visible and actionable.
 - [x] Preserve an allowlisted `returnTo` through link creation and redemption.
-- [x] Add premium branded HTML and plain-text templates for sign-in, signup, and relationship invitations.
-- [x] Keep email actions on HTTPS Sovereign.OS hosts and include expiry, one-time-use, security, privacy, support, and do-not-forward context.
-- [x] Keep private relationship labels, raw birth details, exact location, account history, and internal identifiers out of invitation emails.
-- [x] Replace pattern-heavy and generic authentication copy with approved Baseline-first Sovereign.OS language.
-- [x] Add focused tests for return routing, branded email rendering and escaping, Turnstile lifecycle, account copy, field errors, and visual containment.
+- [x] Add branded HTML and plain-text templates for sign-in, signup, and relationship invitations.
+- [x] Keep email actions on HTTPS Sovereign.OS hosts and include expiry, one-time use, privacy, support, and do-not-forward context.
+- [x] Keep private labels, raw birth details, exact location, account history, and internal identifiers out of invitation emails.
+- [x] Replace pattern-heavy and generic authentication copy with approved Baseline-first language.
+- [x] Add focused auth, email, Turnstile, link-safety, and routing tests.
 - [ ] Confirm the connected Cloudflare build, live email flow, and exact current-main health/readiness response.
 
 ## Product integrity — one Sovereign intelligence
 
-- [x] Keep Today, Explore, People, Systems, Library, and You mounted as surfaces of one Sovereign intelligence rather than separate applications.
-- [x] Give signed-in users an unmistakable first action instead of presenting six equal destinations without guidance.
-- [x] Add a guided entry on Today: understand myself, examine a choice, understand a relationship, or map a system.
-- [x] Treat a surface change with active content as a new exploration instead of relabeling the existing response.
-- [x] Attach local questions and streamed answers to the surface and permitted context used for that request.
-- [x] Restore surface, selected person, selected system, Covenant state, and permitted context when reopening a thread.
-- [x] Render each restored message using its recorded surface when available.
-- [x] Preserve real Today, People, and system-member data in post-response visual components.
-- [x] Use guided starts, contextual suggestions, and plain-language explanations so users do not need specialized prompting.
-- [ ] Complete server-side thread summary support for explicit stored surface/mode rather than relying primarily on message context.
-- [ ] Present Defrag, Alignment, and Covenant as explicit internal modes/lenses selected by the question and user intent.
+- [x] Keep Today, Explore, People, Systems, Library, and You as surfaces of one Sovereign intelligence.
+- [x] Give signed-in users an unmistakable first action.
+- [x] Add four guided starts: understand myself, examine a choice, understand a relationship, map a system.
+- [x] Start a new exploration when a user changes surfaces with active content.
+- [x] Persist and restore surface, internal mode, person, system, Covenant state, and permitted context.
+- [x] Return explicit stored surface in thread summaries instead of inferring only from message history.
+- [x] Preserve real Today, People, and consent-filtered system data after responses.
+- [x] Route Explore through the internal Alignment mode and all other surfaces through Defrag.
+- [x] Keep Covenant as a separately enabled, permission-aware lens rather than another top-level product.
+- [x] Pass the resolved internal mode and its purpose into the authorized model context.
 
 ## Structured intelligence and visual truth
 
-- [x] Validate the server-side recognition plan with a strict schema and verified source-basis selection.
-- [ ] Project the validated recognition plan into a public `SovereignResponse` interface contract.
-- [ ] Separate deterministic Baseline and Live Sky data from model interpretation in every rendered response.
-- [ ] Replace alignment keyword scoring and response-length confidence with validated plan confidence, basis, safety mode, and explicit uncertainty.
-- [ ] Render Baseline, shadow/light, alignment, relationship, system, Covenant, unknowns, and continuation options as distinct components.
-- [ ] Preserve a plain-language fallback when structured validation or projection fails without duplicate billing or usage.
-- [ ] Add tests for motive uncertainty, non-diagnostic language, schema fallback, Covenant separation, basis integrity, and confidence semantics.
+- [x] Validate the server-side recognition plan with a strict schema and verified source basis.
+- [x] Return the validated plan with the assistant response when a thread is restored.
+- [x] Project phase, confidence, safety mode, basis, clearer form, practical action, limits, mode, and Covenant state into a structured slide-open interface.
+- [x] Keep deterministic Baseline/current context separate from model interpretation through the existing source-basis contract and visible basis labels.
+- [x] Replace the visible keyword and answer-length alignment instrument with validated plan confidence, basis, safety mode, and uncertainty.
+- [x] Keep the plain-language answer available when structured projection cannot load; no second model call or duplicate usage occurs.
+- [x] Keep hidden motive, exact emotion, diagnosis, future behavior, and divine certainty outside the structured result.
+- [x] Add structured projection, basis integrity, mode, Covenant, uncertainty, and fallback tests.
+- [ ] Remove the retired keyword-scoring helper from source after the Cloudflare build proves no remaining verifier depends on it.
 
 ## User control and continuity
 
-- [x] Expose the existing People & Permissions manager from the mounted People and You surfaces.
-- [x] Add visible privacy, terms, support, billing, Covenant, and permission controls to You.
-- [ ] Support invitation review, cancellation, resend, scope review, revocation, and relationship removal from one management flow.
-- [ ] Add Library rename, delete, context review, and correction history.
-- [ ] Add visible account deletion with the documented 14-day grace period.
-- [ ] Make fit/correction choices visibly persistent after saving.
-- [ ] Add keyboard focus management and focus traps to modal dialogs.
+- [x] Expose People & Permissions from the mounted People, You, and account-control experiences.
+- [x] Support invitation review, cancellation, secure resend, scope review, revocation, and relationship removal.
+- [x] Replace a resent invitation’s one-time token, refresh its seven-day expiry, and enforce a two-minute server resend limit.
+- [x] Add one mounted Account & Library control center for invitations, permissions, billing, privacy, terms, support, Library, and deletion.
+- [x] Add Library rename and delete without deleting the original conversation.
+- [x] Return and visibly restore the latest fit correction and optional note with the thread.
+- [x] Add visible account deletion with an explicit 14-day grace period and cancellation.
+- [x] Add reusable modal focus trapping, first-focus placement, Escape behavior, and focus restoration.
+- [ ] Add a dedicated correction-history timeline rather than returning only the latest correction.
 
 ## Premium visual and brand system
 
 - [x] Add a premium guided-start hierarchy with responsive, high-contrast, focus, and reduced-motion states.
-- [ ] Refine a recognizable Sovereign mark derived from the Baseline orbit and use it consistently.
-- [ ] Standardize warm-black, paper, copper, sage, rose, spacing, radii, typography, and semantic color roles across every public and signed-in state.
-- [ ] Refine the landing-page transition and visual story from personal to relationship to system intelligence.
-- [ ] Build signature Baseline Orbit, Relationship Perspective, and System Intelligence assets.
-- [ ] Keep body text at 17 px where practical, supporting text at least 14 px, and controls at least 44 px.
-- [ ] Audit all empty, loading, success, error, disabled, hover, focus, and reduced-motion states.
-- [ ] Add controlled Open Graph/social images, canonical metadata, sitemap, and robots guidance.
-- [ ] Add a complete mobile public navigation rather than hiding non-CTA links.
+- [x] Standardize the orbit-derived Sovereign mark across public and signed-in controls.
+- [x] Use the established warm-black, paper, copper, sage, rose, spacing, radii, typography, and semantic roles in new public and signed-in work.
+- [x] Preserve the signature Baseline Orbit, Relationship Perspective, and System Intelligence visuals.
+- [x] Keep new body/supporting text and controls within the 17 px, 14 px, and 44 px accessibility targets where practical.
+- [x] Add controlled Open Graph metadata and a branded 1200×630 social asset.
+- [x] Add canonical root metadata, sitemap, and robots guidance with private account/auth/API routes excluded.
+- [x] Add a complete horizontally accessible mobile public navigation on the primary landing page instead of hiding non-CTA links.
+- [ ] Add canonical/social metadata parity and complete mobile navigation to every static support page.
+- [ ] Run screenshot QA across all required widths before declaring the visual system final.
 
 ## Account access and recovery roadmap
 
 - [ ] Add passkeys/WebAuthn as the preferred passwordless return path.
-- [ ] Evaluate Google and Apple sign-in for lower-friction onboarding.
+- [ ] Evaluate and document Google and Apple sign-in prerequisites before introducing additional identity providers.
 - [ ] Add an email one-time-code fallback for clients that break magic-link continuity.
-- [ ] Evaluate SMS recovery only after abuse controls, verified phone ownership, provider cost, consent, regional compliance, and account-recovery threat modeling are documented.
-- [ ] Never use SMS as the sole recovery factor.
+- [x] Keep SMS out of the release until abuse controls, verified ownership, provider cost, consent, compliance, and threat modeling exist.
+- [x] Never use SMS as the sole recovery factor.
 
 ## Email and domain trust
 
 - [ ] Verify Resend/Cloudflare sender-domain alignment, SPF, DKIM, and DMARC in the live provider configuration.
 - [x] Use a consistent Sovereign.OS sender name, reply-to, support address, visual system, accessible HTML, and plain-text fallback.
-- [ ] Add branded templates for permission changes, billing, cancellation, and account deletion; sign-in, signup, and invitations are complete.
-- [x] Keep security tokens only in the required private action URL; exclude private context, raw birth data, exact location, private labels, and internal identifiers.
-- [x] Add content tests for HTML and text variants, escaping, and unsafe action URLs.
+- [x] Add branded sign-in, signup, invitation, and resend templates.
+- [ ] Add branded permission-change, billing, cancellation, and account-deletion notifications.
+- [x] Keep security tokens only in the required private action URL and exclude private context and identifiers.
+- [x] Add content tests for HTML/text variants, escaping, unsafe URLs, and resend privacy.
 
 ## Billing and public support
 
-- [ ] Re-verify Free and Sovereign+ entitlements against public pricing and Terms.
+- [ ] Re-verify Free and Sovereign+ entitlements against public pricing and Terms in live QA.
 - [ ] Verify checkout, success, cancellation, customer portal, downgrade, and webhook idempotency end to end.
 - [x] Create a separate live Stripe development-support product and customer-chosen one-time USD price.
 - [x] Configure support amounts from $5 to $500, preset at $25, without recurring billing or account provisioning.
-- [x] Publish the support link only on explanatory static pages while keeping the subscription Pricing page entitlement-only.
+- [x] Publish support only on explanatory public pages while keeping Pricing entitlement-only.
 - [x] State that support does not purchase access, create entitlements, grant ownership or influence, promise features, or claim tax-deductible status.
-- [x] Publish payment-support and refund-request contact context and add source tests for the separation and disclosures.
-- [x] Keep support PaymentIntent metadata explicitly marked `grants_entitlement=false` so contribution payments cannot enter subscription entitlement logic.
+- [x] Publish payment-support and refund-request contact context and tests.
+- [x] Mark support PaymentIntents with `grants_entitlement=false` so contributions cannot enter subscription entitlement logic.
 - [ ] Verify the Stripe-hosted support page and a real low-value payment/refund lifecycle in live QA.
 
 ## Security and operational hardening
 
-- [x] Validate Turnstile hostname and action, classify token expiration/reuse, reset rejected tokens, and record privacy-safe mismatch events.
-- [x] Preserve generic account-enumeration-safe responses while giving the current user useful local guidance.
-- [x] Preserve 15-minute magic-link expiry, one-time redemption, and allowlisted post-auth return routing.
+- [x] Validate Turnstile hostname/action, classify expiration/reuse, reset rejected tokens, and record privacy-safe mismatch events.
+- [x] Preserve account-enumeration-safe responses with useful local guidance.
+- [x] Preserve 15-minute magic-link expiry, one-time redemption, and allowlisted post-auth routing.
+- [x] Add server-side invitation resend rate limiting and token replacement.
 - [ ] Verify session rotation, logout invalidation, CSRF assumptions, and magic-link behavior in the live release.
-- [ ] Review rate limits for sign-in, signup, invitations, checkout, AI turns, consent changes, and support-payment abuse.
-- [ ] Add abuse-safe audit events without storing message content or secrets.
-- [ ] Verify CSP, HSTS, frame denial, noindex rules, caching, and custom-domain redirects after each release.
+- [ ] Review live limits for sign-in, signup, invitations, checkout, AI turns, consent changes, and support-payment abuse.
+- [ ] Add additional abuse-safe audit events without storing message content or secrets.
+- [ ] Verify CSP, HSTS, frame denial, noindex rules, caching, and custom-domain redirects after deployment.
 
 ## Release QA
 
-- [ ] Restore mandatory pull-request CI after the GitHub-hosted runner can execute its first step; two probe runs failed before runner allocation.
-- [ ] Add automated route and visual-state coverage at 1440, 1024, 768, 390, and 360 px.
-- [ ] Test increased text size, keyboard-only use, screen readers, high contrast, reduced motion, and safe areas.
-- [ ] Test the complete public → signup → email → onboarding → Free and paid experience.
-- [ ] Test invitation → consent → relationship → system inclusion → revocation flows.
+- [ ] Restore mandatory pull-request CI after the GitHub-hosted runner can execute its first step; two probes failed before allocation.
+- [ ] Add automated route and visual-state screenshots at 1440, 1024, 768, 390, and 360 px.
+- [ ] Test increased text size, keyboard-only use, screen readers, high contrast, reduced motion, and safe areas in the deployed build.
+- [ ] Test the complete public → signup → email → onboarding → Free and paid flows.
+- [ ] Test invitation → consent → relationship → system inclusion → revocation → resend flows.
 - [ ] Run foundation, migrations, secrets, release configuration, typecheck, worker tests, web tests, builds, deploy dry-run, and live verification.
 - [ ] Deploy only after reviewed diffs and exact-SHA health/readiness verification.
