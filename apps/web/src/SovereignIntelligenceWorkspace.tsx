@@ -67,7 +67,7 @@ const promptSets: Record<Surface, string[]> = {
 export function SovereignIntelligenceWorkspace() {
   const [surface, setSurface] = useState<Surface>('Today');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [contextOpen, setContextOpen] = useState(true);
+  const [contextOpen, setContextOpen] = useState(false);
   const [draft, setDraft] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [threadId, setThreadId] = useState(() => newThreadId('Today'));
@@ -519,7 +519,7 @@ function PerspectiveSplit({ person, today, onPrompt }: { person: Json; today: Js
 function SystemMap({ system, people, onPrompt }: { system: Json; people: Json[]; onPrompt: (prompt: string) => void }) {
   const memberIds = new Set((system.members ?? []).map((member: Json) => member.personId ?? member.id));
   const members = people.filter((person) => memberIds.has(person.id));
-  const visible = members.length > 0 ? members : people.filter((person) => person.identityBound).slice(0, 5);
+  const visible = members;
   return (
     <section className="system-map-card">
       <header><div><p>{String(system.systemType ?? 'SYSTEM').replace('_', ' ').toUpperCase()}</p><h2>{system.name ?? 'Your system'}</h2></div><button onClick={() => onPrompt(`What role does each person occupy in ${system.name ?? 'this system'}?`)}>Explore this system</button></header>
@@ -679,8 +679,9 @@ function responseSections(text: string) {
   const blocks = clean.split(/\n\s*\n+/).map((block) => block.trim()).filter(Boolean);
   return blocks.slice(0, 8).map((block, index) => {
     const lines = block.split('\n').map((line) => line.trim()).filter(Boolean);
-    const heading = lines[0]?.replace(/^#{1,4}\s*/, '').replace(/\*\*/g, '');
-    const hasHeading = lines.length > 1 && (lines[0].startsWith('#') || lines[0].endsWith(':') || lines[0].startsWith('**'));
+    const firstLine = lines[0] ?? '';
+    const heading = firstLine.replace(/^#{1,4}\s*/, '').replace(/\*\*/g, '');
+    const hasHeading = lines.length > 1 && (firstLine.startsWith('#') || firstLine.endsWith(':') || firstLine.startsWith('**'));
     return {
       title: hasHeading ? heading.replace(/:$/, '') : index === 0 ? 'Direct answer' : `What this may show`,
       body: (hasHeading ? lines.slice(1) : lines).join(' ').replace(/^[-*]\s+/gm, '')
