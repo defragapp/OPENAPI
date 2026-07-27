@@ -1,4 +1,5 @@
 import type { Env } from './env';
+import { getModelSafeBaselineContext } from './baseline';
 import { buildPairComparison, buildSystemAnalysis } from './relational-context';
 import { requireFeature, type EntitlementSet } from './db/entitlements';
 
@@ -36,13 +37,20 @@ export async function authorizeConversationContext(
   accountId: string,
   selection: ConversationContextSelection,
   entitlements: EntitlementSet
-): Promise<unknown | undefined> {
+): Promise<unknown> {
   requireConversationContextEntitlement(selection, entitlements);
-  if (selection.personId) return projectModelSafeConversationContext(await buildPairComparison(env, accountId, selection.personId));
-  if (selection.systemId) {
-    return projectModelSafeConversationContext(await buildSystemAnalysis(env, accountId, selection.systemId));
-  }
-  return undefined;
+  const selectedContext = selection.personId
+    ? await buildPairComparison(env, accountId, selection.personId)
+    : selection.systemId
+      ? await buildSystemAnalysis(env, accountId, selection.systemId)
+      : await getModelSafeBaselineContext(env, accountId);
+  return {
+    sovereignMode: selection.mode,
+    modeInstruction: selection.mode === 'alignment'
+      ? 'Examine fit, tradeoffs, pressure, responsibility, and unknowns without issuing a score or deciding for the user.'
+      : 'Clarify the user’s own qualities, needs, response, responsibility, and next choice without turning the conversation into a separate product.',
+    selectedContext: projectModelSafeConversationContext(selectedContext)
+  };
 }
 
 export function requireConversationContextEntitlement(selection: Pick<ConversationContextSelection, 'personId' | 'systemId'>, entitlements: EntitlementSet): void {
