@@ -20,9 +20,9 @@ The founder-approved public contract is defined in [`docs/launch-product-contrac
 
 - TypeScript monorepo
 - Cloudflare Worker: `sovv-web`
-- Public platform: `https://sovereign.defrag.app`
-- Authenticated application and API: `https://app.defrag.app`
-- Legacy Defrag apex preserved separately
+- Public platform Custom Domain: `https://sovereign.defrag.app`
+- Authenticated application and API Custom Domain: `https://app.defrag.app`
+- `defrag.app/*` and `www.defrag.app/*` remain explicit Worker routes that send public traffic to Sovereign.OS and application traffic to the authenticated host
 - D1 canonical storage: `sovereign-openapi-db`
 - SQLite Durable Objects for thread coordination
 - Workers AI through AI Gateway
@@ -36,19 +36,19 @@ The founder-approved public contract is defined in [`docs/launch-product-contrac
 
 Cloudflare Queue and R2 are intentionally disabled. Private export is not part of the launch product. Sharing sends only the public Sovereign.OS link and includes no private workspace data.
 
-## Cloudflare Workers Builds
+## Cloudflare production release
 
-Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the only supported production build and deployment path. GitHub Actions is not supported for this repository and workflow files must not exist.
+The current account has no Cloudflare Workers Builds repository connection. Production is therefore released manually through Wrangler using the repository-owned deployment command. GitHub Actions is not supported for this repository and workflow files must not exist.
 
-Use:
+Use an exact, clean `main` checkout:
 
-- Production branch: `main`
-- Root directory: repository root
 - Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
 - Deploy command: `pnpm production:deploy`
-- Non-production branch builds: disabled
+- Commit stamp: set `WORKERS_CI_COMMIT_SHA` to the full 40-character `main` commit SHA
 
-The deployment script receives the exact Cloudflare Git commit through `WORKERS_CI_COMMIT_SHA`, applies D1 migrations, preserves existing encrypted Worker secrets, stamps `APP_VERSION`, deploys `sovv-web`, and then tests the public site, app, health/readiness, pricing, unauthenticated boundaries, Stripe signature rejection, disabled export route, security headers, and concurrent health requests. A deploy command that fails these checks is not a completed release.
+The deployment command applies D1 migrations, preserves existing encrypted Worker secrets, stamps `APP_VERSION`, deploys `sovv-web`, and tests the public site, app, health/readiness, pricing, unauthenticated boundaries, Stripe signature rejection, disabled export route, security headers, concurrent health requests, and all four production domains. A deploy command that fails any check is not a completed release.
+
+Wrangler configuration is the source of truth for routes. Both production Custom Domains and both Defrag parent routes must remain declared in `wrangler.jsonc` and `wrangler.production-direct.jsonc`; dashboard-only routes can be overwritten by the next Wrangler deployment.
 
 Required encrypted Worker secrets:
 
@@ -79,4 +79,4 @@ Account deletion uses a 14-day grace period. When execution becomes due, every n
 
 ## Release status
 
-The repository is production-hardened code, but a release is verified only when Cloudflare Workers Builds succeeds for the exact `main` commit and `pnpm production:deploy` completes every live probe against `sovereign.defrag.app` and `app.defrag.app`.
+The repository is production-hardened code, but a release is verified only when `pnpm production:deploy` completes for the exact `main` commit and every live probe passes against `sovereign.defrag.app`, `app.defrag.app`, `defrag.app`, and `www.defrag.app`.
