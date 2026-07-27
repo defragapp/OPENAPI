@@ -8,10 +8,12 @@ import { installProductionRuntime } from './ProductionRuntime';
 import { installProductLanguageRuntime } from './ProductLanguageRuntime';
 import { PublicLanding } from './PublicLanding';
 import { PublicPolicy } from './PublicPolicy';
+import { AccountFlow } from './AccountFlow';
 import './styles.css';
 import './product-completion.css';
 import './public-landing.css';
 import './production-polish.css';
+import './account-flow.css';
 
 installProductionRuntime();
 installProductRuntime();
@@ -36,17 +38,21 @@ const publicPolicyKind = location.pathname === '/privacy'
   : location.pathname === '/terms'
     ? 'terms'
     : null;
+const accountFlowPaths = new Set(['/login', '/signup', '/forgot-password', '/reset-password', '/onboarding']);
+const isAccountFlow = accountFlowPaths.has(location.pathname);
 const isDirectPublicSurface = isPublicHome || publicPolicyKind !== null;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AppErrorBoundary>
-      {!isDirectPublicSurface && <ProductCompletionLayer />}
+      {!isDirectPublicSurface && !isAccountFlow && <ProductCompletionLayer />}
       {isPublicHome
         ? <PublicLanding />
         : publicPolicyKind
           ? <PublicPolicy kind={publicPolicyKind} />
-          : <App />}
+          : isAccountFlow
+            ? <AccountFlow />
+            : <App />}
     </AppErrorBoundary>
   </React.StrictMode>
 );
