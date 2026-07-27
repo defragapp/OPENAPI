@@ -10,6 +10,7 @@ const encoder = new TextEncoder();
 const TERMS_VERSION = '2026-07-26';
 const PRIVACY_VERSION = '2026-07-26';
 const STATE_TTL_MINUTES = 10;
+const OAUTH_STATE_COOKIE = '__Host-sovereign_oauth_state';
 
 interface OAuthStateRow {
   id: string;
@@ -104,17 +105,46 @@ function onboardingDestination(plan: string | null | undefined, interval: string
   return `/onboarding?plan=${safePlan(plan ?? null)}&interval=${safeInterval(interval ?? null)}`;
 }
 
-function redirectResponse(path: string, cookie?: string): Response {
+function oauthStateCookie(state: string): string {
+  return `${OAUTH_STATE_COOKIE}=${state}; Path=/; Max-Age=${STATE_TTL_MINUTES * 60}; HttpOnly; Secure; SameSite=None; Priority=High`;
+}
+
+function clearOAuthStateCookie(): string {
+  return `${OAUTH_STATE_COOKIE}=deleted; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=None; Priority=High`;
+}
+
+function readCookie(request: Request, name: string): string | undefined {
+  const header = request.headers.get('cookie');
+  if (!header) return undefined;
+  for (const part of header.split(';')) {
+    const [key, ...value] = part.trim().split('=');
+    if (key === name) return value.join('=');
+  }
+  return undefined;
+}
+
+function redirectResponse(path: string, cookies: string[] = []): Response {
   const headers = new Headers({ location: path, 'cache-control': 'private, no-store' });
-  if (cookie) headers.set('set-cookie', cookie);
+  for (const cookie of cookies) headers.append('set-cookie', cookie);
   return new Response(null, { status: 303, headers });
+}
+
+function providerRedirect(url: string, state: string): Response {
+  return new Response(null, {
+    status: 302,
+    headers: {
+      location: url,
+      'cache-control': 'private, no-store',
+      'set-cookie': oauthStateCookie(state)
+    }
+  });
 }
 
 function errorRedirect(intent: OAuthIntent, code: string, plan?: string | null, interval?: string | null): Response {
   const query = new URLSearchParams({ error: code });
   if (plan) query.set('plan', safePlan(plan));
   if (interval) query.set('interval', safeInterval(interval));
-  return redirectResponse(`/${intent === 'signup' ? 'signup' : 'login'}?${query.toString()}`);
+  return redirectResponse(`/${intent === 'signup' ? 'signup' : 'login'}?${query.toString()}`, [clearOAuthStateCookie()]);
 }
 
 export async function startOAuth(request: Request, env: Env, provider: OAuthProvider): Promise<Response> {
@@ -150,7 +180,7 @@ export async function startOAuth(request: Request, env: Env, provider: OAuthProv
   } else {
     authorize.searchParams.set('response_mode', 'form_post');
   }
-  return Response.redirect(authorize.toString(), 302);
+  return providerRedirect(authorize.toString(), state);
 }
 
 export async function finishOAuth(request: Request, env: Env, provider: OAuthProvider): Promise<Response> {
@@ -158,6 +188,9 @@ export async function finishOAuth(request: Request, env: Env, provider: OAuthPro
     const callback = await readCallback(request, provider);
     if (!callback.state || !callback.code) return errorRedirect('login', 'oauth_cancelled');
     const stateHash = await sha256(callback.state);
+    const browserState = readCookie(request, OAUTH_STATE_COOKIE);
+    if (!browserState || await sha256(browserState) !== stateHash) return errorRedirect('login', 'oauth_invalid');
+
     const state = await env.DB.prepare(`SELECT id, provider, intent, nonce_hash, return_path, plan_key, billing_interval, terms_accepted_at, expires_at, used_at
       FROM auth_oauth_states WHERE state_hash = ?`)
       .bind(stateHash)
@@ -222,7 +255,7 @@ export async function finishOAuth(request: Request, env: Env, provider: OAuthPro
     const next = state.intent === 'signup' || state.plan_key === 'sovereign_plus'
       ? onboardingDestination(state.plan_key, state.billing_interval)
       : await existingAccountDestination(env, accountId);
-    return redirectResponse(next, session.cookie);
+    return redirectResponse(next, [session.cookie, clearOAuthStateCookie()]);
   } catch (error) {
     if (error instanceof Response && error.status >= 300 && error.status < 400) return error;
     return errorRedirect('login', 'oauth_unavailable');
