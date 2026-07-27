@@ -78,7 +78,7 @@ describe('Sovereign.OS launch surface', () => {
 
   it('keeps the landing focused while explaining the full platform', () => {
     expect((landing.match(/<section/g) ?? []).length).toBeLessThanOrEqual(7);
-    for (const label of ['BASELINE DESIGN', 'APPLY IT ANYWHERE', 'RELATIONSHIPS · FAMILIES · TEAMS', 'Privacy and control']) {
+    for (const label of ['BASELINE DESIGN', 'APPLY IT ANYWHERE', 'RELATIONSHIPS · FAMILIES · TEAMS', 'Choice, faith, privacy, and control']) {
       expect(landing).toContain(label);
     }
     expect(landing).toContain('A deeper understanding of you—and everyone your life includes.');
