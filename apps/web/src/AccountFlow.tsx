@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
+import { createPasswordEnvelope, signPasswordChallenge } from './PasswordKey';
 
 type AuthMode = 'signup' | 'login' | 'forgot' | 'reset';
 type PlanKey = 'free' | 'sovereign_plus';
@@ -66,41 +67,71 @@ function AuthPage({ mode }: { mode: AuthMode }) {
     setStatus('');
     try {
       if (mode === 'signup') {
+        const credential = await createPasswordEnvelope(password);
         const data = await postJson('/api/v1/auth/password/signup', {
           name,
           email,
-          password,
           termsAccepted: accepted,
           turnstileToken: turnstileToken(),
           plan,
-          interval
+          interval,
+          ...credential
         });
+        clearPassword();
         location.assign(String(data.next || '/onboarding'));
         return;
       }
       if (mode === 'login') {
+        const challenge = await postJson('/api/v1/auth/password/challenge', {
+          email,
+          turnstileToken: turnstileToken()
+        });
+        const signature = await signPasswordChallenge(email, password, challenge);
         const data = await postJson('/api/v1/auth/password/login', {
           email,
-          password,
-          turnstileToken: turnstileToken(),
+          challengeId: challenge.challengeId,
+          signature,
           plan,
           interval
         });
+        clearPassword();
         location.assign(String(data.next || '/app'));
         return;
       }
       if (mode === 'forgot') {
-        await postJson('/api/v1/auth/password/forgot', { email, turnstileToken: turnstileToken() });
+        await postJson('/api/v1/auth/password/forgot', {
+          email,
+          turnstileToken: turnstileToken(),
+          plan,
+          interval
+        });
         setStatus('Check your email for a password reset link.');
+        resetTurnstile();
         setBusy(false);
         return;
       }
-      const data = await postJson('/api/v1/auth/password/reset', { token: resetToken, password });
+      const credential = await createPasswordEnvelope(password);
+      const data = await postJson('/api/v1/auth/password/reset', {
+        token: resetToken,
+        ...credential
+      });
+      clearPassword();
       location.assign(String(data.next || '/app'));
     } catch (caught) {
-      setStatus(caught instanceof Error ? caught.message : 'That did not work. Try again.');
+      const message = mode === 'login'
+        ? 'Email or password is incorrect.'
+        : caught instanceof Error
+          ? caught.message
+          : 'That did not work. Try again.';
+      setStatus(message);
+      clearPassword();
+      if (mode !== 'reset') resetTurnstile();
       setBusy(false);
     }
+  }
+
+  function clearPassword() {
+    setPassword('');
   }
 
   function beginOAuth(provider: 'apple' | 'google') {
@@ -179,7 +210,7 @@ function AuthPage({ mode }: { mode: AuthMode }) {
               </FlowField>
             )}
             {(mode === 'signup' || mode === 'login' || mode === 'reset') && (
-              <FlowField label={mode === 'reset' ? 'New password' : 'Password'} hint={mode === 'login' ? undefined : 'At least 10 characters'}>
+              <FlowField label={mode === 'reset' ? 'New password' : 'Password'} hint={mode === 'login' ? 'Your password stays in this browser' : 'At least 10 characters'}>
                 <input
                   type="password"
                   value={password}
@@ -412,6 +443,11 @@ function TurnstileSlot({ action }: { action: string }) {
 
 function turnstileToken(): string {
   return document.querySelector<HTMLInputElement>('[name="cf-turnstile-response"]')?.value ?? '';
+}
+
+function resetTurnstile(): void {
+  const turnstile = window.turnstile as (typeof window.turnstile & { reset?: () => void }) | undefined;
+  turnstile?.reset?.();
 }
 
 async function postJson(path: string, body: unknown, idempotent = false): Promise<any> {
