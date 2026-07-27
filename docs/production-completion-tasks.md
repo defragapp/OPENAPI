@@ -4,13 +4,13 @@ Updated after each completed implementation tranche.
 
 ## Current release baseline
 
-- Production SHA before this work: `c96ccd6966c6dbab3f0a336fa90b4fce591e7a5a`
-- Active implementation PR: `#55`
-- The previous release build, tests, static-page verification, runtime security checks, and Stripe endpoint contracts passed.
+- Last fully verified production SHA: `c96ccd6966c6dbab3f0a336fa90b4fce591e7a5a`
+- Account-access release merged to `main`: `0000ce5a2355a0ef981ed85103b325584dff6fcb`; Cloudflare promotion is pending exact-SHA verification.
+- Active review branch: `fix/unified-entry-context-integrity`
 - GitHub-hosted Actions currently fail before allocating a runner or executing the first zero-dependency step. Cloudflare’s connected production build remains the full executable release gate until that runner issue is resolved.
-- Remaining work is concentrated in first-use guidance, context integrity, structured intelligence, user controls, visual consistency, recovery, billing support, and discoverability.
+- Remaining work is concentrated in structured intelligence, deeper user controls, visual identity, recovery, billing support, discoverability, and full end-to-end QA.
 
-## Account access and communication — implemented in PR #55, pending release verification
+## Account access and communication — merged, pending live release verification
 
 - [x] Fix the live sign-in error path so the UI distinguishes verification, invalid email, rate limit, provider, and unexpected failures.
 - [x] Center and tightly contain Cloudflare Turnstile on login and signup at desktop and mobile sizes.
@@ -21,19 +21,21 @@ Updated after each completed implementation tranche.
 - [x] Keep private relationship labels, raw birth details, exact location, account history, and internal identifiers out of invitation emails.
 - [x] Replace pattern-heavy and generic authentication copy with approved Baseline-first Sovereign.OS language.
 - [x] Add focused tests for return routing, branded email rendering and escaping, Turnstile lifecycle, account copy, field errors, and visual containment.
-- [ ] Pass the full Cloudflare build and live verification for PR #55.
+- [ ] Confirm the connected Cloudflare build, live email flow, and exact `0000ce5a…` health/readiness response.
 
 ## Product integrity — one Sovereign intelligence
 
 - [x] Keep Today, Explore, People, Systems, Library, and You mounted as surfaces of one Sovereign intelligence rather than separate applications.
-- [ ] Present Defrag, Alignment, and Covenant as internal modes/lenses selected by the question and user intent.
-- [ ] Give signed-in users an unmistakable first action instead of presenting six equal destinations without guidance.
-- [ ] Add a guided entry on Today: understand myself, examine a choice, understand a relationship, or map a system.
-- [ ] Bind every thread and response to its stored surface/mode.
-- [ ] Restore surface, selected person, selected system, Covenant state, and permitted context when reopening a thread.
-- [ ] Prevent changing a tab from relabeling or visually reinterpreting an existing response.
-- [ ] Preserve real Today, People, and system-member data in post-response visual components.
-- [ ] Use contextual suggestions and plain-language explanations so users never need specialized prompting.
+- [x] Give signed-in users an unmistakable first action instead of presenting six equal destinations without guidance.
+- [x] Add a guided entry on Today: understand myself, examine a choice, understand a relationship, or map a system.
+- [x] Treat a surface change with active content as a new exploration instead of relabeling the existing response.
+- [x] Attach local questions and streamed answers to the surface and permitted context used for that request.
+- [x] Restore surface, selected person, selected system, Covenant state, and permitted context when reopening a thread.
+- [x] Render each restored message using its recorded surface when available.
+- [x] Preserve real Today, People, and system-member data in post-response visual components.
+- [x] Use guided starts, contextual suggestions, and plain-language explanations so users do not need specialized prompting.
+- [ ] Complete server-side thread summary support for explicit stored surface/mode rather than relying primarily on message context.
+- [ ] Present Defrag, Alignment, and Covenant as explicit internal modes/lenses selected by the question and user intent.
 
 ## Structured intelligence and visual truth
 
@@ -46,18 +48,19 @@ Updated after each completed implementation tranche.
 
 ## User control and continuity
 
-- [ ] Expose People & Permissions management from the mounted workspace.
-- [ ] Support invitation review, cancellation, resend, scope review, revocation, and relationship removal.
+- [x] Expose the existing People & Permissions manager from the mounted People and You surfaces.
+- [x] Add visible privacy, terms, support, billing, Covenant, and permission controls to You.
+- [ ] Support invitation review, cancellation, resend, scope review, revocation, and relationship removal from one management flow.
 - [ ] Add Library rename, delete, context review, and correction history.
 - [ ] Add visible account deletion with the documented 14-day grace period.
-- [ ] Add privacy, terms, support, billing, and permission controls to You.
 - [ ] Make fit/correction choices visibly persistent after saving.
 - [ ] Add keyboard focus management and focus traps to modal dialogs.
 
 ## Premium visual and brand system
 
+- [x] Add a premium guided-start hierarchy with responsive, high-contrast, focus, and reduced-motion states.
 - [ ] Refine a recognizable Sovereign mark derived from the Baseline orbit and use it consistently.
-- [ ] Standardize warm-black, paper, copper, sage, rose, spacing, radii, typography, and semantic color roles.
+- [ ] Standardize warm-black, paper, copper, sage, rose, spacing, radii, typography, and semantic color roles across every public and signed-in state.
 - [ ] Refine the landing-page transition and visual story from personal to relationship to system intelligence.
 - [ ] Build signature Baseline Orbit, Relationship Perspective, and System Intelligence assets.
 - [ ] Keep body text at 17 px where practical, supporting text at least 14 px, and controls at least 44 px.
@@ -77,7 +80,7 @@ Updated after each completed implementation tranche.
 
 - [ ] Verify Resend/Cloudflare sender-domain alignment, SPF, DKIM, and DMARC in the live provider configuration.
 - [x] Use a consistent Sovereign.OS sender name, reply-to, support address, visual system, accessible HTML, and plain-text fallback.
-- [ ] Add branded templates for permission changes, billing, cancellation, and account deletion; sign-in, signup, and invitations are complete in PR #55.
+- [ ] Add branded templates for permission changes, billing, cancellation, and account deletion; sign-in, signup, and invitations are complete.
 - [x] Keep security tokens only in the required private action URL; exclude private context, raw birth data, exact location, private labels, and internal identifiers.
 - [x] Add content tests for HTML and text variants, escaping, and unsafe action URLs.
 

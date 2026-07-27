@@ -18,6 +18,7 @@ import './workspace-chat.css';
 import './visual-intelligence.css';
 import './system-membership.css';
 import './auth-polish.css';
+import './unified-entry.css';
 
 installProductionRuntime();
 installProductRuntime();
