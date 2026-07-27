@@ -198,7 +198,10 @@ async function verifyLiveProduction() {
   ]);
 
   assert(home.response.ok, `public home returned ${home.response.status}`);
-  assertContainsAll('public home', home.text, ['Sovereign.OS', 'Understand yourself—and everyone your life includes.']);
+  assertContainsAll('public home document', home.text, [
+    'Sovereign.OS turns Baseline Design into a private AI for personal, relationship, and system intelligence.',
+    'id="root"'
+  ]);
 
   assert(how.response.ok && howClean.response.ok, 'How it works page or clean URL is unavailable');
   assertContainsAll('How it works', how.text, [
@@ -287,6 +290,7 @@ async function verifyLiveProduction() {
     'Welcome back.',
     'Create your account.',
     'Choose what this connection may use.',
+    'Understand yourself—and everyone your life includes.',
     'What do you want to understand?',
     'Ask about yourself, a decision, a relationship, or the system around you. Sovereign brings in only the context that belongs.',
     'YOUR BASELINE · AVAILABLE IN EVERY CONVERSATION',

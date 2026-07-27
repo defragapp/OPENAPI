@@ -15,6 +15,7 @@ const stripeRoute = readFileSync('apps/sovereign-worker/src/routes/stripe.ts', '
 const scaleMigration = readFileSync('apps/sovereign-worker/migrations/0009_production_scale_and_billing_safety.sql', 'utf8');
 const workspaceMigration = readFileSync('apps/sovereign-worker/migrations/0010_account_onboarding_and_chat_history.sql', 'utf8');
 const browserRuntime = readFileSync('apps/web/src/ProductionRuntime.ts', 'utf8');
+const appHtml = readFileSync('apps/web/index.html', 'utf8');
 const appUi = readFileSync('apps/web/src/App.tsx', 'utf8');
 const publicLandingUi = readFileSync('apps/web/src/PublicLanding.tsx', 'utf8');
 const workspaceUi = readFileSync('apps/web/src/SovereignWorkspace.tsx', 'utf8');
@@ -25,6 +26,15 @@ const consentCss = readFileSync('apps/web/public/consent.css', 'utf8');
 const consentJs = readFileSync('apps/web/public/consent.js', 'utf8');
 const staticHeaders = readFileSync('apps/web/public/_headers', 'utf8');
 const workerHeaders = readFileSync('apps/sovereign-worker/src/security/headers.ts', 'utf8');
+
+const currentDocumentFingerprints = [
+  'Sovereign.OS turns Baseline Design into a private AI for personal, relationship, and system intelligence.',
+  'id="root"'
+];
+for (const fingerprint of currentDocumentFingerprints) {
+  if (!deploy.includes(fingerprint)) throw new Error(`Direct production deploy is missing current document fingerprint: ${fingerprint}`);
+  if (!appHtml.includes(fingerprint)) throw new Error(`Production HTML is missing verifier fingerprint: ${fingerprint}`);
+}
 
 const currentApplicationFingerprints = [
   'Understand yourself—and everyone your life includes.',
