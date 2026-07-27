@@ -15,6 +15,7 @@ import { SystemMembershipManager } from './SystemMembershipManager';
 import './styles.css';
 import './product-completion.css';
 import './public-landing.css';
+import './public-release.css';
 import './production-polish.css';
 import './baseline-orbit.css';
 import './workspace-chat.css';
@@ -24,6 +25,7 @@ import './auth-polish.css';
 import './unified-entry.css';
 import './account-control.css';
 import './structured-intelligence.css';
+import './sovereign-brand.css';
 
 installProductionRuntime();
 installProductRuntime();
