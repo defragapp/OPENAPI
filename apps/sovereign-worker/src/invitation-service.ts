@@ -12,12 +12,12 @@ const DEFAULT_INVITATION_SCOPES: ConsentScope[] = ['pair.compare', 'trait.displa
 
 const consentScopeEmailLabels: Record<ConsentScope, string> = {
   'pair.compare': 'Compare two permitted Baselines while keeping each person distinct.',
-  'system.include': 'Include this person in a family, household, friendship, or team view.',
-  'trait.display': 'Use only the plain-language Baseline themes this person chooses to share.',
+  'system.include': 'Include your permitted context in a family, household, friendship, or team view.',
+  'trait.display': 'Use only the plain-language Baseline themes you choose to share.',
   'framework.display': 'Show optional supporting framework detail.',
-  'current_conditions.use': 'Include temporary current context when permission remains active.',
+  'current_conditions.use': 'Include temporary current context while permission remains active.',
   'library.link': 'Use a deliberately saved understanding as shared context.',
-  'covenant.include': 'Include this person only when the optional Covenant lens is selected.'
+  'covenant.include': 'Include your permitted context only when the optional Covenant lens is selected.'
 };
 
 type ConsentDecision = 'granted' | 'denied';
@@ -52,8 +52,8 @@ function normalizeScopes(scopes?: string[]): ConsentScope[] {
   return normalized as ConsentScope[];
 }
 
-async function getOwnedPerson(env: Env, accountId: string, personId: string): Promise<{ id: string; bound_account_id: string | null; display_name: string }> {
-  const row = await env.DB.prepare('SELECT id, bound_account_id, display_name FROM persons WHERE id = ? AND account_id = ?').bind(personId, accountId).first<{ id: string; bound_account_id: string | null; display_name: string }>();
+async function getOwnedPerson(env: Env, accountId: string, personId: string): Promise<{ id: string; bound_account_id: string | null }> {
+  const row = await env.DB.prepare('SELECT id, bound_account_id FROM persons WHERE id = ? AND account_id = ?').bind(personId, accountId).first<{ id: string; bound_account_id: string | null }>();
   if (!row) throw new Response('Person not found', { status: 404 });
   return row;
 }
@@ -83,13 +83,13 @@ export async function sendInvitation(request: Request, env: Env, accountId: stri
   const emailTemplate = buildSovereignEmail({
     eyebrow: 'Private relationship invitation',
     title: 'You decide what this connection may use.',
-    intro: `A Sovereign.OS user invited you to review a connection recorded as “${person.display_name || 'Shared relationship'}.” Accepting the invitation does not grant blanket access. You decide each requested use separately.`,
+    intro: 'A Sovereign.OS user invited you to review a private relationship connection. Accepting does not grant blanket access. You decide each requested use separately.',
     actionLabel: 'Review the private invitation',
     actionUrl: invitationUrl.toString(),
     details: [
-      ...requestedScopes.map((scope) => consentScopeEmailLabels[scope]),
       `The invitation expires in ${INVITATION_TTL_DAYS} days.`,
-      'Raw birth details and exact private location are not shared with the other account.'
+      'Raw birth details, exact private location, and the sender’s private notes are not included in this email.',
+      ...requestedScopes.map((scope) => consentScopeEmailLabels[scope])
     ],
     footer: 'You can deny any requested use and revoke an active permission later from your own Sovereign.OS controls.'
   });
