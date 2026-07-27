@@ -55,7 +55,7 @@ const runtime = {
       if (!env.ASSETS) {
         return withSecurityHeaders(Response.json({ error: 'assets_unavailable' }, { status: 503 }));
       }
-      return documentResponse(await env.ASSETS.fetch(request), url.hostname.toLowerCase());
+      return documentResponse(await env.ASSETS.fetch(request), url.hostname.toLowerCase(), url.pathname);
     }
 
     return applicationResponse(request, url.pathname, env, executionContext);
@@ -77,17 +77,30 @@ async function applicationResponse(request: Request, pathname: string, env: Env,
   }));
 }
 
-function documentResponse(response: Response, hostname: string): Response {
-  const secured = withDocumentSecurityHeaders(response);
-  if (hostname !== APP_HOST) return secured;
-  const headers = new Headers(secured.headers);
-  headers.set('x-robots-tag', 'noindex, nofollow');
-  headers.delete('content-length');
-  return new Response(secured.body, {
-    status: secured.status,
-    statusText: secured.statusText,
-    headers
-  });
+function documentResponse(response: Response, hostname: string, pathname: string): Response {
+  let secured = withDocumentSecurityHeaders(response);
+  if (hostname === APP_HOST) {
+    const headers = new Headers(secured.headers);
+    headers.set('x-robots-tag', 'noindex, nofollow');
+    headers.delete('content-length');
+    return new Response(secured.body, { status: secured.status, statusText: secured.statusText, headers });
+  }
+
+  const contentType = secured.headers.get('content-type') ?? '';
+  if (hostname === PUBLIC_HOST && contentType.includes('text/html')) {
+    const canonicalPath = pathname === '/' ? '/' : pathname;
+    secured = new HTMLRewriter()
+      .on('head', {
+        element(element) {
+          element.append(`<link rel="canonical" href="https://${PUBLIC_HOST}${canonicalPath}">`, { html: true });
+          element.append('<link rel="stylesheet" href="/release-public.css">', { html: true });
+          element.append('<script defer src="/release-public.js"></script>', { html: true });
+          element.append(`<meta property="og:url" content="https://${PUBLIC_HOST}${canonicalPath}"><meta property="og:site_name" content="Sovereign.OS"><meta property="og:type" content="website"><meta property="og:image" content="https://${PUBLIC_HOST}/og-sovereign.svg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://${PUBLIC_HOST}/og-sovereign.svg">`, { html: true });
+        }
+      })
+      .transform(secured);
+  }
+  return secured;
 }
 
 async function shareFirstAccountResponse(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
