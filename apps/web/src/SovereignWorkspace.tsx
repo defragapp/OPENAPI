@@ -7,6 +7,14 @@ type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
 type ApiState = 'idle' | 'loading' | 'ready' | 'error';
 type ChatMessage = { id: string; role: 'user' | 'assistant'; text: string; createdAt?: string };
 type ThreadSummary = { id: string; title: string; contextKind: string; covenantEnabled: boolean; updatedAt: string };
+type InterfaceAction =
+  | { type: 'open_baseline'; args: { facet: string } }
+  | { type: 'open_person'; args: { personId: string } }
+  | { type: 'open_system'; args: { systemId: string } }
+  | { type: 'open_decision'; args: Record<string, never> }
+  | { type: 'open_optional_lens'; args: { lens: 'covenant' } }
+  | { type: 'show_plan'; args: { feature: string } };
+type InterfaceActionEnvelope = { version: 1; primary: InterfaceAction | null; suggestions: InterfaceAction[]; confirmationRequired: true };
 
 const surfaces: Array<{ name: Surface; label: string }> = [
   { name: 'Today', label: 'Today' },
@@ -74,6 +82,7 @@ export function SovereignWorkspace() {
   const [selectedPerson, setSelectedPerson] = useState('');
   const [selectedSystem, setSelectedSystem] = useState('');
   const [covenantEnabled, setCovenantEnabled] = useState(false);
+  const [interfaceActions, setInterfaceActions] = useState<InterfaceActionEnvelope | null>(null);
 
   const contextLabel = useMemo(() => {
     const person = people.find((item) => item.id === selectedPerson)?.displayName;
@@ -155,6 +164,10 @@ export function SovereignWorkspace() {
       const data = await api(`/api/v1/threads/${encodeURIComponent(id)}`);
       setThreadId(id);
       setMessages(data.messages ?? []);
+      const restored = [...(data.messages ?? [])].reverse().find((item: any) => item.context || item.interfaceActions);
+      if (restored?.context?.personId) { setSelectedPerson(restored.context.personId); setSelectedSystem(''); }
+      if (restored?.context?.systemId) { setSelectedSystem(restored.context.systemId); setSelectedPerson(''); }
+      setInterfaceActions(validActionEnvelope(restored?.interfaceActions));
       setCovenantEnabled(threads.find((thread) => thread.id === id)?.covenantEnabled === true);
       setPanelOpen(false);
       setStatus('Conversation restored.');
@@ -195,6 +208,7 @@ export function SovereignWorkspace() {
         const problem = await response.json().catch(() => ({})) as { message?: string; error?: string };
         throw new Error(problem.message || problem.error || 'Sovereign is temporarily unavailable.');
       }
+      const actions = decodeActionEnvelope(response.headers.get('x-sovereign-interface-actions'));
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let text = '';
@@ -205,6 +219,8 @@ export function SovereignWorkspace() {
         setMessages((current) => current.map((item) => item.id === assistantId ? { ...item, text } : item));
       }
       setApiState('ready');
+      setInterfaceActions(actions);
+      if (actions?.primary && isReversibleAction(actions.primary)) openInterfaceAction(actions.primary);
       setStatus('Complete');
       const threadData = await api('/api/v1/threads');
       setThreads(threadData.threads ?? []);
@@ -220,6 +236,7 @@ export function SovereignWorkspace() {
   async function saveLatest() {
     const last = [...messages].reverse().find((item) => item.role === 'assistant' && item.text.trim());
     if (!last) return;
+    if (!window.confirm('Save this response to your private Library?')) return;
     await api('/api/v1/library', {
       method: 'POST',
       body: JSON.stringify({
@@ -243,6 +260,7 @@ export function SovereignWorkspace() {
   }
 
   async function changeCovenant(enabled: boolean) {
+    if (!window.confirm(`${enabled ? 'Enable' : 'Disable'} the optional Covenant lens for this conversation?`)) return;
     await api(`/api/v1/threads/${encodeURIComponent(threadId)}/covenant`, {
       method: 'POST',
       body: JSON.stringify({
@@ -254,6 +272,14 @@ export function SovereignWorkspace() {
     });
     setCovenantEnabled(enabled);
     setStatus(enabled ? 'Covenant is on for this conversation.' : 'Covenant is off for this conversation.');
+  }
+
+  function openInterfaceAction(action: InterfaceAction) {
+    if (action.type === 'open_person') { setSelectedPerson(action.args.personId); setSelectedSystem(''); openSurface('People'); }
+    else if (action.type === 'open_system') { setSelectedSystem(action.args.systemId); setSelectedPerson(''); openSurface('Systems'); }
+    else if (action.type === 'open_baseline') openSurface('You');
+    else if (action.type === 'open_decision') openSurface('Explore');
+    else if (action.type === 'open_optional_lens' || action.type === 'show_plan') openSurface('You');
   }
 
   return (
@@ -325,6 +351,8 @@ export function SovereignWorkspace() {
               ))}
               {messages.some((item) => item.role === 'assistant' && item.text.trim()) && (
                 <div className="response-actions">
+                  {interfaceActions?.primary && <button onClick={() => openInterfaceAction(interfaceActions.primary!)}>{actionLabel(interfaceActions.primary)}</button>}
+                  {interfaceActions?.suggestions.map((action) => <button key={`${action.type}-${JSON.stringify(action.args)}`} onClick={() => openInterfaceAction(action)}>{actionLabel(action)}</button>)}
                   <button onClick={() => void saveLatest()}>Save to Library</button>
                   <span>Does this fit?</span>
                   <button onClick={() => void saveCorrection('yes')}>Yes</button>
@@ -366,10 +394,10 @@ export function SovereignWorkspace() {
           {surface === 'Today' && <TodayPanel today={today} onOpenBaseline={() => openSurface('You')} />}
           {surface === 'Explore' && <ExplorePanel onPrompt={(prompt) => { setDraft(prompt); setPanelOpen(false); }} />}
           {surface === 'People' && (
-            <PeoplePanel api={api} people={people} setPeople={setPeople} selectedPerson={selectedPerson} setSelectedPerson={setSelectedPerson} refresh={refreshWorkspace} />
+            <PeoplePanel api={api} people={people} setPeople={setPeople} selectedPerson={selectedPerson} setSelectedPerson={(id: string) => { setSelectedPerson(id); if (id) setSelectedSystem(''); }} refresh={refreshWorkspace} />
           )}
           {surface === 'Systems' && (
-            <SystemsPanel api={api} systems={systems} setSystems={setSystems} people={people} selectedPerson={selectedPerson} setSelectedPerson={setSelectedPerson} selectedSystem={selectedSystem} setSelectedSystem={setSelectedSystem} />
+            <SystemsPanel api={api} systems={systems} setSystems={setSystems} people={people} selectedPerson={selectedPerson} setSelectedPerson={setSelectedPerson} selectedSystem={selectedSystem} setSelectedSystem={(id: string) => { setSelectedSystem(id); if (id) setSelectedPerson(''); }} />
           )}
           {surface === 'Library' && <LibraryPanel library={library} api={api} refresh={refreshWorkspace} onUse={(text: string) => { setDraft(text); setPanelOpen(false); }} />}
           {surface === 'You' && (
@@ -430,6 +458,7 @@ function PeoplePanel({ api, people, setPeople, selectedPerson, setSelectedPerson
 
   async function invite() {
     if (!selectedPerson || !email.includes('@')) return;
+    if (!window.confirm(`Send a private invitation to ${email.trim()}?`)) return;
     await api(`/api/v1/people/${selectedPerson}/invitations/send`, {
       method: 'POST',
       body: JSON.stringify({ email, requestedScopes: ['pair.compare', 'trait.display'] })
@@ -589,7 +618,7 @@ function YouPanel({ api, billing, covenantEnabled, changeCovenant, refresh }: an
               <button className={interval === 'annual' ? 'active' : ''} onClick={() => setInterval('annual')}>$99 yearly</button>
               <button className={interval === 'monthly' ? 'active' : ''} onClick={() => setInterval('monthly')}>$20 monthly</button>
             </div>
-            <button className="primary-button" onClick={() => void handoff('/api/v1/billing/checkout', { interval })}>Choose Sovereign+</button>
+            <button className="primary-button" onClick={() => { if (window.confirm(`Continue to Stripe for the ${interval} Sovereign+ plan?`)) void handoff('/api/v1/billing/checkout', { interval }); }}>Choose Sovereign+</button>
           </>
         )}
         <button className="secondary-button" onClick={() => void handoff('/api/v1/billing/portal')}>Manage billing</button>
@@ -598,7 +627,7 @@ function YouPanel({ api, billing, covenantEnabled, changeCovenant, refresh }: an
         <p className="eyebrow">CONTROL</p>
         <label className="setting-row"><span><strong>Covenant</strong><small>Optional Christian and biblical lens for this conversation.</small></span><input type="checkbox" checked={covenantEnabled} onChange={(event) => void changeCovenant(event.target.checked)} /></label>
         <p className="panel-note">Sharing sends the public Sovereign.OS link. No private workspace data is included.</p>
-        <button className="secondary-button" onClick={() => void sharePublicPlatform()}>Share Sovereign.OS</button>
+        <button className="secondary-button" onClick={() => { if (window.confirm('Open your device sharing options for the public Sovereign.OS link?')) void sharePublicPlatform(); }}>Share Sovereign.OS</button>
         <button className="secondary-button" onClick={() => api('/api/v1/auth/logout', { method: 'POST' })}>Log out</button>
       </section>
     </PanelStack>
@@ -627,6 +656,53 @@ function newThreadId(surface: Surface, personId = '', systemId = '') {
     .filter(Boolean)
     .join('-')
     .replace(/[^a-z0-9_-]/gi, '-');
+}
+
+function decodeActionEnvelope(value: string | null): InterfaceActionEnvelope | null {
+  if (!value) return null;
+  try {
+    const normalized = value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=');
+    return validActionEnvelope(JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(normalized), (character) => character.charCodeAt(0)))));
+  } catch {
+    return null;
+  }
+}
+
+function validActionEnvelope(value: unknown): InterfaceActionEnvelope | null {
+  if (!value || typeof value !== 'object') return null;
+  const envelope = value as Record<string, unknown>;
+  if (envelope.version !== 1 || envelope.confirmationRequired !== true) return null;
+  const primary = validAction(envelope.primary);
+  const suggestions = Array.isArray(envelope.suggestions) ? envelope.suggestions.map(validAction).filter((item): item is InterfaceAction => item !== null).slice(0, 2) : [];
+  return { version: 1, primary, suggestions, confirmationRequired: true };
+}
+
+function validAction(value: unknown): InterfaceAction | null {
+  if (!value || typeof value !== 'object') return null;
+  const action = value as { type?: unknown; args?: unknown };
+  if (!['open_baseline', 'open_person', 'open_system', 'open_decision', 'open_optional_lens', 'show_plan'].includes(String(action.type)) || !action.args || typeof action.args !== 'object') return null;
+  const args = action.args as Record<string, unknown>;
+  if (action.type === 'open_person' && !validClientId(args.personId)) return null;
+  if (action.type === 'open_system' && !validClientId(args.systemId)) return null;
+  if (action.type === 'open_optional_lens' && args.lens !== 'covenant') return null;
+  return action as InterfaceAction;
+}
+
+function validClientId(value: unknown): value is string {
+  return typeof value === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(value);
+}
+
+function isReversibleAction(action: InterfaceAction): boolean {
+  return ['open_baseline', 'open_person', 'open_system', 'open_decision'].includes(action.type);
+}
+
+function actionLabel(action: InterfaceAction): string {
+  if (action.type === 'open_baseline') return 'Show Baseline detail';
+  if (action.type === 'open_person') return 'Open relationship context';
+  if (action.type === 'open_system') return 'Open system context';
+  if (action.type === 'open_decision') return 'Open Decision Check';
+  if (action.type === 'open_optional_lens') return 'Review optional Covenant lens';
+  return 'View plan details';
 }
 
 function textOr(value: unknown, fallback: string) {

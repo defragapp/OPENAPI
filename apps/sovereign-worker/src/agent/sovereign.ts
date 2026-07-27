@@ -20,6 +20,9 @@ export interface SovereignContext {
   traceId: string;
   covenantEnabled: boolean;
   plan: string;
+  personId?: string;
+  systemId?: string;
+  authorizedContext?: unknown;
 }
 
 export interface SovereignResult {
@@ -110,13 +113,9 @@ ${covenantInstruction}`;
 }
 
 async function resolveAuthorizedContext(context: SovereignContext): Promise<unknown> {
-  const systems = await context.env.DB.prepare('SELECT id FROM systems WHERE account_id = ?').bind(context.accountId).all<{ id: string }>();
-  const selectedSystem = (systems.results ?? []).find((item) => threadContainsId(context.threadId, item.id));
-  if (selectedSystem) return buildSystemAnalysis(context.env, context.accountId, selectedSystem.id);
-
-  const people = await context.env.DB.prepare("SELECT id FROM persons WHERE account_id = ? AND role <> 'self'").bind(context.accountId).all<{ id: string }>();
-  const selectedPerson = (people.results ?? []).find((item) => threadContainsId(context.threadId, item.id));
-  if (selectedPerson) return buildPairComparison(context.env, context.accountId, selectedPerson.id);
+  if (context.authorizedContext !== undefined) return context.authorizedContext;
+  if (context.systemId) return buildSystemAnalysis(context.env, context.accountId, context.systemId);
+  if (context.personId) return buildPairComparison(context.env, context.accountId, context.personId);
 
   return getModelSafeBaselineContext(context.env, context.accountId);
 }
@@ -139,11 +138,6 @@ async function isCovenantEnabledForThread(context: SovereignContext): Promise<bo
     .bind(context.threadId, context.accountId)
     .first<{ covenant_enabled: number }>();
   return row?.covenant_enabled === 1;
-}
-
-function threadContainsId(threadId: string, id: string): boolean {
-  const normalized = id.replace(/[^a-z0-9_-]/gi, '-');
-  return threadId.includes(normalized);
 }
 
 function asksForFrameworkDetail(input: string): boolean {

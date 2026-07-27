@@ -14,6 +14,8 @@ import { saveLatestInsightModule } from './db/insight-modules';
 import { canUseDevelopmentFixtures } from './runtime';
 import { computeCurrentConditions, type CurrentLocationInput, type LocationPrecision } from './baseline';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
+import { authorizeConversationContext, parseConversationContext } from './conversation-context';
+import { buildInterfaceActions } from './interface-actions';
 
 app.post('/api/v1/people/:personId/invitations/send', async (context) => {
   requireSameOrigin(context.req.raw);
@@ -207,14 +209,16 @@ function compactVisualStoryPayload(plan: {
 async function handleRecognitionMessage(request: Request, env: Env, threadId: string): Promise<Response> {
   requireSameOrigin(request);
   const auth = await requireAuth(request, env);
-  const body = await request.json().catch(() => ({})) as { message?: string; context?: { surface?: string } };
+  const body = await request.json().catch(() => ({})) as { message?: string; context?: unknown };
   const message = body.message?.trim();
   if (!message) return Response.json({ error: 'Message required' }, { status: 400 });
   const idempotencyKey = request.headers.get('x-idempotency-key');
   if (!idempotencyKey) return Response.json({ error: 'Idempotency key required' }, { status: 400 });
 
   const entitlements = await getEntitlements(env, auth.accountId);
-  await ensureThread(env, auth.accountId, threadId, body.context?.surface?.toLowerCase() ?? 'personal');
+  const selection = parseConversationContext(body.context);
+  const authorizedContext = await authorizeConversationContext(env, auth.accountId, selection);
+  await ensureThread(env, auth.accountId, threadId, selection.surface?.toLowerCase() ?? 'personal');
   await touchThread(env, auth.accountId, threadId, message);
   const coordinator = env.THREADS.get(env.THREADS.idFromName(`${auth.accountId}:${threadId}`));
   const coordination = await coordinator.fetch('https://thread.internal/turn', {
@@ -230,7 +234,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
 
   const traceId = crypto.randomUUID();
   await startTurn(env, auth.accountId, threadId, idempotencyKey, turn.sequence);
-  await appendThreadEvent(env, threadId, turn.sequence, 'user_message', { text: message, surface: body.context?.surface ?? 'Today' }, traceId);
+  await appendThreadEvent(env, threadId, turn.sequence, 'user_message', { text: message, context: selection }, traceId);
 
   const aiConfig = resolveAiModelConfig(env);
   if (aiConfig.provider !== 'cloudflare-gateway' || !env.AI || !env.AI_GATEWAY_ID) {
@@ -255,9 +259,17 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
   const usage = await reserveAiTurn(env, auth.accountId, entitlements.plan);
   try {
     const thread = await getOwnedThread(env, auth.accountId, threadId);
-    const result = await runSovereignResult(message, { env, accountId: auth.accountId, threadId, traceId, covenantEnabled: thread?.covenant_enabled === 1, plan: entitlements.plan });
+    const result = await runSovereignResult(message, {
+      env, accountId: auth.accountId, threadId, traceId,
+      covenantEnabled: thread?.covenant_enabled === 1,
+      plan: entitlements.plan,
+      ...(selection.personId ? { personId: selection.personId } : {}),
+      ...(selection.systemId ? { systemId: selection.systemId } : {}),
+      ...(authorizedContext !== undefined ? { authorizedContext } : {})
+    });
+    const interfaceActions = buildInterfaceActions(message, selection, entitlements);
     await appendThreadEvent(env, threadId, turn.sequence + 1, 'assistant_plan', { plan: result.plan }, traceId);
-    await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_response', { redacted: true, text: result.text }, traceId);
+    await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_response', { text: result.text, context: selection, interfaceActions }, traceId);
     await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'completed');
     const headers = new Headers({
       'content-type': 'text/plain; charset=utf-8',
@@ -266,6 +278,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       'x-sovereign-ai-remaining': String(usage.remaining),
       'x-sovereign-response-phase': result.plan.response_phase,
       'x-sovereign-module-offer': result.plan.module_suggestion.should_offer ? '1' : '0',
+      'x-sovereign-interface-actions': encodeVisualStoryHeader(interfaceActions),
       'x-sovereign-visual-story': result.plan.visual_story.should_show
         ? encodeVisualStoryHeader(compactVisualStoryPayload(result.plan))
         : ''

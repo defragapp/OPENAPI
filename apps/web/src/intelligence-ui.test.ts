@@ -53,6 +53,14 @@ describe('conversation-first Baseline intelligence', () => {
     expect(prompt).toContain('Covenant');
   });
 
+  it('uses typed server actions and confirms consequential operations', () => {
+    expect(workspace).toContain("response.headers.get('x-sovereign-interface-actions')");
+    expect(workspace).toContain("['open_baseline', 'open_person', 'open_system', 'open_decision', 'open_optional_lens', 'show_plan']");
+    expect(workspace).toContain("window.confirm('Save this response to your private Library?')");
+    expect(workspace).toContain('Send a private invitation to');
+    expect(workspace).not.toContain('MutationObserver');
+  });
+
   it('advances the public cache without caching private workspace assets', () => {
     expect(serviceWorker).toContain("sovereign-public-v8");
     expect(serviceWorker).not.toContain("'/intelligence-ui.js'");
