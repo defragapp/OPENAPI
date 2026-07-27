@@ -4,6 +4,7 @@ import { issueAccountSession } from './auth-session';
 
 export type OAuthProvider = 'apple' | 'google';
 type OAuthIntent = 'signup' | 'login';
+type OAuthJwk = JsonWebKey & { kid?: string };
 
 const encoder = new TextEncoder();
 const TERMS_VERSION = '2026-07-26';
@@ -99,33 +100,40 @@ function safeInterval(value: string | null): 'monthly' | 'annual' {
   return value === 'annual' ? 'annual' : 'monthly';
 }
 
+function onboardingDestination(plan: string | null | undefined, interval: string | null | undefined): string {
+  return `/onboarding?plan=${safePlan(plan ?? null)}&interval=${safeInterval(interval ?? null)}`;
+}
+
 function redirectResponse(path: string, cookie?: string): Response {
   const headers = new Headers({ location: path, 'cache-control': 'private, no-store' });
   if (cookie) headers.set('set-cookie', cookie);
   return new Response(null, { status: 303, headers });
 }
 
-function errorRedirect(intent: OAuthIntent, code: string): Response {
-  return redirectResponse(`/${intent === 'signup' ? 'signup' : 'login'}?error=${encodeURIComponent(code)}`);
+function errorRedirect(intent: OAuthIntent, code: string, plan?: string | null, interval?: string | null): Response {
+  const query = new URLSearchParams({ error: code });
+  if (plan) query.set('plan', safePlan(plan));
+  if (interval) query.set('interval', safeInterval(interval));
+  return redirectResponse(`/${intent === 'signup' ? 'signup' : 'login'}?${query.toString()}`);
 }
 
 export async function startOAuth(request: Request, env: Env, provider: OAuthProvider): Promise<Response> {
-  const config = providerConfig(env, provider);
   const url = new URL(request.url);
   const intent = safeIntent(url.searchParams.get('intent'));
+  const plan = safePlan(url.searchParams.get('plan'));
+  const interval = safeInterval(url.searchParams.get('interval'));
   const termsAccepted = url.searchParams.get('terms') === 'accepted';
-  if (intent === 'signup' && !termsAccepted) return errorRedirect(intent, 'accept_terms');
+  if (intent === 'signup' && !termsAccepted) return errorRedirect(intent, 'accept_terms', plan, interval);
+  const config = providerConfig(env, provider);
 
   const state = randomToken();
   const nonce = randomToken();
-  const plan = safePlan(url.searchParams.get('plan'));
-  const interval = safeInterval(url.searchParams.get('interval'));
   const id = `oauth_${crypto.randomUUID()}`;
   const acceptedAt = intent === 'signup' ? new Date().toISOString() : null;
   await env.DB.prepare(`INSERT INTO auth_oauth_states
     (id, provider, intent, state_hash, nonce_hash, return_path, plan_key, billing_interval, terms_accepted_at, expires_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+${STATE_TTL_MINUTES} minutes'))`)
-    .bind(id, provider, intent, await sha256(state), await sha256(nonce), intent === 'signup' ? '/onboarding' : '/app', plan, interval, acceptedAt)
+    .bind(id, provider, intent, await sha256(state), await sha256(nonce), intent === 'signup' || plan === 'sovereign_plus' ? '/onboarding' : '/app', plan, interval, acceptedAt)
     .run();
 
   const authorize = provider === 'google'
@@ -159,15 +167,15 @@ export async function finishOAuth(request: Request, env: Env, provider: OAuthPro
     const claimed = await env.DB.prepare("UPDATE auth_oauth_states SET used_at = datetime('now') WHERE id = ? AND used_at IS NULL AND expires_at > datetime('now')")
       .bind(state.id)
       .run();
-    if ((claimed.meta?.changes ?? 0) === 0) return errorRedirect(state.intent, 'oauth_expired');
+    if ((claimed.meta?.changes ?? 0) === 0) return errorRedirect(state.intent, 'oauth_expired', state.plan_key, state.billing_interval);
 
     const config = providerConfig(env, provider);
     const idToken = await exchangeCode(env, provider, callback.code, config);
     const claims = await verifyIdToken(idToken, provider, config.clientId, config.issuer, config.jwksUrl);
-    if (!claims.sub || !claims.nonce || await sha256(claims.nonce) !== state.nonce_hash) return errorRedirect(state.intent, 'oauth_invalid');
+    if (!claims.sub || !claims.nonce || await sha256(claims.nonce) !== state.nonce_hash) return errorRedirect(state.intent, 'oauth_invalid', state.plan_key, state.billing_interval);
     const email = normalizeEmail(claims.email ?? '');
     const verified = claims.email_verified === true || claims.email_verified === 'true';
-    if (!validEmail(email) || !verified) return errorRedirect(state.intent, 'email_not_verified');
+    if (!validEmail(email) || !verified) return errorRedirect(state.intent, 'email_not_verified', state.plan_key, state.billing_interval);
 
     const existingIdentity = await env.DB.prepare('SELECT account_id FROM auth_external_identities WHERE provider = ? AND provider_subject = ?')
       .bind(provider, claims.sub)
@@ -177,7 +185,7 @@ export async function finishOAuth(request: Request, env: Env, provider: OAuthPro
 
     if (accountId) {
       const account = await env.DB.prepare('SELECT auth_subject FROM accounts WHERE id = ?').bind(accountId).first<{ auth_subject: string }>();
-      if (!account) return errorRedirect(state.intent, 'account_unavailable');
+      if (!account) return errorRedirect(state.intent, 'account_unavailable', state.plan_key, state.billing_interval);
       subject = account.auth_subject;
     } else {
       const accountByEmail = await env.DB.prepare('SELECT id, auth_subject FROM accounts WHERE auth_subject = ?')
@@ -189,7 +197,7 @@ export async function finishOAuth(request: Request, env: Env, provider: OAuthPro
       } else if (state.intent === 'signup' && state.terms_accepted_at) {
         accountId = (await resolveAccount(env, subject)).accountId;
       } else {
-        return errorRedirect(state.intent, 'create_account_first');
+        return errorRedirect(state.intent, 'create_account_first', state.plan_key, state.billing_interval);
       }
 
       await env.DB.prepare(`INSERT INTO auth_external_identities (provider, provider_subject, account_id, email_normalized)
@@ -211,8 +219,8 @@ export async function finishOAuth(request: Request, env: Env, provider: OAuthPro
     }
 
     const session = await issueAccountSession(env, accountId, subject);
-    const next = state.intent === 'signup'
-      ? `${state.return_path}?plan=${safePlan(state.plan_key ?? null)}&interval=${safeInterval(state.billing_interval ?? null)}`
+    const next = state.intent === 'signup' || state.plan_key === 'sovereign_plus'
+      ? onboardingDestination(state.plan_key, state.billing_interval)
       : await existingAccountDestination(env, accountId);
     return redirectResponse(next, session.cookie);
   } catch (error) {
@@ -280,12 +288,12 @@ async function verifyIdToken(token: string, provider: OAuthProvider, audience: s
   if (!audiences.includes(audience) || !claims.exp || claims.exp <= Math.floor(Date.now() / 1000)) throw new Error('invalid_id_token');
 
   const keysResponse = await fetch(jwksUrl, { signal: AbortSignal.timeout(8_000) });
-  const keysPayload = await keysResponse.json() as { keys?: JsonWebKey[] };
+  const keysPayload = await keysResponse.json() as { keys?: OAuthJwk[] };
   const jwk = keysPayload.keys?.find((candidate) => candidate.kid === header.kid);
   if (!keysResponse.ok || !jwk) throw new Error('oauth_jwk_unavailable');
   const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
   const signed = encoder.encode(`${headerPart}.${payloadPart}`);
-  const verified = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, base64UrlDecode(signaturePart), signed);
+  const verified = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, base64UrlDecode(signaturePart) as BufferSource, signed);
   if (!verified) throw new Error('invalid_id_token');
   if (provider === 'apple' && claims.iss !== 'https://appleid.apple.com') throw new Error('invalid_id_token');
   return claims;
