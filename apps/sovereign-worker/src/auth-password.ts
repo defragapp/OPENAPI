@@ -1,7 +1,6 @@
 import type { Env } from './env';
 import { verifyTurnstile } from './auth-public';
 import { sendOperationalEmail } from './email';
-import { resolveAccount } from './db/accounts';
 import { issueAccountSession, revokeAccountSessions } from './auth-session';
 
 const encoder = new TextEncoder();
@@ -171,27 +170,34 @@ export async function passwordSignup(request: Request, env: Env): Promise<Respon
     return Response.json({ error: 'That email is already in use. Sign in or reset your password.' }, { status: 409 });
   }
 
-  const account = await resolveAccount(env, subject);
+  const accountId = crypto.randomUUID();
+  const personId = crypto.randomUUID();
   const record = await derivePasswordRecord(password);
   const acceptedAt = new Date().toISOString();
   try {
-    await env.DB.prepare(`INSERT INTO auth_password_credentials
-      (account_id, email_normalized, password_hash, password_salt, password_iterations)
-      VALUES (?, ?, ?, ?, ?)`)
-      .bind(account.accountId, email, record.hash, record.salt, record.iterations)
-      .run();
-    await env.DB.prepare(`UPDATE accounts SET terms_accepted_at = ?, terms_version = ?, privacy_version = ?, updated_at = datetime('now') WHERE id = ?`)
-      .bind(acceptedAt, TERMS_VERSION, PRIVACY_VERSION, account.accountId)
-      .run();
-    await env.DB.prepare("UPDATE persons SET display_name = ? WHERE account_id = ? AND role = 'self'")
-      .bind(name, account.accountId)
-      .run();
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO accounts (id, auth_subject, terms_accepted_at, terms_version, privacy_version)
+        VALUES (?, ?, ?, ?, ?)`)
+        .bind(accountId, subject, acceptedAt, TERMS_VERSION, PRIVACY_VERSION),
+      env.DB.prepare(`INSERT INTO persons
+        (id, account_id, role, display_name, source_of_truth, baseline_status, consent_status)
+        VALUES (?, ?, 'self', ?, 'authenticated_account', 'pending', 'granted')`)
+        .bind(personId, accountId, name),
+      env.DB.prepare(`INSERT INTO auth_password_credentials
+        (account_id, email_normalized, password_hash, password_salt, password_iterations)
+        VALUES (?, ?, ?, ?, ?)`)
+        .bind(accountId, email, record.hash, record.salt, record.iterations)
+    ]);
   } catch (error) {
-    await env.DB.prepare('DELETE FROM accounts WHERE id = ?').bind(account.accountId).run().catch(() => undefined);
+    const collision = await env.DB.prepare(`SELECT id FROM accounts WHERE auth_subject = ?
+      UNION SELECT account_id AS id FROM auth_password_credentials WHERE email_normalized = ? LIMIT 1`)
+      .bind(subject, email)
+      .first<{ id: string }>();
+    if (collision) return Response.json({ error: 'That email is already in use. Sign in or reset your password.' }, { status: 409 });
     throw error;
   }
 
-  const session = await issueAccountSession(env, account.accountId, subject);
+  const session = await issueAccountSession(env, accountId, subject);
   return responseWithSession({ status: 'success', next: planDestination(body.plan, body.interval) }, session.cookie);
 }
 
