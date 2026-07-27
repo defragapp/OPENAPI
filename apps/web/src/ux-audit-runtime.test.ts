@@ -7,6 +7,8 @@ const css = readFileSync(new URL('../public/ux-audit-polish.css', import.meta.ur
 const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
 const baselineInput = readFileSync(new URL('./BaselineInputRuntime.ts', import.meta.url), 'utf8');
 const productLanguage = readFileSync(new URL('./ProductLanguageRuntime.ts', import.meta.url), 'utf8');
+const ciWorkflow = readFileSync(new URL('../../../.github/workflows/ci.yml', import.meta.url), 'utf8');
+const liveWorkflow = readFileSync(new URL('../../../.github/workflows/live-cloudflare-verification.yml', import.meta.url), 'utf8');
 
 describe('first-run accessibility and dashboard UX pass', () => {
   it('loads syntactically valid progressive-enhancement assets', () => {
@@ -33,6 +35,15 @@ describe('first-run accessibility and dashboard UX pass', () => {
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
+  it('uses the full desktop canvas and iPhone-safe controls', () => {
+    expect(css).toContain('@media (min-width: 1180px)');
+    expect(css).toContain('grid-template-columns: repeat(3, minmax(0, 1fr))');
+    expect(css).toContain('@supports (-webkit-touch-callout: none)');
+    expect(css).toContain('font-size: 16px');
+    expect(css).toContain('grid-template-columns: repeat(6, minmax(0, 1fr))');
+    expect(css).toContain('env(safe-area-inset-bottom)');
+  });
+
   it('uses a searchable timezone input instead of a long native select', () => {
     expect(baselineInput).toContain("input.type = 'search'");
     expect(baselineInput).toContain("document.createElement('datalist')");
@@ -50,5 +61,13 @@ describe('first-run accessibility and dashboard UX pass', () => {
     expect(serviceWorker).toContain("sovereign-public-v7");
     expect(serviceWorker).toContain("'/ux-audit-polish.css'");
     expect(serviceWorker).toContain("'/ux-audit-runtime.js'");
+  });
+
+  it('separates repository CI from production convergence checks', () => {
+    expect(ciWorkflow).toContain('pull_request:');
+    expect(ciWorkflow).toContain('pnpm install --frozen-lockfile');
+    expect(ciWorkflow).toContain('pnpm verify:cloudflare-build');
+    expect(liveWorkflow).not.toContain('pull_request:');
+    expect(liveWorkflow).toContain('EXPECTED_SHA: ${{ github.sha }}');
   });
 });
