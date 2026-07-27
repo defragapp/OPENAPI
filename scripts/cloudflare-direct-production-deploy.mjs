@@ -17,7 +17,7 @@ const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT
 const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAADhGIF8-iOLIg8MU').trim();
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
-const migrationVersion = '0009_production_scale_and_billing_safety';
+const migrationVersion = '0010_auth_password_oauth_onboarding';
 
 if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required');
 if (!/^[0-9a-f]{40}$/i.test(commitSha)) throw new Error('A full 40-character commit SHA is required');
@@ -148,6 +148,7 @@ async function verifyLiveProduction() {
       assert(readyProbe.json?.ready === true, `ready=false: ${readyProbe.text.slice(0, 500)}`);
       assert(readyProbe.json?.version === commitSha, `ready version mismatch: ${readyProbe.json?.version ?? 'missing'}`);
       assert(readyProbe.json?.migrationVersion === migrationVersion, `migration mismatch: ${readyProbe.json?.migrationVersion ?? 'missing'}`);
+      assert(readyProbe.json?.authenticationModes?.passwordProtocol === 'browser-key-v1', 'browser-held password protocol is not active');
       assert(readyProbe.json?.dependencies?.authentication === 'configured', 'authentication dependency is not configured');
       assert(readyProbe.json?.dependencies?.transactionalEmail !== 'missing', 'transactional email is not configured');
       assert(readyProbe.json?.dependencies?.stripe === 'configured', 'Stripe dependency is not configured');
@@ -173,6 +174,9 @@ async function verifyLiveProduction() {
     terms,
     login,
     signup,
+    forgotPassword,
+    resetPassword,
+    onboarding,
     appPage,
     invitation,
     consent,
@@ -190,6 +194,9 @@ async function verifyLiveProduction() {
     readText(`${publicBase}/terms`),
     readText(`${appBase}/login`),
     readText(`${appBase}/signup`),
+    readText(`${appBase}/forgot-password`),
+    readText(`${appBase}/reset-password`),
+    readText(`${appBase}/onboarding`),
     readText(`${appBase}/app`),
     readText(`${appBase}/invitation`),
     readText(`${appBase}/consent.html`),
@@ -219,7 +226,10 @@ async function verifyLiveProduction() {
     '10 Sovereign responses each month',
     '300 Sovereign responses each month',
     'Consent-aware invitations and sharing controls',
-    '/launch-polish.css?v=20260726-final-r1'
+    '/launch-polish.css?v=20260726-final-r1',
+    '/pricing-funnel.css?v=20260726-auth-r1',
+    '/signup?plan=sovereign_plus&amp;interval=monthly',
+    '/signup?plan=sovereign_plus&amp;interval=annual'
   ]);
   assertContainsAll('pricing clean URL', pricingClean.text, [
     '$20',
@@ -243,6 +253,7 @@ async function verifyLiveProduction() {
 
   assert(privacy.response.ok && terms.response.ok, 'privacy or terms page is unavailable');
   assert(login.response.ok && signup.response.ok, 'login or signup page is unavailable');
+  assert(forgotPassword.response.ok && resetPassword.response.ok && onboarding.response.ok, 'account recovery or onboarding page is unavailable');
   assert(appPage.response.ok, `workspace shell returned ${appPage.response.status}`);
   assert(invitation.response.ok, `invitation page returned ${invitation.response.status}`);
   assert(consent.response.ok, `consent page returned ${consent.response.status}`);
@@ -258,11 +269,12 @@ async function verifyLiveProduction() {
 
   assert(health.response.ok && health.json?.ok === true, 'health is not healthy');
   assert(health.json?.version === commitSha, 'health is not serving the deployed commit');
-  assert(health.json?.migrationVersion === migrationVersion, 'health is not serving migration 0009');
+  assert(health.json?.migrationVersion === migrationVersion, 'health is not serving migration 0010');
+  assert(health.json?.authenticationModes?.passwordProtocol === 'browser-key-v1', 'health is not serving browser-key-v1');
   assert(ready.json?.ready === true && ready.json?.version === commitSha, 'ready is not serving the deployed commit');
 
   const publicDocuments = [home.response, how.response, howClean.response, pricing.response, pricingClean.response, faq.response, faqClean.response, privacy.response, terms.response];
-  const appDocuments = [login.response, signup.response, appPage.response, invitation.response, consent.response];
+  const appDocuments = [login.response, signup.response, forgotPassword.response, resetPassword.response, onboarding.response, appPage.response, invitation.response, consent.response];
   for (const page of [...publicDocuments, ...appDocuments]) {
     assert(headerIncludes(page, 'strict-transport-security', 'max-age=31536000'), 'HSTS is missing from a document');
     assert(headerIncludes(page, 'x-content-type-options', 'nosniff'), 'nosniff is missing from a document');
@@ -285,7 +297,10 @@ async function verifyLiveProduction() {
     'How Sovereign.OS handles your information.',
     'Terms for using Sovereign.OS.',
     'Welcome back.',
-    'Create your account.',
+    'Create your Sovereign.OS account.',
+    'Forgot password?',
+    'Choose how far you want to begin.',
+    'Build your starting map.',
     'Choose what this connection may use.',
     'What is active in your life now.',
     'Explore any part of who you are.',
@@ -306,7 +321,9 @@ async function verifyLiveProduction() {
   assertContainsAll('compiled visual polish', compiledCss, [
     'polish-reveal',
     'polish-signal',
-    'prefers-reduced-motion'
+    'prefers-reduced-motion',
+    'account-flow-shell',
+    'onboarding-plan-grid'
   ]);
 
   const launchPolish = await readText(`${publicBase}/launch-polish.css?v=20260726-final-r1`);
@@ -321,15 +338,17 @@ async function verifyLiveProduction() {
   const consentJs = await request(`${appBase}/consent.js?v=20260726-consent-r1`);
   assert(consentCss.ok && consentJs.ok, 'consent page assets are unavailable');
 
-  const [appRoot, publicLogin, publicConsent, appPricing, publicApi] = await Promise.all([
+  const [appRoot, publicLogin, publicOnboarding, publicConsent, appPricing, publicApi] = await Promise.all([
     request(`${appBase}/`, { redirect: 'manual' }),
     request(`${publicBase}/login`, { redirect: 'manual' }),
+    request(`${publicBase}/onboarding`, { redirect: 'manual' }),
     request(`${publicBase}/consent.html`, { redirect: 'manual' }),
     request(`${appBase}/pricing.html`, { redirect: 'manual' }),
     request(`${publicBase}/api/v1/auth/session`, { redirect: 'manual' })
   ]);
   assert(appRoot.status === 308 && appRoot.headers.get('location')?.startsWith(`${appBase}/app`), 'app root redirect is incorrect');
   assert(publicLogin.status === 308 && publicLogin.headers.get('location')?.startsWith(`${appBase}/login`), 'public login redirect is incorrect');
+  assert(publicOnboarding.status === 308 && publicOnboarding.headers.get('location')?.startsWith(`${appBase}/onboarding`), 'public onboarding redirect is incorrect');
   assert(publicConsent.status === 308 && publicConsent.headers.get('location')?.startsWith(`${appBase}/consent.html`), 'public consent redirect is incorrect');
   assert(appPricing.status === 308 && appPricing.headers.get('location')?.startsWith(`${publicBase}/pricing.html`), 'app pricing redirect is incorrect');
   assert(publicApi.status === 308 && publicApi.headers.get('location')?.startsWith(`${appBase}/api/v1/auth/session`), 'public API redirect is incorrect');
@@ -339,7 +358,7 @@ async function verifyLiveProduction() {
     type: 'customer.subscription.updated',
     data: { object: {} }
   });
-  const [session, you, checkout, webhook, legacyWebhook, disabledExport, signupWithoutTurnstile] = await Promise.all([
+  const [session, you, checkout, webhook, legacyWebhook, disabledExport, signupWithoutTurnstile, challengeWithoutTurnstile] = await Promise.all([
     request(`${appBase}/api/v1/auth/session`, { redirect: 'manual' }),
     request(`${appBase}/api/v1/you`, { redirect: 'manual' }),
     request(`${appBase}/api/v1/billing/checkout`, {
@@ -366,7 +385,7 @@ async function verifyLiveProduction() {
       body: '{}',
       redirect: 'manual'
     }),
-    request(`${appBase}/api/v1/auth/signup`, {
+    request(`${appBase}/api/v1/auth/password/signup`, {
       method: 'POST',
       headers: { origin: appBase, 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -374,6 +393,12 @@ async function verifyLiveProduction() {
         name: 'Deployment Probe',
         termsAccepted: true
       }),
+      redirect: 'manual'
+    }),
+    request(`${appBase}/api/v1/auth/password/challenge`, {
+      method: 'POST',
+      headers: { origin: appBase, 'content-type': 'application/json' },
+      body: JSON.stringify({ email: `deploy-smoke-${commitSha.slice(0, 12)}@example.invalid` }),
       redirect: 'manual'
     })
   ]);
@@ -384,7 +409,8 @@ async function verifyLiveProduction() {
   assert(webhook.status === 400, `invalid current Stripe signature returned ${webhook.status}`);
   assert(legacyWebhook.status === 400, `invalid legacy Stripe signature returned ${legacyWebhook.status}`);
   assert(disabledExport.status === 404, `disabled export returned ${disabledExport.status}`);
-  assert(signupWithoutTurnstile.status === 400, `signup without Turnstile returned ${signupWithoutTurnstile.status}`);
+  assert(signupWithoutTurnstile.status === 400, `password signup without Turnstile returned ${signupWithoutTurnstile.status}`);
+  assert(challengeWithoutTurnstile.status === 400, `password challenge without Turnstile returned ${challengeWithoutTurnstile.status}`);
 
   const stripeSignatureRejection = webhook.status === 400 && legacyWebhook.status === 400;
   const exportsDisabled = disabledExport.status === 404;
@@ -409,12 +435,15 @@ async function verifyLiveProduction() {
     probes: {
       publicHome: 'passed',
       howItWorks: 'html-and-clean-url-passed',
-      pricing: 'html-and-clean-url-passed',
+      pricing: 'intent-linked-html-and-clean-url-passed',
       questions: 'html-and-clean-url-passed',
       privacy: 'passed',
       terms: 'passed',
       login: 'passed',
       signup: 'passed',
+      passwordRecovery: 'page-and-turnstile-boundary-passed',
+      onboarding: 'page-and-hostname-passed',
+      passwordProtocol: 'browser-key-v1-active',
       workspaceShell: 'passed',
       invitation: 'passed',
       consent: 'page-assets-and-csp-passed',
@@ -423,7 +452,7 @@ async function verifyLiveProduction() {
       supportPlacementExcluded: 'passed',
       hostnameSeparation: 'passed',
       unauthenticatedAccess: 'passed',
-      turnstileRequired: 'passed',
+      turnstileRequired: 'signup-and-challenge-passed',
       stripeSignatureRejection: 'current-and-legacy-passed',
       exportsDisabled: 'passed',
       documentSecurityHeaders: 'passed',
@@ -515,6 +544,8 @@ try {
     sessionSecretCreated: Object.hasOwn(secrets, 'SESSION_SIGNING_SECRET'),
     turnstileSecretConfigured: configuredSecrets.has('TURNSTILE_SECRET_KEY'),
     resendConfigured: configuredSecrets.has('RESEND_API_KEY'),
+    appleConfigured: configuredSecrets.has('APPLE_CLIENT_ID') && configuredSecrets.has('APPLE_PRIVATE_KEY'),
+    googleConfigured: configuredSecrets.has('GOOGLE_CLIENT_ID') && configuredSecrets.has('GOOGLE_CLIENT_SECRET'),
     stripeConfigured: configuredSecrets.has('STRIPE_SECRET_KEY') && configuredSecrets.has('STRIPE_WEBHOOK_SECRET'),
     verification
   };
