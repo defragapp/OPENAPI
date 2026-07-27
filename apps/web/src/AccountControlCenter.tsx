@@ -134,7 +134,6 @@ export function AccountControlCenter() {
       setStatus('Deletion scheduled. You can cancel during the 14-day grace period.');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Account deletion could not be scheduled.');
-      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -171,6 +170,11 @@ export function AccountControlCenter() {
     }
   }
 
+  function openPermissions() {
+    setOpen(false);
+    window.setTimeout(() => window.dispatchEvent(new CustomEvent('sovereign:open-consent-controls')), 0);
+  }
+
   return (
     <>
       <button className="account-control-trigger" onClick={() => setOpen(true)}>Account & Library</button>
@@ -187,7 +191,7 @@ export function AccountControlCenter() {
             <p className="account-control-status" role="status" aria-live="polite">{status}</p>
 
             <nav className="account-control-links" aria-label="Account links">
-              <button onClick={() => window.dispatchEvent(new CustomEvent('sovereign:open-consent-controls'))}>People & permissions</button>
+              <button onClick={openPermissions}>People & permissions</button>
               <button onClick={() => void openBilling()} disabled={loading}>Manage billing</button>
               <a href="https://sovereign.defrag.app/privacy">Privacy</a>
               <a href="https://sovereign.defrag.app/terms">Terms</a>
