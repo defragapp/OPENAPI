@@ -59,7 +59,9 @@ const runtime = {
     }
 
     return applicationResponse(request, url.pathname, env, executionContext);
-  }
+  },
+  queue,
+  scheduled
 };
 
 async function applicationResponse(request: Request, pathname: string, env: Env, executionContext: ExecutionContext): Promise<Response> {
