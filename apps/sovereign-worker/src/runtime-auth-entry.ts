@@ -2,7 +2,7 @@ import runtime, { ThreadCoordinator, queue as baseQueue, scheduled as baseSchedu
 import type { Env } from './env';
 import { requireSameOrigin } from './security/auth';
 import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/headers';
-import { passwordLogin, passwordSignup, requestPasswordReset, resetPassword } from './auth-password';
+import { passwordChallenge, passwordLogin, passwordSignup, requestPasswordReset, resetPassword } from './auth-password';
 import { finishOAuth, startOAuth, type OAuthProvider } from './auth-oauth';
 import { completeOnboarding, onboardingStatus, selectOnboardingPlan } from './onboarding';
 import { cleanupAuthArtifacts } from './auth-maintenance';
@@ -30,6 +30,10 @@ const authRuntime = {
       if (request.method === 'POST' && url.pathname === '/api/v1/auth/password/signup') {
         requireSameOrigin(request);
         return secure(await passwordSignup(request, env));
+      }
+      if (request.method === 'POST' && url.pathname === '/api/v1/auth/password/challenge') {
+        requireSameOrigin(request);
+        return secure(await passwordChallenge(request, env));
       }
       if (request.method === 'POST' && url.pathname === '/api/v1/auth/password/login') {
         requireSameOrigin(request);
@@ -71,6 +75,7 @@ const authRuntime = {
           migrationVersion: '0010_auth_password_oauth_onboarding',
           authenticationModes: {
             password: 'configured',
+            passwordProtocol: 'browser-key-v1',
             apple: oauthConfigured(env, 'apple') ? 'configured' : 'missing',
             google: oauthConfigured(env, 'google') ? 'configured' : 'missing',
             emailRecovery: env.EMAIL || env.RESEND_API_KEY ? 'configured' : 'missing',
