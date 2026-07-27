@@ -5,7 +5,7 @@ type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
 type ApiState = 'idle' | 'loading' | 'ready' | 'error';
 type Json = Record<string, any>;
 type ChatMessage = { id: string; role: 'user' | 'assistant'; text: string; context?: Json; createdAt?: string };
-type ThreadSummary = { id: string; title: string; updatedAt?: string; covenantEnabled?: boolean };
+type ThreadSummary = { id: string; title: string; updatedAt?: string; covenantEnabled?: boolean; surface?: Surface };
 
 type WorkspaceState = {
   today: Json | null;
@@ -16,6 +16,15 @@ type WorkspaceState = {
   threads: ThreadSummary[];
 };
 
+type GuidedStart = {
+  surface: Surface;
+  label: string;
+  title: string;
+  description: string;
+  prompt: string;
+  contextRequired?: boolean;
+};
+
 const surfaces: Array<{ name: Surface; label: string; description: string }> = [
   { name: 'Today', label: 'Today', description: 'Your Baseline, alive today' },
   { name: 'Explore', label: 'Explore', description: 'Open any part of yourself' },
@@ -23,6 +32,39 @@ const surfaces: Array<{ name: Surface; label: string; description: string }> = [
   { name: 'Systems', label: 'Systems', description: 'See the whole system' },
   { name: 'Library', label: 'Library', description: 'Keep what changes understanding' },
   { name: 'You', label: 'You', description: 'Your design and control' }
+];
+
+const guidedStarts: GuidedStart[] = [
+  {
+    surface: 'Explore',
+    label: 'UNDERSTAND MYSELF',
+    title: 'Open one part of your Baseline.',
+    description: 'Explore a quality, role, strength, tension, or shadow and light expression.',
+    prompt: 'Show me a part of my Baseline I may not recognize yet.'
+  },
+  {
+    surface: 'Explore',
+    label: 'EXAMINE A CHOICE',
+    title: 'Bring a real decision into view.',
+    description: 'See what supports your design, what may cost you, and what still needs context.',
+    prompt: 'Help me examine whether this choice fits who I am.'
+  },
+  {
+    surface: 'People',
+    label: 'UNDERSTAND A RELATIONSHIP',
+    title: 'See what each person brings.',
+    description: 'Choose a permitted person and keep both perspectives and responsibilities distinct.',
+    prompt: 'What are we each bringing into this relationship?',
+    contextRequired: true
+  },
+  {
+    surface: 'Systems',
+    label: 'MAP A HUMAN SYSTEM',
+    title: 'See roles, pressure, and responsibility.',
+    description: 'Choose a family, household, team, or group and understand how the whole system functions.',
+    prompt: 'What role does each person occupy in this system?',
+    contextRequired: true
+  }
 ];
 
 const promptSets: Record<Surface, string[]> = {
@@ -74,7 +116,7 @@ export function SovereignIntelligenceWorkspace() {
   const [selectedPerson, setSelectedPerson] = useState('');
   const [selectedSystem, setSelectedSystem] = useState('');
   const [covenantEnabled, setCovenantEnabled] = useState(false);
-  const [status, setStatus] = useState('Loading your workspace…');
+  const [status, setStatus] = useState('Loading Sovereign.OS…');
   const [apiState, setApiState] = useState<ApiState>('idle');
   const [workspace, setWorkspace] = useState<WorkspaceState>({ today: null, people: [], systems: [], library: [], billing: null, threads: [] });
 
@@ -88,7 +130,7 @@ export function SovereignIntelligenceWorkspace() {
       }
     });
     if (response.status === 401) {
-      location.assign(`/login?returnTo=${encodeURIComponent(location.pathname)}`);
+      location.assign(`/login?returnTo=${encodeURIComponent(location.pathname + location.search)}`);
       throw new Error('Sign-in required');
     }
     const body = response.headers.get('content-type')?.includes('application/json')
@@ -126,7 +168,8 @@ export function SovereignIntelligenceWorkspace() {
       });
       setStatus('Ready');
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Some workspace context is unavailable.');
+      setApiState('error');
+      setStatus(error instanceof Error ? error.message : 'Some context is unavailable.');
     }
   }
 
@@ -148,35 +191,71 @@ export function SovereignIntelligenceWorkspace() {
     covenantEnabled ? 'Covenant' : ''
   ].filter(Boolean);
 
-  function openSurface(next: Surface) {
-    setSurface(next);
-    setContextOpen(true);
-    setMobileNavOpen(false);
+  function keepOnlyRelevantSelection(next: Surface) {
+    if (next !== 'People') setSelectedPerson('');
+    if (next !== 'Systems') setSelectedSystem('');
   }
 
   function startNewThread(nextSurface: Surface = surface) {
+    setSurface(nextSurface);
     setThreadId(newThreadId(nextSurface));
     setMessages([]);
     setDraft('');
     setCovenantEnabled(false);
     setApiState('idle');
     setStatus('Ready');
+    setContextOpen(false);
+    keepOnlyRelevantSelection(nextSurface);
+  }
+
+  function openSurface(next: Surface) {
+    if (next !== surface && (messages.length > 0 || draft.trim())) {
+      startNewThread(next);
+    } else {
+      setSurface(next);
+      keepOnlyRelevantSelection(next);
+      setContextOpen(false);
+      setStatus('Ready');
+    }
+    setMobileNavOpen(false);
+  }
+
+  function beginGuided(start: GuidedStart) {
+    startNewThread(start.surface);
+    setDraft(start.prompt);
+    const needsPerson = start.surface === 'People' && !selectedPerson;
+    const needsSystem = start.surface === 'Systems' && !selectedSystem;
+    setContextOpen(Boolean(start.contextRequired && (needsPerson || needsSystem)));
+    setStatus(start.contextRequired && (needsPerson || needsSystem) ? 'Choose the context that belongs.' : 'Question ready. Add details or send when it fits.');
   }
 
   async function openThread(id: string) {
     setStatus('Opening conversation…');
+    setApiState('loading');
     try {
       const data = await api(`/api/v1/threads/${encodeURIComponent(id)}`);
-      const restored = data.messages ?? [];
+      const restored = Array.isArray(data.messages) ? data.messages as ChatMessage[] : [];
+      const lastContext = [...restored].reverse().find((message) => message.context)?.context ?? {};
+      const summary = workspace.threads.find((thread) => thread.id === id);
+      const restoredSurface = validSurface(lastContext.surface)
+        ? lastContext.surface
+        : validSurface(summary?.surface)
+          ? summary.surface
+          : 'Today';
       setMessages(restored);
       setThreadId(id);
-      const lastContext = [...restored].reverse().find((message: ChatMessage) => message.context)?.context ?? {};
-      setSelectedPerson(validClientId(lastContext.personId) ? lastContext.personId : '');
-      setSelectedSystem(validClientId(lastContext.systemId) ? lastContext.systemId : '');
-      setCovenantEnabled(workspace.threads.find((thread) => thread.id === id)?.covenantEnabled === true);
-      setStatus('Conversation restored.');
+      setSurface(restoredSurface);
+      setSelectedPerson(validClientId(lastContext.personId) && restoredSurface === 'People' ? lastContext.personId : '');
+      setSelectedSystem(validClientId(lastContext.systemId) && restoredSurface === 'Systems' ? lastContext.systemId : '');
+      setCovenantEnabled(typeof lastContext.covenantEnabled === 'boolean'
+        ? lastContext.covenantEnabled
+        : summary?.covenantEnabled === true);
+      setApiState('ready');
+      setStatus('Conversation restored in its original context.');
+      setContextOpen(false);
       setMobileNavOpen(false);
     } catch (error) {
+      setApiState('error');
       setStatus(error instanceof Error ? error.message : 'That conversation is unavailable.');
     }
   }
@@ -185,9 +264,15 @@ export function SovereignIntelligenceWorkspace() {
     event.preventDefault();
     const clean = draft.trim();
     if (!clean || apiState === 'loading') return;
-    const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', text: clean };
+    const messageContext = {
+      surface,
+      personId: selectedPerson || undefined,
+      systemId: selectedSystem || undefined,
+      covenantEnabled
+    };
+    const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', text: clean, context: messageContext };
     const assistantId = crypto.randomUUID();
-    setMessages((current) => [...current, userMessage, { id: assistantId, role: 'assistant', text: '' }]);
+    setMessages((current) => [...current, userMessage, { id: assistantId, role: 'assistant', text: '', context: messageContext }]);
     setDraft('');
     setApiState('loading');
     setStatus('Sovereign is connecting your question to the context that belongs…');
@@ -195,15 +280,7 @@ export function SovereignIntelligenceWorkspace() {
       const response = await fetch(`/api/v1/threads/${encodeURIComponent(threadId)}/messages`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-idempotency-key': crypto.randomUUID() },
-        body: JSON.stringify({
-          message: clean,
-          context: {
-            surface,
-            personId: selectedPerson || undefined,
-            systemId: selectedSystem || undefined,
-            covenantEnabled
-          }
-        })
+        body: JSON.stringify({ message: clean, context: messageContext })
       });
       if (response.status === 401) {
         location.assign('/login?returnTo=%2Fapp');
@@ -275,11 +352,11 @@ export function SovereignIntelligenceWorkspace() {
 
   return (
     <div className={`intelligence-workspace ${contextOpen ? 'context-open' : ''} ${mobileNavOpen ? 'nav-open' : ''}`}>
-      <aside className="intelligence-sidebar" aria-label="Workspace navigation">
+      <aside className="intelligence-sidebar" aria-label="Sovereign navigation">
         <a className="intelligence-brand" href="/app"><span>S</span><strong>SOVEREIGN.OS</strong></a>
-        <button className="new-conversation" onClick={() => startNewThread()}>＋ New conversation</button>
+        <button className="new-conversation" onClick={() => startNewThread()}>＋ New exploration</button>
         <nav>
-          <p>EXPLORE</p>
+          <p>OPEN</p>
           {surfaces.map((item) => (
             <button key={item.name} className={surface === item.name ? 'active' : ''} onClick={() => openSurface(item.name)}>
               <span aria-hidden="true">{surfaceIcon(item.name)}</span>
@@ -289,14 +366,14 @@ export function SovereignIntelligenceWorkspace() {
         </nav>
         <section className="recent-threads">
           <p>RECENT</p>
-          {workspace.threads.length === 0 && <span>Your conversations will appear here.</span>}
+          {workspace.threads.length === 0 && <span>Explorations you begin will appear here.</span>}
           {workspace.threads.slice(0, 12).map((thread) => (
             <button key={thread.id} onClick={() => void openThread(thread.id)}>{thread.title}</button>
           ))}
         </section>
         <button className="plan-chip" onClick={() => openSurface('You')}>
           <span>{workspace.billing?.effective?.plan === 'sovereign_plus' ? 'S+' : 'S'}</span>
-          <span><strong>{workspace.billing?.effective?.plan === 'sovereign_plus' ? 'Sovereign+' : 'Free plan'}</strong><small>Baseline and account</small></span>
+          <span><strong>{workspace.billing?.effective?.plan === 'sovereign_plus' ? 'Sovereign+' : 'Free plan'}</strong><small>Your design and control</small></span>
         </button>
       </aside>
 
@@ -313,7 +390,7 @@ export function SovereignIntelligenceWorkspace() {
         <section className="context-bar" aria-label="Active context">
           <strong>Considering</strong>
           {contextItems.map((item) => <span key={item}>{item}</span>)}
-          <button onClick={() => { setSelectedPerson(''); setSelectedSystem(''); }}>Clear people and systems</button>
+          {(selectedPerson || selectedSystem) && <button onClick={() => { setSelectedPerson(''); setSelectedSystem(''); }}>Clear selected context</button>}
         </section>
 
         <section className="intelligence-scroll" aria-live="polite">
@@ -324,7 +401,8 @@ export function SovereignIntelligenceWorkspace() {
                 selectedPerson={selectedPersonRecord}
                 selectedSystem={selectedSystemRecord}
                 onPrompt={setDraft}
-                onSurface={openSurface}
+                onOpenContext={() => setContextOpen(true)}
+                onGuidedStart={beginGuided}
               />
             : <ResponseThread
                 messages={messages}
@@ -332,6 +410,9 @@ export function SovereignIntelligenceWorkspace() {
                 covenantEnabled={covenantEnabled}
                 selectedPerson={selectedPersonRecord}
                 selectedSystem={selectedSystemRecord}
+                today={workspace.today}
+                people={workspace.people}
+                onPrompt={setDraft}
                 onSave={() => void saveLatest()}
                 onCorrection={(value) => void saveCorrection(value)}
               />}
@@ -344,6 +425,7 @@ export function SovereignIntelligenceWorkspace() {
             onChange={(event) => setDraft(event.target.value)}
             placeholder={composerPlaceholder(surface)}
             rows={2}
+            aria-label={`Ask Sovereign from ${surface}`}
             onKeyDown={(event) => {
               if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
@@ -384,29 +466,34 @@ export function SovereignIntelligenceWorkspace() {
   );
 }
 
-function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, onPrompt, onSurface }: {
+function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, onPrompt, onOpenContext, onGuidedStart }: {
   surface: Surface;
   workspace: WorkspaceState;
   selectedPerson: Json | null;
   selectedSystem: Json | null;
   onPrompt: (prompt: string) => void;
-  onSurface: (surface: Surface) => void;
+  onOpenContext: () => void;
+  onGuidedStart: (start: GuidedStart) => void;
 }) {
   const today = workspace.today;
   if (surface === 'Today') return (
     <div className="surface-home today-home">
-      <div className="surface-heading"><p>YOUR BASELINE, ALIVE TODAY</p><h1>See what remains yours—and what may be louder now.</h1><span>Start with a meaningful view before you ask a question.</span></div>
+      <div className="surface-heading"><p>YOUR BASELINE, ALIVE TODAY</p><h1>Start with what belongs to you.</h1><span>See your foundation first, then choose where Sovereign should help you look.</span></div>
       <div className="today-grid">
         <BaselineCore today={today} />
         <TodaySummary today={today} />
       </div>
-      <PromptGrid prompts={promptSets.Today} onPrompt={onPrompt} />
+      <GuidedStartGrid starts={guidedStarts} onStart={onGuidedStart} />
+      <section className="today-questions" aria-labelledby="today-questions-title">
+        <header><p>ASK FROM TODAY</p><h2 id="today-questions-title">Or begin with what feels relevant now.</h2></header>
+        <PromptGrid prompts={promptSets.Today} onPrompt={onPrompt} />
+      </section>
     </div>
   );
 
   if (surface === 'Explore') return (
     <div className="surface-home">
-      <div className="surface-heading"><p>OPEN ANY PART OF YOURSELF</p><h1>Explore your design in the life you are actually living.</h1><span>Choose a mode or ask in your own words.</span></div>
+      <div className="surface-heading"><p>OPEN ANY PART OF YOURSELF</p><h1>Explore your design in the life you are actually living.</h1><span>Choose a mode or ask in your own words. Sovereign keeps the relevant Baseline context underneath the question.</span></div>
       <div className="explore-mode-grid">
         <ModeCard label="MY BASELINE" title="Understand a quality, role, strength, or tension." prompt="Show me a part of my Baseline I may not recognize yet." onPrompt={onPrompt} />
         <ModeCard label="SHADOW & LIGHT" title="See what a quality protects and what it can become." prompt="Show me the shadow and light of a part of my Baseline." onPrompt={onPrompt} />
@@ -422,7 +509,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, onPro
       <div className="surface-heading"><p>TWO PEOPLE · TWO BASELINES · ONE RELATIONSHIP</p><h1>See what each person brings—and what the relationship creates between you.</h1><span>No compatibility score. No winner and loser.</span></div>
       {selectedPerson
         ? <PerspectiveSplit person={selectedPerson} today={today} onPrompt={onPrompt} />
-        : <EmptyState title="Choose a permitted person" body="Add or select someone in Context. Shared comparison begins only after they choose what to allow." action="Open People controls" onAction={() => onSurface('People')} />}
+        : <EmptyState title="Choose a permitted person" body="Add or select someone in Context. Shared comparison begins only after they choose what to allow." action="Choose a person" onAction={onOpenContext} />}
     </div>
   );
 
@@ -431,7 +518,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, onPro
       <div className="surface-heading"><p>SEE THE WHOLE SYSTEM</p><h1>Map roles, pressure, authority, and responsibility across the group.</h1><span>A family or team is more than its loudest person.</span></div>
       {selectedSystem
         ? <SystemMap system={selectedSystem} people={workspace.people} onPrompt={onPrompt} />
-        : <EmptyState title="Choose a system" body="Create or select a family, household, team, or group in Context." action="Open System controls" onAction={() => onSurface('Systems')} />}
+        : <EmptyState title="Choose a system" body="Create or select a family, household, team, or group in Context." action="Choose a system" onAction={onOpenContext} />}
     </div>
   );
 
@@ -444,9 +531,27 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, onPro
 
   return (
     <div className="surface-home">
-      <div className="surface-heading"><p>YOUR DESIGN · YOUR PEOPLE · YOUR CONTROL</p><h1>Manage the personal foundation beneath every conversation.</h1><span>Your plan, Baseline, permissions, faith lens, and account controls remain yours.</span></div>
+      <div className="surface-heading"><p>YOUR DESIGN · YOUR PEOPLE · YOUR CONTROL</p><h1>Manage the personal foundation beneath every exploration.</h1><span>Your plan, Baseline, permissions, faith lens, and account controls remain yours.</span></div>
       <BaselineCore today={today} />
     </div>
+  );
+}
+
+function GuidedStartGrid({ starts, onStart }: { starts: GuidedStart[]; onStart: (start: GuidedStart) => void }) {
+  return (
+    <section className="guided-start" aria-labelledby="guided-start-title">
+      <header><p>WHAT WOULD YOU LIKE TO UNDERSTAND?</p><h2 id="guided-start-title">Choose one place to begin.</h2><span>You can move anywhere later. Sovereign will open the right context for this exploration.</span></header>
+      <div className="guided-start-grid">
+        {starts.map((start, index) => (
+          <button key={`${start.surface}-${start.label}`} onClick={() => onStart(start)}>
+            <span>{String(index + 1).padStart(2, '0')} · {start.label}</span>
+            <strong>{start.title}</strong>
+            <p>{start.description}</p>
+            <small>Begin here →</small>
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -517,19 +622,20 @@ function PerspectiveSplit({ person, today, onPrompt }: { person: Json; today: Js
 }
 
 function SystemMap({ system, people, onPrompt }: { system: Json; people: Json[]; onPrompt: (prompt: string) => void }) {
-  const memberIds = new Set((system.members ?? []).map((member: Json) => member.personId ?? member.id));
-  const members = people.filter((person) => memberIds.has(person.id));
-  const visible = members;
+  const peopleById = new Map(people.map((person) => [person.id, person]));
+  const members = (Array.isArray(system.members) ? system.members : []).map((member: Json) => peopleById.get(member.personId ?? member.id) ?? member);
+  const visible = members.length > 0 ? members : [{ id: 'you', displayName: 'You', identityBound: true, role: 'self' }];
   return (
     <section className="system-map-card">
       <header><div><p>{String(system.systemType ?? 'SYSTEM').replace('_', ' ').toUpperCase()}</p><h2>{system.name ?? 'Your system'}</h2></div><button onClick={() => onPrompt(`What role does each person occupy in ${system.name ?? 'this system'}?`)}>Explore this system</button></header>
       <div className="system-map-field">
         <div className="system-center"><span>SYSTEM</span><strong>{system.name ?? 'Shared context'}</strong></div>
-        {(visible.length > 0 ? visible : [{ id: 'you', displayName: 'You' }]).map((person, index, array) => {
+        {visible.map((person: Json, index: number, array: Json[]) => {
           const angle = (index / array.length) * Math.PI * 2 - Math.PI / 2;
           const x = 50 + Math.cos(angle) * 36;
           const y = 50 + Math.sin(angle) * 34;
-          return <article key={person.id ?? index} style={{ left: `${x}%`, top: `${y}%` }}><span>{person.identityBound ? 'PERMITTED' : 'LIMITED'}</span><strong>{person.displayName ?? person.name ?? 'You'}</strong><small>{firstText(person.role, person.metadata?.formalRole, 'Member')}</small></article>;
+          const permitted = person.identityBound === true || person.consentActive === true || person.activeConsent === true;
+          return <article key={person.id ?? person.personId ?? index} style={{ left: `${x}%`, top: `${y}%` }}><span>{permitted ? 'PERMITTED' : 'LIMITED'}</span><strong>{person.displayName ?? person.name ?? 'Member'}</strong><small>{firstText(person.role, person.roleLabel, person.metadata?.formalRole, 'Member')}</small></article>;
         })}
       </div>
       <footer><span>Roles</span><span>Pressure</span><span>Perspective</span><span>Authority</span><span>Change</span><span>Alignment</span></footer>
@@ -537,26 +643,33 @@ function SystemMap({ system, people, onPrompt }: { system: Json; people: Json[];
   );
 }
 
-function ResponseThread({ messages, surface, covenantEnabled, selectedPerson, selectedSystem, onSave, onCorrection }: {
+function ResponseThread({ messages, surface, covenantEnabled, selectedPerson, selectedSystem, today, people, onPrompt, onSave, onCorrection }: {
   messages: ChatMessage[];
   surface: Surface;
   covenantEnabled: boolean;
   selectedPerson: Json | null;
   selectedSystem: Json | null;
+  today: Json | null;
+  people: Json[];
+  onPrompt: (prompt: string) => void;
   onSave: () => void;
   onCorrection: (value: 'yes' | 'partly' | 'not_today') => void;
 }) {
+  const latestAnswer = [...messages].reverse().find((message) => message.role === 'assistant' && message.text.trim())?.text ?? '';
   return (
     <div className="response-thread">
-      {messages.map((message) => message.role === 'user'
-        ? <article key={message.id} className="user-question"><span>YOU</span><p>{message.text}</p></article>
-        : <article key={message.id} className="sovereign-response"><span className="response-mark">S</span>{message.text ? <StructuredResponse text={message.text} surface={surface} /> : <p className="thinking">Connecting the relevant context…</p>}</article>)}
-      {messages.some((message) => message.role === 'assistant' && message.text.trim()) && (
+      {messages.map((message) => {
+        const messageSurface = validSurface(message.context?.surface) ? message.context.surface : surface;
+        return message.role === 'user'
+          ? <article key={message.id} className="user-question"><span>YOU</span><p>{message.text}</p></article>
+          : <article key={message.id} className="sovereign-response"><span className="response-mark">S</span>{message.text ? <StructuredResponse text={message.text} surface={messageSurface} /> : <p className="thinking">Connecting the relevant context…</p>}</article>;
+      })}
+      {latestAnswer && (
         <>
-          {surface === 'Explore' && <AlignmentNeedle text={[...messages].reverse().find((message) => message.role === 'assistant')?.text ?? ''} active />}
-          {surface === 'People' && selectedPerson && <PerspectiveSplit person={selectedPerson} today={null} onPrompt={() => undefined} />}
-          {surface === 'Systems' && selectedSystem && <SystemMap system={selectedSystem} people={[]} onPrompt={() => undefined} />}
-          {covenantEnabled && <ScriptureDrawer text={[...messages].reverse().find((message) => message.role === 'assistant')?.text ?? ''} />}
+          {surface === 'Explore' && <AlignmentNeedle text={latestAnswer} active />}
+          {surface === 'People' && selectedPerson && <PerspectiveSplit person={selectedPerson} today={today} onPrompt={onPrompt} />}
+          {surface === 'Systems' && selectedSystem && <SystemMap system={selectedSystem} people={people} onPrompt={onPrompt} />}
+          {covenantEnabled && <ScriptureDrawer text={latestAnswer} />}
           <div className="response-controls"><button onClick={onSave}>Save to Library</button><span>Does this fit?</span><button onClick={() => onCorrection('yes')}>Yes</button><button onClick={() => onCorrection('partly')}>Partly</button><button onClick={() => onCorrection('not_today')}>Not today</button></div>
         </>
       )}
@@ -599,11 +712,15 @@ function ContextPanel(props: {
   changeCovenant: (enabled: boolean) => Promise<void>;
 }) {
   if (props.surface === 'Today') return <TodaySummary today={props.workspace.today} />;
-  if (props.surface === 'Explore') return <div className="context-stack"><p className="context-intro">Choose a direction. The visual instrument will remain separate from confidence and uncertainty.</p>{promptSets.Explore.map((prompt) => <button className="context-prompt" key={prompt} onClick={() => props.setDraft(prompt)}>{prompt}</button>)}</div>;
+  if (props.surface === 'Explore') return <div className="context-stack"><p className="context-intro">Choose a direction. Baseline, current timing, user facts, and uncertainty remain visibly distinct.</p>{promptSets.Explore.map((prompt) => <button className="context-prompt" key={prompt} onClick={() => props.setDraft(prompt)}>{prompt}</button>)}</div>;
   if (props.surface === 'People') return <PeopleControls {...props} />;
   if (props.surface === 'Systems') return <SystemControls {...props} />;
   if (props.surface === 'Library') return <LibraryGrid library={props.workspace.library} onPrompt={props.setDraft} compact />;
   return <YouControls {...props} />;
+}
+
+function openConsentControls() {
+  window.dispatchEvent(new CustomEvent('sovereign:open-consent-controls'));
 }
 
 function PeopleControls({ workspace, selectedPerson, setSelectedPerson, api, refresh }: any) {
@@ -623,7 +740,7 @@ function PeopleControls({ workspace, selectedPerson, setSelectedPerson, api, ref
     setEmail('');
     await refresh();
   }
-  return <div className="context-stack"><p className="context-intro">Adding a name is not permission. Shared comparison begins only after the other person connects and chooses what to allow.</p><label>Person<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Name" /></label><button className="secondary-action" onClick={() => void addPerson()}>Add person</button><label>Use in this conversation<select value={selectedPerson} onChange={(event) => setSelectedPerson(event.target.value)}><option value="">Only me</option>{workspace.people.map((person: Json) => <option key={person.id} value={person.id}>{person.displayName}</option>)}</select></label>{selected && <div className="permission-card"><span>Account</span><strong>{selected.identityBound ? 'Connected' : 'Not connected'}</strong><span>Baseline</span><strong>{firstText(selected.baselineStatus, 'Unavailable')}</strong></div>}{selected && !selected.identityBound && <><label>Invitation email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label><button className="primary-action" onClick={() => void invite()}>Send private invitation</button></>}</div>;
+  return <div className="context-stack"><p className="context-intro">Adding a name is not permission. Shared comparison begins only after the other person connects and chooses what to allow.</p><button className="secondary-action" onClick={openConsentControls}>People & permissions</button><label>Add a person<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Name" /></label><button className="secondary-action" onClick={() => void addPerson()}>Add person</button><label>Use in this exploration<select value={selectedPerson} onChange={(event) => setSelectedPerson(event.target.value)}><option value="">Only me</option>{workspace.people.map((person: Json) => <option key={person.id} value={person.id}>{person.displayName}</option>)}</select></label>{selected && <div className="permission-card"><span>Account</span><strong>{selected.identityBound ? 'Connected' : 'Not connected'}</strong><span>Baseline</span><strong>{firstText(selected.baselineStatus, 'Unavailable')}</strong></div>}{selected && !selected.identityBound && <><label>Invitation email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label><button className="primary-action" onClick={() => void invite()}>Send private invitation</button></>}</div>;
 }
 
 function SystemControls({ workspace, selectedSystem, setSelectedSystem, api, refresh }: any) {
@@ -636,7 +753,7 @@ function SystemControls({ workspace, selectedSystem, setSelectedSystem, api, ref
     await refresh();
     if (data.system?.id) setSelectedSystem(data.system.id);
   }
-  return <div className="context-stack"><p className="context-intro">A System keeps roles, authority, pressure, and responsibility visible across a family, household, team, or group.</p><label>New system<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Family, household, team…" /></label><label>Type<select value={type} onChange={(event) => setType(event.target.value)}>{['family', 'household', 'friendship_group', 'team', 'workplace', 'custom'].map((item) => <option key={item} value={item}>{item.replace('_', ' ')}</option>)}</select></label><button className="secondary-action" onClick={() => void createSystem()}>Create system</button><label>Use in this conversation<select value={selectedSystem} onChange={(event) => setSelectedSystem(event.target.value)}><option value="">No system</option>{workspace.systems.map((system: Json) => <option key={system.id} value={system.id}>{system.name}</option>)}</select></label></div>;
+  return <div className="context-stack"><p className="context-intro">A System keeps roles, authority, pressure, and responsibility visible across a family, household, team, or group.</p><label>New system<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Family, household, team…" /></label><label>Type<select value={type} onChange={(event) => setType(event.target.value)}>{['family', 'household', 'friendship_group', 'team', 'workplace', 'custom'].map((item) => <option key={item} value={item}>{systemTypeLabel(item)}</option>)}</select></label><button className="secondary-action" onClick={() => void createSystem()}>Create system</button><label>Use in this exploration<select value={selectedSystem} onChange={(event) => setSelectedSystem(event.target.value)}><option value="">No system</option>{workspace.systems.map((system: Json) => <option key={system.id} value={system.id}>{system.name}</option>)}</select></label></div>;
 }
 
 function YouControls({ workspace, covenantEnabled, changeCovenant, api, refresh }: any) {
@@ -653,7 +770,7 @@ function YouControls({ workspace, covenantEnabled, changeCovenant, api, refresh 
     const url = data.checkout?.url ?? data.portal?.url;
     if (url) location.assign(url);
   }
-  return <div className="context-stack"><section className="control-section"><p>YOUR BASELINE</p><h3>Build once. Explore continuously.</h3><form onSubmit={buildBaseline}><label>Birth date<input type="date" name="birthDate" /></label><label>Birthplace<input name="birthplace" placeholder="City, region, country" /></label><label>Birth-time certainty<select name="birthTimeCertainty" value={certainty} onChange={(event) => setCertainty(event.target.value)}><option value="exact">Exact</option><option value="approximate">Approximate</option><option value="unknown">Unknown</option></select></label>{certainty !== 'unknown' && <label>Birth time<input type="time" name="birthTime" /></label>}<input type="hidden" name="locationPrecision" value="city_or_regional" /><button className="primary-action">Build my Baseline</button></form></section><section className="control-section"><p>PLAN</p><h3>{workspace.billing?.effective?.plan === 'sovereign_plus' ? 'Sovereign+' : 'Free plan'}</h3>{workspace.billing?.effective?.plan !== 'sovereign_plus' && <><div className="billing-switch"><button className={interval === 'annual' ? 'active' : ''} onClick={() => setInterval('annual')}>$99 yearly</button><button className={interval === 'monthly' ? 'active' : ''} onClick={() => setInterval('monthly')}>$20 monthly</button></div><button className="primary-action" onClick={() => void handoff('/api/v1/billing/checkout', { interval })}>Choose Sovereign+</button></>}<button className="secondary-action" onClick={() => void handoff('/api/v1/billing/portal')}>Manage billing</button></section><section className="control-section"><p>CONTROL</p><label className="toggle-row"><span><strong>Covenant</strong><small>Optional Christian and biblical lens for this conversation.</small></span><input type="checkbox" checked={covenantEnabled} onChange={(event) => void changeCovenant(event.target.checked)} /></label><button className="secondary-action" onClick={() => void api('/api/v1/auth/logout', { method: 'POST' }).then(() => location.assign('/'))}>Log out</button></section></div>;
+  return <div className="context-stack"><section className="control-section"><p>YOUR BASELINE</p><h3>Build once. Explore continuously.</h3><form onSubmit={buildBaseline}><label>Birth date<input type="date" name="birthDate" /></label><label>Birthplace<input name="birthplace" placeholder="City, region, country" /></label><label>Birth-time certainty<select name="birthTimeCertainty" value={certainty} onChange={(event) => setCertainty(event.target.value)}><option value="exact">Exact</option><option value="approximate">Approximate</option><option value="unknown">Unknown</option></select></label>{certainty !== 'unknown' && <label>Birth time<input type="time" name="birthTime" /></label>}<input type="hidden" name="locationPrecision" value="city_or_regional" /><button className="primary-action">Build my Baseline</button></form></section><section className="control-section"><p>PLAN</p><h3>{workspace.billing?.effective?.plan === 'sovereign_plus' ? 'Sovereign+' : 'Free plan'}</h3>{workspace.billing?.effective?.plan !== 'sovereign_plus' && <><div className="billing-switch"><button type="button" className={interval === 'annual' ? 'active' : ''} onClick={() => setInterval('annual')}>$99 yearly</button><button type="button" className={interval === 'monthly' ? 'active' : ''} onClick={() => setInterval('monthly')}>$20 monthly</button></div><button className="primary-action" onClick={() => void handoff('/api/v1/billing/checkout', { interval })}>Choose Sovereign+</button></>}<button className="secondary-action" onClick={() => void handoff('/api/v1/billing/portal')}>Manage billing</button></section><section className="control-section"><p>PEOPLE & PRIVACY</p><h3>Your context remains yours.</h3><button className="secondary-action" onClick={openConsentControls}>People & permissions</button><div className="control-links"><a href="https://sovereign.defrag.app/privacy">Privacy</a><a href="https://sovereign.defrag.app/terms">Terms</a><a href="mailto:info@defrag.app">Support</a></div></section><section className="control-section"><p>OPTIONAL LENS</p><label className="toggle-row"><span><strong>Covenant</strong><small>Christian teaching and clearly cited biblical scripture for this exploration only.</small></span><input type="checkbox" checked={covenantEnabled} onChange={(event) => void changeCovenant(event.target.checked)} /></label></section><section className="control-section"><p>ACCOUNT</p><button className="secondary-action" onClick={() => void api('/api/v1/auth/logout', { method: 'POST' }).then(() => location.assign('/'))}>Log out</button></section></div>;
 }
 
 function PromptGrid({ prompts, onPrompt }: { prompts: string[]; onPrompt: (prompt: string) => void }) {
@@ -665,7 +782,7 @@ function ModeCard({ label, title, prompt, onPrompt, featured = false }: { label:
 }
 
 function EmptyState({ title, body, action, onAction }: { title: string; body: string; action: string; onAction: () => void }) {
-  return <div className="empty-state"><span>NOTHING SELECTED</span><h2>{title}</h2><p>{body}</p><button onClick={onAction}>{action}</button></div>;
+  return <div className="empty-state"><span>CHOOSE CONTEXT</span><h2>{title}</h2><p>{body}</p><button onClick={onAction}>{action}</button></div>;
 }
 
 function LibraryGrid({ library, onPrompt, compact = false }: { library: Json[]; onPrompt: (prompt: string) => void; compact?: boolean }) {
@@ -683,7 +800,7 @@ function responseSections(text: string) {
     const heading = firstLine.replace(/^#{1,4}\s*/, '').replace(/\*\*/g, '');
     const hasHeading = lines.length > 1 && (firstLine.startsWith('#') || firstLine.endsWith(':') || firstLine.startsWith('**'));
     return {
-      title: hasHeading ? heading.replace(/:$/, '') : index === 0 ? 'Direct answer' : `What this may show`,
+      title: hasHeading ? heading.replace(/:$/, '') : index === 0 ? 'Direct answer' : 'What this may show',
       body: (hasHeading ? lines.slice(1) : lines).join(' ').replace(/^[-*]\s+/gm, '')
     };
   });
@@ -704,9 +821,11 @@ function alignmentFromText(text: string, active: boolean) {
 
 function countTerms(text: string, terms: string[]) { return terms.reduce((count, term) => count + (text.includes(term) ? 1 : 0), 0); }
 function responseType(surface: Surface, covenant: boolean) { return covenant ? 'covenant_reflection' : surface === 'People' ? 'relationship_understanding' : surface === 'Systems' ? 'system_understanding' : surface === 'Explore' ? 'alignment_exploration' : surface === 'Today' ? 'today_understanding' : 'baseline_understanding'; }
-function composerPlaceholder(surface: Surface) { return surface === 'People' ? 'Ask about this relationship…' : surface === 'Systems' ? 'Ask about this system…' : surface === 'Explore' ? 'Bring a choice, behavior, or quality into view…' : 'Ask Sovereign…'; }
+function composerPlaceholder(surface: Surface) { return surface === 'People' ? 'Ask about this relationship…' : surface === 'Systems' ? 'Ask about this system…' : surface === 'Explore' ? 'Bring a choice, behavior, or quality into view…' : surface === 'Library' ? 'Continue from something you chose to keep…' : 'Ask Sovereign…'; }
 function surfaceIcon(surface: Surface) { return ({ Today: '◉', Explore: '✦', People: '◇', Systems: '⌘', Library: '□', You: '○' } as Record<Surface, string>)[surface]; }
 function newThreadId(surface: Surface) { return `thread-${Date.now()}-${surface}-${crypto.randomUUID().slice(0, 8)}`.replace(/[^a-z0-9_-]/gi, '-'); }
 function validClientId(value: unknown): value is string { return typeof value === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(value); }
+function validSurface(value: unknown): value is Surface { return typeof value === 'string' && surfaces.some((item) => item.name === value); }
 function firstText(...values: unknown[]) { return values.find((value) => typeof value === 'string' && value.trim()) as string ?? ''; }
 function shorten(value: unknown, max: number) { const text = typeof value === 'string' ? value.trim() : ''; return text.length > max ? `${text.slice(0, max - 1).trim()}…` : text; }
+function systemTypeLabel(value: string) { return ({ friendship_group: 'Friend group', workplace: 'Workplace', family: 'Family', household: 'Household', team: 'Team', custom: 'Other group' } as Record<string, string>)[value] ?? value.replace('_', ' '); }
