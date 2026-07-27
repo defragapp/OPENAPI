@@ -1,10 +1,11 @@
-import runtime, { ThreadCoordinator, queue, scheduled } from './runtime-entry';
+import runtime, { ThreadCoordinator, queue as baseQueue, scheduled as baseScheduled } from './runtime-entry';
 import type { Env } from './env';
 import { requireSameOrigin } from './security/auth';
 import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/headers';
 import { passwordLogin, passwordSignup, requestPasswordReset, resetPassword } from './auth-password';
 import { finishOAuth, startOAuth, type OAuthProvider } from './auth-oauth';
 import { completeOnboarding, onboardingStatus, selectOnboardingPlan } from './onboarding';
+import { cleanupAuthArtifacts } from './auth-maintenance';
 
 const APP_HOST = 'app.defrag.app';
 const PUBLIC_HOST = 'sovereign.defrag.app';
@@ -111,6 +112,13 @@ function redirectToApp(source: URL): Response {
 
 function secure(response: Response): Response {
   return withSecurityHeaders(response);
+}
+
+const queue = baseQueue;
+
+async function scheduled(event: ScheduledEvent, env: Env): Promise<void> {
+  await baseScheduled(event, env);
+  await cleanupAuthArtifacts(env);
 }
 
 export { ThreadCoordinator, queue, scheduled };
