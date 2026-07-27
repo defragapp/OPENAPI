@@ -1,0 +1,43 @@
+name: Pull Request Verify
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - 'fix/**'
+      - 'feat/**'
+      - 'refactor/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-verify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Activate repository pnpm version
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Cloudflare production build
+        run: pnpm verify:cloudflare-build
