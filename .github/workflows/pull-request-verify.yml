@@ -23,6 +23,9 @@ jobs:
     timeout-minutes: 20
 
     steps:
+      - name: Confirm runner availability
+        run: echo "GitHub-hosted runner allocated"
+
       - name: Check out repository
         uses: actions/checkout@v6
 
