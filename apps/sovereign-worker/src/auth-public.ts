@@ -20,9 +20,20 @@ function validEmail(email: string): boolean { return email.length <= MAX_EMAIL_L
 async function sha256(value: string) { const hash = await crypto.subtle.digest('SHA-256', encoder.encode(value)); return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, '0')).join(''); }
 function base64Url(bytes: Uint8Array) { return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 function newToken(): string { const bytes = new Uint8Array(32); crypto.getRandomValues(bytes); return base64Url(bytes); }
-function newEmailCode(): string { const bytes = new Uint32Array(1); crypto.getRandomValues(bytes); return String((bytes[0]! % 900_000) + 100_000); }
+function newEmailCode(): string {
+  const range = 900_000;
+  const ceiling = Math.floor(0x1_0000_0000 / range) * range;
+  const sample = new Uint32Array(1);
+  do crypto.getRandomValues(sample); while (sample[0]! >= ceiling);
+  return String((sample[0]! % range) + 100_000);
+}
 function publicBaseUrl(request: Request, env: Env): string { return env.PUBLIC_APP_URL || new URL(request.url).origin; }
 function cookie(name: string, value: string, maxAge = SESSION_TTL_SECONDS) { return `${name}=${value}; Path=/; Max-Age=${maxAge}; HttpOnly; Secure; SameSite=Lax; Priority=High`; }
+function parseSqliteTimestamp(value?: string | null): number {
+  if (!value) return Number.NaN;
+  const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value) ? `${value.replace(' ', 'T')}Z` : value;
+  return Date.parse(normalized);
+}
 
 export function safeReturnTo(value: unknown, fallback = '/app'): string {
   if (typeof value !== 'string' || value.length > 512 || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback;
@@ -37,6 +48,9 @@ export function safeReturnTo(value: unknown, fallback = '/app'): string {
 
 function turnstileProblem(reason: string, status = 400): Response {
   return Response.json({ status: 'verification_failed', reason }, { status, headers: { 'cache-control': 'no-store' } });
+}
+function invalidCodeResponse(): Response {
+  return Response.json({ status: 'invalid_code' }, { status: 400, headers: { 'cache-control': 'no-store' } });
 }
 
 export async function verifyTurnstile(env: Env, token?: string, ip?: string, expectedAction?: string): Promise<void> {
@@ -135,7 +149,7 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   const row = await env.DB.prepare("SELECT id, email_normalized, account_id, purpose, name, terms_accepted_at, expires_at, used_at FROM auth_magic_links WHERE token_hash = ?").bind(tokenHash).first<Record<string, string | null>>();
   if (!row || !row.email_normalized || !validEmail(row.email_normalized) || !['signup', 'login'].includes(row.purpose ?? '')) return Response.json({ status: 'invalid' }, { status: 400 });
   if (row.used_at) return Response.json({ status: 'already used' }, { status: 409 });
-  if (!row.expires_at || Date.parse(row.expires_at) < Date.now()) return Response.json({ status: 'expired' }, { status: 410 });
+  if (!Number.isFinite(parseSqliteTimestamp(row.expires_at)) || parseSqliteTimestamp(row.expires_at) < Date.now()) return Response.json({ status: 'expired' }, { status: 410 });
   if (row.purpose === 'login' && !row.account_id) return Response.json({ status: 'invalid' }, { status: 400 });
   if (row.purpose === 'signup' && !row.terms_accepted_at) return Response.json({ status: 'invalid' }, { status: 400 });
 
@@ -156,6 +170,8 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   if (row.purpose === 'signup') {
     await env.DB.prepare("UPDATE accounts SET terms_accepted_at = ?, terms_version = ?, privacy_version = ?, updated_at = datetime('now') WHERE id = ? AND auth_subject = ?").bind(row.terms_accepted_at, TERMS_VERSION, PRIVACY_VERSION, accountId, subject).run();
     if (row.name?.trim()) await env.DB.prepare("UPDATE persons SET display_name = ?, updated_at = datetime('now') WHERE account_id = ? AND role = 'self'").bind(row.name.trim().slice(0, MAX_NAME_LENGTH), accountId).run();
+  } else {
+    await env.DB.prepare("UPDATE auth_email_codes SET used_at = COALESCE(used_at, datetime('now')) WHERE account_id = ? AND used_at IS NULL").bind(accountId).run();
   }
   return createSessionResponse(env, accountId, subject, createdAccount, returnTo);
 }
@@ -163,23 +179,20 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
 async function redeemEmailCode(env: Env, rawEmail?: string, rawCode?: string): Promise<Response> {
   const email = normalizeEmail(rawEmail ?? '');
   const code = rawCode?.replace(/\s+/g, '') ?? '';
-  if (!validEmail(email) || !/^\d{6}$/.test(code)) return Response.json({ status: 'invalid_code' }, { status: 400, headers: { 'cache-control': 'no-store' } });
+  if (!validEmail(email) || !/^\d{6}$/.test(code)) return invalidCodeResponse();
   const row = await env.DB.prepare("SELECT id, account_id, code_hash, return_to, attempts, max_attempts, expires_at, used_at FROM auth_email_codes WHERE email_normalized = ? ORDER BY created_at DESC LIMIT 1")
     .bind(email).first<{ id: string; account_id: string; code_hash: string; return_to: string; attempts: number; max_attempts: number; expires_at: string; used_at: string | null }>();
-  if (!row || row.used_at) return Response.json({ status: 'invalid_code' }, { status: 400, headers: { 'cache-control': 'no-store' } });
-  if (Date.parse(row.expires_at) < Date.now()) return Response.json({ status: 'expired_code' }, { status: 410, headers: { 'cache-control': 'no-store' } });
-  if (Number(row.attempts) >= Number(row.max_attempts)) return Response.json({ status: 'code_locked' }, { status: 429, headers: { 'cache-control': 'no-store', 'retry-after': '600' } });
+  if (!row || row.used_at || !Number.isFinite(parseSqliteTimestamp(row.expires_at)) || parseSqliteTimestamp(row.expires_at) < Date.now() || Number(row.attempts) >= Number(row.max_attempts)) return invalidCodeResponse();
   const submittedHash = await sha256(`${email}:${code}`);
   if (!constantTimeEqual(submittedHash, row.code_hash)) {
-    const updated = await env.DB.prepare("UPDATE auth_email_codes SET attempts = attempts + 1 WHERE id = ? AND used_at IS NULL AND attempts < max_attempts").bind(row.id).run();
-    const locked = Number(row.attempts) + Number(updated.meta?.changes ?? 0) >= Number(row.max_attempts);
-    return Response.json({ status: locked ? 'code_locked' : 'invalid_code' }, { status: locked ? 429 : 400, headers: { 'cache-control': 'no-store', ...(locked ? { 'retry-after': '600' } : {}) } });
+    await env.DB.prepare("UPDATE auth_email_codes SET attempts = attempts + 1 WHERE id = ? AND used_at IS NULL AND attempts < max_attempts").bind(row.id).run();
+    return invalidCodeResponse();
   }
   const account = await env.DB.prepare('SELECT id, auth_subject FROM accounts WHERE id = ?').bind(row.account_id).first<{ id: string; auth_subject: string }>();
   const subject = `email:${email}`;
-  if (!account || account.auth_subject !== subject) return Response.json({ status: 'invalid_code' }, { status: 400, headers: { 'cache-control': 'no-store' } });
+  if (!account || account.auth_subject !== subject) return invalidCodeResponse();
   const redeemed = await env.DB.prepare("UPDATE auth_email_codes SET used_at = datetime('now') WHERE id = ? AND used_at IS NULL AND attempts < max_attempts AND expires_at > datetime('now')").bind(row.id).run();
-  if ((redeemed.meta?.changes ?? 0) === 0) return Response.json({ status: 'invalid_code' }, { status: 409, headers: { 'cache-control': 'no-store' } });
+  if ((redeemed.meta?.changes ?? 0) === 0) return invalidCodeResponse();
   await env.DB.prepare("UPDATE auth_magic_links SET used_at = COALESCE(used_at, datetime('now')) WHERE account_id = ? AND purpose = 'login' AND used_at IS NULL").bind(account.id).run();
   return createSessionResponse(env, account.id, subject, false, safeReturnTo(row.return_to));
 }
