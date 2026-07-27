@@ -1,6 +1,6 @@
 import type { Env } from './env';
 import { runtimeMode } from './runtime';
-import { sendOperationalEmail } from './email';
+import { buildSovereignEmail, sendOperationalEmail } from './email';
 import { createSignedSessionToken } from './security/auth';
 import { resolveAccount } from './db/accounts';
 
@@ -8,6 +8,7 @@ const encoder = new TextEncoder();
 const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60;
 const MAX_EMAIL_LENGTH = 320;
 const MAX_NAME_LENGTH = 120;
+const MAX_TURNSTILE_TOKEN_LENGTH = 2048;
 const MAX_MAGIC_LINKS_PER_IP_WINDOW = 10;
 const TERMS_VERSION = '2026-07-26';
 const PRIVACY_VERSION = '2026-07-26';
@@ -20,14 +21,31 @@ function newToken(): string { const bytes = new Uint8Array(32); crypto.getRandom
 function publicBaseUrl(request: Request, env: Env): string { return env.PUBLIC_APP_URL || new URL(request.url).origin; }
 function cookie(name: string, value: string, maxAge = SESSION_TTL_SECONDS) { return `${name}=${value}; Path=/; Max-Age=${maxAge}; HttpOnly; Secure; SameSite=Lax; Priority=High`; }
 
+export function safeReturnTo(value: unknown, fallback = '/app'): string {
+  if (typeof value !== 'string' || value.length > 512 || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback;
+  try {
+    const parsed = new URL(value, 'https://app.defrag.app');
+    const allowed = parsed.pathname === '/app' || parsed.pathname.startsWith('/app/') || parsed.pathname === '/onboarding';
+    return allowed ? `${parsed.pathname}${parsed.search}` : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function turnstileProblem(reason: string, status = 400): Response {
+  return Response.json({ status: 'verification_failed', reason }, { status, headers: { 'cache-control': 'no-store' } });
+}
+
 export async function verifyTurnstile(env: Env, token?: string, ip?: string, expectedAction?: string): Promise<void> {
   if (runtimeMode(env) === 'test' && token === 'test-turnstile-pass') return;
-  if (!env.TURNSTILE_SECRET_KEY) throw new Response('Turnstile unavailable', { status: 503 });
-  if (!token) throw new Response('Turnstile verification required', { status: 400 });
+  if (!env.TURNSTILE_SECRET_KEY) throw turnstileProblem('unavailable', 503);
+  if (!token) throw turnstileProblem('required');
+  if (token.length > MAX_TURNSTILE_TOKEN_LENGTH) throw turnstileProblem('invalid');
 
   const body = new FormData();
   body.set('secret', env.TURNSTILE_SECRET_KEY);
   body.set('response', token);
+  body.set('idempotency_key', crypto.randomUUID());
   if (ip) body.set('remoteip', ip);
 
   const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -35,20 +53,41 @@ export async function verifyTurnstile(env: Env, token?: string, ip?: string, exp
     body,
     signal: AbortSignal.timeout(8_000)
   }).catch(() => undefined);
-  if (!response) throw new Response('Turnstile unavailable', { status: 503 });
+  if (!response) throw turnstileProblem('unavailable', 503);
 
-  const result = await response.json().catch(() => ({ success: false })) as { success?: boolean; hostname?: string; action?: string };
-  if (!result.success) throw new Response('Turnstile verification failed', { status: 400 });
-  if (env.TURNSTILE_EXPECTED_HOSTNAME && result.hostname !== env.TURNSTILE_EXPECTED_HOSTNAME) throw new Response('Turnstile hostname mismatch', { status: 400 });
-  if (expectedAction && result.action !== expectedAction) throw new Response('Turnstile action mismatch', { status: 400 });
+  const result = await response.json().catch(() => ({ success: false })) as {
+    success?: boolean;
+    hostname?: string;
+    action?: string;
+    'error-codes'?: string[];
+  };
+  if (!result.success) {
+    const codes = result['error-codes'] ?? [];
+    if (codes.includes('invalid-input-secret')) {
+      console.error('turnstile_configuration_error', { invalidSecret: true });
+      throw turnstileProblem('unavailable', 503);
+    }
+    if (codes.includes('internal-error')) throw turnstileProblem('unavailable', 503);
+    if (codes.includes('timeout-or-duplicate')) throw turnstileProblem('expired_or_used');
+    throw turnstileProblem('invalid');
+  }
+  if (env.TURNSTILE_EXPECTED_HOSTNAME && result.hostname !== env.TURNSTILE_EXPECTED_HOSTNAME) {
+    console.warn('turnstile_hostname_mismatch', { expected: env.TURNSTILE_EXPECTED_HOSTNAME, received: result.hostname ?? 'missing' });
+    throw turnstileProblem('hostname_mismatch');
+  }
+  if (expectedAction && result.action !== expectedAction) {
+    console.warn('turnstile_action_mismatch', { expected: expectedAction, received: result.action ?? 'missing' });
+    throw turnstileProblem('action_mismatch');
+  }
 }
 
 export async function requestMagicLink(request: Request, env: Env, kind: 'signup' | 'login'): Promise<Response> {
-  const body = await request.json().catch(() => ({})) as { email?: string; name?: string; termsAccepted?: boolean; turnstileToken?: string };
+  const body = await request.json().catch(() => ({})) as { email?: string; name?: string; termsAccepted?: boolean; turnstileToken?: string; returnTo?: string };
   const email = normalizeEmail(body.email ?? '');
   const name = body.name?.trim() ?? '';
-  if (!validEmail(email)) return Response.json({ status: 'invalid' }, { status: 400 });
-  if (kind === 'signup' && (!name || name.length > MAX_NAME_LENGTH || body.termsAccepted !== true)) return Response.json({ status: 'invalid' }, { status: 400 });
+  const returnTo = safeReturnTo(body.returnTo);
+  if (!validEmail(email)) return Response.json({ status: 'invalid', field: 'email' }, { status: 400 });
+  if (kind === 'signup' && (!name || name.length > MAX_NAME_LENGTH || body.termsAccepted !== true)) return Response.json({ status: 'invalid', field: !name || name.length > MAX_NAME_LENGTH ? 'name' : 'terms' }, { status: 400 });
 
   const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
   await verifyTurnstile(env, body.turnstileToken, ip, kind);
@@ -80,12 +119,29 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
     .bind(id, email, existing?.id ?? null, kind, tokenHash, kind === 'signup' ? name : null, acceptedAt, ipHash, userAgentHash)
     .run();
 
-  const url = `${publicBaseUrl(request, env)}/auth/redeem?token=${encodeURIComponent(token)}`;
+  const redeemUrl = new URL('/auth/redeem', publicBaseUrl(request, env));
+  redeemUrl.searchParams.set('token', token);
+  redeemUrl.searchParams.set('returnTo', returnTo);
+  const emailTemplate = buildSovereignEmail(kind === 'signup' ? {
+    eyebrow: 'Start with your Baseline',
+    title: 'Your Sovereign.OS account is ready to open.',
+    intro: 'Use the private link below to confirm this email, choose how you want to begin, and enter your personal intelligence environment.',
+    actionLabel: 'Continue to Sovereign.OS',
+    actionUrl: redeemUrl.toString(),
+    details: ['This link expires in 15 minutes.', 'It can be used only once.', 'Your raw birth details and exact private location do not enter the language model.']
+  } : {
+    eyebrow: 'Private sign-in',
+    title: 'Return to your Sovereign.OS.',
+    intro: 'Open the private workspace where your Baseline, chosen conversations, people, systems, and saved understandings remain connected.',
+    actionLabel: 'Open Sovereign.OS',
+    actionUrl: redeemUrl.toString(),
+    details: ['This link expires in 15 minutes.', 'It can be used only once.', 'No password or private workspace information is included in this message.']
+  });
   try {
     await sendOperationalEmail(env, {
       to: email,
-      subject: 'Your Sovereign.OS sign-in link',
-      text: `Use this private one-time link to continue. It expires in 15 minutes: ${url}`,
+      subject: kind === 'signup' ? 'Open your Sovereign.OS account' : 'Open your Sovereign.OS workspace',
+      ...emailTemplate,
       idempotencyKey: id
     });
   } catch {
@@ -98,6 +154,7 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
 export async function redeemMagicLink(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
   const token = url.searchParams.get('token') || (await request.json().catch(() => ({})) as { token?: string }).token;
+  const returnTo = safeReturnTo(url.searchParams.get('returnTo'));
   if (!token || token.length < 32 || token.length > 512) return Response.json({ status: 'invalid' }, { status: 400 });
   const tokenHash = await sha256(token);
   const row = await env.DB.prepare("SELECT id, email_normalized, account_id, purpose, name, terms_accepted_at, expires_at, used_at FROM auth_magic_links WHERE token_hash = ?")
@@ -160,7 +217,7 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   return Response.json({
     status: 'success',
     createdAccount,
-    next: onboarding?.onboarding_completed_at ? '/app' : '/onboarding'
+    next: onboarding?.onboarding_completed_at ? returnTo : '/onboarding'
   }, { headers: { 'set-cookie': cookie('__Host-sovereign_session', tokenValue) } });
 }
 
