@@ -36,7 +36,7 @@ describe('Baseline-first visual intelligence experience', () => {
       'My Role in a System',
       'Christian Perspective'
     ]) expect(ui).toContain(phrase);
-    expect(ui).toContain('Alignment Needle');
+    expect(ui).toContain('ALIGNMENT NEEDLE');
     expect(ui).toContain('SHADOW–LIGHT RAIL');
   });
 
@@ -60,9 +60,9 @@ describe('Baseline-first visual intelligence experience', () => {
 
   it('makes the composer context explicit', () => {
     expect(ui).toContain('sovereign-context-bar');
-    expect(ui).toContain('Baseline included');
-    expect(ui).toContain('Live Sky');
-    expect(ui).toContain('Covenant');
+    expect(ui).toContain("baselineReady ? 'included' : 'not built'");
+    expect(ui).toContain("liveReady ? 'included' : 'off'");
+    expect(ui).toContain("covenantOn ? 'on' : 'off'");
   });
 
   it('is responsive, high-contrast aware, and reduced-motion safe', () => {
