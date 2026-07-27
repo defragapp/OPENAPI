@@ -39,7 +39,7 @@ function safeActionUrl(value: string): string {
 export function buildSovereignEmail(template: SovereignEmailTemplate): { text: string; html: string } {
   const actionUrl = safeActionUrl(template.actionUrl);
   const details = (template.details ?? []).map((detail) => detail.trim()).filter(Boolean).slice(0, 10);
-  const footer = template.footer?.trim() || 'You control what enters your Sovereign.OS workspace and what may be shared.';
+  const footer = template.footer?.trim() || 'You control what enters Sovereign.OS and what may be shared.';
   const text = [
     'SOVEREIGN.OS',
     template.eyebrow.trim().toUpperCase(),
