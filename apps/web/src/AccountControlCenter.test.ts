@@ -7,12 +7,21 @@ const styles = readFileSync(new URL('./account-control.css', import.meta.url), '
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('mounted Account and Library controls', () => {
-  it('exposes Library rename and delete through existing account-scoped endpoints', () => {
+  it('exposes Library rename and delete through account-scoped endpoints', () => {
     expect(controls).toContain("api('/api/v1/library')");
     expect(controls).toContain("method: 'PATCH'");
     expect(controls).toContain("method: 'DELETE'");
     expect(controls).toContain('Save title');
     expect(controls).toContain('Delete this saved understanding from your Library?');
+  });
+
+  it('reviews, resends, and cancels pending invitations without revealing the recipient address', () => {
+    expect(controls).toContain("api('/api/v1/people')");
+    expect(controls).toContain("person.invitationStatus === 'pending'");
+    expect(controls).toContain('Resend invitation');
+    expect(controls).toContain("status: action === 'resend' ? 'pending' : 'revoked'");
+    expect(controls).toContain('new one-time invitation link');
+    expect(controls).not.toContain('invited_email_normalized');
   });
 
   it('makes the 14-day account deletion grace period visible and cancellable', () => {
@@ -48,6 +57,7 @@ describe('mounted Account and Library controls', () => {
     expect(main).toContain("import './account-control.css'");
     expect(main).toContain('installDialogAccessibility()');
     expect(styles).toContain('.account-control-dialog');
+    expect(styles).toContain('.pending-invitation-list');
     expect(styles).toContain('min-height:44px');
     expect(styles).toContain('@media(max-width:640px)');
     expect(styles).toContain('@media(prefers-contrast:more)');
