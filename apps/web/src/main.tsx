@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import { AppErrorBoundary } from './AppErrorBoundary';
 import { AccountControlCenter } from './AccountControlCenter';
+import { EmailCodeFallback, installEmailCodeFallbackRuntime } from './EmailCodeFallback';
 import { ProductCompletionLayer, installProductRuntime } from './ProductCompletionLayer';
 import { installBaselineInputRuntime } from './BaselineInputRuntime';
 import { installDialogAccessibility } from './dialog-accessibility';
@@ -22,6 +23,7 @@ import './workspace-chat.css';
 import './visual-intelligence.css';
 import './system-membership.css';
 import './auth-polish.css';
+import './email-code-fallback.css';
 import './unified-entry.css';
 import './account-control.css';
 import './structured-intelligence.css';
@@ -29,6 +31,7 @@ import './sovereign-brand.css';
 
 installProductionRuntime();
 installProductRuntime();
+installEmailCodeFallbackRuntime();
 installStructuredIntelligenceRuntime();
 installBaselineInputRuntime();
 installDialogAccessibility();
@@ -64,7 +67,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           ? <PublicPolicy kind={publicPolicyKind} />
           : isAuthenticatedWorkspace
             ? <><SovereignIntelligenceWorkspace /><StructuredIntelligenceLayer /><AccountControlCenter /><SystemMembershipManager /></>
-            : <App />}
+            : <><App /><EmailCodeFallback /></>}
     </AppErrorBoundary>
   </React.StrictMode>
 );
