@@ -11,6 +11,11 @@ const PASSWORD_MAX_LENGTH = 128;
 const RESET_TTL_MINUTES = 30;
 const TERMS_VERSION = '2026-07-26';
 const PRIVACY_VERSION = '2026-07-26';
+const DUMMY_PASSWORD_RECORD = {
+  hash: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  salt: 'AAAAAAAAAAAAAAAAAAAAAA',
+  iterations: PASSWORD_ITERATIONS
+};
 
 interface PasswordRecord {
   hash: string;
@@ -75,17 +80,16 @@ export async function derivePasswordRecord(password: string): Promise<PasswordRe
 
 export async function verifyPasswordRecord(password: string, record: PasswordRecord): Promise<boolean> {
   if (!validPassword(password) || record.iterations < 100_000 || record.iterations > 1_000_000) return false;
-  let expected: Uint8Array;
   try {
-    expected = base64UrlDecode(record.hash);
+    const expected = base64UrlDecode(record.hash);
+    const actual = await derive(password, base64UrlDecode(record.salt), record.iterations);
+    if (actual.length !== expected.length) return false;
+    let difference = 0;
+    for (let index = 0; index < actual.length; index += 1) difference |= actual[index]! ^ expected[index]!;
+    return difference === 0;
   } catch {
     return false;
   }
-  const actual = await derive(password, base64UrlDecode(record.salt), record.iterations);
-  if (actual.length !== expected.length) return false;
-  let difference = 0;
-  for (let index = 0; index < actual.length; index += 1) difference |= actual[index]! ^ expected[index]!;
-  return difference === 0;
 }
 
 function responseWithSession(payload: Record<string, unknown>, cookie: string): Response {
@@ -103,7 +107,8 @@ function planDestination(plan: unknown, interval: unknown): string {
   return `/onboarding?plan=${selectedPlan}&interval=${selectedInterval}`;
 }
 
-async function nextForExistingAccount(env: Env, accountId: string): Promise<string> {
+async function nextForExistingAccount(env: Env, accountId: string, plan?: unknown, interval?: unknown): Promise<string> {
+  if (plan === 'sovereign_plus') return planDestination(plan, interval);
   const baseline = await env.DB.prepare('SELECT status FROM baseline_onboarding WHERE account_id = ?')
     .bind(accountId)
     .first<{ status: string }>();
@@ -160,7 +165,13 @@ export async function passwordSignup(request: Request, env: Env): Promise<Respon
 }
 
 export async function passwordLogin(request: Request, env: Env): Promise<Response> {
-  const body = await request.json().catch(() => ({})) as { email?: string; password?: string; turnstileToken?: string };
+  const body = await request.json().catch(() => ({})) as {
+    email?: string;
+    password?: string;
+    turnstileToken?: string;
+    plan?: string;
+    interval?: string;
+  };
   const email = normalizeEmail(body.email ?? '');
   const password = body.password ?? '';
   if (!validEmail(email) || !validPassword(password)) return Response.json({ error: 'Email or password is incorrect.' }, { status: 401 });
@@ -173,17 +184,17 @@ export async function passwordLogin(request: Request, env: Env): Promise<Respons
     .bind(email)
     .first<{ account_id: string; password_hash: string; password_salt: string; password_iterations: number; auth_subject: string }>();
 
-  const valid = credential
-    ? await verifyPasswordRecord(password, {
-      hash: credential.password_hash,
-      salt: credential.password_salt,
-      iterations: credential.password_iterations
-    })
-    : false;
+  const record = credential
+    ? { hash: credential.password_hash, salt: credential.password_salt, iterations: credential.password_iterations }
+    : DUMMY_PASSWORD_RECORD;
+  const valid = await verifyPasswordRecord(password, record);
   if (!credential || !valid) return Response.json({ error: 'Email or password is incorrect.' }, { status: 401 });
 
   const session = await issueAccountSession(env, credential.account_id, credential.auth_subject);
-  return responseWithSession({ status: 'success', next: await nextForExistingAccount(env, credential.account_id) }, session.cookie);
+  return responseWithSession({
+    status: 'success',
+    next: await nextForExistingAccount(env, credential.account_id, body.plan, body.interval)
+  }, session.cookie);
 }
 
 export async function requestPasswordReset(request: Request, env: Env): Promise<Response> {
