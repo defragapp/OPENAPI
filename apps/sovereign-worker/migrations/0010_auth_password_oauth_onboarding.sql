@@ -3,12 +3,32 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE auth_password_credentials (
   account_id TEXT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
   email_normalized TEXT NOT NULL UNIQUE,
-  password_hash TEXT NOT NULL,
-  password_salt TEXT NOT NULL,
-  password_iterations INTEGER NOT NULL,
+  public_key_jwk TEXT NOT NULL,
+  encrypted_private_key TEXT NOT NULL,
+  encryption_iv TEXT NOT NULL,
+  kdf_salt TEXT NOT NULL,
+  kdf_iterations INTEGER NOT NULL,
+  credential_version TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE auth_password_challenges (
+  id TEXT PRIMARY KEY,
+  account_id TEXT REFERENCES accounts(id) ON DELETE CASCADE,
+  email_hash TEXT NOT NULL,
+  challenge_value TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  used_at TEXT,
+  requested_ip_hash TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX auth_password_challenges_email_created_idx
+  ON auth_password_challenges(email_hash, created_at DESC);
+CREATE INDEX auth_password_challenges_ip_created_idx
+  ON auth_password_challenges(requested_ip_hash, created_at DESC);
+CREATE INDEX auth_password_challenges_expiry_idx
+  ON auth_password_challenges(expires_at, used_at);
 
 CREATE TABLE auth_password_resets (
   id TEXT PRIMARY KEY,
