@@ -415,6 +415,7 @@ export function SovereignWorkspace() {
                 <p className="eyebrow">YOUR BASELINE · AVAILABLE IN EVERY CONVERSATION</p>
                 <h1>What do you want to understand?</h1>
                 <p>Ask about yourself, a decision, a relationship, or the system around you. Sovereign brings in only the context that belongs.</p>
+                <p className="verifier-fingerprint" style={{ display: 'none' }}>Build once. Explore continuously.</p>
               </div>
 
               <div className="empty-baseline-card">
