@@ -20,6 +20,7 @@ describe('Sovereign.OS public experience', () => {
   it('makes the product unmistakable in the first viewport', () => {
     expect(landing).toContain('Understand yourself—and everyone your life includes.');
     expect(landing).toContain('Sovereign.OS turns your Baseline Design into a private AI for personal, relationship, and system intelligence.');
+    expect(landing).toContain('Baseline Design is your personal starting point: an explorable view of your qualities, needs, strengths, shadow and light, and alignment.');
     expect(landing).toContain('Start free');
     expect(index).toContain('Sovereign.OS turns Baseline Design into a private AI');
     expect(index).toContain('Personal, relationship, and system intelligence');
