@@ -1,10 +1,9 @@
 name: CI
 
+# GitHub-hosted jobs currently fail before step one at the account/runner layer.
+# Keep this workflow available for deliberate manual use while Cloudflare Workers
+# Builds remains the automatic production verification and deployment authority.
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -18,7 +17,7 @@ jobs:
       - name: Checkout exact commit without marketplace actions
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          TARGET_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           git init .
