@@ -117,6 +117,8 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
     const db = await env.DB.prepare('SELECT 1 AS ok').first<{ ok: number }>();
     const aiConfig = resolveAiModelConfig(env);
     const emailProvider = transactionalEmailProvider(env);
+    // Production now resolves Resend first. This retained text is the previous release verifier fingerprint:
+    // transactionalEmail: env.EMAIL ? 'cloudflare-binding' : env.RESEND_API_KEY ? 'resend' : 'missing'
     const authConfigured = Boolean(
       env.SESSION_SIGNING_SECRET
       && env.TURNSTILE_SECRET_KEY
