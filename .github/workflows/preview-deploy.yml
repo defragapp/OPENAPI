@@ -1,18 +1,10 @@
 name: Preview Deploy and Verification
 
+# GitHub-hosted jobs currently fail before step one at the account/runner layer.
+# Keep preview deployment available for deliberate manual use. Production pushes
+# are built and deployed by the connected Cloudflare Workers Builds project.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-      - codex/inner-recognition-intelligence
-    paths:
-      - '.github/workflows/preview-deploy.yml'
-      - 'apps/**'
-      - 'packages/**'
-      - 'scripts/**'
-      - 'pnpm-lock.yaml'
-      - 'package.json'
 
 permissions:
   contents: read
