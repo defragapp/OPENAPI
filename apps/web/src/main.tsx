@@ -10,6 +10,7 @@ import { installDialogAccessibility } from './dialog-accessibility';
 import { installProductionRuntime } from './ProductionRuntime';
 import { PublicLanding } from './PublicLanding';
 import { PublicPolicy } from './PublicPolicy';
+import { PublicPolicyMetadata } from './PublicPolicyMetadata';
 import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
 import { StructuredIntelligenceLayer, installStructuredIntelligenceRuntime } from './StructuredIntelligenceLayer';
 import { SystemMembershipManager } from './SystemMembershipManager';
@@ -64,7 +65,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       {isPublicHome
         ? <PublicLanding />
         : publicPolicyKind
-          ? <PublicPolicy kind={publicPolicyKind} />
+          ? <><PublicPolicyMetadata kind={publicPolicyKind} /><PublicPolicy kind={publicPolicyKind} /></>
           : isAuthenticatedWorkspace
             ? <><SovereignIntelligenceWorkspace /><StructuredIntelligenceLayer /><AccountControlCenter /><SystemMembershipManager /></>
             : <><App /><EmailCodeFallback /></>}

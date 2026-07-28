@@ -28,7 +28,7 @@ export function installDialogAccessibility(): void {
       const target = returnTarget;
       activeDialog = null;
       returnTarget = null;
-      if (target?.isConnected) window.setTimeout(() => target.focus(), 0);
+      if (target?.isConnected) window.setTimeout(() => target?.focus(), 0);
       return;
     }
 
@@ -36,11 +36,12 @@ export function installDialogAccessibility(): void {
       returnTarget = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       activeDialog = next;
       window.setTimeout(() => {
-        if (!activeDialog?.isConnected) return;
-        const preferred = activeDialog.querySelector<HTMLElement>('[autofocus]');
-        const first = preferred ?? activeDialog.querySelector<HTMLElement>(focusableSelector);
-        if (!activeDialog.hasAttribute('tabindex')) activeDialog.tabIndex = -1;
-        (first ?? activeDialog).focus();
+        const dialog = activeDialog;
+        if (!dialog?.isConnected) return;
+        const preferred = dialog.querySelector<HTMLElement>('[autofocus]');
+        const first = preferred ?? dialog.querySelector<HTMLElement>(focusableSelector);
+        if (!dialog.hasAttribute('tabindex')) dialog.tabIndex = -1;
+        (first ?? dialog).focus();
       }, 0);
     }
   };

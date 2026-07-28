@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import type { FormEvent } from 'react';
 
 const EMAIL_CODE_READY = 'sovereign:email-code-ready';
 let installed = false;
@@ -19,7 +20,7 @@ export function installEmailCodeFallbackRuntime(): void {
       const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
       if (response.ok && method === 'POST' && url.pathname === '/api/v1/auth/login') {
         const payload = await response.clone().json().catch(() => ({})) as Json;
-        const requestBody = readRequestBody(input, init);
+        const requestBody = readRequestBody(init);
         const email = typeof requestBody.email === 'string' ? requestBody.email.trim().toLowerCase() : '';
         if (payload.recovery === 'link_or_code' && validEmail(email)) {
           window.dispatchEvent(new CustomEvent<CodeReadyDetail>(EMAIL_CODE_READY, {
@@ -56,9 +57,9 @@ export function EmailCodeFallback() {
 
   if (location.pathname !== '/login' || !ready) return null;
 
-  async function submit(event: React.FormEvent) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
-    if (submitting) return;
+    if (submitting || !ready) return;
     const cleanCode = code.replace(/\D/g, '').slice(0, 6);
     if (!/^\d{6}$/.test(cleanCode)) {
       setTone('error');
@@ -94,9 +95,11 @@ export function EmailCodeFallback() {
   }
 
   function requestFreshEmail() {
+    if (!ready) return;
     const search = new URLSearchParams();
     if (ready.returnTo !== '/app') search.set('returnTo', ready.returnTo);
-    location.assign(`/login${search.size ? `?${search.toString()}` : ''}`);
+    const query = search.toString();
+    location.assign(`/login${query ? `?${query}` : ''}`);
   }
 
   return (
@@ -125,13 +128,9 @@ export function EmailCodeFallback() {
   );
 }
 
-function readRequestBody(input: RequestInfo | URL, init?: RequestInit): Json {
-  const body = init?.body;
-  if (typeof body === 'string') {
-    try { return JSON.parse(body) as Json; } catch { return {}; }
-  }
-  if (input instanceof Request && !input.bodyUsed) return {};
-  return {};
+function readRequestBody(init?: RequestInit): Json {
+  if (typeof init?.body !== 'string') return {};
+  try { return JSON.parse(init.body) as Json; } catch { return {}; }
 }
 
 function validEmail(value: string): boolean {

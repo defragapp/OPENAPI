@@ -18,6 +18,17 @@ const PRIVACY_VERSION = '2026-07-26';
 export function normalizeEmail(email: string): string { return email.trim().toLowerCase(); }
 function validEmail(email: string): boolean { return email.length <= MAX_EMAIL_LENGTH && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 async function sha256(value: string) { const hash = await crypto.subtle.digest('SHA-256', encoder.encode(value)); return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, '0')).join(''); }
+async function emailCodeHash(env: Env, email: string, code: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(env.SESSION_SIGNING_SECRET),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(`${email}:${code}`));
+  return [...new Uint8Array(signature)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
 function base64Url(bytes: Uint8Array) { return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 function newToken(): string { const bytes = new Uint8Array(32); crypto.getRandomValues(bytes); return base64Url(bytes); }
 function newEmailCode(): string {
@@ -115,7 +126,7 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
     emailCodeId = `email_code_${crypto.randomUUID()}`;
     await env.DB.prepare("UPDATE auth_email_codes SET used_at = COALESCE(used_at, datetime('now')) WHERE email_normalized = ? AND used_at IS NULL").bind(email).run();
     await env.DB.prepare("INSERT INTO auth_email_codes (id, account_id, email_normalized, code_hash, return_to, max_attempts, expires_at, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, datetime('now', '+10 minutes'), ?, ?)")
-      .bind(emailCodeId, existing.id, email, await sha256(`${email}:${emailCode}`), returnTo, EMAIL_CODE_MAX_ATTEMPTS, ipHash, userAgentHash).run();
+      .bind(emailCodeId, existing.id, email, await emailCodeHash(env, email, emailCode), returnTo, EMAIL_CODE_MAX_ATTEMPTS, ipHash, userAgentHash).run();
   }
 
   const redeemUrl = new URL('/auth/redeem', publicBaseUrl(request, env));
@@ -183,7 +194,7 @@ async function redeemEmailCode(env: Env, rawEmail?: string, rawCode?: string): P
   const row = await env.DB.prepare("SELECT id, account_id, code_hash, return_to, attempts, max_attempts, expires_at, used_at FROM auth_email_codes WHERE email_normalized = ? ORDER BY created_at DESC LIMIT 1")
     .bind(email).first<{ id: string; account_id: string; code_hash: string; return_to: string; attempts: number; max_attempts: number; expires_at: string; used_at: string | null }>();
   if (!row || row.used_at || !Number.isFinite(parseSqliteTimestamp(row.expires_at)) || parseSqliteTimestamp(row.expires_at) < Date.now() || Number(row.attempts) >= Number(row.max_attempts)) return invalidCodeResponse();
-  const submittedHash = await sha256(`${email}:${code}`);
+  const submittedHash = await emailCodeHash(env, email, code);
   if (!constantTimeEqual(submittedHash, row.code_hash)) {
     await env.DB.prepare("UPDATE auth_email_codes SET attempts = attempts + 1 WHERE id = ? AND used_at IS NULL AND attempts < max_attempts").bind(row.id).run();
     return invalidCodeResponse();
