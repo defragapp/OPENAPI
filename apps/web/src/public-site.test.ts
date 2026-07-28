@@ -11,7 +11,6 @@ const consentCss = readFileSync(new URL('../public/consent.css', import.meta.url
 const launchCss = readFileSync(new URL('../public/launch.css', import.meta.url), 'utf8');
 const launchPolishCss = readFileSync(new URL('../public/launch-polish.css', import.meta.url), 'utf8');
 const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
-const baselineCss = readFileSync(new URL('./baseline-orbit.css', import.meta.url), 'utf8');
 const refinementCss = readFileSync(new URL('./brand-landing-refinement.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -20,12 +19,11 @@ const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent
 
 describe('Sovereign.OS public experience', () => {
   it('makes the product unmistakable in the first viewport', () => {
-    expect(landing).toContain('Begin with how you work. See what life is asking of you.');
+    expect(landing).toContain('Know what is <em>yours</em> to carry.');
     expect(landing).toContain('Why this appears');
-    expect(landing).toContain('PRESSURE CONCENTRATION');
-    expect(landing).toContain('corrections are saved with the exploration');
-    expect(landing).toContain('Sovereign.OS turns your Baseline Design into private, explorable intelligence for choices, relationships, families, and teams.');
-    expect(landing).toContain('Start with how you process, communicate, connect, decide, and respond under pressure.');
+    expect(landing).toContain('Responsibility without matching authority');
+    expect(landing).toContain('this correction stays with the exploration');
+    expect(landing).toContain('Sovereign begins with your Baseline Design');
     expect(landing).toContain('Build my Baseline');
     expect(index).toContain('Personal intelligence for real life');
     expect(index).toContain('Private personal, relationship, and system intelligence');
@@ -36,8 +34,8 @@ describe('Sovereign.OS public experience', () => {
       'Baseline Design',
       'shadow and light',
       'alignment',
-      'See where two people differ.',
-      'See how the whole group works.',
+      'TWO BASELINES',
+      'WHOLE HUMAN SYSTEM',
       'Covenant'
     ]) expect(publicCopy).toContain(phrase);
     expect(publicCopy).not.toMatch(/healing journey|observatory|signal map|hidden motive revealed|diagnose the relationship/i);
@@ -45,18 +43,12 @@ describe('Sovereign.OS public experience', () => {
 
   it('keeps the landing concise and visually demonstrative', () => {
     expect((landing.match(/<section/g) ?? []).length).toBeLessThanOrEqual(7);
-    for (const label of ['BASELINE DESIGN', 'BRING A REAL QUESTION', 'TWO PEOPLE · TWO BASELINES · ONE RELATIONSHIP']) {
+    for (const label of ['PERSONAL INTELLIGENCE, WITH A FOUNDATION', 'TRY A REAL EXPLORATION', 'TWO BASELINES · WITH PERMISSION']) {
       expect(landing).toContain(label);
     }
-    expect(landing).toContain('Start with who you are. Expand only when the wider context matters.');
+    expect(landing).toContain('Let the context expand when it matters.');
     expect(landing).toContain('<BaselineOrbit />');
-    expect(landing).toContain('className="relationship-visual"');
-    for (const selector of ['.baseline-orbit', '.orbit-node-core', '.orbit-node-aligned']) {
-      expect(baselineCss).toContain(selector);
-    }
-    for (const selector of ['.relationship-visual', '.relationship-person', '.orbit-layer-key']) {
-      expect(refinementCss).toContain(selector);
-    }
+    expect(landing).toContain('className={`scope-field scope-${scope}`}');
   });
 
   it('uses accessible examples instead of unexplained decoration', () => {
@@ -67,7 +59,7 @@ describe('Sovereign.OS public experience', () => {
       'onKeyDown',
       'ArrowLeft',
       'aria-selected',
-      'Examples show possibilities, not verdicts'
+      'You remain the authority'
     ]) expect(landing).toContain(phrase);
     for (const selector of ['.baseline-card', '.example-tabs', '.example-thread', '.example-sovereign']) {
       expect(landingCss).toContain(selector);

@@ -40,7 +40,7 @@ Cloudflare Queue and R2 are intentionally disabled. Private export is not part o
 
 ## Cloudflare production release
 
-The current account has no Cloudflare Workers Builds repository connection. Production is therefore released manually through Wrangler using the repository-owned deployment command. GitHub Actions is not supported for this repository and workflow files must not exist.
+Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the sole production release authority. Merging an approved, fully gated commit to `main` authorizes Cloudflare to run the repository-owned deployment command. GitHub Actions is not supported for this repository, ad-hoc local production deploys are forbidden, and workflow files must not exist.
 
 Use an exact, clean `main` checkout:
 

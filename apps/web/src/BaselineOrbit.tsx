@@ -1,51 +1,35 @@
 import { useState } from 'react';
 
-const stages = ['Baseline', 'Question', 'Connection', 'Insight'] as const;
+const stages = [
+  { label: 'Foundation', eyebrow: 'STEADY BASELINE', title: 'Self-directed clarity', copy: 'You tend to find direction by naming what matters and retaining meaningful agency.' },
+  { label: 'Question', eyebrow: 'A REAL QUESTION', title: 'Why do I carry everything alone?', copy: 'The question enters as context. It does not overwrite what is relatively steady.' },
+  { label: 'Connection', eyebrow: 'RELEVANT CONNECTION', title: 'Authority and support', copy: 'Self-direction may become most relevant where accepting support feels like surrendering your voice.' },
+  { label: 'Insight', eyebrow: 'POSSIBLE INSIGHT', title: 'Support may not be the problem.', copy: 'The tension may be whether support comes with shared responsibility or loss of authority.' },
+  { label: 'Evidence', eyebrow: 'WHY THIS APPEARS', title: 'Tendency, question, possibility.', copy: 'Baseline: self-direction · Question: carrying responsibility · Actual current state: still unknown.' },
+  { label: 'Confirm', eyebrow: 'YOUR EXPERIENCE DECIDES', title: 'Confirm, partly confirm, or correct.', copy: 'What fits can be kept with the exploration. What does not fit changes the context—not your authority.' }
+] as const;
 
 export function BaselineOrbit({ compact = false }: { compact?: boolean }) {
-  const [stage, setStage] = useState(3);
+  const [stage, setStage] = useState(compact ? 0 : 3);
+  const active = stages[stage]!;
 
   return (
-    <div
-      className={`baseline-orbit ${compact ? 'baseline-orbit-compact' : ''}`}
-      style={compact ? { minHeight: 500 } : undefined}
-      aria-label="Example of the Baseline Core used inside Sovereign.OS"
-    >
-      <header>
-        <div><span className="orbit-mark" aria-hidden="true" /><strong>YOUR BASELINE CORE</strong></div>
-        <span>{compact ? 'PERSONAL FOUNDATION' : 'EXAMPLE · YOUR DESIGN WILL BE PERSONAL'}</span>
-      </header>
-      {!compact && <div className="orbit-stages" aria-label="Example interpretation stages">
-        {stages.map((label, index) => <button type="button" key={label} className={stage === index ? 'active' : ''} aria-pressed={stage === index} onClick={() => setStage(index)}><span>{index + 1}</span>{label}</button>)}
+    <div className={`baseline-experience ${compact ? 'is-compact' : ''}`} aria-label="Interactive example of a personal Baseline becoming relevant to a question">
+      <div className="baseline-experience-topline"><span>EXAMPLE BASELINE</span><span>{stage + 1} / {stages.length}</span></div>
+      <div className={`baseline-signature signature-stage-${stage}`} aria-hidden="true">
+        <i className="signature-shell shell-one" /><i className="signature-shell shell-two" /><i className="signature-shell shell-three" />
+        <div className="signature-core"><span>YOUR</span><strong>Baseline</strong><small>steady foundation</small></div>
+        <span className="signature-quality quality-one">Direct clarity</span>
+        <span className="signature-quality quality-two">Shared responsibility</span>
+        <span className="signature-quality quality-three">Agency</span>
+        <span className="signature-context">“Why do I carry everything alone?”</span>
+      </div>
+      {!compact && <div className="baseline-resolution" key={stage} aria-live="polite">
+        <span>{active.eyebrow}</span><h2>{active.title}</h2><p>{active.copy}</p>
       </div>}
-      <div className={`orbit-map orbit-stage-${stage}`} aria-hidden="true">
-        <div className="orbit-ring orbit-ring-outer" />
-        <div className="orbit-ring orbit-ring-inner" />
-        <div className="orbit-node orbit-node-core"><span>HOW YOU PROCESS</span><strong>Names what matters through direct clarity</strong></div>
-        <div className="orbit-node orbit-node-light"><span>CLEARER EXPRESSION</span><strong>Leads without carrying every role</strong></div>
-        <div className="orbit-node orbit-node-shadow"><span>UNDER PRESSURE</span><strong>Withdraws and tries to hold everything alone</strong></div>
-        <div className="orbit-node orbit-node-aligned"><span>CURRENT EMPHASIS</span><strong>Boundaries and shared responsibility</strong></div>
-        <div className="orbit-center"><span>CORE ORIENTATION</span><strong>Self-directed<br />clarity</strong><small>steady Baseline</small></div>
-      </div>
-      <div className="orbit-layer-key" aria-label="Baseline and current context legend">
-        <span><i className="steady" />Steady design</span>
-        <span><i className="current" />Current emphasis</span>
-      </div>
-      {!compact && stage > 0 && (
-        <>
-          <article className="orbit-question">
-            <span>A REAL QUESTION</span>
-            <p>Why do I feel responsible for everything, then disappear when I need support?</p>
-          </article>
-          {stage > 1 && <article className="orbit-answer">
-            <div><span>BASELINE CONNECTION</span><p>Self-direction can support courage and leadership. Under pressure, accepting help may feel like losing authority.</p></div>
-            {stage > 2 && <div><span>POSSIBLE INSIGHT</span><strong>What changes when support is shared without asking you to surrender your voice?</strong></div>}
-          </article>}
-        </>
-      )}
-      <footer>
-        <span>Baseline core</span><i>+</i><span>pressure response</span><i>+</i><span>aligned expression</span><i>+</i><span>current context</span>
-      </footer>
+      {!compact && <div className="baseline-stage-rail" aria-label="Interpretation sequence">
+        {stages.map((item, index) => <button type="button" key={item.label} onClick={() => setStage(index)} aria-pressed={stage === index}><i>{index + 1}</i><span>{item.label}</span></button>)}
+      </div>}
     </div>
   );
 }

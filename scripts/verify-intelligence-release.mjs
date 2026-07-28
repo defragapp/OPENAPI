@@ -49,12 +49,12 @@ containsAll('workspace stylesheet', workspaceCss, [
 ]);
 
 containsAll('Baseline visual', orbit, [
-  'YOUR BASELINE CORE',
-  'HOW YOU PROCESS',
-  'UNDER PRESSURE',
-  'CLEARER EXPRESSION',
-  'CURRENT EMPHASIS',
-  'steady Baseline'
+  'EXAMPLE BASELINE',
+  'STEADY BASELINE',
+  'RELEVANT CONNECTION',
+  'POSSIBLE INSIGHT',
+  'WHY THIS APPEARS',
+  'Actual current state: still unknown'
 ]);
 containsAll('Baseline visual stylesheet', orbitCss, [
   '.baseline-orbit',

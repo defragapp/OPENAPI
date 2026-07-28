@@ -11,11 +11,11 @@ describe('shared Baseline visual asset', () => {
   it('uses one owned visual on the homepage and in the workspace', () => {
     expect(landing).toContain('<BaselineOrbit />');
     expect(workspace).toContain('<BaselineOrbit compact />');
-    expect(orbit).toContain('YOUR BASELINE CORE');
-    expect(orbit).toContain('HOW YOU PROCESS');
-    expect(orbit).toContain('UNDER PRESSURE');
-    expect(orbit).toContain('CLEARER EXPRESSION');
-    expect(orbit).toContain('CURRENT EMPHASIS');
+    expect(orbit).toContain('EXAMPLE BASELINE');
+    expect(orbit).toContain('steady foundation');
+    expect(orbit).toContain('YOUR EXPERIENCE DECIDES');
+    expect(orbit).toContain('POSSIBLE INSIGHT');
+    expect(orbit).toContain('Actual current state: still unknown');
   });
 
   it('removes the old visualization runtime stack from production', () => {
