@@ -1,5 +1,6 @@
 import worker, { ThreadCoordinator, queue, scheduled } from './entry';
 import type { Env } from './env';
+import { transactionalEmailProvider } from './email';
 import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/headers';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 
@@ -115,10 +116,11 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
   try {
     const db = await env.DB.prepare('SELECT 1 AS ok').first<{ ok: number }>();
     const aiConfig = resolveAiModelConfig(env);
+    const emailProvider = transactionalEmailProvider(env);
     const authConfigured = Boolean(
       env.SESSION_SIGNING_SECRET
       && env.TURNSTILE_SECRET_KEY
-      && (env.EMAIL || env.RESEND_API_KEY)
+      && emailProvider === 'resend'
     );
     const stripeConfigured = Boolean(
       env.STRIPE_SECRET_KEY
@@ -139,7 +141,9 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       baselineObserver: 'Earth geocenter 500@399',
       birthplaceGeocoder: 'disabled',
       authentication: authConfigured ? 'configured' : 'missing',
-      transactionalEmail: env.EMAIL ? 'cloudflare-binding' : env.RESEND_API_KEY ? 'resend' : 'missing',
+      transactionalEmail: emailProvider,
+      publicContactEmail: env.PUBLIC_CONTACT_EMAIL || 'info@defrag.app',
+      transactionalFromEmail: env.TRANSACTIONAL_FROM_EMAIL || 'info@defrag.app',
       legacySovvAdapter: env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'disabled',
       stripe: stripeConfigured ? 'configured' : 'missing',
       stripeWebhookPaths: [...STRIPE_WEBHOOK_PATHS],
@@ -154,6 +158,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && dependencies.ai === 'configured'
       && dependencies.baselineEngine === 'configured'
       && dependencies.authentication === 'configured'
+      && dependencies.transactionalEmail === 'resend'
       && dependencies.stripe === 'configured';
     return withSecurityHeaders(Response.json({
       ok,
