@@ -237,6 +237,7 @@
 @media (max-width: 1000px) {
   .landing-hero { grid-template-columns: 1fr; }
   .landing-hero-stack { grid-template-columns: 1fr; }
+  .landing-hero-evidence-list { grid-template-columns: 1fr; }
   .baseline-orbit { width: min(100%, 760px); }
   .relationship-section { grid-template-columns: 1fr; }
   .relationship-visual { width: min(100%, 760px); }

@@ -110,6 +110,26 @@ export function PublicLanding() {
             <a className="landing-button landing-button-primary" href="/signup">Build my Baseline</a>
             <a className="landing-button landing-button-secondary" href="#product-example">See how it works</a>
           </div>
+          <div className="landing-hero-evidence" aria-label="How Sovereign explains an insight">
+            <div className="landing-hero-evidence-head">
+              <span>WHY IT FEELS GROUNDED</span>
+              <strong>The system shows the basis beneath each insight.</strong>
+            </div>
+            <div className="landing-hero-evidence-list">
+              <article>
+                <span>BASELINE</span>
+                <p>What remains steady.</p>
+              </article>
+              <article>
+                <span>NOW</span>
+                <p>What the current question emphasizes.</p>
+              </article>
+              <article>
+                <span>UNKNOWN</span>
+                <p>What still needs your confirmation.</p>
+              </article>
+            </div>
+          </div>
           <div className="landing-hero-stack" aria-label="What the experience follows">
             <article>
               <span>01</span>
@@ -146,6 +166,13 @@ export function PublicLanding() {
           <p>
             A normal assistant starts from a blank prompt. Sovereign begins with a personal foundation and expands only when the wider context matters.
           </p>
+        </div>
+        <div className="intelligence-proof">
+          <div>
+            <span>WHAT MAKES IT DIFFERENT</span>
+            <strong>An insight is never just a response. It is an interpretation with a visible basis.</strong>
+          </div>
+          <p>What stays steady, what is emphasized now, and what remains uncertain are all part of the experience.</p>
         </div>
         <div className="intelligence-grid">
           {intelligenceLevels.map((level) => (
