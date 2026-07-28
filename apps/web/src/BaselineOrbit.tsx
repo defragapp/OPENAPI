@@ -1,34 +1,37 @@
 export function BaselineOrbit({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={`baseline-orbit ${compact ? 'baseline-orbit-compact' : ''}`} aria-label="Example Baseline Design card">
+    <div className={`baseline-orbit ${compact ? 'baseline-orbit-compact' : ''}`} aria-label="Example of the Baseline Core used inside Sovereign.OS">
       <header>
-        <div><span className="orbit-mark">S</span><strong>YOUR BASELINE</strong></div>
-        <span>{compact ? 'PERSONAL CONTEXT' : 'EXAMPLE · YOUR EXPERIENCE WILL DIFFER'}</span>
+        <div><span className="orbit-mark" aria-hidden="true" /><strong>YOUR BASELINE CORE</strong></div>
+        <span>{compact ? 'PERSONAL FOUNDATION' : 'EXAMPLE · YOUR DESIGN WILL BE PERSONAL'}</span>
       </header>
       <div className="orbit-map" aria-hidden="true">
         <div className="orbit-ring orbit-ring-outer" />
         <div className="orbit-ring orbit-ring-inner" />
-        <div className="orbit-node orbit-node-core"><span>CORE</span><strong>Self-direction</strong></div>
-        <div className="orbit-node orbit-node-light"><span>LIGHT</span><strong>Clear leadership</strong></div>
-        <div className="orbit-node orbit-node-shadow"><span>SHADOW</span><strong>Carrying everything</strong></div>
-        <div className="orbit-node orbit-node-aligned"><span>ALIGNED</span><strong>Support without surrender</strong></div>
-        <div className="orbit-center"><span>YOU</span><strong>One quality<br />many expressions</strong></div>
+        <div className="orbit-node orbit-node-core"><span>HOW YOU PROCESS</span><strong>Names what matters through direct clarity</strong></div>
+        <div className="orbit-node orbit-node-light"><span>CLEARER EXPRESSION</span><strong>Leads without carrying every role</strong></div>
+        <div className="orbit-node orbit-node-shadow"><span>UNDER PRESSURE</span><strong>Withdraws and tries to hold everything alone</strong></div>
+        <div className="orbit-node orbit-node-aligned"><span>CURRENT EMPHASIS</span><strong>Boundaries and shared responsibility</strong></div>
+        <div className="orbit-center"><span>CORE ORIENTATION</span><strong>Self-directed<br />clarity</strong><small>steady Baseline</small></div>
+      </div>
+      <div className="orbit-layer-key" aria-label="Baseline and current context legend">
+        <span><i className="steady" />Steady design</span>
+        <span><i className="current" />Current emphasis</span>
       </div>
       {!compact && (
         <>
           <article className="orbit-question">
-            <span>YOU EXPLORE</span>
-            <p>How do I know when independence is aligned—and when it has become isolation?</p>
+            <span>A REAL QUESTION</span>
+            <p>Why do I feel responsible for everything, then disappear when I need support?</p>
           </article>
           <article className="orbit-answer">
-            <span>SOVEREIGN CONNECTS</span>
-            <p>Your need for self-direction can support courage and leadership. Under pressure, receiving support may feel unsafe.</p>
-            <strong>What changes when support does not require surrendering authority?</strong>
+            <div><span>BASELINE CONNECTION</span><p>Self-direction can support courage and leadership. Under pressure, accepting help may feel like losing authority.</p></div>
+            <div><span>WHAT TO EXAMINE</span><strong>What changes when support is shared without asking you to surrender your voice?</strong></div>
           </article>
         </>
       )}
       <footer>
-        <span>Baseline</span><i>+</i><span>shadow &amp; light</span><i>+</i><span>real life</span>
+        <span>Baseline core</span><i>+</i><span>pressure response</span><i>+</i><span>aligned expression</span><i>+</i><span>current context</span>
       </footer>
     </div>
   );
