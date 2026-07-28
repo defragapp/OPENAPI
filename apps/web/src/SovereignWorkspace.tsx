@@ -292,15 +292,18 @@ export function SovereignWorkspace() {
     const last = [...messages].reverse().find((item) => item.role === 'assistant' && item.text.trim());
     if (!last) return;
     if (!window.confirm('Save this response to your private Library?')) return;
+    const body = {
+      title: threads.find((item) => item.id === threadId)?.title ?? `${surface} understanding`,
+      summary: last.text,
+      threadId,
+      links: { personId: selectedPerson, systemId: selectedSystem },
+      uncertainty: 'visible',
+      basis: visualStory?.basis,
+      type: surface
+    };
     await api('/api/v1/library', {
       method: 'POST',
-      body: JSON.stringify({
-        title: threads.find((item) => item.id === threadId)?.title ?? `${surface} understanding`,
-        summary: last.text,
-        threadId,
-        links: { personId: selectedPerson, systemId: selectedSystem },
-        uncertainty: 'visible'
-      })
+      body: JSON.stringify(body)
     });
     await refreshWorkspace();
     setStatus('Saved to Library.');
@@ -413,47 +416,47 @@ export function SovereignWorkspace() {
                 <h1>What do you want to understand?</h1>
                 <p>Ask about yourself, a decision, a relationship, or the system around you. Sovereign brings in only the context that belongs.</p>
               </div>
-              {!baselineReady && (
-                <div className="onboarding-nudge">
-                  <header>
-                    <p className="eyebrow">GET STARTED</p>
-                    <h2>Begin with your personal intelligence foundation.</h2>
-                  </header>
-                  <p>Sovereign.OS explains your qualities, shadow and light, relationships, and systems by starting with your Baseline Design.</p>
-                  <button className="primary-button" onClick={() => openSurface('You')}>Build my Baseline</button>
-                </div>
-              )}
-              <div className="starter-grid">
-                {surfacePrompts.map((prompt) => <button key={prompt} onClick={() => setDraft(prompt)}>{prompt}<span>↗</span></button>)}
-              </div>
+
               <div className="empty-baseline-card">
                 <BaselineOrbit compact />
-                <button onClick={() => openSurface('You')}>Explore my Baseline</button>
+                <div className="baseline-card-actions">
+                  <button className="primary-button" onClick={() => openSurface('You')}>{baselineReady ? 'Explore my Baseline' : 'Build my Baseline'}</button>
+                  {!baselineReady && <p className="nudge-text">Begin with your personal intelligence foundation.</p>}
+                </div>
+              </div>
+
+              <div className="starter-grid">
+                {surfacePrompts.map((prompt) => <button key={prompt} onClick={() => setDraft(prompt)}>{prompt}<span>↗</span></button>)}
               </div>
             </div>
           ) : (
             <div className="message-list">
-              {messages.map((message) => (
-                <article key={message.id} className={`chat-message ${message.role}`}>
-                  <span>{message.role === 'assistant' ? 'S' : 'You'}</span>
-                  <div>{message.text || <i>Thinking…</i>}</div>
-                </article>
-              ))}
-              {messages.some((item) => item.role === 'assistant' && item.text.trim()) && (
-                <>
-                  {visualStory && <VisualStoryCard payload={visualStory} phase={visualPhase} setPhase={setVisualPhase} />}
-                  <div className="response-actions">
-                    {interfaceActions?.primary && <button onClick={() => openInterfaceAction(interfaceActions.primary!)}>{actionLabel(interfaceActions.primary)}</button>}
-                    {interfaceActions?.suggestions.map((action) => <button key={`${action.type}-${JSON.stringify(action.args)}`} onClick={() => openInterfaceAction(action)}>{actionLabel(action)}</button>)}
-                    {moduleOffer && <button onClick={() => void saveModuleOffer()}>Save “{moduleOffer.title}”</button>}
-                    <button onClick={() => void saveLatest()}>Save to Library</button>
-                    <span>Does this fit?</span>
-                    <button onClick={() => void saveCorrection('yes')}>Yes</button>
-                    <button onClick={() => void saveCorrection('partly')}>Partly</button>
-                    <button onClick={() => void saveCorrection('not_today')}>Not today</button>
+              {messages.map((message, index) => {
+                const isLatestAssistant = message.role === 'assistant' && index === messages.length - 1;
+                return (
+                  <div key={message.id} className="message-wrapper">
+                    <article className={`chat-message ${message.role}`}>
+                      <span>{message.role === 'assistant' ? 'S' : 'You'}</span>
+                      <div>{message.text || <i>Thinking…</i>}</div>
+                    </article>
+                    {isLatestAssistant && message.text.trim() && (
+                      <>
+                        {visualStory && <VisualStoryCard payload={visualStory} phase={visualPhase} setPhase={setVisualPhase} />}
+                        <div className="response-actions">
+                          {interfaceActions?.primary && <button className="action-primary" onClick={() => openInterfaceAction(interfaceActions.primary!)}>{actionLabel(interfaceActions.primary)}</button>}
+                          {interfaceActions?.suggestions.map((action) => <button key={`${action.type}-${JSON.stringify(action.args)}`} className="action-suggestion" onClick={() => openInterfaceAction(action)}>{actionLabel(action)}</button>)}
+                          {moduleOffer && <button className="action-module" onClick={() => void saveModuleOffer()}>Save “{moduleOffer.title}”</button>}
+                          <button onClick={() => void saveLatest()}>Save to Library</button>
+                          <span className="fit-ask">Does this fit?</span>
+                          <button onClick={() => void saveCorrection('yes')}>Yes</button>
+                          <button onClick={() => void saveCorrection('partly')}>Partly</button>
+                          <button onClick={() => void saveCorrection('not_today')}>Not today</button>
+                        </div>
+                      </>
+                    )}
                   </div>
-                </>
-              )}
+                );
+              })}
             </div>
           )}
         </section>
@@ -575,9 +578,17 @@ function PeoplePanel({ api, people, setPeople, selectedPerson, setSelectedPerson
         </select>
       </Field>
       {selected && (
-        <div className="compact-status-card">
-          <span>Account</span><strong>{selected.identityBound ? 'Connected' : 'Not connected'}</strong>
-          <span>Baseline</span><strong>{textOr(selected.baselineStatus, 'Unavailable')}</strong>
+        <div className="person-visual-card">
+          <div className="person-visual-avatar">{selected.displayName.slice(0, 1)}</div>
+          <div className="compact-status-card">
+            <span>Account</span><strong>{selected.identityBound ? 'Connected' : 'Not connected'}</strong>
+            <span>Baseline</span><strong>{textOr(selected.baselineStatus, 'Unavailable')}</strong>
+          </div>
+          {selected.identityBound && (
+            <div className="person-connection-hint">
+              <p>Baselines are distinct. Comparison happens only when both roles are active in a conversation.</p>
+            </div>
+          )}
         </div>
       )}
       {selected && !selected.identityBound && (
@@ -640,7 +651,16 @@ function SystemsPanel({ api, systems, setSystems, people, selectedSystem, setSel
         </select>
       </Field>
       {selectedSystem && (
-        <>
+        <div className="system-visual-card">
+          <header>
+            <strong>{systems.find((s: any) => s.id === selectedSystem)?.name}</strong>
+            <span>{type.replace('_', ' ')}</span>
+          </header>
+          <div className="system-members-preview">
+            {eligible.map((p: any) => (
+              <div key={p.id} className="member-glyph" title={p.displayName}>{p.displayName.slice(0, 1)}</div>
+            ))}
+          </div>
           <Field label="Add a permitted person">
             <select value={memberId} onChange={(event) => setMemberId(event.target.value)}>
               <option value="">Choose a person</option>
@@ -648,34 +668,54 @@ function SystemsPanel({ api, systems, setSystems, people, selectedSystem, setSel
             </select>
           </Field>
           <button className="primary-button" disabled={!memberId} onClick={() => void addMember()}>Add to system</button>
-        </>
+        </div>
       )}
     </PanelStack>
   );
 }
 
 function LibraryPanel({ library, api, refresh, onUse }: any) {
+  const groups = useMemo(() => {
+    const map: Record<string, any[]> = {};
+    library.forEach((item: any) => {
+      const type = item.body?.type || 'Other';
+      if (!map[type]) map[type] = [];
+      map[type].push(item);
+    });
+    return Object.entries(map).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [library]);
+
   return (
     <PanelStack>
       <p className="panel-intro">Only understandings you deliberately save appear here.</p>
       {library.length === 0 && <div className="panel-empty"><strong>Nothing saved yet.</strong><p>Save a Sovereign response when it changes how you see something.</p></div>}
-      {library.map((item: any) => (
-        <article className="library-panel-item" key={item.id}>
-          <button onClick={() => onUse(`Continue from this saved understanding: ${item.body?.summary ?? ''}`)}>
-            <strong>{item.body?.title || 'Saved understanding'}</strong>
-            <p>{item.body?.summary}</p>
-          </button>
-          <button aria-label="Remove saved understanding" onClick={() => api(`/api/v1/library/${item.id}`, { method: 'DELETE' }).then(refresh)}>×</button>
-        </article>
+      {groups.map(([type, items]) => (
+        <section key={type} className="library-group">
+          <p className="eyebrow">{type}</p>
+          <div className="library-items">
+            {items.map((item: any) => (
+              <article className="library-panel-item" key={item.id}>
+                <button onClick={() => onUse(`Continue from this saved understanding: ${item.body?.summary ?? ''}`)}>
+                  <strong>{item.body?.title || 'Saved understanding'}</strong>
+                  <p>{item.body?.summary}</p>
+                  {item.body?.basis && <span className="library-basis-tag">B✓</span>}
+                </button>
+                <button aria-label="Remove saved understanding" onClick={() => api(`/api/v1/library/${item.id}`, { method: 'DELETE' }).then(refresh)}>×</button>
+              </article>
+            ))}
+          </div>
+        </section>
       ))}
     </PanelStack>
   );
 }
 
-function YouPanel({ api, billing, covenantEnabled, changeCovenant, refresh }: any) {
+function YouPanel({ api, billing, today, covenantEnabled, changeCovenant, refresh }: any) {
   const [certainty, setCertainty] = useState('unknown');
   const [interval, setInterval] = useState<'monthly' | 'annual'>('annual');
   const [deletionJob, setDeletionJob] = useState<{ id: string; status: string; scheduledFor?: string } | null>(null);
+  const baseline = today?.baseline;
+  const isComplete = baseline?.status === 'completed' || baseline?.status === 'partial';
 
   useEffect(() => {
     void api('/api/v1/deletion-jobs')
@@ -715,21 +755,38 @@ function YouPanel({ api, billing, covenantEnabled, changeCovenant, refresh }: an
     <PanelStack>
       <section className="panel-section">
         <p className="eyebrow">YOUR BASELINE</p>
-        <h3>Build once. Explore continuously.</h3>
-        <form className="panel-form" onSubmit={buildBaseline}>
-          <Field label="Birth date"><input type="date" name="birthDate" /></Field>
-          <Field label="Birthplace"><input name="birthplace" placeholder="City, region, country" /></Field>
-          <Field label="Birth-time certainty">
-            <select name="birthTimeCertainty" value={certainty} onChange={(event) => setCertainty(event.target.value)}>
-              <option value="exact">Exact</option>
-              <option value="approximate">Approximate</option>
-              <option value="unknown">Unknown</option>
-            </select>
-          </Field>
-          {certainty !== 'unknown' && <Field label="Birth time"><input type="time" name="birthTime" /></Field>}
-          <input type="hidden" name="locationPrecision" value="city_or_regional" />
-          <button className="primary-button">Build my Baseline</button>
-        </form>
+        <div className="baseline-status-summary">
+          <div className="baseline-status-indicator">
+            <span className={`status-dot ${isComplete ? 'complete' : 'pending'}`} />
+            <strong>{isComplete ? 'Baseline Active' : 'Baseline Pending'}</strong>
+          </div>
+          <p className="panel-note">{isComplete ? 'Your foundation is built. Every conversation starts here.' : 'Enter your birth details to begin. Your data stays private.'}</p>
+        </div>
+        
+        {!isComplete && (
+          <form className="panel-form" onSubmit={buildBaseline}>
+            <Field label="Birth date"><input type="date" name="birthDate" /></Field>
+            <Field label="Birthplace"><input name="birthplace" placeholder="City, region, country" /></Field>
+            <Field label="Birth-time certainty">
+              <select name="birthTimeCertainty" value={certainty} onChange={(event) => setCertainty(event.target.value)}>
+                <option value="exact">Exact</option>
+                <option value="approximate">Approximate</option>
+                <option value="unknown">Unknown</option>
+              </select>
+            </Field>
+            {certainty !== 'unknown' && <Field label="Birth time"><input type="time" name="birthTime" /></Field>}
+            <input type="hidden" name="locationPrecision" value="city_or_regional" />
+            <button className="primary-button">Build my Baseline</button>
+          </form>
+        )}
+
+        {isComplete && (
+          <div className="baseline-details-preview">
+            <div className="detail-row"><span>Born</span><strong>{baseline.birthDate}</strong></div>
+            <div className="detail-row"><span>Place</span><strong>{baseline.birthplace}</strong></div>
+            <button className="secondary-button" onClick={() => window.confirm('Updating your Baseline will clear existing interpretations. Continue?') && isComplete && openSurface('You')}>Edit details</button>
+          </div>
+        )}
       </section>
       <section className="panel-section">
         <p className="eyebrow">PLAN</p>
@@ -848,7 +905,19 @@ function VisualStoryCard({ payload, phase, setPhase }: {
       </header>
       <div className="visual-story-body">
         <div className="visual-story-archetypes" aria-label="Available archetypes">
-          {cards.map((card) => <article key={`${card.archetype}-${card.title}`}><i aria-hidden="true">{archetypeMark(card.archetype)}</i><strong>{card.title}</strong></article>)}
+          {cards.map((card) => (
+            <article key={`${card.archetype}-${card.title}`} className={`visual-archetype-artwork visual-archetype-${card.archetype}`}>
+              <div className="artwork-stage">
+                <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="100" height="140" rx="12" fill="currentColor" fillOpacity="0.03" />
+                  <path d="M50 20 L80 120 L20 120 Z" fill="currentColor" fillOpacity="0.1" className="artwork-breath" />
+                  <ArchetypeGlyph archetype={card.archetype} />
+                </svg>
+              </div>
+              <p className="artwork-mark">{archetypeMark(card.archetype)}</p>
+              <strong>{card.title}</strong>
+            </article>
+          ))}
         </div>
         <div>
           <div className="visual-phase-tabs" aria-label="View three expressions of this role">
@@ -866,6 +935,16 @@ function VisualStoryCard({ payload, phase, setPhase }: {
       </div>
     </section>
   );
+}
+
+function ArchetypeGlyph({ archetype }: { archetype: VisualCard['archetype'] }) {
+  if (archetype === 'fool') return <path d="M50 40 Q70 40 70 60 T50 80 T30 60 T50 40" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="artwork-float" />;
+  if (archetype === 'magician') return <path d="M30 50 L70 50 L50 90 Z M30 50 L50 10 L70 50" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="artwork-sway" />;
+  if (archetype === 'three_of_cups') return <g stroke="currentColor" strokeWidth="2" className="artwork-pulse"><circle cx="50" cy="50" r="10" /><circle cx="35" cy="75" r="10" /><circle cx="65" cy="75" r="10" /></g>;
+  if (archetype === 'hermit') return <path d="M50 30 V110 M40 40 H60 M45 100 H55" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="artwork-dim" />;
+  if (archetype === 'strength') return <path d="M30 70 Q50 30 70 70 T30 110" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="artwork-lean" />;
+  if (archetype === 'tower') return <path d="M40 120 V40 H60 V120 M35 40 H65 M45 20 L55 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="artwork-shake" />;
+  return null;
 }
 
 function decodeVisualStoryPayload(value: string | null): VisualStoryPayload | null {
