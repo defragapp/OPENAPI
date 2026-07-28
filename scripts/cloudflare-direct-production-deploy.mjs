@@ -207,7 +207,7 @@ async function verifyLiveProduction() {
   assertContainsAll('How it works', how.text, [
     'One Baseline. An entire life in context.',
     'THE PLATFORM IN FOUR PARTS',
-    'Explore shadow and light',
+    'Explore shadow and gift expression',
     '/launch-polish.css?v=20260726-final-r1'
   ]);
   assertContainsAll('How it works clean URL', howClean.text, [
@@ -219,8 +219,8 @@ async function verifyLiveProduction() {
   assertContainsAll('pricing', pricing.text, [
     '$20',
     '$99',
-    '10 Sovereign responses each month',
-    '300 Sovereign responses each month',
+    '10 conversations each month',
+    '300 conversations each month',
     'Consent-aware invitations and sharing controls',
     '/launch-polish.css?v=20260726-final-r1'
   ]);
@@ -236,7 +236,7 @@ async function verifyLiveProduction() {
   assertContainsAll('Questions', faq.text, [
     'What it is. What you can explore. What it never pretends to know.',
     'What is Sovereign.OS?',
-    'What do shadow and light mean?',
+    'What do shadow and gift expression mean?',
     'What does alignment mean?',
     'Can Sovereign know why another person did something?',
     'What is Covenant?',
