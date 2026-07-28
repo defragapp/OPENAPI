@@ -77,7 +77,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
     const response = await fetch(`/api/v1/auth/redeem?${parameters.toString()}`);
     if (response.status === 410) {
       setStatusTone('error');
-      setMessage('Request a new private link from the sign-in page.');
+      setMessage('Request a new one-time email link from the sign-in page.');
       return setState('This link expired');
     }
     if (response.status === 409) {
@@ -87,7 +87,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
     }
     if (!response.ok) {
       setStatusTone('error');
-      setMessage('Request a new private link. Nothing was changed in your account.');
+      setMessage('Request a new one-time email link. Nothing was changed in your account.');
       return setState('This link is invalid');
     }
     const payload = await response.json().catch(() => ({})) as { next?: string };
@@ -123,7 +123,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
     }
 
     setSubmitting(true);
-    setState('Sending private link');
+    setState('Sending one-time email link');
     setMessage('Keep this page open while the request completes.');
     setStatusTone('neutral');
     const turnstileToken = (document.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null)?.value ?? '';
@@ -159,7 +159,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
         resetTurnstile();
         return;
       }
-      setState('Private link sent');
+      setState('One-time email link sent');
       setMessage('Check your inbox. The link expires in 15 minutes and can be used once.');
       setStatusTone('success');
       setLinkSent(true);
@@ -250,7 +250,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
               </div>
               {fieldErrors.turnstile && <p className="field-error">{fieldErrors.turnstile}</p>}
               <button className="primary-button" disabled={buttonDisabled}>
-                {submitting ? 'Sending…' : linkSent ? 'Check your inbox' : mode === 'signup' ? 'Create account' : 'Email my private link'}
+                {submitting ? 'Sending…' : linkSent ? 'Check your inbox' : mode === 'signup' ? 'Create account' : 'Email my sign-in link'}
               </button>
             </form>
           )}

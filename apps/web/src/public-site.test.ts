@@ -19,11 +19,11 @@ const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent
 
 describe('Sovereign.OS public experience', () => {
   it('makes the product unmistakable in the first viewport', () => {
-    expect(landing).toContain('Know what is <em>yours</em> to carry.');
+    expect(landing).toContain('Choose what is yours to carry.');
     expect(landing).toContain('Why this appears');
     expect(landing).toContain('Responsibility without matching authority');
     expect(landing).toContain('this correction stays with the exploration');
-    expect(landing).toContain('Sovereign begins with your Baseline Design');
+    expect(landing).toContain('Sovereign.OS begins with a private reference point');
     expect(landing).toContain('Build my Baseline');
     expect(index).toContain('Personal intelligence for real life');
     expect(index).toContain('Private personal, relationship, and system intelligence');
@@ -32,10 +32,10 @@ describe('Sovereign.OS public experience', () => {
   it('explains the complete Baseline-first platform in direct language', () => {
     for (const phrase of [
       'Baseline Design',
-      'shadow and light',
-      'alignment',
-      'TWO BASELINES',
-      'WHOLE HUMAN SYSTEM',
+      'shadow and gift expression',
+      'ALIGNMENT',
+      'PEOPLE · EXPLICIT PERMISSION',
+      'SYSTEMS · FAMILY, GROUP, AND TEAM',
       'Covenant'
     ]) expect(publicCopy).toContain(phrase);
     expect(publicCopy).not.toMatch(/healing journey|observatory|signal map|hidden motive revealed|diagnose the relationship/i);
@@ -43,12 +43,12 @@ describe('Sovereign.OS public experience', () => {
 
   it('keeps the landing concise and visually demonstrative', () => {
     expect((landing.match(/<section/g) ?? []).length).toBeLessThanOrEqual(7);
-    for (const label of ['PERSONAL INTELLIGENCE, WITH A FOUNDATION', 'TRY A REAL EXPLORATION', 'TWO BASELINES · WITH PERMISSION']) {
+    for (const label of ['A PRIVATE INTELLIGENCE WORKSPACE', 'ALIGNMENT · APPLY YOUR BASELINE NOW', 'PEOPLE · EXPLICIT PERMISSION']) {
       expect(landing).toContain(label);
     }
-    expect(landing).toContain('Let the context expand when it matters.');
+    expect(landing).toContain('Return without starting over.');
     expect(landing).toContain('<BaselineOrbit />');
-    expect(landing).toContain('className={`scope-field scope-${scope}`}');
+    expect(landing).toContain('className={`scope-field scope-mode-${scope}`}');
   });
 
   it('uses accessible examples instead of unexplained decoration', () => {
@@ -76,7 +76,7 @@ describe('Sovereign.OS public experience', () => {
   });
 
   it('keeps pricing, privacy, permission, and authority explicit', () => {
-    for (const phrase of ['$20', '$99', '10 Sovereign responses', '300 Sovereign responses', 'Stripe']) {
+    for (const phrase of ['$20', '$99', '10 conversations', '300 conversations', 'Stripe']) {
       expect(publicCopy).toContain(phrase);
     }
     for (const phrase of [

@@ -180,3 +180,15 @@ body.launch-page {
 @media (prefers-contrast: more) {
   .launch-links a { border-color: rgba(23, 32, 29, .35); }
 }
+
+/* Final public-surface override: earlier launch layers must not restore the light/green shell. */
+html, body.launch-page, .launch-page .launch-shell, .launch-page .launch-nav {
+  background: #11100f !important;
+  color: #f4efe7;
+}
+.launch-page .launch-nav { border-bottom: 1px solid var(--line); }
+.launch-page a:focus-visible, .launch-page summary:focus-visible {
+  outline: 2px solid #f0ad87;
+  outline-offset: 4px;
+}
+.launch-page p, .launch-page li, .launch-page dd { font-size: max(1rem, 16px); }
