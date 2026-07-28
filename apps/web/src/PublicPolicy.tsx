@@ -65,13 +65,13 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
   return (
     <main className="sovereign-policy">
       <header className="landing-nav">
-        <a className="landing-wordmark" href="/" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
+        <a className="landing-wordmark" href="/" aria-label="Sovereign.OS home"><span aria-hidden="true" /><strong>SOVEREIGN.OS</strong></a>
         <nav aria-label="Public navigation">
           <a href="/how-it-works.html">How it works</a>
           <a href="/pricing.html">Pricing</a>
-          <a href="/faq.html">FAQ</a>
+          <a href="/faq.html">Questions</a>
           <a href="/login">Sign in</a>
-          <a className="landing-nav-cta" href="/signup">Start free</a>
+          <a className="landing-nav-cta" href="/signup">Build my Baseline</a>
         </nav>
       </header>
 
@@ -99,17 +99,18 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
         <div>
           <p className="landing-kicker"><span /> QUESTIONS OR REQUESTS</p>
           <h2>Talk to a person.</h2>
-          <p>Send privacy requests, account questions, billing concerns, or safety feedback to info@sovereign.os or info@defrag.app.</p>
+          <p>Send privacy requests, account questions, billing concerns, public inquiries, or safety feedback to info@defrag.app.</p>
         </div>
-        <a className="landing-button landing-button-primary" href="mailto:info@sovereign.os">Email Sovereign.OS</a>
+        <a className="landing-button landing-button-primary" href="mailto:info@defrag.app">Email Sovereign.OS</a>
       </section>
 
       <footer className="landing-footer">
-        <span>Sovereign.OS · Personal, relational, and system intelligence</span>
+        <span>Sovereign.OS · Private personal, relationship, and system intelligence</span>
         <nav aria-label="Footer navigation">
           <a aria-current={privacy ? 'page' : undefined} href="/privacy">Privacy</a>
           <a aria-current={!privacy ? 'page' : undefined} href="/terms">Terms</a>
           <a href="/pricing.html">Pricing</a>
+          <a href="mailto:info@defrag.app">Contact</a>
         </nav>
       </footer>
     </main>
