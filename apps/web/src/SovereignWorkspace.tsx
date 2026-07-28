@@ -498,7 +498,7 @@ export function SovereignWorkspace() {
           )}
           {surface === 'Library' && <LibraryPanel library={library} api={api} refresh={refreshWorkspace} onUse={(text: string) => { setDraft(text); setPanelOpen(false); }} />}
           {surface === 'You' && (
-            <YouPanel api={api} billing={billing} covenantEnabled={covenantEnabled} changeCovenant={changeCovenant} refresh={refreshWorkspace} />
+            <YouPanel api={api} billing={billing} today={today} covenantEnabled={covenantEnabled} changeCovenant={changeCovenant} refresh={refreshWorkspace} openSurface={openSurface} />
           )}
         </div>
       </aside>
@@ -578,12 +578,25 @@ function PeoplePanel({ api, people, setPeople, selectedPerson, setSelectedPerson
         </select>
       </Field>
       {selected && (
-        <div className="person-visual-card">
-          <div className="person-visual-avatar">{selected.displayName.slice(0, 1)}</div>
-          <div className="compact-status-card">
-            <span>Account</span><strong>{selected.identityBound ? 'Connected' : 'Not connected'}</strong>
-            <span>Baseline</span><strong>{textOr(selected.baselineStatus, 'Unavailable')}</strong>
+        <div className="person-visual-card premium-elevation">
+          <div className="person-visual-avatar-stage">
+            <svg viewBox="0 0 80 80" className="avatar-svg">
+              <circle cx="40" cy="40" r="38" fill="var(--clay-light)" fillOpacity="0.1" stroke="var(--clay-light)" strokeWidth="1" strokeDasharray="4 2" />
+              <text x="50%" y="50%" dominantBaseline="central" textAnchor="middle" fill="var(--clay-light)" fontSize="32" fontFamily="var(--serif)">{selected.displayName.slice(0, 1)}</text>
+            </svg>
+            {selected.identityBound && <div className="avatar-archetype-overlay" title="Baseline Active">B✓</div>}
           </div>
+          
+          <div className="relational-intelligence-box">
+            <p className="eyebrow">RELATIONAL STATUS</p>
+            <p>{selected.identityBound ? 'This person has connected their Baseline. Comparison and shared context are available.' : 'Private entry. Add their email to invite them to connect their own Baseline.'}</p>
+            <div className="intelligence-tag-row">
+              <span className="intel-tag">{selected.identityBound ? 'Connected' : 'Private'}</span>
+              <span className="intel-tag">{textOr(selected.baselineStatus, 'No Baseline')}</span>
+              {selected.role && <span className="intel-tag">{selected.role}</span>}
+            </div>
+          </div>
+
           {selected.identityBound && (
             <div className="person-connection-hint">
               <p>Baselines are distinct. Comparison happens only when both roles are active in a conversation.</p>
@@ -651,16 +664,28 @@ function SystemsPanel({ api, systems, setSystems, people, selectedSystem, setSel
         </select>
       </Field>
       {selectedSystem && (
-        <div className="system-visual-card">
+        <div className="system-visual-card premium-elevation">
           <header>
-            <strong>{systems.find((s: any) => s.id === selectedSystem)?.name}</strong>
-            <span>{type.replace('_', ' ')}</span>
+            <div>
+              <strong>{systems.find((s: any) => s.id === selectedSystem)?.name}</strong>
+              <span className="system-type-badge">{type.replace('_', ' ')}</span>
+            </div>
           </header>
-          <div className="system-members-preview">
-            {eligible.map((p: any) => (
-              <div key={p.id} className="member-glyph" title={p.displayName}>{p.displayName.slice(0, 1)}</div>
-            ))}
+          
+          <div className="system-map-visual">
+            <div className="system-map-center">⌘</div>
+            <div className="system-members-orbit" style={{ '--total': eligible.length + 1 } as any}>
+              <div className="member-orbit-node" style={{ '--idx': 0 } as any}>
+                <div className="member-glyph" title="You (Lead)">Y</div>
+              </div>
+              {eligible.map((p: any, idx: number) => (
+                <div key={p.id} className="member-orbit-node" style={{ '--idx': idx + 1 } as any}>
+                  <div className="member-glyph" title={p.displayName}>{p.displayName.slice(0, 1)}</div>
+                </div>
+              ))}
+            </div>
           </div>
+
           <Field label="Add a permitted person">
             <select value={memberId} onChange={(event) => setMemberId(event.target.value)}>
               <option value="">Choose a person</option>
@@ -698,7 +723,10 @@ function LibraryPanel({ library, api, refresh, onUse }: any) {
                 <button onClick={() => onUse(`Continue from this saved understanding: ${item.body?.summary ?? ''}`)}>
                   <strong>{item.body?.title || 'Saved understanding'}</strong>
                   <p>{item.body?.summary}</p>
-                  {item.body?.basis && <span className="library-basis-tag">B✓</span>}
+                  <div className="intelligence-tag-row">
+                    {item.body?.basis && <span className="intel-tag">Verified Basis ✓</span>}
+                    {item.body?.type && <span className="intel-tag">{item.body.type}</span>}
+                  </div>
                 </button>
                 <button aria-label="Remove saved understanding" onClick={() => api(`/api/v1/library/${item.id}`, { method: 'DELETE' }).then(refresh)}>×</button>
               </article>
@@ -710,7 +738,7 @@ function LibraryPanel({ library, api, refresh, onUse }: any) {
   );
 }
 
-function YouPanel({ api, billing, today, covenantEnabled, changeCovenant, refresh }: any) {
+function YouPanel({ api, billing, today, covenantEnabled, changeCovenant, refresh, openSurface }: any) {
   const [certainty, setCertainty] = useState('unknown');
   const [interval, setInterval] = useState<'monthly' | 'annual'>('annual');
   const [deletionJob, setDeletionJob] = useState<{ id: string; status: string; scheduledFor?: string } | null>(null);

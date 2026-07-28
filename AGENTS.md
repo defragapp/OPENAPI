@@ -23,6 +23,14 @@ These instructions apply to the entire OPENAPI repository.
 - Do not send raw birth inputs, exact private location, secrets, or private identifiers to the model.
 - Do not trust client-supplied account IDs such as `x-sovereign-account` or `x-sovereign-subject`.
 
+## Intelligence interface layer
+- Sovereign.OS is an intelligence platform, not a generic chatbot.
+- AI responses should prioritize structured, interactive interfaces (visual stories, archetypes, contextual actions).
+- Relationships and systems are visualized as active intelligence maps, not just lists.
+- Users explore through guided intelligence paths (Shadow/Light, Alignment, Growth).
+- Saved understandings in the Library preserve basis and framework context.
+- Premium perception is maintained through intentional spacing, motion, and visual clarity.
+
 ## Verification
 Before commits:
 - Inspect the diff.
