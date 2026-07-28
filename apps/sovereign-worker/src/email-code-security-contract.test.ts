@@ -17,7 +17,8 @@ describe('email code storage security', () => {
   it('never stores the plain code or a reversible value in D1', () => {
     expect(migration).toContain('code_hash TEXT NOT NULL');
     expect(migration).not.toMatch(/plain_code|raw_code|code_encrypted/i);
-    expect(auth).not.toContain('code_hash, return_to, max_attempts, expires_at, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, datetime');
+    expect(auth).not.toContain('.bind(emailCodeId, existing.id, email, emailCode,');
+    expect(auth).not.toContain('.bind(emailCodeId, existing.id, email, `${email}:${emailCode}`');
   });
 
   it('retains constant-time comparison and generic failure behavior', () => {
