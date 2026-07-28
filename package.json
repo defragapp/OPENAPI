@@ -25,6 +25,7 @@
     "smoke:worker-gateway": "node --import tsx scripts/worker-gateway-smoke.ts",
     "smoke:stripe": "node --import tsx scripts/stripe-smoke.ts",
     "smoke:product": "node --import tsx scripts/product-smoke.ts",
+    "smoke:email": "node --import tsx scripts/email-smoke.ts",
     "build:preview": "node scripts/build-preview.mjs",
     "preview:bootstrap": "node scripts/cloudflare-preview-bootstrap.mjs",
     "smoke:preview": "node --import tsx scripts/preview-smoke.ts",
