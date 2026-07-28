@@ -65,6 +65,16 @@
 
 .landing-button { min-height: 52px; padding-inline: 20px; }
 .landing-nav nav .landing-nav-cta { border-radius: 12px; }
+.landing-hero-stack article {
+  min-height: auto;
+  padding: 15px 16px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.035);
+}
+.baseline-provenance {
+  border-radius: 16px;
+  background: rgba(255,255,255,.035);
+}
 
 .intelligence-grid article {
   min-height: 410px;
@@ -226,6 +236,7 @@
 
 @media (max-width: 1000px) {
   .landing-hero { grid-template-columns: 1fr; }
+  .landing-hero-stack { grid-template-columns: 1fr; }
   .baseline-orbit { width: min(100%, 760px); }
   .relationship-section { grid-template-columns: 1fr; }
   .relationship-visual { width: min(100%, 760px); }

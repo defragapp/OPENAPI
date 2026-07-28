@@ -99,16 +99,33 @@ export function PublicLanding() {
       <section className="landing-hero">
         <div className="landing-copy">
           <p className="landing-kicker">PERSONAL INTELLIGENCE FOR REAL LIFE</p>
-          <h1>Know yourself. Understand the people around you. See the whole system.</h1>
+          <h1>Build a foundation for yourself, then use it where life gets complicated.</h1>
           <p className="landing-lede">
-            Sovereign.OS turns your Baseline Design into private, explorable intelligence for choices, relationships, families, and teams.
+            Know yourself. Understand the people around you. See the whole system.
           </p>
           <p className="landing-support">
-            Start with how you process, communicate, connect, decide, and respond under pressure. Add another person or a whole system only when it matters.
+            Sovereign.OS turns your Baseline Design into private, explorable intelligence for choices, relationships, families, and teams. Start with how you process, communicate, connect, decide, and respond under pressure. A real question then shows what is supported, what is interpreted, and what remains uncertain.
           </p>
           <div className="landing-actions">
             <a className="landing-button landing-button-primary" href="/signup">Build my Baseline</a>
-            <a className="landing-button landing-button-secondary" href="#product-example">See a real example</a>
+            <a className="landing-button landing-button-secondary" href="#product-example">See how it works</a>
+          </div>
+          <div className="landing-hero-stack" aria-label="What the experience follows">
+            <article>
+              <span>01</span>
+              <strong>Baseline foundation</strong>
+              <p>Your steady qualities, needs, and ways of processing.</p>
+            </article>
+            <article>
+              <span>02</span>
+              <strong>Current question</strong>
+              <p>A decision, relationship tension, family role, or system pressure.</p>
+            </article>
+            <article>
+              <span>03</span>
+              <strong>Why it appears</strong>
+              <p>The basis, the interpretation, and what still needs your confirmation.</p>
+            </article>
           </div>
           <div className="landing-trust">
             <span>Free to begin</span>
@@ -127,7 +144,7 @@ export function PublicLanding() {
             <h2 id="intelligence-title">One foundation. Three ways to understand what is happening.</h2>
           </div>
           <p>
-            Begin with your own Baseline. Bring in another person with permission. Map the larger human system when roles and pressure matter.
+            A normal assistant starts from a blank prompt. Sovereign begins with a personal foundation and expands only when the wider context matters.
           </p>
         </div>
         <div className="intelligence-grid">
@@ -147,8 +164,19 @@ export function PublicLanding() {
           <p className="landing-kicker">BASELINE DESIGN</p>
           <h2 id="baseline-title">Your design, explained in language you can use.</h2>
           <p>
-            Baseline Design is not a score or a personality label. It is the personal foundation Sovereign uses to explain how your qualities may show up at their clearest, under pressure, in relationships, and in the choices you are making now.
+            Baseline Design is the steady foundation. The rest of the experience interprets the question against it, the current context, and what you have already confirmed.
           </p>
+          <div className="baseline-provenance">
+            <div>
+              <span>WHY THIS APPEARS</span>
+              <h3>Evidence stays visible without becoming technical.</h3>
+            </div>
+            <ul>
+              <li>What your Baseline suggests</li>
+              <li>What the current question emphasizes</li>
+              <li>What remains uncertain and needs your confirmation</li>
+            </ul>
+          </div>
           <a href="/how-it-works.html">See how Baseline Design works <span aria-hidden="true">→</span></a>
         </div>
         <div className="baseline-card">
@@ -167,7 +195,7 @@ export function PublicLanding() {
         <div className="landing-section-heading">
           <div>
             <p className="landing-kicker">BRING A REAL QUESTION</p>
-            <h2 id="conversation-title">Keep the right context in view while you think.</h2>
+            <h2 id="conversation-title">Stay grounded in your foundation while a real question unfolds.</h2>
           </div>
           <p>
             Ask about a decision, relationship, behavior, family role, or part of yourself. Sovereign keeps your Baseline, selected people, and selected system distinct underneath the conversation.
@@ -228,7 +256,7 @@ export function PublicLanding() {
           <p className="landing-kicker">TWO PEOPLE · TWO BASELINES · ONE RELATIONSHIP</p>
           <h2 id="permission-title">Different processing is not the same as different care.</h2>
           <p>
-            Sovereign keeps each person’s way of processing visible, then explains what the difference may create between them—without deciding who is right.
+            Sovereign keeps each person’s way of processing visible, then shows what the difference may create between them—without turning difference into verdict.
           </p>
         </div>
         <div className="relationship-visual" aria-label="See the relationship from both sides.">
@@ -251,7 +279,7 @@ export function PublicLanding() {
           </article>
           <footer>
             <div><span>WHAT SOVEREIGN KEEPS DISTINCT</span><strong>Each person’s needs, limits, responsibility, and permission.</strong></div>
-            <div><span>WHAT THE RELATIONSHIP CAN PRACTICE</span><strong>A clear return time instead of forced immediacy or indefinite silence.</strong></div>
+            <div><span>WHAT THE RELATIONSHIP CAN PRACTICE</span><strong>Clear expectations instead of pressure, silence, or forced immediacy.</strong></div>
           </footer>
         </div>
       </section>
@@ -266,7 +294,7 @@ export function PublicLanding() {
         <div>
           <p className="landing-kicker">BUILD YOUR FOUNDATION · USE IT WHERE LIFE GETS COMPLICATED</p>
           <h2>Start with who you are. Expand only when the wider context matters.</h2>
-          <p>Explore your design, examine what fits, and understand the people and systems shaping your life.</p>
+          <p>Build your Baseline in a few guided steps, confirm what fits, and keep using it as your life grows more complex.</p>
         </div>
         <div className="landing-actions">
           <a className="landing-button landing-button-primary" href="/signup">Build my Baseline</a>

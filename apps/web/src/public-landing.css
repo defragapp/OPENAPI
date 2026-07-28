@@ -124,12 +124,12 @@ body:has(.sovereign-policy) {
 .landing-hero {
   display: grid;
   width: var(--public-shell);
-  min-height: 720px;
+  min-height: 680px;
   grid-template-columns: minmax(0, .92fr) minmax(470px, 1.08fr);
   align-items: center;
-  gap: clamp(48px, 7vw, 104px);
+  gap: clamp(42px, 6vw, 88px);
   margin: 0 auto;
-  padding: clamp(76px, 9vw, 126px) 0;
+  padding: clamp(66px, 8vw, 96px) 0 clamp(84px, 9vw, 116px);
 }
 
 .landing-copy { max-width: 640px; }
@@ -158,19 +158,19 @@ body:has(.sovereign-policy) {
 }
 
 .landing-copy h1 {
-  max-width: 10ch;
-  font-size: clamp(3.35rem, 5vw, 4.2rem);
+  max-width: 10.5ch;
+  font-size: clamp(3.15rem, 4.6vw, 4.05rem);
   line-height: .94;
 }
 
 .landing-lede {
   max-width: 57ch;
-  margin: 28px 0 0;
+  margin: 24px 0 0;
   color: #ddd7cd;
-  font-size: clamp(1.12rem, 1.5vw, 1.3rem);
+  font-size: clamp(1.08rem, 1.4vw, 1.24rem);
   line-height: 1.58;
 }
-
+ 
 .landing-support {
   max-width: 61ch;
   margin: 14px 0 0;
@@ -178,12 +178,49 @@ body:has(.sovereign-policy) {
   font-size: .98rem;
   line-height: 1.68;
 }
-
+ 
 .landing-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 30px;
+  margin-top: 28px;
+}
+
+.landing-hero-stack {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.landing-hero-stack article {
+  min-height: 126px;
+  padding: 16px 16px 18px;
+  border: 1px solid var(--public-line);
+  border-radius: 16px;
+  background: rgba(255,255,255,.025);
+}
+
+.landing-hero-stack span {
+  color: var(--public-clay-light);
+  font-size: .62rem;
+  font-weight: 780;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.landing-hero-stack strong {
+  display: block;
+  margin-top: 10px;
+  font-size: .95rem;
+  line-height: 1.35;
+}
+
+.landing-hero-stack p {
+  margin: 8px 0 0;
+  color: var(--public-muted);
+  font-size: .8rem;
+  line-height: 1.55;
 }
 
 .landing-button {
@@ -208,7 +245,7 @@ body:has(.sovereign-policy) {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 18px;
-  margin-top: 25px;
+  margin-top: 22px;
   color: var(--public-dim);
   font-size: .72rem;
 }
@@ -382,7 +419,7 @@ body:has(.sovereign-policy) {
 
 .intelligence-section,
 .conversation-section {
-  padding: clamp(90px, 11vw, 150px) max(24px, calc((100vw - 1220px) / 2));
+  padding: clamp(84px, 10vw, 128px) max(24px, calc((100vw - 1220px) / 2));
 }
 
 .intelligence-section {
@@ -397,16 +434,16 @@ body:has(.sovereign-policy) {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr);
   align-items: end;
-  gap: clamp(32px, 7vw, 100px);
-  margin-bottom: 48px;
+  gap: clamp(28px, 5vw, 70px);
+  margin-bottom: 40px;
 }
 
 .landing-section-heading h2,
 .baseline-copy h2,
 .permission-section h2,
 .landing-final-callout h2 {
-  max-width: 14ch;
-  font-size: clamp(2.7rem, 4.2vw, 3.8rem);
+  max-width: 13.5ch;
+  font-size: clamp(2.5rem, 3.8vw, 3.4rem);
   line-height: .98;
 }
 
@@ -447,18 +484,59 @@ body:has(.sovereign-policy) {
   width: var(--public-shell);
   grid-template-columns: minmax(0, .85fr) minmax(440px, 1.15fr);
   align-items: center;
-  gap: clamp(52px, 8vw, 120px);
+  gap: clamp(44px, 7vw, 92px);
   margin: 0 auto;
-  padding: clamp(100px, 12vw, 165px) 0;
+  padding: clamp(88px, 10vw, 132px) 0;
 }
 
 .baseline-copy > p:not(.landing-kicker) {
   max-width: 58ch;
-  margin: 22px 0 0;
+  margin: 20px 0 0;
   color: var(--public-muted);
   line-height: 1.72;
 }
 
+.baseline-provenance {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0 24px;
+  padding: 18px 19px 20px;
+  border: 1px solid var(--public-line);
+  border-radius: 18px;
+  background: rgba(255,255,255,.03);
+}
+
+.baseline-provenance > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px 14px;
+}
+
+.baseline-provenance span {
+  color: var(--public-clay-light);
+  font-size: .62rem;
+  font-weight: 780;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.baseline-provenance h3 {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.45;
+}
+
+.baseline-provenance ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0 0 0 18px;
+  color: var(--public-muted);
+  font-size: .9rem;
+  line-height: 1.55;
+}
+ 
 .baseline-copy > a {
   display: inline-flex;
   gap: 8px;
@@ -559,9 +637,9 @@ body:has(.sovereign-policy) {
   width: var(--public-shell);
   grid-template-columns: minmax(0, .8fr) minmax(480px, 1.2fr);
   align-items: center;
-  gap: clamp(52px, 8vw, 120px);
+  gap: clamp(44px, 7vw, 92px);
   margin: 0 auto;
-  padding: clamp(100px, 12vw, 160px) 0;
+  padding: clamp(88px, 10vw, 132px) 0;
 }
 
 .permission-section > div:first-child > p:not(.landing-kicker) { max-width: 54ch; margin: 24px 0 0; color: var(--public-muted); line-height: 1.72; }
@@ -603,12 +681,12 @@ body:has(.sovereign-policy) {
 .landing-final-callout {
   display: flex;
   width: var(--public-shell);
-  min-height: 520px;
+  min-height: 420px;
   align-items: center;
   justify-content: space-between;
-  gap: 50px;
+  gap: 42px;
   margin: 0 auto;
-  padding: 90px 0;
+  padding: 72px 0;
 }
 
 .landing-final-callout h2 { max-width: 13ch; }

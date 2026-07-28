@@ -6,9 +6,10 @@ export function BaselineOrbit({ compact = false }: { compact?: boolean }) {
       aria-label="Example of the Baseline Core used inside Sovereign.OS"
     >
       <header>
-        <div><span className="orbit-mark" aria-hidden="true" /><strong>YOUR BASELINE CORE</strong></div>
+        <div><span className="orbit-mark" aria-hidden="true" /><strong>YOUR BASELINE CORE · A REAL QUESTION</strong></div>
         <span>{compact ? 'PERSONAL FOUNDATION' : 'EXAMPLE · YOUR DESIGN WILL BE PERSONAL'}</span>
       </header>
+      {!compact && <p className="orbit-summary">A question activates the most relevant qualities, then shows how the interpretation connects back to your Baseline.</p>}
       <div className="orbit-map" aria-hidden="true">
         <div className="orbit-ring orbit-ring-outer" />
         <div className="orbit-ring orbit-ring-inner" />
@@ -29,7 +30,7 @@ export function BaselineOrbit({ compact = false }: { compact?: boolean }) {
             <p>Why do I feel responsible for everything, then disappear when I need support?</p>
           </article>
           <article className="orbit-answer">
-            <div><span>BASELINE CONNECTION</span><p>Self-direction can support courage and leadership. Under pressure, accepting help may feel like losing authority.</p></div>
+            <div><span>WHY THIS APPEARS</span><p>Self-direction can support courage and leadership. Under pressure, asking for help may feel like surrendering authority.</p></div>
             <div><span>WHAT TO EXAMINE</span><strong>What changes when support is shared without asking you to surrender your voice?</strong></div>
           </article>
         </>
