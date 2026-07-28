@@ -110,11 +110,28 @@ describe('inner recognition structured output', () => {
       module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
       visual_story: hiddenVisualStory,
       basis: { user_confirmed: true, ...emptyBasis },
+      provenance: { why_this_appears: 'The interpretation is based on the available context and the current limits of what is known.', based_on: ['Baseline Design'], unknowns: ['What remains unverified'], next_exploration: 'What feels most true today?' },
       confidence: 'supported',
       safety_mode: 'standard'
     });
     expect(response).toContain('WHAT THIS MAY BE SHOWING');
     expect(response).toContain('You can care without taking ownership of every outcome.');
+  });
+
+  it('normalizes a readable provenance layer for trust and uncertainty', () => {
+    const plan = parseRecognitionPlan(JSON.stringify({
+      response_phase: 'integration', recognition: 'You can care without taking ownership of every outcome.', inward_question: 'What is yours to choose?',
+      candidate_hidden_expectation: 'You may be carrying a responsibility that is larger than the choice in front of you.', protected_need: 'clarity',
+      clearer_form: 'Separate care from over-responsibility.', practical_action: 'Name what is yours to hold and what belongs elsewhere.',
+      module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
+      basis: { user_confirmed: true, ...emptyBasis },
+      provenance: { why_this_appears: 'This appears because your Baseline and current emphasis both point toward responsibility pressure.', based_on: ['Baseline Design', 'Current emphasis', 'User-confirmed experience'], unknowns: ['Whether the other person is also contributing'], next_exploration: 'What part of this feels most true today?' },
+      confidence: 'supported', safety_mode: 'standard'
+    }), emptyBasis);
+    expect(plan.provenance.why_this_appears).toContain('Baseline');
+    expect(plan.provenance.based_on).toEqual(['Baseline Design', 'Current emphasis', 'User-confirmed experience']);
+    expect(plan.provenance.unknowns).toEqual(['Whether the other person is also contributing']);
+    expect(plan.provenance.next_exploration).toContain('today');
   });
 
   it('requires a complete module offer and removes offers during grounding', () => {
@@ -145,6 +162,7 @@ describe('inner recognition structured output', () => {
       module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
       visual_story: hiddenVisualStory,
       basis: { user_confirmed: true, human_design: ['5/1'], gene_keys: ['16.1'], astrology: ['☾ Scorpio'], relationship: [], live: ['♃ Leo'], numerology: [] },
+      provenance: { why_this_appears: 'The interpretation is grounded in the available evidence and remains limited by the current context.', based_on: ['Baseline Design'], unknowns: ['What remains unverified'], next_exploration: 'What feels most true today?' },
       confidence: 'confirmed', safety_mode: 'grounded'
     });
     expect(response).toContain('BASIS · U✓');

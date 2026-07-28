@@ -156,6 +156,28 @@ Rules:
 - The main answer remains complete when the footer is hidden.
 - In grounded or escalate safety mode, symbolic details are removed from the footer; directly confirmed user experience may remain.
 
+## Provenance contract
+
+Every meaningful insight should explain why it appeared in plain language. The server validates a lightweight provenance block alongside the recognition plan:
+
+```ts
+provenance: {
+  why_this_appears: string;
+  based_on: string[];
+  unknowns: string[];
+  next_exploration: string;
+}
+```
+
+Rules:
+
+- `why_this_appears` explains the connection between Baseline Design, current emphasis, user-confirmed experience, and the interpretation without exposing raw calculations.
+- `based_on` contains short trusted labels such as `Baseline Design`, `Current emphasis`, `User-confirmed experience`, `Observed context`, or `AI interpretation`.
+- `unknowns` names what cannot be established from the evidence available in the thread.
+- `next_exploration` offers one short next question or lens, not a command.
+
+The structured intelligence UI can use this block to present a compact `WHY THIS APPEARS` section beneath the main interpretation and above the basis footer.
+
 ## Consent and relational use
 
 Plain-language pair comparison requires active `pair.compare` and `trait.display` permission.

@@ -13,6 +13,13 @@ type Basis = {
   numerology: string[];
 };
 
+type Provenance = {
+  why_this_appears: string;
+  based_on: string[];
+  unknowns: string[];
+  next_exploration: string;
+};
+
 type SovereignPlan = {
   response_phase: 'question' | 'integration';
   recognition: string;
@@ -24,6 +31,7 @@ type SovereignPlan = {
   confidence: 'confirmed' | 'supported' | 'exploratory';
   safety_mode: 'standard' | 'grounded' | 'escalate';
   basis: Basis;
+  provenance?: Provenance;
 };
 
 type FitCorrection = { value: 'yes' | 'partly' | 'not_today'; note?: string; createdAt: string };
@@ -131,6 +139,7 @@ export function StructuredIntelligenceLayer() {
   const basis = useMemo(() => detail ? basisItems(detail.plan.basis) : [], [detail]);
   if (!detail) return null;
   const plan = detail.plan;
+  const provenance = plan.provenance && [plan.provenance.why_this_appears, ...plan.provenance.based_on, ...plan.provenance.unknowns, plan.provenance.next_exploration].some((value) => value.trim()) ? plan.provenance : undefined;
   const title = detail.covenantEnabled
     ? `Covenant + ${detail.mode === 'alignment' ? 'Alignment' : 'Defrag'}`
     : detail.mode === 'alignment'
@@ -157,6 +166,7 @@ export function StructuredIntelligenceLayer() {
           <PlanSection label="WHAT SOVEREIGN NOTICED" value={plan.recognition} />
           {plan.response_phase === 'question' ? <PlanSection label="LOOK INWARD" value={plan.inward_question} featured /> : <><PlanSection label="WHAT THIS MAY BE SHOWING" value={plan.candidate_hidden_expectation || plan.recognition} /><PlanSection label="WHAT MAY BE PROTECTED" value={plan.protected_need} /><PlanSection label="A CLEARER FORM" value={plan.clearer_form} featured /><PlanSection label="PRACTICAL NEXT ACTION" value={plan.practical_action} /></>}
 
+          {provenance && <section className="structured-provenance"><header><p>WHY THIS APPEARS</p><h3>{provenance.why_this_appears || 'This response is presented as a possibility shaped by the available evidence.'}</h3></header>{provenance.based_on.length > 0 && <div className="structured-provenance-group"><h4>Based on</h4><ul>{provenance.based_on.map((item) => <li key={item}>{item}</li>)}</ul></div>}{provenance.unknowns.length > 0 && <div className="structured-provenance-group"><h4>Known unknowns</h4><ul>{provenance.unknowns.map((item) => <li key={item}>{item}</li>)}</ul></div>}{provenance.next_exploration && <div className="structured-provenance-group"><h4>Next exploration</h4><p>{provenance.next_exploration}</p></div>}</section>}
           <section className="structured-basis"><header><p>BASIS</p><h3>What this response was allowed to use</h3></header>{basis.length ? <div>{basis.map((item) => <span key={item}>{item}</span>)}</div> : <p>No framework basis was displayed. The response remains exploratory.</p>}</section>
           <section className="structured-limits"><p>LIMITS</p><h3>{limitTitle(plan)}</h3><span>{limitCopy(plan)}</span></section>
           {detail.covenantEnabled && <section className="structured-covenant"><p>COVENANT IS ACTIVE</p><h3>Scripture remains a separate lens.</h3><span>Christian teaching and retrieved biblical references may support reflection, but they do not establish God’s exact intent or override consent, safety, responsibility, or the user’s judgment.</span></section>}
@@ -175,13 +185,19 @@ function validPlan(value: unknown): value is SovereignPlan {
   if (!value || typeof value !== 'object') return false;
   const plan = value as Record<string, unknown>;
   const basis = plan.basis as Record<string, unknown> | undefined;
-  return ['question', 'integration'].includes(String(plan.response_phase)) && ['confirmed', 'supported', 'exploratory'].includes(String(plan.confidence)) && ['standard', 'grounded', 'escalate'].includes(String(plan.safety_mode)) && typeof plan.recognition === 'string' && typeof plan.inward_question === 'string' && typeof plan.candidate_hidden_expectation === 'string' && typeof plan.protected_need === 'string' && typeof plan.clearer_form === 'string' && typeof plan.practical_action === 'string' && Boolean(basis) && typeof basis?.user_confirmed === 'boolean' && ['human_design', 'gene_keys', 'astrology', 'relationship', 'live', 'numerology'].every((key) => Array.isArray(basis?.[key]));
+  return ['question', 'integration'].includes(String(plan.response_phase)) && ['confirmed', 'supported', 'exploratory'].includes(String(plan.confidence)) && ['standard', 'grounded', 'escalate'].includes(String(plan.safety_mode)) && typeof plan.recognition === 'string' && typeof plan.inward_question === 'string' && typeof plan.candidate_hidden_expectation === 'string' && typeof plan.protected_need === 'string' && typeof plan.clearer_form === 'string' && typeof plan.practical_action === 'string' && Boolean(basis) && typeof basis?.user_confirmed === 'boolean' && ['human_design', 'gene_keys', 'astrology', 'relationship', 'live', 'numerology'].every((key) => Array.isArray(basis?.[key])) && (plan.provenance === undefined || validProvenance(plan.provenance));
 }
 
 function validCorrection(value: unknown): value is FitCorrection {
   if (!value || typeof value !== 'object') return false;
   const correction = value as Record<string, unknown>;
   return ['yes', 'partly', 'not_today'].includes(String(correction.value)) && typeof correction.createdAt === 'string' && (correction.note === undefined || typeof correction.note === 'string');
+}
+
+function validProvenance(value: unknown): value is Provenance {
+  if (!value || typeof value !== 'object') return false;
+  const provenance = value as Record<string, unknown>;
+  return typeof provenance.why_this_appears === 'string' && Array.isArray(provenance.based_on) && Array.isArray(provenance.unknowns) && (provenance.next_exploration === undefined || typeof provenance.next_exploration === 'string');
 }
 
 function validSurface(value: unknown): value is string { return typeof value === 'string' && ['Today', 'Explore', 'People', 'Systems', 'Library', 'You'].includes(value); }

@@ -10,6 +10,13 @@ export const basisSelectionSchema = z.object({
   numerology: z.array(z.string().min(1)).max(6)
 });
 
+export const provenanceSchema = z.object({
+  why_this_appears: z.string().max(260),
+  based_on: z.array(z.string().min(1)).max(4),
+  unknowns: z.array(z.string().min(1)).max(4),
+  next_exploration: z.string().max(240)
+}).default({ why_this_appears: '', based_on: [], unknowns: [], next_exploration: '' });
+
 const archetypeIdSchema = z.enum(['fool', 'magician', 'three_of_cups', 'hermit', 'strength', 'tower']);
 const visualPhaseSchema = z.enum(['origin', 'shadow', 'gift']);
 const visualCardSchema = z.object({
@@ -63,12 +70,14 @@ export const recognitionPlanSchema = z.object({
   }),
   visual_story: visualStorySchema,
   basis: basisSelectionSchema,
+  provenance: provenanceSchema,
   confidence: z.enum(['confirmed', 'supported', 'exploratory']),
   safety_mode: z.enum(['standard', 'grounded', 'escalate'])
 });
 
 export type RecognitionPlan = z.infer<typeof recognitionPlanSchema>;
 export type BasisSelection = z.infer<typeof basisSelectionSchema>;
+export type RecognitionProvenance = z.infer<typeof provenanceSchema>;
 
 export type VisualStoryPayload = {
   story: RecognitionPlan['visual_story'];
@@ -167,6 +176,7 @@ export function parseRecognitionPlan(raw: string, available: AvailableBasis): Re
   parsed.practical_action = parsed.practical_action.trim();
   parsed.module_suggestion.title = parsed.module_suggestion.title.trim();
   parsed.module_suggestion.reason = parsed.module_suggestion.reason.trim();
+  parsed.provenance = normalizeProvenance(parsed.provenance);
   trimVisualStory(parsed.visual_story);
 
   for (const key of Object.keys(available) as BasisKey[]) {
@@ -217,6 +227,15 @@ function trimVisualStory(story: RecognitionPlan['visual_story']): void {
   story.current = story.current.trim();
   story.next_step = story.next_step.trim();
   story.visual_reason = story.visual_reason.trim();
+}
+
+function normalizeProvenance(provenance: RecognitionPlan['provenance']): RecognitionPlan['provenance'] {
+  return {
+    why_this_appears: provenance.why_this_appears.trim(),
+    based_on: provenance.based_on.map((item) => item.trim()).filter(Boolean).slice(0, 4),
+    unknowns: provenance.unknowns.map((item) => item.trim()).filter(Boolean).slice(0, 4),
+    next_exploration: provenance.next_exploration.trim()
+  };
 }
 
 function validateOrSuppressVisualStory(plan: RecognitionPlan): void {
@@ -308,6 +327,7 @@ export function recognitionJsonContract(_available: AvailableBasis): string {
       visual_reason: ''
     },
     basis: { user_confirmed: false, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
+    provenance: { why_this_appears: 'plain-language explanation of how the Baseline, current emphasis, confirmed experience, and interpretation fit together', based_on: ['Baseline Design', 'Current emphasis'], unknowns: ['What remains unverified'], next_exploration: 'a short next question or lens' },
     confidence: 'confirmed | supported | exploratory',
     safety_mode: 'standard | grounded | escalate'
   }, null, 2);

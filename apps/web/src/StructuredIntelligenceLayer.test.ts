@@ -17,6 +17,8 @@ describe('validated structured intelligence projection', () => {
     for (const field of ['response_phase', 'confidence', 'safety_mode', 'recognition', 'inward_question', 'candidate_hidden_expectation', 'protected_need', 'clearer_form', 'practical_action']) {
       expect(layer).toContain(field);
     }
+    expect(layer).toContain('WHY THIS APPEARS');
+    expect(layer).toContain('Known unknowns');
     expect(layer).toContain('What this response was allowed to use');
     expect(layer).toContain('No framework basis was displayed. The response remains exploratory.');
   });
