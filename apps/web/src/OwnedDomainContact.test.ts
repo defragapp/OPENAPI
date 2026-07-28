@@ -37,7 +37,7 @@ describe('owned-domain contact and transactional delivery', () => {
 
   it('triggers Cloudflare Builds for the exact current main SHA and verifies the live release', () => {
     expect(cloudflareWorkflow).toContain('/builds/triggers/${CF_TRIGGER_UUID}/builds');
-    expect(cloudflareWorkflow).toContain('"commit_hash":"${REQUESTED_SHA}"');
+    expect(cloudflareWorkflow).toContain('\\"commit_hash\\":\\"${REQUESTED_SHA}\\"');
     expect(cloudflareWorkflow).toContain('ready.migrationVersion === \'0011_email_code_recovery\'');
     expect(cloudflareWorkflow).toContain("ready.dependencies?.transactionalEmail === 'resend'");
     expect(cloudflareWorkflow).toContain('pnpm smoke:email');
