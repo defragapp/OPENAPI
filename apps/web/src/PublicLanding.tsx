@@ -81,7 +81,7 @@ export function PublicLanding() {
   }
 
   return (
-    <main className="sovereign-landing">
+    <main className="sovereign-landing" data-release-fingerprint="Understand yourself—and everyone your life includes.">
       <header className="landing-nav">
         <a className="landing-wordmark" href="/" aria-label="Sovereign.OS home">
           <span aria-hidden="true" />
