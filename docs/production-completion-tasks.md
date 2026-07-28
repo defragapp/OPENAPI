@@ -5,10 +5,11 @@ Updated after each completed implementation tranche.
 ## Current release baseline
 
 - Last fully verified production SHA: `c96ccd6966c6dbab3f0a336fa90b4fce591e7a5a`.
-- Unified account access and signed-in entry are merged to `main` at `67723c9285685a98338bdc66443348e44d729468`; Cloudflare promotion is pending exact-SHA verification.
-- Active implementation branch: `feat/public-support-and-structured-intelligence`.
-- GitHub-hosted Actions currently fail before allocating a runner or executing the first zero-dependency step. Cloudflare’s connected production build remains the executable release gate until that runner issue is resolved.
-- Remaining work is concentrated in passkey/provider readiness, live provider/domain verification, broader screenshot QA, and exact-SHA production promotion.
+- Current production source target: `3c03075d16297bfa1ce463212809127d51c2ea69`.
+- No implementation PR is open. `main` is the only release target.
+- Cloudflare build evidence for `70def2c58268bf0cdc3d066ebdd960091c1cf939` passed foundation, migrations, secret scanning, production fixture scanning, release configuration, production release verification, intelligence verification, visual intelligence verification, typecheck, and all 124 Worker tests. The two stale web-test failures were corrected and merged through PR #73 at `3c03075d16297bfa1ce463212809127d51c2ea69`.
+- GitHub-hosted Actions are intentionally absent. Cloudflare Workers Builds is the sole executable production release gate.
+- Remaining release work is live/provider verification: exact-SHA Cloudflare promotion, `/health` and `/ready`, sender-domain trust, Stripe lifecycle, deployed accessibility/visual QA, and account-level abuse/security review.
 
 ## Account access and communication
 
@@ -49,7 +50,7 @@ Updated after each completed implementation tranche.
 - [x] Keep the plain-language answer available when structured projection cannot load; no second model call or duplicate usage occurs.
 - [x] Keep hidden motive, exact emotion, diagnosis, future behavior, and divine certainty outside the structured result.
 - [x] Add structured projection, basis integrity, mode, Covenant, uncertainty, and fallback tests.
-- [ ] Remove the retired keyword-scoring helper from source after the Cloudflare build proves no remaining release verifier depends on it.
+- [ ] Remove the retired keyword-scoring helper from source after the exact-SHA Cloudflare release proves no remaining release verifier depends on it.
 
 ## User control and continuity
 
@@ -62,6 +63,7 @@ Updated after each completed implementation tranche.
 - [x] Return and visibly restore the latest fit correction and optional note with the thread.
 - [x] Return and render up to 20 account-scoped fit corrections as a correction-history timeline.
 - [x] Add visible account deletion with an explicit 14-day grace period and cancellation.
+- [x] Add branded, privacy-safe account-deletion scheduling and cancellation notifications.
 - [x] Add reusable modal focus trapping, first-focus placement, Escape behavior, and focus restoration.
 
 ## Premium visual and brand system
@@ -88,8 +90,8 @@ Updated after each completed implementation tranche.
 
 - [ ] Verify Resend/Cloudflare sender-domain alignment, SPF, DKIM, and DMARC in the live provider configuration.
 - [x] Use a consistent Sovereign.OS sender name, reply-to, support address, visual system, accessible HTML, and plain-text fallback.
-- [x] Add branded sign-in, signup, invitation, and resend templates.
-- [ ] Add branded permission-change, billing, cancellation, and account-deletion notifications.
+- [x] Add branded sign-in, signup, invitation, resend, account-deletion scheduling, and account-deletion cancellation templates.
+- [ ] Add branded permission-change, billing, and subscription-cancellation notifications.
 - [x] Keep security tokens only in the required private action URL and exclude private context and identifiers.
 - [x] Add content tests for HTML/text variants, escaping, unsafe URLs, resend privacy, and email-code privacy.
 
@@ -119,10 +121,11 @@ Updated after each completed implementation tranche.
 
 ## Release QA
 
-- [ ] Restore mandatory pull-request CI after the GitHub-hosted runner can execute its first step; two probes failed before allocation.
+- [x] Keep GitHub Actions absent while Cloudflare Workers Builds is the sole release path; do not reintroduce a workflow that violates the release-config gate.
 - [ ] Add automated route and visual-state screenshots at 1440, 1024, 768, 390, and 360 px.
 - [ ] Test increased text size, keyboard-only use, screen readers, high contrast, reduced motion, and safe areas in the deployed build.
 - [ ] Test the complete public → signup → email → onboarding → Free and paid flows.
 - [ ] Test invitation → consent → relationship → system inclusion → revocation → resend flows.
-- [ ] Run foundation, migrations, secrets, release configuration, typecheck, worker tests, web tests, builds, deploy dry-run, and live verification.
+- [x] Run foundation, migrations, secrets, release configuration, intelligence verification, visual intelligence verification, typecheck, and all 124 Worker tests for the prior release target; correct the two resulting stale web-test failures in PR #73.
+- [ ] Run the complete web test/build/deploy chain for the exact current `main` SHA.
 - [ ] Deploy only after reviewed diffs and exact-SHA health/readiness verification.
