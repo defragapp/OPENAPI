@@ -66,6 +66,7 @@ const baselineDimensions = [
 export function PublicLanding() {
   const [activeExample, setActiveExample] = useState(0);
   const [perspective, setPerspective] = useState<'mine' | 'theirs' | 'between'>('between');
+  const [exampleFit, setExampleFit] = useState<'yes' | 'partly' | 'no' | null>(null);
   const example = examples[activeExample]!;
 
   function moveExample(event: KeyboardEvent<HTMLButtonElement>, index: number) {
@@ -239,7 +240,17 @@ export function PublicLanding() {
               <div><dt>Unknown actual state</dt><dd>What is happening outside this example</dd></div>
             </dl>
           </details>
-          <div className="example-confirm" aria-label="Example correction controls"><span>Does this fit?</span><button type="button">Yes</button><button type="button">Partly</button><button type="button">No</button></div>
+          <div className="example-confirm" aria-label="Example correction controls">
+            <span>Does this example fit?</span>
+            {(['yes', 'partly', 'no'] as const).map((fit) => (
+              <button type="button" key={fit} aria-pressed={exampleFit === fit} onClick={() => setExampleFit(fit)}>{fit === 'yes' ? 'Yes' : fit === 'partly' ? 'Partly' : 'No'}</button>
+            ))}
+          </div>
+          <p className="example-continuity" role="status" aria-live="polite">
+            {exampleFit
+              ? `Example marked ${exampleFit === 'yes' ? 'as fitting' : exampleFit === 'partly' ? 'as partly fitting' : 'as not fitting'}. In your workspace, corrections are saved with the exploration and remain available to future context.`
+              : 'Example only. In your workspace, you can confirm or correct an insight and keep that understanding with the exploration.'}
+          </p>
           <footer>Examples show possibilities, not verdicts. Your experience remains yours to confirm, correct, or reject.</footer>
         </div>
       </section>

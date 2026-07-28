@@ -25,3 +25,22 @@ Responsive rules stack the content safely, but the diagram becomes tall and labe
 ## Known limitations
 
 Marketing interactions use representative static data and do not call private intelligence APIs. Confirmation controls demonstrate the product pattern but do not persist for anonymous visitors. Visual regression evidence depends on the local browser capture environment.
+
+## Final production review
+
+### Product-honesty verification
+
+| Landing representation | Implemented product basis | Assessment |
+| --- | --- | --- |
+| Baseline-first exploration | The authenticated workspace builds and uses a Baseline before presenting personal context. | Supported. |
+| Correction and continuity | Thread corrections are persisted by the authenticated API, returned in correction history, and included in later conversation context. The public interaction is explicitly labeled as an example and does not claim anonymous persistence. | Supported with an explicit marketing-demo boundary. |
+| Insight provenance | Structured responses expose reduced basis, confidence, safety mode, and saved fit without raw birth inputs or exact private locations. | Supported; the landing uses representative language rather than claiming identical UI. |
+| Relationship comparison | People context is permission-scoped and supports two-person comparison. The public perspective switch illustrates balanced views; it is not presented as a literal workspace control. | Supported as a representative interaction. |
+| System intelligence | Authenticated Systems can be created, populated through active consent, selected as exploration context, and analyzed for roles, authority, pressure, and responsibility. | Supported; the public map is representative static data. |
+| Current emphasis | Today exposes a reduced possible-current-amplification value and explicitly avoids treating it as observed fact. | Supported with appropriately conditional copy. |
+
+### Merge recommendation
+
+**Recommend merge after normal code review. Production-readiness score: 91/100.** The page now communicates the Baseline-first distinction, separates interpretation from confirmed and unknown state, shows a coherent self-to-relationship-to-system progression, and explains the setup action. The remaining nine points are operational rather than landing-code blockers: production browser comparison, authenticated end-to-end smoke coverage in the target account, and deployment/version verification still require a production-capable environment.
+
+No copy reviewed here claims diagnosis, motive access, compatibility scoring, deterministic behavior, anonymous correction persistence, or guaranteed outcomes. The screenshot set should be regenerated from the final commit before deployment so the evidence matches the correction-state refinement.

@@ -23,6 +23,7 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).toContain('Begin with how you work. See what life is asking of you.');
     expect(landing).toContain('Why this appears');
     expect(landing).toContain('PRESSURE CONCENTRATION');
+    expect(landing).toContain('corrections are saved with the exploration');
     expect(landing).toContain('Sovereign.OS turns your Baseline Design into private, explorable intelligence for choices, relationships, families, and teams.');
     expect(landing).toContain('Start with how you process, communicate, connect, decide, and respond under pressure.');
     expect(landing).toContain('Build my Baseline');
