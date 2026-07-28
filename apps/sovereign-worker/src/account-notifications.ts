@@ -51,7 +51,7 @@ export async function notifyAccountDeletionChange(
       details: scheduled
         ? [
             `Deletion is scheduled after a ${graceDays}-day grace period.`,
-            'Your active subscription will be cancelled before account deletion completes.',
+            'Any active subscription will be cancelled before account deletion completes.',
             'Cancelling during the grace period keeps your account and saved information in place.'
           ]
         : [
@@ -59,7 +59,9 @@ export async function notifyAccountDeletionChange(
             'Your current plan and account controls remain available.',
             'You can submit a new deletion request later from Account & Library.'
           ],
-      footer: 'Account deletion remains under your control during the grace period.'
+      footer: scheduled
+        ? 'Account deletion remains under your control during the grace period.'
+        : 'Your account remains active unless you submit and approve a new deletion request.'
     });
 
     await sendOperationalEmail(env, {
