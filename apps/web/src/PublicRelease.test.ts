@@ -30,15 +30,24 @@ describe('public production release surfaces', () => {
     expect(sitemap).not.toContain('/app');
   });
 
-  it('does not hide mobile public navigation links', () => {
-    expect(landingCss).toContain('.landing-nav nav a:not(.landing-nav-cta){display:inline-flex');
-    expect(staticCss).toContain('.launch-links a:not(.launch-cta){display:inline-flex');
-    expect(staticCss).toContain('overflow-x:auto');
+  it('keeps every mobile public destination visible without a hidden horizontal scroller', () => {
+    expect(landingCss).toContain('repeat(auto-fit, minmax(78px, 1fr))');
+    expect(landingCss).toContain('.landing-nav nav a:not(.landing-nav-cta)');
+    expect(landingCss).not.toContain('overflow-x: auto');
+    expect(staticCss).toContain('repeat(auto-fit, minmax(78px, 1fr))');
+    expect(staticCss).toContain('.launch-links a:not(.launch-cta)');
+    expect(staticCss).not.toContain('overflow-x: auto');
+  });
+
+  it('labels authenticated mobile navigation as a menu instead of an unexplained mark', () => {
+    expect(brandCss).toContain('content: "Menu"');
+    expect(brandCss).toContain('min-width: 86px');
+    expect(brandCss).toContain('min-height');
   });
 
   it('uses the orbit-derived mark consistently', () => {
-    expect(brandCss).toContain('.landing-wordmark>span::before');
-    expect(brandCss).toContain('.intelligence-brand>span::before');
+    expect(brandCss).toContain('.landing-wordmark > span::before');
+    expect(brandCss).toContain('.intelligence-brand > span::before');
     expect(brandCss).toContain('.response-mark::before');
     expect(brandCss).toContain('.account-control-trigger::before');
   });
