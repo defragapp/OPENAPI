@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const mobile = readFileSync(new URL('./ios-production-refinement.css', import.meta.url), 'utf8');
+const refinement = readFileSync(new URL('./brand-landing-refinement.css', import.meta.url), 'utf8');
 const staticRelease = readFileSync(new URL('../public/static-release.css', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const account = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
@@ -10,7 +11,9 @@ const account = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
 describe('production iOS and responsive experience', () => {
   it('loads the final production refinement after the established design layers', () => {
     expect(main).toContain("import './ios-production-refinement.css'");
+    expect(main).toContain("import './brand-landing-refinement.css'");
     expect(main.indexOf("import './ios-production-refinement.css'")).toBeGreaterThan(main.indexOf("import './sovereign-brand.css'"));
+    expect(main.indexOf("import './brand-landing-refinement.css'")).toBeGreaterThan(main.indexOf("import './ios-production-refinement.css'"));
   });
 
   it('keeps every authenticated surface thumb reachable on small screens', () => {
@@ -39,6 +42,16 @@ describe('production iOS and responsive experience', () => {
     expect(mobile).toContain('.account-points');
   });
 
+  it('removes pill-shaped text controls on iOS while preserving circular icon controls', () => {
+    expect(refinement).toContain('.mobile-nav-trigger');
+    expect(refinement).toContain('.composer-context-button');
+    expect(refinement).toContain('.account-control-trigger');
+    expect(refinement).toContain('border-radius: 11px !important;');
+    expect(refinement).toContain('.composer-send');
+    expect(refinement).toContain('border-radius: 50% !important;');
+    expect(staticRelease).toContain('border-radius: 11px;');
+  });
+
   it('keeps static public navigation visible and readable without horizontal discovery', () => {
     expect(staticRelease).toContain('repeat(auto-fit, minmax(78px, 1fr))');
     expect(staticRelease).toContain('font-size: .84rem;');
@@ -49,5 +62,6 @@ describe('production iOS and responsive experience', () => {
   it('retains contrast and reduced-motion accommodations', () => {
     expect(mobile).toContain('@media (prefers-contrast: more)');
     expect(mobile).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(refinement).toContain('@media (prefers-reduced-motion: reduce)');
   });
 });

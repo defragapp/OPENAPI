@@ -16,10 +16,11 @@ const workspace = read('apps/web/src/SovereignWorkspace.tsx');
 const workspaceCss = read('apps/web/src/workspace-chat.css');
 const orbit = read('apps/web/src/BaselineOrbit.tsx');
 const orbitCss = read('apps/web/src/baseline-orbit.css');
+const refinementCss = read('apps/web/src/brand-landing-refinement.css');
 const serviceWorker = read('apps/web/public/sw.js');
 const prompt = read('apps/sovereign-worker/src/agent/prompt-v1.ts');
 
-containsAll('web index', index, ['/src/main.tsx']);
+containsAll('web index', index, ['/src/main.tsx', '/app-icon.svg', '/safari-pinned-tab.svg']);
 for (const retired of ['intelligence-ui.js', 'ux-audit-runtime.js', 'recognition-ui.js', 'archetype-clarity.js']) {
   assert(!index.includes(retired), `Legacy DOM runtime remains active: ${retired}`);
 }
@@ -48,17 +49,25 @@ containsAll('workspace stylesheet', workspaceCss, [
 ]);
 
 containsAll('Baseline visual', orbit, [
-  'YOUR BASELINE',
-  'SHADOW',
-  'LIGHT',
-  'ALIGNED',
-  'One quality'
+  'YOUR BASELINE CORE',
+  'HOW YOU PROCESS',
+  'UNDER PRESSURE',
+  'CLEARER EXPRESSION',
+  'CURRENT EMPHASIS',
+  'steady Baseline'
 ]);
 containsAll('Baseline visual stylesheet', orbitCss, [
   '.baseline-orbit',
   '.orbit-node-core',
   '.orbit-node-aligned',
   '@media (max-width: 700px)',
+  '@media (prefers-reduced-motion: reduce)'
+]);
+containsAll('final brand and landing refinement', refinementCss, [
+  "url('/brand-mark.svg')",
+  '.relationship-visual',
+  '.orbit-layer-key',
+  'border-radius: 11px !important;',
   '@media (prefers-reduced-motion: reduce)'
 ]);
 
@@ -77,11 +86,12 @@ containsAll('Baseline-first agent prompt', prompt, [
 
 assert(!prompt.includes('Unless the current message clearly answers a prior inward question'), 'Incident-first prompt language remains active.');
 assert(!workspace.match(/compatibility percentage|numerical score|private thoughts are known/i), 'Disallowed certainty or scoring language is present.');
-assert(serviceWorker.includes('sovereign-public-v8'), 'Service worker cache version was not advanced.');
+assert(serviceWorker.includes('sovereign-public-v9'), 'Service worker cache version was not advanced.');
+assert(serviceWorker.includes("'/brand-mark.svg'"), 'Unified brand mark is not part of the public shell.');
 assert(!serviceWorker.includes("'/app'"), 'Private workspace navigation must not be cached.');
 assert(!serviceWorker.includes("'/intelligence-ui.js'"), 'Retired visual runtime remains cached.');
 
-for (const [label, css] of [['workspace', workspaceCss], ['Baseline visual', orbitCss]]) {
+for (const [label, css] of [['workspace', workspaceCss], ['Baseline visual', orbitCss], ['brand refinement', refinementCss]]) {
   const openBraces = (css.match(/{/g) ?? []).length;
   const closeBraces = (css.match(/}/g) ?? []).length;
   assert(openBraces === closeBraces, `${label} CSS has unbalanced braces (${openBraces}/${closeBraces}).`);
@@ -89,8 +99,8 @@ for (const [label, css] of [['workspace', workspaceCss], ['Baseline visual', orb
 
 console.log(JSON.stringify({
   ok: true,
-  contract: 'conversation-first-baseline-intelligence-v2',
-  assets: ['SovereignWorkspace.tsx', 'BaselineOrbit.tsx'],
+  contract: 'conversation-first-baseline-intelligence-v3',
+  assets: ['SovereignWorkspace.tsx', 'BaselineOrbit.tsx', 'brand-mark.svg'],
   agentFlow: 'baseline-first',
   responsive: true,
   reducedMotion: true,

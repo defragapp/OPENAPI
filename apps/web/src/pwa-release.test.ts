@@ -5,17 +5,22 @@ const manifest = JSON.parse(readFileSync(new URL('../public/manifest.webmanifest
 const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const icon = readFileSync(new URL('../public/app-icon.svg', import.meta.url), 'utf8');
+const brandMark = readFileSync(new URL('../public/brand-mark.svg', import.meta.url), 'utf8');
 
 describe('release PWA surface', () => {
-  it('provides installable metadata and an application icon', () => {
+  it('provides installable metadata and one consistent application mark', () => {
     expect(manifest.name).toBe('Sovereign.OS');
     expect(manifest.scope).toBe('/');
     expect(manifest.icons).toEqual(expect.arrayContaining([
       expect.objectContaining({ src: '/app-icon.svg', type: 'image/svg+xml' })
     ]));
     expect(index).toContain('rel="icon" href="/app-icon.svg"');
+    expect(index).toContain('rel="apple-touch-icon" href="/app-icon.svg"');
+    expect(index).toContain('rel="mask-icon" href="/safari-pinned-tab.svg"');
     expect(icon).toContain('<svg');
     expect(icon).toContain('viewBox="0 0 512 512"');
+    expect(icon).toContain('A central point held by three open layers');
+    expect(brandMark).toContain('viewBox="0 0 48 48"');
   });
 
   it('never caches authenticated navigation or API requests', () => {
@@ -27,6 +32,8 @@ describe('release PWA surface', () => {
   });
 
   it('limits runtime caching to declared public and compiled assets', () => {
+    expect(serviceWorker).toContain('sovereign-public-v9');
+    expect(serviceWorker).toContain("'/brand-mark.svg'");
     expect(serviceWorker).toContain('PUBLIC_ASSETS.has(url.pathname)');
     expect(serviceWorker).toContain("url.pathname.startsWith('/assets/')");
     expect(serviceWorker).not.toContain('request.destination');

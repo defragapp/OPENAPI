@@ -12,18 +12,20 @@ const launchCss = readFileSync(new URL('../public/launch.css', import.meta.url),
 const launchPolishCss = readFileSync(new URL('../public/launch-polish.css', import.meta.url), 'utf8');
 const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
 const baselineCss = readFileSync(new URL('./baseline-orbit.css', import.meta.url), 'utf8');
+const refinementCss = readFileSync(new URL('./brand-landing-refinement.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const icon = readFileSync(new URL('../public/app-icon.svg', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
 describe('Sovereign.OS public experience', () => {
   it('makes the product unmistakable in the first viewport', () => {
-    expect(landing).toContain('Understand yourself—and everyone your life includes.');
-    expect(landing).toContain('Sovereign.OS turns your Baseline Design into a private AI for personal, relationship, and system intelligence.');
-    expect(landing).toContain('Baseline Design is your personal starting point: an explorable view of your qualities, needs, strengths, shadow and light, and alignment.');
-    expect(landing).toContain('Start free');
-    expect(index).toContain('Sovereign.OS turns Baseline Design into a private AI');
-    expect(index).toContain('Personal, relationship, and system intelligence');
+    expect(landing).toContain('Know yourself. Understand the people around you. See the whole system.');
+    expect(landing).toContain('Sovereign.OS turns your Baseline Design into private, explorable intelligence for choices, relationships, families, and teams.');
+    expect(landing).toContain('Start with how you process, communicate, connect, decide, and respond under pressure.');
+    expect(landing).toContain('Build my Baseline');
+    expect(index).toContain('Personal intelligence for real life');
+    expect(index).toContain('Private personal, relationship, and system intelligence');
   });
 
   it('explains the complete Baseline-first platform in direct language', () => {
@@ -31,8 +33,8 @@ describe('Sovereign.OS public experience', () => {
       'Baseline Design',
       'shadow and light',
       'alignment',
-      'See the relationship from both sides',
-      'Understand how the whole group functions',
+      'See where two people differ.',
+      'See how the whole group works.',
       'Covenant'
     ]) expect(publicCopy).toContain(phrase);
     expect(publicCopy).not.toMatch(/healing journey|observatory|signal map|hidden motive revealed|diagnose the relationship/i);
@@ -40,13 +42,17 @@ describe('Sovereign.OS public experience', () => {
 
   it('keeps the landing concise and visually demonstrative', () => {
     expect((landing.match(/<section/g) ?? []).length).toBeLessThanOrEqual(7);
-    for (const label of ['BASELINE DESIGN', 'APPLY IT ANYWHERE', 'RELATIONSHIPS · FAMILIES · TEAMS']) {
+    for (const label of ['BASELINE DESIGN', 'BRING A REAL QUESTION', 'TWO PEOPLE · TWO BASELINES · ONE RELATIONSHIP']) {
       expect(landing).toContain(label);
     }
-    expect(landing).toContain('Start with you. Expand when the wider system matters.');
+    expect(landing).toContain('Start with who you are. Expand only when the wider context matters.');
     expect(landing).toContain('<BaselineOrbit />');
+    expect(landing).toContain('className="relationship-visual"');
     for (const selector of ['.baseline-orbit', '.orbit-node-core', '.orbit-node-aligned']) {
       expect(baselineCss).toContain(selector);
+    }
+    for (const selector of ['.relationship-visual', '.relationship-person', '.orbit-layer-key']) {
+      expect(refinementCss).toContain(selector);
     }
   });
 
@@ -63,6 +69,15 @@ describe('Sovereign.OS public experience', () => {
     for (const selector of ['.baseline-card', '.example-tabs', '.example-thread', '.example-sovereign']) {
       expect(landingCss).toContain(selector);
     }
+  });
+
+  it('uses one consistent, non-letterform brand mark', () => {
+    expect(index).toContain('rel="icon" href="/app-icon.svg"');
+    expect(index).toContain('rel="mask-icon" href="/safari-pinned-tab.svg"');
+    expect(icon).toContain('A central point held by three open layers');
+    expect(refinementCss).toContain("url('/brand-mark.svg')");
+    expect(refinementCss).toContain('.landing-wordmark > span');
+    expect(refinementCss).toContain('.intelligence-brand > span');
   });
 
   it('keeps pricing, privacy, permission, and authority explicit', () => {
@@ -85,6 +100,7 @@ describe('Sovereign.OS public experience', () => {
     expect(main).toContain("location.pathname === '/'");
     expect(main).toContain('<PublicLanding />');
     expect(main).toContain('<PublicPolicy kind={publicPolicyKind} />');
+    expect(main).toContain("import './brand-landing-refinement.css'");
     expect(main).not.toContain('ProductLanguageRuntime');
     expect(index).not.toContain('/public-site.js');
     expect(index).not.toContain('/intelligence-ui.js');

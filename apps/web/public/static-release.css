@@ -1,6 +1,12 @@
 .launch-wordmark::before {
   position: relative;
-  box-shadow: 0 0 0 7px rgba(185, 111, 72, .07), inset 0 0 0 1px rgba(255, 255, 255, .08);
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: url('/brand-mark.svg') center / contain no-repeat;
+  box-shadow: none;
+  color: transparent;
+  content: '';
 }
 
 .launch-kicker,
@@ -19,6 +25,14 @@
 .billing-note p,
 .launch-footer {
   font-size: .9rem;
+}
+
+.launch-button,
+.launch-links a,
+.launch-cta,
+.price-card .launch-button,
+.launch-callout .launch-button {
+  border-radius: 12px;
 }
 
 @media (max-width: 680px) {
@@ -45,7 +59,7 @@
     justify-content: center;
     padding: 8px 6px;
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: 11px;
     background: rgba(255, 253, 248, .42);
     font-size: .84rem;
     line-height: 1.2;
@@ -57,6 +71,13 @@
     margin-left: 0;
     border-color: var(--forest);
     font-size: .9rem;
+  }
+
+  .launch-button,
+  .launch-callout .launch-button,
+  .price-card .launch-button {
+    min-height: 48px;
+    border-radius: 11px;
   }
 
   .launch-kicker,
@@ -78,43 +99,21 @@
     line-height: 1.58;
   }
 
-  .launch-hero {
-    padding-top: 46px;
-  }
+  .launch-hero { padding-top: 46px; }
 
   .launch-hero > p,
-  .launch-hero > div > p:not(.launch-kicker) {
-    font-size: 1.04rem;
-  }
-
-  .launch-section {
-    padding-block: 60px;
-  }
-
-  .launch-band {
-    padding-block: 62px;
-  }
+  .launch-hero > div > p:not(.launch-kicker) { font-size: 1.04rem; }
+  .launch-section { padding-block: 60px; }
+  .launch-band { padding-block: 62px; }
 }
 
 @media (max-width: 420px) {
-  .launch-shell {
-    width: min(100% - 20px, 1180px);
-  }
-
-  .launch-links {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 5px;
-  }
-
+  .launch-shell { width: min(100% - 20px, 1180px); }
+  .launch-links { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
   .launch-links a,
-  .launch-links a:not(.launch-cta) {
-    padding-inline: 4px;
-    font-size: .82rem;
-  }
+  .launch-links a:not(.launch-cta) { padding-inline: 4px; font-size: .82rem; }
 }
 
 @media (prefers-contrast: more) {
-  .launch-links a {
-    border-color: rgba(23, 32, 29, .35);
-  }
+  .launch-links a { border-color: rgba(23, 32, 29, .35); }
 }

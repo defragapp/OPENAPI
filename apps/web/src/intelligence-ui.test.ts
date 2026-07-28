@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignWorkspace.tsx', import.meta.url), 'utf8');
 const styles = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
+const refinement = readFileSync(new URL('./brand-landing-refinement.css', import.meta.url), 'utf8');
 const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
 const prompt = readFileSync(new URL('../../sovereign-worker/src/agent/prompt-v1.ts', import.meta.url), 'utf8');
 
@@ -41,6 +42,7 @@ describe('conversation-first Baseline intelligence', () => {
     expect(styles).toContain('env(safe-area-inset-bottom)');
     expect(styles).toContain('.conversation-shell');
     expect(styles).toContain('.workspace-context-panel');
+    expect(refinement).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
   it('keeps the agent Baseline-first and user-correctable', () => {
@@ -90,7 +92,8 @@ describe('conversation-first Baseline intelligence', () => {
   });
 
   it('advances the public cache without caching private workspace assets', () => {
-    expect(serviceWorker).toContain("sovereign-public-v8");
+    expect(serviceWorker).toContain('sovereign-public-v9');
+    expect(serviceWorker).toContain("'/brand-mark.svg'");
     expect(serviceWorker).not.toContain("'/intelligence-ui.js'");
     expect(serviceWorker).not.toContain("'/ux-audit-runtime.js'");
     expect(serviceWorker).not.toContain("'/app'");

@@ -2,12 +2,12 @@
   "id": "/",
   "name": "Sovereign.OS",
   "short_name": "Sovereign",
-  "description": "Personal and relational intelligence powered by Baseline Design for self, relationships, and human systems.",
+  "description": "Private personal, relationship, and system intelligence powered by Baseline Design.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0a0c",
-  "theme_color": "#0a0a0c",
+  "background_color": "#101011",
+  "theme_color": "#101011",
   "categories": ["lifestyle", "productivity"],
   "icons": [
     {
@@ -19,9 +19,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Open Sovereign",
+      "name": "Open Sovereign.OS",
       "short_name": "Open",
-      "description": "Open the private Sovereign.OS workspace.",
+      "description": "Open your private Sovereign.OS intelligence environment.",
       "url": "/app",
       "icons": [{ "src": "/app-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
