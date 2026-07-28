@@ -99,6 +99,10 @@ export function PublicLanding() {
       <section className="landing-hero">
         <div className="landing-copy">
           <p className="landing-kicker">PERSONAL INTELLIGENCE FOR REAL LIFE</p>
+          <div className="landing-hero-intro">
+            <span>STARTS WITH YOUR BASELINE</span>
+            <strong>A question activates what matters, an insight appears, and the basis stays visible.</strong>
+          </div>
           <h1>Build a foundation for yourself, then use it where life gets complicated.</h1>
           <p className="landing-lede">
             Know yourself. Understand the people around you. See the whole system.
@@ -154,7 +158,13 @@ export function PublicLanding() {
           </div>
         </div>
 
-        <BaselineOrbit />
+        <div className="landing-hero-visual">
+          <div className="landing-hero-visual-head">
+            <span>PRODUCT DEMO</span>
+            <strong>Visible intelligence from your Baseline to the next step.</strong>
+          </div>
+          <BaselineOrbit />
+        </div>
       </section>
 
       <section className="intelligence-section" id="product-example" aria-labelledby="intelligence-title">
