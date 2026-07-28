@@ -1,14 +1,15 @@
 name: Trigger Cloudflare production build
 
+# GitHub-hosted runners are currently unavailable for this account and fail
+# before step one. Automatic production builds are owned by the connected
+# Cloudflare Workers Builds project. This workflow remains a manual fallback.
 on:
   workflow_dispatch:
     inputs:
       target_sha:
-        description: Exact main commit SHA to build
+        description: Exact current main commit SHA to build
         required: false
         type: string
-  push:
-    branches: [main]
 
 permissions:
   contents: read
@@ -19,7 +20,6 @@ concurrency:
 
 jobs:
   trigger-and-verify:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[cloudflare-build]')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -28,7 +28,6 @@ jobs:
       CF_TOKEN_BUILDS: ${{ secrets.CLOUDFLARE_BUILDS_API_TOKEN }}
       CF_TOKEN_PRIMARY: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CF_TOKEN_LEGACY: ${{ secrets.CF_API_TOKEN }}
-      CF_DEPLOY_HOOK_URL: ${{ secrets.SOVV_WEB_DEPLOY_HOOK }}
       REQUESTED_SHA: ${{ inputs.target_sha || github.sha }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       EMAIL_SMOKE_TEST_RECIPIENT: ${{ secrets.EMAIL_SMOKE_TEST_RECIPIENT }}
@@ -43,6 +42,7 @@ jobs:
           fetch-depth: 2
 
       - name: Validate release target
+        id: release
         shell: bash
         run: |
           set -euo pipefail
@@ -57,7 +57,6 @@ jobs:
             exit 1
           fi
           echo "target_sha=$REQUESTED_SHA" >> "$GITHUB_OUTPUT"
-        id: release
 
       - name: Trigger exact Cloudflare Workers Build
         id: cloudflare
@@ -65,32 +64,22 @@ jobs:
         run: |
           set -euo pipefail
           CF_TOKEN="${CF_TOKEN_BUILDS:-${CF_TOKEN_PRIMARY:-${CF_TOKEN_LEGACY:-}}}"
-          if [[ -n "$CF_TOKEN" ]]; then
-            RESPONSE="$(curl --silent --show-error --fail-with-body --retry 3 --retry-all-errors \
-              --request POST \
-              --url "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/builds/triggers/${CF_TRIGGER_UUID}/builds" \
-              --header "Authorization: Bearer ${CF_TOKEN}" \
-              --header "Content-Type: application/json" \
-              --data "{\"branch\":\"main\",\"commit_hash\":\"${REQUESTED_SHA}\"}")"
-            echo "trigger_method=builds_api" >> "$GITHUB_OUTPUT"
-            echo "cf_token_available=true" >> "$GITHUB_OUTPUT"
-          elif [[ -n "$CF_DEPLOY_HOOK_URL" ]]; then
-            RESPONSE="$(curl --silent --show-error --fail-with-body --retry 3 --retry-all-errors \
-              --request POST \
-              --url "$CF_DEPLOY_HOOK_URL")"
-            echo "trigger_method=deploy_hook" >> "$GITHUB_OUTPUT"
-            echo "cf_token_available=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "::error::No Cloudflare Builds API token or protected deploy hook is configured in GitHub secrets."
+          if [[ -z "$CF_TOKEN" ]]; then
+            echo "::error::A Cloudflare Builds API token is required for the manual fallback."
             exit 1
           fi
+          RESPONSE="$(curl --silent --show-error --fail-with-body --retry 3 --retry-all-errors \
+            --request POST \
+            --url "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/builds/triggers/${CF_TRIGGER_UUID}/builds" \
+            --header "Authorization: Bearer ${CF_TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data "{\"branch\":\"main\",\"commit_hash\":\"${REQUESTED_SHA}\"}")"
           printf '%s' "$RESPONSE" > cloudflare-trigger.json
           BUILD_UUID="$(node -e "const p=JSON.parse(require('fs').readFileSync('cloudflare-trigger.json','utf8')); if(!p.success||!p.result?.build_uuid){console.error(JSON.stringify(p.errors||p));process.exit(1)}; process.stdout.write(p.result.build_uuid)")"
           echo "build_uuid=$BUILD_UUID" >> "$GITHUB_OUTPUT"
           echo "Cloudflare build UUID: $BUILD_UUID"
 
       - name: Monitor Cloudflare build and print failure logs
-        if: steps.cloudflare.outputs.cf_token_available == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -115,13 +104,11 @@ jobs:
               curl --silent --show-error --fail-with-body \
                 --url "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/builds/builds/${BUILD_UUID}/logs" \
                 --header "Authorization: Bearer ${CF_TOKEN}" > cloudflare-build-logs.json || true
-              node <<'NODE'
+              node - <<'NODE'
           const fs = require('fs');
           if (!fs.existsSync('cloudflare-build-logs.json')) process.exit(0);
           const payload = JSON.parse(fs.readFileSync('cloudflare-build-logs.json', 'utf8'));
-          for (const line of payload.result?.lines ?? []) {
-            console.error(Array.isArray(line) ? line.join(' ') : String(line));
-          }
+          for (const line of payload.result?.lines ?? []) console.error(Array.isArray(line) ? line.join(' ') : String(line));
           NODE
               echo "::error::Cloudflare build stopped with outcome $OUTCOME."
               exit 1
@@ -143,7 +130,7 @@ jobs:
               "https://app.defrag.app/health" > app-health.json || true
             curl --silent --show-error --fail --retry 2 --retry-all-errors \
               "https://app.defrag.app/ready" > app-ready.json || true
-            if node <<'NODE'
+            if node - <<'NODE'
           const fs = require('fs');
           const target = process.env.REQUESTED_SHA;
           const read = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -185,7 +172,6 @@ jobs:
           grep -q 'Sovereign.OS' login.html
 
       - name: Install release dependencies for email verification
-        shell: bash
         run: |
           set -euo pipefail
           corepack enable
@@ -196,7 +182,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ -z "$RESEND_API_KEY" ]]; then
-            echo "::error::RESEND_API_KEY is not configured as a GitHub Actions secret, so a confirmed delivery test cannot run."
+            echo "::error::RESEND_API_KEY is not configured, so a confirmed delivery test cannot run."
             exit 1
           fi
           pnpm smoke:email | tee email-smoke.json
@@ -217,29 +203,3 @@ jobs:
             app-health.json
             app-ready.json
             email-smoke.json
-
-      - name: Write release summary
-        if: always()
-        shell: bash
-        run: |
-          {
-            echo '## Sovereign.OS production release'
-            echo
-            echo "- Target SHA: \`$REQUESTED_SHA\`"
-            echo "- Cloudflare build UUID: \`${{ steps.cloudflare.outputs.build_uuid }}\`"
-            echo "- Trigger: \`${{ steps.cloudflare.outputs.trigger_method }}\`"
-            if [[ -f app-ready.json ]]; then
-              echo '- Readiness:'
-              echo '```json'
-              cat app-ready.json
-              echo
-              echo '```'
-            fi
-            if [[ -f email-smoke.json ]]; then
-              echo '- Email delivery:'
-              echo '```json'
-              cat email-smoke.json
-              echo
-              echo '```'
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
