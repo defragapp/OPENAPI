@@ -5,7 +5,7 @@ import { SovereignWorkspace } from './SovereignWorkspace';
 
 type ConsentDecision = 'granted' | 'denied';
 type TurnstileState = 'loading' | 'ready' | 'verified' | 'expired' | 'error' | 'unsupported';
-type FieldErrors = Partial<Record<'email' | 'name' | 'terms' | 'turnstile', string>>;
+type FieldErrors = Partial<Record<'email' | 'name' | 'terms' | 'turnstile', string | undefined>>;
 
 const consentScopes = [
   ['pair.compare', 'Compare together'],
@@ -393,6 +393,6 @@ function scopeDescription(scope: string): string {
   return consentScopeDescriptions[scope] ?? 'Use only the context covered by this permission.';
 }
 
-function Field({ label, children, error }: { label: string; children: ReactNode; error?: string }) {
+function Field({ label, children, error }: { label: string; children: ReactNode; error?: string | undefined }) {
   return <label className={`field ${error ? 'has-error' : ''}`}><span>{label}</span>{children}{error && <small className="field-error">{error}</small>}</label>;
 }
