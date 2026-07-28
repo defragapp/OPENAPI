@@ -65,6 +65,7 @@ const baselineDimensions = [
 
 export function PublicLanding() {
   const [activeExample, setActiveExample] = useState(0);
+  const [perspective, setPerspective] = useState<'mine' | 'theirs' | 'between'>('between');
   const example = examples[activeExample]!;
 
   function moveExample(event: KeyboardEvent<HTMLButtonElement>, index: number) {
@@ -98,13 +99,13 @@ export function PublicLanding() {
 
       <section className="landing-hero">
         <div className="landing-copy">
-          <p className="landing-kicker">PERSONAL INTELLIGENCE FOR REAL LIFE</p>
-          <h1>Know yourself. Understand the people around you. See the whole system.</h1>
+          <p className="landing-kicker">A PERSONAL INTELLIGENCE FOUNDATION</p>
+          <h1>Begin with how you work. See what life is asking of you.</h1>
           <p className="landing-lede">
-            Sovereign.OS turns your Baseline Design into private, explorable intelligence for choices, relationships, families, and teams.
+            Sovereign builds a structured Baseline Design around you—then applies it to choices, relationships, families, and teams.
           </p>
           <p className="landing-support">
-            Start with how you process, communicate, connect, decide, and respond under pressure. Add another person or a whole system only when it matters.
+            Unlike an assistant that starts with a blank prompt, Sovereign keeps your steady tendencies distinct from current pressure, what you confirm, and what remains unknown.
           </p>
           <div className="landing-actions">
             <a className="landing-button landing-button-primary" href="/signup">Build my Baseline</a>
@@ -120,6 +121,12 @@ export function PublicLanding() {
         <BaselineOrbit />
       </section>
 
+      <section className="foundation-difference" aria-label="What makes Sovereign different">
+        <p>A normal assistant starts with <strong>a blank prompt.</strong></p>
+        <span aria-hidden="true">→</span>
+        <p>Sovereign starts with <strong>your personal foundation.</strong></p>
+      </section>
+
       <section className="intelligence-section" id="product-example" aria-labelledby="intelligence-title">
         <div className="landing-section-heading">
           <div>
@@ -130,13 +137,16 @@ export function PublicLanding() {
             Begin with your own Baseline. Bring in another person with permission. Map the larger human system when roles and pressure matter.
           </p>
         </div>
-        <div className="intelligence-grid">
+        <div className="intelligence-path" aria-label="One Baseline expands to relationship and system intelligence">
           {intelligenceLevels.map((level) => (
             <article key={level.label}>
               <div><span>{level.number}</span><strong>{level.label}</strong></div>
               <h3>{level.title}</h3>
               <blockquote>{level.prompt}</blockquote>
               <p>{level.copy}</p>
+              <div className={`path-object path-object-${level.number}`} aria-hidden="true">
+                <i /><i /><i /><i />
+              </div>
             </article>
           ))}
         </div>
@@ -219,6 +229,17 @@ export function PublicLanding() {
             <div><span>A CLEARER VIEW</span><p>{example.result}</p></div>
             <div><span>WHAT ALIGNMENT MAY REQUIRE</span><strong>{example.move}</strong></div>
           </article>
+          <details className="example-provenance" open>
+            <summary>Why this appears</summary>
+            <dl>
+              <div><dt>Baseline tendency</dt><dd>Self-direction and direct clarity</dd></div>
+              <div><dt>Current question</dt><dd>{example.label}</dd></div>
+              <div><dt>Possible pressure expression</dt><dd>Carrying responsibility alone</dd></div>
+              <div><dt>User-confirmed experience</dt><dd>Not yet confirmed</dd></div>
+              <div><dt>Unknown actual state</dt><dd>What is happening outside this example</dd></div>
+            </dl>
+          </details>
+          <div className="example-confirm" aria-label="Example correction controls"><span>Does this fit?</span><button type="button">Yes</button><button type="button">Partly</button><button type="button">No</button></div>
           <footer>Examples show possibilities, not verdicts. Your experience remains yours to confirm, correct, or reject.</footer>
         </div>
       </section>
@@ -232,18 +253,23 @@ export function PublicLanding() {
           </p>
         </div>
         <div className="relationship-visual" aria-label="See the relationship from both sides.">
-          <article className="relationship-person">
+          <div className="perspective-switch" role="group" aria-label="Relationship perspective">
+            <button type="button" className={perspective === 'mine' ? 'active' : ''} onClick={() => setPerspective('mine')}>My view</button>
+            <button type="button" className={perspective === 'theirs' ? 'active' : ''} onClick={() => setPerspective('theirs')}>Their possible view</button>
+            <button type="button" className={perspective === 'between' ? 'active' : ''} onClick={() => setPerspective('between')}>Relationship view</button>
+          </div>
+          <article className={`relationship-person ${perspective === 'mine' ? 'is-focused' : ''}`}>
             <header><span>YOU</span><small>BASELINE SHARED</small></header>
             <strong>Processes through conversation</strong>
             <p>Clarity develops by speaking, asking, and receiving a response.</p>
             <dl><div><dt>May reach for</dt><dd>Connection now</dd></div><div><dt>May hear silence as</dt><dd>Distance or avoidance</dd></div></dl>
           </article>
-          <div className="relationship-between">
+          <div className={`relationship-between ${perspective === 'between' ? 'is-focused' : ''}`}>
             <span>BETWEEN YOU</span>
             <strong>Same need: understanding. Different route: immediacy and time.</strong>
             <p>Friction begins when one person experiences waiting as abandonment while the other experiences urgency as pressure.</p>
           </div>
-          <article className="relationship-person">
+          <article className={`relationship-person ${perspective === 'theirs' ? 'is-focused' : ''}`}>
             <header><span>ALEX</span><small>BASELINE SHARED</small></header>
             <strong>Processes through reflection</strong>
             <p>Clarity develops through privacy, internal organization, and time.</p>
@@ -253,6 +279,25 @@ export function PublicLanding() {
             <div><span>WHAT SOVEREIGN KEEPS DISTINCT</span><strong>Each person’s needs, limits, responsibility, and permission.</strong></div>
             <div><span>WHAT THE RELATIONSHIP CAN PRACTICE</span><strong>A clear return time instead of forced immediacy or indefinite silence.</strong></div>
           </footer>
+        </div>
+      </section>
+
+      <section className="system-section" aria-labelledby="system-title">
+        <div>
+          <p className="landing-kicker">FROM ONE PERSON TO THE WHOLE SYSTEM</p>
+          <h2 id="system-title">See where pressure collects—not just who reacts.</h2>
+          <p>A system view keeps individual Baselines distinct while showing formal roles, informal responsibility, and a perspective the group may be missing. It suggests patterns to examine; it does not diagnose the group.</p>
+        </div>
+        <div className="system-map" aria-label="Example team system map">
+          <header><span>EXAMPLE · TEAM VIEW</span><strong>Launch decision</strong></header>
+          <div className="system-stage">
+            <article className="system-person system-lead"><i>MK</i><strong>Mika</strong><span>Formal lead</span></article>
+            <article className="system-person system-stabilizer"><i>JA</i><strong>Jae</strong><span>Informal stabilizer</span></article>
+            <article className="system-person system-challenger"><i>NO</i><strong>Noor</strong><span>Missing perspective</span></article>
+            <article className="system-person system-builder"><i>EL</i><strong>Eli</strong><span>Delivery owner</span></article>
+            <div className="pressure-field"><span>PRESSURE CONCENTRATION</span><strong>Jae is carrying coordination without matching authority.</strong></div>
+          </div>
+          <footer><span>SHIFT TO EXAMINE</span><strong>Move decision ownership back to the formal lead and invite Noor’s risk perspective before commitment.</strong></footer>
         </div>
       </section>
 
@@ -266,7 +311,7 @@ export function PublicLanding() {
         <div>
           <p className="landing-kicker">BUILD YOUR FOUNDATION · USE IT WHERE LIFE GETS COMPLICATED</p>
           <h2>Start with who you are. Expand only when the wider context matters.</h2>
-          <p>Explore your design, examine what fits, and understand the people and systems shaping your life.</p>
+          <p>Begin free in a few minutes. Add your birth date and place; exact time helps but is not required. Review what fits, correct what does not, and expand only when it matters.</p>
         </div>
         <div className="landing-actions">
           <a className="landing-button landing-button-primary" href="/signup">Build my Baseline</a>

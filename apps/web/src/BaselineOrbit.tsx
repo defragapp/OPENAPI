@@ -1,4 +1,10 @@
+import { useState } from 'react';
+
+const stages = ['Baseline', 'Question', 'Connection', 'Insight'] as const;
+
 export function BaselineOrbit({ compact = false }: { compact?: boolean }) {
+  const [stage, setStage] = useState(3);
+
   return (
     <div
       className={`baseline-orbit ${compact ? 'baseline-orbit-compact' : ''}`}
@@ -9,7 +15,10 @@ export function BaselineOrbit({ compact = false }: { compact?: boolean }) {
         <div><span className="orbit-mark" aria-hidden="true" /><strong>YOUR BASELINE CORE</strong></div>
         <span>{compact ? 'PERSONAL FOUNDATION' : 'EXAMPLE · YOUR DESIGN WILL BE PERSONAL'}</span>
       </header>
-      <div className="orbit-map" aria-hidden="true">
+      {!compact && <div className="orbit-stages" aria-label="Example interpretation stages">
+        {stages.map((label, index) => <button type="button" key={label} className={stage === index ? 'active' : ''} aria-pressed={stage === index} onClick={() => setStage(index)}><span>{index + 1}</span>{label}</button>)}
+      </div>}
+      <div className={`orbit-map orbit-stage-${stage}`} aria-hidden="true">
         <div className="orbit-ring orbit-ring-outer" />
         <div className="orbit-ring orbit-ring-inner" />
         <div className="orbit-node orbit-node-core"><span>HOW YOU PROCESS</span><strong>Names what matters through direct clarity</strong></div>
@@ -22,16 +31,16 @@ export function BaselineOrbit({ compact = false }: { compact?: boolean }) {
         <span><i className="steady" />Steady design</span>
         <span><i className="current" />Current emphasis</span>
       </div>
-      {!compact && (
+      {!compact && stage > 0 && (
         <>
           <article className="orbit-question">
             <span>A REAL QUESTION</span>
             <p>Why do I feel responsible for everything, then disappear when I need support?</p>
           </article>
-          <article className="orbit-answer">
+          {stage > 1 && <article className="orbit-answer">
             <div><span>BASELINE CONNECTION</span><p>Self-direction can support courage and leadership. Under pressure, accepting help may feel like losing authority.</p></div>
-            <div><span>WHAT TO EXAMINE</span><strong>What changes when support is shared without asking you to surrender your voice?</strong></div>
-          </article>
+            {stage > 2 && <div><span>POSSIBLE INSIGHT</span><strong>What changes when support is shared without asking you to surrender your voice?</strong></div>}
+          </article>}
         </>
       )}
       <footer>

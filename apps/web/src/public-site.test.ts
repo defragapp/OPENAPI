@@ -20,7 +20,9 @@ const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent
 
 describe('Sovereign.OS public experience', () => {
   it('makes the product unmistakable in the first viewport', () => {
-    expect(landing).toContain('Know yourself. Understand the people around you. See the whole system.');
+    expect(landing).toContain('Begin with how you work. See what life is asking of you.');
+    expect(landing).toContain('Why this appears');
+    expect(landing).toContain('PRESSURE CONCENTRATION');
     expect(landing).toContain('Sovereign.OS turns your Baseline Design into private, explorable intelligence for choices, relationships, families, and teams.');
     expect(landing).toContain('Start with how you process, communicate, connect, decide, and respond under pressure.');
     expect(landing).toContain('Build my Baseline');
