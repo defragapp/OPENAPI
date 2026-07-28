@@ -33,6 +33,7 @@ describe('thread account ownership and continuity', () => {
         context: { surface: 'Explore', mode: 'alignment', personId: 'person_1' },
         plan: { response_phase: 'integration', confidence: 'supported', safety_mode: 'standard', clearer_form: 'Protect agency while accepting support.' },
         correction: { value: 'partly', note: 'The agency point fits; the timing does not.', createdAt: '2026-07-26 10:05:00' },
+        correctionHistory: [{ value: 'partly', note: 'The agency point fits; the timing does not.', createdAt: '2026-07-26 10:05:00' }],
         interfaceActions: { version: 1 }, visualStory: { story: { should_show: true } }, moduleOffer: { title: 'Two needs in one decision' }
       }
     ]);
@@ -53,11 +54,11 @@ function historyEnv(): Env {
             return {
               async first() {
                 if (sql.includes('SELECT id, account_id, covenant_enabled FROM threads')) return args[0] === 't1' && args[1] === 'a1' ? { id: 't1', account_id: 'a1', covenant_enabled: 0 } : null;
-                if (sql.includes('FROM user_corrections')) return { correction: 'partly', note: 'The agency point fits; the timing does not.', created_at: '2026-07-26 10:05:00' };
                 return null;
               },
               async all() {
                 if (sql.includes('FROM threads t')) return { results: [{ id: 't1', title: 'A decision about work', context_kind: 'explore', covenant_enabled: 0, created_at: '2026-07-25 10:00:00', updated_at: '2026-07-26 10:00:00' }] };
+                if (sql.includes('FROM user_corrections')) return { results: [{ correction: 'partly', note: 'The agency point fits; the timing does not.', created_at: '2026-07-26 10:05:00' }] };
                 if (sql.includes('FROM thread_events')) return { results: [
                   { id: 'e1', seq: 1, event_type: 'user_message', payload_json: '{"text":"Help me understand this choice."}', created_at: '2026-07-26 10:00:00' },
                   { id: 'e2', seq: 2, event_type: 'assistant_plan', payload_json: '{"plan":{"response_phase":"integration","confidence":"supported","safety_mode":"standard","clearer_form":"Protect agency while accepting support."}}', created_at: '2026-07-26 10:00:01' },
