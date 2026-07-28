@@ -1,7 +1,16 @@
 import type { Env } from './env';
 import { runtimeMode } from './runtime';
 
-export interface EmailMessage { to: string; subject: string; text: string; html?: string; idempotencyKey?: string }
+export type EmailCategory = 'account_signup' | 'account_signin' | 'relationship_invitation' | 'relationship_invitation_resend' | 'operational';
+
+export interface EmailMessage {
+  to: string;
+  subject: string;
+  text: string;
+  html?: string;
+  idempotencyKey?: string;
+  category?: EmailCategory;
+}
 
 export interface SovereignEmailTemplate {
   eyebrow: string;
@@ -11,13 +20,16 @@ export interface SovereignEmailTemplate {
   actionUrl: string;
   details?: string[];
   footer?: string;
+  preheader?: string;
+  contactEmail?: string;
 }
 
-const FROM = 'Sovereign.OS <info@defrag.app>';
-const REPLY_TO = 'info@defrag.app';
-const SUPPORT = 'info@defrag.app';
+const DEFAULT_FROM_ADDRESS = 'info@defrag.app';
+const DEFAULT_PUBLIC_CONTACT = 'info@defrag.app';
+const BRAND_MARK_URL = 'https://sovereign.defrag.app/brand-mark.svg';
 
 function validRecipient(to: string): boolean { return to.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to); }
+function validAddress(value?: string): value is string { return Boolean(value && validRecipient(value.trim())); }
 function redact(value: string): string { return value.replace(/token=[^\s]+/g, 'token=[redacted]'); }
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (character) => ({
@@ -36,10 +48,30 @@ function safeActionUrl(value: string): string {
   return url.toString();
 }
 
+function fromAddress(env: Env): string {
+  return validAddress(env.TRANSACTIONAL_FROM_EMAIL) ? env.TRANSACTIONAL_FROM_EMAIL.trim() : DEFAULT_FROM_ADDRESS;
+}
+
+function contactAddress(env: Env): string {
+  return validAddress(env.PUBLIC_CONTACT_EMAIL) ? env.PUBLIC_CONTACT_EMAIL.trim() : DEFAULT_PUBLIC_CONTACT;
+}
+
+function safeTag(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 64) || 'operational';
+}
+
+export function transactionalEmailProvider(env: Env): 'resend' | 'cloudflare-binding' | 'missing' {
+  if (env.RESEND_API_KEY) return 'resend';
+  if (env.EMAIL) return 'cloudflare-binding';
+  return 'missing';
+}
+
 export function buildSovereignEmail(template: SovereignEmailTemplate): { text: string; html: string } {
   const actionUrl = safeActionUrl(template.actionUrl);
   const details = (template.details ?? []).map((detail) => detail.trim()).filter(Boolean).slice(0, 10);
   const footer = template.footer?.trim() || 'You control what enters Sovereign.OS and what may be shared.';
+  const support = validAddress(template.contactEmail) ? template.contactEmail.trim() : DEFAULT_PUBLIC_CONTACT;
+  const preheader = template.preheader?.trim() || template.intro.trim();
   const text = [
     'SOVEREIGN.OS',
     template.eyebrow.trim().toUpperCase(),
@@ -54,7 +86,7 @@ export function buildSovereignEmail(template: SovereignEmailTemplate): { text: s
     actionUrl,
     '',
     footer,
-    `Questions or safety concerns: ${SUPPORT}`,
+    `Questions or account support: ${support}`,
     '',
     'This message contains a private account link. Do not forward it.'
   ].filter((line): line is string => typeof line === 'string').join('\n');
@@ -62,7 +94,7 @@ export function buildSovereignEmail(template: SovereignEmailTemplate): { text: s
   const detailRows = details.map((detail) => `
     <tr>
       <td style="padding:0 0 10px 0;color:#c8c0b6;font:400 14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-        <span style="color:#d99c6b;padding-right:8px;">•</span>${escapeHtml(detail)}
+        <span style="color:#dda273;padding-right:8px;">•</span>${escapeHtml(detail)}
       </td>
     </tr>`).join('');
 
@@ -75,9 +107,9 @@ export function buildSovereignEmail(template: SovereignEmailTemplate): { text: s
   <meta name="supported-color-schemes" content="dark">
   <title>${escapeHtml(template.title)}</title>
 </head>
-<body style="margin:0;padding:0;background:#0d0d0e;color:#f3efe8;">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(template.intro)}</div>
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#0d0d0e;">
+<body style="margin:0;padding:0;background:#101011;color:#f3efe8;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(preheader)}</div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#101011;">
     <tr>
       <td align="center" style="padding:34px 16px 42px;">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;">
@@ -85,22 +117,24 @@ export function buildSovereignEmail(template: SovereignEmailTemplate): { text: s
             <td style="padding:0 0 20px;border-bottom:1px solid rgba(243,239,232,.14);">
               <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td width="38" height="38" align="center" valign="middle" style="width:38px;height:38px;border:1px solid rgba(217,156,107,.45);border-radius:50%;color:#d99c6b;font:500 18px/38px Georgia,serif;">S</td>
+                  <td width="40" height="40" valign="middle" style="width:40px;height:40px;">
+                    <img src="${BRAND_MARK_URL}" width="40" height="40" alt="" style="display:block;width:40px;height:40px;border:0;border-radius:12px;">
+                  </td>
                   <td style="padding-left:12px;color:#f3efe8;font:800 12px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:2.1px;">SOVEREIGN.OS</td>
                 </tr>
               </table>
             </td>
           </tr>
           <tr>
-            <td style="padding:42px 36px 38px;border:1px solid rgba(243,239,232,.14);border-top:0;border-radius:0 0 24px 24px;background:#171718;box-shadow:0 28px 80px rgba(0,0,0,.28);">
-              <p style="margin:0 0 12px;color:#dea074;font:800 11px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:1.8px;text-transform:uppercase;">${escapeHtml(template.eyebrow)}</p>
+            <td style="padding:42px 36px 38px;border:1px solid rgba(243,239,232,.14);border-top:0;border-radius:0 0 18px 18px;background:#171718;box-shadow:0 28px 80px rgba(0,0,0,.28);">
+              <p style="margin:0 0 12px;color:#dda273;font:800 11px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:1.8px;text-transform:uppercase;">${escapeHtml(template.eyebrow)}</p>
               <h1 style="margin:0;color:#f3efe8;font:500 42px/1.02 Georgia,'Times New Roman',serif;letter-spacing:-1.7px;">${escapeHtml(template.title)}</h1>
               <p style="margin:20px 0 0;color:#c8c0b6;font:400 16px/1.7 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">${escapeHtml(template.intro)}</p>
               ${details.length ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top:24px;">${detailRows}</table>` : ''}
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin-top:30px;">
                 <tr>
-                  <td align="center" style="border-radius:999px;background:#ece5da;">
-                    <a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:14px 22px;color:#1b1815;font:800 15px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;border-radius:999px;">${escapeHtml(template.actionLabel)}</a>
+                  <td align="center" style="border-radius:10px;background:#ece5da;">
+                    <a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:14px 22px;color:#1b1815;font:800 15px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;border-radius:10px;">${escapeHtml(template.actionLabel)}</a>
                   </td>
                 </tr>
               </table>
@@ -110,7 +144,7 @@ export function buildSovereignEmail(template: SovereignEmailTemplate): { text: s
           <tr>
             <td style="padding:24px 8px 0;color:#817a72;font:400 12px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
               <p style="margin:0;">${escapeHtml(footer)}</p>
-              <p style="margin:10px 0 0;">Questions or safety concerns? Reply to this email or contact <a href="mailto:${SUPPORT}" style="color:#b5afa6;">${SUPPORT}</a>.</p>
+              <p style="margin:10px 0 0;">Questions or account support? Reply to this email or contact <a href="mailto:${escapeHtml(support)}" style="color:#b5afa6;">${escapeHtml(support)}</a>.</p>
               <p style="margin:10px 0 0;">This message contains a private account link. Do not forward it.</p>
             </td>
           </tr>
@@ -127,23 +161,16 @@ export function buildSovereignEmail(template: SovereignEmailTemplate): { text: s
 export async function sendOperationalEmail(env: Env, message: EmailMessage): Promise<{ provider: string; id: string; retryable: boolean }> {
   if (!validRecipient(message.to)) throw new Response('Invalid email recipient', { status: 400 });
   if (runtimeMode(env) === 'test') {
-    await env.KV?.put?.(`test-email:${crypto.randomUUID()}`, JSON.stringify({ to: message.to, subject: message.subject, text: message.text, html: message.html }), { expirationTtl: 3600 });
+    await env.KV?.put?.(`test-email:${crypto.randomUUID()}`, JSON.stringify({ to: message.to, subject: message.subject, text: message.text, html: message.html, category: message.category }), { expirationTtl: 3600 });
     return { provider: 'test-capture', id: `email_${crypto.randomUUID()}`, retryable: false };
   }
 
-  try {
-    if (env.EMAIL) {
-      const result = await env.EMAIL.send({
-        from: FROM,
-        to: message.to,
-        subject: message.subject,
-        text: message.text,
-        ...(message.html ? { html: message.html } : {})
-      });
-      return { provider: 'cloudflare-email-binding', id: requestId(result), retryable: false };
-    }
+  const from = `Sovereign.OS <${fromAddress(env)}>`;
+  const replyTo = contactAddress(env);
 
+  try {
     if (env.RESEND_API_KEY) {
+      const category = safeTag(message.category ?? 'operational');
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         signal: AbortSignal.timeout(8_000),
@@ -153,23 +180,41 @@ export async function sendOperationalEmail(env: Env, message: EmailMessage): Pro
           'idempotency-key': message.idempotencyKey ?? crypto.randomUUID()
         },
         body: JSON.stringify({
-          from: FROM,
-          reply_to: REPLY_TO,
+          from,
+          reply_to: replyTo,
           to: [message.to],
           subject: message.subject,
           text: message.text,
-          ...(message.html ? { html: message.html } : {})
+          ...(message.html ? { html: message.html } : {}),
+          tags: [
+            { name: 'product', value: 'sovereign-os' },
+            { name: 'category', value: category },
+            { name: 'environment', value: safeTag(env.APP_ENV || 'production') }
+          ]
         })
       });
-      const payload = await response.json().catch(() => ({})) as { id?: string };
-      if (!response.ok) throw new Error(`resend_${response.status}`);
+      const payload = await response.json().catch(() => ({})) as { id?: string; message?: string };
+      if (!response.ok) throw new Error(`resend_${response.status}_${String(payload.message ?? 'request_failed').slice(0, 48)}`);
       return { provider: 'resend', id: payload.id ?? `email_${crypto.randomUUID()}`, retryable: false };
+    }
+
+    if (env.EMAIL) {
+      const result = await env.EMAIL.send({
+        from,
+        to: message.to,
+        subject: message.subject,
+        text: message.text,
+        ...(message.html ? { html: message.html } : {})
+      });
+      return { provider: 'cloudflare-email-binding', id: requestId(result), retryable: false };
     }
 
     throw new Error('provider_missing');
   } catch (error) {
     console.warn('email_delivery_failed', {
-      reason: error instanceof Error ? error.message.slice(0, 48) : 'response',
+      provider: transactionalEmailProvider(env),
+      reason: error instanceof Error ? error.message.slice(0, 72) : 'response',
+      category: message.category ?? 'operational',
       subject: message.subject,
       toHashOnly: true,
       body: redact(message.text).slice(0, 24)
