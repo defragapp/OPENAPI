@@ -104,7 +104,7 @@ export function PublicLanding() {
             Sovereign.OS turns your Baseline Design into a private AI for personal, relationship, and system intelligence.
           </p>
           <p className="landing-support">
-            Explore who you are, check the fit of a choice or relationship, and see how people function together.
+            Baseline Design is your personal starting point: an explorable view of your qualities, needs, strengths, shadow and light, and alignment.
           </p>
           <div className="landing-actions">
             <a className="landing-button landing-button-primary" href="/signup">Explore my Baseline</a>
