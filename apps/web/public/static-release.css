@@ -47,7 +47,7 @@
     border: 1px solid var(--line);
     border-radius: 12px;
     background: rgba(255, 253, 248, .42);
-    font-size: .76rem;
+    font-size: .84rem;
     line-height: 1.2;
     text-align: center;
   }
@@ -56,6 +56,26 @@
     grid-column: 1 / -1;
     margin-left: 0;
     border-color: var(--forest);
+    font-size: .9rem;
+  }
+
+  .launch-kicker,
+  .section-label,
+  .card-label,
+  .launch-summary > span,
+  .launch-card > span,
+  .use-case-card > span,
+  .plan-guidance article > span {
+    font-size: .82rem;
+  }
+
+  .launch-summary small,
+  .launch-summary > p,
+  .journey-steps p,
+  .billing-note p,
+  .launch-footer {
+    font-size: .94rem;
+    line-height: 1.58;
   }
 
   .launch-hero {
@@ -89,7 +109,7 @@
   .launch-links a,
   .launch-links a:not(.launch-cta) {
     padding-inline: 4px;
-    font-size: .74rem;
+    font-size: .82rem;
   }
 }
 
