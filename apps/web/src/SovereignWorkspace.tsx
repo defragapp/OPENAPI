@@ -348,6 +348,19 @@ export function SovereignWorkspace() {
     else if (action.type === 'open_optional_lens' || action.type === 'show_plan') openSurface('You');
   }
 
+  const baselineReady = today?.baseline?.status === 'completed' || today?.baseline?.status === 'partial';
+  const surfacePrompts = useMemo(() => {
+    if (surface === 'Today' && !baselineReady) {
+      return [
+        'How do I start building my Baseline?',
+        'What is Baseline Design?',
+        'Why does my birth date and birthplace matter?',
+        'Is my private information shared with the AI?'
+      ];
+    }
+    return prompts[surface];
+  }, [surface, baselineReady]);
+
   return (
     <div className={`chat-workspace ${panelOpen ? 'has-context-panel' : ''} ${navOpen ? 'has-nav-open' : ''}`}>
       <aside className="chat-sidebar" aria-label="Workspace navigation">
@@ -385,6 +398,7 @@ export function SovereignWorkspace() {
             <span>{contextLabel || 'Today'}</span>
           </div>
           <div className="conversation-actions">
+            <span className="plan-indicator">{billing?.effective?.plan === 'sovereign_plus' ? 'Sovereign+' : 'Free'}</span>
             <span className={`connection-dot ${apiState}`}>{status}</span>
             <button onClick={() => setPanelOpen(!panelOpen)}>{panelOpen ? 'Close context' : 'Context'}</button>
           </div>
@@ -399,8 +413,18 @@ export function SovereignWorkspace() {
                 <h1>What do you want to understand?</h1>
                 <p>Ask about yourself, a decision, a relationship, or the system around you. Sovereign brings in only the context that belongs.</p>
               </div>
+              {!baselineReady && (
+                <div className="onboarding-nudge">
+                  <header>
+                    <p className="eyebrow">GET STARTED</p>
+                    <h2>Begin with your personal intelligence foundation.</h2>
+                  </header>
+                  <p>Sovereign.OS explains your qualities, shadow and light, relationships, and systems by starting with your Baseline Design.</p>
+                  <button className="primary-button" onClick={() => openSurface('You')}>Build my Baseline</button>
+                </div>
+              )}
               <div className="starter-grid">
-                {prompts[surface].map((prompt) => <button key={prompt} onClick={() => setDraft(prompt)}>{prompt}<span>↗</span></button>)}
+                {surfacePrompts.map((prompt) => <button key={prompt} onClick={() => setDraft(prompt)}>{prompt}<span>↗</span></button>)}
               </div>
               <div className="empty-baseline-card">
                 <BaselineOrbit compact />
