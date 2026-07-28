@@ -231,7 +231,7 @@ export function PublicLanding() {
             Sovereign keeps each person’s way of processing visible, then explains what the difference may create between them—without deciding who is right.
           </p>
         </div>
-        <div className="relationship-visual" aria-label="Example of two permitted Baseline Designs in one relationship">
+        <div className="relationship-visual" aria-label="See the relationship from both sides.">
           <article className="relationship-person">
             <header><span>YOU</span><small>BASELINE SHARED</small></header>
             <strong>Processes through conversation</strong>
