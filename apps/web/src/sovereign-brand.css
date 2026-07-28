@@ -106,6 +106,7 @@ html {
     width: auto;
     min-width: 86px;
     height: 44px;
+    min-height: 44px;
     align-items: center;
     justify-content: center;
     gap: 8px;
