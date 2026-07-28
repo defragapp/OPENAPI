@@ -53,6 +53,7 @@
   }
 
   .launch-links .launch-cta {
+    grid-column: 1 / -1;
     margin-left: 0;
     border-color: var(--forest);
   }
@@ -81,14 +82,14 @@
   }
 
   .launch-links {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 5px;
   }
 
   .launch-links a,
   .launch-links a:not(.launch-cta) {
     padding-inline: 4px;
-    font-size: .72rem;
+    font-size: .74rem;
   }
 }
 
