@@ -1,4 +1,5 @@
 import type { Env } from '../env';
+import { notifyAccountDeletionChange } from '../account-notifications';
 import { getEntitlements, requireFeature } from './entitlements';
 import { requireConsent } from './people';
 
@@ -150,6 +151,7 @@ export async function createDeletionJob(env: Env, accountId: string, graceDays =
     .bind(backgroundJobId, accountId, payload, offset)
     .run();
 
+  await notifyAccountDeletionChange(env, accountId, { jobId: id, state: 'scheduled', graceDays });
   return { id, status: 'grace', graceDays, backgroundJobId };
 }
 
@@ -178,6 +180,7 @@ export async function cancelDeletionJob(env: Env, accountId: string, id: string)
     WHERE account_id = ? AND kind = 'deletion.execute' AND status = 'queued' AND payload_json = ?`)
     .bind(accountId, JSON.stringify({ deletionJobId: id }))
     .run();
+  await notifyAccountDeletionChange(env, accountId, { jobId: id, state: 'cancelled' });
 }
 
 export function freeEntitlements() {
