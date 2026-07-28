@@ -1,6 +1,10 @@
 export function BaselineOrbit({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={`baseline-orbit ${compact ? 'baseline-orbit-compact' : ''}`} aria-label="Example of the Baseline Core used inside Sovereign.OS">
+    <div
+      className={`baseline-orbit ${compact ? 'baseline-orbit-compact' : ''}`}
+      style={compact ? { minHeight: 500 } : undefined}
+      aria-label="Example of the Baseline Core used inside Sovereign.OS"
+    >
       <header>
         <div><span className="orbit-mark" aria-hidden="true" /><strong>YOUR BASELINE CORE</strong></div>
         <span>{compact ? 'PERSONAL FOUNDATION' : 'EXAMPLE · YOUR DESIGN WILL BE PERSONAL'}</span>
