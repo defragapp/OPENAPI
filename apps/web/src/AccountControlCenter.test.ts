@@ -47,7 +47,8 @@ describe('mounted Account and Library controls', () => {
     expect(dialogRuntime).toContain('[role="dialog"][aria-modal="true"]');
     expect(dialogRuntime).toContain("event.key !== 'Tab'");
     expect(dialogRuntime).toContain('returnTarget');
-    expect(dialogRuntime).toContain('target.focus()');
+    expect(dialogRuntime).toContain('if (target?.isConnected)');
+    expect(dialogRuntime).toContain('target?.focus()');
     expect(dialogRuntime).toContain('MutationObserver');
   });
 

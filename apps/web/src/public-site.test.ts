@@ -74,7 +74,10 @@ describe('Sovereign.OS public experience', () => {
       'cannot establish another person’s private motive',
       'Your experience remains authoritative'
     ]) expect(publicCopy).toContain(phrase);
-    expect(publicCopy).not.toMatch(/full account export|export features|donate\.stripe\.com|Support the platform/i);
+    expect(policy).toContain('Private account export is not available at launch.');
+    expect(landing).not.toContain('donate.stripe.com');
+    expect(pricing).not.toContain('donate.stripe.com');
+    expect(publicCopy).not.toMatch(/full account export|export features|Support the platform/i);
   });
 
   it('renders public React routes without runtime copy rewriting', () => {
