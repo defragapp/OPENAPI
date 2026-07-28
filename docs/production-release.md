@@ -9,12 +9,15 @@ Production is released from one exact commit on `main`. Non-production branch bu
 - Worker: `sovv-web`
 - Public site: `https://sovereign.defrag.app`
 - Authenticated app and API: `https://app.defrag.app`
+- Owned root domain: `defrag.app`
 - D1: `sovereign-openapi-db`
 - Durable Object: `ThreadCoordinator`
 - AI: Workers AI through AI Gateway with Unified Billing
 - Assets: compiled web application
 - Background cleanup: scheduled D1 work every 15 minutes
 - R2 and Queue: disabled
+
+`sovereign.os` is a product name, not an owned or delegated public domain. Do not publish links or email addresses at `sovereign.os`. `sovereign.app` is a separately registrable `.app` domain and must not be used unless it is purchased and added to Cloudflare.
 
 Private account export is disabled for launch. Sharing sends only the public Sovereign.OS link and includes no private workspace data.
 
@@ -27,6 +30,26 @@ Private account export is disabled for launch. Sharing sends only the public Sov
 - `STRIPE_WEBHOOK_SECRET`
 
 Secret values stay in Cloudflare. Never copy them into repository files, build output, issues, or chat.
+
+## Transactional email
+
+Production account and invitation email must use the branded Resend API template in `apps/sovereign-worker/src/email.ts`.
+
+Recommended values:
+
+- `TRANSACTIONAL_FROM_EMAIL=info@defrag.app`
+- `PUBLIC_CONTACT_EMAIL=info@defrag.app`
+- `EMAIL_SMOKE_TEST_RECIPIENT=info@defrag.app`
+
+The exact sender domain in `TRANSACTIONAL_FROM_EMAIL` must match a verified Resend domain. Resend is the required production provider; the Cloudflare Email binding is only a fallback for non-production recovery.
+
+Before release, verify SPF and DKIM for the selected Resend domain and add DMARC. Run the live delivery test from a secure environment that contains the Resend API key:
+
+```bash
+pnpm smoke:email
+```
+
+The command sends the same branded template used by the product, reports the Resend message ID, and does not print secrets or the full recipient address.
 
 ## Build configuration
 
@@ -41,7 +64,7 @@ VITE_TURNSTILE_SITE_KEY=0x4AAAAAADhGIF8-iOLIg8MU corepack enable && pnpm install
 - Deploy command:
 
 ```bash
-node scripts/cloudflare-direct-production-deploy.mjs
+pnpm production:deploy
 ```
 
 The build gate verifies the release configuration, migrations, secret scan, production-fixture scan, release contract, type checks, worker and web tests, and production build.
@@ -66,7 +89,8 @@ Merging the approved commit to `main` authorizes Cloudflare Workers Builds to ex
 The deploy command must confirm:
 
 - the public and app hostnames serve the exact commit;
-- health and readiness report D1, authentication, AI Gateway, email, Stripe, scheduled cleanup, and the disabled private-export boundary correctly;
+- health and readiness report D1, authentication, AI Gateway, Resend, Stripe, scheduled cleanup, and the disabled private-export boundary correctly;
+- `dependencies.transactionalEmail` is exactly `resend`;
 - pricing shows Free, $20 monthly, and $99 annual without legacy export or unapproved support placement;
 - unauthenticated protected routes fail closed;
 - invalid Stripe signatures are rejected;
@@ -91,6 +115,7 @@ Keep:
 - Cloudflare build UUID;
 - protected preview URL and screenshots;
 - test and smoke results;
+- Resend provider message ID for the delivery smoke test;
 - migration list and D1 backup confirmation;
 - prior stable Worker version;
 - sanitized `production-deployment.json`;
