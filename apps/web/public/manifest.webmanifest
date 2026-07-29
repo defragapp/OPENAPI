@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Sovereign.OS",
   "short_name": "Sovereign",
-  "description": "Private personal, relationship, and system intelligence powered by Baseline Design.",
+  "description": "A private personal AI for understanding yourself, your relationships, and the decisions in front of you.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -21,7 +21,7 @@
     {
       "name": "Open Sovereign.OS",
       "short_name": "Open",
-      "description": "Open your private Sovereign.OS intelligence environment.",
+      "description": "Open your private personal AI workspace.",
       "url": "/app",
       "icons": [{ "src": "/app-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
