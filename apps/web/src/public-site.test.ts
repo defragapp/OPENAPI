@@ -10,6 +10,7 @@ const consent = readFileSync(new URL('../public/consent.html', import.meta.url),
 const consentCss = readFileSync(new URL('../public/consent.css', import.meta.url), 'utf8');
 const launchCss = readFileSync(new URL('../public/launch.css', import.meta.url), 'utf8');
 const launchPolishCss = readFileSync(new URL('../public/launch-polish.css', import.meta.url), 'utf8');
+const staticExperienceCss = readFileSync(new URL('../public/static-experience.css', import.meta.url), 'utf8');
 const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
@@ -32,7 +33,7 @@ describe('Sovereign.OS public experience', () => {
     expect(questionIndex).toBeGreaterThan(-1);
     expect(answerIndex).toBeGreaterThan(questionIndex);
     expect(frameworkIndex).toBeGreaterThan(answerIndex);
-    expect(landing).toContain('EXAMPLE SOVEREIGN ANSWER');
+    expect(landing).toContain('EXAMPLE ANSWER');
     expect(landing).toContain('Sanitized demonstration · Not your Baseline');
   });
 
@@ -87,10 +88,13 @@ describe('Sovereign.OS public experience', () => {
     for (const page of [how, pricing, faq]) {
       expect(page).toContain('/launch.css?v=20260728-baseline-first');
       expect(page).toContain('/launch-polish.css?v=20260728-baseline-first');
+      expect(page).toContain('/static-experience.css?v=20260728-reconciliation');
     }
     expect(launchCss).toContain('@media (max-width: 680px)');
     expect(launchPolishCss).toContain('prefers-reduced-motion');
     expect(landingCss).toContain('@media (max-width: 760px)');
+    expect(staticExperienceCss).toContain('@media (max-width: 860px)');
+    expect(staticExperienceCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(consent).toContain('You decide what another account may use.');
     expect(consent).toContain('The inviting account cannot make or change these decisions for you.');
     expect(consentCss).toContain('@media (max-width: 680px)');

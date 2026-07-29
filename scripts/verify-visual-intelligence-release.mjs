@@ -2,9 +2,10 @@ import { readFileSync } from 'node:fs';
 
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const workspace = readFileSync('apps/web/src/SovereignIntelligenceWorkspace.tsx', 'utf8');
-const workspaceCss = readFileSync('apps/web/src/workspace-chat.css', 'utf8');
+const workspaceCss = `${readFileSync('apps/web/src/workspace-chat.css', 'utf8')}\n${readFileSync('apps/web/src/experience-reconciliation.css', 'utf8')}`;
 const landing = readFileSync('apps/web/src/PublicLanding.tsx', 'utf8');
-const landingCss = readFileSync('apps/web/src/public-landing.css', 'utf8');
+const landingCss = `${readFileSync('apps/web/src/public-landing.css', 'utf8')}\n${readFileSync('apps/web/src/experience-reconciliation.css', 'utf8')}`;
+const staticExperienceCss = readFileSync('apps/web/public/static-experience.css', 'utf8');
 const tokens = readFileSync('apps/web/src/styles.css', 'utf8');
 const membership = readFileSync('apps/web/src/SystemMembershipManager.tsx', 'utf8');
 const product = readFileSync('apps/sovereign-worker/src/db/product.ts', 'utf8');
@@ -19,6 +20,7 @@ requireAll('authenticated app entry', main, [
   "import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace'",
   "import { SystemMembershipManager } from './SystemMembershipManager'",
   "import './workspace-chat.css'",
+  "import './experience-reconciliation.css'",
   "location.pathname === '/app'",
   '<SovereignIntelligenceWorkspace />',
   '<SystemMembershipManager />'
@@ -52,15 +54,15 @@ requireAll('answer renderer', workspace, [
 ]);
 
 requireAll('workspace layout and accessibility', workspaceCss, [
-  'width: 272px',
-  'width: 390px',
-  'width: min(100%, 916px)',
+  'width: 220px',
+  'width: 360px',
+  'width: min(100%, 1120px)',
   'min-height: 44px',
   'font-size: 1rem',
   '@media (max-width: 1180px)',
-  '@media (max-width: 920px)',
-  '@media (max-width: 700px)',
-  '@media (max-width: 360px)',
+  '@media (max-width: 980px)',
+  '@media (max-width: 760px)',
+  '@media (max-width: 420px)',
   '@media (prefers-reduced-motion: reduce)',
   'env(safe-area-inset-bottom)'
 ]);
@@ -71,12 +73,15 @@ requireAll('public category clarity', landing, [
   'Get an answer built around you.',
   'private personal AI',
   'Why do I keep taking responsibility for everyone else?',
-  'EXAMPLE SOVEREIGN ANSWER',
+  'EXAMPLE ANSWER',
   'Build my Baseline'
 ]);
 
 requireAll('public product stage', landing, [
-  'Direct answer',
+  'DIRECT ANSWER',
+  'THE PERSONAL CONNECTION',
+  'A PRACTICAL NEXT STEP',
+  'Why this is personal',
   'Shadow',
   'Gift',
   'Alignment',
@@ -97,12 +102,21 @@ requireAll('public brand hierarchy', landing, [
 ]);
 
 requireAll('public visual accessibility', landingCss, [
-  'font-size: clamp(3.4rem, 5.1vw, 4.25rem)',
+  'font-size: clamp(3.7rem, 6.3vw, 5.5rem)',
   'min-height: 44px',
   'min-width: 320px',
-  '@media (max-width: 1040px)',
+  '@media (max-width: 980px)',
   '@media (max-width: 760px)',
-  '@media (max-width: 440px)',
+  '@media (max-width: 420px)',
+  '@media (prefers-reduced-motion: reduce)'
+]);
+
+requireAll('static public support experience', staticExperienceCss, [
+  '--paper: #0a0c0b',
+  '.pricing-grid',
+  '.faq-list details',
+  'border-radius: 1px',
+  '@media (max-width: 860px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
 

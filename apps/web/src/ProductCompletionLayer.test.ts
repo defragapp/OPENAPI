@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const layer = readFileSync(new URL('./ProductCompletionLayer.tsx', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
+const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const css = readFileSync(new URL('./product-completion.css', import.meta.url), 'utf8');
 
 describe('product completion layer', () => {
@@ -19,15 +20,15 @@ describe('product completion layer', () => {
     expect(layer).not.toContain('TURNSTILE_SECRET_KEY');
   });
 
-  it('surfaces real pair and system responses instead of discarding them', () => {
-    expect(layer).toContain("const RELATIONAL_EVENT = 'sovereign:relational-result'");
-    expect(layer).toContain('/(compare|comparison)');
-    expect(layer).toContain('/(alignment|analysis)');
-    expect(layer).toContain('result.participants');
-    expect(layer).toContain('Who is responsible for what');
-    expect(layer).toContain('Raw birth details stayed private');
-    expect(layer).toContain('Exact private location stayed private');
-    expect(layer).toContain('Two people, not one story.');
+  it('keeps pair and system responses inside their authoritative workspace surfaces', () => {
+    expect(workspace).toContain('/comparison');
+    expect(workspace).toContain('/analysis');
+    expect(workspace).toContain('comparison.participants');
+    expect(workspace).toContain('analysis.participants');
+    expect(workspace).toContain('WHAT HAPPENS BETWEEN YOU');
+    expect(workspace).toContain('Pressure field');
+    expect(layer).not.toContain('sovereign:relational-result');
+    expect(layer).not.toContain('RelationalResultDialog');
   });
 
   it('provides owner and invitee revocation controls in plain language', () => {
@@ -45,7 +46,6 @@ describe('product completion layer', () => {
     expect(layer).toContain("event.key !== 'Escape'");
     expect(layer).toContain("document.body.style.overflow = 'hidden'");
     expect(layer).toContain('aria-labelledby="shared-context-title"');
-    expect(layer).toContain('aria-labelledby="relational-result-title"');
     expect(layer).toContain('aria-pressed={decision');
   });
 

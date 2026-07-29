@@ -43,12 +43,12 @@ const currentApplicationFingerprints = [
   'Know yourself.',
   'Understand the system.',
   'Choose what fits.',
-  'What is active for you now?',
+  'Your intelligence begins with your Baseline.',
   'What do you want to understand?',
   'Understand the relationship from both sides.',
   'See how the whole group functions.',
   'Keep what changes your understanding.',
-  'Your Baseline, plan, permissions, and account.',
+  'Your personal foundation and control.',
   'Explore this through Covenant?',
   'Build your Baseline.'
 ];

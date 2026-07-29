@@ -1,0 +1,529 @@
+:root {
+  --forest: #0a0c0b;
+  --forest-soft: #111311;
+  --paper: #0a0c0b;
+  --paper-deep: #111311;
+  --ink: #f0ece4;
+  --muted: #afa99f;
+  --line: rgba(240, 236, 228, .13);
+  --line-dark: rgba(240, 236, 228, .13);
+  --copper: #c9865d;
+  --sage: #9aab91;
+  --white: #f0ece4;
+  color-scheme: dark;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+}
+
+body.launch-page {
+  background:
+    radial-gradient(circle at 77% -8%, rgba(154, 171, 145, .07), transparent 30rem),
+    var(--paper);
+  color: var(--ink);
+}
+
+.launch-shell {
+  width: min(1280px, calc(100% - 64px));
+}
+
+.launch-nav {
+  min-height: 82px;
+  margin-inline: 0;
+  padding-inline: 0;
+  border-bottom: 1px solid rgba(240, 236, 228, .075);
+  background: rgba(10, 12, 11, .92);
+}
+
+.launch-wordmark {
+  color: var(--ink);
+  font-size: .7rem;
+  letter-spacing: .14em;
+}
+
+.launch-wordmark::before {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(201, 134, 93, .36);
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  color: var(--copper);
+}
+
+.launch-links {
+  gap: 28px;
+}
+
+.launch-links a {
+  color: var(--muted);
+  font-size: .74rem;
+  font-weight: 560;
+}
+
+.launch-links a:hover,
+.launch-links a[aria-current="page"] {
+  color: var(--ink);
+}
+
+.launch-links .launch-cta {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid rgba(240, 236, 228, .2);
+  border-radius: 1px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+}
+
+.launch-links .launch-cta:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.launch-hero,
+.launch-hero-compact {
+  max-width: 100%;
+  padding: clamp(88px, 10vw, 136px) 0 clamp(76px, 8vw, 108px);
+}
+
+.launch-hero::before,
+.launch-hero::after {
+  display: none;
+}
+
+.launch-hero h1,
+.launch-hero-compact h1 {
+  max-width: 13ch;
+  color: var(--ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(3.65rem, 7vw, 6rem);
+  font-weight: 410;
+  letter-spacing: -.055em;
+  line-height: .93;
+}
+
+.launch-hero > p,
+.launch-hero > div > p:not(.launch-kicker),
+.launch-hero-compact > p:last-child {
+  max-width: 58ch;
+  margin-top: 28px;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.72;
+}
+
+.launch-kicker,
+.section-label,
+.card-label {
+  color: var(--sage);
+  font-size: .67rem;
+  font-weight: 720;
+  letter-spacing: .13em;
+}
+
+.launch-button {
+  min-height: 48px;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  color: var(--ink);
+  font-size: .79rem;
+  font-weight: 600;
+}
+
+.launch-button:hover {
+  border-color: var(--copper);
+  transform: none;
+}
+
+.launch-button.primary {
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 1px;
+  background: var(--copper);
+  box-shadow: none;
+  color: #171713;
+}
+
+.launch-button.primary:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.launch-section {
+  padding-block: clamp(86px, 10vw, 132px);
+  border-top: 1px solid var(--line);
+}
+
+.launch-heading {
+  gap: clamp(45px, 8vw, 110px);
+  margin-bottom: 52px;
+}
+
+.launch-heading h2,
+.launch-section > h2,
+.launch-callout h2,
+.baseline-explainer h2 {
+  color: var(--ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(2.7rem, 5vw, 4.5rem);
+  font-weight: 410;
+  letter-spacing: -.045em;
+  line-height: .98;
+}
+
+.launch-heading > p,
+.launch-section > p,
+.baseline-explainer p,
+.billing-note p,
+.launch-callout p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.launch-band {
+  margin-inline: calc(50% - 50vw);
+  padding: clamp(92px, 11vw, 145px) max(32px, calc((100vw - 1280px) / 2));
+  border-top: 1px solid var(--line);
+  background: #0e100e;
+  color: var(--ink);
+}
+
+.launch-band .launch-kicker {
+  color: var(--sage);
+}
+
+.journey-steps {
+  gap: 1px;
+  border-block: 1px solid var(--line);
+  background: rgba(240, 236, 228, .075);
+}
+
+.journey-steps::before {
+  display: none;
+}
+
+.journey-steps article {
+  min-height: 260px;
+  padding: 27px 24px;
+  border: 0;
+  border-radius: 0;
+  background: #0e100e;
+}
+
+.journey-steps article::after {
+  display: none;
+}
+
+.journey-steps article:hover {
+  background: #0e100e;
+  transform: none;
+}
+
+.journey-steps article > span {
+  color: var(--sage);
+}
+
+.journey-steps h3 {
+  color: var(--ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: 1.45rem;
+  font-weight: 420;
+}
+
+.journey-steps p {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.baseline-explainer {
+  gap: clamp(55px, 9vw, 120px);
+}
+
+.definition-list {
+  border-top: 1px solid var(--line);
+}
+
+.definition-list > div {
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(240, 236, 228, .075);
+}
+
+.definition-list > div::after {
+  display: none;
+}
+
+.definition-list dt {
+  color: var(--sage);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.definition-list dd {
+  color: var(--muted);
+}
+
+.billing-note,
+.framework-disclosure {
+  padding: 24px 0;
+  border: 0;
+  border-block: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+
+.billing-note strong {
+  color: var(--ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 420;
+}
+
+.pricing-section,
+.faq-section {
+  padding-top: clamp(64px, 8vw, 100px);
+}
+
+.pricing-grid {
+  gap: 1px;
+  border-block: 1px solid var(--line);
+  background: rgba(240, 236, 228, .075);
+}
+
+.price-card,
+.price-card.featured {
+  padding: clamp(28px, 4vw, 46px);
+  border: 0;
+  border-radius: 0;
+  background: var(--paper);
+  box-shadow: none;
+}
+
+.price-card::after {
+  display: none;
+}
+
+.price-card:hover,
+.price-card.featured:hover {
+  border-color: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.price-card.featured {
+  box-shadow: inset 0 2px var(--copper);
+}
+
+.price-card header {
+  border-bottom-color: var(--line);
+}
+
+.price-card h2 {
+  color: var(--ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-weight: 420;
+}
+
+.price-tag,
+.plan-audience {
+  color: var(--sage);
+}
+
+.plan-audience {
+  border-color: var(--line);
+  border-radius: 1px;
+}
+
+.price {
+  color: var(--ink);
+}
+
+.price-note,
+.plan-summary,
+.price-options small {
+  color: var(--muted);
+}
+
+.price-options {
+  border-color: var(--line);
+  border-radius: 0;
+  background: #0e100e;
+}
+
+.feature-list {
+  border-top: 1px solid var(--line);
+}
+
+.feature-list li {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(240, 236, 228, .075);
+  color: var(--muted);
+}
+
+.feature-list li::before {
+  display: none;
+}
+
+.faq-category + .faq-category {
+  margin-top: 90px;
+}
+
+.faq-list {
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.faq-list details,
+.faq-list details:hover,
+.faq-list details[open] {
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(240, 236, 228, .1);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.faq-list summary {
+  min-height: 68px;
+  padding: 20px 45px 20px 0;
+  color: var(--ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: 1.15rem;
+}
+
+.faq-list summary::after {
+  right: 0;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 0;
+  color: var(--sage);
+}
+
+.faq-list details[open] summary::after {
+  background: transparent;
+  color: var(--copper);
+}
+
+.faq-list details > p {
+  max-width: 72ch;
+  padding: 0 0 26px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.launch-callout {
+  gap: clamp(50px, 8vw, 110px);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.launch-callout::after {
+  display: none;
+}
+
+.launch-footer {
+  border-top-color: var(--line);
+  color: var(--muted);
+}
+
+.launch-footer a {
+  color: var(--muted);
+}
+
+.launch-card,
+.use-case-card,
+.plan-guidance article,
+.launch-summary {
+  border-radius: 1px;
+  background: #0e100e;
+}
+
+.launch-card::after,
+.use-case-card::after,
+.plan-guidance article::after,
+.launch-summary::after {
+  display: none;
+}
+
+.launch-card:hover,
+.use-case-card:hover,
+.plan-guidance article:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+@media (max-width: 860px) {
+  .launch-shell {
+    width: calc(100% - 36px);
+  }
+
+  .launch-links a:not(.launch-cta):not([href="/login"]) {
+    display: none;
+  }
+
+  .launch-links {
+    gap: 15px;
+  }
+
+  .launch-hero h1,
+  .launch-hero-compact h1 {
+    font-size: clamp(3.2rem, 14vw, 4.5rem);
+  }
+
+  .launch-heading,
+  .baseline-explainer {
+    grid-template-columns: 1fr;
+  }
+
+  .journey-steps,
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .launch-callout {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .launch-wordmark {
+    font-size: 0;
+  }
+
+  .launch-wordmark::before {
+    font-size: 1rem;
+  }
+
+  .launch-links a[href="/login"] {
+    display: none;
+  }
+
+  .launch-hero h1,
+  .launch-hero-compact h1 {
+    font-size: 3.05rem;
+  }
+
+  .price-card,
+  .price-card.featured {
+    padding-inline: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launch-page *,
+  .launch-page *::before,
+  .launch-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

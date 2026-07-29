@@ -5,7 +5,7 @@ const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
-const styles = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
+const styles = `${readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8')}\n${readFileSync(new URL('./experience-reconciliation.css', import.meta.url), 'utf8')}`;
 
 describe('authenticated product flow', () => {
   it('routes account creation through plan confirmation into one workspace', () => {
@@ -50,9 +50,9 @@ describe('authenticated product flow', () => {
   });
 
   it('supports unknown birth time without guessed outputs', () => {
-    expect(workspace).toContain('<option value="unknown">Unknown</option>');
-    expect(workspace).toContain('Unknown time is supported.');
-    expect(workspace).toContain('Sovereign will not guess them.');
+    expect(workspace).toContain("['unknown', 'Unknown'");
+    expect(workspace).toContain('A supported path.');
+    expect(workspace).toContain('Sovereign will not guess unavailable values.');
   });
 
   it('requires an explicit, removable current-context choice without requesting device location', () => {

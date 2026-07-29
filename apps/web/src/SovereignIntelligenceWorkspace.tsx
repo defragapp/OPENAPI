@@ -3,6 +3,7 @@ import type { FormEvent, KeyboardEvent, ReactNode } from 'react';
 
 type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
 type ApiState = 'idle' | 'loading' | 'ready' | 'error';
+type BaselineExperience = 'idle' | 'building' | 'reveal';
 type Json = Record<string, any>;
 
 type AnswerSectionId =
@@ -147,8 +148,10 @@ export function SovereignIntelligenceWorkspace() {
   const [selectedSystem, setSelectedSystem] = useState('');
   const [covenantEnabled, setCovenantEnabled] = useState(false);
   const [covenantSheetOpen, setCovenantSheetOpen] = useState(false);
+  const [baselineExperience, setBaselineExperience] = useState<BaselineExperience>('idle');
+  const [baselineReveal, setBaselineReveal] = useState<Json | null>(null);
   const [status, setStatus] = useState('Loading Sovereign.OS…');
-  const [apiState, setApiState] = useState<ApiState>('idle');
+  const [apiState, setApiState] = useState<ApiState>('loading');
   const [workspace, setWorkspace] = useState<WorkspaceState>({
     today: null,
     people: [],
@@ -182,6 +185,7 @@ export function SovereignIntelligenceWorkspace() {
   }
 
   async function refreshWorkspace() {
+    setApiState('loading');
     try {
       const onboarding = await api('/api/v1/account/onboarding');
       if (!onboarding.completed) {
@@ -228,6 +232,7 @@ export function SovereignIntelligenceWorkspace() {
     selectedPersonRecord?.displayName ?? '',
     selectedSystemRecord?.name ?? ''
   ].filter(Boolean);
+  const baselineReady = workspace.today?.baseline?.status === 'completed';
 
   function startNewThread(nextSurface: Surface = surface) {
     setSurface(nextSurface);
@@ -239,11 +244,15 @@ export function SovereignIntelligenceWorkspace() {
     setApiState('idle');
     setStatus('Ready');
     setContextOpen(false);
+    setBaselineExperience('idle');
+    setBaselineReveal(null);
     if (nextSurface !== 'People') setSelectedPerson('');
     if (nextSurface !== 'Systems') setSelectedSystem('');
   }
 
   function openSurface(next: Surface) {
+    setBaselineExperience('idle');
+    setBaselineReveal(null);
     if (next !== surface && (messages.length || draft.trim())) startNewThread(next);
     else {
       setSurface(next);
@@ -252,6 +261,39 @@ export function SovereignIntelligenceWorkspace() {
     }
     setContextOpen(false);
     setMenuOpen(false);
+  }
+
+  function beginBaseline() {
+    setSurface('Today');
+    setMessages([]);
+    setDraft('');
+    setContextOpen(false);
+    setBaselineReveal(null);
+    setBaselineExperience('building');
+  }
+
+  async function completeBaseline(result: Json) {
+    setBaselineReveal(result);
+    setBaselineExperience('reveal');
+    setApiState('ready');
+    setStatus('Your Baseline is ready.');
+    try {
+      const todayData = await api('/api/v1/today');
+      setWorkspace((current) => ({ ...current, today: todayData.today ?? null }));
+    } catch {
+      // The successful Baseline response still supports the reveal while Today refreshes later.
+    }
+  }
+
+  function beginFromReveal(prompt?: string) {
+    setBaselineExperience('idle');
+    setBaselineReveal(null);
+    if (prompt) {
+      setSurface('Explore');
+      setDraft(prompt);
+    } else {
+      setSurface('Today');
+    }
   }
 
   async function openThread(id: string) {
@@ -420,56 +462,68 @@ export function SovereignIntelligenceWorkspace() {
     <div className={`intelligence-workspace ${contextOpen ? 'context-open' : ''}`}>
       <aside className="intelligence-sidebar" aria-label="Sovereign navigation">
         <a className="intelligence-brand" href="/app"><span aria-hidden="true">S</span><strong>SOVEREIGN.OS</strong></a>
-        <button className="new-conversation" onClick={() => startNewThread()}>New exploration</button>
         <nav>
-          <p>OPEN</p>
           {surfaces.map((item) => (
-            <button key={item.name} className={surface === item.name ? 'active' : ''} onClick={() => openSurface(item.name)}>
-              <span aria-hidden="true">{surfaceIcon(item.name)}</span>
-              <span><strong>{item.label}</strong><small>{item.description}</small></span>
+            <button
+              key={item.name}
+              className={surface === item.name ? 'active' : ''}
+              aria-label={`${item.label}: ${item.description}`}
+              onClick={() => openSurface(item.name)}
+            >
+              <strong>{item.label}</strong>
             </button>
           ))}
         </nav>
-        <section className="recent-threads">
-          <p>RECENT</p>
+        {workspace.threads.length > 0 && <section className="recent-threads">
+          <p>Recent explorations</p>
           {!workspace.threads.length && <span>Explorations you begin will appear here.</span>}
           {workspace.threads.slice(0, 10).map((thread) => (
             <button key={thread.id} onClick={() => void openThread(thread.id)}>{thread.title}</button>
           ))}
-        </section>
-        <button className="plan-chip" onClick={() => openSurface('You')}>
-          <span>{workspace.billing?.effective?.plan === 'sovereign_plus' ? 'S+' : 'S'}</span>
-          <span><strong>{workspace.billing?.effective?.plan === 'sovereign_plus' ? 'Sovereign+' : 'Free'}</strong><small>Plan and account</small></span>
-        </button>
+        </section>}
+        <button className="new-conversation" onClick={() => startNewThread()}>New exploration <span aria-hidden="true">+</span></button>
       </aside>
 
       <main className="intelligence-main">
         <header className="intelligence-topbar">
           <button className="mobile-menu-trigger" onClick={() => setMenuOpen(true)} aria-label="Open account menu">S</button>
-          <div><strong>Sovereign</strong><span>{surface} · {surfaces.find((item) => item.name === surface)?.description}</span></div>
+          <div><strong>Sovereign</strong><span aria-hidden="true" /><em>{surface}</em></div>
           <div className="topbar-actions">
-            <span className={`workspace-status ${apiState}`}>{status}</span>
-            <button onClick={() => setContextOpen((open) => !open)}>{contextOpen ? 'Close context' : 'Context'}</button>
+            {(apiState === 'loading' || apiState === 'error') && <span className={`workspace-status ${apiState}`}>{status}</span>}
+            <button onClick={() => setContextOpen((open) => !open)}>{contextOpen ? 'Close' : 'Context'}</button>
           </div>
         </header>
 
-        <section className="context-bar" aria-label="Active context">
-          <strong>Considering</strong>
-          {contextItems.map((item) => <span key={item}>{item}</span>)}
-          {(selectedPerson || selectedSystem) && <button onClick={() => { setSelectedPerson(''); setSelectedSystem(''); }}>Clear</button>}
-        </section>
-
         <section className="intelligence-scroll" aria-live="polite">
           {!messages.length
-            ? <SurfaceHome
-                surface={surface}
-                workspace={workspace}
-                selectedPerson={selectedPersonRecord}
-                selectedSystem={selectedSystemRecord}
-                api={api}
-                onPrompt={setDraft}
-                onOpenContext={() => setContextOpen(true)}
-              />
+            ? apiState === 'loading' && !workspace.today && baselineExperience === 'idle'
+              ? <WorkspaceArrival />
+              : apiState === 'error' && !workspace.today && baselineExperience === 'idle'
+                ? <WorkspaceUnavailable message={status} onRetry={() => void refreshWorkspace()} />
+                : baselineExperience === 'building'
+              ? <BaselineBuilder
+                  api={api}
+                  onCancel={() => setBaselineExperience('idle')}
+                  onComplete={(result) => void completeBaseline(result)}
+                />
+              : baselineExperience === 'reveal'
+                ? <BaselineReveal
+                    result={baselineReveal}
+                    today={workspace.today}
+                    onOpenToday={() => beginFromReveal()}
+                    onExplore={(prompt) => beginFromReveal(prompt)}
+                    onCurrentContext={() => { setBaselineExperience('idle'); setSurface('You'); setContextOpen(true); }}
+                  />
+                : <SurfaceHome
+                    surface={surface}
+                    workspace={workspace}
+                    selectedPerson={selectedPersonRecord}
+                    selectedSystem={selectedSystemRecord}
+                    api={api}
+                    onPrompt={setDraft}
+                    onOpenContext={() => setContextOpen(true)}
+                    onBuildBaseline={beginBaseline}
+                  />
             : <ResponseThread
                 messages={messages}
                 onPrompt={setDraft}
@@ -479,30 +533,34 @@ export function SovereignIntelligenceWorkspace() {
               />}
         </section>
 
-        <form className="sovereign-composer" onSubmit={submit}>
-          <textarea
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            placeholder={composerPlaceholder(surface)}
-            rows={2}
-            aria-label={`Ask Sovereign from ${surface}`}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                event.currentTarget.form?.requestSubmit();
-              }
-            }}
-          />
-          <div>
-            <button type="button" className="composer-context-button" onClick={() => setContextOpen(true)}>{contextItems.join(' · ')}</button>
-            <span>Enter to send · Shift + Enter for a new line</span>
-            <button className="composer-send" disabled={!draft.trim() || apiState === 'loading'} aria-label="Send message">↑</button>
-          </div>
-        </form>
+        {baselineExperience === 'idle' && baselineReady && (
+          <form className="sovereign-composer" onSubmit={submit}>
+            <div className="composer-context-line">
+              <span>Considering · {contextItems.join(' · ')}</span>
+              <button type="button" onClick={() => setContextOpen(true)}>Change context</button>
+            </div>
+            <div className="composer-entry">
+              <textarea
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                placeholder={composerPlaceholder(surface)}
+                rows={2}
+                aria-label={`Ask Sovereign from ${surface}`}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    event.currentTarget.form?.requestSubmit();
+                  }
+                }}
+              />
+              <button className="composer-send" disabled={!draft.trim() || apiState === 'loading'} aria-label="Send message">→</button>
+            </div>
+          </form>
+        )}
       </main>
 
       <aside className="intelligence-context" aria-label={`${surface} controls`}>
-        <header><div><p>CONTEXT</p><h2>{surface}</h2></div><button onClick={() => setContextOpen(false)} aria-label="Close context">×</button></header>
+        <header><div><p>What Sovereign is considering</p><h2>{surface}</h2></div><button onClick={() => setContextOpen(false)} aria-label="Close context">×</button></header>
         <div className="context-scroll">
           <ContextPanel
             surface={surface}
@@ -514,6 +572,7 @@ export function SovereignIntelligenceWorkspace() {
             setSelectedPerson={(id) => { setSelectedPerson(id); if (id) setSelectedSystem(''); }}
             setSelectedSystem={(id) => { setSelectedSystem(id); if (id) setSelectedPerson(''); }}
             setDraft={(value) => { setDraft(value); setContextOpen(false); }}
+            onBuildBaseline={beginBaseline}
           />
         </div>
       </aside>
@@ -521,7 +580,7 @@ export function SovereignIntelligenceWorkspace() {
       <nav className="mobile-bottom-nav" aria-label="Primary navigation">
         {surfaces.filter((item) => item.name !== 'You').map((item) => (
           <button key={item.name} className={surface === item.name ? 'active' : ''} onClick={() => openSurface(item.name)}>
-            <span aria-hidden="true">{surfaceIcon(item.name)}</span><small>{item.label}</small>
+            <small>{item.label}</small>
           </button>
         ))}
       </nav>
@@ -556,7 +615,197 @@ export function SovereignIntelligenceWorkspace() {
   );
 }
 
-function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, onPrompt, onOpenContext }: {
+function BaselineBuilder({ api, onCancel, onComplete }: {
+  api: (path: string, init?: RequestInit) => Promise<Json>;
+  onCancel: () => void;
+  onComplete: (result: Json) => void;
+}) {
+  const [step, setStep] = useState(1);
+  const [birthDate, setBirthDate] = useState('');
+  const [birthplace, setBirthplace] = useState('');
+  const [certainty, setCertainty] = useState<'exact' | 'approximate' | 'unknown'>('unknown');
+  const [birthTime, setBirthTime] = useState('');
+  const [state, setState] = useState<'idle' | 'submitting' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  function continueFromDetails(event: FormEvent) {
+    event.preventDefault();
+    if (!birthDate || birthplace.trim().length < 2) {
+      setState('error');
+      setMessage('Add your birth date and birthplace before continuing.');
+      return;
+    }
+    setState('idle');
+    setMessage('');
+    setStep(2);
+  }
+
+  function continueFromTime(event: FormEvent) {
+    event.preventDefault();
+    if (certainty !== 'unknown' && !birthTime) {
+      setState('error');
+      setMessage('Add the exact or approximate birth time, or choose Unknown.');
+      return;
+    }
+    setState('idle');
+    setMessage('');
+    setStep(3);
+  }
+
+  async function build(event: FormEvent) {
+    event.preventDefault();
+    setState('submitting');
+    setMessage('Sovereign is constructing your private personal foundation…');
+    try {
+      const data = await api('/api/v1/baseline/onboarding', {
+        method: 'POST',
+        body: JSON.stringify({
+          birthDate,
+          birthplace: birthplace.trim(),
+          birthTimezone: timezone,
+          birthTimeCertainty: certainty,
+          ...(certainty !== 'unknown' ? { birthTime } : {}),
+          locationPrecision: 'city_or_regional'
+        })
+      });
+      onComplete(data.baseline ?? data);
+    } catch (error) {
+      setState('error');
+      setMessage(error instanceof Error ? error.message : 'Your Baseline could not be completed yet.');
+    }
+  }
+
+  return (
+    <section className="baseline-builder" aria-labelledby="baseline-builder-title">
+      <header className="baseline-progress">
+        <span>{step} of 3 · {step === 1 ? 'Birth details' : step === 2 ? 'Birth-time certainty' : 'Review'}</span>
+        <i aria-hidden="true"><b style={{ width: `${step * 33.333}%` }} /></i>
+      </header>
+      <div className="baseline-builder-layout">
+        <div className="baseline-builder-main">
+          <h1 id="baseline-builder-title">Build your Baseline.</h1>
+          <p>These details create the private personal foundation Sovereign uses across self, decisions, relationships, and systems.</p>
+
+          {step === 1 && (
+            <form onSubmit={continueFromDetails} className="baseline-step-form">
+              <label>
+                <strong>Birth date</strong>
+                <span>Required for the Baseline calculation.</span>
+                <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} required />
+              </label>
+              <label>
+                <strong>Birthplace</strong>
+                <span>Used to resolve time and astronomical context.</span>
+                <input value={birthplace} onChange={(event) => setBirthplace(event.target.value)} placeholder="City, region, country" required />
+              </label>
+              <button className="baseline-primary">Continue <span aria-hidden="true">→</span></button>
+              <button type="button" className="baseline-back" onClick={onCancel}>Back to Today</button>
+            </form>
+          )}
+
+          {step === 2 && (
+            <form onSubmit={continueFromTime} className="baseline-step-form">
+              <fieldset>
+                <legend>How certain is your birth time?</legend>
+                <p>Birth-time certainty changes which time-sensitive parts can be used and how much uncertainty they carry.</p>
+                {[
+                  ['exact', 'Exact', 'Use this when the recorded time is known.'],
+                  ['approximate', 'Approximate', 'Use this when the time is close but not exact.'],
+                  ['unknown', 'Unknown', 'A supported path. Sovereign will not guess unavailable values.']
+                ].map(([value, label, description]) => (
+                  <label className="certainty-choice" key={value}>
+                    <input type="radio" name="birthTimeCertainty" value={value} checked={certainty === value} onChange={() => setCertainty(value as typeof certainty)} />
+                    <span><strong>{label}</strong><small>{description}</small></span>
+                  </label>
+                ))}
+              </fieldset>
+              {certainty !== 'unknown' && (
+                <label>
+                  <strong>Birth time</strong>
+                  <span>Improves time-sensitive parts of the calculation.</span>
+                  <input type="time" value={birthTime} onChange={(event) => setBirthTime(event.target.value)} required />
+                </label>
+              )}
+              <button className="baseline-primary">Continue <span aria-hidden="true">→</span></button>
+              <button type="button" className="baseline-back" onClick={() => setStep(1)}>Back</button>
+            </form>
+          )}
+
+          {step === 3 && (
+            <form onSubmit={(event) => void build(event)} className="baseline-step-form baseline-review">
+              <dl>
+                <div><dt>Birth date</dt><dd>{new Date(`${birthDate}T12:00:00`).toLocaleDateString()}</dd></div>
+                <div><dt>Birthplace</dt><dd>{birthplace}</dd></div>
+                <div><dt>Birth time</dt><dd>{certainty === 'unknown' ? 'Unknown · time-sensitive values will be omitted or carry higher uncertainty' : `${birthTime} · ${certainty}`}</dd></div>
+              </dl>
+              <p>Your raw birth details and exact private location are not sent to the model. Your Baseline remains interpretive and correctable.</p>
+              <button className="baseline-primary" disabled={state === 'submitting'}>{state === 'submitting' ? 'Building your Baseline…' : 'Build my Baseline'} <span aria-hidden="true">→</span></button>
+              <button type="button" className="baseline-back" onClick={() => setStep(2)} disabled={state === 'submitting'}>Back</button>
+            </form>
+          )}
+
+          {message && <p className={`baseline-builder-message ${state === 'error' ? 'error' : ''}`} role={state === 'error' ? 'alert' : 'status'}>{message}</p>}
+        </div>
+        <aside>
+          <h2>Why this matters</h2>
+          <p>Your Baseline gives Sovereign a consistent place to begin before you describe a problem.</p>
+          <p>Your raw birth details and exact private location are not sent to the model.</p>
+          <small>{step === 1 ? 'Next, you’ll confirm your birth-time certainty and review your details.' : step === 2 ? 'Next, you’ll review the details before anything is calculated.' : 'After this, Sovereign will reveal a small number of high-value qualities you can begin exploring.'}</small>
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function BaselineReveal({ result, today, onOpenToday, onExplore, onCurrentContext }: {
+  result: Json | null;
+  today: Json | null;
+  onOpenToday: () => void;
+  onExplore: (prompt: string) => void;
+  onCurrentContext: () => void;
+}) {
+  const reduced = result?.reducedContext ?? today?.baseline?.reducedContext ?? {};
+  const facets = Array.isArray(reduced?.facetProfile?.facets) ? reduced.facetProfile.facets as Json[] : [];
+  const registry = Array.isArray(today?.baseline?.reducedContext?.basisRegistry)
+    ? today.baseline.reducedContext.basisRegistry as Json[]
+    : Array.isArray(reduced?.basisRegistry)
+      ? reduced.basisRegistry as Json[]
+      : [];
+  const facet = (id: string) => facets.find((item) => item.id === id);
+  const core = facet('core_orientation') ?? facets[0];
+  const communication = facet('communication');
+  const decisions = facet('decision_making');
+  const pressure = facet('response_pressure') ?? facet('shadow_expression');
+  const support = registry.filter((item) => Array.isArray(core?.basisRefs) && core.basisRefs.includes(item.id));
+  const currentReady = today?.current?.status === 'ready';
+
+  return (
+    <section className="baseline-reveal">
+      <p>Your Baseline is ready.</p>
+      <h1>{core?.title ?? 'Your personal foundation is ready to explore.'}</h1>
+      <span>{core?.description ?? 'Sovereign can now keep a stable, correctable personal foundation beneath questions about decisions, relationships, pressure, and change.'}</span>
+      <BaselineEvidence values={support} />
+      <div className="baseline-reveal-facets">
+        <article><small>How you communicate</small><p>{communication?.description ?? 'Open this part of your Baseline to see how you make a question and response clear.'}</p></article>
+        <article><small>How you decide</small><p>{decisions?.description ?? 'Open this part of your Baseline to see how clarity forms and what pressure may change.'}</p></article>
+        <article><small>Under pressure</small><p>{pressure?.shadowExpression ?? pressure?.description ?? 'Open this part of your Baseline to see when a useful capacity may narrow or overreach.'}</p></article>
+      </div>
+      <div className="baseline-current-choice">
+        <span>{currentReady ? 'Current context is available · Your stable Baseline remains separate.' : 'Current context is off · Your Baseline remains available.'}</span>
+        <button onClick={onCurrentContext}>Choose whether to add it</button>
+      </div>
+      <button className="baseline-reveal-primary" onClick={onOpenToday}>Open Today <span aria-hidden="true">→</span></button>
+      <nav aria-label="Begin exploring">
+        <button onClick={() => onExplore('How do I show, receive, and protect love and connection?')}>Understand how I show love</button>
+        <button onClick={() => onExplore('Help me examine whether this choice fits who I am now.')}>Examine a decision</button>
+      </nav>
+      <small>Your Baseline is interpretive and correctable. Keep what fits; correct or reject what does not.</small>
+    </section>
+  );
+}
+
+function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, onPrompt, onOpenContext, onBuildBaseline }: {
   surface: Surface;
   workspace: WorkspaceState;
   selectedPerson: Json | null;
@@ -564,6 +813,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   api: (path: string, init?: RequestInit) => Promise<Json>;
   onPrompt: (prompt: string) => void;
   onOpenContext: () => void;
+  onBuildBaseline: () => void;
 }) {
   if (surface === 'Today') {
     const baseline = workspace.today?.baseline;
@@ -571,50 +821,46 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
       ? baseline.reducedContext.facetProfile.facets
       : [];
     const current = workspace.today?.current;
+    const registry = Array.isArray(baseline?.reducedContext?.basisRegistry)
+      ? baseline.reducedContext.basisRegistry
+      : [];
     return (
       <div className="surface-home today-home">
-        <SurfaceHeading kicker="TODAY" title="What is active for you now?" body="Begin with what remains steady in your Baseline, then see which parts may be more relevant today." />
         {facets.length
-          ? <TodayFacetView facets={facets} current={current} />
-          : <IncompleteState title="Your Baseline facets are not ready yet." body="Complete or refresh your Baseline before Sovereign presents personalized qualities, Shadow, Gift, or Alignment." action="Open Baseline controls" onAction={onOpenContext} />}
-        <QuestionRail prompts={surfacePrompts.Today} onPrompt={onPrompt} />
+          ? <TodayFacetView facets={facets} current={current} registry={registry} onPrompt={onPrompt} />
+          : baseline?.status === 'not_started' || !baseline
+            ? <BaselineInvitation onBuild={onBuildBaseline} />
+            : <BaselinePreparingState onReview={onBuildBaseline} />}
       </div>
     );
   }
-  if (surface === 'Explore') return (
-    <div className="surface-home">
-      <SurfaceHeading kicker="EXPLORE" title="What do you want to understand?" body="Choose a part of your Baseline or bring your own question. Each mode opens a real exploration." />
-      <div className="explore-mode-list">
-        {exploreModes.map(([label, prompt]) => <button key={label} onClick={() => onPrompt(prompt)}><span>{label}</span><small>Open exploration</small></button>)}
-      </div>
-    </div>
-  );
+  if (surface === 'Explore') return <ExploreHome onPrompt={onPrompt} />;
   if (surface === 'People') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="PEOPLE" title="Understand the relationship from both sides." body="Choose someone who has connected their account and permitted comparison, or invite a person to begin." />
+      <SurfaceHeading kicker="People" title="Understand the relationship from both sides." body="Choose someone who has connected their account and permitted comparison, or invite a person to begin." />
       {selectedPerson
         ? <RelationshipOverview person={selectedPerson} api={api} onPrompt={onPrompt} />
-        : <IncompleteState title="Choose a permitted person." body="A name alone does not create access. The other person connects their account and chooses what Sovereign may use." action="Invite or choose someone" onAction={onOpenContext} />}
+        : <EmptyState title="Bring one relationship into view." body="A name alone does not create access. The other person connects their account and chooses what Sovereign may use." action="Invite or choose someone" onAction={onOpenContext} />}
     </div>
   );
   if (surface === 'Systems') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="SYSTEMS" title="See how the whole group functions." body="Choose a family, household, team, workplace, friendship group, or custom system. Keep roles, authority, responsibility, pressure, and perspective in view." />
+      <SurfaceHeading kicker="Systems" title="See how the whole group functions." body="Choose a family, household, team, workplace, friendship group, or custom system. Keep roles, authority, responsibility, pressure, and perspective in view." />
       {selectedSystem
         ? <SystemOverview system={selectedSystem} api={api} onPrompt={onPrompt} />
-        : <IncompleteState title="Choose a system." body="Select a permitted group to see supported roles and connections." action="Choose a system" onAction={onOpenContext} />}
+        : <EmptyState title="Bring the whole structure into view." body="Choose a permitted group to see supported roles, authority, responsibility, pressure, and the perspectives that remain missing." action="Choose a system" onAction={onOpenContext} />}
     </div>
   );
   if (surface === 'Library') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="LIBRARY" title="Keep what changes your understanding." body="Save useful Baseline insights, alignment distinctions, relationship understandings, and system views. Library is not a journal or transcript archive." />
+      <SurfaceHeading kicker="Library" title="Keep what changes your understanding." body="Return to useful Baseline insights, alignment distinctions, relationship understandings, and system views. Library is not a journal or transcript archive." />
       <LibraryGrid library={workspace.library} onPrompt={onPrompt} />
     </div>
   );
   return (
     <div className="surface-home">
-      <SurfaceHeading kicker="YOU" title="Your Baseline, plan, permissions, and account." body="Use Context to manage the personal foundation and controls beneath every exploration." />
-      <AccountSummary workspace={workspace} onOpenContext={onOpenContext} />
+      <SurfaceHeading kicker="You" title="Your personal foundation and control." body="Keep your Baseline, current context, people, privacy, plan, and account together." />
+      <AccountSummary workspace={workspace} onOpenContext={onOpenContext} onBuildBaseline={onBuildBaseline} />
     </div>
   );
 }
@@ -623,24 +869,121 @@ function SurfaceHeading({ kicker, title, body }: { kicker: string; title: string
   return <header className="surface-heading"><p>{kicker}</p><h1>{title}</h1><span>{body}</span></header>;
 }
 
-function TodayFacetView({ facets, current }: { facets: Json[]; current: Json }) {
+function BaselineInvitation({ onBuild }: { onBuild: () => void }) {
+  return (
+    <section className="baseline-invitation">
+      <div>
+        <h1>Your intelligence begins with your Baseline.</h1>
+        <p>Sovereign.OS uses your Baseline to understand how you communicate, decide, connect, respond to pressure, and move through change.</p>
+        <button onClick={onBuild}>Build my Baseline <span aria-hidden="true">→</span></button>
+        <small>Complete it once to open Today, personal exploration, choices, relationships, and systems from the same foundation.</small>
+      </div>
+      <div className="baseline-foundation-visual" aria-hidden="true"><span /><span /><span /><i /></div>
+      <div className="baseline-composer-preview">
+        <strong>Ask something grounded in your Baseline…</strong>
+        <span>Your future questions and explorations will draw from your personal foundation.</span>
+      </div>
+    </section>
+  );
+}
+
+function BaselinePreparingState({ onReview }: { onReview: () => void }) {
+  return (
+    <section className="baseline-preparing">
+      <p>Today</p>
+      <h1>Sovereign is preparing the parts of your Baseline you can explore.</h1>
+      <span>Your personal foundation is saved. The plain-language qualities that support Today, Shadow, Gift, and Alignment are still taking shape.</span>
+      <button onClick={onReview}>Review my Baseline details</button>
+    </section>
+  );
+}
+
+function TodayFacetView({ facets, current, registry, onPrompt }: { facets: Json[]; current: Json; registry: Json[]; onPrompt: (prompt: string) => void }) {
   const facet = (id: string) => facets.find((item) => item.id === id);
   const core = facet('core_orientation') ?? facets[0];
-  const shadow = facet('shadow_expression') ?? core;
   const gift = facet('gift_expression') ?? core;
   const alignment = facet('alignment_markers') ?? core;
   const activeIds = current?.status === 'ready' && Array.isArray(current?.reduced?.affectedBaselineFacetIds)
     ? current.reduced.affectedBaselineFacetIds
     : [];
   const active = facets.find((item) => activeIds.includes(item.id));
-  const rows = [
-    ['Your Baseline', core?.description],
-    ['Active now', active ? `${active.title} may be more relevant for a limited time. Current data does not establish behavior.` : 'No unexpired current contact is available.'],
-    ['Shadow to notice', shadow?.shadowExpression],
-    ['Gift available', gift?.giftExpression],
-    ['Alignment question', Array.isArray(alignment?.alignmentMarkers) ? alignment.alignmentMarkers[0] : 'No alignment marker is available yet.']
-  ];
-  return <section className="today-facet-view">{rows.map(([label, value]) => <article key={label}><span>{label}</span><p>{value || 'This facet is incomplete. Refresh your Baseline to continue.'}</p></article>)}</section>;
+  const support = registry.filter((item) => Array.isArray(core?.basisRefs) && core.basisRefs.includes(item.id));
+  const alignmentMarker = Array.isArray(alignment?.alignmentMarkers) ? alignment.alignmentMarkers[0] : '';
+  return (
+    <section className="today-facet-view">
+      <header>
+        <p>Today</p>
+        <h1>{core?.title ?? 'Begin with what remains steady.'}</h1>
+        <span>{core?.description ?? 'Your Baseline is ready to explore.'}</span>
+      </header>
+      <div className="today-insight-lines">
+        <article>
+          <span>Your Baseline</span>
+          <p>{core?.description}</p>
+          <BaselineEvidence values={support} />
+        </article>
+        <article>
+          <span>More relevant now</span>
+          <p>{active ? `${active.title} may deserve attention for a limited time. Current context does not determine your behavior.` : 'Current context is off or no unexpired contact is available. Your stable Baseline remains available.'}</p>
+        </article>
+        <article>
+          <span>Where this may matter</span>
+          <p>{alignmentMarker || 'Notice where responsibility, authority, and exposure to the outcome do—or do not—match.'}</p>
+        </article>
+      </div>
+      <nav className="today-continuations" aria-label="Continue this insight">
+        <button onClick={() => onPrompt(`How does ${core?.title ?? 'this quality'} change under pressure?`)}>What changes under pressure? <span aria-hidden="true">→</span></button>
+        <button onClick={() => onPrompt(gift?.giftExpression ? `Show me what this Gift expression looks like in real life: ${gift.giftExpression}` : 'What does the Gift expression look like for me?')}>What does the Gift expression look like? <span aria-hidden="true">→</span></button>
+        <button onClick={() => onPrompt(`What exact Baseline evidence supports this quality: ${core?.title ?? 'the quality shown today'}?`)}>What exact Baseline evidence supports this? <span aria-hidden="true">→</span></button>
+      </nav>
+    </section>
+  );
+}
+
+function BaselineEvidence({ values }: { values: Json[] }) {
+  if (!values.length) return null;
+  return (
+    <details className="baseline-evidence">
+      <summary>Why this is personal</summary>
+      <p>{values.slice(0, 4).map((value) => value.accessibleLabel).filter(Boolean).join(' · ')}</p>
+    </details>
+  );
+}
+
+function ExploreHome({ onPrompt }: { onPrompt: (prompt: string) => void }) {
+  const [selected, setSelected] = useState(0);
+  const [label, prompt] = exploreModes[selected]!;
+  const descriptions: Record<string, string> = {
+    'My Baseline': 'Open the stable qualities Sovereign can keep beneath any question.',
+    'Shadow & Gift': 'See how the same valid quality may narrow under pressure or become more useful with awareness.',
+    Alignment: 'Examine what supports a choice, what pulls against it, and the tradeoff that remains.',
+    Decisions: 'Understand how clarity forms for you and what pressure can change.',
+    Communication: 'See how you make the question, meaning, and response visible.',
+    'Love & Relationships': 'Explore how you give, receive, protect, and repair connection.',
+    Learning: 'Understand what helps information become usable and what interrupts it.',
+    Leadership: 'See the form of direction and responsibility that may come naturally.',
+    Boundaries: 'Examine where a strength becomes overextension or where a limit protects what matters.',
+    'Pressure & Change': 'Distinguish a steady quality from the way it may contract when urgency rises.',
+    'Family Role': 'Explore a possible role while keeping supplied facts, interpretation, and unknowns separate.'
+  };
+  return (
+    <div className="surface-home explore-home">
+      <SurfaceHeading kicker="Explore" title="What do you want to understand?" body="Open a practical part of your Baseline without having to invent the right prompt." />
+      <div className="explore-editorial">
+        <nav aria-label="Baseline areas">
+          {exploreModes.map(([itemLabel], index) => (
+            <button key={itemLabel} aria-pressed={selected === index} onClick={() => setSelected(index)}>{itemLabel}</button>
+          ))}
+        </nav>
+        <section>
+          <p>Selected area</p>
+          <h2>{label}</h2>
+          <span>{descriptions[label]}</span>
+          <button onClick={() => onPrompt(prompt)}>Explore {label.toLowerCase()} <i aria-hidden="true">→</i></button>
+        </section>
+      </div>
+    </div>
+  );
 }
 
 function RelationshipOverview({ person, api, onPrompt }: { person: Json; api: (path: string, init?: RequestInit) => Promise<Json>; onPrompt: (value: string) => void }) {
@@ -651,7 +994,7 @@ function RelationshipOverview({ person, api, onPrompt }: { person: Json; api: (p
       .then((data) => setComparison(data.comparison ?? null))
       .catch((problem) => setError(problem instanceof Error ? problem.message : 'Comparison unavailable.'));
   }, [person.id]);
-  if (error) return <IncompleteState title="This comparison is not available yet." body={error} action="Manage permissions" onAction={openConsentControls} />;
+  if (error) return <EmptyState title="This relationship needs one more permission." body={error} action="Manage permissions" onAction={openConsentControls} />;
   if (!comparison) return <p className="loading-state">Loading the permitted comparison…</p>;
   const participants = comparison.participants ?? [];
   return (
@@ -675,7 +1018,7 @@ function SystemOverview({ system, api, onPrompt }: { system: Json; api: (path: s
       .then((data) => setAnalysis(data.analysis ?? null))
       .catch((problem) => setError(problem instanceof Error ? problem.message : 'System analysis unavailable.'));
   }, [system.id]);
-  if (error) return <IncompleteState title="This system is not ready for analysis." body={error} action="Review members" onAction={openConsentControls} />;
+  if (error) return <EmptyState title="This system needs more confirmed context." body={error} action="Review members" onAction={openConsentControls} />;
   if (!analysis) return <p className="loading-state">Loading the permitted system…</p>;
   const participants = analysis.participants ?? [];
   const edges = analysis.relationshipGraph ?? [];
@@ -716,9 +1059,8 @@ function ResponseThread({ messages, onPrompt, onAction, onSave, onCorrection }: 
   return (
     <div className="response-thread">
       {messages.map((message) => message.role === 'user'
-        ? <article key={message.id} className="user-question"><span>YOU</span><p>{message.text}</p></article>
+        ? <article key={message.id} className="user-question"><span>You asked</span><p>{message.text}</p></article>
         : <article key={message.id} className="sovereign-response">
-            <span className="response-mark" aria-hidden="true">S</span>
             {message.answer
               ? <SovereignAnswerView
                   answer={message.answer}
@@ -755,38 +1097,43 @@ function SovereignAnswerView({ answer, basis, interfaceActions, latest, onPrompt
   const covenantPlanAction = planActions.find((action) => action.feature === 'covenant');
   const libraryPlanAction = planActions.find((action) => action.feature === 'library');
   const openPlans = () => location.assign('/pricing.html');
+  const unknown = answer.sections.find((section) => section.id === 'unknowns');
+  const standardSections = answer.sections.filter((section) => section.id !== 'unknowns');
   return (
     <section className={`sovereign-answer answer-${answer.mode}`} aria-label={`${answer.mode.replace('_', ' ')} answer`}>
-      <header><span>{modeLabel(answer.mode)}</span><small>{answer.confidence}</small><h2>{answer.headline}</h2></header>
+      <header><span>Sovereign · {modeLabel(answer.mode)}</span><h2>{answer.headline}</h2></header>
       <p className="direct-answer">{answer.direct_answer}</p>
 
       {answer.mode === 'alignment'
-        ? <AlignmentView sections={answer.sections} />
+        ? <AlignmentView sections={standardSections} />
         : answer.mode === 'relationship'
-          ? <RelationshipAnswer sections={answer.sections} />
+          ? <RelationshipAnswer sections={standardSections} />
           : answer.mode === 'system'
-            ? <SystemAnswer sections={answer.sections} />
-            : answer.mode === 'covenant'
-              ? <CovenantAnswer sections={answer.sections} />
-              : <div className="answer-sections">{answer.sections.map((section) => <article key={`${section.id}-${section.label}`}><span>{section.label}</span><p>{section.body}</p></article>)}</div>}
+            ? <SystemAnswer sections={standardSections} />
+          : answer.mode === 'covenant'
+              ? <CovenantAnswer sections={standardSections} />
+              : <div className="answer-sections">{standardSections.map((section) => <article className={section.id === 'experiment' ? 'answer-experiment' : ''} key={`${section.id}-${section.label}`}><span>{section.label}</span><p>{section.body}</p></article>)}</div>}
 
-      <div className="answer-meta-row">
+      <div className="answer-evidence-row">
         <BasisStrip values={basis} />
         {covenantAction && <button className="covenant-action" onClick={() => onAction(covenantAction)}><span aria-hidden="true">✝</span>{covenantAction.label}</button>}
         {!covenantAction && covenantPlanAction && <button className="covenant-action plan-action" onClick={openPlans}><span aria-hidden="true">✝</span>{covenantPlanAction.label}</button>}
       </div>
+      <p className="answer-limit"><strong>Still unknown</strong>{unknown?.body ?? `This remains an ${answer.confidence} interpretation. Your actual response, another person’s private experience, and the outcome remain yours to confirm.`}</p>
 
       {latest && (
         <footer className="answer-actions">
-          {primaryAction && <button className="answer-primary" onClick={() => onAction(primaryAction)}>{primaryAction.label}</button>}
-          {!primaryAction && primaryPlanAction && <button className="answer-primary plan-action" onClick={openPlans}>{primaryPlanAction.label}</button>}
-          {saveAction
-            ? <button className="answer-save" onClick={onSave}>Save to Library</button>
-            : libraryPlanAction
-              ? <button className="answer-save plan-action" onClick={openPlans}>{libraryPlanAction.label}</button>
-              : null}
           <div className="fit-controls"><span>{answer.correction_prompt}</span><button onClick={() => onCorrection('yes')}>Yes</button><button onClick={() => onCorrection('partly')}>Partly</button><button onClick={() => onCorrection('not_today')}>Not today</button></div>
-          <button className="answer-continue" onClick={() => onPrompt(`Continue from this distinction: ${answer.headline}`)}>Ask a follow-up</button>
+          <nav className="answer-continuations" aria-label="Continue this understanding">
+            {primaryAction && <button onClick={() => onAction(primaryAction)}>{primaryAction.label} <span aria-hidden="true">→</span></button>}
+            {!primaryAction && primaryPlanAction && <button className="plan-action" onClick={openPlans}>{primaryPlanAction.label} <span aria-hidden="true">→</span></button>}
+            {saveAction
+              ? <button onClick={onSave}>Save this understanding <span aria-hidden="true">→</span></button>
+              : libraryPlanAction
+                ? <button className="plan-action" onClick={openPlans}>{libraryPlanAction.label} <span aria-hidden="true">→</span></button>
+                : null}
+            <button onClick={() => onPrompt(`Continue from this distinction: ${answer.headline}`)}>Ask a follow-up <span aria-hidden="true">→</span></button>
+          </nav>
         </footer>
       )}
     </section>
@@ -833,20 +1180,21 @@ function BasisStrip({ values }: { values: BasisValue[] }) {
   const mobile = useMediaQuery('(max-width: 640px)');
   const limit = mobile ? 3 : 5;
   const visible = values.slice(0, limit);
-  if (!values.length) return <span className="basis-empty">BASIS · No exact value selected</span>;
+  if (!values.length) return null;
   return (
     <>
-      <button className="basis-strip" onClick={() => setOpen(true)} aria-label={`Open Basis sources. ${values.length} exact values available.`}>
-        <strong>BASIS</strong>
-        {visible.map((value) => <span key={value.id} aria-label={value.accessibleLabel}>{value.display}</span>)}
-        {values.length > limit && <b>+{values.length - limit}</b>}
+      <button className="basis-strip" onClick={() => setOpen(true)} aria-label={`Why this is personal. Open ${values.length} exact supporting values.`}>
+        <strong>Why this is personal</strong>
+        <span>{visible.map((value) => value.accessibleLabel).join(' · ')}</span>
+        {values.length > limit && <b>+{values.length - limit} more</b>}
+        <i aria-hidden="true">⌄</i>
       </button>
       {open && (
         <ModalDialog className="source-drawer" labelledBy="basis-title" onClose={() => setOpen(false)}>
           <button className="sheet-backdrop" onClick={() => setOpen(false)} aria-label="Close Basis sources" />
           <section>
-            <header><div><span>EXACT SUPPORT</span><h2 id="basis-title">Basis</h2></div><button onClick={() => setOpen(false)} aria-label="Close">×</button></header>
-            <p>These exact values shaped the interpretation. They support reflection; they do not prove a personality or current state.</p>
+            <header><div><span>Exact support</span><h2 id="basis-title">Why this is personal</h2></div><button onClick={() => setOpen(false)} aria-label="Close">×</button></header>
+            <p>These server-approved values shaped the interpretation. They support reflection; they do not prove a personality or current state.</p>
             <dl>{values.map((value) => <div key={value.id}><dt>{value.display}</dt><dd><span>{value.accessibleLabel}</span><span>Calculated {formatDate(value.computedAt)} · {value.uncertainty} uncertainty</span><span>{value.provenance}</span></dd></div>)}</dl>
           </section>
         </ModalDialog>
@@ -855,16 +1203,30 @@ function BasisStrip({ values }: { values: BasisValue[] }) {
   );
 }
 
-function QuestionRail({ prompts, onPrompt }: { prompts: string[]; onPrompt: (value: string) => void }) {
-  return <section className="question-rail"><header><span>ASK FROM HERE</span><h2>Start with the question you already have.</h2></header><div>{prompts.map((prompt) => <button key={prompt} onClick={() => onPrompt(prompt)}>{prompt}</button>)}</div></section>;
+function EmptyState({ title, body, action, onAction }: { title: string; body: string; action: string; onAction: () => void }) {
+  return <section className="empty-state"><h2>{title}</h2><p>{body}</p><button onClick={onAction}>{action} <span aria-hidden="true">→</span></button></section>;
 }
 
-function IncompleteState({ title, body, action, onAction }: { title: string; body: string; action: string; onAction: () => void }) {
-  return <section className="incomplete-state"><span>INCOMPLETE</span><h2>{title}</h2><p>{body}</p><button onClick={onAction}>{action}</button></section>;
+function WorkspaceArrival() {
+  return <section className="workspace-arrival" role="status"><span>Sovereign</span><h1>Opening your intelligence.</h1><p>Bringing your Baseline, current choices, conversations, and permissions into one place.</p></section>;
 }
 
-function AccountSummary({ workspace, onOpenContext }: { workspace: WorkspaceState; onOpenContext: () => void }) {
-  return <section className="account-summary"><article><span>Baseline</span><strong>{workspace.today?.baseline?.status === 'completed' ? 'Ready' : 'Needs attention'}</strong></article><article><span>Plan and billing</span><strong>{workspace.billing?.effective?.plan === 'sovereign_plus' ? 'Sovereign+' : 'Free'}</strong></article><article><span>People and permissions</span><strong>{workspace.people.length} connected records</strong></article><button onClick={onOpenContext}>Open account controls</button></section>;
+function WorkspaceUnavailable({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return <section className="workspace-arrival unavailable" role="alert"><span>Sovereign</span><h1>Your private workspace could not open yet.</h1><p>{message}</p><button onClick={onRetry}>Try again <span aria-hidden="true">→</span></button></section>;
+}
+
+function AccountSummary({ workspace, onOpenContext, onBuildBaseline }: { workspace: WorkspaceState; onOpenContext: () => void; onBuildBaseline: () => void }) {
+  const baselineReady = workspace.today?.baseline?.status === 'completed';
+  const plan = workspace.billing?.effective?.plan === 'sovereign_plus' ? 'Sovereign+' : 'Free';
+  return (
+    <section className="account-summary">
+      <article><span>My Baseline</span><strong>{baselineReady ? 'Ready and available beneath every exploration' : 'Begin the personal foundation Sovereign needs'}</strong><button onClick={onBuildBaseline}>{baselineReady ? 'Review or rebuild' : 'Build my Baseline'}</button></article>
+      <article><span>Current context</span><strong>{workspace.today?.current?.status === 'ready' ? 'On for a limited window' : 'Off · your stable Baseline remains available'}</strong><button onClick={onOpenContext}>Choose current context</button></article>
+      <article><span>People and permissions</span><strong>{workspace.people.length ? `${workspace.people.length} private connection${workspace.people.length === 1 ? '' : 's'}` : 'No shared relationship context yet'}</strong><button onClick={openConsentControls}>Manage permissions</button></article>
+      <article><span>Plan and billing</span><strong>{plan}</strong><button onClick={onOpenContext}>Review plan</button></article>
+      <article><span>Privacy and saved data</span><strong>Library, retention, account access, and deletion</strong><button onClick={openAccountControls}>Open my controls</button></article>
+    </section>
+  );
 }
 
 function ContextPanel(props: {
@@ -877,6 +1239,7 @@ function ContextPanel(props: {
   setSelectedPerson: (id: string) => void;
   setSelectedSystem: (id: string) => void;
   setDraft: (value: string) => void;
+  onBuildBaseline: () => void;
 }) {
   if (props.surface === 'People') return <PeopleControls {...props} />;
   if (props.surface === 'Systems') return <SystemControls {...props} />;
@@ -943,20 +1306,12 @@ function SystemControls({ workspace, selectedSystem, setSelectedSystem, api, ref
   );
 }
 
-function YouControls({ workspace, api, refresh }: any) {
-  const [certainty, setCertainty] = useState('unknown');
+function YouControls({ workspace, api, refresh, onBuildBaseline }: any) {
   const [interval, setInterval] = useState<'annual' | 'monthly'>('annual');
   const [currentAction, setCurrentAction] = useState<'idle' | 'loading' | 'error'>('idle');
   const [currentMessage, setCurrentMessage] = useState('');
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const current = workspace.today?.current ?? { status: 'not_started' };
   const currentReady = current.status === 'ready';
-  async function buildBaseline(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    await api('/api/v1/baseline/onboarding', { method: 'POST', body: JSON.stringify(Object.fromEntries(data)) });
-    await refresh();
-  }
   async function handoff(path: string, body: Json = {}) {
     const data = await api(path, { method: 'POST', body: JSON.stringify(body) });
     const url = data.checkout?.url ?? data.portal?.url;
@@ -999,17 +1354,8 @@ function YouControls({ workspace, api, refresh }: any) {
   return (
     <div className="context-stack account-controls">
       <section className="control-section">
-        <p>BASELINE</p><h3>Build your Baseline.</h3><span>Add your birth details to create the personal foundation Sovereign uses across self, decisions, relationships, and systems.</span>
-        <form onSubmit={buildBaseline}>
-          <label>Birth date<small>Required for the Baseline calculation.</small><input type="date" name="birthDate" required /></label>
-          <label>Birthplace<small>Used to resolve time and astronomical context.</small><input name="birthplace" placeholder="City, region, country" required /></label>
-          <input type="hidden" name="birthTimezone" value={timezone} />
-          <label>Birth-time certainty<small>Tell us whether the time is exact, approximate, or unknown.</small><select name="birthTimeCertainty" value={certainty} onChange={(event) => setCertainty(event.target.value)}><option value="exact">Exact</option><option value="approximate">Approximate</option><option value="unknown">Unknown</option></select></label>
-          {certainty !== 'unknown' && <label>Birth time<small>Improves time-sensitive parts of the calculation.</small><input type="time" name="birthTime" required /></label>}
-          {certainty === 'unknown' && <p className="field-note">Unknown time is supported. Time-sensitive activations remain unavailable or carry higher uncertainty; Sovereign will not guess them.</p>}
-          <input type="hidden" name="locationPrecision" value="city_or_regional" />
-          <button className="primary-action">Build my Baseline</button>
-        </form>
+        <p>MY BASELINE</p><h3>{workspace.today?.baseline?.status === 'completed' ? 'Your personal foundation is ready.' : 'Your intelligence begins here.'}</h3><span>Build or review the private foundation Sovereign uses across self, decisions, relationships, and systems.</span>
+        <button className="primary-action" onClick={onBuildBaseline}>{workspace.today?.baseline?.status === 'completed' ? 'Review or rebuild my Baseline' : 'Build my Baseline'}</button>
       </section>
       <section className="control-section">
         <p>CURRENT-CONDITION PERMISSION</p><h3>Current context stays separate.</h3>
@@ -1033,7 +1379,7 @@ function YouControls({ workspace, api, refresh }: any) {
         {workspace.billing?.effective?.plan !== 'sovereign_plus' && <><div className="billing-switch"><button type="button" className={interval === 'annual' ? 'active' : ''} onClick={() => setInterval('annual')}>$99 / year</button><button type="button" className={interval === 'monthly' ? 'active' : ''} onClick={() => setInterval('monthly')}>$20 / month</button></div><button className="primary-action" onClick={() => void handoff('/api/v1/billing/checkout', { interval })}>Choose Sovereign+</button></>}
         <button className="secondary-action" onClick={() => void handoff('/api/v1/billing/portal')}>Manage billing</button>
       </section>
-      <section className="control-section"><p>PRIVACY AND RETENTION</p><h3>Your controls.</h3><div className="control-links"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><button onClick={openConsentControls}>Permissions</button></div></section>
+      <section className="control-section"><p>PRIVACY AND SAVED DATA</p><h3>Your controls stay together.</h3><div className="control-links"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><button onClick={openConsentControls}>Permissions</button><button onClick={openAccountControls}>Library and account data</button></div></section>
       <section className="control-section"><p>ACCOUNT</p><button className="secondary-action" onClick={() => void api('/api/v1/auth/logout', { method: 'POST' }).then(() => location.assign('/'))}>Log out</button></section>
     </div>
   );
@@ -1046,12 +1392,16 @@ function formatCurrentExpiry(value: string) {
 }
 
 function LibraryGrid({ library, onPrompt, compact = false }: { library: Json[]; onPrompt: (prompt: string) => void; compact?: boolean }) {
-  if (!library.length) return <IncompleteState title="Nothing saved yet." body="Save a Sovereign answer when it changes your understanding. Library does not collect unsaved conversations." action="Start an exploration" onAction={() => onPrompt('Show me a part of my Baseline I may not recognize yet.')} />;
+  if (!library.length) return <EmptyState title="Nothing has been kept yet." body="Save a Sovereign answer when it changes your understanding. Library does not collect unsaved conversations." action="Start an exploration" onAction={() => onPrompt('Show me a part of my Baseline I may not recognize yet.')} />;
   return <div className={`library-grid ${compact ? 'compact' : ''}`}>{library.map((item) => <button key={item.id} onClick={() => onPrompt(`Continue from this saved understanding: ${item.body?.summary ?? item.summary ?? ''}`)}><span>{String(item.body?.type ?? item.type ?? 'Saved understanding').replaceAll('_', ' ').toUpperCase()}</span><strong>{item.body?.title ?? item.title ?? 'Saved understanding'}</strong><p>{shorten(item.body?.summary ?? item.summary ?? '', compact ? 120 : 220)}</p><small>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Private Library'}</small></button>)}</div>;
 }
 
 function openConsentControls() {
   window.dispatchEvent(new CustomEvent('sovereign:open-consent-controls'));
+}
+
+function openAccountControls() {
+  window.dispatchEvent(new CustomEvent('sovereign:open-account-controls'));
 }
 
 function normalizeMessage(value: unknown): ChatMessage | null {
@@ -1170,11 +1520,8 @@ function composerPlaceholder(surface: Surface) {
     : surface === 'Systems' ? 'Ask about this system…'
       : surface === 'Explore' ? 'Ask about a quality, choice, behavior, or direction…'
         : surface === 'Library' ? 'Continue from something you saved…'
-          : 'Ask Sovereign…';
-}
-
-function surfaceIcon(surface: Surface) {
-  return ({ Today: '◉', Explore: '✦', People: '◇', Systems: '⌘', Library: '□', You: '○' } as Record<Surface, string>)[surface];
+          : surface === 'You' ? 'Ask about your Baseline or personal context…'
+            : 'Ask about what feels relevant now…';
 }
 
 function newThreadId(surface: Surface) {
