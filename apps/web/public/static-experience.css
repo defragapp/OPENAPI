@@ -4,7 +4,7 @@
   --paper: #0a0c0b;
   --paper-deep: #111311;
   --ink: #f0ece4;
-  --muted: #afa99f;
+  --muted: #c0b9ae;
   --line: rgba(240, 236, 228, .13);
   --line-dark: rgba(240, 236, 228, .13);
   --copper: #c9865d;
@@ -380,11 +380,11 @@ body.launch-page {
 .pricing-page .pricing-hero {
   display: grid;
   max-width: none;
-  grid-template-columns: minmax(0, 1fr) minmax(340px, .7fr);
+  grid-template-columns: minmax(0, 1fr) minmax(340px, .72fr);
   grid-template-rows: auto 1fr;
   column-gap: clamp(56px, 9vw, 128px);
-  row-gap: 18px;
-  padding: 48px 0 52px;
+  row-gap: 14px;
+  padding: 34px 0 30px;
 }
 
 .pricing-page .pricing-hero .launch-kicker {
@@ -395,7 +395,8 @@ body.launch-page {
 .pricing-page .pricing-hero h1 {
   grid-column: 1;
   grid-row: 2;
-  font-size: clamp(3.3rem, 5vw, 4.65rem);
+  max-width: 20ch;
+  font-size: clamp(3.2rem, 4.7vw, 4.35rem);
 }
 
 .pricing-page .pricing-hero > p:last-child {
@@ -403,7 +404,7 @@ body.launch-page {
   grid-column: 2;
   grid-row: 1 / 3;
   align-self: end;
-  margin: 0 0 5px;
+  margin: 0 0 3px;
 }
 
 .pricing-page .pricing-section {
@@ -420,7 +421,7 @@ body.launch-page {
 .pricing-page .price-card,
 .pricing-page .price-card.featured {
   min-height: 0;
-  padding: clamp(26px, 3vw, 34px);
+  padding: clamp(25px, 2.6vw, 32px);
   border: 1px solid rgba(154, 171, 145, .5);
   background: transparent;
 }
@@ -431,7 +432,7 @@ body.launch-page {
 }
 
 .pricing-page .price-card header {
-  padding-bottom: 18px;
+  padding-bottom: 16px;
 }
 
 .pricing-page .price-card h2 {
@@ -451,19 +452,12 @@ body.launch-page {
   color: var(--copper);
 }
 
-.pricing-page .plan-summary {
-  min-height: 4.4em;
-  margin: 16px 0 0;
-  font-size: .88rem;
-  line-height: 1.5;
-}
-
 .pricing-page .price-card-body {
   display: grid;
   grid-template-columns: minmax(130px, .68fr) minmax(0, 1.32fr);
-  gap: 24px;
-  margin-top: 20px;
-  padding-top: 20px;
+  gap: 22px;
+  margin-top: 16px;
+  padding-top: 18px;
   border-top: 1px solid var(--line);
 }
 
@@ -507,7 +501,7 @@ body.launch-page {
   padding: 7px 0 7px 27px;
   border: 0;
   color: var(--muted);
-  font-size: .88rem;
+  font-size: .94rem;
   line-height: 1.4;
 }
 
@@ -525,7 +519,7 @@ body.launch-page {
 
 .pricing-page .price-card .launch-button {
   width: 100%;
-  margin-top: 24px;
+  margin-top: 18px;
   padding-inline: 18px;
   border: 1px solid rgba(154, 171, 145, .56);
   text-align: center;
@@ -608,8 +602,50 @@ body.launch-page {
   color: var(--copper);
 }
 
+.questions-page .questions-hero {
+  display: grid;
+  max-width: none;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, .72fr);
+  grid-template-rows: auto 1fr;
+  column-gap: clamp(56px, 9vw, 128px);
+  row-gap: 14px;
+  padding: 34px 0 38px;
+}
+
+.questions-page .questions-hero .launch-kicker {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.questions-page .questions-hero h1 {
+  max-width: 13ch;
+  grid-column: 1;
+  grid-row: 2;
+  font-size: clamp(3.1rem, 4.55vw, 4.2rem);
+}
+
+.questions-page .questions-hero > p:last-child {
+  max-width: 44ch;
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: end;
+  margin: 0 0 3px;
+}
+
+.questions-page .faq-section {
+  padding: 0 0 clamp(76px, 8vw, 108px);
+  border-top: 0;
+}
+
+.questions-page .faq-category {
+  display: grid;
+  grid-template-columns: minmax(180px, .3fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(42px, 7vw, 96px);
+}
+
 .faq-category + .faq-category {
-  margin-top: 90px;
+  margin-top: 72px;
 }
 
 .faq-list {
@@ -629,11 +665,11 @@ body.launch-page {
 }
 
 .faq-list summary {
-  min-height: 68px;
-  padding: 20px 45px 20px 0;
+  min-height: 62px;
+  padding: 18px 45px 18px 0;
   color: var(--ink);
   font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-  font-size: 1.15rem;
+  font-size: 1.26rem;
 }
 
 .faq-list summary::after {
@@ -654,6 +690,7 @@ body.launch-page {
   max-width: 72ch;
   padding: 0 0 26px;
   color: var(--muted);
+  font-size: 1rem;
   line-height: 1.7;
 }
 
@@ -792,7 +829,7 @@ body.launch-page {
   .pricing-page .pricing-hero {
     display: block;
     max-width: 900px;
-    padding: 42px 0 38px;
+    padding: 38px 0 32px;
   }
 
   .pricing-page .pricing-hero > p:last-child {
@@ -802,6 +839,22 @@ body.launch-page {
 
   .pricing-page .pricing-section {
     padding-bottom: 72px;
+  }
+
+  .questions-page .questions-hero {
+    display: block;
+    max-width: 900px;
+    padding: 38px 0 34px;
+  }
+
+  .questions-page .questions-hero > p:last-child {
+    max-width: 54ch;
+    margin-top: 22px;
+  }
+
+  .questions-page .faq-category {
+    grid-template-columns: 1fr;
+    gap: 18px;
   }
 
   .pricing-page .price-card-body {
@@ -841,7 +894,7 @@ body.launch-page {
 
 @media (max-width: 480px) {
   .launch-wordmark {
-    font-size: 0;
+    font-size: .62rem;
   }
 
   .launch-wordmark::before {
@@ -857,10 +910,6 @@ body.launch-page {
     font-size: 3.05rem;
   }
 
-  .pricing-page .launch-wordmark {
-    font-size: .62rem;
-  }
-
   .pricing-page .launch-wordmark::before {
     width: 30px;
     height: 30px;
@@ -868,6 +917,14 @@ body.launch-page {
 
   .pricing-page .pricing-hero h1 {
     font-size: clamp(2.85rem, 13vw, 3.35rem);
+  }
+
+  .questions-page .questions-hero h1 {
+    font-size: clamp(2.8rem, 12.6vw, 3.3rem);
+  }
+
+  .pricing-hero-detail {
+    display: none;
   }
 
   .price-card,
@@ -878,10 +935,6 @@ body.launch-page {
   .pricing-page .price-card-body,
   .plan-comparison-list > div {
     grid-template-columns: 1fr;
-  }
-
-  .pricing-page .plan-summary {
-    min-height: 0;
   }
 
   .pricing-page .price-options {

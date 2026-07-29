@@ -193,7 +193,7 @@ for (const required of [
 for (const required of [
   'This page is not part of Sovereign.OS.',
   'content="noindex, nofollow"',
-  '/static-experience.css?v=20260729-route-closure'
+  '/static-experience.css?v=20260729-visual-sync'
 ]) {
   if (!notFoundDocument.includes(required)) throw new Error(`Static 404 document is missing ${required}`);
 }
