@@ -678,6 +678,67 @@ body.launch-page {
   color: var(--muted);
 }
 
+.not-found-page .launch-shell {
+  display: grid;
+  min-height: 100svh;
+  grid-template-rows: auto 1fr auto;
+}
+
+.not-found-main {
+  display: grid;
+  align-items: center;
+  padding: clamp(42px, 7vw, 90px) 0;
+}
+
+.not-found-stage {
+  display: grid;
+  min-height: min(560px, 62vh);
+  grid-template-columns: minmax(0, .82fr) minmax(360px, 1fr);
+  align-items: center;
+  gap: clamp(30px, 7vw, 100px);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.not-found-code {
+  margin: 0;
+  color: rgba(244, 239, 231, .09);
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(8rem, 18vw, 14rem);
+  font-weight: 410;
+  letter-spacing: -.08em;
+  line-height: .75;
+  user-select: none;
+}
+
+.not-found-copy {
+  max-width: 610px;
+}
+
+.not-found-copy h1 {
+  max-width: 12ch;
+  margin: 14px 0 24px;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(3rem, 5.2vw, 5rem);
+  font-weight: 410;
+  letter-spacing: -.05em;
+  line-height: .96;
+}
+
+.not-found-copy > p:not(.launch-kicker) {
+  max-width: 54ch;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 34px;
+}
+
 .launch-card,
 .use-case-card,
 .plan-guidance article,
@@ -747,6 +808,17 @@ body.launch-page {
     grid-template-columns: minmax(120px, .62fr) minmax(0, 1.38fr);
   }
 
+  .not-found-stage {
+    min-height: 0;
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 48px 0 58px;
+  }
+
+  .not-found-code {
+    font-size: clamp(6.5rem, 25vw, 10rem);
+  }
+
   .pricing-details-heading {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -813,9 +885,28 @@ body.launch-page {
   }
 
   .pricing-page .price-options {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: end;
-    gap: 18px;
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .pricing-page .price-options > p:last-child {
+    justify-items: start;
+  }
+
+  .not-found-copy h1 {
+    font-size: clamp(2.8rem, 13vw, 3.35rem);
+  }
+
+  .not-found-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .not-found-actions .launch-button {
+    width: 100%;
+    text-align: center;
   }
 
   .plan-comparison-list dt,

@@ -170,6 +170,7 @@ async function verifyLiveProduction() {
     faq,
     faqClean,
     questionsAlias,
+    publicNotFound,
     privacy,
     terms,
     login,
@@ -177,6 +178,7 @@ async function verifyLiveProduction() {
     appPage,
     invitation,
     consent,
+    appNotFound,
     health,
     ready
   ] = await Promise.all([
@@ -188,6 +190,7 @@ async function verifyLiveProduction() {
     readText(`${publicBase}/faq.html`),
     readText(`${publicBase}/faq`),
     readText(`${publicBase}/questions`),
+    readText(`${publicBase}/release-probe-not-found`),
     readText(`${publicBase}/privacy`),
     readText(`${publicBase}/terms`),
     readText(`${appBase}/login`),
@@ -195,6 +198,7 @@ async function verifyLiveProduction() {
     readText(`${appBase}/app`),
     readText(`${appBase}/invitation`),
     readText(`${appBase}/consent.html`),
+    readText(`${appBase}/release-probe-not-found`),
     readJson(`${appBase}/health`),
     readJson(`${appBase}/ready`)
   ]);
@@ -249,6 +253,13 @@ async function verifyLiveProduction() {
   assert(questionsAlias.response.ok, `Questions alias returned ${questionsAlias.response.status}`);
   assert(questionsAlias.response.url === `${publicBase}/faq`, `Questions alias resolved to ${questionsAlias.response.url}`);
   assertContainsAll('Questions alias', questionsAlias.text, ['What is Sovereign.OS?', 'What does Sovereign+ include?']);
+  for (const [label, probe] of [['public', publicNotFound], ['application', appNotFound]]) {
+    assert(probe.response.status === 404, `${label} unknown route returned ${probe.response.status}`);
+    assertContainsAll(`${label} 404 document`, probe.text, [
+      'This page is not part of Sovereign.OS.',
+      'content="noindex, nofollow"'
+    ]);
+  }
 
   assert(privacy.response.ok && terms.response.ok, 'privacy or terms page is unavailable');
   assert(login.response.ok && signup.response.ok, 'login or signup page is unavailable');
@@ -270,8 +281,8 @@ async function verifyLiveProduction() {
   assert(health.json?.migrationVersion === migrationVersion, 'health is not serving the current migration');
   assert(ready.json?.ready === true && ready.json?.version === commitSha, 'ready is not serving the deployed commit');
 
-  const publicDocuments = [home.response, how.response, howClean.response, pricing.response, pricingClean.response, faq.response, faqClean.response, questionsAlias.response, privacy.response, terms.response];
-  const appDocuments = [login.response, signup.response, appPage.response, invitation.response, consent.response];
+  const publicDocuments = [home.response, how.response, howClean.response, pricing.response, pricingClean.response, faq.response, faqClean.response, questionsAlias.response, publicNotFound.response, privacy.response, terms.response];
+  const appDocuments = [login.response, signup.response, appPage.response, invitation.response, consent.response, appNotFound.response];
   for (const page of [...publicDocuments, ...appDocuments]) {
     assert(headerIncludes(page, 'strict-transport-security', 'max-age=31536000'), 'HSTS is missing from a document');
     assert(headerIncludes(page, 'x-content-type-options', 'nosniff'), 'nosniff is missing from a document');
@@ -425,6 +436,7 @@ async function verifyLiveProduction() {
       pricing: 'html-and-clean-url-passed',
       questions: 'html-and-clean-url-passed',
       canonicalQuestionsAlias: 'redirect-passed',
+      unknownRoutes: 'public-and-app-404-passed',
       privacy: 'passed',
       terms: 'passed',
       login: 'passed',

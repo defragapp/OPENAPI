@@ -6,6 +6,7 @@ const policy = readFileSync(new URL('./PublicPolicy.tsx', import.meta.url), 'utf
 const how = readFileSync(new URL('../public/how-it-works.html', import.meta.url), 'utf8');
 const pricing = readFileSync(new URL('../public/pricing.html', import.meta.url), 'utf8');
 const faq = readFileSync(new URL('../public/faq.html', import.meta.url), 'utf8');
+const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'utf8');
 const consent = readFileSync(new URL('../public/consent.html', import.meta.url), 'utf8');
 const consentCss = readFileSync(new URL('../public/consent.css', import.meta.url), 'utf8');
 const launchCss = readFileSync(new URL('../public/launch.css', import.meta.url), 'utf8');
@@ -89,7 +90,7 @@ describe('Sovereign.OS public experience', () => {
     for (const page of [how, pricing, faq]) {
       expect(page).toContain('/launch.css?v=20260728-baseline-first');
       expect(page).toContain('/launch-polish.css?v=20260728-baseline-first');
-      expect(page).toContain('/static-experience.css?v=20260729-final-review');
+      expect(page).toContain('/static-experience.css?v=20260729-route-closure');
     }
     expect(launchCss).toContain('@media (max-width: 680px)');
     expect(launchPolishCss).toContain('prefers-reduced-motion');
@@ -98,7 +99,13 @@ describe('Sovereign.OS public experience', () => {
     expect(staticExperienceCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(staticExperienceCss).toContain('.pricing-page .pricing-hero > p:last-child');
     expect(staticExperienceCss).toContain('white-space: nowrap');
+    expect(staticExperienceCss).toMatch(/@media \(max-width: 480px\)[\s\S]*?\.pricing-page \.price-options \{[\s\S]*?grid-template-columns: 1fr;/);
     expect(staticExperienceCss).toContain('margin-inline: 0');
+    expect(notFound).toContain('This page is not part of Sovereign.OS.');
+    expect(notFound).toContain('content="noindex, nofollow"');
+    expect(notFound).toContain('/static-experience.css?v=20260729-route-closure');
+    expect(notFound).toContain('href="https://sovereign.defrag.app/"');
+    expect(notFound).toContain('href="https://app.defrag.app/login"');
     expect(consent).toContain('You decide what another account may use.');
     expect(consent).toContain('The inviting account cannot make or change these decisions for you.');
     expect(consentCss).toContain('@media (max-width: 680px)');
