@@ -1,46 +1,69 @@
 # Landing experience audit and revised architecture
 
-## Audit
+## Production audit
 
-The existing release has a strong warm-black and paper palette, a considered serif/sans relationship, credible privacy language, and a working keyboard-accessible example selector. Its Baseline, relationship, and system product truths are present.
+The July 29 release has a strong warm-black and paper palette, a considered serif/sans relationship, credible privacy language, keyboard-accessible examples, and accurate Baseline, relationship, system, Basis, pricing, and consent product truths.
 
-As a complete journey, however, the hero asks a large headline, two paragraphs, two actions, trust notes, and a dense diagram to compete at once. The page then repeats large headings, rectangular cards, and two-column sections with generous vertical padding. Product behavior is mostly described rather than shown. Supporting labels are small, the provenance of an example insight is absent, the three intelligence levels resemble separate feature cards, and the system promise has no concrete visual proof. The final action does not explain the input, time, uncertainty, or correction experience.
+The deployed page is nevertheless unclear at the category level. A new visitor sees `PRIVATE AI, BUILT AROUND YOUR BASELINE` and `Know yourself. Understand the system. Choose what fits.` before they understand what Baseline means, what kind of AI Sovereign is, what they can ask, or why the answer card is relevant.
 
-Responsive rules stack the content safely, but the diagram becomes tall and label-dense on phones. Motion is limited to an ambient orbit, so it does not communicate a change in intelligence state. Relationship copy is balanced and consent-aware, but visitors cannot change perspective. These gaps make the experience feel editorial rather than operational and weaken recognition, trust, and conversion.
+The first viewport therefore behaves like an editorial introduction to an intelligence framework rather than an immediately recognizable AI product. The visitor must decode the product before they can desire it.
+
+The current test suite preserves the problem by treating the old philosophy headline and Baseline-first kicker as proof that the product is unmistakable. Category clarity must instead be verified through an explicit AI definition, a visible user question, a visible Sovereign answer, and an obvious first action.
+
+## Founder correction
+
+Within five seconds, a first-time visitor must understand:
+
+- Sovereign.OS is a private personal AI;
+- they can ask about themselves, relationships, decisions, families, or teams;
+- Sovereign gives a direct answer grounded in a private personal foundation;
+- Baseline Design is why the answer does not begin from a blank prompt;
+- the user remains responsible for deciding what fits;
+- the first action is `Build my Baseline`.
+
+The founder-approved emotional line `Healing isn’t optional. Holding the pain is.` remains part of the brand voice, but it follows product clarity. It is not the category definition and must not become a therapy or diagnosis claim.
+
+The enduring line `Know yourself. Understand the system. Choose what fits.` remains a brand close, not the only product explanation.
 
 ## Revised architecture
 
 | Section | Visitor question | Product truth | Visual / interaction | CTA and mobile behavior |
 | --- | --- | --- | --- | --- |
-| Hero | What is this and why is it different? | A Baseline foundation is applied to real life while tendency, pressure, confirmation, and unknown state remain distinct. | Four-stage Baseline-to-insight control. | Build Baseline / see example; stages become a compact scroll-free grid. |
-| Difference | Why not use a blank chat? | Sovereign begins with structured personal context. | Short prompt-to-foundation bridge. | No competing CTA; one-column statement on mobile. |
-| Intelligence path | Does this expand beyond me? | One foundation supports personal, consented relationship, and system views. | One-to-two-to-many objects across a connected path. | Cards stack while retaining the visual progression. |
-| Baseline | What is kept in the foundation? | Stable tendencies remain distinct from pressure, integrated expression, and current emphasis. | Existing dimension ledger. | Link to How it works; compact rows on mobile. |
-| Real-life application | Can I see an insight form? | Question, interpretation, evidence, uncertainty, correction, and next move remain visible. | Keyboard tabs, open provenance, and correction controls. | Controls wrap with 44px targets. |
-| Relationship | Can it represent both people fairly? | Comparison requires permission and does not infer motives or choose a winner. | My / their possible / relationship perspective switch. | Views stack and focus state remains explicit. |
-| System | Can it reveal a family or team pattern? | Individual contributions, roles, authority, pressure, and missing perspective can be examined together. | Stable four-person map with a pressure overlay. | Converts to a legible list rather than a node graph. |
-| Trust and control | Is this private and optional? | Raw inputs stay protected, consent is deterministic, and Covenant is opt-in. | Existing three-part control statement. | Single column. |
-| Final action | What happens next? | Free setup takes minutes, exact time is optional, and the user can correct the result. | Concise setup expectation beside CTA. | Full-width actions on small screens. |
+| Hero | What is this and what can I do? | Sovereign.OS is a private personal AI. | Recognizable user question, interactive Sovereign answer, plain-language tabs, quiet Basis. | Build my Baseline / See a Sovereign answer; category, question, answer beginning, and CTA remain visible on mobile. |
+| Brand meaning | Why does this matter? | Understanding can separate pain, identity, relationship interaction, and system reinforcement without diagnosis. | Quiet editorial statement after the product interaction. | No competing CTA. |
+| Questions | Can it help with my real life? | One AI supports self, decisions, relationships, and systems. | Real-life question rail updating one shared answer stage. | Keyboard tabs; horizontally scrollable without page overflow. |
+| Difference | Why not use a blank chat? | Sovereign starts with a private Baseline and adds only chosen context. | Baseline, temporary current context, confirmation, and unknown state remain separate. | No competing CTA. |
+| Expression | Is this a fixed label? | One valid quality can narrow under pressure or become useful with awareness. | Existing Shadow, Gift, and Alignment state selector. | Controls wrap with 44px targets. |
+| Relationship | Can it represent both people fairly? | Comparison requires permission and does not infer motives or choose a winner. | Separate person fields and full-width interaction field. | Permission steps remain legible as a list on mobile. |
+| System | Can it reveal how a family or team functions? | Roles, authority, responsibility, care, pressure, and missing perspective can be examined together. | Stable four-person system map and separate pressure field. | Converts to a legible list rather than a decorative graph. |
+| Basis | What shaped the answer? | Exact approved values remain available but secondary. | Compact Basis strip and accessible source detail. | One-line truncation with `+N`. |
+| Pricing | What do I receive? | Free supports personal exploration; Sovereign+ brings in permitted people, systems, continuity, and Covenant. | Outcome-led plan cards with exact prices and limits. | Full-width cards and actions on mobile. |
+| Final action | What happens next? | The user builds a Baseline and then asks naturally. | Concrete entry statement and quiet enduring brand line. | Full-width primary action on small screens. |
 
-## Known limitations
+## Product-honesty boundary
 
-Marketing interactions use representative static data and do not call private intelligence APIs. Confirmation controls demonstrate the product pattern but do not persist for anonymous visitors. Visual regression evidence depends on the local browser capture environment.
+Marketing interactions use sanitized representative data and do not call private intelligence APIs. The demonstration must say that it is not the visitor’s Baseline.
 
-## Final production review
+The public labels `Answer`, `Under pressure`, `At its best`, and `What fits` are translations of Direct answer, Shadow, Gift, and Alignment for category clarity. They do not alter `sovereign-answer.v2`.
 
-### Product-honesty verification
+Relationship and system demonstrations remain representative. They may show supported role and interaction logic but must not imply anonymous persistence, private person access, motive detection, diagnosis, compatibility scoring, or deterministic outcome.
 
-| Landing representation | Implemented product basis | Assessment |
-| --- | --- | --- |
-| Baseline-first exploration | The authenticated workspace builds and uses a Baseline before presenting personal context. | Supported. |
-| Correction and continuity | Thread corrections are persisted by the authenticated API, returned in correction history, and included in later conversation context. The public interaction is explicitly labeled as an example and does not claim anonymous persistence. | Supported with an explicit marketing-demo boundary. |
-| Insight provenance | Structured responses expose reduced basis, confidence, safety mode, and saved fit without raw birth inputs or exact private locations. | Supported; the landing uses representative language rather than claiming identical UI. |
-| Relationship comparison | People context is permission-scoped and supports two-person comparison. The public perspective switch illustrates balanced views; it is not presented as a literal workspace control. | Supported as a representative interaction. |
-| System intelligence | Authenticated Systems can be created, populated through active consent, selected as exploration context, and analyzed for roles, authority, pressure, and responsibility. | Supported; the public map is representative static data. |
-| Current emphasis | Today exposes a reduced possible-current-amplification value and explicitly avoids treating it as observed fact. | Supported with appropriately conditional copy. |
+## Approval criteria
 
-### Merge recommendation
+The landing is ready only when an unfamiliar reviewer can answer without scrolling through framework explanation:
 
-**Recommend merge after normal code review. Production-readiness score: 91/100.** The page now communicates the Baseline-first distinction, separates interpretation from confirmed and unknown state, shows a coherent self-to-relationship-to-system progression, and explains the setup action. The remaining nine points are operational rather than landing-code blockers: production browser comparison, authenticated end-to-end smoke coverage in the target account, and deployment/version verification still require a production-capable environment.
+1. What is Sovereign.OS?
+2. What can I ask it?
+3. What does it give me?
+4. Why is it different from generic AI?
+5. What should I click first?
 
-No copy reviewed here claims diagnosis, motive access, compatibility scoring, deterministic behavior, anonymous correction persistence, or guaranteed outcomes. The screenshot set should be regenerated from the final commit before deployment so the evidence matches the correction-state refinement.
+The required answers are:
+
+- a private personal AI;
+- questions about self, relationships, decisions, families, and teams;
+- a direct answer built around the person asking;
+- it begins with a private Baseline rather than a blank prompt;
+- Build my Baseline.
+
+Production deployment still requires the exact-SHA Cloudflare release gate, live health/readiness, responsive browser review, and deployed route verification.
