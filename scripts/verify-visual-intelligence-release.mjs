@@ -6,6 +6,8 @@ const workspace = readFileSync('apps/web/src/SovereignIntelligenceWorkspace.tsx'
 const workspaceCss = `${readFileSync('apps/web/src/workspace-chat.css', 'utf8')}\n${readFileSync('apps/web/src/experience-reconciliation.css', 'utf8')}`;
 const landing = readFileSync('apps/web/src/PublicLanding.tsx', 'utf8');
 const landingCss = `${readFileSync('apps/web/src/public-landing.css', 'utf8')}\n${readFileSync('apps/web/src/experience-reconciliation.css', 'utf8')}`;
+const experienceV3 = `${readFileSync('apps/web/src/sovereign-experience-v3.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-experience-v3-fixes.css', 'utf8')}`;
+const contextField = readFileSync('apps/web/public/assets/sovereign-context-field.svg', 'utf8');
 const staticExperienceCss = readFileSync('apps/web/public/static-experience.css', 'utf8');
 const tokens = readFileSync('apps/web/src/styles.css', 'utf8');
 const membership = readFileSync('apps/web/src/SystemMembershipManager.tsx', 'utf8');
@@ -21,6 +23,8 @@ requireAll('authenticated app entry', main, [
   "import { AuthenticatedWorkspace } from './AuthenticatedWorkspace'",
   "import './workspace-chat.css'",
   "import './experience-reconciliation.css'",
+  "import './sovereign-experience-v3.css'",
+  "import './sovereign-experience-v3-fixes.css'",
   "location.pathname === '/app'",
   '<AuthenticatedWorkspace />'
 ]);
@@ -124,6 +128,31 @@ requireAll('public visual accessibility', landingCss, [
   '@media (max-width: 760px)',
   '@media (max-width: 420px)',
   '@media (prefers-reduced-motion: reduce)'
+]);
+
+requireAll('Sovereign v3 product environment', experienceV3, [
+  'context reorganizes around the question',
+  "url('/assets/sovereign-context-field.svg')",
+  '.landing-hero::before',
+  '.living-answer',
+  '.question-section',
+  '.public-answer-stage',
+  '.baseline-now-visual::before',
+  '.baseline-invitation::after',
+  '.sovereign-composer',
+  '.mobile-bottom-nav',
+  '@media (max-width: 560px)',
+  '@media (prefers-reduced-motion: reduce)',
+  'env(safe-area-inset-bottom)'
+]);
+
+requireAll('Sovereign context field asset', contextField, [
+  '<title id="title">Sovereign context field</title>',
+  'translucent planes and lines reorganizing around a central opening',
+  '<linearGradient id="planeA"',
+  '<linearGradient id="planeB"',
+  '<filter id="depth"',
+  'aria-labelledby="title description"'
 ]);
 
 requireAll('static public support experience', staticExperienceCss, [
