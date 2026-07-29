@@ -137,7 +137,7 @@ const surfacePrompts: Record<Surface, string[]> = {
   You: ['Explain one Baseline facet in plain language.', 'Which parts of my Baseline are limited by unknown birth time?']
 };
 
-export function SovereignIntelligenceWorkspace() {
+export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: { onboardingVerified?: boolean }) {
   const [surface, setSurface] = useState<Surface>('Today');
   const [contextOpen, setContextOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -187,10 +187,12 @@ export function SovereignIntelligenceWorkspace() {
   async function refreshWorkspace() {
     setApiState('loading');
     try {
-      const onboarding = await api('/api/v1/account/onboarding');
-      if (!onboarding.completed) {
-        location.assign('/onboarding');
-        return;
+      if (!onboardingVerified) {
+        const onboarding = await api('/api/v1/account/onboarding');
+        if (!onboarding.completed) {
+          location.assign('/onboarding');
+          return;
+        }
       }
       const [threadData, peopleData, systemData, libraryData, billingData, todayData] = await Promise.all([
         api('/api/v1/threads'),

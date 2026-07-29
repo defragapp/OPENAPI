@@ -113,6 +113,16 @@ body.launch-page {
   line-height: 1.72;
 }
 
+.launch-hero-compact {
+  max-width: 960px;
+  padding: clamp(54px, 6vw, 76px) 0 clamp(50px, 5vw, 66px);
+}
+
+.launch-hero-compact h1 {
+  max-width: 14ch;
+  font-size: clamp(3.2rem, 5vw, 4.7rem);
+}
+
 .launch-kicker,
 .section-label,
 .card-label {
@@ -367,6 +377,216 @@ body.launch-page {
   display: none;
 }
 
+.pricing-page .pricing-hero {
+  max-width: 900px;
+  padding: 48px 0 42px;
+}
+
+.pricing-page .pricing-hero h1 {
+  font-size: clamp(3.3rem, 5vw, 4.65rem);
+}
+
+.pricing-page .pricing-section {
+  padding: 0 0 clamp(76px, 8vw, 108px);
+  border-top: 0;
+}
+
+.pricing-page .pricing-grid {
+  gap: 16px;
+  border: 0;
+  background: transparent;
+}
+
+.pricing-page .price-card,
+.pricing-page .price-card.featured {
+  min-height: 0;
+  padding: clamp(26px, 3vw, 34px);
+  border: 1px solid rgba(154, 171, 145, .5);
+  background: transparent;
+}
+
+.pricing-page .price-card.featured {
+  border-color: rgba(201, 134, 93, .68);
+  box-shadow: none;
+}
+
+.pricing-page .price-card header {
+  padding-bottom: 18px;
+}
+
+.pricing-page .price-card h2 {
+  max-width: 18ch;
+  font-size: clamp(1.75rem, 2.3vw, 2.25rem);
+  line-height: 1.05;
+}
+
+.pricing-page .plan-audience {
+  max-width: 16ch;
+  border: 0;
+  color: var(--sage);
+  text-align: right;
+}
+
+.pricing-page .featured .plan-audience {
+  color: var(--copper);
+}
+
+.pricing-page .plan-summary {
+  min-height: 4.4em;
+  margin: 16px 0 0;
+  font-size: .88rem;
+  line-height: 1.5;
+}
+
+.pricing-page .price-card-body {
+  display: grid;
+  grid-template-columns: minmax(130px, .68fr) minmax(0, 1.32fr);
+  gap: 24px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.pricing-page .price,
+.pricing-page .price-options .price {
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(3rem, 4vw, 4rem);
+  font-weight: 410;
+}
+
+.pricing-page .price-options {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  border: 0;
+  background: transparent;
+}
+
+.pricing-page .price-options > p:last-child {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.pricing-page .price-options > p:last-child strong {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(2.35rem, 3.5vw, 3.15rem);
+  font-weight: 410;
+}
+
+.pricing-page .feature-list {
+  align-content: start;
+  gap: 0;
+  margin: 0;
+  border: 0;
+}
+
+.pricing-page .feature-list li {
+  padding: 7px 0 7px 27px;
+  border: 0;
+  color: var(--muted);
+  font-size: .88rem;
+  line-height: 1.4;
+}
+
+.pricing-page .feature-list li::before {
+  display: block;
+  top: 7px;
+  left: 1px;
+  color: var(--sage);
+  content: "✓";
+}
+
+.pricing-page .featured .feature-list li::before {
+  color: var(--copper);
+}
+
+.pricing-page .price-card .launch-button {
+  width: 100%;
+  margin-top: 24px;
+  padding-inline: 18px;
+  border: 1px solid rgba(154, 171, 145, .56);
+  text-align: center;
+}
+
+.pricing-page .price-card.featured .launch-button {
+  border-color: var(--copper);
+  background: var(--copper);
+}
+
+.pricing-details-section {
+  padding-top: clamp(70px, 8vw, 104px);
+}
+
+.pricing-details-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, .7fr);
+  align-items: end;
+  gap: clamp(44px, 8vw, 100px);
+  margin-bottom: 46px;
+}
+
+.pricing-details-heading h2 {
+  max-width: 14ch;
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(2.7rem, 4.5vw, 4rem);
+  font-weight: 410;
+  letter-spacing: -.045em;
+  line-height: .98;
+}
+
+.pricing-details-heading > p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.plan-comparison-list {
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+
+.plan-comparison-list > div {
+  display: grid;
+  grid-template-columns: minmax(170px, .72fr) minmax(0, 1fr) minmax(0, 1fr);
+  border-bottom: 1px solid var(--line);
+}
+
+.plan-comparison-list dt,
+.plan-comparison-list dd {
+  margin: 0;
+  padding: 20px 22px 20px 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.plan-comparison-list dt {
+  color: var(--ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: 1.1rem;
+}
+
+.plan-comparison-list dd {
+  border-left: 1px solid var(--line);
+  padding-left: 22px;
+}
+
+.plan-comparison-list dd > span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--sage);
+  font-size: .64rem;
+  font-weight: 720;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.plan-comparison-list dd:last-child > span {
+  color: var(--copper);
+}
+
 .faq-category + .faq-category {
   margin-top: 90px;
 }
@@ -487,6 +707,32 @@ body.launch-page {
     grid-template-columns: 1fr;
   }
 
+  .pricing-page .pricing-hero {
+    padding: 42px 0 38px;
+  }
+
+  .pricing-page .pricing-section {
+    padding-bottom: 72px;
+  }
+
+  .pricing-page .price-card-body {
+    grid-template-columns: minmax(120px, .62fr) minmax(0, 1.38fr);
+  }
+
+  .pricing-details-heading {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .plan-comparison-list > div {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .plan-comparison-list dt {
+    grid-column: 1 / -1;
+    padding-bottom: 10px;
+  }
+
   .launch-callout {
     align-items: start;
     flex-direction: column;
@@ -511,9 +757,47 @@ body.launch-page {
     font-size: 3.05rem;
   }
 
+  .pricing-page .launch-wordmark {
+    font-size: .62rem;
+  }
+
+  .pricing-page .launch-wordmark::before {
+    width: 30px;
+    height: 30px;
+  }
+
+  .pricing-page .pricing-hero h1 {
+    font-size: clamp(2.85rem, 13vw, 3.35rem);
+  }
+
   .price-card,
   .price-card.featured {
     padding-inline: 20px;
+  }
+
+  .pricing-page .price-card-body,
+  .plan-comparison-list > div {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-page .plan-summary {
+    min-height: 0;
+  }
+
+  .pricing-page .price-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+    gap: 18px;
+  }
+
+  .plan-comparison-list dt,
+  .plan-comparison-list dd {
+    padding: 16px 0;
+    border-left: 0;
+  }
+
+  .plan-comparison-list dd + dd {
+    border-top: 1px solid var(--line);
   }
 }
 

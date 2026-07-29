@@ -88,7 +88,7 @@ describe('Sovereign.OS public experience', () => {
     for (const page of [how, pricing, faq]) {
       expect(page).toContain('/launch.css?v=20260728-baseline-first');
       expect(page).toContain('/launch-polish.css?v=20260728-baseline-first');
-      expect(page).toContain('/static-experience.css?v=20260728-reconciliation');
+      expect(page).toContain('/static-experience.css?v=20260729-production-refinement');
     }
     expect(launchCss).toContain('@media (max-width: 680px)');
     expect(launchPolishCss).toContain('prefers-reduced-motion');

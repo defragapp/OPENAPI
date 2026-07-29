@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import { AppErrorBoundary } from './AppErrorBoundary';
-import { AccountControlCenter } from './AccountControlCenter';
+import { AuthenticatedWorkspace } from './AuthenticatedWorkspace';
 import { EmailCodeFallback, installEmailCodeFallbackRuntime } from './EmailCodeFallback';
 import { ProductCompletionLayer, installProductRuntime } from './ProductCompletionLayer';
 import { installBaselineInputRuntime } from './BaselineInputRuntime';
@@ -11,8 +11,6 @@ import { installProductionRuntime } from './ProductionRuntime';
 import { PublicLanding } from './PublicLanding';
 import { PublicPolicy } from './PublicPolicy';
 import { PublicPolicyMetadata } from './PublicPolicyMetadata';
-import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
-import { SystemMembershipManager } from './SystemMembershipManager';
 import './styles.css';
 import './product-completion.css';
 import './public-landing.css';
@@ -61,7 +59,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         : publicPolicyKind
           ? <><PublicPolicyMetadata kind={publicPolicyKind} /><PublicPolicy kind={publicPolicyKind} /></>
           : isAuthenticatedWorkspace
-            ? <><SovereignIntelligenceWorkspace /><AccountControlCenter /><SystemMembershipManager /></>
+            ? <AuthenticatedWorkspace />
             : <><App /><EmailCodeFallback /></>}
     </AppErrorBoundary>
   </React.StrictMode>

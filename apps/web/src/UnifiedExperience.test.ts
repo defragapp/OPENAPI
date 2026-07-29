@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
+const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
 const css = readFileSync(new URL('./experience-reconciliation.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
@@ -16,7 +17,8 @@ describe('unified Sovereign intelligence experience', () => {
     for (const surface of ['Today', 'Explore', 'People', 'Systems', 'Library', 'You']) expect(workspace).toContain(`name: '${surface}'`);
     expect(workspace).toContain('Sovereign navigation');
     expect(workspace).toContain('New exploration');
-    expect(main).toContain('<SovereignIntelligenceWorkspace />');
+    expect(main).toContain('<AuthenticatedWorkspace />');
+    expect(authenticatedWorkspace).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
   });
 
   it('starts a clean exploration when context changes with active content', () => {

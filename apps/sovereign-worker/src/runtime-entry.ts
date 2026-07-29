@@ -17,6 +17,9 @@ const PARENT_HOSTS = new Set(['defrag.app', 'www.defrag.app']);
 const PUBLIC_HOST = 'sovereign.defrag.app';
 const APP_HOST = 'app.defrag.app';
 const PUBLIC_PATHS = new Set(['/privacy', '/terms', '/pricing.html', '/faq.html', '/how-it-works.html']);
+const PUBLIC_ROUTE_ALIASES = new Map([
+  ['/questions', '/faq.html']
+]);
 const THREAD_MESSAGE_PATH = /^\/api\/v1\/threads\/[^/]+\/messages$/;
 
 const runtime = {
@@ -36,6 +39,9 @@ const runtime = {
       });
       return worker.fetch(forwarded, env, executionContext);
     }
+
+    const aliased = routePublicAlias(request, url);
+    if (aliased) return aliased;
 
     const routed = routeHostname(request, url);
     if (routed) return routed;
@@ -181,6 +187,18 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       error: 'health_check_failed'
     }, { status: 503 }));
   }
+}
+
+function routePublicAlias(request: Request, url: URL): Response | undefined {
+  if (request.method !== 'GET' && request.method !== 'HEAD') return undefined;
+  const pathname = PUBLIC_ROUTE_ALIASES.get(url.pathname);
+  if (!pathname) return undefined;
+
+  const target = new URL(url);
+  target.pathname = pathname;
+  const host = url.hostname.toLowerCase();
+  const destinationHost = host === APP_HOST || PARENT_HOSTS.has(host) ? PUBLIC_HOST : host;
+  return redirectTo(destinationHost, target);
 }
 
 function routeHostname(request: Request, url: URL): Response | undefined {

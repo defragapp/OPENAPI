@@ -26,7 +26,9 @@
 .intelligence-workspace,
 .sovereign-landing,
 .account-shell,
-.plan-onboarding {
+.plan-onboarding,
+.private-route-gate,
+.public-not-found {
   background:
     radial-gradient(circle at 76% -10%, rgba(154, 171, 145, .07), transparent 30rem),
     var(--experience-page);
@@ -1541,15 +1543,16 @@
 
 .landing-hero {
   width: min(calc(100% - 64px), 1320px);
-  min-height: min(900px, calc(100dvh - 82px));
-  grid-template-columns: minmax(0, .82fr) minmax(560px, 1.18fr);
-  gap: clamp(52px, 7vw, 108px);
-  padding: 72px 0 110px;
+  min-height: calc(100dvh - 82px);
+  grid-template-columns: minmax(0, .72fr) minmax(600px, 1.28fr);
+  align-items: center;
+  gap: clamp(36px, 4vw, 56px);
+  padding: 52px 0 64px;
 }
 
 .landing-hero h1 {
   max-width: 12ch;
-  font-size: clamp(3.7rem, 6.3vw, 5.5rem);
+  font-size: clamp(3.45rem, 5vw, 4.7rem);
   font-weight: 410;
   letter-spacing: -.055em;
   line-height: .93;
@@ -1586,7 +1589,7 @@
 
 .living-answer {
   min-height: 0;
-  padding: clamp(30px, 4vw, 52px);
+  padding: clamp(28px, 3vw, 38px);
   border: 0;
   border-radius: 2px;
   background: var(--experience-paper);
@@ -1615,25 +1618,25 @@
 }
 
 .living-answer .fixture-label {
-  margin: 24px 0 7px;
+  margin: 18px 0 6px;
   color: #80796e;
   font-size: .62rem;
   letter-spacing: .11em;
 }
 
 .living-question {
-  max-width: 30ch;
+  max-width: 38ch;
   margin: 0;
   color: var(--experience-paper-ink);
   font-family: var(--serif);
-  font-size: 1.35rem;
+  font-size: 1.22rem;
   line-height: 1.35;
 }
 
 .living-answer-body {
   display: block;
   min-height: 0;
-  margin-top: 35px;
+  margin-top: 24px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -1644,26 +1647,26 @@
 }
 
 .living-answer-body h2 {
-  max-width: 17ch;
-  margin: 12px 0 20px;
+  max-width: 24ch;
+  margin: 10px 0 14px;
   font-family: var(--serif);
-  font-size: clamp(2.1rem, 3.5vw, 3.15rem);
+  font-size: clamp(2.05rem, 3vw, 2.75rem);
   font-weight: 410;
   letter-spacing: -.04em;
-  line-height: 1;
+  line-height: .98;
 }
 
 .living-answer-body > p {
-  max-width: 64ch;
+  max-width: 72ch;
   margin: 0;
   color: #4c4942;
-  font-size: .91rem;
-  line-height: 1.72;
+  font-size: .88rem;
+  line-height: 1.58;
 }
 
 .living-connection {
-  margin-top: 27px;
-  padding-top: 20px;
+  margin-top: 20px;
+  padding-top: 16px;
   border-top: 1px solid rgba(36, 35, 31, .12);
 }
 
@@ -1672,17 +1675,17 @@
 }
 
 .living-connection p {
-  margin: 9px 0 0;
+  margin: 7px 0 0;
   color: #57534b;
-  font-size: .82rem;
-  line-height: 1.65;
+  font-size: .8rem;
+  line-height: 1.5;
 }
 
 .living-answer-body aside {
   display: grid;
-  gap: 8px;
-  margin-top: 26px;
-  padding: 20px 22px;
+  gap: 6px;
+  margin-top: 20px;
+  padding: 14px 18px;
   border: 0;
   border-left: 2px solid #9a6f53;
   border-radius: 0;
@@ -1697,9 +1700,13 @@
 }
 
 .living-answer-basis {
-  margin-top: 28px;
-  padding-block: 14px;
+  margin-top: 20px;
+  padding-block: 12px;
   border-block: 1px solid rgba(36, 35, 31, .14);
+}
+
+.living-answer > .fixture-label:last-child {
+  margin: 14px 0 0;
 }
 
 .living-answer-basis summary {
@@ -1802,6 +1809,103 @@
 }
 
 /* Account and onboarding: calm transitions into the workspace */
+
+.private-route-gate,
+.public-not-found {
+  display: grid;
+  min-height: 100dvh;
+  grid-template-rows: auto 1fr;
+  padding: calc(24px + env(safe-area-inset-top)) 32px calc(32px + env(safe-area-inset-bottom));
+}
+
+.private-route-brand {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 46px;
+  align-items: center;
+  gap: 12px;
+  color: var(--experience-ink);
+  font-size: .69rem;
+  letter-spacing: .13em;
+  text-decoration: none;
+}
+
+.private-route-brand > span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(201, 134, 93, .38);
+  border-radius: 50%;
+  color: var(--experience-clay);
+  font-family: var(--serif);
+  font-size: 1rem;
+}
+
+.private-route-gate > section,
+.public-not-found > section {
+  width: min(100%, 680px);
+  align-self: center;
+  margin: 0 auto;
+  padding: 72px 0;
+}
+
+.private-route-gate > section > span,
+.public-not-found > section > span {
+  color: var(--experience-clay);
+  font-size: .68rem;
+  font-weight: 720;
+  letter-spacing: .13em;
+}
+
+.private-route-gate h1,
+.public-not-found h1 {
+  max-width: 12ch;
+  margin: 14px 0 24px;
+  font-family: var(--serif);
+  font-size: clamp(3.2rem, 7vw, 5.4rem);
+  font-weight: 410;
+  letter-spacing: -.05em;
+  line-height: .94;
+}
+
+.private-route-gate p,
+.public-not-found p {
+  max-width: 52ch;
+  color: var(--experience-muted);
+  line-height: 1.68;
+}
+
+.private-route-gate button,
+.public-not-found section a {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+  padding: 10px 18px;
+  border: 1px solid var(--experience-line);
+  border-radius: 1px;
+  background: transparent;
+  color: var(--experience-ink);
+  text-decoration: none;
+}
+
+.private-route-gate button {
+  gap: 12px;
+}
+
+.public-not-found section > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.public-not-found section a:first-child {
+  border-color: var(--experience-clay);
+  background: var(--experience-clay);
+  color: #171713;
+}
 
 .account-shell {
   padding-inline: 32px;
@@ -2003,8 +2107,8 @@
 
 @media (max-width: 1180px) {
   .landing-hero {
-    grid-template-columns: minmax(0, .88fr) minmax(500px, 1.12fr);
-    gap: 46px;
+    grid-template-columns: minmax(0, .75fr) minmax(540px, 1.25fr);
+    gap: 36px;
   }
 
   .intelligence-workspace.context-open .intelligence-main {
@@ -2303,6 +2407,11 @@
 
   .account-shell,
   .plan-onboarding {
+    padding-inline: 18px;
+  }
+
+  .private-route-gate,
+  .public-not-found {
     padding-inline: 18px;
   }
 
