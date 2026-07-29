@@ -1,0 +1,15 @@
+/* Small corrective layer kept separate so the primary visual system remains easy to audit. */
+
+@media (max-width: 1080px) {
+  .landing-hero::before {
+    left: 34%;
+  }
+}
+
+@media (max-width: 860px) {
+  .landing-hero + .landing-section .landing-section-header .landing-kicker,
+  .landing-hero + .landing-section .landing-section-header h2,
+  .landing-hero + .landing-section .landing-section-header > p:last-child {
+    grid-column: 1;
+  }
+}

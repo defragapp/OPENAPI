@@ -22,6 +22,8 @@ import './email-code-fallback.css';
 import './unified-entry.css';
 import './account-control.css';
 import './experience-reconciliation.css';
+import './sovereign-experience-v3.css';
+import './sovereign-experience-v3-fixes.css';
 
 installProductionRuntime();
 installProductRuntime();
