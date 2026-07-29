@@ -24,6 +24,7 @@ requireValue(rootConfig.d1_databases?.some((item) => item.binding === 'DB'), 'Ro
 requireValue(rootConfig.durable_objects?.bindings?.some((item) => item.name === 'THREADS'), 'Root config is missing Durable Object coordination');
 requireValue(rootConfig.ai?.binding === 'AI', 'Root config is missing Workers AI');
 requireValue(rootConfig.assets?.binding === 'ASSETS', 'Root config is missing static assets');
+requireValue(rootConfig.assets?.not_found_handling === '404-page', 'Production assets must return a real 404 document for unknown routes');
 requireValue(!rootConfig.r2_buckets?.length, 'Production must not enable R2');
 requireValue(!rootConfig.queues?.producers?.length && !rootConfig.queues?.consumers?.length, 'Production must not enable Queue');
 for (const hostname of ['sovereign.defrag.app', 'app.defrag.app']) {
@@ -43,10 +44,22 @@ requireValue(preview?.d1_databases?.some((item) => item.binding === 'DB'), 'Prev
 requireValue(preview?.durable_objects?.bindings?.some((item) => item.name === 'THREADS'), 'Preview is missing Durable Object coordination');
 requireValue(preview?.ai?.binding === 'AI', 'Preview is missing Workers AI');
 requireValue(preview?.assets?.binding === 'ASSETS', 'Preview is missing static assets');
+requireValue(workerConfig.assets?.not_found_handling === '404-page', 'Local assets must preserve the production 404 contract');
+requireValue(preview?.assets?.not_found_handling === '404-page', 'Preview assets must preserve the production 404 contract');
 requireValue(!preview?.r2_buckets?.length, 'R2 must remain disabled for visual-review preview');
 requireValue(!preview?.queues?.producers?.length && !preview?.queues?.consumers?.length, 'Queue must remain disabled for visual-review preview');
 requireValue(!workerConfig.r2_buckets?.length, 'Package-level Worker config must not declare R2');
 requireValue(!workerConfig.queues?.producers?.length && !workerConfig.queues?.consumers?.length, 'Package-level Worker config must not declare Queue');
+for (const [label, assets] of [
+  ['production', rootConfig.assets],
+  ['local', workerConfig.assets],
+  ['preview', preview?.assets]
+]) {
+  for (const pathname of ['/', '/login', '/signup', '/onboarding', '/app', '/app/*', '/auth/*', '/invitation', '/consent.html', '/privacy', '/terms']) {
+    requireValue(assets?.run_worker_first?.includes(pathname), `${label} assets must run the Worker first for ${pathname}`);
+  }
+}
+requireValue(existsSync('apps/web/public/404.html'), 'The static 404 document is missing');
 
 requireValue(!existsSync('.github/workflows'), 'GitHub Actions workflows are forbidden; Cloudflare Workers Builds is the sole release path');
 requireValue(packageJson.scripts?.['verify:cloudflare-build']?.includes('verify:release-config'), 'Canonical build must retain release verification');

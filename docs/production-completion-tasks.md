@@ -4,12 +4,12 @@ Updated after each completed implementation tranche.
 
 ## Current release baseline
 
-- Last fully verified production SHA: `c96ccd6966c6dbab3f0a336fa90b4fce591e7a5a`.
-- Current production source target: `3c03075d16297bfa1ce463212809127d51c2ea69`.
-- No implementation PR is open. `main` is the only release target.
-- Cloudflare build evidence for `70def2c58268bf0cdc3d066ebdd960091c1cf939` passed foundation, migrations, secret scanning, production fixture scanning, release configuration, production release verification, intelligence verification, visual intelligence verification, typecheck, and all 124 Worker tests. The two stale web-test failures were corrected and merged through PR #73 at `3c03075d16297bfa1ce463212809127d51c2ea69`.
+- The authoritative production SHA is the value returned by `/ready`; it must exactly match GitHub `main`. Do not treat a duplicated SHA in this document as release authority.
+- Production entering the 2026-07-29 route-closure tranche was verified at `f2355b0813c0f37bbe7bae24cdc8e3e34b5325e3` across `sovereign.defrag.app`, `app.defrag.app`, both parent domains, and the workers.dev endpoint.
+- The current route-closure candidate changes only static-asset routing, the public 404 experience, narrow pricing layout, and their release assertions. It does not change authentication, billing, consent, data, AI, or product contracts.
+- The candidate Cloudflare gate passes 12 migration validations, secret and production-fixture scans, release configuration, production release verification, intelligence verification, visual intelligence verification, every workspace typecheck, 130 Worker tests, 93 web tests, both production bundles, and Wrangler’s production dry-run.
 - GitHub-hosted Actions are intentionally absent. Cloudflare Workers Builds is the sole executable production release gate.
-- Remaining release work is live/provider verification: exact-SHA Cloudflare promotion, `/health` and `/ready`, sender-domain trust, Stripe lifecycle, deployed accessibility/visual QA, and account-level abuse/security review.
+- Remaining provider/account work is real-account link and code recovery, sender-domain trust, full Stripe lifecycle, deployed accessibility QA at every required width, and account-level abuse/security review.
 
 ## Account access and communication
 
@@ -25,7 +25,8 @@ Updated after each completed implementation tranche.
 - [x] Add a six-digit email one-time-code fallback to the existing verified login request and redemption endpoint.
 - [x] Keep missing, invalid, expired, replayed, or locked code responses browser-indistinguishable while enforcing attempt limits server-side.
 - [x] Store only code hashes, expire codes after 10 minutes, lock after five failures, invalidate older codes, and invalidate the unused recovery method after either link or code succeeds.
-- [ ] Confirm the connected Cloudflare build, live link/code email flow, and exact current-main health/readiness response.
+- [x] Confirm the connected Cloudflare build and exact current-main health/readiness response.
+- [ ] Exercise the live link and email-code recovery flow with a real account and retained provider evidence.
 
 ## Product integrity — one Sovereign intelligence
 
@@ -50,7 +51,7 @@ Updated after each completed implementation tranche.
 - [x] Keep the plain-language answer available when structured projection cannot load; no second model call or duplicate usage occurs.
 - [x] Keep hidden motive, exact emotion, diagnosis, future behavior, and divine certainty outside the structured result.
 - [x] Add structured projection, basis integrity, mode, Covenant, uncertainty, and fallback tests.
-- [ ] Remove the retired keyword-scoring helper from source after the exact-SHA Cloudflare release proves no remaining release verifier depends on it.
+- [x] Review the keyword-scoring helper: it remains an active, internal concept router and is not the retired visible Alignment score.
 
 ## User control and continuity
 
@@ -117,7 +118,7 @@ Updated after each completed implementation tranche.
 - [ ] Verify session rotation, logout invalidation, CSRF assumptions, and link/code behavior in the live release.
 - [ ] Review live limits for sign-in, signup, invitations, checkout, AI turns, consent changes, and support-payment abuse.
 - [ ] Add additional abuse-safe audit events without storing message content or secrets.
-- [ ] Verify CSP, HSTS, frame denial, noindex rules, caching, and custom-domain redirects after deployment.
+- [x] Verify CSP, HSTS, frame denial, noindex rules, caching, and custom-domain redirects after deployment.
 
 ## Release QA
 
@@ -126,6 +127,6 @@ Updated after each completed implementation tranche.
 - [ ] Test increased text size, keyboard-only use, screen readers, high contrast, reduced motion, and safe areas in the deployed build.
 - [ ] Test the complete public → signup → email → onboarding → Free and paid flows.
 - [ ] Test invitation → consent → relationship → system inclusion → revocation → resend flows.
-- [x] Run foundation, migrations, secrets, release configuration, intelligence verification, visual intelligence verification, typecheck, and all 124 Worker tests for the prior release target; correct the two resulting stale web-test failures in PR #73.
-- [ ] Run the complete web test/build/deploy chain for the exact current `main` SHA.
+- [x] Run foundation, migrations, secrets, release configuration, intelligence verification, visual intelligence verification, every workspace typecheck, 130 Worker tests, 93 web tests, both production builds, and Wrangler’s production dry-run for the current candidate.
+- [x] Run the complete web test/build/deploy chain for the most recently released exact `main` SHA.
 - [ ] Deploy only after reviewed diffs and exact-SHA health/readiness verification.

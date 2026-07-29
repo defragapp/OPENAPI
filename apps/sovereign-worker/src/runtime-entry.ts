@@ -71,7 +71,8 @@ const runtime = {
       if (!env.ASSETS) {
         return withSecurityHeaders(Response.json({ error: 'assets_unavailable' }, { status: 503 }));
       }
-      return documentResponse(await env.ASSETS.fetch(request), url.hostname.toLowerCase());
+      const assetRequest = navigationAssetRequest(request, url.pathname);
+      return documentResponse(await env.ASSETS.fetch(assetRequest), url.hostname.toLowerCase());
     }
 
     return applicationResponse(request, url.pathname, env, executionContext);
@@ -254,6 +255,27 @@ function isNavigationAssetPath(pathname: string): boolean {
   return pathname === '/'
     || PUBLIC_PATHS.has(pathname)
     || isApplicationPagePath(pathname);
+}
+
+function navigationAssetRequest(request: Request, pathname: string): Request {
+  if (!isSpaDocumentPath(pathname)) return request;
+  const target = new URL(request.url);
+  target.pathname = '/';
+  target.search = '';
+  return new Request(target, request);
+}
+
+function isSpaDocumentPath(pathname: string): boolean {
+  return pathname === '/'
+    || pathname === '/privacy'
+    || pathname === '/terms'
+    || pathname === '/app'
+    || pathname.startsWith('/app/')
+    || pathname === '/login'
+    || pathname === '/signup'
+    || pathname === '/onboarding'
+    || pathname === '/invitation'
+    || pathname.startsWith('/auth/');
 }
 
 function redirectTo(hostname: string, source: URL): Response {

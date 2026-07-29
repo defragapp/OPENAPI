@@ -25,6 +25,7 @@ const authenticatedWorkspaceUi = readFileSync('apps/web/src/AuthenticatedWorkspa
 const workspaceUi = readFileSync('apps/web/src/SovereignIntelligenceWorkspace.tsx', 'utf8');
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const pricing = readFileSync('apps/web/public/pricing.html', 'utf8');
+const notFoundDocument = readFileSync('apps/web/public/404.html', 'utf8');
 const consent = readFileSync('apps/web/public/consent.html', 'utf8');
 const consentCss = readFileSync('apps/web/public/consent.css', 'utf8');
 const consentJs = readFileSync('apps/web/public/consent.js', 'utf8');
@@ -97,6 +98,9 @@ for (const required of [
   'pricingClean',
   'faqClean',
   'questionsAlias',
+  'publicNotFound',
+  'appNotFound',
+  'unknownRoutes',
   'publicConsent',
   'compiledCopy',
   'consentCss',
@@ -135,6 +139,7 @@ for (const required of [
   '"class_name": "ThreadCoordinator"',
   '"binding": "AI"',
   '"directory": "apps/web/dist"',
+  '"not_found_handling": "404-page"',
   '"crons": ["*/15 * * * *"]',
   '"/api/*"',
   '"/login"',
@@ -166,9 +171,12 @@ for (const required of [
   "'/api/webhooks/stripe'",
   "'/api/v1/export-jobs'",
   "pathname === '/consent.html'",
-  'documentResponse(await env.ASSETS.fetch(request)',
+  'documentResponse(await env.ASSETS.fetch(assetRequest)',
   "headers.set('x-robots-tag', 'noindex, nofollow')",
   'isNavigationAssetPath',
+  'navigationAssetRequest',
+  'isSpaDocumentPath',
+  "target.pathname = '/'",
   "target.pathname = '/app'",
   "const PUBLIC_ROUTE_ALIASES = new Map",
   "['/questions', '/faq']",
@@ -180,6 +188,14 @@ for (const required of [
   'THREAD_MESSAGE_PATH'
 ]) {
   if (!runtime.includes(required)) throw new Error(`Runtime production contract is missing ${required}`);
+}
+
+for (const required of [
+  'This page is not part of Sovereign.OS.',
+  'content="noindex, nofollow"',
+  '/static-experience.css?v=20260729-route-closure'
+]) {
+  if (!notFoundDocument.includes(required)) throw new Error(`Static 404 document is missing ${required}`);
 }
 
 for (const required of [
