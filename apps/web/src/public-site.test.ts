@@ -37,9 +37,11 @@ describe('Sovereign.OS public experience', () => {
   });
 
   it('preserves the founder language as emotional brand meaning rather than category explanation', () => {
-    expect(landing).toContain('Healing isn’t optional. Holding the pain is.');
+    const heroInvocationIndex = landing.indexOf('<LivingSovereignAnswer />');
+    const healingIndex = landing.indexOf('Healing isn’t optional. Holding the pain is.');
+    expect(heroInvocationIndex).toBeGreaterThan(-1);
+    expect(healingIndex).toBeGreaterThan(heroInvocationIndex);
     expect(landing).toContain('Sovereign does not decide for you.');
-    expect(landing.indexOf('Healing isn’t optional. Holding the pain is.')).toBeGreaterThan(landing.indexOf('EXAMPLE SOVEREIGN ANSWER'));
   });
 
   it('explains the complete Baseline-first platform in direct language', () => {
