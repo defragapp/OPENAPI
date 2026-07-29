@@ -13,12 +13,18 @@ These instructions apply to the entire OPENAPI repository.
 - The single user-facing agent is named Sovereign.
 - Defrag, Alignment, and Covenant are internal reasoning lenses, not separate top-level products.
 - Authenticated navigation is Today, Explore, People, Systems, Library, and You.
-- Do not build external marketing pages in this milestone.
+- Public product pages must demonstrate the real Baseline-first answer hierarchy and must stay accurate to live plans and entitlements.
+- The only supported answer contract is `sovereign-answer.v2`.
+- Exact source data, interpretive Baseline facets, temporary current context, and question-specific synthesis must remain separate.
+- Basis contains server-approved exact values only. The model selects Basis IDs and never writes display values.
+- Alignment is a structured comparison, never a score, gauge, or model-text sentiment calculation.
+- The canonical authenticated implementation is `SovereignIntelligenceWorkspace`.
+- Visual explanation must come from Baseline facets, Shadow and Gift, Alignment, relationships, systems, current context, and exact Basis data.
 
 ## Safety, consent, and privacy
-- Always distinguish Baseline tendency, current amplification, observed behavior supplied or confirmed by the user, and unknown actual state.
+- Always distinguish a stable Baseline facet, temporary current context, observed behavior supplied or confirmed by the user, role and material context, and unknown actual state.
 - Never diagnose, assign hidden motives, claim exact emotions, predict with certainty, or present Baseline/current sky/psychological/biblical interpretation as deterministic proof.
-- Covenant is unavailable unless explicitly enabled for the turn or thread.
+- Covenant may be offered contextually but is unavailable until explicitly confirmed for the question or thread.
 - Enforce consent and authorization in deterministic server code before tools execute.
 - Do not send raw birth inputs, exact private location, secrets, or private identifiers to the model.
 - Do not trust client-supplied account IDs such as `x-sovereign-account` or `x-sovereign-subject`.

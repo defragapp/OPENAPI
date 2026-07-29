@@ -8,7 +8,7 @@ const entry = readFileSync(new URL('./entry.ts', import.meta.url), 'utf8');
 const runtimeEntry = readFileSync(new URL('./runtime-entry.ts', import.meta.url), 'utf8');
 const migration = readFileSync(new URL('../migrations/0008_identity_bound_invitations.sql', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../../web/src/App.tsx', import.meta.url), 'utf8');
-const workspace = readFileSync(new URL('../../web/src/SovereignWorkspace.tsx', import.meta.url), 'utf8');
+const workspace = readFileSync(new URL('../../web/src/SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const consentPage = readFileSync(new URL('../../web/public/consent.html', import.meta.url), 'utf8');
 const consentRuntime = readFileSync(new URL('../../web/public/consent.js', import.meta.url), 'utf8');
 const wrangler = readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8');
@@ -35,8 +35,8 @@ describe('identity-bound multi-user contract', () => {
   });
 
   it('builds real pair and system contexts from separate reduced Baselines', () => {
-    expect(relational).toContain("participant('self', 'You', 'self', ownerBaseline, true)");
-    expect(relational).toContain('loadReducedBaseline(env, person.bound_account_id)');
+    expect(relational).toContain("participant('you', 'You', 'self', ownerBaseline, {})");
+    expect(relational).toContain('loadStructuredBaseline(env, person.bound_account_id)');
     expect(relational).toContain("await requireConsent(env, accountId, personId, 'pair.compare')");
     expect(relational).toContain("await requireConsent(env, accountId, personId, 'system.include')");
     expect(relational).toContain('rawBirthInputShared: false');
@@ -46,9 +46,12 @@ describe('identity-bound multi-user contract', () => {
 
   it('requires separate framework permission before invited exact Basis values enter shared context', () => {
     expect(relational).toContain("hasConsent(env, accountId, personId, 'framework.display')");
-    expect(relational).toContain('frameworkDetailShared: frameworkAllowed');
-    expect(relational).toContain('if (frameworkAllowed && Object.keys(baseline.exactBasis).length)');
-    expect(relational).toContain("['humanDesign', 'geneKeys', 'natalPlacements', 'numerology', 'currentAstronomy']");
+    expect(relational).toContain('frameworkDisplay: frameworkAllowed');
+    expect(relational).toContain("? prefixBasis(invitedBaseline.basisRegistry, 'other', 'other')");
+    expect(relational).toContain('if (frameworkAllowed) basisRegistry.push');
+    expect(relational).toContain('facets: frameworkAllowed');
+    expect(relational).toContain('facetPairs: pairFacetPairs(visibleOwnerFacets, visibleOtherFacets)');
+    expect(relational).toContain('other.facets.map((facet) => ({ ...facet, basisRefs: [] }))');
   });
 
   it('removes owner-side granting and exposes invitee revocation controls', () => {

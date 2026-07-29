@@ -151,7 +151,9 @@ describe('authenticated Today and Explore smoke flow', () => {
 
     const first = await dispatch(request(), env);
     expect(first.status).toBe(202);
-    expect(await first.text()).toContain('OPENAPI Baseline fixture is available for development checks');
+    const firstText = await first.text();
+    expect(firstText).toContain('Your Baseline is still being prepared.');
+    expect(firstText).toContain('No quality or current state is being guessed.');
 
     const duplicate = await dispatch(request(), env);
     expect(duplicate.status).toBe(200);

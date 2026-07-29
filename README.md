@@ -12,11 +12,11 @@ Canonical repository: `defragapp/OPENAPI`.
 
 ## Product direction
 
-Sovereign.OS is a Baseline-first personal, relational, and system intelligence platform. One Sovereign agent helps a person understand themselves, compare consented Baseline Designs, and reason across relationships and systems such as families, households, teams, friendships, and workplaces.
+Sovereign.OS is a Baseline-first AI platform for understanding yourself, your relationships, and the human systems around you. One Sovereign agent helps a person explore a structured Baseline, distinguish stable qualities from temporary current context, compare consented Baselines, examine Alignment, and understand families, households, teams, friendships, and workplaces.
 
 Defrag, Alignment, and Covenant are internal capabilities of one agent. They are not separate top-level applications.
 
-The founder-approved public contract is defined in [`docs/launch-product-contract.md`](docs/launch-product-contract.md). The staged response and exact-data footer contract is defined in [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md).
+The founder-approved public contract is defined in [`docs/launch-product-contract.md`](docs/launch-product-contract.md). The Layer A–D intelligence model, `sovereign-answer.v2`, and exact Basis contract are defined in [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md).
 
 ## Production architecture
 
@@ -28,6 +28,7 @@ The founder-approved public contract is defined in [`docs/launch-product-contrac
 - D1 canonical storage: `sovereign-openapi-db`
 - SQLite Durable Objects for thread coordination
 - Workers AI through AI Gateway
+- `openai/gpt-5.5` through the existing Cloudflare AI Gateway configuration
 - Static assets for high-volume browser delivery
 - D1-scheduled background work every 15 minutes
 - Stripe-hosted Checkout and Customer Portal
@@ -37,6 +38,15 @@ The founder-approved public contract is defined in [`docs/launch-product-contrac
 - iOS-optimized Progressive Web App on the public hostname only
 
 Cloudflare Queue and R2 are intentionally disabled. Private export is not part of the launch product. Sharing sends only the public Sovereign.OS link and includes no private workspace data.
+
+## Intelligence contracts
+
+- `baseline-source.v1` contains deterministic or provider-returned exact values only.
+- `baseline-facets.v1` contains versioned interpretations derived from authorized source values and exact Basis references.
+- Current conditions expire and may identify a theme as more relevant; they never establish behavior.
+- `sovereign-answer.v2` returns a direct answer, adaptive sections, exact Basis references, correction language, contextual actions, confidence, and safety mode.
+- Relationship and system context is built on the server after entitlement and consent checks.
+- Covenant is contextual, explicitly confirmed, and limited to retrieved or curated verified Scripture.
 
 ## Cloudflare production release
 

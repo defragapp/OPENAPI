@@ -1,90 +1,106 @@
 import { describe, expect, it } from 'vitest';
-import { sovereignRuntimePromptV1 } from './prompt-v1';
+import { sovereignRuntimePromptV2 } from './prompt-v1';
 import { compareBaselineToCurrentConditions } from '../adapters/sovv';
-import type { RecognitionPlan } from './recognition';
+import type { SovereignAnswerV2 } from './recognition';
+import { retrieveScripture } from '../covenant/scripture';
 
 const fakeEnv = { APP_ENV: 'test', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '' } as never;
 
 describe('Sovereign runtime behavior contract', () => {
-  it('uses Baseline and Live Sky first and asks only for materially missing context', () => {
-    expect(sovereignRuntimePromptV1).toContain('FOUNDATION ORDER');
-    expect(sovereignRuntimePromptV1).toContain('BASELINE-FIRST FLOW');
-    expect(sovereignRuntimePromptV1).toContain('Begin with what the available Baseline and Live Sky context already provides.');
-    expect(sovereignRuntimePromptV1).toContain('choose response_phase "integration" and give a clear answer now');
-    expect(sovereignRuntimePromptV1).toContain('Use response_phase "question" only when one missing fact materially prevents a responsible answer');
-    expect(sovereignRuntimePromptV1).toContain('The user’s story shows where the computed framework may be appearing');
+  it('is Baseline-first and does not force an incident or action plan', () => {
+    expect(sovereignRuntimePromptV2).toContain('A user does not need to report a problem');
+    expect(sovereignRuntimePromptV2).toContain('Give the direct answer first');
+    expect(sovereignRuntimePromptV2).toContain('Do not turn every answer into an action plan');
+    expect(sovereignRuntimePromptV2).toContain('Shadow and Gift');
+    expect(sovereignRuntimePromptV2).toContain('Alignment is not a score');
   });
 
-  it('blocks diagnosis, hidden motive, destiny, spiritual certainty, and invented fields', () => {
-    expect(sovereignRuntimePromptV1).toContain('Never diagnose');
-    expect(sovereignRuntimePromptV1).toContain('Never claim hidden motives');
-    expect(sovereignRuntimePromptV1).toContain('Never fill missing data');
-    expect(sovereignRuntimePromptV1).toContain('Covenant is off');
+  it('keeps exact data, interpretation, current context, and synthesis separate', () => {
+    expect(sovereignRuntimePromptV2).toContain('Keep four layers separate');
+    expect(sovereignRuntimePromptV2).toContain('Select IDs only in basis_refs');
+    expect(sovereignRuntimePromptV2).toContain('Never fill missing data');
+    expect(sovereignRuntimePromptV2).toContain('Covenant activates only');
   });
 });
 
-describe('SOVV adapter fallback', () => {
-  it('returns reduced provenance and uncertainty without raw birth or exact location data', async () => {
+describe('current-condition adapter fallback', () => {
+  it('returns exact temporary context without raw birth or exact location data', async () => {
     const result = await compareBaselineToCurrentConditions(fakeEnv, 'self');
     const json = JSON.stringify(result);
     expect(result.contractVersion).toBe('1');
     expect(result.uncertainty).toBe('high');
-    expect(json).not.toMatch(/birth|latitude|longitude|location/i);
-    expect(result.data.separation).toContain('Actual state is unknown unless the user confirms it.');
+    expect(json).not.toMatch(/birthDate|birthTime|latitude|longitude/i);
+    expect(result.data.current.headline).toContain('Exact current positions');
   });
 });
 
-describe('Cloudflare Gateway recognition adapter', () => {
-  it('validates JSON, composes a focused question when material context is missing, and keeps account identity pseudonymous', async () => {
+describe('Cloudflare Gateway answer adapter', () => {
+  it('validates sovereign-answer.v2, attaches exact Basis, and keeps account identity pseudonymous', async () => {
     const calls: Array<{ model: string; input: unknown; options: unknown }> = [];
-    const { runSovereignStream } = await import('./sovereign');
+    const { runSovereignResult } = await import('./sovereign');
+    const basis = {
+      id: 'natal.sun',
+      category: 'natal',
+      display: '☉ CAN 04.2°',
+      accessibleLabel: 'Sun in Cancer at 4.2 degrees',
+      computedAt: '2026-07-28T12:00:00.000Z',
+      uncertainty: 'low',
+      provenance: 'NASA/JPL Horizons',
+      subject: 'self'
+    };
     const env = {
       APP_ENV: 'test',
       APP_VERSION: 'test',
       AI_PROVIDER: 'cloudflare-gateway',
       AI_MODEL: 'openai/gpt-5.5',
       AI_GATEWAY_ID: 'sovereign',
-      SOVV_INTERNAL_BASE_URL: '',
-      SOVV_INTERNAL_AUTH_TOKEN: '',
       STRIPE_SECRET_KEY: '',
       STRIPE_WEBHOOK_SECRET: '',
       SESSION_SIGNING_SECRET: 'test',
       DB: {
-        prepare() {
-          return { bind() { return {
-            async first() { return null; },
-            async all() { return { results: [] }; }
-          }; } };
+        prepare(sql: string) {
+          return {
+            bind() {
+              return {
+                async first() { return null; },
+                async all() {
+                  return {
+                    results: sql.includes('user_corrections')
+                      ? [{ correction: 'yes', note: null, created_at: '2026-07-28 12:00:00' }]
+                      : []
+                  };
+                }
+              };
+            }
+          };
         }
       },
       AI: {
         async run(model: string, input: unknown, options: unknown) {
           calls.push({ model, input, options });
           return {
-            output: [{
-              type: 'message',
-              content: [{
-                type: 'output_text',
-                text: JSON.stringify({
-                  response_phase: 'question',
-                  recognition: 'Your Baseline may make clarity especially important when the available information is incomplete.',
-                  inward_question: 'What information would materially change this decision?',
-                  candidate_hidden_expectation: '',
-                  protected_need: '',
-                  clearer_form: '',
-                  practical_action: '',
-                  module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
-                  basis: { user_confirmed: false, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
-                  confidence: 'exploratory',
-                  safety_mode: 'standard'
-                })
-              }]
-            }]
+            output_text: JSON.stringify({
+              version: 'sovereign-answer.v2',
+              mode: 'baseline',
+              depth: 'standard',
+              headline: 'Direction can become responsibility quickly.',
+              direct_answer: 'You may be quick to create direction when a situation has no clear owner. That capacity becomes costly when consequences become yours without matching authority.',
+              sections: [
+                { id: 'shadow', label: 'Shadow', body: 'You may end uncertainty by taking over before responsibility is shared.' },
+                { id: 'gift', label: 'Gift', body: 'You can create structure while leaving ownership visible and shared.' }
+              ],
+              basis_refs: ['natal.sun'],
+              correction_prompt: 'Does this fit your experience?',
+              actions: [],
+              confidence: 'supported',
+              safety_mode: 'standard'
+            })
           };
         }
       }
     } as never;
-    const stream = await runSovereignStream('I feel responsible for everyone and keep stepping in to fix everything, but I have not described what is actually mine to carry.', {
+
+    const result = await runSovereignResult('Who am I beneath the roles I learned to perform?', {
       env,
       accountId: 'acct_test',
       threadId: 'thread_test',
@@ -92,75 +108,91 @@ describe('Cloudflare Gateway recognition adapter', () => {
       covenantEnabled: false,
       plan: 'free',
       authorizedContext: {
-        kind: 'pair',
+        kind: 'baseline',
         personId: 'person_private',
-        participants: [{ personId: 'person_private', label: 'Private Name', baseline: { baselineTendency: 'reflective' } }]
+        label: 'Private Name',
+        baseline: { basisRegistry: [basis] }
       }
     });
-    const reader = stream.getReader();
-    let text = '';
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      text += value;
-    }
-    expect(text).toContain('WHAT I NOTICE');
-    expect(text).toContain('LOOK INWARD');
-    expect(text.match(/\?/g)).toHaveLength(1);
+
+    expect(result.answer.version).toBe('sovereign-answer.v2');
+    expect(result.basis[0]?.display).toBe('☉ CAN 04.2°');
+    expect(result.text).toContain('Direction can become responsibility quickly.');
     expect(calls).toHaveLength(1);
     expect(calls[0]?.model).toBe('openai/gpt-5.5');
+    expect(calls[0]?.input).toMatchObject({ max_output_tokens: 3_200 });
     expect(calls[0]?.options).toMatchObject({
       gateway: {
         id: 'sovereign',
         skipCache: true,
         collectLog: false,
-        metadata: { plan: 'free', response_contract: 'inner-recognition-v1' }
+        metadata: { plan: 'free', response_contract: 'sovereign-answer.v2' }
       }
     });
     expect((calls[0]?.options as any).gateway.metadata.account_ref).toMatch(/^[a-f0-9]{32}$/);
     expect(JSON.stringify(calls[0]?.options)).not.toContain('acct_test');
-    expect(JSON.stringify(calls[0]?.input)).toContain('Available exact Basis values');
-    expect(JSON.stringify(calls[0]?.input)).toContain('overfunctioning_underfunctioning');
-    expect(JSON.stringify(calls[0]?.input)).toContain('cannotInfer');
-    expect(JSON.stringify(calls[0]?.input)).toContain('Do not force a psychological explanation');
-    expect(JSON.stringify(calls[0]?.input)).not.toContain('Your Baseline proves');
-    expect(JSON.stringify(calls[0]?.input)).not.toMatch(/birth date|birth time|latitude|longitude|workspace\/SOVV/i);
+    expect(JSON.stringify(calls[0]?.input)).toContain('Authorized exact Basis registry');
+    expect(JSON.stringify(calls[0]?.input)).toContain('U✓');
     expect(JSON.stringify(calls[0]?.input)).not.toMatch(/person_private|Private Name/);
-    expect(JSON.stringify(calls[0]?.input)).toContain('Other person');
   });
 });
 
-describe('externally visible plan metadata', () => {
-  it('safety-reviews module and visual-card titles before they leave the private plan', async () => {
-    const { sanitizeRecognitionPlanLanguage } = await import('./sovereign');
-    const plan = {
-      recognition: 'A direct answer.',
-      inward_question: 'What fits now?',
-      candidate_hidden_expectation: 'One possibility.',
-      protected_need: 'clarity',
-      clearer_form: 'Keep what is known separate.',
-      practical_action: 'Name one observed fact.',
-      module_suggestion: { should_offer: true, title: 'You are the overfunctioner', reason: 'Your mother is trying to control you.', format: 'reflection' },
-      visual_story: {
-        should_show: true,
-        mode: 'self',
-        primary: { archetype: 'fool', title: 'You are the overfunctioner', phase: 'shadow' },
-        secondary: null,
-        tertiary: null,
-        origin: 'Past protection.',
-        shadow: 'Current pressure.',
-        gift: 'Clear expression.',
-        current: 'Something is active.',
-        next_step: 'Name one fact.',
-        visual_reason: 'The user confirmed it.'
-      },
-      basis: { user_confirmed: true, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
-      confidence: 'supported',
-      safety_mode: 'standard',
-      response_phase: 'integration'
-    } as unknown as RecognitionPlan;
-    sanitizeRecognitionPlanLanguage(plan, true);
-    expect(JSON.stringify(plan.module_suggestion)).not.toMatch(/overfunctioner|trying to control/i);
-    expect(plan.visual_story.primary.title).not.toContain('overfunctioner');
+describe('Covenant Scripture grounding', () => {
+  it('replaces model Scripture with a retrieved passage and rejects citations outside that section', async () => {
+    const { groundCovenantScripture } = await import('./sovereign');
+    const covenantAnswer = {
+      version: 'sovereign-answer.v2',
+      mode: 'covenant',
+      depth: 'deep',
+      headline: 'A family role through Covenant',
+      direct_answer: 'The comparison is a reflection lens, not an identity assignment or promised outcome.',
+      sections: [
+        { id: 'system', label: 'Biblical parallel', body: 'Joseph’s family story may offer a comparison without assigning anyone a biblical identity.' },
+        { id: 'steady', label: 'Scripture', body: 'Model-authored passage text must not survive.' },
+        { id: 'gift', label: 'Teaching', body: 'Hold responsibility and care together.' },
+        { id: 'experiment', label: 'Application', body: 'Name the responsibility that can be examined directly.' },
+        { id: 'unknowns', label: 'Boundary', body: 'No relationship outcome or private motive is established.' }
+      ],
+      basis_refs: [],
+      correction_prompt: 'Does this lens help?',
+      actions: [],
+      confidence: 'exploratory',
+      safety_mode: 'grounded'
+    } as SovereignAnswerV2;
+    groundCovenantScripture(covenantAnswer, [retrieveScripture('Genesis 37:3-4')]);
+    expect(covenantAnswer.sections.find((section) => section.label === 'Scripture')?.body)
+      .toContain('Genesis 37:3–4 (WEB)');
+    expect(JSON.stringify(covenantAnswer)).not.toContain('Model-authored passage text');
+
+    const invented = structuredClone(covenantAnswer);
+    invented.direct_answer = 'Psalm 1:1 proves the outcome, which is not an authorized citation.';
+    expect(() => groundCovenantScripture(invented, [retrieveScripture('Genesis 37:3-4')]))
+      .toThrow('Scripture citations must remain');
+  });
+});
+
+describe('answer language review', () => {
+  it('reviews every user-visible answer field', async () => {
+    const { sanitizeSovereignAnswerLanguage } = await import('./sovereign');
+    const answer = {
+      version: 'sovereign-answer.v2',
+      mode: 'relationship',
+      depth: 'deep',
+      headline: 'A relationship question',
+      direct_answer: 'Your mother is trying to control you.',
+      sections: [
+        { id: 'you', label: 'You', body: 'You are the overfunctioner.' },
+        { id: 'other', label: 'Other', body: 'They secretly want control.' },
+        { id: 'interaction', label: 'Interaction', body: 'One possibility needs direct confirmation.' },
+        { id: 'unknowns', label: 'Unknown', body: 'Their actual state is not known.' }
+      ],
+      basis_refs: [],
+      correction_prompt: 'Does this fit?',
+      actions: [{ type: 'open_person', label: 'Open this relationship', target_id: 'person_1' }],
+      confidence: 'exploratory',
+      safety_mode: 'standard'
+    } as SovereignAnswerV2;
+    sanitizeSovereignAnswerLanguage(answer, true);
+    expect(JSON.stringify(answer)).not.toMatch(/trying to control|overfunctioner|secretly want/i);
   });
 });

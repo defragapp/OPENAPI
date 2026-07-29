@@ -167,9 +167,9 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       ...(pathname === '/ready' ? { ready } : {}),
       version: env.APP_VERSION,
       environment: env.APP_ENV,
-      migrationVersion: '0011_email_code_recovery',
-      recognitionContract: 'inner-recognition-v1',
-      baselineContract: 'openapi-baseline-engine-v2',
+      migrationVersion: '0012_baseline_facets_and_answer_v2',
+      answerContract: 'sovereign-answer.v2',
+      baselineContract: 'baseline-source.v1+baseline-facets.v1',
       dependencies
     }));
   } catch {

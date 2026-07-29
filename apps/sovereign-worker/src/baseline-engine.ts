@@ -1,5 +1,10 @@
 import type { Env } from './env';
 import type { BaselineProvider, BaselineProviderOutput, normalizeBaselineInput } from './baseline';
+import {
+  BASELINE_SOURCE_VERSION,
+  type BaselineSourceData,
+  type DataUncertainty
+} from './baseline-contracts';
 
 const DEFAULT_HORIZONS_URL = 'https://ssd.jpl.nasa.gov/api/horizons.api';
 const CACHE_TTL_SECONDS = 60 * 60 * 24 * 365;
@@ -87,7 +92,8 @@ export function createOpenApiBaselineProvider(env: Env, fetchImpl: FetchLike = f
       const placements = Object.fromEntries(
         Object.entries(positions).map(([body, position]) => [body, `${position.sign} ${position.degree.toFixed(2)}°${position.retrograde ? ' retrograde' : ''}`])
       );
-      const aspects = computeMajorAspects(positions);
+      const aspectRecords = computeMajorAspects(positions, normalized.birthTimeCertainty);
+      const aspects = aspectRecords.map((aspect) => aspect.display);
       const timeKnown = normalized.birthTimeCertainty !== 'unknown';
       const personalityGates = timeKnown
         ? Object.fromEntries(Object.entries(positions).map(([body, position]) => [body, gateForLongitude(position.longitude)]))
@@ -100,8 +106,18 @@ export function createOpenApiBaselineProvider(env: Env, fetchImpl: FetchLike = f
         positions.mercury ? `Mercury in ${positions.mercury.sign}` : undefined,
         ...aspects.slice(0, 3)
       ].filter((value): value is string => Boolean(value));
+      const computedAt = new Date().toISOString();
+      const sourceData = buildSourceData(
+        positions,
+        aspectRecords,
+        personalityGates,
+        numerology,
+        normalized.birthTimeCertainty,
+        computedAt
+      );
 
       const output: BaselineProviderOutput = {
+        sourceData,
         natalPlacements: placements,
         houses: null,
         aspects,
@@ -119,7 +135,7 @@ export function createOpenApiBaselineProvider(env: Env, fetchImpl: FetchLike = f
         currentAstronomy: {},
         baselineTendency,
         interpretiveSignals,
-        sourceTimestamp: new Date().toISOString(),
+        sourceTimestamp: computedAt,
         provenance: {
           engine: 'openapi-cloudflare-baseline-engine-v2',
           referenceCommit: REFERENCE_COMMIT,
@@ -243,16 +259,29 @@ function parseCsvLine(line: string): string[] {
   return fields;
 }
 
-function computeMajorAspects(positions: Record<string, BodyPosition>): string[] {
+interface ComputedAspect {
+  id: string;
+  leftBody: string;
+  aspect: 'conjunction' | 'sextile' | 'square' | 'trine' | 'opposition';
+  rightBody: string;
+  orb: number;
+  display: string;
+  uncertainty: DataUncertainty;
+}
+
+function computeMajorAspects(
+  positions: Record<string, BodyPosition>,
+  certainty: NormalizedBaselineInput['birthTimeCertainty']
+): ComputedAspect[] {
   const definitions = [
-    { name: 'conjunction', angle: 0, orb: 8 },
-    { name: 'sextile', angle: 60, orb: 5 },
-    { name: 'square', angle: 90, orb: 7 },
-    { name: 'trine', angle: 120, orb: 7 },
-    { name: 'opposition', angle: 180, orb: 8 }
-  ];
+    { name: 'conjunction' as const, angle: 0, orb: 8 },
+    { name: 'sextile' as const, angle: 60, orb: 5 },
+    { name: 'square' as const, angle: 90, orb: 7 },
+    { name: 'trine' as const, angle: 120, orb: 7 },
+    { name: 'opposition' as const, angle: 180, orb: 8 }
+  ] as const;
   const entries = Object.entries(positions);
-  const aspects: string[] = [];
+  const aspects: ComputedAspect[] = [];
   for (let left = 0; left < entries.length; left += 1) {
     for (let right = left + 1; right < entries.length; right += 1) {
       const [leftName, leftPosition] = entries[left]!;
@@ -260,11 +289,93 @@ function computeMajorAspects(positions: Record<string, BodyPosition>): string[] 
       const separation = Math.abs(signedLongitudeDelta(leftPosition.longitude, rightPosition.longitude));
       for (const definition of definitions) {
         const orb = Math.abs(separation - definition.angle);
-        if (orb <= definition.orb) aspects.push(`${title(leftName)} ${definition.name} ${title(rightName)} (${orb.toFixed(1)}° orb)`);
+        if (orb <= definition.orb) {
+          aspects.push({
+            id: `aspect.${leftName}.${definition.name}.${rightName}`,
+            leftBody: leftName,
+            aspect: definition.name,
+            rightBody: rightName,
+            orb: Math.round(orb * 10) / 10,
+            display: `${title(leftName)} ${definition.name} ${title(rightName)} (${orb.toFixed(1)}° orb)`,
+            uncertainty: certaintyUncertainty(certainty, leftName === 'moon' || rightName === 'moon')
+          });
+        }
       }
     }
   }
   return aspects.slice(0, 16);
+}
+
+function buildSourceData(
+  positions: Record<string, BodyPosition>,
+  aspects: ComputedAspect[],
+  personalityGates: Record<string, { gate: number; line: number }>,
+  numerology: Record<string, number>,
+  certainty: NormalizedBaselineInput['birthTimeCertainty'],
+  computedAt: string
+): BaselineSourceData {
+  return {
+    version: BASELINE_SOURCE_VERSION,
+    computationVersion: 'openapi-baseline-engine-v3',
+    computedAt,
+    uncertainty: certainty === 'exact' ? 'low' : certainty === 'approximate' ? 'medium' : 'high',
+    natalBodies: Object.entries(positions).map(([body, position]) => ({
+      id: `natal.${body}`,
+      body,
+      sign: position.sign,
+      longitude: Math.round(position.longitude * 10_000) / 10_000,
+      displayDegree: `${position.degree.toFixed(1)}°`,
+      retrograde: position.retrograde,
+      uncertainty: certaintyUncertainty(certainty, body === 'moon')
+    })),
+    aspects,
+    humanDesign: {
+      personalityActivations: Object.entries(personalityGates).map(([body, value]) => ({
+        id: `hd.personality.${body}`,
+        body,
+        gate: value.gate,
+        line: value.line,
+        uncertainty: certainty === 'exact' ? 'low' : 'medium'
+      }))
+    },
+    geneKeys: {
+      activations: Object.entries(personalityGates).map(([body, value]) => ({
+        id: `gk.activation.${body}`,
+        body,
+        activation: value.gate,
+        uncertainty: certainty === 'exact' ? 'low' : 'medium'
+      }))
+    },
+    numerology: Object.entries(numerology)
+      .filter(([key]) => key === 'lifePath' || key === 'birthDay')
+      .map(([key, value]) => ({
+        id: `numerology.${key}`,
+        key: key as 'lifePath' | 'birthDay',
+        value,
+        uncertainty: 'low' as const
+      })),
+    houses: null,
+    provenance: {
+      astronomy: 'NASA/JPL Horizons',
+      observerCenter: 'Earth geocenter 500@399',
+      timezoneResolution: 'User-selected IANA timezone',
+      birthTimeCertainty: certainty,
+      rawBirthInputReturned: false,
+      exactPrivateLocationReturned: false,
+      completeHumanDesignClaimed: false,
+      completeGeneKeysClaimed: false,
+      housesClaimed: false
+    }
+  };
+}
+
+function certaintyUncertainty(
+  certainty: NormalizedBaselineInput['birthTimeCertainty'],
+  timeSensitive: boolean
+): DataUncertainty {
+  if (certainty === 'exact') return 'low';
+  if (certainty === 'approximate') return timeSensitive ? 'medium' : 'low';
+  return timeSensitive ? 'high' : 'medium';
 }
 
 function gateForLongitude(longitude: number): { gate: number; line: number } {

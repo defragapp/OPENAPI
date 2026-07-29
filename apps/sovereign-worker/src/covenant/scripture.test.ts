@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyBiblicalLens, assertCovenantSafe, normalizeReference, retrieveScripture } from './scripture';
+import { applyBiblicalLens, assertCovenantSafe, normalizeReference, retrieveCovenantContext, retrieveScripture } from './scripture';
 
 describe('Covenant Scripture provider', () => {
   it('normalizes references and retrieves configured fixture passages with citations', () => {
@@ -12,9 +12,16 @@ describe('Covenant Scripture provider', () => {
   it('separates passage retrieval from interpretation', () => {
     const passage = retrieveScripture('Romans 12:18', 'WEB');
     const lens = applyBiblicalLens(passage, 'a family boundary');
-    expect(lens.passage).toEqual(passage);
-    expect(lens.interpretation).toContain('Interpretation:');
-    expect(lens.boundaries).toContain('Scripture is separate from interpretation.');
+    expect(lens.scripture.reference).toBe(passage.reference);
+    expect(lens.biblicalParallel).toContain('lens for reflection');
+    expect(lens.boundary).toContain('God’s exact intent');
+    expect(() => assertCovenantSafe(JSON.stringify(lens))).not.toThrow();
+  });
+
+  it('selects verified passages for a relevant family dynamic without religious keywords', () => {
+    const passages = retrieveCovenantContext('Why was I singled out while my siblings were favored?');
+    expect(passages.map((passage) => passage.reference)).toContain('Genesis 37:3–4');
+    expect(passages.every((passage) => passage.translation === 'WEB')).toBe(true);
   });
 
   it('fails closed for unavailable passages and translations', () => {
@@ -24,6 +31,7 @@ describe('Covenant Scripture provider', () => {
 
   it('rejects spiritual certainty and coercive covenant output', () => {
     expect(() => assertCovenantSafe('God told me this is your only path.')).toThrow('Covenant output failed safety validation');
+    expect(() => assertCovenantSafe('The outcome is guaranteed.')).toThrow('Covenant output failed safety validation');
     expect(() => assertCovenantSafe('Use wisdom while preserving agency.')).not.toThrow();
   });
 });

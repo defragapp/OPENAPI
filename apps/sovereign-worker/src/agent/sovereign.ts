@@ -2,17 +2,20 @@ import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import type { Env } from '../env';
 import { getModelSafeBaselineContext } from '../baseline';
 import { buildPairComparison, buildSystemAnalysis } from '../relational-context';
-import { sovereignRuntimePromptV1 } from './prompt-v1';
+import { sovereignRuntimePromptV2 } from './prompt-v1';
 import { groundedIntelligencePrompt } from './grounded-intelligence';
 import { assertSafeUserInput, assertSovereignOutputSafety, reviewSovereignOutputSafety } from './safety';
 import { projectModelSafeConversationContext } from '../conversation-context';
 import {
-  composeRecognitionResponse,
-  deriveAvailableBasis,
-  parseRecognitionPlan,
-  recognitionJsonContract,
-  type RecognitionPlan
+  attachBasisValues,
+  composeSovereignAnswerText,
+  deriveAuthorizedBasisRegistry,
+  parseSovereignAnswer,
+  sovereignAnswerJsonContract,
+  type SovereignAnswerV2
 } from './recognition';
+import type { BasisRegistryItem } from '../baseline-contracts';
+import { assertCovenantSafe, retrieveCovenantContext, type ScripturePassage } from '../covenant/scripture';
 
 export interface SovereignContext {
   env: Env;
@@ -28,7 +31,8 @@ export interface SovereignContext {
 
 export interface SovereignResult {
   text: string;
-  plan: RecognitionPlan;
+  answer: SovereignAnswerV2;
+  basis: BasisRegistryItem[];
 }
 
 export async function runSovereignText(input: string, context: SovereignContext): Promise<string> {
@@ -44,15 +48,33 @@ export async function runSovereignResult(input: string, context: SovereignContex
   const aiConfig = resolveAiModelConfig(context.env);
   if (aiConfig.provider !== 'cloudflare-gateway') throw new Error('Only Cloudflare AI Gateway is supported.');
 
-  const { prompt, availableBasis } = await buildCloudflareGatewayPrompt(input, context);
+  const { prompt, basisRegistry, covenantPassages } = await buildCloudflareGatewayPrompt(input, context);
   const raw = await runCloudflareGateway(prompt, context, aiConfig.model);
-  const plan = parseRecognitionPlan(raw, availableBasis);
+  const answer = parseSovereignAnswer(raw, basisRegistry);
+  assertAuthorizedAnswerMode(answer, context);
+  groundCovenantScripture(answer, covenantPassages);
   const allowFrameworkLabels = asksForFrameworkDetail(input);
-  sanitizeRecognitionPlanLanguage(plan, allowFrameworkLabels);
-  const review = reviewSovereignOutputSafety(composeRecognitionResponse(plan), { allowFrameworkLabels });
+  sanitizeSovereignAnswerLanguage(answer, allowFrameworkLabels);
+  const review = reviewSovereignOutputSafety(composeSovereignAnswerText(answer), { allowFrameworkLabels });
   const text = review.text;
-  assertSovereignOutputSafety(text, { phase: plan.response_phase, allowFrameworkLabels });
-  return { text, plan };
+  assertSovereignOutputSafety(text, { contract: 'sovereign-answer.v2', allowFrameworkLabels });
+  if (answer.mode === 'covenant') assertCovenantSafe(text);
+  return { text, answer, basis: attachBasisValues(answer, basisRegistry) };
+}
+
+function assertAuthorizedAnswerMode(answer: SovereignAnswerV2, context: SovereignContext): void {
+  if (context.covenantEnabled && answer.mode !== 'covenant') {
+    throw new Error('Explicitly enabled Covenant requires a Covenant answer');
+  }
+  if (!context.covenantEnabled && answer.mode === 'covenant') {
+    throw new Error('Covenant cannot activate without explicit confirmation');
+  }
+  if (!context.covenantEnabled && context.personId && answer.mode !== 'relationship') {
+    throw new Error('A permitted person comparison requires a relationship answer');
+  }
+  if (!context.covenantEnabled && context.systemId && answer.mode !== 'system') {
+    throw new Error('A permitted system context requires a system answer');
+  }
 }
 
 async function runCloudflareGateway(prompt: string, context: SovereignContext, model: string): Promise<string> {
@@ -60,7 +82,7 @@ async function runCloudflareGateway(prompt: string, context: SovereignContext, m
   if (!context.env.AI_GATEWAY_ID) throw new Error('AI_GATEWAY_ID is not configured.');
   const result = await context.env.AI.run(
     model,
-    { input: prompt, max_output_tokens: 1_200 },
+    { input: prompt, max_output_tokens: 3_200 },
     {
       gateway: {
         id: context.env.AI_GATEWAY_ID,
@@ -69,7 +91,7 @@ async function runCloudflareGateway(prompt: string, context: SovereignContext, m
         metadata: {
           plan: context.plan === 'sovereign_plus' ? 'sovereign_plus' : 'free',
           account_ref: await pseudonymousAccountRef(context),
-          response_contract: 'inner-recognition-v1'
+          response_contract: 'sovereign-answer.v2'
         }
       }
     }
@@ -80,17 +102,22 @@ async function runCloudflareGateway(prompt: string, context: SovereignContext, m
   return extractText(result);
 }
 
-async function buildCloudflareGatewayPrompt(input: string, context: SovereignContext): Promise<{ prompt: string; availableBasis: ReturnType<typeof deriveAvailableBasis> }> {
+async function buildCloudflareGatewayPrompt(input: string, context: SovereignContext): Promise<{
+  prompt: string;
+  basisRegistry: BasisRegistryItem[];
+  covenantPassages: ScripturePassage[];
+}> {
   const [authorizedContext, continuity, covenantEnabled] = await Promise.all([
     resolveAuthorizedContext(context),
     loadRecognitionContinuity(context),
     isCovenantEnabledForThread(context)
   ]);
-  const availableBasis = deriveAvailableBasis(authorizedContext);
+  const basisRegistry = deriveAuthorizedBasisRegistry({ authorizedContext, continuity });
+  const covenantContext = covenantEnabled ? retrieveCovenantContext(input) : [];
   const covenantInstruction = covenantEnabled
-    ? 'Covenant was explicitly enabled for this thread. Keep the grounded recognition complete on its own. A module may optionally suggest a separate Scripture exploration, but do not invent or quote a passage that was not retrieved by the approved Scripture service.'
+    ? `Covenant was explicitly enabled for this thread. Use mode "covenant". Keep the grounded answer complete on its own. Use only these retrieved passages and quote no passage not present here:\n${JSON.stringify(covenantContext)}`
     : 'Covenant is off. Do not apply Scripture or biblical metaphor automatically.';
-  const prompt = `${sovereignRuntimePromptV1}
+  const prompt = `${sovereignRuntimePromptV2}
 
 Authorization-checked server context, stripped of raw birth inputs, exact private location, secrets, source paths, and private identifiers:
 ${JSON.stringify(authorizedContext)}
@@ -98,19 +125,41 @@ ${JSON.stringify(authorizedContext)}
 Recent thread continuity. Assistant text and user corrections only; no hidden reasoning:
 ${JSON.stringify(continuity)}
 
-Available exact Basis values. The basis arrays in your JSON must select verbatim from these lists only:
-${JSON.stringify(availableBasis)}
+Authorized exact Basis registry. Select IDs only in basis_refs:
+${JSON.stringify(basisRegistry.map(({ id, display, uncertainty, subject }) => ({ id, display, uncertainty, subject })))}
 
 ${groundedIntelligencePrompt(input)}
 
 Required JSON shape:
-${recognitionJsonContract(availableBasis)}
+${sovereignAnswerJsonContract()}
 
 Current user message:
 ${input}
 
 ${covenantInstruction}`;
-  return { prompt, availableBasis };
+  return { prompt, basisRegistry, covenantPassages: covenantContext };
+}
+
+export function groundCovenantScripture(answer: SovereignAnswerV2, passages: ScripturePassage[]): void {
+  if (answer.mode !== 'covenant') return;
+  if (!passages.length) throw new Error('Covenant requires a retrieved Scripture passage');
+  const scripture = answer.sections.find((section) => section.label.toLowerCase().includes('scripture'));
+  if (!scripture) throw new Error('Covenant answer is missing its Scripture section');
+  const nonScriptureText = [
+    answer.headline,
+    answer.direct_answer,
+    ...answer.sections.filter((section) => section !== scripture).flatMap((section) => [section.label, section.body])
+  ].join('\n');
+  if (extractScriptureCitations(nonScriptureText).length) {
+    throw new Error('Scripture citations must remain in the server-grounded Scripture section');
+  }
+  scripture.body = passages.map((passage) => (
+    `${passage.citation} — ${passage.text}\nContext: ${passage.context}`
+  )).join('\n\n');
+}
+
+function extractScriptureCitations(value: string): string[] {
+  return value.match(/\b(?:[1-3]\s+)?[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}\s+\d{1,3}:\d{1,3}(?:[–—-]\d{1,3})?\b/g) ?? [];
 }
 
 async function resolveAuthorizedContext(context: SovereignContext): Promise<unknown> {
@@ -128,9 +177,22 @@ async function loadRecognitionContinuity(context: SovereignContext): Promise<unk
     ORDER BY te.seq DESC LIMIT 3`).bind(context.threadId, context.accountId).all<Record<string, string>>();
   const corrections = await context.env.DB.prepare(`SELECT correction, note, created_at FROM user_corrections
     WHERE thread_id = ? AND account_id = ? ORDER BY created_at DESC LIMIT 3`).bind(context.threadId, context.accountId).all<Record<string, string | null>>();
+  const userCorrections = corrections.results ?? [];
   return {
     recentAssistantResponses: (events.results ?? []).map((row) => safeJson(row.payload_json)),
-    userCorrections: corrections.results ?? []
+    userCorrections,
+    basisRegistry: userCorrections.flatMap((row, index): BasisRegistryItem[] => row.correction === 'yes'
+      ? [{
+          id: `user_confirmation.${index + 1}`,
+          category: 'user_confirmation',
+          display: 'U✓',
+          accessibleLabel: 'User confirmed that a prior interpretation fit',
+          computedAt: normalizeDatabaseTimestamp(row.created_at ?? null),
+          uncertainty: 'low',
+          provenance: 'User confirmation',
+          subject: 'self'
+        }]
+      : [])
   };
 }
 
@@ -145,25 +207,17 @@ function asksForFrameworkDetail(input: string): boolean {
   return /\b(?:Bowen|IFS|internal family systems|attachment theory|psychological framework|sources?|research)\b/i.test(input);
 }
 
-export function sanitizeRecognitionPlanLanguage(plan: RecognitionPlan, allowFrameworkLabels: boolean): void {
+export function sanitizeSovereignAnswerLanguage(answer: SovereignAnswerV2, allowFrameworkLabels: boolean): void {
   const rewrite = (value: string) => reviewSovereignOutputSafety(value, { allowFrameworkLabels }).text;
-  plan.recognition = rewrite(plan.recognition);
-  plan.inward_question = rewrite(plan.inward_question);
-  plan.candidate_hidden_expectation = rewrite(plan.candidate_hidden_expectation);
-  plan.protected_need = rewrite(plan.protected_need);
-  plan.clearer_form = rewrite(plan.clearer_form);
-  plan.practical_action = rewrite(plan.practical_action);
-  plan.module_suggestion.title = rewrite(plan.module_suggestion.title);
-  plan.module_suggestion.reason = rewrite(plan.module_suggestion.reason);
-  plan.visual_story.primary.title = rewrite(plan.visual_story.primary.title);
-  if (plan.visual_story.secondary) plan.visual_story.secondary.title = rewrite(plan.visual_story.secondary.title);
-  if (plan.visual_story.tertiary) plan.visual_story.tertiary.title = rewrite(plan.visual_story.tertiary.title);
-  plan.visual_story.origin = rewrite(plan.visual_story.origin);
-  plan.visual_story.shadow = rewrite(plan.visual_story.shadow);
-  plan.visual_story.gift = rewrite(plan.visual_story.gift);
-  plan.visual_story.current = rewrite(plan.visual_story.current);
-  plan.visual_story.next_step = rewrite(plan.visual_story.next_step);
-  plan.visual_story.visual_reason = rewrite(plan.visual_story.visual_reason);
+  answer.headline = rewrite(answer.headline);
+  answer.direct_answer = rewrite(answer.direct_answer);
+  answer.correction_prompt = rewrite(answer.correction_prompt);
+  answer.sections = answer.sections.map((section) => ({
+    ...section,
+    label: rewrite(section.label),
+    body: rewrite(section.body)
+  }));
+  answer.actions = answer.actions.map((action) => ({ ...action, label: rewrite(action.label) }));
 }
 
 async function pseudonymousAccountRef(context: SovereignContext): Promise<string> {
@@ -257,4 +311,10 @@ async function collectTextStream(stream: ReadableStream<string>): Promise<string
 function safeJson(value: string | undefined): unknown {
   if (!value) return {};
   try { return JSON.parse(value); } catch { return {}; }
+}
+
+function normalizeDatabaseTimestamp(value: string | null): string {
+  if (!value) return new Date(0).toISOString();
+  const timestamp = Date.parse(value.includes('T') ? value : `${value.replace(' ', 'T')}Z`);
+  return Number.isNaN(timestamp) ? new Date(0).toISOString() : new Date(timestamp).toISOString();
 }

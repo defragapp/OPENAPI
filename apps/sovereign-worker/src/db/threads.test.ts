@@ -24,17 +24,30 @@ describe('thread account ownership and continuity', () => {
     await expect(listThreads(historyEnv(), 'a1')).resolves.toEqual([{ id: 't1', title: 'A decision about work', contextKind: 'explore', surface: 'Explore', covenantEnabled: false, createdAt: '2026-07-25 10:00:00', updatedAt: '2026-07-26 10:00:00' }]);
   });
 
-  it('restores the validated plan, internal mode, selected context, and latest fit correction', async () => {
+  it('restores the validated answer, selected context, exact Basis, and latest fit correction', async () => {
     const messages = await listThreadMessages(historyEnv(), 'a1', 't1');
     expect(messages).toEqual([
       { id: 'e1', role: 'user', text: 'Help me understand this choice.', createdAt: '2026-07-26 10:00:00' },
       {
         id: 'e3', role: 'assistant', text: 'Two needs may be interacting.', createdAt: '2026-07-26 10:00:02',
         context: { surface: 'Explore', mode: 'alignment', personId: 'person_1' },
-        plan: { response_phase: 'integration', confidence: 'supported', safety_mode: 'standard', clearer_form: 'Protect agency while accepting support.' },
+        answer: {
+          version: 'sovereign-answer.v2',
+          mode: 'alignment',
+          depth: 'focused',
+          headline: 'Agency and support can coexist.',
+          direct_answer: 'Support fits when it leaves your decision authority visible.',
+          sections: [{ id: 'alignment', label: 'A closer version', body: 'Accept support without transferring the decision.' }],
+          basis_refs: ['natal.sun'],
+          correction_prompt: 'Does this fit?',
+          actions: [],
+          confidence: 'supported',
+          safety_mode: 'standard'
+        },
+        basis: [{ id: 'natal.sun', display: '☉ CAN 04.2°' }],
         correction: { value: 'partly', note: 'The agency point fits; the timing does not.', createdAt: '2026-07-26 10:05:00' },
         correctionHistory: [{ value: 'partly', note: 'The agency point fits; the timing does not.', createdAt: '2026-07-26 10:05:00' }],
-        interfaceActions: { version: 1 }, visualStory: { story: { should_show: true } }, moduleOffer: { title: 'Two needs in one decision' }
+        interfaceActions: { version: 2 }
       }
     ]);
   });
@@ -61,8 +74,8 @@ function historyEnv(): Env {
                 if (sql.includes('FROM user_corrections')) return { results: [{ correction: 'partly', note: 'The agency point fits; the timing does not.', created_at: '2026-07-26 10:05:00' }] };
                 if (sql.includes('FROM thread_events')) return { results: [
                   { id: 'e1', seq: 1, event_type: 'user_message', payload_json: '{"text":"Help me understand this choice."}', created_at: '2026-07-26 10:00:00' },
-                  { id: 'e2', seq: 2, event_type: 'assistant_plan', payload_json: '{"plan":{"response_phase":"integration","confidence":"supported","safety_mode":"standard","clearer_form":"Protect agency while accepting support."}}', created_at: '2026-07-26 10:00:01' },
-                  { id: 'e3', seq: 3, event_type: 'assistant_response', payload_json: '{"text":"Two needs may be interacting.","context":{"surface":"Explore","mode":"alignment","personId":"person_1"},"interfaceActions":{"version":1},"visualStory":{"story":{"should_show":true}},"moduleOffer":{"title":"Two needs in one decision"}}', created_at: '2026-07-26 10:00:02' }
+                  { id: 'e2', seq: 2, event_type: 'assistant_plan', payload_json: '{"answer":{"version":"sovereign-answer.v2","mode":"alignment","depth":"focused","headline":"Agency and support can coexist.","direct_answer":"Support fits when it leaves your decision authority visible.","sections":[{"id":"alignment","label":"A closer version","body":"Accept support without transferring the decision."}],"basis_refs":["natal.sun"],"correction_prompt":"Does this fit?","actions":[],"confidence":"supported","safety_mode":"standard"}}', created_at: '2026-07-26 10:00:01' },
+                  { id: 'e3', seq: 3, event_type: 'assistant_response', payload_json: '{"text":"Two needs may be interacting.","context":{"surface":"Explore","mode":"alignment","personId":"person_1"},"basis":[{"id":"natal.sun","display":"☉ CAN 04.2°"}],"interfaceActions":{"version":2}}', created_at: '2026-07-26 10:00:02' }
                 ] };
                 return { results: [] };
               }

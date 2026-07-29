@@ -1,154 +1,92 @@
 import { describe, expect, it } from 'vitest';
-import { composeRecognitionResponse, deriveAvailableBasis, parseRecognitionPlan, renderBasisFooter } from './recognition';
+import type { BasisRegistryItem } from '../baseline-contracts';
+import {
+  attachBasisValues,
+  composeSovereignAnswerText,
+  deriveAuthorizedBasisRegistry,
+  parseSovereignAnswer
+} from './recognition';
 
-const emptyBasis = { human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] };
-const hiddenVisualStory = {
-  should_show: false,
-  mode: 'self' as const,
-  primary: { archetype: 'fool' as const, title: '', phase: 'shadow' as const },
-  secondary: null,
-  tertiary: null,
-  origin: '',
-  shadow: '',
-  gift: '',
-  current: '',
-  next_step: '',
-  visual_reason: ''
-};
+const registry: BasisRegistryItem[] = [{
+  id: 'natal.sun',
+  category: 'natal',
+  display: '☉ CAN 04.2°',
+  accessibleLabel: 'Sun in Cancer at 4.2 degrees',
+  computedAt: '2026-07-28T12:00:00.000Z',
+  uncertainty: 'low',
+  provenance: 'NASA/JPL Horizons',
+  subject: 'self'
+}];
 
-describe('inner recognition structured output', () => {
-  it('derives exact verified values and renders the compact footer', () => {
-    const available = deriveAvailableBasis({
+function answer(overrides: Record<string, unknown> = {}) {
+  return JSON.stringify({
+    version: 'sovereign-answer.v2',
+    mode: 'baseline',
+    depth: 'standard',
+    headline: 'Direction becomes responsibility quickly.',
+    direct_answer: 'You may be quick to create direction when a situation has no clear owner, which can be useful until the consequences become yours without matching authority.',
+    sections: [
+      { id: 'shadow', label: 'Shadow', body: 'You may end uncertainty by taking over a decision before responsibility is shared.' },
+      { id: 'gift', label: 'Gift', body: 'You can turn ambiguity into structure without becoming responsible for everyone inside it.' }
+    ],
+    basis_refs: ['natal.sun'],
+    correction_prompt: 'Does this fit your experience?',
+    actions: [{ type: 'explore_facet', label: 'Explore this quality' }],
+    confidence: 'supported',
+    safety_mode: 'standard',
+    ...overrides
+  });
+}
+
+describe('sovereign-answer.v2', () => {
+  it('validates a useful answer and attaches exact server-owned Basis values', () => {
+    const parsed = parseSovereignAnswer(answer(), registry);
+    expect(parsed.version).toBe('sovereign-answer.v2');
+    expect(parsed.sections).toHaveLength(2);
+    expect(attachBasisValues(parsed, registry)).toEqual(registry);
+    expect(composeSovereignAnswerText(parsed)).toContain('Direction becomes responsibility quickly.');
+    expect(composeSovereignAnswerText(parsed)).not.toContain('☉ CAN 04.2°');
+  });
+
+  it('rejects an invented Basis reference', () => {
+    expect(() => parseSovereignAnswer(answer({ basis_refs: ['natal.invented'] }), registry))
+      .toThrow(/invented or unauthorized Basis reference/);
+  });
+
+  it('requires structured alignment distinctions rather than a score', () => {
+    const sections = [
+      { id: 'alignment', label: 'Supports the fit', body: 'The role uses a capacity already available to you.' },
+      { id: 'responsibility', label: 'Pulls against it', body: 'The responsibility is clear while authority remains limited.' },
+      { id: 'alignment', label: 'The real tradeoff', body: 'You would accept security in exchange for less control over the terms.' },
+      { id: 'unknowns', label: 'Still needed', body: 'The decision changes if authority can be negotiated directly.' },
+      { id: 'experiment', label: 'A closer version', body: 'Ask for decision authority that matches the outcome you would carry.' }
+    ];
+    const parsed = parseSovereignAnswer(answer({ mode: 'alignment', depth: 'deep', sections }), registry);
+    expect(parsed.sections.map((section) => section.label)).toContain('The real tradeoff');
+    expect(JSON.stringify(parsed)).not.toMatch(/score|percentage|gauge/i);
+  });
+
+  it('requires both people, the interaction, and unknowns in relationship mode', () => {
+    const sections = [
+      { id: 'you', label: 'You may be bringing', body: 'You may seek clarity by naming the question and starting movement.' },
+      { id: 'other', label: 'They may be bringing', body: 'They may need time before their language becomes reliable.' },
+      { id: 'interaction', label: 'What happens between you', body: 'Urgency can shorten the time needed for a considered answer.' },
+      { id: 'responsibility', label: 'What each person can own', body: 'You can name the question without demanding an answer, and they can request time without leaving the pause undefined.' },
+      { id: 'unknowns', label: 'What still needs to be asked directly', body: 'Their motive, feeling, and future action remain unknown.' }
+    ];
+    expect(parseSovereignAnswer(answer({ mode: 'relationship', depth: 'deep', sections }), registry).mode)
+      .toBe('relationship');
+  });
+
+  it('collects only explicit validated Basis registry entries', () => {
+    const context = {
       baseline: {
-        reducedContext: {
-          deterministicCalculation: {
-            humanDesign: { profile: '5/1', channels: ['13–33'] },
-            geneKeys: { lifeWork: '16.1', evolution: '9.1' },
-            natalPlacements: { sun: 'Leo', moon: 'Scorpio' },
-            numerology: { lifePath: 7 }
-          }
-        }
+        status: 'completed',
+        withheld: 'Type unavailable',
+        basisRegistry: registry
       }
-    });
-    expect(available.human_design).toEqual(expect.arrayContaining(['5/1', '13–33']));
-    expect(available.gene_keys).toEqual(expect.arrayContaining(['16.1', '9.1']));
-    expect(available.astrology).toEqual(expect.arrayContaining(['☉ Leo', '☾ Scorpio']));
-    expect(renderBasisFooter({ user_confirmed: true, human_design: ['5/1', '13–33'], gene_keys: ['16.1'], astrology: ['☾ Scorpio'], relationship: [], live: [], numerology: [] }))
-      .toBe('BASIS · U✓ | HD 5/1 · 13–33 | GK 16.1 | A ☾ Scorpio');
-  });
-
-  it('rejects an invented footer value', () => {
-    const raw = JSON.stringify({
-      response_phase: 'question', recognition: 'Something changed.', inward_question: 'What feels at risk?',
-      candidate_hidden_expectation: '', protected_need: '', clearer_form: '', practical_action: '',
-      module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
-      basis: { user_confirmed: false, human_design: ['7/2'], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
-      confidence: 'exploratory', safety_mode: 'standard'
-    });
-    expect(() => parseRecognitionPlan(raw, { ...emptyBasis, human_design: ['5/1'] }))
-      .toThrow(/unverified human_design/);
-  });
-
-  it('keeps question phase short, unconfirmed, and without action or module content', () => {
-    const plan = parseRecognitionPlan(JSON.stringify({
-      response_phase: 'question', recognition: 'You may be trying to make the outcome certain.', inward_question: 'What are you trying to prevent',
-      candidate_hidden_expectation: 'Should be removed', protected_need: 'connection', clearer_form: 'Should be removed', practical_action: 'Should be removed',
-      module_suggestion: { should_offer: true, title: 'Should not show', reason: 'too early', format: 'reflection' },
-      basis: { user_confirmed: true, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
-      confidence: 'exploratory', safety_mode: 'standard'
-    }), emptyBasis);
-    const response = composeRecognitionResponse(plan);
-    expect(response).toContain('WHAT I NOTICE');
-    expect(response).toContain('LOOK INWARD');
-    expect(response).not.toContain('WHAT TO DO');
-    expect(response).not.toContain('Should not show');
-    expect(response.match(/\?/g)).toHaveLength(1);
-    expect(plan.basis.user_confirmed).toBe(false);
-  });
-
-  it('rejects empty inward questions and incomplete integration plans', () => {
-    const question = JSON.stringify({
-      response_phase: 'question', recognition: 'Something changed.', inward_question: '??',
-      candidate_hidden_expectation: '', protected_need: '', clearer_form: '', practical_action: '',
-      module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
-      basis: { user_confirmed: false, ...emptyBasis }, confidence: 'exploratory', safety_mode: 'standard'
-    });
-    expect(() => parseRecognitionPlan(question, emptyBasis)).toThrow(/empty inward question/);
-
-    const integration = JSON.stringify({
-      response_phase: 'integration', recognition: 'The answer matters.', inward_question: 'What fits now?',
-      candidate_hidden_expectation: 'You may expect waiting to mean you do not matter.', protected_need: 'connection', clearer_form: '', practical_action: '',
-      module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
-      basis: { user_confirmed: true, ...emptyBasis }, confidence: 'confirmed', safety_mode: 'standard'
-    });
-    expect(() => parseRecognitionPlan(integration, emptyBasis)).toThrow(/missing clearer_form/);
-  });
-
-  it('preserves the compatibility field without forcing an invented hidden expectation', () => {
-    const plan = parseRecognitionPlan(JSON.stringify({
-      response_shape: 'natural', response_phase: 'integration', recognition: 'You can care without taking ownership of every outcome.', inward_question: 'What is yours to choose?',
-      candidate_hidden_expectation: '', protected_need: '', clearer_form: 'Keep the care and return each responsibility to the person who controls it.', practical_action: 'Name one choice that is yours and one outcome that is not.',
-      module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
-      basis: { user_confirmed: true, ...emptyBasis }, confidence: 'supported', safety_mode: 'standard'
-    }), emptyBasis);
-    const response = composeRecognitionResponse(plan);
-    expect(plan.candidate_hidden_expectation).toBe('');
-    expect(response).not.toContain('WHAT THIS MAY BE SHOWING');
-    expect(response).toContain('You can care without taking ownership');
-  });
-
-  it('keeps the direct recognition in guided integrations when the compatibility field is empty', () => {
-    const response = composeRecognitionResponse({
-      response_shape: 'guided',
-      response_phase: 'integration',
-      recognition: 'You can care without taking ownership of every outcome.',
-      inward_question: 'What is yours to choose?',
-      candidate_hidden_expectation: '',
-      protected_need: '',
-      clearer_form: 'Keep the care and return each responsibility to the person who controls it.',
-      practical_action: 'Name one choice that is yours and one outcome that is not.',
-      module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
-      visual_story: hiddenVisualStory,
-      basis: { user_confirmed: true, ...emptyBasis },
-      confidence: 'supported',
-      safety_mode: 'standard'
-    });
-    expect(response).toContain('WHAT THIS MAY BE SHOWING');
-    expect(response).toContain('You can care without taking ownership of every outcome.');
-  });
-
-  it('requires a complete module offer and removes offers during grounding', () => {
-    const missingReason = JSON.stringify({
-      response_phase: 'integration', recognition: 'The answer matters.', inward_question: 'What fits now?',
-      candidate_hidden_expectation: 'You may expect waiting to mean you do not matter.', protected_need: 'connection',
-      clearer_form: 'Ask for information without making it prove your worth.', practical_action: 'Wait until the agreed response time.',
-      module_suggestion: { should_offer: true, title: 'When waiting feels personal', reason: '', format: 'reflection' },
-      basis: { user_confirmed: true, ...emptyBasis }, confidence: 'confirmed', safety_mode: 'standard'
-    });
-    expect(() => parseRecognitionPlan(missingReason, emptyBasis)).toThrow(/requires a title and reason/);
-
-    const grounded = parseRecognitionPlan(JSON.stringify({
-      response_phase: 'integration', recognition: 'You sound frightened.', inward_question: 'Who can help right now?',
-      candidate_hidden_expectation: 'The fear is making it hard to know what is directly observable.', protected_need: 'safety',
-      clearer_form: 'Focus on immediate safety and one trusted person.', practical_action: 'Contact someone you trust and seek appropriate support.',
-      module_suggestion: { should_offer: true, title: 'Later reflection', reason: 'save it', format: 'reflection' },
-      basis: { user_confirmed: true, ...emptyBasis }, confidence: 'confirmed', safety_mode: 'grounded'
-    }), emptyBasis);
-    expect(grounded.module_suggestion.should_offer).toBe(false);
-  });
-
-  it('removes symbolic footer detail in grounded safety mode', () => {
-    const response = composeRecognitionResponse({
-      response_phase: 'integration', recognition: 'You sound frightened.', inward_question: 'Who can help you feel safe right now?',
-      candidate_hidden_expectation: 'The fear is making it hard to know what is directly observable.', protected_need: 'safety',
-      clearer_form: 'Focus on immediate safety and one trusted person.', practical_action: 'Contact someone you trust and stay with them while you seek appropriate support.',
-      module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
-      visual_story: hiddenVisualStory,
-      basis: { user_confirmed: true, human_design: ['5/1'], gene_keys: ['16.1'], astrology: ['☾ Scorpio'], relationship: [], live: ['♃ Leo'], numerology: [] },
-      confidence: 'confirmed', safety_mode: 'grounded'
-    });
-    expect(response).toContain('BASIS · U✓');
-    expect(response).not.toContain('HD 5/1');
-    expect(response).not.toContain('LIVE');
+    };
+    expect(deriveAuthorizedBasisRegistry(context)).toEqual(registry);
+    expect(deriveAuthorizedBasisRegistry({ basisRegistry: [{ ...registry[0], display: 'status withheld' }] })).toEqual([]);
   });
 });

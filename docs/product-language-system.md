@@ -1,158 +1,172 @@
 # Sovereign.OS product language system
 
-Status: canonical public and in-product language for the Baseline-first launch.
+Use this guide for public pages, authentication, onboarding, the authenticated workspace, AI answers, errors, and release tests.
 
-## The product in one sentence
+## Product definition
 
-Sovereign.OS is a private intelligence platform for understanding yourself, your relationships, and the groups you live and work inside.
+Sovereign.OS is a private AI platform for understanding yourself, your relationships, and the groups around you. It starts with your Baseline Design, then adds only the current, relational, and system context you choose.
 
-## The user promise
-
-Understand your life in context.
-
-Sovereign begins with the user's interpretive Baseline, then adds only the current, relational, and system context the user permits. The Baseline gives the platform a consistent starting map for how someone may decide, communicate, connect, learn, express themselves, and respond under pressure. Sovereign keeps these categories separate:
-
-1. the user's enduring Baseline themes;
-2. what may be temporarily amplified now;
-3. what the user directly observed or confirmed;
-4. relevant roles, authority, dependence, and material constraints;
-5. everything that remains unknown.
-
-The result is a focused inward question or a concrete next action. It is never a diagnosis, prediction, hidden-motive claim, or instruction to surrender the user's judgment.
-
-## What a Baseline is
-
-A Baseline is a private interpretive profile calculated from:
-
-- birth date;
-- birthplace and its timezone;
-- birth time when known;
-- the user's selected location-precision permission.
-
-The computation uses verified astronomical positions plus selected symbolic frameworks. The primary interface translates the result into plain-language reflection themes for decisions, communication, connection, learning, expression, and pressure response.
-
-A Baseline is:
-
-- a consistent starting context;
-- useful before the user describes an incident;
-- correctable in the moment;
-- private by default.
-
-A Baseline is not:
-
-- a psychological assessment;
-- a scientific measurement of personality;
-- a fixed identity;
-- proof of present behavior;
-- a prediction.
-
-Astrology, partial Human Design and Gene Keys signals, and numerology may appear as optional supporting detail. They never carry the primary explanation.
-
-## How people use Sovereign.OS
-
-### Self
-
-The user opens Today before writing anything. Sovereign shows the Baseline theme that is steady, what may be louder now, and what only the user can confirm.
-
-Example:
-
-> I keep rewriting this message. Why can I not just send it?
-
-Sovereign may first notice that the user is trying to make the message create certainty, then ask one inward question:
-
-> What are you hoping their reply will prove?
-
-After the user answers, Sovereign can offer a clearer form and one concrete action.
-
-### Another person
-
-The user may add someone privately, but that does not create permission. The other person chooses which parts of their own reduced Baseline may be used.
-
-Example:
-
-> I want an answer now. Alex goes quiet before serious conversations.
-
-Sovereign may show a difference in processing pace. It may not claim that Alex is avoiding, punishing, afraid, or uninterested. A useful next move could be to agree on a time to return to the conversation.
-
-### A family, household, or team
-
-Consented people can be viewed together with their roles, authority, dependence, shared objective, and constraints kept visible.
-
-Example:
-
-> Everyone comes to me when something goes wrong, but no one follows my decisions.
-
-Sovereign may distinguish emotional reliance from formal decision authority, show where the role distribution is unclear, and suggest one explicit ownership agreement.
-
-## Page jobs
-
-### Home
-
-Answer, in this order:
-
-1. What is Sovereign.OS?
-2. What is a Baseline?
-3. What would I actually do with it?
-4. What does an answer look like?
-5. How do relationships and groups work?
-6. Is it private, and how do I start?
-
-### How it works
-
-Show the complete journey:
-
-1. create an account;
-2. build the Baseline;
-3. open Today before telling a story;
-4. ask Sovereign in ordinary language;
-5. confirm or correct the response;
-6. save only what should carry forward;
-7. add people and systems only with explicit permission.
-
-### Pricing
-
-Lead with who each plan is for and what it enables. Technical billing implementation belongs in supporting text, not the headline.
-
-### Signup and login
-
-Use standard, explicit account language. Keep the form and primary action visible in the first viewport. Explain the one-time email link without emotional slogans.
-
-### Authenticated workspace
-
-Use the user's task as the heading. Internal architecture, permission codes, provider names, and deployment details remain secondary or hidden.
+Baseline Design is the personal intelligence foundation. It gives Sovereign a consistent reference for how a person may decide, communicate, learn, connect, lead, create, respond under pressure, and grow.
 
 ## Voice
 
-The voice is direct, warm, specific, and calm.
+Write in clear, adult language. Be calm, specific, and direct. State the central insight before explanation. Make the mechanism visible: capacity, pressure expression, Gift, tradeoff, supported context, and unknowns.
 
-Use:
+Use uncertainty words only where uncertainty requires them. Do not weaken every sentence.
 
-- “Your Baseline”
-- “what may be louder now”
-- “what you confirmed”
-- “what is still unknown”
-- “one next move”
-- “another person controls their own information”
-- “save this understanding”
+Do not use generic coaching, inspirational filler, therapy voice, diagnosis, spiritual certainty, specialist-first language, or verdicts about another person.
+
+## Core terms
+
+### Baseline
+
+A stable, explorable reference. It is interpretive and correctable, not a measured psychological fact.
+
+### Active now
+
+An expiring current-condition layer that may make a Baseline theme more relevant. It does not determine behavior.
+
+### Shadow
+
+How a valid quality may narrow, distort, protect, avoid, or overreach under pressure.
+
+### Gift
+
+What the same quality makes possible when used with awareness and choice.
+
+### Alignment
+
+A way to examine whether a choice, behavior, relationship, opportunity, or direction fits the person a user is and is becoming. It is not a score or rule.
+
+### Basis
+
+Exact server-approved values that shaped an interpretation. Basis supports reflection; it does not scientifically prove personality or state.
+
+### Covenant
+
+An optional way to explore a relevant question through Christian teaching and clearly cited Scripture. It appears contextually and activates only after confirmation.
+
+## Answer language
+
+A normal answer contains:
+
+- a specific headline;
+- a direct answer;
+- two to five relevant sections;
+- a compact exact Basis line;
+- only relevant actions;
+- a concise correction prompt.
+
+Relationship answers distinguish **You may be bringing**, **They may be bringing**, **What happens between you**, **What each person can own**, and **What still needs to be asked directly**.
+
+System answers distinguish supported roles, authority, responsibility, pressure, change effects, and unknown perspectives.
+
+Alignment answers use **Supports the fit**, **Pulls against it**, **The real tradeoff**, **Still needed**, and **A closer version**.
+
+Covenant answers use **Biblical parallel**, **Scripture**, **Teaching**, **Application**, and **Boundary**.
+
+## Public page copy
+
+Hero:
+
+- Kicker: `PRIVATE AI, BUILT AROUND YOUR BASELINE`
+- Headline: `Know yourself. Understand the system. Choose what fits.`
+- Primary action: `Build my Baseline`
+- Secondary action: `See what Sovereign can answer`
+- Trust line: `Start free · No card required · Confirm, correct, or reject any interpretation`
+
+Primary section language:
+
+- `START WITH THE QUESTION YOU ALREADY HAVE`
+- `WHAT IS YOURS · WHAT IS ACTIVE NOW`
+- `ONE QUALITY · MORE THAN ONE EXPRESSION`
+- `TWO PEOPLE · TWO BASELINES · ONE INTERACTION`
+- `SEE THE WHOLE SYSTEM`
+- `SEE WHAT SHAPED THE ANSWER`
+
+## Authentication
+
+Signup:
+
+- Headline: `Create your Sovereign.OS account.`
+- Body: `Start free. Verify your email, then build your Baseline.`
+
+Login:
+
+- Headline: `Sign in to Sovereign.OS.`
+- Body: `Use your email and the available secure sign-in method for your account.`
+
+Do not use privacy slogans or spiritual promises in account access copy.
+
+## Baseline onboarding
+
+- Headline: `Build your Baseline.`
+- Body: `Add your birth details to create the personal foundation Sovereign uses across self, decisions, relationships, and systems.`
+- Birth date: `Required for the Baseline calculation.`
+- Birthplace: `Used to resolve time and astronomical context.`
+- Birth time: `Improves time-sensitive parts of the calculation.`
+- Birth-time certainty: `Tell us whether the time is exact, approximate, or unknown.`
+
+Unknown birth time is a supported path. Explain which outputs remain unavailable or have higher uncertainty. Never imply that the Baseline is invalid or fill missing values.
+
+## Authenticated surfaces
+
+Today:
+
+- `What is active for you now?`
+- `Begin with what remains steady in your Baseline, then see which parts may be more relevant today.`
+
+Explore:
+
+- `What do you want to understand?`
+
+People:
+
+- `Understand the relationship from both sides.`
+- `Choose someone who has connected their account and permitted comparison, or invite a person to begin.`
+
+Systems:
+
+- `See how the whole group functions.`
+- `Choose a family, household, team, workplace, friendship group, or custom system. Keep roles, authority, responsibility, pressure, and perspective in view.`
+
+Library:
+
+- `Keep what changes your understanding.`
+- `Save useful Baseline insights, alignment distinctions, relationship understandings, and system views. Library is not a journal or transcript archive.`
+
+You:
+
+- `Your Baseline, plan, permissions, and account.`
+
+## Pricing
+
+Free:
+
+- `Understand yourself.`
+- $0, permanent, no card.
+- 10 Sovereign AI turns each month.
+
+Sovereign+:
+
+- `Understand the people and systems around you.`
+- $20 monthly or $99 annually.
+- 300 Sovereign AI turns each month.
+
+Do not alter live prices, products, lookup keys, or entitlement descriptions.
+
+## Prohibited phrasing
 
 Avoid:
 
-- abstract claims such as “see what belongs where” without an example;
-- “identity-bound,” “scope-specific,” “reduced context,” and provider names as primary interface copy;
-- “cleanest move,” which can imply one objectively correct choice;
-- “Return to yourself” and similar emotional language on utility screens;
-- framework-first explanations;
-- repeated privacy disclaimers where one clear explanation will do;
-- journal language or blank writing surfaces in Library;
-- claims about patterns, mirrors, hidden intent, diagnosis, or certainty.
-
-## Visual language
-
-- Body copy is never smaller than 16px on primary surfaces.
-- Display headings do not exceed 68px on desktop or 46px on mobile.
-- Public pages use both dark and warm-light surfaces to create hierarchy.
-- Product UI is shown at useful scale; it is not faded behind decorative effects.
-- Forms and primary actions stay above the fold on common desktop and iPhone viewports.
-- Authenticated screens prioritize information density and task completion over marketing-sized typography.
-- Warm clay is the primary accent. High-luminance neon is not used for large controls.
-- Every example is explicitly labeled as an example, not the viewer's reading.
+- “possible interaction vector”;
+- “calculated solution”;
+- “read” or “reading” as the product;
+- “your chart says”;
+- “the universe is telling you”;
+- “this transit means”;
+- “choose yourself”;
+- “return to yourself”;
+- “do the work”;
+- “one clean next move” as the whole value;
+- claims of motive, exact emotion, diagnosis, destiny, or guaranteed outcome.

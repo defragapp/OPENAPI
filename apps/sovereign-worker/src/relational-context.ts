@@ -1,5 +1,16 @@
 import type { Env } from './env';
 import { hasConsent, requireConsent } from './db/people';
+import {
+  baselineFacetProfileSchema,
+  baselineSourceDataSchema,
+  buildBaselineBasisRegistry,
+  validateFacetProfileBasis,
+  type BaselineFacet,
+  type BaselineFacetProfile,
+  type BaselineSourceData,
+  type BasisRegistryItem
+} from './baseline-contracts';
+import { getCachedBaselineFacetProfile } from './baseline-facets';
 
 interface BaselineRow {
   status: string;
@@ -18,15 +29,23 @@ interface PersonRow {
   bound_account_id: string | null;
 }
 
-interface ReducedParticipant {
-  personId: string;
-  label: string;
-  role: string;
-  baseline: Record<string, unknown>;
-  basis?: Record<string, unknown>;
+interface LoadedBaseline {
+  facets: BaselineFacet[];
+  source: BaselineSourceData;
+  basisRegistry: BasisRegistryItem[];
   uncertainty: string;
   providerStatus: string;
+  computationVersion: string;
   lastComputedAt: string;
+}
+
+interface ParticipantContext {
+  key: string;
+  label: string;
+  role: string;
+  facets: BaselineFacet[];
+  roleContext: Record<string, unknown>;
+  uncertainty: string;
   observedState: 'not_confirmed';
   unknownActualState: string;
 }
@@ -42,47 +61,92 @@ export async function buildPairComparison(env: Env, accountId: string, personId:
   if (!person.bound_account_id) throw new Response('The invited identity is not bound yet.', { status: 409 });
 
   const [ownerBaseline, invitedBaseline] = await Promise.all([
-    loadReducedBaseline(env, accountId),
-    loadReducedBaseline(env, person.bound_account_id)
+    loadStructuredBaseline(env, accountId),
+    loadStructuredBaseline(env, person.bound_account_id)
   ]);
 
+  const owner = participant('you', 'You', 'self', ownerBaseline, {});
+  const other = participant('other', person.display_name, person.role, invitedBaseline, safeJson(person.source_of_truth));
+  const pairContacts = frameworkAllowed ? buildPairContacts(ownerBaseline.source, invitedBaseline.source) : [];
+  const invitedBasis = frameworkAllowed
+    ? prefixBasis(invitedBaseline.basisRegistry, 'other', 'other')
+    : [];
+  const ownerBasis = ownerBaseline.basisRegistry;
+  const visibleOwnerFacets = remapFacetRefs(owner.facets, '');
+  const visibleOtherFacets = frameworkAllowed
+    ? remapFacetRefs(other.facets, 'other')
+    : other.facets.map((facet) => ({ ...facet, basisRefs: [] }));
+  const relationshipBasis = pairContacts.map((contact): BasisRegistryItem => ({
+    id: contact.id,
+    category: 'relationship',
+    display: contact.display,
+    accessibleLabel: contact.accessibleLabel,
+    computedAt: ownerBaseline.source.computedAt,
+    uncertainty: contact.uncertainty,
+    provenance: 'Deterministic consented pair contact',
+    subject: 'relationship'
+  }));
+
   return {
-    kind: 'pair',
-    personId,
+    kind: 'relationship',
     participants: [
-      participant('self', 'You', 'self', ownerBaseline, true),
-      participant(person.id, person.display_name, person.role, invitedBaseline, frameworkAllowed)
+      { ...owner, facets: visibleOwnerFacets },
+      { ...other, facets: visibleOtherFacets }
     ],
     interaction: {
-      possibleAlignment: sharedSignals(ownerBaseline.context, invitedBaseline.context),
-      possibleFriction: differingSignals(ownerBaseline.context, invitedBaseline.context),
-      roleContext: safeJson(person.source_of_truth),
-      observationRule: 'Keep user-supplied observations separate from interpretations about why they happened.',
-      perspectiveRule: 'Offer more than one plausible interaction explanation without deciding who is right.',
-      responsibilityBoundary: 'Each person remains responsible for their own choices, communication, and confirmed experience.',
-      prohibitedInference: 'This comparison does not establish a psychological profile, emotion, motive, diagnosis, moral status, or future behavior.',
-      missingInformation: ['What each person is experiencing now', 'What each person has directly observed', 'Material constraints not supplied by the users']
+      facetPairs: pairFacetPairs(visibleOwnerFacets, visibleOtherFacets),
+      sharedNeeds: 'Compare observable alignment markers in the relevant facets; do not treat similarity as compatibility.',
+      differentRoutes: 'Explain how two distinct facets may reach clarity, connection, or protection differently.',
+      likelyInteractionPressure: 'A possible interaction mechanism must be tied to both permitted facet profiles or a user-reported observation.',
+      responsibilities: {
+        you: 'The user owns their communication, choices, limits, and confirmed experience.',
+        other: 'The invited person owns their communication, choices, limits, and confirmed experience.',
+        relationship: 'Shared expectations require direct agreement; the comparison cannot create consent or certainty.'
+      },
+      userReportedObservations: extractArray(safeJson(person.source_of_truth).observations),
+      unconfirmedInterpretations: [],
+      missingInformation: [
+        'What each person is experiencing now',
+        'What each person has directly observed',
+        'What has been agreed about timing, authority, responsibility, and boundaries'
+      ],
+      exactPairContacts: pairContacts
+    },
+    basisRegistry: [...ownerBasis, ...invitedBasis, ...relationshipBasis],
+    permissions: {
+      pairCompare: true,
+      traitDisplay: true,
+      frameworkDisplay: frameworkAllowed
     },
     provenance: {
       ownerComputationVersion: ownerBaseline.computationVersion,
       invitedComputationVersion: invitedBaseline.computationVersion,
-      frameworkDetailShared: frameworkAllowed,
-      consentCheckedAt: new Date().toISOString(),
       rawBirthInputShared: false,
       exactPrivateLocationShared: false
     }
   };
 }
 
-export async function addConsentedSystemMember(env: Env, accountId: string, systemId: string, personId: string, metadata: Record<string, unknown>) {
+export async function addConsentedSystemMember(
+  env: Env,
+  accountId: string,
+  systemId: string,
+  personId: string,
+  metadata: Record<string, unknown>
+) {
   await requireConsent(env, accountId, personId, 'system.include');
   await requireConsent(env, accountId, personId, 'trait.display');
-  const system = await env.DB.prepare('SELECT id FROM systems WHERE id = ? AND account_id = ?').bind(systemId, accountId).first<{ id: string }>();
+  const system = await env.DB.prepare('SELECT id FROM systems WHERE id = ? AND account_id = ?')
+    .bind(systemId, accountId)
+    .first<{ id: string }>();
   if (!system) throw new Response('System not found', { status: 404 });
-  const person = await env.DB.prepare('SELECT id, bound_account_id FROM persons WHERE id = ? AND account_id = ?').bind(personId, accountId).first<{ id: string; bound_account_id: string | null }>();
+  const person = await env.DB.prepare('SELECT id, bound_account_id FROM persons WHERE id = ? AND account_id = ?')
+    .bind(personId, accountId)
+    .first<{ id: string; bound_account_id: string | null }>();
   if (!person?.bound_account_id) throw new Response('The member identity and Baseline must be connected first.', { status: 409 });
   await env.DB.prepare('INSERT OR REPLACE INTO system_memberships (system_id, person_id, role_label, is_primary, metadata_json) VALUES (?, ?, ?, ?, ?)')
-    .bind(systemId, personId, String(metadata.formalRole ?? 'member'), 0, JSON.stringify(metadata)).run();
+    .bind(systemId, personId, String(metadata.formalRole ?? 'member'), 0, JSON.stringify(metadata))
+    .run();
   return { systemId, personId, consentVerified: true };
 }
 
@@ -92,63 +156,122 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
     .first<{ id: string; name: string; system_type: string; metadata_json: string }>();
   if (!system) throw new Response('System not found', { status: 404 });
 
-  const members = await env.DB.prepare(`SELECT p.id, p.display_name, p.role, p.source_of_truth, p.bound_account_id, sm.metadata_json
+  const members = await env.DB.prepare(`SELECT p.id, p.display_name, p.role, p.source_of_truth, p.bound_account_id,
+      sm.role_label, sm.metadata_json
     FROM system_memberships sm JOIN persons p ON p.id = sm.person_id
-    WHERE sm.system_id = ? AND p.account_id = ? ORDER BY sm.created_at`).bind(systemId, accountId).all<Record<string, string | null>>();
+    WHERE sm.system_id = ? AND p.account_id = ? ORDER BY sm.created_at`)
+    .bind(systemId, accountId)
+    .all<Record<string, string | null>>();
   if ((members.results ?? []).length < 2) {
     throw new Response('A reviewable system requires the owner and at least two consented invited members.', { status: 409 });
   }
 
-  const ownerBaseline = await loadReducedBaseline(env, accountId);
-  const participants: ReducedParticipant[] = [participant('self', 'You', 'self', ownerBaseline, true)];
+  const systemContext = safeJson(system.metadata_json);
+  const ownerBaseline = await loadStructuredBaseline(env, accountId);
+  const participants: ParticipantContext[] = [
+    participant('you', 'You', 'self', ownerBaseline, extractRoleContext(systemContext.owner))
+  ];
+  const basisRegistry: BasisRegistryItem[] = [...ownerBaseline.basisRegistry];
+
+  let ordinal = 0;
   for (const member of members.results ?? []) {
+    ordinal += 1;
     const personId = member.id ?? '';
     await requireConsent(env, accountId, personId, 'system.include');
     await requireConsent(env, accountId, personId, 'trait.display');
     const frameworkAllowed = await hasConsent(env, accountId, personId, 'framework.display');
-    const boundAccountId = member.bound_account_id;
-    if (!boundAccountId) throw new Response('Every invited member must have a bound identity and Baseline.', { status: 409 });
-    const baseline = await loadReducedBaseline(env, boundAccountId);
-    const roleMetadata = { ...safeJson(member.source_of_truth), membership: safeJson(member.metadata_json) };
+    if (!member.bound_account_id) throw new Response('Every invited member must have a bound identity and Baseline.', { status: 409 });
+    const baseline = await loadStructuredBaseline(env, member.bound_account_id);
+    const key = `member_${ordinal}`;
+    const roleContext = {
+      ...safeJson(member.source_of_truth),
+      ...safeJson(member.metadata_json),
+      formalRole: member.role_label ?? safeJson(member.metadata_json).formalRole ?? member.role ?? 'member'
+    };
+    const item = participant(key, member.display_name ?? `Member ${ordinal}`, member.role ?? 'member', baseline, roleContext);
     participants.push({
-      ...participant(personId, member.display_name ?? 'Member', member.role ?? 'member', baseline, frameworkAllowed),
-      role: String(roleMetadata.membership && typeof roleMetadata.membership === 'object' && 'formalRole' in roleMetadata.membership
-        ? (roleMetadata.membership as Record<string, unknown>).formalRole ?? member.role ?? 'member'
-        : member.role ?? 'member')
+      ...item,
+      facets: frameworkAllowed
+        ? remapFacetRefs(item.facets, key)
+        : item.facets.map((facet) => ({ ...facet, basisRefs: [] }))
     });
+    if (frameworkAllowed) basisRegistry.push(...prefixBasis(baseline.basisRegistry, key, 'other'));
   }
 
   return {
     kind: 'system',
-    system: { id: system.id, name: system.name, type: system.system_type, context: safeJson(system.metadata_json) },
+    system: {
+      label: system.name,
+      type: system.system_type,
+      sharedObjective: systemContext.sharedObjective ?? systemContext.objective ?? null,
+      constraints: extractArray(systemContext.constraints),
+      currentObservations: extractArray(systemContext.observations)
+    },
     participants,
-    interactionEdges: buildEdges(participants),
-    sharedConstraints: participants.map((item) => ({ personId: item.personId, role: item.role, actualState: 'unknown unless confirmed' })),
+    systemView: {
+      stabilizingRoles: roleCandidates(participants, ['responsibility', 'boundaries']),
+      changeChallengeRoles: roleCandidates(participants, ['response_change', 'leadership']),
+      pressureCarriers: roleCandidates(participants, ['response_pressure', 'responsibility']),
+      formalAuthority: participants.flatMap((item) => roleValue(item, 'authority')),
+      informalAuthority: participants.flatMap((item) => roleValue(item, 'informalAuthority')),
+      responsibilityConcentration: participants.flatMap((item) => roleValue(item, 'responsibility')),
+      mediationAndWithdrawal: participants.flatMap((item) => roleValue(item, 'communicationPattern')),
+      roleExpectations: participants.flatMap((item) => roleValue(item, 'expectations')),
+      changeEffects: extractArray(systemContext.changeEffects),
+      unknownRoles: participants.filter((item) => Object.keys(item.roleContext).length === 0).map((item) => item.label)
+    },
+    relationshipGraph: buildSupportedEdges(participants),
+    pressureField: {
+      observations: extractArray(systemContext.pressure),
+      responsibilityAuthorityMismatch: findResponsibilityAuthorityMismatch(participants),
+      rule: 'Pressure is shown only from supplied observations or explicit role context, never from decorative links.'
+    },
+    basisRegistry,
+    missingInformation: [
+      'Unconfirmed perspectives from any participant who has not described the arrangement',
+      'Authority, dependence, caregiving, and material constraints not yet supplied',
+      'Responsibilities that have not been explicitly assigned or confirmed'
+    ],
     responsibilityBoundaries: [
-      'No participant is assigned responsibility for another participant’s internal state.',
-      'Authority, dependence, caregiving, financial limits, safety, and access constraints must be supplied before action guidance.',
-      'A group-level tendency is not a group diagnosis.'
+      'No participant is responsible for another participant’s internal state.',
+      'A Baseline-derived role is a possibility, not a factual assignment.',
+      'A formal role or practical responsibility is factual only when supplied or confirmed.'
     ],
-    missingInformation: ['Current observations from each participant', 'Authority and dependence details', 'Safety or coercion concerns', 'The shared decision or objective'],
-    supportiveNextSteps: [
-      'Ask each participant to confirm what is accurate today.',
-      'Separate shared facts from interpretations.',
-      'Name one responsibility each person actually controls.'
-    ],
-    prohibitedInferences: ['psychological profile', 'hidden motive', 'diagnosis', 'villain assignment', 'right-or-wrong verdict', 'predicted behavior', 'God’s exact intent'],
-    provenance: { consentCheckedAt: new Date().toISOString(), rawBirthInputShared: false, exactPrivateLocationShared: false }
+    provenance: {
+      rawBirthInputShared: false,
+      exactPrivateLocationShared: false,
+      consentRecheckedForEveryParticipant: true
+    }
   };
 }
 
-async function loadReducedBaseline(env: Env, accountId: string): Promise<{ context: Record<string, unknown>; exactBasis: Record<string, unknown>; uncertainty: string; providerStatus: string; computationVersion: string; lastComputedAt: string }> {
-  const row = await env.DB.prepare('SELECT status, uncertainty, reduced_context_json, computation_version, provider_status, last_computed_at FROM baseline_onboarding WHERE account_id = ?')
-    .bind(accountId)
-    .first<BaselineRow>();
-  if (!row || !['completed', 'ready'].includes(row.status)) throw new Response('A completed reduced Baseline is required.', { status: 409 });
+async function loadStructuredBaseline(env: Env, accountId: string): Promise<LoadedBaseline> {
+  const [row, cachedProfile] = await Promise.all([
+    env.DB.prepare('SELECT status, uncertainty, reduced_context_json, computation_version, provider_status, last_computed_at FROM baseline_onboarding WHERE account_id = ?')
+      .bind(accountId)
+      .first<BaselineRow>(),
+    getCachedBaselineFacetProfile(env, accountId)
+  ]);
+  if (!row || !['completed', 'ready'].includes(row.status)) {
+    throw new Response('A completed Baseline is required.', { status: 409 });
+  }
   const reduced = safeJson(row.reduced_context_json);
+  const source = baselineSourceDataSchema.safeParse(reduced.sourceData);
+  const profile = baselineFacetProfileSchema.safeParse(cachedProfile ?? reduced.facetProfile);
+  if (!source.success || !profile.success) {
+    throw new Response('The structured Baseline profile is still being prepared.', { status: 409 });
+  }
+  const basisRegistry = buildBaselineBasisRegistry(source.data);
+  let validatedProfile: BaselineFacetProfile;
+  try {
+    validatedProfile = validateFacetProfileBasis(profile.data, basisRegistry);
+  } catch {
+    throw new Response('The structured Baseline profile is still being prepared.', { status: 409 });
+  }
   return {
-    context: publicBaseline(reduced),
-    exactBasis: exactFrameworkBasis(reduced),
+    facets: validatedProfile.facets,
+    source: source.data,
+    basisRegistry,
     uncertainty: row.uncertainty,
     providerStatus: row.provider_status,
     computationVersion: row.computation_version,
@@ -156,69 +279,146 @@ async function loadReducedBaseline(env: Env, accountId: string): Promise<{ conte
   };
 }
 
-function publicBaseline(context: Record<string, unknown>): Record<string, unknown> {
+function participant(
+  key: string,
+  label: string,
+  role: string,
+  baseline: LoadedBaseline,
+  roleContext: Record<string, unknown>
+): ParticipantContext {
   return {
-    baselineTendency: context.baselineTendency ?? 'No plain-language tendency is available.',
-    currentAmplification: context.currentAmplification ?? 'Current amplification was not included.',
-    userObservation: context.userObservation ?? 'No observation has been confirmed.',
-    systemInference: context.systemInference ?? 'No system inference is available.',
-    uncertainty: context.uncertainty ?? 'unknown',
-    unknownActualState: context.unknownActualState ?? 'Actual state remains unknown unless confirmed.'
-  };
-}
-
-function exactFrameworkBasis(context: Record<string, unknown>): Record<string, unknown> {
-  const calculation = context.deterministicCalculation;
-  if (!calculation || typeof calculation !== 'object') return {};
-  const source = calculation as Record<string, unknown>;
-  const output: Record<string, unknown> = {};
-  for (const key of ['humanDesign', 'geneKeys', 'natalPlacements', 'numerology', 'currentAstronomy']) {
-    const value = source[key];
-    if (value && typeof value === 'object') output[key] = value;
-  }
-  return output;
-}
-
-function participant(personId: string, label: string, role: string, baseline: Awaited<ReturnType<typeof loadReducedBaseline>>, frameworkAllowed: boolean): ReducedParticipant {
-  const output: ReducedParticipant = {
-    personId,
+    key,
     label,
     role,
-    baseline: baseline.context,
+    facets: baseline.facets,
+    roleContext,
     uncertainty: baseline.uncertainty,
-    providerStatus: baseline.providerStatus,
-    lastComputedAt: baseline.lastComputedAt,
     observedState: 'not_confirmed',
     unknownActualState: 'Actual emotion, motive, and present experience remain unknown unless this person confirms them.'
   };
-  if (frameworkAllowed && Object.keys(baseline.exactBasis).length) output.basis = baseline.exactBasis;
-  return output;
 }
 
-function sharedSignals(first: Record<string, unknown>, second: Record<string, unknown>): string[] {
-  const shared = Object.keys(first).filter((key) => key in second && first[key] === second[key] && typeof first[key] === 'string');
-  return shared.length ? shared.map((key) => `Both reduced contexts use compatible ${plainKey(key)} language.`) : ['No reliable shared tendency can be asserted from the available reduced context.'];
+function pairFacetPairs(first: BaselineFacet[], second: BaselineFacet[]) {
+  const secondById = new Map(second.map((facet) => [facet.id, facet]));
+  return first.flatMap((facet) => {
+    const other = secondById.get(facet.id);
+    return other ? [{ facetId: facet.id, you: facet, other }] : [];
+  });
 }
 
-function differingSignals(first: Record<string, unknown>, second: Record<string, unknown>): string[] {
-  const differing = Object.keys(first).filter((key) => key in second && first[key] !== second[key] && typeof first[key] === 'string' && typeof second[key] === 'string');
-  return differing.length ? differing.map((key) => `${plainKey(key)} differs and may be worth checking directly rather than treating as motive.`) : ['No specific difference is asserted without stronger reduced Baseline data.'];
+function prefixBasis(items: BasisRegistryItem[], prefix: string, subject: BasisRegistryItem['subject']): BasisRegistryItem[] {
+  return items.map((item) => ({ ...item, id: `${prefix}.${item.id}`, subject }));
 }
 
-function buildEdges(participants: ReducedParticipant[]) {
-  const edges: Array<{ from: string; to: string; interpretation: string; certainty: 'limited' }> = [];
-  for (let index = 0; index < participants.length; index += 1) {
-    for (let next = index + 1; next < participants.length; next += 1) {
-      edges.push({
-        from: participants[index]!.label,
-        to: participants[next]!.label,
-        interpretation: 'Possible interaction difference only; direct observation and current state are still required.',
-        certainty: 'limited'
-      });
+function remapFacetRefs(facets: BaselineFacet[], prefix: string): BaselineFacet[] {
+  return facets.map((facet) => ({
+    ...facet,
+    basisRefs: prefix ? facet.basisRefs.map((id) => `${prefix}.${id}`) : facet.basisRefs
+  }));
+}
+
+function buildPairContacts(first: BaselineSourceData, second: BaselineSourceData) {
+  const definitions = [
+    { aspect: 'conjunction', glyph: '☌', angle: 0, orb: 3 },
+    { aspect: 'sextile', glyph: '⚹', angle: 60, orb: 2 },
+    { aspect: 'square', glyph: '□', angle: 90, orb: 3 },
+    { aspect: 'trine', glyph: '△', angle: 120, orb: 3 },
+    { aspect: 'opposition', glyph: '☍', angle: 180, orb: 3 }
+  ] as const;
+  const glyphs: Record<string, string> = { sun: '☉', moon: '☾', mercury: '☿', venus: '♀', mars: '♂', jupiter: '♃', saturn: '♄', uranus: '♅', neptune: '♆', pluto: '♇' };
+  const contacts: Array<{ id: string; display: string; accessibleLabel: string; uncertainty: 'low' | 'medium' | 'high' }> = [];
+  for (const left of first.natalBodies) {
+    for (const right of second.natalBodies) {
+      const separation = Math.abs(signedLongitudeDelta(left.longitude, right.longitude));
+      for (const definition of definitions) {
+        const orb = Math.abs(separation - definition.angle);
+        if (orb > definition.orb) continue;
+        const rounded = Math.round(orb * 10) / 10;
+        contacts.push({
+          id: `relationship.${left.body}.${definition.aspect}.${right.body}`,
+          display: `REL ${glyphs[left.body] ?? left.body} ${definition.glyph} ${glyphs[right.body] ?? right.body} ${rounded.toFixed(1)}°`,
+          accessibleLabel: `Relationship contact, your ${left.body} ${definition.aspect} their ${right.body}, ${rounded.toFixed(1)} degree orb`,
+          uncertainty: left.uncertainty === 'high' || right.uncertainty === 'high'
+            ? 'high'
+            : left.uncertainty === 'medium' || right.uncertainty === 'medium'
+              ? 'medium'
+              : 'low'
+        });
+      }
     }
   }
-  return edges;
+  return contacts.sort((left, right) => Number(left.display.match(/(\d+\.\d+)°/)?.[1] ?? 99) - Number(right.display.match(/(\d+\.\d+)°/)?.[1] ?? 99)).slice(0, 12);
 }
 
-function plainKey(value: string): string { return value.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase(); }
-function safeJson(value: string | null | undefined): Record<string, unknown> { try { return JSON.parse(value ?? '{}') as Record<string, unknown>; } catch { return {}; } }
+function roleCandidates(participants: ParticipantContext[], facetIds: string[]) {
+  return participants.map((item) => ({
+    participant: item.label,
+    possibility: item.facets.some((facet) => facetIds.includes(facet.id))
+      ? `Possible role based on ${facetIds.join(' and ')} facets; confirmation is required.`
+      : 'No Baseline role is asserted.'
+  }));
+}
+
+function roleValue(participant: ParticipantContext, key: string) {
+  const value = participant.roleContext[key];
+  if (value === undefined || value === null || value === '') return [];
+  return [{ participant: participant.label, value, source: 'supplied role context' }];
+}
+
+function buildSupportedEdges(participants: ParticipantContext[]) {
+  const allowedTypes = ['authority', 'responsibility', 'reliance', 'communication'] as const;
+  const keys = new Set(participants.map((item) => item.key));
+  return participants.flatMap((participant) => {
+    const raw = Array.isArray(participant.roleContext.connections) ? participant.roleContext.connections : [];
+    return raw.flatMap((value) => {
+      const connection = value && typeof value === 'object' ? value as Record<string, unknown> : {};
+      const to = typeof connection.to === 'string' ? connection.to : '';
+      const type = typeof connection.type === 'string' ? connection.type : '';
+      if (!keys.has(to) || !allowedTypes.includes(type as typeof allowedTypes[number])) return [];
+      return [{
+        from: participant.key,
+        to,
+        type,
+        detail: typeof connection.detail === 'string' ? connection.detail : '',
+        source: 'supplied role context'
+      }];
+    });
+  });
+}
+
+function findResponsibilityAuthorityMismatch(participants: ParticipantContext[]) {
+  return participants.flatMap((participant) => {
+    const responsibility = participant.roleContext.responsibility;
+    const authority = participant.roleContext.authority;
+    if (!responsibility || authority) return [];
+    return [{
+      participant: participant.label,
+      responsibility,
+      authority: 'not supplied',
+      status: 'possible mismatch; confirmation required'
+    }];
+  });
+}
+
+function extractRoleContext(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function extractArray(value: unknown): unknown[] {
+  return Array.isArray(value) ? value.slice(0, 20) : [];
+}
+
+function signedLongitudeDelta(from: number, to: number) {
+  return ((to - from + 540) % 360) - 180;
+}
+
+function safeJson(value: unknown): Record<string, unknown> {
+  if (value && typeof value === 'object' && !Array.isArray(value)) return value as Record<string, unknown>;
+  if (typeof value !== 'string') return {};
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : {};
+  } catch {
+    return {};
+  }
+}

@@ -1,238 +1,194 @@
-# Sovereign.OS Inner Recognition Intelligence
+# Sovereign.OS intelligence and answer contract
 
-## Core rule
+This document defines the canonical Baseline information model, answer contract, Basis validation, relationship and system context, and Covenant behavior.
 
-**Clear guidance first. Exact data support second. Visual explanation third.**
+## Four-layer information model
 
-Sovereign uses verified Baseline, live, relational, and user-confirmed context to answer the user’s actual question. Baseline Design personalizes the answer. A small private grounded-intelligence layer may improve the reasoning. Sovereign translates both into simple language, and the user decides what fits. It does not make the user decode those systems, and it does not treat symbolic data, relational theory, or card artwork as proof.
+### Layer A — exact source data
 
-## User experience
+`BaselineSourceData` is normalized, typed, versioned, and server-owned. It contains only deterministic or provider-returned values:
 
-### Question phase
+- natal body, sign, numeric longitude, display degree, and retrograde state;
+- verified aspects and orb;
+- partial Human Design personality gate and line activations;
+- partial Gene Keys activation numbers;
+- numerology values;
+- calculation version, uncertainty, provenance, and calculation time;
+- exact current positions from the existing NASA/JPL Horizons-backed layer;
+- deterministic current-to-natal and consented pair contacts when numeric inputs exist.
 
-The first response normally fits on one mobile screen:
+Unavailable values are omitted. The contract never substitutes plausible values.
 
-1. **What I notice** — one or two plain sentences.
-2. **Look inward** — exactly one question.
-3. **Basis** — only exact verified values that materially shaped the question.
+It does not claim uncomputed Human Design type, authority, centers, profile, design-side values, or channels; a complete Gene Keys profile; unsupported Gene Keys expressions, spheres, or sequences; or unavailable houses.
 
-No hidden expectation, lecture, action plan, module, or visual archetype is shown before the user answers.
+### Layer B — Baseline facet profile
 
-### Integration phase
+`BaselineFacetProfile` is a validated, versioned, model-generated interpretation derived only from authorized Layer A values.
 
-After the user answers or clearly confirms the direction:
+Supported facet IDs are:
 
-1. **What this may be showing** — a short possibility based mainly on the user’s words.
-2. **A clearer form** — a healthier expression of the same valid need.
-3. **What to do** — one concrete action.
-4. **Visual explanation** — an optional animated archetype shown inside the same AI thread.
-5. **Explore later** — at most one optional module.
-6. **Basis** — updated exact support, with `U✓` first when directly confirmed.
+- `core_orientation`;
+- `identity_purpose`;
+- `communication`;
+- `decision_making`;
+- `learning`;
+- `creativity_expression`;
+- `love_connection`;
+- `leadership`;
+- `boundaries`;
+- `responsibility`;
+- `conflict_repair`;
+- `response_pressure`;
+- `response_change`;
+- `underused_capacity`;
+- `shadow_expression`;
+- `gift_expression`;
+- `alignment_markers`.
 
-## Structured planner
+Each facet contains a plain-language title, concise description, specific Shadow expression, specific Gift expression, observable Alignment markers, uncertainty, and exact `basisRefs`.
 
-The model returns a private JSON plan with:
+The server rejects any facet with an unknown Basis reference. A facet profile is interpretive and must never be presented as measured psychological fact.
 
-- `response_shape`
-- `response_phase`
-- `recognition`
-- `inward_question`
-- `candidate_hidden_expectation`
-- `protected_need`
-- `clearer_form`
-- `practical_action`
-- `module_suggestion`
-- `visual_story`
-- `basis`
-- `confidence`
-- `safety_mode`
+The cache key includes protected Baseline input hash, source calculation version, facet-contract version, and model version. It changes only when one of those values changes or an explicit refresh is requested.
 
-The server validates this plan before composing any user-facing text or returning any visual metadata.
+### Layer C — current overlay
 
-`response_shape` is `natural` by default for new turns. `guided` preserves the existing heading-based rendering when headings materially improve clarity or safety. Older saved plans without this field remain compatible and render with the established guided shape.
+Current conditions remain separate and temporary. The contract returns exact current bodies, sign, degree, retrograde state, deterministic current-to-natal contacts when available, aspect type and orb, calculation and expiry times, uncertainty, and affected facet IDs.
 
-`candidate_hidden_expectation` remains in the contract for saved-plan compatibility. It no longer requires or authorizes an invented hidden expectation. At runtime it means an optional possible pressure, learned expectation, responsibility tension, competing need, or system role, and it may be empty.
+The authenticated web surface requires an explicit six-hour enable action, uses an Earth-geocentric observer with no device-location request, and provides immediate removal. Re-enabling refreshes the expiry; it does not alter the stable Baseline.
 
-## Private grounded-intelligence layer
+Expired data is not live. A body-name lookup alone never establishes pressure, clarity, behavior, emotion, or outcome.
 
-The source-controlled concept library contains a precise internal definition, plain-language translation, appropriate uses, prohibited inferences, safe and unsafe examples, and an authoritative source reference for each approved concept. The initial library covers differentiation, system anxiety, triangles, overfunctioning and underfunctioning, multigenerational transmission, emotional cutoff, learned beliefs and expectations, boundaries and responsibility, competing internal needs, protective reactions, burdens, polarization, and projection.
+### Layer D — question-specific synthesis
 
-A deterministic router examines only the current user message and selects at most two relevant concepts. Only compact plain-language guidance and explicit inference limits for those concepts enter the model prompt. When nothing is relevant, the router explicitly tells the model not to force a psychological explanation. Framework names stay private unless the user asks for theory, research, or sources.
+At answer time, Sovereign receives relevant facets, the exact Basis registry, valid current context, user-confirmed facts, authorized relationship or system context, thread continuity, and corrections.
 
-The reasoning order is:
+The model selects Basis IDs only. The server validates every ID, attaches exact display values, and rejects invented or unauthorized references before display.
 
-1. understand the user’s actual question;
-2. use only verified Baseline information;
-3. separate observations from interpretations;
-4. consider at most two relevant grounded explanations;
-5. preserve uncertainty about absent people, motives, and causes;
-6. distinguish the user’s responsibility from outcomes controlled by others;
-7. connect the answer to the user’s values, needs, boundaries, and meaning of alignment;
-8. offer one useful distinction, question, or realistic next step when appropriate.
-
-## Inline visual story contract
-
-The visual story is part of the existing AI thread. It is not a separate Tarot product, route, workspace, or interpretation engine.
-
-The contract keeps interpretation and presentation separate:
+## `sovereign-answer.v2`
 
 ```ts
-visual_story: {
-  should_show: boolean;
-  mode: 'self' | 'interaction' | 'family';
-  primary: VisualCard;
-  secondary: VisualCard | null;
-  tertiary: VisualCard | null;
-  origin: string;
-  shadow: string;
-  gift: string;
-  current: string;
-  next_step: string;
-  visual_reason: string;
-}
+type SovereignAnswerV2 = {
+  version: 'sovereign-answer.v2';
+  mode: 'baseline' | 'now' | 'shadow_gift' | 'alignment' | 'relationship' | 'system' | 'covenant';
+  depth: 'focused' | 'standard' | 'deep';
+  headline: string;
+  direct_answer: string;
+  sections: Array<{
+    id: 'steady' | 'active_now' | 'shadow' | 'gift' | 'alignment' | 'you' | 'other' | 'interaction' | 'system' | 'responsibility' | 'unknowns' | 'experiment';
+    label: string;
+    body: string;
+  }>;
+  basis_refs: string[];
+  correction_prompt: string;
+  actions: Array<{
+    type: 'explore_facet' | 'examine_alignment' | 'open_person' | 'invite_person' | 'open_system' | 'save_to_library' | 'offer_covenant';
+    label: string;
+    target_id?: string;
+  }>;
+  confidence: 'confirmed' | 'supported' | 'exploratory';
+  safety_mode: 'standard' | 'grounded' | 'escalate';
+};
 ```
 
-A visual story may appear only when all of the following are true:
+Focused answers serve narrow facts and follow-ups. Standard is the normal Baseline default. Deep is the default for a full interpretation, relationship comparison, or system analysis.
 
-- the response is in integration phase;
-- the user directly confirmed the recognition or answered the prior inward question;
-- safety mode is `standard`;
-- the visual copy is complete;
-- interaction or family mode has verified relationship evidence;
-- required secondary or tertiary cards are present.
+Standard and deep answers provide a direct answer plus two to five relevant sections. A question is asked first only when missing information materially blocks a responsible answer. Exploration does not always become an action plan.
 
-Otherwise the server suppresses the visual story.
+## Basis
 
-### Presentation archetypes
+Basis is a data-only interface owned by the server registry.
 
-The initial visual vocabulary is intentionally small:
+Examples of formatting:
 
-- `fool` — beginning, movement, uncertainty, experimentation;
-- `magician` — agency, skill, language, shaping outcomes;
-- `three_of_cups` — belonging, group harmony, shared roles;
-- `hermit` — distance, privacy, discernment, inner direction;
-- `strength` — limits, courage, power without force;
-- `tower` — disruption, truth, structural change.
-
-These are visual analogies selected after the grounded interpretation. They cannot create, justify, prove, or override the interpretation.
-
-### Three expressions
-
-Each visual can be viewed through:
-
-- **Past protection** — how the role may have learned to protect something important;
-- **Shadow** — how the role may act automatically or under pressure;
-- **Gift** — the capacity available when the same role is used with awareness and choice.
-
-The user can mark the visual as fitting, partly fitting, or not relevant today. That correction stays in the current thread and does not rewrite the enduring Baseline.
-
-### Animation
-
-The first implementation uses original layered SVG artwork and deterministic CSS motion inside the browser:
-
-- subtle breathing and posture movement;
-- object or garment movement;
-- card-state transitions;
-- one-, two-, and three-card layouts;
-- reduced-motion support.
-
-The runtime does not generate a new Tarot video for every turn. Future Rive assets may replace individual SVG motion layers without changing the interpretation contract.
-
-## Basis contract
-
-The server derives available values from authorization-checked context. The model may select values verbatim from those lists only. A selected value that does not exist in the verified list fails the turn.
-
-Footer order:
-
-`BASIS · U✓ | HD [...] | GK [...] | A [...] | REL [...] | LIVE [...] | N [...]`
+- user confirmation: `U✓`;
+- Human Design personality activation: `HD G13.1`;
+- deterministically verified channel only: `HD 13–33`;
+- Gene Keys activation number: `GK ACT13`;
+- numerology life path: `N LP1`;
+- natal placement: `☉ CAN 04.2°`;
+- verified aspect and orb: `☉ □ ☾ 1.4°`;
+- live factor: `LIVE ♄ ARI 02.3°R`;
+- consented pair contact: `REL ☿ □ ☿ 1.8°`.
 
 Rules:
 
-- `U✓` appears first when the user directly confirmed the recognition.
-- Human Design channels use `13–33` formatting.
-- Frameworks are separated by `|`.
-- Values inside one framework are separated by `·`.
-- Missing or irrelevant frameworks are omitted.
-- The main answer remains complete when the footer is hidden.
-- In grounded or escalate safety mode, symbolic details are removed from the footer; directly confirmed user experience may remain.
+- no internal status, withheld text, object key, provider debugging value, JSON, summary, or conclusion;
+- no model-authored display value;
+- no unsupported channel or completed framework claim;
+- no other-person framework value without `framework.display`;
+- no raw birth input or exact private location;
+- at most five values on desktop;
+- at most three values on mobile followed by `+N`;
+- accessible labels for glyphs and abbreviations;
+- a compact source drawer containing exact value, calculation time, uncertainty, and provenance only.
 
-## Consent and relational use
+Basis supports an interpretation. It does not prove personality or current state.
 
-Plain-language pair comparison requires active `pair.compare` and `trait.display` permission.
+## Alignment
 
-System inclusion requires active `system.include` and `trait.display` permission.
+Alignment is rendered from structured answer sections:
 
-Exact invited-person framework evidence additionally requires active `framework.display` permission. Without it, the invited person’s exact Human Design, Gene Keys, astrology, live, and numerology values are omitted from model context and the footer.
+- Supports the fit;
+- Pulls against it;
+- The real tradeoff;
+- Still needed;
+- A closer version.
 
-Interaction and family visual stories require verified relationship evidence. Another person’s card is never shown from one person’s private account alone.
+The interface uses balanced fields and a central tradeoff. It never derives a score, percentage, gauge, or sentiment result from generated prose.
 
-Raw birth input and exact private location are never included.
+## Relationship context
 
-## Insight Modules
+The server compares two separate permitted facet profiles and returns:
 
-The AI may stage one small module suggestion only after integration. A staged suggestion is stored as a short-lived thread event, not as an enduring Library record.
+- the user’s relevant facets;
+- the invited person’s permitted facets;
+- shared needs and different routes;
+- possible interaction pressure;
+- each person’s responsibility;
+- user-reported observations;
+- unconfirmed interpretations;
+- missing information;
+- authorized exact Basis references.
 
-Saving requires a separate authenticated request with `approved: true`. The saved object includes:
+The renderer keeps the two people in distinct columns and the relationship itself in a full-width field. It never claims motive, exact emotion, private experience, or future behavior.
 
-- title
-- recognition
-- hidden expectation
-- inward question
-- clearer form
-- practice
-- basis
-- confidence
-- safety mode
-- source thread and source event
-- private visibility
-- explicit approval marker
+## System context
 
-The source event produces a deterministic module ID, so repeated approval requests do not create duplicates.
+System analysis uses consented facets and supplied role, authority, responsibility, care, dependence, constraints, objective, observation, and missing perspective data.
 
-## Safety and grounding
+It returns stabilizing and change roles, pressure carriers, formal and informal authority, responsibility concentration, mediation and withdrawal, expectations, change effects, unknown roles, supported relationship edges, and a separate pressure field.
 
-The output validator rejects:
+A Baseline-derived role is labeled as a possibility. A formal role or practical responsibility is factual only when supplied or confirmed. Unsupported decorative edges are prohibited.
 
-- diagnosis
-- claimed hidden intent
-- guaranteed prediction
-- stigmatizing identity labels
-- spiritual certainty
-- framework language outside the Basis footer
-- more than one question
-- responses that do not match question or integration structure
+## Covenant
 
-Before final validation, a deterministic quality review inspects both the private plan fields and the composed response. It detects diagnosis, absent-person profiling, claimed motives, projection presented as proven, fixed family roles, blame, literal spiritual causation, Baseline-as-proof claims, unnecessary clinical terminology, therapy claims, unsupported relationship commands, and cold institutional phrasing. One affected passage is rewritten into a controlled plain-language alternative, then the complete response is validated again. Crisis, abuse, coercion, self-harm, immediate-danger, and urgent-medical handling continue through the established grounded or escalate path.
+Covenant may be offered contextually for a relevant personal, relationship, or family dynamic without religious keywords. It stays off until explicit confirmation.
 
-Grounded or escalate mode is used for severe fear, little sleep, inability to function, feeling watched or controlled, confusion about reality, immediate harm, abuse, coercion, or urgent medical concerns. In this mode the system prioritizes concrete safety and trusted human support, removes visual symbolism, and reduces symbolic interpretation.
+The confirmation explains that Christian teaching and clearly cited Scripture will be added for the question while the grounded Baseline answer remains separate.
 
-## Runtime sequence
+The answer separates Biblical parallel, Scripture, teaching, application, and boundary. Passage text comes only from the verified retrieval context supplied by the server.
 
-Each turn reserves three event positions:
+Covenant never claims God’s exact intent, turns a metaphor into identity, assigns moral status, proves motive or diagnosis, predicts an outcome, or requires forgiveness, reconciliation, contact, submission, estrangement, or continued exposure to harm.
 
-1. redacted user event;
-2. evidence-checked private recognition plan, including any suppressed or approved visual plan;
-3. deterministic language review of private plan fields;
-4. composed natural or guided response;
-5. deterministic rewrite when needed and final safety validation.
+## Persistence and transport
 
-The public response is not streamed token-by-token. The complete model result is parsed, evidence-checked, composed, and safety-validated before display.
+Thread events persist `answer`, server-attached `basis`, context, interface actions, and user corrections. The browser requests `application/vnd.sovereign.answer+json`; plain text remains available for compatible clients.
 
-When `visual_story.should_show` remains true after validation, the worker sends a compact encoded visual payload in the same response. The browser renders it under the completed AI answer. The surrounding workspace, conversation, and composer remain unchanged.
+No obsolete presentation payload, encoded presentation header, or unused presentation persistence field is part of the contract.
 
-## Review gates
+## Required validation
 
-Before deployment:
+Tests must prove:
 
-- Typecheck and unit tests pass.
-- Worker gateway smoke passes.
-- Invented Basis values are rejected.
-- One-question-first behavior is verified.
-- Question phase never exposes a visual story.
-- Unconfirmed or grounded turns suppress visual symbolism.
-- Interaction and family visuals require verified relationship evidence.
-- The AI thread remains usable when the visual layer is hidden.
-- Reduced-motion behavior is verified on iPhone and desktop.
-- Invitee framework evidence is absent without `framework.display`.
-- Module saving requires explicit approval and is idempotent.
-- Protected preview is reviewed before production approval.
+- exact source omissions and unknown-birth-time limits;
+- facet completeness and Basis reference authorization;
+- deterministic current and pair contacts;
+- expiry enforcement;
+- meaningful Baseline value without an incident;
+- relationship and system structure;
+- exact Basis filtering and accessible truncation;
+- structured Alignment without calculated precision;
+- contextual, confirmed, retrieved-passage Covenant behavior;
+- consent and entitlement enforcement;
+- complete answers even when the Basis drawer is never opened.
