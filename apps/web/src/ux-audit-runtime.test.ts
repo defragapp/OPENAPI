@@ -14,16 +14,17 @@ describe('workspace UX audit', () => {
     expect(workspace).not.toContain('MutationObserver');
   });
 
-  it('provides meaningful first-run guidance and explicit incomplete states', () => {
+  it('provides meaningful first-run guidance without administrative incomplete states', () => {
     expect(workspace).toContain('What do you want to understand?');
-    expect(workspace).toContain('Each mode opens a real exploration.');
-    expect(workspace).toContain('Your Baseline facets are not ready yet.');
-    expect(workspace).toContain('Nothing saved yet.');
+    expect(workspace).toContain('Your intelligence begins with your Baseline.');
+    expect(workspace).toContain('Build my Baseline');
+    expect(workspace).not.toContain('INCOMPLETE');
+    expect(workspace).toContain('Nothing has been kept yet.');
   });
 
   it('supports keyboard, mobile sheets, and reduced motion', () => {
     expect(workspace).toContain("event.key === 'Enter'");
-    expect(workspace).toContain('Shift + Enter for a new line');
+    expect(workspace).toContain('event.shiftKey');
     expect(workspace).toContain('role="dialog"');
     expect(styles).toContain('@media (max-width: 700px)');
     expect(styles).toContain('@media (prefers-reduced-motion: reduce)');

@@ -7,13 +7,11 @@ const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', i
 
 describe('shared Sovereign answer stage', () => {
   it('uses the same answer hierarchy publicly and after authentication', () => {
-    expect(landing).toContain('EXAMPLE SOVEREIGN ANSWER');
-    expect(landing).toContain("const answerTabs = ['Direct answer', 'Shadow', 'Gift', 'Alignment', 'Basis']");
-    expect(landing).toContain("'Direct answer': 'Answer'");
-    expect(landing).toContain("Shadow: 'Under pressure'");
-    expect(landing).toContain("Gift: 'At its best'");
-    expect(landing).toContain("Alignment: 'What fits'");
-    expect(landing).toContain('BASIS');
+    expect(landing).toContain('EXAMPLE ANSWER');
+    expect(landing).toContain('DIRECT ANSWER');
+    expect(landing).toContain('THE PERSONAL CONNECTION');
+    expect(landing).toContain('A PRACTICAL NEXT STEP');
+    expect(landing).toContain('Why this is personal');
     expect(workspace).toContain('<SovereignAnswerView');
     expect(workspace).toContain('<BasisStrip');
   });

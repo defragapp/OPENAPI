@@ -12,7 +12,7 @@ const containsAll = (label, text, values) => {
 };
 
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
-const workspaceCss = read('apps/web/src/workspace-chat.css');
+const workspaceCss = `${read('apps/web/src/workspace-chat.css')}\n${read('apps/web/src/experience-reconciliation.css')}`;
 const landing = read('apps/web/src/PublicLanding.tsx');
 const landingCss = read('apps/web/src/public-landing.css');
 const prompt = read('apps/sovereign-worker/src/agent/prompt-v1.ts');
@@ -69,7 +69,7 @@ containsAll('canonical workspace', workspace, [
   "locationPrecision: 'geocentric'",
   'Remove current context',
   'Birth-time certainty',
-  'Unknown time is supported.'
+  'A supported path. Sovereign will not guess unavailable values.'
 ]);
 
 containsAll('relationship and system intelligence', relational, [
@@ -111,12 +111,12 @@ containsAll('public product moment', landing, [
 ]);
 
 containsAll('responsive workspace', workspaceCss, [
-  'width: 272px',
-  'width: 390px',
+  'width: 220px',
+  'width: 360px',
   'grid-template-columns: repeat(5, 1fr)',
   'min-height: 44px',
   'env(safe-area-inset-bottom)',
-  '@media (max-width: 700px)',
+  '@media (max-width: 760px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
 
@@ -142,6 +142,7 @@ const forbidden = [
 ];
 const scanRoots = ['apps', 'docs', 'packages'];
 for (const file of scanRoots.flatMap((directory) => files(resolve(root, directory)))) {
+  if (file.includes('/dist/') || file.includes('/node_modules/')) continue;
   if (!/\.(?:ts|tsx|js|mjs|md|html|css|sql)$/.test(file)) continue;
   const source = readFileSync(file, 'utf8').toLowerCase();
   for (const token of forbidden) assert(!source.includes(token.toLowerCase()), `Removed presentation token remains in ${file.replace(`${root}/`, '')}.`);

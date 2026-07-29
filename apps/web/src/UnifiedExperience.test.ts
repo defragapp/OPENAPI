@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
-const css = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('./experience-reconciliation.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('unified Sovereign intelligence experience', () => {
@@ -52,16 +52,16 @@ describe('unified Sovereign intelligence experience', () => {
   it('exposes permission and account controls without a permanent Covenant toggle', () => {
     expect(workspace).toContain("new CustomEvent('sovereign:open-consent-controls')");
     expect(workspace).toContain('PEOPLE AND PERMISSIONS');
-    expect(workspace).toContain('PRIVACY AND RETENTION');
+    expect(workspace).toContain('PRIVACY AND SAVED DATA');
     expect(workspace).toContain('PLAN AND BILLING');
     expect(workspace).not.toContain('COVENANT PREFERENCE');
   });
 
   it('ships responsive styling for the canonical workspace', () => {
-    expect(css).toContain('width: 272px');
-    expect(css).toContain('width: 390px');
-    expect(css).toContain('@media (max-width: 920px)');
-    expect(css).toContain('@media (max-width: 700px)');
+    expect(css).toContain('width: 220px');
+    expect(css).toContain('width: 360px');
+    expect(css).toContain('@media (max-width: 980px)');
+    expect(css).toContain('@media (max-width: 760px)');
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');
   });
 });

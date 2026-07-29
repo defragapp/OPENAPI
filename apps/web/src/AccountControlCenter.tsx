@@ -194,7 +194,6 @@ export function AccountControlCenter() {
 
   return (
     <>
-      <button className="account-control-trigger" onClick={() => setOpen(true)}>Account & Library</button>
       {open && (
         <div className="account-control-backdrop" role="presentation" onMouseDown={(event) => {
           if (event.target === event.currentTarget) setOpen(false);

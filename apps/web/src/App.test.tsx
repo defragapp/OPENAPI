@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
-const styles = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
+const styles = `${readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8')}\n${readFileSync(new URL('./experience-reconciliation.css', import.meta.url), 'utf8')}`;
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const consent = readFileSync(new URL('../public/consent.html', import.meta.url), 'utf8');
 const consentRuntime = readFileSync(new URL('../public/consent.js', import.meta.url), 'utf8');
@@ -13,15 +13,15 @@ describe('Sovereign account and workspace shell', () => {
   it('contains every product surface inside one canonical workspace', () => {
     for (const label of ['Today', 'Explore', 'People', 'Systems', 'Library', 'You']) expect(workspace).toContain(`name: '${label}'`);
     expect(workspace).toContain('New exploration');
-    expect(workspace).toContain('RECENT');
+    expect(workspace).toContain('Recent explorations');
     expect(app).toContain('<SovereignIntelligenceWorkspace />');
   });
 
   it('keeps Today Baseline-first and correction-ready', () => {
-    for (const phrase of ['Your Baseline', 'Active now', 'Shadow to notice', 'Gift available', 'Alignment question', 'Not today']) {
+    for (const phrase of ['Your Baseline', 'More relevant now', 'What changes under pressure?', 'Gift expression', 'Where this may matter', 'Not today']) {
       expect(workspace).toContain(phrase);
     }
-    expect(workspace).toContain('Current data does not establish behavior.');
+    expect(workspace).toContain('Current context does not determine your behavior.');
   });
 
   it('routes signup through explicit plan confirmation without changing prices', () => {
@@ -57,7 +57,8 @@ describe('Sovereign account and workspace shell', () => {
 
   it('keeps Library explicit and user-controlled', () => {
     expect(workspace).toContain('Library is not a journal or transcript archive.');
-    expect(workspace).toContain('Save to Library');
-    expect(workspace).toContain('Nothing saved yet.');
+    expect(workspace).toContain("action.type === 'save_to_library'");
+    expect(workspace).toContain('Save this understanding');
+    expect(workspace).toContain('Nothing has been kept yet.');
   });
 });

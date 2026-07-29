@@ -19,16 +19,6 @@ const basisFixture = [
   { compact: 'LIVE ♄ ARI 02.3°R', label: 'Live Saturn, Aries, 2.3 degrees, retrograde', time: 'Demonstration fixture', uncertainty: 'low' }
 ] as const;
 
-const answerTabs = ['Direct answer', 'Shadow', 'Gift', 'Alignment', 'Basis'] as const;
-const answerTabLabels: Record<typeof answerTabs[number], string> = {
-  'Direct answer': 'Answer',
-  Shadow: 'Under pressure',
-  Gift: 'At its best',
-  Alignment: 'What fits',
-  Basis: 'Basis'
-};
-type AnswerTab = typeof answerTabs[number];
-
 const questionAnswers = [
   {
     question: 'Why do I respond this way when pressure rises?',
@@ -224,46 +214,24 @@ export function PublicLanding() {
 }
 
 function LivingSovereignAnswer() {
-  const [tab, setTab] = useState<AnswerTab>('Direct answer');
-  const [basisOpen, setBasisOpen] = useState(false);
-  const body = tab === 'Direct answer'
-    ? heroAnswer.direct
-    : tab === 'Shadow'
-      ? heroAnswer.shadow
-      : tab === 'Gift'
-        ? heroAnswer.gift
-        : tab === 'Alignment'
-          ? heroAnswer.alignment
-          : '';
   return (
-    <div className="living-answer" aria-label="Interactive Sovereign answer demonstration">
-      <header><span>EXAMPLE SOVEREIGN ANSWER</span><strong>Personal · Responsibility</strong></header>
-      <p className="fixture-label">ASK SOVEREIGN</p>
+    <article className="living-answer" aria-label="Sovereign answer demonstration">
+      <header><span>EXAMPLE ANSWER</span><strong>Sovereign · Personal</strong></header>
+      <p className="fixture-label">YOU ASKED</p>
       <p className="living-question">“{heroAnswer.question}”</p>
-      <div className="living-answer-tabs" role="tablist" aria-label="Answer sections">
-        {answerTabs.map((item, index) => <button
-          key={item}
-          id={`hero-answer-tab-${index}`}
-          role="tab"
-          aria-selected={tab === item}
-          aria-controls="hero-answer-panel"
-          tabIndex={tab === item ? 0 : -1}
-          onClick={() => { setTab(item); if (item === 'Basis') setBasisOpen(true); }}
-          onKeyDown={(event) => moveTabFocus(event, index, answerTabs.length, (next) => {
-            const nextTab = answerTabs[next]!;
-            setTab(nextTab);
-            if (nextTab === 'Basis') setBasisOpen(true);
-          })}
-        >{answerTabLabels[item]}</button>)}
-      </div>
-      <section id="hero-answer-panel" className="living-answer-body" role="tabpanel" aria-labelledby={`hero-answer-tab-${answerTabs.indexOf(tab)}`} aria-live="polite">
-        {tab === 'Basis'
-          ? <BasisSourceList values={basisFixture} />
-          : <><span>{answerTabLabels[tab].toUpperCase()}</span><p>{body}</p>{tab === 'Direct answer' && <aside><strong>TRY</strong>{heroAnswer.experiment}</aside>}</>}
+      <section className="living-answer-body">
+        <span>DIRECT ANSWER</span>
+        <h2>Your capacity is real. The question is whether the responsibility is actually yours.</h2>
+        <p>{heroAnswer.direct}</p>
+        <div className="living-connection"><strong>THE PERSONAL CONNECTION</strong><p>{heroAnswer.shadow} {heroAnswer.gift}</p></div>
+        <aside><strong>A PRACTICAL NEXT STEP</strong>{heroAnswer.experiment}</aside>
       </section>
+      <details className="living-answer-basis">
+        <summary>Why this is personal · {basisFixture.length} supporting values</summary>
+        <BasisSourceList values={basisFixture} />
+      </details>
       <p className="fixture-label">Sanitized demonstration · Not your Baseline</p>
-      <PublicBasisStrip values={basisFixture} onOpen={() => { setTab('Basis'); setBasisOpen(true); }} expanded={basisOpen && tab === 'Basis'} />
-    </div>
+    </article>
   );
 }
 

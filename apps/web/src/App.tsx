@@ -212,15 +212,8 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
         </section>
 
         <section className="auth-panel">
-          <p className="eyebrow">{mode === 'signup' ? 'START FREE' : mode === 'redeem' ? 'OPENING' : 'SIGN IN'}</p>
-          <h2>{mode === 'signup' ? 'Create your Sovereign.OS account.' : mode === 'redeem' ? 'One moment.' : 'Sign in to Sovereign.OS.'}</h2>
-          <p className="auth-explainer">
-            {mode === 'signup'
-              ? 'Start free. Verify your email, then build your Baseline.'
-              : mode === 'redeem'
-                ? 'This should take only a moment.'
-                : 'Use your email and the available secure sign-in method for your account.'}
-          </p>
+          <p className="eyebrow">{mode === 'redeem' ? 'OPENING' : 'PRIVATE EMAIL ACCESS'}</p>
+          <h2>{mode === 'signup' ? 'Verify your email to begin.' : mode === 'redeem' ? 'Checking your secure link.' : 'Continue with email.'}</h2>
           {mode !== 'redeem' && (
             <form onSubmit={submit} className="form-stack" noValidate>
               {mode === 'signup' && (

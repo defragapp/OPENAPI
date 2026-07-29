@@ -12,7 +12,6 @@ import { PublicLanding } from './PublicLanding';
 import { PublicPolicy } from './PublicPolicy';
 import { PublicPolicyMetadata } from './PublicPolicyMetadata';
 import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
-import { StructuredIntelligenceLayer, installStructuredIntelligenceRuntime } from './StructuredIntelligenceLayer';
 import { SystemMembershipManager } from './SystemMembershipManager';
 import './styles.css';
 import './product-completion.css';
@@ -24,12 +23,11 @@ import './auth-onboarding.css';
 import './email-code-fallback.css';
 import './unified-entry.css';
 import './account-control.css';
-import './structured-intelligence.css';
+import './experience-reconciliation.css';
 
 installProductionRuntime();
 installProductRuntime();
 installEmailCodeFallbackRuntime();
-installStructuredIntelligenceRuntime();
 installBaselineInputRuntime();
 installDialogAccessibility();
 
@@ -63,7 +61,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         : publicPolicyKind
           ? <><PublicPolicyMetadata kind={publicPolicyKind} /><PublicPolicy kind={publicPolicyKind} /></>
           : isAuthenticatedWorkspace
-            ? <><SovereignIntelligenceWorkspace /><StructuredIntelligenceLayer /><AccountControlCenter /><SystemMembershipManager /></>
+            ? <><SovereignIntelligenceWorkspace /><AccountControlCenter /><SystemMembershipManager /></>
             : <><App /><EmailCodeFallback /></>}
     </AppErrorBoundary>
   </React.StrictMode>
