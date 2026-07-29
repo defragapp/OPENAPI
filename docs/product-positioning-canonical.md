@@ -2,15 +2,53 @@
 
 This document is the source of truth for public language, authenticated surface copy, and product implementation. Claims remain subject to live entitlements and deterministic privacy and consent enforcement.
 
-## Core position
+## Product category
+
+**Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the human systems around you.**
+
+A new visitor should understand the interaction immediately:
+
+1. Build a private personal foundation.
+2. Ask Sovereign a natural-language question.
+3. Receive a direct answer grounded in the person asking and the permitted context that matters.
+4. Review what is supported, what is interpretive, and what remains unknown.
+5. Confirm, correct, reject, or save what helps.
+
+Unlike an AI that begins with a blank prompt, Sovereign begins with the user’s Baseline and adds current, relational, system, or Covenant context only when the user chooses and the required permission exists.
+
+## Brand architecture
+
+### Product category line
+
+**Private personal AI for real life.**
+
+This line explains what the product is. It must appear before unfamiliar framework terminology on the public landing page.
+
+### Primary interaction promise
+
+**Ask about your life. Get an answer built around you.**
+
+This line explains what a visitor can do and what they receive.
+
+### Emotional brand statement
+
+**Healing isn’t optional. Holding the pain is.**
+
+This is a founder-approved tone and campaign statement. It belongs after the product category and interaction are understood. It must not be used as a therapy claim, diagnosis, command to reconcile, or guarantee of emotional outcome.
+
+### Enduring brand line
 
 **Know yourself. Understand the system. Choose what fits.**
 
-Sovereign.OS is a Baseline-first AI platform for understanding yourself, your relationships, and the human systems around you.
+This remains the enduring Sovereign.OS brand line. It may close or deepen the experience, but it does not replace a plain product definition.
+
+## Core position
+
+Sovereign.OS is Baseline-first. The product is useful before the user explains an incident, and it remains useful when the user brings a specific question about self, choice, relationship, family, household, team, workplace, friendship group, or other human system.
 
 Baseline Design is the persistent personal intelligence foundation. It gives Sovereign an explorable reference for identity and purpose; communication; decision-making; learning; creativity; love and connection; leadership; boundaries; responsibility; conflict and repair; responses to pressure and change; underused capacity; Shadow; Gift; Alignment; current relevance; consented relationships; and roles inside a family, household, team, workplace, friendship group, or other system.
 
-A user does not need to report a problem before the product becomes useful.
+The public experience introduces Baseline Design only after a visitor understands that Sovereign is an AI they can ask.
 
 ## Core capabilities
 
@@ -71,7 +109,7 @@ Formal roles and factual responsibilities may be shown as facts only when suppli
 
 Covenant is a contextual, optional capability. It is not a top-level application or the default identity of the platform.
 
-A grounded answer remains complete without Covenant. When a relevant personal, relationship, or family dynamic is recognized, Sovereign may quietly offer **Explore through Covenant**. It activates only after confirmation for the question.
+A grounded answer remains complete without Covenant. When a relevant personal, relationship, or family dynamic is recognized, Sovereign may quietly offer **Explore through Christian Scripture**. It activates only after confirmation for the question.
 
 Covenant separates Biblical parallel, Scripture, teaching, application, and boundary. It uses only retrieved or deliberately curated verified passages. It never claims God’s exact intent, assigns moral status, proves motive, or requires contact, estrangement, forgiveness, reconciliation, submission, or continued exposure to harm.
 
@@ -88,6 +126,8 @@ The exact source layer does not measure personality. The facet layer is interpre
 
 ## Product experience principles
 
+- Name the AI category before explaining its internal framework.
+- Show a recognizable user question and Sovereign answer in the first viewport.
 - Give the direct answer first.
 - Provide meaningful value before asking a question.
 - Use two to five relevant sections for a normal answer.
@@ -102,17 +142,29 @@ The exact source layer does not measure personality. The facet layer is interpre
 
 ## Approved public summary
 
-Sovereign.OS turns your Baseline Design into a living reference for how you decide, communicate, connect, respond under pressure, and grow. Ask what is active now. Examine a choice. Invite someone to compare perspectives. Map a family or team.
+Sovereign.OS is a private personal AI for questions about yourself, your relationships, your decisions, and the people or systems around you. Build your Baseline once, then ask naturally and receive answers grounded in the person asking.
 
-Plain-language insight first. Exact supporting data beneath it. You decide what fits.
+Sovereign.OS turns Baseline Design into a private AI for personal, relationship, and system intelligence. Plain-language insight comes first. Exact supporting data remains available beneath it. You decide what fits.
 
-## Approved headline
+## Approved public hero
 
-**Know yourself.**
+Kicker:
 
-**Understand the system.**
+**PERSONAL AI FOR REAL LIFE**
 
-**Choose what fits.**
+Headline:
+
+**Ask about your life.**
+
+**Get an answer built around you.**
+
+Primary action:
+
+**Build my Baseline**
+
+Secondary action:
+
+**See a Sovereign answer**
 
 ## Language to avoid
 
@@ -129,6 +181,11 @@ Avoid:
 - “choose yourself”;
 - “return to yourself”;
 - “do the work”;
-- “one clean next move” as the whole value.
+- “one clean next move” as the whole value;
+- “healing journey”;
+- “unlock your potential”;
+- “become your highest self”;
+- generic “break the cycle” promises;
+- astrology-first or framework-first hero language.
 
-The brand voice is intelligent, direct, calm, adult, specific, and careful about uncertainty. It should never reduce a person to a fixed label.
+The brand voice is intelligent, direct, calm, adult, specific, emotionally resonant, and careful about uncertainty. It should never reduce a person to a fixed label.
