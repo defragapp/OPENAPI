@@ -130,6 +130,8 @@ requireAll('static public support experience', staticExperienceCss, [
   '--paper: #0a0c0b',
   '.pricing-grid',
   '.pricing-page .pricing-hero > p:last-child',
+  '.questions-page .questions-hero > p:last-child',
+  '.questions-page .faq-section',
   '.price-card-body',
   '.plan-comparison-list',
   '.faq-list details',

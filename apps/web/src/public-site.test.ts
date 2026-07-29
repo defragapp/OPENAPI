@@ -90,7 +90,7 @@ describe('Sovereign.OS public experience', () => {
     for (const page of [how, pricing, faq]) {
       expect(page).toContain('/launch.css?v=20260728-baseline-first');
       expect(page).toContain('/launch-polish.css?v=20260728-baseline-first');
-      expect(page).toContain('/static-experience.css?v=20260729-route-closure');
+      expect(page).toContain('/static-experience.css?v=20260729-visual-sync');
     }
     expect(launchCss).toContain('@media (max-width: 680px)');
     expect(launchPolishCss).toContain('prefers-reduced-motion');
@@ -98,12 +98,19 @@ describe('Sovereign.OS public experience', () => {
     expect(staticExperienceCss).toContain('@media (max-width: 860px)');
     expect(staticExperienceCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(staticExperienceCss).toContain('.pricing-page .pricing-hero > p:last-child');
+    expect(staticExperienceCss).toContain('.questions-page .questions-hero > p:last-child');
+    expect(staticExperienceCss).toContain('.questions-page .faq-section');
+    expect(pricing).toContain('class="pricing-hero-detail"');
+    expect(staticExperienceCss).toMatch(/@media \(max-width: 480px\)[\s\S]*?\.pricing-hero-detail \{[\s\S]*?display: none;/);
+    expect(pricing).not.toContain('class="plan-summary"');
+    expect(faq).toContain('class="launch-page questions-page"');
+    expect(faq).toContain('launch-hero-compact questions-hero');
     expect(staticExperienceCss).toContain('white-space: nowrap');
     expect(staticExperienceCss).toMatch(/@media \(max-width: 480px\)[\s\S]*?\.pricing-page \.price-options \{[\s\S]*?grid-template-columns: 1fr;/);
     expect(staticExperienceCss).toContain('margin-inline: 0');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
     expect(notFound).toContain('content="noindex, nofollow"');
-    expect(notFound).toContain('/static-experience.css?v=20260729-route-closure');
+    expect(notFound).toContain('/static-experience.css?v=20260729-visual-sync');
     expect(notFound).toContain('href="https://sovereign.defrag.app/"');
     expect(notFound).toContain('href="https://app.defrag.app/login"');
     expect(consent).toContain('You decide what another account may use.');

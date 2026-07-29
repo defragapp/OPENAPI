@@ -5,8 +5,8 @@ Updated after each completed implementation tranche.
 ## Current release baseline
 
 - The authoritative production SHA is the value returned by `/ready`; it must exactly match GitHub `main`. Do not treat a duplicated SHA in this document as release authority.
-- Production entering the 2026-07-29 route-closure tranche was verified at `f2355b0813c0f37bbe7bae24cdc8e3e34b5325e3` across `sovereign.defrag.app`, `app.defrag.app`, both parent domains, and the workers.dev endpoint.
-- The current route-closure candidate changes only static-asset routing, the public 404 experience, narrow pricing layout, and their release assertions. It does not change authentication, billing, consent, data, AI, or product contracts.
+- Production entering the 2026-07-29 visual-sync tranche was verified at `b987d95eb53dfb788eb284e198637a7e71b8bdf6` across `sovereign.defrag.app`, `app.defrag.app`, both parent domains, and the workers.dev endpoint.
+- The current visual-sync candidate brings the Pricing and Questions first viewports back into alignment with the approved reference compositions, increases supporting-text contrast, preserves the complete desktop plan comparison, improves mobile scan order, and advances the public cache fingerprint. It does not change authentication, billing, consent, data, AI, or product contracts.
 - The candidate Cloudflare gate passes 12 migration validations, secret and production-fixture scans, release configuration, production release verification, intelligence verification, visual intelligence verification, every workspace typecheck, 130 Worker tests, 93 web tests, both production bundles, and Wrangler’s production dry-run.
 - GitHub-hosted Actions are intentionally absent. Cloudflare Workers Builds is the sole executable production release gate.
 - Remaining provider/account work is real-account link and code recovery, sender-domain trust, full Stripe lifecycle, deployed accessibility QA at every required width, and account-level abuse/security review.
@@ -77,7 +77,7 @@ Updated after each completed implementation tranche.
 - [x] Add controlled Open Graph metadata and a branded 1200×630 social asset.
 - [x] Add canonical metadata, sitemap, and robots guidance with private account/auth/API routes excluded.
 - [x] Add complete horizontally accessible mobile navigation to the React landing page and all static support pages.
-- [ ] Run screenshot QA across all required widths before declaring the visual system final.
+- [x] Run screenshot QA across 1440, 1024, 768, 390, and 360 px before declaring the current visual system final.
 
 ## Account access and recovery roadmap
 
