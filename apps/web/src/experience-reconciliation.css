@@ -1624,6 +1624,15 @@
   letter-spacing: .11em;
 }
 
+.living-answer .hero-fixture-scope {
+  margin: 14px 0 0;
+  color: #956c53;
+}
+
+.hero-fixture-scope + .fixture-label {
+  margin-top: 12px;
+}
+
 .living-question {
   max-width: 38ch;
   margin: 0;
@@ -1703,10 +1712,6 @@
   margin-top: 20px;
   padding-block: 12px;
   border-block: 1px solid rgba(36, 35, 31, .14);
-}
-
-.living-answer > .fixture-label:last-child {
-  margin: 14px 0 0;
 }
 
 .living-answer-basis summary {

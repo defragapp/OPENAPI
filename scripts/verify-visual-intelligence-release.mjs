@@ -85,8 +85,12 @@ requireAll('public category clarity', landing, [
   'private personal AI',
   'Why do I keep taking responsibility for everyone else?',
   'EXAMPLE ANSWER',
+  'Sanitized demonstration · Not your Baseline',
   'Build my Baseline'
 ]);
+if (landing.indexOf('Sanitized demonstration · Not your Baseline') > landing.indexOf('YOU ASKED')) {
+  throw new Error('The public answer boundary must appear before the demonstration question.');
+}
 
 requireAll('public product stage', landing, [
   'DIRECT ANSWER',
@@ -125,10 +129,12 @@ requireAll('public visual accessibility', landingCss, [
 requireAll('static public support experience', staticExperienceCss, [
   '--paper: #0a0c0b',
   '.pricing-grid',
+  '.pricing-page .pricing-hero > p:last-child',
   '.price-card-body',
   '.plan-comparison-list',
   '.faq-list details',
   'border-radius: 1px',
+  'margin-inline: 0',
   '@media (max-width: 860px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);

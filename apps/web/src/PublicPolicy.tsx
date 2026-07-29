@@ -67,9 +67,9 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
       <header className="landing-nav">
         <a className="landing-wordmark" href="/" aria-label="Sovereign.OS home"><span aria-hidden="true" /><strong>SOVEREIGN.OS</strong></a>
         <nav aria-label="Public navigation">
-          <a href="/how-it-works.html">How it works</a>
-          <a href="/pricing.html">Pricing</a>
-          <a href="/faq.html">Questions</a>
+          <a href="/how-it-works">How it works</a>
+          <a href="/pricing">Pricing</a>
+          <a href="/faq">Questions</a>
           <a href="/login">Sign in</a>
           <a className="landing-nav-cta" href="/signup">Build my Baseline</a>
         </nav>
@@ -109,7 +109,7 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
         <nav aria-label="Footer navigation">
           <a aria-current={privacy ? 'page' : undefined} href="/privacy">Privacy</a>
           <a aria-current={!privacy ? 'page' : undefined} href="/terms">Terms</a>
-          <a href="/pricing.html">Pricing</a>
+          <a href="/pricing">Pricing</a>
           <a href="mailto:info@defrag.app">Contact</a>
         </nav>
       </footer>

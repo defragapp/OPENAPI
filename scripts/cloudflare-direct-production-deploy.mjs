@@ -247,7 +247,7 @@ async function verifyLiveProduction() {
   ]);
   assertContainsAll('Questions clean URL', faqClean.text, ['What is Sovereign.OS?', 'What does Sovereign+ include?']);
   assert(questionsAlias.response.ok, `Questions alias returned ${questionsAlias.response.status}`);
-  assert(questionsAlias.response.url === `${publicBase}/faq.html`, `Questions alias resolved to ${questionsAlias.response.url}`);
+  assert(questionsAlias.response.url === `${publicBase}/faq`, `Questions alias resolved to ${questionsAlias.response.url}`);
   assertContainsAll('Questions alias', questionsAlias.text, ['What is Sovereign.OS?', 'What does Sovereign+ include?']);
 
   assert(privacy.response.ok && terms.response.ok, 'privacy or terms page is unavailable');
@@ -270,7 +270,7 @@ async function verifyLiveProduction() {
   assert(health.json?.migrationVersion === migrationVersion, 'health is not serving the current migration');
   assert(ready.json?.ready === true && ready.json?.version === commitSha, 'ready is not serving the deployed commit');
 
-  const publicDocuments = [home.response, how.response, howClean.response, pricing.response, pricingClean.response, faq.response, faqClean.response, privacy.response, terms.response];
+  const publicDocuments = [home.response, how.response, howClean.response, pricing.response, pricingClean.response, faq.response, faqClean.response, questionsAlias.response, privacy.response, terms.response];
   const appDocuments = [login.response, signup.response, appPage.response, invitation.response, consent.response];
   for (const page of [...publicDocuments, ...appDocuments]) {
     assert(headerIncludes(page, 'strict-transport-security', 'max-age=31536000'), 'HSTS is missing from a document');
@@ -332,17 +332,19 @@ async function verifyLiveProduction() {
   const consentJs = await request(`${appBase}/consent.js?v=20260726-consent-r1`);
   assert(consentCss.ok && consentJs.ok, 'consent page assets are unavailable');
 
-  const [appRoot, publicLogin, publicConsent, appPricing, publicApi] = await Promise.all([
+  const [appRoot, publicLogin, publicConsent, appPricing, appPricingClean, publicApi] = await Promise.all([
     request(`${appBase}/`, { redirect: 'manual' }),
     request(`${publicBase}/login`, { redirect: 'manual' }),
     request(`${publicBase}/consent.html`, { redirect: 'manual' }),
     request(`${appBase}/pricing.html`, { redirect: 'manual' }),
+    request(`${appBase}/pricing`, { redirect: 'manual' }),
     request(`${publicBase}/api/v1/auth/session`, { redirect: 'manual' })
   ]);
   assert(appRoot.status === 308 && appRoot.headers.get('location')?.startsWith(`${appBase}/app`), 'app root redirect is incorrect');
   assert(publicLogin.status === 308 && publicLogin.headers.get('location')?.startsWith(`${appBase}/login`), 'public login redirect is incorrect');
   assert(publicConsent.status === 308 && publicConsent.headers.get('location')?.startsWith(`${appBase}/consent.html`), 'public consent redirect is incorrect');
   assert(appPricing.status === 308 && appPricing.headers.get('location')?.startsWith(`${publicBase}/pricing.html`), 'app pricing redirect is incorrect');
+  assert(appPricingClean.status === 308 && appPricingClean.headers.get('location')?.startsWith(`${publicBase}/pricing`), 'app clean pricing redirect is incorrect');
   assert(publicApi.status === 308 && publicApi.headers.get('location')?.startsWith(`${appBase}/api/v1/auth/session`), 'public API redirect is incorrect');
 
   const invalidWebhookBody = JSON.stringify({

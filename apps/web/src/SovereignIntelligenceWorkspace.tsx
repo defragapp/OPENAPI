@@ -1098,7 +1098,7 @@ function SovereignAnswerView({ answer, basis, interfaceActions, latest, onPrompt
   const primaryPlanAction = planActions.find((action) => !['library', 'covenant'].includes(action.feature));
   const covenantPlanAction = planActions.find((action) => action.feature === 'covenant');
   const libraryPlanAction = planActions.find((action) => action.feature === 'library');
-  const openPlans = () => location.assign('/pricing.html');
+  const openPlans = () => location.assign('/pricing');
   const unknown = answer.sections.find((section) => section.id === 'unknowns');
   const standardSections = answer.sections.filter((section) => section.id !== 'unknowns');
   return (

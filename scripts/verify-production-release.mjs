@@ -96,6 +96,7 @@ for (const required of [
   'howClean',
   'pricingClean',
   'faqClean',
+  'questionsAlias',
   'publicConsent',
   'compiledCopy',
   'consentCss',
@@ -104,6 +105,7 @@ for (const required of [
   'stripeSignatureRejection',
   'exportsDisabled',
   'securityHeaders',
+  'appPricingClean',
   'r2Enabled: false',
   'queueEnabled: false'
 ]) {
@@ -141,7 +143,10 @@ for (const required of [
   '"/app/*"',
   '"/auth/*"',
   '"/consent.html"',
+  '"/pricing"',
   '"/pricing.html"',
+  '"/faq"',
+  '"/how-it-works"',
   '"/questions"',
   'price_1Te0g9Bk78yJ8Hww8fFZCqhm',
   'price_1Tq6nPBk78yJ8Hwwm0pxg4hH'
@@ -166,7 +171,7 @@ for (const required of [
   'isNavigationAssetPath',
   "target.pathname = '/app'",
   "const PUBLIC_ROUTE_ALIASES = new Map",
-  "['/questions', '/faq.html']",
+  "['/questions', '/faq']",
   'routePublicAlias(request, url)',
   "migrationVersion: '0012_baseline_facets_and_answer_v2'",
   "includesPrivateWorkspaceData: false",

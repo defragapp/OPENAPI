@@ -16,9 +16,18 @@ const DISABLED_PATH_PREFIXES = ['/api/v1/export-jobs'];
 const PARENT_HOSTS = new Set(['defrag.app', 'www.defrag.app']);
 const PUBLIC_HOST = 'sovereign.defrag.app';
 const APP_HOST = 'app.defrag.app';
-const PUBLIC_PATHS = new Set(['/privacy', '/terms', '/pricing.html', '/faq.html', '/how-it-works.html']);
+const PUBLIC_PATHS = new Set([
+  '/privacy',
+  '/terms',
+  '/pricing',
+  '/pricing.html',
+  '/faq',
+  '/faq.html',
+  '/how-it-works',
+  '/how-it-works.html'
+]);
 const PUBLIC_ROUTE_ALIASES = new Map([
-  ['/questions', '/faq.html']
+  ['/questions', '/faq']
 ]);
 const THREAD_MESSAGE_PATH = /^\/api\/v1\/threads\/[^/]+\/messages$/;
 

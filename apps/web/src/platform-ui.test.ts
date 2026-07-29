@@ -38,7 +38,7 @@ describe('authenticated product flow', () => {
   it('renders entitlement-aware plan actions without weakening the answer contract', () => {
     expect(workspace).toContain('interfaceActions: payload.interfaceActions');
     expect(workspace).toContain("action?.type === 'show_plan'");
-    expect(workspace).toContain("location.assign('/pricing.html')");
+    expect(workspace).toContain("location.assign('/pricing')");
     expect(workspace).toContain('libraryPlanAction');
     expect(workspace).toContain('covenantPlanAction');
   });

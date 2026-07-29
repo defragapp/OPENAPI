@@ -68,9 +68,9 @@ export function PublicLanding() {
       <header className="landing-nav">
         <a className="landing-wordmark" href="/" aria-label="Sovereign.OS home"><span aria-hidden="true">S</span><strong>SOVEREIGN.OS</strong></a>
         <nav aria-label="Public navigation">
-          <a href="/how-it-works.html">How it works</a>
-          <a href="/pricing.html">Pricing</a>
-          <a href="/faq.html">Questions</a>
+          <a href="/how-it-works">How it works</a>
+          <a href="/pricing">Pricing</a>
+          <a href="/faq">Questions</a>
           <a href="/login">Sign in</a>
           <a className="landing-nav-cta" href="/signup">Build my Baseline</a>
         </nav>
@@ -193,7 +193,7 @@ export function PublicLanding() {
         <SectionHeader kicker="START FREE · EXPAND WITH PERMISSION" title="Start free. Bring in relationships and systems when you need them." id="pricing-title" />
         <div className="pricing-options">
           <article><span>FREE</span><h3>A personal AI built around you.</h3><p>Build and explore your own Baseline. Ask about yourself, what may be more relevant now, and the decisions in front of you.</p><strong>$0 <small>permanent · no card</small></strong><ul><li>10 Sovereign AI turns each month</li><li>Baseline, Today, Shadow, Gift, and Alignment</li><li>Review and correct what does not fit</li></ul><a href="/signup">Build my Baseline</a></article>
-          <article><span>SOVEREIGN+</span><h3>Understand the people and systems around you.</h3><p>Bring permitted Baselines together, explore relationships and groups, save what remains useful, and add Christian Scripture when you choose.</p><strong>$20 <small>/ month</small></strong><p className="annual-price">or $99 / year</p><ul><li>300 Sovereign AI turns each month</li><li>People, Systems, Library, and Covenant</li><li>Consent-aware shared use</li></ul><a href="/pricing.html">See Sovereign+</a></article>
+          <article><span>SOVEREIGN+</span><h3>Understand the people and systems around you.</h3><p>Bring permitted Baselines together, explore relationships and groups, save what remains useful, and add Christian Scripture when you choose.</p><strong>$20 <small>/ month</small></strong><p className="annual-price">or $99 / year</p><ul><li>300 Sovereign AI turns each month</li><li>People, Systems, Library, and Covenant</li><li>Consent-aware shared use</li></ul><a href="/pricing">See Sovereign+</a></article>
         </div>
       </section>
 
@@ -201,13 +201,13 @@ export function PublicLanding() {
         <p className="landing-kicker">GIVE SOVEREIGN A REAL PLACE TO BEGIN</p>
         <h2 id="final-title">Your questions are already here. Build the foundation your AI will use to understand them.</h2>
         <p>Create your Baseline, then ask Sovereign about yourself, a relationship, a decision, or the people around you.</p>
-        <div className="landing-actions"><a className="landing-primary" href="/signup">Build my Baseline</a><a className="landing-secondary" href="/how-it-works.html">See how it works</a></div>
+        <div className="landing-actions"><a className="landing-primary" href="/signup">Build my Baseline</a><a className="landing-secondary" href="/how-it-works">See how it works</a></div>
         <small>Start free · No card required · You decide what fits</small>
       </section>
 
       <footer className="landing-footer">
         <span>Sovereign.OS · Know yourself. Understand the system. Choose what fits.</span>
-        <nav aria-label="Footer navigation"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/faq.html">Questions</a></nav>
+        <nav aria-label="Footer navigation"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/faq">Questions</a></nav>
       </footer>
     </main>
   );
@@ -217,6 +217,7 @@ function LivingSovereignAnswer() {
   return (
     <article className="living-answer" aria-label="Sovereign answer demonstration">
       <header><span>EXAMPLE ANSWER</span><strong>Sovereign · Personal</strong></header>
+      <p className="fixture-label hero-fixture-scope">Sanitized demonstration · Not your Baseline</p>
       <p className="fixture-label">YOU ASKED</p>
       <p className="living-question">“{heroAnswer.question}”</p>
       <section className="living-answer-body">
@@ -230,7 +231,6 @@ function LivingSovereignAnswer() {
         <summary>Why this is personal · {basisFixture.length} supporting values</summary>
         <BasisSourceList values={basisFixture} />
       </details>
-      <p className="fixture-label">Sanitized demonstration · Not your Baseline</p>
     </article>
   );
 }
