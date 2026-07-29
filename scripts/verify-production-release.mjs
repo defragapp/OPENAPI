@@ -21,6 +21,7 @@ const recoveryUi = readFileSync('apps/web/src/EmailCodeFallback.tsx', 'utf8');
 const appHtml = readFileSync('apps/web/index.html', 'utf8');
 const appUi = readFileSync('apps/web/src/App.tsx', 'utf8');
 const publicLandingUi = readFileSync('apps/web/src/PublicLanding.tsx', 'utf8');
+const authenticatedWorkspaceUi = readFileSync('apps/web/src/AuthenticatedWorkspace.tsx', 'utf8');
 const workspaceUi = readFileSync('apps/web/src/SovereignIntelligenceWorkspace.tsx', 'utf8');
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const pricing = readFileSync('apps/web/public/pricing.html', 'utf8');
@@ -141,6 +142,7 @@ for (const required of [
   '"/auth/*"',
   '"/consent.html"',
   '"/pricing.html"',
+  '"/questions"',
   'price_1Te0g9Bk78yJ8Hww8fFZCqhm',
   'price_1Tq6nPBk78yJ8Hwwm0pxg4hH'
 ]) {
@@ -163,6 +165,9 @@ for (const required of [
   "headers.set('x-robots-tag', 'noindex, nofollow')",
   'isNavigationAssetPath',
   "target.pathname = '/app'",
+  "const PUBLIC_ROUTE_ALIASES = new Map",
+  "['/questions', '/faq.html']",
+  'routePublicAlias(request, url)',
   "migrationVersion: '0012_baseline_facets_and_answer_v2'",
   "includesPrivateWorkspaceData: false",
   'sovereign_capacity_unavailable',
@@ -315,6 +320,8 @@ if (!product.includes('kind, status, payload_json, run_after')) throw new Error(
 for (const required of [
   'installProductionRuntime()',
   "from './ProductionRuntime'",
+  "import { AuthenticatedWorkspace } from './AuthenticatedWorkspace'",
+  '<AuthenticatedWorkspace />',
   "location.hostname === 'sovereign.defrag.app'",
   'navigator.serviceWorker.getRegistrations()',
   'registration.unregister()',
@@ -322,6 +329,21 @@ for (const required of [
   '<EmailCodeFallback />'
 ]) {
   if (!main.includes(required)) throw new Error(`Web entry is missing ${required}`);
+}
+for (const required of [
+  "fetch('/api/v1/account/onboarding'",
+  "credentials: 'same-origin'",
+  "cache: 'no-store'",
+  "location.replace(`/login?returnTo=",
+  "location.replace('/onboarding')",
+  '<SovereignIntelligenceWorkspace onboardingVerified />',
+  '<AccountControlCenter />',
+  '<SystemMembershipManager />'
+]) {
+  if (!authenticatedWorkspaceUi.includes(required)) throw new Error(`Authenticated workspace gate is missing ${required}`);
+}
+if (appUi.includes('SovereignIntelligenceWorkspace')) {
+  throw new Error('Public application fallback must not import or mount the private workspace');
 }
 for (const required of [
   'VITE_TURNSTILE_SITE_KEY',

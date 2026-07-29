@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
+const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
@@ -12,7 +13,8 @@ describe('authenticated product flow', () => {
     expect(app).toContain("path === '/onboarding'");
     expect(app).toContain('<PlanOnboarding />');
     expect(app).toContain('safeClientReturnTo');
-    expect(main).toContain('<SovereignIntelligenceWorkspace />');
+    expect(main).toContain('<AuthenticatedWorkspace />');
+    expect(authenticatedWorkspace).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
     expect(onboarding).toContain('Choose a plan');
     expect(onboarding).toContain("location.assign('/app')");
   });

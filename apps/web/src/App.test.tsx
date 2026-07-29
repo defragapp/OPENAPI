@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
+const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
+const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
 const styles = `${readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8')}\n${readFileSync(new URL('./experience-reconciliation.css', import.meta.url), 'utf8')}`;
@@ -14,7 +16,17 @@ describe('Sovereign account and workspace shell', () => {
     for (const label of ['Today', 'Explore', 'People', 'Systems', 'Library', 'You']) expect(workspace).toContain(`name: '${label}'`);
     expect(workspace).toContain('New exploration');
     expect(workspace).toContain('Recent explorations');
-    expect(app).toContain('<SovereignIntelligenceWorkspace />');
+    expect(main).toContain('<AuthenticatedWorkspace />');
+    expect(authenticatedWorkspace).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
+  });
+
+  it('verifies the account before mounting any private product surface', () => {
+    expect(authenticatedWorkspace).toContain("fetch('/api/v1/account/onboarding'");
+    expect(authenticatedWorkspace).toContain("location.replace(`/login?returnTo=");
+    expect(authenticatedWorkspace).toContain("location.replace('/onboarding')");
+    expect(authenticatedWorkspace.indexOf("state !== 'ready'")).toBeLessThan(authenticatedWorkspace.indexOf('<SovereignIntelligenceWorkspace onboardingVerified />'));
+    expect(app).toContain('return <PublicNotFound />');
+    expect(app).not.toContain('SovereignIntelligenceWorkspace');
   });
 
   it('keeps Today Baseline-first and correction-ready', () => {

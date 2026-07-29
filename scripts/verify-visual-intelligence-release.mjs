@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
+const authenticatedWorkspace = readFileSync('apps/web/src/AuthenticatedWorkspace.tsx', 'utf8');
 const workspace = readFileSync('apps/web/src/SovereignIntelligenceWorkspace.tsx', 'utf8');
 const workspaceCss = `${readFileSync('apps/web/src/workspace-chat.css', 'utf8')}\n${readFileSync('apps/web/src/experience-reconciliation.css', 'utf8')}`;
 const landing = readFileSync('apps/web/src/PublicLanding.tsx', 'utf8');
@@ -17,12 +18,22 @@ function requireAll(label, source, values) {
 }
 
 requireAll('authenticated app entry', main, [
-  "import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace'",
-  "import { SystemMembershipManager } from './SystemMembershipManager'",
+  "import { AuthenticatedWorkspace } from './AuthenticatedWorkspace'",
   "import './workspace-chat.css'",
   "import './experience-reconciliation.css'",
   "location.pathname === '/app'",
-  '<SovereignIntelligenceWorkspace />',
+  '<AuthenticatedWorkspace />'
+]);
+
+requireAll('authenticated workspace gate', authenticatedWorkspace, [
+  "import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace'",
+  "import { AccountControlCenter } from './AccountControlCenter'",
+  "import { SystemMembershipManager } from './SystemMembershipManager'",
+  "fetch('/api/v1/account/onboarding'",
+  "location.replace(`/login?returnTo=",
+  "location.replace('/onboarding')",
+  '<SovereignIntelligenceWorkspace onboardingVerified />',
+  '<AccountControlCenter />',
   '<SystemMembershipManager />'
 ]);
 
@@ -102,7 +113,7 @@ requireAll('public brand hierarchy', landing, [
 ]);
 
 requireAll('public visual accessibility', landingCss, [
-  'font-size: clamp(3.7rem, 6.3vw, 5.5rem)',
+  'font-size: clamp(3.45rem, 5vw, 4.7rem)',
   'min-height: 44px',
   'min-width: 320px',
   '@media (max-width: 980px)',
@@ -114,6 +125,8 @@ requireAll('public visual accessibility', landingCss, [
 requireAll('static public support experience', staticExperienceCss, [
   '--paper: #0a0c0b',
   '.pricing-grid',
+  '.price-card-body',
+  '.plan-comparison-list',
   '.faq-list details',
   'border-radius: 1px',
   '@media (max-width: 860px)',

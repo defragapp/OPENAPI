@@ -169,6 +169,7 @@ async function verifyLiveProduction() {
     pricingClean,
     faq,
     faqClean,
+    questionsAlias,
     privacy,
     terms,
     login,
@@ -186,6 +187,7 @@ async function verifyLiveProduction() {
     readText(`${publicBase}/pricing`),
     readText(`${publicBase}/faq.html`),
     readText(`${publicBase}/faq`),
+    readText(`${publicBase}/questions`),
     readText(`${publicBase}/privacy`),
     readText(`${publicBase}/terms`),
     readText(`${appBase}/login`),
@@ -244,6 +246,9 @@ async function verifyLiveProduction() {
     '/launch-polish.css?v=20260728-baseline-first'
   ]);
   assertContainsAll('Questions clean URL', faqClean.text, ['What is Sovereign.OS?', 'What does Sovereign+ include?']);
+  assert(questionsAlias.response.ok, `Questions alias returned ${questionsAlias.response.status}`);
+  assert(questionsAlias.response.url === `${publicBase}/faq.html`, `Questions alias resolved to ${questionsAlias.response.url}`);
+  assertContainsAll('Questions alias', questionsAlias.text, ['What is Sovereign.OS?', 'What does Sovereign+ include?']);
 
   assert(privacy.response.ok && terms.response.ok, 'privacy or terms page is unavailable');
   assert(login.response.ok && signup.response.ok, 'login or signup page is unavailable');
@@ -417,6 +422,7 @@ async function verifyLiveProduction() {
       howItWorks: 'html-and-clean-url-passed',
       pricing: 'html-and-clean-url-passed',
       questions: 'html-and-clean-url-passed',
+      canonicalQuestionsAlias: 'redirect-passed',
       privacy: 'passed',
       terms: 'passed',
       login: 'passed',

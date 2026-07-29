@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { PlanOnboarding } from './PlanOnboarding';
-import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
 
 type ConsentDecision = 'granted' | 'denied';
 type TurnstileState = 'loading' | 'ready' | 'verified' | 'expired' | 'error' | 'unsupported';
@@ -34,7 +33,27 @@ export function App() {
   }
   if (path === '/invitation') return <InvitationPage />;
   if (path === '/onboarding') return <PlanOnboarding />;
-  return <SovereignIntelligenceWorkspace />;
+  return <PublicNotFound />;
+}
+
+function PublicNotFound() {
+  return (
+    <main className="public-not-found">
+      <a className="private-route-brand" href="https://sovereign.defrag.app">
+        <span aria-hidden="true">S</span>
+        <strong>SOVEREIGN.OS</strong>
+      </a>
+      <section>
+        <span>PAGE NOT FOUND</span>
+        <h1>This page is not part of Sovereign.OS.</h1>
+        <p>Return to the public product or sign in to open your private workspace.</p>
+        <div>
+          <a href="https://sovereign.defrag.app">Open Sovereign.OS</a>
+          <a href="/login">Sign in</a>
+        </div>
+      </section>
+    </main>
+  );
 }
 
 function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {

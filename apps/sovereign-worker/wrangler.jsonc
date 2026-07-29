@@ -55,7 +55,8 @@
       "/api/*",
       "/health",
       "/healthz",
-      "/ready"
+      "/ready",
+      "/questions"
     ]
   },
   "env": {
@@ -120,7 +121,8 @@
           "/api/*",
           "/health",
           "/healthz",
-          "/ready"
+          "/ready",
+          "/questions"
         ]
       },
       "triggers": {
