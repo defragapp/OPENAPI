@@ -235,7 +235,7 @@ async function verifyLiveProduction() {
 
   assert(faq.response.ok && faqClean.response.ok, 'Questions page or clean URL is unavailable');
   assertContainsAll('Questions', faq.text, [
-    'Questions, answered directly.',
+    'What Sovereign is. What you can ask. What it never pretends to know.',
     'What is Sovereign.OS?',
     'What is Baseline Design?',
     'Can Sovereign tell me what another person feels?',
