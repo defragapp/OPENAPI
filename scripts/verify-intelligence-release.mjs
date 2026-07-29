@@ -99,13 +99,13 @@ containsAll('verified Covenant library', scripture, [
 ]);
 
 containsAll('public product moment', landing, [
-  'PRIVATE AI, BUILT AROUND YOUR BASELINE',
-  'Know yourself.',
-  'Understand the system.',
-  'Choose what fits.',
+  'PERSONAL AI FOR REAL LIFE',
+  'Ask about your life.',
+  'Get an answer built around you.',
+  'Why do I keep taking responsibility for everyone else?',
   '<LivingSovereignAnswer />',
-  'Sanitized demonstration fixture',
-  'TWO PEOPLE · TWO BASELINES · ONE INTERACTION',
+  'Sanitized demonstration · Not your Baseline',
+  'TWO PEOPLE · SHARED WITH PERMISSION',
   '<SystemMap />',
   'No compatibility score. No mind-reading.'
 ]);

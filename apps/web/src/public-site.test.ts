@@ -15,17 +15,35 @@ const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
 describe('Sovereign.OS public experience', () => {
-  it('makes the product and a paid-value answer unmistakable in the first viewport', () => {
-    expect(landing).toContain('PRIVATE AI, BUILT AROUND YOUR BASELINE');
-    expect(landing).toContain('Know yourself.');
-    expect(landing).toContain('Understand the system.');
-    expect(landing).toContain('Choose what fits.');
-    expect(landing).toContain('The resentment often arrives later');
+  it('makes the personal AI category and first action unmistakable in the first viewport', () => {
+    expect(landing).toContain('PERSONAL AI FOR REAL LIFE');
+    expect(landing).toContain('Ask about your life.');
+    expect(landing).toContain('Get an answer built around you.');
+    expect(landing).toContain('private personal AI');
+    expect(landing).toContain('your relationships');
+    expect(landing).toContain('the decisions in front of you');
     expect(landing).toContain('Build my Baseline');
   });
 
+  it('shows a recognizable user question and Sovereign answer before framework explanation', () => {
+    const questionIndex = landing.indexOf('Why do I keep taking responsibility for everyone else?');
+    const answerIndex = landing.indexOf('You may be quick to create direction when responsibility is unclear.');
+    const frameworkIndex = landing.indexOf('WHY THIS AI IS DIFFERENT');
+    expect(questionIndex).toBeGreaterThan(-1);
+    expect(answerIndex).toBeGreaterThan(questionIndex);
+    expect(frameworkIndex).toBeGreaterThan(answerIndex);
+    expect(landing).toContain('EXAMPLE SOVEREIGN ANSWER');
+    expect(landing).toContain('Sanitized demonstration · Not your Baseline');
+  });
+
+  it('preserves the founder language as emotional brand meaning rather than category explanation', () => {
+    expect(landing).toContain('Healing isn’t optional. Holding the pain is.');
+    expect(landing).toContain('Sovereign does not decide for you.');
+    expect(landing.indexOf('Healing isn’t optional. Holding the pain is.')).toBeGreaterThan(landing.indexOf('EXAMPLE SOVEREIGN ANSWER'));
+  });
+
   it('explains the complete Baseline-first platform in direct language', () => {
-    for (const phrase of ['Baseline Design', 'Shadow', 'Gift', 'Alignment', 'TWO PEOPLE · TWO BASELINES · ONE INTERACTION', 'SEE THE WHOLE SYSTEM', 'Covenant']) {
+    for (const phrase of ['Baseline Design', 'Shadow', 'Gift', 'Alignment', 'TWO PEOPLE · SHARED WITH PERMISSION', 'FAMILIES · TEAMS · HUMAN SYSTEMS', 'Covenant']) {
       expect(publicCopy).toContain(phrase);
     }
     expect(publicCopy).not.toMatch(/healing journey|hidden motive revealed|diagnose the relationship/i);
@@ -40,10 +58,11 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).toContain('aria-live="polite"');
   });
 
-  it('uses exact data-only Basis fixtures', () => {
-    expect(landing).toContain('Sanitized demonstration fixture');
+  it('uses exact data-only Basis fixtures after plain-language value', () => {
+    expect(landing).toContain('Sanitized demonstration · Not your Baseline');
     for (const value of ['HD G13.1', 'GK ACT13', 'N LP1', '☉ CAN 04.2°']) expect(landing).toContain(value);
     expect(landing).toContain('Exact source details');
+    expect(landing).toContain('Basis supports an interpretation; it does not prove personality, motive, behavior, or outcome.');
     expect(landing).not.toContain('pressure concentrates with you');
   });
 
