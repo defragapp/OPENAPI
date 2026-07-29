@@ -491,8 +491,9 @@ body.launch-page {
 
 .pricing-page .price-options > p:last-child strong {
   font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-  font-size: clamp(2.35rem, 3.5vw, 3.15rem);
+  font-size: clamp(1.9rem, 2.5vw, 2.35rem);
   font-weight: 410;
+  white-space: nowrap;
 }
 
 .pricing-page .feature-list {
