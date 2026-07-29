@@ -29,8 +29,9 @@ describe('public production release surfaces', () => {
   it('uses a real interactive answer as the public focal point', () => {
     expect(landing).toContain('data-answer-contract="sovereign-answer.v2"');
     expect(landing).toContain('<LivingSovereignAnswer />');
-    expect(landing).toContain('Sanitized demonstration fixture');
-    expect(landing).toContain('Plain-language insight first. Exact supporting data beneath it.');
+    expect(landing).toContain('EXAMPLE SOVEREIGN ANSWER');
+    expect(landing).toContain('Sanitized demonstration · Not your Baseline');
+    expect(landing).toContain('See what is supported, what is only possible, and what remains unknown.');
   });
 
   it('is responsive without depending on hover or motion', () => {
