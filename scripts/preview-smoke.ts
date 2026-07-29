@@ -82,9 +82,9 @@ async function verifyPaidCapabilities() {
 
 async function main() {
   await assertPublicPage('/', 'SOVEREIGN.OS');
-  await assertPublicPage('/how-it-works.html', 'How it works');
-  await assertPublicPage('/pricing.html', 'Sovereign+');
-  await assertPublicPage('/faq.html', 'Clear answers before you begin.');
+  await assertPublicPage('/how-it-works', 'HOW SOVEREIGN WORKS');
+  await assertPublicPage('/pricing', 'Sovereign+');
+  await assertPublicPage('/faq', 'What Sovereign is. What you can ask. What it never pretends to know.');
 
   const health = await json('/health', {}, 200, false);
   const ready = await json('/ready', {}, 200, false);

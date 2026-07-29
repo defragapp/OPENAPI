@@ -13,7 +13,7 @@ const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url)
 describe('public production release surfaces', () => {
   it('publishes canonical and controlled social metadata', () => {
     expect(index).toContain('rel="canonical" href="https://sovereign.defrag.app/"');
-    for (const [page, canonical] of [[pricing, '/pricing.html'], [questions, '/faq.html'], [how, '/how-it-works.html']] as const) {
+    for (const [page, canonical] of [[pricing, '/pricing'], [questions, '/faq'], [how, '/how-it-works']] as const) {
       expect(page).toContain(`rel="canonical" href="https://sovereign.defrag.app${canonical}"`);
       expect(page).toContain('og-sovereign.svg');
       expect(page).toContain('/static-release.css');
@@ -22,7 +22,8 @@ describe('public production release surfaces', () => {
 
   it('keeps private routes out of crawl guidance', () => {
     for (const route of ['/app', '/login', '/signup', '/onboarding', '/auth/', '/invitation', '/consent.html', '/api/']) expect(robots).toContain(`Disallow: ${route}`);
-    expect(sitemap).toContain('https://sovereign.defrag.app/how-it-works.html');
+    expect(sitemap).toContain('https://sovereign.defrag.app/how-it-works');
+    expect(sitemap).not.toContain('.html');
     expect(sitemap).not.toContain('/app');
   });
 

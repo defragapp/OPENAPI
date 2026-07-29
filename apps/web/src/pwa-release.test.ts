@@ -26,13 +26,14 @@ describe('release PWA surface', () => {
   it('never caches authenticated navigation or API requests', () => {
     expect(serviceWorker).toContain("url.pathname.startsWith('/api/')");
     expect(serviceWorker).toContain('PUBLIC_NAVIGATION.has(url.pathname)');
+    for (const route of ['/how-it-works', '/pricing', '/faq', '/questions']) expect(serviceWorker).toContain(`'${route}'`);
     expect(serviceWorker).not.toMatch(/PUBLIC_NAVIGATION[^;]+\/app/);
     expect(serviceWorker).not.toMatch(/PUBLIC_SHELL[^;]+\/login/);
     expect(serviceWorker).not.toMatch(/PUBLIC_SHELL[^;]+\/signup/);
   });
 
   it('limits runtime caching to declared public and compiled assets', () => {
-    expect(serviceWorker).toContain('sovereign-public-v9');
+    expect(serviceWorker).toContain('sovereign-public-v10');
     expect(serviceWorker).toContain("'/brand-mark.svg'");
     expect(serviceWorker).toContain('PUBLIC_ASSETS.has(url.pathname)');
     expect(serviceWorker).toContain("url.pathname.startsWith('/assets/')");

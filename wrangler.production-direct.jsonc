@@ -94,9 +94,12 @@
       "/consent.html",
       "/privacy",
       "/terms",
+      "/pricing",
       "/pricing.html",
+      "/faq",
       "/faq.html",
       "/questions",
+      "/how-it-works",
       "/how-it-works.html"
     ]
   },

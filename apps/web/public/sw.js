@@ -1,19 +1,31 @@
-const CACHE_NAME = 'sovereign-public-v9';
+const CACHE_NAME = 'sovereign-public-v10';
 const PUBLIC_SHELL = [
   '/',
-  '/how-it-works.html',
-  '/pricing.html',
-  '/faq.html',
+  '/how-it-works',
+  '/pricing',
+  '/faq',
   '/manifest.webmanifest',
   '/app-icon.svg',
   '/brand-mark.svg',
   '/safari-pinned-tab.svg',
   '/launch.css',
   '/launch-polish.css',
-  '/static-release.css'
+  '/static-release.css',
+  '/static-experience.css'
 ];
 const PUBLIC_ASSETS = new Set(PUBLIC_SHELL.filter((path) => path !== '/'));
-const PUBLIC_NAVIGATION = new Set(['/', '/how-it-works.html', '/pricing.html', '/faq.html', '/privacy', '/terms']);
+const PUBLIC_NAVIGATION = new Set([
+  '/',
+  '/how-it-works',
+  '/how-it-works.html',
+  '/pricing',
+  '/pricing.html',
+  '/faq',
+  '/faq.html',
+  '/questions',
+  '/privacy',
+  '/terms'
+]);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

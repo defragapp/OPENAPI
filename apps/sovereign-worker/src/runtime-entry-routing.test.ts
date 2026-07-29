@@ -14,7 +14,7 @@ describe('public route aliases', () => {
     );
 
     expect(response.status).toBe(308);
-    expect(response.headers.get('location')).toBe('https://sovereign.defrag.app/faq.html');
+    expect(response.headers.get('location')).toBe('https://sovereign.defrag.app/faq');
   });
 
   it('moves the Questions alias off the private application hostname', async () => {
@@ -25,6 +25,17 @@ describe('public route aliases', () => {
     );
 
     expect(response.status).toBe(308);
-    expect(response.headers.get('location')).toBe('https://sovereign.defrag.app/faq.html?from=footer');
+    expect(response.headers.get('location')).toBe('https://sovereign.defrag.app/faq?from=footer');
+  });
+
+  it('keeps clean public support routes off the private application hostname', async () => {
+    const response = await runtime.fetch(
+      new Request('https://app.defrag.app/pricing'),
+      env,
+      executionContext
+    );
+
+    expect(response.status).toBe(308);
+    expect(response.headers.get('location')).toBe('https://sovereign.defrag.app/pricing');
   });
 });

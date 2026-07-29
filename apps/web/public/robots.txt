@@ -1,8 +1,8 @@
 User-agent: *
 Allow: /
-Allow: /how-it-works.html
-Allow: /pricing.html
-Allow: /faq.html
+Allow: /how-it-works
+Allow: /pricing
+Allow: /faq
 Allow: /privacy
 Allow: /terms
 Disallow: /app
