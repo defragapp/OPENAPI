@@ -7,20 +7,21 @@ const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', i
 
 describe('shared Sovereign answer stage', () => {
   it('uses the same answer hierarchy publicly and after authentication', () => {
-    expect(landing).toContain('EXAMPLE · SOVEREIGN ANSWER');
-    expect(landing).toContain('Direct answer');
-    expect(landing).toContain('Shadow');
-    expect(landing).toContain('Gift');
-    expect(landing).toContain('Alignment');
+    expect(landing).toContain('EXAMPLE SOVEREIGN ANSWER');
+    expect(landing).toContain("const answerTabs = ['Direct answer', 'Shadow', 'Gift', 'Alignment', 'Basis']");
+    expect(landing).toContain("'Direct answer': 'Answer'");
+    expect(landing).toContain("Shadow: 'Under pressure'");
+    expect(landing).toContain("Gift: 'At its best'");
+    expect(landing).toContain("Alignment: 'What fits'");
     expect(landing).toContain('BASIS');
     expect(workspace).toContain('<SovereignAnswerView');
     expect(workspace).toContain('<BasisStrip');
   });
 
   it('distinguishes stable, temporary, confirmed, and unknown information', () => {
-    expect(landing).toContain('STEADY BASELINE FACET');
-    expect(landing).toContain('TEMPORARY CURRENT LAYER');
-    expect(landing).toContain('USER CONFIRMATION');
+    expect(landing).toContain('YOUR BASELINE');
+    expect(landing).toContain('WHAT MAY BE ACTIVE NOW');
+    expect(landing).toContain('YOUR CONFIRMATION');
     expect(landing).toContain('STILL UNKNOWN');
   });
 
