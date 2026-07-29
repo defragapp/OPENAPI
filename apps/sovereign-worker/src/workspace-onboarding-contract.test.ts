@@ -42,6 +42,7 @@ const onboarding = readFileSync(new URL('../../web/src/PlanOnboarding.tsx', impo
   });
 
   it('reports the current recovery migration from the authoritative production health layer', () => {
-    expect(runtime).toContain("migrationVersion: '0011_email_code_recovery'");
+    expect(runtime).toContain("migrationVersion: '0012_baseline_facets_and_answer_v2'");
+    expect(runtime).toContain("answerContract: 'sovereign-answer.v2'");
   });
 });

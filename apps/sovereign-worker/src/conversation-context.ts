@@ -2,6 +2,7 @@ import type { Env } from './env';
 import { getModelSafeBaselineContext } from './baseline';
 import { buildPairComparison, buildSystemAnalysis } from './relational-context';
 import { requireFeature, type EntitlementSet } from './db/entitlements';
+import { baselineFacetIds } from './baseline-contracts';
 
 export type SovereignMode = 'defrag' | 'alignment';
 export type SovereignSurface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
@@ -15,6 +16,7 @@ export interface ConversationContextSelection {
 
 const identifier = /^[A-Za-z0-9_-]{1,128}$/;
 const surfaces = new Set<SovereignSurface>(['Today', 'Explore', 'People', 'Systems', 'Library', 'You']);
+const safeFacetIds = new Set<string>(baselineFacetIds);
 
 export function parseConversationContext(value: unknown): ConversationContextSelection {
   if (value === undefined) return { mode: 'defrag' };
@@ -69,18 +71,56 @@ function project(value: unknown): unknown {
   if (!value || typeof value !== 'object') return value;
   const output: Record<string, unknown> = {};
   for (const [childKey, childValue] of Object.entries(value as Record<string, unknown>)) {
+    if (childKey === 'basisRegistry' && Array.isArray(childValue)) {
+      output.basisRegistry = childValue.flatMap((item) => {
+        if (!item || typeof item !== 'object') return [];
+        const source = item as Record<string, unknown>;
+        if (typeof source.id !== 'string') return [];
+        return [{
+          id: source.id,
+          category: source.category,
+          display: source.display,
+          accessibleLabel: source.accessibleLabel,
+          computedAt: source.computedAt,
+          uncertainty: source.uncertainty,
+          provenance: source.provenance,
+          subject: source.subject
+        }];
+      });
+      continue;
+    }
+    if (childKey === 'id' && typeof childValue === 'string' && safeFacetIds.has(childValue)) {
+      output.id = childValue;
+      continue;
+    }
     if (isPrivateIdentifierKey(childKey)) continue;
     if (childKey === 'label') {
-      output.label = childValue === 'You' ? 'You' : 'Other person';
+      const key = typeof (value as Record<string, unknown>).key === 'string'
+        ? String((value as Record<string, unknown>).key)
+        : '';
+      output.label = childValue === 'You'
+        ? 'You'
+        : /^member_(\d+)$/.test(key)
+          ? `Participant ${key.match(/^member_(\d+)$/)?.[1]}`
+          : 'Other person';
       continue;
     }
     if (childKey === 'from' || childKey === 'to') {
-      output[childKey] = childValue === 'You' ? 'You' : 'Other person';
+      output[childKey] = participantReference(childValue);
       continue;
     }
     output[childKey] = project(childValue);
   }
   return output;
+}
+
+function participantReference(value: unknown): string {
+  if (value === 'you' || value === 'You') return 'You';
+  if (typeof value === 'string') {
+    const member = value.match(/^member_(\d+)$/);
+    if (member) return `Participant ${member[1]}`;
+  }
+  return 'Other person';
 }
 
 function isPrivateIdentifierKey(key: string): boolean {

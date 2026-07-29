@@ -2,12 +2,23 @@ import type { Env } from './env';
 import { canUseDevelopmentFixtures } from './runtime';
 import { createOpenApiBaselineProvider, isValidTimeZone } from './baseline-engine';
 import { computeReducedCurrentConditions } from './current-conditions/current';
+import {
+  BASELINE_SOURCE_VERSION,
+  baselineFacetProfileSchema,
+  baselineSourceDataSchema,
+  buildBaselineBasisRegistry,
+  validateFacetProfileBasis,
+  type BasisRegistryItem,
+  type BaselineSourceData
+} from './baseline-contracts';
+import { ensureBaselineFacetProfile, getCachedBaselineFacetProfile } from './baseline-facets';
 
 export type BirthTimeCertainty = 'exact' | 'approximate' | 'unknown';
-export type LocationPrecision = 'none' | 'approximate' | 'city_or_regional' | 'ephemeral_current' | 'stored_permitted';
+export type LocationPrecision = 'none' | 'approximate' | 'city_or_regional' | 'ephemeral_current' | 'stored_permitted' | 'geocentric';
 export interface BaselineInput { birthDate?: string; birthTime?: string; birthTimeCertainty?: BirthTimeCertainty; birthplace?: string; birthTimezone?: string; locationPrecision?: LocationPrecision; }
 export interface CurrentLocationInput { latitude?: number; longitude?: number; }
-const VERSION = 'openapi-baseline-engine-v2';
+const LOCATION_PRECISIONS: readonly LocationPrecision[] = ['none', 'approximate', 'city_or_regional', 'ephemeral_current', 'stored_permitted', 'geocentric'];
+const VERSION = 'openapi-baseline-engine-v3';
 const SOVV_REFERENCE_COMMIT = 'a3db94bccc75089723bef0cf5ff36c47064bd789';
 const encoder = new TextEncoder();
 
@@ -15,6 +26,11 @@ async function sha256(value: string) { const hash = await crypto.subtle.digest('
 function assertDate(value: string) { if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00Z`))) throw new Response('Invalid birth date', { status: 400 }); }
 function assertTime(value: string | undefined, certainty: BirthTimeCertainty) { if (certainty !== 'unknown' && !/^([01]\d|2[0-3]):[0-5]\d$/.test(value ?? '')) throw new Response('Birth time required for exact or approximate certainty', { status: 400 }); }
 function frameworkAvailability(certainty: BirthTimeCertainty, providerStatus: string) { return { astrology: providerStatus === 'computed' ? 'available' : 'unavailable', humanDesign: certainty === 'unknown' || providerStatus !== 'computed' ? 'unavailable' : 'partial', geneKeys: certainty === 'unknown' || providerStatus !== 'computed' ? 'unavailable' : 'partial', numerology: 'available', houses: 'unavailable' }; }
+
+export function parseLocationPrecision(value: unknown): LocationPrecision {
+  if (typeof value === 'string' && LOCATION_PRECISIONS.includes(value as LocationPrecision)) return value as LocationPrecision;
+  throw new Response('Invalid current-condition precision', { status: 400 });
+}
 
 export async function computeReducedBaseline(input: BaselineInput, options: { providerAvailable?: boolean; provider?: BaselineProvider; allowRecordedFixture?: boolean } = {}) {
   const normalized = normalizeBaselineInput(input);
@@ -42,6 +58,7 @@ export function normalizeBaselineInput(input: BaselineInput) {
 }
 
 export interface BaselineProviderOutput {
+  sourceData: BaselineSourceData;
   natalPlacements: Record<string, unknown>;
   houses: Record<string, unknown> | null;
   aspects: string[];
@@ -64,17 +81,59 @@ export function deterministicRecordedProvider(): BaselineProvider {
     const sun = signs[Math.floor(((month - 1) * 30 + Math.min(day, 30)) / 30) % 12]!;
     const moon = signs[(day + month) % 12]!;
     const ascendant = input.birthTimeCertainty === 'unknown' ? undefined : signs[(Number((input.birthTime ?? '12:00').slice(0, 2)) + day) % 12];
+    const sunLongitude = signs.indexOf(sun) * 30 + 15;
+    const moonLongitude = signs.indexOf(moon) * 30 + 15;
+    const gate = ((month * 6 + day) % 64) + 1;
+    const computedAt = new Date().toISOString();
+    const uncertainty = input.birthTimeCertainty === 'unknown' ? 'high' : input.birthTimeCertainty === 'approximate' ? 'medium' : 'low';
     return {
+      sourceData: {
+        version: BASELINE_SOURCE_VERSION,
+        computationVersion: VERSION,
+        computedAt,
+        uncertainty,
+        natalBodies: [
+          { id: 'natal.sun', body: 'sun', sign: sun, longitude: sunLongitude, displayDegree: '15.0°', retrograde: false, uncertainty: input.birthTimeCertainty === 'exact' ? 'low' : 'medium' },
+          { id: 'natal.moon', body: 'moon', sign: moon, longitude: moonLongitude, displayDegree: '15.0°', retrograde: false, uncertainty }
+        ],
+        aspects: [],
+        humanDesign: {
+          personalityActivations: input.birthTimeCertainty === 'unknown'
+            ? []
+            : [{ id: 'hd.personality.sun', body: 'sun', gate, line: 1, uncertainty }]
+        },
+        geneKeys: {
+          activations: input.birthTimeCertainty === 'unknown'
+            ? []
+            : [{ id: 'gk.activation.sun', body: 'sun', activation: gate, uncertainty }]
+        },
+        numerology: [
+          { id: 'numerology.lifePath', key: 'lifePath', value: reduceNumber(year + month + day), uncertainty: 'low' },
+          { id: 'numerology.birthDay', key: 'birthDay', value: reduceNumber(day), uncertainty: 'low' }
+        ],
+        houses: null,
+        provenance: {
+          astronomy: 'Sanitized development fixture',
+          observerCenter: 'Fixture',
+          timezoneResolution: 'Fixture UTC',
+          birthTimeCertainty: input.birthTimeCertainty,
+          rawBirthInputReturned: false,
+          exactPrivateLocationReturned: false,
+          completeHumanDesignClaimed: false,
+          completeGeneKeysClaimed: false,
+          housesClaimed: false
+        }
+      },
       natalPlacements: { sun, moon, ...(ascendant ? { ascendant } : {}) },
       houses: null,
       aspects: ascendant ? [`Sun ${sun} square Ascendant ${ascendant}`] : [],
-      humanDesign: ascendant ? { status: 'fixture-only', gate: day } : null,
-      geneKeys: input.birthTimeCertainty === 'unknown' ? {} : { status: 'fixture-only', activation: ((month * 6 + day) % 64) + 1 },
+      humanDesign: ascendant ? { personalityGates: { sun: { gate, line: 1 } } } : null,
+      geneKeys: input.birthTimeCertainty === 'unknown' ? {} : { activations: { sun: gate } },
       numerology: { lifePath: reduceNumber(year + month + day), birthDay: reduceNumber(day) },
       currentAstronomy: {},
       baselineTendency: 'Development fixture only: a reduced interpretive tendency is available.',
       interpretiveSignals: [`Sun in ${sun}`, `Moon in ${moon}`],
-      sourceTimestamp: new Date().toISOString(),
+      sourceTimestamp: computedAt,
       provenance: { fixture: true, rawBirthInputReturned: false, birthplaceSentToExternalProvider: false }
     };
   } };
@@ -105,6 +164,7 @@ function reduceComputedBaseline(certainty: BirthTimeCertainty, computed: Baselin
       ...modelSafeContext(certainty, 'computed', availability),
       baselineTendency: computed.baselineTendency,
       interpretiveSignals: computed.interpretiveSignals,
+      sourceData: computed.sourceData,
       deterministicCalculation: {
         natalPlacements: computed.natalPlacements,
         houses: computed.houses,
@@ -134,8 +194,26 @@ export async function persistBaseline(env: Env, accountId: string, input: Baseli
     locationPrecision: input.locationPrecision ?? 'city_or_regional'
   };
   const inputHash = await sha256(JSON.stringify(protectedInput));
+  const parsedSource = baselineSourceDataSchema.safeParse(asRecord(computed.reducedContext).sourceData);
+  let facetProfile = null;
+  if (parsedSource.success) {
+    facetProfile = await ensureBaselineFacetProfile(env, {
+      accountId,
+      inputHash,
+      source: parsedSource.data
+    }).catch(() => null);
+    (computed.reducedContext as Record<string, unknown>).facetProfile = facetProfile;
+    (computed.reducedContext as Record<string, unknown>).facetProfileStatus = facetProfile ? 'ready' : 'pending';
+  }
   await env.DB.prepare(`INSERT OR REPLACE INTO baseline_onboarding (account_id, input_hash, protected_input_json, reduced_context_json, computation_version, provenance_json, status, uncertainty, last_computed_at, provider_status, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, datetime('now'))`).bind(accountId, inputHash, JSON.stringify(protectedInput), JSON.stringify(computed.reducedContext), computed.computationVersion, JSON.stringify(computed.provenance), computed.status, computed.uncertainty, computed.providerStatus).run();
-  return { status: computed.status, uncertainty: computed.uncertainty, reducedContext: computed.reducedContext, provenance: computed.provenance, computationVersion: computed.computationVersion };
+  return {
+    status: computed.status,
+    uncertainty: computed.uncertainty,
+    reducedContext: computed.reducedContext,
+    facetProfileStatus: facetProfile ? 'ready' : 'pending',
+    provenance: computed.provenance,
+    computationVersion: computed.computationVersion
+  };
 }
 
 export async function computeConfiguredBaseline(env: Env, input: BaselineInput) {
@@ -154,23 +232,44 @@ export async function getBaselineStatus(env: Env, accountId: string) {
 
 export async function computeCurrentConditions(env: Env, accountId: string, mode: LocationPrecision, input: CurrentLocationInput = {}) {
   if (mode === 'none') return unavailableCurrentConditions(mode, 'Location permission is not enabled.');
-  const latitude = Number(input.latitude ?? env.CURRENT_CONDITIONS_LAT);
-  const longitude = Number(input.longitude ?? env.CURRENT_CONDITIONS_LNG);
-  if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-    return unavailableCurrentConditions(mode, 'A permitted current location is required.');
-  }
-  const precision = mode === 'ephemeral_current' ? 'ephemeral' : mode === 'approximate' ? 'region' : 'city';
-  try {
-    const current = await computeReducedCurrentConditions(env, { accountId, location: { latitude, longitude, precision } });
-    const person = await env.DB.prepare('SELECT id FROM persons WHERE account_id = ? ORDER BY created_at LIMIT 1').bind(accountId).first<{ id: string }>();
-    if (person?.id) {
-      await env.DB.prepare('INSERT INTO current_conditions (id, person_id, computed_at, location_hash, conditions_json, source_ref, precision_used, provider_status) VALUES (?, ?, datetime(\'now\'), ?, ?, ?, ?, ?)')
-        .bind(`current_${crypto.randomUUID()}`, person.id, null, JSON.stringify(current), current.source, mode, 'computed').run();
+  const geocentric = mode === 'geocentric';
+  let location: { latitude: number; longitude: number; precision: 'city' | 'region' | 'ephemeral' } | undefined;
+  if (!geocentric) {
+    const latitude = Number(input.latitude ?? env.CURRENT_CONDITIONS_LAT);
+    const longitude = Number(input.longitude ?? env.CURRENT_CONDITIONS_LNG);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      return unavailableCurrentConditions(mode, 'A permitted current location is required.');
     }
+    const precision = mode === 'ephemeral_current' ? 'ephemeral' : mode === 'approximate' ? 'region' : 'city';
+    location = { latitude, longitude, precision };
+  }
+  try {
+    const baseline = await getBaselineStatus(env, accountId);
+    const source = baselineSourceDataSchema.safeParse(asRecord(asRecord(baseline).reducedContext).sourceData);
+    const current = await computeReducedCurrentConditions(env, {
+      accountId,
+      perspective: geocentric ? 'geocentric' : 'topocentric',
+      ...(location ? { location } : {}),
+      ...(source.success ? { natalBodies: source.data.natalBodies } : {})
+    });
+    const person = await env.DB.prepare(`SELECT id FROM persons
+      WHERE account_id = ? AND role = 'self'
+      ORDER BY created_at LIMIT 1`).bind(accountId).first<{ id: string }>();
+    if (!person?.id) throw new Error('Self person record unavailable');
+    await env.DB.prepare('INSERT INTO current_conditions (id, person_id, computed_at, location_hash, conditions_json, source_ref, precision_used, provider_status) VALUES (?, ?, datetime(\'now\'), ?, ?, ?, ?, ?)')
+      .bind(`current_${crypto.randomUUID()}`, person.id, null, JSON.stringify(current), current.source, mode, 'computed').run();
     return { source: current.source, computedAt: current.computedAt, precisionUsed: mode, providerStatus: 'computed', reduced: current };
   } catch {
     return unavailableCurrentConditions(mode, 'Current astronomy is temporarily unavailable.');
   }
+}
+
+export async function clearCurrentConditions(env: Env, accountId: string) {
+  await env.DB.prepare(`DELETE FROM current_conditions
+    WHERE person_id IN (SELECT id FROM persons WHERE account_id = ?)`)
+    .bind(accountId)
+    .run();
+  return { status: 'not_started' as const, removed: true };
 }
 
 function unavailableCurrentConditions(mode: LocationPrecision, reason: string) {
@@ -185,13 +284,27 @@ export async function getLatestCurrentConditions(env: Env, accountId: string) {
     ORDER BY cc.computed_at DESC
     LIMIT 1`).bind(accountId).first<{ computed_at: string; conditions_json: string; precision_used: string; provider_status: string }>();
   if (!row) return { status: 'not_started', providerStatus: 'unavailable', reduced: null };
-  return { status: row.provider_status === 'computed' ? 'ready' : 'unavailable', providerStatus: row.provider_status, precisionUsed: row.precision_used, computedAt: row.computed_at, reduced: JSON.parse(row.conditions_json) };
+  const reduced = JSON.parse(row.conditions_json) as Record<string, unknown>;
+  const expiresAt = typeof reduced.expiresAt === 'string' ? Date.parse(reduced.expiresAt) : 0;
+  const expired = !expiresAt || expiresAt <= Date.now();
+  return {
+    status: row.provider_status === 'computed' && !expired ? 'ready' : expired ? 'expired' : 'unavailable',
+    providerStatus: row.provider_status,
+    precisionUsed: row.precision_used,
+    computedAt: row.computed_at,
+    expired,
+    reduced
+  };
 }
 
 export async function getModelSafeBaselineContext(env: Env, accountId: string) {
-  const [baseline, current] = await Promise.all([getBaselineStatus(env, accountId), getLatestCurrentConditions(env, accountId)]);
+  const [baseline, current, cachedFacetProfile] = await Promise.all([
+    getBaselineStatus(env, accountId),
+    getLatestCurrentConditions(env, accountId),
+    getCachedBaselineFacetProfile(env, accountId)
+  ]);
   return {
-    baseline: sanitizeBaselineForModel(baseline),
+    baseline: sanitizeBaselineForModel(baseline, cachedFacetProfile),
     current: sanitizeCurrentForModel(current),
     separation: [
       'Baseline tendency is enduring interpretive context, not diagnosis or proof.',
@@ -202,12 +315,23 @@ export async function getModelSafeBaselineContext(env: Env, accountId: string) {
   };
 }
 
-function sanitizeBaselineForModel(value: unknown) {
+function sanitizeBaselineForModel(value: unknown, cachedFacetProfile: unknown) {
   const baseline = asRecord(value);
   const reduced = asRecord(baseline.reducedContext);
-  const calculation = asRecord(reduced.deterministicCalculation);
   const provenance = asRecord(baseline.provenance);
   if (baseline.status === 'not_started') return { status: 'not_started' };
+  const parsedSource = baselineSourceDataSchema.safeParse(reduced.sourceData);
+  const sourceData = parsedSource.success ? parsedSource.data : null;
+  const registry = sourceData ? buildBaselineBasisRegistry(sourceData) : [];
+  const parsedProfile = baselineFacetProfileSchema.safeParse(cachedFacetProfile ?? reduced.facetProfile);
+  let facetProfile = null;
+  if (sourceData && parsedProfile.success) {
+    try {
+      facetProfile = validateFacetProfileBasis(parsedProfile.data, registry);
+    } catch {
+      facetProfile = null;
+    }
+  }
   return {
     status: baseline.status,
     uncertainty: baseline.uncertainty,
@@ -223,21 +347,12 @@ function sanitizeBaselineForModel(value: unknown) {
       sovvRuntimeDependency: false
     },
     reducedContext: {
-      baselineTendency: reduced.baselineTendency,
-      currentAmplification: reduced.currentAmplification,
-      userObservation: reduced.userObservation,
-      interpretiveSignals: reduced.interpretiveSignals,
-      systemInference: reduced.systemInference,
+      facetProfileStatus: facetProfile ? 'ready' : 'incomplete',
+      facetProfile,
       uncertainty: reduced.uncertainty,
       unknownActualState: reduced.unknownActualState,
-      deterministicCalculation: {
-        natalPlacements: calculation.natalPlacements,
-        aspects: calculation.aspects,
-        humanDesign: calculation.humanDesign,
-        geneKeys: calculation.geneKeys,
-        numerology: calculation.numerology
-      },
-      interpretiveFramework: reduced.interpretiveFramework
+      sourceData,
+      basisRegistry: registry,
     }
   };
 }
@@ -258,11 +373,11 @@ function sanitizeCurrentForModel(value: unknown) {
       source: reduced.source,
       locationPrecisionUsed: reduced.locationPrecisionUsed,
       activeFactors: reduced.activeFactors,
-      affectedBaselineDimensions: reduced.affectedBaselineDimensions,
-      amplification: reduced.amplification,
+      currentToNatalContacts: reduced.currentToNatalContacts,
+      affectedBaselineFacetIds: reduced.affectedBaselineFacetIds,
       uncertainty: reduced.uncertainty,
-      safeLabels: reduced.safeLabels,
       separations: reduced.separations,
+      basisRegistry: current.status === 'ready' ? buildCurrentBasisRegistry(reduced) : [],
       baselineTendency: reduced.baselineTendency,
       possibleCurrentAmplification: reduced.possibleCurrentAmplification,
       knownObservation: reduced.knownObservation,
@@ -273,4 +388,51 @@ function sanitizeCurrentForModel(value: unknown) {
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' ? value as Record<string, unknown> : {};
+}
+
+function buildCurrentBasisRegistry(value: Record<string, unknown>): BasisRegistryItem[] {
+  const computedAt = typeof value.computedAt === 'string' ? value.computedAt : new Date(0).toISOString();
+  const provenance = value.source === 'OPENAPI_PORTED_HORIZONS'
+    ? 'Server current-position calculation'
+    : value.source === 'OPENAPI_SANITIZED_FIXTURE'
+      ? 'Sanitized development fixture'
+      : 'Current astronomical calculation';
+  const bodies = Array.isArray(value.activeFactors) ? value.activeFactors : [];
+  const contacts = Array.isArray(value.currentToNatalContacts) ? value.currentToNatalContacts : [];
+  const bodyGlyphs: Record<string, string> = { sun: '☉', moon: '☾', mercury: '☿', venus: '♀', mars: '♂', jupiter: '♃', saturn: '♄', uranus: '♅', neptune: '♆', pluto: '♇', chiron: '⚷' };
+  const signCodes: Record<string, string> = { Aries: 'ARI', Taurus: 'TAU', Gemini: 'GEM', Cancer: 'CAN', Leo: 'LEO', Virgo: 'VIR', Libra: 'LIB', Scorpio: 'SCO', Sagittarius: 'SAG', Capricorn: 'CAP', Aquarius: 'AQU', Pisces: 'PIS' };
+  const aspectGlyphs: Record<string, string> = { conjunction: '☌', sextile: '⚹', square: '□', trine: '△', opposition: '☍' };
+  const items: BasisRegistryItem[] = [];
+  for (const raw of bodies) {
+    const factor = asRecord(raw);
+    if (typeof factor.id !== 'string' || typeof factor.body !== 'string' || typeof factor.sign !== 'string' || typeof factor.displayDegree !== 'string') continue;
+    const symbol = bodyGlyphs[factor.body] ?? factor.body;
+    items.push({
+      id: factor.id,
+      category: 'live',
+      display: `LIVE ${symbol} ${signCodes[factor.sign] ?? factor.sign.slice(0, 3).toUpperCase()} ${factor.displayDegree}${factor.retrograde === true ? 'R' : ''}`,
+      accessibleLabel: `Current ${factor.body} in ${factor.sign} at ${factor.displayDegree}${factor.retrograde === true ? ', retrograde' : ''}`,
+      computedAt,
+      uncertainty: factor.uncertainty === 'low' || factor.uncertainty === 'medium' ? factor.uncertainty : 'high',
+      provenance,
+      subject: 'self'
+    });
+  }
+  for (const raw of contacts) {
+    const contact = asRecord(raw);
+    if (typeof contact.id !== 'string' || typeof contact.currentBody !== 'string' || typeof contact.natalBody !== 'string' || typeof contact.aspect !== 'string' || typeof contact.orb !== 'number') continue;
+    const currentGlyph = bodyGlyphs[contact.currentBody] ?? contact.currentBody;
+    const natalGlyph = bodyGlyphs[contact.natalBody] ?? contact.natalBody;
+    items.push({
+      id: contact.id,
+      category: 'live',
+      display: `LIVE ${currentGlyph} ${aspectGlyphs[contact.aspect] ?? contact.aspect} ${natalGlyph} ${contact.orb.toFixed(1)}°`,
+      accessibleLabel: `Current ${contact.currentBody} ${contact.aspect} natal ${contact.natalBody}, ${contact.orb.toFixed(1)} degree orb`,
+      computedAt,
+      uncertainty: contact.uncertainty === 'low' || contact.uncertainty === 'medium' ? contact.uncertainty : 'high',
+      provenance,
+      subject: 'self'
+    });
+  }
+  return items;
 }

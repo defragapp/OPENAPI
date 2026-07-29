@@ -1,168 +1,134 @@
 # Sovereign.OS canonical product positioning
 
-This document is the source of truth for public product language, authenticated surface copy, launch materials, and future implementation work.
-
-It defines what Sovereign.OS is. It is not a release-status document and does not mean every described capability is enabled for every plan or environment. Public claims must still be checked against current implementation and entitlements before deployment.
+This document is the source of truth for public language, authenticated surface copy, and product implementation. Claims remain subject to live entitlements and deterministic privacy and consent enforcement.
 
 ## Core position
 
 **Know yourself. Understand the system. Choose what fits.**
 
-Sovereign.OS is a personal and relational intelligence platform powered by Baseline Design.
+Sovereign.OS is a Baseline-first AI platform for understanding yourself, your relationships, and the human systems around you.
 
-It helps people understand who they are, explore the shadow and light expressions of their design, examine whether decisions, behaviors, relationships, and directions are aligned for them, and understand how multiple people function together inside relationships, families, teams, and other human systems.
+Baseline Design is the persistent personal intelligence foundation. It gives Sovereign an explorable reference for identity and purpose; communication; decision-making; learning; creativity; love and connection; leadership; boundaries; responsibility; conflict and repair; responses to pressure and change; underused capacity; Shadow; Gift; Alignment; current relevance; consented relationships; and roles inside a family, household, team, workplace, friendship group, or other system.
 
-For users who choose it, Sovereign.OS can also connect personal and relational exploration with Christian teachings and clearly cited biblical scripture through the optional Covenant lens.
+A user does not need to report a problem before the product becomes useful.
 
-## Baseline Design
+## Core capabilities
 
-Baseline Design is the personal intelligence framework at the center of Sovereign.OS.
+### Understand yourself
 
-Using the platform’s natal-data framework, it translates complex source information into a practical understanding of:
+Users may ask what qualities are central, what they naturally notice or carry, how they communicate and decide, which capacities are underused or overextended, and why one part of themselves is difficult to understand.
 
-- core archetypal qualities and roles;
-- natural strengths and underused capacities;
-- communication and decision-making tendencies;
-- emotional and relational orientation;
-- responses to pressure, change, responsibility, and uncertainty;
-- shadow and light expressions;
-- roles or qualities becoming more relevant in the present;
-- interactions between one person’s design and another person’s design.
+### Understand what is active now
 
-A user does not need to arrive with a problem for Sovereign.OS to be useful. A specific situation is optional application context—not the definition of the product.
+The Baseline stays stable. Current astronomical conditions add an expiring, time-sensitive layer. They may make a theme more relevant; they do not establish behavior, motive, emotion, or outcome.
 
-## Primary capability areas
+Current context is off until the user enables it. The product uses Earth-geocentric current positions without requesting device location, expires the context after six hours, and lets the user remove it immediately.
 
-### Explore yourself
+### Explore Shadow and Gift
 
-Users can explore their full Baseline Design in plain language, including identity, strengths, communication, creativity, leadership, boundaries, responsibility, relationships, decision-making, pressure, change, and development.
+**Shadow** is how a valid quality may narrow, distort, protect, avoid, or overreach under pressure.
 
-### Explore shadow and light
+**Gift** is what the same quality makes possible when it is used with awareness and choice.
 
-The same underlying quality may appear as protection, avoidance, overcompensation, distortion, integration, or strength. Shadow and light are different expressions of the same part of the person—not separate identities or moral labels.
+Shadow and Gift are not bad and good identities. The product must make each expression specific and behavioral.
 
-### Examine alignment
+### Examine Alignment
 
-Users can consider whether a decision, behavior, relationship, opportunity, environment, or direction fits their deeper design.
+Alignment is not a score or rule. It is a way to examine whether a choice, behavior, relationship, opportunity, or direction fits the person a user is and the person they are becoming.
 
-Sovereign.OS helps the user distinguish clarity from fear, growth from self-abandonment, responsibility from overfunctioning, and an integrated strength from its shadow expression. It does not choose for the user.
+A useful Alignment answer distinguishes:
 
-### Understand relationships
+- what supports the fit;
+- what pulls against it;
+- the real tradeoff;
+- what information is still needed;
+- a closer version that better preserves the user’s underlying intention.
 
-Two Baseline Designs can be considered together to explore needs, roles, communication, attraction, tension, compatibility, defenses, accountability, mutual influence, and what each person may be unable to see from their own position.
+Sovereign does not choose for the user.
 
-The purpose is perspective—not compatibility scoring and not deciding who is right.
+### Understand a relationship
 
-### Map families and human systems
+With permission from both people, Sovereign may compare relevant structured Baseline facets and help explain:
 
-Multiple Baseline Designs can be included in a family, household, friendship group, team, workplace, or community view.
+- what each person may be bringing;
+- different communication or processing routes;
+- shared needs;
+- interaction pressure;
+- what each person can own;
+- what remains unconfirmed and must be asked directly.
 
-System exploration may consider roles, authority, responsibility, caregiving, dependence, loyalty, pressure, alliances, recurring expectations, and how one person’s change affects everyone else.
+This is relational perspective, not compatibility scoring, mind-reading, or a verdict about who is right. Understanding, agreement, forgiveness, reconciliation, restored trust, and continued contact remain separate.
 
-The central system question is not only “Who caused this?” but also “How is this functioning, and what is each person contributing?”
+### Understand a system
 
-### See from the other side
+With consented participants and explicit role context, Sovereign may examine stabilizing and change roles, pressure carriers, authority, responsibility, caregiving, dependence, constraints, shared objectives, expectations, and missing perspectives.
 
-Sovereign.OS can help a user understand how another person may experience the same relationship without requiring the user to abandon their own experience or excuse harm.
+The central question is: **How is this functioning, and what is each person contributing?**
 
-Understanding, agreement, forgiveness, reconciliation, trust, and continued contact must remain distinct.
+Formal roles and factual responsibilities may be shown as facts only when supplied or confirmed. A role inferred from a Baseline must remain a possibility.
 
-### Explore Christian and biblical meaning
+### Explore through Covenant
 
-Covenant is an optional, explicit lens for exploring personal and relational questions through Christian teachings and biblical scripture.
+Covenant is a contextual, optional capability. It is not a top-level application or the default identity of the platform.
 
-It may support reflection on responsibility, truth, compassion, forgiveness, reconciliation, boundaries, accountability, pride, humility, fear, faith, resentment, service, discernment, family roles, generational influence, and repair.
+A grounded answer remains complete without Covenant. When a relevant personal, relationship, or family dynamic is recognized, Sovereign may quietly offer **Explore through Covenant**. It activates only after confirmation for the question.
 
-Scripture must be cited clearly and remain visibly distinct from Baseline Design interpretation. Sovereign.OS must not claim divine certainty, speak on behalf of God, or use scripture to justify shame, control, submission to harm, or a required relationship outcome.
+Covenant separates Biblical parallel, Scripture, teaching, application, and boundary. It uses only retrieved or deliberately curated verified passages. It never claims God’s exact intent, assigns moral status, proves motive, or requires contact, estrangement, forgiveness, reconciliation, submission, or continued exposure to harm.
 
-## Three connected levels
+## Information boundaries
 
-### Personal
+Sovereign preserves four layers:
 
-Understand the whole person: Baseline Design, archetypal qualities, shadow and light, choices, behaviors, relationships, internal tensions, and development.
+1. Exact source data deterministically calculated or returned by an authorized provider.
+2. Versioned Baseline facets interpreted from authorized exact values.
+3. Expiring current-condition context and deterministic contacts.
+4. Question-specific synthesis using relevant facets, exact Basis references, user-confirmed facts, consented context, and corrections.
 
-### Relational
-
-Bring two people together to explore communication, needs, roles, tension, connection, boundaries, accountability, and perspective.
-
-### System
-
-Map families, households, teams, groups, and communities to understand how multiple people and roles function together.
+The exact source layer does not measure personality. The facet layer is interpretive. The answer remains a possibility the user may confirm, correct, reject, or save.
 
 ## Product experience principles
 
-- Baseline Design is the foundation, not background decoration for a generic chatbot.
-- The platform must be useful without requiring the user to explain an incident.
-- Users should be able to ask ordinary questions without learning specialist prompts.
-- The same platform should support self, relationship, and system exploration without losing continuity.
-- Interpretations must remain possibilities for reflection, not deterministic verdicts.
-- The user can confirm, correct, reject, save, or remove what the platform presents.
-- Multi-person use requires explicit consent and clear provenance.
-- Another person’s motives, emotions, private experience, or future behavior must never be presented as known fact.
-- Covenant is off unless the user intentionally enables it.
-- Privacy, consent, and user agency are part of the product—not footnotes.
+- Give the direct answer first.
+- Provide meaningful value before asking a question.
+- Use two to five relevant sections for a normal answer.
+- Put depth behind a clear first viewport instead of collapsing the answer into a platitude.
+- Keep exact Basis data available but secondary.
+- Never let the model write or complete a Basis value.
+- Never display another person’s exact framework data without `framework.display`.
+- Never use a one-sided owner entry as access to another person’s private Baseline.
+- Keep the conversation dominant over workspace chrome.
+- Use one canonical authenticated workspace.
+- Keep users in control of correction, consent, continuity, and deletion.
 
-## Public product summary
+## Approved public summary
 
-One person is complex. A relationship is more complex. A family is an entire system.
+Sovereign.OS turns your Baseline Design into a living reference for how you decide, communicate, connect, respond under pressure, and grow. Ask what is active now. Examine a choice. Invite someone to compare perspectives. Map a family or team.
 
-Sovereign.OS helps make all three understandable.
+Plain-language insight first. Exact supporting data beneath it. You decide what fits.
 
-Explore your Baseline Design. Understand your shadow and light. Examine whether a choice or relationship fits who you are. Bring two people together to see both sides. Map an entire family or team to understand the roles, pressures, and relationships shaping the system.
+## Approved headline
 
-Then go deeper through the perspectives that matter to you—including Christian teachings and biblical scripture when you choose them.
+**Know yourself.**
 
-One platform for understanding the self, the relationship, and the whole human system.
+**Understand the system.**
 
-## Approved headline system
-
-Primary:
-
-**Know yourself. Understand the system. Choose what fits.**
-
-Supporting:
-
-- See yourself clearly. See the other side. See the whole system.
-- One person is complex. A relationship is more complex. A family is an entire system.
-- The same quality can become a shadow, a strength, or a turning point.
-- Alignment is not about following a rule. It is about recognizing what fits.
-- Understand what is yours, what is shared, and what the relationship creates between you.
-- A deeper understanding of you—and everyone your life includes.
+**Choose what fits.**
 
 ## Language to avoid
 
-Do not position Sovereign.OS as:
+Do not position Sovereign.OS as a generic chatbot, prediction product, compatibility score, scientific personality test, diagnosis, therapy replacement, incident-only coach, or source of hidden motives.
 
-- a generic chatbot;
-- an incident-analysis or message-analysis tool;
-- a product that begins only after the user describes what happened;
-- a compatibility score;
-- a personality quiz;
-- fortune telling;
-- diagnosis or therapy replacement;
-- a system that knows hidden motives or exact emotional states;
-- a product whose entire promise is one practical next step.
+Avoid:
 
-Avoid making these phrases central to public positioning:
+- “possible interaction vector”;
+- “calculated solution”;
+- “read” or “reading” as the product;
+- “your chart says”;
+- “the universe is telling you”;
+- “this transit means”;
+- “choose yourself”;
+- “return to yourself”;
+- “do the work”;
+- “one clean next move” as the whole value.
 
-- “read” or “current read”;
-- “tell us what happened”;
-- “computed first / revealed first / conversation second”;
-- “describe the moment” as the primary onboarding model;
-- “one next move” as the overall platform promise.
-
-## Brand voice
-
-Sovereign.OS should sound:
-
-- intelligent without sounding academic;
-- insightful without claiming certainty;
-- personal without becoming intrusive;
-- spiritual without becoming vague;
-- Christian when intentionally selected, never by default;
-- calm without becoming clinical;
-- direct without becoming reductive;
-- aspirational without making impossible promises;
-- confident without announcing a verdict about the user.
-
-The platform should help users recognize themselves and understand the systems around them. It should never reduce a person to a fixed label.
+The brand voice is intelligent, direct, calm, adult, specific, and careful about uncertainty. It should never reduce a person to a fixed label.

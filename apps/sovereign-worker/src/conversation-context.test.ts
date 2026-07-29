@@ -42,4 +42,33 @@ describe('conversation context input', () => {
     expect(encoded).toContain('Other person');
     expect(encoded).toContain('baselineTendency');
   });
+
+  it('preserves safe facet identity and distinct pseudonymous system references', () => {
+    const projected = projectModelSafeConversationContext({
+      participants: [
+        {
+          key: 'member_1',
+          label: 'Private Name',
+          facets: [{
+            id: 'communication',
+            title: 'Communication',
+            description: 'A permitted interpretive facet.',
+            basisRefs: ['member_1.natal.mercury']
+          }]
+        }
+      ],
+      relationshipGraph: [
+        { from: 'you', to: 'member_1', type: 'responsibility' },
+        { from: 'member_1', to: 'member_2', type: 'communication' }
+      ]
+    }) as Record<string, any>;
+
+    expect(projected.participants[0].label).toBe('Participant 1');
+    expect(projected.participants[0].facets[0].id).toBe('communication');
+    expect(projected.relationshipGraph).toEqual([
+      { from: 'You', to: 'Participant 1', type: 'responsibility' },
+      { from: 'Participant 1', to: 'Participant 2', type: 'communication' }
+    ]);
+    expect(JSON.stringify(projected)).not.toContain('Private Name');
+  });
 });

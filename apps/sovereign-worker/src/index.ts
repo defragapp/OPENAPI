@@ -15,7 +15,7 @@ import { addSystemMember, analyzeSystem, cancelDeletionJob, createDeletionJob, c
 import { createCheckoutSession, createPortalSession, normalizeStripeFixtureEvent, projectSubscriptionEvent, type BillingInterval } from './billing/stripe';
 import { getAiUsage, reserveAiTurn } from './billing/usage';
 import { requestMagicLink, redeemMagicLink, logout } from './auth-public';
-import { computeCurrentConditions, getBaselineStatus, getModelSafeBaselineContext, persistBaseline, type LocationPrecision } from './baseline';
+import { clearCurrentConditions, computeCurrentConditions, getBaselineStatus, getModelSafeBaselineContext, parseLocationPrecision, persistBaseline, type LocationPrecision } from './baseline';
 import { runDueJobs, runOneJob } from './jobs';
 import { applyBiblicalLens, assertCovenantSafe, retrieveScripture } from './covenant/scripture';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
@@ -33,7 +33,7 @@ async function healthPayload(env: Env) {
     ok: db?.ok === 1,
     version: env.APP_VERSION,
     environment: env.APP_ENV,
-    migrationVersion: '0010_account_onboarding_and_chat_history',
+    migrationVersion: '0012_baseline_facets_and_answer_v2',
     dependencies: {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
       durableObjects: env.THREADS ? 'configured' : 'missing',
@@ -271,7 +271,13 @@ app.post('/api/v1/current-conditions', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
   const body = await context.req.json<{ locationPrecision?: LocationPrecision }>();
-  return context.json({ current: await computeCurrentConditions(context.env, auth.accountId, body.locationPrecision ?? 'none') });
+  return context.json({ current: await computeCurrentConditions(context.env, auth.accountId, parseLocationPrecision(body.locationPrecision ?? 'none')) });
+});
+
+app.delete('/api/v1/current-conditions', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ current: await clearCurrentConditions(context.env, auth.accountId) });
 });
 
 app.post('/api/v1/export-jobs', async (context) => {

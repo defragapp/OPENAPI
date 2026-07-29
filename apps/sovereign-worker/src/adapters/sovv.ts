@@ -131,8 +131,12 @@ export async function getCurrentConditions(env: Env, personId: string): Promise<
     uncertainty: reduced.uncertainty,
     data: {
       status: reduced.source === 'OPENAPI_SANITIZED_FIXTURE' ? 'degraded' : 'ready',
-      headline: reduced.amplification.quality,
-      amplifications: reduced.activeFactors.map((factor) => ({ name: factor.label, effect: `${factor.quality}; relative strength ${factor.relativeStrength}/100`, certainty: reduced.uncertainty === 'low' ? 'medium' : 'low' })),
+      headline: 'Exact current positions are available as temporary context.',
+      amplifications: reduced.activeFactors.map((factor) => ({
+        name: `${factor.body} in ${factor.sign} at ${factor.displayDegree}${factor.retrograde ? ' retrograde' : ''}`,
+        effect: `May make these Baseline facets more relevant: ${factor.affectedFacetIds.join(', ')}. This does not establish behavior.`,
+        certainty: factor.uncertainty === 'low' ? 'medium' : 'low'
+      })),
       unknowns: [reduced.separations.unknownActualState],
       sourceRefs: ['OPENAPI:apps/sovereign-worker/src/current-conditions/current.ts', ...reduced.provenance.referenceFiles]
     }

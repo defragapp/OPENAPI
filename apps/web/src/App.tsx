@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { PlanOnboarding } from './PlanOnboarding';
-import { SovereignWorkspace } from './SovereignWorkspace';
+import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
 
 type ConsentDecision = 'granted' | 'denied';
 type TurnstileState = 'loading' | 'ready' | 'verified' | 'expired' | 'error' | 'unsupported';
@@ -34,7 +34,7 @@ export function App() {
   }
   if (path === '/invitation') return <InvitationPage />;
   if (path === '/onboarding') return <PlanOnboarding />;
-  return <SovereignWorkspace />;
+  return <SovereignIntelligenceWorkspace />;
 }
 
 function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
@@ -190,17 +190,17 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
           <p className="eyebrow">{mode === 'login' ? 'YOUR SOVEREIGN.OS' : 'START WITH YOUR BASELINE'}</p>
           <h1>
             {mode === 'signup'
-              ? 'Understand your life in context.'
+              ? 'Create your Sovereign.OS account.'
               : mode === 'redeem'
                 ? 'Opening Sovereign.OS.'
-                : 'Welcome back.'}
+                : 'Sign in to Sovereign.OS.'}
           </h1>
           <p className="lede">
             {mode === 'signup'
-              ? 'Create your account, choose how you want to begin, and build the personal foundation beneath every exploration.'
+              ? 'Start free. Verify your email, then build your Baseline.'
               : mode === 'redeem'
-                ? 'Your private Sovereign.OS will open in a moment.'
-                : 'Return to your Baseline, the questions you were exploring, and the understandings you chose to keep.'}
+                ? 'Your Sovereign.OS workspace will open in a moment.'
+                : 'Use your email and the available secure sign-in method for your account.'}
           </p>
           {mode !== 'redeem' && (
             <ul className="account-points">
@@ -213,13 +213,13 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
 
         <section className="auth-panel">
           <p className="eyebrow">{mode === 'signup' ? 'START FREE' : mode === 'redeem' ? 'OPENING' : 'SIGN IN'}</p>
-          <h2>{mode === 'signup' ? 'Create your account.' : mode === 'redeem' ? 'One moment.' : 'Continue into Sovereign.OS.'}</h2>
+          <h2>{mode === 'signup' ? 'Create your Sovereign.OS account.' : mode === 'redeem' ? 'One moment.' : 'Sign in to Sovereign.OS.'}</h2>
           <p className="auth-explainer">
             {mode === 'signup'
-              ? 'Confirm your email, choose Free or Sovereign+, and enter your private personal intelligence environment.'
+              ? 'Start free. Verify your email, then build your Baseline.'
               : mode === 'redeem'
                 ? 'This should take only a moment.'
-                : 'Enter your email. We will send a private, one-time link that returns you to Sovereign.OS.'}
+                : 'Use your email and the available secure sign-in method for your account.'}
           </p>
           {mode !== 'redeem' && (
             <form onSubmit={submit} className="form-stack" noValidate>

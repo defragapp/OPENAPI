@@ -12,10 +12,11 @@ import { reserveAiTurn } from './billing/usage';
 import { runSovereignResult } from './agent/sovereign';
 import { saveLatestInsightModule } from './db/insight-modules';
 import { canUseDevelopmentFixtures } from './runtime';
-import { computeCurrentConditions, type CurrentLocationInput, type LocationPrecision } from './baseline';
+import { clearCurrentConditions, computeCurrentConditions, parseLocationPrecision, type CurrentLocationInput, type LocationPrecision } from './baseline';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import { authorizeConversationContext, parseConversationContext } from './conversation-context';
 import { buildInterfaceActions } from './interface-actions';
+import type { SovereignAnswerAction } from './agent/recognition';
 
 app.post('/api/v1/people/:personId/invitations/send', async (context) => {
   requireSameOrigin(context.req.raw);
@@ -146,10 +147,17 @@ const worker = {
           current: await computeCurrentConditions(
             env,
             auth.accountId,
-            body.locationPrecision ?? 'none',
+            parseLocationPrecision(body.locationPrecision ?? 'none'),
             location
           )
         });
+        return secure(response);
+      }
+
+      if (request.method === 'DELETE' && url.pathname === '/api/v1/current-conditions') {
+        requireSameOrigin(request);
+        const auth = await requireAuth(request, env);
+        response = Response.json({ current: await clearCurrentConditions(env, auth.accountId) });
         return secure(response);
       }
 
@@ -158,7 +166,11 @@ const worker = {
         const payload = await response.json() as Record<string, unknown>;
         const headers = new Headers(response.headers);
         headers.delete('content-length');
-        response = Response.json({ ...payload, migrationVersion: '0010_account_onboarding_and_chat_history', recognitionContract: 'inner-recognition-v1' }, { status: response.status, headers });
+        response = Response.json({
+          ...payload,
+          migrationVersion: '0012_baseline_facets_and_answer_v2',
+          answerContract: 'sovereign-answer.v2'
+        }, { status: response.status, headers });
       }
       return secure(response);
     } catch (error) {
@@ -172,38 +184,11 @@ function secure(response: Response): Response {
   return withSecurityHeaders(response);
 }
 
-function encodeVisualStoryHeader(value: unknown): string {
+function encodeMetadataHeader(value: unknown): string {
   const bytes = new TextEncoder().encode(JSON.stringify(value));
   let binary = '';
   for (const byte of bytes) binary += String.fromCharCode(byte);
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
-}
-
-function compactVisualStoryPayload(plan: {
-  visual_story: unknown;
-  basis: {
-    user_confirmed: boolean;
-    human_design: string[];
-    gene_keys: string[];
-    astrology: string[];
-    relationship: string[];
-    live: string[];
-    numerology: string[];
-  };
-}): unknown {
-  const compact = (values: string[]) => values.slice(0, 2).map((value) => value.slice(0, 96));
-  return {
-    story: plan.visual_story,
-    basis: {
-      user_confirmed: plan.basis.user_confirmed,
-      human_design: compact(plan.basis.human_design),
-      gene_keys: compact(plan.basis.gene_keys),
-      astrology: compact(plan.basis.astrology),
-      relationship: compact(plan.basis.relationship),
-      live: compact(plan.basis.live),
-      numerology: compact(plan.basis.numerology)
-    }
-  };
 }
 
 async function handleRecognitionMessage(request: Request, env: Env, threadId: string): Promise<Response> {
@@ -242,18 +227,38 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'failed', 'gateway_unavailable');
       return Response.json({ error: 'Sovereign is temporarily unavailable. Your message remains in this private conversation, but no response was generated.' }, { status: 503 });
     }
-    const fallback = 'WHAT I NOTICE\n\nThe OPENAPI Baseline fixture is available for development checks, but live provider output is not assumed here.\n\nLOOK INWARD\n\nWhat changed inside you when this happened?';
-    await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_development_response', { developmentFallback: true, text: fallback }, traceId);
+    const fallback = {
+      version: 'sovereign-answer.v2' as const,
+      mode: 'baseline' as const,
+      depth: 'focused' as const,
+      headline: 'Your Baseline is still being prepared.',
+      direct_answer: 'The development fixture cannot provide a personalized interpretation until the structured Baseline facets are available. No quality or current state is being guessed.',
+      sections: [
+        { id: 'unknowns' as const, label: 'Still needed', body: 'Complete the Baseline calculation, then ask this question again.' }
+      ],
+      basis_refs: [],
+      correction_prompt: 'Nothing has been saved as an interpretation.',
+      actions: [],
+      confidence: 'exploratory' as const,
+      safety_mode: 'standard' as const
+    };
+    const fallbackText = `${fallback.headline}\n\n${fallback.direct_answer}\n\nSTILL NEEDED\n\n${fallback.sections[0]!.body}`;
+    await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_development_response', {
+      developmentFallback: true,
+      text: fallbackText,
+      answer: fallback,
+      basis: []
+    }, traceId);
     await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'completed');
-    return new Response(fallback, {
-      status: 202,
-      headers: {
-        'content-type': 'text/plain; charset=utf-8',
-        'cache-control': 'private, no-store',
-        'x-sovereign-plan': entitlements.plan,
-        'x-sovereign-response-phase': 'question'
-      }
-    });
+    return request.headers.get('accept')?.includes('application/vnd.sovereign.answer+json')
+      ? Response.json({ answer: fallback, basis: [], interfaceActions: { version: 2, primary: null, contextual: [], confirmationRequired: true } }, {
+          status: 202,
+          headers: { 'cache-control': 'private, no-store', 'x-sovereign-plan': entitlements.plan, 'x-sovereign-answer-version': 'sovereign-answer.v2' }
+        })
+      : new Response(fallbackText, {
+          status: 202,
+          headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'private, no-store', 'x-sovereign-plan': entitlements.plan, 'x-sovereign-answer-version': 'sovereign-answer.v2' }
+        });
   }
 
   const usage = await reserveAiTurn(env, auth.accountId, entitlements.plan);
@@ -268,17 +273,23 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       ...(authorizedContext !== undefined ? { authorizedContext } : {})
     });
     const interfaceActions = buildInterfaceActions(message, selection, entitlements);
-    const visualStory = result.plan.visual_story.should_show ? compactVisualStoryPayload(result.plan) : null;
-    const moduleOffer = result.plan.module_suggestion.should_offer && result.plan.module_suggestion.title
-      ? { title: result.plan.module_suggestion.title }
-      : null;
-    await appendThreadEvent(env, threadId, turn.sequence + 1, 'assistant_plan', { plan: result.plan }, traceId);
+    const trustedActions: SovereignAnswerAction[] = [interfaceActions.primary, ...interfaceActions.contextual]
+      .flatMap((action) => {
+        if (!action || action.type === 'show_plan') return [];
+        return [{
+          type: action.type,
+          label: action.label,
+          ...(action.target_id ? { target_id: action.target_id } : {})
+        }];
+      });
+    result.answer.actions = trustedActions;
+    await appendThreadEvent(env, threadId, turn.sequence + 1, 'assistant_plan', { answer: result.answer }, traceId);
     await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_response', {
       text: result.text,
+      answer: result.answer,
+      basis: result.basis,
       context: selection,
-      interfaceActions,
-      ...(visualStory ? { visualStory } : {}),
-      ...(moduleOffer ? { moduleOffer } : {})
+      interfaceActions
     }, traceId);
     await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'completed');
     const headers = new Headers({
@@ -286,13 +297,18 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       'cache-control': 'private, no-store',
       'x-sovereign-plan': entitlements.plan,
       'x-sovereign-ai-remaining': String(usage.remaining),
-      'x-sovereign-response-phase': result.plan.response_phase,
-      'x-sovereign-module-offer': result.plan.module_suggestion.should_offer ? '1' : '0',
-      'x-sovereign-interface-actions': encodeVisualStoryHeader(interfaceActions),
-      'x-sovereign-visual-story': visualStory ? encodeVisualStoryHeader(visualStory) : ''
+      'x-sovereign-answer-version': 'sovereign-answer.v2',
+      'x-sovereign-answer-mode': result.answer.mode,
+      'x-sovereign-answer-depth': result.answer.depth,
+      'x-sovereign-interface-actions': encodeMetadataHeader(interfaceActions)
     });
-    if (result.plan.module_suggestion.should_offer && result.plan.module_suggestion.title) headers.set('x-sovereign-module-title', encodeURIComponent(result.plan.module_suggestion.title));
-    return new Response(result.text, { status: 202, headers });
+    return request.headers.get('accept')?.includes('application/vnd.sovereign.answer+json')
+      ? Response.json({
+          answer: result.answer,
+          basis: result.basis,
+          interfaceActions
+        }, { status: 202, headers })
+      : new Response(result.text, { status: 202, headers });
   } catch (error) {
     await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'failed', 'recognition_failed');
     throw error;

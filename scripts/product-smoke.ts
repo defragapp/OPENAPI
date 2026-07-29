@@ -226,7 +226,7 @@ async function main() {
     method: 'POST',
     body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', reference: 'James 1:5', subject: 'a decision' })
   });
-  if (!covenant.scriptureSeparateFromInterpretation || !covenant.lens?.passage?.citation) throw new Error('Covenant smoke failed');
+  if (!covenant.scriptureSeparateFromInterpretation || !covenant.lens?.scripture?.citation || !covenant.lens?.boundary) throw new Error('Covenant smoke failed');
 
   console.log('Product smoke passed billing=stripe-projected paid_surfaces=people,systems,library,covenant private_export=disabled owner_granted_consent=blocked');
 }

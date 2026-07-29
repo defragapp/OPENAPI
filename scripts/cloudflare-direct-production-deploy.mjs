@@ -17,7 +17,7 @@ const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT
 const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAADhGIF8-iOLIg8MU').trim();
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
-const migrationVersion = '0011_email_code_recovery';
+const migrationVersion = '0012_baseline_facets_and_answer_v2';
 
 if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required');
 if (!/^[0-9a-f]{40}$/i.test(commitSha)) throw new Error('A full 40-character commit SHA is required');
@@ -205,42 +205,43 @@ async function verifyLiveProduction() {
 
   assert(how.response.ok && howClean.response.ok, 'How it works page or clean URL is unavailable');
   assertContainsAll('How it works', how.text, [
-    'One Baseline. An entire life in context.',
-    'THE PLATFORM IN FOUR PARTS',
-    'Explore shadow and gift expression',
-    '/launch-polish.css?v=20260726-final-r1'
+    'Build a reference point. Keep exploring.',
+    'FIVE CONNECTED STEPS',
+    'Add what is happening now',
+    'Confirm, correct, and keep what helps',
+    '/launch-polish.css?v=20260728-baseline-first'
   ]);
   assertContainsAll('How it works clean URL', howClean.text, [
-    'One Baseline. An entire life in context.',
-    'See yourself, the relationship, and the whole system.'
+    'Build a reference point. Keep exploring.',
+    'Begin with yourself. Expand with permission.'
   ]);
 
   assert(pricing.response.ok && pricingClean.response.ok, 'pricing page or clean URL is unavailable');
   assertContainsAll('pricing', pricing.text, [
     '$20',
     '$99',
-    '10 conversations each month',
-    '300 conversations each month',
+    '10 Sovereign AI turns each month',
+    '300 Sovereign AI turns each month',
     'Consent-aware invitations and sharing controls',
-    '/launch-polish.css?v=20260726-final-r1'
+    '/launch-polish.css?v=20260728-baseline-first'
   ]);
   assertContainsAll('pricing clean URL', pricingClean.text, [
     '$20',
     '$99',
-    'Begin with yourself. Expand to every relationship and system your life includes.'
+    'Understand yourself. Expand when other people matter.'
   ]);
   assert(!pricing.text.includes('$29') && !pricing.text.includes('$79'), 'legacy pricing is still visible');
   assert(!/donate\.stripe\.com|Support Sovereign\.OS|Support the platform/i.test(pricing.text), 'unapproved support placement is public');
 
   assert(faq.response.ok && faqClean.response.ok, 'Questions page or clean URL is unavailable');
   assertContainsAll('Questions', faq.text, [
-    'What it is. What you can explore. What it never pretends to know.',
+    'Questions, answered directly.',
     'What is Sovereign.OS?',
-    'What do shadow and gift expression mean?',
-    'What does alignment mean?',
-    'Can Sovereign know why another person did something?',
+    'What is Baseline Design?',
+    'Can Sovereign tell me what another person feels?',
+    'Does Sovereign make decisions for me?',
     'What is Covenant?',
-    '/launch-polish.css?v=20260726-final-r1'
+    '/launch-polish.css?v=20260728-baseline-first'
   ]);
   assertContainsAll('Questions clean URL', faqClean.text, ['What is Sovereign.OS?', 'What does Sovereign+ include?']);
 
@@ -287,20 +288,20 @@ async function verifyLiveProduction() {
   assertContainsAll('compiled application copy', compiledCopy, [
     'How Sovereign.OS handles your information.',
     'Terms for using Sovereign.OS.',
-    'Welcome back.',
-    'Create your account.',
+    'Sign in to Sovereign.OS.',
+    'Create your Sovereign.OS account.',
     'Choose what this connection may use.',
-    'Understand yourself—and everyone your life includes.',
+    'Know yourself.',
+    'Understand the system.',
+    'Choose what fits.',
+    'What is active for you now?',
     'What do you want to understand?',
-    'Ask about yourself, a decision, a relationship, or the system around you. Sovereign brings in only the context that belongs.',
-    'YOUR BASELINE · AVAILABLE IN EVERY CONVERSATION',
-    'Your Baseline stays steady.',
-    'Explore my Baseline',
-    'See the relationship from both sides.',
-    'What role does each person occupy in this system?',
-    'Only understandings you deliberately save appear here.',
-    'Build once. Explore continuously.',
-    'Optional Christian and biblical lens for this conversation.'
+    'Understand the relationship from both sides.',
+    'See how the whole group functions.',
+    'Keep what changes your understanding.',
+    'Your Baseline, plan, permissions, and account.',
+    'Explore this through Covenant?',
+    'Build your Baseline.'
   ]);
 
   const cssAssetPaths = [...home.text.matchAll(/href=["'](\/assets\/[^"']+\.css)["']/g)].map((match) => match[1]);
@@ -309,12 +310,12 @@ async function verifyLiveProduction() {
   assert(cssAssets.every((asset) => asset.response.ok), 'a compiled CSS asset is unavailable');
   const compiledCss = cssAssets.map((asset) => asset.text).join('\n');
   assertContainsAll('compiled visual polish', compiledCss, [
-    'polish-reveal',
-    'polish-signal',
+    'sovereign-answer',
+    'living-answer',
     'prefers-reduced-motion'
   ]);
 
-  const launchPolish = await readText(`${publicBase}/launch-polish.css?v=20260726-final-r1`);
+  const launchPolish = await readText(`${publicBase}/launch-polish.css?v=20260728-baseline-first`);
   assert(launchPolish.response.ok, 'public launch polish stylesheet is unavailable');
   assertContainsAll('public launch polish', launchPolish.text, [
     'launch-reveal',

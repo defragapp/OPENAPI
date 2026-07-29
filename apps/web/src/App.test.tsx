@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
-const workspace = readFileSync(new URL('./SovereignWorkspace.tsx', import.meta.url), 'utf8');
+const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
 const styles = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -10,67 +10,54 @@ const consent = readFileSync(new URL('../public/consent.html', import.meta.url),
 const consentRuntime = readFileSync(new URL('../public/consent.js', import.meta.url), 'utf8');
 
 describe('Sovereign account and workspace shell', () => {
-  it('contains the complete contextual navigation inside one chat UI', () => {
-    for (const label of ['Today', 'Explore', 'People', 'Systems', 'Library', 'You']) {
-      expect(workspace).toContain(label);
-    }
-    expect(workspace).toContain('＋ New conversation');
+  it('contains every product surface inside one canonical workspace', () => {
+    for (const label of ['Today', 'Explore', 'People', 'Systems', 'Library', 'You']) expect(workspace).toContain(`name: '${label}'`);
+    expect(workspace).toContain('New exploration');
     expect(workspace).toContain('RECENT');
-    expect(workspace).toContain('Ask Sovereign…');
+    expect(app).toContain('<SovereignIntelligenceWorkspace />');
   });
 
   it('keeps Today Baseline-first and correction-ready', () => {
-    expect(workspace).toContain('Your Baseline stays steady.');
-    expect(workspace).toContain('Current emphasis');
-    expect(workspace).toContain('Your experience');
-    expect(workspace).toContain('Still unknown');
-    expect(workspace).toContain('Does this fit?');
-    expect(workspace).toContain('Not today');
+    for (const phrase of ['Your Baseline', 'Active now', 'Shadow to notice', 'Gift available', 'Alignment question', 'Not today']) {
+      expect(workspace).toContain(phrase);
+    }
+    expect(workspace).toContain('Current data does not establish behavior.');
   });
 
-  it('routes signup through explicit tier confirmation and preserves safe return context', () => {
-    expect(app).toContain('Confirm your email, choose Free or Sovereign+, and enter your private personal intelligence environment.');
+  it('routes signup through explicit plan confirmation without changing prices', () => {
+    expect(app).toContain('Start free. Verify your email, then build your Baseline.');
     expect(app).toContain('safeClientReturnTo');
-    expect(app).toContain('returnTo: requestedReturnTo');
-    expect(onboarding).toContain('Your plan is confirmed before the workspace opens.');
     expect(onboarding).toContain('/api/v1/account/onboarding');
     expect(onboarding).toContain('/api/v1/billing/checkout');
+    expect(onboarding).toContain('$20 / month');
+    expect(onboarding).toContain('$99 / year');
   });
 
   it('allows pinch zoom and includes mobile-safe controls', () => {
     expect(html).not.toContain('user-scalable=no');
     expect(styles).toContain('safe-area-inset-bottom');
     expect(styles).toContain('min-height: 44px');
-    expect(styles).toContain('@media (max-width: 800px)');
+    expect(styles).toContain('@media (max-width: 700px)');
   });
 
   it('uses visible labels across private forms', () => {
-    for (const label of ['Email address', 'Person', 'Invitation email', 'New system', 'Birth date', 'Birthplace']) {
+    for (const label of ['Email address', 'Invitation email', 'New system', 'Birth date', 'Birthplace', 'Birth-time certainty']) {
       expect(`${app}\n${workspace}`).toContain(label);
     }
   });
 
   it('keeps consent under the invited person’s control', () => {
     expect(workspace).toContain('Send private invitation');
-    expect(workspace).toContain('They choose what to allow.');
+    expect(workspace).toContain('Adding a name is not permission.');
     expect(app).toContain('Choose what this connection may use.');
     expect(consent).toContain('Manage requested uses.');
     expect(consentRuntime).toContain("fetch('/api/v1/invitations/mine'");
     expect(consentRuntime).toContain('Permission revoked for future use.');
   });
 
-  it('uses direct auth language with visible, enumeration-safe guidance', () => {
-    expect(app).toContain('Understand your life in context.');
-    expect(app).toContain('Welcome back.');
-    expect(app).toContain('Check your inbox. The link expires in 15 minutes and can be used once.');
-    expect(app).toContain('No account change was made.');
-    expect(app).not.toMatch(/never reveal whether|whether or not an account exists|no password/i);
-  });
-
   it('keeps Library explicit and user-controlled', () => {
-    expect(workspace).toContain('Only understandings you deliberately save appear here.');
+    expect(workspace).toContain('Library is not a journal or transcript archive.');
     expect(workspace).toContain('Save to Library');
     expect(workspace).toContain('Nothing saved yet.');
-    expect(workspace).not.toContain('Editable summary');
   });
 });

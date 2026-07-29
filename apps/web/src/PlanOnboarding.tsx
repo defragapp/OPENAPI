@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { BaselineOrbit } from './BaselineOrbit';
 
 type Plan = 'free' | 'sovereign_plus';
 
@@ -80,8 +79,8 @@ export function PlanOnboarding() {
           <div className="onboarding-plan-grid">
             <article className={currentPlan === 'free' ? 'current' : ''}>
               <header><span>FREE</span><strong>$0</strong></header>
-              <h2>Your personal Baseline.</h2>
-              <p>Explore yourself, shadow and light, alignment, decisions, behavior, and current emphasis.</p>
+              <h2>Understand yourself.</h2>
+              <p>Build your Baseline and explore what is active now, Shadow, Gift, Alignment, decisions, and behavior.</p>
               <ul>
                 <li>Complete Baseline Design</li>
                 <li>Today and Explore</li>
@@ -109,8 +108,13 @@ export function PlanOnboarding() {
           <p className="plan-status" role="status" aria-live="polite">{state}</p>
         </section>
         <aside className="plan-visual">
-          <BaselineOrbit compact />
-          <p>One private workspace. Your Baseline stays beneath every conversation.</p>
+          <div className="onboarding-baseline-preview">
+            <span>YOUR BASELINE</span>
+            <h2>A living reference for the questions that matter.</h2>
+            <p>Begin with what remains steady. Add current, relationship, or system context only when it belongs.</p>
+            <div><strong>Plain-language insight</strong><small>Exact Basis available beneath it</small></div>
+          </div>
+          <p>Your Baseline stays beneath every exploration.</p>
         </aside>
       </div>
     </main>

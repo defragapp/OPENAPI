@@ -1,101 +1,71 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-const workspace = readFileSync(new URL('./SovereignWorkspace.tsx', import.meta.url), 'utf8');
+const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const styles = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
-const refinement = readFileSync(new URL('./brand-landing-refinement.css', import.meta.url), 'utf8');
 const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
 const prompt = readFileSync(new URL('../../sovereign-worker/src/agent/prompt-v1.ts', import.meta.url), 'utf8');
 
-describe('conversation-first Baseline intelligence', () => {
-  it('ships one React-owned workspace without legacy DOM enhancement layers', () => {
+describe('Baseline-first Sovereign answer UI', () => {
+  it('ships one React-owned workspace without obsolete DOM enhancement runtimes', () => {
     expect(index).toContain('/src/main.tsx');
-    for (const retired of ['recognition-ui.js', 'archetype-clarity.js', 'intelligence-ui.js', 'ux-audit-runtime.js']) {
-      expect(index).not.toContain(retired);
-    }
-    expect(workspace).toContain('className="conversation-shell"');
-    expect(workspace).toContain('className="chat-composer"');
-  });
-
-  it('keeps Baseline context available without turning the account into a dashboard', () => {
-    expect(workspace).toContain('YOUR BASELINE · AVAILABLE IN EVERY CONVERSATION');
-    expect(workspace).toContain('What do you want to understand?');
-    expect(workspace).toContain('<BaselineOrbit compact />');
-    expect(workspace).toContain("api('/api/v1/today')");
-    expect(workspace).not.toContain('result-panel');
-    expect(workspace).not.toContain('surface-main');
-  });
-
-  it('keeps every product level reachable as contextual tools', () => {
-    for (const label of ['Today', 'Explore', 'People', 'Systems', 'Library', 'You']) {
-      expect(workspace).toContain(label);
-    }
-    expect(workspace).toContain('Manage permissions');
-    expect(workspace).toContain('Only understandings you deliberately save appear here.');
-    expect(workspace).toContain('Optional Christian and biblical lens for this conversation.');
-  });
-
-  it('is responsive and reduced-motion safe', () => {
-    expect(styles).toContain('@media (max-width: 800px)');
-    expect(styles).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(styles).toContain('env(safe-area-inset-bottom)');
-    expect(styles).toContain('.conversation-shell');
-    expect(styles).toContain('.workspace-context-panel');
-    expect(refinement).toContain('@media (prefers-reduced-motion: reduce)');
-  });
-
-  it('keeps the agent Baseline-first and user-correctable', () => {
-    expect(prompt).toContain('BASELINE-FIRST FLOW');
-    expect(prompt).toContain('Do not require the user to explain an incident');
-    expect(prompt).toContain('Shadow and light');
-    expect(prompt).toContain('Alignment');
-    expect(prompt).toContain('Relationship');
-    expect(prompt).toContain('System');
-    expect(prompt).toContain('Covenant');
-  });
-
-  it('uses typed server actions and confirms consequential operations', () => {
-    expect(workspace).toContain("response.headers.get('x-sovereign-interface-actions')");
-    expect(workspace).toContain("['open_baseline', 'open_person', 'open_system', 'open_decision', 'open_optional_lens', 'show_plan']");
-    expect(workspace).toContain("window.confirm('Save this response to your private Library?')");
-    expect(workspace).toContain('Send a private invitation to');
-    expect(workspace).not.toContain('isReversibleAction(actions.primary)');
+    for (const file of ['recognition-ui.js', 'intelligence-ui.js', 'ux-audit-runtime.js']) expect(index).not.toContain(file);
+    expect(workspace).toContain('className={`intelligence-workspace');
+    expect(workspace).toContain('className="sovereign-composer"');
     expect(workspace).not.toContain('MutationObserver');
   });
 
-  it('renders and restores validated visual stories and explicit module offers', () => {
-    expect(workspace).toContain("response.headers.get('x-sovereign-visual-story')");
-    expect(workspace).toContain("response.headers.get('x-sovereign-module-offer')");
-    expect(workspace).toContain("response.headers.get('x-sovereign-module-title')");
-    expect(workspace).toContain('validVisualStoryPayload(restored?.visualStory)');
-    expect(workspace).toContain('validModuleOffer(restored?.moduleOffer)');
-    expect(workspace).toContain('<VisualStoryCard');
-    expect(workspace).toContain('/modules/latest');
-    expect(workspace).toContain('window.confirm(`Save “${moduleOffer.title}” to your private Library?`)');
+  it('renders the validated v2 answer and exact Basis values', () => {
+    expect(workspace).toContain("version: 'sovereign-answer.v2'");
+    expect(workspace).toContain("accept': 'application/vnd.sovereign.answer+json'");
+    expect(workspace).toContain('<SovereignAnswerView');
+    expect(workspace).toContain('<BasisStrip values={basis}');
+    expect(workspace).toContain('value.accessibleLabel');
+    expect(workspace).toContain('Calculated {formatDate(value.computedAt)}');
   });
 
-  it('keeps personal and system-member selection isolated and restores explicit personal context', () => {
-    expect(workspace).toContain("setSelectedPerson(restoredSystem ? '' : restoredPerson)");
-    expect(workspace).toContain("setSelectedSystem(restoredPerson ? '' : restoredSystem)");
-    expect(workspace).toContain("const [memberId, setMemberId] = useState('')");
-    expect(workspace).toContain("person.activeScopes?.includes('system.include')");
-    expect(workspace).not.toContain('if (actions?.primary &&');
+  it('renders structured Alignment without a score or gauge', () => {
+    for (const phrase of ['Supports the fit', 'Pulls against it', 'The real tradeoff', 'Still needed', 'A closer version']) expect(workspace).toContain(phrase);
+    expect(workspace).not.toMatch(/percentage|score|needle|gauge/i);
   });
 
-  it('restores user-controlled deletion and purpose-specific invitation scopes', () => {
-    expect(workspace).toContain("api('/api/v1/deletion-jobs')");
-    expect(workspace).toContain('Request account deletion');
-    expect(workspace).toContain('Cancel account deletion');
-    expect(workspace).toContain("'system.include'");
-    expect(workspace).toContain("'covenant.include'");
+  it('keeps people and their interaction visually distinct', () => {
+    expect(workspace).toContain('You may be bringing');
+    expect(workspace).toContain('They may be bringing');
+    expect(workspace).toContain('What happens between you');
+    expect(styles).toContain('.relationship-answer > div');
+    expect(styles).toContain('grid-template-columns: repeat(2, minmax(0, 1fr))');
   });
 
-  it('advances the public cache without caching private workspace assets', () => {
-    expect(serviceWorker).toContain('sovereign-public-v9');
-    expect(serviceWorker).toContain("'/brand-mark.svg'");
-    expect(serviceWorker).not.toContain("'/intelligence-ui.js'");
-    expect(serviceWorker).not.toContain("'/ux-audit-runtime.js'");
+  it('keeps Covenant contextual and explicitly confirmed', () => {
+    expect(workspace).toContain("action.type === 'offer_covenant'");
+    expect(workspace).toContain('Explore this through Covenant?');
+    expect(workspace).toContain('Use for this question');
+    expect(workspace).toContain('setCovenantEnabled(false)');
+  });
+
+  it('keeps the runtime prompt Baseline-first and user-correctable', () => {
+    expect(prompt).toContain('Give the direct answer first');
+    expect(prompt).toContain('Shadow and Gift');
+    expect(prompt).toContain('Alignment is not a score or rule');
+    expect(prompt).toContain('Keep the people and the interaction distinct');
+    expect(prompt).toContain('System: Consider consented facets');
+  });
+
+  it('has physically removed the obsolete workspace and static enhancement files', () => {
+    const removed = [
+      new URL('./SovereignWorkspace.tsx', import.meta.url),
+      new URL('../public/recognition-ui.js', import.meta.url),
+      new URL('../public/intelligence-ui.js', import.meta.url),
+      new URL('../public/ux-audit-runtime.js', import.meta.url)
+    ];
+    for (const file of removed) expect(existsSync(file)).toBe(false);
+  });
+
+  it('does not cache authenticated workspace assets', () => {
     expect(serviceWorker).not.toContain("'/app'");
+    expect(serviceWorker).not.toContain("'/intelligence-ui.js'");
+    expect(serviceWorker).toContain("'/brand-mark.svg'");
   });
 });

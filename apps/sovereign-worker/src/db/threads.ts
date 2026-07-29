@@ -31,12 +31,11 @@ export interface ThreadMessage {
   text: string;
   createdAt: string;
   context?: Record<string, unknown>;
-  plan?: Record<string, unknown>;
+  answer?: Record<string, unknown>;
+  basis?: Array<Record<string, unknown>>;
   correction?: ThreadCorrection;
   correctionHistory?: ThreadCorrection[];
   interfaceActions?: Record<string, unknown>;
-  visualStory?: Record<string, unknown>;
-  moduleOffer?: Record<string, unknown>;
 }
 
 export async function listThreads(env: Env, accountId: string): Promise<ThreadSummary[]> {
@@ -81,12 +80,12 @@ export async function listThreadMessages(env: Env, accountId: string, threadId: 
   ]);
 
   const messages: ThreadMessage[] = [];
-  let pendingPlan: Record<string, unknown> | undefined;
+  let pendingAnswer: Record<string, unknown> | undefined;
   for (const row of rows.results ?? []) {
     const payload = safeJson(String(row.payload_json ?? ''));
     if (row.event_type === 'assistant_plan') {
-      pendingPlan = payload.plan && typeof payload.plan === 'object'
-        ? payload.plan as Record<string, unknown>
+      pendingAnswer = payload.answer && typeof payload.answer === 'object'
+        ? payload.answer as Record<string, unknown>
         : undefined;
       continue;
     }
@@ -100,12 +99,11 @@ export async function listThreadMessages(env: Env, accountId: string, threadId: 
       text,
       createdAt: String(row.created_at),
       ...(payload.context && typeof payload.context === 'object' ? { context: payload.context as Record<string, unknown> } : {}),
-      ...(role === 'assistant' && pendingPlan ? { plan: pendingPlan } : {}),
-      ...(payload.interfaceActions && typeof payload.interfaceActions === 'object' ? { interfaceActions: payload.interfaceActions as Record<string, unknown> } : {}),
-      ...(payload.visualStory && typeof payload.visualStory === 'object' ? { visualStory: payload.visualStory as Record<string, unknown> } : {}),
-      ...(payload.moduleOffer && typeof payload.moduleOffer === 'object' ? { moduleOffer: payload.moduleOffer as Record<string, unknown> } : {})
+      ...(role === 'assistant' && (payload.answer && typeof payload.answer === 'object' ? { answer: payload.answer as Record<string, unknown> } : pendingAnswer ? { answer: pendingAnswer } : {})),
+      ...(Array.isArray(payload.basis) ? { basis: payload.basis.filter((item): item is Record<string, unknown> => Boolean(item && typeof item === 'object')) } : {}),
+      ...(payload.interfaceActions && typeof payload.interfaceActions === 'object' ? { interfaceActions: payload.interfaceActions as Record<string, unknown> } : {})
     });
-    if (role === 'assistant') pendingPlan = undefined;
+    if (role === 'assistant') pendingAnswer = undefined;
   }
 
   const correctionHistory = (correctionRows.results ?? [])

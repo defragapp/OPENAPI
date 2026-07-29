@@ -1,11 +1,14 @@
 import type { Env } from '../env';
 import { parseHorizonsJson, type HorizonsPayload } from '../baseline-engine';
+import { baselineFacetIds, type BaselineFacetId, type BaselineSourceData } from '../baseline-contracts';
 
 export interface CurrentConditionInput {
   accountId: string;
   timestamp?: string;
   location?: { latitude: number; longitude: number; precision: 'city' | 'region' | 'ephemeral' } | undefined;
+  perspective?: 'geocentric' | 'topocentric' | undefined;
   fixtureBodies?: Record<string, { longitude: number; latitude: number; retrograde?: boolean }> | undefined;
+  natalBodies?: BaselineSourceData['natalBodies'] | undefined;
 }
 
 export interface ReducedCurrentCondition {
@@ -18,27 +21,35 @@ export interface ReducedCurrentCondition {
     referenceFiles: string[];
     implementation: 'ported-minimal-current-condition-layer';
   };
-  locationPrecisionUsed: 'city' | 'region' | 'ephemeral' | 'none';
+  locationPrecisionUsed: 'city' | 'region' | 'ephemeral' | 'geocentric' | 'none';
   activeFactors: Array<{
+    id: string;
     body: string;
     sign: string;
+    longitude: number;
     degree: number;
+    displayDegree: string;
     retrograde: boolean;
-    label: string;
-    quality: 'clarifying' | 'pressurizing' | 'softening' | 'intensifying' | 'stabilizing';
-    relativeStrength: number;
+    basisRef: string;
+    affectedFacetIds: BaselineFacetId[];
+    uncertainty: 'low' | 'medium' | 'high';
   }>;
-  affectedBaselineDimensions: Array<'identity' | 'decisions' | 'communication' | 'learning' | 'love' | 'expression' | 'pressure_response'>;
-  amplification: {
-    direction: string;
-    quality: string;
-    relativeStrength: number;
-  };
+  currentToNatalContacts: Array<{
+    id: string;
+    currentBody: string;
+    natalBody: string;
+    aspect: 'conjunction' | 'sextile' | 'square' | 'trine' | 'opposition';
+    orb: number;
+    display: string;
+    basisRef: string;
+    affectedFacetIds: BaselineFacetId[];
+    uncertainty: 'low' | 'medium' | 'high';
+  }>;
+  affectedBaselineFacetIds: BaselineFacetId[];
   uncertainty: 'low' | 'medium' | 'high';
-  safeLabels: string[];
   separations: {
-    baselineTendency: string;
-    currentAmplification: string;
+    baseline: string;
+    currentContext: string;
     observedBehavior: string;
     unknownActualState: string;
   };
@@ -70,43 +81,43 @@ export async function computeReducedCurrentConditions(env: Env, input: CurrentCo
   const activeFactors = Object.entries(bodies).map(([body, position]) => {
     const { sign, degree } = eclipticLongitudeToSign(position.longitude);
     const retrograde = position.retrograde === true;
-    const quality = qualityForBody(body, retrograde);
     return {
+      id: `current.${body}`,
       body,
       sign,
+      longitude: Math.round(position.longitude * 10_000) / 10_000,
       degree,
+      displayDegree: `${degree.toFixed(1)}°`,
       retrograde,
-      label: `${title(body)} in ${sign}${retrograde ? ' retrograde' : ''}`,
-      quality,
-      relativeStrength: strengthForBody(body, retrograde)
+      basisRef: `current.${body}`,
+      affectedFacetIds: [] as BaselineFacetId[],
+      uncertainty: input.fixtureBodies || input.perspective === 'geocentric'
+        ? 'low' as const
+        : input.location
+          ? 'medium' as const
+          : 'high' as const
     };
-  }).sort((left, right) => right.relativeStrength - left.relativeStrength).slice(0, 6);
+  }).sort((left, right) => left.body.localeCompare(right.body));
 
-  const affectedBaselineDimensions = affectedDimensions(activeFactors.map((factor) => factor.body));
-  const relativeStrength = activeFactors.length ? Math.round(activeFactors.reduce((sum, factor) => sum + factor.relativeStrength, 0) / activeFactors.length) : 0;
+  const currentToNatalContacts = computeCurrentToNatalContacts(activeFactors, input.natalBodies ?? []);
+  const affectedBaselineFacetIds = [...new Set([
+    ...activeFactors.flatMap((factor) => factor.affectedFacetIds),
+    ...currentToNatalContacts.flatMap((contact) => contact.affectedFacetIds)
+  ])];
   return {
     version: 'current-conditions.v1',
     computedAt,
     expiresAt,
     source: input.fixtureBodies ? 'OPENAPI_SANITIZED_FIXTURE' : 'OPENAPI_PORTED_HORIZONS',
     provenance: { referenceCommit: REFERENCE_COMMIT, referenceFiles: REFERENCE_FILES, implementation: 'ported-minimal-current-condition-layer' },
-    locationPrecisionUsed: input.location?.precision ?? 'none',
+    locationPrecisionUsed: input.perspective === 'geocentric' ? 'geocentric' : input.location?.precision ?? 'none',
     activeFactors,
-    affectedBaselineDimensions,
-    amplification: {
-      direction: relativeStrength >= 70 ? 'louder' : relativeStrength >= 40 ? 'noticeable' : 'subtle',
-      quality: summarizeQuality(activeFactors.map((factor) => factor.quality)),
-      relativeStrength
-    },
-    uncertainty: input.fixtureBodies ? 'low' : input.location ? 'medium' : 'high',
-    safeLabels: [
-      'Current amplification is context, not certainty.',
-      'Observed behavior must come from the user.',
-      'Actual state remains unknown unless confirmed.'
-    ],
+    currentToNatalContacts,
+    affectedBaselineFacetIds,
+    uncertainty: input.fixtureBodies || input.perspective === 'geocentric' ? 'low' : input.location ? 'medium' : 'high',
     separations: {
-      baselineTendency: 'Enduring pattern language belongs to the Baseline layer.',
-      currentAmplification: 'Current conditions may make some themes louder or softer for a limited window.',
+      baseline: 'The Baseline remains the stable interpretive reference.',
+      currentContext: 'Current positions and exact contacts identify temporarily relevant themes; they do not establish behavior.',
       observedBehavior: 'No behavior is treated as observed unless the user supplies or confirms it.',
       unknownActualState: 'No exact emotion, motive, diagnosis, or future behavior is inferred.'
     }
@@ -114,15 +125,15 @@ export async function computeReducedCurrentConditions(env: Env, input: CurrentCo
 }
 
 async function fetchCurrentBodies(env: Env, computedAt: string, location?: CurrentConditionInput['location']): Promise<Record<string, { longitude: number; latitude: number; retrograde?: boolean }>> {
-  if (!location) throw new Error('Permitted location is required for current-condition computation');
-  const cacheKey = `current_conditions:${location.latitude.toFixed(1)}:${location.longitude.toFixed(1)}:${computedAt.slice(0, 13)}`;
+  const observerKey = location ? `${location.latitude.toFixed(1)}:${location.longitude.toFixed(1)}` : 'geocentric';
+  const cacheKey = `current_conditions:${observerKey}:${computedAt.slice(0, 13)}`;
   const cached = await env.KV?.get(cacheKey, 'json') as Record<string, { longitude: number; latitude: number; retrograde?: boolean }> | null;
   if (cached) return cached;
   const entries = Object.entries(PLANET_IDS);
   const bodies: Record<string, { longitude: number; latitude: number; retrograde?: boolean }> = {};
   for (const [name, targetId] of entries) {
     if (Object.keys(bodies).length > 0) await new Promise((resolve) => setTimeout(resolve, 125));
-    const position = await fetchHorizonsPosition(env, targetId, computedAt, location.latitude, location.longitude);
+    const position = await fetchHorizonsPosition(env, targetId, computedAt, location);
     if (position) bodies[name] = position;
   }
   if (!Object.keys(bodies).length) throw new Error('No Horizons current-condition bodies returned');
@@ -130,29 +141,10 @@ async function fetchCurrentBodies(env: Env, computedAt: string, location?: Curre
   return bodies;
 }
 
-async function fetchHorizonsPosition(env: Env, targetId: string, computedAt: string, latitude: number, longitude: number): Promise<{ longitude: number; latitude: number; retrograde: boolean } | null> {
+async function fetchHorizonsPosition(env: Env, targetId: string, computedAt: string, location?: CurrentConditionInput['location']): Promise<{ longitude: number; latitude: number; retrograde: boolean } | null> {
   const startDate = new Date(computedAt);
   const stopDate = new Date(startDate.getTime() + 12 * 60 * 60 * 1000);
-  const endpoint = new URL(env.BASELINE_HORIZONS_URL || 'https://ssd.jpl.nasa.gov/api/horizons.api');
-  const params: Record<string, string> = {
-    format: 'json',
-    COMMAND: `'${targetId}'`,
-    OBJ_DATA: 'NO',
-    MAKE_EPHEM: 'YES',
-    EPHEM_TYPE: 'OBSERVER',
-    CENTER: 'coord@399',
-    COORD_TYPE: 'GEODETIC',
-    SITE_COORD: `'${longitude.toFixed(4)},${latitude.toFixed(4)},0'`,
-    START_TIME: `'${horizonsDate(startDate)}'`,
-    STOP_TIME: `'${horizonsDate(stopDate)}'`,
-    STEP_SIZE: `'6 h'`,
-    QUANTITIES: `'31'`,
-    CSV_FORMAT: 'YES',
-    CAL_FORMAT: 'CAL',
-    CAL_TYPE: 'GREGORIAN',
-    EXTRA_PREC: 'YES'
-  };
-  for (const [key, value] of Object.entries(params)) endpoint.searchParams.set(key, value);
+  const endpoint = buildCurrentHorizonsEndpoint(env, targetId, startDate, stopDate, location);
   const timeout = Number(env.BASELINE_PROVIDER_TIMEOUT_MS ?? 8000);
   const response = await fetch(endpoint, {
     headers: { 'User-Agent': 'Sovereign.OS OPENAPI Current Conditions/1.0' },
@@ -175,6 +167,38 @@ async function fetchHorizonsPosition(env: Env, targetId: string, computedAt: str
   };
 }
 
+export function buildCurrentHorizonsEndpoint(
+  env: Env,
+  targetId: string,
+  startDate: Date,
+  stopDate: Date,
+  location?: CurrentConditionInput['location']
+) {
+  const endpoint = new URL(env.BASELINE_HORIZONS_URL || 'https://ssd.jpl.nasa.gov/api/horizons.api');
+  const params: Record<string, string> = {
+    format: 'json',
+    COMMAND: `'${targetId}'`,
+    OBJ_DATA: 'NO',
+    MAKE_EPHEM: 'YES',
+    EPHEM_TYPE: 'OBSERVER',
+    CENTER: location ? 'coord@399' : `'500@399'`,
+    START_TIME: `'${horizonsDate(startDate)}'`,
+    STOP_TIME: `'${horizonsDate(stopDate)}'`,
+    STEP_SIZE: `'6 h'`,
+    QUANTITIES: `'31'`,
+    CSV_FORMAT: 'YES',
+    CAL_FORMAT: 'CAL',
+    CAL_TYPE: 'GREGORIAN',
+    EXTRA_PREC: 'YES'
+  };
+  if (location) {
+    params.COORD_TYPE = 'GEODETIC';
+    params.SITE_COORD = `'${location.longitude.toFixed(4)},${location.latitude.toFixed(4)},0'`;
+  }
+  for (const [key, value] of Object.entries(params)) endpoint.searchParams.set(key, value);
+  return endpoint;
+}
+
 function horizonsDate(date: Date): string {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return `${date.getUTCFullYear()}-${months[date.getUTCMonth()]}-${String(date.getUTCDate()).padStart(2, '0')} ${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
@@ -184,37 +208,59 @@ function signedLongitudeDelta(from: number, to: number) {
   return ((to - from + 540) % 360) - 180;
 }
 
-function title(value: string): string {
-  return value.slice(0, 1).toUpperCase() + value.slice(1);
+function facetsForBody(body: string): BaselineFacetId[] {
+  const mapped: Partial<Record<string, BaselineFacetId[]>> = {
+    sun: ['core_orientation', 'identity_purpose', 'leadership'],
+    moon: ['love_connection', 'response_pressure', 'response_change'],
+    mercury: ['communication', 'learning', 'decision_making'],
+    venus: ['love_connection', 'creativity_expression', 'boundaries'],
+    mars: ['leadership', 'conflict_repair', 'response_pressure'],
+    jupiter: ['learning', 'underused_capacity', 'response_change'],
+    saturn: ['responsibility', 'boundaries', 'alignment_markers'],
+    uranus: ['response_change', 'creativity_expression', 'underused_capacity'],
+    neptune: ['creativity_expression', 'love_connection', 'shadow_expression'],
+    pluto: ['conflict_repair', 'shadow_expression', 'gift_expression'],
+    chiron: ['underused_capacity', 'shadow_expression', 'gift_expression']
+  };
+  return (mapped[body] ?? ['core_orientation']).filter((id) => baselineFacetIds.includes(id));
 }
 
-function qualityForBody(body: string, retrograde: boolean): ReducedCurrentCondition['activeFactors'][number]['quality'] {
-  if (retrograde) return 'intensifying';
-  if (body === 'mercury') return 'clarifying';
-  if (body === 'venus' || body === 'moon') return 'softening';
-  if (body === 'saturn') return 'stabilizing';
-  if (body === 'mars' || body === 'pluto') return 'pressurizing';
-  return 'clarifying';
-}
-
-function strengthForBody(body: string, retrograde: boolean): number {
-  const base: Record<string, number> = { moon: 78, sun: 74, mercury: 68, venus: 62, mars: 72, jupiter: 55, saturn: 70, uranus: 58, neptune: 52, pluto: 60, chiron: 48 };
-  return Math.min(100, (base[body] ?? 50) + (retrograde ? 8 : 0));
-}
-
-function affectedDimensions(bodies: string[]): ReducedCurrentCondition['affectedBaselineDimensions'] {
-  const output = new Set<ReducedCurrentCondition['affectedBaselineDimensions'][number]>();
-  if (bodies.includes('mercury')) output.add('communication').add('learning').add('decisions');
-  if (bodies.includes('venus')) output.add('love').add('expression');
-  if (bodies.includes('mars') || bodies.includes('saturn') || bodies.includes('pluto')) output.add('pressure_response').add('decisions');
-  if (bodies.includes('sun') || bodies.includes('moon')) output.add('identity').add('expression');
-  if (!output.size) output.add('identity');
-  return [...output];
-}
-
-function summarizeQuality(qualities: ReducedCurrentCondition['activeFactors'][number]['quality'][]): string {
-  if (qualities.includes('pressurizing') || qualities.includes('intensifying')) return 'pressure may be easier to notice, without becoming proof of what is true';
-  if (qualities.includes('stabilizing')) return 'structure may be easier to use when kept humane';
-  if (qualities.includes('softening')) return 'connection themes may be more noticeable';
-  return 'clarity themes may be easier to name';
+function computeCurrentToNatalContacts(
+  current: ReducedCurrentCondition['activeFactors'],
+  natal: BaselineSourceData['natalBodies']
+): ReducedCurrentCondition['currentToNatalContacts'] {
+  const definitions = [
+    { aspect: 'conjunction' as const, angle: 0, orb: 3 },
+    { aspect: 'sextile' as const, angle: 60, orb: 2 },
+    { aspect: 'square' as const, angle: 90, orb: 3 },
+    { aspect: 'trine' as const, angle: 120, orb: 3 },
+    { aspect: 'opposition' as const, angle: 180, orb: 3 }
+  ];
+  const contacts: ReducedCurrentCondition['currentToNatalContacts'] = [];
+  for (const live of current) {
+    for (const base of natal) {
+      const separation = Math.abs(signedLongitudeDelta(base.longitude, live.longitude));
+      for (const definition of definitions) {
+        const orb = Math.abs(separation - definition.angle);
+        if (orb > definition.orb) continue;
+        const rounded = Math.round(orb * 10) / 10;
+        contacts.push({
+          id: `contact.${live.body}.${definition.aspect}.${base.body}`,
+          currentBody: live.body,
+          natalBody: base.body,
+          aspect: definition.aspect,
+          orb: rounded,
+          display: `Current ${live.body} ${definition.aspect} natal ${base.body} (${rounded.toFixed(1)}° orb)`,
+          basisRef: `contact.${live.body}.${definition.aspect}.${base.body}`,
+          affectedFacetIds: [...new Set([...facetsForBody(live.body), ...facetsForBody(base.body)])],
+          uncertainty: live.uncertainty === 'high' || base.uncertainty === 'high'
+            ? 'high'
+            : live.uncertainty === 'medium' || base.uncertainty === 'medium'
+              ? 'medium'
+              : 'low'
+        });
+      }
+    }
+  }
+  return contacts.sort((left, right) => left.orb - right.orb).slice(0, 12);
 }

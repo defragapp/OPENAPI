@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { sovereignRuntimePromptV1 } from '../../../apps/sovereign-worker/src/agent/prompt-v1';
+import { sovereignRuntimePromptV2 } from '../../../apps/sovereign-worker/src/agent/prompt-v1';
 import { assertSovereignOutputSafety } from '../../../apps/sovereign-worker/src/agent/safety';
 import { routeGroundedIntelligence, type GroundedConceptId } from '../../../apps/sovereign-worker/src/agent/grounded-intelligence';
 
 const safeQuestion = 'WHAT I NOTICE\n\nYour Baseline may make clarity especially important when the available information is incomplete.\n\nLOOK INWARD\n\nWhat information would materially change this decision?\n\nBASIS · HD 5/1';
 
 describe('Sovereign behavior evals', () => {
-  it('starts from Baseline and Live Sky while preserving user authority', () => {
-    expect(sovereignRuntimePromptV1).toContain('BASELINE-FIRST FLOW');
-    expect(sovereignRuntimePromptV1).toContain('Deterministically computed, normalized Baseline Design');
-    expect(sovereignRuntimePromptV1).toContain('Deterministically computed Live Sky');
-    expect(sovereignRuntimePromptV1).toContain('choose response_phase "integration" and give a clear answer now');
-    expect(sovereignRuntimePromptV1).toContain("The user's lived experience remains authoritative");
-    expect(sovereignRuntimePromptV1).toContain('Use response_phase "question" only when one missing fact materially prevents a responsible answer');
+  it('keeps the four intelligence layers distinct while preserving user authority', () => {
+    expect(sovereignRuntimePromptV2).toContain('Baseline-first intelligence');
+    expect(sovereignRuntimePromptV2).toContain('Exact server-owned source data');
+    expect(sovereignRuntimePromptV2).toContain('Temporary current conditions');
+    expect(sovereignRuntimePromptV2).toContain('Give the direct answer first');
+    expect(sovereignRuntimePromptV2).toContain('does not measure personality or prove behavior');
+    expect(sovereignRuntimePromptV2).toContain('Ask one focused question only when missing information materially blocks');
   });
 
   it('rejects diagnosis, hidden intent, deterministic prediction, and stigma', () => {
@@ -23,7 +23,7 @@ describe('Sovereign behavior evals', () => {
   });
 
   it('keeps framework terminology in the compact Basis footer', () => {
-    expect(sovereignRuntimePromptV1).toContain('Select only exact values');
+    expect(sovereignRuntimePromptV2).toContain('Select IDs only in basis_refs');
     expect(safeQuestion.split('BASIS ·')[0]).not.toMatch(/transit|aspect|gate|channel|human design|gene keys/i);
     expect(() => assertSovereignOutputSafety('WHAT I NOTICE\n\nHD 5/1 makes this happen.\n\nLOOK INWARD\n\nWhat feels at risk?')).toThrow();
   });

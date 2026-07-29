@@ -91,13 +91,22 @@ function safeRewrite(issue: SovereignSafetyIssue, question: boolean): string {
   }
 }
 
-export function assertSovereignOutputSafety(output: string, options: { phase?: 'question' | 'integration'; allowFrameworkLabels?: boolean } = {}): void {
+export function assertSovereignOutputSafety(output: string, options: {
+  phase?: 'question' | 'integration';
+  contract?: 'sovereign-answer.v2';
+  allowFrameworkLabels?: boolean;
+} = {}): void {
   for (const pattern of forbidden) {
     if (pattern.test(output)) throw new Error('Sovereign output failed safety validation');
   }
   for (const { issue, pattern, neutralFrameworkName } of reviewPatterns) {
     if (options.allowFrameworkLabels && neutralFrameworkName) continue;
     if (pattern.test(output)) throw new Error(`Sovereign output failed safety validation: ${issue}`);
+  }
+  if (options.contract === 'sovereign-answer.v2') {
+    if (output.trim().length < 60) throw new Error('Sovereign answer is too shallow');
+    if ((output.match(/\?/g) ?? []).length > 2) throw new Error('Sovereign answer asks too many questions');
+    return;
   }
   const questionPhase = options.phase === 'question' || (output.includes('WHAT I NOTICE') && output.includes('LOOK INWARD'));
   const integrationPhase = options.phase === 'integration' || (output.includes('WHAT THIS MAY BE SHOWING') && output.includes('A CLEARER FORM') && output.includes('WHAT TO DO'));

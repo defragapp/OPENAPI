@@ -36,17 +36,21 @@ function fakeEnv(): Env {
     AI: { async run(model: string, input: unknown, options?: unknown) {
       if (model !== 'openai/gpt-5.5') throw new Error('invalid model');
       const gateway = (options as any)?.gateway;
-      if (gateway?.id !== 'sovereign' || gateway?.skipCache !== true || gateway?.collectLog !== false || gateway?.metadata?.plan !== 'free' || gateway?.metadata?.response_contract !== 'inner-recognition-v1' || !gateway?.metadata?.account_ref) throw new Error('invalid gateway metadata');
+      if (gateway?.id !== 'sovereign' || gateway?.skipCache !== true || gateway?.collectLog !== false || gateway?.metadata?.plan !== 'free' || gateway?.metadata?.response_contract !== 'sovereign-answer.v2' || !gateway?.metadata?.account_ref) throw new Error('invalid gateway metadata');
       if (JSON.stringify(options).includes('acct_')) throw new Error('raw account id leaked');
-      if (JSON.stringify(input).match(/birth date|birth time|latitude|longitude|workspace\/SOVV/i)) throw new Error('private model input leaked');
+      if (JSON.stringify(input).match(/birth date|birth time|latitude|exactPrivateLocation|workspace\/SOVV/i)) throw new Error('private model input leaked');
       return { result: { output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({
-        response_phase: 'question',
-        recognition: 'You may be trying to solve the uncertainty before you know what is available.',
-        inward_question: 'What are you hoping the next message will make certain?',
-        candidate_hidden_expectation: '', protected_need: '', clearer_form: '', practical_action: '',
-        module_suggestion: { should_offer: false, title: '', reason: '', format: 'reflection' },
-        basis: { user_confirmed: false, human_design: [], gene_keys: [], astrology: [], relationship: [], live: [], numerology: [] },
-        confidence: 'exploratory', safety_mode: 'standard'
+        version: 'sovereign-answer.v2',
+        mode: 'baseline',
+        depth: 'focused',
+        headline: 'Uncertainty is not automatically yours to solve.',
+        direct_answer: 'You may be trying to end the uncertainty before you know which part of the decision is actually yours to carry.',
+        sections: [{ id: 'unknowns', label: 'Still unknown', body: 'The available context does not establish what the next message will change.' }],
+        basis_refs: [],
+        correction_prompt: 'Does this fit your experience?',
+        actions: [{ type: 'explore_facet', label: 'Explore responsibility' }],
+        confidence: 'exploratory',
+        safety_mode: 'standard'
       }) }] }] } };
     } }
   };
@@ -57,9 +61,8 @@ async function main(): Promise<void> {
   const res = await app.fetch(new Request('https://app.test/api/v1/threads/t-smoke/messages', { method: 'POST', headers: { authorization: `Bearer ${token}`, origin: 'https://app.test', 'content-type': 'application/json', 'x-idempotency-key': 'smoke-1' }, body: JSON.stringify({ message: 'I already sent three messages, but I still want to explain it better.', context: { surface: 'Today' } }) }), fakeEnv(), {} as ExecutionContext);
   const text = await res.text();
   if (res.status !== 202) throw new Error(`worker gateway smoke failed status=${res.status}`);
-  for (const heading of ['WHAT I NOTICE', 'LOOK INWARD']) if (!text.includes(heading)) throw new Error(`missing ${heading}`);
-  if ((text.match(/\?/g) ?? []).length !== 1) throw new Error('recognition response must ask one question');
-  console.log(`Worker Gateway smoke passed status=${res.status} response_chars=${text.length} contract=inner-recognition-v1 provider=cloudflare-gateway model=openai/gpt-5.5`);
+  for (const phrase of ['Uncertainty is not automatically yours to solve.', 'STILL UNKNOWN']) if (!text.includes(phrase)) throw new Error(`missing ${phrase}`);
+  console.log(`Worker Gateway smoke passed status=${res.status} response_chars=${text.length} contract=sovereign-answer.v2 provider=cloudflare-gateway model=openai/gpt-5.5`);
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1); });

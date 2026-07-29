@@ -15,12 +15,13 @@ const stripeRoute = readFileSync('apps/sovereign-worker/src/routes/stripe.ts', '
 const scaleMigration = readFileSync('apps/sovereign-worker/migrations/0009_production_scale_and_billing_safety.sql', 'utf8');
 const workspaceMigration = readFileSync('apps/sovereign-worker/migrations/0010_account_onboarding_and_chat_history.sql', 'utf8');
 const recoveryMigration = readFileSync('apps/sovereign-worker/migrations/0011_email_code_recovery.sql', 'utf8');
+const intelligenceMigration = readFileSync('apps/sovereign-worker/migrations/0012_baseline_facets_and_answer_v2.sql', 'utf8');
 const browserRuntime = readFileSync('apps/web/src/ProductionRuntime.ts', 'utf8');
 const recoveryUi = readFileSync('apps/web/src/EmailCodeFallback.tsx', 'utf8');
 const appHtml = readFileSync('apps/web/index.html', 'utf8');
 const appUi = readFileSync('apps/web/src/App.tsx', 'utf8');
 const publicLandingUi = readFileSync('apps/web/src/PublicLanding.tsx', 'utf8');
-const workspaceUi = readFileSync('apps/web/src/SovereignWorkspace.tsx', 'utf8');
+const workspaceUi = readFileSync('apps/web/src/SovereignIntelligenceWorkspace.tsx', 'utf8');
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const pricing = readFileSync('apps/web/public/pricing.html', 'utf8');
 const consent = readFileSync('apps/web/public/consent.html', 'utf8');
@@ -39,17 +40,17 @@ for (const fingerprint of currentDocumentFingerprints) {
 }
 
 const currentApplicationFingerprints = [
-  'Understand yourself—and everyone your life includes.',
+  'Know yourself.',
+  'Understand the system.',
+  'Choose what fits.',
+  'What is active for you now?',
   'What do you want to understand?',
-  'Ask about yourself, a decision, a relationship, or the system around you. Sovereign brings in only the context that belongs.',
-  'YOUR BASELINE · AVAILABLE IN EVERY CONVERSATION',
-  'Your Baseline stays steady.',
-  'Explore my Baseline',
-  'See the relationship from both sides.',
-  'What role does each person occupy in this system?',
-  'Only understandings you deliberately save appear here.',
-  'Build once. Explore continuously.',
-  'Optional Christian and biblical lens for this conversation.'
+  'Understand the relationship from both sides.',
+  'See how the whole group functions.',
+  'Keep what changes your understanding.',
+  'Your Baseline, plan, permissions, and account.',
+  'Explore this through Covenant?',
+  'Build your Baseline.'
 ];
 for (const fingerprint of currentApplicationFingerprints) {
   if (!deploy.includes(fingerprint)) throw new Error(`Direct production deploy is missing current application fingerprint: ${fingerprint}`);
@@ -162,7 +163,7 @@ for (const required of [
   "headers.set('x-robots-tag', 'noindex, nofollow')",
   'isNavigationAssetPath',
   "target.pathname = '/app'",
-  "migrationVersion: '0011_email_code_recovery'",
+  "migrationVersion: '0012_baseline_facets_and_answer_v2'",
   "includesPrivateWorkspaceData: false",
   'sovereign_capacity_unavailable',
   "headers: { 'retry-after': '60' }",
@@ -258,6 +259,14 @@ for (const required of [
 ]) {
   if (!recoveryMigration.includes(required)) throw new Error(`Email code recovery migration is missing ${required}`);
 }
+for (const required of [
+  'CREATE TABLE IF NOT EXISTS baseline_facet_profiles',
+  'facet_contract_version TEXT NOT NULL',
+  'model_version TEXT NOT NULL',
+  'profile_json TEXT NOT NULL'
+]) {
+  if (!intelligenceMigration.includes(required)) throw new Error(`Baseline intelligence migration is missing ${required}`);
+}
 
 for (const required of [
   "if (kind === 'login' && !existing)",
@@ -326,7 +335,7 @@ for (const required of [
 ]) {
   if (!browserRuntime.includes(required)) throw new Error(`Browser production runtime is missing ${required}`);
 }
-if (!`${appUi}\n${workspaceUi}`.includes('No private workspace data is included')) {
+if (!`${appUi}\n${workspaceUi}\n${browserRuntime}`.includes('No private workspace data was included')) {
   throw new Error('Workspace sharing control is missing its private-data boundary');
 }
 
@@ -367,4 +376,4 @@ for (const required of [
   if (!consentJs.includes(required)) throw new Error(`Consent controls are missing ${required}`);
 }
 
-console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0011 email_code_recovery=true account_onboarding=true conversation_history=true d1_scale_indexes=true durable_objects=true durable_object_sharding=account_thread workers_ai=true ai_capacity_backpressure=true ai_allowance_retry_after=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true consent_csp_safe=true full_live_copy_gate=true signup_only_account_creation=true policy_acceptance_persisted=true malformed_magic_links_rejected=true trusted_stripe_handoffs=true remote_stripe_subscription_discovery=true cron=true r2=false queues=false turnstile=true magic_link_email=true email_code_fallback=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true support_placement=false private_exports=false public_share=true live_gate=true concurrency_probe=20');
+console.log('Production release verified direct_cloudflare=true isolated_custom_domains=true hostname_navigation=true legacy_apex_preserved=true migration=0012 baseline_facets=true answer_v2=true email_code_recovery=true account_onboarding=true conversation_history=true d1_scale_indexes=true durable_objects=true durable_object_sharding=account_thread workers_ai=true ai_capacity_backpressure=true ai_allowance_retry_after=true static_assets=true static_security_headers=true document_security_headers=true hsts=true immutable_bundles=true app_noindex=true consent_csp_safe=true full_live_copy_gate=true signup_only_account_creation=true policy_acceptance_persisted=true malformed_magic_links_rejected=true trusted_stripe_handoffs=true remote_stripe_subscription_discovery=true cron=true r2=false queues=false turnstile=true magic_link_email=true email_code_fallback=true stripe_checkout=true stripe_portal=true stripe_webhook_retry=true stripe_cancel_before_delete=true deleted_account_entitlements_blocked=true support_placement=false private_exports=false public_share=true live_gate=true concurrency_probe=20');

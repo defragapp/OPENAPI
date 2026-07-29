@@ -11,107 +11,67 @@ const consentCss = readFileSync(new URL('../public/consent.css', import.meta.url
 const launchCss = readFileSync(new URL('../public/launch.css', import.meta.url), 'utf8');
 const launchPolishCss = readFileSync(new URL('../public/launch-polish.css', import.meta.url), 'utf8');
 const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
-const refinementCss = readFileSync(new URL('./brand-landing-refinement.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
-const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-const icon = readFileSync(new URL('../public/app-icon.svg', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
 describe('Sovereign.OS public experience', () => {
-  it('makes the product unmistakable in the first viewport', () => {
-    expect(landing).toContain('Choose what is yours to carry.');
-    expect(landing).toContain('Why this appears');
-    expect(landing).toContain('Responsibility without matching authority');
-    expect(landing).toContain('this correction stays with the exploration');
-    expect(landing).toContain('Sovereign.OS begins with a private reference point');
+  it('makes the product and a paid-value answer unmistakable in the first viewport', () => {
+    expect(landing).toContain('PRIVATE AI, BUILT AROUND YOUR BASELINE');
+    expect(landing).toContain('Know yourself.');
+    expect(landing).toContain('Understand the system.');
+    expect(landing).toContain('Choose what fits.');
+    expect(landing).toContain('The resentment often arrives later');
     expect(landing).toContain('Build my Baseline');
-    expect(index).toContain('Personal intelligence for real life');
-    expect(index).toContain('Private personal, relationship, and system intelligence');
   });
 
   it('explains the complete Baseline-first platform in direct language', () => {
-    for (const phrase of [
-      'Baseline Design',
-      'shadow and gift expression',
-      'ALIGNMENT',
-      'PEOPLE · EXPLICIT PERMISSION',
-      'SYSTEMS · FAMILY, GROUP, AND TEAM',
-      'Covenant'
-    ]) expect(publicCopy).toContain(phrase);
-    expect(publicCopy).not.toMatch(/healing journey|observatory|signal map|hidden motive revealed|diagnose the relationship/i);
-  });
-
-  it('keeps the landing concise and visually demonstrative', () => {
-    expect((landing.match(/<section/g) ?? []).length).toBeLessThanOrEqual(7);
-    for (const label of ['A PRIVATE INTELLIGENCE WORKSPACE', 'ALIGNMENT · APPLY YOUR BASELINE NOW', 'PEOPLE · EXPLICIT PERMISSION']) {
-      expect(landing).toContain(label);
-    }
-    expect(landing).toContain('Return without starting over.');
-    expect(landing).toContain('<BaselineOrbit />');
-    expect(landing).toContain('className={`scope-field scope-mode-${scope}`}');
-  });
-
-  it('uses accessible examples instead of unexplained decoration', () => {
-    for (const phrase of [
-      'role="tablist"',
-      'role="tabpanel"',
-      'aria-live="polite"',
-      'onKeyDown',
-      'ArrowLeft',
-      'aria-selected',
-      'You remain the authority'
-    ]) expect(landing).toContain(phrase);
-    for (const selector of ['.baseline-card', '.example-tabs', '.example-thread', '.example-sovereign']) {
-      expect(landingCss).toContain(selector);
-    }
-  });
-
-  it('uses one consistent, non-letterform brand mark', () => {
-    expect(index).toContain('rel="icon" href="/app-icon.svg"');
-    expect(index).toContain('rel="mask-icon" href="/safari-pinned-tab.svg"');
-    expect(icon).toContain('A central point held by three open layers');
-    expect(refinementCss).toContain("url('/brand-mark.svg')");
-    expect(refinementCss).toContain('.landing-wordmark > span');
-    expect(refinementCss).toContain('.intelligence-brand > span');
-  });
-
-  it('keeps pricing, privacy, permission, and authority explicit', () => {
-    for (const phrase of ['$20', '$99', '10 conversations', '300 conversations', 'Stripe']) {
+    for (const phrase of ['Baseline Design', 'Shadow', 'Gift', 'Alignment', 'TWO PEOPLE · TWO BASELINES · ONE INTERACTION', 'SEE THE WHOLE SYSTEM', 'Covenant']) {
       expect(publicCopy).toContain(phrase);
     }
-    for (const phrase of [
-      'Raw birth',
-      'permission',
-      'cannot establish another person’s private motive',
-      'Your experience remains authoritative'
-    ]) expect(publicCopy).toContain(phrase);
+    expect(publicCopy).not.toMatch(/healing journey|hidden motive revealed|diagnose the relationship/i);
+  });
+
+  it('uses interactive product structures instead of a grid of marketing claims', () => {
+    expect(landing).toContain('<LivingSovereignAnswer />');
+    expect(landing).toContain('<PublicAnswerStage');
+    expect(landing).toContain('<SystemMap />');
+    expect(landing).toContain('role="tablist"');
+    expect(landing).toContain('role="tabpanel"');
+    expect(landing).toContain('aria-live="polite"');
+  });
+
+  it('uses exact data-only Basis fixtures', () => {
+    expect(landing).toContain('Sanitized demonstration fixture');
+    for (const value of ['HD G13.1', 'GK ACT13', 'N LP1', '☉ CAN 04.2°']) expect(landing).toContain(value);
+    expect(landing).toContain('Exact source details');
+    expect(landing).not.toContain('pressure concentrates with you');
+  });
+
+  it('keeps verified prices, permission, and limits explicit', () => {
+    for (const phrase of ['$20', '$99', '10 Sovereign AI turns', '300 Sovereign AI turns', 'Stripe']) expect(publicCopy).toContain(phrase);
+    expect(landing).toContain('No compatibility score. No mind-reading.');
+    expect(faq).toContain('It cannot know another person’s exact feelings, motives, private experience, or future behavior.');
     expect(policy).toContain('Private account export is not available at launch.');
-    expect(landing).not.toContain('donate.stripe.com');
-    expect(pricing).not.toContain('donate.stripe.com');
-    expect(publicCopy).not.toMatch(/full account export|export features|Support the platform/i);
   });
 
   it('renders public React routes without runtime copy rewriting', () => {
     expect(main).toContain("location.pathname === '/'");
     expect(main).toContain('<PublicLanding />');
     expect(main).toContain('<PublicPolicy kind={publicPolicyKind} />');
-    expect(main).toContain("import './brand-landing-refinement.css'");
     expect(main).not.toContain('ProductLanguageRuntime');
-    expect(index).not.toContain('/public-site.js');
-    expect(index).not.toContain('/intelligence-ui.js');
-    expect(index).not.toContain('/ux-audit-runtime.js');
+    expect(main).not.toMatch(/refinement|landing-v2/i);
   });
 
   it('keeps static pages responsive and consent independently controlled', () => {
     for (const page of [how, pricing, faq]) {
-      expect(page).toContain('/launch.css?v=20260726-platform-r2');
-      expect(page).toContain('/launch-polish.css?v=20260726-final-r1');
+      expect(page).toContain('/launch.css?v=20260728-baseline-first');
+      expect(page).toContain('/launch-polish.css?v=20260728-baseline-first');
     }
     expect(launchCss).toContain('@media (max-width: 680px)');
     expect(launchPolishCss).toContain('prefers-reduced-motion');
+    expect(landingCss).toContain('@media (max-width: 760px)');
     expect(consent).toContain('You decide what another account may use.');
     expect(consent).toContain('The inviting account cannot make or change these decisions for you.');
-    expect(consent).toContain('noindex,nofollow');
     expect(consentCss).toContain('@media (max-width: 680px)');
   });
 });

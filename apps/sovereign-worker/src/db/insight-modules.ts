@@ -1,5 +1,5 @@
 import type { Env } from '../env';
-import { recognitionPlanSchema } from '../agent/recognition';
+import { sovereignAnswerSchema } from '../agent/recognition';
 import { getEntitlements, requireFeature } from './entitlements';
 import { ensureThread } from './threads';
 
@@ -13,23 +13,15 @@ export async function saveLatestInsightModule(env: Env, accountId: string, threa
   if (!event) throw new Response('No Insight Module is waiting for approval.', { status: 404 });
 
   const payload = safeJson(event.payload_json);
-  const plan = recognitionPlanSchema.parse(payload.plan);
-  if (!plan.module_suggestion.should_offer || !plan.module_suggestion.title) {
-    throw new Response('The latest response did not offer an Insight Module.', { status: 409 });
-  }
+  const answer = sovereignAnswerSchema.parse(payload.answer);
 
   const module = {
-    title: plan.module_suggestion.title,
-    recognition: plan.recognition,
-    hidden_expectation: plan.candidate_hidden_expectation,
-    inward_question: plan.inward_question,
-    clearer_form: plan.clearer_form,
-    practice: plan.practical_action,
-    example: '',
-    resource: null,
-    basis: plan.basis,
-    confidence: plan.confidence,
-    safety_mode: plan.safety_mode,
+    title: answer.headline,
+    summary: answer.direct_answer,
+    sections: answer.sections,
+    basis_refs: answer.basis_refs,
+    confidence: answer.confidence,
+    safety_mode: answer.safety_mode,
     created_from_session_id: threadId,
     source_event_id: event.id,
     visibility: 'private',

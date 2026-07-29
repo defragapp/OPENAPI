@@ -1,102 +1,104 @@
 # Sovereign.OS launch product contract
 
-Status: founder-approved direction for pre-deployment work as of July 24, 2026.
+Status: canonical implementation and approval boundary.
 
-This document is the product boundary for the first public approval candidate. It prevents implementation agents from guessing positioning, access, religious framing, multi-user behavior, or retention policy.
+## Product boundary
 
-## Approval scope
+Sovereign.OS is a Baseline-first AI platform for self, relationship, and system intelligence. The launch candidate must provide useful personal exploration without an incident and real permission-bound multi-user behavior.
 
-The approval candidate must include real multi-user behavior. A self-only preview with static pair or system placeholders is not sufficient for approval.
+The approval candidate includes:
 
-Before approval, Sovereign.OS must support:
+- private Baseline creation with unknown birth time supported;
+- versioned structured Baseline facets;
+- exact, expiring current-condition context;
+- adaptive `sovereign-answer.v2` answers;
+- exact server-approved Basis rendering;
+- invited-person identity and scope-specific consent;
+- two-person comparison from separate structured Baselines;
+- family, household, friendship, workplace, team, and custom systems;
+- immediate revocation enforcement;
+- contextual, confirmed Covenant exploration;
+- intentional Library continuity;
+- Free and Sovereign+ server-side entitlement enforcement.
 
-- authenticated invited-person identity;
-- invitee-controlled, scope-specific consent;
-- reduced Baseline comparison for two people;
-- reduced Baseline overlays for families, households, teams, workplaces, and custom groups;
-- immediate enforcement of consent revocation;
-- participant-level uncertainty, provenance, role context, and responsibility boundaries;
-- structured results that never merge a group into a diagnosis or inferred hidden motive.
+## Public answer categories
+
+Every answer preserves the difference between:
+
+1. a stable Baseline facet;
+2. a temporary current condition;
+3. a user-confirmed observation;
+4. supplied role, authority, responsibility, dependence, caregiving, or material context;
+5. an unconfirmed interpretation;
+6. the unknown actual state.
+
+The main answer uses plain language. Exact source values appear only in Basis.
+
+## Baseline accuracy
+
+The exact source contract may include natal body, sign, numeric longitude, display degree, retrograde state, verified aspects and orb, partial Human Design personality gate and line activations, partial Gene Keys activation numbers, numerology, computation version, uncertainty, provenance, exact current positions, and deterministic current or pair contacts.
+
+Unavailable values are omitted, not guessed. The product does not claim uncomputed Human Design type, authority, centers, profile, design-side values, or channels; a complete Gene Keys profile; unsupported Gene Keys expressions or sequences; or unavailable houses.
+
+The Baseline facet profile is versioned, validated, interpretive, and tied to exact Basis references. It is cached by protected input hash, calculation version, facet-contract version, and model version.
+
+## Relationship and system consent
 
 A workspace owner may request access, cancel an invitation, remove a person from their workspace, or stop using shared context. A workspace owner may never grant consent on behalf of another person.
 
-## Public Baseline language
+The server rechecks identity, entitlement, and the required scope on every shared use. Revocation blocks future use immediately.
 
-The primary interface uses simple, human language. Users should not need to understand astrology, Human Design, Gene Keys, numerology, source files, model configuration, or framework terminology to receive useful help.
+Another person’s exact framework values remain absent without `framework.display`. A one-sided owner entry never exposes that person’s private Baseline.
 
-Those frameworks may remain inside the private computation and provenance boundary when authorized and technically justified. They must not be exposed as the primary explanation or presented as scientifically verified psychological measurement.
-
-The public answer must keep these categories separate:
-
-1. Baseline tendency
-2. Current amplification
-3. User-confirmed observation
-4. Role, authority, dependence, or material context
-5. Unknown actual state
+System analysis uses supported roles, authority, responsibility, care, reliance, constraints, objectives, observations, and missing perspectives. Graph edges appear only when a relationship is supplied or confirmed.
 
 ## Covenant
 
-Covenant is a primary launch capability.
+Covenant is a primary capability and a contextual action, not a top-level application. A grounded answer remains complete without it.
 
-Sovereign may recognize that a family or relational dynamic could be explored through a relevant biblical metaphor or Scripture pattern. The primary grounded answer must remain complete without Covenant.
+The action may appear for relevant family roles, favoritism, rivalry, blame, betrayal, exile and return, forgiveness and reconciliation, boundaries and accountability, caregiving, pride and humility, truth and compassion, generational influence, peacekeeping, or a person carrying a role for the whole family. Religious keywords are not required for the offer.
 
-When relevant, Sovereign may offer a subtle action such as **Explore through Scripture**. Covenant must not activate until the user explicitly chooses it for the current question or thread.
+Covenant remains off until the user explicitly confirms it for the question. It uses only verified retrieved or curated passages and separates Biblical parallel, Scripture, teaching, application, and boundary.
 
-Covenant must:
-
-- retrieve Scripture from an approved, verifiable source;
-- keep passage text, metaphorical application, and practical suggestion separate;
-- preserve the Baseline, Current, Observed, Role Context, and Unknown boundaries;
-- avoid claims about God's exact intent;
-- avoid using Scripture as proof of another person's motive, diagnosis, future behavior, or moral status;
-- avoid automatic requirements for estrangement, contact, reconciliation, forgiveness, submission, or continued exposure to harm;
-- account for safety, coercion, authority, dependence, caregiving, and practical constraints;
-- require the relevant consent scope before another person's Baseline or saved context is included.
+It must never claim divine certainty, assign an absent person moral status, or require forgiveness, reconciliation, contact, submission, estrangement, or continued exposure to harm.
 
 ## Free access and billing
 
-Free is a permanent first-party plan, not a Stripe subscription and not a temporary trial.
+Free is permanent, not a trial or Stripe subscription.
 
-- Free allowance: 10 Sovereign AI turns per UTC calendar month.
-- Sovereign+ remains a Stripe-backed paid subscription.
-- Entitlements must be enforced server-side on every protected route.
-- A payment failure, cancellation, or expired subscription must resolve safely to Free without deleting the user's workspace.
+- Free: $0, 10 Sovereign AI turns per UTC month.
+- Sovereign+: $20 monthly or $99 annually, 300 turns per UTC month.
+- People, Systems, Library, Covenant, and consent-aware shared use remain Sovereign+ capabilities.
 
-Any future free trial of Sovereign+ requires a separate founder decision.
+Stripe Checkout, Portal, products, prices, lookup keys, and server entitlement enforcement remain authoritative. Payment failure, cancellation, or expiration returns the account safely to Free without deleting the workspace.
 
-## Support contributions
+Existing support products grant no plan entitlement and are not surfaced without a separate approved decision.
 
-The existing Stripe support product is a voluntary contribution toward continued Sovereign.OS development and grants no access, subscription, feature, or entitlement.
+## Retention and account control
 
-No support or donation action is included in the approval candidate until the founder explicitly confirms why it belongs in the product and where it should appear. Existing Stripe objects may remain active, but the application must not silently introduce support placement.
+- Unsaved thread content and complete answers: 30 days.
+- Minimal operational and security metadata without conversation content: 90 days.
+- Explicitly saved Library items: until the user deletes them or closes the account.
+- Sessions and account access links: purpose-specific expiry.
+- Billing records: only as needed for subscription operation, accounting, fraud prevention, and law.
 
-## Retention
+Raw birth inputs, exact private locations, credentials, unrelated account history, and hidden reasoning never enter operational logs or model context.
 
-Use purpose-specific retention rather than one blanket period.
+Account deletion retains the existing 14-day grace period and Stripe-first cancellation requirement.
 
-- Unsaved thread content and complete AI responses: 30 days.
-- Minimal security and operational audit metadata without conversation content: 90 days.
-- Explicitly saved Library understandings: retained until the user deletes them or closes the account.
-- Export artifacts: seven days unless a shorter period is configured.
-- Magic links and sessions: existing purpose-specific expiry.
-- Billing records: retained only as required for subscription operation, accounting, fraud prevention, and applicable law.
+## Release authority
 
-Retention periods must be visible in Privacy and account controls. Scheduled cleanup must be tested. Saved Library records must not depend on retaining the source thread. Full prompts, raw birth input, exact private location, provider credentials, and hidden reasoning must never be written to operational logs.
+Cloudflare Workers Builds connected to `defragapp/OPENAPI` is the only production release authority. GitHub Actions, ad-hoc local production deploys, a second Worker, another AI provider, R2, Queue, and alternate deployment paths are not part of this contract.
 
-## Approval evidence
+Production deployment requires one exact commit with:
 
-Production deployment is prohibited until all of the following are available for one exact commit SHA:
-
-- green CI;
-- protected Cloudflare preview;
-- successful D1 migration replay;
-- authenticated desktop and iPhone smoke tests;
-- real invitation, identity, grant, comparison, revocation, and blocked-after-revocation flow;
-- family or team overlay with at least three consented users;
-- validated structured AI output before display;
-- Covenant suggestion and explicit-enable verification;
-- Free allowance, paid upgrade, cancellation, and fallback verification;
-- 30-day thread and 90-day audit retention tests;
-- reviewed Terms and Privacy documents;
-- zero raw birth inputs, exact private locations, secrets, unconsented person data, or hidden reasoning in logs and traces;
-- explicit founder approval.
+- foundation, type, unit, build, smoke, secret, and removal gates passing;
+- successful idempotent D1 migration replay;
+- desktop and mobile route review;
+- real invitation, grant, comparison, system, revocation, and blocked-after-revocation flows;
+- exact Basis authorization rejection tests;
+- Covenant-offer, explicit-confirmation, verified-passage, and entitlement tests;
+- Free and Sovereign+ pricing and entitlement verification;
+- reviewed privacy and retention behavior;
+- no private inputs, secrets, unconsented context, or hidden reasoning in traces;
+- explicit approval.
