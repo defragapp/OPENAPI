@@ -89,7 +89,7 @@ describe('Sovereign.OS public experience', () => {
     for (const page of [how, pricing, faq]) {
       expect(page).toContain('/launch.css?v=20260728-baseline-first');
       expect(page).toContain('/launch-polish.css?v=20260728-baseline-first');
-      expect(page).toContain('/static-experience.css?v=20260729-post-deploy-review');
+      expect(page).toContain('/static-experience.css?v=20260729-final-review');
     }
     expect(launchCss).toContain('@media (max-width: 680px)');
     expect(launchPolishCss).toContain('prefers-reduced-motion');
@@ -97,6 +97,7 @@ describe('Sovereign.OS public experience', () => {
     expect(staticExperienceCss).toContain('@media (max-width: 860px)');
     expect(staticExperienceCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(staticExperienceCss).toContain('.pricing-page .pricing-hero > p:last-child');
+    expect(staticExperienceCss).toContain('white-space: nowrap');
     expect(staticExperienceCss).toContain('margin-inline: 0');
     expect(consent).toContain('You decide what another account may use.');
     expect(consent).toContain('The inviting account cannot make or change these decisions for you.');
