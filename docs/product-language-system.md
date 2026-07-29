@@ -4,9 +4,38 @@ Use this guide for public pages, authentication, onboarding, the authenticated w
 
 ## Product definition
 
-Sovereign.OS is a private AI platform for understanding yourself, your relationships, and the groups around you. It starts with your Baseline Design, then adds only the current, relational, and system context you choose.
+Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the groups around you. It starts with your Baseline Design, then adds only the current, relational, and system context you choose.
+
+A public visitor should understand the interaction before learning framework terminology:
+
+- ask Sovereign a natural-language question;
+- receive a direct answer built around the person asking;
+- see what is supported, interpretive, confirmed, or still unknown;
+- explore more deeply only when it is useful.
 
 Baseline Design is the personal intelligence foundation. It gives Sovereign a consistent reference for how a person may decide, communicate, learn, connect, lead, create, respond under pressure, and grow.
+
+## Brand-language hierarchy
+
+### Product category
+
+`Private personal AI for real life.`
+
+### Interaction promise
+
+`Ask about your life. Get an answer built around you.`
+
+### Emotional brand statement
+
+`Healing isn’t optional. Holding the pain is.`
+
+Use the emotional statement only after the product category and interaction are clear. It is not a therapy claim, diagnosis, required reconciliation, or guaranteed outcome.
+
+### Enduring brand line
+
+`Know yourself. Understand the system. Choose what fits.`
+
+Use this as a deeper brand statement or closing line. Do not make it carry the full burden of explaining the product.
 
 ## Voice
 
@@ -22,6 +51,10 @@ Do not use generic coaching, inspirational filler, therapy voice, diagnosis, spi
 
 A stable, explorable reference. It is interpretive and correctable, not a measured psychological fact.
 
+Public explanation:
+
+`The private personal foundation Sovereign uses to understand where to begin.`
+
 ### Active now
 
 An expiring current-condition layer that may make a Baseline theme more relevant. It does not determine behavior.
@@ -30,13 +63,19 @@ An expiring current-condition layer that may make a Baseline theme more relevant
 
 How a valid quality may narrow, distort, protect, avoid, or overreach under pressure.
 
+Public demonstration label may be `Under pressure` while the authenticated contract remains Shadow.
+
 ### Gift
 
 What the same quality makes possible when used with awareness and choice.
 
+Public demonstration label may be `At its best` while the authenticated contract remains Gift.
+
 ### Alignment
 
 A way to examine whether a choice, behavior, relationship, opportunity, or direction fits the person a user is and is becoming. It is not a score or rule.
+
+Public demonstration label may be `What fits` while the authenticated contract remains Alignment.
 
 ### Basis
 
@@ -45,6 +84,10 @@ Exact server-approved values that shaped an interpretation. Basis supports refle
 ### Covenant
 
 An optional way to explore a relevant question through Christian teaching and clearly cited Scripture. It appears contextually and activates only after confirmation.
+
+Public action label:
+
+`Explore through Christian Scripture`
 
 ## Answer language
 
@@ -69,20 +112,31 @@ Covenant answers use **Biblical parallel**, **Scripture**, **Teaching**, **Appli
 
 Hero:
 
-- Kicker: `PRIVATE AI, BUILT AROUND YOUR BASELINE`
-- Headline: `Know yourself. Understand the system. Choose what fits.`
+- Kicker: `PERSONAL AI FOR REAL LIFE`
+- Headline: `Ask about your life. Get an answer built around you.`
+- Body: `Sovereign.OS is a private personal AI for understanding yourself, your relationships, and the decisions in front of you. Build your Baseline once, then ask naturally and receive answers grounded in the person asking.`
 - Primary action: `Build my Baseline`
-- Secondary action: `See what Sovereign can answer`
-- Trust line: `Start free · No card required · Confirm, correct, or reject any interpretation`
+- Secondary action: `See a Sovereign answer`
+- Trust line: `Start free · No card required · Review, correct, or reject any interpretation`
 
 Primary section language:
 
-- `START WITH THE QUESTION YOU ALREADY HAVE`
-- `WHAT IS YOURS · WHAT IS ACTIVE NOW`
+- `WHY SOVEREIGN EXISTS`
+- `BRING THE QUESTION YOU ALREADY HAVE`
+- `WHY THIS AI IS DIFFERENT`
 - `ONE QUALITY · MORE THAN ONE EXPRESSION`
-- `TWO PEOPLE · TWO BASELINES · ONE INTERACTION`
-- `SEE THE WHOLE SYSTEM`
-- `SEE WHAT SHAPED THE ANSWER`
+- `TWO PEOPLE · SHARED WITH PERMISSION`
+- `FAMILIES · TEAMS · HUMAN SYSTEMS`
+- `CLEAR ANSWER FIRST`
+
+The first visible answer should use a real-life question, such as:
+
+- `Why do I keep taking responsibility for everyone else?`
+- `Does this decision fit who I am now?`
+- `Why does the same moment land differently for us?`
+- `Why does this responsibility keep landing with me?`
+
+Do not open the public page with framework terminology, source abbreviations, or a philosophy-only headline.
 
 ## Authentication
 
@@ -143,7 +197,7 @@ You:
 
 Free:
 
-- `Understand yourself.`
+- `A personal AI built around you.`
 - $0, permanent, no card.
 - 10 Sovereign AI turns each month.
 
@@ -169,4 +223,8 @@ Avoid:
 - “return to yourself”;
 - “do the work”;
 - “one clean next move” as the whole value;
+- “healing journey”;
+- “unlock your potential”;
+- “become your highest self”;
+- generic “break the cycle” promises;
 - claims of motive, exact emotion, diagnosis, destiny, or guaranteed outcome.
