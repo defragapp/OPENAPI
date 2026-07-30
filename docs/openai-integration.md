@@ -44,6 +44,8 @@ Stripe subscription webhooks project the effective Free or Sovereign+ plan into 
 
 The Workers AI adapter also reserves conservative daily capacity in D1 before each hosted-model call. The production budget is intentionally below Cloudflare's account-wide free allocation so the platform returns a controlled capacity response before the provider hard limit is reached. Failed generation releases the daily reservation and refunds the user's monthly turn.
 
+The required capacity schema is migration `0013_workers_ai_free_capacity`. Production readiness fails unless that ledger exists.
+
 ## Failure behavior
 
 Production and preview never fall back to direct OpenAI or synthetic interpretation. If the AI binding, Gateway, daily free capacity, or private Baseline provider is unavailable, the Worker returns a clear unavailable state and does not invent a result.
