@@ -1,14 +1,17 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const authenticatedWorkspace = readFileSync('apps/web/src/AuthenticatedWorkspace.tsx', 'utf8');
 const workspace = readFileSync('apps/web/src/SovereignIntelligenceWorkspace.tsx', 'utf8');
-const workspaceCss = `${readFileSync('apps/web/src/workspace-chat.css', 'utf8')}\n${readFileSync('apps/web/src/experience-reconciliation.css', 'utf8')}`;
+const workspaceCss = `${readFileSync('apps/web/src/workspace-chat.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8')}`;
 const landing = readFileSync('apps/web/src/PublicLanding.tsx', 'utf8');
-const landingCss = `${readFileSync('apps/web/src/public-landing.css', 'utf8')}\n${readFileSync('apps/web/src/experience-reconciliation.css', 'utf8')}`;
-const experienceV3 = `${readFileSync('apps/web/src/sovereign-experience-v3.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-experience-v3-fixes.css', 'utf8')}`;
+const landingCss = `${readFileSync('apps/web/src/public-landing.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8')}`;
+const cohesion = readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8');
 const contextField = readFileSync('apps/web/public/assets/sovereign-context-field.svg', 'utf8');
 const staticExperienceCss = readFileSync('apps/web/public/static-experience.css', 'utf8');
+const how = readFileSync('apps/web/public/how-it-works.html', 'utf8');
+const pricing = readFileSync('apps/web/public/pricing.html', 'utf8');
+const faq = readFileSync('apps/web/public/faq.html', 'utf8');
 const tokens = readFileSync('apps/web/src/styles.css', 'utf8');
 const membership = readFileSync('apps/web/src/SystemMembershipManager.tsx', 'utf8');
 const product = readFileSync('apps/sovereign-worker/src/db/product.ts', 'utf8');
@@ -22,12 +25,19 @@ function requireAll(label, source, values) {
 requireAll('authenticated app entry', main, [
   "import { AuthenticatedWorkspace } from './AuthenticatedWorkspace'",
   "import './workspace-chat.css'",
-  "import './experience-reconciliation.css'",
-  "import './sovereign-experience-v3.css'",
-  "import './sovereign-experience-v3-fixes.css'",
+  "import './sovereign-cohesion.css'",
   "location.pathname === '/app'",
   '<AuthenticatedWorkspace />'
 ]);
+
+for (const retired of [
+  'apps/web/src/experience-reconciliation.css',
+  'apps/web/src/sovereign-experience-v3.css',
+  'apps/web/src/sovereign-experience-v3-fixes.css'
+]) {
+  if (existsSync(retired)) throw new Error(`Retired visual override remains: ${retired}`);
+  if (main.includes(retired.split('/').pop())) throw new Error(`Retired visual override is still imported: ${retired}`);
+}
 
 requireAll('authenticated workspace gate', authenticatedWorkspace, [
   "import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace'",
@@ -36,6 +46,7 @@ requireAll('authenticated workspace gate', authenticatedWorkspace, [
   "fetch('/api/v1/account/onboarding'",
   "location.replace(`/login?returnTo=",
   "location.replace('/onboarding')",
+  'data-workspace-contract="one-room"',
   '<SovereignIntelligenceWorkspace onboardingVerified />',
   '<AccountControlCenter />',
   '<SystemMembershipManager />'
@@ -68,25 +79,50 @@ requireAll('answer renderer', workspace, [
   'aria-modal="true"'
 ]);
 
+requireAll('canonical cohesion system', cohesion, [
+  'Sovereign.OS cohesion release',
+  'Canonical presentation layer',
+  '--cohesion-night:#080a09',
+  '--cohesion-paper:#ece5da',
+  '--cohesion-clay:#c98a64',
+  '--cohesion-sage:#a5b5a2',
+  "url('/assets/sovereign-context-field.svg')",
+  '.hero-intelligence-stage',
+  '.baseline-context-stage',
+  '.scale-experience',
+  '.question-section',
+  '.permission-field',
+  '.intelligence-workspace',
+  '.sovereign-composer',
+  '.mobile-bottom-nav',
+  'grid-template-columns:repeat(6,minmax(0,1fr))',
+  '@media(max-width:1180px)',
+  '@media(max-width:980px)',
+  '@media(max-width:760px)',
+  '@media(max-width:560px)',
+  '@media(max-width:420px)',
+  '@media(prefers-reduced-motion:reduce)',
+  'env(safe-area-inset-bottom)'
+]);
+
 requireAll('workspace layout and accessibility', workspaceCss, [
-  'width: 220px',
-  'width: 360px',
-  'width: min(100%, 1120px)',
-  'min-height: 44px',
-  'font-size: 1rem',
-  '@media (max-width: 1180px)',
-  '@media (max-width: 980px)',
-  '@media (max-width: 760px)',
-  '@media (max-width: 420px)',
-  '@media (prefers-reduced-motion: reduce)',
+  'width:224px',
+  'width:360px',
+  'width:min(100%,1120px)',
+  'min-height:44px',
+  'font-size:1rem',
+  '@media(max-width:980px)',
+  '@media(max-width:760px)',
+  '@media(max-width:420px)',
+  '@media(prefers-reduced-motion:reduce)',
   'env(safe-area-inset-bottom)'
 ]);
 
 requireAll('public category clarity', landing, [
-  'PERSONAL AI FOR REAL LIFE',
-  'Ask about your life.',
-  'Get an answer built around you.',
-  'private personal AI',
+  'Know yourself.',
+  'Understand the system.',
+  'Choose what fits.',
+  'private AI for understanding yourself',
   'Why do I keep taking responsibility for everyone else?',
   'EXAMPLE ANSWER',
   'Sanitized demonstration · Not your Baseline',
@@ -110,40 +146,22 @@ requireAll('public product stage', landing, [
   'YOUR CONFIRMATION',
   'STILL UNKNOWN',
   'WHAT HAPPENS BETWEEN YOU',
-  'PRESSURE FIELD'
+  'PRESSURE FIELD',
+  'PERMISSION BEFORE COMPARISON'
 ]);
 
-requireAll('public brand hierarchy', landing, [
-  'Healing isn’t optional. Holding the pain is.',
-  'WHY THIS AI IS DIFFERENT',
-  'Most AI starts with a blank prompt. Sovereign starts with you.',
-  'Know yourself. Understand the system. Choose what fits.'
-]);
+if (landing.includes('Healing isn’t optional. Holding the pain is.')) {
+  throw new Error('The public homepage must not present Sovereign.OS as a healing product.');
+}
 
 requireAll('public visual accessibility', landingCss, [
-  'font-size: clamp(3.45rem, 5vw, 4.7rem)',
-  'min-height: 44px',
+  'font-size:clamp(3.75rem,5.2vw,4.25rem)',
+  'min-height:44px',
   'min-width: 320px',
-  '@media (max-width: 980px)',
-  '@media (max-width: 760px)',
-  '@media (max-width: 420px)',
-  '@media (prefers-reduced-motion: reduce)'
-]);
-
-requireAll('Sovereign v3 product environment', experienceV3, [
-  'context reorganizes around the question',
-  "url('/assets/sovereign-context-field.svg')",
-  '.landing-hero::before',
-  '.living-answer',
-  '.question-section',
-  '.public-answer-stage',
-  '.baseline-now-visual::before',
-  '.baseline-invitation::after',
-  '.sovereign-composer',
-  '.mobile-bottom-nav',
-  '@media (max-width: 560px)',
-  '@media (prefers-reduced-motion: reduce)',
-  'env(safe-area-inset-bottom)'
+  '@media(max-width:980px)',
+  '@media(max-width:760px)',
+  '@media(max-width:420px)',
+  '@media(prefers-reduced-motion:reduce)'
 ]);
 
 requireAll('Sovereign context field asset', contextField, [
@@ -156,7 +174,7 @@ requireAll('Sovereign context field asset', contextField, [
 ]);
 
 requireAll('static public support experience', staticExperienceCss, [
-  '--paper: #0a0c0b',
+  '--paper: #080a09',
   '.pricing-grid',
   '.pricing-page .pricing-hero > p:last-child',
   '.questions-page .questions-hero > p:last-child',
@@ -164,10 +182,21 @@ requireAll('static public support experience', staticExperienceCss, [
   '.price-card-body',
   '.plan-comparison-list',
   '.faq-list details',
-  'border-radius: 1px',
-  'margin-inline: 0',
+  'border-radius: 2px',
+  'min-width: 320px',
   '@media (max-width: 860px)',
   '@media (prefers-reduced-motion: reduce)'
+]);
+
+requireAll('static page cohesion', `${how}\n${pricing}\n${faq}`, [
+  '20260730-cohesion',
+  'Private personal, relationship, and system intelligence',
+  'Build my Baseline',
+  '$20',
+  '$99',
+  '10 Sovereign AI turns each month',
+  '300 Sovereign AI turns each month',
+  'permission'
 ]);
 
 requireAll('system membership manager', membership, [
@@ -193,4 +222,4 @@ for (const prohibited of ['God is telling you', 'They secretly want', 'This prov
   }
 }
 
-console.log('Sovereign category-first product stage and workspace visual contract verified.');
+console.log('Sovereign.OS cohesion release visual and product contract verified.');

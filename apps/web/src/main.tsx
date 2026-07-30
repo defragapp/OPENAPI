@@ -1,4 +1,4 @@
-// Production release trigger: Sovereign v3 visual reconciliation.
+// Production release trigger: Sovereign.OS cohesion release.
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
@@ -12,6 +12,8 @@ import { installProductionRuntime } from './ProductionRuntime';
 import { PublicLanding } from './PublicLanding';
 import { PublicPolicy } from './PublicPolicy';
 import { PublicPolicyMetadata } from './PublicPolicyMetadata';
+
+/* Component foundations */
 import './styles.css';
 import './product-completion.css';
 import './public-landing.css';
@@ -22,9 +24,9 @@ import './auth-onboarding.css';
 import './email-code-fallback.css';
 import './unified-entry.css';
 import './account-control.css';
-import './experience-reconciliation.css';
-import './sovereign-experience-v3.css';
-import './sovereign-experience-v3-fixes.css';
+
+/* One canonical visual system across public, account, and workspace surfaces. */
+import './sovereign-cohesion.css';
 
 installProductionRuntime();
 installProductRuntime();
