@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Sovereign.OS",
   "short_name": "Sovereign",
-  "description": "Private AI for understanding yourself, your relationships, and the systems around you.",
+  "description": "Private AI for understanding yourself, a decision, a relationship, or a group.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
