@@ -33,8 +33,8 @@ export async function configureCloudflareFreeTier(options = {}) {
   const zone = await resolveZone(client, zoneName);
   const d1 = await configureD1Replication(client, accountId, databaseId);
   const gateway = await configureAiGateway(client, accountId, gatewayId);
-  const rateLimit = await configureFreeRateLimit(client, zone.id);
-  const schema = await configureApiShield(client, zone.id);
+  const rateLimit = await configureOptionalZoneControl('WAF rate limiting', () => configureFreeRateLimit(client, zone.id));
+  const schema = await configureOptionalZoneControl('API Shield', () => configureApiShield(client, zone.id));
 
   return {
     accountId,
@@ -82,6 +82,19 @@ function createCloudflareClient(apiToken) {
   }
 
   return { request, optional };
+}
+
+async function configureOptionalZoneControl(label, configure) {
+  try {
+    return await configure();
+  } catch (error) {
+    if (error?.status !== 403) throw error;
+    return {
+      management: 'unavailable',
+      reason: `${label} reconciliation requires a Cloudflare token with zone-level management permission`,
+      status: 403
+    };
+  }
 }
 
 async function resolveZone(client, zoneName) {
@@ -194,6 +207,7 @@ async function configureFreeRateLimit(client, zoneId) {
   const active = (ruleset?.rules || []).find((item) => item.ref === RATE_RULE_REF);
   if (!active?.enabled) throw new Error('The Sovereign Free-plan rate-limit rule is not active');
   return {
+    management: 'verified',
     rulesetId: ruleset.id,
     ruleId: active.id,
     threshold: '10 matching-path requests/10s/IP',
@@ -251,6 +265,7 @@ async function configureApiShield(client, zoneId) {
   if (missingAfter.length) throw new Error(`API Shield Endpoint Management is missing ${missingAfter.length} critical operations`);
 
   return {
+    management: 'verified',
     schemaId,
     active: true,
     mitigation: 'block',
