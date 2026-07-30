@@ -66,7 +66,7 @@ const sourceFixture: BaselineSourceData = {
 function facetProfile(basisRef = 'natal.sun'): BaselineFacetProfile {
   return {
     version: BASELINE_FACET_CONTRACT_VERSION,
-    modelVersion: 'openai/gpt-5.5',
+    modelVersion: '@cf/zai-org/glm-4.7-flash',
     sourceComputationVersion: sourceFixture.computationVersion,
     generatedAt: '2026-07-28T12:00:01.000Z',
     interpretive: true,
