@@ -26,9 +26,11 @@ Read these sources first and treat them as approval boundaries:
 - `docs/inner-recognition-intelligence.md`
 - `apps/web/src/App.tsx`
 - `apps/web/src/SovereignIntelligenceWorkspace.tsx`
+- `apps/web/src/PrivateAnswerExportRuntime.ts`
 - `apps/web/src/styles.css`
 - `apps/web/src/interface-composition.css`
 - `apps/web/src/premium-surfaces.css`
+- `apps/web/src/premium-surface-hardening.css`
 
 Inspect the exact deployed commit. Do not review a local branch while assuming it matches production.
 
@@ -45,7 +47,7 @@ The approved visual language is quiet, premium, editorial, warm, and precise:
 - generous negative space;
 - thin structural rules rather than decorative card grids;
 - no mystical, occult, tarot, horoscope-wheel, neon, or generic coaching-dashboard language;
-- no "Esoteric Brutalism" references or styling;
+- no harsh, cryptic, pseudo-occult, or deliberately abrasive presentation;
 - no compatibility scores, alignment gauges, percentages, or diagnostic labels.
 
 The product must feel like one personal intelligence environment, not a collection of widgets.
@@ -96,6 +98,8 @@ At desktop widths `1440x900` and `1280x800`, tablet width `1024x768`, and iPhone
 - the invitation identity and requested uses are immediately understandable;
 - consent scopes remain visually separate without becoming a repetitive card stack;
 - allow and deny actions have equal clarity without visually pressuring consent;
+- selected decisions are visible and remain reversible;
+- loading, success, already-used, expired, invalid, and network-error states remain composed;
 - status feedback is visible, calm, and not detached from the action that caused it;
 - body text remains readable at normal zoom;
 - every control is at least 44 CSS pixels high on touch screens;
@@ -128,6 +132,8 @@ For each answer, verify:
 - Covenant visibly separates Biblical parallel, Scripture, teaching, application, and boundary;
 - `Still unknown` remains readable but subordinate;
 - correction and continuation actions are clear without competing with the answer;
+- `Print or save PDF` appears only for the latest completed answer and performs a local browser print operation without sending answer content to another endpoint;
+- print output removes application chrome and preserves readable section boundaries;
 - the composer never covers the final lines or actions;
 - long content wraps cleanly with no narrow columns, stranded labels, or excessive line length;
 - the mobile layout becomes one intentional reading column rather than squeezed desktop panels.
@@ -143,6 +149,7 @@ Verify with keyboard only and with reduced motion enabled:
 - drawers and dialogs trap focus and return it to the trigger;
 - Escape closes dismissible overlays;
 - screen-reader names explain icon-only controls;
+- consent choices expose their selected state;
 - live status updates do not repeatedly interrupt reading;
 - `prefers-reduced-motion` removes nonessential movement;
 - forced-colors mode preserves boundaries and action visibility;
@@ -189,7 +196,7 @@ pnpm install --frozen-lockfile
 pnpm verify:cloudflare-build
 ```
 
-Also confirm the focused tests covering the invitation and Sovereign answer surfaces pass.
+Also confirm the focused tests covering the invitation, answer presentation, and private print action pass.
 
 ## 7. Final report
 
@@ -201,6 +208,7 @@ Return:
 - desktop and mobile viewport sizes inspected;
 - invitation states inspected;
 - answer modes inspected;
+- private print output inspected;
 - accessibility states inspected;
 - fidelity ledger with every mismatch and fix;
 - remaining intentional deviations, if any;
