@@ -12,6 +12,7 @@ const consentCss = readFileSync(new URL('../public/consent.css', import.meta.url
 const launchCss = readFileSync(new URL('../public/launch.css', import.meta.url), 'utf8');
 const launchPolishCss = readFileSync(new URL('../public/launch-polish.css', import.meta.url), 'utf8');
 const staticExperienceCss = readFileSync(new URL('../public/static-experience.css', import.meta.url), 'utf8');
+const platformPublicCss = readFileSync(new URL('../public/platform-public.css', import.meta.url), 'utf8');
 const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
@@ -96,11 +97,22 @@ describe('Sovereign.OS public experience', () => {
       expect(page).toContain('/launch-polish.css?v=20260730-cohesion');
       expect(page).toContain('/static-release.css?v=20260730-cohesion');
       expect(page).toContain('/static-experience.css?v=20260730-cohesion');
+      expect(page).toContain('/platform-public.css?v=20260730-platform2');
     }
     expect(how).toContain('Set up your Baseline once. Use it wherever life connects.');
     expect(pricing).toContain('$20');
     expect(pricing).toContain('$99 / year');
     expect(faq).toContain('What Sovereign understands. What remains yours to confirm.');
+  });
+
+  it('keeps every static public section visible and composes the pages as one platform', () => {
+    expect(platformPublicCss).toContain('opacity: 1 !important');
+    expect(platformPublicCss).toContain('animation: none !important');
+    expect(platformPublicCss).toContain('.launch-page:not(.pricing-page):not(.questions-page) .launch-band');
+    expect(platformPublicCss).toContain('.pricing-page .pricing-section');
+    expect(platformPublicCss).toContain('.questions-page .faq-section');
+    expect(platformPublicCss).toContain('background: var(--platform-paper)');
+    expect(platformPublicCss).toContain('min-height: 0');
   });
 
   it('keeps public pages responsive and consent independently controlled', () => {
