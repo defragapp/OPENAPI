@@ -37,6 +37,7 @@ import './premium-surface-hardening.css';
 
 /* Final product authority shared by public, account, onboarding, and workspace surfaces. */
 import './sovereign-product-v2.css';
+import './sovereign-product-precision.css';
 
 installProductionRuntime();
 installProductRuntime();
