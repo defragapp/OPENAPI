@@ -1,0 +1,53 @@
+name: Deploy Sovereign production SHA 759bbd9
+
+on:
+  push:
+    branches:
+      - ops/cloudflare-release-759bbd9
+    paths:
+      - .github/workflows/cloudflare-release-759bbd9.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sovereign-production-release
+  cancel-in-progress: false
+
+jobs:
+  verify-deploy-and-prove:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID }}
+      WORKERS_CI_COMMIT_SHA: 759bbd9af283e0b5898bc8f7b4c238f73d161db7
+      VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
+    steps:
+      - name: Check out exact production source
+        uses: actions/checkout@v4
+        with:
+          ref: 759bbd9af283e0b5898bc8f7b4c238f73d161db7
+          fetch-depth: 1
+
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+
+      - name: Verify production build
+        run: pnpm verify:cloudflare-build
+
+      - name: Deploy and verify exact live release
+        run: env -u GITHUB_SHA pnpm production:deploy
+
+      - name: Record release evidence
+        run: |
+          test -f production-deployment.json
+          node -e "const fs=require('fs'); const value=JSON.parse(fs.readFileSync('production-deployment.json','utf8')); const deployed=value.commitSha || value.version; if(deployed !== process.env.WORKERS_CI_COMMIT_SHA) throw new Error('Deployment evidence does not match the exact production SHA'); console.log(JSON.stringify(value, null, 2));"
