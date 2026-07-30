@@ -130,7 +130,7 @@ function sovereignRateRule() {
   return {
     ref: RATE_RULE_REF,
     description: 'Sovereign AI message protection within the Cloudflare Free plan',
-    expression: '(http.request.method eq "POST" and starts_with(http.request.uri.path, "/api/v1/threads/") and ends_with(http.request.uri.path, "/messages"))',
+    expression: '(starts_with(http.request.uri.path, "/api/v1/threads/") and ends_with(http.request.uri.path, "/messages"))',
     action: 'block',
     enabled: true,
     ratelimit: {
@@ -182,7 +182,7 @@ async function configureFreeRateLimit(client, zoneId) {
   return {
     rulesetId: ruleset.id,
     ruleId: active.id,
-    threshold: '10 POST requests/10s/IP',
+    threshold: '10 matching-path requests/10s/IP',
     mitigation: 'block 10s'
   };
 }
