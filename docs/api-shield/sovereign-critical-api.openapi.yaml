@@ -1,62 +1,16 @@
 openapi: 3.0.3
 info:
   title: Sovereign.OS Critical API
-  version: 2026-07-29
+  version: 2026-07-30
   description: >-
-    Request schema for short-body, security-sensitive Sovereign.OS endpoints.
-    The sovereign-answer.v2 contract is validated inside the Worker because API
-    Shield validates incoming requests, not model responses.
+    Request schemas for short-body, security-sensitive Sovereign.OS mutations.
+    Authentication requests carrying Turnstile tokens remain protected by
+    Turnstile and Worker validation because Free-plan schema inspection is
+    limited to the first 1 KB of a request body. sovereign-answer.v2 output is
+    validated inside the Worker, not by API Shield.
 servers:
   - url: https://app.defrag.app
 paths:
-  /api/v1/auth/signup:
-    post:
-      operationId: signup
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SignupRequest'
-      responses:
-        '200':
-          description: Request accepted
-  /api/v1/auth/login:
-    post:
-      operationId: login
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
-      responses:
-        '200':
-          description: Request accepted
-  /api/v1/auth/redeem:
-    post:
-      operationId: redeemAuthentication
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RedeemRequest'
-      responses:
-        '200':
-          description: Authentication redeemed
-  /api/v1/auth/logout:
-    post:
-      operationId: logout
-      responses:
-        '200':
-          description: Session revoked
-  /api/v1/auth/logout-all:
-    post:
-      operationId: logoutAll
-      responses:
-        '200':
-          description: Sessions revoked
   /api/v1/account/onboarding:
     post:
       operationId: completeAccountOnboarding
@@ -135,6 +89,12 @@ paths:
       operationId: createBillingPortalSession
       parameters:
         - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmptyObject'
       responses:
         '201':
           description: Billing portal session created
@@ -191,67 +151,6 @@ components:
         minLength: 8
         maxLength: 200
   schemas:
-    SignupRequest:
-      type: object
-      additionalProperties: false
-      required:
-        - email
-        - name
-        - termsAccepted
-        - turnstileToken
-      properties:
-        email:
-          type: string
-          format: email
-          maxLength: 320
-        name:
-          type: string
-          minLength: 1
-          maxLength: 120
-        termsAccepted:
-          type: boolean
-          enum:
-            - true
-        turnstileToken:
-          type: string
-          minLength: 1
-          maxLength: 2048
-        returnTo:
-          type: string
-          maxLength: 512
-    LoginRequest:
-      type: object
-      additionalProperties: false
-      required:
-        - email
-        - turnstileToken
-      properties:
-        email:
-          type: string
-          format: email
-          maxLength: 320
-        turnstileToken:
-          type: string
-          minLength: 1
-          maxLength: 2048
-        returnTo:
-          type: string
-          maxLength: 512
-    RedeemRequest:
-      type: object
-      additionalProperties: false
-      properties:
-        token:
-          type: string
-          minLength: 32
-          maxLength: 512
-        email:
-          type: string
-          format: email
-          maxLength: 320
-        code:
-          type: string
-          pattern: '^[0-9]{6}$'
     AccountOnboardingRequest:
       type: object
       additionalProperties: false
@@ -304,6 +203,10 @@ components:
           enum:
             - monthly
             - annual
+    EmptyObject:
+      type: object
+      additionalProperties: false
+      maxProperties: 0
     DeletionApprovalRequest:
       type: object
       additionalProperties: false
