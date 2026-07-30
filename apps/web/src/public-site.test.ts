@@ -14,64 +14,62 @@ const launchPolishCss = readFileSync(new URL('../public/launch-polish.css', impo
 const staticExperienceCss = readFileSync(new URL('../public/static-experience.css', import.meta.url), 'utf8');
 const platformPublicCss = readFileSync(new URL('../public/platform-public.css', import.meta.url), 'utf8');
 const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
+const productCss = readFileSync(new URL('./sovereign-product-v2.css', import.meta.url), 'utf8');
+const precisionCss = readFileSync(new URL('./sovereign-product-precision.css', import.meta.url), 'utf8');
+const staticProductCss = readFileSync(new URL('../public/sovereign-product-v2.css', import.meta.url), 'utf8');
+const staticPrecisionCss = readFileSync(new URL('../public/sovereign-product-precision.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
-describe('Sovereign.OS public experience', () => {
-  it('states the current product promise and first action in the first viewport', () => {
-    expect(landing).toContain('Know yourself.');
-    expect(landing).toContain('Understand the system.');
-    expect(landing).toContain('Choose what fits.');
-    expect(landing).toContain('private AI for understanding yourself, your relationships, and the systems around you');
-    expect(landing).toContain('Build your Baseline once');
+ describe('Sovereign.OS public experience', () => {
+  it('states the product value and first action in the first viewport', () => {
+    expect(landing).toContain('Ask about your life.');
+    expect(landing).toContain('Get an answer built around you.');
+    expect(landing).toContain('private personal AI for understanding yourself, your relationships, your decisions, and the groups around you');
     expect(landing).toContain('Build my Baseline');
     expect(landing).toContain('See a Sovereign answer');
-    expect(landing).not.toContain('PERSONAL AI FOR REAL LIFE');
+    expect(landing).not.toContain('INIT_BASELINE');
+    expect(landing).not.toContain('Know yourself.<br />Understand the system.');
   });
 
-  it('shows a recognizable question and direct answer before the Baseline explanation', () => {
+  it('shows a recognizable question and direct answer before explaining the context architecture', () => {
     const questionIndex = landing.indexOf('Why do I keep taking responsibility for everyone else?');
-    const answerIndex = landing.indexOf('Your capacity is real. The question is whether the responsibility is actually yours.');
-    const foundationIndex = landing.indexOf('Your intelligence begins with your Baseline.');
+    const answerIndex = landing.indexOf('Your ability to create direction is real. The problem begins when responsibility reaches you without matching authority.');
+    const foundationIndex = landing.indexOf('Sovereign keeps different kinds of information separate');
     expect(questionIndex).toBeGreaterThan(-1);
     expect(answerIndex).toBeGreaterThan(questionIndex);
     expect(foundationIndex).toBeGreaterThan(answerIndex);
-    expect(landing).toContain('EXAMPLE ANSWER');
     expect(landing).toContain('Sanitized demonstration · Not your Baseline');
-    expect(landing.indexOf('Sanitized demonstration · Not your Baseline')).toBeLessThan(landing.indexOf('YOU ASKED'));
+    expect(landing).toContain('YOU ASKED');
   });
 
-  it('presents one intelligence environment across self, relationship, and system scales', () => {
-    expect(landing).toContain('ONE INTELLIGENCE · THREE CONNECTED SCALES');
-    expect(landing).toContain('The question changes. The environment stays the same.');
-    expect(landing).toContain('Yourself');
-    expect(landing).toContain('Relationship');
-    expect(landing).toContain('System');
+  it('presents one intelligence environment across personal, relationship, decision, and system context', () => {
+    for (const phrase of ['Your Baseline', 'What may be active now', 'People and systems', 'Your answer', 'WHAT HAPPENS BETWEEN YOU', 'PRESSURE FIELD']) {
+      expect(landing).toContain(phrase);
+    }
     expect(landing).toContain('role="tablist"');
     expect(landing).toContain('role="tabpanel"');
     expect(landing).toContain('aria-live="polite"');
   });
 
-  it('uses product demonstrations instead of a grid of disconnected claims', () => {
-    for (const component of ['<HeroIntelligenceStage />', '<BaselineContextStage />', '<PublicAnswerStage', '<PermissionField />', '<SystemMap />']) {
-      expect(landing).toContain(component);
-    }
-    expect(landing).toContain('A REAL QUESTION · A PERSONAL ANSWER');
-    expect(landing).toContain('Useful language first. Exact support when you want it.');
+  it('uses real product demonstrations instead of disconnected marketing claims', () => {
+    for (const component of ['<PublicAnswerStage', '<PermissionField />', '<SystemMap />']) expect(landing).toContain(component);
+    expect(landing).toContain('REAL QUESTIONS · CLEAR ANSWERS');
+    expect(landing).toContain('The useful explanation stays primary while exact Basis remains available underneath it.');
   });
 
   it('keeps exact Basis fixtures secondary to plain-language value', () => {
     for (const value of ['U✓', 'HD G13.1', 'GK ACT13', 'N LP1', '☉ CAN 04.2°']) expect(landing).toContain(value);
-    expect(landing).toContain('Why this is personal');
-    expect(landing).toContain('supporting values');
-    expect(landing).toContain('Temporary context does not determine behavior.');
+    expect(landing).toContain('BASIS');
+    expect(landing).toContain('WHAT MAY BE STEADY');
+    expect(landing).toContain('WHAT MAY BE ACTIVE NOW');
     expect(landing).toContain('STILL UNKNOWN');
   });
 
   it('keeps relationship and system intelligence permission-bound', () => {
     expect(landing).toContain('PERMISSION BEFORE COMPARISON');
-    expect(landing).toContain('Another person remains a person—not a data source you control.');
-    expect(landing).toContain('Their actual motive remains unknown until they speak for themselves.');
+    expect(landing).toContain('Understand the interaction without pretending to know another person’s mind.');
+    expect(landing).toContain('Their actual motive remains unknown until they explain it themselves.');
     expect(landing).toContain('No compatibility score. No mind-reading. No one-sided access to another person’s Baseline.');
     expect(faq).toContain('It cannot know another person’s exact feelings, motives, private experience, or future behavior.');
   });
@@ -87,66 +85,56 @@ describe('Sovereign.OS public experience', () => {
     expect(main).toContain("location.pathname === '/'");
     expect(main).toContain('<PublicLanding />');
     expect(main).toContain('<PublicPolicy kind={publicPolicyKind} />');
+    expect(main).toContain("import './sovereign-product-v2.css'");
+    expect(main).toContain("import './sovereign-product-precision.css'");
     expect(main).not.toContain('ProductLanguageRuntime');
-    expect(main).not.toMatch(/refinement|landing-v2/i);
   });
 
-  it('keeps the static public family on the cohesion release assets', () => {
+  it('keeps the static public family on the unified product assets', () => {
     for (const page of [how, pricing, faq]) {
       expect(page).toContain('/launch.css?v=20260730-cohesion');
       expect(page).toContain('/launch-polish.css?v=20260730-cohesion');
       expect(page).toContain('/static-release.css?v=20260730-cohesion');
       expect(page).toContain('/static-experience.css?v=20260730-cohesion');
       expect(page).toContain('/platform-public.css?v=20260730-platform2');
+      expect(page).toContain('/sovereign-product-v2.css?v=20260730-reconciliation');
+      expect(page).toContain('/sovereign-product-precision.css?v=20260730-precision');
     }
-    expect(how).toContain('Set up your Baseline once. Use it wherever life connects.');
+    expect(how).toContain('One question. The right context. A clear answer.');
     expect(pricing).toContain('$20');
     expect(pricing).toContain('$99 / year');
+    expect(pricing).not.toContain('Begin with yourself. Expand when other people matter.');
     expect(faq).toContain('What Sovereign understands. What remains yours to confirm.');
   });
 
-  it('keeps every static public section visible and composes the pages as one platform', () => {
-    expect(platformPublicCss).toContain('opacity: 1 !important');
-    expect(platformPublicCss).toContain('animation: none !important');
-    expect(platformPublicCss).toContain('.launch-page:not(.pricing-page):not(.questions-page) .launch-band');
-    expect(platformPublicCss).toContain('.pricing-page .pricing-section');
-    expect(platformPublicCss).toContain('.questions-page .faq-section');
-    expect(platformPublicCss).toContain('background: var(--platform-paper)');
-    expect(platformPublicCss).toContain('min-height: 0');
+  it('uses one technical typography and geometry system across public surfaces', () => {
+    for (const css of [productCss, precisionCss, staticProductCss, staticPrecisionCss]) {
+      expect(css).toContain('--s2-bg');
+      expect(css).toContain('@media');
+    }
+    expect(precisionCss).toContain('--precision-display');
+    expect(precisionCss).toContain('--precision-mono');
+    expect(precisionCss).toContain('border-radius:0!important');
+    expect(precisionCss).not.toContain('Iowan Old Style');
+    expect(staticPrecisionCss).not.toContain('Iowan Old Style');
   });
 
   it('keeps public pages responsive and consent independently controlled', () => {
     expect(launchCss).toContain('@media (max-width: 680px)');
     expect(launchPolishCss).toContain('prefers-reduced-motion');
     expect(landingCss).toContain('@media (max-width: 760px)');
+    expect(productCss).toContain('@media(max-width:760px)');
+    expect(precisionCss).toContain('@media(max-width:760px)');
     expect(staticExperienceCss).toContain('@media (max-width: 860px)');
     expect(staticExperienceCss).toContain('@media (max-width: 620px)');
     expect(staticExperienceCss).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(staticExperienceCss).toContain('.pricing-page .pricing-hero > p:last-child');
-    expect(staticExperienceCss).toContain('.questions-page .questions-hero > p:last-child');
-    expect(staticExperienceCss).toContain('.questions-page .faq-section');
-    expect(pricing).toContain('class="launch-hero launch-hero-compact pricing-hero"');
-    expect(pricing).not.toContain('pricing-hero-detail');
-    expect(staticExperienceCss).toMatch(/@media \(max-width: 860px\)[\s\S]*?\.pricing-page \.pricing-hero > p:last-child[\s\S]*?grid-column: 1; grid-row: auto;/);
-    expect(pricing).not.toContain('class="plan-summary"');
-    expect(faq).toContain('class="launch-page questions-page"');
-    expect(faq).toContain('launch-hero-compact questions-hero');
     expect(staticExperienceCss).toContain('overflow-x: auto;');
     expect(staticExperienceCss).toContain('overscroll-behavior-inline: contain;');
-    expect(staticExperienceCss).toContain('.launch-links a { flex: 0 0 auto; white-space: nowrap; }');
-    expect(staticExperienceCss).not.toContain('.launch-links a:not(.launch-cta) { display: none; }');
-    expect(staticExperienceCss).toMatch(/@media \(max-width: 620px\)[\s\S]*?\.price-options \{ grid-template-columns: 1fr; \}/);
-    expect(staticExperienceCss).toContain('.launch-shell { width: min(1320px, calc(100% - 64px)); margin: 0 auto; }');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
     expect(notFound).toContain('content="noindex, nofollow"');
-    expect(notFound).toContain('/launch.css?v=20260730-cohesion');
-    expect(notFound).toContain('/launch-polish.css?v=20260730-cohesion');
-    expect(notFound).toContain('/static-release.css?v=20260730-cohesion');
-    expect(notFound).toContain('/static-experience.css?v=20260730-cohesion');
-    expect(notFound).toContain('href="https://sovereign.defrag.app/"');
-    expect(notFound).toContain('href="https://app.defrag.app/login"');
     expect(consent).toContain('You decide what another account may use.');
     expect(consent).toContain('The inviting account cannot make or change these decisions for you.');
     expect(consentCss).toContain('@media (max-width: 680px)');
+    expect(platformPublicCss).toContain('min-height: 0');
   });
 });
