@@ -13,7 +13,8 @@ describe('premium invitation and Sovereign output surfaces', () => {
     expect(css).toContain('.account-shell > .auth-panel');
     expect(css).toContain('grid-template-columns: minmax(0, .82fr) minmax(380px, 1.18fr)');
     expect(css).toContain('counter-reset: consent-scope');
-    expect(css).toContain('No raw birth input');
+    expect(css).toContain('.account-shell > .auth-panel .usage-card');
+    expect(css).toContain('.account-shell > .auth-panel .scope-list');
   });
 
   it('renders AI output as one readable answer surface', () => {
