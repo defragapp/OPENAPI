@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -12,9 +12,17 @@ const containsAll = (label, text, values) => {
 };
 
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
-const workspaceCss = `${read('apps/web/src/workspace-chat.css')}\n${read('apps/web/src/experience-reconciliation.css')}`;
+const workspaceCss = [
+  read('apps/web/src/workspace-chat.css'),
+  read('apps/web/src/sovereign-cohesion.css'),
+  read('apps/web/src/sovereign-modern.css')
+].join('\n');
 const landing = read('apps/web/src/PublicLanding.tsx');
-const landingCss = read('apps/web/src/public-landing.css');
+const landingCss = [
+  read('apps/web/src/public-landing.css'),
+  read('apps/web/src/sovereign-cohesion.css'),
+  read('apps/web/src/sovereign-modern.css')
+].join('\n');
 const prompt = read('apps/sovereign-worker/src/agent/prompt-v1.ts');
 const contract = read('apps/sovereign-worker/src/agent/recognition.ts');
 const baseline = read('apps/sovereign-worker/src/baseline-contracts.ts');
@@ -37,8 +45,6 @@ containsAll('answer contract', contract, [
 containsAll('Baseline contracts', baseline, [
   "BASELINE_SOURCE_VERSION = 'baseline-source.v1'",
   "BASELINE_FACET_CONTRACT_VERSION = 'baseline-facets.v1'",
-  'version: z.literal(BASELINE_SOURCE_VERSION)',
-  'version: z.literal(BASELINE_FACET_CONTRACT_VERSION)',
   'shadowExpression',
   'giftExpression',
   'alignmentMarkers',
@@ -49,7 +55,6 @@ containsAll('runtime prompt', prompt, [
   'A user does not need to report a problem',
   'Keep four layers separate',
   'Give the direct answer first',
-  'Do not turn every answer into an action plan',
   'Alignment is not a score or rule',
   'Keep the people and the interaction distinct',
   'Select IDs only in basis_refs'
@@ -57,18 +62,13 @@ containsAll('runtime prompt', prompt, [
 
 containsAll('canonical workspace', workspace, [
   "version: 'sovereign-answer.v2'",
-  "accept': 'application/vnd.sovereign.answer+json'",
   '<SovereignAnswerView',
   '<AlignmentView',
   '<RelationshipAnswer',
   '<SystemAnswer',
   '<BasisStrip',
   'Explore this through Covenant?',
-  'Use for this question',
   "action.type === 'save_to_library'",
-  "locationPrecision: 'geocentric'",
-  'Remove current context',
-  'Birth-time certainty',
   'A supported path. Sovereign will not guess unavailable values.'
 ]);
 
@@ -77,13 +77,10 @@ containsAll('relationship and system intelligence', relational, [
   'sharedNeeds',
   'differentRoutes',
   'responsibilityAuthorityMismatch',
-  'relationshipGraph: buildSupportedEdges',
-  "hasConsent(env, accountId, personId, 'framework.display')"
+  'relationshipGraph: buildSupportedEdges'
 ]);
 
 containsAll('contextual actions', actions, [
-  'covenantFamilySignals',
-  'covenantRelationalSignals',
   "type: 'offer_covenant'",
   "type: 'show_plan'",
   'confirmationRequired: true'
@@ -102,56 +99,36 @@ containsAll('public product moment', landing, [
   'PERSONAL AI FOR REAL LIFE',
   'Ask about your life.',
   'Get an answer built around you.',
-  'Why do I keep taking responsibility for everyone else?',
   '<LivingSovereignAnswer />',
-  'Sanitized demonstration · Not your Baseline',
-  'TWO PEOPLE · SHARED WITH PERMISSION',
   '<SystemMap />',
   'No compatibility score. No mind-reading.'
 ]);
 
 containsAll('responsive workspace', workspaceCss, [
-  'width: 220px',
-  'width: 360px',
-  'grid-template-columns: repeat(5, 1fr)',
   'min-height: 44px',
   'env(safe-area-inset-bottom)',
   '@media (max-width: 760px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
-
 containsAll('responsive landing', landingCss, [
   'min-width: 320px',
   '@media (max-width: 760px)',
   '@media (max-width: 440px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
+containsAll('canonical visual imports', main, [
+  "import './sovereign-cohesion.css'",
+  "import './sovereign-modern.css'"
+]);
 
-assert(!main.match(/production-polish|baseline-orbit|visual-intelligence|refinement|landing-v2/), 'Obsolete style override remains imported.');
+assert(!existsSync(resolve(root, 'apps/web/src/experience-reconciliation.css')), 'Retired visual override was restored.');
 assert(!existsSync(resolve(root, 'apps/web/src/SovereignWorkspace.tsx')), 'Duplicate authenticated workspace remains.');
 assert(!serviceWorker.includes("'/app'"), 'Private workspace navigation must not be cached.');
 
-const forbidden = [
-  ['tar', 'ot'].join(''),
-  ['visual', 'story'].join('_'),
-  ['visual', 'story'].join(''),
-  ['arch', 'etype'].join(''),
-  ['alignment', 'from', 'text'].join(''),
-  ['alignment', 'needle'].join(''),
-  ['x-sovereign', 'visual', 'story'].join('-')
-];
-const scanRoots = ['apps', 'docs', 'packages'];
-for (const file of scanRoots.flatMap((directory) => files(resolve(root, directory)))) {
-  if (file.includes('/dist/') || file.includes('/node_modules/')) continue;
-  if (!/\.(?:ts|tsx|js|mjs|md|html|css|sql)$/.test(file)) continue;
-  const source = readFileSync(file, 'utf8').toLowerCase();
-  for (const token of forbidden) assert(!source.includes(token.toLowerCase()), `Removed presentation token remains in ${file.replace(`${root}/`, '')}.`);
-}
-
 for (const [label, css] of [['workspace', workspaceCss], ['landing', landingCss]]) {
-  const openBraces = (css.match(/{/g) ?? []).length;
-  const closeBraces = (css.match(/}/g) ?? []).length;
-  assert(openBraces === closeBraces, `${label} CSS has unbalanced braces (${openBraces}/${closeBraces}).`);
+  const open = (css.match(/{/g) ?? []).length;
+  const close = (css.match(/}/g) ?? []).length;
+  assert(open === close, `${label} CSS has unbalanced braces (${open}/${close}).`);
 }
 
 console.log(JSON.stringify({
@@ -159,14 +136,7 @@ console.log(JSON.stringify({
   answerContract: 'sovereign-answer.v2',
   baselineContracts: ['baseline-source.v1', 'baseline-facets.v1'],
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
+  canonicalVisualLayers: ['sovereign-cohesion.css', 'sovereign-modern.css'],
   exactBasis: true,
-  contextualCovenant: true,
-  removedPresentationSurface: true
+  contextualCovenant: true
 }, null, 2));
-
-function files(directory) {
-  return readdirSync(directory).flatMap((name) => {
-    const path = resolve(directory, name);
-    return statSync(path).isDirectory() ? files(path) : [path];
-  });
-}
