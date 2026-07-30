@@ -1,0 +1,159 @@
+name: Sovereign exact production release
+
+on:
+  push:
+    branches:
+      - sovereign-exact-release-runner
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sovereign-exact-production-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CF_ACCOUNT_ID: 8b1954d216d65077c6480d62583fe2c2
+      CF_TRIGGER_UUID: 459985f1-3479-4be9-8497-33728bc3a56d
+      CF_TOKEN_BUILDS: ${{ secrets.CLOUDFLARE_BUILDS_API_TOKEN }}
+      CF_TOKEN_PRIMARY: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_TOKEN_LEGACY: ${{ secrets.CF_API_TOKEN }}
+
+    steps:
+      - name: Check out current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Resolve exact target
+        id: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          TARGET_SHA="$(git rev-parse HEAD)"
+          echo "sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
+          echo "Deploying current main: $TARGET_SHA"
+
+      - name: Trigger exact Cloudflare Workers Build
+        id: cloudflare
+        shell: bash
+        run: |
+          set -euo pipefail
+          CF_TOKEN="${CF_TOKEN_BUILDS:-${CF_TOKEN_PRIMARY:-${CF_TOKEN_LEGACY:-}}}"
+          if [[ -z "$CF_TOKEN" ]]; then
+            echo "::error::No Cloudflare Builds API secret is configured."
+            exit 1
+          fi
+          TARGET_SHA="${{ steps.target.outputs.sha }}"
+          RESPONSE="$(curl --silent --show-error --fail-with-body --retry 3 --retry-all-errors \
+            --request POST \
+            --url "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/builds/triggers/${CF_TRIGGER_UUID}/builds" \
+            --header "Authorization: Bearer ${CF_TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data "{\"branch\":\"main\",\"commit_hash\":\"${TARGET_SHA}\"}")"
+          printf '%s' "$RESPONSE" > cloudflare-trigger.json
+          BUILD_UUID="$(node -e "const p=JSON.parse(require('fs').readFileSync('cloudflare-trigger.json','utf8'));if(!p.success||!p.result?.build_uuid){console.error(JSON.stringify(p.errors||p));process.exit(1)};process.stdout.write(p.result.build_uuid)")"
+          echo "build_uuid=$BUILD_UUID" >> "$GITHUB_OUTPUT"
+          echo "Cloudflare build UUID: $BUILD_UUID"
+
+      - name: Monitor build and print failure logs
+        shell: bash
+        run: |
+          set -euo pipefail
+          CF_TOKEN="${CF_TOKEN_BUILDS:-${CF_TOKEN_PRIMARY:-${CF_TOKEN_LEGACY:-}}}"
+          TARGET_SHA="${{ steps.target.outputs.sha }}"
+          BUILD_UUID="${{ steps.cloudflare.outputs.build_uuid }}"
+          for ATTEMPT in $(seq 1 180); do
+            curl --silent --show-error --fail-with-body --retry 3 --retry-all-errors \
+              --url "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/builds/builds/${BUILD_UUID}" \
+              --header "Authorization: Bearer ${CF_TOKEN}" > cloudflare-build.json
+            STATUS="$(node -e "const p=JSON.parse(require('fs').readFileSync('cloudflare-build.json','utf8'));process.stdout.write(String(p.result?.status||'unknown'))")"
+            OUTCOME="$(node -e "const p=JSON.parse(require('fs').readFileSync('cloudflare-build.json','utf8'));process.stdout.write(String(p.result?.build_outcome||'pending'))")"
+            COMMIT="$(node -e "const p=JSON.parse(require('fs').readFileSync('cloudflare-build.json','utf8'));process.stdout.write(String(p.result?.build_trigger_metadata?.commit_hash||''))")"
+            echo "Cloudflare build: status=$STATUS outcome=$OUTCOME commit=$COMMIT"
+            if [[ -n "$COMMIT" && "$COMMIT" != "$TARGET_SHA" ]]; then
+              echo "::error::Cloudflare is building $COMMIT instead of $TARGET_SHA."
+              exit 1
+            fi
+            if [[ "$STATUS" == "stopped" ]]; then
+              if [[ "$OUTCOME" == "success" ]]; then
+                exit 0
+              fi
+              curl --silent --show-error --fail-with-body \
+                --url "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/builds/builds/${BUILD_UUID}/logs" \
+                --header "Authorization: Bearer ${CF_TOKEN}" > cloudflare-build-logs.json || true
+              node - <<'NODE'
+          const fs = require('fs');
+          if (!fs.existsSync('cloudflare-build-logs.json')) process.exit(0);
+          const payload = JSON.parse(fs.readFileSync('cloudflare-build-logs.json', 'utf8'));
+          for (const line of payload.result?.lines ?? []) console.error(Array.isArray(line) ? line.join(' ') : String(line));
+          NODE
+              echo "::error::Cloudflare build stopped with outcome $OUTCOME."
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "::error::Cloudflare build did not finish within 30 minutes."
+          exit 1
+
+      - name: Verify exact live release
+        shell: bash
+        run: |
+          set -euo pipefail
+          TARGET_SHA="${{ steps.target.outputs.sha }}"
+          VERIFIED=false
+          for ATTEMPT in $(seq 1 90); do
+            curl --silent --show-error --fail --retry 2 --retry-all-errors \
+              "https://sovv-web.sovereign-os-api.workers.dev/health" > workers-health.json || true
+            curl --silent --show-error --fail --retry 2 --retry-all-errors \
+              "https://sovv-web.sovereign-os-api.workers.dev/ready" > workers-ready.json || true
+            curl --silent --show-error --fail --retry 2 --retry-all-errors \
+              "https://sovereign.defrag.app/health" > domain-health.json || true
+            curl --silent --show-error --fail --retry 2 --retry-all-errors \
+              "https://sovereign.defrag.app/ready" > domain-ready.json || true
+            if TARGET_SHA="$TARGET_SHA" node - <<'NODE'
+          const fs = require('fs');
+          const target = process.env.TARGET_SHA;
+          const read = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
+          try {
+            const payloads = [read('workers-health.json'), read('workers-ready.json'), read('domain-health.json'), read('domain-ready.json')];
+            const versionsMatch = payloads.every((payload) => payload.version === target);
+            const ready = [payloads[1], payloads[3]].every((payload) => payload.ready === true && payload.migrationVersion === '0012_baseline_facets_and_answer_v2');
+            if (!versionsMatch || !ready) process.exit(1);
+          } catch { process.exit(1); }
+          NODE
+            then
+              VERIFIED=true
+              break
+            fi
+            sleep 10
+          done
+          if [[ "$VERIFIED" != "true" ]]; then
+            echo "::error::Production did not converge to $TARGET_SHA."
+            for FILE in workers-health.json workers-ready.json domain-health.json domain-ready.json; do
+              [[ -f "$FILE" ]] && { echo "--- $FILE"; cat "$FILE"; echo; }
+            done
+            exit 1
+          fi
+          echo "Verified exact production SHA: $TARGET_SHA"
+
+      - name: Publish release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sovereign-exact-release-${{ steps.target.outputs.sha }}
+          if-no-files-found: ignore
+          retention-days: 14
+          path: |
+            cloudflare-trigger.json
+            cloudflare-build.json
+            cloudflare-build-logs.json
+            workers-health.json
+            workers-ready.json
+            domain-health.json
+            domain-ready.json
