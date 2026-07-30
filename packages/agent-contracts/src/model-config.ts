@@ -1,5 +1,5 @@
 export const DEFAULT_AI_PROVIDER = 'cloudflare-gateway';
-export const DEFAULT_AI_MODEL = 'openai/gpt-5.5';
+export const DEFAULT_AI_MODEL = '@cf/zai-org/glm-4.7-flash';
 const MAX_MODEL_LENGTH = 120;
 const PROVIDERS = [DEFAULT_AI_PROVIDER] as const;
 
@@ -24,6 +24,7 @@ export function resolveAiModel(value?: unknown): string {
   if (value.length > MAX_MODEL_LENGTH) throw new Error(`AI_MODEL must be ${MAX_MODEL_LENGTH} characters or fewer`);
   if (/\s/.test(value)) throw new Error('AI_MODEL must not contain whitespace');
   if (/[\x00-\x1F\x7F]/.test(value)) throw new Error('AI_MODEL must not contain control characters');
+  if (!value.startsWith('@cf/')) throw new Error('AI_MODEL must be a Cloudflare-hosted Workers AI model on the free-tier production path');
   return value;
 }
 
