@@ -102,28 +102,42 @@ async function configureD1Replication(client, accountId, databaseId) {
 }
 
 async function configureAiGateway(client, accountId, gatewayId) {
-  await client.request(`/accounts/${accountId}/ai-gateway/gateways/${encodeURIComponent(gatewayId)}`, {
-    method: 'PUT',
-    body: {
-      cache_invalidate_on_update: true,
-      cache_ttl: 0,
-      collect_logs: false,
-      rate_limiting_interval: 60,
-      rate_limiting_limit: 50,
-      rate_limiting_technique: 'sliding'
-    }
-  });
-  const verified = await client.request(`/accounts/${accountId}/ai-gateway/gateways/${encodeURIComponent(gatewayId)}`);
-  const result = verified.result || {};
-  if (result.cache_ttl !== 0 || result.collect_logs !== false) throw new Error('AI Gateway privacy controls are not active');
-  if (result.rate_limiting_interval !== 60 || result.rate_limiting_limit !== 50) throw new Error('AI Gateway rate limit is not active');
-  return {
-    id: gatewayId,
-    cacheTtl: result.cache_ttl,
-    collectLogs: result.collect_logs,
-    rateLimit: `${result.rate_limiting_limit}/${result.rate_limiting_interval}s`,
-    technique: result.rate_limiting_technique || 'sliding'
+  const path = `/accounts/${accountId}/ai-gateway/gateways/${encodeURIComponent(gatewayId)}`;
+  const body = {
+    cache_invalidate_on_update: true,
+    cache_ttl: 0,
+    collect_logs: false,
+    rate_limiting_interval: 60,
+    rate_limiting_limit: 50,
+    rate_limiting_technique: 'sliding'
   };
+
+  try {
+    await client.request(path, { method: 'PUT', body });
+    const verified = await client.request(path);
+    const result = verified.result || {};
+    if (result.cache_ttl !== 0 || result.collect_logs !== false) throw new Error('AI Gateway privacy controls are not active');
+    if (result.rate_limiting_interval !== 60 || result.rate_limiting_limit !== 50) throw new Error('AI Gateway rate limit is not active');
+    return {
+      id: gatewayId,
+      management: 'verified',
+      cacheTtl: result.cache_ttl,
+      collectLogs: result.collect_logs,
+      rateLimit: `${result.rate_limiting_limit}/${result.rate_limiting_interval}s`,
+      technique: result.rate_limiting_technique || 'sliding'
+    };
+  } catch (error) {
+    if (error?.status !== 404) throw error;
+    return {
+      id: gatewayId,
+      management: 'unavailable',
+      reason: 'Cloudflare AI Gateway management API returned 404 for this account or token',
+      perRequestPrivacy: {
+        skipCache: true,
+        collectLog: false
+      }
+    };
+  }
 }
 
 function sovereignRateRule() {
