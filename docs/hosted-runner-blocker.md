@@ -1,15 +1,15 @@
-# Hosted runner blocker
+# Historical hosted-runner diagnosis
 
-As of 2026-07-25, GitHub Actions cannot allocate any hosted runner for this repository.
+This document records a July 25, 2026 GitHub-hosted runner failure. It is historical evidence, not a current release instruction.
 
-Verified on PR #15:
+At that time, GitHub Actions could not allocate a hosted runner for the repository. PR #15 and the temporary runner probe failed before checkout or any shell command, with zero executed steps and no job logs across Ubuntu, macOS, and Windows images.
 
-- Standard CI using `actions/checkout` and `actions/setup-node` failed before checkout with zero steps and no logs.
-- A shell-only CI with no marketplace actions also failed before its first command with zero steps and no logs.
-- Runner Probe run `30141605928` tested `ubuntu-latest`, `macos-latest`, and `windows-latest`; all three jobs failed before their first step with no logs.
-- Repeated exact-head CI runs continued to fail before the first step.
-- The temporary probe was removed after diagnosis.
+That diagnosis ruled out application code, workflow syntax, marketplace-action policy, and a single runner image as the immediate cause. The likely cause was repository/account-level hosted-runner admission, billing, quota, or platform policy outside the source tree.
 
-This rules out application code, workflow syntax, marketplace-action policy, and a single runner image as the immediate cause. The remaining blocker is repository/account-level hosted-runner admission, billing, quota, or platform policy outside the source tree.
+The temporary probe and preview workflow described in the original report are no longer release paths. Do not restore or run them.
 
-The protected preview workflow is ready to run from `codex/inner-recognition-intelligence` as soon as hosted runner access is restored. It is shell-only, deploys only the isolated preview environment, requires Cloudflare Access service-token credentials, verifies the Access perimeter, and runs authenticated preview smokes. It cannot deploy production.
+Current authority:
+
+- Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the sole production release authority.
+- Protected preview deployment uses the repository-owned `pnpm preview:bootstrap` path from a secure preview environment.
+- GitHub Actions and ad-hoc local commands are not accepted as production release evidence.
