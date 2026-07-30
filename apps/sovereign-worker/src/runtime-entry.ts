@@ -138,7 +138,9 @@ async function shareFirstAccountResponse(request: Request, env: Env, executionCo
 
 async function healthResponse(pathname: string, env: Env): Promise<Response> {
   try {
-    const db = await env.DB.prepare('SELECT 1 AS ok').first<{ ok: number }>();
+    const db = await env.DB.prepare(`SELECT 1 AS ok,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_daily_capacity') AS capacity_ready`)
+      .first<{ ok: number; capacity_ready: number }>();
     const aiConfig = resolveAiModelConfig(env);
     const emailProvider = transactionalEmailProvider(env);
     // Production now resolves Resend first. This retained text is the previous release verifier fingerprint:
@@ -159,6 +161,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
     );
     const dependencies = {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
+      aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing',
       durableObjects: env.THREADS ? 'configured' : 'missing',
       assets: env.ASSETS ? 'configured' : 'missing',
       ai: aiConfig.provider === 'cloudflare-gateway' && env.AI && env.AI_GATEWAY_ID ? 'configured' : 'missing',
@@ -179,6 +182,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
     };
     const ok = db?.ok === 1;
     const ready = ok
+      && dependencies.aiFreeCapacity === 'configured'
       && dependencies.durableObjects === 'configured'
       && dependencies.assets === 'configured'
       && dependencies.ai === 'configured'
@@ -191,7 +195,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       ...(pathname === '/ready' ? { ready } : {}),
       version: env.APP_VERSION,
       environment: env.APP_ENV,
-      migrationVersion: '0012_baseline_facets_and_answer_v2',
+      migrationVersion: '0013_workers_ai_free_capacity',
       answerContract: 'sovereign-answer.v2',
       baselineContract: 'baseline-source.v1+baseline-facets.v1',
       dependencies
