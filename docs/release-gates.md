@@ -41,7 +41,8 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Every participant retains separate Baseline, Current, Observed, Role Context, and Unknown fields.
 - System analysis never merges participants into a group diagnosis or assigns a villain.
 - Provenance and uncertainty remain available for verification without exposing private implementation details in the primary explanation.
-- Production uses the Cloudflare Workers AI binding through AI Gateway with personalized cache bypass and persistent prompt logging disabled.
+- Production uses the Cloudflare Workers AI binding through AI Gateway with approved model `@cf/zai-org/glm-4.7-flash`.
+- Personalized inference bypasses Gateway cache and persistent prompt logging.
 - Model or provider changes require privacy review, cost review, latency testing, structured-output evaluation, and relational-safety evals.
 - Failed or capacity-blocked inference does not consume the user's monthly turn.
 - The D1-backed daily reservation ledger stops inference before the account-wide Workers AI free allocation is exhausted.
