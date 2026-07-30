@@ -229,7 +229,20 @@ body.launch-page {
 
 @media (max-width: 860px) {
   .launch-shell { width: min(100% - 40px, 1320px); }
-  .launch-links a:not(.launch-cta) { display: none; }
+  .launch-nav { gap: 18px; }
+  .launch-wordmark { flex: 0 0 auto; }
+  .launch-links {
+    min-width: 0;
+    flex: 1 1 auto;
+    justify-content: flex-start;
+    gap: 18px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .launch-links::-webkit-scrollbar { display: none; }
+  .launch-links a { flex: 0 0 auto; white-space: nowrap; }
   .launch-heading,
   .pricing-details-heading,
   .pricing-page .pricing-hero,
@@ -258,6 +271,8 @@ body.launch-page {
   .launch-nav { min-height: 72px; }
   .launch-wordmark { font-size: .64rem; }
   .launch-wordmark::before { width: 27px; height: 27px; }
+  .launch-links { gap: 14px; }
+  .launch-links a { font-size: .68rem; }
   .launch-links .launch-cta { padding-inline: 12px; font-size: .67rem; }
   .launch-hero,
   .launch-hero-compact { padding-block: 72px; }
