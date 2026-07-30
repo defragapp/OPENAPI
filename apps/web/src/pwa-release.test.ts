@@ -33,8 +33,9 @@ describe('release PWA surface', () => {
   });
 
   it('limits runtime caching to declared public and compiled assets', () => {
-    expect(serviceWorker).toContain('sovereign-public-v13');
+    expect(serviceWorker).toContain('sovereign-public-v14');
     expect(serviceWorker).toContain("'/brand-mark.svg'");
+    expect(serviceWorker).toContain("'/platform-public.css'");
     expect(serviceWorker).toContain('PUBLIC_ASSETS.has(url.pathname)');
     expect(serviceWorker).toContain("url.pathname.startsWith('/assets/')");
     expect(serviceWorker).not.toContain('request.destination');
