@@ -29,6 +29,7 @@ const landingCss = [
 ].join('\n');
 const staticPublicCss = read('apps/web/public/platform-public.css');
 const prompt = read('apps/sovereign-worker/src/agent/prompt-v1.ts');
+const language = read('docs/product-language-system.md');
 const contract = read('apps/sovereign-worker/src/agent/recognition.ts');
 const baseline = read('apps/sovereign-worker/src/baseline-contracts.ts');
 const relational = read('apps/sovereign-worker/src/relational-context.ts');
@@ -39,6 +40,8 @@ const main = read('apps/web/src/main.tsx');
 const how = read('apps/web/public/how-it-works.html');
 const pricing = read('apps/web/public/pricing.html');
 const faq = read('apps/web/public/faq.html');
+const app = read('apps/web/src/App.tsx');
+const consent = read('apps/web/public/consent.html');
 
 containsAll('answer contract', contract, [
   "z.literal('sovereign-answer.v2')",
@@ -63,9 +66,21 @@ containsAll('runtime prompt', prompt, [
   'A user does not need to report a problem',
   'Keep four layers separate',
   'Give the direct answer first',
+  'The direct answer must make sense by itself',
+  'Write for a first-time user',
+  'Prefer common verbs',
   'Alignment is not a score or rule',
   'Keep the people and the interaction distinct',
   'Select IDs only in basis_refs'
+]);
+
+containsAll('plain-language system', language, [
+  'Ask about your life. Get an answer built around you.',
+  'The private personal starting point Sovereign uses when answering your questions.',
+  'A heading does not depend on the paragraph below it to become understandable.',
+  'Use short, concrete sentences.',
+  'Supporting details',
+  'Choose what Sovereign may use about you.'
 ]);
 
 containsAll('canonical workspace', workspace, [
@@ -104,16 +119,33 @@ containsAll('verified Covenant library', scripture, [
 ]);
 
 containsAll('current public product contract', landing, [
+  'PRIVATE PERSONAL AI',
+  'Ask about your life.',
+  'Get an answer built around you.',
+  'do not have to explain yourself from scratch',
+  '<HeroIntelligenceStage />',
+  '<SystemMap />',
+  'You cannot add someone else’s private information without their permission.',
+  'No compatibility score. No mind-reading.'
+]);
+
+containsAll('account and invitation clarity', `${app}\n${consent}`, [
+  'Enter your email. We will send a one-time sign-in link.',
+  'Choose what Sovereign may use about you.',
+  'Accept invitation and choose permissions',
+  'Review and change each permission.'
+]);
+
+for (const phrase of [
   'Know yourself.',
   'Understand the system.',
   'Choose what fits.',
-  'Sovereign.OS is a private AI for understanding yourself, your relationships, and the systems around you.',
-  'Build your Baseline once',
-  '<HeroIntelligenceStage />',
-  '<SystemMap />',
-  'Another person remains a person—not a data source you control.',
-  'No compatibility score. No mind-reading.'
-]);
+  'Begin with yourself',
+  'The question changes. The environment stays the same.',
+  'Another person remains a person—not a data source you control.'
+]) {
+  assert(!`${landing}\n${how}\n${pricing}\n${faq}\n${app}\n${consent}`.includes(phrase), `Retired abstract public copy remains: ${phrase}`);
+}
 
 containsAll('responsive workspace', workspaceCss, [
   'min-height: 44px',
@@ -161,8 +193,10 @@ for (const [label, document] of [['How it works', how], ['Pricing', pricing], ['
     'Build my Baseline'
   ]);
 }
+containsAll('How it works clarity', how, ['Build your Baseline once. Then ask about your real life.', 'FIVE SIMPLE STEPS']);
 containsAll('Pricing entitlements', pricing, ['$0', '$20', '$99 / year', '10 Sovereign AI turns each month', '300 Sovereign AI turns each month']);
-containsAll('FAQ contract', faq, ['<details', 'What is Sovereign.OS?', 'Can I correct or remove an interpretation?']);
+containsAll('Pricing clarity', pricing, ['Use Free for personal questions. Use Sovereign+ for relationships and groups.', 'What Sovereign+ adds.']);
+containsAll('FAQ contract', faq, ['<details', 'What is Sovereign.OS?', 'Can I correct or remove an interpretation?', 'what it cannot know']);
 
 containsAll('canonical visual imports', main, [
   "import './sovereign-cohesion.css'",
@@ -191,6 +225,7 @@ console.log(JSON.stringify({
   answerContract: 'sovereign-answer.v2',
   baselineContracts: ['baseline-source.v1', 'baseline-facets.v1'],
   publicProductContract: 'baseline-first-private-ai',
+  publicLanguageContract: 'plain-language-v1',
   legacyTaglineGate: 'retired',
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
   canonicalVisualLayers: [
