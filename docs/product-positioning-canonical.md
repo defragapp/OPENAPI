@@ -18,29 +18,29 @@ Unlike an AI that begins with a blank prompt, Sovereign begins with the user’s
 
 ## Brand architecture
 
-### Product category line
+### Plain product definition
 
-**Private personal AI for real life.**
+**Private AI for understanding yourself, your relationships, and the systems around you.**
 
-This line explains what the product is. It must appear before unfamiliar framework terminology on the public landing page.
+This definition explains what the product is in ordinary language. It belongs in the first public viewport before unfamiliar framework terminology.
 
 ### Primary interaction promise
 
-**Ask about your life. Get an answer built around you.**
+**Build your Baseline once, then ask naturally and receive an answer grounded in the person asking.**
 
-This line explains what a visitor can do and what they receive.
+This explains how the experience differs from a blank generic AI conversation.
 
 ### Emotional brand statement
 
 **Healing isn’t optional. Holding the pain is.**
 
-This is a founder-approved tone and campaign statement. It belongs after the product category and interaction are understood. It must not be used as a therapy claim, diagnosis, command to reconcile, or guarantee of emotional outcome.
+This is a founder-approved campaign statement. It may appear only after the product category and interaction are understood. It must not be used as a therapy claim, diagnosis, command to reconcile, or guarantee of emotional outcome.
 
-### Enduring brand line
+### Enduring brand line and current public hero
 
 **Know yourself. Understand the system. Choose what fits.**
 
-This remains the enduring Sovereign.OS brand line. It may close or deepen the experience, but it does not replace a plain product definition.
+This is the enduring Sovereign.OS brand line and the approved current hero. It must be supported immediately by the plain product definition and a recognizable Sovereign product moment.
 
 ## Core position
 
@@ -148,15 +148,17 @@ Sovereign.OS turns Baseline Design into a private AI for personal, relationship,
 
 ## Approved public hero
 
-Kicker:
-
-**PERSONAL AI FOR REAL LIFE**
-
 Headline:
 
-**Ask about your life.**
+**Know yourself.**
 
-**Get an answer built around you.**
+**Understand the system.**
+
+**Choose what fits.**
+
+Supporting definition:
+
+**Sovereign.OS is a private AI for understanding yourself, your relationships, and the systems around you. Build your Baseline once, then ask naturally and receive an answer grounded in the person asking.**
 
 Primary action:
 
@@ -178,14 +180,3 @@ Avoid:
 - “your chart says”;
 - “the universe is telling you”;
 - “this transit means”;
-- “choose yourself”;
-- “return to yourself”;
-- “do the work”;
-- “one clean next move” as the whole value;
-- “healing journey”;
-- “unlock your potential”;
-- “become your highest self”;
-- generic “break the cycle” promises;
-- astrology-first or framework-first hero language.
-
-The brand voice is intelligent, direct, calm, adult, specific, emotionally resonant, and careful about uncertainty. It should never reduce a person to a fixed label.
