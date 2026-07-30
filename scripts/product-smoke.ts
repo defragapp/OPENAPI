@@ -132,7 +132,7 @@ function fakeEnv(): Env {
     APP_ENV: 'test',
     APP_VERSION: 'product-smoke',
     AI_PROVIDER: 'cloudflare-gateway',
-    AI_MODEL: 'openai/gpt-5.5',
+    AI_MODEL: '@cf/zai-org/glm-4.7-flash',
     AI_GATEWAY_ID: 'sovereign',
     STRIPE_SECRET_KEY: '',
     STRIPE_WEBHOOK_SECRET: '',
