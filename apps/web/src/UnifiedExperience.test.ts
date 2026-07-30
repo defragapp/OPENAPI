@@ -3,7 +3,11 @@ import { readFileSync } from 'node:fs';
 
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
-const css = readFileSync(new URL('./experience-reconciliation.css', import.meta.url), 'utf8');
+const css = [
+  readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8'),
+  readFileSync(new URL('./sovereign-cohesion.css', import.meta.url), 'utf8'),
+  readFileSync(new URL('./sovereign-modern.css', import.meta.url), 'utf8')
+].join('\n');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('unified Sovereign intelligence experience', () => {
@@ -33,7 +37,7 @@ describe('unified Sovereign intelligence experience', () => {
     expect(workspace).toContain('setSurface(restoredSurface)');
     expect(workspace).toContain("restoredSurface === 'People'");
     expect(workspace).toContain("restoredSurface === 'Systems'");
-    expect(workspace).toContain("setCovenantEnabled(false)");
+    expect(workspace).toContain('setCovenantEnabled(false)');
   });
 
   it('keeps each message attached to the context used for the question', () => {
@@ -59,11 +63,11 @@ describe('unified Sovereign intelligence experience', () => {
     expect(workspace).not.toContain('COVENANT PREFERENCE');
   });
 
-  it('ships responsive styling for the canonical workspace', () => {
-    expect(css).toContain('width: 220px');
-    expect(css).toContain('width: 360px');
-    expect(css).toContain('@media (max-width: 980px)');
-    expect(css).toContain('@media (max-width: 760px)');
+  it('ships the active responsive system for the canonical workspace', () => {
+    expect(css).toContain('grid-template-columns: 248px minmax(0,1fr) minmax(0,0)');
+    expect(css).toContain('340px');
+    expect(css).toContain('@media (max-width: 900px)');
+    expect(css).toContain('@media (max-width: 620px)');
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');
   });
 });
