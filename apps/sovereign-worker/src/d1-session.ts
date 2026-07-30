@@ -14,7 +14,7 @@ export function createD1RequestSession(request: Request, db: D1Database): D1Data
 }
 
 export function withD1SessionEnv(env: Env, session: D1DatabaseSession): Env {
-  const override: Partial<Env> = { DB: session };
+  const override: Partial<Env> = { DB: session as unknown as D1Database };
   if (env.AI) {
     const source = env.AI;
     const wrapped: NonNullable<Env['AI']> = {
