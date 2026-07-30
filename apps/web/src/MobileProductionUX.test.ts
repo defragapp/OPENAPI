@@ -4,17 +4,27 @@ import { readFileSync } from 'node:fs';
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const workspaceCss = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
 const workspaceMobileCss = readFileSync(new URL('./workspace-mobile.css', import.meta.url), 'utf8');
+const compositionCss = readFileSync(new URL('./interface-composition.css', import.meta.url), 'utf8');
 const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
 const authCss = readFileSync(new URL('./auth-onboarding.css', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 
 describe('production mobile and responsive experience', () => {
-  it('loads route-owned mobile hardening without retired override layers', () => {
+  it('loads route-owned mobile hardening and composition without retired override layers', () => {
     expect(main).toContain("import './public-landing.css'");
     expect(main).toContain("import './workspace-chat.css'");
     expect(main).toContain("import './workspace-mobile.css'");
     expect(main).toContain("import './auth-onboarding.css'");
+    expect(main).toContain("import './interface-composition.css'");
     expect(main).not.toMatch(/final|refinement|polish.*css|landing-v2/i);
+  });
+
+  it('organizes public, account, onboarding, and workspace surfaces with one hierarchy', () => {
+    expect(compositionCss).toContain('.sovereign-landing .landing-section-header');
+    expect(compositionCss).toContain('.account-layout');
+    expect(compositionCss).toContain('.plan-choice');
+    expect(compositionCss).toContain('.surface-heading');
+    expect(compositionCss).toContain('.answer-sections');
   });
 
   it('keeps five primary surfaces thumb reachable and You in the menu sheet', () => {
@@ -49,5 +59,6 @@ describe('production mobile and responsive experience', () => {
     expect(workspaceCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(landingCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(workspaceMobileCss).toContain('overflow-x: clip');
+    expect(compositionCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
 });
