@@ -59,3 +59,12 @@ export async function reserveAiTurn(env: Env, accountId: string, plan: string, n
   }
   return { periodKey, used: row.turns_used, allowance, remaining: Math.max(allowance - row.turns_used, 0), resetsAt };
 }
+
+export async function releaseAiTurn(env: Env, accountId: string, periodKey: string): Promise<void> {
+  await env.DB.prepare(`UPDATE ai_usage_windows
+    SET turns_used = MAX(0, turns_used - 1),
+        updated_at = datetime('now')
+    WHERE account_id = ? AND period_key = ?`)
+    .bind(accountId, periodKey)
+    .run();
+}
