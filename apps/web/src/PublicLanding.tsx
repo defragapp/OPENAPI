@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, KeyboardEvent } from 'react';
 
 const heroAnswer = {
   question: 'Why do I keep taking responsibility for everyone else?',
@@ -217,7 +217,7 @@ function BaselineContextStage() {
   return (
     <section className="engine-layer engine-baseline" aria-labelledby="foundation-title">
       <div className="engine-copy-block">
-        <p className="engine-mode">BASELINE / COMPILE</p>
+        <p className="engine-mode">YOUR BASELINE · BASELINE / COMPILE</p>
         <h2 id="foundation-title">Your intelligence begins with your Baseline.</h2>
         <p>Sovereign separates what remains structurally yours from what may be receiving more pressure or emphasis now.</p>
         <small>Temporary context does not determine behavior.</small>
@@ -262,20 +262,31 @@ function BaselineContextStage() {
 
       <div className="baseline-telemetry" aria-label="Demonstration telemetry">
         <header><span>INPUT / DEMONSTRATION</span><strong>STATUS / VALIDATED</strong></header>
-        <code>INPUT / NATAL_REDUCTION</code>
-        <code>INPUT / BIRTH_TIME_CERTAINTY</code>
-        <code>INPUT / BASELINE_FACTORS</code>
-        <code>STABLE_CONTEXT / COMPILED</code>
+        <code>YOUR BASELINE / STABLE_CONTEXT_COMPILED</code>
+        <code>WHAT MAY BE ACTIVE NOW / RESPONSIBILITY</code>
+        <code>YOUR CONFIRMATION / REQUIRED</code>
+        <code>FACETS / Shadow · Gift · Alignment</code>
         <code>STILL UNKNOWN / ACTUAL RESPONSE TODAY</code>
       </div>
 
-      <details className="engine-basis">
-        <summary>Why this is personal · {basisFixture.length} supporting values</summary>
-        <div>
-          {basisFixture.map((value) => <span key={value.compact}><b>{value.compact}</b><small>{value.label}</small></span>)}
-        </div>
-      </details>
+      <PublicBasis values={basisFixture} />
     </section>
+  );
+}
+
+function PublicBasis({ values }: { values: ReadonlyArray<typeof basisFixture[number]> }) {
+  const mobile = usePublicMediaQuery('(max-width: 640px)');
+  const limit = mobile ? 3 : 5;
+  const visible = values.slice(0, limit);
+
+  return (
+    <details className="engine-basis">
+      <summary>BASIS · Why this is personal · {values.length} supporting values</summary>
+      <div>
+        {visible.map((value) => <span key={value.compact}><b>{value.compact}</b><small>{value.label}</small></span>)}
+        {values.length > visible.length && <span><b>+{values.length - visible.length}</b><small>Additional supporting values</small></span>}
+      </div>
+    </details>
   );
 }
 
@@ -340,6 +351,7 @@ function ConnectedScalesStage({ selected, onSelect }: { selected: number; onSele
             aria-controls="engine-scale-panel"
             tabIndex={selected === index ? 0 : -1}
             onClick={() => onSelect(index)}
+            onKeyDown={(event) => moveScaleFocus(event, index, scales.length, onSelect)}
           >
             {label}
           </button>
@@ -350,10 +362,18 @@ function ConnectedScalesStage({ selected, onSelect }: { selected: number; onSele
         <p>{scales[selected]![1]}</p>
       </div>
 
-      <SystemMap />
-      <p className="engine-trust">PERMISSION BEFORE COMPARISON · Another person remains a person—not a data source you control.</p>
-      <p className="engine-trust">No compatibility score. No mind-reading. No one-sided access to another person’s Baseline.</p>
+      <PermissionField />
     </section>
+  );
+}
+
+function PermissionField() {
+  return (
+    <>
+      <SystemMap />
+      <p className="engine-trust">WHAT HAPPENS BETWEEN YOU · Their actual motive remains unknown until they speak for themselves.</p>
+      <p className="engine-trust">PERMISSION BEFORE COMPARISON · Another person remains a person—not a data source you control. No compatibility score. No mind-reading. No one-sided access to another person’s Baseline.</p>
+    </>
   );
 }
 
@@ -365,7 +385,7 @@ function SystemMap() {
       <span className="system-person person-sibling"><b>SIBLING</b><small>reliance</small></span>
       <i className="system-line line-one" aria-hidden="true" />
       <i className="system-line line-two" aria-hidden="true" />
-      <strong>RESPONSIBILITY CONCENTRATION / YOU</strong>
+      <strong>PRESSURE FIELD · RESPONSIBILITY CONCENTRATION / YOU</strong>
     </div>
   );
 }
@@ -383,6 +403,7 @@ function PublicAnswerStage() {
       <div className="query-question">
         <p className="engine-mode">A REAL QUESTION · A PERSONAL ANSWER</p>
         <small>EXAMPLE ANSWER · Sanitized demonstration · Not your Baseline</small>
+        <span className="engine-mode">YOU ASKED</span>
         <h2 id="questions-title">“{heroAnswer.question}”</h2>
         <p>Useful language first. Exact support when you want it.</p>
       </div>
@@ -400,6 +421,7 @@ function PublicAnswerStage() {
         <article className="query-answer">
           <span>DIRECT ANSWER</span>
           <h3>{heroAnswer.direct}</h3>
+          <strong className="engine-mode">THE PERSONAL CONNECTION</strong>
           <p>{heroAnswer.connection}</p>
           <div className="answer-distinction">
             <span><small>SUPPORT</small><strong>I will do my part.</strong></span>
@@ -445,6 +467,36 @@ function EngineProgress() {
       <span>100</span>
     </aside>
   );
+}
+
+function usePublicMediaQuery(query: string) {
+  const [matches, setMatches] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    const update = () => setMatches(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, [query]);
+
+  return matches;
+}
+
+function moveScaleFocus(
+  event: KeyboardEvent<HTMLButtonElement>,
+  index: number,
+  count: number,
+  select: (next: number) => void
+) {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const next = event.key === 'Home'
+    ? 0
+    : event.key === 'End'
+      ? count - 1
+      : (index + (event.key === 'ArrowRight' ? 1 : -1) + count) % count;
+  select(next);
+  event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
 }
 
 function clamp(value: number) {
