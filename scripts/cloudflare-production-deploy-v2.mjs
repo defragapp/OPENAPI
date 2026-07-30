@@ -17,7 +17,7 @@ const d1Name = 'sovereign-openapi-db';
 const model = '@cf/zai-org/glm-4.7-flash';
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
-const migrationVersion = '0012_baseline_facets_and_answer_v2';
+const migrationVersion = '0013_workers_ai_free_capacity';
 const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAADhGIF8-iOLIg8MU').trim();
 
 if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required');
@@ -124,6 +124,7 @@ async function verifyLiveProduction() {
       assert(ready.response.ok && ready.json?.ready === true, `ready returned ${ready.response.status}`);
       assert(ready.json?.version === commitSha, `ready version is ${ready.json?.version || 'missing'}`);
       assert(ready.json?.migrationVersion === migrationVersion, 'migration version mismatch');
+      assert(ready.json?.dependencies?.aiFreeCapacity === 'configured', 'free-capacity ledger is not configured');
       break;
     } catch (error) {
       lastError = error;
@@ -161,6 +162,7 @@ async function verifyLiveProduction() {
   assert(notFound.response.status === 404 && notFound.text.includes('This page is not part of Sovereign.OS.'), 'public 404 contract failed');
   assert(health.response.ok && health.json?.ok === true && health.json?.version === commitSha, 'health contract failed');
   assert(health.json?.dependencies?.ai === 'configured', 'Workers AI dependency is not configured');
+  assert(health.json?.dependencies?.aiFreeCapacity === 'configured', 'Workers AI free-capacity ledger is not configured');
   assert(health.json?.dependencies?.authentication === 'configured', 'authentication is not configured');
   assert(health.json?.dependencies?.stripe === 'configured', 'Stripe is not configured');
 
@@ -283,6 +285,7 @@ try {
     publicUrl: publicBase,
     appUrl: appBase,
     cloudflarePlanTarget: 'free',
+    dailyNeuronReservationBudget: 7_500,
     r2Enabled: false,
     queueEnabled: false,
     privateExports: 'disabled',
