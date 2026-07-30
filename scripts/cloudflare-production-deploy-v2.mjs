@@ -178,13 +178,16 @@ async function verifyLiveProduction() {
   const asset = await readText(`${publicBase}${assetPath}`);
   assert(asset.response.ok && headerIncludes(asset.response, 'cache-control', 'immutable'), 'compiled JavaScript is unavailable or not immutable');
   assertContains('compiled application', asset.text, [
-    'Know yourself.',
-    'Understand the system.',
-    'Choose what fits.',
-    'Your intelligence begins with your Baseline.',
+    'Ask about your life.',
+    'Get an answer built around you.',
+    'Build one Baseline. Use it across every personal question.',
+    'Choose what Sovereign may use about you.',
     'What do you want to understand?',
     'Explore this through Covenant?'
   ]);
+  for (const retired of ['Know yourself.', 'Understand the system.', 'Choose what fits.', 'Your intelligence begins with your Baseline.']) {
+    assert(!asset.text.includes(retired), `compiled application still contains retired abstract copy: ${retired}`);
+  }
 
   const invalidWebhookBody = JSON.stringify({ id: 'evt_release_invalid', type: 'customer.subscription.updated', data: { object: {} } });
   const [session, account, checkout, webhook, signupWithoutTurnstile] = await Promise.all([
