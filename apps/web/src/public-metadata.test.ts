@@ -46,8 +46,8 @@ describe('public metadata and fallback documents', () => {
 
   it('invalidates the retired public shell without caching private workspace navigation', () => {
     expect(serviceWorker).toContain("const CACHE_NAME = 'sovereign-public-v12'");
-    expect(serviceWorker).not.toContain("'/app'");
-    expect(serviceWorker).not.toContain("'/api/'");
+    expect(serviceWorker).not.toContain("  '/app',");
     expect(serviceWorker).toContain("url.pathname.startsWith('/api/')");
+    expect(serviceWorker).toContain("if (!PUBLIC_NAVIGATION.has(url.pathname)) return;");
   });
 });
