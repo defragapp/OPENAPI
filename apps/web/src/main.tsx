@@ -19,6 +19,7 @@ import './product-completion.css';
 import './public-landing.css';
 import './public-release.css';
 import './workspace-chat.css';
+import './workspace-mobile.css';
 import './system-membership.css';
 import './auth-onboarding.css';
 import './email-code-fallback.css';
