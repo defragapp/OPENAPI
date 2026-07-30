@@ -1,0 +1,18 @@
+/* Static public precision layer — technical sans typography and flat product geometry. */
+:root{--precision-display:"SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;--precision-text:"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;--precision-mono:"SFMono-Regular","Roboto Mono","Cascadia Mono",Menlo,Consolas,monospace;--s2-bg:#070908;--s2-panel:#0b0e0d;--s2-panel-2:#101311;--s2-paper:#f3f3ef;--s2-paper-ink:#111311;--s2-ink:#f4f5f1;--s2-muted:#a1a6a2;--s2-subtle:#666c68;--s2-line:rgba(244,245,241,.14);--s2-line-strong:rgba(244,245,241,.27);--s2-clay:#d49a6a;--s2-sage:#9eb19f}
+html,body.launch-page{background:var(--s2-bg)!important;font-family:var(--precision-text)!important}
+.launch-page{font-feature-settings:"ss01" 1,"ss02" 1,"cv01" 1}
+.launch-page :where(h1,h2,h3,h4){font-family:var(--precision-display)!important;font-style:normal!important;font-weight:600!important;letter-spacing:-.048em!important}
+.launch-page :where(.launch-kicker,.price-tag,.plan-audience,.journey-steps article>span){font-family:var(--precision-mono)!important;letter-spacing:.075em!important}
+.launch-page .launch-nav{min-height:68px!important;background:rgba(7,9,8,.96)!important;backdrop-filter:none!important}
+.launch-page .launch-wordmark::before{border-radius:2px!important;font-family:var(--precision-display)!important;font-weight:700!important}
+.launch-page .launch-links .launch-cta,.launch-page .launch-button{border-radius:3px!important;box-shadow:none!important}
+.launch-page .launch-hero h1,.launch-page .launch-hero-compact h1{max-width:14ch!important;font-size:clamp(46px,4.8vw,64px)!important;font-weight:600!important;line-height:.94!important;letter-spacing:-.065em!important}
+.launch-page .launch-hero>p:last-child,.launch-page .launch-hero-compact>p:last-child{font-size:16px!important;line-height:1.62!important}
+.launch-page .launch-heading h2,.launch-page .launch-section>h2,.launch-page .launch-callout h2,.launch-page .baseline-explainer h2,.launch-page .pricing-details-heading h2{font-size:clamp(36px,3.6vw,54px)!important;line-height:1!important}
+.launch-page :where(.baseline-explainer,.definition-list,.billing-note,.framework-disclosure,.launch-callout,.price-card,.plan-comparison-list){border-radius:0!important;background:var(--s2-panel)!important;box-shadow:none!important}
+.launch-page .price-card.featured{background:var(--s2-panel)!important;border-top:2px solid var(--s2-clay)!important}
+.launch-page .faq-list details{background:transparent!important;border-radius:0!important}
+.launch-page .faq-list summary{font-family:var(--precision-display)!important;font-weight:600!important;letter-spacing:-.025em!important}
+@media(max-width:760px){.launch-page .launch-hero h1,.launch-page .launch-hero-compact h1{font-size:44px!important}.launch-page .launch-heading h2,.launch-page .launch-section>h2,.launch-page .launch-callout h2,.launch-page .baseline-explainer h2,.launch-page .pricing-details-heading h2{font-size:38px!important}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
