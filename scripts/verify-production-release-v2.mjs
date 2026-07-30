@@ -87,11 +87,14 @@ requireAll('Cloudflare controls', controls, [
   'rate_limiting_limit: 50',
   'collect_logs: false',
   'sovereign_ai_messages_free_tier',
+  'starts_with(http.request.uri.path',
+  'ends_with(http.request.uri.path',
   'requests_per_period: 10',
   'schema_validation/schemas',
   "validation_default_mitigation_action: 'block'",
   'api_gateway/operations'
 ]);
+assert(!controls.includes('http.request.method'), 'Free-plan rate-limit expression must use path-only fields');
 requireAll('production deploy', deploy, [
   "const model = '@cf/zai-org/glm-4.7-flash'",
   'configureCloudflareFreeTier',
