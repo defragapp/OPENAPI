@@ -1,0 +1,437 @@
+/* Route-aware composition layer for Sovereign.OS.
+   Clarifies hierarchy, spacing, and responsive grouping without changing product semantics. */
+
+:root {
+  --sov-reading: 70ch;
+  --sov-content: 920px;
+  --sov-wide: 1180px;
+}
+
+/* Public product */
+.sovereign-landing .landing-hero,
+.sovereign-landing .landing-foundation,
+.sovereign-landing .landing-section,
+.sovereign-landing .landing-final {
+  scroll-margin-top: 88px;
+}
+
+.sovereign-landing .landing-hero {
+  position: relative;
+}
+
+.sovereign-landing .landing-hero::after {
+  position: absolute;
+  inset: auto 0 0;
+  display: block;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lp-line) 18% 82%, transparent);
+  content: "";
+}
+
+.sovereign-landing .landing-hero-copy {
+  align-self: center;
+}
+
+.sovereign-landing .landing-hero-copy > p {
+  max-width: 42ch;
+}
+
+.sovereign-landing .hero-intelligence-stage {
+  isolation: isolate;
+  box-shadow: 0 42px 110px rgba(0, 0, 0, .42);
+}
+
+.sovereign-landing .landing-foundation,
+.sovereign-landing .scale-section,
+.sovereign-landing .question-section,
+.sovereign-landing .permission-section,
+.sovereign-landing .pricing-preview {
+  position: relative;
+}
+
+.sovereign-landing .landing-foundation::before,
+.sovereign-landing .question-section::before,
+.sovereign-landing .pricing-preview::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, .012);
+  content: "";
+}
+
+.sovereign-landing .landing-section-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, .62fr);
+  gap: clamp(32px, 6vw, 88px);
+  align-items: end;
+  max-width: none;
+  margin-bottom: 48px;
+}
+
+.sovereign-landing .landing-section-header .landing-kicker {
+  grid-column: 1 / -1;
+  margin-bottom: -18px;
+}
+
+.sovereign-landing .landing-section-header h2 {
+  max-width: 13ch;
+}
+
+.sovereign-landing .landing-section-header > p:last-child {
+  align-self: end;
+  margin: 0;
+}
+
+.sovereign-landing .scale-experience,
+.sovereign-landing .public-answer-stage,
+.sovereign-landing .permission-field,
+.sovereign-landing .pricing-options {
+  margin-top: 0;
+}
+
+.sovereign-landing .pricing-options {
+  align-items: stretch;
+}
+
+.sovereign-landing .pricing-options > article {
+  position: relative;
+  overflow: hidden;
+}
+
+.sovereign-landing .pricing-options > article:nth-child(2)::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--lp-accent);
+  content: "";
+}
+
+.sovereign-landing .landing-final {
+  display: grid;
+  justify-items: center;
+  padding-inline: clamp(20px, 7vw, 96px);
+  text-align: center;
+}
+
+.sovereign-landing .landing-final h2,
+.sovereign-landing .landing-final > p {
+  max-width: 18ch;
+}
+
+.sovereign-landing .landing-final > p {
+  max-width: 48ch;
+}
+
+/* Account access */
+.account-shell {
+  min-height: 100svh;
+  background:
+    radial-gradient(circle at 10% 15%, var(--sov-clay-soft), transparent 31rem),
+    var(--sov-page);
+}
+
+.account-nav,
+.account-layout {
+  width: min(var(--sov-wide), calc(100% - 48px));
+  margin-inline: auto;
+}
+
+.account-layout {
+  grid-template-columns: minmax(0, .92fr) minmax(420px, .68fr);
+  gap: clamp(56px, 8vw, 118px);
+  align-items: center;
+  min-height: calc(100svh - 82px);
+  padding-block: clamp(56px, 8vw, 104px);
+}
+
+.account-intro {
+  max-width: 620px;
+}
+
+.account-intro h1 {
+  max-width: 12ch;
+}
+
+.account-points {
+  display: grid;
+  gap: 0;
+  margin-top: 38px;
+  padding: 0;
+  border-top: 1px solid var(--sov-line);
+  list-style: none;
+}
+
+.account-points li {
+  position: relative;
+  padding: 17px 0 17px 26px;
+  border-bottom: 1px solid var(--sov-line);
+}
+
+.account-points li::before {
+  position: absolute;
+  top: 23px;
+  left: 2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sov-clay);
+  content: "";
+}
+
+.auth-panel {
+  width: 100%;
+  max-width: 520px;
+  justify-self: end;
+  padding: clamp(28px, 4vw, 42px);
+  border: 1px solid var(--sov-line);
+  border-radius: 28px;
+  box-shadow: 0 28px 80px var(--sov-shadow);
+}
+
+.auth-panel h2 {
+  max-width: 16ch;
+}
+
+/* Plan onboarding */
+.plan-layout {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 1120px;
+}
+
+.plan-choice {
+  display: grid;
+  grid-template-columns: minmax(0, .72fr) minmax(520px, 1.28fr);
+  gap: clamp(46px, 7vw, 88px);
+  align-items: start;
+}
+
+.plan-choice > .eyebrow,
+.plan-choice > h1,
+.plan-choice > .plan-intro,
+.plan-choice > .billing-toggle {
+  grid-column: 1;
+}
+
+.onboarding-plan-grid {
+  grid-column: 2;
+  grid-row: 1 / span 5;
+  margin-top: 0;
+}
+
+.onboarding-plan-grid > article {
+  min-height: 520px;
+}
+
+.plan-aside {
+  display: none;
+}
+
+/* Authenticated workspace */
+.intelligence-sidebar {
+  width: 252px;
+  padding-inline: 16px;
+}
+
+.intelligence-main {
+  margin-left: 252px;
+}
+
+.intelligence-sidebar nav {
+  gap: 5px;
+}
+
+.intelligence-sidebar nav button {
+  min-height: 52px;
+  grid-template-columns: 1fr;
+  padding-inline: 13px;
+}
+
+.intelligence-scroll {
+  width: min(100%, var(--sov-content));
+  padding-top: clamp(48px, 7vw, 76px);
+}
+
+.surface-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, .55fr);
+  gap: 26px 54px;
+  align-items: end;
+  max-width: none;
+  margin-bottom: 46px;
+}
+
+.surface-heading > p {
+  grid-column: 1 / -1;
+  margin-bottom: -14px;
+}
+
+.surface-heading h1 {
+  max-width: 14ch;
+  margin-bottom: 0;
+}
+
+.surface-heading > span {
+  align-self: end;
+  padding-bottom: 4px;
+}
+
+.today-facet-view,
+.account-summary,
+.person-split,
+.relationship-answer > div,
+.alignment-view,
+.library-grid,
+.system-graph {
+  box-shadow: 0 22px 70px color-mix(in srgb, var(--sov-shadow) 70%, transparent);
+}
+
+.question-rail {
+  padding-top: 12px;
+  border-top: 1px solid var(--sov-line);
+}
+
+.response-thread {
+  max-width: 840px;
+  margin-inline: auto;
+}
+
+.user-question {
+  max-width: 560px;
+}
+
+.sovereign-answer > header h2 {
+  max-width: 20ch;
+}
+
+.answer-sections {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--sov-line);
+  border-radius: 22px;
+  background: var(--sov-line);
+}
+
+.answer-sections article {
+  max-width: none;
+  min-height: 150px;
+  padding: 22px;
+  background: var(--sov-panel);
+}
+
+.sovereign-composer {
+  box-shadow: 0 24px 70px var(--sov-shadow-strong);
+}
+
+@media (max-width: 1000px) {
+  .sovereign-landing .landing-section-header,
+  .surface-heading {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .sovereign-landing .landing-section-header .landing-kicker,
+  .surface-heading > p {
+    margin-bottom: 0;
+  }
+
+  .plan-choice {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-choice > .eyebrow,
+  .plan-choice > h1,
+  .plan-choice > .plan-intro,
+  .plan-choice > .billing-toggle,
+  .onboarding-plan-grid {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .onboarding-plan-grid {
+    margin-top: 18px;
+  }
+}
+
+@media (max-width: 920px) {
+  .intelligence-main {
+    margin-left: 0;
+  }
+
+  .account-layout {
+    grid-template-columns: 1fr;
+    gap: 42px;
+    align-items: start;
+  }
+
+  .auth-panel {
+    max-width: 620px;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 700px) {
+  .sovereign-landing .landing-section-header {
+    margin-bottom: 32px;
+  }
+
+  .sovereign-landing .landing-final {
+    padding-inline: 0;
+  }
+
+  .account-nav,
+  .account-layout {
+    width: min(100% - 28px, var(--sov-wide));
+  }
+
+  .account-layout {
+    min-height: auto;
+    padding-block: 36px 72px;
+  }
+
+  .account-intro h1 {
+    max-width: 14ch;
+  }
+
+  .auth-panel {
+    padding: 24px 20px;
+    border-radius: 22px;
+  }
+
+  .plan-onboarding {
+    padding-inline: 16px;
+  }
+
+  .plan-layout {
+    padding-top: 38px;
+  }
+
+  .onboarding-plan-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding-plan-grid > article {
+    min-height: auto;
+  }
+
+  .surface-heading {
+    margin-bottom: 34px;
+  }
+
+  .answer-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .answer-sections article {
+    min-height: auto;
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interface-composition-motion-placeholder {
+    animation: none;
+  }
+}
