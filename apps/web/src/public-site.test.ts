@@ -121,7 +121,7 @@ describe('Sovereign.OS public experience', () => {
     expect(faq).toContain('launch-hero-compact questions-hero');
     expect(staticExperienceCss).toContain('.launch-links a:not(.launch-cta) { display: none; }');
     expect(staticExperienceCss).toMatch(/@media \(max-width: 620px\)[\s\S]*?\.price-options \{ grid-template-columns: 1fr; \}/);
-    expect(staticExperienceCss).toContain('margin-inline: 0');
+    expect(staticExperienceCss).toContain('.launch-shell { width: min(1320px, calc(100% - 64px)); margin: 0 auto; }');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
     expect(notFound).toContain('content="noindex, nofollow"');
     expect(notFound).toContain('/launch.css?v=20260730-cohesion');
