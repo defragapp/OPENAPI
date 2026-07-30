@@ -26,9 +26,13 @@ The founder-approved public contract is defined in [`docs/launch-product-contrac
 - Authenticated application and API Custom Domain: `https://app.defrag.app`
 - `defrag.app/*` and `www.defrag.app/*` remain explicit Worker routes that send public traffic to Sovereign.OS and application traffic to the authenticated host
 - D1 canonical storage: `sovereign-openapi-db`
+- D1 Sessions with browser-held opaque bookmarks for sequential API consistency
+- D1 read replication in automatic mode
 - SQLite Durable Objects for thread coordination
-- Workers AI through AI Gateway
-- `openai/gpt-5.5` through the existing Cloudflare AI Gateway configuration
+- Cloudflare Workers AI through AI Gateway `sovereign`
+- Production model: `@cf/zai-org/glm-4.7-flash`
+- Personalized inference bypasses Gateway cache and persistent prompt logging
+- D1-backed daily free-capacity reservations stop inference before the account-wide Workers AI free allocation is exhausted
 - Static assets for high-volume browser delivery
 - D1-scheduled background work every 15 minutes
 - Stripe-hosted Checkout and Customer Portal
@@ -50,7 +54,7 @@ Cloudflare Queue and R2 are intentionally disabled. Private export is not part o
 
 ## Cloudflare production release
 
-Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the sole production release authority. Merging an approved, fully gated commit to `main` authorizes Cloudflare to run the repository-owned deployment command. GitHub Actions is not supported for this repository, ad-hoc local production deploys are forbidden, and workflow files must not exist.
+Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the sole production release authority. Merging an approved, fully gated commit to `main` authorizes Cloudflare to run the repository-owned deployment command. GitHub Actions and ad-hoc local production deploys are not release authorities.
 
 Use an exact, clean `main` checkout:
 
@@ -58,7 +62,7 @@ Use an exact, clean `main` checkout:
 - Deploy command: `pnpm production:deploy`
 - Commit stamp: set `WORKERS_CI_COMMIT_SHA` to the full 40-character `main` commit SHA
 
-The deployment command applies D1 migrations, preserves existing encrypted Worker secrets, stamps `APP_VERSION`, deploys `sovv-web`, and tests the public site, app, health/readiness, pricing, unauthenticated boundaries, Stripe signature rejection, disabled export route, security headers, concurrent health requests, and all four production domains. A deploy command that fails any check is not a completed release.
+The deployment command applies D1 migrations, preserves existing encrypted Worker secrets, configures and verifies Free-plan Cloudflare controls, stamps `APP_VERSION`, deploys `sovv-web`, and tests the public site, app, health/readiness, pricing, unauthenticated boundaries, Stripe signature rejection, disabled export route, security headers, concurrent health requests, and all four production domains. A deploy command that fails any check is not a completed release.
 
 Wrangler configuration is the source of truth for routes. Both production Custom Domains and both Defrag parent routes must remain declared in `wrangler.jsonc` and `wrangler.production-direct.jsonc`; dashboard-only routes can be overwritten by the next Wrangler deployment.
 
@@ -70,7 +74,7 @@ Required encrypted Worker secrets:
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 
-Secret values belong only in Cloudflare and must never be copied into repository files, logs, issues, or chat.
+The production deploy environment also requires a scoped `CLOUDFLARE_API_TOKEN` so the repository-owned deploy script can configure and verify D1 replication, AI Gateway controls, the Free-plan rate-limit rule, and API Shield. Secret values belong only in Cloudflare and must never be copied into repository files, logs, issues, or chat.
 
 ## Launch billing
 
