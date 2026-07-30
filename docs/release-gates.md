@@ -27,7 +27,7 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Stripe signatures and timestamps are verified.
 - Webhooks and thread turns are idempotent.
 - All D1 queries use bound parameters.
-- Secrets exist only in Worker bindings or CI secrets.
+- Secrets exist only in Cloudflare Worker bindings or the Cloudflare build/deploy environment.
 - The disabled private-export boundary, public-link sharing, and deletion are tested.
 - Unsaved thread content expires after 30 days.
 - Minimal security and operational audit metadata without conversation content expires after 90 days unless a documented incident or legal hold applies.
@@ -41,7 +41,10 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Every participant retains separate Baseline, Current, Observed, Role Context, and Unknown fields.
 - System analysis never merges participants into a group diagnosis or assigns a villain.
 - Provenance and uncertainty remain available for verification without exposing private implementation details in the primary explanation.
+- Production uses the Cloudflare Workers AI binding through AI Gateway with personalized cache bypass and persistent prompt logging disabled.
 - Model or provider changes require privacy review, cost review, latency testing, structured-output evaluation, and relational-safety evals.
+- Failed or capacity-blocked inference does not consume the user's monthly turn.
+- The D1-backed daily reservation ledger stops inference before the account-wide Workers AI free allocation is exhausted.
 
 ## Billing
 
@@ -55,18 +58,21 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 
 ## Reliability
 
-- CI or Cloudflare Workers Builds is green for the exact preview commit.
-- D1 migrations apply locally and remotely.
+- Cloudflare Workers Builds is green for the exact approved `main` commit.
+- D1 migrations apply locally and remotely through `0013_workers_ai_free_capacity`.
+- D1 Sessions preserve sequential API consistency and reject invalid bookmarks.
 - Thread ordering survives concurrent requests.
 - Invitation redemption and consent decisions are race-safe and one-time.
-- Health checks cover code version, D1, Durable Objects, AI Gateway, Baseline provider, email, scheduled cleanup, Stripe, and adapter readiness without exposing secrets.
+- Health checks cover code version, D1, Durable Objects, AI Gateway, Workers AI, Baseline provider, email, scheduled cleanup, Stripe, and adapter readiness without exposing secrets.
+- `/ready` fails unless the daily AI capacity ledger exists.
 - Traces correlate by thread and request ID.
-- Request rate limits, bounded pagination, provider timeouts, and spend limits are verified.
+- Request rate limits, bounded pagination, provider timeouts, Gateway privacy controls, API Shield, and the daily free-capacity budget are verified.
 - Scheduled retention cleanup is tested at the 30-day and 90-day boundaries.
 - Cloudflare Workers Builds verifies and deploys only the exact approved `main` commit.
 - Migration compatibility and D1 backup evidence are recorded before the build deploys.
 - Rollback instructions and the previous stable Worker version are documented.
 - The production build is bound to the exact approved commit SHA and fails closed if live probes do not converge.
+- GitHub Actions and ad-hoc local commands are not accepted as production release evidence.
 
 ## UX
 
