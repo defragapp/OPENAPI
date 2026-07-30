@@ -21,7 +21,8 @@ const landing = read('apps/web/src/PublicLanding.tsx');
 const landingCss = [
   read('apps/web/src/public-landing.css'),
   read('apps/web/src/sovereign-cohesion.css'),
-  read('apps/web/src/sovereign-modern.css')
+  read('apps/web/src/sovereign-modern.css'),
+  read('apps/web/src/landing-production.css')
 ].join('\n');
 const prompt = read('apps/sovereign-worker/src/agent/prompt-v1.ts');
 const contract = read('apps/sovereign-worker/src/agent/recognition.ts');
@@ -95,12 +96,15 @@ containsAll('verified Covenant library', scripture, [
   'boundary:'
 ]);
 
-containsAll('public product moment', landing, [
-  'PERSONAL AI FOR REAL LIFE',
-  'Ask about your life.',
-  'Get an answer built around you.',
-  '<LivingSovereignAnswer />',
+containsAll('current public product contract', landing, [
+  'Know yourself.',
+  'Understand the system.',
+  'Choose what fits.',
+  'Sovereign.OS is a private AI for understanding yourself, your relationships, and the systems around you.',
+  'Build your Baseline once',
+  '<HeroIntelligenceStage />',
   '<SystemMap />',
+  'Another person remains a person—not a data source you control.',
   'No compatibility score. No mind-reading.'
 ]);
 
@@ -110,15 +114,18 @@ containsAll('responsive workspace', workspaceCss, [
   '@media (max-width: 760px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
+
 containsAll('responsive landing', landingCss, [
   'min-width: 320px',
   '@media (max-width: 760px)',
   '@media (max-width: 440px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
+
 containsAll('canonical visual imports', main, [
   "import './sovereign-cohesion.css'",
-  "import './sovereign-modern.css'"
+  "import './sovereign-modern.css'",
+  "import './landing-production.css'"
 ]);
 
 assert(!existsSync(resolve(root, 'apps/web/src/experience-reconciliation.css')), 'Retired visual override was restored.');
@@ -135,8 +142,9 @@ console.log(JSON.stringify({
   ok: true,
   answerContract: 'sovereign-answer.v2',
   baselineContracts: ['baseline-source.v1', 'baseline-facets.v1'],
+  publicProductContract: 'baseline-first-private-ai',
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
-  canonicalVisualLayers: ['sovereign-cohesion.css', 'sovereign-modern.css'],
+  canonicalVisualLayers: ['sovereign-cohesion.css', 'sovereign-modern.css', 'landing-production.css'],
   exactBasis: true,
   contextualCovenant: true
 }, null, 2));
