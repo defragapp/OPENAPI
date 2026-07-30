@@ -15,6 +15,7 @@ const faq = readFileSync('apps/web/public/faq.html', 'utf8');
 const tokens = readFileSync('apps/web/src/styles.css', 'utf8');
 const membership = readFileSync('apps/web/src/SystemMembershipManager.tsx', 'utf8');
 const product = readFileSync('apps/sovereign-worker/src/db/product.ts', 'utf8');
+const prompt = readFileSync('apps/sovereign-worker/src/agent/prompt-v1.ts', 'utf8');
 
 function requireAll(label, source, values) {
   for (const value of values) {
@@ -119,10 +120,10 @@ requireAll('workspace layout and accessibility', workspaceCss, [
 ]);
 
 requireAll('public category clarity', landing, [
-  'Know yourself.',
-  'Understand the system.',
-  'Choose what fits.',
-  'private AI for understanding yourself',
+  'PRIVATE PERSONAL AI',
+  'Ask about your life.',
+  'Get an answer built around you.',
+  'do not have to explain yourself from scratch',
   'Why do I keep taking responsibility for everyone else?',
   'EXAMPLE ANSWER',
   'Sanitized demonstration · Not your Baseline',
@@ -134,21 +135,41 @@ if (landing.indexOf('Sanitized demonstration · Not your Baseline') > landing.in
 
 requireAll('public product stage', landing, [
   'DIRECT ANSWER',
-  'THE PERSONAL CONNECTION',
-  'A PRACTICAL NEXT STEP',
-  'Why this is personal',
-  'Shadow',
-  'Gift',
-  'Alignment',
-  'BASIS',
+  'WHY THIS MAY FIT',
+  'TRY THIS',
+  'Open supporting details',
+  'Under pressure',
+  'At your best',
+  'SUPPORTING DETAILS',
   'YOUR BASELINE',
-  'WHAT MAY BE ACTIVE NOW',
-  'YOUR CONFIRMATION',
-  'STILL UNKNOWN',
+  'TEMPORARY CONTEXT',
+  'WHAT YOU CONFIRMED',
+  'WHAT SOVEREIGN CANNOT KNOW',
   'WHAT HAPPENS BETWEEN YOU',
-  'PRESSURE FIELD',
+  'WHERE PRESSURE BUILDS',
   'PERMISSION BEFORE COMPARISON'
 ]);
+
+requireAll('plain-language answer prompt', prompt, [
+  'The direct answer must make sense by itself',
+  'Write for a first-time user',
+  'Use short, concrete sentences',
+  'Prefer common verbs',
+  'A user should be able to quote the direct answer'
+]);
+
+for (const abstractPhrase of [
+  'Know yourself.',
+  'Understand the system.',
+  'Choose what fits.',
+  'The question changes. The environment stays the same.',
+  'Another person remains a person—not a data source you control.',
+  'Your intelligence begins with your Baseline.'
+]) {
+  if (`${landing}\n${how}\n${pricing}\n${faq}`.includes(abstractPhrase)) {
+    throw new Error(`Retired abstract public copy remains: ${abstractPhrase}`);
+  }
+}
 
 if (landing.includes('Healing isn’t optional. Holding the pain is.')) {
   throw new Error('The public homepage must not present Sovereign.OS as a healing product.');
@@ -190,13 +211,26 @@ requireAll('static public support experience', staticExperienceCss, [
 
 requireAll('static page cohesion', `${how}\n${pricing}\n${faq}`, [
   '20260730-cohesion',
-  'Private personal, relationship, and system intelligence',
+  'Private AI for personal',
   'Build my Baseline',
   '$20',
   '$99',
   '10 Sovereign AI turns each month',
   '300 Sovereign AI turns each month',
   'permission'
+]);
+
+requireAll('static page clarity', how, [
+  'Build your Baseline once. Then ask about your real life.',
+  'Sovereign does not start from a blank chat.'
+]);
+requireAll('pricing page clarity', pricing, [
+  'Use Free for personal questions. Use Sovereign+ for relationships and groups.',
+  'What Sovereign+ adds.'
+]);
+requireAll('questions page clarity', faq, [
+  'What Sovereign does, how it works, and what it cannot know.',
+  'How do invitations work?'
 ]);
 
 requireAll('system membership manager', membership, [
@@ -222,4 +256,4 @@ for (const prohibited of ['God is telling you', 'They secretly want', 'This prov
   }
 }
 
-console.log('Sovereign.OS cohesion release visual and product contract verified.');
+console.log('Sovereign.OS visual, product, and plain-language contracts verified.');
