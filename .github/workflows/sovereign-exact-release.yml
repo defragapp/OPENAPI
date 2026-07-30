@@ -1,0 +1,81 @@
+name: Sovereign exact production release
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/sovereign-exact-release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sovereign-exact-production-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      RELEASE_SHA: 086647d55fde136a8426399cf330e4da33d1ca96
+      CLOUDFLARE_ACCOUNT_ID: 8b1954d216d65077c6480d62583fe2c2
+      VITE_TURNSTILE_SITE_KEY: 0x4AAAAAADhGIF8-iOLIg8MU
+
+    steps:
+      - name: Check out locked production source
+        uses: actions/checkout@v4
+        with:
+          ref: 086647d55fde136a8426399cf330e4da33d1ca96
+          fetch-depth: 2
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: Install locked workspace
+        run: pnpm install --frozen-lockfile
+
+      - name: Run canonical Cloudflare release gate
+        env:
+          GITHUB_SHA: ${{ env.RELEASE_SHA }}
+          WORKERS_CI_COMMIT_SHA: ${{ env.RELEASE_SHA }}
+        run: pnpm verify:cloudflare-build
+
+      - name: Resolve deployment credential
+        env:
+          TOKEN_PRIMARY: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          TOKEN_LEGACY: ${{ secrets.CF_API_TOKEN }}
+          TOKEN_BUILDS: ${{ secrets.CLOUDFLARE_BUILDS_API_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TOKEN="${TOKEN_PRIMARY:-${TOKEN_LEGACY:-${TOKEN_BUILDS:-}}}"
+          if [[ -z "$TOKEN" ]]; then
+            echo "No Cloudflare API credential is configured." >&2
+            exit 1
+          fi
+          echo "CLOUDFLARE_API_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+
+      - name: Deploy exact verified SHA
+        env:
+          GITHUB_SHA: ${{ env.RELEASE_SHA }}
+          WORKERS_CI_COMMIT_SHA: ${{ env.RELEASE_SHA }}
+        run: pnpm production:deploy
+
+      - name: Publish release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sovereign-production-${{ env.RELEASE_SHA }}
+          if-no-files-found: ignore
+          retention-days: 14
+          path: |
+            production-deployment.json
+            apps/web/dist
