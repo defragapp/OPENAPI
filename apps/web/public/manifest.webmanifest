@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Sovereign.OS",
   "short_name": "Sovereign",
-  "description": "Private AI for understanding yourself, a decision, a relationship, or a group.",
+  "description": "Private personal and relational intelligence for clearer decisions, stronger self-understanding, and more informed relationships.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -21,7 +21,7 @@
     {
       "name": "Open Sovereign.OS",
       "short_name": "Open",
-      "description": "Open your private Sovereign.OS workspace.",
+      "description": "Open your private personal and relational intelligence space.",
       "url": "/app",
       "icons": [{ "src": "/app-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
