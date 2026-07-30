@@ -8,12 +8,12 @@ const socialPreview = readFileSync(new URL('../public/og-sovereign.svg', import.
 const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
 
 describe('public metadata and fallback documents', () => {
-  it('uses the current self, relationship, and system positioning in document metadata', () => {
-    expect(index).toContain('Know yourself. Understand the system. Choose what fits.');
-    expect(index).toContain('Private AI for understanding yourself, your relationships, and the systems around you.');
-    expect(index).toContain('Private personal, relationship, and system intelligence');
+  it('uses an immediate plain-language product description in document metadata', () => {
+    expect(index).toContain('Ask about your life. Get an answer built around you.');
+    expect(index).toContain('Private AI for personal questions, decisions, relationships, families, and teams.');
+    expect(index).toContain('Private AI built around your Baseline');
+    expect(index).not.toContain('Know yourself. Understand the system. Choose what fits.');
     expect(index).not.toContain('Personal AI for real life');
-    expect(index).not.toContain('the decisions in front of you');
   });
 
   it('keeps the static 404 on the current cohesion assets and product category', () => {
@@ -30,18 +30,19 @@ describe('public metadata and fallback documents', () => {
     expect(notFound).not.toContain('20260729-visual-sync');
   });
 
-  it('keeps install metadata aligned with the current product category', () => {
-    expect(manifest).toContain('Private AI for understanding yourself, your relationships, and the systems around you.');
+  it('keeps install metadata clear and accurate', () => {
+    expect(manifest).toContain('Private AI for understanding yourself, a decision, a relationship, or a group.');
     expect(manifest).toContain('Open your private Sovereign.OS workspace.');
     expect(manifest).not.toContain('the decisions in front of you');
-    expect(manifest).not.toContain('private personal AI');
   });
 
   it('keeps social previews permission-safe and consistent with the hero promise', () => {
-    expect(socialPreview).toContain('Know yourself.');
-    expect(socialPreview).toContain('Understand the system.');
-    expect(socialPreview).toContain('Choose what fits.');
-    expect(socialPreview).not.toContain('Understand the people around you.');
+    expect(socialPreview).toContain('Ask about your life.');
+    expect(socialPreview).toContain('Get an answer built');
+    expect(socialPreview).toContain('around you.');
+    expect(socialPreview).toContain('Build your private Baseline once.');
+    expect(socialPreview).not.toContain('Know yourself.');
+    expect(socialPreview).not.toContain('Understand the system.');
   });
 
   it('invalidates the retired public shell without caching private workspace navigation', () => {
