@@ -119,7 +119,10 @@ describe('Sovereign.OS public experience', () => {
     expect(pricing).not.toContain('class="plan-summary"');
     expect(faq).toContain('class="launch-page questions-page"');
     expect(faq).toContain('launch-hero-compact questions-hero');
-    expect(staticExperienceCss).toContain('.launch-links a:not(.launch-cta) { display: none; }');
+    expect(staticExperienceCss).toContain('overflow-x: auto;');
+    expect(staticExperienceCss).toContain('overscroll-behavior-inline: contain;');
+    expect(staticExperienceCss).toContain('.launch-links a { flex: 0 0 auto; white-space: nowrap; }');
+    expect(staticExperienceCss).not.toContain('.launch-links a:not(.launch-cta) { display: none; }');
     expect(staticExperienceCss).toMatch(/@media \(max-width: 620px\)[\s\S]*?\.price-options \{ grid-template-columns: 1fr; \}/);
     expect(staticExperienceCss).toContain('.launch-shell { width: min(1320px, calc(100% - 64px)); margin: 0 auto; }');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
