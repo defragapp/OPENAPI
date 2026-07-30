@@ -13,7 +13,8 @@ const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url)
 describe('public production release surfaces', () => {
   it('publishes canonical and controlled social metadata', () => {
     expect(index).toContain('rel="canonical" href="https://sovereign.defrag.app/"');
-    expect(index).toContain('Know yourself. Understand the system. Choose what fits.');
+    expect(index).toContain('Ask about your life. Get an answer built around you.');
+    expect(index).not.toContain('Know yourself. Understand the system. Choose what fits.');
     for (const [page, canonical] of [[pricing, '/pricing'], [questions, '/faq'], [how, '/how-it-works']] as const) {
       expect(page).toContain(`rel="canonical" href="https://sovereign.defrag.app${canonical}"`);
       expect(page).toContain('og-sovereign.svg');
@@ -35,8 +36,8 @@ describe('public production release surfaces', () => {
     expect(landing).toContain('<PublicAnswerStage');
     expect(landing).toContain('EXAMPLE ANSWER');
     expect(landing).toContain('Sanitized demonstration · Not your Baseline');
-    expect(landing).toContain('Your capacity is real. The question is whether the responsibility is actually yours.');
-    expect(landing).toContain('Useful language first. Exact support when you want it.');
+    expect(landing).toContain('You are good at creating order. That does not make every problem yours to carry.');
+    expect(landing).toContain('Get the answer first. Open the supporting details when you need them.');
   });
 
   it('is responsive without depending on hover or motion', () => {
