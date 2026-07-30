@@ -96,6 +96,8 @@ containsAll('verified Covenant library', scripture, [
   'boundary:'
 ]);
 
+// The legacy “PERSONAL AI FOR REAL LIFE” release assertion is intentionally retired.
+// Release authority follows the current Baseline-first public product contract below.
 containsAll('current public product contract', landing, [
   'Know yourself.',
   'Understand the system.',
@@ -144,6 +146,7 @@ console.log(JSON.stringify({
   answerContract: 'sovereign-answer.v2',
   baselineContracts: ['baseline-source.v1', 'baseline-facets.v1'],
   publicProductContract: 'baseline-first-private-ai',
+  legacyTaglineGate: 'retired',
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
   canonicalVisualLayers: ['sovereign-cohesion.css', 'sovereign-modern.css', 'landing-production.css'],
   responsiveBreakpoints: ['900px', '620px'],
