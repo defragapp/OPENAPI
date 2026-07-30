@@ -13,10 +13,11 @@ const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url)
 describe('public production release surfaces', () => {
   it('publishes canonical and controlled social metadata', () => {
     expect(index).toContain('rel="canonical" href="https://sovereign.defrag.app/"');
+    expect(index).toContain('Know yourself. Understand the system. Choose what fits.');
     for (const [page, canonical] of [[pricing, '/pricing'], [questions, '/faq'], [how, '/how-it-works']] as const) {
       expect(page).toContain(`rel="canonical" href="https://sovereign.defrag.app${canonical}"`);
       expect(page).toContain('og-sovereign.svg');
-      expect(page).toContain('/static-release.css');
+      expect(page).toContain('/static-release.css?v=20260730-cohesion');
     }
   });
 
@@ -29,10 +30,13 @@ describe('public production release surfaces', () => {
 
   it('uses a real interactive answer as the public focal point', () => {
     expect(landing).toContain('data-answer-contract="sovereign-answer.v2"');
-    expect(landing).toContain('<LivingSovereignAnswer />');
+    expect(landing).toContain('<HeroIntelligenceStage />');
+    expect(landing).toContain('<BaselineContextStage />');
+    expect(landing).toContain('<PublicAnswerStage');
     expect(landing).toContain('EXAMPLE ANSWER');
     expect(landing).toContain('Sanitized demonstration · Not your Baseline');
-    expect(landing).toContain('See what is supported, what is only possible, and what remains unknown.');
+    expect(landing).toContain('Your capacity is real. The question is whether the responsibility is actually yours.');
+    expect(landing).toContain('Useful language first. Exact support when you want it.');
   });
 
   it('is responsive without depending on hover or motion', () => {
@@ -41,5 +45,6 @@ describe('public production release surfaces', () => {
     expect(landingCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(landing).toContain('role="tablist"');
     expect(landing).toContain('role="tabpanel"');
+    expect(landing).toContain('aria-live="polite"');
   });
 });
