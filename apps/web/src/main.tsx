@@ -26,7 +26,7 @@ import './email-code-fallback.css';
 import './unified-entry.css';
 import './account-control.css';
 
-/* Shared product system, route-owned landing layout, and final composition hierarchy. */
+/* Shared product system, route-owned landing layout, and composition hierarchy. */
 import './sovereign-cohesion.css';
 import './sovereign-modern.css';
 import './landing-production.css';
