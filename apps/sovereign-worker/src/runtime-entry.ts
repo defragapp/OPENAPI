@@ -265,10 +265,24 @@ function isNavigationAssetPath(pathname: string): boolean {
 }
 
 function navigationAssetRequest(request: Request, pathname: string): Request {
+  if (!isSpaDocumentPath(pathname)) return request;
   const target = new URL(request.url);
-  target.pathname = isApplicationPagePath(pathname) ? '/app' : '/';
+  target.pathname = '/';
   target.search = '';
-  return new Request(target.toString(), request);
+  return new Request(target, request);
+}
+
+function isSpaDocumentPath(pathname: string): boolean {
+  return pathname === '/'
+    || pathname === '/privacy'
+    || pathname === '/terms'
+    || pathname === '/app'
+    || pathname.startsWith('/app/')
+    || pathname === '/login'
+    || pathname === '/signup'
+    || pathname === '/onboarding'
+    || pathname === '/invitation'
+    || pathname.startsWith('/auth/');
 }
 
 function redirectTo(hostname: string, source: URL): Response {
@@ -279,6 +293,5 @@ function redirectTo(hostname: string, source: URL): Response {
   return withSecurityHeaders(Response.redirect(target.toString(), 308));
 }
 
-export { ThreadCoordinator };
-export { queue, scheduled };
+export { ThreadCoordinator, queue, scheduled };
 export default runtime;
