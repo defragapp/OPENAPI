@@ -61,7 +61,7 @@ export function PublicLanding() {
       const rect = root.getBoundingClientRect();
       const travel = Math.max(root.offsetHeight - window.innerHeight, 1);
       const progress = clamp(-rect.top / travel);
-      const style = root.style as EngineVariables;
+      const style = root.style;
 
       style.setProperty('--engine-progress', progress.toFixed(4));
       style.setProperty('--hero-opacity', windowed(progress, 0, 0.22, 0.08, true).toFixed(4));
