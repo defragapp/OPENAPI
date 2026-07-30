@@ -10,103 +10,126 @@ Prepared for the `defragapp/OPENAPI` production architecture.
 - D1 database: `sovereign-openapi-db`.
 - Migrations: `apps/sovereign-worker/migrations`.
 - AI Gateway ID: `sovereign`.
-- AI model: `openai/gpt-5.5`.
+- AI model: `@cf/zai-org/glm-4.7-flash` through the Workers AI binding.
 - Answer contract: `sovereign-answer.v2`.
+- Queue and R2: disabled.
 
-Do not replace these values with placeholder names or alternate migration paths.
+Do not replace production names with placeholders or create alternate data paths.
+
+## Automated production authority
+
+Cloudflare Workers Builds remains the sole release path. The configured commands are:
+
+```text
+Build: corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build
+Deploy: pnpm production:deploy
+```
+
+`pnpm production:deploy` now:
+
+1. Resolves the exact Workers Builds commit SHA.
+2. Resolves the existing D1 database ID.
+3. Applies all D1 migrations.
+4. Verifies required Worker secrets.
+5. Configures and verifies the Free-plan Cloudflare controls below.
+6. Deploys the exact SHA.
+7. Verifies the live public and application domains, current product copy, security headers, authentication boundaries, Stripe signature rejection, and readiness version.
+
+The release fails closed when an infrastructure control or live verification does not match the repository contract.
 
 ## D1 Sessions and read replication
 
-The Sessions API does not require a new D1 binding shape. Read replication is enabled on the existing D1 database in the Cloudflare dashboard. The application must then use `DB.withSession(...)` for requests that should benefit from replicas and cross-request sequential consistency.
+The Sessions API does not require a new D1 binding. The Worker creates a request-scoped `DB.withSession(...)` connection for `/api/*` requests.
 
-This release implements the transport:
-
-1. API requests without a bookmark begin with `first-primary` so authentication, consent, billing, and account state start from current primary data.
-2. The Worker returns the latest opaque bookmark in `x-d1-bookmark`.
-3. The browser stores that bookmark in session storage.
-4. Later same-origin `/api/*` calls return the bookmark.
-5. Invalid, oversized, or control-character bookmark values are ignored.
+1. Requests without a bookmark begin with `first-primary`.
+2. The Worker returns the latest opaque bookmark in `x-d1-bookmark` after a D1 query.
+3. The browser stores it in session storage.
+4. Later same-origin API calls return the bookmark.
+5. Invalid, oversized, or control-character values are ignored.
 6. The bookmark is cleared on logout.
+7. Requests that produce no bookmark continue normally.
 
-The bookmark is a database consistency marker, not an authentication token. Authentication remains the signed, revocable `__Host-sovereign_session` cookie.
+The bookmark is a consistency marker, not an authentication credential. Authentication remains the signed, revocable `__Host-sovereign_session` cookie.
 
-### Cloudflare account action
+The deploy script enables and verifies `read_replication.mode = auto` on the existing `sovereign-openapi-db`. It never creates a replacement database merely to enable replication.
 
-Enable read replication for the existing `sovereign-openapi-db` database:
+## Free Workers AI inference
 
-`D1 > sovereign-openapi-db > Settings > Read Replication`
+Production and preview use the Cloudflare-hosted `@cf/zai-org/glm-4.7-flash` model. This keeps the inference path within the Workers AI Free allocation rather than routing normal product turns to a separately billed third-party model.
 
-Do not create a replacement database and do not insert a placeholder `database_id` into the repository.
+The request boundary normalizes the existing Sovereign prompts into Workers AI chat messages and normalizes hosted-model output back into the stable `output_text` shape expected by the answer and Baseline-facet parsers.
 
-## AI Gateway controls
+Every personalized call enforces:
 
-The repository already sets `skipCache: true` and `collectLog: false` for personalized Sovereign requests. Preserve both settings.
+- `skipCache: true`.
+- `collectLog: false`.
+- JSON response mode.
+- Low temperature for structured output.
+- The existing `sovereign-answer.v2` schema, Basis authorization, and output-safety checks.
 
-The default AI Gateway rate limiter applies uniformly to the gateway. It is not a per-IP limiter. For gateway-wide protection, configure the existing `sovereign` gateway with:
+Workers AI Free capacity is finite. The application-level monthly turn allowance remains the product authority, while Cloudflare may return a capacity error when the daily account allocation is exhausted. The Worker already converts failed AI generation into a retryable, non-guessed response.
 
-- Rate limit: 50 requests.
-- Interval: 60 seconds.
-- Technique: sliding.
-- Persistent request-content logging: disabled.
-- Cache TTL: zero for personalized requests.
+## AI Gateway and per-IP protection
 
-For per-IP abuse protection, use the single Free-plan zone rate-limiting rule on the public AI message route rather than describing the AI Gateway limit as per-IP:
+The deploy script updates and verifies the existing `sovereign` gateway with:
 
-- Host: `app.defrag.app`.
-- Path pattern: `/api/v1/threads/*/messages`.
-- Method: `POST`.
-- Counting characteristic: source IP.
-- Threshold: choose a value compatible with the product's per-account entitlement limits.
+- 50 requests per 60 seconds.
+- Sliding rate-limit technique.
+- Cache TTL zero.
+- Persistent request-content logs disabled.
 
-The application-level monthly turn reservation remains authoritative. Cloudflare rate limiting is defense in depth.
+Gateway limiting is account-wide, not per-IP. The script separately owns the single Free-plan zone rate-limit rule for the AI message route:
 
-### Spend limit
+- Path: `/api/v1/threads/*/messages`.
+- Characteristic: source IP and Cloudflare data center.
+- Limit: 10 requests per 10 seconds.
+- Mitigation: block for 10 seconds.
 
-Set a fixed monthly global spend limit of `$5.00` on the existing `sovereign` gateway only when third-party model billing is enabled. The default action should block and return `429`; do not silently route Baseline, relationship, system, Alignment, or Covenant requests to an unevaluated cheaper model.
+If an unrelated rule occupies the one Free-plan rate-limit slot, deployment stops rather than silently deleting that rule.
 
-The code already supplies pseudonymous account metadata. A future spend rule may partition by that metadata after usage has been measured, but the initial `$5.00` rule should be global and simple.
+No paid-model spend limit is required because the active production model is Cloudflare-hosted Workers AI.
 
 ## API Shield
 
-`docs/api-shield/sovereign-critical-api.openapi.yaml` is an upload-ready OpenAPI 3.0 request schema for short-body, security-sensitive endpoints.
+`docs/api-shield/sovereign-critical-api.openapi.yaml` covers only short, security-sensitive mutation bodies:
 
-Important boundaries:
+- Account onboarding.
+- Current-condition settings.
+- Person and invitation consent.
+- Stripe checkout and billing portal handoffs.
+- Account deletion approval.
 
-- API Shield validates incoming HTTP requests.
-- It does not validate AI responses.
-- `sovereign-answer.v2` remains enforced by the Worker Zod schema and parser.
-- Free-plan request-body validation covers only the first 1 KB.
-- Long thread-message requests therefore remain protected primarily by server-side validation, authorization, idempotency, entitlements, and safety checks.
+Authentication requests carrying Turnstile tokens are intentionally excluded from blocking schema validation because the Free plan inspects only the first 1 KB of request bodies. Those routes remain protected by Turnstile, same-origin enforcement, rate limits, token-length limits, D1 state, and Worker validation.
 
-Upload the schema under:
+The deploy script:
 
-`Security > API Shield > Schema Validation`
+1. Replaces only the schema named `Sovereign.OS Critical API`.
+2. Enables its validation.
+3. Ensures the required operations exist in Endpoint Management.
+4. Sets the schema validation mitigation to `block`.
+5. Re-reads the schema, operations, and settings before deployment continues.
 
-Before enabling `Block`, verify each generated operation against production smoke tests. Free plans expose `Block` rather than a full log-only rollout, so do not globally block unlisted routes without confirming route coverage.
+API Shield validates incoming HTTP requests. It does not validate AI responses. `sovereign-answer.v2` remains enforced inside the Worker.
 
 ## Worker bundle budget
 
-The Cloudflare Workers Free compressed upload limit is 3 MiB. The repository now enforces a stricter internal budget of 2,500 KiB.
-
-Run:
+The Cloudflare Workers Free compressed upload limit is 3 MiB. Sovereign.OS enforces a stricter internal budget of 2,500 KiB.
 
 ```bash
 pnpm build
 pnpm verify:worker-bundle-size
 ```
 
-The verifier runs Wrangler in dry-run mode, parses Wrangler's reported gzip upload size, and fails before release if the internal budget or Cloudflare limit is exceeded. It is included in `verify:cloudflare-build` and `verify:full`.
-
-Do not use `du -kb dist/index.js` as the release authority. That measures an assumed uncompressed file path rather than Wrangler's actual compressed upload.
+The verifier runs Wrangler in dry-run mode and parses Wrangler's gzip upload measurement. It does not rely on an assumed uncompressed `dist/index.js` path.
 
 ## Canonical contract validation
 
-The supplied external mock was intentionally not adopted. It conflicted with the live contract by using:
+The supplied external mock was intentionally rejected because it used:
 
 - `version: "2.0"` instead of `version: "sovereign-answer.v2"`.
 - `baseline` instead of `headline`, `direct_answer`, and structured sections.
 - `basis_references` instead of `basis_refs`.
-- `alignment_score`, which the repository explicitly prohibits.
+- `alignment_score`, which the repository prohibits.
 - `covenant_id`, which would bypass explicit thread-level Covenant confirmation.
 
-The existing `recognition.test.ts` now includes regression coverage that rejects that shape, missing `safety_mode`, and score fields added to otherwise valid answers.
+Regression tests reject that shape, missing `safety_mode`, invented Basis references, and score fields added to otherwise valid answers.
