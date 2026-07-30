@@ -1,132 +1,92 @@
-# #tasks — Sovereign.OS production completion
+# Sovereign.OS production completion
 
-Updated after each completed implementation tranche.
+This file tracks unresolved production evidence. It is not release authority. The authoritative source is the exact `main` commit reported by the deployed `/ready` response after `pnpm production:deploy` completes.
 
-## Current release baseline
+## Current code baseline
 
-- The authoritative production SHA is the value returned by `/ready`; it must exactly match GitHub `main`. Do not treat a duplicated SHA in this document as release authority.
-- Production entering the 2026-07-29 visual-sync tranche was verified at `b987d95eb53dfb788eb284e198637a7e71b8bdf6` across `sovereign.defrag.app`, `app.defrag.app`, both parent domains, and the workers.dev endpoint.
-- The current visual-sync candidate brings the Pricing and Questions first viewports back into alignment with the approved reference compositions, increases supporting-text contrast, preserves the complete desktop plan comparison, improves mobile scan order, and advances the public cache fingerprint. It does not change authentication, billing, consent, data, AI, or product contracts.
-- The candidate Cloudflare gate passes 12 migration validations, secret and production-fixture scans, release configuration, production release verification, intelligence verification, visual intelligence verification, every workspace typecheck, 130 Worker tests, 93 web tests, both production bundles, and Wrangler’s production dry-run.
-- GitHub-hosted Actions are intentionally absent. Cloudflare Workers Builds is the sole executable production release gate.
-- Remaining provider/account work is real-account link and code recovery, sender-domain trust, full Stripe lifecycle, deployed accessibility QA at every required width, and account-level abuse/security review.
+The current repository release contract includes:
 
-## Account access and communication
+- Cloudflare Workers Builds as the sole production deployment authority;
+- Worker `sovv-web` on the four declared production domains;
+- Cloudflare Workers AI through AI Gateway `sovereign`;
+- approved model `@cf/zai-org/glm-4.7-flash`;
+- D1 Sessions and automatic read replication;
+- migration `0013_workers_ai_free_capacity`;
+- D1-backed daily Workers AI capacity reservations;
+- failed inference refunding the user's monthly turn;
+- strict `sovereign-answer.v2` validation;
+- consent-bound relationship and system intelligence;
+- Free, $20 monthly, and $99 annual plans;
+- private account export disabled;
+- Queue and R2 disabled;
+- public metadata, social preview, PWA manifest, static 404, and service-worker cache aligned to the current product contract.
 
-- [x] Distinguish verification, invalid email, rate limit, provider, network, and unexpected failures.
-- [x] Center and contain Cloudflare Turnstile across desktop and mobile.
-- [x] Make Turnstile loading, verified, expired, unsupported, and failure states visible and actionable.
-- [x] Preserve an allowlisted `returnTo` through link creation and redemption.
-- [x] Add branded HTML and plain-text templates for sign-in, signup, relationship invitations, and invitation resend.
-- [x] Keep email actions on HTTPS Sovereign.OS hosts and include expiry, one-time use, privacy, support, and do-not-forward context.
-- [x] Keep private labels, raw birth details, exact location, account history, and internal identifiers out of invitation emails.
-- [x] Replace pattern-heavy and generic authentication copy with approved Baseline-first language.
-- [x] Add focused auth, email, Turnstile, link-safety, routing, invitation-resend, and email-code tests.
-- [x] Add a six-digit email one-time-code fallback to the existing verified login request and redemption endpoint.
-- [x] Keep missing, invalid, expired, replayed, or locked code responses browser-indistinguishable while enforcing attempt limits server-side.
-- [x] Store only code hashes, expire codes after 10 minutes, lock after five failures, invalidate older codes, and invalidate the unused recovery method after either link or code succeeds.
-- [x] Confirm the connected Cloudflare build and exact current-main health/readiness response.
-- [ ] Exercise the live link and email-code recovery flow with a real account and retained provider evidence.
+Code readiness is not production completion. Do not mark the release complete from repository state alone.
 
-## Product integrity — one Sovereign intelligence
+## Required Cloudflare release evidence
 
-- [x] Keep Today, Explore, People, Systems, Library, and You as surfaces of one Sovereign intelligence.
-- [x] Give signed-in users an unmistakable first action.
-- [x] Add four guided starts: understand myself, examine a choice, understand a relationship, map a system.
-- [x] Start a new exploration when a user changes surfaces with active content.
-- [x] Persist and restore surface, internal mode, person, system, Covenant state, and permitted context.
-- [x] Return explicit stored surface in thread summaries instead of inferring only from message history.
-- [x] Preserve real Today, People, and consent-filtered system data after responses.
-- [x] Route Explore through the internal Alignment mode and all other surfaces through Defrag.
-- [x] Keep Covenant as a separately enabled, permission-aware lens rather than another top-level product.
-- [x] Pass the resolved internal mode and its purpose into the authorized model context.
+- [ ] Cloudflare Workers Build runs against the exact current `main` SHA.
+- [ ] `pnpm verify:cloudflare-build` completes without a repository gate, typecheck, test, build, or compressed-size failure.
+- [ ] `pnpm production:deploy` completes for that same SHA.
+- [ ] Cloudflare build UUID and deployment/version identifiers are recorded.
+- [ ] D1 migrations apply through `0013_workers_ai_free_capacity`.
+- [ ] D1 automatic read replication is configured.
+- [ ] AI Gateway cache bypass and persistent-log disablement are verified.
+- [ ] Free-plan WAF rate limiting and API Shield configuration are verified.
+- [ ] The previous stable Worker version is recorded before promotion.
 
-## Structured intelligence and visual truth
+## Required live readiness evidence
 
-- [x] Validate the server-side recognition plan with a strict schema and verified source basis.
-- [x] Return the validated plan with the assistant response when a thread is restored.
-- [x] Project phase, confidence, safety mode, basis, clearer form, practical action, limits, mode, and Covenant state into a structured slide-open interface.
-- [x] Keep deterministic Baseline/current context separate from model interpretation through the existing source-basis contract and visible basis labels.
-- [x] Replace the visible keyword and answer-length alignment instrument with validated plan confidence, basis, safety mode, and uncertainty.
-- [x] Keep the plain-language answer available when structured projection cannot load; no second model call or duplicate usage occurs.
-- [x] Keep hidden motive, exact emotion, diagnosis, future behavior, and divine certainty outside the structured result.
-- [x] Add structured projection, basis integrity, mode, Covenant, uncertainty, and fallback tests.
-- [x] Review the keyword-scoring helper: it remains an active, internal concept router and is not the retired visible Alignment score.
+- [ ] `/health`, `/healthz`, and `/ready` return successfully on the production Worker.
+- [ ] `/ready` reports the exact deployed SHA.
+- [ ] `/ready` reports migration `0013_workers_ai_free_capacity`.
+- [ ] `/ready` reports `aiFreeCapacity: configured`.
+- [ ] D1, Durable Objects, authentication, AI Gateway, Workers AI, Resend, Stripe, and scheduled cleanup report their intended states without exposing secrets.
+- [ ] `sovereign.defrag.app`, `app.defrag.app`, `defrag.app`, `www.defrag.app`, and the workers.dev fallback converge on the intended release.
+- [ ] Unknown public routes return the branded static 404.
+- [ ] Private application and API responses are not cached by the service worker.
 
-## User control and continuity
+## Required account and authentication evidence
 
-- [x] Expose People & Permissions from the mounted People, You, and account-control experiences.
-- [x] Support invitation review, cancellation, secure resend, scope review, revocation, and relationship removal.
-- [x] Replace a resent invitation’s one-time token, refresh its seven-day expiry, and enforce a two-minute server resend limit.
-- [x] Persist a replacement invitation token before delivery and invalidate it if email delivery fails.
-- [x] Add one mounted Account & Library control center for invitations, permissions, billing, privacy, terms, support, Library, and deletion.
-- [x] Add Library rename and delete without deleting the original conversation.
-- [x] Return and visibly restore the latest fit correction and optional note with the thread.
-- [x] Return and render up to 20 account-scoped fit corrections as a correction-history timeline.
-- [x] Add visible account deletion with an explicit 14-day grace period and cancellation.
-- [x] Add branded, privacy-safe account-deletion scheduling and cancellation notifications.
-- [x] Add reusable modal focus trapping, first-focus placement, Escape behavior, and focus restoration.
+- [ ] Complete signup with a real account and valid Turnstile token.
+- [ ] Complete magic-link sign-in.
+- [ ] Complete six-digit email-code recovery.
+- [ ] Confirm link and code replay protection.
+- [ ] Confirm session rotation and logout invalidation.
+- [ ] Confirm CSRF protection on cookie-authenticated mutations.
+- [ ] Verify Resend sender-domain SPF, DKIM, and DMARC alignment.
 
-## Premium visual and brand system
+## Required product evidence
 
-- [x] Add a premium guided-start hierarchy with responsive, high-contrast, focus, and reduced-motion states.
-- [x] Standardize the orbit-derived Sovereign mark across public and signed-in controls.
-- [x] Use the established warm-black, paper, copper, sage, rose, spacing, radii, typography, and semantic roles in new public and signed-in work.
-- [x] Preserve the signature Baseline Orbit, Relationship Perspective, and System Intelligence visuals.
-- [x] Keep new body/supporting text and controls within the 17 px, 14 px, and 44 px accessibility targets where practical.
-- [x] Add controlled Open Graph metadata and a branded 1200×630 social asset.
-- [x] Add canonical metadata, sitemap, and robots guidance with private account/auth/API routes excluded.
-- [x] Add complete horizontally accessible mobile navigation to the React landing page and all static support pages.
-- [x] Run screenshot QA across 1440, 1024, 768, 390, and 360 px before declaring the current visual system final.
+- [ ] Complete public → signup → onboarding → Baseline → authenticated workspace flow.
+- [ ] Verify Today, Explore, People, Systems, Library, and You as one intelligence environment.
+- [ ] Verify a valid `sovereign-answer.v2` response with authorized Basis references.
+- [ ] Verify correction and Library save/delete flows.
+- [ ] Verify invitation → consent → relationship → system inclusion → revocation → blocked-after-revocation.
+- [ ] Verify another person's motive or private experience is never asserted as known.
+- [ ] Verify optional Covenant enablement and disablement without replacing the grounded answer.
 
-## Account access and recovery roadmap
+## Required billing evidence
 
-- [ ] Add passkeys/WebAuthn as the preferred passwordless return path after the email-code release is verified and the RP ID/origin contract is exercised on the live custom domain.
-- [ ] Evaluate and document Google and Apple sign-in prerequisites before introducing additional identity providers.
-- [x] Add an email one-time-code fallback for clients that break magic-link continuity.
-- [x] Keep SMS out of the release until abuse controls, verified ownership, provider cost, consent, compliance, and threat modeling exist.
-- [x] Never use SMS as the sole recovery factor.
+- [ ] Free works without creating a Stripe customer.
+- [ ] Free monthly allowance is enforced.
+- [ ] Daily Workers AI capacity failure returns a controlled response and refunds the monthly turn.
+- [ ] $20 monthly Checkout succeeds in Stripe test mode.
+- [ ] $99 annual Checkout succeeds in Stripe test mode.
+- [ ] Signed webhooks project entitlements correctly and remain idempotent.
+- [ ] Customer Portal opens and returns to the authenticated application.
+- [ ] Cancellation or payment failure returns the account safely to Free without deleting the workspace.
 
-## Email and domain trust
+Support payments are not part of the launch entitlement contract and must not appear in production approval evidence unless separately approved.
 
-- [ ] Verify Resend/Cloudflare sender-domain alignment, SPF, DKIM, and DMARC in the live provider configuration.
-- [x] Use a consistent Sovereign.OS sender name, reply-to, support address, visual system, accessible HTML, and plain-text fallback.
-- [x] Add branded sign-in, signup, invitation, resend, account-deletion scheduling, and account-deletion cancellation templates.
-- [ ] Add branded permission-change, billing, and subscription-cancellation notifications.
-- [x] Keep security tokens only in the required private action URL and exclude private context and identifiers.
-- [x] Add content tests for HTML/text variants, escaping, unsafe URLs, resend privacy, and email-code privacy.
+## Required deployed UX evidence
 
-## Billing and public support
+- [ ] Review desktop widths at 1440, 1024, and 768 px.
+- [ ] Review mobile widths at 390 and 360 px.
+- [ ] Verify increased text size, keyboard-only use, screen-reader labels, high contrast, reduced motion, safe areas, and composer behavior above the mobile keyboard.
+- [ ] Verify public metadata and social preview render the current promise: “Know yourself. Understand the system. Choose what fits.”
+- [ ] Verify the PWA installs with the current self, relationship, and system description.
 
-- [ ] Re-verify Free and Sovereign+ entitlements against public pricing and Terms in live QA.
-- [ ] Verify checkout, success, cancellation, customer portal, downgrade, and webhook idempotency end to end.
-- [x] Create a separate live Stripe development-support product and customer-chosen one-time USD price.
-- [x] Configure support amounts from $5 to $500, preset at $25, without recurring billing or account provisioning.
-- [x] Publish support only on explanatory public pages while keeping Pricing entitlement-only.
-- [x] State that support does not purchase access, create entitlements, grant ownership or influence, promise features, or claim tax-deductible status.
-- [x] Publish payment-support and refund-request contact context and tests.
-- [x] Mark support PaymentIntents with `grants_entitlement=false` so contributions cannot enter subscription entitlement logic.
-- [ ] Verify the Stripe-hosted support page and a real low-value payment/refund lifecycle in live QA.
+## Completion rule
 
-## Security and operational hardening
-
-- [x] Validate Turnstile hostname/action, classify expiration/reuse, reset rejected tokens, and record privacy-safe mismatch events.
-- [x] Preserve account-enumeration-safe responses with useful local guidance.
-- [x] Preserve 15-minute magic-link expiry, one-time redemption, and allowlisted post-auth routing.
-- [x] Add hashed, expiring, one-use email codes with generic failure behavior and safe return routing.
-- [x] Add server-side invitation resend rate limiting, token replacement, and delivery-failure invalidation.
-- [ ] Verify session rotation, logout invalidation, CSRF assumptions, and link/code behavior in the live release.
-- [ ] Review live limits for sign-in, signup, invitations, checkout, AI turns, consent changes, and support-payment abuse.
-- [ ] Add additional abuse-safe audit events without storing message content or secrets.
-- [x] Verify CSP, HSTS, frame denial, noindex rules, caching, and custom-domain redirects after deployment.
-
-## Release QA
-
-- [x] Keep GitHub Actions absent while Cloudflare Workers Builds is the sole release path; do not reintroduce a workflow that violates the release-config gate.
-- [ ] Add automated route and visual-state screenshots at 1440, 1024, 768, 390, and 360 px.
-- [ ] Test increased text size, keyboard-only use, screen readers, high contrast, reduced motion, and safe areas in the deployed build.
-- [ ] Test the complete public → signup → email → onboarding → Free and paid flows.
-- [ ] Test invitation → consent → relationship → system inclusion → revocation → resend flows.
-- [x] Run foundation, migrations, secrets, release configuration, intelligence verification, visual intelligence verification, every workspace typecheck, 130 Worker tests, 93 web tests, both production builds, and Wrangler’s production dry-run for the current candidate.
-- [x] Run the complete web test/build/deploy chain for the most recently released exact `main` SHA.
-- [ ] Deploy only after reviewed diffs and exact-SHA health/readiness verification.
+Production is complete only when all applicable live evidence above is recorded for one exact `main` SHA. Repository checks, dry runs, or an older successful deployment do not substitute for exact-SHA production verification.
