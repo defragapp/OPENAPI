@@ -8,7 +8,7 @@ import { removePerson } from './db/people';
 import { ensureThread, appendThreadEvent, getOwnedThread, touchThread } from './db/threads';
 import { getTurn, startTurn, updateTurnStatus } from './db/turns';
 import { getEntitlements } from './db/entitlements';
-import { reserveAiTurn } from './billing/usage';
+import { releaseAiTurn, reserveAiTurn } from './billing/usage';
 import { runSovereignResult } from './agent/sovereign';
 import { saveLatestInsightModule } from './db/insight-modules';
 import { canUseDevelopmentFixtures } from './runtime';
@@ -168,7 +168,7 @@ const worker = {
         headers.delete('content-length');
         response = Response.json({
           ...payload,
-          migrationVersion: '0012_baseline_facets_and_answer_v2',
+          migrationVersion: '0013_workers_ai_free_capacity',
           answerContract: 'sovereign-answer.v2'
         }, { status: response.status, headers });
       }
@@ -310,7 +310,10 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
         }, { status: 202, headers })
       : new Response(result.text, { status: 202, headers });
   } catch (error) {
-    await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'failed', 'recognition_failed');
+    await Promise.all([
+      updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'failed', 'recognition_failed'),
+      releaseAiTurn(env, auth.accountId, usage.periodKey)
+    ]);
     throw error;
   }
 }
