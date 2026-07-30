@@ -13,7 +13,7 @@ import { canUseDevelopmentFixtures, serviceUnavailable } from './runtime';
 import { createInvitation, createPerson, listPeople, requireConsent, setConsent, updateInvitationStatus, type InvitationStatus, type RelationshipMetadataInput } from './db/people';
 import { addSystemMember, analyzeSystem, cancelDeletionJob, createDeletionJob, createExportJob, createSystem, deleteUnderstanding, freeEntitlements, getActiveDeletionJob, listSystems, listUnderstandings, saveUnderstanding, updateUnderstanding, type SystemType } from './db/product';
 import { createCheckoutSession, createPortalSession, normalizeStripeFixtureEvent, projectSubscriptionEvent, type BillingInterval } from './billing/stripe';
-import { getAiUsage, reserveAiTurn } from './billing/usage';
+import { getAiUsage, releaseAiTurn, reserveAiTurn } from './billing/usage';
 import { requestMagicLink, redeemMagicLink, logout } from './auth-public';
 import { clearCurrentConditions, computeCurrentConditions, getBaselineStatus, getModelSafeBaselineContext, parseLocationPrecision, persistBaseline, type LocationPrecision } from './baseline';
 import { runDueJobs, runOneJob } from './jobs';
@@ -28,14 +28,17 @@ app.use('*', async (context, next) => {
 });
 
 async function healthPayload(env: Env) {
-  const db = await env.DB.prepare('SELECT 1 AS ok').first<{ ok: number }>();
+  const db = await env.DB.prepare(`SELECT 1 AS ok,
+    EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_daily_capacity') AS capacity_ready`)
+    .first<{ ok: number; capacity_ready: number }>();
   return {
     ok: db?.ok === 1,
     version: env.APP_VERSION,
     environment: env.APP_ENV,
-    migrationVersion: '0012_baseline_facets_and_answer_v2',
+    migrationVersion: '0013_workers_ai_free_capacity',
     dependencies: {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
+      aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing',
       durableObjects: env.THREADS ? 'configured' : 'missing',
       assets: env.ASSETS ? 'configured' : 'missing',
       ai: aiDependencyStatus(env),
@@ -55,6 +58,7 @@ app.get('/ready', async (context) => {
   return context.json({
     ...payload,
     ready: payload.ok
+      && payload.dependencies.aiFreeCapacity === 'configured'
       && payload.dependencies.durableObjects === 'configured'
       && payload.dependencies.ai !== 'missing'
       && payload.dependencies.baselineEngine === 'configured'
@@ -67,9 +71,7 @@ function aiDependencyStatus(env: Env): 'configured' | 'missing' {
 }
 
 function baselineDependencyStatus(env: Env): 'configured' | 'missing' {
-  return env.BASELINE_GEOCODER_URL && env.BASELINE_TIMEZONE_URL && env.BASELINE_HORIZONS_URL
-    ? 'configured'
-    : 'missing';
+  return env.BASELINE_HORIZONS_URL ? 'configured' : 'missing';
 }
 
 function isSovereignRuntimeReady(env: Env): boolean {
@@ -469,7 +471,10 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
   try {
     stream = await runSovereignStream(message, { env: context.env, accountId: auth.accountId, threadId, traceId, covenantEnabled: false, plan: entitlements.plan });
   } catch (error) {
-    await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'failed', 'gateway_start_failed');
+    await Promise.all([
+      updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'failed', 'gateway_start_failed'),
+      releaseAiTurn(context.env, auth.accountId, usage.periodKey)
+    ]);
     throw error;
   }
   await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'streaming');
@@ -478,7 +483,10 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
     await appendThreadEvent(context.env, threadId, turn.sequence + 1, 'assistant_response', { redacted: true, text }, traceId);
     await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'completed');
   }, async () => {
-    await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'failed', 'stream_failed');
+    await Promise.all([
+      updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'failed', 'stream_failed'),
+      releaseAiTurn(context.env, auth.accountId, usage.periodKey)
+    ]);
   });
   return new Response(encodeTextStream(persistedStream), {
     status: turn.duplicate ? 200 : 202,
