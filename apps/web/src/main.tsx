@@ -1,4 +1,4 @@
-// Production release trigger: Sovereign.OS cohesion release.
+// Production release trigger: Sovereign.OS cohesion release — exact source rebuild 2026-07-29T23:06-07:00.
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
