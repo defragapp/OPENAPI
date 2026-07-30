@@ -48,14 +48,13 @@ for (const [label, config] of [['root config', rootConfig], ['direct config', di
 
 requireAll('model config', modelConfig, [
   "DEFAULT_AI_MODEL = '@cf/zai-org/glm-4.7-flash'",
-  "value.startsWith('@cf/')",
-  'Cloudflare-hosted Workers AI model'
+  "DEFAULT_AI_PROVIDER = 'cloudflare-gateway'"
 ]);
 requireAll('D1 session boundary', session, [
-  "db.withSession(bookmark)",
+  'db.withSession(bookmark)',
   "readD1Bookmark(request) ?? 'first-primary'",
   'normalizeWorkersAiInput',
-  "response_format = { type: 'json_object' }",
+  "output.response_format = { type: 'json_object' }",
   'skipCache: true',
   'collectLog: false'
 ]);
@@ -101,23 +100,27 @@ requireAll('production deploy', deploy, [
   'Set up your Baseline once. Use it wherever life connects.',
   '/launch-polish.css?v=20260730-cohesion',
   'ready version is',
-  'cloudflarePlanTarget: \'free\''
+  "cloudflarePlanTarget: 'free'"
 ]);
 
 requireAll('bundle verifier', bundle, [
   'CLOUDFLARE_FREE_LIMIT_BYTES = 3 * 1024 * 1024',
   'INTERNAL_BUDGET_BYTES = 2_500 * 1024',
-  "wrangler did not report a compressed Worker upload size"
+  'Wrangler did not report a compressed Worker upload size'
 ]);
 requireAll('API Shield schema', schema, [
   'openapi: 3.0.3',
   'https://app.defrag.app',
-  '/api/v1/auth/signup:',
+  'Free-plan schema inspection is',
+  '/api/v1/account/onboarding:',
   '/api/v1/billing/portal:',
   '/api/v1/people/{personId}/consent/{scope}:',
   'city_or_regional',
-  'stored_permitted'
+  'stored_permitted',
+  'EmptyObject:'
 ]);
+assert(!schema.includes('/api/v1/auth/signup:'), 'Turnstile-bearing signup must not be blocked by the Free-plan 1 KB schema limit');
+assert(!schema.includes('/api/v1/auth/login:'), 'Turnstile-bearing login must not be blocked by the Free-plan 1 KB schema limit');
 
 requireAll('How it works', how, [
   'Set up your Baseline once. Use it wherever life connects.',
