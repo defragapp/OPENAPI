@@ -18,8 +18,8 @@ const consentRuntime = readFileSync(new URL('../public/consent.js', import.meta.
 describe('Sovereign account and workspace shell', () => {
   it('contains every product surface inside one canonical workspace', () => {
     for (const label of ['Today', 'Explore', 'People', 'Systems', 'Library', 'You']) expect(workspace).toContain(`name: '${label}'`);
-    expect(workspace).toContain('New exploration');
-    expect(workspace).toContain('Recent explorations');
+    expect(workspace).toContain('New question');
+    expect(workspace).toContain('Recent conversations');
     expect(main).toContain('<AuthenticatedWorkspace />');
     expect(authenticatedWorkspace).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
   });
@@ -33,11 +33,12 @@ describe('Sovereign account and workspace shell', () => {
     expect(app).not.toContain('SovereignIntelligenceWorkspace');
   });
 
-  it('keeps Today Baseline-first and correction-ready', () => {
-    for (const phrase of ['Your Baseline', 'More relevant now', 'What changes under pressure?', 'Gift expression', 'Where this may matter', 'Not today']) {
+  it('keeps Today Baseline-first and immediately understandable', () => {
+    for (const phrase of ['Your Baseline', 'May deserve more attention now', 'What changes under pressure?', 'What does this make possible at its best?', 'Where this may matter', 'Not today']) {
       expect(workspace).toContain(phrase);
     }
-    expect(workspace).toContain('Current context does not determine your behavior.');
+    expect(workspace).toContain('Temporary current context does not determine your behavior.');
+    expect(workspace).toContain('See what is steady and what may matter more right now.');
   });
 
   it('routes signup through explicit plan confirmation without changing prices', () => {
@@ -59,14 +60,14 @@ describe('Sovereign account and workspace shell', () => {
   });
 
   it('uses visible labels across private forms', () => {
-    for (const label of ['Email address', 'Invitation email', 'New system', 'Birth date', 'Birthplace', 'Birth-time certainty']) {
+    for (const label of ['Email address', 'Invitation email', 'New group', 'Birth date', 'Birthplace', 'Birth-time certainty']) {
       expect(`${app}\n${workspace}`).toContain(label);
     }
   });
 
   it('keeps consent under the invited person’s control in plain language', () => {
     expect(workspace).toContain('Send private invitation');
-    expect(workspace).toContain('Adding a name is not permission.');
+    expect(workspace).toContain('Adding a name does not give you access to their information.');
     expect(app).toContain('Choose what Sovereign may use about you.');
     expect(app).toContain('Accept invitation and choose permissions');
     expect(consent).toContain('Review and change each permission.');
@@ -75,9 +76,18 @@ describe('Sovereign account and workspace shell', () => {
   });
 
   it('keeps Library explicit and user-controlled', () => {
-    expect(workspace).toContain('Library is not a journal or transcript archive.');
+    expect(workspace).toContain('Library contains selected insights, not every conversation.');
     expect(workspace).toContain("action.type === 'save_to_library'");
-    expect(workspace).toContain('Save this understanding');
-    expect(workspace).toContain('Nothing has been kept yet.');
+    expect(workspace).toContain('Save this insight');
+    expect(workspace).toContain('Nothing saved yet.');
+  });
+
+  it('removes abstract workspace headings and control labels', () => {
+    for (const phrase of ['Your intelligence begins with your Baseline.', 'Bring the whole structure into view.', 'Keep what changes your understanding.', 'Opening your intelligence.', 'Why this is personal']) {
+      expect(workspace).not.toContain(phrase);
+    }
+    expect(workspace).toContain('Manage your Baseline, privacy, plan, and account.');
+    expect(workspace).toContain('Supporting details');
+    expect(workspace).toContain('What shaped this answer');
   });
 });
