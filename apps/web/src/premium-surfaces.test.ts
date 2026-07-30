@@ -2,11 +2,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const css = readFileSync(new URL('./premium-surfaces.css', import.meta.url), 'utf8');
+const hardening = readFileSync(new URL('./premium-surface-hardening.css', import.meta.url), 'utf8');
+const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
+const exportRuntime = readFileSync(new URL('./PrivateAnswerExportRuntime.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('premium invitation and Sovereign output surfaces', () => {
-  it('loads the final composition layer after the shared interface system', () => {
-    expect(main).toContain("import './interface-composition.css';\nimport './premium-surfaces.css';");
+  it('loads the final composition and release-hardening layers in deterministic order', () => {
+    expect(main).toContain("import './interface-composition.css';\nimport './premium-surfaces.css';\nimport './premium-surface-hardening.css';");
+    expect(main).toContain("import { installPrivateAnswerExportRuntime } from './PrivateAnswerExportRuntime';");
+    expect(main).toContain('installPrivateAnswerExportRuntime();');
   });
 
   it('gives invitation consent a dedicated editorial hierarchy', () => {
@@ -15,6 +20,20 @@ describe('premium invitation and Sovereign output surfaces', () => {
     expect(css).toContain('counter-reset: consent-scope');
     expect(css).toContain('.account-shell > .auth-panel .usage-card');
     expect(css).toContain('.account-shell > .auth-panel .scope-list');
+    expect(hardening).toContain('.invitation-state');
+    expect(hardening).toContain('[data-decision="granted"]');
+    expect(hardening).toContain('[data-decision="denied"]');
+  });
+
+  it('keeps consent choices independent, neutral, and accessible', () => {
+    expect(app).toContain('data-invitation-state={invitationState}');
+    expect(app).toContain('aria-pressed={decision === \'granted\'}');
+    expect(app).toContain('aria-pressed={decision === \'denied\'}');
+    expect(app).toContain('Every requested use needs its own decision');
+    expect(app).toContain('Nothing changed.');
+    expect(hardening).toContain('.scope-list button:first-child');
+    expect(hardening).toContain('background: transparent');
+    expect(hardening).toContain('min-height: 44px');
   });
 
   it('renders AI output as one readable answer surface', () => {
@@ -26,6 +45,15 @@ describe('premium invitation and Sovereign output surfaces', () => {
     expect(css).toContain('.answer-evidence-row');
   });
 
+  it('adds a private, local print and PDF action without a sharing endpoint', () => {
+    expect(exportRuntime).toContain("button.textContent = 'Print or save PDF'");
+    expect(exportRuntime).toContain('window.print()');
+    expect(exportRuntime).toContain("document.querySelectorAll<HTMLElement>('.sovereign-answer')");
+    expect(exportRuntime).not.toContain('fetch(');
+    expect(hardening).toContain('.answer-export-action');
+    expect(hardening).toContain('break-inside: avoid');
+  });
+
   it('protects mobile, reduced-motion, forced-color, and private print behavior', () => {
     expect(css).toContain('overflow-x: clip');
     expect(css).toContain('@media (max-width: 680px)');
@@ -34,5 +62,7 @@ describe('premium invitation and Sovereign output surfaces', () => {
     expect(css).toContain('@media (forced-colors: active)');
     expect(css).toContain('@media print');
     expect(css).toContain('.response-thread > *:not(:last-child)');
+    expect(hardening).toContain('@media print');
+    expect(hardening).toContain('page-break-inside: avoid');
   });
 });
