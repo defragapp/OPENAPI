@@ -5,6 +5,7 @@ const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'utf8');
 const manifest = readFileSync(new URL('../public/manifest.webmanifest', import.meta.url), 'utf8');
 const socialPreview = readFileSync(new URL('../public/og-sovereign.svg', import.meta.url), 'utf8');
+const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
 
 describe('public metadata and fallback documents', () => {
   it('uses the current self, relationship, and system positioning in document metadata', () => {
@@ -41,5 +42,12 @@ describe('public metadata and fallback documents', () => {
     expect(socialPreview).toContain('Understand the system.');
     expect(socialPreview).toContain('Choose what fits.');
     expect(socialPreview).not.toContain('Understand the people around you.');
+  });
+
+  it('invalidates the retired public shell without caching private workspace navigation', () => {
+    expect(serviceWorker).toContain("const CACHE_NAME = 'sovereign-public-v12'");
+    expect(serviceWorker).not.toContain("'/app'");
+    expect(serviceWorker).not.toContain("'/api/'");
+    expect(serviceWorker).toContain("url.pathname.startsWith('/api/')");
   });
 });
