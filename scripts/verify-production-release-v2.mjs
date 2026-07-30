@@ -19,6 +19,11 @@ const deploy = read('scripts/cloudflare-production-deploy-v2.mjs');
 const controls = read('scripts/configure-cloudflare-free-tier.mjs');
 const bundle = read('scripts/verify-worker-bundle-size.mjs');
 const schema = read('docs/api-shield/sovereign-critical-api.openapi.yaml');
+const readme = read('README.md');
+const aiGuide = read('docs/openai-integration.md');
+const releasePrep = read('docs/release-prep.md');
+const previewGuide = read('docs/direct-cloudflare-preview.md');
+const releaseGates = read('docs/release-gates.md');
 const how = read('apps/web/public/how-it-works.html');
 const pricing = read('apps/web/public/pricing.html');
 const faq = read('apps/web/public/faq.html');
@@ -158,6 +163,38 @@ requireAll('API Shield schema', schema, [
 ]);
 assert(!schema.includes('/api/v1/auth/signup:'), 'Turnstile-bearing signup must not be blocked by the Free-plan 1 KB schema limit');
 assert(!schema.includes('/api/v1/auth/login:'), 'Turnstile-bearing login must not be blocked by the Free-plan 1 KB schema limit');
+
+for (const [label, document] of [
+  ['README', readme],
+  ['AI integration guide', aiGuide],
+  ['release preparation guide', releasePrep],
+  ['preview guide', previewGuide],
+  ['release gates', releaseGates]
+]) {
+  requireAll(label, document, ['@cf/zai-org/glm-4.7-flash', '0013_workers_ai_free_capacity']);
+  assert(!document.includes('AI_MODEL=openai/gpt-5.5'), `${label} still instructs maintainers to select the retired paid model`);
+}
+requireAll('README release authority', readme, [
+  'Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the sole production release authority.',
+  'D1-backed daily free-capacity reservations',
+  'personalized inference bypasses Gateway cache and persistent prompt logging'
+]);
+requireAll('AI integration guide contract', aiGuide, [
+  'Failed generation releases the daily reservation and refunds the user\'s monthly turn.',
+  'Production and preview never fall back to direct OpenAI or synthetic interpretation.'
+]);
+requireAll('release preparation contract', releasePrep, [
+  'GitHub Actions and ad-hoc local commands are not production release authorities.',
+  'daily free-capacity failures do not charge users for missing answers'
+]);
+requireAll('preview contract', previewGuide, [
+  'bypass personalized Gateway caching',
+  'return controlled capacity errors without charging monthly turns for missing answers'
+]);
+requireAll('release gate authority', releaseGates, [
+  'Cloudflare Workers Builds is green for the exact approved `main` commit.',
+  'GitHub Actions and ad-hoc local commands are not accepted as production release evidence.'
+]);
 
 requireAll('How it works', how, [
   'Set up your Baseline once. Use it wherever life connects.',
