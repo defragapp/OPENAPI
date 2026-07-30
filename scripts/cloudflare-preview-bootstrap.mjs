@@ -18,10 +18,18 @@ const previewBaseUrl =
   (accountSubdomain ? `https://${workerName}.${accountSubdomain}.workers.dev` : '');
 const previewHostname = previewBaseUrl ? new URL(previewBaseUrl).hostname : '';
 const env = { ...process.env };
+const APPROVED_AI_PROVIDER = 'cloudflare-gateway';
+const APPROVED_AI_MODEL = '@cf/zai-org/glm-4.7-flash';
 
 if (accountId) env.CLOUDFLARE_ACCOUNT_ID = accountId;
 if (token) env.CLOUDFLARE_API_TOKEN = token;
 
+if (process.env.AI_PROVIDER && process.env.AI_PROVIDER !== APPROVED_AI_PROVIDER) {
+  throw new Error(`Preview AI_PROVIDER must remain ${APPROVED_AI_PROVIDER}`);
+}
+if (process.env.AI_MODEL && process.env.AI_MODEL !== APPROVED_AI_MODEL) {
+  throw new Error(`Preview AI_MODEL must remain ${APPROVED_AI_MODEL}`);
+}
 if (workersCi && !process.env.PREVIEW_SESSION_SIGNING_SECRET) {
   throw new Error('PREVIEW_SESSION_SIGNING_SECRET is required in Cloudflare Workers Builds');
 }
@@ -121,8 +129,8 @@ try {
     APP_ENV: 'preview',
     APP_VERSION: commitSha,
     PUBLIC_APP_URL: previewBaseUrl,
-    AI_PROVIDER: process.env.AI_PROVIDER || config.env.preview.vars.AI_PROVIDER,
-    AI_MODEL: process.env.AI_MODEL || config.env.preview.vars.AI_MODEL,
+    AI_PROVIDER: APPROVED_AI_PROVIDER,
+    AI_MODEL: APPROVED_AI_MODEL,
     AI_GATEWAY_ID: process.env.AI_GATEWAY_ID || config.env.preview.vars.AI_GATEWAY_ID,
     SOVV_INTERNAL_BASE_URL: process.env.SOVV_BASE_URL || '',
     STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY:
@@ -200,6 +208,12 @@ try {
     databaseIdSource: 'cloudflare-api',
     commitSha,
     buildUuid: process.env.WORKERS_CI_BUILD_UUID || null,
+    ai: {
+      provider: APPROVED_AI_PROVIDER,
+      model: APPROVED_AI_MODEL,
+      gateway: process.env.AI_GATEWAY_ID || config.env.preview.vars.AI_GATEWAY_ID
+    },
+    migrationTarget: '0013_workers_ai_free_capacity',
     configuredIntegrations: {
       turnstile: Boolean(process.env.VITE_TURNSTILE_SITE_KEY && process.env.TURNSTILE_SECRET_KEY),
       email: Boolean(process.env.EMAIL_API_URL && process.env.EMAIL_API_TOKEN && process.env.EMAIL_FROM),
