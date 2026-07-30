@@ -41,6 +41,13 @@ describe('D1 request sessions', () => {
     expect(withSession).not.toHaveBeenCalled();
   });
 
+  it('does not create a session when the D1 binding is unavailable', () => {
+    expect(createD1RequestSession(
+      new Request('https://app.defrag.app/api/not-a-route'),
+      undefined
+    )).toBeUndefined();
+  });
+
   it('rejects oversized or control-character bookmarks', () => {
     expect(normalizeD1Bookmark('a'.repeat(1_025))).toBeUndefined();
     expect(normalizeD1Bookmark('bookmark\nforged')).toBeUndefined();
