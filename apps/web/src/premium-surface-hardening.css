@@ -106,6 +106,14 @@
   opacity: .58;
 }
 
+.consent-completion-note {
+  max-width: 54ch;
+  margin: 0 0 16px;
+  color: var(--platform-muted);
+  font-size: .73rem;
+  line-height: 1.55;
+}
+
 .account-shell > .auth-panel button:focus-visible,
 .account-shell > .auth-panel a:focus-visible,
 .sovereign-answer button:focus-visible,
