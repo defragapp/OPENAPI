@@ -1,4 +1,5 @@
 import type { Env } from './env';
+import { releaseWorkersAiCapacity, reserveWorkersAiCapacity } from './ai/free-tier-capacity';
 
 export const D1_BOOKMARK_HEADER = 'x-d1-bookmark';
 const MAX_D1_BOOKMARK_LENGTH = 1_024;
@@ -19,12 +20,23 @@ export function withD1SessionEnv(env: Env, session: D1DatabaseSession): Env {
     const source = env.AI;
     const wrapped: NonNullable<Env['AI']> = {
       async run(model, input, options) {
-        const result = await source.run(
-          model,
-          normalizeWorkersAiInput(model, input),
-          normalizeGatewayOptions(options)
-        );
-        return normalizeWorkersAiOutput(model, result);
+        const normalizedInput = normalizeWorkersAiInput(model, input);
+        const reservation = await reserveWorkersAiCapacity(session, model, normalizedInput);
+        try {
+          const result = await source.run(
+            model,
+            normalizedInput,
+            normalizeGatewayOptions(options)
+          );
+          return normalizeWorkersAiOutput(model, result);
+        } catch (error) {
+          await releaseWorkersAiCapacity(session, reservation).catch((releaseError) => {
+            console.error('workers_ai_capacity_release_failed', {
+              error: releaseError instanceof Error ? releaseError.name : 'unknown'
+            });
+          });
+          throw error;
+        }
       }
     };
     if (source.aiGatewayLogId) wrapped.aiGatewayLogId = source.aiGatewayLogId;
