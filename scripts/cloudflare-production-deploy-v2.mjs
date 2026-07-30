@@ -1,0 +1,296 @@
+import { readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { randomBytes } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { configureCloudflareFreeTier } from './configure-cloudflare-free-tier.mjs';
+
+const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const sourceConfigPath = resolve(root, 'wrangler.production-direct.jsonc');
+const generatedConfigPath = resolve(root, '.wrangler.production-direct.generated.jsonc');
+const metadataPath = resolve(root, 'production-deployment.json');
+const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || '8b1954d216d65077c6480d62583fe2c2').trim();
+const apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
+const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT_SHA || '').trim();
+const workerName = 'sovv-web';
+const d1Name = 'sovereign-openapi-db';
+const model = '@cf/zai-org/glm-4.7-flash';
+const publicBase = 'https://sovereign.defrag.app';
+const appBase = 'https://app.defrag.app';
+const migrationVersion = '0012_baseline_facets_and_answer_v2';
+const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAADhGIF8-iOLIg8MU').trim();
+
+if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required');
+if (!apiToken) throw new Error('CLOUDFLARE_API_TOKEN is required for production deployment');
+if (!/^[0-9a-f]{40}$/i.test(commitSha)) throw new Error('A full 40-character commit SHA is required');
+if (!turnstileSiteKey) throw new Error('VITE_TURNSTILE_SITE_KEY is required');
+
+const env = {
+  ...process.env,
+  CLOUDFLARE_ACCOUNT_ID: accountId,
+  CLOUDFLARE_API_TOKEN: apiToken,
+  VITE_TURNSTILE_SITE_KEY: turnstileSiteKey
+};
+const sensitiveValues = [apiToken];
+
+function sanitize(value) {
+  let output = String(value ?? '');
+  for (const secret of sensitiveValues.filter(Boolean)) output = output.replaceAll(secret, '[redacted]');
+  return output;
+}
+
+function executeWrangler(args, options = {}) {
+  return spawnSync('pnpm', ['--filter', '@sovereign/worker', 'exec', 'wrangler', ...args], {
+    cwd: root,
+    encoding: 'utf8',
+    input: options.input,
+    stdio: options.capture === false ? 'inherit' : ['pipe', 'pipe', 'pipe'],
+    env
+  });
+}
+
+function runWrangler(args, options = {}) {
+  const result = executeWrangler(args, options);
+  if (result.error) throw result.error;
+  if (result.status !== 0) throw new Error(`wrangler ${args.join(' ')} failed: ${sanitize(result.stderr || result.stdout)}`);
+  return result.stdout || '';
+}
+
+function parseJsonOutput(output) {
+  const text = String(output || '').trim();
+  if (!text) return [];
+  try { return JSON.parse(text); } catch {
+    const starts = [text.indexOf('{'), text.indexOf('[')].filter((index) => index >= 0);
+    if (!starts.length) throw new Error(`Expected JSON output: ${sanitize(text.slice(0, 500))}`);
+    return JSON.parse(text.slice(Math.min(...starts)));
+  }
+}
+
+function rows(value) {
+  if (Array.isArray(value)) return value;
+  return value?.result || value?.databases || value?.secrets || [];
+}
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+async function request(url, options = {}) {
+  return fetch(url, {
+    method: options.method || 'GET',
+    headers: options.headers,
+    body: options.body,
+    redirect: options.redirect || 'follow',
+    signal: AbortSignal.timeout(options.timeoutMs || 15_000)
+  });
+}
+
+async function readText(url, options) {
+  const response = await request(url, options);
+  return { response, text: await response.text() };
+}
+
+async function readJson(url, options) {
+  const response = await request(url, options);
+  const text = await response.text();
+  let json;
+  try { json = JSON.parse(text); } catch { json = undefined; }
+  return { response, text, json };
+}
+
+function assertContains(label, text, values) {
+  for (const value of values) assert(text.includes(value), `${label} is missing: ${value}`);
+}
+
+function headerIncludes(response, name, value) {
+  return String(response.headers.get(name) || '').toLowerCase().includes(String(value).toLowerCase());
+}
+
+async function resolveTurnstileSecret() {
+  const response = await request(`https://api.cloudflare.com/client/v4/accounts/${accountId}/challenges/widgets/${encodeURIComponent(turnstileSiteKey)}`, {
+    headers: { authorization: `Bearer ${apiToken}` }
+  });
+  if (!response.ok) return undefined;
+  const payload = await response.json().catch(() => ({}));
+  return payload?.result?.secret || undefined;
+}
+
+async function verifyLiveProduction() {
+  let ready;
+  let lastError;
+  for (let attempt = 1; attempt <= 30; attempt += 1) {
+    try {
+      ready = await readJson(`${appBase}/ready`);
+      assert(ready.response.ok && ready.json?.ready === true, `ready returned ${ready.response.status}`);
+      assert(ready.json?.version === commitSha, `ready version is ${ready.json?.version || 'missing'}`);
+      assert(ready.json?.migrationVersion === migrationVersion, 'migration version mismatch');
+      break;
+    } catch (error) {
+      lastError = error;
+      if (attempt === 30) throw new Error(`Live readiness did not converge: ${lastError?.message || lastError}`);
+      await new Promise((resolveDelay) => setTimeout(resolveDelay, 5_000));
+    }
+  }
+
+  const [home, how, pricing, faq, login, signup, app, health, notFound] = await Promise.all([
+    readText(`${publicBase}/`),
+    readText(`${publicBase}/how-it-works`),
+    readText(`${publicBase}/pricing`),
+    readText(`${publicBase}/faq`),
+    readText(`${appBase}/login`),
+    readText(`${appBase}/signup`),
+    readText(`${appBase}/app`),
+    readJson(`${appBase}/health`),
+    readText(`${publicBase}/release-probe-not-found`)
+  ]);
+
+  assert(home.response.ok, `home returned ${home.response.status}`);
+  assertContains('home', home.text, ['id="root"', 'Sovereign.OS turns Baseline Design into a private AI for personal, relationship, and system intelligence.']);
+  assert(how.response.ok, `how-it-works returned ${how.response.status}`);
+  assertContains('how-it-works', how.text, [
+    'Set up your Baseline once. Use it wherever life connects.',
+    'A large private context becomes one clear answer.',
+    'Bring in people or systems with permission.',
+    '/launch-polish.css?v=20260730-cohesion'
+  ]);
+  assert(pricing.response.ok, `pricing returned ${pricing.response.status}`);
+  assertContains('pricing', pricing.text, ['$0', '$20', '$99 / year', '10 Sovereign AI turns each month', '300 Sovereign AI turns each month', '/launch-polish.css?v=20260730-cohesion']);
+  assert(faq.response.ok, `faq returned ${faq.response.status}`);
+  assertContains('faq', faq.text, ['What Sovereign understands. What remains yours to confirm.', 'What is Baseline Design?', 'Can I correct or remove an interpretation?', '/launch-polish.css?v=20260730-cohesion']);
+  assert(login.response.ok && signup.response.ok && app.response.ok, 'application documents are unavailable');
+  assert(notFound.response.status === 404 && notFound.text.includes('This page is not part of Sovereign.OS.'), 'public 404 contract failed');
+  assert(health.response.ok && health.json?.ok === true && health.json?.version === commitSha, 'health contract failed');
+  assert(health.json?.dependencies?.ai === 'configured', 'Workers AI dependency is not configured');
+  assert(health.json?.dependencies?.authentication === 'configured', 'authentication is not configured');
+  assert(health.json?.dependencies?.stripe === 'configured', 'Stripe is not configured');
+
+  for (const document of [home.response, how.response, pricing.response, faq.response, login.response, signup.response, app.response]) {
+    assert(headerIncludes(document, 'strict-transport-security', 'max-age=31536000'), 'HSTS is missing');
+    assert(headerIncludes(document, 'x-content-type-options', 'nosniff'), 'nosniff is missing');
+    assert(headerIncludes(document, 'x-frame-options', 'deny'), 'frame protection is missing');
+  }
+  for (const document of [login.response, signup.response, app.response]) {
+    assert(headerIncludes(document, 'x-robots-tag', 'noindex'), 'application document is indexable');
+  }
+
+  const assetPath = home.text.match(/src=["'](\/assets\/[^"']+\.js)["']/)?.[1];
+  assert(assetPath, 'compiled JavaScript asset is missing');
+  const asset = await readText(`${publicBase}${assetPath}`);
+  assert(asset.response.ok && headerIncludes(asset.response, 'cache-control', 'immutable'), 'compiled JavaScript is unavailable or not immutable');
+  assertContains('compiled application', asset.text, [
+    'Know yourself.',
+    'Understand the system.',
+    'Choose what fits.',
+    'Your intelligence begins with your Baseline.',
+    'What do you want to understand?',
+    'Explore this through Covenant?'
+  ]);
+
+  const invalidWebhookBody = JSON.stringify({ id: 'evt_release_invalid', type: 'customer.subscription.updated', data: { object: {} } });
+  const [session, account, checkout, webhook, signupWithoutTurnstile] = await Promise.all([
+    request(`${appBase}/api/v1/auth/session`, { redirect: 'manual' }),
+    request(`${appBase}/api/v1/you`, { redirect: 'manual' }),
+    request(`${appBase}/api/v1/billing/checkout`, {
+      method: 'POST',
+      headers: { origin: appBase, 'content-type': 'application/json', 'x-idempotency-key': `release-${commitSha}` },
+      body: JSON.stringify({ interval: 'monthly' }),
+      redirect: 'manual'
+    }),
+    request(`${appBase}/api/v1/stripe/webhook`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'stripe-signature': 't=0,v1=invalid' },
+      body: invalidWebhookBody,
+      redirect: 'manual'
+    }),
+    request(`${appBase}/api/v1/auth/signup`, {
+      method: 'POST',
+      headers: { origin: appBase, 'content-type': 'application/json' },
+      body: JSON.stringify({ email: `release-${commitSha.slice(0, 12)}@example.invalid`, name: 'Release Probe', termsAccepted: true }),
+      redirect: 'manual'
+    })
+  ]);
+  assert(session.status === 401, `unauthenticated session returned ${session.status}`);
+  assert(account.status === 401, `unauthenticated account returned ${account.status}`);
+  assert(checkout.status === 401, `unauthenticated checkout returned ${checkout.status}`);
+  assert(webhook.status === 400, `invalid Stripe signature returned ${webhook.status}`);
+  assert([400, 403].includes(signupWithoutTurnstile.status), `Turnstile/API Shield rejection returned ${signupWithoutTurnstile.status}`);
+
+  return {
+    health: health.json,
+    ready: ready.json,
+    probes: {
+      cohesionCopy: 'passed',
+      pricing: 'passed',
+      applicationShell: 'passed',
+      immutableAssets: 'passed',
+      securityHeaders: 'passed',
+      unauthenticatedAccess: 'passed',
+      turnstileOrSchemaRejection: signupWithoutTurnstile.status,
+      stripeSignatureRejection: 'passed'
+    }
+  };
+}
+
+let generated = false;
+try {
+  const databases = rows(parseJsonOutput(runWrangler(['d1', 'list', '--json'])));
+  const database = databases.find((item) => item.name === d1Name || item.database_name === d1Name);
+  let databaseId = database?.uuid || database?.id || database?.database_id;
+  if (!databaseId) {
+    runWrangler(['d1', 'create', d1Name], { capture: false });
+    const refreshed = rows(parseJsonOutput(runWrangler(['d1', 'list', '--json'])));
+    databaseId = refreshed.find((item) => item.name === d1Name || item.database_name === d1Name)?.uuid;
+  }
+  if (!databaseId) throw new Error(`Unable to resolve D1 database ${d1Name}`);
+
+  const config = JSON.parse(readFileSync(sourceConfigPath, 'utf8'));
+  config.name = workerName;
+  config.vars.APP_VERSION = commitSha;
+  config.vars.AI_MODEL = model;
+  config.d1_databases = [{ binding: 'DB', database_name: d1Name, database_id: databaseId, migrations_dir: 'apps/sovereign-worker/migrations' }];
+  writeFileSync(generatedConfigPath, JSON.stringify(config, null, 2));
+  generated = true;
+
+  runWrangler(['d1', 'migrations', 'apply', d1Name, '--remote', '--config', generatedConfigPath], { capture: false });
+
+  const existingSecrets = new Set(rows(parseJsonOutput(runWrangler(['secret', 'list', '--name', workerName, '--format', 'json']))).map((item) => item.name));
+  const secrets = {};
+  if (!existingSecrets.has('SESSION_SIGNING_SECRET')) secrets.SESSION_SIGNING_SECRET = randomBytes(48).toString('base64url');
+  if (!existingSecrets.has('TURNSTILE_SECRET_KEY')) {
+    const secret = await resolveTurnstileSecret();
+    if (secret) secrets.TURNSTILE_SECRET_KEY = secret;
+  }
+  if (Object.keys(secrets).length) {
+    for (const value of Object.values(secrets)) sensitiveValues.push(value);
+    runWrangler(['secret', 'bulk', '--name', workerName], { input: JSON.stringify(secrets) });
+  }
+  const configuredSecrets = new Set([...existingSecrets, ...Object.keys(secrets)]);
+  const requiredSecrets = ['SESSION_SIGNING_SECRET', 'TURNSTILE_SECRET_KEY', 'RESEND_API_KEY', 'STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'];
+  const missing = requiredSecrets.filter((name) => !configuredSecrets.has(name));
+  if (missing.length) throw new Error(`Production secrets are missing from ${workerName}: ${missing.join(', ')}`);
+
+  const controls = await configureCloudflareFreeTier({ accountId, apiToken, databaseId, gatewayId: 'sovereign', zoneName: 'defrag.app' });
+  const deployOutput = runWrangler(['deploy', '--config', generatedConfigPath]);
+  const workersDevUrl = deployOutput.match(/https:\/\/[^\s]+\.workers\.dev/)?.[0] || null;
+  const verification = await verifyLiveProduction();
+  const metadata = {
+    workerName,
+    commitSha,
+    migrationVersion,
+    model,
+    d1Name,
+    workersDevUrl,
+    publicUrl: publicBase,
+    appUrl: appBase,
+    cloudflarePlanTarget: 'free',
+    r2Enabled: false,
+    queueEnabled: false,
+    privateExports: 'disabled',
+    controls,
+    verification
+  };
+  writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+  console.log(JSON.stringify(metadata, null, 2));
+} finally {
+  if (generated) rmSync(generatedConfigPath, { force: true });
+}

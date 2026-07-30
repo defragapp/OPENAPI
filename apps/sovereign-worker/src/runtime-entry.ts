@@ -3,6 +3,7 @@ import type { Env } from './env';
 import { transactionalEmailProvider } from './email';
 import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/headers';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
+import { attachD1Bookmark, createD1RequestSession, withD1SessionEnv } from './d1-session';
 
 const HEALTH_PATHS = new Set(['/health', '/healthz', '/ready']);
 const STRIPE_WEBHOOK_PATHS = new Set([
@@ -33,53 +34,60 @@ const THREAD_MESSAGE_PATH = /^\/api\/v1\/threads\/[^/]+\/messages$/;
 
 const runtime = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
-    const url = new URL(request.url);
-
-    if (request.method === 'POST' && STRIPE_WEBHOOK_PATHS.has(url.pathname)) {
-      const target = new URL(request.url);
-      target.protocol = 'https:';
-      target.hostname = APP_HOST;
-      target.port = '';
-      target.pathname = '/api/v1/stripe/webhook';
-      const forwarded = new Request(target.toString(), {
-        method: request.method,
-        headers: request.headers,
-        body: request.body
-      });
-      return worker.fetch(forwarded, env, executionContext);
-    }
-
-    const aliased = routePublicAlias(request, url);
-    if (aliased) return aliased;
-
-    const routed = routeHostname(request, url);
-    if (routed) return routed;
-
-    if (DISABLED_PATH_PREFIXES.some((prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`))) {
-      return withSecurityHeaders(Response.json({ error: 'not_found' }, { status: 404 }));
-    }
-
-    if (request.method === 'GET' && HEALTH_PATHS.has(url.pathname)) {
-      return healthResponse(url.pathname, env);
-    }
-
-    if (request.method === 'GET' && url.pathname === '/api/v1/you') {
-      return shareFirstAccountResponse(request, env, executionContext);
-    }
-
-    if ((request.method === 'GET' || request.method === 'HEAD') && isNavigationAssetPath(url.pathname)) {
-      if (!env.ASSETS) {
-        return withSecurityHeaders(Response.json({ error: 'assets_unavailable' }, { status: 503 }));
-      }
-      const assetRequest = navigationAssetRequest(request, url.pathname);
-      return documentResponse(await env.ASSETS.fetch(assetRequest), url.hostname.toLowerCase());
-    }
-
-    return applicationResponse(request, url.pathname, env, executionContext);
+    const session = createD1RequestSession(request, env.DB);
+    const requestEnv = session ? withD1SessionEnv(env, session) : env;
+    const response = await dispatchRequest(request, requestEnv, executionContext);
+    return attachD1Bookmark(response, session);
   },
   queue,
   scheduled
 };
+
+async function dispatchRequest(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
+  const url = new URL(request.url);
+
+  if (request.method === 'POST' && STRIPE_WEBHOOK_PATHS.has(url.pathname)) {
+    const target = new URL(request.url);
+    target.protocol = 'https:';
+    target.hostname = APP_HOST;
+    target.port = '';
+    target.pathname = '/api/v1/stripe/webhook';
+    const forwarded = new Request(target.toString(), {
+      method: request.method,
+      headers: request.headers,
+      body: request.body
+    });
+    return worker.fetch(forwarded, env, executionContext);
+  }
+
+  const aliased = routePublicAlias(request, url);
+  if (aliased) return aliased;
+
+  const routed = routeHostname(request, url);
+  if (routed) return routed;
+
+  if (DISABLED_PATH_PREFIXES.some((prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`))) {
+    return withSecurityHeaders(Response.json({ error: 'not_found' }, { status: 404 }));
+  }
+
+  if (request.method === 'GET' && HEALTH_PATHS.has(url.pathname)) {
+    return healthResponse(url.pathname, env);
+  }
+
+  if (request.method === 'GET' && url.pathname === '/api/v1/you') {
+    return shareFirstAccountResponse(request, env, executionContext);
+  }
+
+  if ((request.method === 'GET' || request.method === 'HEAD') && isNavigationAssetPath(url.pathname)) {
+    if (!env.ASSETS) {
+      return withSecurityHeaders(Response.json({ error: 'assets_unavailable' }, { status: 503 }));
+    }
+    const assetRequest = navigationAssetRequest(request, url.pathname);
+    return documentResponse(await env.ASSETS.fetch(assetRequest), url.hostname.toLowerCase());
+  }
+
+  return applicationResponse(request, url.pathname, env, executionContext);
+}
 
 async function applicationResponse(request: Request, pathname: string, env: Env, executionContext: ExecutionContext): Promise<Response> {
   const response = await worker.fetch(request, env, executionContext);
@@ -203,7 +211,6 @@ function routePublicAlias(request: Request, url: URL): Response | undefined {
   if (request.method !== 'GET' && request.method !== 'HEAD') return undefined;
   const pathname = PUBLIC_ROUTE_ALIASES.get(url.pathname);
   if (!pathname) return undefined;
-
   const target = new URL(url);
   target.pathname = pathname;
   const host = url.hostname.toLowerCase();

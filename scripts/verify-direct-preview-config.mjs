@@ -6,7 +6,8 @@ const workerConfig = JSON.parse(readFileSync('apps/sovereign-worker/wrangler.jso
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 const readme = readFileSync('README.md', 'utf8');
 const bootstrap = readFileSync('scripts/cloudflare-preview-bootstrap.mjs', 'utf8');
-const productionDeploy = readFileSync('scripts/cloudflare-direct-production-deploy.mjs', 'utf8');
+const productionDeploy = readFileSync('scripts/cloudflare-production-deploy-v2.mjs', 'utf8');
+const freeTierControls = readFileSync('scripts/configure-cloudflare-free-tier.mjs', 'utf8');
 const parentDomainVerifier = readFileSync('scripts/verify-parent-domain-routes.mjs', 'utf8');
 const preview = workerConfig.env?.preview;
 
@@ -20,6 +21,7 @@ requireValue(rootConfig.main === 'apps/sovereign-worker/src/runtime-entry.ts', '
 requireValue(rootConfig.workers_dev === true, 'Production Worker must preserve its workers.dev fallback');
 requireValue(rootConfig.preview_urls === false, 'Versioned preview URLs must remain disabled');
 requireValue(rootConfig.vars?.APP_ENV === 'production', 'Root config must be production-only');
+requireValue(rootConfig.vars?.AI_MODEL === '@cf/zai-org/glm-4.7-flash', 'Production must use the Cloudflare-hosted free-tier model');
 requireValue(rootConfig.d1_databases?.some((item) => item.binding === 'DB'), 'Root config is missing D1');
 requireValue(rootConfig.durable_objects?.bindings?.some((item) => item.name === 'THREADS'), 'Root config is missing Durable Object coordination');
 requireValue(rootConfig.ai?.binding === 'AI', 'Root config is missing Workers AI');
@@ -36,10 +38,12 @@ for (const pattern of ['defrag.app/*', 'www.defrag.app/*']) {
 
 requireValue(workerConfig.main === 'src/runtime-entry.ts', 'Worker must use the active OPENAPI runtime entry');
 requireValue(workerConfig.vars?.APP_ENV === 'development', 'Package-level Worker config must remain local-development only');
+requireValue(workerConfig.vars?.AI_MODEL === '@cf/zai-org/glm-4.7-flash', 'Local Worker must use the Cloudflare-hosted model');
 requireValue(preview?.name === 'sovereign-openapi-preview', 'Preview Worker name drifted');
 requireValue(preview?.workers_dev === true, 'Preview must deploy to workers.dev');
 requireValue(preview?.preview_urls === false, 'Versioned preview URLs must remain disabled');
 requireValue(preview?.vars?.APP_ENV === 'preview', 'Preview environment must be explicit');
+requireValue(preview?.vars?.AI_MODEL === '@cf/zai-org/glm-4.7-flash', 'Preview must use the Cloudflare-hosted model');
 requireValue(preview?.d1_databases?.some((item) => item.binding === 'DB'), 'Preview is missing D1');
 requireValue(preview?.durable_objects?.bindings?.some((item) => item.name === 'THREADS'), 'Preview is missing Durable Object coordination');
 requireValue(preview?.ai?.binding === 'AI', 'Preview is missing Workers AI');
@@ -50,11 +54,7 @@ requireValue(!preview?.r2_buckets?.length, 'R2 must remain disabled for visual-r
 requireValue(!preview?.queues?.producers?.length && !preview?.queues?.consumers?.length, 'Queue must remain disabled for visual-review preview');
 requireValue(!workerConfig.r2_buckets?.length, 'Package-level Worker config must not declare R2');
 requireValue(!workerConfig.queues?.producers?.length && !workerConfig.queues?.consumers?.length, 'Package-level Worker config must not declare Queue');
-for (const [label, assets] of [
-  ['production', rootConfig.assets],
-  ['local', workerConfig.assets],
-  ['preview', preview?.assets]
-]) {
+for (const [label, assets] of [['production', rootConfig.assets], ['local', workerConfig.assets], ['preview', preview?.assets]]) {
   for (const pathname of ['/', '/login', '/signup', '/onboarding', '/app', '/app/*', '/auth/*', '/invitation', '/consent.html', '/privacy', '/terms']) {
     requireValue(assets?.run_worker_first?.includes(pathname), `${label} assets must run the Worker first for ${pathname}`);
   }
@@ -65,7 +65,7 @@ requireValue(!existsSync('.github/workflows'), 'GitHub Actions workflows are for
 requireValue(packageJson.scripts?.['verify:cloudflare-build']?.includes('verify:release-config'), 'Canonical build must retain release verification');
 requireValue(packageJson.scripts?.['verify:release-config'] === 'node scripts/verify-direct-preview-config.mjs', 'Release verifier must use the direct Cloudflare contract');
 requireValue(packageJson.scripts?.['preview:bootstrap'] === 'node scripts/cloudflare-preview-bootstrap.mjs', 'Preview bootstrap command drifted');
-requireValue(packageJson.scripts?.['production:deploy'] === 'node scripts/cloudflare-direct-production-deploy.mjs && node scripts/verify-parent-domain-routes.mjs', 'Production deploy command drifted');
+requireValue(packageJson.scripts?.['production:deploy'] === 'node scripts/cloudflare-production-deploy-v2.mjs && node scripts/verify-parent-domain-routes.mjs', 'Production deploy command drifted');
 
 requireValue(!existsSync('.dev.vars.example'), 'Deploy-template secret form must not exist');
 requireValue(!existsSync('scripts/verify-one-click-deploy.mjs'), 'One-click fork verifier must not exist');
@@ -77,8 +77,11 @@ requireValue(readme.includes('Build command: `corepack enable && pnpm install --
 requireValue(readme.includes('Deploy command: `pnpm production:deploy`'), 'README Cloudflare deploy command drifted');
 requireValue(readme.includes('`defrag.app/*` and `www.defrag.app/*` remain explicit Worker routes'), 'README parent-route contract drifted');
 
-for (const required of ['WORKERS_CI_COMMIT_SHA', 'APP_VERSION', "'d1', 'migrations', 'apply'", "'deploy', '--config'", 'verifyLiveProduction']) {
+for (const required of ['WORKERS_CI_COMMIT_SHA', 'APP_VERSION', "'d1', 'migrations', 'apply'", "'deploy', '--config'", 'verifyLiveProduction', 'configureCloudflareFreeTier']) {
   requireValue(productionDeploy.includes(required), `Production deploy is missing ${required}`);
+}
+for (const required of ["read_replication: { mode: 'auto' }", 'rate_limiting_limit: 50', 'collect_logs: false', 'schema_validation/schemas', 'sovereign_ai_messages_free_tier']) {
+  requireValue(freeTierControls.includes(required), `Cloudflare free-tier control is missing ${required}`);
 }
 for (const required of ['https://defrag.app/', 'https://www.defrag.app/', 'https://sovereign.defrag.app/', 'https://app.defrag.app/app', 'payload?.version !== commitSha']) {
   requireValue(parentDomainVerifier.includes(required), `Parent-domain verifier is missing ${required}`);
@@ -87,4 +90,4 @@ for (const required of ['PREVIEW_BASE_URL', 'PREVIEW_SESSION_SIGNING_SECRET', "[
   requireValue(bootstrap.includes(required), `Preview bootstrap is missing ${required}`);
 }
 
-console.log('Direct Cloudflare release config verified existing_repo=true production_root=true cloudflare_builds_only=true github_actions=false isolated_preview=true fork=false r2=false queues=false d1=true durable_objects=true ai=true assets=true custom_domains=2 parent_routes=2');
+console.log('Direct Cloudflare release config verified production_root=true cloudflare_builds_only=true github_actions=false free_workers_ai=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');

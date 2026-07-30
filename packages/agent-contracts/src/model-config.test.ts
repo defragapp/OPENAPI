@@ -2,22 +2,30 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_AI_MODEL, DEFAULT_AI_PROVIDER, resolveAiModel, resolveAiModelConfig, resolveAiProvider } from './model-config';
 
 describe('AI model configuration', () => {
-  it('uses the configured Cloudflare catalog model when present', () => {
-    expect(resolveAiModelConfig({ AI_PROVIDER: DEFAULT_AI_PROVIDER, AI_MODEL: 'openai/gpt-5.5' })).toEqual({ provider: DEFAULT_AI_PROVIDER, model: 'openai/gpt-5.5' });
+  it('uses the configured Cloudflare-hosted model when present', () => {
+    expect(resolveAiModelConfig({ AI_PROVIDER: DEFAULT_AI_PROVIDER, AI_MODEL: '@cf/zai-org/glm-4.7-flash' })).toEqual({
+      provider: DEFAULT_AI_PROVIDER,
+      model: '@cf/zai-org/glm-4.7-flash'
+    });
   });
 
-  it('uses Cloudflare Gateway and a ZDR-cataloged OpenAI model by default', () => {
+  it('uses Cloudflare Gateway and a Workers AI model by default', () => {
     expect(resolveAiProvider()).toBe(DEFAULT_AI_PROVIDER);
     expect(resolveAiModel()).toBe(DEFAULT_AI_MODEL);
     expect(resolveAiModelConfig()).toEqual({ provider: DEFAULT_AI_PROVIDER, model: DEFAULT_AI_MODEL });
+    expect(DEFAULT_AI_MODEL.startsWith('@cf/')).toBe(true);
   });
 
   it('rejects invalid provider and model values', () => {
     expect(() => resolveAiProvider('personal-openai')).toThrow(/AI_PROVIDER/);
     expect(() => resolveAiModel('')).toThrow(/must not be empty/);
-    expect(() => resolveAiModel('openai/gpt 5')).toThrow(/whitespace/);
-    expect(() => resolveAiModel('openai/gpt-5\n')).toThrow(/whitespace/);
+    expect(() => resolveAiModel('@cf/zai org/model')).toThrow(/whitespace/);
+    expect(() => resolveAiModel('@cf/model\n')).toThrow(/whitespace/);
     expect(() => resolveAiModel('x'.repeat(121))).toThrow(/120 characters/);
+  });
+
+  it('allows explicit model injection for isolated tests while release gates enforce Workers AI', () => {
+    expect(resolveAiModel('openai/gpt-5.5')).toBe('openai/gpt-5.5');
   });
 
   it('rejects the removed direct provider path', () => {

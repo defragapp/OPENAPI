@@ -1,5 +1,5 @@
 export const DEFAULT_AI_PROVIDER = 'cloudflare-gateway';
-export const DEFAULT_AI_MODEL = 'openai/gpt-5.5';
+export const DEFAULT_AI_MODEL = '@cf/zai-org/glm-4.7-flash';
 const MAX_MODEL_LENGTH = 120;
 const PROVIDERS = [DEFAULT_AI_PROVIDER] as const;
 

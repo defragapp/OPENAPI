@@ -4,7 +4,8 @@ import {
   attachBasisValues,
   composeSovereignAnswerText,
   deriveAuthorizedBasisRegistry,
-  parseSovereignAnswer
+  parseSovereignAnswer,
+  sovereignAnswerSchema
 } from './recognition';
 
 const registry: BasisRegistryItem[] = [{
@@ -88,5 +89,30 @@ describe('sovereign-answer.v2', () => {
     };
     expect(deriveAuthorizedBasisRegistry(context)).toEqual(registry);
     expect(deriveAuthorizedBasisRegistry({ basisRegistry: [{ ...registry[0], display: 'status withheld' }] })).toEqual([]);
+  });
+
+  it('rejects the score-based external mock because it is not the canonical contract', () => {
+    const externalMock = {
+      version: '2.0',
+      baseline: 'The system is operational within normal parameters.',
+      basis_references: ['basis-core-001'],
+      metadata: {
+        safety_check: true,
+        alignment_score: 0.98,
+        covenant_id: 'cov-standard-public'
+      }
+    };
+
+    expect(sovereignAnswerSchema.safeParse(externalMock).success).toBe(false);
+  });
+
+  it('rejects missing safety metadata and score fields added to an otherwise valid answer', () => {
+    const missingSafetyMode = JSON.parse(answer()) as Record<string, unknown>;
+    delete missingSafetyMode.safety_mode;
+    expect(sovereignAnswerSchema.safeParse(missingSafetyMode).success).toBe(false);
+
+    const scoredAnswer = JSON.parse(answer()) as Record<string, unknown>;
+    scoredAnswer.alignment_score = 0.98;
+    expect(sovereignAnswerSchema.safeParse(scoredAnswer).success).toBe(false);
   });
 });

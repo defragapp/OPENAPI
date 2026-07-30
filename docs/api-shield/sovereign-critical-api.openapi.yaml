@@ -1,0 +1,219 @@
+openapi: 3.0.3
+info:
+  title: Sovereign.OS Critical API
+  version: 2026-07-30
+  description: >-
+    Request schemas for short-body, security-sensitive Sovereign.OS mutations.
+    Authentication requests carrying Turnstile tokens remain protected by
+    Turnstile and Worker validation because Free-plan schema inspection is
+    limited to the first 1 KB of a request body. sovereign-answer.v2 output is
+    validated inside the Worker, not by API Shield.
+servers:
+  - url: https://app.defrag.app
+paths:
+  /api/v1/account/onboarding:
+    post:
+      operationId: completeAccountOnboarding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountOnboardingRequest'
+      responses:
+        '200':
+          description: Onboarding updated
+  /api/v1/current-conditions:
+    post:
+      operationId: updateCurrentConditions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrentConditionsRequest'
+      responses:
+        '200':
+          description: Current conditions updated
+    delete:
+      operationId: clearCurrentConditions
+      responses:
+        '200':
+          description: Current conditions cleared
+  /api/v1/people/{personId}/consent/{scope}:
+    put:
+      operationId: updatePersonConsent
+      parameters:
+        - $ref: '#/components/parameters/PersonId'
+        - $ref: '#/components/parameters/ConsentScope'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentDecisionRequest'
+      responses:
+        '200':
+          description: Consent updated
+  /api/v1/invitations/{invitationId}/consent/{scope}:
+    put:
+      operationId: updateInvitationConsent
+      parameters:
+        - $ref: '#/components/parameters/InvitationId'
+        - $ref: '#/components/parameters/ConsentScope'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentDecisionRequest'
+      responses:
+        '200':
+          description: Invitation consent updated
+  /api/v1/billing/checkout:
+    post:
+      operationId: createCheckoutSession
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutRequest'
+      responses:
+        '201':
+          description: Checkout session created
+  /api/v1/billing/portal:
+    post:
+      operationId: createBillingPortalSession
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmptyObject'
+      responses:
+        '201':
+          description: Billing portal session created
+  /api/v1/deletion-jobs:
+    post:
+      operationId: createDeletionJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeletionApprovalRequest'
+      responses:
+        '202':
+          description: Deletion job accepted
+components:
+  parameters:
+    PersonId:
+      name: personId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+    InvitationId:
+      name: invitationId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+    ConsentScope:
+      name: scope
+      in: path
+      required: true
+      schema:
+        type: string
+        enum:
+          - pair.compare
+          - system.include
+          - trait.display
+          - framework.display
+          - current_conditions.use
+          - library.link
+          - covenant.include
+    IdempotencyKey:
+      name: x-idempotency-key
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 200
+  schemas:
+    AccountOnboardingRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - plan
+      properties:
+        plan:
+          type: string
+          enum:
+            - free
+            - sovereign_plus
+    CurrentConditionsRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        locationPrecision:
+          type: string
+          enum:
+            - none
+            - approximate
+            - city_or_regional
+            - ephemeral_current
+            - stored_permitted
+            - geocentric
+        latitude:
+          type: number
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+    ConsentDecisionRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - granted
+      properties:
+        granted:
+          type: boolean
+        reason:
+          type: string
+          maxLength: 500
+    CheckoutRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        interval:
+          type: string
+          enum:
+            - monthly
+            - annual
+    EmptyObject:
+      type: object
+      additionalProperties: false
+      maxProperties: 0
+    DeletionApprovalRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - approved
+      properties:
+        approved:
+          type: boolean
+          enum:
+            - true
