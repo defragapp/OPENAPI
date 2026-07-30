@@ -27,6 +27,7 @@ import './account-control.css';
 
 /* One canonical visual system across public, account, and workspace surfaces. */
 import './sovereign-cohesion.css';
+import './sovereign-modern.css';
 
 installProductionRuntime();
 installProductRuntime();
