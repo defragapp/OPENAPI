@@ -2,68 +2,76 @@
 
 ## Production audit
 
-The July 29 release has a strong warm-black and paper palette, a considered serif/sans relationship, credible privacy language, keyboard-accessible examples, and accurate Baseline, relationship, system, Basis, pricing, and consent product truths.
+The July 29 release has a strong warm-black and paper palette, a considered serif/sans relationship, credible privacy language, keyboard-accessible examples, and accurate personal, relationship, group, pricing, and consent product truths.
 
-The deployed page is nevertheless unclear at the category level. A new visitor sees `PRIVATE AI, BUILT AROUND YOUR BASELINE` and `Know yourself. Understand the system. Choose what fits.` before they understand what Baseline means, what kind of AI Sovereign is, what they can ask, or why the answer card is relevant.
+The deployed page is nevertheless unclear at the category level. A new visitor encounters internal framework language before they understand what Sovereign.OS helps them do, why carrying personal context forward matters, or how the product differs from a blank general-purpose AI conversation.
 
-The first viewport therefore behaves like an editorial introduction to an intelligence framework rather than an immediately recognizable AI product. The visitor must decode the product before they can desire it.
+The first viewport therefore behaves like an editorial introduction to an intelligence framework rather than an immediately recognizable consumer product. The visitor must decode the product before they can desire it.
 
-The current test suite preserves the problem by treating the old philosophy headline and Baseline-first kicker as proof that the product is unmistakable. Category clarity must instead be verified through an explicit AI definition, a visible user question, a visible Sovereign answer, and an obvious first action.
+The test suite must verify customer comprehension rather than preserve internal terminology. Category clarity requires an explicit product definition, a recognizable question, a useful answer, and an obvious first action.
 
 ## Founder correction
 
 Within five seconds, a first-time visitor must understand:
 
-- Sovereign.OS is a private personal AI;
-- they can ask about themselves, relationships, decisions, families, or teams;
-- Sovereign gives a direct answer grounded in a private personal foundation;
-- Baseline Design is why the answer does not begin from a blank prompt;
-- the user remains responsible for deciding what fits;
-- the first action is `Build my Baseline`.
+- Sovereign.OS provides private personal and relational intelligence;
+- it helps with self-understanding, decisions, relationships, families, and teams;
+- it carries forward a private personal foundation instead of starting from zero;
+- it uses shared context only with permission;
+- the user remains responsible for deciding what is true and useful;
+- the first action is `Create my personal foundation`.
 
 The founder-approved emotional line `Healing isn’t optional. Holding the pain is.` remains part of the brand voice, but it follows product clarity. It is not the category definition and must not become a therapy or diagnosis claim.
 
-The enduring line `Know yourself. Understand the system. Choose what fits.` remains a brand close, not the only product explanation.
+The enduring line `Know yourself. Understand the system. Choose what fits.` may remain a brand close. It is not the primary product explanation.
 
 ## Revised architecture
 
 | Section | Visitor question | Product truth | Visual / interaction | CTA and mobile behavior |
 | --- | --- | --- | --- | --- |
-| Hero | What is this and what can I do? | Sovereign.OS is a private personal AI. | Recognizable user question, interactive Sovereign answer, plain-language tabs, quiet Basis. | Build my Baseline / See a Sovereign answer; category, question, answer beginning, and CTA remain visible on mobile. |
-| Brand meaning | Why does this matter? | Understanding can separate pain, identity, relationship interaction, and system reinforcement without diagnosis. | Quiet editorial statement after the product interaction. | No competing CTA. |
-| Questions | Can it help with my real life? | One AI supports self, decisions, relationships, and systems. | Real-life question rail updating one shared answer stage. | Keyboard tabs; horizontally scrollable without page overflow. |
-| Difference | Why not use a blank chat? | Sovereign starts with a private Baseline and adds only chosen context. | Baseline, temporary current context, confirmation, and unknown state remain separate. | No competing CTA. |
-| Expression | Is this a fixed label? | One valid quality can narrow under pressure or become useful with awareness. | Existing Shadow, Gift, and Alignment state selector. | Controls wrap with 44px targets. |
-| Relationship | Can it represent both people fairly? | Comparison requires permission and does not infer motives or choose a winner. | Separate person fields and full-width interaction field. | Permission steps remain legible as a list on mobile. |
-| System | Can it reveal how a family or team functions? | Roles, authority, responsibility, care, pressure, and missing perspective can be examined together. | Stable four-person system map and separate pressure field. | Converts to a legible list rather than a decorative graph. |
-| Basis | What shaped the answer? | Exact approved values remain available but secondary. | Compact Basis strip and accessible source detail. | One-line truncation with `+N`. |
-| Pricing | What do I receive? | Free supports personal exploration; Sovereign+ brings in permitted people, systems, continuity, and Covenant. | Outcome-led plan cards with exact prices and limits. | Full-width cards and actions on mobile. |
-| Final action | What happens next? | The user builds a Baseline and then asks naturally. | Concrete entry statement and quiet enduring brand line. | Full-width primary action on small screens. |
+| Hero | What is this and why should I care? | Sovereign.OS provides private personal and relational intelligence. | Recognizable question, useful answer, and clear explanation that personal context carries forward. | Create my personal foundation / See how Sovereign answers; category, question, answer beginning, and CTA remain visible on mobile. |
+| Difference | Why not use a blank AI chat? | Sovereign starts with the private personal foundation the user creates. | Personal foundation, temporary context, user confirmation, and remaining uncertainty stay distinct. | No competing CTA. |
+| Questions | Can it help with my real life? | One product supports self-understanding, decisions, relationships, and groups. | Real questions update one shared answer stage. | Keyboard tabs; horizontally scrollable without page overflow. |
+| Pressure and strength | Is this a fixed label? | A useful quality can become difficult under pressure and more effective when used well. | Existing internal Shadow, Gift, and Alignment states translated into ordinary language. | Controls wrap with 44px targets. |
+| Relationship | Can it represent both people fairly? | Comparison requires permission and keeps each person’s information distinct. | Separate person views and one shared interaction view. | Permission steps remain legible as a list on mobile. |
+| Group | Can it explain a family or team? | Decision authority, responsibility, care, pressure, and missing perspective can be examined together. | Stable four-person group map and separate pressure explanation. | Converts to a legible list rather than a decorative graph. |
+| Supporting details | What shaped the answer? | Exact approved values remain available but secondary. | Compact disclosure and accessible source detail. | One-line truncation with `+N`. |
+| Pricing | What do I receive? | Free supports personal clarity; Sovereign+ adds permitted relationships, groups, saved insights, and the optional Christian Scripture perspective. | Outcome-led plan cards with exact prices and limits. | Full-width cards and actions on mobile. |
+| Final action | What happens next? | The user creates a personal foundation and brings a real question. | Concrete entry statement and quiet brand close. | Full-width primary action on small screens. |
 
 ## Product-honesty boundary
 
-Marketing interactions use sanitized representative data and do not call private intelligence APIs. The demonstration must say that it is not the visitor’s Baseline.
+Marketing interactions use sanitized representative data and do not call private intelligence APIs. The demonstration must say that it is not the visitor’s personal foundation.
 
-The public labels `Answer`, `Under pressure`, `At its best`, and `What fits` are translations of Direct answer, Shadow, Gift, and Alignment for category clarity. They do not alter `sovereign-answer.v2`.
+Public labels such as `The answer`, `Under pressure`, `At your best`, `Decision clarity`, and `What this is based on` translate internal contracts without altering `sovereign-answer.v2`.
 
-Relationship and system demonstrations remain representative. They may show supported role and interaction logic but must not imply anonymous persistence, private person access, motive detection, diagnosis, compatibility scoring, or deterministic outcome.
+Relationship and group demonstrations remain representative. They may show supported role and interaction logic but must not imply anonymous persistence, private person access, motive detection, diagnosis, or deterministic outcome.
 
-## Approval criteria
+## Copy approval criteria
 
-The landing is ready only when an unfamiliar reviewer can answer without scrolling through framework explanation:
+The landing is ready only when an unfamiliar reviewer can answer without scrolling:
 
 1. What is Sovereign.OS?
-2. What can I ask it?
-3. What does it give me?
-4. Why is it different from generic AI?
+2. What can it help me understand?
+3. Why is it different from general AI?
+4. What information carries forward?
 5. What should I click first?
 
 The required answers are:
 
-- a private personal AI;
-- questions about self, relationships, decisions, families, and teams;
-- a direct answer built around the person asking;
-- it begins with a private Baseline rather than a blank prompt;
-- Build my Baseline.
+- private personal and relational intelligence;
+- self-understanding, decisions, relationships, families, and teams;
+- it starts with the personal context the user chooses to create;
+- relationship and group information is permission-based;
+- Create my personal foundation.
+
+The following phrases must not appear on public product surfaces:
+
+- `Build my Baseline`;
+- `Ask about your life`;
+- `Get an answer built around you`;
+- `Choose what Sovereign may use about you`;
+- `No mind-reading`;
+- `No compatibility score`.
 
 Production deployment still requires the exact-SHA Cloudflare release gate, live health/readiness, responsive browser review, and deployed route verification.
