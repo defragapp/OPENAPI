@@ -52,7 +52,7 @@ describe('Cloudflare Gateway answer adapter', () => {
       APP_ENV: 'test',
       APP_VERSION: 'test',
       AI_PROVIDER: 'cloudflare-gateway',
-      AI_MODEL: 'openai/gpt-5.5',
+      AI_MODEL: '@cf/zai-org/glm-4.7-flash',
       AI_GATEWAY_ID: 'sovereign',
       STRIPE_SECRET_KEY: '',
       STRIPE_WEBHOOK_SECRET: '',
@@ -119,7 +119,7 @@ describe('Cloudflare Gateway answer adapter', () => {
     expect(result.basis[0]?.display).toBe('☉ CAN 04.2°');
     expect(result.text).toContain('Direction can become responsibility quickly.');
     expect(calls).toHaveLength(1);
-    expect(calls[0]?.model).toBe('openai/gpt-5.5');
+    expect(calls[0]?.model).toBe('@cf/zai-org/glm-4.7-flash');
     expect(calls[0]?.input).toMatchObject({ max_output_tokens: 3_200 });
     expect(calls[0]?.options).toMatchObject({
       gateway: {
