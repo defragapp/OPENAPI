@@ -13,23 +13,23 @@ type InvitationRecord = {
 };
 
 const consentScopes = [
-  ['pair.compare', 'Compare together'],
-  ['system.include', 'Include in a system'],
-  ['trait.display', 'Use shared Baseline traits'],
-  ['framework.display', 'Show optional source detail'],
-  ['current_conditions.use', 'Use current conditions'],
-  ['library.link', 'Link a saved understanding'],
-  ['covenant.include', 'Include in a Scripture lens']
+  ['pair.compare', 'Compare our Baselines'],
+  ['system.include', 'Include me in a group view'],
+  ['trait.display', 'Use the Baseline details I share'],
+  ['framework.display', 'Show supporting source details'],
+  ['current_conditions.use', 'Use my temporary current context'],
+  ['library.link', 'Use an insight I saved'],
+  ['covenant.include', 'Include me in a Covenant answer']
 ] as const;
 
 const consentScopeDescriptions: Record<string, string> = {
-  'pair.compare': 'Compare the two permitted Baselines while keeping each person distinct.',
-  'system.include': 'Include this person in a family, household, friendship, or team view.',
-  'trait.display': 'Use the plain-language themes this person chose to share.',
-  'framework.display': 'Show optional supporting framework detail.',
-  'current_conditions.use': 'Include temporary current context for this person.',
-  'library.link': 'Use a saved understanding as shared context.',
-  'covenant.include': 'Include this person only when the optional Covenant lens is on.'
+  'pair.compare': 'Compare the parts of each Baseline that both people agreed to share.',
+  'system.include': 'Include you in a family, household, friendship, or team view.',
+  'trait.display': 'Use only the plain-language Baseline details you chose to share.',
+  'framework.display': 'Show the exact source details behind shared Baseline information when requested.',
+  'current_conditions.use': 'Use your temporary current context for this shared question.',
+  'library.link': 'Use a saved insight as shared context for this connection.',
+  'covenant.include': 'Include you only when the optional Christian Scripture perspective is turned on.'
 };
 
 export function App() {
@@ -51,10 +51,10 @@ function PublicNotFound() {
       </a>
       <section>
         <span>PAGE NOT FOUND</span>
-        <h1>This page is not part of Sovereign.OS.</h1>
-        <p>Return to the public product or sign in to open your private workspace.</p>
+        <h1>We could not find this page.</h1>
+        <p>Return to the Sovereign.OS website or sign in to open your private workspace.</p>
         <div>
-          <a href="https://sovereign.defrag.app">Open Sovereign.OS</a>
+          <a href="https://sovereign.defrag.app">Go to Sovereign.OS</a>
           <a href="/login">Sign in</a>
         </div>
       </section>
@@ -95,31 +95,31 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
   }, [mode]);
 
   async function redeem(token: string, returnTo: string | null) {
-    setState('Checking link');
+    setState('Checking your sign-in link');
     setStatusTone('neutral');
     const parameters = new URLSearchParams({ token });
     parameters.set('returnTo', safeClientReturnTo(returnTo));
     const response = await fetch(`/api/v1/auth/redeem?${parameters.toString()}`);
     if (response.status === 410) {
       setStatusTone('error');
-      setMessage('Request a new one-time email link from the sign-in page.');
-      return setState('This link expired');
+      setMessage('Go back to sign in and request a new email link.');
+      return setState('This link has expired');
     }
     if (response.status === 409) {
       setStatusTone('error');
-      setMessage('For your protection, each link can open Sovereign.OS only once.');
-      return setState('This link was already used');
+      setMessage('Each sign-in link works once. Request a new link to continue.');
+      return setState('This link has already been used');
     }
     if (!response.ok) {
       setStatusTone('error');
-      setMessage('Request a new one-time email link. Nothing was changed in your account.');
-      return setState('This link is invalid');
+      setMessage('Request a new email link. Nothing in your account was changed.');
+      return setState('This link is not valid');
     }
     const payload = await response.json().catch(() => ({})) as { next?: string };
     const next = safeClientReturnTo(payload.next, '/app');
     setState('Signed in');
     setStatusTone('success');
-    setMessage('Opening Sovereign.OS.');
+    setMessage('Opening your workspace.');
     setTimeout(() => location.assign(next), 300);
   }
 
@@ -138,18 +138,18 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
     if (mode === 'signup' && !accepted) nextErrors.terms = 'Review and accept the Terms and Privacy Policy.';
     if (turnstileState !== 'verified') nextErrors.turnstile = turnstileState === 'error' || turnstileState === 'unsupported'
       ? 'The security check is unavailable. Refresh the page or try another browser.'
-      : 'Complete the private security check before continuing.';
+      : 'Complete the security check before continuing.';
     setFieldErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
-      setState('Review the details below');
-      setMessage('Your account was not changed.');
+      setState('Check the highlighted details');
+      setMessage('Nothing was submitted.');
       setStatusTone('error');
       return;
     }
 
     setSubmitting(true);
-    setState('Sending one-time email link');
-    setMessage('Keep this page open while the request completes.');
+    setState('Sending your sign-in link');
+    setMessage('Keep this page open while we send the email.');
     setStatusTone('neutral');
     const turnstileToken = (document.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null)?.value ?? '';
     try {
@@ -163,34 +163,34 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
         if (problem.field) setFieldErrors((current) => ({ ...current, [problem.field!]: problem.field === 'email' ? 'Enter a complete email address.' : problem.field === 'name' ? 'Enter the name you want Sovereign.OS to use.' : 'Review and accept the Terms and Privacy Policy.' }));
         if (response.status === 429) {
           setState('A link was requested recently');
-          setMessage('Wait two minutes, then complete a fresh security check and try again.');
+          setMessage('Wait two minutes, complete a new security check, and try again.');
         } else if (response.status === 503) {
           setState('Sign-in is temporarily unavailable');
-          setMessage('No account change was made. Try again in a moment.');
+          setMessage('Nothing in your account was changed. Try again in a moment.');
         } else if (problem.reason === 'expired_or_used') {
           setState('The security check expired');
-          setMessage('A fresh check is loading now. Complete it, then send the link again.');
+          setMessage('Complete the new security check, then send the link again.');
         } else if (problem.reason === 'hostname_mismatch' || problem.reason === 'action_mismatch') {
           setState('The security check did not match this page');
-          setMessage('Refresh this page before trying again.');
+          setMessage('Refresh the page before trying again.');
         } else if (problem.reason === 'required' || problem.reason === 'invalid') {
-          setState('Complete a fresh security check');
+          setState('Complete a new security check');
           setMessage('The previous check could not be verified.');
         } else {
-          setState('Review the details and try again');
-          setMessage('No account change was made.');
+          setState('Check the details and try again');
+          setMessage('Nothing in your account was changed.');
         }
         setStatusTone('error');
         resetTurnstile();
         return;
       }
-      setState('One-time email link sent');
-      setMessage('Check your inbox. The link expires in 15 minutes and can be used once.');
+      setState('Email sent');
+      setMessage('Check your inbox. The link expires in 15 minutes and works once.');
       setStatusTone('success');
       setLinkSent(true);
     } catch {
-      setState('The request could not reach Sovereign.OS');
-      setMessage('Check your connection, then complete a fresh security check and try again.');
+      setState('We could not send the request');
+      setMessage('Check your connection, complete a new security check, and try again.');
       setStatusTone('error');
       resetTurnstile();
     } finally {
@@ -212,33 +212,33 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
       </header>
       <div className={`account-layout ${mode === 'redeem' ? 'redeem-layout' : ''}`}>
         <section className="account-intro">
-          <p className="eyebrow">{mode === 'login' ? 'YOUR SOVEREIGN.OS' : 'START WITH YOUR BASELINE'}</p>
+          <p className="eyebrow">{mode === 'login' ? 'WELCOME BACK' : mode === 'signup' ? 'CREATE YOUR ACCOUNT' : 'SECURE SIGN-IN'}</p>
           <h1>
             {mode === 'signup'
               ? 'Create your Sovereign.OS account.'
               : mode === 'redeem'
-                ? 'Opening Sovereign.OS.'
+                ? 'Opening your workspace.'
                 : 'Sign in to Sovereign.OS.'}
           </h1>
           <p className="lede">
             {mode === 'signup'
-              ? 'Start free. Verify your email, then build your Baseline.'
+              ? 'Start free. Verify your email, choose a plan, and build your Baseline.'
               : mode === 'redeem'
-                ? 'Your Sovereign.OS workspace will open in a moment.'
-                : 'Use your email and the available secure sign-in method for your account.'}
+                ? 'We are checking your one-time link before opening your private workspace.'
+                : 'Enter your email. We will send a one-time sign-in link.'}
           </p>
           {mode !== 'redeem' && (
             <ul className="account-points">
-              <li>Bring a decision into view with your Baseline underneath it</li>
+              <li>Ask about yourself or a decision without starting from zero</li>
               <li>Understand a relationship without guessing another person’s motives</li>
-              <li>See roles and responsibility across a family, household, or team</li>
+              <li>See who decides, who carries responsibility, and where pressure builds in a group</li>
             </ul>
           )}
         </section>
 
         <section className="auth-panel">
-          <p className="eyebrow">{mode === 'redeem' ? 'OPENING' : 'PRIVATE EMAIL ACCESS'}</p>
-          <h2>{mode === 'signup' ? 'Verify your email to begin.' : mode === 'redeem' ? 'Checking your secure link.' : 'Continue with email.'}</h2>
+          <p className="eyebrow">{mode === 'redeem' ? 'CHECKING YOUR LINK' : 'EMAIL ACCESS'}</p>
+          <h2>{mode === 'signup' ? 'Verify your email to begin.' : mode === 'redeem' ? 'Checking your one-time link.' : 'Get a sign-in link.'}</h2>
           {mode !== 'redeem' && (
             <form onSubmit={submit} className="form-stack" noValidate>
               {mode === 'signup' && (
@@ -263,12 +263,12 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
                   data-action={mode}
                 />
                 <p data-turnstile-caption aria-live="polite">
-                  {turnstileState === 'verified' ? 'Security check complete.' : 'Preparing the private security check…'}
+                  {turnstileState === 'verified' ? 'Security check complete.' : 'Preparing the security check…'}
                 </p>
               </div>
               {fieldErrors.turnstile && <p className="field-error">{fieldErrors.turnstile}</p>}
               <button className="primary-button" disabled={buttonDisabled}>
-                {submitting ? 'Sending…' : linkSent ? 'Check your inbox' : mode === 'signup' ? 'Create account' : 'Email my sign-in link'}
+                {submitting ? 'Sending…' : linkSent ? 'Check your inbox' : mode === 'signup' ? 'Create account' : 'Send my sign-in link'}
               </button>
             </form>
           )}
@@ -278,7 +278,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
           </div>
           {mode !== 'redeem' && (
             <p className="account-switch">
-              {mode === 'signup' ? 'Already use Sovereign.OS?' : 'New to Sovereign.OS?'}{' '}
+              {mode === 'signup' ? 'Already have an account?' : 'New to Sovereign.OS?'}{' '}
               <a href={mode === 'signup' ? '/login' : '/signup'}>
                 {mode === 'signup' ? 'Sign in' : 'Create an account'}
               </a>
@@ -304,21 +304,21 @@ function InvitationPage() {
     let cancelled = false;
     if (!token) {
       setPhase('error');
-      setState('This invitation link is invalid.');
+      setState('This invitation link is not valid.');
       return () => { cancelled = true; };
     }
 
     setPhase('loading');
     void fetch(`/api/v1/invitations/preview?token=${encodeURIComponent(token)}`)
       .then(async (response) => {
-        if (!response.ok) throw new Error(response.status === 410 ? 'This invitation expired.' : 'This invitation is no longer available.');
+        if (!response.ok) throw new Error(response.status === 410 ? 'This invitation has expired.' : 'This invitation is no longer available.');
         return response.json() as Promise<{ invitation?: InvitationRecord }>;
       })
       .then((data) => {
         if (cancelled || !data.invitation) return;
         setInvitation(data.invitation);
         setPhase('ready');
-        setState('Review what is being requested.');
+        setState('Review the requested permissions before accepting.');
       })
       .catch((error) => {
         if (cancelled) return;
@@ -341,17 +341,17 @@ function InvitationPage() {
       });
       if (!response.ok) {
         setPhase('error');
-        setState(response.status === 409 ? 'This invitation was already used.' : 'The invitation could not be accepted.');
+        setState(response.status === 409 ? 'This invitation has already been used.' : 'We could not accept this invitation.');
         return;
       }
       const data = await response.json() as { invitation?: InvitationRecord };
       if (data.invitation) setInvitation(data.invitation);
       setAccepted(true);
       setPhase('ready');
-      setState('Choose separately for each requested use.');
+      setState('Choose Allow or Do not allow for each permission.');
     } catch {
       setPhase('error');
-      setState('The invitation could not reach Sovereign.OS. Check your connection and try again.');
+      setState('We could not reach Sovereign.OS. Check your connection and try again.');
     } finally {
       setAccepting(false);
     }
@@ -360,7 +360,7 @@ function InvitationPage() {
   async function decide(scope: string, granted: boolean) {
     if (!invitation?.id || savingScope) return;
     setSavingScope(scope);
-    setState(`Saving your ${granted ? 'permission' : 'decision not to share'}…`);
+    setState(granted ? 'Saving permission…' : 'Saving your choice not to share…');
     try {
       const response = await fetch(`/api/v1/invitations/${invitation.id}/consent/${encodeURIComponent(scope)}`, {
         method: 'PUT',
@@ -368,13 +368,13 @@ function InvitationPage() {
         body: JSON.stringify({ granted })
       });
       if (!response.ok) {
-        setState('That decision could not be saved safely. Nothing changed.');
+        setState('We could not save that choice. Nothing changed.');
         return;
       }
       setDecisions((current) => ({ ...current, [scope]: granted ? 'granted' : 'denied' }));
-      setState('Decision saved. You can change it later.');
+      setState('Choice saved. You can change it later.');
     } catch {
-      setState('That decision could not reach Sovereign.OS. Nothing changed.');
+      setState('We could not save that choice. Nothing changed.');
     } finally {
       setSavingScope(null);
     }
@@ -389,16 +389,16 @@ function InvitationPage() {
     <main className="account-shell invitation-shell">
       <a className="wordmark" href="/">SOVEREIGN.OS</a>
       <section className="auth-panel" data-invitation-state={invitationState} aria-labelledby="invitation-title">
-        <p className="eyebrow">PRIVATE CONSENT</p>
-        <h1 id="invitation-title">Choose what this connection may use.</h1>
-        <p className="lede">Accepting an invitation does not give another person blanket access. Review each requested use separately; you can change your choices later.</p>
+        <p className="eyebrow">PRIVATE INVITATION</p>
+        <h1 id="invitation-title">Choose what Sovereign may use about you.</h1>
+        <p className="lede">Accepting connects your account. It does not share everything. Review each permission separately, and change your choices later at any time.</p>
         <div className={`status-note ${statusTone}`} role={phase === 'error' ? 'alert' : 'status'} aria-live="polite"><span>{state}</span></div>
 
         {!invitation && (
           <section className="invitation-state" aria-busy={phase === 'loading'}>
             <span>{phase === 'loading' ? 'Checking invitation' : 'Invitation unavailable'}</span>
-            <h2>{phase === 'loading' ? 'Opening the private request.' : 'This request cannot be opened.'}</h2>
-            <p>{phase === 'loading' ? 'Sovereign.OS is confirming the invitation before showing any requested use.' : 'No permission was granted and no account information was changed.'}</p>
+            <h2>{phase === 'loading' ? 'Confirming this private invitation.' : 'This invitation cannot be opened.'}</h2>
+            <p>{phase === 'loading' ? 'We are checking the link before showing any requested permission.' : 'No permission was granted and nothing in your account was changed.'}</p>
             {phase === 'error' && <a href="/login">Sign in to Sovereign.OS</a>}
           </section>
         )}
@@ -406,22 +406,22 @@ function InvitationPage() {
         {invitation && !accepted && (
           <div className="form-stack">
             <div className="usage-card">
-              <div><span>Shared relationship record</span><strong>{invitation.displayName || 'Private connection'}</strong></div>
-              <p>No raw birth input or exact private location is shared with the other account.</p>
+              <div><span>CONNECTION</span><strong>{invitation.displayName || 'Private connection'}</strong></div>
+              <p>Your raw birth details and exact private location are never shared with the other account.</p>
             </div>
             <section className="scope-panel">
-              <div><p className="eyebrow">REQUESTED USES</p><h3>Review before accepting.</h3></div>
+              <div><p className="eyebrow">REQUESTED PERMISSIONS</p><h3>See exactly what is being requested.</h3></div>
               <div className="scope-list">
                 {requestedScopes.map((scope) => <div key={scope}><span><strong>{scopeLabel(scope)}</strong><small>{scopeDescription(scope)}</small></span></div>)}
               </div>
             </section>
-            <button className="primary-button" onClick={acceptInvitation} disabled={accepting}>{accepting ? 'Connecting invitation…' : 'Verify me and review each choice'}</button>
+            <button className="primary-button" onClick={acceptInvitation} disabled={accepting}>{accepting ? 'Accepting invitation…' : 'Accept invitation and choose permissions'}</button>
           </div>
         )}
 
         {invitation && accepted && (
           <section className="scope-panel">
-            <div><p className="eyebrow">YOUR DECISIONS</p><h3>Choose independently.</h3></div>
+            <div><p className="eyebrow">YOUR PERMISSIONS</p><h3>Choose each one separately.</h3></div>
             <div className="scope-list">
               {requestedScopes.map((scope) => {
                 const decision = decisions[scope];
@@ -437,7 +437,7 @@ function InvitationPage() {
                 );
               })}
             </div>
-            <p className="consent-completion-note">Every requested use needs its own decision before the shared workspace opens.</p>
+            <p className="consent-completion-note">Choose one option for every requested permission before opening the shared workspace.</p>
             <button className="primary-button" disabled={!completed || Boolean(savingScope)} onClick={() => location.assign('/app')}>Open Sovereign.OS</button>
           </section>
         )}
@@ -462,7 +462,7 @@ function scopeLabel(scope: string): string {
 }
 
 function scopeDescription(scope: string): string {
-  return consentScopeDescriptions[scope] ?? 'Use only the context covered by this permission.';
+  return consentScopeDescriptions[scope] ?? 'Use only the information covered by this specific permission.';
 }
 
 function Field({ label, children, error }: { label: string; children: ReactNode; error?: string | undefined }) {
