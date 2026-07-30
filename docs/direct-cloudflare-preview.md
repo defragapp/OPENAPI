@@ -10,7 +10,8 @@ The repository-root `wrangler.jsonc` is the authoritative production configurati
 - URL: `https://sovereign-openapi-preview.sovereign-os-api.workers.dev`
 - D1: `sovereign-openapi-preview-db`
 - Durable Object: `ThreadCoordinator`
-- AI: Workers AI binding through AI Gateway
+- AI: Workers AI binding through AI Gateway `sovereign`
+- Model: `@cf/zai-org/glm-4.7-flash`
 - Assets: compiled Sovereign.OS web application
 - Background cleanup: scheduled D1 work
 - R2 and Queue: disabled
@@ -19,7 +20,7 @@ The preview must not attach a production custom domain, production D1 database, 
 
 ## Required Cloudflare configuration
 
-Provide a user-scoped token with the minimum permissions needed for Workers Scripts, D1, Workers AI, account membership, and read-only account details. Queue, R2, and Workers Routes permissions are not required.
+Provide a user-scoped token with the minimum permissions needed for Workers Scripts, D1, Workers AI, account membership, and read-only account details. Queue, R2, and production Workers Routes permissions are not required.
 
 Configure:
 
@@ -31,7 +32,7 @@ Configure:
 - `PREVIEW_D1_NAME=sovereign-openapi-preview-db`
 - `CLOUDFLARE_WORKERS_SUBDOMAIN=sovereign-os-api`
 - `AI_PROVIDER=cloudflare-gateway`
-- `AI_MODEL=openai/gpt-5.5`
+- `AI_MODEL=@cf/zai-org/glm-4.7-flash`
 - `AI_GATEWAY_ID=sovereign`
 
 Turnstile, email, and Stripe test-mode settings may be added for authenticated acceptance testing. Never attach live Stripe credentials to preview.
@@ -46,6 +47,8 @@ pnpm install --frozen-lockfile
 pnpm verify:cloudflare-build
 pnpm preview:bootstrap
 ```
+
+The preview must apply all migrations through `0013_workers_ai_free_capacity`, use the same structured-output adapter as production, bypass personalized Gateway caching, disable persistent prompt logging, and return controlled capacity errors without charging monthly turns for missing answers.
 
 Protect the entire preview hostname with Cloudflare Access before accepting it as founder-review evidence. Then verify `/health`, `/healthz`, `/ready`, the public pages, authenticated product surfaces, the disabled private-export boundary, and test-mode billing.
 
