@@ -35,6 +35,9 @@ import './interface-composition.css';
 import './premium-surfaces.css';
 import './premium-surface-hardening.css';
 
+/* Route-owned Engine Room art direction must load after legacy visual layers. */
+import './engine-room.css';
+
 installProductionRuntime();
 installProductRuntime();
 installEmailCodeFallbackRuntime();
