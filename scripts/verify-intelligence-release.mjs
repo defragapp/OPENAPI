@@ -12,18 +12,22 @@ const containsAll = (label, text, values) => {
 };
 
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
+const composition = read('apps/web/src/interface-composition.css');
 const workspaceCss = [
   read('apps/web/src/workspace-chat.css'),
   read('apps/web/src/sovereign-cohesion.css'),
-  read('apps/web/src/sovereign-modern.css')
+  read('apps/web/src/sovereign-modern.css'),
+  composition
 ].join('\n');
 const landing = read('apps/web/src/PublicLanding.tsx');
 const landingCss = [
   read('apps/web/src/public-landing.css'),
   read('apps/web/src/sovereign-cohesion.css'),
   read('apps/web/src/sovereign-modern.css'),
-  read('apps/web/src/landing-production.css')
+  read('apps/web/src/landing-production.css'),
+  composition
 ].join('\n');
+const staticPublicCss = read('apps/web/public/platform-public.css');
 const prompt = read('apps/sovereign-worker/src/agent/prompt-v1.ts');
 const contract = read('apps/sovereign-worker/src/agent/recognition.ts');
 const baseline = read('apps/sovereign-worker/src/baseline-contracts.ts');
@@ -32,6 +36,9 @@ const actions = read('apps/sovereign-worker/src/interface-actions.ts');
 const scripture = read('apps/sovereign-worker/src/covenant/scripture.ts');
 const serviceWorker = read('apps/web/public/sw.js');
 const main = read('apps/web/src/main.tsx');
+const how = read('apps/web/public/how-it-works.html');
+const pricing = read('apps/web/public/pricing.html');
+const faq = read('apps/web/public/faq.html');
 
 containsAll('answer contract', contract, [
   "z.literal('sovereign-answer.v2')",
@@ -96,8 +103,6 @@ containsAll('verified Covenant library', scripture, [
   'boundary:'
 ]);
 
-// The legacy “PERSONAL AI FOR REAL LIFE” release assertion is intentionally retired.
-// Release authority follows the current Baseline-first public product contract below.
 containsAll('current public product contract', landing, [
   'Know yourself.',
   'Understand the system.',
@@ -113,29 +118,69 @@ containsAll('current public product contract', landing, [
 containsAll('responsive workspace', workspaceCss, [
   'min-height: 44px',
   'env(safe-area-inset-bottom)',
-  '@media (max-width: 900px)',
   '.mobile-bottom-nav',
+  '.intelligence-workspace',
+  '.answer-sections',
+  '@media (max-width: 700px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
 
 containsAll('responsive landing', landingCss, [
   'min-width: 320px',
-  '@media (max-width: 900px)',
-  '@media (max-width: 620px)',
+  '.sovereign-landing',
+  '.landing-section-header',
+  '@media (max-width: 700px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
+
+containsAll('cross-route composition', composition, [
+  '.sovereign-landing',
+  '.account-shell',
+  '.plan-onboarding',
+  '.sovereign-policy',
+  '.public-not-found',
+  '.intelligence-workspace',
+  '--platform-clay: #c58b67',
+  '--platform-sage: #a9b8a7'
+]);
+
+containsAll('static public platform layer', staticPublicCss, [
+  'body.launch-page',
+  '.launch-nav',
+  '.journey-steps',
+  '.pricing-grid',
+  '.questions-page .faq-section',
+  '.launch-callout',
+  '@media (max-width: 720px)'
+]);
+
+for (const [label, document] of [['How it works', how], ['Pricing', pricing], ['FAQ', faq]]) {
+  containsAll(label, document, [
+    '/platform-public.css?v=20260730-platform',
+    'SOVEREIGN.OS',
+    'Build my Baseline'
+  ]);
+}
+containsAll('Pricing entitlements', pricing, ['$0', '$20', '$99 / year', '10 Sovereign AI turns each month', '300 Sovereign AI turns each month']);
+containsAll('FAQ contract', faq, ['<details', 'What is Sovereign.OS?', 'Can I correct or remove an interpretation?']);
 
 containsAll('canonical visual imports', main, [
   "import './sovereign-cohesion.css'",
   "import './sovereign-modern.css'",
-  "import './landing-production.css'"
+  "import './landing-production.css'",
+  "import './interface-composition.css'"
 ]);
 
 assert(!existsSync(resolve(root, 'apps/web/src/experience-reconciliation.css')), 'Retired visual override was restored.');
 assert(!existsSync(resolve(root, 'apps/web/src/SovereignWorkspace.tsx')), 'Duplicate authenticated workspace remains.');
 assert(!serviceWorker.includes("'/app'"), 'Private workspace navigation must not be cached.');
 
-for (const [label, css] of [['workspace', workspaceCss], ['landing', landingCss]]) {
+for (const [label, css] of [
+  ['workspace', workspaceCss],
+  ['landing', landingCss],
+  ['composition', composition],
+  ['static public', staticPublicCss]
+]) {
   const open = (css.match(/{/g) ?? []).length;
   const close = (css.match(/}/g) ?? []).length;
   assert(open === close, `${label} CSS has unbalanced braces (${open}/${close}).`);
@@ -148,8 +193,15 @@ console.log(JSON.stringify({
   publicProductContract: 'baseline-first-private-ai',
   legacyTaglineGate: 'retired',
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
-  canonicalVisualLayers: ['sovereign-cohesion.css', 'sovereign-modern.css', 'landing-production.css'],
-  responsiveBreakpoints: ['900px', '620px'],
+  canonicalVisualLayers: [
+    'sovereign-cohesion.css',
+    'sovereign-modern.css',
+    'landing-production.css',
+    'interface-composition.css',
+    'platform-public.css'
+  ],
+  coveredSurfaces: ['home', 'how-it-works', 'pricing', 'faq', 'login', 'signup', 'onboarding', 'invitation', 'workspace', 'privacy', 'terms', 'not-found'],
+  responsiveBreakpoints: ['1080px', '1000px', '920px', '700px'],
   exactBasis: true,
   contextualCovenant: true
 }, null, 2));
