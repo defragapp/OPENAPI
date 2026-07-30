@@ -4,31 +4,35 @@ This document is the source of truth for public language, authenticated surface 
 
 ## Product category
 
-**Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the human systems around you.**
+**Sovereign.OS is a private personal and relational intelligence platform for understanding yourself, making clearer decisions, and navigating relationships, families, and teams.**
 
-A new visitor should understand the interaction immediately:
+A first-time visitor should understand the product without learning its internal architecture:
 
-1. Build a private personal foundation.
-2. Ask Sovereign a natural-language question.
-3. Receive a direct answer grounded in the person asking and the permitted context that matters.
-4. Review what is supported, what is interpretive, and what remains unknown.
-5. Confirm, correct, reject, or save what helps.
+1. Create a private personal foundation.
+2. Bring a real question about yourself, a decision, a relationship, or a group.
+3. Receive a direct answer informed by the personal and permitted context that matters.
+4. See what the answer is based on, what is interpretation, and what still requires judgment.
+5. Keep, correct, or reject the insight.
 
-Unlike an AI that begins with a blank prompt, Sovereign begins with the user’s Baseline and adds current, relational, system, or Covenant context only when the user chooses and the required permission exists.
+Most AI starts each conversation from zero. Sovereign carries forward a private personal foundation and adds temporary or shared context only when the user chooses and the required permission exists.
 
 ## Brand architecture
 
 ### Plain product definition
 
-**Private AI for understanding yourself, your relationships, and the systems around you.**
+**Private personal and relational intelligence for clearer decisions, stronger self-understanding, and more informed relationships.**
 
-This definition explains what the product is in ordinary language. It belongs in the first public viewport before unfamiliar framework terminology.
+This definition belongs in the first public viewport. Internal framework names do not.
 
 ### Primary interaction promise
 
-**Build your Baseline once, then ask naturally and receive an answer grounded in the person asking.**
+**Bring the question that matters. Sovereign connects it to the personal context behind it.**
 
-This explains how the experience differs from a blank generic AI conversation.
+This explains the difference from a blank general-purpose AI conversation without using vague claims such as “built around you.”
+
+### Primary value statement
+
+**Understand what is shaping the moment, see your options more clearly, and decide what comes next.**
 
 ### Emotional brand statement
 
@@ -36,143 +40,175 @@ This explains how the experience differs from a blank generic AI conversation.
 
 This is a founder-approved campaign statement. It may appear only after the product category and interaction are understood. It must not be used as a therapy claim, diagnosis, command to reconcile, or guarantee of emotional outcome.
 
-### Enduring brand line and current public hero
+### Enduring brand line
 
 **Know yourself. Understand the system. Choose what fits.**
 
-This is the enduring Sovereign.OS brand line and the approved current hero. It must be supported immediately by the plain product definition and a recognizable Sovereign product moment.
+This may appear as a brand close or campaign line. It must never replace a literal explanation of what Sovereign.OS does.
+
+## Public vocabulary
+
+Internal contracts keep their canonical names. Public copy translates them into language a new customer can understand immediately.
+
+| Internal term | Public language |
+| --- | --- |
+| Baseline | personal foundation; personal context; your starting point |
+| Today / current conditions | what matters now; temporary context |
+| Alignment | decision clarity; what supports the choice; what needs attention |
+| People | relationships |
+| Systems | families, teams, groups, and shared situations |
+| Library | saved insights |
+| Basis | what this is based on; supporting details |
+| Covenant | Christian Scripture perspective |
+
+The word `Baseline` may appear after the public meaning is explained, especially inside account setup and the authenticated product. It must not carry the first public explanation by itself.
 
 ## Core position
 
-Sovereign.OS is Baseline-first. The product is useful before the user explains an incident, and it remains useful when the user brings a specific question about self, choice, relationship, family, household, team, workplace, friendship group, or other human system.
+Sovereign.OS is useful before the user explains an incident, and it remains useful when the user brings a specific question about self, choice, relationship, family, household, team, workplace, friendship group, or another shared situation.
 
-Baseline Design is the persistent personal intelligence foundation. It gives Sovereign an explorable reference for identity and purpose; communication; decision-making; learning; creativity; love and connection; leadership; boundaries; responsibility; conflict and repair; responses to pressure and change; underused capacity; Shadow; Gift; Alignment; current relevance; consented relationships; and roles inside a family, household, team, workplace, friendship group, or other system.
+The private personal foundation gives Sovereign an ongoing reference for communication, decision-making, learning, creativity, love and connection, leadership, boundaries, responsibility, conflict and repair, responses to pressure and change, underused strengths, current relevance, consented relationships, and roles inside groups.
 
-The public experience introduces Baseline Design only after a visitor understands that Sovereign is an AI they can ask.
+The public experience introduces how this foundation is created only after the visitor understands the outcome: more relevant personal and relational intelligence.
 
 ## Core capabilities
 
 ### Understand yourself
 
-Users may ask what qualities are central, what they naturally notice or carry, how they communicate and decide, which capacities are underused or overextended, and why one part of themselves is difficult to understand.
+Users may explore what they naturally notice or carry, how they communicate and decide, where strengths become overextended, what changes under pressure, and why one part of themselves is difficult to understand.
 
-### Understand what is active now
+### Understand what matters now
 
-The Baseline stays stable. Current astronomical conditions add an expiring, time-sensitive layer. They may make a theme more relevant; they do not establish behavior, motive, emotion, or outcome.
+The personal foundation remains stable. Optional current astronomical context adds a temporary layer that may make one topic more relevant for a limited time. It does not establish behavior, motive, emotion, or outcome.
 
 Current context is off until the user enables it. The product uses Earth-geocentric current positions without requesting device location, expires the context after six hours, and lets the user remove it immediately.
 
-### Explore Shadow and Gift
+### Understand pressure and strength
 
-**Shadow** is how a valid quality may narrow, distort, protect, avoid, or overreach under pressure.
+The internal Shadow and Gift contract remains intact. Publicly, explain how a useful quality can become protective, controlling, avoidant, or overextended under pressure, and what the same quality makes possible when it is used well.
 
-**Gift** is what the same quality makes possible when it is used with awareness and choice.
+Do not present these states as bad and good identities.
 
-Shadow and Gift are not bad and good identities. The product must make each expression specific and behavioral.
+### Make a clearer decision
 
-### Examine Alignment
+The internal Alignment contract remains intact. Publicly, show:
 
-Alignment is not a score or rule. It is a way to examine whether a choice, behavior, relationship, opportunity, or direction fits the person a user is and the person they are becoming.
-
-A useful Alignment answer distinguishes:
-
-- what supports the fit;
-- what pulls against it;
+- what supports the choice;
+- what makes it difficult;
 - the real tradeoff;
 - what information is still needed;
-- a closer version that better preserves the user’s underlying intention.
+- a version that better preserves the user’s intention.
 
 Sovereign does not choose for the user.
 
 ### Understand a relationship
 
-With permission from both people, Sovereign may compare relevant structured Baseline facets and help explain:
+With permission from both people, Sovereign may compare relevant structured personal context and help explain:
 
 - what each person may be bringing;
-- different communication or processing routes;
+- different communication or processing needs;
 - shared needs;
-- interaction pressure;
+- where pressure builds between them;
 - what each person can own;
-- what remains unconfirmed and must be asked directly.
+- what still needs to be asked directly.
 
-This is relational perspective, not compatibility scoring, mind-reading, or a verdict about who is right. Understanding, agreement, forgiveness, reconciliation, restored trust, and continued contact remain separate.
+The public value is clearer relational perspective without reducing the relationship to a score or claiming access to another person’s private experience.
 
-### Understand a system
+### Understand a family, team, or group
 
-With consented participants and explicit role context, Sovereign may examine stabilizing and change roles, pressure carriers, authority, responsibility, caregiving, dependence, constraints, shared objectives, expectations, and missing perspectives.
+With consented participants and explicit role context, Sovereign may examine decision authority, responsibility, care, reliance, constraints, shared objectives, expectations, pressure, and missing perspectives.
 
-The central question is: **How is this functioning, and what is each person contributing?**
+The central public question is: **How is this group working, where is pressure building, and what could make responsibility clearer?**
 
-Formal roles and factual responsibilities may be shown as facts only when supplied or confirmed. A role inferred from a Baseline must remain a possibility.
+Formal roles and factual responsibilities may be shown as facts only when supplied or confirmed. An inferred role remains a possibility.
 
-### Explore through Covenant
+### Add a Christian Scripture perspective
 
 Covenant is a contextual, optional capability. It is not a top-level application or the default identity of the platform.
 
-A grounded answer remains complete without Covenant. When a relevant personal, relationship, or family dynamic is recognized, Sovereign may quietly offer **Explore through Christian Scripture**. It activates only after confirmation for the question.
+A grounded answer remains complete without it. When relevant, Sovereign may quietly offer **Add a Christian Scripture perspective**. It activates only after confirmation for the question.
 
-Covenant separates Biblical parallel, Scripture, teaching, application, and boundary. It uses only retrieved or deliberately curated verified passages. It never claims God’s exact intent, assigns moral status, proves motive, or requires contact, estrangement, forgiveness, reconciliation, submission, or continued exposure to harm.
+The perspective separates Biblical parallel, Scripture, teaching, application, and boundary. It uses only retrieved or deliberately curated verified passages. It never claims God’s exact intent, assigns moral status, proves motive, or requires contact, estrangement, forgiveness, reconciliation, submission, or continued exposure to harm.
 
 ## Information boundaries
 
-Sovereign preserves four layers:
+Sovereign preserves four layers internally:
 
-1. Exact source data deterministically calculated or returned by an authorized provider.
-2. Versioned Baseline facets interpreted from authorized exact values.
+1. Exact source data calculated or returned by an authorized provider.
+2. Versioned interpretive personal facets derived from authorized values.
 3. Expiring current-condition context and deterministic contacts.
-4. Question-specific synthesis using relevant facets, exact Basis references, user-confirmed facts, consented context, and corrections.
+4. Question-specific synthesis using relevant facets, exact supporting references, user-confirmed facts, consented context, and corrections.
 
-The exact source layer does not measure personality. The facet layer is interpretive. The answer remains a possibility the user may confirm, correct, reject, or save.
+Publicly, translate those layers as:
+
+- what comes from the user’s personal foundation;
+- what may be temporarily relevant;
+- what the user or another participant confirmed;
+- what is interpretation;
+- what still requires human judgment.
+
+The exact source layer does not measure personality. The answer remains a possibility the user may confirm, correct, reject, or save.
 
 ## Product experience principles
 
-- Name the AI category before explaining its internal framework.
-- Show a recognizable user question and Sovereign answer in the first viewport.
-- Give the direct answer first.
-- Provide meaningful value before asking a question.
-- Use two to five relevant sections for a normal answer.
-- Put depth behind a clear first viewport instead of collapsing the answer into a platitude.
-- Keep exact Basis data available but secondary.
-- Never let the model write or complete a Basis value.
-- Never display another person’s exact framework data without `framework.display`.
-- Never use a one-sided owner entry as access to another person’s private Baseline.
+- Explain the customer outcome before the internal framework.
+- Show a recognizable question and useful answer in the first viewport.
+- Give the answer before the explanation.
+- Make every heading understandable without relying on the paragraph below it.
+- Use specific behavior and decisions instead of abstract qualities.
+- Keep supporting data available but secondary.
 - Keep the conversation dominant over workspace chrome.
 - Use one canonical authenticated workspace.
 - Keep users in control of correction, consent, continuity, and deletion.
+- Preserve uncertainty without making every sentence vague.
+- Write for a person evaluating a paid product, not a maintainer reading architecture documentation.
 
 ## Approved public summary
 
-Sovereign.OS is a private personal AI for questions about yourself, your relationships, your decisions, and the people or systems around you. Build your Baseline once, then ask naturally and receive answers grounded in the person asking.
+**Sovereign.OS is private personal and relational intelligence for understanding yourself, making clearer decisions, and navigating the people and situations around you.**
 
-Sovereign.OS turns Baseline Design into a private AI for personal, relationship, and system intelligence. Plain-language insight comes first. Exact supporting data remains available beneath it. You decide what fits.
+Create a private personal foundation once. Sovereign uses it to make future answers more relevant, then adds relationship, group, or temporary context only when you choose and the required permission exists.
 
 ## Approved public hero
 
+Kicker:
+
+**PRIVATE PERSONAL AND RELATIONAL INTELLIGENCE**
+
 Headline:
 
-**Know yourself.**
-
-**Understand the system.**
-
-**Choose what fits.**
+**Understand yourself. Make clearer decisions. Navigate relationships with context.**
 
 Supporting definition:
 
-**Sovereign.OS is a private AI for understanding yourself, your relationships, and the systems around you. Build your Baseline once, then ask naturally and receive an answer grounded in the person asking.**
+**Sovereign.OS keeps a private personal foundation behind every question, so the answer can reflect how you decide, communicate, respond under pressure, and relate to other people.**
 
 Primary action:
 
-**Build my Baseline**
+**Create my personal foundation**
 
 Secondary action:
 
-**See a Sovereign answer**
+**See how Sovereign answers**
+
+Trust line:
+
+**Start free · No card required · You control what is used and saved**
 
 ## Language to avoid
 
-Do not position Sovereign.OS as a generic chatbot, prediction product, compatibility score, scientific personality test, diagnosis, therapy replacement, incident-only coach, or source of hidden motives.
+Do not position Sovereign.OS as a generic chatbot, prediction product, scientific personality test, diagnosis, therapy replacement, incident-only coach, or source of hidden motives.
 
-Avoid:
+Remove these phrases from public product surfaces:
+
+- `Build my Baseline`;
+- `Ask about your life`;
+- `Get an answer built around you`;
+- `Choose what Sovereign may use about you`;
+- `No mind-reading`;
+- `No compatibility score`.
+
+Also avoid:
 
 - “possible interaction vector”;
 - “calculated solution”;
@@ -180,3 +216,19 @@ Avoid:
 - “your chart says”;
 - “the universe is telling you”;
 - “this transit means”;
+- “bring this into view” when a concrete action can be named;
+- “your intelligence begins here”;
+- “the environment stays the same”;
+- generic coaching, inspirational filler, therapy voice, spiritual certainty, or AI buzzwords.
+
+## Voice
+
+The public voice is:
+
+- intelligent, not academic;
+- personal, not intrusive;
+- direct, not reductive;
+- calm, not clinical;
+- clear about product value;
+- careful about interpretation;
+- confident without pretending certainty.
