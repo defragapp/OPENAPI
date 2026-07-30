@@ -140,9 +140,10 @@ function installFetchObserver(): void {
   window.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const requestUrl = resolveRequestUrl(input);
     const isSameOriginApi = requestUrl.origin === location.origin && requestUrl.pathname.startsWith('/api/');
-    const [requestInput, requestInit] = isSameOriginApi
+    const requestPair: [RequestInfo | URL, RequestInit | undefined] = isSameOriginApi
       ? withD1Bookmark(input, init, d1Bookmark)
       : [input, init];
+    const [requestInput, requestInit] = requestPair;
     const response = await nativeFetch(requestInput, requestInit);
 
     if (isSameOriginApi) {
