@@ -67,10 +67,12 @@ export function AuthenticatedWorkspace() {
   }
 
   return (
-    <>
+    <div className="sovereign-app-runtime" data-workspace-contract="one-room">
       <SovereignIntelligenceWorkspace onboardingVerified />
-      <AccountControlCenter />
-      <SystemMembershipManager />
-    </>
+      <div className="sovereign-workspace-overlays" aria-label="Workspace controls">
+        <AccountControlCenter />
+        <SystemMembershipManager />
+      </div>
+    </div>
   );
 }
