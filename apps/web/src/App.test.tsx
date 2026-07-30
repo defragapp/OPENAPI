@@ -41,12 +41,13 @@ describe('Sovereign account and workspace shell', () => {
   });
 
   it('routes signup through explicit plan confirmation without changing prices', () => {
-    expect(app).toContain('Start free. Verify your email, then build your Baseline.');
+    expect(app).toContain('Start free. Verify your email, choose a plan, and build your Baseline.');
     expect(app).toContain('safeClientReturnTo');
     expect(onboarding).toContain('/api/v1/account/onboarding');
     expect(onboarding).toContain('/api/v1/billing/checkout');
     expect(onboarding).toContain('$20 / month');
     expect(onboarding).toContain('$99 / year');
+    expect(onboarding).toContain('Choose Free or Sovereign+.');
   });
 
   it('allows pinch zoom and includes mobile-safe controls', () => {
@@ -63,13 +64,14 @@ describe('Sovereign account and workspace shell', () => {
     }
   });
 
-  it('keeps consent under the invited person’s control', () => {
+  it('keeps consent under the invited person’s control in plain language', () => {
     expect(workspace).toContain('Send private invitation');
     expect(workspace).toContain('Adding a name is not permission.');
-    expect(app).toContain('Choose what this connection may use.');
-    expect(consent).toContain('Manage requested uses.');
+    expect(app).toContain('Choose what Sovereign may use about you.');
+    expect(app).toContain('Accept invitation and choose permissions');
+    expect(consent).toContain('Review and change each permission.');
     expect(consentRuntime).toContain("fetch('/api/v1/invitations/mine'");
-    expect(consentRuntime).toContain('Permission revoked for future use.');
+    expect(consentRuntime).toContain('Permission not allowed.');
   });
 
   it('keeps Library explicit and user-controlled', () => {
