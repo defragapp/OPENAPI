@@ -271,9 +271,11 @@ components:
           type: string
           enum:
             - none
-            - city
             - approximate
-            - exact
+            - city_or_regional
+            - ephemeral_current
+            - stored_permitted
+            - geocentric
         latitude:
           type: number
           minimum: -90
