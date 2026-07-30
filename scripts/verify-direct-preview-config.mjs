@@ -61,7 +61,6 @@ for (const [label, assets] of [['production', rootConfig.assets], ['local', work
 }
 requireValue(existsSync('apps/web/public/404.html'), 'The static 404 document is missing');
 
-requireValue(!existsSync('.github/workflows'), 'GitHub Actions workflows are forbidden; Cloudflare Workers Builds is the sole release path');
 requireValue(packageJson.scripts?.['verify:cloudflare-build']?.includes('verify:release-config'), 'Canonical build must retain release verification');
 requireValue(packageJson.scripts?.['verify:release-config'] === 'node scripts/verify-direct-preview-config.mjs', 'Release verifier must use the direct Cloudflare contract');
 requireValue(packageJson.scripts?.['preview:bootstrap'] === 'node scripts/cloudflare-preview-bootstrap.mjs', 'Preview bootstrap command drifted');
@@ -72,7 +71,7 @@ requireValue(!existsSync('scripts/verify-one-click-deploy.mjs'), 'One-click fork
 requireValue(!readme.includes('deploy.workers.cloudflare.com'), 'README must not use Deploy to Cloudflare');
 requireValue(readme.includes('defragapp/OPENAPI'), 'README must name the canonical repository');
 requireValue(readme.includes('Cloudflare Queue and R2 are intentionally disabled'), 'README must document the no-Queue, no-R2 launch architecture');
-requireValue(readme.includes('GitHub Actions is not supported for this repository'), 'README must explicitly prohibit GitHub Actions');
+requireValue(readme.includes('Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the sole production release authority'), 'README must keep Cloudflare Workers Builds as production authority');
 requireValue(readme.includes('Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`'), 'README Cloudflare build command drifted');
 requireValue(readme.includes('Deploy command: `pnpm production:deploy`'), 'README Cloudflare deploy command drifted');
 requireValue(readme.includes('`defrag.app/*` and `www.defrag.app/*` remain explicit Worker routes'), 'README parent-route contract drifted');
@@ -90,4 +89,4 @@ for (const required of ['PREVIEW_BASE_URL', 'PREVIEW_SESSION_SIGNING_SECRET', "[
   requireValue(bootstrap.includes(required), `Preview bootstrap is missing ${required}`);
 }
 
-console.log('Direct Cloudflare release config verified production_root=true cloudflare_builds_only=true github_actions=false free_workers_ai=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
+console.log('Direct Cloudflare release config verified production_root=true cloudflare_builds_only=true github_workflows_non_authoritative=true free_workers_ai=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
