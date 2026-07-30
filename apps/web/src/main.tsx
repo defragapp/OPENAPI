@@ -1,4 +1,4 @@
-// Production release trigger: Sovereign.OS cohesion release — exact source rebuild 2026-07-29T23:06-07:00.
+// Production release trigger: Sovereign.OS landing repair.
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
@@ -25,9 +25,10 @@ import './email-code-fallback.css';
 import './unified-entry.css';
 import './account-control.css';
 
-/* One canonical visual system across public, account, and workspace surfaces. */
+/* Shared product system, followed by the route-owned production landing layout. */
 import './sovereign-cohesion.css';
 import './sovereign-modern.css';
+import './landing-production.css';
 
 installProductionRuntime();
 installProductRuntime();
