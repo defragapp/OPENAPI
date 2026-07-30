@@ -15,6 +15,13 @@ const usage = read('apps/sovereign-worker/src/billing/usage.ts');
 const browser = read('apps/web/src/ProductionRuntime.ts');
 const answer = read('apps/sovereign-worker/src/agent/recognition.ts');
 const answerTests = read('apps/sovereign-worker/src/agent/recognition.test.ts');
+const sovereignTests = read('apps/sovereign-worker/src/agent/sovereign.test.ts');
+const baselineContractTests = read('apps/sovereign-worker/src/baseline-contracts.test.ts');
+const modelConfigTests = read('packages/agent-contracts/src/model-config.test.ts');
+const d1SessionTests = read('apps/sovereign-worker/src/d1-session.test.ts');
+const gatewaySmoke = read('scripts/worker-gateway-smoke.ts');
+const stripeSmoke = read('scripts/stripe-smoke.ts');
+const productSmoke = read('scripts/product-smoke.ts');
 const deploy = read('scripts/cloudflare-production-deploy-v2.mjs');
 const controls = read('scripts/configure-cloudflare-free-tier.mjs');
 const bundle = read('scripts/verify-worker-bundle-size.mjs');
@@ -115,6 +122,35 @@ requireAll('answer regression tests', answerTests, [
   'rejects the score-based external mock',
   'alignment_score',
   'missing safety metadata'
+]);
+
+for (const [label, fixture] of [
+  ['gateway smoke', gatewaySmoke],
+  ['Stripe smoke', stripeSmoke],
+  ['product smoke', productSmoke],
+  ['Sovereign adapter tests', sovereignTests],
+  ['Baseline contract tests', baselineContractTests]
+]) {
+  assert(fixture.includes('@cf/zai-org/glm-4.7-flash'), `${label} does not exercise the approved Workers AI model`);
+}
+assert(!gatewaySmoke.includes('openai/gpt-5.5'), 'Gateway smoke still exercises the retired model');
+assert(!stripeSmoke.includes('openai/gpt-5.5'), 'Stripe smoke still carries the retired model');
+assert(!productSmoke.includes('openai/gpt-5.5'), 'Product smoke still carries the retired model');
+assert(!sovereignTests.includes('openai/gpt-5.5'), 'Sovereign adapter tests still bypass approved model selection');
+assert(!baselineContractTests.includes('openai/gpt-5.5'), 'Baseline contract tests still record the retired model');
+requireAll('gateway smoke privacy contract', gatewaySmoke, [
+  'resolveAiModelConfig',
+  'skipCache !== true',
+  'collectLog !== false',
+  '[redacted]'
+]);
+requireAll('intentional non-Workers-AI normalization tests', d1SessionTests, [
+  "normalizeWorkersAiInput('openai/gpt-5.5', input)",
+  "normalizeWorkersAiOutput('openai/gpt-5.5', output)"
+]);
+requireAll('intentional isolated model injection test', modelConfigTests, [
+  "resolveAiModel('openai/gpt-5.5')",
+  'allows explicit model injection for isolated tests while release gates enforce Workers AI'
 ]);
 
 requireAll('Cloudflare controls', controls, [
