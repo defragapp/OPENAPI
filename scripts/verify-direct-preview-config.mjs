@@ -85,8 +85,22 @@ for (const required of ["read_replication: { mode: 'auto' }", 'rate_limiting_lim
 for (const required of ['https://defrag.app/', 'https://www.defrag.app/', 'https://sovereign.defrag.app/', 'https://app.defrag.app/app', 'payload?.version !== commitSha']) {
   requireValue(parentDomainVerifier.includes(required), `Parent-domain verifier is missing ${required}`);
 }
-for (const required of ['PREVIEW_BASE_URL', 'PREVIEW_SESSION_SIGNING_SECRET', "['deploy', '--env', 'preview'", 'sovereign-openapi-preview-db']) {
+for (const required of [
+  'PREVIEW_BASE_URL',
+  'PREVIEW_SESSION_SIGNING_SECRET',
+  "['deploy', '--env', 'preview'",
+  'sovereign-openapi-preview-db',
+  "const APPROVED_AI_PROVIDER = 'cloudflare-gateway'",
+  "const APPROVED_AI_MODEL = '@cf/zai-org/glm-4.7-flash'",
+  'Preview AI_PROVIDER must remain',
+  'Preview AI_MODEL must remain',
+  'AI_PROVIDER: APPROVED_AI_PROVIDER',
+  'AI_MODEL: APPROVED_AI_MODEL',
+  "migrationTarget: '0013_workers_ai_free_capacity'"
+]) {
   requireValue(bootstrap.includes(required), `Preview bootstrap is missing ${required}`);
 }
+requireValue(!bootstrap.includes('AI_MODEL: process.env.AI_MODEL ||'), 'Preview bootstrap must not allow arbitrary model override');
+requireValue(!bootstrap.includes('AI_PROVIDER: process.env.AI_PROVIDER ||'), 'Preview bootstrap must not allow arbitrary provider override');
 
-console.log('Direct Cloudflare release config verified production_root=true cloudflare_builds_only=true github_workflows_non_authoritative=true free_workers_ai=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
+console.log('Direct Cloudflare release config verified production_root=true cloudflare_builds_only=true github_workflows_non_authoritative=true free_workers_ai=true preview_model_pinned=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
