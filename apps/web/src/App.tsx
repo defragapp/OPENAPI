@@ -5,6 +5,12 @@ import { PlanOnboarding } from './PlanOnboarding';
 type ConsentDecision = 'granted' | 'denied';
 type TurnstileState = 'loading' | 'ready' | 'verified' | 'expired' | 'error' | 'unsupported';
 type FieldErrors = Partial<Record<'email' | 'name' | 'terms' | 'turnstile', string | undefined>>;
+type InvitationPhase = 'loading' | 'ready' | 'error';
+type InvitationRecord = {
+  id?: string;
+  displayName?: string;
+  requestedScopes?: string[];
+};
 
 const consentScopes = [
   ['pair.compare', 'Compare together'],
@@ -286,73 +292,121 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
 
 function InvitationPage() {
   const token = useMemo(() => new URLSearchParams(location.search).get('token') ?? '', []);
-  const [invitation, setInvitation] = useState<any>(null);
+  const [invitation, setInvitation] = useState<InvitationRecord | null>(null);
+  const [phase, setPhase] = useState<InvitationPhase>('loading');
   const [state, setState] = useState('Checking invitation');
   const [accepted, setAccepted] = useState(false);
+  const [accepting, setAccepting] = useState(false);
+  const [savingScope, setSavingScope] = useState<string | null>(null);
   const [decisions, setDecisions] = useState<Record<string, ConsentDecision>>({});
 
   useEffect(() => {
+    let cancelled = false;
     if (!token) {
+      setPhase('error');
       setState('This invitation link is invalid.');
-      return;
+      return () => { cancelled = true; };
     }
-    fetch(`/api/v1/invitations/preview?token=${encodeURIComponent(token)}`)
+
+    setPhase('loading');
+    void fetch(`/api/v1/invitations/preview?token=${encodeURIComponent(token)}`)
       .then(async (response) => {
         if (!response.ok) throw new Error(response.status === 410 ? 'This invitation expired.' : 'This invitation is no longer available.');
-        return response.json();
+        return response.json() as Promise<{ invitation?: InvitationRecord }>;
       })
-      .then((data) => { setInvitation(data.invitation); setState('Review what is being requested.'); })
-      .catch((error) => setState(error instanceof Error ? error.message : 'This invitation is unavailable.'));
+      .then((data) => {
+        if (cancelled || !data.invitation) return;
+        setInvitation(data.invitation);
+        setPhase('ready');
+        setState('Review what is being requested.');
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setPhase('error');
+        setState(error instanceof Error ? error.message : 'This invitation is unavailable.');
+      });
+
+    return () => { cancelled = true; };
   }, [token]);
 
   async function acceptInvitation() {
+    if (accepting) return;
+    setAccepting(true);
     setState('Connecting this invitation to your account.');
-    const response = await fetch(`/api/v1/invitations/redeem?token=${encodeURIComponent(token)}`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: '{}'
-    });
-    if (!response.ok) {
-      setState(response.status === 409 ? 'This invitation was already used.' : 'The invitation could not be accepted.');
-      return;
+    try {
+      const response = await fetch(`/api/v1/invitations/redeem?token=${encodeURIComponent(token)}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: '{}'
+      });
+      if (!response.ok) {
+        setPhase('error');
+        setState(response.status === 409 ? 'This invitation was already used.' : 'The invitation could not be accepted.');
+        return;
+      }
+      const data = await response.json() as { invitation?: InvitationRecord };
+      if (data.invitation) setInvitation(data.invitation);
+      setAccepted(true);
+      setPhase('ready');
+      setState('Choose separately for each requested use.');
+    } catch {
+      setPhase('error');
+      setState('The invitation could not reach Sovereign.OS. Check your connection and try again.');
+    } finally {
+      setAccepting(false);
     }
-    const data = await response.json();
-    setInvitation(data.invitation);
-    setAccepted(true);
-    setState('You can now review each requested use.');
   }
 
   async function decide(scope: string, granted: boolean) {
-    if (!invitation?.id) return;
+    if (!invitation?.id || savingScope) return;
+    setSavingScope(scope);
     setState(`Saving your ${granted ? 'permission' : 'decision not to share'}…`);
-    const response = await fetch(`/api/v1/invitations/${invitation.id}/consent/${encodeURIComponent(scope)}`, {
-      method: 'PUT',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ granted })
-    });
-    if (!response.ok) {
-      setState('That decision could not be saved safely.');
-      return;
+    try {
+      const response = await fetch(`/api/v1/invitations/${invitation.id}/consent/${encodeURIComponent(scope)}`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ granted })
+      });
+      if (!response.ok) {
+        setState('That decision could not be saved safely. Nothing changed.');
+        return;
+      }
+      setDecisions((current) => ({ ...current, [scope]: granted ? 'granted' : 'denied' }));
+      setState('Decision saved. You can change it later.');
+    } catch {
+      setState('That decision could not reach Sovereign.OS. Nothing changed.');
+    } finally {
+      setSavingScope(null);
     }
-    setDecisions((current) => ({ ...current, [scope]: granted ? 'granted' : 'denied' }));
-    setState('Decision saved. You can change it later.');
   }
 
-  const requestedScopes: string[] = invitation?.requestedScopes ?? [];
-  const completed = requestedScopes.length > 0 && requestedScopes.every((scope) => decisions[scope]);
+  const requestedScopes = invitation?.requestedScopes ?? [];
+  const completed = requestedScopes.length > 0 && requestedScopes.every((scope) => Boolean(decisions[scope]));
+  const invitationState = phase === 'error' ? 'error' : !invitation ? 'loading' : accepted ? 'decisions' : 'review';
+  const statusTone = phase === 'error' ? 'error' : completed ? 'success' : 'neutral';
 
   return (
-    <main className="account-shell">
+    <main className="account-shell invitation-shell">
       <a className="wordmark" href="/">SOVEREIGN.OS</a>
-      <section className="auth-panel">
+      <section className="auth-panel" data-invitation-state={invitationState} aria-labelledby="invitation-title">
         <p className="eyebrow">PRIVATE CONSENT</p>
-        <h1>Choose what this connection may use.</h1>
+        <h1 id="invitation-title">Choose what this connection may use.</h1>
         <p className="lede">Accepting an invitation does not give another person blanket access. Review each requested use separately; you can change your choices later.</p>
-        <div className="status-note" aria-live="polite"><span>{state}</span></div>
+        <div className={`status-note ${statusTone}`} role={phase === 'error' ? 'alert' : 'status'} aria-live="polite"><span>{state}</span></div>
+
+        {!invitation && (
+          <section className="invitation-state" aria-busy={phase === 'loading'}>
+            <span>{phase === 'loading' ? 'Checking invitation' : 'Invitation unavailable'}</span>
+            <h2>{phase === 'loading' ? 'Opening the private request.' : 'This request cannot be opened.'}</h2>
+            <p>{phase === 'loading' ? 'Sovereign.OS is confirming the invitation before showing any requested use.' : 'No permission was granted and no account information was changed.'}</p>
+            {phase === 'error' && <a href="/login">Sign in to Sovereign.OS</a>}
+          </section>
+        )}
+
         {invitation && !accepted && (
           <div className="form-stack">
             <div className="usage-card">
-              <div><span>Shared relationship record</span><strong>{invitation.displayName}</strong></div>
+              <div><span>Shared relationship record</span><strong>{invitation.displayName || 'Private connection'}</strong></div>
               <p>No raw birth input or exact private location is shared with the other account.</p>
             </div>
             <section className="scope-panel">
@@ -361,24 +415,30 @@ function InvitationPage() {
                 {requestedScopes.map((scope) => <div key={scope}><span><strong>{scopeLabel(scope)}</strong><small>{scopeDescription(scope)}</small></span></div>)}
               </div>
             </section>
-            <button className="primary-button" onClick={acceptInvitation}>Verify me and review each choice</button>
+            <button className="primary-button" onClick={acceptInvitation} disabled={accepting}>{accepting ? 'Connecting invitation…' : 'Verify me and review each choice'}</button>
           </div>
         )}
+
         {invitation && accepted && (
           <section className="scope-panel">
             <div><p className="eyebrow">YOUR DECISIONS</p><h3>Choose independently.</h3></div>
             <div className="scope-list">
-              {requestedScopes.map((scope) => (
-                <div key={scope}>
-                  <span><strong>{scopeLabel(scope)}</strong><small>{decisions[scope] ? `Saved: ${decisions[scope]}` : 'No decision yet'}</small></span>
-                  <div>
-                    <button onClick={() => decide(scope, true)}>Allow</button>
-                    <button onClick={() => decide(scope, false)}>Do not allow</button>
+              {requestedScopes.map((scope) => {
+                const decision = decisions[scope];
+                const descriptionId = `scope-${scope.replace(/[^a-z0-9]/gi, '-')}`;
+                return (
+                  <div key={scope} data-decision={decision ?? 'undecided'}>
+                    <span><strong>{scopeLabel(scope)}</strong><small id={descriptionId}>{decision === 'granted' ? 'Allowed. You can change this later.' : decision === 'denied' ? 'Not allowed. You can change this later.' : scopeDescription(scope)}</small></span>
+                    <div role="group" aria-label={`Permission for ${scopeLabel(scope)}`} aria-describedby={descriptionId}>
+                      <button className="consent-choice" aria-pressed={decision === 'granted'} disabled={savingScope === scope} onClick={() => void decide(scope, true)}>Allow</button>
+                      <button className="consent-choice" aria-pressed={decision === 'denied'} disabled={savingScope === scope} onClick={() => void decide(scope, false)}>Do not allow</button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
-            <button className="primary-button" disabled={!completed} onClick={() => location.assign('/app')}>Open Sovereign.OS</button>
+            <p className="consent-completion-note">Every requested use needs its own decision before the shared workspace opens.</p>
+            <button className="primary-button" disabled={!completed || Boolean(savingScope)} onClick={() => location.assign('/app')}>Open Sovereign.OS</button>
           </section>
         )}
       </section>
