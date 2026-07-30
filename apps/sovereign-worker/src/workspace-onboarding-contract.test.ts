@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const onboardingMigration = readFileSync(new URL('../migrations/0010_account_onboarding_and_chat_history.sql', import.meta.url), 'utf8');
 const recoveryMigration = readFileSync(new URL('../migrations/0011_email_code_recovery.sql', import.meta.url), 'utf8');
+const capacityMigration = readFileSync(new URL('../migrations/0013_workers_ai_free_capacity.sql', import.meta.url), 'utf8');
 const auth = readFileSync(new URL('./auth-public.ts', import.meta.url), 'utf8');
 const index = readFileSync(new URL('./index.ts', import.meta.url), 'utf8');
 const entry = readFileSync(new URL('./entry.ts', import.meta.url), 'utf8');
@@ -33,6 +34,13 @@ const onboarding = readFileSync(new URL('../../web/src/PlanOnboarding.tsx', impo
     expect(auth).toContain('invalidCodeResponse()');
   });
 
+  it('stores global Workers AI reservations below the Cloudflare free allocation', () => {
+    expect(capacityMigration).toContain('CREATE TABLE IF NOT EXISTS workers_ai_daily_capacity');
+    expect(capacityMigration).toContain('reserved_neurons INTEGER NOT NULL');
+    expect(runtime).toContain("aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing'");
+    expect(runtime).toContain("dependencies.aiFreeCapacity === 'configured'");
+  });
+
   it('exposes account-owned thread history and stores restorable message text', () => {
     expect(index).toContain("app.get('/api/v1/threads'");
     expect(index).toContain("app.get('/api/v1/threads/:threadId'");
@@ -41,8 +49,8 @@ const onboarding = readFileSync(new URL('../../web/src/PlanOnboarding.tsx', impo
     expect(entry).not.toContain("'user_message', { redacted: true");
   });
 
-  it('reports the current recovery migration from the authoritative production health layer', () => {
-    expect(runtime).toContain("migrationVersion: '0012_baseline_facets_and_answer_v2'");
+  it('reports the current capacity migration from the authoritative production health layer', () => {
+    expect(runtime).toContain("migrationVersion: '0013_workers_ai_free_capacity'");
     expect(runtime).toContain("answerContract: 'sovereign-answer.v2'");
   });
 });
