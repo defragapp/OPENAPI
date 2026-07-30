@@ -44,14 +44,14 @@ export function AccountControlCenter() {
       : {};
     if (!response.ok) {
       const retry = Number(response.headers.get('retry-after') ?? body.retryAfterSeconds ?? 0);
-      throw new Error(response.status === 429 && retry > 0 ? `Try again in ${retry} seconds.` : body.message || body.error || 'That request could not be completed.');
+      throw new Error(response.status === 429 && retry > 0 ? `Try again in ${retry} seconds.` : body.message || body.error || 'We could not complete that request.');
     }
     return body;
   }
 
   async function refresh() {
     setLoading(true);
-    setStatus('Loading your controls…');
+    setStatus('Loading your account controls…');
     try {
       const [libraryData, peopleData, deletionData] = await Promise.all([
         api('/api/v1/library'),
@@ -61,9 +61,9 @@ export function AccountControlCenter() {
       const items = Array.isArray(libraryData.understandings) ? libraryData.understandings as LibraryItem[] : [];
       setLibrary(items);
       setPeople(Array.isArray(peopleData.people) ? peopleData.people as PersonItem[] : []);
-      setEdits(Object.fromEntries(items.map((item) => [item.id, item.body?.title ?? item.title ?? 'Saved understanding'])));
+      setEdits(Object.fromEntries(items.map((item) => [item.id, item.body?.title ?? item.title ?? 'Saved insight'])));
       setDeletionJob(deletionData.deletionJob ?? null);
-      setStatus('Account controls are current.');
+      setStatus('Your account controls are up to date.');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Account controls are unavailable.');
     } finally {
@@ -95,31 +95,31 @@ export function AccountControlCenter() {
   async function rename(item: LibraryItem) {
     const title = (edits[item.id] ?? '').replace(/\s+/g, ' ').trim().slice(0, 120);
     if (!title) {
-      setStatus('A saved understanding needs a title.');
+      setStatus('Enter a title for this saved insight.');
       return;
     }
     setLoading(true);
-    setStatus('Renaming saved understanding…');
+    setStatus('Saving the new title…');
     try {
       await api(`/api/v1/library/${encodeURIComponent(item.id)}`, { method: 'PATCH', body: JSON.stringify({ title }) });
       await refresh();
-      setStatus('Saved understanding renamed.');
+      setStatus('Title saved.');
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'That title could not be saved.');
+      setStatus(error instanceof Error ? error.message : 'We could not save that title.');
       setLoading(false);
     }
   }
 
   async function remove(item: LibraryItem) {
-    if (!window.confirm('Delete this saved understanding from your Library? This does not delete its original conversation.')) return;
+    if (!window.confirm('Delete this saved insight from Library? The original conversation will remain.')) return;
     setLoading(true);
-    setStatus('Deleting saved understanding…');
+    setStatus('Deleting saved insight…');
     try {
       await api(`/api/v1/library/${encodeURIComponent(item.id)}`, { method: 'DELETE' });
       await refresh();
-      setStatus('Saved understanding deleted.');
+      setStatus('Saved insight deleted.');
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'That understanding could not be deleted.');
+      setStatus(error instanceof Error ? error.message : 'We could not delete that insight.');
       setLoading(false);
     }
   }
@@ -128,16 +128,16 @@ export function AccountControlCenter() {
     if (!person.invitationId || loading) return;
     if (action === 'cancel' && !window.confirm(`Cancel the pending invitation for ${person.displayName}?`)) return;
     setLoading(true);
-    setStatus(action === 'resend' ? `Resending ${person.displayName}’s invitation…` : `Cancelling ${person.displayName}’s invitation…`);
+    setStatus(action === 'resend' ? `Sending a new invitation to ${person.displayName}…` : `Cancelling ${person.displayName}’s invitation…`);
     try {
       await api(`/api/v1/invitations/${encodeURIComponent(person.invitationId)}`, {
         method: 'PATCH',
         body: JSON.stringify({ status: action === 'resend' ? 'pending' : 'revoked' })
       });
       await refresh();
-      setStatus(action === 'resend' ? 'A new one-time invitation link was sent.' : 'Pending invitation cancelled.');
+      setStatus(action === 'resend' ? 'A new one-time invitation link was sent.' : 'Invitation cancelled.');
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'That invitation could not be changed.');
+      setStatus(error instanceof Error ? error.message : 'We could not change that invitation.');
       setLoading(false);
     }
   }
@@ -153,7 +153,7 @@ export function AccountControlCenter() {
       setDeletePhrase('');
       setStatus('Deletion scheduled. You can cancel during the 14-day grace period.');
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Account deletion could not be scheduled.');
+      setStatus(error instanceof Error ? error.message : 'We could not schedule account deletion.');
     } finally {
       setLoading(false);
     }
@@ -168,7 +168,7 @@ export function AccountControlCenter() {
       setDeletionJob(null);
       setStatus('Account deletion cancelled.');
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Account deletion could not be cancelled.');
+      setStatus(error instanceof Error ? error.message : 'We could not cancel account deletion.');
     } finally {
       setLoading(false);
     }
@@ -199,8 +199,8 @@ export function AccountControlCenter() {
           if (event.target === event.currentTarget) setOpen(false);
         }}>
           <section className="account-control-dialog" role="dialog" aria-modal="true" aria-labelledby="account-control-title">
-            <header><div><p>YOUR CONTROL</p><h2 id="account-control-title">Account & Library</h2></div><button onClick={() => setOpen(false)} aria-label="Close account controls">×</button></header>
-            <p className="account-control-intro">Manage invitations, saved understandings, billing, permissions, and deletion without searching through separate product areas.</p>
+            <header><div><p>ACCOUNT CONTROLS</p><h2 id="account-control-title">Manage your account and saved insights.</h2></div><button onClick={() => setOpen(false)} aria-label="Close account controls">×</button></header>
+            <p className="account-control-intro">Review invitations, saved insights, billing, permissions, and account deletion in one place.</p>
             <p className="account-control-status" role="status" aria-live="polite">{status}</p>
 
             <nav className="account-control-links" aria-label="Account links">
@@ -208,17 +208,17 @@ export function AccountControlCenter() {
             </nav>
 
             <section className="account-control-section">
-              <div className="account-section-heading"><p>PENDING INVITATIONS</p><h3>Private links awaiting review</h3><span>Resending creates a new one-time link and invalidates the previous link. Server-side rate limits prevent repeated delivery.</span></div>
-              {pendingInvitations.length === 0 ? <p className="account-empty">No invitations are waiting.</p> : <div className="pending-invitation-list">{pendingInvitations.map((person) => <article key={person.id}><div><strong>{person.displayName}</strong><small>{person.invitationExpiresAt ? `Expires ${new Date(person.invitationExpiresAt).toLocaleDateString()}` : 'Pending review'}</small></div><div><button disabled={loading} onClick={() => void changeInvitation(person, 'resend')}>Resend invitation</button><button className="danger" disabled={loading} onClick={() => void changeInvitation(person, 'cancel')}>Cancel</button></div></article>)}</div>}
+              <div className="account-section-heading"><p>PENDING INVITATIONS</p><h3>Invitations that have not been accepted</h3><span>Resending creates a new one-time link and invalidates the previous one. Delivery limits prevent repeated sends.</span></div>
+              {pendingInvitations.length === 0 ? <p className="account-empty">No invitations are waiting.</p> : <div className="pending-invitation-list">{pendingInvitations.map((person) => <article key={person.id}><div><strong>{person.displayName}</strong><small>{person.invitationExpiresAt ? `Expires ${new Date(person.invitationExpiresAt).toLocaleDateString()}` : 'Waiting for review'}</small></div><div><button disabled={loading} onClick={() => void changeInvitation(person, 'resend')}>Send a new link</button><button className="danger" disabled={loading} onClick={() => void changeInvitation(person, 'cancel')}>Cancel</button></div></article>)}</div>}
             </section>
 
             <section className="account-control-section">
-              <div className="account-section-heading"><p>LIBRARY</p><h3>What you chose to keep</h3><span>Rename or remove an understanding without changing the original conversation.</span></div>
+              <div className="account-section-heading"><p>LIBRARY</p><h3>Insights you chose to save</h3><span>Rename or remove a saved insight without changing the original conversation.</span></div>
               {library.length === 0 ? <p className="account-empty">Nothing saved yet.</p> : <div className="account-library-list">{library.map((item) => <article key={item.id}><label>Title<input value={edits[item.id] ?? ''} maxLength={120} onChange={(event) => setEdits((current) => ({ ...current, [item.id]: event.target.value }))} /></label><p>{item.body?.summary ?? item.summary ?? 'No summary is available.'}</p><small>{item.updatedAt ? `Updated ${new Date(item.updatedAt).toLocaleDateString()}` : 'Saved privately'}{item.body?.uncertainty ? ` · uncertainty ${item.body.uncertainty}` : ''}</small><div><button disabled={loading} onClick={() => void rename(item)}>Save title</button><button className="danger" disabled={loading} onClick={() => void remove(item)}>Delete</button></div></article>)}</div>}
             </section>
 
             <section className="account-control-section deletion-section">
-              <div className="account-section-heading"><p>ACCOUNT DELETION</p><h3>14-day grace period</h3><span>Scheduling deletion does not happen immediately. You can cancel while the request remains in the grace period.</span></div>
+              <div className="account-section-heading"><p>ACCOUNT DELETION</p><h3>Deletion starts after a 14-day grace period</h3><span>You can cancel the request during the grace period. After that, private account data is removed subject to required billing and legal retention.</span></div>
               {deletionJob ? <div className="active-deletion"><strong>Deletion scheduled</strong><p>Status: {deletionJob.status}. Scheduled for {deletionJob.scheduledFor ? new Date(deletionJob.scheduledFor).toLocaleString() : 'the end of the grace period'}.</p><button disabled={loading || deletionJob.status !== 'grace'} onClick={() => void cancelDeletion()}>Cancel account deletion</button></div> : <div className="deletion-approval"><label className="approval-check"><input type="checkbox" checked={deleteApproval} onChange={(event) => setDeleteApproval(event.target.checked)} /><span>I understand that deletion removes the account and its private data after the grace period, subject to required billing and legal retention.</span></label><label>Type DELETE to continue<input value={deletePhrase} onChange={(event) => setDeletePhrase(event.target.value)} autoComplete="off" /></label><button className="danger" disabled={loading || !deleteApproval || deletePhrase !== 'DELETE'} onClick={() => void requestDeletion()}>Schedule account deletion</button></div>}
             </section>
           </section>
