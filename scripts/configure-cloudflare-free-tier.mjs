@@ -130,15 +130,14 @@ function sovereignRateRule() {
   return {
     ref: RATE_RULE_REF,
     description: 'Sovereign AI message protection within the Cloudflare Free plan',
-    expression: '(http.request.method eq "POST" and http.request.uri.path wildcard r"/api/v1/threads/*/messages")',
+    expression: '(http.request.method eq "POST" and starts_with(http.request.uri.path, "/api/v1/threads/") and ends_with(http.request.uri.path, "/messages"))',
     action: 'block',
     enabled: true,
     ratelimit: {
       characteristics: ['cf.colo.id', 'ip.src'],
       period: 10,
       requests_per_period: 10,
-      mitigation_timeout: 10,
-      requests_to_origin: true
+      mitigation_timeout: 10
     }
   };
 }
