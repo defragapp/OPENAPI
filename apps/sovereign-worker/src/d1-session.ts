@@ -18,11 +18,14 @@ export function withD1SessionEnv(env: Env, session: D1DatabaseSession): Env {
   if (env.AI) {
     const source = env.AI;
     const wrapped: NonNullable<Env['AI']> = {
-      run: (model, input, options) => source.run(
-        model,
-        normalizeWorkersAiInput(model, input),
-        normalizeGatewayOptions(options)
-      )
+      async run(model, input, options) {
+        const result = await source.run(
+          model,
+          normalizeWorkersAiInput(model, input),
+          normalizeGatewayOptions(options)
+        );
+        return normalizeWorkersAiOutput(model, result);
+      }
     };
     if (source.aiGatewayLogId) wrapped.aiGatewayLogId = source.aiGatewayLogId;
     override.AI = wrapped;
@@ -50,6 +53,31 @@ export function normalizeWorkersAiInput(model: string, input: unknown): unknown 
   if (!output.response_format) output.response_format = { type: 'json_object' };
   if (output.temperature === undefined) output.temperature = 0.2;
   return output;
+}
+
+export function normalizeWorkersAiOutput(model: string, result: unknown): unknown {
+  if (!model.startsWith('@cf/') || result instanceof Response || result instanceof ReadableStream) return result;
+  if (result && typeof result === 'object' && typeof (result as Record<string, unknown>).output_text === 'string') return result;
+  const text = extractAiOutputText(result);
+  return text === undefined ? result : { output_text: text };
+}
+
+function extractAiOutputText(value: unknown): string | undefined {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) {
+    const parts = value.map(extractAiOutputText).filter((part): part is string => part !== undefined);
+    return parts.length ? parts.join('') : undefined;
+  }
+  if (!value || typeof value !== 'object') return undefined;
+  const record = value as Record<string, unknown>;
+  for (const key of ['output_text', 'text', 'content']) {
+    if (typeof record[key] === 'string') return record[key] as string;
+  }
+  for (const key of ['message', 'delta', 'response', 'result', 'output', 'choices']) {
+    const text = extractAiOutputText(record[key]);
+    if (text !== undefined) return text;
+  }
+  return undefined;
 }
 
 export function normalizeGatewayOptions(options: unknown): unknown {
