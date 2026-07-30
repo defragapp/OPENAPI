@@ -90,9 +90,14 @@ containsAll('canonical workspace', workspace, [
   '<RelationshipAnswer',
   '<SystemAnswer',
   '<BasisStrip',
-  'Explore this through Covenant?',
+  'Add a Christian Scripture perspective?',
   "action.type === 'save_to_library'",
-  'A supported path. Sovereign will not guess unavailable values.'
+  'Sovereign will continue without guessing missing values.',
+  'See what is steady and what may matter more right now.',
+  'See who decides, who carries responsibility, and where pressure builds.',
+  'Manage your Baseline, privacy, plan, and account.',
+  'Supporting details',
+  'What shaped this answer'
 ]);
 
 containsAll('relationship and system intelligence', relational, [
@@ -142,9 +147,14 @@ for (const phrase of [
   'Choose what fits.',
   'Begin with yourself',
   'The question changes. The environment stays the same.',
-  'Another person remains a person—not a data source you control.'
+  'Another person remains a person—not a data source you control.',
+  'Your intelligence begins with your Baseline.',
+  'Bring the whole structure into view.',
+  'Keep what changes your understanding.',
+  'Opening your intelligence.',
+  'Why this is personal'
 ]) {
-  assert(!`${landing}\n${how}\n${pricing}\n${faq}\n${app}\n${consent}`.includes(phrase), `Retired abstract public copy remains: ${phrase}`);
+  assert(!`${landing}\n${how}\n${pricing}\n${faq}\n${app}\n${consent}\n${workspace}`.includes(phrase), `Retired abstract copy remains: ${phrase}`);
 }
 
 containsAll('responsive workspace', workspaceCss, [
