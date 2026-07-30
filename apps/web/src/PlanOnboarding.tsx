@@ -14,15 +14,15 @@ export function PlanOnboarding() {
           location.assign('/login?returnTo=%2Fonboarding');
           return null;
         }
-        if (!response.ok) throw new Error('Your plan options are temporarily unavailable.');
+        if (!response.ok) throw new Error('Plan options are temporarily unavailable.');
         return response.json();
       })
       .then((data) => {
         if (!data) return;
         setCurrentPlan(data.effectivePlan === 'sovereign_plus' ? 'sovereign_plus' : 'free');
-        setState('Choose how you want to begin.');
+        setState('Choose Free or Sovereign+.');
       })
-      .catch((error) => setState(error instanceof Error ? error.message : 'Your plan options are temporarily unavailable.'));
+      .catch((error) => setState(error instanceof Error ? error.message : 'Plan options are temporarily unavailable.'));
   }, []);
 
   async function confirm(plan: Plan) {
@@ -36,7 +36,7 @@ export function PlanOnboarding() {
       body: JSON.stringify({ plan })
     });
     if (!response.ok) {
-      setState('That plan could not be confirmed. Please try again.');
+      setState('We could not confirm that plan. Try again.');
       return;
     }
     if (plan === 'free') {
@@ -70,33 +70,33 @@ export function PlanOnboarding() {
           <ol className="onboarding-progress" aria-label="Account setup progress">
             <li className="complete"><span>1</span>Account</li>
             <li className="active"><span>2</span>Choose a plan</li>
-            <li><span>3</span>Your workspace</li>
+            <li><span>3</span>Open workspace</li>
           </ol>
-          <p className="eyebrow">CHOOSE HOW TO BEGIN</p>
-          <h1>Start free—or open the full system.</h1>
-          <p className="plan-intro">Your plan is confirmed before the workspace opens. You can change it later without losing your Baseline, conversations, people, systems, or saved understandings.</p>
+          <p className="eyebrow">CHOOSE YOUR PLAN</p>
+          <h1>Choose Free or Sovereign+.</h1>
+          <p className="plan-intro">Free covers personal questions and decisions. Sovereign+ adds permission-based relationships, families, teams, saved insights, and more monthly AI turns. You can change plans later without losing your Baseline or saved information.</p>
 
           <div className="onboarding-plan-grid">
             <article className={currentPlan === 'free' ? 'current' : ''}>
               <header><span>FREE</span><strong>$0</strong></header>
-              <h2>Understand yourself.</h2>
-              <p>Build your Baseline and explore what is active now, Shadow, Gift, Alignment, decisions, and behavior.</p>
+              <h2>Personal questions and decisions.</h2>
+              <p>Build your Baseline and ask about yourself, what may matter more right now, and the choices in front of you.</p>
               <ul>
-                <li>Complete Baseline Design</li>
-                <li>Today and Explore</li>
-                <li>10 Sovereign responses monthly</li>
+                <li>Complete private Baseline</li>
+                <li>Today and personal exploration</li>
+                <li>10 Sovereign AI turns each month</li>
               </ul>
               <button className="primary-button" onClick={() => void confirm('free')}>Continue with Free</button>
             </article>
 
             <article className="plus-plan">
               <header><span>SOVEREIGN+</span><strong>{interval === 'annual' ? '$99 / year' : '$20 / month'}</strong></header>
-              <h2>Relationships and systems.</h2>
-              <p>Bring permitted Baselines together and keep the wider human system in view.</p>
+              <h2>Relationships, families, and teams.</h2>
+              <p>Use permission-based information from other people, understand group roles and responsibility, and save useful insights for later.</p>
               <ul>
                 <li>Everything in Free</li>
-                <li>People, Systems, Library, and Covenant</li>
-                <li>300 Sovereign responses monthly</li>
+                <li>People, Systems, Library, and optional Covenant</li>
+                <li>300 Sovereign AI turns each month</li>
               </ul>
               <div className="billing-toggle" role="group" aria-label="Billing interval">
                 <button className={interval === 'annual' ? 'active' : ''} onClick={() => setInterval('annual')}>Annual · $99</button>
@@ -110,11 +110,11 @@ export function PlanOnboarding() {
         <aside className="plan-visual">
           <div className="onboarding-baseline-preview">
             <span>YOUR BASELINE</span>
-            <h2>A living reference for the questions that matter.</h2>
-            <p>Begin with what remains steady. Add current, relationship, or system context only when it belongs.</p>
-            <div><strong>Plain-language insight</strong><small>Exact Basis available beneath it</small></div>
+            <h2>One private starting point for every personal question.</h2>
+            <p>Sovereign uses your Baseline to keep answers consistent across decisions, pressure, relationships, and change.</p>
+            <div><strong>Direct answer first</strong><small>Supporting source details stay available underneath</small></div>
           </div>
-          <p>Your Baseline stays beneath every exploration.</p>
+          <p>You can review, correct, or reject any interpretation.</p>
         </aside>
       </div>
     </main>
