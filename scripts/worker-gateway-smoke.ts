@@ -2,6 +2,8 @@ import app from '../apps/sovereign-worker/src/entry';
 import { createSignedSessionToken } from '../apps/sovereign-worker/src/security/auth';
 import type { Env } from '../apps/sovereign-worker/src/env';
 
+const APPROVED_MODEL = '@cf/zai-org/glm-4.7-flash';
+
 function fakeEnv(): Env {
   const accounts = new Map<string, string>();
   const threads = new Map<string, string>();
@@ -30,11 +32,11 @@ function fakeEnv(): Env {
     async all() { return { results: [] }; }
   }; } }; } } as unknown as D1Database;
   return {
-    APP_ENV: 'test', APP_VERSION: 'worker-gateway-smoke', AI_PROVIDER: 'cloudflare-gateway', AI_MODEL: 'openai/gpt-5.5', AI_GATEWAY_ID: 'sovereign',
+    APP_ENV: 'test', APP_VERSION: 'worker-gateway-smoke', AI_PROVIDER: 'cloudflare-gateway', AI_MODEL: APPROVED_MODEL, AI_GATEWAY_ID: 'sovereign',
     STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db,
     THREADS: { idFromName: (name: string) => ({ name }) as DurableObjectId, get: () => ({ fetch: async () => Response.json({ sequence: ++seq, duplicate: false }) }) as unknown as DurableObjectStub } as unknown as DurableObjectNamespace,
     AI: { async run(model: string, input: unknown, options?: unknown) {
-      if (model !== 'openai/gpt-5.5') throw new Error('invalid model');
+      if (model !== APPROVED_MODEL) throw new Error('invalid model');
       const gateway = (options as any)?.gateway;
       if (gateway?.id !== 'sovereign' || gateway?.skipCache !== true || gateway?.collectLog !== false || gateway?.metadata?.plan !== 'free' || gateway?.metadata?.response_contract !== 'sovereign-answer.v2' || !gateway?.metadata?.account_ref) throw new Error('invalid gateway metadata');
       if (JSON.stringify(options).includes('acct_')) throw new Error('raw account id leaked');
@@ -62,7 +64,7 @@ async function main(): Promise<void> {
   const text = await res.text();
   if (res.status !== 202) throw new Error(`worker gateway smoke failed status=${res.status}`);
   for (const phrase of ['Uncertainty is not automatically yours to solve.', 'STILL UNKNOWN']) if (!text.includes(phrase)) throw new Error(`missing ${phrase}`);
-  console.log(`Worker Gateway smoke passed status=${res.status} response_chars=${text.length} contract=sovereign-answer.v2 provider=cloudflare-gateway model=openai/gpt-5.5`);
+  console.log(`Worker Gateway smoke passed status=${res.status} response_chars=${text.length} contract=sovereign-answer.v2 provider=cloudflare-gateway model=${APPROVED_MODEL}`);
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1); });
