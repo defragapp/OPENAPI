@@ -14,7 +14,60 @@ export function createD1RequestSession(request: Request, db: D1Database): D1Data
 }
 
 export function withD1SessionEnv(env: Env, session: D1DatabaseSession): Env {
-  return Object.assign(Object.create(env) as Env, { DB: session }) as Env;
+  const override: Partial<Env> = { DB: session };
+  if (env.AI) {
+    const source = env.AI;
+    const wrapped: NonNullable<Env['AI']> = {
+      run: (model, input, options) => source.run(
+        model,
+        normalizeWorkersAiInput(model, input),
+        normalizeGatewayOptions(options)
+      )
+    };
+    if (source.aiGatewayLogId) wrapped.aiGatewayLogId = source.aiGatewayLogId;
+    override.AI = wrapped;
+  }
+  return Object.assign(Object.create(env) as Env, override) as Env;
+}
+
+export function normalizeWorkersAiInput(model: string, input: unknown): unknown {
+  if (!model.startsWith('@cf/')) return input;
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return { prompt: String(input ?? '') };
+
+  const source = input as Record<string, unknown>;
+  const prompt = typeof source.input === 'string'
+    ? source.input
+    : typeof source.prompt === 'string'
+      ? source.prompt
+      : undefined;
+  if (!prompt) return input;
+
+  const output: Record<string, unknown> = { ...source };
+  delete output.input;
+  delete output.max_output_tokens;
+  output.messages = [{ role: 'user', content: prompt }];
+  if (typeof source.max_output_tokens === 'number') output.max_completion_tokens = source.max_output_tokens;
+  if (!output.response_format) output.response_format = { type: 'json_object' };
+  if (output.temperature === undefined) output.temperature = 0.2;
+  return output;
+}
+
+export function normalizeGatewayOptions(options: unknown): unknown {
+  if (!options || typeof options !== 'object' || Array.isArray(options)) {
+    return { gateway: { skipCache: true, collectLog: false } };
+  }
+  const source = options as Record<string, unknown>;
+  const existingGateway = source.gateway && typeof source.gateway === 'object' && !Array.isArray(source.gateway)
+    ? source.gateway as Record<string, unknown>
+    : {};
+  return {
+    ...source,
+    gateway: {
+      ...existingGateway,
+      skipCache: true,
+      collectLog: false
+    }
+  };
 }
 
 export function attachD1Bookmark(response: Response, session?: D1DatabaseSession): Response {
