@@ -27,13 +27,16 @@ import './email-code-fallback.css';
 import './unified-entry.css';
 import './account-control.css';
 
-/* Shared product system, route-owned landing layout, and composition hierarchy. */
+/* Shared product system and composition history. */
 import './sovereign-cohesion.css';
 import './sovereign-modern.css';
 import './landing-production.css';
 import './interface-composition.css';
 import './premium-surfaces.css';
 import './premium-surface-hardening.css';
+
+/* Final product authority shared by public, account, onboarding, and workspace surfaces. */
+import './sovereign-product-v2.css';
 
 installProductionRuntime();
 installProductRuntime();
