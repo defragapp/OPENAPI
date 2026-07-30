@@ -9,11 +9,6 @@ const RATE_RULE_REF = 'sovereign_ai_messages_free_tier';
 const RATE_PHASE = 'http_ratelimit';
 
 const CRITICAL_OPERATIONS = [
-  ['POST', '/api/v1/auth/signup'],
-  ['POST', '/api/v1/auth/login'],
-  ['POST', '/api/v1/auth/redeem'],
-  ['POST', '/api/v1/auth/logout'],
-  ['POST', '/api/v1/auth/logout-all'],
   ['POST', '/api/v1/account/onboarding'],
   ['POST', '/api/v1/current-conditions'],
   ['DELETE', '/api/v1/current-conditions'],
@@ -135,7 +130,7 @@ function sovereignRateRule() {
   return {
     ref: RATE_RULE_REF,
     description: 'Sovereign AI message protection within the Cloudflare Free plan',
-    expression: 'http.request.uri.path wildcard r"/api/v1/threads/*/messages"',
+    expression: '(http.request.method eq "POST" and http.request.uri.path wildcard r"/api/v1/threads/*/messages")',
     action: 'block',
     enabled: true,
     ratelimit: {
@@ -188,7 +183,7 @@ async function configureFreeRateLimit(client, zoneId) {
   return {
     rulesetId: ruleset.id,
     ruleId: active.id,
-    threshold: '10 requests/10s/IP',
+    threshold: '10 POST requests/10s/IP',
     mitigation: 'block 10s'
   };
 }
