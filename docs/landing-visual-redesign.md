@@ -1,36 +1,44 @@
 # Sovereign.OS public visual contract
 
-The public experience explains Sovereign.OS through a recognizable AI interaction. The focal visual is one user question becoming one interactive Sovereign answer at readable product scale.
+The public experience explains Sovereign.OS through a recognizable customer question and a useful answer. The focal visual is one real question becoming one clear Sovereign response at readable product scale.
 
 ## Category clarity
 
 A new visitor must understand within five seconds:
 
-- Sovereign.OS is a private personal AI;
-- they can ask about themselves, relationships, decisions, families, or teams;
-- the answer is grounded in a private personal foundation;
-- they begin by building a Baseline;
-- they remain responsible for deciding what fits.
+- Sovereign.OS provides private personal and relational intelligence;
+- it helps with self-understanding, decisions, relationships, families, and teams;
+- it carries forward a private personal foundation instead of starting from zero;
+- relationship and group information is used only with permission;
+- the user decides what is true and useful;
+- the first action is `Create my personal foundation`.
 
 Framework terminology must not be required to understand the first viewport.
 
 ## Hero
 
-- Kicker: `PERSONAL AI FOR REAL LIFE`
-- Headline: `Ask about your life. Get an answer built around you.`
-- Primary action: `Build my Baseline`
-- Secondary action: `See a Sovereign answer`
-- Trust line: `Start free · No card required · Review, correct, or reject any interpretation`
+- Kicker: `PRIVATE PERSONAL AND RELATIONAL INTELLIGENCE`
+- Headline: `Understand yourself. Make clearer decisions. Navigate relationships with context.`
+- Body: `Sovereign keeps a private personal foundation behind every question, so the answer can reflect how you decide, communicate, respond under pressure, and relate to other people.`
+- Primary action: `Create my personal foundation`
+- Secondary action: `See how Sovereign answers`
+- Trust line: `Start free · No card required · You control what is used and saved`
 
-The answer stage includes a recognizable `ASK SOVEREIGN` question state, a direct answer with a specific mechanism, selectable Answer, Under pressure, At its best, What fits, and Basis sections, a practical experiment, and an explicitly labeled sanitized fixture.
+The answer stage includes a recognizable customer question, a specific answer, clear supporting sections, a practical option, and an explicitly labeled sanitized fixture.
 
-The authenticated answer contract remains Direct answer, Shadow, Gift, Alignment, and Basis. Public demonstration labels may translate these terms without altering the contract.
+Public labels translate internal contracts without changing them:
 
-It must feel like a finished AI product surface rather than a report, article, framework diagram, or generic marketing mockup.
+- Direct answer → `The answer`;
+- Shadow → `Under pressure`;
+- Gift → `At your best`;
+- Alignment → `Decision clarity`;
+- Basis → `What this is based on`.
+
+It must feel like a finished consumer product rather than a report, article, framework diagram, or generic marketing mockup.
 
 ## Emotional brand scene
 
-After the hero interaction is clear, the page may use the founder-approved statement:
+After the product interaction is clear, the page may use the founder-approved statement:
 
 `Healing isn’t optional. Holding the pain is.`
 
@@ -38,23 +46,23 @@ This scene must remain visually quiet and must not imply therapy, diagnosis, gua
 
 ## Page sequence
 
-1. Personal AI category and real Sovereign answer.
-2. Emotional brand statement after category clarity.
-3. Horizontally selectable real-life questions updating one shared answer stage.
-4. Explanation of why Sovereign does not begin with a blank prompt.
-5. Stable Baseline plus expiring current overlay, user confirmation, and visible unknown.
-6. One central quality with selectable Shadow, Gift, and Alignment behavior.
-7. Permission journey and a two-person relationship view with a full-width interaction field.
-8. A supported system map with readable people, roles, one active connection, a separate pressure field, and a quiet contextual Covenant action.
-9. Exact Basis strip and data-only source detail.
+1. Clear product category, value, and real Sovereign answer.
+2. Why carrying personal context forward matters.
+3. Real questions about self, decisions, relationships, and groups updating one shared answer stage.
+4. Explanation of why Sovereign does not begin with a blank conversation.
+5. Personal foundation plus optional temporary context, user confirmation, and visible uncertainty.
+6. One central strength with selectable pressure, best-use, and decision-clarity views.
+7. Permission journey and a two-person relationship view with a full-width interaction explanation.
+8. A supported family or team view with readable people, roles, one active connection, and a separate pressure explanation.
+9. Exact supporting details kept secondary.
 10. Accurate Free and Sovereign+ pricing.
-11. Concrete final action and quiet enduring brand line.
+11. Concrete final action and quiet brand close.
 
 ## Visual system
 
 Use the shared `--sov-*` tokens. Preserve near-black charcoal, warm paper, restrained clay, muted sage, quiet depth, generous space, readable editorial display type, and modern system UI type.
 
-The first viewport must make the AI interaction dominant. Avoid making a philosophy headline and a report card compete as equal focal points.
+The first viewport must make the product interaction dominant. Avoid making a philosophy headline and a report card compete as equal focal points.
 
 The page uses one focal point per scene. It avoids symbolic spiritual ornament, decorative charts, neon AI imagery, a therapy-dashboard look, generic feature grids, and repeated oversized editorial headlines without product behavior.
 
@@ -69,6 +77,17 @@ Primary containers use 20–28px radii. Compact controls use 10–14px radii or 
 - Exact glyphs have accessible labels.
 - No essential information depends on hover.
 - No horizontal page overflow occurs at 320px.
-- The mobile first viewport shows the category, a question, the beginning of the answer, and the primary action without a long explanatory preamble.
-- The mobile Basis strip stays one line and reveals `+N` for hidden values.
+- The mobile first viewport shows the product category, value, the beginning of an answer, and the primary action without a long explanatory preamble.
+- Supporting-detail strips stay one line and reveal `+N` for hidden values.
 - Source and context detail uses a bottom-sheet pattern on mobile when presented as a dialog.
+
+## Public copy exclusions
+
+Do not render these phrases on the landing or supporting public pages:
+
+- `Build my Baseline`;
+- `Ask about your life`;
+- `Get an answer built around you`;
+- `Choose what Sovereign may use about you`;
+- `No mind-reading`;
+- `No compatibility score`.
