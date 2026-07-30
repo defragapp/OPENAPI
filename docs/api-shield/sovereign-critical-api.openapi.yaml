@@ -1,0 +1,314 @@
+openapi: 3.0.3
+info:
+  title: Sovereign.OS Critical API
+  version: 2026-07-29
+  description: >-
+    Request schema for short-body, security-sensitive Sovereign.OS endpoints.
+    The sovereign-answer.v2 contract is validated inside the Worker because API
+    Shield validates incoming requests, not model responses.
+servers:
+  - url: https://app.defrag.app
+paths:
+  /api/v1/auth/signup:
+    post:
+      operationId: signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '200':
+          description: Request accepted
+  /api/v1/auth/login:
+    post:
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Request accepted
+  /api/v1/auth/redeem:
+    post:
+      operationId: redeemAuthentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RedeemRequest'
+      responses:
+        '200':
+          description: Authentication redeemed
+  /api/v1/auth/logout:
+    post:
+      operationId: logout
+      responses:
+        '200':
+          description: Session revoked
+  /api/v1/auth/logout-all:
+    post:
+      operationId: logoutAll
+      responses:
+        '200':
+          description: Sessions revoked
+  /api/v1/account/onboarding:
+    post:
+      operationId: completeAccountOnboarding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountOnboardingRequest'
+      responses:
+        '200':
+          description: Onboarding updated
+  /api/v1/current-conditions:
+    post:
+      operationId: updateCurrentConditions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrentConditionsRequest'
+      responses:
+        '200':
+          description: Current conditions updated
+    delete:
+      operationId: clearCurrentConditions
+      responses:
+        '200':
+          description: Current conditions cleared
+  /api/v1/people/{personId}/consent/{scope}:
+    put:
+      operationId: updatePersonConsent
+      parameters:
+        - $ref: '#/components/parameters/PersonId'
+        - $ref: '#/components/parameters/ConsentScope'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentDecisionRequest'
+      responses:
+        '200':
+          description: Consent updated
+  /api/v1/invitations/{invitationId}/consent/{scope}:
+    put:
+      operationId: updateInvitationConsent
+      parameters:
+        - $ref: '#/components/parameters/InvitationId'
+        - $ref: '#/components/parameters/ConsentScope'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentDecisionRequest'
+      responses:
+        '200':
+          description: Invitation consent updated
+  /api/v1/billing/checkout:
+    post:
+      operationId: createCheckoutSession
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutRequest'
+      responses:
+        '201':
+          description: Checkout session created
+  /api/v1/billing/portal:
+    post:
+      operationId: createBillingPortalSession
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Billing portal session created
+  /api/v1/deletion-jobs:
+    post:
+      operationId: createDeletionJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeletionApprovalRequest'
+      responses:
+        '202':
+          description: Deletion job accepted
+components:
+  parameters:
+    PersonId:
+      name: personId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+    InvitationId:
+      name: invitationId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+    ConsentScope:
+      name: scope
+      in: path
+      required: true
+      schema:
+        type: string
+        enum:
+          - pair.compare
+          - system.include
+          - trait.display
+          - framework.display
+          - current_conditions.use
+          - library.link
+          - covenant.include
+    IdempotencyKey:
+      name: x-idempotency-key
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 200
+  schemas:
+    SignupRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - name
+        - termsAccepted
+        - turnstileToken
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 320
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        termsAccepted:
+          type: boolean
+          enum:
+            - true
+        turnstileToken:
+          type: string
+          minLength: 1
+          maxLength: 2048
+        returnTo:
+          type: string
+          maxLength: 512
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - turnstileToken
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 320
+        turnstileToken:
+          type: string
+          minLength: 1
+          maxLength: 2048
+        returnTo:
+          type: string
+          maxLength: 512
+    RedeemRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        token:
+          type: string
+          minLength: 32
+          maxLength: 512
+        email:
+          type: string
+          format: email
+          maxLength: 320
+        code:
+          type: string
+          pattern: '^[0-9]{6}$'
+    AccountOnboardingRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - plan
+      properties:
+        plan:
+          type: string
+          enum:
+            - free
+            - sovereign_plus
+    CurrentConditionsRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        locationPrecision:
+          type: string
+          enum:
+            - none
+            - city
+            - approximate
+            - exact
+        latitude:
+          type: number
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+    ConsentDecisionRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - granted
+      properties:
+        granted:
+          type: boolean
+        reason:
+          type: string
+          maxLength: 500
+    CheckoutRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        interval:
+          type: string
+          enum:
+            - monthly
+            - annual
+    DeletionApprovalRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - approved
+      properties:
+        approved:
+          type: boolean
+          enum:
+            - true
