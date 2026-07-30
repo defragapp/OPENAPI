@@ -4,32 +4,32 @@ let runtimeInstalled = false;
 
 const scopeCopy: Record<string, { title: string; description: string }> = {
   'pair.compare': {
-    title: 'Compare together',
-    description: 'Use the Baseline themes each person agreed to share in a two-person comparison.'
+    title: 'Compare our Baselines',
+    description: 'Compare the parts of each Baseline that both people agreed to share.'
   },
   'system.include': {
-    title: 'Include in a system',
-    description: 'Include this person in a consented family, household, friendship, or team view.'
+    title: 'Include me in a group view',
+    description: 'Include this person in a family, household, friendship, or team view.'
   },
   'trait.display': {
-    title: 'Use shared Baseline traits',
-    description: 'Use the reduced plain-language traits needed for the requested view.'
+    title: 'Use the Baseline details I share',
+    description: 'Use only the plain-language Baseline details this person chose to share.'
   },
   'framework.display': {
-    title: 'Show optional source detail',
-    description: 'Allow exact supporting framework detail to appear only when specifically requested.'
+    title: 'Show supporting source details',
+    description: 'Show the exact source details behind shared Baseline information when requested.'
   },
   'current_conditions.use': {
-    title: 'Use current conditions',
-    description: 'Include current timing only for this person when permission is active.'
+    title: 'Use my temporary current context',
+    description: 'Use temporary current context for this shared question.'
   },
   'library.link': {
-    title: 'Link a saved understanding',
-    description: 'Use a deliberately saved understanding as shared context.'
+    title: 'Use an insight I saved',
+    description: 'Use a saved insight as shared context for this connection.'
   },
   'covenant.include': {
-    title: 'Include in a Scripture lens',
-    description: 'Include this person only when the optional Covenant lens is explicitly enabled.'
+    title: 'Include me in a Covenant answer',
+    description: 'Include this person only when the optional Christian Scripture perspective is turned on.'
   }
 };
 
@@ -84,7 +84,7 @@ function installTurnstileRenderer(): void {
     document.querySelectorAll<HTMLElement>('.turnstile-slot:not([data-turnstile-rendered])').forEach((slot) => {
       if (!sitekey) {
         slot.dataset.turnstileRendered = 'missing-config';
-        slot.textContent = 'Turnstile site key is not configured for this build.';
+        slot.textContent = 'The security check is not configured for this build.';
         return;
       }
       if (!turnstile?.render) return;
@@ -165,7 +165,7 @@ export function ProductCompletionLayer() {
 
   async function refreshControls() {
     setLoading(true);
-    setStatus('Loading current consent state…');
+    setStatus('Loading current permissions…');
     try {
       const [ownerData, inviteeData] = await Promise.all([
         api('/api/v1/people'),
@@ -176,9 +176,9 @@ export function ProductCompletionLayer() {
       ]);
       setPeople(ownerData.people ?? []);
       setInvitations(inviteeData.invitations ?? []);
-      setStatus('Current consent state loaded.');
+      setStatus('Permissions are up to date.');
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Shared context is unavailable.');
+      setStatus(error instanceof Error ? error.message : 'Shared permissions are unavailable.');
     } finally {
       setLoading(false);
     }
@@ -191,7 +191,7 @@ export function ProductCompletionLayer() {
       await api(path, init);
       await refreshControls();
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'That change could not be completed safely.');
+      setStatus(error instanceof Error ? error.message : 'We could not complete that change.');
       setLoading(false);
     }
   }
@@ -211,22 +211,22 @@ export function ProductCompletionLayer() {
             <header className="completion-dialog-header">
               <div>
                 <p className="eyebrow">PEOPLE & PERMISSIONS</p>
-                <h2 id="shared-context-title">Manage what others may use.</h2>
+                <h2 id="shared-context-title">Manage shared permissions.</h2>
               </div>
               <button className="quiet-button" onClick={() => setControlsOpen(false)} autoFocus>Close</button>
             </header>
-            <p className="completion-intro">A connection never creates blanket access. Review active permissions, stop a specific use, cancel a pending invitation, or remove a person from your workspace.</p>
+            <p className="completion-intro">A connection does not share everything. Review what each person allowed, stop a specific permission, cancel a pending invitation, or remove a person from your workspace.</p>
             <p className="result-status" role="status" aria-live="polite">{status}</p>
 
             <section className="completion-section">
               <h3>People you added</h3>
-              {people.length === 0 && <p className="empty-copy">No people have been added.</p>}
+              {people.length === 0 && <p className="empty-copy">You have not added anyone yet.</p>}
               {people.map((person) => (
                 <article className="consent-person-card" key={person.id}>
                   <div className="consent-person-heading">
                     <div>
                       <strong>{person.displayName}</strong>
-                      <small>{person.identityBound ? 'Connected to their own account' : 'Private name only'} · Shared Baseline {humanStatus(person.baselineStatus)}</small>
+                      <small>{person.identityBound ? 'Connected to their own account' : 'Name only · not connected'} · Shared Baseline: {humanStatus(person.baselineStatus)}</small>
                     </div>
                     <span>{humanStatus(person.invitationStatus ?? 'not invited')}</span>
                   </div>
@@ -238,12 +238,12 @@ export function ProductCompletionLayer() {
                           disabled={loading}
                           title={scopeDescription(scope)}
                           onClick={() => mutate(
-                            `Stopping use of ${scopeTitle(scope)}…`,
+                            `Stopping ${scopeTitle(scope)}…`,
                             `/api/v1/people/${encodeURIComponent(person.id)}/consent/${encodeURIComponent(scope)}`,
-                            { method: 'PUT', body: JSON.stringify({ granted: false, reason: 'Workspace owner stopped using this scope.' }) }
+                            { method: 'PUT', body: JSON.stringify({ granted: false, reason: 'Workspace owner stopped using this permission.' }) }
                           )}
                         >
-                          {scopeTitle(scope)} · stop using
+                          Stop: {scopeTitle(scope)}
                         </button>
                       ))}
                     </div>
@@ -254,7 +254,7 @@ export function ProductCompletionLayer() {
                         className="secondary-button"
                         disabled={loading}
                         onClick={() => mutate(
-                          'Cancelling pending invitation…',
+                          'Cancelling invitation…',
                           `/api/v1/invitations/${encodeURIComponent(person.invitationId!)}`,
                           { method: 'PATCH', body: JSON.stringify({ status: 'revoked' }) }
                         )}
@@ -266,9 +266,9 @@ export function ProductCompletionLayer() {
                       className="danger-button"
                       disabled={loading}
                       onClick={() => {
-                        if (!window.confirm(`Remove ${person.displayName} and all consented relationship/system links from this workspace?`)) return;
+                        if (!window.confirm(`Remove ${person.displayName} and all shared relationship or group links from this workspace?`)) return;
                         void mutate(
-                          'Removing person and linked shared context…',
+                          'Removing person and shared links…',
                           `/api/v1/people/${encodeURIComponent(person.id)}`,
                           { method: 'DELETE' }
                         );
@@ -282,12 +282,12 @@ export function ProductCompletionLayer() {
             </section>
 
             <section className="completion-section">
-              <h3>Invitations you accepted</h3>
-              {invitations.length === 0 && <p className="empty-copy">No accepted invitations are linked to this account.</p>}
+              <h3>Invitations connected to your account</h3>
+              {invitations.length === 0 && <p className="empty-copy">No accepted invitations are connected to this account.</p>}
               {invitations.map((invitation) => (
                 <article className="consent-person-card" key={invitation.id}>
                   <div className="consent-person-heading">
-                    <div><strong>{invitation.displayName}</strong><small>You control each use independently and can change it here.</small></div>
+                    <div><strong>{invitation.displayName}</strong><small>You control each permission separately and can change it here.</small></div>
                     <span>{humanStatus(invitation.status)}</span>
                   </div>
                   <div className="invitee-decision-list">
@@ -299,7 +299,7 @@ export function ProductCompletionLayer() {
                             <strong>{scopeTitle(scope)}</strong>
                             <small>{scopeDescription(scope)} · {decisionLabel(decision)}</small>
                           </span>
-                          <div className="decision-choice" role="group" aria-label={`${scopeTitle(scope)} decision`}>
+                          <div className="decision-choice" role="group" aria-label={`${scopeTitle(scope)} permission`}>
                             <button
                               disabled={loading}
                               aria-pressed={decision === 'granted'}
@@ -342,13 +342,13 @@ function scopeTitle(scope: string): string {
 }
 
 function scopeDescription(scope: string): string {
-  return scopeCopy[scope]?.description ?? 'Use only the context covered by this specific permission.';
+  return scopeCopy[scope]?.description ?? 'Use only the information covered by this specific permission.';
 }
 
 function decisionLabel(decision?: 'granted' | 'denied'): string {
   if (decision === 'granted') return 'Currently allowed';
   if (decision === 'denied') return 'Not allowed';
-  return 'No decision yet';
+  return 'No choice yet';
 }
 
 function humanStatus(value: string): string {
