@@ -17,68 +17,72 @@ const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
 describe('Sovereign.OS public experience', () => {
-  it('makes the personal AI category and first action unmistakable in the first viewport', () => {
-    expect(landing).toContain('PERSONAL AI FOR REAL LIFE');
-    expect(landing).toContain('Ask about your life.');
-    expect(landing).toContain('Get an answer built around you.');
-    expect(landing).toContain('private personal AI');
-    expect(landing).toContain('your relationships');
-    expect(landing).toContain('the decisions in front of you');
+  it('states the current product promise and first action in the first viewport', () => {
+    expect(landing).toContain('Know yourself.');
+    expect(landing).toContain('Understand the system.');
+    expect(landing).toContain('Choose what fits.');
+    expect(landing).toContain('private AI for understanding yourself, your relationships, and the systems around you');
+    expect(landing).toContain('Build your Baseline once');
     expect(landing).toContain('Build my Baseline');
+    expect(landing).toContain('See a Sovereign answer');
+    expect(landing).not.toContain('PERSONAL AI FOR REAL LIFE');
   });
 
-  it('shows a recognizable user question and Sovereign answer before framework explanation', () => {
+  it('shows a recognizable question and direct answer before the Baseline explanation', () => {
     const questionIndex = landing.indexOf('Why do I keep taking responsibility for everyone else?');
-    const answerIndex = landing.indexOf('You may be quick to create direction when responsibility is unclear.');
-    const frameworkIndex = landing.indexOf('WHY THIS AI IS DIFFERENT');
+    const answerIndex = landing.indexOf('Your capacity is real. The question is whether the responsibility is actually yours.');
+    const foundationIndex = landing.indexOf('Your intelligence begins with your Baseline.');
     expect(questionIndex).toBeGreaterThan(-1);
     expect(answerIndex).toBeGreaterThan(questionIndex);
-    expect(frameworkIndex).toBeGreaterThan(answerIndex);
+    expect(foundationIndex).toBeGreaterThan(answerIndex);
     expect(landing).toContain('EXAMPLE ANSWER');
     expect(landing).toContain('Sanitized demonstration · Not your Baseline');
     expect(landing.indexOf('Sanitized demonstration · Not your Baseline')).toBeLessThan(landing.indexOf('YOU ASKED'));
   });
 
-  it('preserves the founder language as emotional brand meaning rather than category explanation', () => {
-    const heroInvocationIndex = landing.indexOf('<LivingSovereignAnswer />');
-    const healingIndex = landing.indexOf('Healing isn’t optional. Holding the pain is.');
-    expect(heroInvocationIndex).toBeGreaterThan(-1);
-    expect(healingIndex).toBeGreaterThan(heroInvocationIndex);
-    expect(landing).toContain('Sovereign does not decide for you.');
-  });
-
-  it('explains the complete Baseline-first platform in direct language', () => {
-    for (const phrase of ['Baseline Design', 'Shadow', 'Gift', 'Alignment', 'TWO PEOPLE · SHARED WITH PERMISSION', 'FAMILIES · TEAMS · HUMAN SYSTEMS', 'Covenant']) {
-      expect(publicCopy).toContain(phrase);
-    }
-    expect(publicCopy).not.toMatch(/healing journey|hidden motive revealed|diagnose the relationship/i);
-  });
-
-  it('uses interactive product structures instead of a grid of marketing claims', () => {
-    expect(landing).toContain('<LivingSovereignAnswer />');
-    expect(landing).toContain('<PublicAnswerStage');
-    expect(landing).toContain('<SystemMap />');
+  it('presents one intelligence environment across self, relationship, and system scales', () => {
+    expect(landing).toContain('ONE INTELLIGENCE · THREE CONNECTED SCALES');
+    expect(landing).toContain('The question changes. The environment stays the same.');
+    expect(landing).toContain('Yourself');
+    expect(landing).toContain('Relationship');
+    expect(landing).toContain('System');
     expect(landing).toContain('role="tablist"');
     expect(landing).toContain('role="tabpanel"');
     expect(landing).toContain('aria-live="polite"');
   });
 
-  it('uses exact data-only Basis fixtures after plain-language value', () => {
-    expect(landing).toContain('Sanitized demonstration · Not your Baseline');
-    for (const value of ['HD G13.1', 'GK ACT13', 'N LP1', '☉ CAN 04.2°']) expect(landing).toContain(value);
-    expect(landing).toContain('Exact source details');
-    expect(landing).toContain('Basis supports an interpretation; it does not prove personality, motive, behavior, or outcome.');
-    expect(landing).not.toContain('pressure concentrates with you');
+  it('uses product demonstrations instead of a grid of disconnected claims', () => {
+    for (const component of ['<HeroIntelligenceStage />', '<BaselineContextStage />', '<PublicAnswerStage', '<PermissionField />', '<SystemMap />']) {
+      expect(landing).toContain(component);
+    }
+    expect(landing).toContain('A REAL QUESTION · A PERSONAL ANSWER');
+    expect(landing).toContain('Useful language first. Exact support when you want it.');
   });
 
-  it('keeps verified prices, permission, and limits explicit', () => {
-    for (const phrase of ['$20', '$99', '10 Sovereign AI turns', '300 Sovereign AI turns', 'Stripe']) expect(publicCopy).toContain(phrase);
-    expect(landing).toContain('No compatibility score. No mind-reading.');
+  it('keeps exact Basis fixtures secondary to plain-language value', () => {
+    for (const value of ['U✓', 'HD G13.1', 'GK ACT13', 'N LP1', '☉ CAN 04.2°']) expect(landing).toContain(value);
+    expect(landing).toContain('Why this is personal');
+    expect(landing).toContain('supporting values');
+    expect(landing).toContain('Temporary context does not determine behavior.');
+    expect(landing).toContain('STILL UNKNOWN');
+  });
+
+  it('keeps relationship and system intelligence permission-bound', () => {
+    expect(landing).toContain('PERMISSION BEFORE COMPARISON');
+    expect(landing).toContain('Another person remains a person—not a data source you control.');
+    expect(landing).toContain('Their actual motive remains unknown until they speak for themselves.');
+    expect(landing).toContain('No compatibility score. No mind-reading. No one-sided access to another person’s Baseline.');
     expect(faq).toContain('It cannot know another person’s exact feelings, motives, private experience, or future behavior.');
+  });
+
+  it('keeps verified prices, plan limits, correction, and optional Covenant explicit', () => {
+    for (const phrase of ['$0', '$20', '$99', '10 Sovereign AI turns', '300 Sovereign AI turns', 'Review and correct what does not fit', 'Covenant']) {
+      expect(publicCopy).toContain(phrase);
+    }
     expect(policy).toContain('Private account export is not available at launch.');
   });
 
-  it('renders public React routes without runtime copy rewriting', () => {
+  it('renders the public React routes without runtime copy rewriting', () => {
     expect(main).toContain("location.pathname === '/'");
     expect(main).toContain('<PublicLanding />');
     expect(main).toContain('<PublicPolicy kind={publicPolicyKind} />');
@@ -86,12 +90,20 @@ describe('Sovereign.OS public experience', () => {
     expect(main).not.toMatch(/refinement|landing-v2/i);
   });
 
-  it('keeps static pages responsive and consent independently controlled', () => {
+  it('keeps the static public family on the cohesion release assets', () => {
     for (const page of [how, pricing, faq]) {
-      expect(page).toContain('/launch.css?v=20260728-baseline-first');
-      expect(page).toContain('/launch-polish.css?v=20260728-baseline-first');
-      expect(page).toContain('/static-experience.css?v=20260729-visual-sync');
+      expect(page).toContain('/launch.css?v=20260730-cohesion');
+      expect(page).toContain('/launch-polish.css?v=20260730-cohesion');
+      expect(page).toContain('/static-release.css?v=20260730-cohesion');
+      expect(page).toContain('/static-experience.css?v=20260730-cohesion');
     }
+    expect(how).toContain('Set up your Baseline once. Use it wherever life connects.');
+    expect(pricing).toContain('$20');
+    expect(pricing).toContain('$99 / year');
+    expect(faq).toContain('What Sovereign understands. What remains yours to confirm.');
+  });
+
+  it('keeps public pages responsive and consent independently controlled', () => {
     expect(launchCss).toContain('@media (max-width: 680px)');
     expect(launchPolishCss).toContain('prefers-reduced-motion');
     expect(landingCss).toContain('@media (max-width: 760px)');
