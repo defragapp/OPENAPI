@@ -56,13 +56,13 @@ describe('identity-bound multi-user contract', () => {
 
   it('removes owner-side granting and exposes invitee revocation controls', () => {
     expect(workspace).toContain('Send private invitation');
-    expect(app).toContain('Choose what this connection may use.');
+    expect(app).toContain('Choose what Sovereign may use about you.');
     expect(app).not.toContain('>Grant</button>');
-    expect(consentPage).toContain('Manage requested uses.');
+    expect(consentPage).toContain('Review and change each permission.');
     expect(consentPage).toContain('/consent.js?v=20260726-consent-r1');
     expect(consentRuntime).toContain("fetch('/api/v1/invitations/mine'");
     expect(consentRuntime).toContain("deny.textContent = decision === 'denied' ? 'Not allowed' : 'Do not allow'");
-    expect(consentRuntime).toContain("status.textContent = granted ? 'Permission allowed for future use.' : 'Permission revoked for future use.'");
+    expect(consentRuntime).toContain("status.textContent = granted ? 'Permission allowed.' : 'Permission not allowed.'");
     expect(consentRuntime).toContain("method: 'PUT'");
   });
 
