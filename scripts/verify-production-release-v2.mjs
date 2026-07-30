@@ -7,7 +7,11 @@ const directConfig = read('wrangler.production-direct.jsonc');
 const workerConfig = read('apps/sovereign-worker/wrangler.jsonc');
 const modelConfig = read('packages/agent-contracts/src/model-config.ts');
 const runtime = read('apps/sovereign-worker/src/runtime-entry.ts');
+const entry = read('apps/sovereign-worker/src/entry.ts');
 const session = read('apps/sovereign-worker/src/d1-session.ts');
+const capacity = read('apps/sovereign-worker/src/ai/free-tier-capacity.ts');
+const capacityMigration = read('apps/sovereign-worker/migrations/0013_workers_ai_free_capacity.sql');
+const usage = read('apps/sovereign-worker/src/billing/usage.ts');
 const browser = read('apps/web/src/ProductionRuntime.ts');
 const answer = read('apps/sovereign-worker/src/agent/recognition.ts');
 const answerTests = read('apps/sovereign-worker/src/agent/recognition.test.ts');
@@ -53,15 +57,42 @@ requireAll('model config', modelConfig, [
 requireAll('D1 session boundary', session, [
   'db.withSession(bookmark)',
   "readD1Bookmark(request) ?? 'first-primary'",
+  'reserveWorkersAiCapacity(session, model, normalizedInput)',
+  'releaseWorkersAiCapacity(session, reservation)',
   'normalizeWorkersAiInput',
   "output.response_format = { type: 'json_object' }",
   'skipCache: true',
   'collectLog: false'
 ]);
+requireAll('global free capacity', capacity, [
+  'FREE_DAILY_NEURON_BUDGET = 7_500',
+  'INPUT_NEURONS_PER_MILLION_TOKENS = 5_500',
+  'OUTPUT_NEURONS_PER_MILLION_TOKENS = 36_400',
+  'CONSERVATIVE_CHARACTERS_PER_TOKEN = 2',
+  'workers_ai_daily_capacity',
+  'sovereign_free_capacity_reached',
+  'retry-after'
+]);
+requireAll('capacity migration', capacityMigration, [
+  'CREATE TABLE IF NOT EXISTS workers_ai_daily_capacity',
+  'reserved_neurons INTEGER NOT NULL',
+  'request_count INTEGER NOT NULL'
+]);
+requireAll('failed-turn refunds', usage, [
+  'export async function releaseAiTurn',
+  'turns_used = MAX(0, turns_used - 1)'
+]);
+requireAll('entry refund integration', entry, [
+  'releaseAiTurn(env, auth.accountId, usage.periodKey)',
+  "migrationVersion: '0013_workers_ai_free_capacity'"
+]);
 requireAll('runtime D1 integration', runtime, [
   'createD1RequestSession(request, env.DB)',
   'withD1SessionEnv(env, session)',
-  'attachD1Bookmark(response, session)'
+  'attachD1Bookmark(response, session)',
+  "aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing'",
+  "dependencies.aiFreeCapacity === 'configured'",
+  "migrationVersion: '0013_workers_ai_free_capacity'"
 ]);
 requireAll('browser bookmark continuity', browser, [
   "const D1_BOOKMARK_HEADER = 'x-d1-bookmark'",
@@ -97,9 +128,12 @@ requireAll('Cloudflare controls', controls, [
 assert(!controls.includes('http.request.method'), 'Free-plan rate-limit expression must use path-only fields');
 requireAll('production deploy', deploy, [
   "const model = '@cf/zai-org/glm-4.7-flash'",
+  "const migrationVersion = '0013_workers_ai_free_capacity'",
   'configureCloudflareFreeTier',
   "'d1', 'migrations', 'apply'",
   "'deploy', '--config', generatedConfigPath",
+  "dependencies?.aiFreeCapacity === 'configured'",
+  'dailyNeuronReservationBudget: 7_500',
   'Set up your Baseline once. Use it wherever life connects.',
   '/launch-polish.css?v=20260730-cohesion',
   'ready version is',
