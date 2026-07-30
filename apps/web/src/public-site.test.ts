@@ -122,7 +122,10 @@ describe('Sovereign.OS public experience', () => {
     expect(staticExperienceCss).toContain('margin-inline: 0');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
     expect(notFound).toContain('content="noindex, nofollow"');
-    expect(notFound).toContain('/static-experience.css?v=20260729-visual-sync');
+    expect(notFound).toContain('/launch.css?v=20260730-cohesion');
+    expect(notFound).toContain('/launch-polish.css?v=20260730-cohesion');
+    expect(notFound).toContain('/static-release.css?v=20260730-cohesion');
+    expect(notFound).toContain('/static-experience.css?v=20260730-cohesion');
     expect(notFound).toContain('href="https://sovereign.defrag.app/"');
     expect(notFound).toContain('href="https://app.defrag.app/login"');
     expect(consent).toContain('You decide what another account may use.');
