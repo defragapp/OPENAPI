@@ -71,7 +71,8 @@ export function normalizeGatewayOptions(options: unknown): unknown {
 }
 
 export function attachD1Bookmark(response: Response, session?: D1DatabaseSession): Response {
-  const bookmark = session?.getBookmark();
+  let bookmark: string | null | undefined;
+  try { bookmark = session?.getBookmark(); } catch { return response; }
   if (!bookmark) return response;
 
   const headers = new Headers(response.headers);
