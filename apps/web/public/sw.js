@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sovereign-public-v13';
+const CACHE_NAME = 'sovereign-public-v14';
 const PUBLIC_SHELL = [
   '/',
   '/how-it-works',
@@ -11,7 +11,8 @@ const PUBLIC_SHELL = [
   '/launch.css',
   '/launch-polish.css',
   '/static-release.css',
-  '/static-experience.css'
+  '/static-experience.css',
+  '/platform-public.css'
 ];
 const PUBLIC_ASSETS = new Set(PUBLIC_SHELL.filter((path) => path !== '/'));
 const PUBLIC_NAVIGATION = new Set([
