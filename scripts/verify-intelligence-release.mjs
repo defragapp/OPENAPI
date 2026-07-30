@@ -111,14 +111,15 @@ containsAll('current public product contract', landing, [
 containsAll('responsive workspace', workspaceCss, [
   'min-height: 44px',
   'env(safe-area-inset-bottom)',
-  '@media (max-width: 760px)',
+  '@media (max-width: 900px)',
+  '.mobile-bottom-nav',
   '@media (prefers-reduced-motion: reduce)'
 ]);
 
 containsAll('responsive landing', landingCss, [
   'min-width: 320px',
-  '@media (max-width: 760px)',
-  '@media (max-width: 440px)',
+  '@media (max-width: 900px)',
+  '@media (max-width: 620px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
 
@@ -145,6 +146,7 @@ console.log(JSON.stringify({
   publicProductContract: 'baseline-first-private-ai',
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
   canonicalVisualLayers: ['sovereign-cohesion.css', 'sovereign-modern.css', 'landing-production.css'],
+  responsiveBreakpoints: ['900px', '620px'],
   exactBasis: true,
   contextualCovenant: true
 }, null, 2));
