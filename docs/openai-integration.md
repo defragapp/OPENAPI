@@ -2,54 +2,50 @@
 
 ## Production inference path
 
-Public Sovereign inference uses Cloudflare AI Gateway Unified Billing:
+Public Sovereign inference uses Cloudflare Workers AI through the existing AI Gateway:
 
 ```text
-Authenticated Sovereign Worker → AI binding → AI Gateway `sovereign` → openai/gpt-5.5
+Authenticated Sovereign Worker → AI binding → AI Gateway `sovereign` → @cf/zai-org/glm-4.7-flash
 ```
 
-The Worker does not read a personal or project OpenAI API key. Cloudflare manages the provider credential and deducts inference cost from Unified Billing credits.
+The Worker does not read a personal or project OpenAI API key. The former `openai/gpt-5.5` Unified Billing path is retired for production because the current release is designed around Cloudflare-hosted Free-plan inference.
 
 The reviewed runtime configuration is:
 
 ```text
 AI_PROVIDER=cloudflare-gateway
 AI_GATEWAY_ID=sovereign
-AI_MODEL=openai/gpt-5.5
+AI_MODEL=@cf/zai-org/glm-4.7-flash
 AI_FREE_MONTHLY_TURNS=10
 AI_SOVEREIGN_PLUS_MONTHLY_TURNS=300
 ```
 
-`openai/gpt-5.5` is used because the Cloudflare model catalog currently marks it as supporting Zero Data Retention. A model change requires a catalog/privacy check and behavior eval before release.
+A production model change requires privacy review, response-contract evaluation, cost review, and updates to every Wrangler and release-verification configuration.
 
 ## Worker binding and privacy
 
-The Worker calls `env.AI.run()` with:
+The Worker calls `env.AI.run()` through a request-bound adapter that:
 
-- the configured gateway;
-- cache bypass enabled;
-- request/response logging disabled;
-- pseudonymous account metadata;
-- the effective Stripe-backed plan;
-- reduced Baseline/current context only.
-
-Raw birth input, exact private location, secrets, source paths, and raw account IDs are excluded from model input and Gateway metadata. Gateway Zero Data Retention must also be enabled at the account level; it is separate from request logging.
+- converts the existing prompt shape into Workers AI chat messages;
+- requests structured JSON output;
+- normalizes Workers AI chat-completion output into the stable `output_text` shape;
+- uses the configured Gateway;
+- forces cache bypass for personalized inference;
+- disables persistent request/response logging;
+- sends only reduced authorized Baseline/current context;
+- keeps exact private location, secrets, source paths, and raw account IDs out of prompts and Gateway metadata.
 
 ## Access and allowance boundary
 
-Stripe subscription webhooks project the effective Free or Sovereign+ plan into D1. The message route then reserves one monthly AI turn atomically before inference:
+Stripe subscription webhooks project the effective Free or Sovereign+ plan into D1. Before inference, the message route reserves one monthly user turn atomically:
 
 - Free: 10 turns per UTC calendar month.
 - Sovereign+: 300 turns per UTC calendar month.
 
-The values are environment-configurable but must be reviewed with pricing and Cloudflare spend limits before release. Stripe is a flat subscription; it is not used as metered billing for individual model calls.
+The Workers AI adapter also reserves conservative daily capacity in D1 before each hosted-model call. The production budget is intentionally below Cloudflare's account-wide free allocation so the platform returns a controlled capacity response before the provider hard limit is reached. Failed generation releases the daily reservation and refunds the user's monthly turn.
 
 ## Failure behavior
 
-Production and preview never fall back to direct OpenAI or synthetic interpretation. If the AI binding, Gateway, Unified Billing credits, or private Baseline provider is unavailable, the Worker returns a clear unavailable state and does not invent a result.
+Production and preview never fall back to direct OpenAI or synthetic interpretation. If the AI binding, Gateway, daily free capacity, or private Baseline provider is unavailable, the Worker returns a clear unavailable state and does not invent a result.
 
-References:
-
-- https://developers.cloudflare.com/ai-gateway/features/unified-billing/
-- https://developers.cloudflare.com/ai-gateway/usage/worker-binding-methods/
-- https://developers.cloudflare.com/ai-gateway/features/spend-limits/
+The filename is retained for historical links; this document now describes the canonical Workers AI integration.
