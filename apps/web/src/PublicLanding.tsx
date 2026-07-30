@@ -20,52 +20,52 @@ const basisFixture = [
 const questionAnswers = [
   {
     question: 'Why do I respond this way when pressure rises?',
-    mode: 'ABOUT ME',
+    mode: 'ABOUT YOU',
     headline: 'A real strength may turn into taking over when pressure rises.',
     direct: 'You may be naturally good at creating direction. Under pressure, that same strength can become an attempt to remove uncertainty for everyone—even when the responsibility is not yours.',
-    sections: [['WHAT STAYS TRUE', 'You can create direction without having every detail settled.'], ['UNDER PRESSURE', 'You may take responsibility before anyone has agreed that you have the authority.'], ['AT YOUR BEST', 'You can name the decision, the owner, and the next step without carrying every person’s part.'], ['WHAT FITS', 'The role fits when authority, responsibility, and consequences belong to the same person.']]
+    sections: [['WHAT STAYS TRUE', 'You can create direction without having every detail settled.'], ['UNDER PRESSURE', 'You may take responsibility before anyone has agreed that you have the authority.'], ['AT YOUR BEST', 'You can name the decision, the owner, and the next step without carrying every person’s part.'], ['WHAT MAY WORK BETTER', 'The role works when authority, responsibility, and consequences belong to the same person.']]
   },
   {
-    question: 'Does this decision fit who I am now?',
+    question: 'Does this decision actually work for me?',
     mode: 'A DECISION',
-    headline: 'The opportunity may fit you, but the terms still matter.',
-    direct: 'This choice may use your ability to create direction. The title alone does not make it a fit. You also need enough authority to shape the outcomes you will be responsible for.',
-    sections: [['SUPPORTS THE FIT', 'You would have real decision-making authority and room to create structure.'], ['PULLS AGAINST IT', 'You would be responsible for results you cannot influence.'], ['THE REAL TRADEOFF', 'You would give up some autonomy in exchange for stability.'], ['STILL NEEDED', 'A direct answer about who has final decision rights.']]
+    headline: 'The opportunity may suit you, but the terms still matter.',
+    direct: 'This choice may use your ability to create direction. The title alone does not make it right for you. You also need enough authority to shape the outcomes you will be responsible for.',
+    sections: [['WHAT SUPPORTS THE CHOICE', 'You would have real decision-making authority and room to create structure.'], ['WHAT MAKES IT DIFFICULT', 'You would be responsible for results you cannot influence.'], ['THE TRADEOFF', 'You would give up some autonomy in exchange for stability.'], ['WHAT YOU STILL NEED TO KNOW', 'A direct answer about who has final decision rights.']]
   },
   {
-    question: 'Why does the same moment land differently for us?',
+    question: 'Why do we keep misunderstanding each other?',
     mode: 'A RELATIONSHIP',
     headline: 'You may need to talk sooner. They may need more time before they can respond clearly.',
     direct: 'You may feel better once the question is named. They may need time before their words feel reliable. Your push for clarity can feel like pressure to them, while their silence can make you feel even more uncertain.',
-    sections: [['YOU MAY BE BRINGING', 'Directness that becomes more urgent when the relationship feels unclear.'], ['THEY MAY BE BRINGING', 'A slower route to words. Their actual reason still has to come from them.'], ['WHAT HAPPENS BETWEEN YOU', 'Your urgency reduces their processing time. Their silence increases the uncertainty behind your urgency.'], ['WHAT STILL MUST BE ASKED', 'What the pause means to them and when they are willing to return to the conversation.']]
+    sections: [['WHAT YOU MAY BE BRINGING', 'Directness that becomes more urgent when the relationship feels unclear.'], ['WHAT THEY MAY BE BRINGING', 'A slower route to words. Their actual reason still has to come from them.'], ['HOW YOU AFFECT EACH OTHER', 'Your urgency reduces their processing time. Their silence increases the uncertainty behind your urgency.'], ['WHAT STILL NEEDS TO BE DISCUSSED', 'What the pause means to them and when they are willing to return to the conversation.']]
   },
   {
-    question: 'Why does this responsibility keep landing with me?',
+    question: 'Why does this responsibility keep ending up with me?',
     mode: 'A FAMILY OR TEAM',
     headline: 'You may be carrying the responsibility while someone else still holds the authority.',
     direct: 'People may bring uncertainty to you because you know how to organize it. But if final decisions remain elsewhere, you can become responsible for keeping things together without the power to change the conditions causing the pressure.',
-    sections: [['YOUR ROLE', 'You notice what is disconnected and create enough structure for the group to keep moving.'], ['WHERE PRESSURE BUILDS', 'Responsibility keeps reaching you while formal authority stays somewhere else.'], ['WHAT CHANGES', 'When you stop stabilizing automatically, the group has to show who will decide and who will participate.'], ['WHAT IS UNKNOWN', 'Each person still needs to confirm how they understand the arrangement.']]
+    sections: [['YOUR ROLE', 'You notice what is disconnected and create enough structure for the group to keep moving.'], ['WHERE PRESSURE BUILDS', 'Responsibility keeps reaching you while formal authority stays somewhere else.'], ['WHAT CHANGES', 'When you stop stabilizing automatically, the group has to show who will decide and who will participate.'], ['WHAT STILL NEEDS CONFIRMATION', 'Each person still needs to explain how they understand the arrangement.']]
   }
 ] as const;
 
 const scaleStories = [
   {
     label: 'Yourself',
-    title: 'Understand what is steady and what changes under pressure.',
-    body: 'Explore how you tend to decide, communicate, connect, lead, and respond—without reducing yourself to a label.',
+    title: 'Understand what stays consistent and what changes under pressure.',
+    body: 'Explore how you decide, communicate, connect, lead, and respond without reducing yourself to a label.',
     prompt: 'Why do I keep taking responsibility for everyone else?'
   },
   {
     label: 'Relationship',
-    title: 'See what each person may be bringing and what happens between you.',
-    body: 'Compare two Baselines only after both people agree. Keep your patterns, their patterns, and the interaction separate.',
-    prompt: 'Why does the same moment land differently for us?'
+    title: 'Understand what each person brings and how you affect each other.',
+    body: 'Compare personal context only after both people agree. Keep your experience, their experience, and the interaction distinct.',
+    prompt: 'Why do we keep misunderstanding each other?'
   },
   {
-    label: 'System',
-    title: 'See who decides, who carries responsibility, and where pressure builds.',
-    body: 'Map roles, authority, responsibility, reliance, and missing perspectives across a family, household, or team.',
-    prompt: 'Why does this responsibility keep landing with me?'
+    label: 'Family or team',
+    title: 'See where decisions, responsibility, and pressure become unclear.',
+    body: 'Examine roles, authority, responsibility, reliance, and missing perspectives across a family, household, or team.',
+    prompt: 'Why does this responsibility keep ending up with me?'
   }
 ] as const;
 
@@ -84,36 +84,36 @@ export function PublicLanding() {
           <a href="/pricing">Pricing</a>
           <a href="/faq">Questions</a>
           <a href="/login">Sign in</a>
-          <a className="landing-nav-cta" href="/signup">Build my Baseline</a>
+          <a className="landing-nav-cta" href="/signup">Create my personal foundation</a>
         </nav>
       </header>
 
       <section className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-hero-copy">
-          <p className="landing-kicker">PRIVATE PERSONAL AI</p>
-          <h1 id="landing-title">Ask about your life.<br /><em>Get an answer built around you.</em></h1>
-          <p>Sovereign.OS helps you understand yourself, a decision, a relationship, or a group. Build your private Baseline once so you do not have to explain yourself from scratch every time you ask a question.</p>
-          <div className="landing-actions"><a className="landing-primary" href="/signup">Build my Baseline</a><a className="landing-secondary" href="#answer">See an example answer</a></div>
-          <small>Start free · No card required · Review, correct, or reject any interpretation</small>
+          <p className="landing-kicker">PRIVATE PERSONAL AND RELATIONAL INTELLIGENCE</p>
+          <h1 id="landing-title">Understand yourself.<br /><em>Make clearer decisions. Navigate relationships with context.</em></h1>
+          <p>Sovereign.OS keeps a private personal foundation behind every question, so the answer can reflect how you decide, communicate, respond under pressure, and relate to other people.</p>
+          <div className="landing-actions"><a className="landing-primary" href="/signup">Create my personal foundation</a><a className="landing-secondary" href="#answer">See how Sovereign answers</a></div>
+          <small>Start free · No card required · You control what is used and saved</small>
         </div>
         <HeroIntelligenceStage />
       </section>
 
       <section className="landing-foundation" aria-labelledby="foundation-title">
         <header>
-          <p className="landing-kicker">YOUR PRIVATE STARTING POINT</p>
-          <h2 id="foundation-title">Build one Baseline. Use it across every personal question.</h2>
-          <p>Most AI only knows what you type in the current chat. Your Baseline gives Sovereign a consistent starting point for how you may decide, communicate, learn, connect, lead, and respond under pressure.</p>
+          <p className="landing-kicker">YOUR PERSONAL FOUNDATION</p>
+          <h2 id="foundation-title">Your context should carry forward.</h2>
+          <p>Most AI only knows the current conversation. Sovereign keeps the personal context you choose to create, so future answers can reflect how you decide, communicate, relate, and respond under pressure.</p>
         </header>
         <BaselineContextStage />
       </section>
 
       <section className="landing-section scale-section" aria-labelledby="scale-title">
-        <SectionHeader kicker="YOURSELF · RELATIONSHIPS · GROUPS" title="Use the same personal context wherever the question leads." id="scale-title">
-          Ask about yourself first. Add another person or a wider group only when the question includes them and the required permission exists.
+        <SectionHeader kicker="PERSONAL CLARITY · RELATIONSHIPS · GROUPS" title="Use the same private context across the questions that matter." id="scale-title">
+          Start with yourself. Include another person, family, or team only when the question requires it and the right permission exists.
         </SectionHeader>
         <div className="scale-experience">
-          <nav aria-label="Sovereign intelligence scales" role="tablist">
+          <nav aria-label="Ways Sovereign can help" role="tablist">
             {scaleStories.map((story, index) => <button
               key={story.label}
               id={`scale-tab-${index}`}
@@ -135,10 +135,10 @@ export function PublicLanding() {
       </section>
 
       <section className="landing-section question-section" id="answer" aria-labelledby="questions-title">
-        <SectionHeader kicker="A REAL QUESTION · A DIRECT ANSWER" title="Get the answer first. Open the supporting details when you need them." id="questions-title">
-          Choose a question to see how Sovereign answers personal, decision, relationship, and group questions without blurring facts, interpretation, and what is still unknown.
+        <SectionHeader kicker="SEE HOW SOVEREIGN ANSWERS" title="Start with the answer. Open the reasoning when you need it." id="questions-title">
+          Choose a question to see how Sovereign handles personal, decision, relationship, and group context while keeping interpretation and uncertainty visible.
         </SectionHeader>
-        <div className="landing-question-rail" role="tablist" aria-label="Questions Sovereign can answer">
+        <div className="landing-question-rail" role="tablist" aria-label="Questions Sovereign can help with">
           {questionAnswers.map((item, index) => (
             <button
               key={item.question}
@@ -156,30 +156,30 @@ export function PublicLanding() {
       </section>
 
       <section className="landing-section permission-section" aria-labelledby="permission-title">
-        <SectionHeader kicker="PERMISSION BEFORE COMPARISON" title="You cannot add someone else’s private information without their permission." id="permission-title">
-          The other person connects their own account and chooses what Sovereign may use. Sovereign can explain the interaction without pretending to know their private thoughts or motives.
+        <SectionHeader kicker="PRIVATE BY DESIGN" title="Relationships work only when both people choose what they share." id="permission-title">
+          Each person connects their own account and approves the information used for a relationship or group question. Those choices can be changed later.
         </SectionHeader>
         <PermissionField />
       </section>
 
       <section className="landing-section pricing-preview" aria-labelledby="pricing-title">
-        <SectionHeader kicker="FREE FOR PERSONAL USE · SOVEREIGN+ FOR SHARED CONTEXT" title="Start free for personal questions. Upgrade for relationships and groups." id="pricing-title" />
+        <SectionHeader kicker="START FREE · ADD SHARED CONTEXT WITH SOVEREIGN+" title="Use Free for personal clarity. Add relationships and groups when you need them." id="pricing-title" />
         <div className="pricing-options">
-          <article><span>FREE</span><h3>Understand yourself and your decisions.</h3><p>Build your Baseline. Ask about yourself, what may matter more right now, and the choices in front of you.</p><strong>$0 <small>permanent · no card</small></strong><ul><li>10 Sovereign AI turns each month</li><li>Baseline, Today, Shadow, Gift, and Alignment</li><li>Review and correct what does not fit</li></ul><a href="/signup">Build my Baseline</a></article>
-          <article><span>SOVEREIGN+</span><h3>Add relationships, families, and teams.</h3><p>Compare permitted Baselines, understand group roles and responsibility, save useful insights, and add Covenant when you choose.</p><strong>$20 <small>/ month</small></strong><p className="annual-price">or $99 / year</p><ul><li>300 Sovereign AI turns each month</li><li>People, Systems, Library, and Covenant</li><li>Consent-aware invitations and sharing controls</li></ul><a href="/pricing">Compare plans</a></article>
+          <article><span>FREE</span><h3>Personal clarity and decision support.</h3><p>Create your personal foundation and explore what is steady, what may matter more now, and what deserves attention before you decide.</p><strong>$0 <small>permanent · no card</small></strong><ul><li>10 Sovereign AI turns each month</li><li>Personal foundation, current context, pressure, strengths, and decision clarity</li><li>Review and correct what does not fit</li></ul><a href="/signup">Create my personal foundation</a></article>
+          <article><span>SOVEREIGN+</span><h3>Relationship and group intelligence with permission.</h3><p>Compare approved personal context, understand family or team roles, save useful insights, and add a Christian Scripture perspective when you choose.</p><strong>$20 <small>/ month</small></strong><p className="annual-price">or $99 / year</p><ul><li>300 Sovereign AI turns each month</li><li>Relationships, groups, saved insights, and Christian Scripture perspective</li><li>Consent-aware invitations and sharing controls</li></ul><a href="/pricing">Compare plans</a></article>
         </div>
       </section>
 
       <section className="landing-final" aria-labelledby="final-title">
-        <p className="landing-kicker">A BETTER WAY TO ASK PERSONAL QUESTIONS</p>
-        <h2 id="final-title">Stop explaining yourself from scratch every time.</h2>
-        <p>Build your Baseline once, then ask Sovereign about yourself, a decision, a relationship, or a group.</p>
-        <div className="landing-actions"><a className="landing-primary" href="/signup">Build my Baseline</a><a className="landing-secondary" href="/how-it-works">See how it works</a></div>
-        <small>Interpretation stays visible · Permission stays specific · You keep the final say</small>
+        <p className="landing-kicker">PERSONAL CONTEXT THAT DOES NOT RESET</p>
+        <h2 id="final-title">Create the foundation your future questions can use.</h2>
+        <p>Start with private personal context. Add relationship, group, or temporary context only when it helps answer the question in front of you.</p>
+        <div className="landing-actions"><a className="landing-primary" href="/signup">Create my personal foundation</a><a className="landing-secondary" href="/how-it-works">See how it works</a></div>
+        <small>Interpretation stays visible · Permission stays specific · Your judgment stays central</small>
       </section>
 
       <footer className="landing-footer">
-        <span>Sovereign.OS · Private AI for personal, relationship, and group questions</span>
+        <span>Sovereign.OS · Private personal and relational intelligence</span>
         <nav aria-label="Footer navigation"><a href="/how-it-works">How it works</a><a href="/pricing">Pricing</a><a href="/faq">Questions</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav>
       </footer>
     </main>
@@ -189,28 +189,28 @@ export function PublicLanding() {
 function HeroIntelligenceStage() {
   return (
     <article className="hero-intelligence-stage" aria-label="Sovereign answer demonstration">
-      <div className="hero-baseline-core" aria-label="Conceptual Baseline and current context">
+      <div className="hero-baseline-core" aria-label="Conceptual personal foundation and temporary context">
         <span className="baseline-orbit orbit-one" aria-hidden="true" />
         <span className="baseline-orbit orbit-two" aria-hidden="true" />
         <span className="baseline-orbit orbit-three" aria-hidden="true" />
-        <div><small>YOUR BASELINE</small><strong>Creates direction</strong><em>when nobody owns the decision</em></div>
+        <div><small>YOUR PERSONAL FOUNDATION</small><strong>Creates direction</strong><em>when nobody owns the decision</em></div>
         <p className="baseline-signal signal-one"><b>Communication</b> changes under pressure</p>
         <p className="baseline-signal signal-two"><b>Responsibility</b> may feel more urgent</p>
         <p className="baseline-signal signal-three"><b>Relationship</b> needs a clearer agreement</p>
       </div>
       <section className="hero-answer">
         <header><span>EXAMPLE ANSWER</span><strong>Sovereign · Personal</strong></header>
-        <p className="fixture-label hero-fixture-scope">Sanitized demonstration · Not your Baseline</p>
-        <p className="fixture-label">YOU ASKED</p>
+        <p className="fixture-label hero-fixture-scope">Sanitized demonstration · Not your personal foundation</p>
+        <p className="fixture-label">YOUR QUESTION</p>
         <p className="living-question">“{heroAnswer.question}”</p>
         <div className="living-answer-body">
-          <span>DIRECT ANSWER</span>
+          <span>THE ANSWER</span>
           <h2>{heroAnswer.direct}</h2>
-          <div className="living-connection"><strong>WHY THIS MAY FIT</strong><p>{heroAnswer.connection}</p></div>
-          <aside><strong>TRY THIS</strong>{heroAnswer.experiment}</aside>
+          <div className="living-connection"><strong>WHY THIS MATTERS</strong><p>{heroAnswer.connection}</p></div>
+          <aside><strong>THINGS TO CONSIDER</strong>{heroAnswer.experiment}</aside>
         </div>
         <details className="living-answer-basis">
-          <summary>Open supporting details · {basisFixture.length} values</summary>
+          <summary>See what this is based on · {basisFixture.length} details</summary>
           <BasisSourceList values={basisFixture} />
         </details>
       </section>
@@ -221,10 +221,10 @@ function HeroIntelligenceStage() {
 function BaselineContextStage() {
   return (
     <div className="baseline-context-stage">
-      <div className="baseline-context-core"><span>YOUR BASELINE</span><strong>You often create direction when ownership is unclear.</strong><small>Stable starting point · open to correction</small></div>
-      <div className="baseline-context-line current"><span>TEMPORARY CONTEXT</span><strong>Responsibility may deserve more attention for a limited time.</strong><small>This context does not determine what you will do.</small></div>
+      <div className="baseline-context-core"><span>YOUR PERSONAL FOUNDATION</span><strong>You often create direction when ownership is unclear.</strong><small>Available across future questions · open to correction</small></div>
+      <div className="baseline-context-line current"><span>TEMPORARY CONTEXT</span><strong>Responsibility may deserve more attention for a limited time.</strong><small>This does not determine what you will do.</small></div>
       <div className="baseline-context-line confirmed"><span>WHAT YOU CONFIRMED</span><strong>“Yes, this has felt stronger this week.”</strong></div>
-      <div className="baseline-context-line unknown"><span>WHAT SOVEREIGN CANNOT KNOW</span><strong>How you are actually responding today.</strong></div>
+      <div className="baseline-context-line unknown"><span>WHAT STILL REQUIRES YOUR JUDGMENT</span><strong>How you are actually responding today.</strong></div>
       <PublicBasisStrip values={basisFixture.slice(0, 5)} />
     </div>
   );
@@ -233,7 +233,7 @@ function BaselineContextStage() {
 function PublicAnswerStage({ answer, tabId }: { answer: typeof questionAnswers[number]; tabId: string }) {
   return (
     <article id="question-answer-stage" className="public-answer-stage" role="tabpanel" aria-labelledby={tabId} aria-live="polite">
-      <header><span>{answer.mode}</span><small>POSSIBLE INTERPRETATION</small><h3>{answer.headline}</h3></header>
+      <header><span>{answer.mode}</span><small>REPRESENTATIVE EXAMPLE</small><h3>{answer.headline}</h3></header>
       <p>{answer.direct}</p>
       <div>{answer.sections.map(([label, body]) => <section key={label}><span>{label}</span><p>{body}</p></section>)}</div>
       <PublicBasisStrip values={basisFixture.slice(0, 4)} />
@@ -245,15 +245,15 @@ function PermissionField() {
   const [active, setActive] = useState<'relationship' | 'system'>('relationship');
   return (
     <div className="permission-field">
-      <nav aria-label="Permission demonstration"><button aria-pressed={active === 'relationship'} onClick={() => setActive('relationship')}>Relationship</button><button aria-pressed={active === 'system'} onClick={() => setActive('system')}>Group</button></nav>
+      <nav aria-label="Permission demonstration"><button aria-pressed={active === 'relationship'} onClick={() => setActive('relationship')}>Relationship</button><button aria-pressed={active === 'system'} onClick={() => setActive('system')}>Family or team</button></nav>
       {active === 'relationship' ? (
         <div className="relationship-field-public">
-          <article><span>YOU MAY BE BRINGING</span><strong>You want to name the question quickly.</strong><p>Talking sooner may help you feel less uncertain.</p></article>
-          <div className="between-field"><span>WHAT HAPPENS BETWEEN YOU</span><strong>Your urgency gives them less time. Their silence makes you more urgent.</strong><p>Sovereign can show the pattern without deciding who is right.</p></div>
-          <article><span>THEY MAY BE BRINGING</span><strong>They may need more time before they can answer clearly.</strong><p>Their actual reason remains unknown until they explain it themselves.</p></article>
+          <article><span>WHAT YOU MAY BE BRINGING</span><strong>You want to name the question quickly.</strong><p>Talking sooner may help you feel less uncertain.</p></article>
+          <div className="between-field"><span>HOW YOU AFFECT EACH OTHER</span><strong>Your urgency gives them less time. Their silence makes you more urgent.</strong><p>Sovereign can explain the interaction while keeping each person’s private experience distinct.</p></div>
+          <article><span>WHAT THEY MAY BE BRINGING</span><strong>They may need more time before they can answer clearly.</strong><p>Their actual reason remains theirs to explain.</p></article>
         </div>
       ) : <SystemMap />}
-      <p className="landing-trust-line">No compatibility score. No mind-reading. No access to another person’s Baseline without permission.</p>
+      <p className="landing-trust-line">Each person controls their own information. Shared insight uses only the context both people approved.</p>
     </div>
   );
 }
@@ -269,7 +269,7 @@ function PublicBasisStrip({ values, showSource = false }: {
   return (
     <div className="public-basis">
       <button className="public-basis-strip" type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open}>
-        <strong>SUPPORTING DETAILS</strong>
+        <strong>WHAT THIS IS BASED ON</strong>
         {visible.map((value) => <span key={value.compact} aria-label={value.label}>{value.compact}</span>)}
         {values.length > visible.length && <b>+{values.length - visible.length}</b>}
       </button>
@@ -291,7 +291,7 @@ function usePublicMediaQuery(query: string) {
 
 function BasisSourceList({ values }: { values: ReadonlyArray<typeof basisFixture[number]> }) {
   return (
-    <dl className="public-basis-source" aria-label="Exact source details">
+    <dl className="public-basis-source" aria-label="Supporting source details">
       {values.map((value) => <div key={value.compact}><dt>{value.compact}</dt><dd><span>{value.label}</span><small>{value.time} · {value.uncertainty} uncertainty</small></dd></div>)}
     </dl>
   );
@@ -308,13 +308,13 @@ function SystemMap() {
   const activeConnection = connections[active]!;
   return (
     <div className="public-system-map">
-      <div className="system-members" aria-label="Permitted system participants">
-        <button className="stabilizer" aria-pressed={active === 0} onClick={() => setActive(0)}><strong>Maya</strong><small>Keeps things moving · permitted</small></button>
+      <div className="system-members" aria-label="Approved group participants">
+        <button className="stabilizer" aria-pressed={active === 0} onClick={() => setActive(0)}><strong>Maya</strong><small>Keeps things moving · approved</small></button>
         <button aria-pressed={active === 1} onClick={() => setActive(1)}><strong>Leon</strong><small>Final decision-maker · confirmed</small></button>
-        <button aria-pressed={active === 2} onClick={() => setActive(2)}><strong>Rae</strong><small>Relies on support · permitted</small></button>
+        <button aria-pressed={active === 2} onClick={() => setActive(2)}><strong>Rae</strong><small>Relies on support · approved</small></button>
         <button aria-pressed={active === 3} onClick={() => setActive(3)}><strong>Eli</strong><small>Challenges the usual pattern · supplied</small></button>
       </div>
-      <div className="system-connections" role="tablist" aria-label="Supported system relationships">
+      <div className="system-connections" role="tablist" aria-label="Confirmed group relationships">
         {connections.map((connection, index) => <button
           key={connection[0]}
           id={`system-connection-tab-${index}`}
@@ -327,8 +327,8 @@ function SystemMap() {
         ><span>{connection[1]}</span>{connection[0]}</button>)}
       </div>
       <article id="system-connection-panel" className="active-connection" role="tabpanel" aria-labelledby={`system-connection-tab-${active}`}><span>{activeConnection[1].toUpperCase()}</span><h3>{activeConnection[0]}</h3><p>{activeConnection[2]}</p></article>
-      <aside className="pressure-field"><span>WHERE PRESSURE BUILDS</span><strong>Responsibility reaches Maya. Final authority remains with Leon.</strong><small>This is based on confirmed roles and observations. Each person’s private reason remains unknown.</small></aside>
-      <div className="system-answer-actions"><PublicBasisStrip values={basisFixture.slice(0, 4)} /><button type="button">See a Christian Scripture perspective</button></div>
+      <aside className="pressure-field"><span>WHERE PRESSURE BUILDS</span><strong>Responsibility reaches Maya. Final authority remains with Leon.</strong><small>This is based on confirmed roles and observations. Each person’s private reason remains their own.</small></aside>
+      <div className="system-answer-actions"><PublicBasisStrip values={basisFixture.slice(0, 4)} /><button type="button">Add a Christian Scripture perspective</button></div>
     </div>
   );
 }
