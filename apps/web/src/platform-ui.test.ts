@@ -6,7 +6,11 @@ const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.ts
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
-const styles = `${readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8')}\n${readFileSync(new URL('./experience-reconciliation.css', import.meta.url), 'utf8')}`;
+const styles = [
+  readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8'),
+  readFileSync(new URL('./sovereign-cohesion.css', import.meta.url), 'utf8'),
+  readFileSync(new URL('./sovereign-modern.css', import.meta.url), 'utf8')
+].join('\n');
 
 describe('authenticated product flow', () => {
   it('routes account creation through plan confirmation into one workspace', () => {
@@ -47,7 +51,7 @@ describe('authenticated product flow', () => {
     expect(styles).toContain('.intelligence-sidebar');
     expect(styles).toContain('.intelligence-main');
     expect(styles).toContain('.sovereign-composer');
-    expect(styles).toContain('@media (max-width: 920px)');
+    expect(styles).toContain('@media (max-width: 900px)');
     expect(styles).toContain('min-height: 44px');
   });
 
