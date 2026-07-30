@@ -6,6 +6,7 @@ import {
   normalizeD1Bookmark,
   normalizeGatewayOptions,
   normalizeWorkersAiInput,
+  normalizeWorkersAiOutput,
   readD1Bookmark
 } from './d1-session';
 
@@ -52,6 +53,14 @@ describe('D1 request sessions', () => {
     expect(response.headers.get(D1_BOOKMARK_HEADER)).toBe('bookmark-next');
     await expect(response.json()).resolves.toEqual({ ok: true });
   });
+
+  it('preserves the response when no bookmark can be produced', async () => {
+    const session = { getBookmark: () => { throw new Error('no query executed'); } } as unknown as D1DatabaseSession;
+    const response = attachD1Bookmark(Response.json({ ok: true }), session);
+
+    expect(response.headers.get(D1_BOOKMARK_HEADER)).toBeNull();
+    await expect(response.json()).resolves.toEqual({ ok: true });
+  });
 });
 
 describe('Workers AI free-tier normalization', () => {
@@ -67,9 +76,17 @@ describe('Workers AI free-tier normalization', () => {
     });
   });
 
-  it('leaves non-Workers-AI input unchanged', () => {
+  it('normalizes Cloudflare chat-completion output for existing parsers', () => {
+    expect(normalizeWorkersAiOutput('@cf/zai-org/glm-4.7-flash', {
+      choices: [{ message: { content: '{"ok":true}' } }]
+    })).toEqual({ output_text: '{"ok":true}' });
+  });
+
+  it('leaves non-Workers-AI input and output unchanged', () => {
     const input = { input: 'unchanged', max_output_tokens: 10 };
+    const output = { output_text: 'unchanged' };
     expect(normalizeWorkersAiInput('openai/gpt-5.5', input)).toBe(input);
+    expect(normalizeWorkersAiOutput('openai/gpt-5.5', output)).toBe(output);
   });
 
   it('forces personalized gateway calls to bypass cache and persistent logs', () => {
