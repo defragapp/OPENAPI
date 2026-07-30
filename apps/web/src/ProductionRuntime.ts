@@ -5,6 +5,10 @@ const PRODUCTION_TURNSTILE_SITE_KEY = '0x4AAAAAADhGIF8-iOLIg8MU';
 const STRIPE_HANDOFF_HOSTS = new Set(['checkout.stripe.com', 'billing.stripe.com']);
 const TURNSTILE_STATE_EVENT = 'sovereign:turnstile-state';
 const TURNSTILE_RESET_EVENT = 'sovereign:turnstile-reset';
+const D1_BOOKMARK_HEADER = 'x-d1-bookmark';
+const D1_BOOKMARK_STORAGE_KEY = 'sovereign:d1-bookmark';
+const MAX_D1_BOOKMARK_LENGTH = 1_024;
+const CONTROL_CHARACTER = /[\u0000-\u001F\u007F]/;
 
 type TurnstileState = 'loading' | 'ready' | 'verified' | 'expired' | 'error' | 'unsupported';
 type TurnstileApi = {
@@ -131,17 +135,30 @@ function installTurnstile(): void {
 
 function installFetchObserver(): void {
   const nativeFetch = window.fetch.bind(window);
+  let d1Bookmark = readStoredD1Bookmark();
 
   window.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    const response = await nativeFetch(input, init);
     const requestUrl = resolveRequestUrl(input);
+    const isSameOriginApi = requestUrl.origin === location.origin && requestUrl.pathname.startsWith('/api/');
+    const [requestInput, requestInit] = isSameOriginApi
+      ? withD1Bookmark(input, init, d1Bookmark)
+      : [input, init];
+    const response = await nativeFetch(requestInput, requestInit);
 
-    if (requestUrl.origin === location.origin && requestUrl.pathname.startsWith('/api/')) {
+    if (isSameOriginApi) {
+      const nextBookmark = normalizeD1Bookmark(response.headers.get(D1_BOOKMARK_HEADER));
+      if (nextBookmark) {
+        d1Bookmark = nextBookmark;
+        storeD1Bookmark(nextBookmark);
+      }
+
       if (response.status === 401 && isWorkspaceLocation()) {
         setTimeout(() => location.assign(`/login?returnTo=${encodeURIComponent(location.pathname + location.search)}`), 50);
       }
 
       if (response.ok && requestUrl.pathname.startsWith('/api/v1/auth/logout')) {
+        d1Bookmark = undefined;
+        clearStoredD1Bookmark();
         setTimeout(() => location.assign('/login'), 50);
       }
 
@@ -163,6 +180,55 @@ function installFetchObserver(): void {
 
     return response;
   }) as typeof window.fetch;
+}
+
+function withD1Bookmark(
+  input: RequestInfo | URL,
+  init: RequestInit | undefined,
+  bookmark: string | undefined
+): [RequestInfo | URL, RequestInit | undefined] {
+  if (!bookmark) return [input, init];
+
+  if (input instanceof Request) {
+    const headers = new Headers(input.headers);
+    new Headers(init?.headers).forEach((value, key) => headers.set(key, value));
+    headers.set(D1_BOOKMARK_HEADER, bookmark);
+    return [new Request(input, { ...init, headers }), undefined];
+  }
+
+  const headers = new Headers(init?.headers);
+  headers.set(D1_BOOKMARK_HEADER, bookmark);
+  return [input, { ...init, headers }];
+}
+
+function normalizeD1Bookmark(value: string | null | undefined): string | undefined {
+  const bookmark = value?.trim();
+  if (!bookmark || bookmark.length > MAX_D1_BOOKMARK_LENGTH || CONTROL_CHARACTER.test(bookmark)) return undefined;
+  return bookmark;
+}
+
+function readStoredD1Bookmark(): string | undefined {
+  try {
+    return normalizeD1Bookmark(sessionStorage.getItem(D1_BOOKMARK_STORAGE_KEY));
+  } catch {
+    return undefined;
+  }
+}
+
+function storeD1Bookmark(bookmark: string): void {
+  try {
+    sessionStorage.setItem(D1_BOOKMARK_STORAGE_KEY, bookmark);
+  } catch {
+    // Session continuity remains correct within the current request when storage is unavailable.
+  }
+}
+
+function clearStoredD1Bookmark(): void {
+  try {
+    sessionStorage.removeItem(D1_BOOKMARK_STORAGE_KEY);
+  } catch {
+    // Nothing else is required when storage is unavailable.
+  }
 }
 
 function isBillingHandoffPath(pathname: string): boolean {
