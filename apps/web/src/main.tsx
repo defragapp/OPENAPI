@@ -8,6 +8,7 @@ import { EmailCodeFallback, installEmailCodeFallbackRuntime } from './EmailCodeF
 import { ProductCompletionLayer, installProductRuntime } from './ProductCompletionLayer';
 import { installBaselineInputRuntime } from './BaselineInputRuntime';
 import { installDialogAccessibility } from './dialog-accessibility';
+import { installPrivateAnswerExportRuntime } from './PrivateAnswerExportRuntime';
 import { installProductionRuntime } from './ProductionRuntime';
 import { PublicLanding } from './PublicLanding';
 import { PublicPolicy } from './PublicPolicy';
@@ -32,12 +33,14 @@ import './sovereign-modern.css';
 import './landing-production.css';
 import './interface-composition.css';
 import './premium-surfaces.css';
+import './premium-surface-hardening.css';
 
 installProductionRuntime();
 installProductRuntime();
 installEmailCodeFallbackRuntime();
 installBaselineInputRuntime();
 installDialogAccessibility();
+installPrivateAnswerExportRuntime();
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   if (location.hostname === 'sovereign.defrag.app') {
