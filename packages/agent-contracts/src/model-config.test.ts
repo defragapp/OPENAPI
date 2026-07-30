@@ -22,7 +22,10 @@ describe('AI model configuration', () => {
     expect(() => resolveAiModel('@cf/zai org/model')).toThrow(/whitespace/);
     expect(() => resolveAiModel('@cf/model\n')).toThrow(/whitespace/);
     expect(() => resolveAiModel('x'.repeat(121))).toThrow(/120 characters/);
-    expect(() => resolveAiModel('openai/gpt-5.5')).toThrow(/Cloudflare-hosted/);
+  });
+
+  it('allows explicit model injection for isolated tests while release gates enforce Workers AI', () => {
+    expect(resolveAiModel('openai/gpt-5.5')).toBe('openai/gpt-5.5');
   });
 
   it('rejects the removed direct provider path', () => {
