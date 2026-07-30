@@ -33,6 +33,7 @@ The founder-approved public contract is defined in [`docs/launch-product-contrac
 - Production model: `@cf/zai-org/glm-4.7-flash`
 - Personalized inference bypasses Gateway cache and persistent prompt logging
 - D1-backed daily free-capacity reservations stop inference before the account-wide Workers AI free allocation is exhausted
+- Daily capacity schema: `0013_workers_ai_free_capacity`
 - Static assets for high-volume browser delivery
 - D1-scheduled background work every 15 minutes
 - Stripe-hosted Checkout and Customer Portal
@@ -40,6 +41,8 @@ The founder-approved public contract is defined in [`docs/launch-product-contrac
 - Resend transactional email fallback for magic links
 - Turnstile-protected signup and login
 - iOS-optimized Progressive Web App on the public hostname only
+
+The release gate verifies that personalized inference bypasses Gateway cache and persistent prompt logging.
 
 Cloudflare Queue and R2 are intentionally disabled. Private export is not part of the launch product. Sharing sends only the public Sovereign.OS link and includes no private workspace data.
 
