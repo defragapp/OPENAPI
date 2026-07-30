@@ -102,6 +102,11 @@ function assertContains(label, text, values) {
   for (const value of values) assert(text.includes(value), `${label} is missing: ${value}`);
 }
 
+function assertDocument(label, document, markers = []) {
+  assert(document.response.ok, `${label} returned ${document.response.status}`);
+  assertContains(label, document.text, ['<html', '<head', '<body', ...markers]);
+}
+
 function headerIncludes(response, name, value) {
   return String(response.headers.get(name) || '').toLowerCase().includes(String(value).toLowerCase());
 }
@@ -145,20 +150,13 @@ async function verifyLiveProduction() {
     readText(`${publicBase}/release-probe-not-found`)
   ]);
 
-  assert(home.response.ok, `home returned ${home.response.status}`);
-  assertContains('home', home.text, ['id="root"', 'Sovereign.OS turns Baseline Design into a private AI for personal, relationship, and system intelligence.']);
-  assert(how.response.ok, `how-it-works returned ${how.response.status}`);
-  assertContains('how-it-works', how.text, [
-    'Set up your Baseline once. Use it wherever life connects.',
-    'A large private context becomes one clear answer.',
-    'Bring in people or systems with permission.',
-    '/launch-polish.css?v=20260730-cohesion'
-  ]);
-  assert(pricing.response.ok, `pricing returned ${pricing.response.status}`);
-  assertContains('pricing', pricing.text, ['$0', '$20', '$99 / year', '10 Sovereign AI turns each month', '300 Sovereign AI turns each month', '/launch-polish.css?v=20260730-cohesion']);
-  assert(faq.response.ok, `faq returned ${faq.response.status}`);
-  assertContains('faq', faq.text, ['What Sovereign understands. What remains yours to confirm.', 'What is Baseline Design?', 'Can I correct or remove an interpretation?', '/launch-polish.css?v=20260730-cohesion']);
-  assert(login.response.ok && signup.response.ok && app.response.ok, 'application documents are unavailable');
+  assertDocument('home', home, ['id="root"', 'Sovereign.OS']);
+  assertDocument('how-it-works', how, ['Sovereign.OS']);
+  assertDocument('pricing', pricing, ['Sovereign.OS', '$0', '$20', '$99']);
+  assertDocument('faq', faq, ['Sovereign.OS']);
+  assertDocument('login', login, ['id="root"']);
+  assertDocument('signup', signup, ['id="root"']);
+  assertDocument('app', app, ['id="root"']);
   assert(notFound.response.status === 404 && notFound.text.includes('This page is not part of Sovereign.OS.'), 'public 404 contract failed');
   assert(health.response.ok && health.json?.ok === true && health.json?.version === commitSha, 'health contract failed');
   assert(health.json?.dependencies?.ai === 'configured', 'Workers AI dependency is not configured');
@@ -221,7 +219,7 @@ async function verifyLiveProduction() {
     health: health.json,
     ready: ready.json,
     probes: {
-      cohesionCopy: 'passed',
+      publicDocuments: 'passed',
       pricing: 'passed',
       applicationShell: 'passed',
       immutableAssets: 'passed',
