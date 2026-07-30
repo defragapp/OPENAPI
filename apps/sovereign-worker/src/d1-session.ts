@@ -5,10 +5,10 @@ export const D1_BOOKMARK_HEADER = 'x-d1-bookmark';
 const MAX_D1_BOOKMARK_LENGTH = 1_024;
 const CONTROL_CHARACTER = /[\u0000-\u001F\u007F]/;
 
-export function createD1RequestSession(request: Request, db: D1Database): D1DatabaseSession | undefined {
+export function createD1RequestSession(request: Request, db: D1Database | undefined): D1DatabaseSession | undefined {
   const url = new URL(request.url);
   if (!url.pathname.startsWith('/api/')) return undefined;
-  if (typeof db.withSession !== 'function') return undefined;
+  if (!db || typeof db.withSession !== 'function') return undefined;
 
   const bookmark = readD1Bookmark(request) ?? 'first-primary';
   return db.withSession(bookmark);
