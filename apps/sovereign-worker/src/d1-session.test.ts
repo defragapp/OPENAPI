@@ -4,6 +4,8 @@ import {
   attachD1Bookmark,
   createD1RequestSession,
   normalizeD1Bookmark,
+  normalizeGatewayOptions,
+  normalizeWorkersAiInput,
   readD1Bookmark
 } from './d1-session';
 
@@ -49,5 +51,32 @@ describe('D1 request sessions', () => {
 
     expect(response.headers.get(D1_BOOKMARK_HEADER)).toBe('bookmark-next');
     await expect(response.json()).resolves.toEqual({ ok: true });
+  });
+});
+
+describe('Workers AI free-tier normalization', () => {
+  it('converts Responses-style input into the Cloudflare-hosted model shape', () => {
+    expect(normalizeWorkersAiInput('@cf/zai-org/glm-4.7-flash', {
+      input: 'Return one JSON object.',
+      max_output_tokens: 3_200
+    })).toEqual({
+      messages: [{ role: 'user', content: 'Return one JSON object.' }],
+      max_completion_tokens: 3_200,
+      response_format: { type: 'json_object' },
+      temperature: 0.2
+    });
+  });
+
+  it('leaves non-Workers-AI input unchanged', () => {
+    const input = { input: 'unchanged', max_output_tokens: 10 };
+    expect(normalizeWorkersAiInput('openai/gpt-5.5', input)).toBe(input);
+  });
+
+  it('forces personalized gateway calls to bypass cache and persistent logs', () => {
+    expect(normalizeGatewayOptions({
+      gateway: { id: 'sovereign', skipCache: false, collectLog: true, metadata: { plan: 'free' } }
+    })).toEqual({
+      gateway: { id: 'sovereign', skipCache: true, collectLog: false, metadata: { plan: 'free' } }
+    });
   });
 });
