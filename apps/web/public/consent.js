@@ -1,21 +1,21 @@
 const labels = {
-  'pair.compare': 'Compare your two Baselines',
-  'system.include': 'Include you in a family, household, friendship, or team view',
-  'trait.display': 'Use the plain-language themes you chose to share',
-  'framework.display': 'Show optional supporting framework detail',
-  'current_conditions.use': 'Use your temporary current context',
-  'library.link': 'Link a saved understanding',
-  'covenant.include': 'Include your context in an explicit Scripture lens'
+  'pair.compare': 'Compare our Baselines',
+  'system.include': 'Include me in a group view',
+  'trait.display': 'Use the Baseline details I share',
+  'framework.display': 'Show supporting source details',
+  'current_conditions.use': 'Use my temporary current context',
+  'library.link': 'Use an insight I saved',
+  'covenant.include': 'Include me in a Covenant answer'
 };
 
 const descriptions = {
-  'pair.compare': 'Compare permitted context from both accounts while keeping each person distinct.',
-  'system.include': 'Use your permitted context inside one named group view.',
-  'trait.display': 'Show only the reduced themes you chose to share.',
-  'framework.display': 'Show optional supporting framework details for this connection.',
-  'current_conditions.use': 'Include temporary current context without treating it as confirmed fact.',
-  'library.link': 'Use a saved understanding as shared context for this connection.',
-  'covenant.include': 'Include your context only when the optional Covenant lens is explicitly enabled.'
+  'pair.compare': 'Compare the parts of each Baseline that both people agreed to share.',
+  'system.include': 'Include you in a family, household, friendship, or team view.',
+  'trait.display': 'Use only the plain-language Baseline details you chose to share.',
+  'framework.display': 'Show the exact source details behind shared Baseline information when requested.',
+  'current_conditions.use': 'Use your temporary current context for this shared question.',
+  'library.link': 'Use a saved insight as shared context for this connection.',
+  'covenant.include': 'Include you only when the optional Christian Scripture perspective is turned on.'
 };
 
 const status = document.querySelector('#status');
@@ -29,7 +29,7 @@ async function load() {
     return;
   }
   if (!response.ok) {
-    status.textContent = 'Your permissions could not be loaded safely.';
+    status.textContent = 'We could not load your permissions. Try again.';
     return;
   }
   const data = await response.json();
@@ -40,21 +40,21 @@ function render(invitations) {
   container.replaceChildren();
   if (!invitations.length) {
     status.textContent = 'No accepted invitations are connected to this account.';
-    container.innerHTML = '<p class="consent-empty">When you accept a Sovereign.OS invitation, its requested uses and your decisions will appear here.</p>';
+    container.innerHTML = '<p class="consent-empty">After you accept an invitation, its requested permissions and your choices will appear here.</p>';
     return;
   }
 
-  status.textContent = 'Choose each permission independently.';
+  status.textContent = 'Choose Allow or Do not allow for each permission.';
   for (const invitation of invitations) {
     const article = document.createElement('article');
     article.className = 'consent-invitation';
 
     const heading = document.createElement('h3');
-    heading.textContent = invitation.displayName || 'Shared relationship';
+    heading.textContent = invitation.displayName || 'Private connection';
     article.append(heading);
 
     const note = document.createElement('p');
-    note.textContent = 'Only the uses listed below are being requested.';
+    note.textContent = 'Only the permissions listed below are being requested.';
     article.append(note);
 
     for (const scope of invitation.requestedScopes || []) article.append(scopeRow(invitation, scope));
@@ -71,8 +71,8 @@ function scopeRow(invitation, scope) {
   title.textContent = labels[scope] || scope;
   const detail = document.createElement('small');
   const decision = invitation.decisions?.[scope];
-  const decisionLabel = decision === 'granted' ? 'Currently allowed.' : decision === 'denied' ? 'Not allowed.' : 'No decision yet.';
-  detail.textContent = `${decisionLabel} ${descriptions[scope] || 'Use only the context covered by this permission.'}`;
+  const decisionLabel = decision === 'granted' ? 'Currently allowed.' : decision === 'denied' ? 'Not allowed.' : 'No choice yet.';
+  detail.textContent = `${decisionLabel} ${descriptions[scope] || 'Use only the information covered by this specific permission.'}`;
   copy.append(title, detail);
 
   const actions = document.createElement('div');
@@ -96,19 +96,19 @@ function scopeRow(invitation, scope) {
 
 async function decide(invitationId, scope, granted, row) {
   for (const button of row.querySelectorAll('button')) button.disabled = true;
-  status.textContent = granted ? 'Saving permission…' : 'Revoking permission…';
+  status.textContent = granted ? 'Saving permission…' : 'Saving your choice not to share…';
   const response = await fetch(`/api/v1/invitations/${encodeURIComponent(invitationId)}/consent/${encodeURIComponent(scope)}`, {
     method: 'PUT',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ granted })
   });
   if (!response.ok) {
-    status.textContent = 'That decision could not be saved safely.';
+    status.textContent = 'We could not save that choice. Nothing changed.';
     for (const button of row.querySelectorAll('button')) button.disabled = false;
     return;
   }
-  status.textContent = granted ? 'Permission allowed for future use.' : 'Permission revoked for future use.';
+  status.textContent = granted ? 'Permission allowed.' : 'Permission not allowed.';
   await load();
 }
 
-load().catch(() => { status.textContent = 'Your permissions could not be loaded safely.'; });
+load().catch(() => { status.textContent = 'We could not load your permissions. Try again.'; });
