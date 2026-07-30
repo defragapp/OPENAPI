@@ -2,7 +2,7 @@
 
 Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the only supported production deployment path for Sovereign.OS.
 
-Production is released from one exact commit on `main`. Non-production branch builds remain disabled. Do not run an alternate GitHub Actions deploy, a repository-template deploy, or the retired candidate/migrate/promote scripts.
+Production is released from one exact commit on `main`. Non-production branch builds remain disabled. Do not run an alternate GitHub Actions deploy, a repository-template deploy, or retired candidate/migrate/promote scripts.
 
 ## Production target
 
@@ -11,8 +11,11 @@ Production is released from one exact commit on `main`. Non-production branch bu
 - Authenticated app and API: `https://app.defrag.app`
 - Owned root domain: `defrag.app`
 - D1: `sovereign-openapi-db`
+- D1 Sessions and automatic read replication
 - Durable Object: `ThreadCoordinator`
-- AI: Workers AI through AI Gateway with Unified Billing
+- AI: Cloudflare Workers AI through AI Gateway `sovereign`
+- Model: `@cf/zai-org/glm-4.7-flash`
+- Daily capacity ledger: migration `0013_workers_ai_free_capacity`
 - Assets: compiled web application
 - Background cleanup: scheduled D1 work every 15 minutes
 - R2 and Queue: disabled
@@ -30,6 +33,14 @@ Private account export is disabled for launch. Sharing sends only the public Sov
 - `STRIPE_WEBHOOK_SECRET`
 
 Secret values stay in Cloudflare. Never copy them into repository files, build output, issues, or chat.
+
+The Cloudflare build/deploy environment also requires:
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `VITE_TURNSTILE_SITE_KEY`
+
+These are configured as Cloudflare Workers Builds variables or secrets, not prepended to one command in a shell chain.
 
 ## Transactional email
 
@@ -58,7 +69,7 @@ The command sends the same branded template used by the product, reports the Res
 - Build command:
 
 ```bash
-VITE_TURNSTILE_SITE_KEY=0x4AAAAAADhGIF8-iOLIg8MU corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build
+corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build
 ```
 
 - Deploy command:
@@ -67,16 +78,15 @@ VITE_TURNSTILE_SITE_KEY=0x4AAAAAADhGIF8-iOLIg8MU corepack enable && pnpm install
 pnpm production:deploy
 ```
 
-The build gate verifies the release configuration, migrations, secret scan, production-fixture scan, release contract, type checks, worker and web tests, and production build.
+The build gate verifies release configuration, migrations through `0013_workers_ai_free_capacity`, secret and fixture scans, intelligence and visual contracts, type checks, Worker and web tests, production build, and compressed Worker size.
 
-The deploy command requires the exact Cloudflare build commit SHA. It resolves the existing D1 database, applies forward-only migrations, preserves encrypted Worker secrets, deploys that exact commit, and runs live probes. It fails closed when required secrets or runtime dependencies are missing.
+The deploy command requires the exact Cloudflare build commit SHA. It resolves the existing D1 database, applies forward-only migrations, preserves encrypted Worker secrets, configures Free-plan Cloudflare controls, deploys that exact commit, and runs live probes. It fails closed when required secrets or runtime dependencies are missing.
 
 ## Approval boundary
 
 Do not merge a release branch to `main` until the exact branch commit has:
 
-- green repository and Cloudflare preview checks;
-- protected preview evidence;
+- green repository and protected Cloudflare preview checks;
 - authenticated desktop and iPhone review;
 - reviewed Privacy and Terms;
 - test-mode Checkout, webhook, Portal, cancellation, and Free fallback evidence;
@@ -88,8 +98,9 @@ Merging the approved commit to `main` authorizes Cloudflare Workers Builds to ex
 
 The deploy command must confirm:
 
-- the public and app hostnames serve the exact commit;
-- health and readiness report D1, authentication, AI Gateway, Resend, Stripe, scheduled cleanup, and the disabled private-export boundary correctly;
+- public and app hostnames serve the exact commit;
+- `/ready` reports migration `0013_workers_ai_free_capacity`;
+- D1, D1 Sessions, authentication, AI Gateway, Workers AI capacity, Resend, Stripe, and scheduled cleanup are configured;
 - `dependencies.transactionalEmail` is exactly `resend`;
 - pricing shows Free, $20 monthly, and $99 annual without legacy export or unapproved support placement;
 - unauthenticated protected routes fail closed;
@@ -103,7 +114,7 @@ A deploy command that does not complete these probes is not a completed release.
 
 ## Rollback
 
-Record the previously stable Worker version before merging the approved commit. If rollback is required, use Cloudflare’s version/deployment controls to restore that exact version after explicit approval.
+Record the previously stable Worker version before merging the approved commit. If rollback is required, use Cloudflare version/deployment controls to restore that exact version after explicit approval.
 
 Worker rollback does not reverse D1 migrations or external Stripe and email events. Use forward-repair migrations and confirm database compatibility before restoring an older Worker.
 
