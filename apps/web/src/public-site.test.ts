@@ -45,7 +45,7 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).toContain('ONE INTELLIGENCE · THREE CONNECTED SCALES');
     expect(landing).toContain('The question changes. The environment stays the same.');
     expect(landing).toContain('Yourself');
-    expect(landing).toContain('Relationship');
+    expect(landing).toContain('RELATIONSHIP');
     expect(landing).toContain('System');
     expect(landing).toContain('role="tablist"');
     expect(landing).toContain('role="tabpanel"');
