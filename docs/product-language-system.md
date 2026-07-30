@@ -1,47 +1,85 @@
 # Sovereign.OS product language system
 
-Use this guide for public pages, authentication, onboarding, the authenticated workspace, AI answers, errors, and release tests.
+Use this guide for public pages, authentication, onboarding, the authenticated workspace, AI answers, errors, emails, consent controls, and release tests.
 
 ## Product definition
 
-Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the groups around you. It starts with your Baseline Design, then adds only the current, relational, and system context you choose.
+Sovereign.OS is a private AI for understanding yourself, a decision, a relationship, or a group. It starts with your Baseline, then adds temporary current context or permission-based information from other people only when the question requires it.
 
-A public visitor should understand the interaction before learning framework terminology:
+A new visitor should understand the product before encountering framework terminology:
 
-- ask Sovereign a natural-language question;
-- receive a direct answer built around the person asking;
-- see what is supported, interpretive, confirmed, or still unknown;
-- explore more deeply only when it is useful.
+1. Build a private Baseline once.
+2. Ask a normal question about your life.
+3. Receive a direct answer built around your personal context.
+4. Open the supporting details only when you need them.
+5. Correct or reject anything that does not fit.
 
-Baseline Design is the personal intelligence foundation. It gives Sovereign a consistent reference for how a person may decide, communicate, learn, connect, lead, create, respond under pressure, and grow.
+Baseline is the private personal starting point Sovereign uses across questions about decisions, communication, learning, connection, leadership, boundaries, responsibility, conflict, pressure, and change.
 
-## Brand-language hierarchy
+## Primary public language
 
 ### Product category
 
-`Private personal AI for real life.`
+`Private AI for personal, relationship, and group questions.`
 
 ### Interaction promise
 
 `Ask about your life. Get an answer built around you.`
 
-### Emotional brand statement
+### Supporting explanation
 
-`Healing isn’t optional. Holding the pain is.`
+`Build your Baseline once so you do not have to explain yourself from scratch every time.`
 
-Use the emotional statement only after the product category and interaction are clear. It is not a therapy claim, diagnosis, required reconciliation, or guaranteed outcome.
+### Primary action
 
-### Enduring brand line
+`Build my Baseline`
 
-`Know yourself. Understand the system. Choose what fits.`
+### Secondary action
 
-Use this as a deeper brand statement or closing line. Do not make it carry the full burden of explaining the product.
+`See an example answer`
+
+Brand lines may add character after the product is clear. They must never replace a literal explanation of what the product does.
+
+## Plain-language standard
+
+Every user-facing heading and paragraph must pass these tests:
+
+- A first-time visitor can explain what happens next after one read.
+- The sentence names the actual person, object, action, or decision.
+- The main verb is visible. Avoid noun stacks such as “contextual continuity” or “intelligence environment.”
+- Product terms are explained before they are used as shorthand.
+- Metaphor never carries essential instructions.
+- Internal architecture words never appear as marketing copy.
+- A heading does not depend on the paragraph below it to become understandable.
+- The user can tell what is known, interpreted, temporary, permitted, or unknown.
+- The copy sounds adult and direct, not clinical, mystical, therapeutic, or inspirational.
+
+Prefer:
+
+- `Choose what Sovereign may use about you.`
+- `Use Free for personal questions. Use Sovereign+ for relationships and groups.`
+- `See who decides, who carries responsibility, and where pressure builds.`
+- `Open the supporting details.`
+
+Avoid:
+
+- `Bring the whole structure into view.`
+- `Open the full system.`
+- `Your intelligence begins here.`
+- `The environment stays the same.`
+- `Keep useful understanding.`
 
 ## Voice
 
-Write in clear, adult language. Be calm, specific, and direct. State the central insight before explanation. Make the mechanism visible: capacity, pressure expression, Gift, tradeoff, supported context, and unknowns.
+Write in clear, adult language. Be calm, specific, and direct.
 
-Use uncertainty words only where uncertainty requires them. Do not weaken every sentence.
+- State the answer before the explanation.
+- Use familiar verbs: ask, choose, compare, save, remove, decide, share, confirm.
+- Prefer concrete descriptions of behavior and responsibility over abstract qualities.
+- Explain a tradeoff in ordinary language.
+- Use uncertainty only where uncertainty is real.
+- Keep paragraphs short enough to scan on a phone.
+- Ask one focused question only when the missing answer blocks responsible help.
 
 Do not use generic coaching, inspirational filler, therapy voice, diagnosis, spiritual certainty, specialist-first language, or verdicts about another person.
 
@@ -49,161 +87,204 @@ Do not use generic coaching, inspirational filler, therapy voice, diagnosis, spi
 
 ### Baseline
 
-A stable, explorable reference. It is interpretive and correctable, not a measured psychological fact.
+Internal meaning: a stable, explorable, interpretive personal reference. It is correctable and is not a measured psychological fact.
 
 Public explanation:
 
-`The private personal foundation Sovereign uses to understand where to begin.`
+`The private personal starting point Sovereign uses when answering your questions.`
 
-### Active now
+### Temporary current context
 
-An expiring current-condition layer that may make a Baseline theme more relevant. It does not determine behavior.
+A short-lived layer based on current astronomical conditions. It may make one Baseline topic more relevant for a limited time. It does not determine behavior.
+
+Public explanation:
+
+`Optional temporary context that may make one topic more relevant without predicting what you will do.`
 
 ### Shadow
 
-How a valid quality may narrow, distort, protect, avoid, or overreach under pressure.
+How a useful quality may become narrow, protective, avoidant, controlling, or overextended under pressure.
 
-Public demonstration label may be `Under pressure` while the authenticated contract remains Shadow.
+Public label may be `Under pressure` while the authenticated contract remains Shadow.
 
 ### Gift
 
-What the same quality makes possible when used with awareness and choice.
+What the same quality can make possible when used with awareness and choice.
 
-Public demonstration label may be `At its best` while the authenticated contract remains Gift.
+Public label may be `At your best` while the authenticated contract remains Gift.
 
 ### Alignment
 
-A way to examine whether a choice, behavior, relationship, opportunity, or direction fits the person a user is and is becoming. It is not a score or rule.
+A structured way to compare a choice, role, relationship, or direction with the person’s needs, responsibilities, limits, and actual tradeoffs. It is not a score or rule.
 
-Public demonstration label may be `What fits` while the authenticated contract remains Alignment.
+Public label may be `What fits` while the authenticated contract remains Alignment.
 
 ### Basis
 
-Exact server-approved values that shaped an interpretation. Basis supports reflection; it does not scientifically prove personality or state.
+Exact server-approved values that shaped an interpretation. Basis supports reflection; it does not prove personality or current state.
+
+Public label:
+
+`Supporting details`
+
+Drawer heading:
+
+`What shaped this answer`
 
 ### Covenant
 
-An optional way to explore a relevant question through Christian teaching and clearly cited Scripture. It appears contextually and activates only after confirmation.
+An optional Christian Scripture perspective for a relevant question. It appears only after explicit confirmation and remains separate from the main Baseline answer.
 
 Public action label:
 
-`Explore through Christian Scripture`
+`See a Christian Scripture perspective`
 
 ## Answer language
 
 A normal answer contains:
 
-- a specific headline;
+- a specific, understandable headline;
 - a direct answer;
 - two to five relevant sections;
-- a compact exact Basis line;
-- only relevant actions;
-- a concise correction prompt.
+- optional supporting details;
+- only actions that help with the current question;
+- a concise way to correct the interpretation.
 
-Relationship answers distinguish **You may be bringing**, **They may be bringing**, **What happens between you**, **What each person can own**, and **What still needs to be asked directly**.
+### Required clarity rules for generated answers
 
-System answers distinguish supported roles, authority, responsibility, pressure, change effects, and unknown perspectives.
+- The headline must describe the actual tension or finding. Do not write a slogan.
+- The direct answer must make sense without reading the supporting sections.
+- Define any product term the first time it appears in an answer.
+- Do not use “capacity,” “expression,” “field,” “vector,” “activation,” “orientation,” or “continuity” when a common word is more precise.
+- Use examples of observable behavior instead of abstract personality claims.
+- Never write “you are being asked to,” “life is inviting you to,” or similar implied authority claims.
+- Never hide the practical meaning behind poetic phrasing.
 
-Alignment answers use **Supports the fit**, **Pulls against it**, **The real tradeoff**, **Still needed**, and **A closer version**.
+Relationship answers distinguish:
 
-Covenant answers use **Biblical parallel**, **Scripture**, **Teaching**, **Application**, and **Boundary**.
+- `What you may be bringing`
+- `What they may be bringing`
+- `What happens between you`
+- `What each person can own`
+- `What still needs to be asked directly`
+
+System answers distinguish roles, decision authority, responsibility, reliance, pressure, change effects, and missing perspectives.
+
+Alignment answers use:
+
+- `Supports the fit`
+- `Pulls against it`
+- `The real tradeoff`
+- `Still needed`
+- `A closer version`
+
+Covenant answers use:
+
+- `Biblical parallel`
+- `Scripture`
+- `Teaching`
+- `Application`
+- `Boundary`
 
 ## Public page copy
 
 Hero:
 
-- Kicker: `PERSONAL AI FOR REAL LIFE`
+- Kicker: `PRIVATE PERSONAL AI`
 - Headline: `Ask about your life. Get an answer built around you.`
-- Body: `Sovereign.OS is a private personal AI for understanding yourself, your relationships, and the decisions in front of you. Build your Baseline once, then ask naturally and receive answers grounded in the person asking.`
+- Body: `Sovereign.OS helps you understand yourself, a decision, a relationship, or a group. Build your private Baseline once so you do not have to explain yourself from scratch every time.`
 - Primary action: `Build my Baseline`
-- Secondary action: `See a Sovereign answer`
+- Secondary action: `See an example answer`
 - Trust line: `Start free · No card required · Review, correct, or reject any interpretation`
 
 Primary section language:
 
-- `WHY SOVEREIGN EXISTS`
-- `BRING THE QUESTION YOU ALREADY HAVE`
-- `WHY THIS AI IS DIFFERENT`
-- `ONE QUALITY · MORE THAN ONE EXPRESSION`
-- `TWO PEOPLE · SHARED WITH PERMISSION`
-- `FAMILIES · TEAMS · HUMAN SYSTEMS`
-- `CLEAR ANSWER FIRST`
+- `YOUR PRIVATE STARTING POINT`
+- `YOURSELF · RELATIONSHIPS · GROUPS`
+- `A REAL QUESTION · A DIRECT ANSWER`
+- `PERMISSION BEFORE COMPARISON`
+- `FREE FOR PERSONAL USE · SOVEREIGN+ FOR SHARED CONTEXT`
 
-The first visible answer should use a real-life question, such as:
+Use recognizable questions such as:
 
 - `Why do I keep taking responsibility for everyone else?`
 - `Does this decision fit who I am now?`
 - `Why does the same moment land differently for us?`
 - `Why does this responsibility keep landing with me?`
 
-Do not open the public page with framework terminology, source abbreviations, or a philosophy-only headline.
+Do not open a public page with framework terminology, source abbreviations, a philosophy-only headline, or an internal product metaphor.
 
 ## Authentication
 
 Signup:
 
 - Headline: `Create your Sovereign.OS account.`
-- Body: `Start free. Verify your email, then build your Baseline.`
+- Body: `Start free. Verify your email, choose a plan, and build your Baseline.`
 
 Login:
 
 - Headline: `Sign in to Sovereign.OS.`
-- Body: `Use your email and the available secure sign-in method for your account.`
+- Body: `Enter your email. We will send a one-time sign-in link.`
 
-Do not use privacy slogans or spiritual promises in account access copy.
+Invitation:
+
+- Headline: `Choose what Sovereign may use about you.`
+- Body: `Accepting connects your account. It does not share everything. Review each permission separately, and change your choices later.`
+
+Do not use privacy slogans, legalistic warnings, or spiritual promises in account access copy.
 
 ## Baseline onboarding
 
 - Headline: `Build your Baseline.`
-- Body: `Add your birth details to create the personal foundation Sovereign uses across self, decisions, relationships, and systems.`
+- Body: `Add the birth details Sovereign uses to create your private personal starting point.`
 - Birth date: `Required for the Baseline calculation.`
-- Birthplace: `Used to resolve time and astronomical context.`
-- Birth time: `Improves time-sensitive parts of the calculation.`
-- Birth-time certainty: `Tell us whether the time is exact, approximate, or unknown.`
+- Birthplace: `Used to calculate the astronomical positions for your birth date and time.`
+- Birth time: `Improves the parts of the calculation that depend on time.`
+- Birth-time certainty: `Choose exact, approximate, or unknown.`
 
-Unknown birth time is a supported path. Explain which outputs remain unavailable or have higher uncertainty. Never imply that the Baseline is invalid or fill missing values.
+Unknown birth time is supported. Explain what will be omitted or carry more uncertainty. Never guess missing values.
 
 ## Authenticated surfaces
 
 Today:
 
-- `What is active for you now?`
-- `Begin with what remains steady in your Baseline, then see which parts may be more relevant today.`
+- Heading: `See what is steady and what may matter more right now.`
+- Explanation: `Your Baseline remains the starting point. Temporary current context stays separate.`
 
 Explore:
 
-- `What do you want to understand?`
+- Heading: `Ask about yourself or a decision.`
 
 People:
 
-- `Understand the relationship from both sides.`
-- `Choose someone who has connected their account and permitted comparison, or invite a person to begin.`
+- Heading: `See what each person may be bringing and what happens between you.`
+- Explanation: `Choose someone who connected their account and permitted comparison, or send an invitation.`
 
 Systems:
 
-- `See how the whole group functions.`
-- `Choose a family, household, team, workplace, friendship group, or custom system. Keep roles, authority, responsibility, pressure, and perspective in view.`
+- Heading: `See who decides, who carries responsibility, and where pressure builds.`
+- Explanation: `Choose a family, household, team, workplace, friendship group, or custom group.`
 
 Library:
 
-- `Keep what changes your understanding.`
-- `Save useful Baseline insights, alignment distinctions, relationship understandings, and system views. Library is not a journal or transcript archive.`
+- Heading: `Return to insights you chose to save.`
+- Explanation: `Library contains selected insights, not every conversation.`
 
 You:
 
-- `Your Baseline, plan, permissions, and account.`
+- Heading: `Manage your Baseline, privacy, plan, and account.`
 
 ## Pricing
 
 Free:
 
-- `A personal AI built around you.`
+- `Personal questions and decisions.`
 - $0, permanent, no card.
 - 10 Sovereign AI turns each month.
 
 Sovereign+:
 
-- `Understand the people and systems around you.`
+- `Relationships, families, and teams.`
 - $20 monthly or $99 annually.
 - 300 Sovereign AI turns each month.
 
@@ -221,10 +302,15 @@ Avoid:
 - “this transit means”;
 - “choose yourself”;
 - “return to yourself”;
+- “begin with yourself” as a tagline;
 - “do the work”;
 - “one clean next move” as the whole value;
 - “healing journey”;
 - “unlock your potential”;
 - “become your highest self”;
+- “bring this into view” when a concrete action can be named;
+- “open the full system”;
+- “your intelligence begins here”;
+- “the environment stays the same”;
 - generic “break the cycle” promises;
-- claims of motive, exact emotion, diagnosis, destiny, or guaranteed outcome.
+- claims of motive, exact emotion, diagnosis, destiny, divine intent, or guaranteed outcome.
