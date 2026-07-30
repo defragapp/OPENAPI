@@ -157,7 +157,7 @@ if (landing.includes('Healing isn’t optional. Holding the pain is.')) {
 requireAll('public visual accessibility', landingCss, [
   'font-size:clamp(3.75rem,5.2vw,4.25rem)',
   'min-height:44px',
-  'min-width:320px',
+  'min-width: 320px',
   '@media(max-width:980px)',
   '@media(max-width:760px)',
   '@media(max-width:420px)',
