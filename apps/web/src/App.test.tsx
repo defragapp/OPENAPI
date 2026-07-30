@@ -6,7 +6,11 @@ const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.ts
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
-const styles = `${readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8')}\n${readFileSync(new URL('./experience-reconciliation.css', import.meta.url), 'utf8')}`;
+const styles = [
+  readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8'),
+  readFileSync(new URL('./sovereign-cohesion.css', import.meta.url), 'utf8'),
+  readFileSync(new URL('./sovereign-modern.css', import.meta.url), 'utf8')
+].join('\n');
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const consent = readFileSync(new URL('../public/consent.html', import.meta.url), 'utf8');
 const consentRuntime = readFileSync(new URL('../public/consent.js', import.meta.url), 'utf8');
@@ -22,7 +26,7 @@ describe('Sovereign account and workspace shell', () => {
 
   it('verifies the account before mounting any private product surface', () => {
     expect(authenticatedWorkspace).toContain("fetch('/api/v1/account/onboarding'");
-    expect(authenticatedWorkspace).toContain("location.replace(`/login?returnTo=");
+    expect(authenticatedWorkspace).toContain('location.replace(`/login?returnTo=');
     expect(authenticatedWorkspace).toContain("location.replace('/onboarding')");
     expect(authenticatedWorkspace.indexOf("state !== 'ready'")).toBeLessThan(authenticatedWorkspace.indexOf('<SovereignIntelligenceWorkspace onboardingVerified />'));
     expect(app).toContain('return <PublicNotFound />');
@@ -50,6 +54,7 @@ describe('Sovereign account and workspace shell', () => {
     expect(styles).toContain('safe-area-inset-bottom');
     expect(styles).toContain('min-height: 44px');
     expect(styles).toContain('@media (max-width: 700px)');
+    expect(styles).toContain('@media (max-width: 900px)');
   });
 
   it('uses visible labels across private forms', () => {
