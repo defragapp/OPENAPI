@@ -1,11 +1,12 @@
 import { rmSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const CLOUDFLARE_FREE_LIMIT_BYTES = 3 * 1024 * 1024;
 const INTERNAL_BUDGET_BYTES = 2_500 * 1024;
-const outputDirectory = '../../.artifacts/worker-bundle-size';
+const outputDirectory = resolve(process.cwd(), '.artifacts/worker-bundle-size');
 
-rmSync('.artifacts/worker-bundle-size', { recursive: true, force: true });
+rmSync(outputDirectory, { recursive: true, force: true });
 
 const result = spawnSync('pnpm', [
   '--filter',
