@@ -11,29 +11,33 @@ const membership = readFileSync(new URL('./SystemMembershipManager.tsx', import.
 const premiumCss = readFileSync(new URL('./premium-platform-release.css', import.meta.url), 'utf8');
 const visualCss = readFileSync(new URL('./sovereign-visual-system.css', import.meta.url), 'utf8');
 const viewportCss = readFileSync(new URL('./responsive-viewport-contract.css', import.meta.url), 'utf8');
+const densityCss = readFileSync(new URL('./mobile-density-polish.css', import.meta.url), 'utf8');
 const publicCss = readFileSync(new URL('../public/premium-public-release.css', import.meta.url), 'utf8');
 const how = readFileSync(new URL('../public/how-it-works.html', import.meta.url), 'utf8');
 const pricing = readFileSync(new URL('../public/pricing.html', import.meta.url), 'utf8');
 const faq = readFileSync(new URL('../public/faq.html', import.meta.url), 'utf8');
 const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'utf8');
-const reactVisualSource = `${premiumCss}\n${visualCss}\n${viewportCss}`;
+const reactVisualSource = `${premiumCss}\n${visualCss}\n${viewportCss}\n${densityCss}`;
 
 function expectBalancedCss(source: string) {
   expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
 }
 
 describe('premium platform release', () => {
-  it('loads the viewport contract after the approved visual system', () => {
+  it('loads the mobile density layer after the responsive viewport contract', () => {
     const premiumImport = "import './premium-platform-release.css';";
     const visualImport = "import './sovereign-visual-system.css';";
     const viewportImport = "import './responsive-viewport-contract.css';";
+    const densityImport = "import './mobile-density-polish.css';";
     const premium = main.indexOf(premiumImport);
     const visual = main.indexOf(visualImport);
     const viewport = main.indexOf(viewportImport);
+    const density = main.indexOf(densityImport);
     expect(premium).toBeGreaterThan(-1);
     expect(visual).toBeGreaterThan(premium);
     expect(viewport).toBeGreaterThan(visual);
-    expect(main.slice(viewport + viewportImport.length)).not.toContain("import './");
+    expect(density).toBeGreaterThan(viewport);
+    expect(main.slice(density + densityImport.length)).not.toContain("import './");
   });
 
   it('covers every production-owned React surface without replacing architecture', () => {
@@ -53,14 +57,16 @@ describe('premium platform release', () => {
     expect(workspace).toContain("version: 'sovereign-answer.v2'");
   });
 
-  it('resets the retired hero grid and protects phone-width composition', () => {
+  it('resets the retired hero grid and improves phone scale and density', () => {
     expect(viewportCss).toContain('.sovereign-landing .hero-intelligence-stage');
     expect(viewportCss).toContain('display: block;');
     expect(viewportCss).toContain('grid-template-columns: minmax(0, 1fr);');
     expect(viewportCss).toContain('min-height: 0;');
-    expect(viewportCss).toContain('@media (max-width: 700px)');
-    expect(viewportCss).toContain('.sovereign-landing .permission-section');
-    expect(viewportCss).toContain('.intelligence-scroll');
+    expect(densityCss).toContain('@media (max-width: 700px)');
+    expect(densityCss).toContain('font-size: clamp(3.25rem, 15.8vw, 4.35rem);');
+    expect(densityCss).toContain('padding-block: 62px;');
+    expect(densityCss).toContain('.sovereign-landing .permission-section');
+    expect(densityCss).toContain('display: block;');
   });
 
   it('uses motion to explain chat, reasoning, and systems while respecting reduced motion', () => {
@@ -71,6 +77,7 @@ describe('premium platform release', () => {
     expect(visualCss).toContain('@keyframes sovereign-message-in');
     expect(visualCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(viewportCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(densityCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
   it('preserves working authentication, consent, billing, and Stripe checkout flows', () => {
@@ -100,10 +107,12 @@ describe('premium platform release', () => {
       expectBalancedCss(source);
     }
     expectBalancedCss(viewportCss);
+    expectBalancedCss(densityCss);
     expect(premiumCss).toContain(':focus-visible');
     expect(visualCss).toContain('env(safe-area-inset-bottom)');
     expect(visualCss).toContain('@media print');
     expect(viewportCss).toContain('@media (max-width: 430px)');
+    expect(densityCss).toContain('@media (max-width: 430px)');
     expect(publicCss).toContain('min-width: 320px');
     expect(publicCss).toContain('@media (max-width: 620px)');
   });
