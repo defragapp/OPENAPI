@@ -17,14 +17,16 @@ function passingSnapshot(): PublicLandingViewportSnapshot {
   return {
     viewportWidth: 375,
     scrollWidth: 375,
-    surfaces: surfaceIds.map((id) => ({ id, left: 16, right: 359, width: 343, layoutWidth: 343 })),
+    surfaces: surfaceIds.map((id) => id === 'baseline'
+      ? { id, left: 36, right: 339, width: 303, layoutWidth: 303 }
+      : { id, left: 16, right: 359, width: 343, layoutWidth: 343 }),
     stageGaps: [36, 32, 32, 32],
     permissionStacked: true
   };
 }
 
 describe('public landing rendered viewport contract', () => {
-  it('accepts full-width phone surfaces with 16px gutters', () => {
+  it('accepts full-width workflow surfaces and the intentional Baseline inset', () => {
     expect(evaluatePublicLandingViewport(passingSnapshot())).toMatchObject({ ok: true, failures: [] });
   });
 
