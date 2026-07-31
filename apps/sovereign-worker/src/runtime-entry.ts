@@ -7,6 +7,8 @@ import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import { attachD1Bookmark, createD1RequestSession, withD1SessionEnv } from './d1-session';
 import { getBaselineCompilerStatus } from './baseline-compiler';
 import { startConfirmedBaselineCompilation } from './baseline-compiler-entry';
+import { resolveAndStoreBaselinePlaceCandidates } from './baseline-place-provider';
+import { confirmServerPlaceResolution } from './baseline-place-resolution';
 
 const HEALTH_PATHS = new Set(['/health', '/healthz', '/ready']);
 const STRIPE_WEBHOOK_PATHS = new Set([
@@ -34,6 +36,7 @@ const PUBLIC_ROUTE_ALIASES = new Map([
   ['/questions', '/faq']
 ]);
 const THREAD_MESSAGE_PATH = /^\/api\/v1\/threads\/[^/]+\/messages$/;
+const PLACE_CONFIRM_PATH = /^\/api\/v1\/baseline\/place\/([^/]+)\/confirm$/;
 
 const runtime = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
@@ -79,6 +82,42 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
     return withSecurityHeaders(Response.json({ error: 'not_found' }, { status: 404 }));
   }
 
+  if (request.method === 'POST' && url.pathname === '/api/v1/baseline/place/resolve') {
+    requireSameOrigin(request);
+    const auth = await requireAuth(request, env);
+    try {
+      const candidates = await resolveAndStoreBaselinePlaceCandidates(
+        env,
+        auth.accountId,
+        await request.json().catch(() => ({}))
+      );
+      return withSecurityHeaders(Response.json({
+        candidates,
+        requiresConfirmation: true,
+        attribution: 'GeoNames'
+      }, {
+        headers: { 'cache-control': 'private, no-store' }
+      }));
+    } catch (error) {
+      return baselinePlaceRequestError(error);
+    }
+  }
+
+  const confirmMatch = url.pathname.match(PLACE_CONFIRM_PATH);
+  if (request.method === 'POST' && confirmMatch) {
+    requireSameOrigin(request);
+    const auth = await requireAuth(request, env);
+    try {
+      const resolutionId = decodeURIComponent(confirmMatch[1] ?? '');
+      const resolution = await confirmServerPlaceResolution(env, auth.accountId, resolutionId);
+      return withSecurityHeaders(Response.json({ resolution }, {
+        headers: { 'cache-control': 'private, no-store' }
+      }));
+    } catch (error) {
+      return baselinePlaceRequestError(error);
+    }
+  }
+
   if (request.method === 'POST' && url.pathname === '/api/v1/baseline/onboarding') {
     requireSameOrigin(request);
     const auth = await requireAuth(request, env);
@@ -117,6 +156,34 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
   }
 
   return applicationResponse(request, url.pathname, env, executionContext);
+}
+
+function baselinePlaceRequestError(error: unknown): Response {
+  if (error instanceof Response) return withSecurityHeaders(error);
+  const code = error instanceof Error ? error.message : '';
+  if (error instanceof Error && error.name === 'ZodError') {
+    return withSecurityHeaders(Response.json({
+      error: 'baseline_place_invalid',
+      message: 'Enter a city, region, and country before resolving the birthplace.'
+    }, { status: 400 }));
+  }
+  if (code === 'baseline_place_provider_unconfigured') {
+    return withSecurityHeaders(Response.json({
+      error: code,
+      message: 'Birthplace resolution is not configured.'
+    }, { status: 503 }));
+  }
+  if (code === 'baseline_place_provider_capacity') {
+    return withSecurityHeaders(Response.json({
+      error: code,
+      message: 'Birthplace resolution capacity is temporarily unavailable.'
+    }, { status: 503, headers: { 'retry-after': '300' } }));
+  }
+  console.error('baseline_place_resolution_failure', { error: error instanceof Error ? error.name : 'unknown' });
+  return withSecurityHeaders(Response.json({
+    error: 'baseline_place_resolution_unavailable',
+    message: 'The birthplace could not be resolved. No timezone or coordinates were guessed.'
+  }, { status: 503 }));
 }
 
 function baselineRequestError(error: unknown): Response {
@@ -224,6 +291,8 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && db?.baseline_source_ready === 1
       && db?.baseline_compiler_ready === 1
       && db?.baseline_stages_ready === 1;
+    const placeProviderConfigured = (env.BASELINE_PLACE_PROVIDER ?? 'geonames') === 'geonames'
+      && Boolean(env.BASELINE_GEONAMES_USERNAME);
     const dependencies = {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
       aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing',
@@ -235,7 +304,8 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       baselineCompilerSchema: compilerSchemaConfigured ? 'configured' : 'missing',
       baselineSourceEncryption: env.BASELINE_SOURCE_ENCRYPTION_KEY && env.BASELINE_SOURCE_ENCRYPTION_KEY_VERSION ? 'configured' : 'missing',
       baselineObserver: 'Earth geocenter 500@399',
-      birthplaceResolver: 'implementation-pending',
+      birthplaceResolver: placeProviderConfigured ? 'configured' : 'missing',
+      birthplaceResolverSource: 'GeoNames',
       authentication: authConfigured ? 'configured' : 'missing',
       transactionalEmail: emailProvider,
       publicContactEmail: env.PUBLIC_CONTACT_EMAIL || 'info@defrag.app',
