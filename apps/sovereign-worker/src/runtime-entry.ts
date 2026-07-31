@@ -5,7 +5,7 @@ import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/hea
 import { requireAuth, requireSameOrigin } from './security/auth';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import { attachD1Bookmark, createD1RequestSession, withD1SessionEnv } from './d1-session';
-import { getBaselineCompilerStatus } from './baseline-compiler';
+import { getBaselineCompilerStatus } from './baseline-compiler-status';
 import { startConfirmedBaselineCompilation } from './baseline-compiler-entry';
 import { resolveAndStoreBaselinePlaceCandidates } from './baseline-place-provider';
 import { confirmServerPlaceResolution } from './baseline-place-resolution';
