@@ -14,6 +14,11 @@ import {
   sovereignAnswerJsonContract,
   type SovereignAnswerV2
 } from './recognition';
+import {
+  buildDeterministicSafetyAnswer,
+  decideSovereignInputSafety,
+  type SovereignInputSafetyDecision
+} from './input-safety';
 import type { BasisRegistryItem } from '../baseline-contracts';
 import { assertCovenantSafe, retrieveCovenantContext, type ScripturePassage } from '../covenant/scripture';
 
@@ -35,6 +40,10 @@ export interface SovereignResult {
   basis: BasisRegistryItem[];
 }
 
+export interface SovereignDeterministicSafetyResult extends SovereignResult {
+  decision: SovereignInputSafetyDecision;
+}
+
 export async function runSovereignText(input: string, context: SovereignContext): Promise<string> {
   return (await runSovereignResult(input, context)).text;
 }
@@ -43,8 +52,20 @@ export async function runSovereignStream(input: string, context: SovereignContex
   return oneChunkStream(Promise.resolve((await runSovereignResult(input, context)).text));
 }
 
-export async function runSovereignResult(input: string, context: SovereignContext): Promise<SovereignResult> {
+export function runDeterministicSovereignSafety(input: string): SovereignDeterministicSafetyResult | null {
   assertSafeUserInput(input);
+  const decision = decideSovereignInputSafety(input);
+  if (decision.disposition === 'standard') return null;
+  const answer = buildDeterministicSafetyAnswer(decision);
+  const text = composeSovereignAnswerText(answer);
+  assertSovereignOutputSafety(text, { contract: 'sovereign-answer.v2' });
+  return { text, answer, basis: [], decision };
+}
+
+export async function runSovereignResult(input: string, context: SovereignContext): Promise<SovereignResult> {
+  const deterministicSafety = runDeterministicSovereignSafety(input);
+  if (deterministicSafety) return deterministicSafety;
+
   const aiConfig = resolveAiModelConfig(context.env);
   if (aiConfig.provider !== 'cloudflare-gateway') throw new Error('Only Cloudflare AI Gateway is supported.');
 
@@ -122,7 +143,7 @@ async function buildCloudflareGatewayPrompt(input: string, context: SovereignCon
 Authorization-checked server context, stripped of raw birth inputs, exact private location, secrets, source paths, and private identifiers:
 ${JSON.stringify(authorizedContext)}
 
-Recent thread continuity. Assistant text and user corrections only; no hidden reasoning:
+Validated recent continuity. Bounded answer fields and user corrections only; no raw assistant payload, actions, identifiers, prompts, or hidden reasoning:
 ${JSON.stringify(continuity)}
 
 Authorized exact Basis registry. Select IDs only in basis_refs:
@@ -177,11 +198,16 @@ async function loadRecognitionContinuity(context: SovereignContext): Promise<unk
     ORDER BY te.seq DESC LIMIT 3`).bind(context.threadId, context.accountId).all<Record<string, string>>();
   const corrections = await context.env.DB.prepare(`SELECT correction, note, created_at FROM user_corrections
     WHERE thread_id = ? AND account_id = ? ORDER BY created_at DESC LIMIT 3`).bind(context.threadId, context.accountId).all<Record<string, string | null>>();
-  const userCorrections = corrections.results ?? [];
+  const correctionRows = corrections.results ?? [];
+  const userCorrections = correctionRows.map((row) => ({
+    correction: row.correction,
+    note: boundedText(row.note, 240),
+    createdAt: normalizeDatabaseTimestamp(row.created_at ?? null)
+  }));
   return {
-    recentAssistantResponses: (events.results ?? []).map((row) => safeJson(row.payload_json)),
+    recentAssistantAnswers: (events.results ?? []).map((row) => projectSafeAssistantContinuity(row.payload_json)),
     userCorrections,
-    basisRegistry: userCorrections.flatMap((row, index): BasisRegistryItem[] => row.correction === 'yes'
+    basisRegistry: correctionRows.flatMap((row, index): BasisRegistryItem[] => row.correction === 'yes'
       ? [{
           id: `user_confirmation.${index + 1}`,
           category: 'user_confirmation',
@@ -193,6 +219,32 @@ async function loadRecognitionContinuity(context: SovereignContext): Promise<unk
           subject: 'self'
         }]
       : [])
+  };
+}
+
+function projectSafeAssistantContinuity(payloadJson: string): Record<string, unknown> {
+  const payload = asRecord(safeJson(payloadJson));
+  const answer = asRecord(payload.answer);
+  if (answer.version !== 'sovereign-answer.v2') return {};
+  const sections = Array.isArray(answer.sections)
+    ? answer.sections.slice(0, 3).map((value) => {
+        const section = asRecord(value);
+        return {
+          id: boundedText(section.id, 40),
+          label: boundedText(section.label, 80),
+          body: boundedText(section.body, 360)
+        };
+      })
+    : [];
+  return {
+    version: 'sovereign-answer.v2',
+    mode: boundedText(answer.mode, 40),
+    headline: boundedText(answer.headline, 180),
+    directAnswer: boundedText(answer.direct_answer, 500),
+    sections,
+    basisRefs: Array.isArray(answer.basis_refs)
+      ? answer.basis_refs.filter((value): value is string => typeof value === 'string').slice(0, 8)
+      : []
   };
 }
 
@@ -311,6 +363,14 @@ async function collectTextStream(stream: ReadableStream<string>): Promise<string
 function safeJson(value: string | undefined): unknown {
   if (!value) return {};
   try { return JSON.parse(value); } catch { return {}; }
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' ? value as Record<string, unknown> : {};
+}
+
+function boundedText(value: unknown, maximum: number): string {
+  return typeof value === 'string' ? value.trim().slice(0, maximum) : '';
 }
 
 function normalizeDatabaseTimestamp(value: string | null): string {
