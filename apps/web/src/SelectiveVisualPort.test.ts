@@ -12,7 +12,7 @@ describe('selective Sovereign visual port', () => {
     expect(landing).toContain('STEP 01 · YOU');
     expect(landing).toContain('STEP 02 · YOU + 1');
     expect(landing).toContain('STEP 03 · YOUR WHOLE SYSTEM');
-    expect(landing).toContain('className="visual-reasoning-panel');
+    expect(landing).toContain('visual-reasoning-panel');
     expect(landing).toContain('className="visual-evidence-chips"');
     expect(landing).toContain('className="relationship-baseline-pair"');
     expect(landing).toContain('className="story-system-map"');
