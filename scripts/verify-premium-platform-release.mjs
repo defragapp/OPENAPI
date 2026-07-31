@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
 const read = (path) => readFileSync(path, 'utf8');
@@ -8,6 +9,7 @@ const balanced = (label, source) => assert((source.match(/{/g) ?? []).length ===
 const main = read('apps/web/src/main.tsx');
 const app = read('apps/web/src/App.tsx');
 const landing = read('apps/web/src/PublicLanding.tsx');
+const landingCss = read('apps/web/src/public-landing.css');
 const viewportProbe = read('apps/web/src/PublicLandingViewportContract.ts');
 const authenticated = read('apps/web/src/AuthenticatedWorkspace.tsx');
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
@@ -19,51 +21,36 @@ const visual = read('apps/web/src/sovereign-visual-system.css');
 const viewport = read('apps/web/src/responsive-viewport-contract.css');
 const publicCss = read('apps/web/public/premium-public-release.css');
 const supportPages = ['how-it-works', 'pricing', 'faq', '404'].map((name) => read(`apps/web/public/${name}.html`));
-const reactCss = `${premium}\n${visual}\n${viewport}`;
 
-const imports = ["import './premium-platform-release.css';", "import './sovereign-visual-system.css';", "import './responsive-viewport-contract.css';"];
-const indexes = imports.map((value) => main.indexOf(value));
-assert(indexes.every((value) => value >= 0), 'A required visual contract import is missing.');
-assert(indexes.every((value, index) => index === 0 || value > indexes[index - 1]), 'React visual layers load in the wrong order.');
-assert(!main.slice(indexes[2] + imports[2].length).includes("import './"), 'A local visual layer loads after the responsive contract.');
+assert(main.includes("import './public-landing.css';"), 'Public landing visual owner is not imported.');
 assert(!main.includes('mobile-density-contract.css'), 'The retired mobile density override is still imported.');
 assert(!/final|refinement|polish.*css|landing-v2/i.test(main), 'A retired override-layer filename is imported.');
 
-requireAll('rendered landing composition', landing, [
-  'data-viewport-contract="public-landing-v1"',
-  'className="story-product-stage"',
-  'data-viewport-surface="permission"',
-  'surface="personal-chat"',
-  'surface="personal-reasoning"',
-  'surface="relationship-chat"',
-  'surface="relationship-reasoning"',
-  'surface="system-map"'
+requireAll('v0 editorial landing', landing, [
+  'className="sovereign-public"', 'data-visual-contract="v0-editorial-reconciliation"',
+  'Know yourself.', 'Understand the system.', 'Choose what fits.',
+  'className="baseline-artifact"', 'className="product-window chat-window"',
+  'className="product-window workflow-window"', 'className="workflow-branches"',
+  'className="system-instrument"', 'className="system-center"',
+  'className="consent-editorial"', 'className="pricing-editorial"',
+  '$20', '$99 / year'
 ]);
-requireAll('responsive viewport contract', viewport, [
-  '.sovereign-landing .sovereign-story-step',
-  '.sovereign-landing [data-viewport-surface]',
-  'width: calc(100% - var(--public-mobile-left) - var(--public-mobile-right));',
-  'min-height: 0;',
-  'transform: none;',
-  'env(safe-area-inset-left)',
-  'env(safe-area-inset-right)',
-  '@media (max-width: 760px)',
-  '@media (max-width: 430px)'
+requireAll('public landing visual owner', landingCss, [
+  '.sovereign-public', '.public-hero', '.baseline-hinge', '.story-grid', '.product-window',
+  '.system-instrument', '.consent-editorial', '.pricing-editorial',
+  '@supports (animation-timeline:view())', '@media (max-width:720px)', '@media (max-width:390px)', '@media (prefers-reduced-motion:reduce)'
 ]);
-requireAll('rendered viewport measurement', viewportProbe, [
-  'getBoundingClientRect()',
-  'node.offsetWidth',
-  'doc.documentElement.scrollWidth',
-  'permissionStacked',
-  'runPublicLandingViewportContract',
-  "new URLSearchParams(location.search).get('viewport-contract') !== '1'"
-]);
-requireAll('visual surfaces', reactCss, ['.sovereign-landing', '.intelligence-workspace', '.relationship-overview', '.system-overview', '.baseline-builder', '.sovereign-answer', '.sovereign-composer', '.visual-demo-window', '.story-system-map']);
+for (const layer of [premium, visual, viewport]) assert(!layer.includes('.sovereign-public'), 'A later visual layer overrides the isolated public route.');
+requireAll('rendered viewport measurement', viewportProbe, ['getBoundingClientRect()', 'node.offsetWidth', 'doc.documentElement.scrollWidth', 'consentStacked', "querySelector<HTMLElement>('.sovereign-public')"]);
 requireAll('canonical workspace', `${authenticated}\n${workspace}`, ['data-workspace-contract="one-room"', '<SovereignIntelligenceWorkspace onboardingVerified />', "type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'", "version: 'sovereign-answer.v2'"]);
 requireAll('auth', app, ["path === '/login'", "path === '/signup'", "path === '/invitation'", '__TURNSTILE_SITE_KEY__']);
 requireAll('billing', `${onboarding}\n${controls}`, ['/api/v1/billing/checkout', '/api/v1/billing/portal']);
 requireAll('consent', membership, ['person.identityBound === true', "person.activeScopes.includes('system.include')"]);
 supportPages.forEach((page) => requireAll('support page', page, ['/premium-public-release.css?v=20260730-final', 'SOVEREIGN.OS']));
-for (const source of [premium, visual, viewport, publicCss]) balanced('visual contract', source);
+for (const source of [landingCss, premium, visual, viewport, publicCss]) balanced('visual contract', source);
+for (const prohibited of ['Healing isn', 'compatibility-score', 'Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'mock-auth', 'fake-answer']) assert(!landing.includes(prohibited), `Public landing contains prohibited value: ${prohibited}`);
 
-console.log(JSON.stringify({ ok: true, release: 'sovereign-rendered-mobile-composition', canonicalWorkspace: 'SovereignIntelligenceWorkspace', answerContract: 'sovereign-answer.v2', renderedViewportProbe: true }, null, 2));
+const visualParity = spawnSync(process.execPath, ['scripts/verify-public-visual-parity.mjs'], { encoding: 'utf8' });
+assert(visualParity.status === 0, `Public visual parity gate failed: ${visualParity.stderr || visualParity.stdout}`);
+
+console.log(JSON.stringify({ ok: true, release: 'sovereign-v0-editorial-reconciliation', canonicalWorkspace: 'SovereignIntelligenceWorkspace', answerContract: 'sovereign-answer.v2', publicVisualOwner: 'public-landing.css', renderedViewportProbe: true }, null, 2));
