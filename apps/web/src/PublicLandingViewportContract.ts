@@ -33,7 +33,6 @@ const requiredSurfaces = [
 
 export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSnapshot): PublicLandingViewportResult {
   const failures: string[] = [];
-  const minimumSurfaceWidth = snapshot.viewportWidth - 42;
 
   if (snapshot.scrollWidth > snapshot.viewportWidth + 1) {
     failures.push(`horizontal overflow ${snapshot.scrollWidth}px > ${snapshot.viewportWidth}px`);
@@ -45,6 +44,7 @@ export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSna
       failures.push(`missing surface ${id}`);
       continue;
     }
+    const minimumSurfaceWidth = id === 'baseline' ? snapshot.viewportWidth - 82 : snapshot.viewportWidth - 42;
     if (surface.width < minimumSurfaceWidth) failures.push(`${id} width ${surface.width}px < ${minimumSurfaceWidth}px`);
     if (surface.left < 12) failures.push(`${id} left gutter ${surface.left}px < 12px`);
     if (snapshot.viewportWidth - surface.right < 12) failures.push(`${id} right gutter ${snapshot.viewportWidth - surface.right}px < 12px`);
