@@ -36,6 +36,7 @@ import './premium-surface-hardening.css';
 import './selective-visual-port.css';
 import './premium-platform-release.css';
 import './sovereign-visual-system.css';
+import './responsive-viewport-contract.css';
 
 installProductionRuntime();
 installProductRuntime();

@@ -10,53 +10,39 @@ const controls = readFileSync(new URL('./AccountControlCenter.tsx', import.meta.
 const membership = readFileSync(new URL('./SystemMembershipManager.tsx', import.meta.url), 'utf8');
 const premiumCss = readFileSync(new URL('./premium-platform-release.css', import.meta.url), 'utf8');
 const visualCss = readFileSync(new URL('./sovereign-visual-system.css', import.meta.url), 'utf8');
+const viewportCss = readFileSync(new URL('./responsive-viewport-contract.css', import.meta.url), 'utf8');
 const publicCss = readFileSync(new URL('../public/premium-public-release.css', import.meta.url), 'utf8');
 const how = readFileSync(new URL('../public/how-it-works.html', import.meta.url), 'utf8');
 const pricing = readFileSync(new URL('../public/pricing.html', import.meta.url), 'utf8');
 const faq = readFileSync(new URL('../public/faq.html', import.meta.url), 'utf8');
 const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'utf8');
-const reactVisualSource = `${premiumCss}\n${visualCss}`;
+const reactVisualSource = `${premiumCss}\n${visualCss}\n${viewportCss}`;
 
 function expectBalancedCss(source: string) {
   expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
 }
 
 describe('premium platform release', () => {
-  it('loads the approved visual system after every existing React composition layer', () => {
-    const selectiveImport = "import './selective-visual-port.css';";
+  it('loads the viewport contract after the approved visual system', () => {
     const premiumImport = "import './premium-platform-release.css';";
     const visualImport = "import './sovereign-visual-system.css';";
-    const selective = main.indexOf(selectiveImport);
+    const viewportImport = "import './responsive-viewport-contract.css';";
     const premium = main.indexOf(premiumImport);
     const visual = main.indexOf(visualImport);
-    expect(selective).toBeGreaterThan(-1);
-    expect(premium).toBeGreaterThan(selective);
+    const viewport = main.indexOf(viewportImport);
+    expect(premium).toBeGreaterThan(-1);
     expect(visual).toBeGreaterThan(premium);
-    expect(main.slice(visual + visualImport.length)).not.toContain("import './");
+    expect(viewport).toBeGreaterThan(visual);
+    expect(main.slice(viewport + viewportImport.length)).not.toContain("import './");
   });
 
   it('covers every production-owned React surface without replacing architecture', () => {
     for (const selector of [
-      '.sovereign-landing',
-      '.sovereign-policy',
-      '.public-not-found',
-      '.private-route-gate',
-      '.account-shell',
-      '.auth-panel',
-      '.plan-onboarding',
-      '.intelligence-workspace',
-      '.today-facet-view',
-      '.explore-editorial',
-      '.relationship-overview',
-      '.system-overview',
-      '.baseline-builder',
-      '.baseline-reveal',
-      '.sovereign-answer',
-      '.sovereign-composer',
-      '.intelligence-context',
-      '.library-grid',
-      '.account-control-dialog',
-      '.system-membership-dialog'
+      '.sovereign-landing', '.sovereign-policy', '.public-not-found', '.private-route-gate',
+      '.account-shell', '.auth-panel', '.plan-onboarding', '.intelligence-workspace',
+      '.today-facet-view', '.explore-editorial', '.relationship-overview', '.system-overview',
+      '.baseline-builder', '.baseline-reveal', '.sovereign-answer', '.sovereign-composer',
+      '.intelligence-context', '.library-grid', '.account-control-dialog', '.system-membership-dialog'
     ]) expect(reactVisualSource).toContain(selector);
 
     expect(authenticated).toContain('data-workspace-contract="one-room"');
@@ -67,18 +53,24 @@ describe('premium platform release', () => {
     expect(workspace).toContain("version: 'sovereign-answer.v2'");
   });
 
+  it('resets the retired hero grid and protects phone-width composition', () => {
+    expect(viewportCss).toContain('.sovereign-landing .hero-intelligence-stage');
+    expect(viewportCss).toContain('display: block;');
+    expect(viewportCss).toContain('grid-template-columns: minmax(0, 1fr);');
+    expect(viewportCss).toContain('min-height: 0;');
+    expect(viewportCss).toContain('@media (max-width: 700px)');
+    expect(viewportCss).toContain('.sovereign-landing .permission-section');
+    expect(viewportCss).toContain('.intelligence-scroll');
+  });
+
   it('uses motion to explain chat, reasoning, and systems while respecting reduced motion', () => {
-    for (const selector of [
-      '.visual-demo-window',
-      '.visual-reasoning-panel',
-      '.story-user-message',
-      '.story-assistant-message',
-      '.story-system-map',
-      '.response-thread'
-    ]) expect(visualCss).toContain(selector);
+    for (const selector of ['.visual-demo-window', '.visual-reasoning-panel', '.story-user-message', '.story-assistant-message', '.story-system-map', '.response-thread']) {
+      expect(visualCss).toContain(selector);
+    }
     expect(visualCss).toContain('@supports (animation-timeline: view())');
     expect(visualCss).toContain('@keyframes sovereign-message-in');
     expect(visualCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(viewportCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
   it('preserves working authentication, consent, billing, and Stripe checkout flows', () => {
@@ -95,22 +87,10 @@ describe('premium platform release', () => {
   });
 
   it('loads the public composition on every static support page', () => {
-    for (const page of [how, pricing, faq, notFound]) {
-      expect(page).toContain('/premium-public-release.css?v=20260730-final');
+    for (const page of [how, pricing, faq, notFound]) expect(page).toContain('/premium-public-release.css?v=20260730-final');
+    for (const selector of ['.launch-nav', '.launch-hero', '.journey-steps', '.baseline-explainer', '.pricing-grid', '.price-card', '.plan-comparison-list', '.faq-list', '.launch-callout', '.not-found-stage', '.launch-footer']) {
+      expect(publicCss).toContain(selector);
     }
-    for (const selector of [
-      '.launch-nav',
-      '.launch-hero',
-      '.journey-steps',
-      '.baseline-explainer',
-      '.pricing-grid',
-      '.price-card',
-      '.plan-comparison-list',
-      '.faq-list',
-      '.launch-callout',
-      '.not-found-stage',
-      '.launch-footer'
-    ]) expect(publicCss).toContain(selector);
   });
 
   it('retains responsive, accessible, reduced-motion, high-contrast, and print behavior', () => {
@@ -119,26 +99,19 @@ describe('premium platform release', () => {
       expect(source).toContain('@media (forced-colors: active)');
       expectBalancedCss(source);
     }
+    expectBalancedCss(viewportCss);
     expect(premiumCss).toContain(':focus-visible');
     expect(visualCss).toContain('env(safe-area-inset-bottom)');
     expect(visualCss).toContain('@media print');
-    expect(visualCss).toContain('@media (max-width: 430px)');
+    expect(viewportCss).toContain('@media (max-width: 430px)');
     expect(publicCss).toContain('min-width: 320px');
     expect(publicCss).toContain('@media (max-width: 620px)');
   });
 
   it('does not add a dashboard, scoring, mock auth, or fake product behavior', () => {
     const productionVisualSource = `${reactVisualSource}\n${publicCss}`;
-    for (const prohibited of [
-      'Alignment Score',
-      'Stability Index',
-      'Growth Rate',
-      'compatibility-score',
-      'Math.random',
-      'localStorage',
-      'mock-auth',
-      'fake-answer',
-      'dashboard-grid'
-    ]) expect(productionVisualSource).not.toContain(prohibited);
+    for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'compatibility-score', 'Math.random', 'localStorage', 'mock-auth', 'fake-answer', 'dashboard-grid']) {
+      expect(productionVisualSource).not.toContain(prohibited);
+    }
   });
 });
