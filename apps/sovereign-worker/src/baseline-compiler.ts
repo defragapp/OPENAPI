@@ -29,6 +29,13 @@ export type BaselineCompilerStage = typeof BASELINE_COMPILER_STAGES[number];
 type CompilerValidationStatus = 'pending' | 'supported_reduced' | 'confirmed' | 'failed';
 type CompilerRunStatus = 'recompute_queued' | 'computing' | 'validation_failed' | 'facet_generation_pending' | 'ready' | 'degraded' | 'cancelled';
 type StageStatus = 'pending' | 'running' | 'completed' | 'unavailable' | 'failed';
+type StageExecutionResult = {
+  status: 'completed' | 'unavailable';
+  output: Record<string, unknown>;
+  validationStatus: CompilerValidationStatus;
+  uncertainty: 'low' | 'medium' | 'high';
+  sourceVersion?: string | undefined;
+};
 
 interface CompilerRunRow {
   id: string;
@@ -230,7 +237,7 @@ async function executeStage(
   run: CompilerRunRow,
   stage: BaselineCompilerStage,
   source: CanonicalBaselineSourceInput
-): Promise<{ status: 'completed' | 'unavailable'; output: Record<string, unknown>; validationStatus: CompilerValidationStatus; uncertainty: 'low' | 'medium' | 'high'; sourceVersion?: string }> {
+): Promise<StageExecutionResult> {
   switch (stage) {
     case 'baseline.resolve_place':
       return {
@@ -383,12 +390,12 @@ async function executeStage(
   }
 }
 
-function unavailableStage(reason: string) {
+function unavailableStage(reason: string): StageExecutionResult {
   return {
-    status: 'unavailable' as const,
+    status: 'unavailable',
     output: { reason, guessed: false },
-    validationStatus: 'pending' as const,
-    uncertainty: 'high' as const
+    validationStatus: 'pending',
+    uncertainty: 'high'
   };
 }
 
@@ -424,7 +431,7 @@ async function completeStage(
   env: Env,
   run: CompilerRunRow,
   stage: BaselineCompilerStage,
-  result: { status: 'completed' | 'unavailable'; output: Record<string, unknown>; validationStatus: CompilerValidationStatus; uncertainty: 'low' | 'medium' | 'high'; sourceVersion?: string }
+  result: StageExecutionResult
 ) {
   await env.DB.prepare(`UPDATE baseline_compiler_stage_results SET
     status = ?, output_json = ?, validation_status = ?, uncertainty = ?, source_version = ?,
