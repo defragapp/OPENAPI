@@ -8,26 +8,31 @@ const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', i
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
 const controls = readFileSync(new URL('./AccountControlCenter.tsx', import.meta.url), 'utf8');
 const membership = readFileSync(new URL('./SystemMembershipManager.tsx', import.meta.url), 'utf8');
-const finalCss = readFileSync(new URL('./premium-platform-release.css', import.meta.url), 'utf8');
+const premiumCss = readFileSync(new URL('./premium-platform-release.css', import.meta.url), 'utf8');
+const visualCss = readFileSync(new URL('./sovereign-visual-system.css', import.meta.url), 'utf8');
 const publicCss = readFileSync(new URL('../public/premium-public-release.css', import.meta.url), 'utf8');
 const how = readFileSync(new URL('../public/how-it-works.html', import.meta.url), 'utf8');
 const pricing = readFileSync(new URL('../public/pricing.html', import.meta.url), 'utf8');
 const faq = readFileSync(new URL('../public/faq.html', import.meta.url), 'utf8');
 const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'utf8');
+const reactVisualSource = `${premiumCss}\n${visualCss}`;
 
 function expectBalancedCss(source: string) {
   expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
 }
 
-describe('premium platform final release', () => {
-  it('loads one final composition layer after every existing React visual layer', () => {
+describe('premium platform release', () => {
+  it('loads the approved visual system after every existing React composition layer', () => {
     const selectiveImport = "import './selective-visual-port.css';";
-    const finalImport = "import './premium-platform-release.css';";
+    const premiumImport = "import './premium-platform-release.css';";
+    const visualImport = "import './sovereign-visual-system.css';";
     const selective = main.indexOf(selectiveImport);
-    const final = main.indexOf(finalImport);
+    const premium = main.indexOf(premiumImport);
+    const visual = main.indexOf(visualImport);
     expect(selective).toBeGreaterThan(-1);
-    expect(final).toBeGreaterThan(selective);
-    expect(main.slice(final + finalImport.length)).not.toContain("import './");
+    expect(premium).toBeGreaterThan(selective);
+    expect(visual).toBeGreaterThan(premium);
+    expect(main.slice(visual + visualImport.length)).not.toContain("import './");
   });
 
   it('covers every production-owned React surface without replacing architecture', () => {
@@ -52,7 +57,7 @@ describe('premium platform final release', () => {
       '.library-grid',
       '.account-control-dialog',
       '.system-membership-dialog'
-    ]) expect(finalCss).toContain(selector);
+    ]) expect(reactVisualSource).toContain(selector);
 
     expect(authenticated).toContain('data-workspace-contract="one-room"');
     expect(authenticated).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
@@ -60,6 +65,20 @@ describe('premium platform final release', () => {
     expect(authenticated).toContain('<SystemMembershipManager />');
     expect(workspace).toContain("type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'");
     expect(workspace).toContain("version: 'sovereign-answer.v2'");
+  });
+
+  it('uses motion to explain chat, reasoning, and systems while respecting reduced motion', () => {
+    for (const selector of [
+      '.visual-demo-window',
+      '.visual-reasoning-panel',
+      '.story-user-message',
+      '.story-assistant-message',
+      '.story-system-map',
+      '.response-thread'
+    ]) expect(visualCss).toContain(selector);
+    expect(visualCss).toContain('@supports (animation-timeline: view())');
+    expect(visualCss).toContain('@keyframes sovereign-message-in');
+    expect(visualCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
   it('preserves working authentication, consent, billing, and Stripe checkout flows', () => {
@@ -75,7 +94,7 @@ describe('premium platform final release', () => {
     expect(membership).toContain('/members`,');
   });
 
-  it('loads the final public composition on every static support page', () => {
+  it('loads the public composition on every static support page', () => {
     for (const page of [how, pricing, faq, notFound]) {
       expect(page).toContain('/premium-public-release.css?v=20260730-final');
     }
@@ -95,21 +114,21 @@ describe('premium platform final release', () => {
   });
 
   it('retains responsive, accessible, reduced-motion, high-contrast, and print behavior', () => {
-    for (const source of [finalCss, publicCss]) {
+    for (const source of [premiumCss, visualCss, publicCss]) {
       expect(source).toContain('@media (prefers-reduced-motion: reduce)');
       expect(source).toContain('@media (forced-colors: active)');
-      expect(source).toContain(':focus-visible');
       expectBalancedCss(source);
     }
-    expect(finalCss).toContain('env(safe-area-inset-bottom)');
-    expect(finalCss).toContain('@media print');
-    expect(finalCss).toContain('@media (max-width: 520px)');
+    expect(premiumCss).toContain(':focus-visible');
+    expect(visualCss).toContain('env(safe-area-inset-bottom)');
+    expect(visualCss).toContain('@media print');
+    expect(visualCss).toContain('@media (max-width: 430px)');
     expect(publicCss).toContain('min-width: 320px');
     expect(publicCss).toContain('@media (max-width: 620px)');
   });
 
   it('does not add a dashboard, scoring, mock auth, or fake product behavior', () => {
-    const productionVisualSource = `${finalCss}\n${publicCss}`;
+    const productionVisualSource = `${reactVisualSource}\n${publicCss}`;
     for (const prohibited of [
       'Alignment Score',
       'Stability Index',
