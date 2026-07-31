@@ -5,7 +5,8 @@ import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/hea
 import { requireAuth, requireSameOrigin } from './security/auth';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import { attachD1Bookmark, createD1RequestSession, withD1SessionEnv } from './d1-session';
-import { getBaselineCompilerStatus, startBaselineCompilation } from './baseline-compiler';
+import { getBaselineCompilerStatus } from './baseline-compiler';
+import { startConfirmedBaselineCompilation } from './baseline-compiler-entry';
 
 const HEALTH_PATHS = new Set(['/health', '/healthz', '/ready']);
 const STRIPE_WEBHOOK_PATHS = new Set([
@@ -36,10 +37,16 @@ const THREAD_MESSAGE_PATH = /^\/api\/v1\/threads\/[^/]+\/messages$/;
 
 const runtime = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
-    const session = createD1RequestSession(request, env.DB);
-    const requestEnv = session ? withD1SessionEnv(env, session) : env;
-    const response = await dispatchRequest(request, requestEnv, executionContext);
-    return attachD1Bookmark(response, session);
+    try {
+      const session = createD1RequestSession(request, env.DB);
+      const requestEnv = session ? withD1SessionEnv(env, session) : env;
+      const response = await dispatchRequest(request, requestEnv, executionContext);
+      return attachD1Bookmark(response, session);
+    } catch (error) {
+      if (error instanceof Response) return withSecurityHeaders(error);
+      console.error('sovereign_runtime_failure', { error: error instanceof Error ? error.name : 'unknown' });
+      return withSecurityHeaders(Response.json({ error: 'Internal error' }, { status: 500 }));
+    }
   },
   queue,
   scheduled
@@ -75,11 +82,15 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
   if (request.method === 'POST' && url.pathname === '/api/v1/baseline/onboarding') {
     requireSameOrigin(request);
     const auth = await requireAuth(request, env);
-    const result = await startBaselineCompilation(env, auth.accountId, await request.json().catch(() => ({})));
-    return withSecurityHeaders(Response.json({ baseline: result }, {
-      status: 202,
-      headers: { 'cache-control': 'private, no-store' }
-    }));
+    try {
+      const result = await startConfirmedBaselineCompilation(env, auth.accountId, await request.json().catch(() => ({})));
+      return withSecurityHeaders(Response.json({ baseline: result }, {
+        status: 202,
+        headers: { 'cache-control': 'private, no-store' }
+      }));
+    } catch (error) {
+      return baselineRequestError(error);
+    }
   }
 
   if (request.method === 'GET' && url.pathname === '/api/v1/baseline/status') {
@@ -106,6 +117,28 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
   }
 
   return applicationResponse(request, url.pathname, env, executionContext);
+}
+
+function baselineRequestError(error: unknown): Response {
+  if (error instanceof Response) return withSecurityHeaders(error);
+  const code = error instanceof Error ? error.message : '';
+  if (error instanceof Error && error.name === 'ZodError') {
+    return withSecurityHeaders(Response.json({
+      error: 'baseline_source_invalid',
+      message: 'The Baseline source details were incomplete or invalid.'
+    }, { status: 400 }));
+  }
+  if (code.startsWith('baseline_source_encryption_key')) {
+    return withSecurityHeaders(Response.json({
+      error: 'baseline_source_storage_unavailable',
+      message: 'Private Baseline source storage is not configured.'
+    }, { status: 503 }));
+  }
+  console.error('baseline_onboarding_failure', { error: error instanceof Error ? error.name : 'unknown' });
+  return withSecurityHeaders(Response.json({
+    error: 'baseline_onboarding_unavailable',
+    message: 'The Baseline could not be queued. Nothing was calculated or saved as complete.'
+  }, { status: 503 }));
 }
 
 async function applicationResponse(request: Request, pathname: string, env: Env, executionContext: ExecutionContext): Promise<Response> {
@@ -159,10 +192,18 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
   try {
     const db = await env.DB.prepare(`SELECT 1 AS ok,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_daily_capacity') AS capacity_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'baseline_place_resolutions') AS baseline_place_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'baseline_source_records') AS baseline_source_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'baseline_compiler_runs') AS baseline_compiler_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'baseline_compiler_stage_results') AS baseline_stages_ready`)
-      .first<{ ok: number; capacity_ready: number; baseline_source_ready: number; baseline_compiler_ready: number; baseline_stages_ready: number }>();
+      .first<{
+        ok: number;
+        capacity_ready: number;
+        baseline_place_ready: number;
+        baseline_source_ready: number;
+        baseline_compiler_ready: number;
+        baseline_stages_ready: number;
+      }>();
     const aiConfig = resolveAiModelConfig(env);
     const emailProvider = transactionalEmailProvider(env);
     const authConfigured = Boolean(
@@ -179,7 +220,8 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && env.STRIPE_CANCEL_URL
       && env.STRIPE_PORTAL_RETURN_URL
     );
-    const compilerSchemaConfigured = db?.baseline_source_ready === 1
+    const compilerSchemaConfigured = db?.baseline_place_ready === 1
+      && db?.baseline_source_ready === 1
       && db?.baseline_compiler_ready === 1
       && db?.baseline_stages_ready === 1;
     const dependencies = {
@@ -193,7 +235,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       baselineCompilerSchema: compilerSchemaConfigured ? 'configured' : 'missing',
       baselineSourceEncryption: env.BASELINE_SOURCE_ENCRYPTION_KEY && env.BASELINE_SOURCE_ENCRYPTION_KEY_VERSION ? 'configured' : 'missing',
       baselineObserver: 'Earth geocenter 500@399',
-      birthplaceResolver: 'confirmed-server-contract',
+      birthplaceResolver: 'implementation-pending',
       authentication: authConfigured ? 'configured' : 'missing',
       transactionalEmail: emailProvider,
       publicContactEmail: env.PUBLIC_CONTACT_EMAIL || 'info@defrag.app',
@@ -214,6 +256,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && dependencies.baselineEngine === 'configured'
       && dependencies.baselineCompilerSchema === 'configured'
       && dependencies.baselineSourceEncryption === 'configured'
+      && dependencies.birthplaceResolver === 'configured'
       && dependencies.authentication === 'configured'
       && dependencies.transactionalEmail === 'resend'
       && dependencies.stripe === 'configured';
@@ -224,7 +267,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       environment: env.APP_ENV,
       migrationVersion: '0014_baseline_compiler_foundation',
       answerContract: 'sovereign-answer.v2',
-      baselineContract: 'baseline-source-input.v2+baseline-source-envelope.v1+baseline-source.v1+baseline-facets.v1',
+      baselineContract: 'baseline-source-submission.v1+baseline-source-input.v2+baseline-source-envelope.v1+baseline-source.v1+baseline-facets.v1',
       dependencies
     }));
   } catch {
