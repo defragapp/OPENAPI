@@ -10,6 +10,7 @@ import { installDialogAccessibility } from './dialog-accessibility';
 import { installPrivateAnswerExportRuntime } from './PrivateAnswerExportRuntime';
 import { installProductionRuntime } from './ProductionRuntime';
 import { PublicLanding } from './PublicLanding';
+import { installPublicLandingViewportContract } from './PublicLandingViewportContract';
 import { PublicPolicy } from './PublicPolicy';
 import { PublicPolicyMetadata } from './PublicPolicyMetadata';
 
@@ -37,7 +38,6 @@ import './selective-visual-port.css';
 import './premium-platform-release.css';
 import './sovereign-visual-system.css';
 import './responsive-viewport-contract.css';
-import './mobile-density-contract.css';
 
 installProductionRuntime();
 installProductRuntime();
@@ -81,3 +81,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </AppErrorBoundary>
   </React.StrictMode>
 );
+
+installPublicLandingViewportContract();
