@@ -1,7 +1,54 @@
 name: One-time Cloudflare production release
-on: push
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sovereign-production-release
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CLOUDFLARE_ACCOUNT_ID: 8b1954d216d65077c6480d62583fe2c2
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      WORKERS_CI_COMMIT_SHA: 46272032bb92a5a8da335510fa4d52ccdfa7b400
+      GITHUB_SHA: ''
     steps:
-      - run: echo ready
+      - name: Check out exact production source
+        uses: actions/checkout@v4
+        with:
+          ref: 46272032bb92a5a8da335510fa4d52ccdfa7b400
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Cloudflare production build
+        run: pnpm verify:cloudflare-build
+
+      - name: Deploy and verify sovv-web
+        run: pnpm production:deploy
+
+      - name: Preserve release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sovereign-production-release-46272032
+          path: production-deployment.json
+          if-no-files-found: ignore
+          retention-days: 7
