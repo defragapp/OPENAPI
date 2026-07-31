@@ -10,6 +10,7 @@ import { getTurn, startTurn, updateTurnStatus } from './db/turns';
 import { getEntitlements } from './db/entitlements';
 import { releaseAiTurn, reserveAiTurn } from './billing/usage';
 import { runSovereignResult } from './agent/sovereign';
+import { decideSovereignInputSafety } from './agent/input-safety';
 import { saveLatestInsightModule } from './db/insight-modules';
 import { canUseDevelopmentFixtures } from './runtime';
 import { clearCurrentConditions, computeCurrentConditions, parseLocationPrecision, type CurrentLocationInput, type LocationPrecision } from './baseline';
@@ -197,6 +198,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
   const body = await request.json().catch(() => ({})) as { message?: string; context?: unknown };
   const message = body.message?.trim();
   if (!message) return Response.json({ error: 'Message required' }, { status: 400 });
+  decideSovereignInputSafety(message);
   const idempotencyKey = request.headers.get('x-idempotency-key');
   if (!idempotencyKey) return Response.json({ error: 'Idempotency key required' }, { status: 400 });
 
