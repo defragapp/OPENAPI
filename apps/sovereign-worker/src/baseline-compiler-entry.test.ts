@@ -37,6 +37,7 @@ function env(): Env {
 
 const canonical = {
   version: 'baseline-source-input.v2',
+  fullBirthName: 'Sample Person',
   birthDate: '1993-07-26',
   birthTimeCertainty: 'exact',
   birthTime: '20:00',
@@ -74,6 +75,7 @@ describe('Baseline compiler entry', () => {
 
   it('ignores the browser timezone and resolves the birthplace on the server', async () => {
     const result = await startConfirmedBaselineCompilation(env(), 'acct_test', {
+      fullBirthName: 'Sample Person',
       birthDate: '1993-07-26',
       birthplace: 'Upland, California, United States',
       birthTimezone: 'Asia/Tokyo',
@@ -94,6 +96,7 @@ describe('Baseline compiler entry', () => {
       'place_12345678-1234-1234-1234-123456789012'
     );
     expect(mocks.resolveCanonical).toHaveBeenCalledWith(env(), 'acct_test', {
+      fullBirthName: 'Sample Person',
       birthDate: '1993-07-26',
       birthTimeCertainty: 'exact',
       birthTime: '20:00',
@@ -103,6 +106,18 @@ describe('Baseline compiler entry', () => {
     expect(JSON.stringify(mocks.resolveCanonical.mock.calls)).not.toContain('Asia/Tokyo');
     expect(JSON.stringify(mocks.resolveCanonical.mock.calls)).not.toContain('birthTimezone');
     expect(mocks.startCompilation).toHaveBeenCalledWith(env(), 'acct_test', canonical);
+  });
+
+  it('rejects a missing birth-record name before any provider call', async () => {
+    await expect(startConfirmedBaselineCompilation(env(), 'acct_test', {
+      birthDate: '1993-07-26',
+      birthplace: 'Upland, California, United States',
+      birthTimeCertainty: 'unknown'
+    })).rejects.toThrow();
+
+    expect(mocks.resolveCandidates).not.toHaveBeenCalled();
+    expect(mocks.confirmResolution).not.toHaveBeenCalled();
+    expect(mocks.startCompilation).not.toHaveBeenCalled();
   });
 
   it('requires explicit clarification when no unique high-confidence place exists', async () => {
@@ -126,6 +141,7 @@ describe('Baseline compiler entry', () => {
     ]);
 
     const response = await startConfirmedBaselineCompilation(env(), 'acct_test', {
+      fullBirthName: 'Sample Person',
       birthDate: '1993-07-26',
       birthplace: 'Springfield, State, United States',
       birthTimeCertainty: 'unknown',
@@ -144,6 +160,7 @@ describe('Baseline compiler entry', () => {
 
   it('rejects birthplace text that omits city, region, or country', async () => {
     const response = await startConfirmedBaselineCompilation(env(), 'acct_test', {
+      fullBirthName: 'Sample Person',
       birthDate: '1993-07-26',
       birthplace: 'Upland, California',
       birthTimeCertainty: 'unknown'
