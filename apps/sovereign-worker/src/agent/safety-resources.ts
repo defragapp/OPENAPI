@@ -1,8 +1,10 @@
-import type { SovereignSafetyResource, SovereignSafetyResponse } from './recognition';
+import type { SovereignSafetyResponse } from './recognition';
 
 export const SAFETY_RESOURCE_CATALOG_VERSION = 'safety-resources.2026-07-31.1' as const;
 
-const reviewedResources: SovereignSafetyResource[] = [
+type SafetyResource = SovereignSafetyResponse['resources'][number];
+
+const reviewedResources: SafetyResource[] = [
   {
     id: 'us-988',
     regions: ['US', 'PR', 'VI', 'GU', 'AS', 'MP'],
@@ -50,7 +52,7 @@ const reviewedResources: SovereignSafetyResource[] = [
 
 export function resourcesForSafetyPresentation(
   presentation: SovereignSafetyResponse['presentation']
-): SovereignSafetyResource[] {
+): SafetyResource[] {
   if (presentation === 'grounded' || presentation === 'secure_refusal') return [];
   return reviewedResources.map((resource) => ({
     ...resource,
