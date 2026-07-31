@@ -40,10 +40,10 @@ import './selective-visual-port.css';
 import './premium-platform-release.css';
 import './sovereign-visual-system.css';
 
-/* Typography and targeted landing corrections load before the canonical responsive contract. */
+/* Shared typography, canonical viewport behavior, then the final public-route contract. */
 import './typography-system.css';
-import './landing-live-correction.css';
 import './responsive-viewport-contract.css';
+import './public-landing-editorial.css';
 
 installProductionRuntime();
 installProductRuntime();
