@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
+import { installPublicLandingViewportContract } from './PublicLandingViewportContract';
 
 type EvidenceItem = { compact: string; label: string };
 type FlowKind = 'feeling' | 'baseline' | 'pattern' | 'next';
@@ -62,6 +63,10 @@ const relationshipFlow: readonly FlowStep[] = [
 ];
 
 export function PublicLanding() {
+  useEffect(() => {
+    installPublicLandingViewportContract();
+  }, []);
+
   return (
     <main className="sovereign-public" data-product-contract="baseline-first" data-answer-contract="sovereign-answer.v2" data-visual-contract="v0-editorial-reconciliation">
       <PublicNav />
