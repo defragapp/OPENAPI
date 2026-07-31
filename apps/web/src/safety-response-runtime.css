@@ -19,10 +19,16 @@
   pointer-events: none;
 }
 
-.sovereign-answer[data-sovereign-safety='urgent']::before {
+.sovereign-answer[data-sovereign-safety='urgent']::before,
+.sovereign-answer[data-sovereign-safety='emergency']::before {
   border-width: 2px;
   border-color: color-mix(in srgb, currentColor 36%, transparent);
   background: color-mix(in srgb, currentColor 7%, transparent);
+}
+
+.sovereign-answer[data-sovereign-safety='supportive-resources']::before {
+  border-color: color-mix(in srgb, currentColor 24%, transparent);
+  background: color-mix(in srgb, currentColor 5%, transparent);
 }
 
 .sovereign-answer[data-sovereign-safety] header > span {
@@ -35,10 +41,74 @@
   margin-top: 24px;
 }
 
+.sovereign-safety-resources {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.sovereign-safety-resources > h3 {
+  margin: 0;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+}
+
+.sovereign-safety-resources article {
+  display: grid;
+  gap: 7px;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: 16px;
+}
+
+.sovereign-safety-resources article > strong,
+.sovereign-safety-resources article > p {
+  margin: 0;
+}
+
+.sovereign-safety-resources article > p {
+  max-width: 68ch;
+  line-height: 1.55;
+}
+
+.sovereign-safety-resources article > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.sovereign-safety-resources a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 9px 13px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: inherit;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.sovereign-safety-resources a:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 3px;
+}
+
 @media (max-width: 640px) {
   .sovereign-answer[data-sovereign-safety]::before {
     inset: -12px;
     border-radius: 20px;
+  }
+
+  .sovereign-safety-resources article > div,
+  .sovereign-safety-resources a {
+    width: 100%;
+  }
+
+  .sovereign-safety-resources a {
+    justify-content: center;
   }
 }
 
