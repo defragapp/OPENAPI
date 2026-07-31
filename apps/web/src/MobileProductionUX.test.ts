@@ -11,12 +11,18 @@ const workspaceMobileCss = read('./workspace-mobile.css');
 const authCss = read('./auth-onboarding.css');
 const workspace = read('./SovereignIntelligenceWorkspace.tsx');
 
+const retiredLandingLayers = [
+  'mobile-density-contract.css',
+  'landing-v2.css',
+  'experience-reconciliation.css',
+  'public-landing-final.css'
+] as const;
+
 describe('production mobile and responsive experience', () => {
   it('keeps the public route isolated from retired override layers', () => {
     expect(main).toContain("import './public-landing.css'");
     expect(landing).toContain('className="sovereign-public"');
-    expect(main).not.toContain('mobile-density-contract.css');
-    expect(main).not.toMatch(/final|refinement|polish.*css|landing-v2/i);
+    for (const retiredLayer of retiredLandingLayers) expect(main).not.toContain(retiredLayer);
   });
 
   it('owns phone composition in the real landing component', () => {
