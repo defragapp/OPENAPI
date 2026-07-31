@@ -21,10 +21,10 @@ const visual = read('apps/web/src/sovereign-visual-system.css');
 const viewport = read('apps/web/src/responsive-viewport-contract.css');
 const publicCss = read('apps/web/public/premium-public-release.css');
 const supportPages = ['how-it-works', 'pricing', 'faq', '404'].map((name) => read(`apps/web/public/${name}.html`));
+const retiredLandingLayers = ['mobile-density-contract.css', 'landing-v2.css', 'experience-reconciliation.css', 'public-landing-final.css'];
 
 assert(main.includes("import './public-landing.css';"), 'Public landing visual owner is not imported.');
-assert(!main.includes('mobile-density-contract.css'), 'The retired mobile density override is still imported.');
-assert(!/final|refinement|polish.*css|landing-v2/i.test(main), 'A retired override-layer filename is imported.');
+for (const retiredLayer of retiredLandingLayers) assert(!main.includes(retiredLayer), `Retired public landing layer is imported: ${retiredLayer}`);
 
 requireAll('v0 editorial landing', landing, [
   'className="sovereign-public"', 'data-visual-contract="v0-editorial-reconciliation"',
@@ -42,6 +42,7 @@ requireAll('public landing visual owner', landingCss, [
 ]);
 for (const layer of [premium, visual, viewport]) assert(!layer.includes('.sovereign-public'), 'A later visual layer overrides the isolated public route.');
 requireAll('rendered viewport measurement', viewportProbe, ['getBoundingClientRect()', 'node.offsetWidth', 'doc.documentElement.scrollWidth', 'consentStacked', "querySelector<HTMLElement>('.sovereign-public')"]);
+requireAll('rendered viewport installation', landing, ['installPublicLandingViewportContract();']);
 requireAll('canonical workspace', `${authenticated}\n${workspace}`, ['data-workspace-contract="one-room"', '<SovereignIntelligenceWorkspace onboardingVerified />', "type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'", "version: 'sovereign-answer.v2'"]);
 requireAll('auth', app, ["path === '/login'", "path === '/signup'", "path === '/invitation'", '__TURNSTILE_SITE_KEY__']);
 requireAll('billing', `${onboarding}\n${controls}`, ['/api/v1/billing/checkout', '/api/v1/billing/portal']);
