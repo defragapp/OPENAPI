@@ -2,6 +2,8 @@ import { z } from 'zod';
 import type { Env } from './env';
 import {
   BASELINE_SOURCE_INPUT_VERSION,
+  activeBaselineEncryptionKeyVersion,
+  importBaselineEncryptionKey,
   parseCanonicalBaselineSourceInput,
   type CanonicalBaselineSourceInput
 } from './baseline-source-crypto';
@@ -9,10 +11,7 @@ import {
 export const BASELINE_SOURCE_SUBMISSION_VERSION = 'baseline-source-submission.v1' as const;
 export const BASELINE_PLACE_RESOLUTION_VERSION = 'baseline-place-resolution.v1' as const;
 
-const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(
-  (value) => !Number.isNaN(Date.parse(`${value}T00:00:00Z`)),
-  'Invalid birth date'
-);
+const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(isValidCalendarDate, 'Invalid birth date');
 const timeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 const text = (minimum: number, maximum: number) => z.string().trim().min(minimum).max(maximum).transform((value) => value.normalize('NFC'));
 
@@ -119,7 +118,7 @@ export async function storeServerPlaceResolution(
   const place = baselinePlaceCandidateSchema.parse(resolvedInput);
   const id = `place_${crypto.randomUUID()}`;
   const queryHash = await hashPlaceQuery(query);
-  const keyVersion = requiredKeyVersion(env);
+  const keyVersion = activeBaselineEncryptionKeyVersion(env);
   const encrypted = await encryptPayload(env, accountId, id, keyVersion, {
     version: BASELINE_PLACE_RESOLUTION_VERSION,
     query,
@@ -207,7 +206,7 @@ async function hashPlaceQuery(query: BaselinePlaceQuery): Promise<string> {
 }
 
 async function encryptPayload(env: Env, accountId: string, id: string, keyVersion: string, payload: unknown) {
-  const key = await importEncryptionKey(env);
+  const key = await importBaselineEncryptionKey(env, keyVersion);
   const nonce = crypto.getRandomValues(new Uint8Array(12));
   const encrypted = await crypto.subtle.encrypt(
     { name: 'AES-GCM', iv: nonce, additionalData: placeAdditionalData(accountId, id, keyVersion), tagLength: 128 },
@@ -225,7 +224,6 @@ async function decryptPayload(
   nonceB64: string,
   ciphertextB64: string
 ): Promise<unknown> {
-  if (keyVersion !== requiredKeyVersion(env)) throw new Error('baseline_source_key_version_unavailable');
   const decrypted = await crypto.subtle.decrypt(
     {
       name: 'AES-GCM',
@@ -233,7 +231,7 @@ async function decryptPayload(
       additionalData: placeAdditionalData(accountId, id, keyVersion),
       tagLength: 128
     },
-    await importEncryptionKey(env),
+    await importBaselineEncryptionKey(env, keyVersion),
     decodeBase64(ciphertextB64)
   );
   return JSON.parse(new TextDecoder().decode(decrypted)) as unknown;
@@ -243,18 +241,16 @@ function placeAdditionalData(accountId: string, id: string, keyVersion: string):
   return new TextEncoder().encode(canonicalJson({ accountId, id, keyVersion, version: BASELINE_PLACE_RESOLUTION_VERSION }));
 }
 
-function requiredKeyVersion(env: Env): string {
-  const version = env.BASELINE_SOURCE_ENCRYPTION_KEY_VERSION?.trim();
-  if (!version) throw new Error('baseline_source_encryption_key_version_missing');
-  return version;
-}
-
-async function importEncryptionKey(env: Env): Promise<CryptoKey> {
-  const encoded = env.BASELINE_SOURCE_ENCRYPTION_KEY?.trim();
-  if (!encoded) throw new Error('baseline_source_encryption_key_missing');
-  const bytes = decodeBase64(encoded);
-  if (bytes.byteLength !== 32) throw new Error('baseline_source_encryption_key_invalid');
-  return crypto.subtle.importKey('raw', bytes, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
+function isValidCalendarDate(value: string): boolean {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year
+    && date.getUTCMonth() + 1 === month
+    && date.getUTCDate() === day;
 }
 
 function canonicalJson(value: unknown): string {
