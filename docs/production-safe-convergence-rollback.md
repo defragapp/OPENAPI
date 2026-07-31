@@ -1,3 +1,3 @@
-Production-safe convergence rollback created 2026-07-31.
+Production-safe convergence checkpoint updated 2026-07-31.
 
-Code and release configuration in this commit match deployable commit 2ae5ef66795651cfe36a7710b2fabd10db9f5777. The unshipped safety integration sequence was removed after Cloudflare Workers Builds did not advance beyond that commit. Safety routing will be reintroduced as a smaller request-boundary change and must pass exact-SHA production verification before issue closure.
+Code and release configuration in this commit match deployed classifier commit fde2b0f7be33262bf6d7d3cfe26baff4ff094d72. The first request-boundary integration did not pass Cloudflare Workers Builds and was removed. Reintegration proceeds through independently deployable steps before issue closure.
