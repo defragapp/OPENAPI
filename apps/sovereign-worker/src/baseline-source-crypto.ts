@@ -64,13 +64,26 @@ export function parseCanonicalBaselineSourceInput(value: unknown): CanonicalBase
   return canonicalBaselineSourceInputSchema.parse(value);
 }
 
+export function activeBaselineEncryptionKeyVersion(env: Env): string {
+  const version = env.BASELINE_SOURCE_ENCRYPTION_KEY_VERSION?.trim();
+  if (!version) throw new Error('baseline_source_encryption_key_version_missing');
+  return version;
+}
+
+export async function importBaselineEncryptionKey(env: Env, keyVersion: string): Promise<CryptoKey> {
+  const encoded = encodedKeyForVersion(env, keyVersion);
+  const bytes = decodeBase64(encoded);
+  if (bytes.byteLength !== 32) throw new Error('baseline_source_encryption_key_invalid');
+  return crypto.subtle.importKey('raw', bytes, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
+}
+
 export async function encryptBaselineSource(
   env: Env,
   accountId: string,
   value: CanonicalBaselineSourceInput
 ): Promise<EncryptedBaselineSourceEnvelope> {
-  const keyVersion = requiredKeyVersion(env);
-  const key = await importEncryptionKey(env);
+  const keyVersion = activeBaselineEncryptionKeyVersion(env);
+  const key = await importBaselineEncryptionKey(env, keyVersion);
   const nonce = crypto.getRandomValues(new Uint8Array(12));
   const plaintext = new TextEncoder().encode(canonicalJson(value));
   const additionalData = sourceAdditionalData(accountId, keyVersion);
@@ -94,11 +107,7 @@ export async function decryptBaselineSource(
   accountId: string,
   envelope: Pick<EncryptedBaselineSourceEnvelope, 'encryptionKeyVersion' | 'nonceB64' | 'ciphertextB64'>
 ): Promise<CanonicalBaselineSourceInput> {
-  const activeVersion = requiredKeyVersion(env);
-  if (envelope.encryptionKeyVersion !== activeVersion) {
-    throw new Error('baseline_source_key_version_unavailable');
-  }
-  const key = await importEncryptionKey(env);
+  const key = await importBaselineEncryptionKey(env, envelope.encryptionKeyVersion);
   const decrypted = await crypto.subtle.decrypt(
     {
       name: 'AES-GCM',
@@ -117,18 +126,33 @@ export async function hashCanonicalBaselineSource(value: CanonicalBaselineSource
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
-function requiredKeyVersion(env: Env): string {
-  const version = env.BASELINE_SOURCE_ENCRYPTION_KEY_VERSION?.trim();
-  if (!version) throw new Error('baseline_source_encryption_key_version_missing');
-  return version;
+function encodedKeyForVersion(env: Env, keyVersion: string): string {
+  const activeVersion = activeBaselineEncryptionKeyVersion(env);
+  const activeKey = env.BASELINE_SOURCE_ENCRYPTION_KEY?.trim();
+  if (keyVersion === activeVersion && activeKey) return activeKey;
+
+  const keyring = parseKeyring(env.BASELINE_SOURCE_ENCRYPTION_KEYS);
+  const encoded = keyring[keyVersion]?.trim();
+  if (!encoded) throw new Error('baseline_source_key_version_unavailable');
+  return encoded;
 }
 
-async function importEncryptionKey(env: Env): Promise<CryptoKey> {
-  const encoded = env.BASELINE_SOURCE_ENCRYPTION_KEY?.trim();
-  if (!encoded) throw new Error('baseline_source_encryption_key_missing');
-  const bytes = decodeBase64(encoded);
-  if (bytes.byteLength !== 32) throw new Error('baseline_source_encryption_key_invalid');
-  return crypto.subtle.importKey('raw', bytes, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
+function parseKeyring(value: string | undefined): Record<string, string> {
+  if (!value?.trim()) return {};
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new Error('baseline_source_encryption_keyring_invalid');
+    }
+    const entries = Object.entries(parsed as Record<string, unknown>);
+    if (!entries.every(([version, key]) => /^[a-zA-Z0-9._-]{1,80}$/.test(version) && typeof key === 'string')) {
+      throw new Error('baseline_source_encryption_keyring_invalid');
+    }
+    return Object.fromEntries(entries) as Record<string, string>;
+  } catch (error) {
+    if (error instanceof Error && error.message === 'baseline_source_encryption_keyring_invalid') throw error;
+    throw new Error('baseline_source_encryption_keyring_invalid');
+  }
 }
 
 function sourceAdditionalData(accountId: string, keyVersion: string): Uint8Array {
