@@ -7,6 +7,7 @@ const ACCOUNT_TABLE_DELETES = [
   'auth_sessions',
   'baseline_facet_profiles',
   'baseline_compiler_runs',
+  'baseline_place_resolutions',
   'baseline_source_records',
   'baseline_onboarding',
   'account_privacy_settings',
@@ -23,6 +24,30 @@ const ACCOUNT_TABLE_DELETES = [
   'entitlement_cache',
   'ai_usage_windows'
 ];
+
+const SAFE_JOB_ERROR_CODES = new Set([
+  'account_required',
+  'baseline_compiler_version_mismatch',
+  'baseline_facets_unavailable',
+  'baseline_natal_source_unavailable',
+  'baseline_place_resolution_integrity_failed',
+  'baseline_prior_stage_unavailable',
+  'baseline_run_id_missing',
+  'baseline_run_missing',
+  'baseline_source_encryption_key_invalid',
+  'baseline_source_encryption_key_missing',
+  'baseline_source_encryption_key_version_missing',
+  'baseline_source_key_version_unavailable',
+  'baseline_source_record_unavailable',
+  'baseline_stage_failed',
+  'baseline_stage_out_of_order',
+  'baseline_stage_unsupported',
+  'deletion_claim_lost',
+  'deletion_not_due_or_cancelled',
+  'private_export_disabled',
+  'stripe_retry_requires_original_signed_delivery',
+  'unsupported_background_job'
+]);
 
 interface JobRow {
   id: string;
@@ -234,8 +259,7 @@ function safeJson(value?: string): Record<string, unknown> {
 
 function safeJobErrorCode(error: unknown): string {
   const raw = error instanceof Error ? error.message : 'job_failed';
-  if (/^[a-z0-9_]{3,80}$/.test(raw)) return raw;
-  return 'job_failed';
+  return SAFE_JOB_ERROR_CODES.has(raw) ? raw : 'job_failed';
 }
 
 export function deletionInventory(): string[] {
