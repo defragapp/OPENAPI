@@ -10,7 +10,7 @@ import { getTurn, startTurn, updateTurnStatus } from './db/turns';
 import { getEntitlements } from './db/entitlements';
 import { releaseAiTurn, reserveAiTurn } from './billing/usage';
 import { runSovereignResult } from './agent/sovereign';
-import { decideSovereignInputSafety } from './agent/input-safety';
+import { buildDeterministicSafetyAnswer, decideSovereignInputSafety } from './agent/input-safety';
 import { saveLatestInsightModule } from './db/insight-modules';
 import { canUseDevelopmentFixtures } from './runtime';
 import { clearCurrentConditions, computeCurrentConditions, parseLocationPrecision, type CurrentLocationInput, type LocationPrecision } from './baseline';
@@ -198,7 +198,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
   const body = await request.json().catch(() => ({})) as { message?: string; context?: unknown };
   const message = body.message?.trim();
   if (!message) return Response.json({ error: 'Message required' }, { status: 400 });
-  decideSovereignInputSafety(message);
+  const safetyDecision = decideSovereignInputSafety(message);
   const idempotencyKey = request.headers.get('x-idempotency-key');
   if (!idempotencyKey) return Response.json({ error: 'Idempotency key required' }, { status: 400 });
 
@@ -222,6 +222,49 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
   const traceId = crypto.randomUUID();
   await startTurn(env, auth.accountId, threadId, idempotencyKey, turn.sequence);
   await appendThreadEvent(env, threadId, turn.sequence, 'user_message', { text: message, context: selection }, traceId);
+
+  if (safetyDecision.disposition !== 'standard') {
+    const answer = buildDeterministicSafetyAnswer(safetyDecision);
+    const text = [
+      answer.headline,
+      answer.direct_answer,
+      ...answer.sections.map((section) => `${section.label.toUpperCase()}\n\n${section.body}`)
+    ].join('\n\n');
+    const interfaceActions = {
+      version: 2 as const,
+      primary: null,
+      contextual: [],
+      confirmationRequired: true as const
+    };
+    const safety = {
+      version: safetyDecision.version,
+      disposition: safetyDecision.disposition,
+      category: safetyDecision.category
+    };
+    await appendThreadEvent(env, threadId, turn.sequence + 1, 'assistant_plan', { answer, safety }, traceId);
+    await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_response', {
+      text,
+      answer,
+      basis: [],
+      context: selection,
+      interfaceActions,
+      safety
+    }, traceId);
+    await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'completed');
+    const headers = new Headers({
+      'content-type': 'text/plain; charset=utf-8',
+      'cache-control': 'private, no-store',
+      'x-sovereign-plan': entitlements.plan,
+      'x-sovereign-answer-version': 'sovereign-answer.v2',
+      'x-sovereign-answer-mode': answer.mode,
+      'x-sovereign-answer-depth': answer.depth,
+      'x-sovereign-safety-mode': answer.safety_mode,
+      'x-sovereign-interface-actions': encodeMetadataHeader(interfaceActions)
+    });
+    return request.headers.get('accept')?.includes('application/vnd.sovereign.answer+json')
+      ? Response.json({ answer, basis: [], interfaceActions }, { status: 202, headers })
+      : new Response(text, { status: 202, headers });
+  }
 
   const aiConfig = resolveAiModelConfig(env);
   if (aiConfig.provider !== 'cloudflare-gateway' || !env.AI || !env.AI_GATEWAY_ID) {
