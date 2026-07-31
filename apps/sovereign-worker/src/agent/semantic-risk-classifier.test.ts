@@ -100,9 +100,10 @@ describe('semantic Sovereign safety classifier', () => {
     expect(decision.categories).toContain('harm_to_others');
   });
 
-  it('uses only a bounded message and privacy-safe gateway metadata', async () => {
+  it('bounds and redacts private message details before semantic review', async () => {
     const capture: { input?: unknown; options?: unknown } = {};
-    const input = `${'x'.repeat(5_000)} private-location-marker`;
+    const privateDetails = 'email person@example.com phone 909-555-1212 at 123 Private Street, coordinates 34.123,-117.456, born on July 26 1993 at 8 PM, https://private.example/path';
+    const input = `${privateDetails} ${'x'.repeat(5_000)} private-tail-marker`;
     await reviewSovereignSafetyRisk(
       input,
       routeSovereignSafety(input),
@@ -113,13 +114,25 @@ describe('semantic Sovereign safety classifier', () => {
     const options = capture.options as { gateway: { skipCache: boolean; collectLog: boolean; metadata: Record<string, string> } };
     expect(request.max_output_tokens).toBe(280);
     expect(request.temperature).toBe(0);
-    expect(request.input).not.toContain('private-location-marker');
+    expect(request.input).not.toContain('private-tail-marker');
+    expect(request.input).not.toContain('person@example.com');
+    expect(request.input).not.toContain('909-555-1212');
+    expect(request.input).not.toContain('123 Private Street');
+    expect(request.input).not.toContain('34.123,-117.456');
+    expect(request.input).not.toContain('July 26 1993 at 8 PM');
+    expect(request.input).not.toContain('https://private.example/path');
+    expect(request.input).toContain('[email]');
+    expect(request.input).toContain('[phone]');
+    expect(request.input).toContain('[address]');
+    expect(request.input).toContain('[coordinates]');
+    expect(request.input).toContain('[birth details]');
+    expect(request.input).toContain('[url]');
     expect(request.input).not.toMatch(/account_ref|authorized server context|exact private location/i);
     expect(options.gateway.skipCache).toBe(true);
     expect(options.gateway.collectLog).toBe(false);
     expect(options.gateway.metadata).toEqual({
       response_contract: 'sovereign-risk-signal.v1',
-      classifier_version: 'semantic-risk-classifier.1'
+      classifier_version: 'semantic-risk-classifier.2'
     });
   });
 
