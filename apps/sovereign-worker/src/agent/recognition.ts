@@ -57,8 +57,9 @@ export const sovereignSafetyResourceSchema = z.object({
 
 export const sovereignSafetyResponseSchema = z.object({
   version: z.literal('sovereign-safety-response.v1'),
-  disposition: z.enum(['grounded', 'supportive_resources', 'urgent', 'secure_refusal']),
+  disposition: z.enum(['standard', 'grounded', 'supportive_resources', 'urgent', 'secure_refusal']),
   category: z.enum([
+    'none',
     'immediate_self_harm',
     'immediate_harm_to_others',
     'dangerous_ingestion',
@@ -75,7 +76,14 @@ export const sovereignSafetyResponseSchema = z.object({
   presentation: z.enum(sovereignSafetyPresentations),
   resource_catalog_version: z.literal('safety-resources.2026-07-31.1'),
   resources: z.array(sovereignSafetyResourceSchema).max(4)
-}).strict();
+}).strict().superRefine((value, context) => {
+  if (value.disposition === 'standard' || value.category === 'none') {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Safety metadata may be attached only to a non-standard deterministic decision'
+    });
+  }
+});
 
 export type SovereignSafetyResponse = z.infer<typeof sovereignSafetyResponseSchema>;
 
