@@ -15,29 +15,34 @@ const membership = read('apps/web/src/SystemMembershipManager.tsx');
 const premium = read('apps/web/src/premium-platform-release.css');
 const visual = read('apps/web/src/sovereign-visual-system.css');
 const viewport = read('apps/web/src/responsive-viewport-contract.css');
+const density = read('apps/web/src/mobile-density-polish.css');
 const publicCss = read('apps/web/public/premium-public-release.css');
 const supportPages = ['how-it-works', 'pricing', 'faq', '404'].map((name) => read(`apps/web/public/${name}.html`));
-const reactCss = `${premium}\n${visual}\n${viewport}`;
+const reactCss = `${premium}\n${visual}\n${viewport}\n${density}`;
 
 const premiumImport = "import './premium-platform-release.css';";
 const visualImport = "import './sovereign-visual-system.css';";
 const viewportImport = "import './responsive-viewport-contract.css';";
+const densityImport = "import './mobile-density-polish.css';";
 const premiumIndex = main.indexOf(premiumImport);
 const visualIndex = main.indexOf(visualImport);
 const viewportIndex = main.indexOf(viewportImport);
-assert(premiumIndex >= 0 && visualIndex > premiumIndex && viewportIndex > visualIndex, 'React visual layers load in the wrong order.');
-assert(!main.slice(viewportIndex + viewportImport.length).includes("import './"), 'A local visual layer loads after the viewport contract.');
+const densityIndex = main.indexOf(densityImport);
+assert(premiumIndex >= 0 && visualIndex > premiumIndex && viewportIndex > visualIndex && densityIndex > viewportIndex, 'React visual layers load in the wrong order.');
+assert(!main.slice(densityIndex + densityImport.length).includes("import './"), 'A local visual layer loads after the mobile density contract.');
 
 requireAll('viewport repair', viewport, [
-  '.sovereign-landing .hero-intelligence-stage',
-  'display: block;',
-  'grid-template-columns: minmax(0, 1fr);',
-  'min-height: 0;',
-  '@media (max-width: 700px)',
-  '@media (max-width: 430px)',
-  '.sovereign-landing .permission-section',
-  '.intelligence-scroll',
+  '.sovereign-landing .hero-intelligence-stage', 'display: block;',
+  'grid-template-columns: minmax(0, 1fr);', 'min-height: 0;',
+  '@media (max-width: 700px)', '@media (max-width: 430px)',
+  '.sovereign-landing .permission-section', '.intelligence-scroll',
   '@media (prefers-reduced-motion: reduce)'
+]);
+requireAll('mobile density refinement', density, [
+  '@media (max-width: 700px)', '@media (max-width: 430px)',
+  'font-size: clamp(3.25rem, 15.8vw, 4.35rem);',
+  'padding-block: 62px;', '.sovereign-landing .permission-section',
+  '.sovereign-landing .visual-demo-window', '@media (prefers-reduced-motion: reduce)'
 ]);
 requireAll('visual surfaces', reactCss, [
   '.sovereign-landing', '.intelligence-workspace', '.today-facet-view', '.explore-editorial',
@@ -61,6 +66,7 @@ for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', '
 balanced('premium', premium);
 balanced('visual', visual);
 balanced('viewport', viewport);
+balanced('density', density);
 balanced('public', publicCss);
 
-console.log(JSON.stringify({ ok: true, release: 'sovereign-responsive-viewport-repair', canonicalWorkspace: 'SovereignIntelligenceWorkspace', answerContract: 'sovereign-answer.v2' }, null, 2));
+console.log(JSON.stringify({ ok: true, release: 'sovereign-mobile-density-refinement', canonicalWorkspace: 'SovereignIntelligenceWorkspace', answerContract: 'sovereign-answer.v2' }, null, 2));
