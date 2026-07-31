@@ -37,7 +37,7 @@ import './selective-visual-port.css';
 import './premium-platform-release.css';
 import './sovereign-visual-system.css';
 import './responsive-viewport-contract.css';
-import './mobile-density-polish.css';
+import './mobile-density-contract.css';
 
 installProductionRuntime();
 installProductRuntime();
