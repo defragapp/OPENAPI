@@ -202,9 +202,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
   const idempotencyKey = request.headers.get('x-idempotency-key');
   if (!idempotencyKey) return Response.json({ error: 'Idempotency key required' }, { status: 400 });
 
-  const entitlements = await getEntitlements(env, auth.accountId);
   const selection = parseConversationContext(body.context);
-  const authorizedContext = await authorizeConversationContext(env, auth.accountId, selection, entitlements);
   await ensureThread(env, auth.accountId, threadId, selection.surface?.toLowerCase() ?? 'personal');
   await touchThread(env, auth.accountId, threadId, message);
   const coordinator = env.THREADS.get(env.THREADS.idFromName(`${auth.accountId}:${threadId}`));
@@ -254,7 +252,6 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
     const headers = new Headers({
       'content-type': 'text/plain; charset=utf-8',
       'cache-control': 'private, no-store',
-      'x-sovereign-plan': entitlements.plan,
       'x-sovereign-answer-version': 'sovereign-answer.v2',
       'x-sovereign-answer-mode': answer.mode,
       'x-sovereign-answer-depth': answer.depth,
@@ -266,6 +263,8 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       : new Response(text, { status: 202, headers });
   }
 
+  const entitlements = await getEntitlements(env, auth.accountId);
+  const authorizedContext = await authorizeConversationContext(env, auth.accountId, selection, entitlements);
   const aiConfig = resolveAiModelConfig(env);
   if (aiConfig.provider !== 'cloudflare-gateway' || !env.AI || !env.AI_GATEWAY_ID) {
     if (!canUseDevelopmentFixtures(env)) {
