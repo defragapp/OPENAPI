@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const read = (path) => readFileSync(path, 'utf8');
 const assert = (value, message) => { if (!value) throw new Error(message); };
@@ -17,15 +17,25 @@ const membership = read('apps/web/src/SystemMembershipManager.tsx');
 const premium = read('apps/web/src/premium-platform-release.css');
 const visual = read('apps/web/src/sovereign-visual-system.css');
 const viewport = read('apps/web/src/responsive-viewport-contract.css');
+const editorial = read('apps/web/src/public-landing-editorial.css');
 const publicCss = read('apps/web/public/premium-public-release.css');
 const supportPages = ['how-it-works', 'pricing', 'faq', '404'].map((name) => read(`apps/web/public/${name}.html`));
-const reactCss = `${premium}\n${visual}\n${viewport}`;
+const reactCss = `${premium}\n${visual}\n${viewport}\n${editorial}`;
 
-const imports = ["import './premium-platform-release.css';", "import './sovereign-visual-system.css';", "import './responsive-viewport-contract.css';"];
+const imports = [
+  "import './premium-platform-release.css';",
+  "import './sovereign-visual-system.css';",
+  "import './typography-system.css';",
+  "import './responsive-viewport-contract.css';",
+  "import './public-landing-editorial.css';"
+];
 const indexes = imports.map((value) => main.indexOf(value));
 assert(indexes.every((value) => value >= 0), 'A required visual contract import is missing.');
 assert(indexes.every((value, index) => index === 0 || value > indexes[index - 1]), 'React visual layers load in the wrong order.');
-assert(!main.slice(indexes[2] + imports[2].length).includes("import './"), 'A local visual layer loads after the responsive contract.');
+const finalImportEnd = indexes.at(-1) + imports.at(-1).length;
+assert(!main.slice(finalImportEnd).includes("import './"), 'A local visual layer loads after the canonical public landing contract.');
+assert(!main.includes('landing-live-correction.css'), 'The obsolete landing correction layer is still imported.');
+assert(!existsSync('apps/web/src/landing-live-correction.css'), 'The obsolete landing correction layer still exists.');
 assert(!main.includes('mobile-density-contract.css'), 'The retired mobile density override is still imported.');
 assert(!/final|refinement|polish.*css|landing-v2/i.test(main), 'A retired override-layer filename is imported.');
 
@@ -50,6 +60,20 @@ requireAll('responsive viewport contract', viewport, [
   '@media (max-width: 760px)',
   '@media (max-width: 430px)'
 ]);
+requireAll('canonical public landing contract', editorial, [
+  '--editorial-page:',
+  '.sovereign-landing .landing-nav',
+  '.sovereign-landing .landing-hero',
+  '.sovereign-landing .hero-intelligence-stage',
+  '.sovereign-landing .landing-foundation',
+  '.sovereign-landing .sovereign-story-step',
+  '.sovereign-landing .permission-section',
+  '.sovereign-landing .pricing-preview',
+  '@media (max-width: 1024px)',
+  '@media (max-width: 760px)',
+  '@media (max-width: 430px)',
+  '@media (prefers-reduced-motion: reduce)'
+]);
 requireAll('rendered viewport measurement', viewportProbe, [
   'getBoundingClientRect()',
   'node.offsetWidth',
@@ -64,6 +88,13 @@ requireAll('auth', app, ["path === '/login'", "path === '/signup'", "path === '/
 requireAll('billing', `${onboarding}\n${controls}`, ['/api/v1/billing/checkout', '/api/v1/billing/portal']);
 requireAll('consent', membership, ['person.identityBound === true', "person.activeScopes.includes('system.include')"]);
 supportPages.forEach((page) => requireAll('support page', page, ['/premium-public-release.css?v=20260730-final', 'SOVEREIGN.OS']));
-for (const source of [premium, visual, viewport, publicCss]) balanced('visual contract', source);
+for (const [label, source] of [['premium', premium], ['visual', visual], ['responsive', viewport], ['public landing', editorial], ['public support', publicCss]]) balanced(label, source);
 
-console.log(JSON.stringify({ ok: true, release: 'sovereign-rendered-mobile-composition', canonicalWorkspace: 'SovereignIntelligenceWorkspace', answerContract: 'sovereign-answer.v2', renderedViewportProbe: true }, null, 2));
+console.log(JSON.stringify({
+  ok: true,
+  release: 'sovereign-editorial-public-landing',
+  canonicalLanding: 'public-landing-editorial.css',
+  canonicalWorkspace: 'SovereignIntelligenceWorkspace',
+  answerContract: 'sovereign-answer.v2',
+  renderedViewportProbe: true
+}, null, 2));
