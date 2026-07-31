@@ -113,7 +113,7 @@ requireAll('selective visual port layer', `${landing}\n${hardening}\n${selective
   'STEP 01 · YOU',
   'STEP 02 · YOU + 1',
   'STEP 03 · YOUR WHOLE SYSTEM',
-  'className="visual-reasoning-panel',
+  'visual-reasoning-panel',
   'className="visual-evidence-chips"',
   'className="relationship-baseline-pair"',
   'className="story-system-map"',
