@@ -1,0 +1,298 @@
+/*
+ * Live landing correction.
+ *
+ * The approved editorial type remains in place. This file corrects the responsive
+ * hierarchy that made headings collapse into narrow word stacks and product
+ * demonstrations recede into the page. It does not change product copy, routes,
+ * component structure, pricing, permissions, or application behavior.
+ */
+
+.sovereign-landing {
+  --visual-muted: #b8b0a7;
+  --visual-faint: #8d867f;
+}
+
+.sovereign-landing .landing-hero {
+  padding-top: clamp(82px, 10vw, 126px);
+  padding-bottom: clamp(72px, 8vw, 104px);
+}
+
+.sovereign-landing .landing-hero-copy h1 {
+  max-width: 12ch;
+  line-height: .91;
+}
+
+.sovereign-landing .landing-hero-copy h1 em {
+  color: rgba(238, 229, 217, .54);
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+}
+
+.sovereign-landing .hero-intelligence-stage {
+  margin-top: clamp(46px, 6vw, 70px);
+  border-color: rgba(241, 235, 227, .14);
+}
+
+.sovereign-landing .sovereign-story-step {
+  padding-top: clamp(88px, 10vw, 128px);
+  padding-bottom: clamp(88px, 10vw, 128px);
+}
+
+.sovereign-landing .story-heading h2 {
+  line-height: .93;
+}
+
+.sovereign-landing .story-heading h2 span {
+  display: block;
+  margin-top: .08em;
+  color: rgba(238, 229, 217, .38);
+  font-size: .78em;
+  -webkit-text-stroke: 0;
+}
+
+.sovereign-landing .story-product-stage,
+.sovereign-landing .visual-story-grid {
+  margin-top: clamp(38px, 5vw, 58px);
+}
+
+.sovereign-landing .visual-demo-window,
+.sovereign-landing .visual-reasoning-panel,
+.sovereign-landing .story-system-window,
+.sovereign-landing .permission-boundary {
+  border-color: rgba(241, 235, 227, .14);
+}
+
+@media (max-width: 760px) {
+  .sovereign-landing {
+    --public-mobile-left: max(20px, env(safe-area-inset-left));
+    --public-mobile-right: max(20px, env(safe-area-inset-right));
+  }
+
+  .sovereign-landing .landing-nav {
+    min-height: calc(62px + env(safe-area-inset-top));
+    gap: 14px;
+  }
+
+  .sovereign-landing .landing-wordmark {
+    flex: 0 1 auto;
+    min-width: 0;
+    font-size: .9rem;
+    white-space: nowrap;
+  }
+
+  .sovereign-landing .landing-nav nav {
+    flex: 0 0 auto;
+    gap: 0;
+  }
+
+  .sovereign-landing .landing-nav nav a:not(.landing-nav-cta) {
+    display: none;
+  }
+
+  .sovereign-landing .landing-nav .landing-nav-cta {
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: .72rem;
+    white-space: nowrap;
+  }
+
+  .sovereign-landing .landing-hero {
+    padding-top: 42px;
+    padding-bottom: 54px;
+  }
+
+  .sovereign-landing .landing-hero-copy h1,
+  .sovereign-landing .landing-hero h1 {
+    max-width: none;
+    font-size: clamp(2.72rem, 12vw, 3.5rem);
+    letter-spacing: -.055em;
+    line-height: .94;
+    text-wrap: balance;
+  }
+
+  .sovereign-landing .landing-hero-copy h1 em {
+    color: rgba(238, 229, 217, .58);
+  }
+
+  .sovereign-landing .landing-hero-copy > p:not(.landing-kicker, .landing-support) {
+    margin-top: 22px;
+    color: #bdb5ac;
+    font-size: .98rem;
+    line-height: 1.62;
+  }
+
+  .sovereign-landing .landing-actions {
+    margin-top: 22px;
+  }
+
+  .sovereign-landing .landing-primary,
+  .sovereign-landing .landing-secondary {
+    min-height: 50px;
+  }
+
+  .sovereign-landing .landing-hero-copy > small {
+    color: #928a82;
+  }
+
+  .sovereign-landing .hero-intelligence-stage {
+    margin-top: 30px;
+    border-radius: 16px;
+  }
+
+  .sovereign-landing .hero-answer {
+    padding: 20px 17px;
+  }
+
+  .sovereign-landing .living-answer-body h2 {
+    font-size: clamp(1.95rem, 9.4vw, 2.46rem);
+    line-height: 1;
+  }
+
+  .sovereign-landing .landing-foundation {
+    gap: 22px;
+    margin-bottom: 58px;
+    padding: 28px 19px;
+    border-radius: 18px;
+  }
+
+  .sovereign-landing .landing-foundation h2 {
+    max-width: 13ch;
+    font-size: clamp(2.5rem, 11.4vw, 3.2rem);
+    line-height: .96;
+  }
+
+  .sovereign-landing .landing-foundation > header > p:last-child {
+    font-size: .94rem;
+    line-height: 1.58;
+  }
+
+  .sovereign-landing .sovereign-story-step {
+    padding-top: 56px;
+    padding-bottom: 62px;
+  }
+
+  .sovereign-landing .story-heading > p {
+    margin-bottom: 12px;
+  }
+
+  .sovereign-landing .story-heading h2 {
+    max-width: 15ch;
+    font-size: clamp(2.62rem, 11.8vw, 3.42rem);
+    letter-spacing: -.052em;
+    line-height: .96;
+  }
+
+  .sovereign-landing .story-heading h2 span {
+    margin-top: .14em;
+    color: rgba(238, 229, 217, .46);
+    font-size: .67em;
+    line-height: 1;
+  }
+
+  .sovereign-landing .story-heading > div {
+    margin-top: 18px;
+    color: #b8b0a7;
+    font-size: .96rem;
+    line-height: 1.58;
+  }
+
+  .sovereign-landing .story-product-stage,
+  .sovereign-landing .visual-story-grid {
+    margin-top: 27px;
+  }
+
+  .sovereign-landing .visual-demo-window,
+  .sovereign-landing .visual-reasoning-panel,
+  .sovereign-landing .story-system-window {
+    border-radius: 16px;
+  }
+
+  .sovereign-landing .story-conversation,
+  .sovereign-landing .story-system-window .story-conversation {
+    padding: 17px;
+  }
+
+  .sovereign-landing .story-user-message,
+  .sovereign-landing .story-assistant-message,
+  .sovereign-landing .visual-reasoning-panel li {
+    font-size: .82rem;
+    line-height: 1.5;
+  }
+
+  .sovereign-landing .permission-section {
+    padding-top: 58px;
+    padding-bottom: 62px;
+  }
+
+  .sovereign-landing .permission-section h2,
+  .sovereign-landing .permission-section .landing-section-header h2 {
+    max-width: 15ch;
+    font-size: clamp(2.55rem, 11.6vw, 3.25rem);
+    line-height: .97;
+  }
+
+  .sovereign-landing .permission-section .landing-section-header > p:last-child {
+    color: #b8b0a7;
+    font-size: .96rem;
+    line-height: 1.58;
+  }
+
+  .sovereign-landing .permission-boundary {
+    margin-top: 26px;
+  }
+
+  .sovereign-landing .pricing-preview {
+    padding: 28px 19px;
+    border-radius: 18px;
+  }
+
+  .sovereign-landing .pricing-preview .landing-section-header h2 {
+    max-width: 15ch;
+    font-size: clamp(2.48rem, 11.2vw, 3.16rem);
+    line-height: .97;
+  }
+
+  .sovereign-landing .pricing-options article {
+    padding-inline: 0;
+  }
+
+  .sovereign-landing .landing-final {
+    margin-top: 58px;
+    padding: 38px 19px;
+  }
+
+  .sovereign-landing .landing-final h2 {
+    max-width: 14ch;
+    margin-inline: auto;
+    font-size: clamp(2.5rem, 11.3vw, 3.2rem);
+    line-height: .97;
+  }
+
+  .sovereign-landing .landing-final > p:not(.landing-kicker) {
+    color: #b8b0a7;
+    line-height: 1.58;
+  }
+}
+
+@media (max-width: 430px) {
+  .sovereign-landing {
+    --public-mobile-left: max(18px, env(safe-area-inset-left));
+    --public-mobile-right: max(18px, env(safe-area-inset-right));
+  }
+
+  .sovereign-landing .landing-hero-copy h1,
+  .sovereign-landing .landing-hero h1 {
+    font-size: clamp(2.58rem, 12.1vw, 3.08rem);
+  }
+
+  .sovereign-landing .story-heading h2 {
+    font-size: clamp(2.48rem, 11.9vw, 3rem);
+  }
+
+  .sovereign-landing .landing-foundation h2,
+  .sovereign-landing .permission-section h2,
+  .sovereign-landing .pricing-preview .landing-section-header h2,
+  .sovereign-landing .landing-final h2 {
+    font-size: clamp(2.36rem, 11.4vw, 2.82rem);
+  }
+}

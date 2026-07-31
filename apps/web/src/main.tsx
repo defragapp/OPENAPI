@@ -41,8 +41,9 @@ import './premium-platform-release.css';
 import './sovereign-visual-system.css';
 import './responsive-viewport-contract.css';
 
-/* Final typography-only contract: headings, titles, and supporting subheadings. */
+/* Final typography contract and responsive correction for the public landing. */
 import './typography-system.css';
+import './landing-live-correction.css';
 
 installProductionRuntime();
 installProductRuntime();
