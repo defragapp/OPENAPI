@@ -25,7 +25,8 @@ export interface SovereignInputSafetyDecision {
 const immediateSelfHarmPatterns = [
   /\b(?:i am|i'm|im|i will|i'll|i plan to|i intend to|i am going to|i'm going to|im going to|i am about to|i'm about to|im about to)\s+(?:kill|hurt|harm)\s+(?:myself|me)\b/i,
   /\b(?:i have|i've got|ive got)\s+(?:a\s+)?(?:suicide|suicidal)\s+plan\b/i,
-  /\b(?:i just|i have|i've|ive)\s+(?:taken|swallowed|overdosed on)\s+[^.!?]{0,120}\b/i
+  /\bi\s+(?:just\s+)?(?:have\s+)?overdosed\b/i,
+  /\b(?:i just|i have|i've|ive)\s+(?:taken|swallowed)\s+(?:too many|a dangerous amount of|all of my|a bottle of)\s+(?:pills?|medication|medicine|drugs?|poison|bleach|chemicals?)\b/i
 ];
 
 const immediateHarmPatterns = [
