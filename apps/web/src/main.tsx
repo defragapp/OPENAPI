@@ -39,11 +39,11 @@ import './premium-surface-hardening.css';
 import './selective-visual-port.css';
 import './premium-platform-release.css';
 import './sovereign-visual-system.css';
-import './responsive-viewport-contract.css';
 
-/* Final typography contract and responsive correction for the public landing. */
+/* Typography and targeted landing corrections load before the canonical responsive contract. */
 import './typography-system.css';
 import './landing-live-correction.css';
+import './responsive-viewport-contract.css';
 
 installProductionRuntime();
 installProductRuntime();
