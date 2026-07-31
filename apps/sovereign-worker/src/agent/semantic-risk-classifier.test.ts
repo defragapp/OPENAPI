@@ -102,7 +102,7 @@ describe('semantic Sovereign safety classifier', () => {
 
   it('bounds and redacts private message details before semantic review', async () => {
     const capture: { input?: unknown; options?: unknown } = {};
-    const privateDetails = 'email person@example.com phone 909-555-1212 at 123 Private Street, coordinates 34.123,-117.456, born on July 26 1993 at 8 PM, https://private.example/path';
+    const privateDetails = 'email person@example.com phone 909-555-1212 at 123 Private Street, coordinates 34.123,-117.456, born on July 26 1993 at 8 PM. https://private.example/path';
     const input = `${privateDetails} ${'x'.repeat(5_000)} private-tail-marker`;
     await reviewSovereignSafetyRisk(
       input,
