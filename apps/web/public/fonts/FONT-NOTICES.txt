@@ -1,0 +1,20 @@
+Sovereign.OS bundled font notices
+
+sovereign-display.woff2
+- Derived from GFS Didot.
+- Copyright (c) 2007, Greek Font Society.
+- Upstream Reserved Font Name: GFS Didot.
+- This redistributed subset is renamed "Sovereign Display" and does not use the reserved upstream name as its presented family name.
+- Licensed under the SIL Open Font License 1.1. See OFL-1.1.txt.
+- Subset: English interface characters and common punctuation.
+- Source font package: fonts-gfs-didot.
+
+sovereign-sans.woff2
+- Derived from Inter Display Regular.
+- Copyright 2016-2023 The Inter Project Authors.
+- This redistributed subset is renamed "Sovereign Sans".
+- Licensed under the SIL Open Font License 1.1. See OFL-1.1.txt.
+- Subset: English interface characters and common punctuation.
+- Source project: Inter.
+
+The fonts are bundled as first-party application assets and are not loaded from a third-party runtime CDN.
