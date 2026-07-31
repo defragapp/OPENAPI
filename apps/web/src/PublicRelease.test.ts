@@ -9,6 +9,7 @@ const robots = readFileSync(new URL('../public/robots.txt', import.meta.url), 'u
 const sitemap = readFileSync(new URL('../public/sitemap.xml', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
+const hardening = readFileSync(new URL('./premium-surface-hardening.css', import.meta.url), 'utf8');
 
 describe('public production release surfaces', () => {
   it('publishes canonical and controlled social metadata', () => {
@@ -28,23 +29,30 @@ describe('public production release surfaces', () => {
     expect(sitemap).not.toContain('/app');
   });
 
-  it('uses a real interactive answer as the public focal point', () => {
+  it('uses the approved three-stage product demonstration as the public focal point', () => {
     expect(landing).toContain('data-answer-contract="sovereign-answer.v2"');
-    expect(landing).toContain('<HeroIntelligenceStage />');
-    expect(landing).toContain('<BaselineContextStage />');
-    expect(landing).toContain('<PublicAnswerStage');
+    expect(landing).toContain('<HeroAnswerPreview />');
+    expect(landing).toContain('<PersonalStory />');
+    expect(landing).toContain('<RelationshipStory />');
+    expect(landing).toContain('<SystemStory />');
+    expect(landing).toContain('STEP 01 · YOU');
+    expect(landing).toContain('STEP 02 · YOU + 1');
+    expect(landing).toContain('STEP 03 · YOUR WHOLE SYSTEM');
     expect(landing).toContain('EXAMPLE ANSWER');
     expect(landing).toContain('Sanitized demonstration · Not your Baseline');
     expect(landing).toContain('Your capacity is real. The question is whether the responsibility is actually yours.');
-    expect(landing).toContain('Useful language first. Exact support when you want it.');
+    expect(landing).toContain('How Sovereign reads both of you');
+    expect(landing).toContain('className="story-system-map"');
   });
 
-  it('is responsive without depending on hover or motion', () => {
+  it('keeps the visual demonstrations responsive, interactive, and accessible without depending on motion', () => {
     expect(landingCss).toContain('@media (max-width: 760px)');
     expect(landingCss).toContain('@media (max-width: 440px)');
-    expect(landingCss).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(landing).toContain('role="tablist"');
-    expect(landing).toContain('role="tabpanel"');
-    expect(landing).toContain('aria-live="polite"');
+    expect(hardening).toContain('@media (max-width: 680px)');
+    expect(hardening).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(hardening).toContain('@media (forced-colors: active)');
+    expect(landing).toContain('aria-label="Permitted family system map"');
+    expect(landing).toContain('aria-pressed={activeId === member.id}');
+    expect(landing).toContain('aria-label={label || \'Baseline support\'}');
   });
 });

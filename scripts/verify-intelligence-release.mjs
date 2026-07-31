@@ -13,11 +13,15 @@ const containsAll = (label, text, values) => {
 
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const composition = read('apps/web/src/interface-composition.css');
+const hardening = read('apps/web/src/premium-surface-hardening.css');
+const completion = read('apps/web/src/selective-visual-port.css');
 const workspaceCss = [
   read('apps/web/src/workspace-chat.css'),
   read('apps/web/src/sovereign-cohesion.css'),
   read('apps/web/src/sovereign-modern.css'),
-  composition
+  composition,
+  hardening,
+  completion
 ].join('\n');
 const landing = read('apps/web/src/PublicLanding.tsx');
 const landingCss = [
@@ -25,7 +29,9 @@ const landingCss = [
   read('apps/web/src/sovereign-cohesion.css'),
   read('apps/web/src/sovereign-modern.css'),
   read('apps/web/src/landing-production.css'),
-  composition
+  composition,
+  hardening,
+  completion
 ].join('\n');
 const staticPublicCss = read('apps/web/public/platform-public.css');
 const prompt = read('apps/sovereign-worker/src/agent/prompt-v1.ts');
@@ -109,11 +115,37 @@ containsAll('current public product contract', landing, [
   'Choose what fits.',
   'Sovereign.OS is a private AI for understanding yourself, your relationships, and the systems around you.',
   'Build your Baseline once',
-  '<HeroIntelligenceStage />',
-  '<SystemMap />',
+  '<HeroAnswerPreview />',
+  '<PersonalStory />',
+  '<RelationshipStory />',
+  '<SystemStory />',
+  'STEP 01 · YOU',
+  'STEP 02 · YOU + 1',
+  'STEP 03 · YOUR WHOLE SYSTEM',
+  'Sanitized product demonstrations · Illustrative Baseline values · Not your personal result',
   'Another person remains a person—not a data source you control.',
-  'No compatibility score. No mind-reading.'
+  'No compatibility score.',
+  'No mind-reading.',
+  'No one-sided access.'
 ]);
+
+containsAll('selective visual port', `${landing}\n${hardening}\n${completion}`, [
+  'visual-reasoning-panel',
+  'className="visual-evidence-chips"',
+  'className="relationship-baseline-pair"',
+  'className="story-system-map"',
+  'How Sovereign reads both of you',
+  '.response-thread .answer-baseline',
+  '.response-thread .relationship-answer > div:first-child',
+  '.system-overview .system-graph',
+  '.response-thread .basis-strip',
+  '.relationship-baseline-pair',
+  '.story-fixture-boundary'
+]);
+
+for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'localStorage']) {
+  assert(!landing.includes(prohibited), `Public landing contains prohibited mock or scoring behavior: ${prohibited}`);
+}
 
 containsAll('responsive workspace', workspaceCss, [
   'min-height: 44px',
@@ -129,6 +161,8 @@ containsAll('responsive landing', landingCss, [
   'min-width: 320px',
   '.sovereign-landing',
   '.landing-section-header',
+  '.sovereign-story-step',
+  '@media (max-width: 680px)',
   '@media (max-width: 700px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
@@ -168,7 +202,9 @@ containsAll('canonical visual imports', main, [
   "import './sovereign-cohesion.css'",
   "import './sovereign-modern.css'",
   "import './landing-production.css'",
-  "import './interface-composition.css'"
+  "import './interface-composition.css'",
+  "import './premium-surface-hardening.css'",
+  "import './selective-visual-port.css'"
 ]);
 
 assert(!existsSync(resolve(root, 'apps/web/src/experience-reconciliation.css')), 'Retired visual override was restored.');
@@ -179,6 +215,8 @@ for (const [label, css] of [
   ['workspace', workspaceCss],
   ['landing', landingCss],
   ['composition', composition],
+  ['hardening', hardening],
+  ['selective visual port', completion],
   ['static public', staticPublicCss]
 ]) {
   const open = (css.match(/{/g) ?? []).length;
@@ -198,10 +236,13 @@ console.log(JSON.stringify({
     'sovereign-modern.css',
     'landing-production.css',
     'interface-composition.css',
+    'premium-surface-hardening.css',
+    'selective-visual-port.css',
     'platform-public.css'
   ],
   coveredSurfaces: ['home', 'how-it-works', 'pricing', 'faq', 'login', 'signup', 'onboarding', 'invitation', 'workspace', 'privacy', 'terms', 'not-found'],
-  responsiveBreakpoints: ['1080px', '1000px', '920px', '700px'],
+  responsiveBreakpoints: ['1080px', '1000px', '920px', '700px', '680px'],
   exactBasis: true,
-  contextualCovenant: true
+  contextualCovenant: true,
+  selectiveVisualPort: true
 }, null, 2));

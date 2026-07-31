@@ -1,0 +1,107 @@
+/* Focused completion layer for the approved v0-reference visual port. */
+
+.story-fixture-boundary {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  padding: 18px 24px;
+  border-bottom: 1px solid rgba(238, 232, 223, .08);
+  color: #77726b;
+  background: #0a0b0a;
+  font-size: .62rem;
+  font-weight: 720;
+  letter-spacing: .14em;
+  line-height: 1.45;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.relationship-baseline-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(238, 232, 223, .08);
+  background: rgba(7, 8, 7, .2);
+}
+
+.relationship-baseline-pair article {
+  display: grid;
+  min-width: 0;
+  min-height: 78px;
+  align-content: center;
+  gap: 5px;
+  padding: 12px 14px;
+  border: 1px solid rgba(238, 232, 223, .1);
+  border-radius: 12px;
+  background: #111211;
+}
+
+.relationship-baseline-pair article > span {
+  color: #8d8881;
+  font-size: .59rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.relationship-baseline-pair article > strong {
+  color: #e8e2da;
+  font-family: var(--serif);
+  font-size: .95rem;
+  font-weight: 510;
+}
+
+.relationship-baseline-pair article > small {
+  color: #77726b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .55rem;
+}
+
+.relationship-baseline-pair > i {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid rgba(221, 162, 115, .3);
+  border-radius: 50%;
+  color: #c99a77;
+  font-size: .72rem;
+  font-style: normal;
+}
+
+@media (max-width: 680px) {
+  .story-fixture-boundary {
+    padding-inline: 18px;
+    font-size: .56rem;
+  }
+
+  .relationship-baseline-pair {
+    gap: 7px;
+    padding: 14px;
+  }
+
+  .relationship-baseline-pair article {
+    min-height: 72px;
+    padding: 10px;
+  }
+
+  .relationship-baseline-pair > i {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .relationship-baseline-pair,
+  .story-fixture-boundary {
+    scroll-behavior: auto;
+  }
+}
+
+@media (forced-colors: active) {
+  .relationship-baseline-pair article,
+  .relationship-baseline-pair > i {
+    border-color: CanvasText;
+  }
+}

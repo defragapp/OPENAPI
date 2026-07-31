@@ -3,9 +3,11 @@ import { existsSync, readFileSync } from 'node:fs';
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const authenticatedWorkspace = readFileSync('apps/web/src/AuthenticatedWorkspace.tsx', 'utf8');
 const workspace = readFileSync('apps/web/src/SovereignIntelligenceWorkspace.tsx', 'utf8');
-const workspaceCss = `${readFileSync('apps/web/src/workspace-chat.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8')}`;
+const hardening = readFileSync('apps/web/src/premium-surface-hardening.css', 'utf8');
+const selectivePort = readFileSync('apps/web/src/selective-visual-port.css', 'utf8');
+const workspaceCss = `${readFileSync('apps/web/src/workspace-chat.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8')}\n${hardening}\n${selectivePort}`;
 const landing = readFileSync('apps/web/src/PublicLanding.tsx', 'utf8');
-const landingCss = `${readFileSync('apps/web/src/public-landing.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8')}`;
+const landingCss = `${readFileSync('apps/web/src/public-landing.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8')}\n${hardening}\n${selectivePort}`;
 const cohesion = readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8');
 const contextField = readFileSync('apps/web/public/assets/sovereign-context-field.svg', 'utf8');
 const staticExperienceCss = readFileSync('apps/web/public/static-experience.css', 'utf8');
@@ -26,6 +28,8 @@ requireAll('authenticated app entry', main, [
   "import { AuthenticatedWorkspace } from './AuthenticatedWorkspace'",
   "import './workspace-chat.css'",
   "import './sovereign-cohesion.css'",
+  "import './premium-surface-hardening.css'",
+  "import './selective-visual-port.css'",
   "location.pathname === '/app'",
   '<AuthenticatedWorkspace />'
 ]);
@@ -105,6 +109,23 @@ requireAll('canonical cohesion system', cohesion, [
   'env(safe-area-inset-bottom)'
 ]);
 
+requireAll('selective visual port layer', `${landing}\n${hardening}\n${selectivePort}`, [
+  'STEP 01 · YOU',
+  'STEP 02 · YOU + 1',
+  'STEP 03 · YOUR WHOLE SYSTEM',
+  'visual-reasoning-panel',
+  'className="visual-evidence-chips"',
+  'className="relationship-baseline-pair"',
+  'className="story-system-map"',
+  '.sovereign-story-step',
+  '.response-thread .answer-baseline',
+  '.response-thread .relationship-answer > div:first-child',
+  '.system-overview .system-graph',
+  '.response-thread .basis-strip',
+  '.relationship-baseline-pair',
+  '.story-fixture-boundary'
+]);
+
 requireAll('workspace layout and accessibility', workspaceCss, [
   'width:224px',
   'width:360px',
@@ -114,7 +135,9 @@ requireAll('workspace layout and accessibility', workspaceCss, [
   '@media(max-width:980px)',
   '@media(max-width:760px)',
   '@media(max-width:420px)',
+  '@media (max-width: 680px)',
   '@media(prefers-reduced-motion:reduce)',
+  '@media (prefers-reduced-motion: reduce)',
   'env(safe-area-inset-bottom)'
 ]);
 
@@ -126,6 +149,7 @@ requireAll('public category clarity', landing, [
   'Why do I keep taking responsibility for everyone else?',
   'EXAMPLE ANSWER',
   'Sanitized demonstration · Not your Baseline',
+  'Sanitized product demonstrations · Illustrative Baseline values · Not your personal result',
   'Build my Baseline'
 ]);
 if (landing.indexOf('Sanitized demonstration · Not your Baseline') > landing.indexOf('YOU ASKED')) {
@@ -153,15 +177,23 @@ requireAll('public product stage', landing, [
 if (landing.includes('Healing isn’t optional. Holding the pain is.')) {
   throw new Error('The public homepage must not present Sovereign.OS as a healing product.');
 }
+for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'localStorage']) {
+  if (landing.includes(prohibited)) throw new Error(`The public homepage contains prohibited mock or scoring behavior: ${prohibited}`);
+}
 
 requireAll('public visual accessibility', landingCss, [
   'font-size:clamp(3.75rem,5.2vw,4.25rem)',
   'min-height:44px',
   'min-width: 320px',
+  '.relationship-baseline-pair',
+  '.story-person-node[aria-pressed="true"]',
   '@media(max-width:980px)',
   '@media(max-width:760px)',
   '@media(max-width:420px)',
-  '@media(prefers-reduced-motion:reduce)'
+  '@media (max-width: 680px)',
+  '@media(prefers-reduced-motion:reduce)',
+  '@media (prefers-reduced-motion: reduce)',
+  '@media (forced-colors: active)'
 ]);
 
 requireAll('Sovereign context field asset', contextField, [
@@ -178,7 +210,6 @@ requireAll('static public support experience', staticExperienceCss, [
   '.pricing-grid',
   '.pricing-page .pricing-hero > p:last-child',
   '.questions-page .questions-hero > p:last-child',
-  '.questions-page .faq-section',
   '.price-card-body',
   '.plan-comparison-list',
   '.faq-list details',
@@ -220,6 +251,15 @@ for (const prohibited of ['God is telling you', 'They secretly want', 'This prov
   if (`${workspace}\n${landing}`.toLowerCase().includes(prohibited.toLowerCase())) {
     throw new Error(`User interface contains prohibited framing: ${prohibited}`);
   }
+}
+
+for (const [label, css] of [
+  ['premium hardening', hardening],
+  ['selective visual port', selectivePort]
+]) {
+  const open = (css.match(/{/g) ?? []).length;
+  const close = (css.match(/}/g) ?? []).length;
+  if (open !== close) throw new Error(`${label} CSS has unbalanced braces (${open}/${close}).`);
 }
 
 console.log('Sovereign.OS cohesion release visual and product contract verified.');
