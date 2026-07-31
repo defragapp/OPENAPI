@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import { AppErrorBoundary } from './AppErrorBoundary';
 import { AuthenticatedWorkspace } from './AuthenticatedWorkspace';
+import { installBaselineSupportedRuntime } from './BaselineSupportedRuntime';
 import { EmailCodeFallback, installEmailCodeFallbackRuntime } from './EmailCodeFallback';
 import { ProductCompletionLayer, installProductRuntime } from './ProductCompletionLayer';
 import { installDialogAccessibility } from './dialog-accessibility';
@@ -43,6 +44,7 @@ installProductRuntime();
 installEmailCodeFallbackRuntime();
 installDialogAccessibility();
 installPrivateAnswerExportRuntime();
+installBaselineSupportedRuntime();
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   if (location.hostname === 'sovereign.defrag.app') {
