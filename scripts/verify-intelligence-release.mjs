@@ -14,12 +14,14 @@ const containsAll = (label, text, values) => {
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const composition = read('apps/web/src/interface-composition.css');
 const hardening = read('apps/web/src/premium-surface-hardening.css');
+const completion = read('apps/web/src/selective-visual-port.css');
 const workspaceCss = [
   read('apps/web/src/workspace-chat.css'),
   read('apps/web/src/sovereign-cohesion.css'),
   read('apps/web/src/sovereign-modern.css'),
   composition,
-  hardening
+  hardening,
+  completion
 ].join('\n');
 const landing = read('apps/web/src/PublicLanding.tsx');
 const landingCss = [
@@ -28,7 +30,8 @@ const landingCss = [
   read('apps/web/src/sovereign-modern.css'),
   read('apps/web/src/landing-production.css'),
   composition,
-  hardening
+  hardening,
+  completion
 ].join('\n');
 const staticPublicCss = read('apps/web/public/platform-public.css');
 const prompt = read('apps/sovereign-worker/src/agent/prompt-v1.ts');
@@ -119,21 +122,25 @@ containsAll('current public product contract', landing, [
   'STEP 01 · YOU',
   'STEP 02 · YOU + 1',
   'STEP 03 · YOUR WHOLE SYSTEM',
+  'Sanitized product demonstrations · Illustrative Baseline values · Not your personal result',
   'Another person remains a person—not a data source you control.',
   'No compatibility score.',
   'No mind-reading.',
   'No one-sided access.'
 ]);
 
-containsAll('selective visual port', `${landing}\n${hardening}`, [
+containsAll('selective visual port', `${landing}\n${hardening}\n${completion}`, [
   'className="visual-reasoning-panel',
   'className="visual-evidence-chips"',
+  'className="relationship-baseline-pair"',
   'className="story-system-map"',
   'How Sovereign reads both of you',
   '.response-thread .answer-baseline',
   '.response-thread .relationship-answer > div:first-child',
   '.system-overview .system-graph',
-  '.response-thread .basis-strip'
+  '.response-thread .basis-strip',
+  '.relationship-baseline-pair',
+  '.story-fixture-boundary'
 ]);
 
 for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'localStorage']) {
@@ -196,7 +203,8 @@ containsAll('canonical visual imports', main, [
   "import './sovereign-modern.css'",
   "import './landing-production.css'",
   "import './interface-composition.css'",
-  "import './premium-surface-hardening.css'"
+  "import './premium-surface-hardening.css'",
+  "import './selective-visual-port.css'"
 ]);
 
 assert(!existsSync(resolve(root, 'apps/web/src/experience-reconciliation.css')), 'Retired visual override was restored.');
@@ -208,6 +216,7 @@ for (const [label, css] of [
   ['landing', landingCss],
   ['composition', composition],
   ['hardening', hardening],
+  ['selective visual port', completion],
   ['static public', staticPublicCss]
 ]) {
   const open = (css.match(/{/g) ?? []).length;
@@ -228,6 +237,7 @@ console.log(JSON.stringify({
     'landing-production.css',
     'interface-composition.css',
     'premium-surface-hardening.css',
+    'selective-visual-port.css',
     'platform-public.css'
   ],
   coveredSurfaces: ['home', 'how-it-works', 'pricing', 'faq', 'login', 'signup', 'onboarding', 'invitation', 'workspace', 'privacy', 'terms', 'not-found'],
