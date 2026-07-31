@@ -21,6 +21,15 @@ These instructions apply to the entire OPENAPI repository.
 - The canonical authenticated implementation is `SovereignIntelligenceWorkspace`.
 - Visual explanation must come from Baseline facets, Shadow and Gift, Alignment, relationships, systems, current context, and exact Basis data.
 
+## Typography contract
+- Treat `apps/web/src/typography-system.css` as the platform-wide typography source of truth.
+- Use `--font-display` for every meaningful heading and title across public, authenticated, onboarding, policy, modal, drawer, answer, relationship, system, Alignment, and Covenant surfaces.
+- Use `--font-subheading` only for short supporting introductions and secondary headings.
+- Preserve `--font-body` for paragraphs, controls, evidence, metadata, inputs, and long-form answers.
+- New headings must use semantic heading elements whenever possible so the typography contract applies automatically.
+- Do not add component-local font families or bypass the shared typography tokens without a documented product exception.
+- Typography-only work must not alter copy, line breaks, layout, spacing, dimensions, colors, backgrounds, borders, imagery, motion, responsive behavior, or product logic.
+
 ## Safety, consent, and privacy
 - Always distinguish a stable Baseline facet, temporary current context, observed behavior supplied or confirmed by the user, role and material context, and unknown actual state.
 - Never diagnose, assign hidden motives, claim exact emotions, predict with certainty, or present Baseline/current sky/psychological/biblical interpretation as deterministic proof.
