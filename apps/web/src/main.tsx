@@ -26,6 +26,7 @@ import './auth-onboarding.css';
 import './email-code-fallback.css';
 import './unified-entry.css';
 import './account-control.css';
+import './baseline-supported-runtime.css';
 
 /* Shared product system, route-owned landing layout, and composition hierarchy. */
 import './sovereign-cohesion.css';
