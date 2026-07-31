@@ -1,0 +1,63 @@
+name: One-time sovv-web production release
+
+on:
+  push:
+    branches:
+      - ops/one-time-sovv-web-deploy-20260731
+    paths:
+      - .github/workflows/one-time-sovv-web-production.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: one-time-sovv-web-production-20260731
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/ops/one-time-sovv-web-deploy-20260731'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: 8b1954d216d65077c6480d62583fe2c2
+      VITE_TURNSTILE_SITE_KEY: 0x4AAAAAADhGIF8-iOLIg8MU
+      TARGET_SHA: 46272032bb92a5a8da335510fa4d52ccdfa7b400
+
+    steps:
+      - name: Check out exact production source
+        uses: actions/checkout@v4
+        with:
+          ref: 46272032bb92a5a8da335510fa4d52ccdfa7b400
+          fetch-depth: 1
+
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}"
+          corepack enable
+          pnpm install --frozen-lockfile
+
+      - name: Verify canonical Cloudflare release
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm verify:cloudflare-build
+
+      - name: Deploy exact SHA to sovv-web
+        shell: bash
+        run: |
+          set -euo pipefail
+          env -u GITHUB_SHA \
+            WORKERS_CI_COMMIT_SHA="$TARGET_SHA" \
+            CLOUDFLARE_ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID" \
+            CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN" \
+            VITE_TURNSTILE_SITE_KEY="$VITE_TURNSTILE_SITE_KEY" \
+            pnpm production:deploy
