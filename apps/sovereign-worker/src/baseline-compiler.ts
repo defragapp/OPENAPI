@@ -1,6 +1,7 @@
 import type { Env } from './env';
 import { computeConfiguredBaseline } from './baseline';
 import { baselineSourceDataSchema, type BaselineSourceData } from './baseline-contracts';
+import { sanitizeCompilerBaselineResult } from './baseline-compiler-source';
 import { ensureBaselineFacetProfile } from './baseline-facets';
 import { isValidTimeZone } from './baseline-engine';
 import {
@@ -12,7 +13,7 @@ import {
   type CanonicalBaselineSourceInput
 } from './baseline-source-crypto';
 
-export const BASELINE_COMPILER_VERSION = 'baseline-compiler.v1-foundation' as const;
+export const BASELINE_COMPILER_VERSION = 'baseline-compiler.v1-foundation.2' as const;
 export const BASELINE_COMPILER_STAGES = [
   'baseline.resolve_place',
   'baseline.fetch_natal_source',
@@ -152,7 +153,18 @@ export async function getBaselineCompilerStatus(env: Env, accountId: string) {
   if (!run) return { status: 'not_started' as const };
   const stages = await env.DB.prepare(`SELECT stage, status, validation_status,
       uncertainty, failure_code, started_at, completed_at
-    FROM baseline_compiler_stage_results WHERE run_id = ? ORDER BY created_at`)
+    FROM baseline_compiler_stage_results WHERE run_id = ?
+    ORDER BY CASE stage
+      WHEN 'baseline.resolve_place' THEN 1
+      WHEN 'baseline.fetch_natal_source' THEN 2
+      WHEN 'baseline.compute_astrology' THEN 3
+      WHEN 'baseline.compute_human_design' THEN 4
+      WHEN 'baseline.compute_gene_keys' THEN 5
+      WHEN 'baseline.compute_name_systems' THEN 6
+      WHEN 'baseline.validate' THEN 7
+      WHEN 'baseline.generate_facets' THEN 8
+      WHEN 'baseline.finalize' THEN 9
+      ELSE 99 END`)
     .bind(run.id)
     .all<StageResultRow>();
   return {
@@ -247,7 +259,7 @@ async function executeStage(
       if (source.birthTimeCertainty === 'window') {
         return unavailableStage('birth_time_window_engine_not_implemented');
       }
-      const computed = await computeConfiguredBaseline(env, {
+      const rawComputed = await computeConfiguredBaseline(env, {
         birthDate: source.birthDate,
         birthTimeCertainty: source.birthTimeCertainty,
         birthplace: source.resolvedPlace.displayName,
@@ -255,7 +267,8 @@ async function executeStage(
         locationPrecision: 'city_or_regional',
         ...(source.birthTime ? { birthTime: source.birthTime } : {})
       });
-      if (computed.status !== 'completed') throw new Error('baseline_natal_source_unavailable');
+      if (rawComputed.status !== 'completed') throw new Error('baseline_natal_source_unavailable');
+      const computed = sanitizeCompilerBaselineResult(rawComputed);
       return {
         status: 'completed',
         output: { computed },
@@ -287,11 +300,15 @@ async function executeStage(
     case 'baseline.validate': {
       const sourceData = await readFetchedSourceData(env, run.id);
       baselineSourceDataSchema.parse(sourceData);
+      if (sourceData.humanDesign.personalityActivations.length || sourceData.geneKeys.activations.length) {
+        throw new Error('baseline_provisional_framework_values_present');
+      }
       return {
         status: 'completed',
         output: {
           validationLevel: 'supported_reduced',
           fullCompilerReady: false,
+          provisionalFrameworkValuesRemoved: true,
           unavailableModules: ['houses', 'complete_human_design', 'complete_gene_keys', 'name_systems']
         },
         validationStatus: 'supported_reduced',
@@ -331,7 +348,8 @@ async function executeStage(
           version: BASELINE_COMPILER_VERSION,
           validationStatus: 'supported_reduced',
           completeness: 'reduced',
-          fullCompilerReady: false
+          fullCompilerReady: false,
+          provisionalFrameworkValuesRemoved: true
         }
       };
       const provenance = {
@@ -339,6 +357,7 @@ async function executeStage(
         compilerVersion: BASELINE_COMPILER_VERSION,
         sourceInputHash: run.source_input_hash,
         encryptedRecomputableSource: true,
+        provisionalFrameworkValuesRemoved: true,
         fullCompilerReady: false
       };
       await env.DB.prepare(`INSERT INTO baseline_onboarding (
@@ -373,7 +392,7 @@ async function executeStage(
         .run();
       return {
         status: 'completed',
-        output: { status: 'degraded', fullCompilerReady: false },
+        output: { status: 'degraded', fullCompilerReady: false, provisionalFrameworkValuesRemoved: true },
         validationStatus: 'supported_reduced',
         uncertainty: computed.uncertainty === 'low' || computed.uncertainty === 'medium' ? computed.uncertainty : 'high'
       };
@@ -398,6 +417,12 @@ async function loadSourceRecord(env: Env, accountId: string, expectedHash: strin
     .first<SourceRecordRow>();
   if (!row || row.status !== 'confirmed' || row.normalized_input_hash !== expectedHash) {
     throw new Error('baseline_source_record_unavailable');
+  }
+  if (
+    row.source_contract_version !== BASELINE_SOURCE_ENVELOPE_VERSION
+    || row.source_input_version !== BASELINE_SOURCE_INPUT_VERSION
+  ) {
+    throw new Error('baseline_source_contract_version_mismatch');
   }
   return row;
 }
@@ -546,13 +571,15 @@ function safeFailureCode(error: unknown): string {
     'baseline_compiler_version_mismatch',
     'baseline_stage_out_of_order',
     'baseline_source_record_unavailable',
+    'baseline_source_contract_version_mismatch',
     'baseline_source_key_version_unavailable',
     'baseline_source_encryption_key_missing',
     'baseline_source_encryption_key_version_missing',
     'baseline_source_encryption_key_invalid',
     'baseline_natal_source_unavailable',
     'baseline_facets_unavailable',
-    'baseline_prior_stage_unavailable'
+    'baseline_prior_stage_unavailable',
+    'baseline_provisional_framework_values_present'
   ]);
   return allowed.has(code) ? code : 'baseline_stage_failed';
 }
