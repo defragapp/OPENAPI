@@ -1,7 +1,58 @@
-const SAFETY_HEADLINES = new Map<string, 'urgent' | 'grounded' | 'secure-refusal'>([
-  ['Immediate human support matters most.', 'urgent'],
-  ['Separate what is happening from what it may mean.', 'grounded'],
-  ['Private system details stay protected.', 'secure-refusal']
+export type SafetyPresentationMode =
+  | 'emergency'
+  | 'urgent'
+  | 'supportive'
+  | 'grounded'
+  | 'secure-refusal';
+
+interface SafetyPresentation {
+  mode: SafetyPresentationMode;
+  label: string;
+  ariaLabel: string;
+}
+
+const SAFETY_HEADLINES = new Map<string, SafetyPresentation>([
+  ['Your immediate safety comes first.', {
+    mode: 'emergency',
+    label: 'Sovereign · Immediate safety',
+    ariaLabel: 'Emergency human support response'
+  }],
+  ['Pause the interpretation and check safety.', {
+    mode: 'urgent',
+    label: 'Sovereign · Urgent safety',
+    ariaLabel: 'Urgent human support response'
+  }],
+  ['Bring in a grounded human point of contact.', {
+    mode: 'supportive',
+    label: 'Sovereign · Human support',
+    ariaLabel: 'Grounded human support response'
+  }],
+  ['Keep meaning and evidence separate.', {
+    mode: 'grounded',
+    label: 'Sovereign · Grounded response',
+    ariaLabel: 'Grounded safety response'
+  }],
+  ['That internal access is not available.', {
+    mode: 'secure-refusal',
+    label: 'Sovereign · Protected boundary',
+    ariaLabel: 'Protected system boundary response'
+  }],
+  // Temporary aliases preserve presentation for already-persisted answers from the prior contract.
+  ['Immediate human support matters most.', {
+    mode: 'urgent',
+    label: 'Sovereign · Urgent safety',
+    ariaLabel: 'Urgent human support response'
+  }],
+  ['Separate what is happening from what it may mean.', {
+    mode: 'grounded',
+    label: 'Sovereign · Grounded response',
+    ariaLabel: 'Grounded safety response'
+  }],
+  ['Private system details stay protected.', {
+    mode: 'secure-refusal',
+    label: 'Sovereign · Protected boundary',
+    ariaLabel: 'Protected system boundary response'
+  }]
 ]);
 
 let observer: MutationObserver | null = null;
@@ -11,22 +62,16 @@ export function installSafetyResponseRuntime(): void {
   const apply = () => {
     document.querySelectorAll<HTMLElement>('.sovereign-answer').forEach((answer) => {
       const headline = answer.querySelector('h2')?.textContent?.trim() ?? '';
-      const mode = SAFETY_HEADLINES.get(headline);
-      if (!mode) return;
-      answer.dataset.sovereignSafety = mode;
-      answer.setAttribute('aria-label', mode === 'urgent'
-        ? 'Immediate human support response'
-        : mode === 'grounded'
-          ? 'Grounded safety response'
-          : 'Protected system boundary response');
+      const presentation = SAFETY_HEADLINES.get(headline);
+      if (!presentation) return;
+
+      answer.dataset.sovereignSafety = presentation.mode;
+      answer.setAttribute('aria-label', presentation.ariaLabel);
+      answer.setAttribute('role', presentation.mode === 'emergency' || presentation.mode === 'urgent' ? 'alert' : 'region');
+      answer.setAttribute('aria-live', presentation.mode === 'emergency' ? 'assertive' : 'polite');
+
       const label = answer.querySelector<HTMLElement>('header > span');
-      if (label) {
-        label.textContent = mode === 'urgent'
-          ? 'Sovereign · Immediate support'
-          : mode === 'grounded'
-            ? 'Sovereign · Grounded response'
-            : 'Sovereign · Protected boundary';
-      }
+      if (label) label.textContent = presentation.label;
     });
   };
   observer = new MutationObserver(apply);
