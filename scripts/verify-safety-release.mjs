@@ -53,7 +53,7 @@ requireAll('reviewed safety resources', resources, [
 const safetyDecisionIndex = entry.indexOf('const safetyDecision = decideSovereignInputSafety(message);');
 const entitlementIndex = entry.indexOf('const entitlements = await getEntitlements(env, auth.accountId);');
 const gatewayIndex = entry.indexOf('const aiConfig = resolveAiModelConfig(env);');
-const reserveIndex = entry.indexOf('reserveAiTurn');
+const reserveIndex = entry.indexOf('await reserveAiTurn(');
 assert(safetyDecisionIndex >= 0, 'The deterministic safety decision is missing from the message route.');
 assert(entitlementIndex > safetyDecisionIndex, 'Safety must execute before entitlement lookup.');
 assert(gatewayIndex > safetyDecisionIndex, 'Safety must execute before Gateway/model resolution.');
@@ -93,7 +93,7 @@ requireAll('router regression fixtures', routerTests, [
 ]);
 
 requireAll('presentation regression fixtures', runtimeTests, [
-  "registerSovereignSafetyPayload",
+  'registerSovereignSafetyPayload',
   "'supportive_resources'",
   "'emergency'",
   'does not infer safety state from a headline without validated metadata'
