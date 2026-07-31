@@ -2,8 +2,10 @@ import worker, { ThreadCoordinator, queue, scheduled } from './entry';
 import type { Env } from './env';
 import { transactionalEmailProvider } from './email';
 import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/headers';
+import { requireAuth, requireSameOrigin } from './security/auth';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import { attachD1Bookmark, createD1RequestSession, withD1SessionEnv } from './d1-session';
+import { getBaselineCompilerStatus, startBaselineCompilation } from './baseline-compiler';
 
 const HEALTH_PATHS = new Set(['/health', '/healthz', '/ready']);
 const STRIPE_WEBHOOK_PATHS = new Set([
@@ -68,6 +70,23 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
 
   if (DISABLED_PATH_PREFIXES.some((prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`))) {
     return withSecurityHeaders(Response.json({ error: 'not_found' }, { status: 404 }));
+  }
+
+  if (request.method === 'POST' && url.pathname === '/api/v1/baseline/onboarding') {
+    requireSameOrigin(request);
+    const auth = await requireAuth(request, env);
+    const result = await startBaselineCompilation(env, auth.accountId, await request.json().catch(() => ({})));
+    return withSecurityHeaders(Response.json({ baseline: result }, {
+      status: 202,
+      headers: { 'cache-control': 'private, no-store' }
+    }));
+  }
+
+  if (request.method === 'GET' && url.pathname === '/api/v1/baseline/status') {
+    const auth = await requireAuth(request, env);
+    return withSecurityHeaders(Response.json({ baseline: await getBaselineCompilerStatus(env, auth.accountId) }, {
+      headers: { 'cache-control': 'private, no-store' }
+    }));
   }
 
   if (request.method === 'GET' && HEALTH_PATHS.has(url.pathname)) {
@@ -139,12 +158,13 @@ async function shareFirstAccountResponse(request: Request, env: Env, executionCo
 async function healthResponse(pathname: string, env: Env): Promise<Response> {
   try {
     const db = await env.DB.prepare(`SELECT 1 AS ok,
-      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_daily_capacity') AS capacity_ready`)
-      .first<{ ok: number; capacity_ready: number }>();
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_daily_capacity') AS capacity_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'baseline_source_records') AS baseline_source_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'baseline_compiler_runs') AS baseline_compiler_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'baseline_compiler_stage_results') AS baseline_stages_ready`)
+      .first<{ ok: number; capacity_ready: number; baseline_source_ready: number; baseline_compiler_ready: number; baseline_stages_ready: number }>();
     const aiConfig = resolveAiModelConfig(env);
     const emailProvider = transactionalEmailProvider(env);
-    // Production now resolves Resend first. This retained text is the previous release verifier fingerprint:
-    // transactionalEmail: env.EMAIL ? 'cloudflare-binding' : env.RESEND_API_KEY ? 'resend' : 'missing'
     const authConfigured = Boolean(
       env.SESSION_SIGNING_SECRET
       && env.TURNSTILE_SECRET_KEY
@@ -159,6 +179,9 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && env.STRIPE_CANCEL_URL
       && env.STRIPE_PORTAL_RETURN_URL
     );
+    const compilerSchemaConfigured = db?.baseline_source_ready === 1
+      && db?.baseline_compiler_ready === 1
+      && db?.baseline_stages_ready === 1;
     const dependencies = {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
       aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing',
@@ -167,8 +190,10 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       ai: aiConfig.provider === 'cloudflare-gateway' && env.AI && env.AI_GATEWAY_ID ? 'configured' : 'missing',
       aiGateway: env.AI_GATEWAY_ID ? 'configured' : 'missing',
       baselineEngine: env.BASELINE_HORIZONS_URL ? 'configured' : 'missing',
+      baselineCompilerSchema: compilerSchemaConfigured ? 'configured' : 'missing',
+      baselineSourceEncryption: env.BASELINE_SOURCE_ENCRYPTION_KEY && env.BASELINE_SOURCE_ENCRYPTION_KEY_VERSION ? 'configured' : 'missing',
       baselineObserver: 'Earth geocenter 500@399',
-      birthplaceGeocoder: 'disabled',
+      birthplaceResolver: 'confirmed-server-contract',
       authentication: authConfigured ? 'configured' : 'missing',
       transactionalEmail: emailProvider,
       publicContactEmail: env.PUBLIC_CONTACT_EMAIL || 'info@defrag.app',
@@ -187,6 +212,8 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && dependencies.assets === 'configured'
       && dependencies.ai === 'configured'
       && dependencies.baselineEngine === 'configured'
+      && dependencies.baselineCompilerSchema === 'configured'
+      && dependencies.baselineSourceEncryption === 'configured'
       && dependencies.authentication === 'configured'
       && dependencies.transactionalEmail === 'resend'
       && dependencies.stripe === 'configured';
@@ -195,9 +222,9 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       ...(pathname === '/ready' ? { ready } : {}),
       version: env.APP_VERSION,
       environment: env.APP_ENV,
-      migrationVersion: '0013_workers_ai_free_capacity',
+      migrationVersion: '0014_baseline_compiler_foundation',
       answerContract: 'sovereign-answer.v2',
-      baselineContract: 'baseline-source.v1+baseline-facets.v1',
+      baselineContract: 'baseline-source-input.v2+baseline-source-envelope.v1+baseline-source.v1+baseline-facets.v1',
       dependencies
     }));
   } catch {
