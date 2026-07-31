@@ -41,6 +41,8 @@ export interface Env {
   BASELINE_TIMEZONE_URL?: string;
   BASELINE_HORIZONS_URL?: string;
   BASELINE_PROVIDER_TIMEOUT_MS?: string;
+  BASELINE_SOURCE_ENCRYPTION_KEY?: string;
+  BASELINE_SOURCE_ENCRYPTION_KEY_VERSION?: string;
 }
 
 export interface AuthContext {
