@@ -48,7 +48,8 @@
     "TURNSTILE_EXPECTED_HOSTNAME": "app.defrag.app",
     "SCRIPTURE_TRANSLATION": "WEB",
     "BASELINE_HORIZONS_URL": "https://ssd.jpl.nasa.gov/api/horizons.api",
-    "BASELINE_PROVIDER_TIMEOUT_MS": "8000"
+    "BASELINE_PROVIDER_TIMEOUT_MS": "8000",
+    "BASELINE_SOURCE_ENCRYPTION_KEY_VERSION": "v1"
   },
   "d1_databases": [
     {
