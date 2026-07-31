@@ -17,7 +17,7 @@ concurrency:
 jobs:
   deploy:
     if: github.event.pull_request.head.ref == 'ops/one-time-sovv-web-deploy-20260731'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 60
     env:
       TARGET_SHA: 46272032bb92a5a8da335510fa4d52ccdfa7b400
