@@ -77,6 +77,16 @@ describe('encrypted Baseline source storage', () => {
     expect(() => parseCanonicalBaselineSourceInput({ ...sourceInput, fullBirthName: ' ' })).toThrow();
   });
 
+  it('rejects calendar dates that JavaScript would otherwise normalize', () => {
+    expect(() => parseCanonicalBaselineSourceInput({ ...sourceInput, birthDate: '2024-02-31' })).toThrow(
+      'Invalid birth date'
+    );
+    expect(() => parseCanonicalBaselineSourceInput({ ...sourceInput, birthDate: '2023-02-29' })).toThrow(
+      'Invalid birth date'
+    );
+    expect(() => parseCanonicalBaselineSourceInput({ ...sourceInput, birthDate: '2024-02-29' })).not.toThrow();
+  });
+
   it('requires an explicit supported birth-time shape and confirmed resolved place', () => {
     expect(() => parseCanonicalBaselineSourceInput({
       ...sourceInput,
