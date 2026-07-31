@@ -1,0 +1,89 @@
+/*
+ * Sovereign.OS typography contract.
+ *
+ * Typography-only layer: no layout, spacing, color, component, or content changes.
+ * The display stack follows the approved high-contrast editorial reference while
+ * retaining production-safe local fallbacks when a licensed Canela asset is not
+ * available in the browser. Body and interface copy keep the existing UI stack.
+ */
+
+:root {
+  --font-display:
+    "Canela",
+    "Canela Deck",
+    "Bodoni 72",
+    Didot,
+    "Bodoni MT",
+    "Iowan Old Style",
+    "Palatino Linotype",
+    "Book Antiqua",
+    Georgia,
+    serif;
+  --font-subheading:
+    "Suisse Int'l",
+    "Neue Haas Grotesk Text Pro",
+    "Avenir Next",
+    Avenir,
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+  --font-body:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+
+  /* Preserve the existing token API while making the approved display face global. */
+  --serif: var(--font-display);
+  --sans: var(--font-body);
+}
+
+/* Every semantic title and heading uses the shared editorial display face. */
+:where(h1, h2, h3, h4, h5, h6, [role="heading"]) {
+  font-family: var(--font-display) !important;
+}
+
+/* Brand and non-semantic product titles that function as headings. */
+:where(
+  .landing-wordmark,
+  .brand-button,
+  .demo-window > header strong,
+  .reasoning-panel > header strong,
+  .hero-answer > header strong,
+  .baseline-context-core > strong,
+  .baseline-context-line > strong,
+  .living-question,
+  .response-headline,
+  .workspace-title,
+  .surface-title,
+  .page-title,
+  .section-title,
+  .modal-title,
+  .drawer-title,
+  .dialog-title,
+  .empty-state-title
+) {
+  font-family: var(--font-display) !important;
+}
+
+/* Premium grotesk for short supporting introductions and subheadings only. */
+:where(
+  .lede,
+  .subheading,
+  .section-introduction,
+  .supporting-heading,
+  .context-heading,
+  .landing-hero-copy > p:not(.landing-kicker, .fixture-label),
+  .landing-foundation > header > p:last-child,
+  .landing-section-header > p:not(.landing-kicker),
+  .story-heading > p,
+  .story-heading-copy > p,
+  .policy-lede,
+  .auth-intro,
+  .workspace-intro
+) {
+  font-family: var(--font-subheading) !important;
+}
