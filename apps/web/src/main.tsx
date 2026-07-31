@@ -5,7 +5,6 @@ import { AppErrorBoundary } from './AppErrorBoundary';
 import { AuthenticatedWorkspace } from './AuthenticatedWorkspace';
 import { EmailCodeFallback, installEmailCodeFallbackRuntime } from './EmailCodeFallback';
 import { ProductCompletionLayer, installProductRuntime } from './ProductCompletionLayer';
-import { installBaselineInputRuntime } from './BaselineInputRuntime';
 import { installDialogAccessibility } from './dialog-accessibility';
 import { installPrivateAnswerExportRuntime } from './PrivateAnswerExportRuntime';
 import { installProductionRuntime } from './ProductionRuntime';
@@ -42,7 +41,6 @@ import './responsive-viewport-contract.css';
 installProductionRuntime();
 installProductRuntime();
 installEmailCodeFallbackRuntime();
-installBaselineInputRuntime();
 installDialogAccessibility();
 installPrivateAnswerExportRuntime();
 
