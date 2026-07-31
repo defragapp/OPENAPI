@@ -45,7 +45,6 @@ installEmailCodeFallbackRuntime();
 installBaselineInputRuntime();
 installDialogAccessibility();
 installPrivateAnswerExportRuntime();
-installPublicLandingViewportContract();
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   if (location.hostname === 'sovereign.defrag.app') {
@@ -82,3 +81,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </AppErrorBoundary>
   </React.StrictMode>
 );
+
+installPublicLandingViewportContract();
