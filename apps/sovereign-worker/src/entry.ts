@@ -9,7 +9,7 @@ import { ensureThread, appendThreadEvent, getOwnedThread, touchThread } from './
 import { getTurn, startTurn, updateTurnStatus } from './db/turns';
 import { getEntitlements } from './db/entitlements';
 import { releaseAiTurn, reserveAiTurn } from './billing/usage';
-import { runSovereignResult } from './agent/sovereign';
+import { runDeterministicSovereignSafety, runSovereignResult, type SovereignDeterministicSafetyResult } from './agent/sovereign';
 import { saveLatestInsightModule } from './db/insight-modules';
 import { canUseDevelopmentFixtures } from './runtime';
 import { clearCurrentConditions, computeCurrentConditions, parseLocationPrecision, type CurrentLocationInput, type LocationPrecision } from './baseline';
@@ -221,6 +221,22 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
   await startTurn(env, auth.accountId, threadId, idempotencyKey, turn.sequence);
   await appendThreadEvent(env, threadId, turn.sequence, 'user_message', { text: message, context: selection }, traceId);
 
+  const deterministicSafety = runDeterministicSovereignSafety(message);
+  if (deterministicSafety) {
+    return completeDeterministicSafetyTurn(
+      request,
+      env,
+      auth.accountId,
+      threadId,
+      idempotencyKey,
+      turn.sequence,
+      traceId,
+      entitlements.plan,
+      selection,
+      deterministicSafety
+    );
+  }
+
   const aiConfig = resolveAiModelConfig(env);
   if (aiConfig.provider !== 'cloudflare-gateway' || !env.AI || !env.AI_GATEWAY_ID) {
     if (!canUseDevelopmentFixtures(env)) {
@@ -316,6 +332,57 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
     ]);
     throw error;
   }
+}
+
+async function completeDeterministicSafetyTurn(
+  request: Request,
+  env: Env,
+  accountId: string,
+  threadId: string,
+  idempotencyKey: string,
+  sequence: number,
+  traceId: string,
+  plan: string,
+  selection: unknown,
+  result: SovereignDeterministicSafetyResult
+): Promise<Response> {
+  const interfaceActions = {
+    version: 2 as const,
+    primary: null,
+    contextual: [],
+    confirmationRequired: true as const
+  };
+  const safety = {
+    version: result.decision.version,
+    disposition: result.decision.disposition,
+    category: result.decision.category
+  };
+  await appendThreadEvent(env, threadId, sequence + 1, 'assistant_plan', {
+    answer: result.answer,
+    safety
+  }, traceId);
+  await appendThreadEvent(env, threadId, sequence + 2, 'assistant_response', {
+    text: result.text,
+    answer: result.answer,
+    basis: [],
+    context: selection,
+    interfaceActions,
+    safety
+  }, traceId);
+  await updateTurnStatus(env, accountId, threadId, idempotencyKey, 'completed');
+  const headers = new Headers({
+    'content-type': 'text/plain; charset=utf-8',
+    'cache-control': 'private, no-store',
+    'x-sovereign-plan': plan,
+    'x-sovereign-answer-version': 'sovereign-answer.v2',
+    'x-sovereign-answer-mode': result.answer.mode,
+    'x-sovereign-answer-depth': result.answer.depth,
+    'x-sovereign-safety-mode': result.answer.safety_mode,
+    'x-sovereign-interface-actions': encodeMetadataHeader(interfaceActions)
+  });
+  return request.headers.get('accept')?.includes('application/vnd.sovereign.answer+json')
+    ? Response.json({ answer: result.answer, basis: [], interfaceActions }, { status: 202, headers })
+    : new Response(result.text, { status: 202, headers });
 }
 
 export { ThreadCoordinator };
