@@ -35,6 +35,7 @@ import './interface-composition.css';
 import './premium-surfaces.css';
 import './premium-surface-hardening.css';
 import './selective-visual-port.css';
+import './premium-platform-release.css';
 
 installProductionRuntime();
 installProductRuntime();
