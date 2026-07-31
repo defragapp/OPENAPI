@@ -47,6 +47,7 @@ export interface Env {
   BASELINE_GEONAMES_TOKEN?: string;
   BASELINE_SOURCE_ENCRYPTION_KEY?: string;
   BASELINE_SOURCE_ENCRYPTION_KEY_VERSION?: string;
+  BASELINE_SOURCE_ENCRYPTION_KEYS?: string;
 }
 
 export interface AuthContext {
