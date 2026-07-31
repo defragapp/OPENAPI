@@ -8,17 +8,19 @@ type FakeAnswer = {
   dataset: Record<string, string>;
   attributes: Map<string, string>;
   headline: FakeTextNode;
+  directAnswer: FakeTextNode;
   label: FakeTextNode;
   querySelector: (selector: string) => FakeTextNode | null;
   setAttribute: (name: string, value: string) => void;
   getAttribute: (name: string) => string | null;
 };
 
-function createAnswer(headline: string, label = 'Sovereign'): FakeAnswer {
+function createAnswer(headline: string, directAnswer: string, label = 'Sovereign'): FakeAnswer {
   const answer: FakeAnswer = {
     dataset: {},
     attributes: new Map(),
     headline: { textContent: headline },
+    directAnswer: { textContent: directAnswer },
     label: { textContent: label },
     querySelector: () => null,
     setAttribute(name, value) {
@@ -30,10 +32,30 @@ function createAnswer(headline: string, label = 'Sovereign'): FakeAnswer {
   };
   answer.querySelector = (selector) => selector === 'h2'
     ? answer.headline
-    : selector === 'header > span'
-      ? answer.label
-      : null;
+    : selector === '.direct-answer'
+      ? answer.directAnswer
+      : selector === 'header > span'
+        ? answer.label
+        : null;
   return answer;
+}
+
+function safetyAnswer(headline: string, directAnswer: string, presentation: 'grounded' | 'supportive_resources' | 'urgent' | 'emergency' | 'secure_refusal') {
+  return {
+    answer: {
+      version: 'sovereign-answer.v2',
+      headline,
+      direct_answer: directAnswer,
+      safety: {
+        version: 'sovereign-safety-response.v1',
+        disposition: presentation === 'emergency' ? 'urgent' : presentation,
+        category: presentation === 'secure_refusal' ? 'protected_system_request' : 'immediate_self_harm',
+        presentation,
+        resource_catalog_version: 'safety-resources.2026-07-31.1',
+        resources: []
+      }
+    }
+  };
 }
 
 function installDeterministicDom(answers: FakeAnswer[]): void {
@@ -57,34 +79,53 @@ afterEach(() => {
 });
 
 describe('safety response presentation runtime', () => {
-  it('labels urgent deterministic responses and removes ordinary answer controls', async () => {
-    const urgent = createAnswer('Immediate human support matters most.', 'Sovereign · Baseline');
-    installDeterministicDom([urgent]);
-    const { installSafetyResponseRuntime } = await import('./SafetyResponseRuntime');
+  it('uses explicit server-owned metadata for emergency presentation and removes ordinary controls', async () => {
+    const headline = 'Immediate human support matters most.';
+    const directAnswer = 'Contact local emergency services and bring another person into this now.';
+    const emergency = createAnswer(headline, directAnswer, 'Sovereign · Baseline');
+    installDeterministicDom([emergency]);
+    const { installSafetyResponseRuntime, registerSovereignSafetyPayload } = await import('./SafetyResponseRuntime');
 
+    registerSovereignSafetyPayload(safetyAnswer(headline, directAnswer, 'emergency'));
     installSafetyResponseRuntime();
 
-    expect(urgent.dataset.sovereignSafety).toBe('urgent');
-    expect(urgent.getAttribute('aria-label')).toBe('Immediate human support response');
-    expect(urgent.label.textContent).toBe('Sovereign · Immediate support');
+    expect(emergency.dataset.sovereignSafety).toBe('emergency');
+    expect(emergency.getAttribute('aria-label')).toBe('Immediate human support response');
+    expect(emergency.label.textContent).toBe('Sovereign · Immediate support');
     expect(css).toContain('[data-sovereign-safety] .answer-actions');
     expect(css).toContain('[data-sovereign-safety] .answer-evidence-row');
     expect(css).toContain('display: none !important');
   });
 
-  it('recognizes grounded and protected-boundary deterministic responses only', async () => {
-    const grounded = createAnswer('Separate what is happening from what it may mean.');
-    const protectedBoundary = createAnswer('Private system details stay protected.');
-    const ordinary = createAnswer('An ordinary Baseline answer.');
-    installDeterministicDom([grounded, protectedBoundary, ordinary]);
+  it('supports grounded, supportive, urgent, and protected presentation states from metadata', async () => {
+    const cases = [
+      ['Grounded answer', 'Check what can be directly observed.', 'grounded', 'Sovereign · Grounded response'],
+      ['Support answer', 'Bring another person into this today.', 'supportive_resources', 'Sovereign · Support resources'],
+      ['Urgent answer', 'Contact urgent human support now.', 'urgent', 'Sovereign · Urgent support'],
+      ['Protected answer', 'Private context stays protected.', 'secure_refusal', 'Sovereign · Protected boundary']
+    ] as const;
+    const answers = cases.map(([headline, direct]) => createAnswer(headline, direct));
+    const ordinary = createAnswer('An ordinary Baseline answer.', 'This answer has no safety metadata.');
+    installDeterministicDom([...answers, ordinary]);
+    const { installSafetyResponseRuntime, registerSovereignSafetyPayload } = await import('./SafetyResponseRuntime');
+
+    cases.forEach(([headline, direct, presentation]) => registerSovereignSafetyPayload(safetyAnswer(headline, direct, presentation)));
+    installSafetyResponseRuntime();
+
+    cases.forEach(([, , presentation, label], index) => {
+      expect(answers[index]!.dataset.sovereignSafety).toBe(presentation.replaceAll('_', '-'));
+      expect(answers[index]!.label.textContent).toBe(label);
+    });
+    expect(ordinary.dataset.sovereignSafety).toBeUndefined();
+  });
+
+  it('does not infer safety state from a headline without validated metadata', async () => {
+    const oldHeadlineOnly = createAnswer('Immediate human support matters most.', 'No explicit safety field was supplied.');
+    installDeterministicDom([oldHeadlineOnly]);
     const { installSafetyResponseRuntime } = await import('./SafetyResponseRuntime');
 
     installSafetyResponseRuntime();
 
-    expect(grounded.dataset.sovereignSafety).toBe('grounded');
-    expect(grounded.label.textContent).toBe('Sovereign · Grounded response');
-    expect(protectedBoundary.dataset.sovereignSafety).toBe('secure-refusal');
-    expect(protectedBoundary.label.textContent).toBe('Sovereign · Protected boundary');
-    expect(ordinary.dataset.sovereignSafety).toBeUndefined();
+    expect(oldHeadlineOnly.dataset.sovereignSafety).toBeUndefined();
   });
 });
