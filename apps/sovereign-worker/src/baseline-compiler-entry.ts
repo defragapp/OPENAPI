@@ -7,11 +7,10 @@ import {
   resolveCanonicalBaselineSubmission,
   type BaselinePlaceQuery
 } from './baseline-place-resolution';
+import type { CanonicalBaselineSourceInput } from './baseline-source-crypto';
+import { resolveHistoricalCivilTime } from './historical-timezone';
 
-const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(
-  (value) => !Number.isNaN(Date.parse(`${value}T00:00:00Z`)),
-  'Invalid birth date'
-);
+const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(isValidCalendarDate, 'Invalid birth date');
 const timeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 const legacySubmissionSchema = z.object({
   birthDate: dateSchema,
@@ -36,6 +35,7 @@ export async function startConfirmedBaselineCompilation(env: Env, accountId: str
   const canonical = typeof input.placeResolutionId === 'string'
     ? await resolveCanonicalBaselineSubmission(env, accountId, rawInput)
     : await resolveLegacyBaselineSubmission(env, accountId, rawInput);
+  assertUniqueHistoricalBirthTime(canonical);
   return startBaselineCompilation(env, accountId, canonical);
 }
 
@@ -72,6 +72,33 @@ async function resolveLegacyBaselineSubmission(env: Env, accountId: string, rawI
   });
 }
 
+function assertUniqueHistoricalBirthTime(source: CanonicalBaselineSourceInput) {
+  if (!source.birthTime) return;
+  const resolution = resolveHistoricalCivilTime(
+    source.birthDate,
+    source.birthTime,
+    source.resolvedPlace.timezone
+  );
+  if (resolution.status === 'nonexistent') {
+    throw Response.json({
+      error: 'baseline_birth_time_nonexistent',
+      message: 'That local birth time did not occur because the clock changed. Confirm the recorded time before calculating the Baseline.'
+    }, {
+      status: 422,
+      headers: { 'cache-control': 'private, no-store' }
+    });
+  }
+  if (resolution.status === 'ambiguous') {
+    throw Response.json({
+      error: 'baseline_birth_time_ambiguous',
+      message: 'That local birth time occurred twice because the clock changed. A confirmed offset or occurrence is required before calculating the Baseline.'
+    }, {
+      status: 409,
+      headers: { 'cache-control': 'private, no-store' }
+    });
+  }
+}
+
 function parseBirthplace(value: string): BaselinePlaceQuery {
   const parts = value.split(',').map((part) => part.trim()).filter(Boolean);
   if (parts.length < 3) {
@@ -87,6 +114,18 @@ function parseBirthplace(value: string): BaselinePlaceQuery {
   const country = parts[parts.length - 1]!;
   const region = parts.slice(1, -1).join(', ');
   return { city, region, country };
+}
+
+function isValidCalendarDate(value: string): boolean {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year
+    && date.getUTCMonth() + 1 === month
+    && date.getUTCDate() === day;
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
