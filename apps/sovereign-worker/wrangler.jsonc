@@ -21,7 +21,8 @@
     "THREAD_RETENTION_DAYS": "30",
     "AUDIT_RETENTION_DAYS": "90",
     "BASELINE_HORIZONS_URL": "https://ssd.jpl.nasa.gov/api/horizons.api",
-    "BASELINE_PROVIDER_TIMEOUT_MS": "8000"
+    "BASELINE_PROVIDER_TIMEOUT_MS": "8000",
+    "BASELINE_SOURCE_ENCRYPTION_KEY_VERSION": "dev-v1"
   },
   "d1_databases": [
     {
@@ -104,7 +105,8 @@
         "STRIPE_PORTAL_RETURN_URL": "https://sovereign-openapi-preview.sovereign-os-api.workers.dev/app?billing=portal",
         "SCRIPTURE_TRANSLATION": "WEB",
         "BASELINE_HORIZONS_URL": "https://ssd.jpl.nasa.gov/api/horizons.api",
-        "BASELINE_PROVIDER_TIMEOUT_MS": "8000"
+        "BASELINE_PROVIDER_TIMEOUT_MS": "8000",
+        "BASELINE_SOURCE_ENCRYPTION_KEY_VERSION": "preview-v1"
       },
       "d1_databases": [
         {
