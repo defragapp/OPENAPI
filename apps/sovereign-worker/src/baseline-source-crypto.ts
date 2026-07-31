@@ -4,10 +4,7 @@ import type { Env } from './env';
 export const BASELINE_SOURCE_INPUT_VERSION = 'baseline-source-input.v2' as const;
 export const BASELINE_SOURCE_ENVELOPE_VERSION = 'baseline-source-envelope.v1' as const;
 
-const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(
-  (value) => !Number.isNaN(Date.parse(`${value}T00:00:00Z`)),
-  'Invalid birth date'
-);
+const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(isValidCalendarDate, 'Invalid birth date');
 const timeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 const normalizedText = (minimum: number, maximum: number) => z.string().trim().min(minimum).max(maximum).transform((value) => value.normalize('NFC'));
 
@@ -141,6 +138,18 @@ function sourceAdditionalData(accountId: string, keyVersion: string): Uint8Array
     sourceInputVersion: BASELINE_SOURCE_INPUT_VERSION,
     keyVersion
   }));
+}
+
+function isValidCalendarDate(value: string): boolean {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year
+    && date.getUTCMonth() + 1 === month
+    && date.getUTCDate() === day;
 }
 
 function canonicalJson(value: unknown): string {
