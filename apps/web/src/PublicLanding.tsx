@@ -1,86 +1,44 @@
-import { useEffect, useState } from 'react';
-import type { KeyboardEvent } from 'react';
+import { useState } from 'react';
 
-const heroAnswer = {
-  question: 'Why do I keep taking responsibility for everyone else?',
-  direct: 'Your capacity is real. The question is whether the responsibility is actually yours.',
-  connection: 'You may create direction quickly when ownership is unclear. That can be a genuine strength. The cost begins when you carry the outcome without matching authority.',
-  experiment: 'Before taking it on, ask: “Am I being asked to lead—or only to absorb the uncertainty?”'
-} as const;
-
-const basisFixture = [
-  { compact: 'U✓', label: 'User-confirmed experience', time: 'Demonstration fixture', uncertainty: 'confirmed' },
-  { compact: 'HD G13.1', label: 'Human Design personality gate 13, line 1', time: 'Demonstration fixture', uncertainty: 'low' },
-  { compact: 'GK ACT13', label: 'Gene Keys activation number 13', time: 'Demonstration fixture', uncertainty: 'low' },
-  { compact: 'N LP1', label: 'Numerology life path 1', time: 'Demonstration fixture', uncertainty: 'low' },
-  { compact: '☉ CAN 04.2°', label: 'Natal Sun, Cancer, 4.2 degrees', time: 'Demonstration fixture', uncertainty: 'low' },
-  { compact: 'LIVE ♄ ARI 02.3°R', label: 'Live Saturn, Aries, 2.3 degrees, retrograde', time: 'Demonstration fixture', uncertainty: 'low' }
+const personalBasis = [
+  { compact: 'SUN · LEO', label: 'Natal Sun in Leo' },
+  { compact: 'GK 13.4', label: 'Gene Key 13, line 4' },
+  { compact: 'GATE 4.11', label: 'Baseline gate 4, line 11' },
+  { compact: 'GK 9', label: 'Gene Key 9' },
+  { compact: 'MARS · CANCER', label: 'Natal Mars in Cancer' }
 ] as const;
 
-const questionAnswers = [
-  {
-    question: 'Why do I respond this way when pressure rises?',
-    mode: 'ABOUT ME',
-    headline: 'A useful strength can become too much responsibility under pressure.',
-    direct: 'Creating direction may be one of your steady capacities. Pressure changes the way you use it: what normally creates clarity can become an attempt to remove uncertainty for everyone.',
-    sections: [['STEADY', 'You can create direction without needing every variable settled.'], ['SHADOW', 'You may take over responsibility before authority has been agreed.'], ['GIFT', 'You can name the decision, the owner, and the next step without carrying every person inside it.'], ['ALIGNMENT', 'The role fits when authority, responsibility, and consequences match.']]
-  },
-  {
-    question: 'Does this decision fit who I am now?',
-    mode: 'A DECISION',
-    headline: 'The choice may fit; the terms determine whether the role does.',
-    direct: 'This choice may use your ability to create direction, but the title alone is not enough. Fit depends on whether you can shape the conditions you will be accountable for.',
-    sections: [['SUPPORTS THE FIT', 'Meaningful authority and room to establish structure.'], ['PULLS AGAINST IT', 'Responsibility for outcomes you cannot influence.'], ['THE REAL TRADEOFF', 'You would accept less autonomy in exchange for stability.'], ['STILL NEEDED', 'A direct answer about decision rights.']]
-  },
-  {
-    question: 'Why does the same moment land differently for us?',
-    mode: 'A RELATIONSHIP',
-    headline: 'You may reach clarity through movement while they reach it through space.',
-    direct: 'Your permitted Baseline may make uncertainty easier once the question is named. Their permitted Baseline may need time before language becomes reliable. Your attempt to create clarity can therefore feel like pressure, while their pause can feel like withdrawal.',
-    sections: [['YOU MAY BE BRINGING', 'Directness that becomes more urgent when the relationship feels unclear.'], ['THEY MAY BE BRINGING', 'A slower route to language; their actual motive remains unknown.'], ['WHAT HAPPENS BETWEEN YOU', 'Urgency shortens their processing time, while silence increases the uncertainty driving your urgency.'], ['WHAT STILL MUST BE ASKED', 'What the pause means to them and when they are willing to return.']]
-  },
-  {
-    question: 'Why does this responsibility keep landing with me?',
-    mode: 'A FAMILY OR TEAM',
-    headline: 'Responsibility may be concentrating with you while authority remains elsewhere.',
-    direct: 'People may bring uncertainty to you because you organize it, while final decisions remain somewhere else. That can make you responsible for continuity without the power to change the conditions creating the pressure.',
-    sections: [['ROLE', 'You notice what is disconnected and create enough structure for the group to keep moving.'], ['PRESSURE FIELD', 'Responsibility concentrates with you while formal authority stays elsewhere.'], ['MOVEMENT', 'When you stop stabilizing automatically, the system has to reveal who will decide and who will participate.'], ['UNKNOWN', 'Each person must participate or confirm how they understand the arrangement.']]
-  }
+const relationshipBasis = [
+  { compact: 'YOU · AUTH EMO', label: 'Your permitted emotional authority' },
+  { compact: 'YOU · NEEDS TIME', label: 'Your permitted decision timing' },
+  { compact: 'MAYA · AUTH SPLENIC', label: 'Maya’s permitted splenic authority' },
+  { compact: 'MAYA · DECIDES NOW', label: 'Maya’s permitted decision timing' }
 ] as const;
 
-const scaleStories = [
-  {
-    label: 'Yourself',
-    title: 'See what remains true—and what pressure changes.',
-    body: 'Explore your Baseline, current context, Shadow, Gift, and Alignment without reducing yourself to a label.',
-    prompt: 'Why do I keep taking responsibility for everyone else?'
-  },
-  {
-    label: 'Relationship',
-    title: 'Understand the interaction from both sides.',
-    body: 'Bring two permitted Baselines together. Keep You, Them, and What Happens Between You distinct.',
-    prompt: 'Why does the same moment land differently for us?'
-  },
-  {
-    label: 'System',
-    title: 'See who decides. See who carries the result.',
-    body: 'Map roles, authority, responsibility, reliance, pressure, and missing perspectives across a family or team.',
-    prompt: 'Why does this responsibility keep landing with me?'
-  }
+const systemBasis = [
+  { compact: 'AUTH · EMO ×3', label: 'Three permitted emotional-authority profiles' },
+  { compact: 'SPLENIC ×1', label: 'One permitted splenic-authority profile' },
+  { compact: 'ROLE · PARENT', label: 'User-confirmed parent role' },
+  { compact: 'SYSTEM · FAMILY', label: 'User-created family system' }
 ] as const;
+
+const systemMembers = [
+  { id: 'you', name: 'You', role: 'Parent', detail: 'SUN · LEO · AUTH · EMO', position: 'node-you' },
+  { id: 'ruth', name: 'Ruth', role: 'Grandparent', detail: 'SUN · CAP · AUTH · EMO', position: 'node-ruth' },
+  { id: 'maya', name: 'Maya', role: 'Partner', detail: 'SUN · VIRGO · AUTH · SPLENIC', position: 'node-maya' },
+  { id: 'noa', name: 'Noa', role: 'Child', detail: 'SUN · PISCES · AUTH · EMO', position: 'node-noa' }
+] as const;
+
+type EvidenceItem = { compact: string; label: string };
+type ReasoningStep = { label: string; title: string; body: string; evidence?: readonly EvidenceItem[] };
 
 export function PublicLanding() {
-  const [selectedQuestion, setSelectedQuestion] = useState(0);
-  const [selectedScale, setSelectedScale] = useState(0);
-  const currentAnswer = questionAnswers[selectedQuestion]!;
-  const currentScale = scaleStories[selectedScale]!;
-
   return (
     <main className="sovereign-landing" data-product-contract="baseline-first" data-answer-contract="sovereign-answer.v2">
       <header className="landing-nav">
         <a className="landing-wordmark" href="/" aria-label="Sovereign.OS home"><span aria-hidden="true" /><strong>SOVEREIGN.OS</strong></a>
         <nav aria-label="Public navigation">
-          <a href="/how-it-works">How it works</a>
+          <a href="#how-it-works">How it works</a>
           <a href="/pricing">Pricing</a>
           <a href="/faq">Questions</a>
           <a href="/login">Sign in</a>
@@ -92,77 +50,52 @@ export function PublicLanding() {
         <div className="landing-hero-copy">
           <h1 id="landing-title">Know yourself.<br />Understand the system.<br /><em>Choose what fits.</em></h1>
           <p>Sovereign.OS is a private AI for understanding yourself, your relationships, and the systems around you. Build your Baseline once, then ask naturally and receive an answer grounded in the person asking.</p>
-          <div className="landing-actions"><a className="landing-primary" href="/signup">Build my Baseline</a><a className="landing-secondary" href="#answer">See a Sovereign answer</a></div>
+          <div className="landing-actions"><a className="landing-primary" href="/signup">Build my Baseline</a><a className="landing-secondary" href="#how-it-works">See how it works</a></div>
           <small>Start free · No card required · Review, correct, or reject any interpretation</small>
         </div>
-        <HeroIntelligenceStage />
+        <HeroAnswerPreview />
       </section>
 
       <section className="landing-foundation" aria-labelledby="foundation-title">
         <header>
           <p className="landing-kicker">A BETTER STARTING POINT</p>
           <h2 id="foundation-title">Your intelligence begins with your Baseline.</h2>
-          <p>Most AI begins with whatever you type into a blank box. Sovereign begins with a lasting reference for how you may decide, communicate, learn, connect, lead, and respond under pressure.</p>
+          <p>Most AI begins with whatever you type into a blank box. Sovereign begins with a stable, correctable reference for how you may decide, communicate, connect, lead, and respond under pressure.</p>
         </header>
-        <BaselineContextStage />
-      </section>
-
-      <section className="landing-section scale-section" aria-labelledby="scale-title">
-        <SectionHeader kicker="ONE INTELLIGENCE · THREE CONNECTED SCALES" title="The question changes. The environment stays the same." id="scale-title">
-          Move from yourself to a relationship or wider system without rebuilding context from the beginning. Sovereign uses only the context that belongs to the question.
-        </SectionHeader>
-        <div className="scale-experience">
-          <nav aria-label="Sovereign intelligence scales" role="tablist">
-            {scaleStories.map((story, index) => <button
-              key={story.label}
-              id={`scale-tab-${index}`}
-              role="tab"
-              aria-selected={selectedScale === index}
-              aria-controls="scale-panel"
-              tabIndex={selectedScale === index ? 0 : -1}
-              onClick={() => setSelectedScale(index)}
-              onKeyDown={(event) => moveTabFocus(event, index, scaleStories.length, setSelectedScale)}
-            ><span>0{index + 1}</span><strong>{story.label}</strong></button>)}
-          </nav>
-          <article id="scale-panel" role="tabpanel" aria-labelledby={`scale-tab-${selectedScale}`}>
-            <p>{currentScale.label.toUpperCase()}</p>
-            <h3>{currentScale.title}</h3>
-            <span>{currentScale.body}</span>
-            <blockquote>“{currentScale.prompt}”</blockquote>
-          </article>
+        <div className="baseline-context-stage">
+          <div className="baseline-context-core"><span>YOUR BASELINE</span><strong>Creates direction when ownership is unclear</strong><small>Stable · explorable · correctable</small></div>
+          <div className="baseline-context-line current"><span>WHAT MAY BE ACTIVE NOW</span><strong>Responsibility may deserve attention for a limited time.</strong><small>Temporary context does not determine behavior.</small></div>
+          <div className="baseline-context-line confirmed"><span>YOUR CONFIRMATION</span><strong>“Yes, this is louder this week.”</strong></div>
+          <div className="baseline-context-line unknown"><span>STILL UNKNOWN</span><strong>How you are actually responding today.</strong></div>
+          <EvidenceChips values={personalBasis} label="BASIS" />
         </div>
       </section>
 
-      <section className="landing-section question-section" id="answer" aria-labelledby="questions-title">
-        <SectionHeader kicker="A REAL QUESTION · A PERSONAL ANSWER" title="Useful language first. Exact support when you want it." id="questions-title">
-          Select a question to see how the answer changes across self, decisions, relationships, and systems while keeping possibility, confirmation, and unknowns separate.
-        </SectionHeader>
-        <div className="landing-question-rail" role="tablist" aria-label="Questions Sovereign can answer">
-          {questionAnswers.map((item, index) => (
-            <button
-              key={item.question}
-              id={`question-tab-${index}`}
-              role="tab"
-              aria-selected={selectedQuestion === index}
-              aria-controls="question-answer-stage"
-              tabIndex={selectedQuestion === index ? 0 : -1}
-              onClick={() => setSelectedQuestion(index)}
-              onKeyDown={(event) => moveTabFocus(event, index, questionAnswers.length, setSelectedQuestion)}
-            >{item.question}</button>
-          ))}
-        </div>
-        <PublicAnswerStage answer={currentAnswer} tabId={`question-tab-${selectedQuestion}`} />
+      <section id="how-it-works" className="sovereign-story-sequence" aria-label="How Sovereign works">
+        <PersonalStory />
+        <RelationshipStory />
+        <SystemStory />
       </section>
 
       <section className="landing-section permission-section" aria-labelledby="permission-title">
-        <SectionHeader kicker="PERMISSION BEFORE COMPARISON" title="Another person remains a person—not a data source you control." id="permission-title">
-          Invitations are identity-bound and use-specific. Each person chooses what Sovereign may use. The product can show interaction, responsibility, and missing perspective without claiming access to private thoughts.
-        </SectionHeader>
-        <PermissionField />
+        <header className="landing-section-header">
+          <p className="landing-kicker">PERMISSION BEFORE COMPARISON</p>
+          <h2 id="permission-title">Another person remains a person—not a data source you control.</h2>
+          <p>Invitations are identity-bound and use-specific. Each person chooses what Sovereign may use. The product can show interaction, responsibility, and missing perspective without claiming access to private thoughts.</p>
+        </header>
+        <div className="permission-boundary">
+          <span>No compatibility score.</span>
+          <span>No mind-reading.</span>
+          <span>No one-sided access.</span>
+          <strong>Consent stays visible at every scale.</strong>
+        </div>
       </section>
 
       <section className="landing-section pricing-preview" aria-labelledby="pricing-title">
-        <SectionHeader kicker="START FREE · EXPAND WITH PERMISSION" title="Begin with yourself. Add relationships and systems when they matter." id="pricing-title" />
+        <header className="landing-section-header">
+          <p className="landing-kicker">START FREE · EXPAND WITH PERMISSION</p>
+          <h2 id="pricing-title">Begin with yourself. Add relationships and systems when they matter.</h2>
+        </header>
         <div className="pricing-options">
           <article><span>FREE</span><h3>Understand yourself.</h3><p>Build and explore your own Baseline. Ask about yourself, what may be more relevant now, and the decisions in front of you.</p><strong>$0 <small>permanent · no card</small></strong><ul><li>10 Sovereign AI turns each month</li><li>Baseline, Today, Shadow, Gift, and Alignment</li><li>Review and correct what does not fit</li></ul><a href="/signup">Build my Baseline</a></article>
           <article><span>SOVEREIGN+</span><h3>Understand the people and systems around you.</h3><p>Bring permitted Baselines together, explore relationships and groups, keep useful understanding, and add Covenant when you choose.</p><strong>$20 <small>/ month</small></strong><p className="annual-price">or $99 / year</p><ul><li>300 Sovereign AI turns each month</li><li>People, Systems, Library, and Covenant</li><li>Consent-aware invitations and sharing controls</li></ul><a href="/pricing">Compare plans</a></article>
@@ -185,170 +118,167 @@ export function PublicLanding() {
   );
 }
 
-function HeroIntelligenceStage() {
+function HeroAnswerPreview() {
   return (
     <article className="hero-intelligence-stage" aria-label="Sovereign answer demonstration">
-      <div className="hero-baseline-core" aria-label="Conceptual Baseline and current context">
-        <span className="baseline-orbit orbit-one" aria-hidden="true" />
-        <span className="baseline-orbit orbit-two" aria-hidden="true" />
-        <span className="baseline-orbit orbit-three" aria-hidden="true" />
-        <div><small>YOUR BASELINE</small><strong>Creating direction</strong><em>when ownership is unclear</em></div>
-        <p className="baseline-signal signal-one"><b>Communication</b> under pressure</p>
-        <p className="baseline-signal signal-two"><b>Responsibility</b> more active</p>
-        <p className="baseline-signal signal-three"><b>Relationship</b> asking for clarity</p>
-      </div>
       <section className="hero-answer">
         <header><span>EXAMPLE ANSWER</span><strong>Sovereign · Personal</strong></header>
         <p className="fixture-label hero-fixture-scope">Sanitized demonstration · Not your Baseline</p>
         <p className="fixture-label">YOU ASKED</p>
-        <p className="living-question">“{heroAnswer.question}”</p>
+        <p className="living-question">“Why do I keep taking responsibility for everyone else?”</p>
         <div className="living-answer-body">
           <span>DIRECT ANSWER</span>
-          <h2>{heroAnswer.direct}</h2>
-          <div className="living-connection"><strong>THE PERSONAL CONNECTION</strong><p>{heroAnswer.connection}</p></div>
-          <aside><strong>A PRACTICAL NEXT STEP</strong>{heroAnswer.experiment}</aside>
+          <h2>Your capacity is real. The question is whether the responsibility is actually yours.</h2>
+          <div className="living-connection"><strong>THE PERSONAL CONNECTION</strong><p>You may create direction quickly when ownership is unclear. The cost begins when you carry the outcome without matching authority.</p></div>
+          <aside><strong>A PRACTICAL NEXT STEP</strong>Ask whether you are being asked to lead—or only to absorb the uncertainty.</aside>
         </div>
-        <details className="living-answer-basis">
-          <summary>Why this is personal · {basisFixture.length} supporting values</summary>
-          <BasisSourceList values={basisFixture} />
-        </details>
+        <EvidenceChips values={personalBasis} label="Why this is personal" />
       </section>
     </article>
   );
 }
 
-function BaselineContextStage() {
+function PersonalStory() {
+  const steps: ReasoningStep[] = [
+    { label: 'STEP 1', title: 'What you’re feeling', body: 'The pull to fix everyone’s problems—often before your own.' },
+    { label: 'STEP 2', title: 'What your Baseline shows', body: 'Stability is a core value, and under stress you may protect others to feel safe.', evidence: personalBasis.slice(1, 3) },
+    { label: 'STEP 3', title: 'The pattern, named', body: 'Taking control is not a flaw. It may be an old safety habit that no longer belongs in every situation.' },
+    { label: 'YOUR NEXT STEP', title: 'Start here', body: 'Notice the first moment responsibility moves toward you, then ask: is this actually mine to carry?' }
+  ];
   return (
-    <div className="baseline-context-stage">
-      <div className="baseline-context-core"><span>YOUR BASELINE</span><strong>Creates direction when ownership is unclear</strong><small>Stable · explorable · correctable</small></div>
-      <div className="baseline-context-line current"><span>WHAT MAY BE ACTIVE NOW</span><strong>Responsibility may deserve attention for a limited time.</strong><small>Temporary context does not determine behavior.</small></div>
-      <div className="baseline-context-line confirmed"><span>YOUR CONFIRMATION</span><strong>“Yes, this is louder this week.”</strong></div>
-      <div className="baseline-context-line unknown"><span>STILL UNKNOWN</span><strong>How you are actually responding today.</strong></div>
-      <PublicBasisStrip values={basisFixture.slice(0, 5)} />
-    </div>
-  );
-}
-
-function PublicAnswerStage({ answer, tabId }: { answer: typeof questionAnswers[number]; tabId: string }) {
-  return (
-    <article id="question-answer-stage" className="public-answer-stage" role="tabpanel" aria-labelledby={tabId} aria-live="polite">
-      <header><span>{answer.mode}</span><small>EXPLORATORY</small><h3>{answer.headline}</h3></header>
-      <p>{answer.direct}</p>
-      <div>{answer.sections.map(([label, body]) => <section key={label}><span>{label}</span><p>{body}</p></section>)}</div>
-      <PublicBasisStrip values={basisFixture.slice(0, 4)} />
+    <article className="sovereign-story-step story-self" aria-labelledby="story-self-title">
+      <StoryHeading step="STEP 01 · YOU" title="Ask about your life." outline="Get an answer built for you." id="story-self-title">
+        You ask a real question. Sovereign reads your Baseline, then works through it step by step—turning a vague feeling into a clearer distinction.
+      </StoryHeading>
+      <div className="visual-story-grid">
+        <DemoWindow title="Sovereign — Chat" className="story-chat-window">
+          <div className="story-conversation">
+            <p className="story-user-message">Why do I keep taking on responsibility for everyone around me?</p>
+            <div className="story-assistant-message">
+              <p>Your Baseline shows you value stability almost above everything. When someone around you is struggling, stepping in can become how you make yourself feel safe. It is not weakness—it is a useful capacity that needs the right boundary.</p>
+              <EvidenceChips values={personalBasis} label="GROUNDED IN" />
+            </div>
+            <p className="story-user-message follow-up">That’s exactly it. How do I start to change it?</p>
+            <StoryComposer placeholder="Ask a question…" />
+          </div>
+        </DemoWindow>
+        <ReasoningPanel title="How Sovereign works it through" steps={steps} />
+      </div>
+      <a className="story-action" href="/signup">Try it free <span aria-hidden="true">→</span></a>
     </article>
   );
 }
 
-function PermissionField() {
-  const [active, setActive] = useState<'relationship' | 'system'>('relationship');
+function RelationshipStory() {
+  const steps: ReasoningStep[] = [
+    { label: 'STEP 1', title: 'The friction you feel', body: 'The same conversation lands calm for one of you and urgent for the other.' },
+    { label: 'STEP 2', title: 'Each Baseline, read in parallel', body: 'Sovereign checks how each of you may naturally reach a decision.', evidence: relationshipBasis },
+    { label: 'STEP 3', title: 'What’s really happening', body: 'This may be a timing gap rather than a values gap. Neither person has to be reduced to wrong.' },
+    { label: 'YOUR NEXT STEP', title: 'What may work for both', body: 'Name the decision, then agree on a return time. One person can share an initial sense; the other can confirm after processing.' }
+  ];
   return (
-    <div className="permission-field">
-      <nav aria-label="Permission demonstration"><button aria-pressed={active === 'relationship'} onClick={() => setActive('relationship')}>Relationship</button><button aria-pressed={active === 'system'} onClick={() => setActive('system')}>System</button></nav>
-      {active === 'relationship' ? (
-        <div className="relationship-field-public">
-          <article><span>YOU MAY BE BRINGING</span><strong>Clarity through naming the question</strong><p>Uncertainty becomes easier when movement begins.</p></article>
-          <div className="between-field"><span>WHAT HAPPENS BETWEEN YOU</span><strong>Urgency shortens their time. Silence increases your urgency.</strong><p>The interaction becomes visible without deciding who is right.</p></div>
-          <article><span>THEY MAY BE BRINGING</span><strong>Clarity after time to process</strong><p>Their actual motive remains unknown until they speak for themselves.</p></article>
+    <article className="sovereign-story-step story-relationship" aria-labelledby="story-relationship-title">
+      <StoryHeading step="STEP 02 · YOU + 1" title="See the space" outline="between you." id="story-relationship-title">
+        Bring another person’s permitted Baseline into the room. Sovereign reads both, then shows what each person may be bringing and what the relationship creates between them.
+      </StoryHeading>
+      <div className="visual-story-grid">
+        <DemoWindow title="Sovereign — Shared Chat" className="story-chat-window">
+          <div className="story-conversation">
+            <p className="story-user-message">Why does the same conversation land so differently for me and Maya?</p>
+            <div className="story-assistant-message">
+              <p>You may need time to talk things through before you are sure. Maya may recognize an immediate response. The clash may be about timing—not how much either of you cares.</p>
+              <EvidenceChips values={relationshipBasis} label="GROUNDED IN" />
+            </div>
+            <StoryComposer placeholder="Ask about the two of you…" />
+          </div>
+        </DemoWindow>
+        <ReasoningPanel title="How Sovereign reads both of you" steps={steps} relationship />
+      </div>
+      <a className="story-action secondary" href="/signup">Explore a relationship <span aria-hidden="true">→</span></a>
+    </article>
+  );
+}
+
+function SystemStory() {
+  const [activeId, setActiveId] = useState<(typeof systemMembers)[number]['id']>('you');
+  const active = systemMembers.find((member) => member.id === activeId) ?? systemMembers[0];
+  return (
+    <article className="sovereign-story-step story-system" aria-labelledby="story-system-title">
+      <StoryHeading step="STEP 03 · YOUR WHOLE SYSTEM" title="From one person" outline="to the whole system." id="story-system-title">
+        Overlay everyone’s permitted Baseline and the shared dynamic becomes visible—mapped inside the same conversation, exactly where it becomes useful.
+      </StoryHeading>
+      <DemoWindow title="Sovereign — Family System" className="story-system-window">
+        <div className="story-conversation">
+          <p className="story-user-message">Can you map my whole family? Decisions around here always seem to take forever.</p>
+          <div className="story-assistant-message system-message">
+            <p>Three of the four permitted people share Emotional Authority, so decisions may carry more weight and need more time to settle. That is structural, not personal.</p>
+            <div className="story-system-map" aria-label="Permitted family system map">
+              <span className="system-map-line line-top" aria-hidden="true" />
+              <span className="system-map-line line-left" aria-hidden="true" />
+              <span className="system-map-line line-right" aria-hidden="true" />
+              <span className="system-map-line line-bottom" aria-hidden="true" />
+              <div className="story-system-center"><span>SHARED PATTERN</span><strong>Emotional<br />Authority</strong><small>3 of 4</small></div>
+              {systemMembers.map((member) => (
+                <button key={member.id} className={`story-person-node ${member.position}`} aria-pressed={activeId === member.id} onClick={() => setActiveId(member.id)}>
+                  <span>{member.name.slice(0, 1)}</span><strong>{member.name}</strong><small>{member.role}</small><em>{member.detail}</em>
+                </button>
+              ))}
+            </div>
+            <p className="system-focus"><strong>{active.name} · {active.role}</strong>{active.id === 'maya' ? 'Maya’s permitted Baseline may reach a decision sooner, so the mismatch can feel like values when it may be timing.' : 'This person’s role and permitted Baseline are shown without claiming their private motive or current emotional state.'}</p>
+            <EvidenceChips values={systemBasis} label="GROUNDED IN" />
+          </div>
+          <StoryComposer placeholder="Ask about your family…" />
         </div>
-      ) : <SystemMap />}
-      <p className="landing-trust-line">No compatibility score. No mind-reading. No one-sided access to another person’s Baseline.</p>
+      </DemoWindow>
+      <p className="system-pressure-note"><span>PRESSURE FIELD</span><strong>See where decisions slow, responsibility gathers, and one person’s change affects everyone else.</strong></p>
+    </article>
+  );
+}
+
+function StoryHeading({ step, title, outline, id, children }: { step: string; title: string; outline: string; id: string; children: string }) {
+  return (
+    <header className="story-heading">
+      <p>{step}</p>
+      <h2 id={id}>{title}<br /><span>{outline}</span></h2>
+      <div>{children}</div>
+    </header>
+  );
+}
+
+function DemoWindow({ title, className, children }: { title: string; className: string; children: React.ReactNode }) {
+  return (
+    <section className={`visual-demo-window ${className}`}>
+      <header><i aria-hidden="true"><b /><b /><b /></i><span>{title}</span></header>
+      {children}
+    </section>
+  );
+}
+
+function ReasoningPanel({ title, steps, relationship = false }: { title: string; steps: ReasoningStep[]; relationship?: boolean }) {
+  return (
+    <section className={`visual-reasoning-panel ${relationship ? 'relationship-reasoning' : ''}`}>
+      <header><span>{title}</span><small>BASELINE DESIGN</small></header>
+      <ol>
+        {steps.map((step) => (
+          <li key={`${step.label}-${step.title}`}>
+            <i aria-hidden="true" />
+            <div><small>{step.label}</small><strong>{step.title}</strong><p>{step.body}</p>{step.evidence && <EvidenceChips values={step.evidence} label="" />}</div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+function EvidenceChips({ values, label }: { values: readonly EvidenceItem[]; label: string }) {
+  return (
+    <div className="visual-evidence-chips" aria-label={label || 'Baseline support'}>
+      {label && <strong>{label}</strong>}
+      <div>{values.map((value) => <span key={value.compact} title={value.label}>{value.compact}</span>)}</div>
     </div>
   );
 }
 
-function PublicBasisStrip({ values, showSource = false }: {
-  values: ReadonlyArray<typeof basisFixture[number]>;
-  showSource?: boolean;
-}) {
-  const [open, setOpen] = useState(showSource);
-  const mobile = usePublicMediaQuery('(max-width: 640px)');
-  const limit = mobile ? 3 : 5;
-  const visible = values.slice(0, limit);
-  return (
-    <div className="public-basis">
-      <button className="public-basis-strip" type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open}>
-        <strong>BASIS</strong>
-        {visible.map((value) => <span key={value.compact} aria-label={value.label}>{value.compact}</span>)}
-        {values.length > visible.length && <b>+{values.length - visible.length}</b>}
-      </button>
-      {open && <BasisSourceList values={values} />}
-    </div>
-  );
-}
-
-function usePublicMediaQuery(query: string) {
-  const [matches, setMatches] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    const update = () => setMatches(media.matches);
-    media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
-  }, [query]);
-  return matches;
-}
-
-function BasisSourceList({ values }: { values: ReadonlyArray<typeof basisFixture[number]> }) {
-  return (
-    <dl className="public-basis-source" aria-label="Exact source details">
-      {values.map((value) => <div key={value.compact}><dt>{value.compact}</dt><dd><span>{value.label}</span><small>{value.time} · {value.uncertainty} uncertainty</small></dd></div>)}
-    </dl>
-  );
-}
-
-function SystemMap() {
-  const [active, setActive] = useState(0);
-  const connections = [
-    ['Maya → Leon', 'Responsibility', 'Maya coordinates outcomes; Leon holds the formal decision. Authority and responsibility do not currently match.'],
-    ['Leon → Eli', 'Authority', 'Leon supplies the formal decision context. Eli has confirmed the reporting line.'],
-    ['Rae → Maya', 'Reliance', 'Rae has confirmed that practical uncertainty is usually routed through Maya.'],
-    ['Eli → Group', 'Change pressure', 'Eli is challenging a familiar expectation. The role is supplied; motive remains unknown.']
-  ] as const;
-  const activeConnection = connections[active]!;
-  return (
-    <div className="public-system-map">
-      <div className="system-members" aria-label="Permitted system participants">
-        <button className="stabilizer" aria-pressed={active === 0} onClick={() => setActive(0)}><strong>Maya</strong><small>Informal stabilizer · permitted</small></button>
-        <button aria-pressed={active === 1} onClick={() => setActive(1)}><strong>Leon</strong><small>Formal authority · confirmed</small></button>
-        <button aria-pressed={active === 2} onClick={() => setActive(2)}><strong>Rae</strong><small>Care recipient · permitted</small></button>
-        <button aria-pressed={active === 3} onClick={() => setActive(3)}><strong>Eli</strong><small>Change role · supplied</small></button>
-      </div>
-      <div className="system-connections" role="tablist" aria-label="Supported system relationships">
-        {connections.map((connection, index) => <button
-          key={connection[0]}
-          id={`system-connection-tab-${index}`}
-          role="tab"
-          aria-selected={active === index}
-          aria-controls="system-connection-panel"
-          tabIndex={active === index ? 0 : -1}
-          onClick={() => setActive(index)}
-          onKeyDown={(event) => moveTabFocus(event, index, connections.length, setActive)}
-        ><span>{connection[1]}</span>{connection[0]}</button>)}
-      </div>
-      <article id="system-connection-panel" className="active-connection" role="tabpanel" aria-labelledby={`system-connection-tab-${active}`}><span>{activeConnection[1].toUpperCase()}</span><h3>{activeConnection[0]}</h3><p>{activeConnection[2]}</p></article>
-      <aside className="pressure-field"><span>PRESSURE FIELD</span><strong>Responsibility reaches Maya. Final authority remains with Leon.</strong><small>Supported by supplied roles and current observations; each member’s private motive remains unknown.</small></aside>
-      <div className="system-answer-actions"><PublicBasisStrip values={basisFixture.slice(0, 4)} /><button type="button">Explore this through Covenant?</button></div>
-    </div>
-  );
-}
-
-function SectionHeader({ kicker, title, id, children }: { kicker: string; title: string; id: string; children?: string }) {
-  return <header className="landing-section-header"><p className="landing-kicker">{kicker}</p><h2 id={id}>{title}</h2>{children && <p>{children}</p>}</header>;
-}
-
-function moveTabFocus(
-  event: KeyboardEvent<HTMLButtonElement>,
-  index: number,
-  count: number,
-  select: (next: number) => void
-) {
-  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-  event.preventDefault();
-  const next = event.key === 'Home'
-    ? 0
-    : event.key === 'End'
-      ? count - 1
-      : (index + (event.key === 'ArrowRight' ? 1 : -1) + count) % count;
-  select(next);
-  event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
+function StoryComposer({ placeholder }: { placeholder: string }) {
+  return <div className="story-composer"><span>{placeholder}</span><i aria-hidden="true">→</i></div>;
 }
