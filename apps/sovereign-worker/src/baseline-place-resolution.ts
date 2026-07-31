@@ -38,7 +38,7 @@ export const resolvedBaselinePlaceSchema = baselinePlaceCandidateSchema.extend({
 
 const sourceSubmissionSchema = z.object({
   version: z.literal(BASELINE_SOURCE_SUBMISSION_VERSION).default(BASELINE_SOURCE_SUBMISSION_VERSION),
-  fullBirthName: text(2, 200),
+  fullBirthName: text(2, 200).optional(),
   preferredName: text(1, 120).optional(),
   birthDate: dateSchema,
   birthTimeCertainty: z.enum(['exact', 'approximate', 'window', 'unknown']),
@@ -97,7 +97,7 @@ export async function resolveCanonicalBaselineSubmission(
   );
   return parseCanonicalBaselineSourceInput({
     version: BASELINE_SOURCE_INPUT_VERSION,
-    fullBirthName: submission.fullBirthName,
+    ...(submission.fullBirthName ? { fullBirthName: submission.fullBirthName } : {}),
     ...(submission.preferredName ? { preferredName: submission.preferredName } : {}),
     birthDate: submission.birthDate,
     birthTimeCertainty: submission.birthTimeCertainty,
