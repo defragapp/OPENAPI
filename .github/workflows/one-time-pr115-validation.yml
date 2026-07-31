@@ -12,12 +12,12 @@ permissions:
 
 concurrency:
   group: one-time-pr115-validation-20260731
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   validate:
     if: github.event.pull_request.head.ref == 'ops/validate-pr115-20260731'
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
       TARGET_SHA: 3f17f8a17a4bc295d99053e93f3c1e14218c920e
