@@ -1,0 +1,54 @@
+.sovereign-answer[data-sovereign-safety] {
+  position: relative;
+  isolation: isolate;
+}
+
+.sovereign-answer[data-sovereign-safety] .answer-evidence-row,
+.sovereign-answer[data-sovereign-safety] .answer-actions {
+  display: none !important;
+}
+
+.sovereign-answer[data-sovereign-safety]::before {
+  content: '';
+  position: absolute;
+  inset: -18px;
+  z-index: -1;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: 24px;
+  background: color-mix(in srgb, currentColor 3%, transparent);
+  pointer-events: none;
+}
+
+.sovereign-answer[data-sovereign-safety='urgent']::before {
+  border-width: 2px;
+  border-color: color-mix(in srgb, currentColor 36%, transparent);
+  background: color-mix(in srgb, currentColor 7%, transparent);
+}
+
+.sovereign-answer[data-sovereign-safety='urgent'] header > span,
+.sovereign-answer[data-sovereign-safety='grounded'] header > span,
+.sovereign-answer[data-sovereign-safety='secure-refusal'] header > span {
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sovereign-answer[data-sovereign-safety] .answer-limit {
+  margin-top: 24px;
+}
+
+@media (max-width: 640px) {
+  .sovereign-answer[data-sovereign-safety]::before {
+    inset: -12px;
+    border-radius: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sovereign-answer[data-sovereign-safety],
+  .sovereign-answer[data-sovereign-safety] * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
