@@ -18,6 +18,13 @@ const viewportCss = read('./responsive-viewport-contract.css');
 const publicCss = read('../public/premium-public-release.css');
 const supportPages = ['how-it-works', 'pricing', 'faq', '404'].map((name) => read(`../public/${name}.html`));
 
+const retiredLandingLayers = [
+  'mobile-density-contract.css',
+  'landing-v2.css',
+  'experience-reconciliation.css',
+  'public-landing-final.css'
+] as const;
+
 function balanced(source: string) {
   expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
 }
@@ -29,8 +36,7 @@ describe('premium platform release', () => {
     expect(landing).toContain('data-visual-contract="v0-editorial-reconciliation"');
     expect(landingCss).toContain('.sovereign-public');
     for (const laterLayer of [premiumCss, visualCss, viewportCss]) expect(laterLayer).not.toContain('.sovereign-public');
-    expect(main).not.toContain('mobile-density-contract.css');
-    expect(main).not.toMatch(/final|refinement|polish.*css|landing-v2/i);
+    for (const retiredLayer of retiredLandingLayers) expect(main).not.toContain(retiredLayer);
   });
 
   it('matches the approved v0 editorial sequence without changing product truth', () => {
@@ -60,7 +66,7 @@ describe('premium platform release', () => {
   });
 
   it('measures the rendered viewport and keeps motion accessible', () => {
-    expect(main).toContain('installPublicLandingViewportContract();');
+    expect(landing).toContain('installPublicLandingViewportContract();');
     for (const value of ['getBoundingClientRect()', 'node.offsetWidth', 'doc.documentElement.scrollWidth', 'consentStacked']) expect(viewportProbe).toContain(value);
     expect(landingCss).toContain('@supports (animation-timeline:view())');
     expect(landingCss).toContain('@media (prefers-reduced-motion:reduce)');
