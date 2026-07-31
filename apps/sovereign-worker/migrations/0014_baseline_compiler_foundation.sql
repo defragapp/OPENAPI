@@ -1,5 +1,24 @@
 PRAGMA foreign_keys = ON;
 
+CREATE TABLE baseline_place_resolutions (
+  id TEXT PRIMARY KEY,
+  account_id TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  query_hash TEXT NOT NULL,
+  encryption_key_version TEXT NOT NULL,
+  nonce_b64 TEXT NOT NULL,
+  ciphertext_b64 TEXT NOT NULL,
+  resolver_source TEXT NOT NULL,
+  resolver_version TEXT NOT NULL,
+  confidence TEXT NOT NULL CHECK(confidence IN ('low','medium','high')),
+  confirmed_at TEXT,
+  expires_at TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX baseline_place_resolutions_account_idx
+  ON baseline_place_resolutions(account_id, expires_at DESC);
+
 CREATE TABLE baseline_source_records (
   account_id TEXT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
   source_contract_version TEXT NOT NULL,
