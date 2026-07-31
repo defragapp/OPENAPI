@@ -13,7 +13,7 @@ const normalizedText = (minimum: number, maximum: number) => z.string().trim().m
 
 export const canonicalBaselineSourceInputSchema = z.object({
   version: z.literal(BASELINE_SOURCE_INPUT_VERSION).default(BASELINE_SOURCE_INPUT_VERSION),
-  fullBirthName: normalizedText(2, 200).optional(),
+  fullBirthName: normalizedText(2, 200),
   preferredName: normalizedText(1, 120).optional(),
   birthDate: dateSchema,
   birthTimeCertainty: z.enum(['exact', 'approximate', 'window', 'unknown']),
