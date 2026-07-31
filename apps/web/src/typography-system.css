@@ -2,26 +2,22 @@
  * Sovereign.OS typography contract.
  *
  * Typography-only layer: no layout, spacing, color, component, or content changes.
- * The display stack follows the approved high-contrast editorial reference while
- * retaining production-safe local fallbacks when a licensed Canela asset is not
- * available in the browser. Body and interface copy keep the existing UI stack.
+ * The prior stack named Canela without shipping a Canela webfont, so browsers fell
+ * through to inconsistent defaults and the requested visual change was not real.
+ * This contract now begins with premium editorial and grotesk faces that are
+ * actually present on the primary macOS/iOS production audience, with stable
+ * cross-platform fallbacks for every other browser.
  */
 
 :root {
   --font-display:
-    "Canela",
-    "Canela Deck",
-    "Bodoni 72",
-    Didot,
-    "Bodoni MT",
     "Iowan Old Style",
     "Palatino Linotype",
+    Palatino,
     "Book Antiqua",
     Georgia,
     serif;
   --font-subheading:
-    "Suisse Int'l",
-    "Neue Haas Grotesk Text Pro",
     "Avenir Next",
     Avenir,
     "Helvetica Neue",
@@ -44,6 +40,8 @@
 /* Every semantic title and heading uses the shared editorial display face. */
 :where(h1, h2, h3, h4, h5, h6, [role="heading"]) {
   font-family: var(--font-display) !important;
+  font-kerning: normal;
+  font-synthesis: none;
 }
 
 /* Brand and non-semantic product titles that function as headings. */
@@ -67,6 +65,8 @@
   .empty-state-title
 ) {
   font-family: var(--font-display) !important;
+  font-kerning: normal;
+  font-synthesis: none;
 }
 
 /* Premium grotesk for short supporting introductions and subheadings only. */
@@ -86,4 +86,6 @@
   .workspace-intro
 ) {
   font-family: var(--font-subheading) !important;
+  font-kerning: normal;
+  font-synthesis: none;
 }
