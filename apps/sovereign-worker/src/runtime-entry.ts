@@ -37,6 +37,7 @@ const PUBLIC_ROUTE_ALIASES = new Map([
 ]);
 const THREAD_MESSAGE_PATH = /^\/api\/v1\/threads\/[^/]+\/messages$/;
 const PLACE_CONFIRM_PATH = /^\/api\/v1\/baseline\/place\/([^/]+)\/confirm$/;
+const FULL_BASELINE_COMPILER_APPROVAL = 'validation-pending' as const;
 
 const runtime = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
@@ -306,6 +307,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       baselineObserver: 'Earth geocenter 500@399',
       birthplaceResolver: placeProviderConfigured ? 'configured' : 'missing',
       birthplaceResolverSource: 'GeoNames',
+      baselineFullCompiler: FULL_BASELINE_COMPILER_APPROVAL,
       authentication: authConfigured ? 'configured' : 'missing',
       transactionalEmail: emailProvider,
       publicContactEmail: env.PUBLIC_CONTACT_EMAIL || 'info@defrag.app',
@@ -327,6 +329,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && dependencies.baselineCompilerSchema === 'configured'
       && dependencies.baselineSourceEncryption === 'configured'
       && dependencies.birthplaceResolver === 'configured'
+      && dependencies.baselineFullCompiler === 'configured'
       && dependencies.authentication === 'configured'
       && dependencies.transactionalEmail === 'resend'
       && dependencies.stripe === 'configured';
