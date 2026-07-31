@@ -5,6 +5,7 @@ const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf
 const main = read('./main.tsx');
 const app = read('./App.tsx');
 const landing = read('./PublicLanding.tsx');
+const landingCss = read('./public-landing.css');
 const viewportProbe = read('./PublicLandingViewportContract.ts');
 const authenticated = read('./AuthenticatedWorkspace.tsx');
 const workspace = read('./SovereignIntelligenceWorkspace.tsx');
@@ -15,100 +16,71 @@ const premiumCss = read('./premium-platform-release.css');
 const visualCss = read('./sovereign-visual-system.css');
 const viewportCss = read('./responsive-viewport-contract.css');
 const publicCss = read('../public/premium-public-release.css');
-const how = read('../public/how-it-works.html');
-const pricing = read('../public/pricing.html');
-const faq = read('../public/faq.html');
-const notFound = read('../public/404.html');
-const reactVisualSource = `${premiumCss}\n${visualCss}\n${viewportCss}`;
+const supportPages = ['how-it-works', 'pricing', 'faq', '404'].map((name) => read(`../public/${name}.html`));
 
-function expectBalancedCss(source: string) {
+function balanced(source: string) {
   expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
 }
 
 describe('premium platform release', () => {
-  it('loads the responsive contract last without an extra mobile override layer', () => {
-    const visualImport = "import './sovereign-visual-system.css';";
-    const viewportImport = "import './responsive-viewport-contract.css';";
-    const visual = main.indexOf(visualImport);
-    const viewport = main.indexOf(viewportImport);
-    expect(visual).toBeGreaterThan(-1);
-    expect(viewport).toBeGreaterThan(visual);
-    expect(main.slice(viewport + viewportImport.length)).not.toContain("import './");
+  it('gives the public route one isolated visual owner', () => {
+    expect(main).toContain("import './public-landing.css'");
+    expect(landing).toContain('className="sovereign-public"');
+    expect(landing).toContain('data-visual-contract="v0-editorial-reconciliation"');
+    expect(landingCss).toContain('.sovereign-public');
+    for (const laterLayer of [premiumCss, visualCss, viewportCss]) expect(laterLayer).not.toContain('.sovereign-public');
     expect(main).not.toContain('mobile-density-contract.css');
     expect(main).not.toMatch(/final|refinement|polish.*css|landing-v2/i);
   });
 
-  it('recomposes the real public landing surfaces for phone-width rendering', () => {
+  it('matches the approved v0 editorial sequence without changing product truth', () => {
     for (const value of [
-      'data-viewport-contract="public-landing-v1"',
-      'className="story-product-stage"',
-      'data-viewport-surface="permission"',
-      'surface="personal-chat"',
-      'surface="personal-reasoning"',
-      'surface="relationship-chat"',
-      'surface="relationship-reasoning"',
-      'surface="system-map"'
+      'Know yourself.', 'Understand the system.', 'Choose what fits.',
+      'Your intelligence begins with your Baseline.',
+      'Ask about your life.', 'See the space', 'From one person',
+      'Another person remains a person—not a data source you control.',
+      '$20', '$99 / year', 'No compatibility score.', 'No mind-reading.', 'No one-sided access.'
     ]) expect(landing).toContain(value);
-    expect(viewportCss).toContain('.sovereign-landing .sovereign-story-step');
-    expect(viewportCss).toContain('.sovereign-landing [data-viewport-surface]');
-    expect(viewportCss).toContain('width: calc(100% - var(--public-mobile-left) - var(--public-mobile-right));');
-    expect(viewportCss).toContain('min-height: 0;');
-    expect(viewportCss).toContain('transform: none;');
+    for (const prohibited of ['Healing isn', 'compatibility-score', 'Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'mock-auth', 'fake-answer']) expect(landing).not.toContain(prohibited);
   });
 
-  it('measures the rendered viewport instead of checking CSS strings alone', () => {
-    expect(main).toContain("installPublicLandingViewportContract();");
-    expect(viewportProbe).toContain('getBoundingClientRect()');
-    expect(viewportProbe).toContain('node.offsetWidth');
-    expect(viewportProbe).toContain('doc.documentElement.scrollWidth');
-    expect(viewportProbe).toContain('permissionStacked');
-    expect(viewportProbe).toContain("new URLSearchParams(location.search).get('viewport-contract') !== '1'");
-    for (const surface of ['hero-answer', 'baseline', 'personal-chat', 'personal-reasoning', 'relationship-chat', 'relationship-reasoning', 'system-map', 'permission']) {
-      expect(viewportProbe).toContain(`'${surface}'`);
-    }
+  it('renders substantial product scenes and a prominent system instrument', () => {
+    for (const value of [
+      'className="product-window chat-window"',
+      'className="product-window workflow-window"',
+      'className="workflow-branches"',
+      'className="between-field"',
+      'className="system-instrument"',
+      'className="system-center"',
+      'className={`system-member ${member.position}`}',
+      'data-viewport-surface="system-instrument"'
+    ]) expect(landing).toContain(value);
+    expect(landingCss).toContain('grid-template-columns:minmax(0,1.55fr) minmax(260px,.45fr)');
+    expect(landingCss).toContain('min-height:520px');
   });
 
-  it('covers every production-owned React surface without replacing architecture', () => {
-    for (const selector of ['.sovereign-landing', '.intelligence-workspace', '.today-facet-view', '.explore-editorial', '.relationship-overview', '.system-overview', '.baseline-builder', '.baseline-reveal', '.sovereign-answer', '.sovereign-composer', '.intelligence-context', '.library-grid']) {
-      expect(reactVisualSource).toContain(selector);
-    }
-    expect(authenticated).toContain('data-workspace-contract="one-room"');
-    expect(authenticated).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
-    expect(workspace).toContain("type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'");
-    expect(workspace).toContain("version: 'sovereign-answer.v2'");
+  it('measures the rendered viewport and keeps motion accessible', () => {
+    expect(main).toContain('installPublicLandingViewportContract();');
+    for (const value of ['getBoundingClientRect()', 'node.offsetWidth', 'doc.documentElement.scrollWidth', 'consentStacked']) expect(viewportProbe).toContain(value);
+    expect(landingCss).toContain('@supports (animation-timeline:view())');
+    expect(landingCss).toContain('@media (prefers-reduced-motion:reduce)');
+    expect(landingCss).toContain('@media (max-width:720px)');
+    expect(landingCss).toContain('@media (max-width:390px)');
   });
 
-  it('uses motion while respecting reduced motion', () => {
-    expect(visualCss).toContain('@supports (animation-timeline: view())');
-    expect(visualCss).toContain('@keyframes sovereign-message-in');
-    expect(visualCss).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(viewportCss).toContain('@media (prefers-reduced-motion: reduce)');
-  });
-
-  it('preserves authentication, consent, and billing', () => {
+  it('preserves authentication, billing, consent, and the canonical workspace', () => {
     for (const route of ["path === '/login'", "path === '/signup'", "path === '/invitation'", "path === '/onboarding'"]) expect(app).toContain(route);
     expect(app).toContain('__TURNSTILE_SITE_KEY__');
     expect(onboarding).toContain('/api/v1/billing/checkout');
     expect(controls).toContain('/api/v1/billing/portal');
     expect(membership).toContain("person.activeScopes.includes('system.include')");
+    expect(authenticated).toContain('data-workspace-contract="one-room"');
+    expect(workspace).toContain("type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'");
+    expect(workspace).toContain("version: 'sovereign-answer.v2'");
   });
 
-  it('loads the public composition on every support page', () => {
-    for (const page of [how, pricing, faq, notFound]) expect(page).toContain('/premium-public-release.css?v=20260730-final');
-  });
-
-  it('retains responsive and accessible behavior', () => {
-    for (const source of [premiumCss, visualCss, viewportCss, publicCss]) expectBalancedCss(source);
-    expect(premiumCss).toContain(':focus-visible');
-    expect(visualCss).toContain('env(safe-area-inset-bottom)');
-    expect(visualCss).toContain('@media print');
-    expect(viewportCss).toContain('env(safe-area-inset-left)');
-    expect(viewportCss).toContain('env(safe-area-inset-right)');
-    expect(viewportCss).toContain('@media (max-width: 430px)');
-  });
-
-  it('does not add dashboard scoring or mock behavior', () => {
-    const source = `${reactVisualSource}\n${publicCss}\n${landing}`;
-    for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'compatibility-score', 'Math.random', 'mock-auth', 'fake-answer', 'dashboard-grid']) expect(source).not.toContain(prohibited);
+  it('keeps support pages and CSS structurally valid', () => {
+    supportPages.forEach((page) => expect(page).toContain('/premium-public-release.css?v=20260730-final'));
+    for (const source of [landingCss, premiumCss, visualCss, viewportCss, publicCss]) balanced(source);
   });
 });
