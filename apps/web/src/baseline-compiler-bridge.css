@@ -1,0 +1,189 @@
+.baseline-place-confirmation {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 4vw, 48px);
+}
+
+.baseline-place-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(8, 10, 13, 0.76);
+  backdrop-filter: blur(18px);
+  cursor: default;
+}
+
+.baseline-place-confirmation > section {
+  position: relative;
+  width: min(680px, 100%);
+  max-height: min(780px, calc(100dvh - 32px));
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  border-radius: 28px;
+  background: color-mix(in srgb, #11151b 96%, transparent);
+  box-shadow: 0 32px 100px rgba(0, 0, 0, 0.48);
+  padding: clamp(24px, 5vw, 48px);
+}
+
+.baseline-place-confirmation header {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.baseline-place-confirmation header p,
+.baseline-place-confirmation header h2,
+.baseline-place-confirmation header span,
+.baseline-place-confirmation footer small {
+  margin: 0;
+}
+
+.baseline-place-confirmation header p {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.62;
+}
+
+.baseline-place-confirmation header h2 {
+  max-width: 14ch;
+  font-family: var(--font-display, ui-serif, Georgia, serif);
+  font-size: clamp(2rem, 5vw, 3.7rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+.baseline-place-confirmation header span {
+  max-width: 58ch;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  opacity: 0.7;
+}
+
+.baseline-place-options {
+  display: grid;
+  gap: 10px;
+}
+
+.baseline-place-options button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5px 18px;
+  width: 100%;
+  min-height: 76px;
+  padding: 16px 18px;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.baseline-place-options button:hover,
+.baseline-place-options button:focus-visible {
+  border-color: color-mix(in srgb, currentColor 30%, transparent);
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.baseline-place-options strong {
+  align-self: end;
+  font-size: 1rem;
+  font-weight: 620;
+}
+
+.baseline-place-options span {
+  grid-row: 2;
+  font-size: 0.82rem;
+  opacity: 0.62;
+}
+
+.baseline-place-options small {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.54;
+}
+
+.baseline-place-confirmation footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 22px;
+}
+
+.baseline-place-confirmation footer small {
+  max-width: 52ch;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  opacity: 0.5;
+}
+
+.baseline-place-confirmation footer button {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  opacity: 0.66;
+  cursor: pointer;
+}
+
+.baseline-place-confirmation footer button:hover,
+.baseline-place-confirmation footer button:focus-visible {
+  opacity: 1;
+  outline: none;
+}
+
+@media (max-width: 640px) {
+  .baseline-place-confirmation {
+    align-items: end;
+    padding: 0;
+  }
+
+  .baseline-place-confirmation > section {
+    width: 100%;
+    max-height: 88dvh;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 26px 26px 0 0;
+    padding: 28px 20px calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .baseline-place-options button {
+    grid-template-columns: 1fr;
+  }
+
+  .baseline-place-options small {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: start;
+  }
+
+  .baseline-place-confirmation footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .baseline-place-options button {
+    transition: none;
+  }
+}
