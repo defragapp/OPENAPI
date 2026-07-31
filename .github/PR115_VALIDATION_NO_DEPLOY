@@ -1,0 +1,1 @@
+This branch executes verification only. It does not call production:deploy and must be reset after results are collected.
