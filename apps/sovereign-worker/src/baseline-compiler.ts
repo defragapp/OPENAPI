@@ -60,7 +60,6 @@ interface SourceRecordRow {
 interface StageResultRow {
   stage: string;
   status: StageStatus;
-  output_json: string;
   validation_status: CompilerValidationStatus;
   uncertainty: 'low' | 'medium' | 'high';
   failure_code: string | null;
@@ -146,11 +145,12 @@ export async function startBaselineCompilation(env: Env, accountId: string, rawI
 export async function getBaselineCompilerStatus(env: Env, accountId: string) {
   const run = await env.DB.prepare(`SELECT id, account_id, source_input_hash, compiler_version,
       status, current_stage, validation_status
-    FROM baseline_compiler_runs WHERE account_id = ? ORDER BY created_at DESC LIMIT 1`)
+    FROM baseline_compiler_runs WHERE account_id = ?
+    ORDER BY updated_at DESC, created_at DESC LIMIT 1`)
     .bind(accountId)
     .first<CompilerRunRow>();
   if (!run) return { status: 'not_started' as const };
-  const stages = await env.DB.prepare(`SELECT stage, status, output_json, validation_status,
+  const stages = await env.DB.prepare(`SELECT stage, status, validation_status,
       uncertainty, failure_code, started_at, completed_at
     FROM baseline_compiler_stage_results WHERE run_id = ? ORDER BY created_at`)
     .bind(run.id)
@@ -185,17 +185,22 @@ export async function runBaselineCompilerStage(env: Env, runId: string, requeste
   if (run.compiler_version !== BASELINE_COMPILER_VERSION) throw new Error('baseline_compiler_version_mismatch');
   if (run.current_stage !== requestedStage) throw new Error('baseline_stage_out_of_order');
 
-  const sourceRecord = await loadSourceRecord(env, run.account_id, run.source_input_hash);
-  const source = await decryptBaselineSource(env, run.account_id, {
-    encryptionKeyVersion: sourceRecord.encryption_key_version,
-    nonceB64: sourceRecord.nonce_b64,
-    ciphertextB64: sourceRecord.ciphertext_b64
-  });
-
   await markStageRunning(env, run, requestedStage);
   try {
+    const sourceRecord = await loadSourceRecord(env, run.account_id, run.source_input_hash);
+    const source = await decryptBaselineSource(env, run.account_id, {
+      encryptionKeyVersion: sourceRecord.encryption_key_version,
+      nonceB64: sourceRecord.nonce_b64,
+      ciphertextB64: sourceRecord.ciphertext_b64
+    });
     const result = await executeStage(env, run, requestedStage, source);
     await completeStage(env, run, requestedStage, result);
+
+    if (result.status === 'unavailable' && requestedStage === 'baseline.fetch_natal_source') {
+      await markRunDegraded(env, run, 'natal_source_unavailable');
+      return { runId, stage: requestedStage, status: 'unavailable' as const };
+    }
+
     const next = nextStage(requestedStage);
     if (next) {
       const runStatus = next === 'baseline.generate_facets' ? 'facet_generation_pending' : 'computing';
@@ -208,22 +213,7 @@ export async function runBaselineCompilerStage(env: Env, runId: string, requeste
     return { runId, stage: requestedStage, status: result.status };
   } catch (error) {
     const failureCode = safeFailureCode(error);
-    await env.DB.prepare(`UPDATE baseline_compiler_stage_results SET
-      status = 'failed', validation_status = 'failed', failure_code = ?, output_json = '{}',
-      completed_at = datetime('now'), updated_at = datetime('now')
-      WHERE run_id = ? AND stage = ?`)
-      .bind(failureCode, run.id, requestedStage)
-      .run();
-    await env.DB.prepare(`UPDATE baseline_compiler_runs SET
-      status = 'validation_failed', validation_status = 'failed', failure_code = ?,
-      completed_at = datetime('now'), updated_at = datetime('now') WHERE id = ?`)
-      .bind(failureCode, run.id)
-      .run();
-    await env.DB.prepare(`UPDATE baseline_onboarding SET
-      status = 'validation_failed', provider_status = 'unavailable', updated_at = datetime('now')
-      WHERE account_id = ?`)
-      .bind(run.account_id)
-      .run();
+    await markStageFailed(env, run, requestedStage, failureCode);
     throw new Error(failureCode);
   }
 }
@@ -347,6 +337,7 @@ async function executeStage(
       const provenance = {
         ...asRecord(computed.provenance),
         compilerVersion: BASELINE_COMPILER_VERSION,
+        sourceInputHash: run.source_input_hash,
         encryptedRecomputableSource: true,
         fullCompilerReady: false
       };
@@ -414,7 +405,7 @@ async function loadSourceRecord(env: Env, accountId: string, expectedHash: strin
 async function markStageRunning(env: Env, run: CompilerRunRow, stage: BaselineCompilerStage) {
   await env.DB.prepare(`UPDATE baseline_compiler_runs SET
     status = 'computing', current_stage = ?, started_at = COALESCE(started_at, datetime('now')),
-    updated_at = datetime('now') WHERE id = ?`)
+    failure_code = NULL, updated_at = datetime('now') WHERE id = ?`)
     .bind(stage, run.id)
     .run();
   await env.DB.prepare(`INSERT INTO baseline_compiler_stage_results (
@@ -427,12 +418,7 @@ async function markStageRunning(env: Env, run: CompilerRunRow, stage: BaselineCo
     .run();
 }
 
-async function completeStage(
-  env: Env,
-  run: CompilerRunRow,
-  stage: BaselineCompilerStage,
-  result: StageExecutionResult
-) {
+async function completeStage(env: Env, run: CompilerRunRow, stage: BaselineCompilerStage, result: StageExecutionResult) {
   await env.DB.prepare(`UPDATE baseline_compiler_stage_results SET
     status = ?, output_json = ?, validation_status = ?, uncertainty = ?, source_version = ?,
     failure_code = NULL, completed_at = datetime('now'), updated_at = datetime('now')
@@ -446,6 +432,38 @@ async function completeStage(
       run.id,
       stage
     )
+    .run();
+}
+
+async function markStageFailed(env: Env, run: CompilerRunRow, stage: BaselineCompilerStage, failureCode: string) {
+  await env.DB.prepare(`UPDATE baseline_compiler_stage_results SET
+    status = 'failed', validation_status = 'failed', failure_code = ?, output_json = '{}',
+    completed_at = datetime('now'), updated_at = datetime('now')
+    WHERE run_id = ? AND stage = ?`)
+    .bind(failureCode, run.id, stage)
+    .run();
+  await env.DB.prepare(`UPDATE baseline_compiler_runs SET
+    status = 'validation_failed', validation_status = 'failed', failure_code = ?,
+    completed_at = datetime('now'), updated_at = datetime('now') WHERE id = ?`)
+    .bind(failureCode, run.id)
+    .run();
+  await env.DB.prepare(`UPDATE baseline_onboarding SET
+    status = 'validation_failed', provider_status = 'unavailable', updated_at = datetime('now')
+    WHERE account_id = ?`)
+    .bind(run.account_id)
+    .run();
+}
+
+async function markRunDegraded(env: Env, run: CompilerRunRow, failureCode: string) {
+  await env.DB.prepare(`UPDATE baseline_compiler_runs SET
+    status = 'degraded', current_stage = NULL, validation_status = 'pending', failure_code = ?,
+    completed_at = datetime('now'), updated_at = datetime('now') WHERE id = ?`)
+    .bind(failureCode, run.id)
+    .run();
+  await env.DB.prepare(`UPDATE baseline_onboarding SET
+    status = 'degraded', provider_status = 'unavailable', updated_at = datetime('now')
+    WHERE account_id = ?`)
+    .bind(run.account_id)
     .run();
 }
 
