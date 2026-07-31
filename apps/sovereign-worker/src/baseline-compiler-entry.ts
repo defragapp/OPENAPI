@@ -18,7 +18,7 @@ const legacySubmissionSchema = z.object({
   birthplace: z.string().trim().min(2).max(240),
   birthTimeCertainty: z.enum(['exact', 'approximate', 'unknown']),
   birthTime: timeSchema.optional(),
-  fullBirthName: z.string().trim().min(2).max(200).optional(),
+  fullBirthName: z.string().trim().min(2).max(200),
   preferredName: z.string().trim().min(1).max(120).optional(),
   birthTimezone: z.string().optional(),
   locationPrecision: z.string().optional()
@@ -62,7 +62,7 @@ async function resolveLegacyBaselineSubmission(env: Env, accountId: string, rawI
   const selected = confirmedCandidates[0]!;
   await confirmServerPlaceResolution(env, accountId, selected.resolutionId);
   return resolveCanonicalBaselineSubmission(env, accountId, {
-    ...(legacy.fullBirthName ? { fullBirthName: legacy.fullBirthName } : {}),
+    fullBirthName: legacy.fullBirthName,
     ...(legacy.preferredName ? { preferredName: legacy.preferredName } : {}),
     birthDate: legacy.birthDate,
     birthTimeCertainty: legacy.birthTimeCertainty,
