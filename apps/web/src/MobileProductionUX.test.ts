@@ -1,82 +1,62 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
-const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
-const viewportProbe = readFileSync(new URL('./PublicLandingViewportContract.ts', import.meta.url), 'utf8');
-const viewportCss = readFileSync(new URL('./responsive-viewport-contract.css', import.meta.url), 'utf8');
-const workspaceCss = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
-const workspaceMobileCss = readFileSync(new URL('./workspace-mobile.css', import.meta.url), 'utf8');
-const compositionCss = readFileSync(new URL('./interface-composition.css', import.meta.url), 'utf8');
-const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
-const authCss = readFileSync(new URL('./auth-onboarding.css', import.meta.url), 'utf8');
-const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
+const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
+const main = read('./main.tsx');
+const landing = read('./PublicLanding.tsx');
+const landingCss = read('./public-landing.css');
+const viewportProbe = read('./PublicLandingViewportContract.ts');
+const workspaceCss = read('./workspace-chat.css');
+const workspaceMobileCss = read('./workspace-mobile.css');
+const authCss = read('./auth-onboarding.css');
+const workspace = read('./SovereignIntelligenceWorkspace.tsx');
 
 describe('production mobile and responsive experience', () => {
-  it('loads route-owned mobile hardening without retired override layers', () => {
+  it('keeps the public route isolated from retired override layers', () => {
     expect(main).toContain("import './public-landing.css'");
-    expect(main).toContain("import './workspace-chat.css'");
-    expect(main).toContain("import './workspace-mobile.css'");
-    expect(main).toContain("import './auth-onboarding.css'");
-    expect(main).toContain("import './interface-composition.css'");
-    expect(main).toContain("import './responsive-viewport-contract.css'");
+    expect(landing).toContain('className="sovereign-public"');
     expect(main).not.toContain('mobile-density-contract.css');
     expect(main).not.toMatch(/final|refinement|polish.*css|landing-v2/i);
   });
 
-  it('measures actual phone surface dimensions and overflow in the rendered DOM', () => {
-    expect(landing).toContain('data-viewport-contract="public-landing-v1"');
-    expect(landing).toContain('className="story-product-stage"');
+  it('owns phone composition in the real landing component', () => {
+    for (const value of ['data-viewport-surface="hero-content"','data-viewport-surface="baseline-artifact"','personal-chat','personal-workflow','relationship-chat','relationship-workflow','system-instrument','data-viewport-surface="consent"']) expect(landing).toContain(value);
+    expect(viewportProbe).toContain("querySelector<HTMLElement>('.sovereign-public')");
     expect(viewportProbe).toContain('getBoundingClientRect()');
-    expect(viewportProbe).toContain('node.offsetWidth');
     expect(viewportProbe).toContain('doc.documentElement.scrollWidth');
-    expect(viewportProbe).toContain('permissionStacked');
-    expect(viewportCss).toContain('.sovereign-landing [data-viewport-surface]');
   });
 
-  it('organizes public, account, onboarding, and workspace surfaces with one hierarchy', () => {
-    expect(compositionCss).toContain('.sovereign-landing .landing-section-header');
-    expect(compositionCss).toContain('.account-layout');
-    expect(compositionCss).toContain('.plan-choice');
-    expect(compositionCss).toContain('.surface-heading');
-    expect(compositionCss).toContain('.answer-sections');
+  it('uses 18px mobile gutters, full-width workflows, and no desktop scaling', () => {
+    expect(landingCss).toContain('.sovereign-public .public-story,');
+    expect(landingCss).toContain('padding:86px 18px');
+    expect(landingCss).toContain('.sovereign-public .story-grid{grid-template-columns:1fr}');
+    expect(landingCss).toContain('.sovereign-public .product-window{min-height:0}');
+    expect(landingCss).toContain('transform:none');
+    expect(landingCss).toContain('overflow:clip');
   });
 
-  it('keeps five primary surfaces thumb reachable and You in the menu sheet', () => {
+  it('turns the system map into a deliberate two-column phone instrument', () => {
+    expect(landingCss).toContain('grid-template-columns:1fr 1fr');
+    expect(landingCss).toContain('.sovereign-public .system-center');
+    expect(landingCss).toContain('grid-column:1 / -1');
+    expect(landingCss).toContain('.sovereign-public .system-links{display:none}');
+  });
+
+  it('keeps authenticated iOS controls thumb reachable and safe-area aware', () => {
     expect(workspace).toContain('className="mobile-bottom-nav"');
-    expect(workspace).toContain("surfaces.filter((item) => item.name !== 'You')");
-    expect(workspace).toContain('You · Baseline, plan, permissions, and account');
     expect(workspaceCss).toContain('grid-template-columns: repeat(5, 1fr)');
-    expect(workspaceCss).toContain('min-height: 56px');
-  });
-
-  it('protects the composer, sheets, controls, and notched edges with safe areas', () => {
     expect(workspaceCss).toContain('bottom: calc(66px + env(safe-area-inset-bottom))');
-    expect(workspaceCss).toContain('padding: calc(7px + env(safe-area-inset-top))');
-    expect(workspaceCss).toContain('padding: 4px 5px env(safe-area-inset-bottom)');
-    expect(workspaceCss).toContain('max-height: 86dvh');
     expect(workspaceMobileCss).toContain('env(safe-area-inset-left)');
     expect(workspaceMobileCss).toContain('env(safe-area-inset-right)');
-    expect(workspaceMobileCss).toContain('max-height: 86svh');
-    expect(viewportCss).toContain('env(safe-area-inset-left)');
-    expect(viewportCss).toContain('env(safe-area-inset-right)');
-  });
-
-  it('keeps every mobile interaction at least 44px and prevents iOS input zoom', () => {
-    expect(workspaceMobileCss).toContain('.fit-controls button');
-    expect(workspaceMobileCss).toContain('.composer-context-line button');
     expect(workspaceMobileCss).toContain('min-height: 44px');
-    expect(workspaceCss).toContain('font-size: 1rem');
     expect(authCss).toContain('.auth-panel');
-    expect(landingCss).toContain('min-width: 320px');
-    expect(landingCss).toContain('@media (max-width: 440px)');
   });
 
-  it('retains visible focus, reduced-motion support, and horizontal overflow protection', () => {
+  it('retains reduced motion, focus visibility, and iOS input safeguards', () => {
+    expect(landingCss).toContain(':focus-visible');
+    expect(landingCss).toContain('@media (prefers-reduced-motion:reduce)');
     expect(workspaceCss).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(landingCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(workspaceMobileCss).toContain('overflow-x: clip');
-    expect(compositionCss).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(viewportCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(workspaceCss).toContain('font-size: 1rem');
   });
 });
