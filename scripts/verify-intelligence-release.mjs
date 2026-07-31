@@ -130,7 +130,7 @@ containsAll('current public product contract', landing, [
 ]);
 
 containsAll('selective visual port', `${landing}\n${hardening}\n${completion}`, [
-  'className="visual-reasoning-panel',
+  'visual-reasoning-panel',
   'className="visual-evidence-chips"',
   'className="relationship-baseline-pair"',
   'className="story-system-map"',
