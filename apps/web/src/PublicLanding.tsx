@@ -73,6 +73,7 @@ export function PublicLanding() {
       </section>
 
       <section id="how-it-works" className="sovereign-story-sequence" aria-label="How Sovereign works">
+        <p className="story-fixture-boundary">Sanitized product demonstrations · Illustrative Baseline values · Not your personal result</p>
         <PersonalStory />
         <RelationshipStory />
         <SystemStory />
@@ -259,6 +260,13 @@ function ReasoningPanel({ title, steps, relationship = false }: { title: string;
   return (
     <section className={`visual-reasoning-panel ${relationship ? 'relationship-reasoning' : ''}`}>
       <header><span>{title}</span><small>BASELINE DESIGN</small></header>
+      {relationship && (
+        <div className="relationship-baseline-pair" aria-label="Two permitted Baselines read in parallel">
+          <article><span>You</span><strong>Needs time</strong><small>AUTH · EMO</small></article>
+          <i aria-hidden="true">↔</i>
+          <article><span>Maya</span><strong>Decides now</strong><small>AUTH · SPLENIC</small></article>
+        </div>
+      )}
       <ol>
         {steps.map((step) => (
           <li key={`${step.label}-${step.title}`}>
