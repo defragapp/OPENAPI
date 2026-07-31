@@ -85,3 +85,11 @@ CREATE INDEX baseline_compiler_stage_results_run_idx
 ALTER TABLE background_jobs ADD COLUMN lease_token TEXT;
 ALTER TABLE background_jobs ADD COLUMN lease_expires_at TEXT;
 ALTER TABLE background_jobs ADD COLUMN error_code TEXT;
+
+-- Existing rows contain reduced output and one-way hashes only. They cannot be
+-- promoted into encrypted recomputable source or reversed into birth details.
+UPDATE baseline_onboarding
+SET status = 'legacy_reduced',
+    provider_status = 'source_reentry_required',
+    updated_at = datetime('now')
+WHERE status IN ('completed', 'ready', 'degraded');
