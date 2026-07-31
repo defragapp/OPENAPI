@@ -21,11 +21,13 @@ function expectBalancedCss(source: string) {
 
 describe('premium platform final release', () => {
   it('loads one final composition layer after every existing React visual layer', () => {
-    const selective = main.indexOf("import './selective-visual-port.css';");
-    const final = main.indexOf("import './premium-platform-release.css';");
+    const selectiveImport = "import './selective-visual-port.css';";
+    const finalImport = "import './premium-platform-release.css';";
+    const selective = main.indexOf(selectiveImport);
+    const final = main.indexOf(finalImport);
     expect(selective).toBeGreaterThan(-1);
     expect(final).toBeGreaterThan(selective);
-    expect(main.slice(final).indexOf("import './")).toBe(-1);
+    expect(main.slice(final + finalImport.length)).not.toContain("import './");
   });
 
   it('covers every production-owned React surface without replacing architecture', () => {
@@ -96,12 +98,13 @@ describe('premium platform final release', () => {
     for (const source of [finalCss, publicCss]) {
       expect(source).toContain('@media (prefers-reduced-motion: reduce)');
       expect(source).toContain('@media (forced-colors: active)');
-      expect(source).toContain('min-width: 320px');
       expect(source).toContain(':focus-visible');
       expectBalancedCss(source);
     }
     expect(finalCss).toContain('env(safe-area-inset-bottom)');
     expect(finalCss).toContain('@media print');
+    expect(finalCss).toContain('@media (max-width: 520px)');
+    expect(publicCss).toContain('min-width: 320px');
     expect(publicCss).toContain('@media (max-width: 620px)');
   });
 
