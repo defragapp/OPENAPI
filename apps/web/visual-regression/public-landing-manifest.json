@@ -1,0 +1,26 @@
+{
+  "contract": "v0-editorial-reconciliation",
+  "basis": [
+    "v0 exported Sovereign source",
+    "thread desktop workflow screenshots",
+    "thread mobile full-page screenshot"
+  ],
+  "captures": [
+    {
+      "file": "public-landing-desktop-1440x900.jpg.base64",
+      "viewport": { "width": 1440, "height": 900 },
+      "sha256": "d0ba635cd89da0b124e97f57ea183b343f94148ea5386088925e7e5d556bd0e3",
+      "minimumBytes": 34000,
+      "heroHeading": { "x": 180, "y": 232, "width": 1080, "height": 271 },
+      "nextSectionY": 900
+    },
+    {
+      "file": "public-landing-mobile-390x844.jpg.base64",
+      "viewport": { "width": 390, "height": 844 },
+      "sha256": "cc47520de4c5a27c7dda222127295c6678e5fabdc68cc9a9ccee0b9a8b05ac2c",
+      "minimumBytes": 17000,
+      "heroHeading": { "x": 18, "y": 186, "width": 354, "height": 194 },
+      "nextSectionY": 820
+    }
+  ]
+}
