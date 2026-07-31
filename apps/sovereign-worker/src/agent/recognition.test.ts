@@ -54,6 +54,19 @@ describe('sovereign-answer.v2', () => {
       .toThrow(/invented or unauthorized Basis reference/);
   });
 
+  it('rejects model-authored safety metadata even when the object is structurally valid', () => {
+    const safety = {
+      version: 'sovereign-safety-response.v1',
+      disposition: 'grounded',
+      category: 'unverifiable_threat',
+      presentation: 'grounded',
+      resource_catalog_version: 'safety-resources.2026-07-31.1',
+      resources: []
+    };
+    expect(() => parseSovereignAnswer(answer({ safety }), registry)).toThrow(/Model-authored safety metadata/);
+    expect(sovereignAnswerSchema.safeParse(JSON.parse(answer({ safety }))).success).toBe(true);
+  });
+
   it('requires structured alignment distinctions rather than a score', () => {
     const sections = [
       { id: 'alignment', label: 'Supports the fit', body: 'The role uses a capacity already available to you.' },
