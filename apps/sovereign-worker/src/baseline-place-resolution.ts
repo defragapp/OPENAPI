@@ -22,14 +22,17 @@ export const baselinePlaceQuerySchema = z.object({
   country: text(2, 120)
 }).strict();
 
-export const resolvedBaselinePlaceSchema = z.object({
+export const baselinePlaceCandidateSchema = z.object({
   displayName: text(2, 240),
   latitude: z.number().finite().min(-90).max(90),
   longitude: z.number().finite().min(-180).max(180),
   timezone: text(3, 100),
   resolverSource: text(2, 100),
   resolverVersion: text(1, 100),
-  confidence: z.enum(['low', 'medium', 'high']),
+  confidence: z.enum(['low', 'medium', 'high'])
+}).strict();
+
+export const resolvedBaselinePlaceSchema = baselinePlaceCandidateSchema.extend({
   confirmed: z.literal(true)
 }).strict();
 
@@ -62,7 +65,7 @@ const placeResolutionPayloadSchema = z.object({
   version: z.literal(BASELINE_PLACE_RESOLUTION_VERSION),
   query: baselinePlaceQuerySchema,
   queryHash: z.string().regex(/^[a-f0-9]{64}$/),
-  place: resolvedBaselinePlaceSchema
+  place: baselinePlaceCandidateSchema
 }).strict();
 
 interface PlaceResolutionRow {
@@ -77,6 +80,7 @@ interface PlaceResolutionRow {
 }
 
 export type BaselinePlaceQuery = z.infer<typeof baselinePlaceQuerySchema>;
+export type BaselinePlaceCandidate = z.infer<typeof baselinePlaceCandidateSchema>;
 export type ResolvedBaselinePlace = z.infer<typeof resolvedBaselinePlaceSchema>;
 
 export async function resolveCanonicalBaselineSubmission(
@@ -112,7 +116,7 @@ export async function storeServerPlaceResolution(
   options: { confirmed: boolean; ttlSeconds?: number } = { confirmed: false }
 ) {
   const query = baselinePlaceQuerySchema.parse(queryInput);
-  const place = resolvedBaselinePlaceSchema.parse(resolvedInput);
+  const place = baselinePlaceCandidateSchema.parse(resolvedInput);
   const id = `place_${crypto.randomUUID()}`;
   const queryHash = await hashPlaceQuery(query);
   const keyVersion = requiredKeyVersion(env);
@@ -194,7 +198,7 @@ async function loadConfirmedPlaceResolution(
   ) {
     throw new Error('baseline_place_resolution_integrity_failed');
   }
-  return payload.place;
+  return resolvedBaselinePlaceSchema.parse({ ...payload.place, confirmed: true });
 }
 
 async function hashPlaceQuery(query: BaselinePlaceQuery): Promise<string> {
