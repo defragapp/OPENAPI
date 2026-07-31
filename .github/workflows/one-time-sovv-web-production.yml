@@ -1,85 +1,61 @@
 name: One-time sovv-web production release
 
 on:
-  push:
+  pull_request:
     branches:
-      - ops/one-time-sovv-web-deploy-20260731
+      - main
     paths:
       - .github/workflows/one-time-sovv-web-production.yml
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: one-time-sovv-web-production-20260731
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  trigger:
-    if: github.ref == 'refs/heads/ops/one-time-sovv-web-deploy-20260731'
+  deploy:
+    if: github.event.pull_request.head.ref == 'ops/one-time-sovv-web-deploy-20260731'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 60
     env:
       TARGET_SHA: 46272032bb92a5a8da335510fa4d52ccdfa7b400
-      TOKEN_B64: Y2ZhdF9ybW9NM0w5VWxyVTVZU2JxMXFVSHBZaDAyYUhQNjhCbTR3VUJ3QmhmOWJlNTMxNDc=
-      HOOK_B64: aHR0cHM6Ly9hcGkuY2xvdWRmbGFyZS5jb20vY2xpZW50L3Y0L3dvcmtlcnMvYnVpbGRzL2RlcGxveV9ob29rcy9jZGU3ZjZlNi05YTRmLTQzZDktODJkOC1iN2RiN2E2MTdlNzE=
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: 8b1954d216d65077c6480d62583fe2c2
+      VITE_TURNSTILE_SITE_KEY: 0x4AAAAAADhGIF8-iOLIg8MU
 
     steps:
-      - name: Check out isolated operations branch
+      - name: Check out exact production source
         uses: actions/checkout@v4
         with:
-          ref: ops/one-time-sovv-web-deploy-20260731
+          ref: 46272032bb92a5a8da335510fa4d52ccdfa7b400
           fetch-depth: 1
 
-      - name: Verify token and trigger Cloudflare Workers Build
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
         shell: bash
         run: |
           set -euo pipefail
-          TOKEN="$(printf '%s' "$TOKEN_B64" | base64 -d)"
-          HOOK="$(printf '%s' "$HOOK_B64" | base64 -d)"
-          echo "::add-mask::$TOKEN"
-          echo "::add-mask::$HOOK"
+          test -n "${CLOUDFLARE_API_TOKEN:-}"
+          corepack enable
+          pnpm install --frozen-lockfile
 
-          verify_code="$(curl -sS -o /tmp/token.json -w '%{http_code}' \
-            -H "Authorization: Bearer $TOKEN" \
-            'https://api.cloudflare.com/client/v4/user/tokens/verify')"
-          hook_code="$(curl -sS -X POST -o /tmp/hook.json -w '%{http_code}' "$HOOK")"
+      - name: Run canonical Cloudflare production gate
+        shell: bash
+        run: pnpm verify:cloudflare-build
 
-          mkdir -p ops
-          VERIFY_CODE="$verify_code" HOOK_CODE="$hook_code" python - <<'PY'
-          import json, os, time
-          from pathlib import Path
-          def load(path):
-            raw=Path(path).read_text().strip()
-            try: return json.loads(raw) if raw else {}
-            except Exception: return {'response':raw[:500]}
-          token=load('/tmp/token.json')
-          hook=load('/tmp/hook.json')
-          evidence={
-            'checkedAt':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),
-            'targetSha':os.environ['TARGET_SHA'],
-            'tokenHttpStatus':int(os.environ['VERIFY_CODE']),
-            'tokenVerified':token.get('success') is True and (token.get('result') or {}).get('status')=='active',
-            'hookHttpStatus':int(os.environ['HOOK_CODE']),
-            'hookAccepted':int(os.environ['HOOK_CODE']) in (200,201,202) and hook.get('success',True) is not False,
-            'hookResult':hook.get('result',hook),
-          }
-          Path('ops/cloudflare-trigger-result.json').write_text(json.dumps(evidence,indent=2,sort_keys=True))
-          if not evidence['tokenVerified'] or not evidence['hookAccepted']:
-            Path('/tmp/failed').write_text('1')
-          PY
-
-      - name: Commit sanitized trigger evidence
-        if: always()
+      - name: Deploy exact SHA to sovv-web
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name 'sovereign-release-bot'
-          git config user.email 'release-bot@users.noreply.github.com'
-          git add ops/cloudflare-trigger-result.json
-          git commit -m 'Record Cloudflare deploy-hook response' || exit 0
-          git push origin HEAD:ops/one-time-sovv-web-deploy-20260731
-
-      - name: Enforce trigger acceptance
-        shell: bash
-        run: test ! -f /tmp/failed
+          env -u GITHUB_SHA \
+            WORKERS_CI_COMMIT_SHA="$TARGET_SHA" \
+            CLOUDFLARE_ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID" \
+            CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN" \
+            VITE_TURNSTILE_SITE_KEY="$VITE_TURNSTILE_SITE_KEY" \
+            pnpm production:deploy
