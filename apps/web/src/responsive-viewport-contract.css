@@ -1,0 +1,261 @@
+/* Sovereign responsive viewport contract.
+   Resolves inherited landing-grid rules that compressed the real answer demonstration
+   and hardens public and authenticated layouts at phone, tablet, and desktop widths. */
+
+/* The current HeroAnswerPreview contains one answer surface. Retired landing CSS still
+   defined a two-column orbit + answer grid, leaving the real answer trapped in the
+   narrow first track. Reset that obsolete container contract at every viewport. */
+.sovereign-landing .hero-intelligence-stage {
+  display: block;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  width: min(100%, 1020px);
+  min-height: 0;
+  padding: 0;
+}
+
+.sovereign-landing .hero-answer {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(24px, 4vw, 42px);
+}
+
+.sovereign-landing .hero-answer > *,
+.sovereign-landing .living-answer-body,
+.sovereign-landing .living-connection,
+.sovereign-landing .living-answer-body aside {
+  min-width: 0;
+}
+
+.sovereign-landing .living-answer-body {
+  min-height: 0;
+}
+
+.sovereign-landing .permission-section {
+  grid-template-columns: minmax(0, 1.18fr) minmax(340px, .82fr);
+}
+
+.sovereign-landing .permission-section .landing-section-header,
+.sovereign-landing .permission-section .landing-section-header h2 {
+  max-width: none;
+}
+
+/* Keep every authenticated object inside its actual content track. */
+.intelligence-main,
+.intelligence-scroll,
+.response-thread,
+.sovereign-answer,
+.answer-sections,
+.relationship-answer,
+.system-answer,
+.alignment-view,
+.covenant-answer {
+  min-width: 0;
+}
+
+@media (max-width: 980px) {
+  .sovereign-landing .hero-intelligence-stage {
+    min-height: 0;
+  }
+
+  .sovereign-landing .permission-section {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .sovereign-landing .permission-boundary {
+    width: min(100%, 680px);
+    margin-top: 36px;
+  }
+}
+
+@media (max-width: 700px) {
+  .sovereign-landing .landing-hero {
+    gap: 0;
+    padding: 72px 0 82px;
+  }
+
+  .sovereign-landing .landing-hero-copy {
+    width: 100%;
+    max-width: none;
+  }
+
+  .sovereign-landing .landing-hero h1,
+  .sovereign-landing .landing-hero-copy h1 {
+    width: 100%;
+    max-width: none;
+    font-size: clamp(2.48rem, 11.8vw, 3.25rem);
+    letter-spacing: -.058em;
+    line-height: .92;
+  }
+
+  .sovereign-landing .landing-hero h1 em {
+    display: inline;
+  }
+
+  .sovereign-landing .landing-hero-copy > p:not(.landing-kicker, .landing-support) {
+    width: min(100%, 38rem);
+    margin-top: 26px;
+    font-size: .96rem;
+    line-height: 1.64;
+  }
+
+  .sovereign-landing .landing-hero-copy > small {
+    max-width: 34ch;
+    margin-inline: auto;
+  }
+
+  .sovereign-landing .hero-intelligence-stage {
+    display: block;
+    grid-template-columns: 1fr;
+    gap: 0;
+    min-height: 0;
+    margin-top: 48px;
+    padding: 0;
+    border-radius: 18px;
+  }
+
+  .sovereign-landing .hero-answer {
+    width: 100%;
+    min-height: 0;
+    padding: 22px 17px;
+  }
+
+  .sovereign-landing .hero-answer > header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    row-gap: 7px;
+  }
+
+  .sovereign-landing .hero-fixture-scope {
+    margin: 15px 0 22px;
+  }
+
+  .sovereign-landing .living-question {
+    max-width: 100%;
+    margin-bottom: 24px;
+    font-size: 1.05rem;
+  }
+
+  .sovereign-landing .living-answer-body {
+    display: block;
+    min-height: 0;
+    padding: 22px 0 18px;
+  }
+
+  .sovereign-landing .living-answer-body > span,
+  .sovereign-landing .living-answer-body > h2 {
+    grid-column: auto;
+  }
+
+  .sovereign-landing .living-answer-body h2 {
+    max-width: none;
+    margin-bottom: 22px;
+    font-size: clamp(1.92rem, 9.2vw, 2.65rem);
+    line-height: 1;
+  }
+
+  .sovereign-landing .living-connection,
+  .sovereign-landing .living-answer-body aside {
+    min-height: 0;
+    padding: 17px;
+  }
+
+  .sovereign-landing .living-answer-body aside {
+    margin-top: 12px;
+  }
+
+  .sovereign-landing .landing-foundation {
+    margin-bottom: 92px;
+  }
+
+  .sovereign-landing .story-heading {
+    width: 100%;
+  }
+
+  .sovereign-landing .story-heading h2 {
+    font-size: clamp(2.65rem, 13.6vw, 4rem);
+    line-height: .91;
+  }
+
+  .sovereign-landing .permission-section {
+    display: block;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .sovereign-landing .permission-section .landing-section-header,
+  .sovereign-landing .permission-section .landing-section-header h2,
+  .sovereign-landing .permission-section .landing-section-header > p:last-child {
+    width: 100%;
+    max-width: none;
+  }
+
+  .sovereign-landing .permission-section h2 {
+    font-size: clamp(2.65rem, 13.5vw, 3.8rem);
+    line-height: .96;
+  }
+
+  .sovereign-landing .permission-boundary {
+    width: 100%;
+    margin-top: 34px;
+  }
+
+  .sovereign-landing .pricing-preview {
+    margin-inline: auto;
+  }
+
+  .intelligence-scroll {
+    overflow-x: clip;
+  }
+
+  .surface-heading > span,
+  .today-facet-view > header > span,
+  .direct-answer,
+  .answer-sections p,
+  .relationship-answer p,
+  .system-answer p,
+  .alignment-view p,
+  .covenant-answer p {
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+}
+
+@media (max-width: 430px) {
+  .sovereign-landing .landing-hero h1,
+  .sovereign-landing .landing-hero-copy h1 {
+    font-size: clamp(2.38rem, 11.5vw, 2.9rem);
+  }
+
+  .sovereign-landing .landing-actions {
+    width: 100%;
+  }
+
+  .sovereign-landing .hero-answer {
+    padding-inline: 15px;
+  }
+
+  .sovereign-landing .living-answer-body h2 {
+    font-size: clamp(1.82rem, 8.8vw, 2.3rem);
+  }
+
+  .sovereign-landing .story-conversation {
+    padding-inline: 15px;
+  }
+
+  .sovereign-landing .story-user-message,
+  .sovereign-landing .story-assistant-message {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sovereign-landing .hero-intelligence-stage,
+  .sovereign-landing .hero-answer,
+  .intelligence-workspace .response-thread > * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
