@@ -13,6 +13,7 @@ import { PublicLanding } from './PublicLanding';
 import { installPublicLandingViewportContract } from './PublicLandingViewportContract';
 import { PublicPolicy } from './PublicPolicy';
 import { PublicPolicyMetadata } from './PublicPolicyMetadata';
+import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
 
 /* Component foundations */
 import './styles.css';
@@ -26,6 +27,7 @@ import './auth-onboarding.css';
 import './email-code-fallback.css';
 import './unified-entry.css';
 import './account-control.css';
+import './safety-response-runtime.css';
 
 /* Shared product system, route-owned landing layout, and composition hierarchy. */
 import './sovereign-cohesion.css';
@@ -45,6 +47,7 @@ installEmailCodeFallbackRuntime();
 installBaselineInputRuntime();
 installDialogAccessibility();
 installPrivateAnswerExportRuntime();
+installSafetyResponseRuntime();
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   if (location.hostname === 'sovereign.defrag.app') {
