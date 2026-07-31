@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 
 const personalBasis = [
   { compact: 'SUN · LEO', label: 'Natal Sun in Leo' },
@@ -186,7 +187,7 @@ function RelationshipStory() {
           <div className="story-conversation">
             <p className="story-user-message">Why does the same conversation land so differently for me and Maya?</p>
             <div className="story-assistant-message">
-              <p>You may need time to talk things through before you are sure. Maya may recognize an immediate response. The clash may be about timing—not how much either of you cares.</p>
+              <p><strong>WHAT HAPPENS BETWEEN YOU</strong><br />You may need time to talk things through before you are sure. Maya may recognize an immediate response. The clash may be about timing—not how much either of you cares.</p>
               <EvidenceChips values={relationshipBasis} label="GROUNDED IN" />
             </div>
             <StoryComposer placeholder="Ask about the two of you…" />
@@ -245,7 +246,7 @@ function StoryHeading({ step, title, outline, id, children }: { step: string; ti
   );
 }
 
-function DemoWindow({ title, className, children }: { title: string; className: string; children: React.ReactNode }) {
+function DemoWindow({ title, className, children }: { title: string; className: string; children: ReactNode }) {
   return (
     <section className={`visual-demo-window ${className}`}>
       <header><i aria-hidden="true"><b /><b /><b /></i><span>{title}</span></header>
