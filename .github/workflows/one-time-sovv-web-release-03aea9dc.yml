@@ -11,8 +11,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: one-time-sovv-web-release-03aea9dc
-  cancel-in-progress: false
+  group: one-time-sovv-web-release-03aea9dc-hosted
+  cancel-in-progress: true
 
 jobs:
   deploy:
