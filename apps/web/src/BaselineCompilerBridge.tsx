@@ -13,9 +13,9 @@ type PlaceCandidate = {
   confirmed: false;
 };
 
-type PendingChoice = {
-  candidates: PlaceCandidate[];
-  resolve: (candidate: PlaceCandidate | null) => void;
+type SourceNames = {
+  fullBirthName: string;
+  preferredName?: string;
 };
 
 type LegacyBaselineSubmission = {
@@ -31,42 +31,124 @@ const BASELINE_ONBOARDING_PATH = '/api/v1/baseline/onboarding';
 const TERMINAL_STATUSES = new Set(['ready', 'degraded', 'validation_failed', 'cancelled']);
 
 export function BaselineCompilerBridge({ children }: { children: ReactNode }) {
-  const [pendingChoice, setPendingChoice] = useState<PendingChoice | null>(null);
-  const chooser = useRef<(candidates: PlaceCandidate[]) => Promise<PlaceCandidate | null>>(async () => null);
-
-  chooser.current = (candidates) => new Promise((resolve) => {
-    setPendingChoice({ candidates, resolve });
-  });
+  const [sourcePromptOpen, setSourcePromptOpen] = useState(false);
+  const [fullBirthName, setFullBirthName] = useState('');
+  const [preferredName, setPreferredName] = useState('');
+  const [placeCandidates, setPlaceCandidates] = useState<PlaceCandidate[]>([]);
+  const sourceResolver = useRef<((value: SourceNames | null) => void) | null>(null);
+  const placeResolver = useRef<((value: PlaceCandidate | null) => void) | null>(null);
 
   useEffect(() => {
     const originalFetch = window.fetch.bind(window);
     const bridgedFetch: typeof window.fetch = async (input, init) => {
       if (!isLegacyBaselineRequest(input, init)) return originalFetch(input, init);
-      return submitThroughCompilerBridge(originalFetch, input, init, (candidates) => chooser.current(candidates));
+      return submitThroughCompilerBridge(
+        originalFetch,
+        input,
+        init,
+        collectSourceNames,
+        choosePlaceCandidate
+      );
     };
     window.fetch = bridgedFetch;
     return () => {
       window.fetch = originalFetch;
-      setPendingChoice((current) => {
-        current?.resolve(null);
-        return null;
-      });
+      sourceResolver.current?.(null);
+      sourceResolver.current = null;
+      placeResolver.current?.(null);
+      placeResolver.current = null;
     };
   }, []);
 
-  function finishChoice(candidate: PlaceCandidate | null) {
-    setPendingChoice((current) => {
-      current?.resolve(candidate);
-      return null;
+  function collectSourceNames(): Promise<SourceNames | null> {
+    setFullBirthName('');
+    setPreferredName('');
+    setSourcePromptOpen(true);
+    return new Promise((resolve) => {
+      sourceResolver.current = resolve;
     });
   }
+
+  function choosePlaceCandidate(candidates: PlaceCandidate[]): Promise<PlaceCandidate | null> {
+    setPlaceCandidates(candidates);
+    return new Promise((resolve) => {
+      placeResolver.current = resolve;
+    });
+  }
+
+  function finishSourceNames(value: SourceNames | null) {
+    sourceResolver.current?.(value);
+    sourceResolver.current = null;
+    setSourcePromptOpen(false);
+  }
+
+  function finishPlaceChoice(candidate: PlaceCandidate | null) {
+    placeResolver.current?.(candidate);
+    placeResolver.current = null;
+    setPlaceCandidates([]);
+  }
+
+  const normalizedBirthName = fullBirthName.trim();
+  const normalizedPreferredName = preferredName.trim();
 
   return (
     <>
       {children}
-      {pendingChoice && (
+
+      {sourcePromptOpen && (
+        <div className="baseline-place-confirmation baseline-source-confirmation" role="dialog" aria-modal="true" aria-labelledby="baseline-source-confirmation-title">
+          <button className="baseline-place-backdrop" aria-label="Cancel private source details" onClick={() => finishSourceNames(null)} />
+          <section>
+            <header>
+              <p>Private source</p>
+              <h2 id="baseline-source-confirmation-title">Complete the source beneath your Baseline.</h2>
+              <span>Your birth-record name supports approved name-based calculations. It is encrypted for correction and recomputation, and it is not sent to the model.</span>
+            </header>
+            <div className="baseline-source-fields">
+              <label>
+                <strong>Full name at birth</strong>
+                <span>Enter the name shown on the birth record.</span>
+                <input
+                  autoFocus
+                  autoComplete="name"
+                  value={fullBirthName}
+                  onChange={(event) => setFullBirthName(event.target.value)}
+                  maxLength={200}
+                  required
+                />
+              </label>
+              <label>
+                <strong>Preferred or current name <small>Optional</small></strong>
+                <span>Keep this separate when it differs from the birth-record name.</span>
+                <input
+                  autoComplete="nickname"
+                  value={preferredName}
+                  onChange={(event) => setPreferredName(event.target.value)}
+                  maxLength={120}
+                />
+              </label>
+            </div>
+            <footer>
+              <small>Date, time, place, coordinates, timezone, and names remain encrypted source data. Only validated technical values may become Basis.</small>
+              <div>
+                <button onClick={() => finishSourceNames(null)}>Go back</button>
+                <button
+                  className="baseline-source-continue"
+                  disabled={normalizedBirthName.length < 2}
+                  onClick={() => finishSourceNames({
+                    fullBirthName: normalizedBirthName,
+                    ...(normalizedPreferredName ? { preferredName: normalizedPreferredName } : {})
+                  })}
+                >Continue</button>
+              </div>
+            </footer>
+          </section>
+        </div>
+      )}
+
+      {placeCandidates.length > 0 && (
         <div className="baseline-place-confirmation" role="dialog" aria-modal="true" aria-labelledby="baseline-place-confirmation-title">
-          <button className="baseline-place-backdrop" aria-label="Cancel birthplace confirmation" onClick={() => finishChoice(null)} />
+          <button className="baseline-place-backdrop" aria-label="Cancel birthplace confirmation" onClick={() => finishPlaceChoice(null)} />
           <section>
             <header>
               <p>Confirm the source</p>
@@ -74,8 +156,8 @@ export function BaselineCompilerBridge({ children }: { children: ReactNode }) {
               <span>Sovereign resolved these city-level matches on the server. Your device timezone was not used.</span>
             </header>
             <div className="baseline-place-options">
-              {pendingChoice.candidates.map((candidate) => (
-                <button key={candidate.resolutionId} onClick={() => finishChoice(candidate)}>
+              {placeCandidates.map((candidate) => (
+                <button key={candidate.resolutionId} onClick={() => finishPlaceChoice(candidate)}>
                   <strong>{candidate.displayName}</strong>
                   <span>{friendlyTimezone(candidate.timezone)}</span>
                   <small>{confidenceLabel(candidate.confidence)}</small>
@@ -84,7 +166,7 @@ export function BaselineCompilerBridge({ children }: { children: ReactNode }) {
             </div>
             <footer>
               <small>Place and timezone resolution: GeoNames. Exact coordinates remain encrypted and are not shown to the model.</small>
-              <button onClick={() => finishChoice(null)}>Go back</button>
+              <button onClick={() => finishPlaceChoice(null)}>Go back</button>
             </footer>
           </section>
         </div>
@@ -97,10 +179,18 @@ async function submitThroughCompilerBridge(
   originalFetch: typeof fetch,
   input: RequestInfo | URL,
   init: RequestInit | undefined,
+  collectNames: () => Promise<SourceNames | null>,
   chooseCandidate: (candidates: PlaceCandidate[]) => Promise<PlaceCandidate | null>
 ): Promise<Response> {
   try {
     const legacy = parseLegacySubmission(init?.body);
+    const names = legacy.fullBirthName
+      ? { fullBirthName: legacy.fullBirthName, ...(legacy.preferredName ? { preferredName: legacy.preferredName } : {}) }
+      : await collectNames();
+    if (!names) {
+      return problemResponse(409, 'baseline_source_confirmation_cancelled', 'Complete the private source details before the Baseline is calculated.');
+    }
+
     const birthplace = parseBirthplace(legacy.birthplace);
     const resolutionResponse = await originalFetch('/api/v1/baseline/place/resolve', jsonInit({
       city: birthplace.city,
@@ -130,8 +220,8 @@ async function submitThroughCompilerBridge(
     if (!confirmation.ok) return cloneJsonResponse(confirmationBody, confirmation.status, confirmation.headers);
 
     const canonicalBody = {
-      ...(legacy.fullBirthName ? { fullBirthName: legacy.fullBirthName } : {}),
-      ...(legacy.preferredName ? { preferredName: legacy.preferredName } : {}),
+      fullBirthName: names.fullBirthName,
+      ...(names.preferredName ? { preferredName: names.preferredName } : {}),
       birthDate: legacy.birthDate,
       birthTimeCertainty: legacy.birthTimeCertainty,
       ...(legacy.birthTime ? { birthTime: legacy.birthTime } : {}),
@@ -310,6 +400,8 @@ function isPlaceCandidate(value: unknown): value is PlaceCandidate {
   return typeof candidate.resolutionId === 'string'
     && typeof candidate.displayName === 'string'
     && typeof candidate.timezone === 'string'
+    && candidate.attribution === 'GeoNames'
+    && candidate.confirmed === false
     && ['low', 'medium', 'high'].includes(String(candidate.confidence));
 }
 
@@ -318,7 +410,7 @@ function asRecord(value: unknown): Json {
 }
 
 function friendlyTimezone(value: string): string {
-  return value.replaceAll('_', ' ').replace('/', ' · ');
+  return value.replaceAll('_', ' ').replaceAll('/', ' · ');
 }
 
 function confidenceLabel(value: PlaceCandidate['confidence']): string {
@@ -326,5 +418,5 @@ function confidenceLabel(value: PlaceCandidate['confidence']): string {
 }
 
 function delay(milliseconds: number): Promise<void> {
-  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
