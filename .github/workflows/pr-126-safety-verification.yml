@@ -1,6 +1,9 @@
 name: PR 126 Safety Verification
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - codex/server-owned-safety-router
@@ -10,7 +13,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: pr-126-safety-verification
+  group: pr-126-safety-verification-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -20,9 +23,10 @@ jobs:
     timeout-minutes: 45
 
     steps:
-      - name: Check out exact commit
+      - name: Check out exact pull-request head
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 1
 
       - name: Set up Node.js
@@ -38,9 +42,11 @@ jobs:
           pnpm --version
 
       - name: Confirm exact checked-out SHA
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          printf 'verified_sha=%s\n' "$GITHUB_SHA" | tee verification-evidence.txt
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          printf 'verified_sha=%s\n' "$EXPECTED_SHA" | tee verification-evidence.txt
 
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
@@ -50,10 +56,12 @@ jobs:
 
       - name: Record successful verification
         if: success()
+        env:
+          VERIFIED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           {
             printf 'status=passed\n'
-            printf 'verified_sha=%s\n' "$GITHUB_SHA"
+            printf 'verified_sha=%s\n' "$VERIFIED_SHA"
             printf 'workflow_run_id=%s\n' "$GITHUB_RUN_ID"
             printf 'workflow_attempt=%s\n' "$GITHUB_RUN_ATTEMPT"
           } >> verification-evidence.txt
@@ -62,7 +70,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pr-126-safety-verification-${{ github.sha }}
+          name: pr-126-safety-verification-${{ github.event.pull_request.head.sha || github.sha }}
           path: verification-evidence.txt
           if-no-files-found: error
           retention-days: 14
