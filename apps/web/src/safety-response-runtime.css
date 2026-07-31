@@ -13,24 +13,33 @@
   position: absolute;
   inset: -18px;
   z-index: -1;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
   border-radius: 24px;
-  background: color-mix(in srgb, currentColor 3%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
   pointer-events: none;
 }
 
+.sovereign-answer[data-sovereign-safety='emergency']::before,
 .sovereign-answer[data-sovereign-safety='urgent']::before {
   border-width: 2px;
-  border-color: color-mix(in srgb, currentColor 36%, transparent);
-  background: color-mix(in srgb, currentColor 7%, transparent);
+  border-color: color-mix(in srgb, currentColor 40%, transparent);
+  background: color-mix(in srgb, currentColor 8%, transparent);
 }
 
-.sovereign-answer[data-sovereign-safety='urgent'] header > span,
-.sovereign-answer[data-sovereign-safety='grounded'] header > span,
-.sovereign-answer[data-sovereign-safety='secure-refusal'] header > span {
+.sovereign-answer[data-sovereign-safety='supportive']::before {
+  border-color: color-mix(in srgb, currentColor 26%, transparent);
+  background: color-mix(in srgb, currentColor 6%, transparent);
+}
+
+.sovereign-answer[data-sovereign-safety] header > span {
   font-weight: 750;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.sovereign-answer[data-sovereign-safety='emergency'] h2,
+.sovereign-answer[data-sovereign-safety='urgent'] h2 {
+  max-width: 19ch;
 }
 
 .sovereign-answer[data-sovereign-safety] .answer-limit {
