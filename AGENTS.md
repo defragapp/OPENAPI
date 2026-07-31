@@ -8,6 +8,14 @@ These instructions apply to the entire OPENAPI repository.
 - `/workspace/SOVV` is read-only reference material. Never edit, format, generate files in, commit to, reset, merge, rebase, delete, or push SOVV.
 - Verify the SOVV commit and working tree after each meaningful phase when the checkout is available.
 
+## Branch and release discipline
+- `main` is the single canonical development and production branch for Sovereign.OS.
+- Work directly on `main` for normal AI-assisted implementation turns. Do not create a new branch for each request, correction, release attempt, visual pass, or verification pass.
+- Create a temporary branch only when the user explicitly asks for isolated review work or when repository protection makes direct `main` work impossible.
+- Never create parallel `final`, `release`, `reconciliation`, `visual`, `hotfix`, or agent-named branches as substitutes for strengthening the existing platform on `main`.
+- Cloudflare production builds must originate from `main`, and the injected Workers Builds commit SHA must match the checked-out repository HEAD.
+- Extend the canonical components and contracts in place. Do not create duplicate workspaces, alternative landing implementations, second agents, or disconnected product shells.
+
 ## Product definition
 - Sovereign.OS is Baseline-first. The product must be useful before the user explains an incident.
 - The single user-facing agent is named Sovereign.
