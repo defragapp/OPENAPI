@@ -17,7 +17,7 @@ concurrency:
 jobs:
   deploy:
     if: github.event.pull_request.head.ref == 'ops/cloudflare-release-03aea9dc'
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
       TARGET_SHA: 03aea9dc700560cd999182ad5bbce7348076c6aa
