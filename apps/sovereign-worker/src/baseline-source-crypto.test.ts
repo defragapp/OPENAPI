@@ -71,6 +71,12 @@ describe('encrypted Baseline source storage', () => {
     await expect(decryptBaselineSource(env, 'acct_other', envelope)).rejects.toBeTruthy();
   });
 
+  it('requires a birth-record name before encryption or provider work', () => {
+    const { fullBirthName: _omitted, ...withoutBirthName } = sourceInput;
+    expect(() => parseCanonicalBaselineSourceInput(withoutBirthName)).toThrow();
+    expect(() => parseCanonicalBaselineSourceInput({ ...sourceInput, fullBirthName: ' ' })).toThrow();
+  });
+
   it('requires an explicit supported birth-time shape and confirmed resolved place', () => {
     expect(() => parseCanonicalBaselineSourceInput({
       ...sourceInput,
