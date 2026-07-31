@@ -20,22 +20,27 @@ const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const onboarding = read('apps/web/src/PlanOnboarding.tsx');
 const controls = read('apps/web/src/AccountControlCenter.tsx');
 const membership = read('apps/web/src/SystemMembershipManager.tsx');
-const finalCss = read('apps/web/src/premium-platform-release.css');
+const premiumCss = read('apps/web/src/premium-platform-release.css');
+const visualCss = read('apps/web/src/sovereign-visual-system.css');
 const publicCss = read('apps/web/public/premium-public-release.css');
 const how = read('apps/web/public/how-it-works.html');
 const pricing = read('apps/web/public/pricing.html');
 const faq = read('apps/web/public/faq.html');
 const notFound = read('apps/web/public/404.html');
+const reactVisualSource = `${premiumCss}\n${visualCss}`;
 
 const selectiveImport = "import './selective-visual-port.css';";
-const finalImport = "import './premium-platform-release.css';";
+const premiumImport = "import './premium-platform-release.css';";
+const visualImport = "import './sovereign-visual-system.css';";
 const selectiveIndex = main.indexOf(selectiveImport);
-const finalIndex = main.indexOf(finalImport);
+const premiumIndex = main.indexOf(premiumImport);
+const visualIndex = main.indexOf(visualImport);
 assert(selectiveIndex >= 0, 'Selective visual reference layer is not imported.');
-assert(finalIndex > selectiveIndex, 'Premium final-release composition must load after the selective visual port.');
-assert(!main.slice(finalIndex + finalImport.length).includes("import './"), 'Another local visual layer loads after the premium final-release composition.');
+assert(premiumIndex > selectiveIndex, 'Premium composition must load after the selective visual port.');
+assert(visualIndex > premiumIndex, 'The approved visual system must load after the premium composition.');
+assert(!main.slice(visualIndex + visualImport.length).includes("import './"), 'Another local visual layer loads after the approved visual system.');
 
-requireAll('premium React surface coverage', finalCss, [
+requireAll('premium React surface coverage', reactVisualSource, [
   '.sovereign-landing',
   '.sovereign-policy',
   '.public-not-found',
@@ -56,6 +61,10 @@ requireAll('premium React surface coverage', finalCss, [
   '.library-grid',
   '.account-control-dialog',
   '.system-membership-dialog',
+  '.visual-demo-window',
+  '.visual-reasoning-panel',
+  '.story-system-map',
+  '@supports (animation-timeline: view())',
   '@media (prefers-reduced-motion: reduce)',
   '@media (forced-colors: active)',
   '@media print',
@@ -128,16 +137,18 @@ for (const prohibited of [
   'mock-auth',
   'fake-answer',
   'dashboard-grid'
-]) assert(!`${finalCss}\n${publicCss}`.includes(prohibited), `Premium release introduces prohibited behavior or framing: ${prohibited}`);
+]) assert(!`${reactVisualSource}\n${publicCss}`.includes(prohibited), `Premium release introduces prohibited behavior or framing: ${prohibited}`);
 
-balanced('premium React release', finalCss);
+balanced('premium React composition', premiumCss);
+balanced('Sovereign visual system', visualCss);
 balanced('premium public release', publicCss);
 
 console.log(JSON.stringify({
   ok: true,
-  release: 'premium-platform-final',
+  release: 'sovereign-motion-visual-system',
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
   answerContract: 'sovereign-answer.v2',
+  visualDirection: 'editorial-dark-motion-led',
   preservedSystems: ['authentication', 'Turnstile', 'Stripe checkout', 'Stripe portal', 'consent', 'Baseline', 'current context', 'People', 'Systems', 'Library'],
   coveredRoutes: ['home', 'how-it-works', 'pricing', 'faq', 'privacy', 'terms', 'login', 'signup', 'redeem', 'invitation', 'onboarding', 'app', 'not-found']
 }, null, 2));
