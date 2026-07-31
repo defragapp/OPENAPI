@@ -229,6 +229,17 @@ export async function cleanupExpired(env: Env) {
   const auditEvents = await env.DB.prepare("DELETE FROM tool_audit_events WHERE created_at < datetime('now', ?)").bind(auditCutoff).run();
   const magicLinks = await env.DB.prepare("DELETE FROM auth_magic_links WHERE created_at < datetime('now', ?)").bind(threadCutoff).run();
   const sessions = await env.DB.prepare("DELETE FROM auth_sessions WHERE revoked_at IS NOT NULL AND created_at < datetime('now', ?)").bind(auditCutoff).run();
+  const expiredPlaceResolutions = await env.DB.prepare("DELETE FROM baseline_place_resolutions WHERE expires_at < datetime('now')").run();
+  const oldCompilerRuns = await env.DB.prepare(`DELETE FROM baseline_compiler_runs
+    WHERE status IN ('validation_failed','degraded','cancelled')
+      AND updated_at < datetime('now', ?)
+      AND source_input_hash <> COALESCE((
+        SELECT source.normalized_input_hash
+        FROM baseline_source_records source
+        WHERE source.account_id = baseline_compiler_runs.account_id
+      ), '')`)
+    .bind(auditCutoff)
+    .run();
   const oldJobs = await env.DB.prepare("DELETE FROM background_jobs WHERE status IN ('completed','failed','cancelled') AND updated_at < datetime('now', ?)").bind(auditCutoff).run();
   await env.DB.prepare("UPDATE auth_sessions SET revoked_at = datetime('now') WHERE expires_at < datetime('now') AND revoked_at IS NULL").run();
   await env.DB.prepare("DELETE FROM export_artifacts WHERE expires_at < datetime('now')").run();
@@ -241,6 +252,8 @@ export async function cleanupExpired(env: Env) {
     auditEvents: auditEvents.meta?.changes ?? 0,
     magicLinks: magicLinks.meta?.changes ?? 0,
     sessions: sessions.meta?.changes ?? 0,
+    expiredPlaceResolutions: expiredPlaceResolutions.meta?.changes ?? 0,
+    oldCompilerRuns: oldCompilerRuns.meta?.changes ?? 0,
     oldJobs: oldJobs.meta?.changes ?? 0
   };
   console.info('retention_cleanup', { threadDays, auditDays, counts });
