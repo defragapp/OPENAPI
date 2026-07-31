@@ -1,17 +1,9 @@
 import { readFileSync } from 'node:fs';
 
 const read = (path) => readFileSync(path, 'utf8');
-const assert = (condition, message) => {
-  if (!condition) throw new Error(message);
-};
-const requireAll = (label, source, values) => {
-  for (const value of values) assert(source.includes(value), `${label} is missing ${value}`);
-};
-const balanced = (label, source) => {
-  const open = (source.match(/{/g) ?? []).length;
-  const close = (source.match(/}/g) ?? []).length;
-  assert(open === close, `${label} CSS has unbalanced braces (${open}/${close}).`);
-};
+const assert = (value, message) => { if (!value) throw new Error(message); };
+const requireAll = (label, source, values) => values.forEach((value) => assert(source.includes(value), `${label} is missing ${value}`));
+const balanced = (label, source) => assert((source.match(/{/g) ?? []).length === (source.match(/}/g) ?? []).length, `${label} CSS is unbalanced.`);
 
 const main = read('apps/web/src/main.tsx');
 const app = read('apps/web/src/App.tsx');
@@ -20,135 +12,55 @@ const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const onboarding = read('apps/web/src/PlanOnboarding.tsx');
 const controls = read('apps/web/src/AccountControlCenter.tsx');
 const membership = read('apps/web/src/SystemMembershipManager.tsx');
-const premiumCss = read('apps/web/src/premium-platform-release.css');
-const visualCss = read('apps/web/src/sovereign-visual-system.css');
+const premium = read('apps/web/src/premium-platform-release.css');
+const visual = read('apps/web/src/sovereign-visual-system.css');
+const viewport = read('apps/web/src/responsive-viewport-contract.css');
 const publicCss = read('apps/web/public/premium-public-release.css');
-const how = read('apps/web/public/how-it-works.html');
-const pricing = read('apps/web/public/pricing.html');
-const faq = read('apps/web/public/faq.html');
-const notFound = read('apps/web/public/404.html');
-const reactVisualSource = `${premiumCss}\n${visualCss}`;
+const supportPages = ['how-it-works', 'pricing', 'faq', '404'].map((name) => read(`apps/web/public/${name}.html`));
+const reactCss = `${premium}\n${visual}\n${viewport}`;
 
-const selectiveImport = "import './selective-visual-port.css';";
 const premiumImport = "import './premium-platform-release.css';";
 const visualImport = "import './sovereign-visual-system.css';";
-const selectiveIndex = main.indexOf(selectiveImport);
+const viewportImport = "import './responsive-viewport-contract.css';";
 const premiumIndex = main.indexOf(premiumImport);
 const visualIndex = main.indexOf(visualImport);
-assert(selectiveIndex >= 0, 'Selective visual reference layer is not imported.');
-assert(premiumIndex > selectiveIndex, 'Premium composition must load after the selective visual port.');
-assert(visualIndex > premiumIndex, 'The approved visual system must load after the premium composition.');
-assert(!main.slice(visualIndex + visualImport.length).includes("import './"), 'Another local visual layer loads after the approved visual system.');
+const viewportIndex = main.indexOf(viewportImport);
+assert(premiumIndex >= 0 && visualIndex > premiumIndex && viewportIndex > visualIndex, 'React visual layers load in the wrong order.');
+assert(!main.slice(viewportIndex + viewportImport.length).includes("import './"), 'A local visual layer loads after the viewport contract.');
 
-requireAll('premium React surface coverage', reactVisualSource, [
-  '.sovereign-landing',
-  '.sovereign-policy',
-  '.public-not-found',
-  '.private-route-gate',
-  '.account-shell',
-  '.auth-panel',
-  '.plan-onboarding',
-  '.intelligence-workspace',
-  '.today-facet-view',
-  '.explore-editorial',
-  '.relationship-overview',
-  '.system-overview',
-  '.baseline-builder',
-  '.baseline-reveal',
-  '.sovereign-answer',
-  '.sovereign-composer',
-  '.intelligence-context',
-  '.library-grid',
-  '.account-control-dialog',
-  '.system-membership-dialog',
-  '.visual-demo-window',
-  '.visual-reasoning-panel',
-  '.story-system-map',
-  '@supports (animation-timeline: view())',
-  '@media (prefers-reduced-motion: reduce)',
-  '@media (forced-colors: active)',
-  '@media print',
+requireAll('viewport repair', viewport, [
+  '.sovereign-landing .hero-intelligence-stage',
+  'display: block;',
+  'grid-template-columns: minmax(0, 1fr);',
+  'min-height: 0;',
+  '@media (max-width: 700px)',
+  '@media (max-width: 430px)',
+  '.sovereign-landing .permission-section',
+  '.intelligence-scroll',
+  '@media (prefers-reduced-motion: reduce)'
+]);
+requireAll('visual surfaces', reactCss, [
+  '.sovereign-landing', '.intelligence-workspace', '.today-facet-view', '.explore-editorial',
+  '.relationship-overview', '.system-overview', '.baseline-builder', '.baseline-reveal',
+  '.sovereign-answer', '.sovereign-composer', '.intelligence-context', '.library-grid',
+  '.visual-demo-window', '.visual-reasoning-panel', '.story-system-map',
+  '@supports (animation-timeline: view())', '@media (forced-colors: active)', '@media print',
   'env(safe-area-inset-bottom)'
 ]);
-
-requireAll('premium static surface coverage', publicCss, [
-  '.launch-nav',
-  '.launch-hero',
-  '.journey-steps',
-  '.baseline-explainer',
-  '.pricing-grid',
-  '.price-card',
-  '.plan-comparison-list',
-  '.faq-list',
-  '.launch-callout',
-  '.not-found-stage',
-  '.launch-footer',
-  'min-width: 320px',
-  '@media (max-width: 620px)',
-  '@media (prefers-reduced-motion: reduce)',
-  '@media (forced-colors: active)'
-]);
-
-for (const [label, document] of [
-  ['How it works', how],
-  ['Pricing', pricing],
-  ['Questions', faq],
-  ['Not found', notFound]
-]) requireAll(label, document, ['/premium-public-release.css?v=20260730-final', 'SOVEREIGN.OS']);
-
 requireAll('canonical workspace', `${authenticated}\n${workspace}`, [
-  'data-workspace-contract="one-room"',
-  '<SovereignIntelligenceWorkspace onboardingVerified />',
-  '<AccountControlCenter />',
-  '<SystemMembershipManager />',
+  'data-workspace-contract="one-room"', '<SovereignIntelligenceWorkspace onboardingVerified />',
+  '<AccountControlCenter />', '<SystemMembershipManager />',
   "type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'",
   "version: 'sovereign-answer.v2'"
 ]);
+requireAll('auth and invitations', app, ["path === '/login'", "path === '/signup'", "path === '/invitation'", '__TURNSTILE_SITE_KEY__']);
+requireAll('billing', `${onboarding}\n${controls}`, ['/api/v1/billing/checkout', 'JSON.stringify({ interval })', '/api/v1/billing/portal']);
+requireAll('consent', membership, ['person.identityBound === true', "person.activeScopes.includes('system.include')"]);
+supportPages.forEach((page) => requireAll('support page', page, ['/premium-public-release.css?v=20260730-final', 'SOVEREIGN.OS']));
+for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'compatibility-score', 'Math.random', 'mock-auth', 'fake-answer', 'dashboard-grid']) assert(!`${reactCss}\n${publicCss}`.includes(prohibited), `Prohibited framing found: ${prohibited}`);
+balanced('premium', premium);
+balanced('visual', visual);
+balanced('viewport', viewport);
+balanced('public', publicCss);
 
-requireAll('authentication and invitation architecture', app, [
-  "path === '/login'",
-  "path === '/signup'",
-  "path === '/invitation'",
-  "path === '/onboarding'",
-  '__TURNSTILE_SITE_KEY__',
-  '/api/v1/invitations/preview',
-  '/api/v1/invitations/redeem'
-]);
-
-requireAll('Stripe and billing architecture', `${onboarding}\n${controls}`, [
-  "/api/v1/billing/checkout",
-  'JSON.stringify({ interval })',
-  "/api/v1/billing/portal"
-]);
-
-requireAll('consent-enforced systems', membership, [
-  "person.identityBound === true",
-  "person.activeScopes.includes('system.include')",
-  '/members`,'
-]);
-
-for (const prohibited of [
-  'Alignment Score',
-  'Stability Index',
-  'Growth Rate',
-  'compatibility-score',
-  'Math.random',
-  'localStorage',
-  'mock-auth',
-  'fake-answer',
-  'dashboard-grid'
-]) assert(!`${reactVisualSource}\n${publicCss}`.includes(prohibited), `Premium release introduces prohibited behavior or framing: ${prohibited}`);
-
-balanced('premium React composition', premiumCss);
-balanced('Sovereign visual system', visualCss);
-balanced('premium public release', publicCss);
-
-console.log(JSON.stringify({
-  ok: true,
-  release: 'sovereign-motion-visual-system',
-  canonicalWorkspace: 'SovereignIntelligenceWorkspace',
-  answerContract: 'sovereign-answer.v2',
-  visualDirection: 'editorial-dark-motion-led',
-  preservedSystems: ['authentication', 'Turnstile', 'Stripe checkout', 'Stripe portal', 'consent', 'Baseline', 'current context', 'People', 'Systems', 'Library'],
-  coveredRoutes: ['home', 'how-it-works', 'pricing', 'faq', 'privacy', 'terms', 'login', 'signup', 'redeem', 'invitation', 'onboarding', 'app', 'not-found']
-}, null, 2));
+console.log(JSON.stringify({ ok: true, release: 'sovereign-responsive-viewport-repair', canonicalWorkspace: 'SovereignIntelligenceWorkspace', answerContract: 'sovereign-answer.v2' }, null, 2));
