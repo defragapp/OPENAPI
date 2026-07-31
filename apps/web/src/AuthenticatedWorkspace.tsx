@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AccountControlCenter } from './AccountControlCenter';
+import { BaselineCompilerBridge } from './BaselineCompilerBridge';
 import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
 import { SystemMembershipManager } from './SystemMembershipManager';
 
@@ -67,12 +68,14 @@ export function AuthenticatedWorkspace() {
   }
 
   return (
-    <div className="sovereign-app-runtime" data-workspace-contract="one-room">
-      <SovereignIntelligenceWorkspace onboardingVerified />
-      <div className="sovereign-workspace-overlays" aria-label="Workspace controls">
-        <AccountControlCenter />
-        <SystemMembershipManager />
+    <BaselineCompilerBridge>
+      <div className="sovereign-app-runtime" data-workspace-contract="one-room">
+        <SovereignIntelligenceWorkspace onboardingVerified />
+        <div className="sovereign-workspace-overlays" aria-label="Workspace controls">
+          <AccountControlCenter />
+          <SystemMembershipManager />
+        </div>
       </div>
-    </div>
+    </BaselineCompilerBridge>
   );
 }
