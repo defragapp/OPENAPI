@@ -108,6 +108,40 @@ describe('Baseline compiler entry', () => {
     expect(mocks.startCompilation).toHaveBeenCalledWith(env(), 'acct_test', canonical);
   });
 
+  it('rejects a local time skipped by a timezone transition before queueing', async () => {
+    mocks.resolveCanonical.mockResolvedValue({
+      ...canonical,
+      birthDate: '2024-03-10',
+      birthTime: '02:30'
+    });
+
+    const response = await startConfirmedBaselineCompilation(env(), 'acct_test', {
+      placeResolutionId: 'place_12345678-1234-1234-1234-123456789012'
+    }).catch((error) => error as Response);
+
+    expect(response).toBeInstanceOf(Response);
+    expect(response.status).toBe(422);
+    await expect(response.json()).resolves.toMatchObject({ error: 'baseline_birth_time_nonexistent' });
+    expect(mocks.startCompilation).not.toHaveBeenCalled();
+  });
+
+  it('rejects a duplicated local time until an occurrence or offset is confirmed', async () => {
+    mocks.resolveCanonical.mockResolvedValue({
+      ...canonical,
+      birthDate: '2024-11-03',
+      birthTime: '01:30'
+    });
+
+    const response = await startConfirmedBaselineCompilation(env(), 'acct_test', {
+      placeResolutionId: 'place_12345678-1234-1234-1234-123456789012'
+    }).catch((error) => error as Response);
+
+    expect(response).toBeInstanceOf(Response);
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toMatchObject({ error: 'baseline_birth_time_ambiguous' });
+    expect(mocks.startCompilation).not.toHaveBeenCalled();
+  });
+
   it('rejects a missing birth-record name before any provider call', async () => {
     await expect(startConfirmedBaselineCompilation(env(), 'acct_test', {
       birthDate: '1993-07-26',
