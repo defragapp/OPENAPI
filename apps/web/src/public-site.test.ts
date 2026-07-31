@@ -33,10 +33,12 @@ describe('Sovereign.OS public experience', () => {
   it('shows a recognizable question and direct answer before the Baseline explanation', () => {
     const questionIndex = landing.indexOf('Why do I keep taking responsibility for everyone else?');
     const answerIndex = landing.indexOf('Your capacity is real. The question is whether the responsibility is actually yours.');
-    const foundationIndex = landing.indexOf('Your intelligence begins with your Baseline.');
+    const previewSlotIndex = landing.indexOf('<HeroAnswerPreview />');
+    const foundationSlotIndex = landing.indexOf('<section className="landing-foundation"');
     expect(questionIndex).toBeGreaterThan(-1);
     expect(answerIndex).toBeGreaterThan(questionIndex);
-    expect(foundationIndex).toBeGreaterThan(answerIndex);
+    expect(previewSlotIndex).toBeGreaterThan(-1);
+    expect(foundationSlotIndex).toBeGreaterThan(previewSlotIndex);
     expect(landing).toContain('EXAMPLE ANSWER');
     expect(landing).toContain('Sanitized demonstration · Not your Baseline');
     expect(landing.indexOf('Sanitized demonstration · Not your Baseline')).toBeLessThan(landing.indexOf('YOU ASKED'));
