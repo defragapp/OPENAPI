@@ -39,6 +39,9 @@ import './premium-platform-release.css';
 import './sovereign-visual-system.css';
 import './responsive-viewport-contract.css';
 
+/* Final typography-only contract: headings, titles, and supporting subheadings. */
+import './typography-system.css';
+
 installProductionRuntime();
 installProductRuntime();
 installEmailCodeFallbackRuntime();
