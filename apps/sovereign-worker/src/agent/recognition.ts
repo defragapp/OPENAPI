@@ -36,6 +36,49 @@ export const sovereignActionTypes = [
   'offer_covenant'
 ] as const;
 
+export const sovereignSafetyPresentations = [
+  'grounded',
+  'supportive_resources',
+  'urgent',
+  'emergency',
+  'secure_refusal'
+] as const;
+
+export const sovereignSafetyResourceSchema = z.object({
+  id: z.string().regex(/^[a-z0-9-]{2,80}$/),
+  regions: z.array(z.string().regex(/^[A-Z]{2}$/)).min(1).max(8),
+  label: z.string().min(3).max(120),
+  description: z.string().min(10).max(260),
+  actions: z.array(z.object({
+    label: z.string().min(2).max(80),
+    href: z.string().regex(/^(?:tel:|sms:|https:\/\/)/)
+  }).strict()).min(1).max(3)
+}).strict();
+
+export const sovereignSafetyResponseSchema = z.object({
+  version: z.literal('sovereign-safety-response.v1'),
+  disposition: z.enum(['grounded', 'supportive_resources', 'urgent', 'secure_refusal']),
+  category: z.enum([
+    'immediate_self_harm',
+    'immediate_harm_to_others',
+    'dangerous_ingestion',
+    'immediate_danger',
+    'medical_urgency',
+    'severe_confusion',
+    'indirect_self_harm',
+    'abuse_or_coercion',
+    'acute_distress',
+    'minor_sexual_exploitation',
+    'unverifiable_threat',
+    'protected_system_request'
+  ]),
+  presentation: z.enum(sovereignSafetyPresentations),
+  resource_catalog_version: z.literal('safety-resources.2026-07-31.1'),
+  resources: z.array(sovereignSafetyResourceSchema).max(4)
+}).strict();
+
+export type SovereignSafetyResponse = z.infer<typeof sovereignSafetyResponseSchema>;
+
 export const sovereignAnswerSchema = z.object({
   version: z.literal('sovereign-answer.v2'),
   mode: z.enum(sovereignAnswerModes),
@@ -55,7 +98,8 @@ export const sovereignAnswerSchema = z.object({
     target_id: z.string().regex(/^[A-Za-z0-9_-]{1,128}$/).optional()
   }).strict()).max(5),
   confidence: z.enum(['confirmed', 'supported', 'exploratory']),
-  safety_mode: z.enum(['standard', 'grounded', 'escalate'])
+  safety_mode: z.enum(['standard', 'grounded', 'escalate']),
+  safety: sovereignSafetyResponseSchema.optional()
 }).strict();
 
 export type SovereignAnswerV2 = z.infer<typeof sovereignAnswerSchema>;
@@ -106,6 +150,7 @@ function isProhibitedBasisDisplay(value: string): boolean {
 
 export function parseSovereignAnswer(raw: string, registry: BasisRegistryItem[]): SovereignAnswerV2 {
   const parsed = sovereignAnswerSchema.parse(JSON.parse(extractJson(raw)));
+  if (parsed.safety) throw new Error('Model-authored safety metadata is not accepted');
   const allowed = new Set(registry.map((item) => item.id));
   if (parsed.basis_refs.some((id) => !allowed.has(id))) {
     throw new Error('Sovereign answer selected an invented or unauthorized Basis reference');
