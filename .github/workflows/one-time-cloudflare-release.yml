@@ -1,0 +1,7 @@
+name: One-time Cloudflare production release
+on: push
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ready
