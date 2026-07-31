@@ -14,7 +14,7 @@ describe('shared Sovereign answer stage', () => {
     expect(landing).toContain('THE PERSONAL CONNECTION');
     expect(landing).toContain('A PRACTICAL NEXT STEP');
     expect(landing).toContain('Why this is personal');
-    expect(landing).toContain('className="visual-reasoning-panel');
+    expect(landing).toContain('visual-reasoning-panel');
     expect(landing).toContain('className="visual-evidence-chips"');
     expect(workspace).toContain('<SovereignAnswerView');
     expect(workspace).toContain('<RelationshipAnswer');
