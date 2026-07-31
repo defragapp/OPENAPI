@@ -1,0 +1,50 @@
+name: One-time PR 115 validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/one-time-pr115-validation.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: one-time-pr115-validation-20260731
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event.pull_request.head.ref == 'ops/validate-pr115-20260731'
+    runs-on: self-hosted
+    timeout-minutes: 90
+    env:
+      TARGET_SHA: 3f17f8a17a4bc295d99053e93f3c1e14218c920e
+
+    steps:
+      - name: Check out exact candidate source
+        uses: actions/checkout@v4
+        with:
+          ref: 3f17f8a17a4bc295d99053e93f3c1e14218c920e
+          fetch-depth: 1
+
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          corepack enable
+          pnpm install --frozen-lockfile
+
+      - name: Run canonical Cloudflare build gate
+        shell: bash
+        run: pnpm verify:cloudflare-build
+
+      - name: Run full repository verification
+        shell: bash
+        run: pnpm verify:full
