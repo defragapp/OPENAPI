@@ -1,9 +1,13 @@
 import type { Env } from './env';
 import { cancelAccountSubscriptions } from './billing/stripe';
+import { BASELINE_COMPILER_STAGES, runBaselineCompilerStage } from './baseline-compiler';
 
 const ACCOUNT_TABLE_DELETES = [
   'auth_magic_links',
   'auth_sessions',
+  'baseline_facet_profiles',
+  'baseline_compiler_runs',
+  'baseline_source_records',
   'baseline_onboarding',
   'account_privacy_settings',
   'relationships',
@@ -26,6 +30,7 @@ interface JobRow {
   kind: string;
   payload_json: string;
   attempts: number;
+  max_attempts: number;
   status: string;
 }
 
@@ -34,18 +39,20 @@ export async function enqueueJob(env: Env, kind: string, accountId?: string, pay
   await env.DB.prepare('INSERT INTO background_jobs (id, account_id, kind, status, payload_json) VALUES (?, ?, ?, ?, ?)')
     .bind(id, accountId ?? null, kind, 'queued', JSON.stringify(payload))
     .run();
-  try { await env.JOBS?.send?.({ id, kind, accountId, payload }); } catch { /* D1 cron remains authoritative. */ }
   return { id, kind, status: 'queued' };
 }
 
 export async function runDueJobs(env: Env, limit = 10, accountId?: string) {
   if (!accountId) await cleanupExpired(env);
   const scopedSql = accountId
-    ? `SELECT id, account_id, kind, payload_json, attempts, status FROM background_jobs
-       WHERE account_id = ? AND status = 'queued' AND run_after <= datetime('now')
+    ? `SELECT id, account_id, kind, payload_json, attempts, max_attempts, status FROM background_jobs
+       WHERE account_id = ?
+         AND run_after <= datetime('now')
+         AND (status = 'queued' OR (status = 'running' AND lease_expires_at <= datetime('now')))
        ORDER BY created_at LIMIT ?`
-    : `SELECT id, account_id, kind, payload_json, attempts, status FROM background_jobs
-       WHERE status = 'queued' AND run_after <= datetime('now')
+    : `SELECT id, account_id, kind, payload_json, attempts, max_attempts, status FROM background_jobs
+       WHERE run_after <= datetime('now')
+         AND (status = 'queued' OR (status = 'running' AND lease_expires_at <= datetime('now')))
        ORDER BY created_at LIMIT ?`;
   const statement = env.DB.prepare(scopedSql);
   const rows = accountId
@@ -65,7 +72,7 @@ export async function runDueJobs(env: Env, limit = 10, accountId?: string) {
 }
 
 export async function runOneJob(env: Env, id: string, expectedKind?: string, expectedAccountId?: string, expectedPayload: Record<string, unknown> = {}) {
-  const row = await env.DB.prepare('SELECT id, account_id, kind, payload_json, attempts, status FROM background_jobs WHERE id = ?')
+  const row = await env.DB.prepare('SELECT id, account_id, kind, payload_json, attempts, max_attempts, status FROM background_jobs WHERE id = ?')
     .bind(id)
     .first<JobRow>();
   if (!row) return { id, status: 'missing' };
@@ -73,46 +80,67 @@ export async function runOneJob(env: Env, id: string, expectedKind?: string, exp
   if (expectedKind && expectedKind !== row.kind) return { id, status: 'rejected' };
   if (expectedAccountId && expectedAccountId !== accountId) return { id, status: 'rejected' };
   const payload = Object.keys(expectedPayload).length ? expectedPayload : safeJson(row.payload_json);
+  const leaseToken = crypto.randomUUID();
 
   const claimed = await env.DB.prepare(`UPDATE background_jobs
-    SET status = 'running', attempts = attempts + 1, updated_at = datetime('now')
-    WHERE id = ? AND status = 'queued'`)
-    .bind(id)
+    SET status = 'running', attempts = attempts + 1, lease_token = ?,
+        lease_expires_at = datetime('now', '+5 minutes'), error_code = NULL,
+        updated_at = datetime('now')
+    WHERE id = ?
+      AND run_after <= datetime('now')
+      AND (status = 'queued' OR (status = 'running' AND lease_expires_at <= datetime('now')))`)
+    .bind(leaseToken, id)
     .run();
   if ((claimed.meta?.changes ?? 0) === 0) return { id, status: 'skipped' };
 
   try {
-    switch (row.kind) {
-      case 'deletion.execute':
-        await executeDeletion(env, requiredAccount(accountId), String(payload.deletionJobId ?? ''));
-        break;
-      case 'cleanup.expired':
-        await cleanupExpired(env);
-        break;
-      case 'export.generate':
-        throw new Error('private_export_disabled');
-      case 'stripe.retry':
-        throw new Error('stripe_retry_requires_original_signed_delivery');
-      default:
-        throw new Error('unsupported_background_job');
+    if ((BASELINE_COMPILER_STAGES as readonly string[]).includes(row.kind)) {
+      const runId = typeof payload.runId === 'string' ? payload.runId : '';
+      if (!runId) throw new Error('baseline_run_id_missing');
+      await runBaselineCompilerStage(env, runId, row.kind);
+    } else {
+      switch (row.kind) {
+        case 'deletion.execute':
+          await executeDeletion(env, requiredAccount(accountId), String(payload.deletionJobId ?? ''));
+          break;
+        case 'cleanup.expired':
+          await cleanupExpired(env);
+          break;
+        case 'export.generate':
+          throw new Error('private_export_disabled');
+        case 'stripe.retry':
+          throw new Error('stripe_retry_requires_original_signed_delivery');
+        default:
+          throw new Error('unsupported_background_job');
+      }
     }
-    await env.DB.prepare(`UPDATE background_jobs SET status = 'completed', last_error = NULL, updated_at = datetime('now')
-      WHERE id = ?`).bind(id).run();
+    await env.DB.prepare(`UPDATE background_jobs SET
+      status = 'completed', last_error = NULL, error_code = NULL,
+      lease_token = NULL, lease_expires_at = NULL, updated_at = datetime('now')
+      WHERE id = ? AND lease_token = ?`)
+      .bind(id, leaseToken)
+      .run();
     return { id, status: 'completed' };
   } catch (error) {
+    const code = safeJobErrorCode(error);
     await env.DB.prepare(`UPDATE background_jobs SET
       status = CASE WHEN attempts >= max_attempts THEN 'failed' ELSE 'queued' END,
-      last_error = ?,
+      run_after = CASE
+        WHEN attempts <= 1 THEN datetime('now', '+1 minute')
+        WHEN attempts = 2 THEN datetime('now', '+5 minutes')
+        ELSE datetime('now', '+15 minutes')
+      END,
+      last_error = ?, error_code = ?, lease_token = NULL, lease_expires_at = NULL,
       updated_at = datetime('now')
-      WHERE id = ?`)
-      .bind(error instanceof Error ? error.message.slice(0, 160) : 'job failed', id)
+      WHERE id = ? AND lease_token = ?`)
+      .bind(code, code, id, leaseToken)
       .run();
-    return { id, status: 'failed' };
+    return { id, status: 'failed', errorCode: code };
   }
 }
 
 function requiredAccount(accountId?: string) {
-  if (!accountId) throw new Error('account required');
+  if (!accountId) throw new Error('account_required');
   return accountId;
 }
 
@@ -141,7 +169,7 @@ export async function executeDeletion(env: Env, accountId: string, deletionJobId
   await env.DB.prepare(`UPDATE stripe_customers SET email_normalized = NULL, updated_at = datetime('now')
     WHERE account_id = ?`).bind(accountId).run();
   await env.DB.prepare(`DELETE FROM background_jobs WHERE account_id = ? AND kind <> 'deletion.execute'`).bind(accountId).run();
-  await env.DB.prepare(`UPDATE background_jobs SET payload_json = '{}', last_error = NULL WHERE account_id = ?`).bind(accountId).run();
+  await env.DB.prepare(`UPDATE background_jobs SET payload_json = '{}', last_error = NULL, error_code = NULL WHERE account_id = ?`).bind(accountId).run();
 
   for (const table of ACCOUNT_TABLE_DELETES) {
     await env.DB.prepare(`DELETE FROM ${table} WHERE account_id = ?`).bind(accountId).run();
@@ -204,9 +232,16 @@ function safeJson(value?: string): Record<string, unknown> {
   try { return value ? JSON.parse(value) as Record<string, unknown> : {}; } catch { return {}; }
 }
 
+function safeJobErrorCode(error: unknown): string {
+  const raw = error instanceof Error ? error.message : 'job_failed';
+  if (/^[a-z0-9_]{3,80}$/.test(raw)) return raw;
+  return 'job_failed';
+}
+
 export function deletionInventory(): string[] {
   return [
     ...ACCOUNT_TABLE_DELETES,
+    'baseline_compiler_stage_results:cascade-via-baseline_compiler_runs',
     'current_conditions:cascade-via-persons',
     'consent_grants:cascade-via-persons',
     'system_memberships:cascade-via-persons-and-systems',
