@@ -16,6 +16,16 @@ These instructions apply to the entire OPENAPI repository.
 - Cloudflare production builds must originate from `main`, and the injected Workers Builds commit SHA must match the checked-out repository HEAD.
 - Extend the canonical components and contracts in place. Do not create duplicate workspaces, alternative landing implementations, second agents, or disconnected product shells.
 
+## Founder v0 visual-port contract
+- Read `docs/v0-visual-port-contract.md` before changing any public, workspace, account, onboarding, policy, or visual release surface.
+- The supplied founder v0 archive is the component and visual authority for the public landing and the visual language applied sitewide.
+- Preserve the exact v0 public sequence beginning with `Healing isn’t optional. Holding onto the pain is.` and ending with `Your thoughts deserve a better place to live.`
+- Port visual components and styling only. Never import the archive’s mock auth, localStorage users, canned or random answers, dashboard state, fake billing, fake consent, or fake account behavior.
+- Preserve the real OPENAPI routes, APIs, authentication, billing, consent, Baseline contracts, one-room workspace, and `sovereign-answer.v2`.
+- `apps/web/src/v0-visual-port.css` is the final local visual authority. No local CSS import may load after it.
+- Do not call a visual implementation `canonical`, `approved`, `v0`, `editorial`, or `cinematic` unless the archive fingerprint, rendered component sequence, compiled asset markers, and sitewide selectors all match the documented contract.
+- The reconstructed `Know yourself. Understand the system. Choose what fits.` landing is not the founder v0 port and must not return as the root public experience.
+
 ## Product definition
 - Sovereign.OS is Baseline-first. The product must be useful before the user explains an incident.
 - The single user-facing agent is named Sovereign.
