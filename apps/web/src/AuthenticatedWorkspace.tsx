@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AccountControlCenter } from './AccountControlCenter';
+import { PasskeyManager } from './PasskeyManager';
 import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
 import { SystemMembershipManager } from './SystemMembershipManager';
 import { VerifiedPlanStatus } from './VerifiedPlanStatus';
@@ -73,6 +74,7 @@ export function AuthenticatedWorkspace() {
       <VerifiedPlanStatus />
       <SovereignIntelligenceWorkspace onboardingVerified />
       <AccountExpressionField />
+      <PasskeyManager />
       <div className="sovereign-workspace-overlays" aria-label="Workspace controls">
         <AccountControlCenter />
         <SystemMembershipManager />
