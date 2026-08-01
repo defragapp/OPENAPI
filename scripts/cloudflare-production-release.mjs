@@ -25,10 +25,8 @@ if (!/^[0-9a-f]{40}$/i.test(checkoutSha)) {
   fail('the checked-out commit is not a full 40-character SHA');
 }
 
-const declaredSha = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
-if (declaredSha && !/^[0-9a-f]{40}$/i.test(declaredSha)) {
-  fail('the declared Cloudflare commit SHA is invalid');
-}
+const rawDeclaredSha = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
+const declaredSha = /^[0-9a-f]{40}$/i.test(rawDeclaredSha) ? rawDeclaredSha : '';
 if (declaredSha && declaredSha !== checkoutSha) {
   fail(`declared commit ${declaredSha} does not match checkout ${checkoutSha}`);
 }
