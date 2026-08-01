@@ -1,7 +1,7 @@
 import {
   expressionAxisIds,
   type ExpressionAxisId
-} from '@sovereign/agent-contracts';
+} from './expression-field-contract';
 
 export type Vec3 = readonly [number, number, number];
 export type Quaternion = readonly [number, number, number, number];
@@ -31,8 +31,6 @@ const labels: Record<ExpressionAxisId, string> = {
   repair: 'Repair'
 };
 
-export const IDENTITY_QUATERNION: Quaternion = [0, 0, 0, 1];
-
 export function fibonacciSphere(count: number): Vec3[] {
   if (!Number.isInteger(count) || count < 2) throw new Error('Fibonacci sphere requires at least two points.');
   const goldenAngle = Math.PI * (3 - Math.sqrt(5));
@@ -44,10 +42,12 @@ export function fibonacciSphere(count: number): Vec3[] {
   });
 }
 
+const axisDirections = fibonacciSphere(expressionAxisIds.length);
+
 export const expressionAxisRegistry: readonly ExpressionAxisDefinition[] = expressionAxisIds.map((id, index) => ({
   id,
   label: labels[id],
-  direction: fibonacciSphere(expressionAxisIds.length)[index]!
+  direction: axisDirections[index]!
 }));
 
 export function quaternionFromEuler(pitch: number, yaw: number): Quaternion {
