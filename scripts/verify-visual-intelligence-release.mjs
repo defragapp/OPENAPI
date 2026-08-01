@@ -1,29 +1,25 @@
 import { existsSync, readFileSync } from 'node:fs';
 
-const main = readFileSync('apps/web/src/main.tsx', 'utf8');
-const authenticatedWorkspace = readFileSync('apps/web/src/AuthenticatedWorkspace.tsx', 'utf8');
-const workspace = readFileSync('apps/web/src/SovereignIntelligenceWorkspace.tsx', 'utf8');
-const expressionField = readFileSync('apps/web/src/expression-field/ExpressionField.tsx', 'utf8');
-const expressionFieldCss = readFileSync('apps/web/src/expression-field/expression-field.css', 'utf8');
-const expressionFieldMath = readFileSync('apps/web/src/expression-field/expression-field-math.ts', 'utf8');
-const expressionFieldFixture = readFileSync('apps/web/src/expression-field/expression-field.fixture.ts', 'utf8');
-const expressionFieldWorker = readFileSync('apps/sovereign-worker/src/expression-field.ts', 'utf8');
-const runtimeEntry = readFileSync('apps/sovereign-worker/src/runtime-entry.ts', 'utf8');
-const expressionFieldContract = readFileSync('packages/agent-contracts/src/expression-field.ts', 'utf8');
-const hardening = readFileSync('apps/web/src/premium-surface-hardening.css', 'utf8');
-const selectivePort = readFileSync('apps/web/src/selective-visual-port.css', 'utf8');
-const workspaceCss = `${readFileSync('apps/web/src/workspace-chat.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8')}\n${hardening}\n${selectivePort}\n${expressionFieldCss}`;
-const landing = readFileSync('apps/web/src/PublicLanding.tsx', 'utf8');
-const landingCss = `${readFileSync('apps/web/src/public-landing.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8')}\n${hardening}\n${selectivePort}\n${expressionFieldCss}`;
-const cohesion = readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8');
-const contextField = readFileSync('apps/web/public/assets/sovereign-context-field.svg', 'utf8');
-const staticExperienceCss = readFileSync('apps/web/public/static-experience.css', 'utf8');
-const how = readFileSync('apps/web/public/how-it-works.html', 'utf8');
-const pricing = readFileSync('apps/web/public/pricing.html', 'utf8');
-const faq = readFileSync('apps/web/public/faq.html', 'utf8');
-const tokens = readFileSync('apps/web/src/styles.css', 'utf8');
-const membership = readFileSync('apps/web/src/SystemMembershipManager.tsx', 'utf8');
-const product = readFileSync('apps/sovereign-worker/src/db/product.ts', 'utf8');
+const read = (path) => readFileSync(path, 'utf8');
+const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
+const main = read('apps/web/src/main.tsx');
+const authenticatedWorkspace = read('apps/web/src/AuthenticatedWorkspace.tsx');
+const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
+const landing = read('apps/web/src/PublicLanding.tsx');
+const v0Visual = read('apps/web/src/v0-visual-port.css');
+const expressionField = read('apps/web/src/expression-field/ExpressionField.tsx');
+const expressionFieldCss = read('apps/web/src/expression-field/expression-field.css');
+const expressionFieldMath = read('apps/web/src/expression-field/expression-field-math.ts');
+const expressionFieldFixture = read('apps/web/src/expression-field/expression-field.fixture.ts');
+const expressionFieldWorker = read('apps/sovereign-worker/src/expression-field.ts');
+const runtimeEntry = read('apps/sovereign-worker/src/runtime-entry.ts');
+const expressionFieldContract = read('packages/agent-contracts/src/expression-field.ts');
+const staticExperienceCss = read('apps/web/public/static-experience.css');
+const how = read('apps/web/public/how-it-works.html');
+const pricing = read('apps/web/public/pricing.html');
+const faq = read('apps/web/public/faq.html');
+const membership = read('apps/web/src/SystemMembershipManager.tsx');
+const product = read('apps/sovereign-worker/src/db/product.ts');
 
 function requireAll(label, source, values) {
   for (const value of values) {
@@ -31,16 +27,24 @@ function requireAll(label, source, values) {
   }
 }
 
+function rejectAll(label, source, values) {
+  for (const value of values) {
+    if (source.includes(value)) throw new Error(`${label} contains prohibited ${value}`);
+  }
+}
+
 requireAll('authenticated app entry', main, [
   "import { AuthenticatedWorkspace } from './AuthenticatedWorkspace'",
   "import './workspace-chat.css'",
-  "import './sovereign-cohesion.css'",
-  "import './premium-surface-hardening.css'",
-  "import './selective-visual-port.css'",
   "import './expression-field/expression-field.css'",
+  "import './v0-visual-port.css'",
   "location.pathname === '/app'",
   '<AuthenticatedWorkspace />'
 ]);
+const v0Import = "import './v0-visual-port.css';";
+if (main.slice(main.indexOf(v0Import) + v0Import.length).includes("import './")) {
+  throw new Error('A local visual layer loads after the founder v0 visual authority.');
+}
 
 for (const retired of [
   'apps/web/src/experience-reconciliation.css',
@@ -66,16 +70,6 @@ requireAll('authenticated workspace gate', authenticatedWorkspace, [
   '<SystemMembershipManager />'
 ]);
 
-requireAll('shared tokens', tokens, [
-  '--sov-page: #0d0d0e',
-  '--sov-panel: #151516',
-  '--sov-raised: #1c1c1e',
-  '--sov-paper: #eee8df',
-  '--sov-clay: #dda273',
-  '--sov-sage: #9fbaa1',
-  '--sov-danger: #d19a9a'
-]);
-
 requireAll('answer renderer', workspace, [
   'className={`sovereign-answer answer-${answer.mode}`}',
   'className="direct-answer"',
@@ -93,102 +87,84 @@ requireAll('answer renderer', workspace, [
   'aria-modal="true"'
 ]);
 
-requireAll('canonical cohesion system', cohesion, [
-  'Sovereign.OS cohesion release',
-  'Canonical presentation layer',
-  '--cohesion-night:#080a09',
-  '--cohesion-paper:#ece5da',
-  '--cohesion-clay:#c98a64',
-  '--cohesion-sage:#a5b5a2',
-  "url('/assets/sovereign-context-field.svg')",
-  '.hero-intelligence-stage',
-  '.baseline-context-stage',
-  '.scale-experience',
-  '.question-section',
-  '.permission-field',
+requireAll('founder v0 archive contract', landing, [
+  `const V0_ARCHIVE_SHA = '${archiveSha}'`,
+  'data-visual-contract="v0-landing-selective-port"',
+  'Healing isn’t optional.',
+  'Holding onto the pain is.',
+  'Personal AI for real life',
+  '<RotatingQuestions />',
+  '<PersonalStory />',
+  '<RelationshipStory />',
+  '<SystemStory />',
+  '<ComparisonStory />',
+  '<FinalCallToAction />',
+  'Ask about your life.',
+  'Get an answer built for you.',
+  'See the space',
+  'between you.',
+  'From one person',
+  'to the whole system.',
+  'Other AI answers',
+  'everyone the same.',
+  'Your thoughts deserve',
+  'a better place to live.'
+]);
+
+requireAll('v0 demonstration components', landing, [
+  'className="v0-story-grid"',
+  'className="v0-baseline-trace"',
+  'className="v0-flow"',
+  'className="v0-family-map"',
+  'className="v0-comparison-grid"',
+  'How Sovereign works it through',
+  'How Sovereign reads both of you',
+  'Illustrative permitted Baselines',
+  'No compatibility score',
+  'No private-thought claims',
+  'Each person controls what may be included'
+]);
+
+requireAll('v0 visual system and sitewide extension', v0Visual, [
+  `Source archive SHA-256:\n * ${archiveSha}`,
+  '--v0-page: #0f0f0f',
+  '--v0-cream: #e8ddd0',
+  '.v0-landing-port',
+  '.v0-hero',
+  '.v0-question-band',
+  '.v0-story-grid',
+  '.v0-window',
+  '.v0-flow',
+  '.v0-family-map',
+  '.v0-comparison-grid',
+  '.v0-final',
   '.intelligence-workspace',
+  '.intelligence-sidebar',
   '.sovereign-composer',
-  '.mobile-bottom-nav',
-  'grid-template-columns:repeat(6,minmax(0,1fr))',
-  '@media(max-width:1180px)',
-  '@media(max-width:980px)',
-  '@media(max-width:760px)',
-  '@media(max-width:560px)',
-  '@media(max-width:420px)',
-  '@media(prefers-reduced-motion:reduce)',
-  'env(safe-area-inset-bottom)'
+  '.account-shell',
+  '.auth-panel',
+  '.workspace-sheet',
+  '@media (max-width: 760px)',
+  '@media (prefers-reduced-motion: reduce)'
 ]);
 
-requireAll('selective visual port layer', `${landing}\n${hardening}\n${selectivePort}`, [
-  'STEP 01 · YOU',
-  'STEP 02 · YOU + 1',
-  'STEP 03 · YOUR WHOLE SYSTEM',
-  'visual-reasoning-panel',
-  'className="visual-evidence-chips"',
-  'className="relationship-baseline-pair"',
-  'className="story-system-map"',
-  '.sovereign-story-step',
-  '.response-thread .answer-baseline',
-  '.response-thread .relationship-answer > div:first-child',
-  '.system-overview .system-graph',
-  '.response-thread .basis-strip',
-  '.relationship-baseline-pair',
-  '.story-fixture-boundary'
-]);
-
-requireAll('workspace layout and accessibility', workspaceCss, [
-  'width:224px',
-  'width:360px',
-  'width:min(100%,1120px)',
-  'min-height:44px',
-  'font-size:1rem',
-  '@media(max-width:980px)',
-  '@media(max-width:760px)',
-  '@media(max-width:420px)',
-  '@media (max-width: 680px)',
-  '@media(prefers-reduced-motion:reduce)',
-  '@media (prefers-reduced-motion: reduce)',
-  'env(safe-area-inset-bottom)'
-]);
-
-requireAll('public category clarity', landing, [
+rejectAll('selective v0 port', `${landing}\n${v0Visual}`, [
   'Know yourself.',
   'Understand the system.',
   'Choose what fits.',
-  'private AI for understanding yourself',
-  'Why do I keep taking responsibility for everyone else?',
-  'EXAMPLE ANSWER',
-  'Sanitized demonstration · Not your Baseline',
-  'Sanitized product demonstrations · Illustrative Baseline values · Not your personal result',
-  'Build my Baseline'
-]);
-if (landing.indexOf('Sanitized demonstration · Not your Baseline') > landing.indexOf('YOU ASKED')) {
-  throw new Error('The public answer boundary must appear before the demonstration question.');
-}
-
-requireAll('public product stage', landing, [
-  'DIRECT ANSWER',
-  'THE PERSONAL CONNECTION',
-  'A PRACTICAL NEXT STEP',
-  'Why this is personal',
-  'Shadow',
-  'Gift',
-  'Alignment',
-  'BASIS',
-  '<LandingExpressionField />',
-  'WHAT MAY BE ACTIVE NOW',
-  'YOUR CONFIRMATION',
-  'STILL UNKNOWN',
-  'WHAT HAPPENS BETWEEN YOU',
-  'PRESSURE FIELD',
-  'PERMISSION BEFORE COMPARISON'
+  'Alignment Score',
+  'Stability Index',
+  'Growth Rate',
+  'Math.random',
+  'generateAIResponse',
+  'Demo User',
+  'dashboard-grid',
+  'mock-auth',
+  'fake-answer'
 ]);
 
-requireAll('Expression Field public and authenticated composition', `${landing}\n${authenticatedWorkspace}\n${expressionField}\n${expressionFieldFixture}`, [
-  "import { LandingExpressionField } from './expression-field/ExpressionField'",
-  '<LandingExpressionField />',
-  'export function LandingExpressionField()',
-  'Sanitized demonstration · Illustrative values · Not your Baseline',
+requireAll('Expression Field authenticated composition', `${authenticatedWorkspace}\n${expressionField}\n${expressionFieldFixture}`, [
+  '<AccountExpressionField />',
   'export function AccountExpressionField()',
   "fetch('/api/v1/expression-field?mode=live'",
   "credentials: 'same-origin'",
@@ -227,55 +203,20 @@ requireAll('Expression Field iOS and accessibility contract', expressionFieldCss
   'env(safe-area-inset-bottom)'
 ]);
 
-if (landing.includes('Healing isn’t optional. Holding the pain is.')) {
-  throw new Error('The public homepage must not present Sovereign.OS as a healing product.');
-}
-for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'localStorage']) {
-  if (landing.includes(prohibited)) throw new Error(`The public homepage contains prohibited mock or scoring behavior: ${prohibited}`);
-}
-
-requireAll('public visual accessibility', landingCss, [
-  'font-size:clamp(3.75rem,5.2vw,4.25rem)',
-  'min-height:44px',
-  'min-width: 320px',
-  '.relationship-baseline-pair',
-  '.story-person-node[aria-pressed="true"]',
-  '.expression-field-canvas',
-  '@media(max-width:980px)',
-  '@media(max-width:760px)',
-  '@media(max-width:420px)',
-  '@media (max-width: 680px)',
-  '@media(prefers-reduced-motion:reduce)',
-  '@media (prefers-reduced-motion: reduce)',
-  '@media (forced-colors: active)'
-]);
-
-requireAll('Sovereign context field asset', contextField, [
-  '<title id="title">Sovereign context field</title>',
-  'translucent planes and lines reorganizing around a central opening',
-  '<linearGradient id="planeA"',
-  '<linearGradient id="planeB"',
-  '<filter id="depth"',
-  'aria-labelledby="title description"'
-]);
-
 requireAll('static public support experience', staticExperienceCss, [
-  '--paper: #080a09',
   '.pricing-grid',
   '.pricing-page .pricing-hero > p:last-child',
   '.questions-page .questions-hero > p:last-child',
   '.price-card-body',
   '.plan-comparison-list',
   '.faq-list details',
-  'border-radius: 2px',
   'min-width: 320px',
   '@media (max-width: 860px)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
 
-requireAll('static page cohesion', `${how}\n${pricing}\n${faq}`, [
-  '20260730-cohesion',
-  'Private personal, relationship, and system intelligence',
+requireAll('static page continuity', `${how}\n${pricing}\n${faq}`, [
+  'SOVEREIGN.OS',
   'Build my Baseline',
   '$20',
   '$99',
@@ -285,13 +226,12 @@ requireAll('static page cohesion', `${how}\n${pricing}\n${faq}`, [
 ]);
 
 requireAll('system membership manager', membership, [
-  "person.identityBound === true",
+  'person.identityBound === true',
   "person.activeScopes.includes('system.include')",
   '/members`,',
   'Add only permitted people.',
   'Add permitted member'
 ]);
-
 requireAll('consent-safe system projection', product, [
   'FROM system_memberships sm',
   "cg.scope = 'system.include'",
@@ -307,14 +247,10 @@ for (const prohibited of ['God is telling you', 'They secretly want', 'This prov
   }
 }
 
-for (const [label, css] of [
-  ['premium hardening', hardening],
-  ['selective visual port', selectivePort],
-  ['Expression Field', expressionFieldCss]
-]) {
+for (const [label, css] of [['founder v0', v0Visual], ['Expression Field', expressionFieldCss]]) {
   const open = (css.match(/{/g) ?? []).length;
   const close = (css.match(/}/g) ?? []).length;
   if (open !== close) throw new Error(`${label} CSS has unbalanced braces (${open}/${close}).`);
 }
 
-console.log('Sovereign.OS cohesion release, Expression Field, and product contract verified.');
+console.log('Sovereign.OS founder v0 selective port, real workspace, Expression Field, and product contracts verified.');
