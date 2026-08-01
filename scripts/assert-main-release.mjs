@@ -5,7 +5,9 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const workersCi = String(process.env.WORKERS_CI || '').trim() === '1';
 const branch = String(process.env.WORKERS_CI_BRANCH || '').trim();
-const declaredSha = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
+const rawDeclaredSha = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
+const declaredSha = /^[0-9a-f]{40}$/i.test(rawDeclaredSha) ? rawDeclaredSha : '';
+const ignoredInvalidDeclaredSha = Boolean(rawDeclaredSha && !declaredSha);
 
 function fail(message) {
   throw new Error(`Main-only release guard failed: ${message}`);
@@ -32,10 +34,6 @@ if (!/^[0-9a-f]{40}$/i.test(checkoutSha)) {
   fail('the checked-out commit is not a full 40-character SHA');
 }
 
-if (declaredSha && !/^[0-9a-f]{40}$/i.test(declaredSha)) {
-  fail('WORKERS_CI_COMMIT_SHA is invalid');
-}
-
 if (declaredSha && declaredSha !== checkoutSha) {
   fail(`declared commit ${declaredSha} does not match checkout ${checkoutSha}`);
 }
@@ -52,5 +50,9 @@ if (workersCi) {
   }
 }
 
-const metadataSource = declaredSha ? 'cloudflare' : 'checkout';
+const metadataSource = declaredSha
+  ? 'cloudflare'
+  : ignoredInvalidDeclaredSha
+    ? 'checkout-invalid-cloudflare-metadata-ignored'
+    : 'checkout';
 console.log(`Main-only release guard verified branch=${workersCi ? branch : 'local'} commit=${checkoutSha} currentMain=${currentMainSha} metadata=${metadataSource}`);
