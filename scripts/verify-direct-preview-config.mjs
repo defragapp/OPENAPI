@@ -6,6 +6,7 @@ const workerConfig = JSON.parse(readFileSync('apps/sovereign-worker/wrangler.jso
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 const readme = readFileSync('README.md', 'utf8');
 const bootstrap = readFileSync('scripts/cloudflare-preview-bootstrap.mjs', 'utf8');
+const mainReleaseGuard = readFileSync('scripts/assert-main-release.mjs', 'utf8');
 const productionDeploy = readFileSync('scripts/cloudflare-production-deploy-v2.mjs', 'utf8');
 const freeTierControls = readFileSync('scripts/configure-cloudflare-free-tier.mjs', 'utf8');
 const parentDomainVerifier = readFileSync('scripts/verify-parent-domain-routes.mjs', 'utf8');
@@ -61,10 +62,14 @@ for (const [label, assets] of [['production', rootConfig.assets], ['local', work
 }
 requireValue(existsSync('apps/web/public/404.html'), 'The static 404 document is missing');
 
+requireValue(packageJson.scripts?.['verify:cloudflare-build']?.startsWith('node scripts/assert-main-release.mjs && '), 'Canonical build must begin with the main release guard');
 requireValue(packageJson.scripts?.['verify:cloudflare-build']?.includes('verify:release-config'), 'Canonical build must retain release verification');
 requireValue(packageJson.scripts?.['verify:release-config'] === 'node scripts/verify-direct-preview-config.mjs', 'Release verifier must use the direct Cloudflare contract');
 requireValue(packageJson.scripts?.['preview:bootstrap'] === 'node scripts/cloudflare-preview-bootstrap.mjs', 'Preview bootstrap command drifted');
-requireValue(packageJson.scripts?.['production:deploy'] === 'node scripts/cloudflare-production-deploy-v2.mjs && node scripts/verify-parent-domain-routes.mjs', 'Production deploy command drifted');
+requireValue(packageJson.scripts?.['production:deploy'] === 'node scripts/assert-main-release.mjs && node scripts/cloudflare-production-deploy-v2.mjs && node scripts/verify-parent-domain-routes.mjs', 'Production deploy command drifted');
+for (const required of ['WORKERS_CI_BRANCH', 'WORKERS_CI_COMMIT_SHA', "'refs/heads/main'", "'FETCH_HEAD'", 'has been superseded by current main']) {
+  requireValue(mainReleaseGuard.includes(required), `Main release guard is missing ${required}`);
+}
 
 requireValue(!existsSync('.dev.vars.example'), 'Deploy-template secret form must not exist');
 requireValue(!existsSync('scripts/verify-one-click-deploy.mjs'), 'One-click fork verifier must not exist');
@@ -82,7 +87,17 @@ for (const required of ['WORKERS_CI_COMMIT_SHA', 'APP_VERSION', "'d1', 'migratio
 for (const required of ["read_replication: { mode: 'auto' }", 'rate_limiting_limit: 50', 'collect_logs: false', 'schema_validation/schemas', 'sovereign_ai_messages_free_tier']) {
   requireValue(freeTierControls.includes(required), `Cloudflare free-tier control is missing ${required}`);
 }
-for (const required of ['https://defrag.app/', 'https://www.defrag.app/', 'https://sovereign.defrag.app/', 'https://app.defrag.app/app', 'payload?.version !== commitSha']) {
+for (const required of [
+  'https://defrag.app/',
+  'https://www.defrag.app/',
+  'https://sovereign.defrag.app/',
+  'https://app.defrag.app/app',
+  'payload?.version !== commitSha',
+  '--editorial-page:#fbfbf8',
+  '/fonts/sovereign-display.woff2',
+  '/fonts/sovereign-sans.woff2',
+  "const CACHE_NAME = 'sovereign-public-v15'"
+]) {
   requireValue(parentDomainVerifier.includes(required), `Parent-domain verifier is missing ${required}`);
 }
 for (const required of [
@@ -103,4 +118,4 @@ for (const required of [
 requireValue(!bootstrap.includes('AI_MODEL: process.env.AI_MODEL ||'), 'Preview bootstrap must not allow arbitrary model override');
 requireValue(!bootstrap.includes('AI_PROVIDER: process.env.AI_PROVIDER ||'), 'Preview bootstrap must not allow arbitrary provider override');
 
-console.log('Direct Cloudflare release config verified production_root=true cloudflare_builds_only=true github_workflows_non_authoritative=true free_workers_ai=true preview_model_pinned=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
+console.log('Direct Cloudflare release config verified production_root=true cloudflare_builds_only=true current_main_only=true github_workflows_non_authoritative=true free_workers_ai=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
