@@ -11,7 +11,8 @@ describe('founder v0 selective visual port', () => {
     expect(landing).toContain('Step 01 · You');
     expect(landing).toContain('Step 02 · You + 1');
     expect(landing).toContain('Step 03 · Your whole system');
-    expect(landing).toContain('className="v0-flow"');
+    expect(landing).toContain('function ProcessingFlow(');
+    expect(landing).toContain('className="v0-window v0-flow"');
     expect(landing).toContain('className="v0-baseline-trace"');
     expect(landing).toContain('className="v0-family-map"');
     expect(landing).toContain('How Sovereign reads both of you');

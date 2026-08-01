@@ -131,7 +131,8 @@ requireAll('founder v0 archive contract', landing, [
 requireAll('v0 demonstration components', landing, [
   'className="v0-story-grid"',
   'className="v0-baseline-trace"',
-  'className="v0-flow"',
+  'function ProcessingFlow(',
+  'className="v0-window v0-flow"',
   'className="v0-family-map"',
   'className="v0-comparison-grid"',
   'How Sovereign works it through',

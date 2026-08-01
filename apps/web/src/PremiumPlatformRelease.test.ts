@@ -84,7 +84,8 @@ describe('founder v0 selective visual port', () => {
     for (const marker of [
       'className="v0-story-grid"',
       'className="v0-baseline-trace"',
-      'className="v0-flow"',
+      'function ProcessingFlow(',
+      'className="v0-window v0-flow"',
       'className="v0-family-map"',
       'data-viewport-surface="personal-chat"',
       'data-viewport-surface="personal-reasoning"',
