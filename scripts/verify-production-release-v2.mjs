@@ -119,7 +119,12 @@ requireAll('production deploy', deploy, [
   'ready version is',
   "cloudflarePlanTarget: 'free'"
 ]);
-assert(!deploy.includes('Know yourself.'), 'Production deploy still certifies the rejected reconstruction');
+requireAll('production deploy retirement guard', deploy, [
+  "'Know yourself.'",
+  "'Understand the system.'",
+  "'Choose what fits.'",
+  'assert(!javascript.text.includes(prohibited)'
+]);
 assert(!deploy.includes("'Math.random'"), 'Production deploy still rejects an entire compiled dependency bundle by a generic string');
 assert(!deploy.includes('/launch-polish.css?v=20260730-cohesion'), 'Production deploy still gates on a retired stylesheet fingerprint');
 
