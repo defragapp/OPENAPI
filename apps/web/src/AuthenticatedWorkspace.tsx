@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AccountControlCenter } from './AccountControlCenter';
 import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
 import { SystemMembershipManager } from './SystemMembershipManager';
+import { VerifiedPlanStatus } from './VerifiedPlanStatus';
 import { AccountExpressionField } from './expression-field/ExpressionField';
 
 type GateState = 'checking' | 'ready' | 'error';
@@ -59,7 +60,7 @@ export function AuthenticatedWorkspace() {
           <p>
             {state === 'error'
               ? 'Your workspace was not shown. Check your connection and try again.'
-              : 'Confirming your account before the private workspace is shown.'}
+              : 'Confirming your account and verified plan before the private workspace is shown.'}
           </p>
           {state === 'error' && <button onClick={() => setAttempt((value) => value + 1)}>Try again <span aria-hidden="true">→</span></button>}
         </section>
@@ -69,6 +70,7 @@ export function AuthenticatedWorkspace() {
 
   return (
     <div className="sovereign-app-runtime" data-workspace-contract="one-room">
+      <VerifiedPlanStatus />
       <SovereignIntelligenceWorkspace onboardingVerified />
       <AccountExpressionField />
       <div className="sovereign-workspace-overlays" aria-label="Workspace controls">
