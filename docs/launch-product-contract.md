@@ -19,7 +19,8 @@ The approval candidate includes:
 - immediate revocation enforcement;
 - contextual, confirmed Covenant exploration;
 - intentional Library continuity;
-- Free and Sovereign+ server-side entitlement enforcement.
+- Free and Sovereign+ server-side entitlement enforcement;
+- founder-approved voluntary support links that remain separate from subscription access.
 
 ## Public answer categories
 
@@ -62,7 +63,7 @@ Covenant remains off until the user explicitly confirms it for the question. It 
 
 It must never claim divine certainty, assign an absent person moral status, or require forgiveness, reconciliation, contact, submission, estrangement, or continued exposure to harm.
 
-## Free access and billing
+## Free access, billing, and voluntary support
 
 Free is permanent, not a trial or Stripe subscription.
 
@@ -72,7 +73,7 @@ Free is permanent, not a trial or Stripe subscription.
 
 Stripe Checkout, Portal, products, prices, lookup keys, and server entitlement enforcement remain authoritative. Payment failure, cancellation, or expiration returns the account safely to Free without deleting the workspace.
 
-Existing support products grant no plan entitlement and are not surfaced without a separate approved decision.
+The two founder-approved support products are public on the How it works and Questions surfaces. They use Stripe-hosted one-time custom-amount Payment Links and remain voluntary, entitlement-neutral contributions. They do not purchase access, subscription benefits, ownership, influence, tax-deductible status, or a promise of future features. Support payments must never enter the Sovereign+ entitlement projection path.
 
 ## Retention and account control
 
@@ -99,6 +100,7 @@ Production deployment requires one exact commit with:
 - exact Basis authorization rejection tests;
 - Covenant-offer, explicit-confirmation, verified-passage, and entitlement tests;
 - Free and Sovereign+ pricing and entitlement verification;
+- active public support links with entitlement-neutral metadata and copy;
 - reviewed privacy and retention behavior;
 - no private inputs, secrets, unconsented context, or hidden reasoning in traces;
 - explicit approval.

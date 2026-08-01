@@ -15,7 +15,8 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Covenant is a primary capability but remains explicit per question or thread.
 - A Scripture lens is suggested subtly, retrieved from an approved source, and never presented as proof of motive, diagnosis, future behavior, or God's exact intent.
 - Free remains a permanent first-party plan with 10 AI turns per UTC calendar month.
-- Support contributions grant no entitlements and are not placed in the approval candidate without a separate founder decision.
+- Founder-approved support links remain publicly visible on the How it works and Questions surfaces.
+- Support contributions are one-time, voluntary, and entitlement-neutral. They do not replace Free or Sovereign+ and do not purchase product access, ownership, influence, tax-deductible status, or future-feature commitments.
 
 ## Security and privacy
 
@@ -55,7 +56,9 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Protected endpoints enforce entitlements server-side.
 - Cancellation or payment failure does not delete the workspace.
 - Billing Portal returns to the authenticated application.
-- Support contributions, when enabled later, remain one-time and entitlement-neutral unless the founder approves a different product.
+- The two public donation Payment Links remain active and use one-time custom-amount prices.
+- Donation Payment Links remain outside the subscription entitlement projection path.
+- Public support copy explicitly states that contributions grant no access or subscription benefits and are not presented as tax-deductible.
 
 ## Reliability
 
@@ -88,6 +91,7 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Pair and system actions explain why they are unavailable when identity, consent, Baseline data, or entitlement is missing.
 - The primary result includes a clear summary, practical next move, words the user can use, uncertainty, and optional deeper actions.
 - Covenant can be enabled and disabled without obscuring the grounded answer.
+- Donation actions use Stripe-hosted pages, are visually separated from subscription CTAs, and explain that no entitlement is granted.
 
 ## Approval evidence
 
@@ -96,6 +100,7 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Browser smoke for invite, redeem, grant, compare, system overlay, revoke, and blocked-after-revocation.
 - A three-person family or team overlay using consented reduced Baseline fixtures.
 - Free allowance, paid upgrade, cancellation, and Free fallback smoke evidence.
+- Both founder-approved donation links resolve to active Stripe-hosted donation pages and preserve entitlement-neutral metadata.
 - Disabled private-export, public-link sharing, deletion grace, immediate thread deletion, and scheduled retention evidence.
 - Reviewed Terms and Privacy documents matching actual behavior.
 - Cloudflare build UUID and post-deploy metadata for the exact commit.
