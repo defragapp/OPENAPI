@@ -45,6 +45,7 @@ import './typography-system.css';
 import './expression-field/expression-field.css';
 import './responsive-viewport-contract.css';
 import './public-landing-editorial.css';
+import './public-landing-production-lock.css';
 
 installProductionRuntime();
 installProductRuntime();
@@ -56,7 +57,11 @@ installSafetyResponseRuntime();
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   if (location.hostname === 'sovereign.defrag.app') {
-    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+    window.addEventListener('load', () => {
+      void navigator.serviceWorker
+        .register('/sw.js?v=16', { updateViaCache: 'none' })
+        .then((registration) => registration.update());
+    });
   } else {
     window.addEventListener('load', () => {
       void navigator.serviceWorker.getRegistrations().then((registrations) =>
