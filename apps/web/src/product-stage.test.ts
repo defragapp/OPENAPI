@@ -22,7 +22,7 @@ describe('shared Sovereign intelligence stage', () => {
   it('keeps stable evidence, interpretation, and actual experience distinct', () => {
     expect(landing).toContain('Grounded in');
     expect(landing).toContain('Illustrative Baseline');
-    expect(landing).toContain('That is a possible structural pattern—not a verdict about any person.');
+    expect(landing).toContain('That is a possible coordination pattern—not a verdict about any person.');
     expect(landing).toContain('The actual experience still belongs to each person to confirm.');
     expect(landing).toContain('No private-thought claims');
   });

@@ -62,7 +62,7 @@ describe('Sovereign.OS public experience', () => {
   });
 
   it('keeps exact Basis fixtures secondary and permission-safe', () => {
-    for (const value of ['SUN · LEO', 'GK 13.4', 'GATE 4.11', 'MARS · CANCER', 'AUTH · EMO', 'AUTH · SPLENIC']) expect(landing).toContain(value);
+    for (const value of ['SUN · LEO', 'GK 13.4', 'GATE 4.11', 'MARS · CANCER', 'SUN · VIRGO', 'GATE 57.2', 'GK 25']) expect(landing).toContain(value);
     expect(landing).toContain('Grounded in');
     expect(landing).toContain('Illustrative permitted Baselines');
     expect(landing).toContain('No compatibility score');
