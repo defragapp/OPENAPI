@@ -1,0 +1,85 @@
+import { spawnSync } from 'node:child_process';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const reportUrl = 'https://60e450a49abc97aea5.v2.appdeploy.ai/api/report';
+const reportKey = 'sovereign-release-379a-9d8c4e77';
+const maxOutputLength = 12_000;
+
+function runGit(args, label) {
+  const result = spawnSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  if (result.error || result.status !== 0) {
+    throw new Error(`${label}: ${String(result.stderr || result.error?.message || 'unknown git error').trim()}`);
+  }
+  return String(result.stdout || '').trim();
+}
+
+function sanitize(value) {
+  return String(value || '')
+    .replace(/cfat_[A-Za-z0-9_-]+/g, '[redacted-cloudflare-token]')
+    .replace(/\bsk-(?:live|test|proj)?[_A-Za-z0-9-]+/g, '[redacted-api-key]')
+    .replace(/Bearer\s+[A-Za-z0-9._~-]+/gi, 'Bearer [redacted]')
+    .replace(/(CLOUDFLARE_API_TOKEN|CF_API_TOKEN|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|RESEND_API_KEY)=\S+/g, '$1=[redacted]');
+}
+
+function outputTail(stdout, stderr) {
+  return sanitize(`${String(stdout || '')}\n${String(stderr || '')}`.trim()).slice(-maxOutputLength);
+}
+
+async function report(sha, stage, status, output = '') {
+  try {
+    await fetch(reportUrl, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ key: reportKey, sha, phase: 'build', stage, status, output }),
+      signal: AbortSignal.timeout(4_000)
+    });
+  } catch {
+    // Telemetry must never become release authority or block the canonical gate.
+  }
+}
+
+const checkoutSha = runGit(['rev-parse', 'HEAD'], 'unable to resolve checkout SHA');
+if (!/^[0-9a-f]{40}$/i.test(checkoutSha)) throw new Error('Cloudflare build checkout is not a full commit SHA');
+
+const stages = [
+  ['main-release', process.execPath, ['scripts/assert-main-release.mjs']],
+  ['foundation', 'pnpm', ['verify:foundation']],
+  ['migrations', 'pnpm', ['verify:migrations']],
+  ['secrets-scan', 'pnpm', ['scan:secrets']],
+  ['production-fixtures', 'pnpm', ['scan:production-fixtures']],
+  ['release-config', 'pnpm', ['verify:release-config']],
+  ['production-release', 'pnpm', ['verify:production-release']],
+  ['intelligence-release', 'pnpm', ['verify:intelligence-release']],
+  ['visual-intelligence', 'pnpm', ['verify:visual-intelligence']],
+  ['premium-platform', 'pnpm', ['verify:premium-platform']],
+  ['typecheck', 'pnpm', ['typecheck']],
+  ['tests', 'pnpm', ['test']],
+  ['build', 'pnpm', ['build']],
+  ['worker-bundle-size', 'pnpm', ['verify:worker-bundle-size']]
+];
+
+for (const [stage, command, args] of stages) {
+  console.log(`\n[cloudflare-release] stage=${stage} status=start`);
+  await report(checkoutSha, stage, 'start');
+  const result = spawnSync(command, args, {
+    cwd: root,
+    env: process.env,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    maxBuffer: 64 * 1024 * 1024
+  });
+  if (result.stdout) process.stdout.write(result.stdout);
+  if (result.stderr) process.stderr.write(result.stderr);
+  const output = outputTail(result.stdout, result.stderr);
+  if (result.error || result.status !== 0) {
+    await report(checkoutSha, stage, 'failure', output || String(result.error?.message || `exit ${result.status}`));
+    console.error(`[cloudflare-release] stage=${stage} status=failure exit=${String(result.status ?? 'error')}`);
+    process.exit(result.status || 1);
+  }
+  await report(checkoutSha, stage, 'success', output);
+  console.log(`[cloudflare-release] stage=${stage} status=success`);
+}
+
+console.log(`[cloudflare-release] build gate complete commit=${checkoutSha}`);
