@@ -32,8 +32,8 @@ if (!/^[0-9a-f]{40}$/i.test(checkoutSha)) {
   fail('the checked-out commit is not a full 40-character SHA');
 }
 
-if (workersCi && !/^[0-9a-f]{40}$/i.test(declaredSha)) {
-  fail('WORKERS_CI_COMMIT_SHA is missing or invalid');
+if (declaredSha && !/^[0-9a-f]{40}$/i.test(declaredSha)) {
+  fail('WORKERS_CI_COMMIT_SHA is invalid');
 }
 
 if (declaredSha && declaredSha !== checkoutSha) {
@@ -52,4 +52,5 @@ if (workersCi) {
   }
 }
 
-console.log(`Main-only release guard verified branch=${workersCi ? branch : 'local'} commit=${checkoutSha} currentMain=${currentMainSha}`);
+const metadataSource = declaredSha ? 'cloudflare' : 'checkout';
+console.log(`Main-only release guard verified branch=${workersCi ? branch : 'local'} commit=${checkoutSha} currentMain=${currentMainSha} metadata=${metadataSource}`);
