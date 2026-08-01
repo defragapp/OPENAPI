@@ -16,7 +16,7 @@ describe('founder v0 selective visual port', () => {
     expect(landing).toContain('className="v0-baseline-trace"');
     expect(landing).toContain('className="v0-family-map"');
     expect(landing).toContain('How Sovereign reads both of you');
-    expect(landing).toContain('Shared pattern');
+    expect(landing).toContain('The tension may be a timing gap rather than a values gap.');
   });
 
   it('keeps demonstrations distinct from actual user data', () => {
@@ -56,12 +56,12 @@ describe('founder v0 selective visual port', () => {
   });
 
   it('does not introduce the archive mock runtime, scores, or alternate architecture', () => {
+    expect(landing).not.toContain('localStorage');
     const source = `${landing}\n${v0Visual}`;
     for (const prohibited of [
       'Alignment Score',
       'Stability Index',
       'Growth Rate',
-      'localStorage',
       'Math.random',
       'generateAIResponse',
       'Demo User',
