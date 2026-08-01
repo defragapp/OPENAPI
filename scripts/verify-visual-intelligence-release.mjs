@@ -3,11 +3,18 @@ import { existsSync, readFileSync } from 'node:fs';
 const main = readFileSync('apps/web/src/main.tsx', 'utf8');
 const authenticatedWorkspace = readFileSync('apps/web/src/AuthenticatedWorkspace.tsx', 'utf8');
 const workspace = readFileSync('apps/web/src/SovereignIntelligenceWorkspace.tsx', 'utf8');
+const expressionField = readFileSync('apps/web/src/expression-field/ExpressionField.tsx', 'utf8');
+const expressionFieldCss = readFileSync('apps/web/src/expression-field/expression-field.css', 'utf8');
+const expressionFieldMath = readFileSync('apps/web/src/expression-field/expression-field-math.ts', 'utf8');
+const expressionFieldFixture = readFileSync('apps/web/src/expression-field/expression-field.fixture.ts', 'utf8');
+const expressionFieldWorker = readFileSync('apps/sovereign-worker/src/expression-field.ts', 'utf8');
+const runtimeEntry = readFileSync('apps/sovereign-worker/src/runtime-entry.ts', 'utf8');
+const expressionFieldContract = readFileSync('packages/agent-contracts/src/expression-field.ts', 'utf8');
 const hardening = readFileSync('apps/web/src/premium-surface-hardening.css', 'utf8');
 const selectivePort = readFileSync('apps/web/src/selective-visual-port.css', 'utf8');
-const workspaceCss = `${readFileSync('apps/web/src/workspace-chat.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8')}\n${hardening}\n${selectivePort}`;
+const workspaceCss = `${readFileSync('apps/web/src/workspace-chat.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8')}\n${hardening}\n${selectivePort}\n${expressionFieldCss}`;
 const landing = readFileSync('apps/web/src/PublicLanding.tsx', 'utf8');
-const landingCss = `${readFileSync('apps/web/src/public-landing.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8')}\n${hardening}\n${selectivePort}`;
+const landingCss = `${readFileSync('apps/web/src/public-landing.css', 'utf8')}\n${readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8')}\n${hardening}\n${selectivePort}\n${expressionFieldCss}`;
 const cohesion = readFileSync('apps/web/src/sovereign-cohesion.css', 'utf8');
 const contextField = readFileSync('apps/web/public/assets/sovereign-context-field.svg', 'utf8');
 const staticExperienceCss = readFileSync('apps/web/public/static-experience.css', 'utf8');
@@ -30,6 +37,7 @@ requireAll('authenticated app entry', main, [
   "import './sovereign-cohesion.css'",
   "import './premium-surface-hardening.css'",
   "import './selective-visual-port.css'",
+  "import './expression-field/expression-field.css'",
   "location.pathname === '/app'",
   '<AuthenticatedWorkspace />'
 ]);
@@ -47,11 +55,13 @@ requireAll('authenticated workspace gate', authenticatedWorkspace, [
   "import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace'",
   "import { AccountControlCenter } from './AccountControlCenter'",
   "import { SystemMembershipManager } from './SystemMembershipManager'",
+  "import { AccountExpressionField } from './expression-field/ExpressionField'",
   "fetch('/api/v1/account/onboarding'",
   "location.replace(`/login?returnTo=",
   "location.replace('/onboarding')",
   'data-workspace-contract="one-room"',
   '<SovereignIntelligenceWorkspace onboardingVerified />',
+  '<AccountExpressionField />',
   '<AccountControlCenter />',
   '<SystemMembershipManager />'
 ]);
@@ -165,13 +175,56 @@ requireAll('public product stage', landing, [
   'Gift',
   'Alignment',
   'BASIS',
-  'YOUR BASELINE',
+  '<LandingExpressionField />',
   'WHAT MAY BE ACTIVE NOW',
   'YOUR CONFIRMATION',
   'STILL UNKNOWN',
   'WHAT HAPPENS BETWEEN YOU',
   'PRESSURE FIELD',
   'PERMISSION BEFORE COMPARISON'
+]);
+
+requireAll('Expression Field public and authenticated composition', `${landing}\n${authenticatedWorkspace}\n${expressionField}\n${expressionFieldFixture}`, [
+  "import { LandingExpressionField } from './expression-field/ExpressionField'",
+  '<LandingExpressionField />',
+  'export function LandingExpressionField()',
+  'Sanitized demonstration · Illustrative values · Not your Baseline',
+  'export function AccountExpressionField()',
+  "fetch('/api/v1/expression-field?mode=live'",
+  "credentials: 'same-origin'",
+  "cache: 'no-store'",
+  'ONE CENTER · SIXTEEN EXPRESSIONS',
+  'aria-live="polite"',
+  'role="dialog"',
+  'aria-modal="true"'
+]);
+requireAll('Expression Field deterministic renderer', `${expressionField}\n${expressionFieldMath}\n${expressionFieldContract}`, [
+  'const shellPoints = fibonacciSphere(1200)',
+  'context.moveTo(centerX, centerY)',
+  'expressionAxisIds.length',
+  "export const EXPRESSION_FIELD_VERSION = 'expression-field.v1'",
+  "export const EXPRESSION_AXIS_REGISTRY_VERSION = 'expression-axis-registry.v1'"
+]);
+if (`${expressionField}\n${expressionFieldMath}`.includes('Math.random')) {
+  throw new Error('Expression Field production rendering must remain deterministic.');
+}
+requireAll('Expression Field privacy-safe Worker route', `${runtimeEntry}\n${expressionFieldWorker}`, [
+  "url.pathname === '/api/v1/expression-field'",
+  'handleExpressionFieldRequest(request, env)',
+  'const auth = await requireAuth(request, env)',
+  "value.subject === 'self'",
+  "'cache-control': 'private, no-store'",
+  "vary: 'Cookie'",
+  "measurementKind: 'relative_expression_salience'",
+  "state: 'unconfirmed'"
+]);
+requireAll('Expression Field iOS and accessibility contract', expressionFieldCss, [
+  'touch-action: pan-y',
+  'touch-action: none',
+  '@media (prefers-reduced-motion: reduce)',
+  '@media (forced-colors: active)',
+  'env(safe-area-inset-top)',
+  'env(safe-area-inset-bottom)'
 ]);
 
 if (landing.includes('Healing isn’t optional. Holding the pain is.')) {
@@ -187,6 +240,7 @@ requireAll('public visual accessibility', landingCss, [
   'min-width: 320px',
   '.relationship-baseline-pair',
   '.story-person-node[aria-pressed="true"]',
+  '.expression-field-canvas',
   '@media(max-width:980px)',
   '@media(max-width:760px)',
   '@media(max-width:420px)',
@@ -255,11 +309,12 @@ for (const prohibited of ['God is telling you', 'They secretly want', 'This prov
 
 for (const [label, css] of [
   ['premium hardening', hardening],
-  ['selective visual port', selectivePort]
+  ['selective visual port', selectivePort],
+  ['Expression Field', expressionFieldCss]
 ]) {
   const open = (css.match(/{/g) ?? []).length;
   const close = (css.match(/}/g) ?? []).length;
   if (open !== close) throw new Error(`${label} CSS has unbalanced braces (${open}/${close}).`);
 }
 
-console.log('Sovereign.OS cohesion release visual and product contract verified.');
+console.log('Sovereign.OS cohesion release, Expression Field, and product contract verified.');
