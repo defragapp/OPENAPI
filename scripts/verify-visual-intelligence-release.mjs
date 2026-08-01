@@ -14,7 +14,9 @@ const balanced = (label, source) => {
 
 const main = read('apps/web/src/main.tsx');
 const landing = read('apps/web/src/PublicLanding.tsx');
-const engine = read('apps/web/src/engine-room.css');
+const engineCss = read('apps/web/src/engine-room.css');
+const engineSafeAreaCss = read('apps/web/src/engine-room-safe-area.css');
+const engine = `${engineSafeAreaCss}\n${engineCss}`;
 const authenticated = read('apps/web/src/AuthenticatedWorkspace.tsx');
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const expressionField = read('apps/web/src/expression-field/ExpressionField.tsx');
@@ -28,6 +30,7 @@ const product = read('apps/sovereign-worker/src/db/product.ts');
 
 requireAll('application entry', main, [
   "import { AuthenticatedWorkspace } from './AuthenticatedWorkspace'",
+  "import './engine-room-safe-area.css'",
   "import './engine-room.css'",
   "location.pathname === '/app'",
   '<AuthenticatedWorkspace />'
@@ -90,7 +93,10 @@ requireAll('Engine Room visual accessibility', engine, [
   '@media (max-width: 680px)',
   '@media (prefers-reduced-motion: reduce)',
   '@media (forced-colors: active)',
-  'env(safe-area-inset-bottom)'
+  'env(safe-area-inset-top)',
+  'env(safe-area-inset-bottom)',
+  'env(safe-area-inset-left)',
+  'env(safe-area-inset-right)'
 ]);
 for (const prohibited of [
   'Purple AI',
@@ -163,6 +169,7 @@ for (const prohibited of ['God is telling you', 'They secretly want', 'This prov
   }
 }
 
-balanced('Engine Room', engine);
+balanced('Engine Room', engineCss);
+balanced('Engine Room safe area', engineSafeAreaCss);
 balanced('Expression Field', expressionFieldCss);
 console.log('Sovereign.OS Engine Room, Expression Field, and product intelligence contracts verified.');
