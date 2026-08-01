@@ -17,10 +17,12 @@ const onboarding = read('apps/web/src/PlanOnboarding.tsx');
 const controls = read('apps/web/src/AccountControlCenter.tsx');
 const membership = read('apps/web/src/SystemMembershipManager.tsx');
 const v0Visual = read('apps/web/src/v0-visual-port.css');
+const staticV0Visual = read('apps/web/public/v0-public-port.css');
 const publicSupport = read('apps/web/public/premium-public-release.css');
 const supportPages = ['how-it-works', 'pricing', 'faq', '404'].map((name) => read(`apps/web/public/${name}.html`));
 
 assert(existsSync('apps/web/src/v0-visual-port.css'), 'The founder v0 visual authority is missing.');
+assert(existsSync('apps/web/public/v0-public-port.css'), 'The founder v0 static-route authority is missing.');
 const v0Import = "import './v0-visual-port.css';";
 const v0ImportIndex = main.indexOf(v0Import);
 assert(v0ImportIndex >= 0, 'The founder v0 visual authority is not imported.');
@@ -93,6 +95,20 @@ requireAll('v0 visual language', v0Visual, [
   '@media (prefers-reduced-motion: reduce)'
 ]);
 
+requireAll('v0 static-route visual language', staticV0Visual, [
+  `Archive SHA-256: ${archiveSha}`,
+  'body.launch-page',
+  '.launch-nav',
+  '.launch-hero',
+  '.journey-steps',
+  '.pricing-grid',
+  '.faq-list details',
+  '.launch-footer',
+  '@media(max-width:760px)',
+  '@media(prefers-reduced-motion:reduce)'
+]);
+requireAll('static route authority import', publicSupport, ["@import url('/v0-public-port.css?v=20260801-founder-v0')"]);
+
 requireAll('v0 rendered viewport measurement', viewportProbe, [
   "'hero'",
   "'personal-chat'",
@@ -135,13 +151,15 @@ rejectAll('selective v0 port', productionVisualSource, [
 
 supportPages.forEach((page) => requireAll('support page', page, ['/premium-public-release.css?v=20260730-final', 'SOVEREIGN.OS']));
 balanced('founder v0 visual authority', v0Visual);
-balanced('public support', publicSupport);
+balanced('founder v0 static authority', staticV0Visual);
+balanced('public support authority', publicSupport);
 
 console.log(JSON.stringify({
   ok: true,
   release: 'sovereign-v0-selective-visual-port',
   archiveSha256: archiveSha,
   canonicalLanding: 'PublicLanding.tsx + v0-visual-port.css',
+  staticRouteVisualAuthority: 'v0-public-port.css',
   visualDirection: 'founder-v0-dark-editorial',
   portMode: 'components-and-styling-only',
   excludedMockRuntime: true,
