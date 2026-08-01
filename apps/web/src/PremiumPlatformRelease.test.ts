@@ -50,9 +50,12 @@ describe('founder v0 selective visual port', () => {
   it('ports the actual v0 landing headings and sequence', () => {
     expect(landing).toContain(`const V0_ARCHIVE_SHA = '${archiveSha}'`);
     expect(landing).toContain('data-visual-contract="v0-landing-selective-port"');
+    expect(landing).toContain('Healing isn’t optional.');
+    expect(landing).toContain('Holding onto the pain is.');
+    const renderStart = landing.indexOf('export function PublicLanding()');
+    const renderEnd = landing.indexOf('function V0Navigation()', renderStart);
+    const renderedSequence = landing.slice(renderStart, renderEnd);
     const markers = [
-      'Healing isn’t optional.',
-      'Holding onto the pain is.',
       '<RotatingQuestions />',
       '<PersonalStory />',
       '<RelationshipStory />',
@@ -62,7 +65,7 @@ describe('founder v0 selective visual port', () => {
     ];
     let previous = -1;
     for (const marker of markers) {
-      const index = landing.indexOf(marker);
+      const index = renderedSequence.indexOf(marker);
       expect(index).toBeGreaterThan(previous);
       previous = index;
     }
@@ -87,12 +90,13 @@ describe('founder v0 selective visual port', () => {
       'function ProcessingFlow(',
       'className="v0-window v0-flow"',
       'className="v0-family-map"',
-      'data-viewport-surface="personal-chat"',
-      'data-viewport-surface="personal-reasoning"',
-      'data-viewport-surface="relationship-chat"',
-      'data-viewport-surface="relationship-reasoning"',
-      'data-viewport-surface="system-map"',
-      'data-viewport-surface="comparison"'
+      'surface="personal-chat"',
+      'surface="personal-reasoning"',
+      'surface="relationship-chat"',
+      'surface="relationship-reasoning"',
+      'surface="system-map"',
+      'data-viewport-surface="comparison"',
+      'data-viewport-surface={surface}'
     ]) expect(landing).toContain(marker);
   });
 
