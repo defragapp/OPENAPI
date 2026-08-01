@@ -8,6 +8,7 @@ const readme = readFileSync('README.md', 'utf8');
 const bootstrap = readFileSync('scripts/cloudflare-preview-bootstrap.mjs', 'utf8');
 const mainReleaseGuard = readFileSync('scripts/assert-main-release.mjs', 'utf8');
 const productionDeploy = readFileSync('scripts/cloudflare-production-deploy-v2.mjs', 'utf8');
+const productionRelease = readFileSync('scripts/cloudflare-production-release.mjs', 'utf8');
 const freeTierControls = readFileSync('scripts/configure-cloudflare-free-tier.mjs', 'utf8');
 const parentDomainVerifier = readFileSync('scripts/verify-parent-domain-routes.mjs', 'utf8');
 const preview = workerConfig.env?.preview;
@@ -66,9 +67,12 @@ requireValue(packageJson.scripts?.['verify:cloudflare-build']?.startsWith('node 
 requireValue(packageJson.scripts?.['verify:cloudflare-build']?.includes('verify:release-config'), 'Canonical build must retain release verification');
 requireValue(packageJson.scripts?.['verify:release-config'] === 'node scripts/verify-direct-preview-config.mjs', 'Release verifier must use the direct Cloudflare contract');
 requireValue(packageJson.scripts?.['preview:bootstrap'] === 'node scripts/cloudflare-preview-bootstrap.mjs', 'Preview bootstrap command drifted');
-requireValue(packageJson.scripts?.['production:deploy'] === 'node scripts/assert-main-release.mjs && node scripts/cloudflare-production-deploy-v2.mjs && node scripts/verify-parent-domain-routes.mjs', 'Production deploy command drifted');
+requireValue(packageJson.scripts?.['production:deploy'] === 'node scripts/assert-main-release.mjs && node scripts/cloudflare-production-release.mjs && node scripts/verify-parent-domain-routes.mjs', 'Production deploy command drifted');
 for (const required of ['WORKERS_CI_BRANCH', 'WORKERS_CI_COMMIT_SHA', "'refs/heads/main'", "'FETCH_HEAD'", 'has been superseded by current main']) {
   requireValue(mainReleaseGuard.includes(required), `Main release guard is missing ${required}`);
+}
+for (const required of ['WORKERS_CI_COMMIT_SHA', 'GITHUB_SHA', 'APP_VERSION', 'cloudflare-production-deploy-v2.mjs', 'declared commit']) {
+  requireValue(productionRelease.includes(required), `Production release wrapper is missing ${required}`);
 }
 
 requireValue(!existsSync('.dev.vars.example'), 'Deploy-template secret form must not exist');
