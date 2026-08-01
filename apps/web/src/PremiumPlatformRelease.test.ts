@@ -6,6 +6,7 @@ const main = read('./main.tsx');
 const app = read('./App.tsx');
 const landing = read('./PublicLanding.tsx');
 const engine = read('./engine-room.css');
+const safeArea = read('./engine-room-safe-area.css');
 const authenticated = read('./AuthenticatedWorkspace.tsx');
 const workspace = read('./SovereignIntelligenceWorkspace.tsx');
 const onboarding = read('./PlanOnboarding.tsx');
@@ -19,33 +20,34 @@ function expectBalancedCss(source: string) {
 }
 
 describe('premium platform release', () => {
-  it('loads Engine Room after every inherited public landing layer', () => {
-    const inherited = "import './public-landing-editorial.css';";
-    const lock = "import './public-landing-production-lock.css';";
+  it('loads the canonical Engine Room after every inherited visual layer', () => {
+    const safeAreaImport = "import './engine-room-safe-area.css';";
     const engineImport = "import './engine-room.css';";
-    expect(main.indexOf(inherited)).toBeGreaterThan(-1);
-    expect(main.indexOf(lock)).toBeGreaterThan(main.indexOf(inherited));
-    expect(main.indexOf(engineImport)).toBeGreaterThan(main.indexOf(lock));
+    expect(main).toContain(safeAreaImport);
+    expect(main).toContain(engineImport);
+    expect(main.indexOf(engineImport)).toBeGreaterThan(main.indexOf(safeAreaImport));
     expect(main.slice(main.indexOf(engineImport) + engineImport.length)).not.toContain("import './");
   });
 
-  it('renders one continuous five-state intelligence environment', () => {
-    expect(landing).toContain('data-viewport-contract="engine-room-v1"');
+  it('renders one continuous intelligence environment rather than a stacked campaign page', () => {
     expect(landing).toContain('className="sovereign-landing engine-room"');
-    for (const component of ['<TechnicalGrid />', '<DataPointField />', '<HeroState />', '<BaselineState />', '<ConnectedScalesState />', '<LiveQueryState />', '<ReadyState />']) {
+    for (const component of ['<TechnicalGrid />', '<DataPointField />', '<HeroIntelligenceStage />', '<BaselineContextStage />', '<ConnectedScalesStage', '<PublicAnswerStage />', '<TerminalStage />']) {
       expect(landing).toContain(component);
     }
-    expect(engine).toContain('.engine-scroll-shell { min-height: 600svh; }');
+    expect(engine).toContain('height: 560svh');
     expect(engine).toContain('position: sticky');
     expect(engine).not.toContain('border-radius: 999px');
+    expect(landing).not.toContain('landing-foundation');
+    expect(landing).not.toContain('pricing-preview');
   });
 
-  it('uses scroll-linked reversible state changes and a mobile-specific composition', () => {
-    expect(landing).toContain('resolveState(next)');
+  it('uses scroll-linked reversible state changes and keyboard-accessible scales', () => {
     expect(landing).toContain("window.addEventListener('scroll', requestUpdate, { passive: true })");
     expect(landing).toContain("window.matchMedia('(prefers-reduced-motion: reduce)')");
-    expect(engine).toContain('@media (max-width: 680px)');
-    expect(engine).toMatch(/@media \(max-width: 680px\)[\s\S]*?\.engine-state,[\s\S]*?position: relative;/);
+    expect(landing).toContain('role="tablist"');
+    expect(landing).toContain('onKeyDown');
+    expect(landing).toContain('ArrowRight');
+    expect(engine).toContain('@media (max-width: 760px)');
     expect(engine).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
@@ -70,10 +72,11 @@ describe('premium platform release', () => {
 
   it('retains accessible controls and avoids fake scoring', () => {
     expectBalancedCss(engine);
+    expectBalancedCss(safeArea);
     expectBalancedCss(publicCss);
     expect(engine).toContain(':focus-visible');
     expect(engine).toContain('min-height: 44px');
-    expect(engine).toContain('@media (forced-colors: active)');
+    expect(safeArea).toContain('env(safe-area-inset-bottom)');
     const source = `${engine}\n${landing}`;
     for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'compatibility-score', 'OVERLAP: 68%', 'Math.random', 'mock-auth', 'fake-answer', 'dashboard-grid']) {
       expect(source).not.toContain(prohibited);

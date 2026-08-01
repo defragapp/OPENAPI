@@ -1,100 +1,150 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
-const landing = read('./PublicLanding.tsx');
-const engine = read('./engine-room.css');
-const policy = read('./PublicPolicy.tsx');
-const main = read('./main.tsx');
-const how = read('../public/how-it-works.html');
-const pricing = read('../public/pricing.html');
-const faq = read('../public/faq.html');
-const notFound = read('../public/404.html');
-const consent = read('../public/consent.html');
-const consentCss = read('../public/consent.css');
+const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
+const policy = readFileSync(new URL('./PublicPolicy.tsx', import.meta.url), 'utf8');
+const how = readFileSync(new URL('../public/how-it-works.html', import.meta.url), 'utf8');
+const pricing = readFileSync(new URL('../public/pricing.html', import.meta.url), 'utf8');
+const faq = readFileSync(new URL('../public/faq.html', import.meta.url), 'utf8');
+const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'utf8');
+const consent = readFileSync(new URL('../public/consent.html', import.meta.url), 'utf8');
+const consentCss = readFileSync(new URL('../public/consent.css', import.meta.url), 'utf8');
+const launchCss = readFileSync(new URL('../public/launch.css', import.meta.url), 'utf8');
+const launchPolishCss = readFileSync(new URL('../public/launch-polish.css', import.meta.url), 'utf8');
+const staticExperienceCss = readFileSync(new URL('../public/static-experience.css', import.meta.url), 'utf8');
+const platformPublicCss = readFileSync(new URL('../public/platform-public.css', import.meta.url), 'utf8');
+const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
+const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
 describe('Sovereign.OS public experience', () => {
-  it('opens inside the intelligence engine rather than a conventional marketing page', () => {
-    expect(landing).toContain('className="sovereign-landing engine-room"');
-    expect(landing).toContain('KNOW YOURSELF.');
-    expect(landing).toContain('UNDERSTAND THE SYSTEM.');
-    expect(landing).toContain('Personal, relationship, and system intelligence built from context.');
-    expect(landing).toContain('&gt; BUILD_MY_BASELINE');
-    expect(landing).toContain('&gt; VIEW_ENGINE');
-    expect(landing).not.toContain('<section className="landing-foundation"');
-    expect(landing).not.toContain('className="pricing-preview"');
+  it('states the current product promise and first action in the first viewport', () => {
+    expect(landing).toContain('Know yourself.');
+    expect(landing).toContain('Understand the system.');
+    expect(landing).toContain('Choose what fits.');
+    expect(landing).toContain('private AI for understanding yourself, your relationships, and the systems around you');
+    expect(landing).toContain('Build your Baseline once');
+    expect(landing).toContain('Build my Baseline');
+    expect(landing).toContain('See a Sovereign answer');
+    expect(landing).not.toContain('PERSONAL AI FOR REAL LIFE');
   });
 
-  it('shows one deterministic computation from Baseline through a real question', () => {
-    for (const value of [
-      'Your intelligence begins with a stable Baseline.',
-      'INPUT / NATAL_REDUCTION',
-      'STATUS / VALIDATED',
-      'Move outward without rebuilding context.',
-      'PERMISSION /',
-      'SOURCE /',
-      'CONSENTED',
-      'Why do I keep taking responsibility for everyone else?',
-      'FETCH_BASELINE',
-      'APPLY_CURRENT_CONTEXT',
-      'DISTINGUISH_SIGNAL',
-      'FORM_UNDERSTANDING',
-      'Your capacity is real.',
-      'The question is whether the responsibility is actually yours.',
-      'I will do my part.',
-      'I must make this work for everyone.',
-      '&gt; READY'
-    ]) expect(landing).toContain(value);
+  it('shows a recognizable question and direct answer before the Baseline explanation', () => {
+    const questionIndex = landing.indexOf('Why do I keep taking responsibility for everyone else?');
+    const answerIndex = landing.indexOf('Your capacity is real. The question is whether the responsibility is actually yours.');
+    const foundationIndex = landing.indexOf('Your intelligence begins with your Baseline.');
+    expect(questionIndex).toBeGreaterThan(-1);
+    expect(answerIndex).toBeGreaterThan(questionIndex);
+    expect(foundationIndex).toBeGreaterThan(answerIndex);
+    expect(landing).toContain('EXAMPLE ANSWER');
+    expect(landing).toContain('Sanitized demonstration · Not your Baseline');
+    expect(landing.indexOf('Sanitized demonstration · Not your Baseline')).toBeLessThan(landing.indexOf('YOU ASKED'));
   });
 
-  it('uses a continuous pinned canvas and a deliberate mobile recomposition', () => {
-    expect(engine).toContain('.engine-scroll-shell { min-height: 600svh; }');
-    expect(engine).toContain('position: sticky');
-    expect(engine).toContain('.engine-grid');
-    expect(engine).toContain('.baseline-machine');
-    expect(engine).toContain('.scale-field');
-    expect(engine).toContain('.query-computation');
-    expect(engine).toContain('@media (max-width: 680px)');
-    expect(engine).toMatch(/@media \(max-width: 680px\)[\s\S]*?position: relative;/);
-    expect(engine).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(engine).not.toContain('border-radius: 999px');
+  it('presents one intelligence environment across self, relationship, and system scales', () => {
+    expect(landing).toContain('ONE INTELLIGENCE · THREE CONNECTED SCALES');
+    expect(landing).toContain('The question changes. The environment stays the same.');
+    expect(landing).toContain('Yourself');
+    expect(landing).toContain('RELATIONSHIP');
+    expect(landing).toContain('System');
+    expect(landing).toContain('role="tablist"');
+    expect(landing).toContain('role="tabpanel"');
+    expect(landing).toContain('aria-live="polite"');
   });
 
-  it('keeps privacy and permission visible without fake metrics', () => {
-    expect(landing).toContain('PERMISSION /');
-    expect(landing).toContain('CONTEXT /');
-    expect(landing).toContain('SCOPE /');
-    expect(landing).toContain('SOURCE /');
-    expect(landing).not.toContain('OVERLAP: 68%');
-    expect(landing).not.toContain('compatibility score');
+  it('uses product demonstrations instead of a grid of disconnected claims', () => {
+    for (const component of ['<HeroIntelligenceStage />', '<BaselineContextStage />', '<PublicAnswerStage', '<PermissionField />', '<SystemMap />']) {
+      expect(landing).toContain(component);
+    }
+    expect(landing).toContain('A REAL QUESTION · A PERSONAL ANSWER');
+    expect(landing).toContain('Useful language first. Exact support when you want it.');
+  });
+
+  it('keeps exact Basis fixtures secondary to plain-language value', () => {
+    for (const value of ['U✓', 'HD G13.1', 'GK ACT13', 'N LP1', '☉ CAN 04.2°']) expect(landing).toContain(value);
+    expect(landing).toContain('Why this is personal');
+    expect(landing).toContain('supporting values');
+    expect(landing).toContain('Temporary context does not determine behavior.');
+    expect(landing).toContain('STILL UNKNOWN');
+  });
+
+  it('keeps relationship and system intelligence permission-bound', () => {
+    expect(landing).toContain('PERMISSION BEFORE COMPARISON');
+    expect(landing).toContain('Another person remains a person—not a data source you control.');
+    expect(landing).toContain('Their actual motive remains unknown until they speak for themselves.');
+    expect(landing).toContain('No compatibility score. No mind-reading. No one-sided access to another person’s Baseline.');
     expect(faq).toContain('It cannot know another person’s exact feelings, motives, private experience, or future behavior.');
   });
 
-  it('keeps verified pricing, correction, and optional Covenant explicit on support surfaces', () => {
+  it('keeps verified prices, plan limits, correction, and optional Covenant explicit', () => {
     for (const phrase of ['$0', '$20', '$99', '10 Sovereign AI turns', '300 Sovereign AI turns', 'Review and correct what does not fit', 'Covenant']) {
       expect(publicCopy).toContain(phrase);
     }
     expect(policy).toContain('Private account export is not available at launch.');
   });
 
-  it('renders public React routes without runtime copy rewriting', () => {
+  it('renders the public React routes without runtime copy rewriting', () => {
     expect(main).toContain("location.pathname === '/'");
     expect(main).toContain('<PublicLanding />');
     expect(main).toContain('<PublicPolicy kind={publicPolicyKind} />');
-    expect(main).toContain("import './engine-room.css'");
     expect(main).not.toContain('ProductLanguageRuntime');
+    expect(main).not.toMatch(/refinement|landing-v2/i);
   });
 
-  it('keeps support pages and consent independently controlled', () => {
+  it('keeps the static public family on the cohesion release assets', () => {
     for (const page of [how, pricing, faq]) {
-      expect(page).toContain('/premium-public-release.css?v=20260730-final');
-      expect(page).toContain('SOVEREIGN.OS');
+      expect(page).toContain('/launch.css?v=20260730-cohesion');
+      expect(page).toContain('/launch-polish.css?v=20260730-cohesion');
+      expect(page).toContain('/static-release.css?v=20260730-cohesion');
+      expect(page).toContain('/static-experience.css?v=20260730-cohesion');
+      expect(page).toContain('/platform-public.css?v=20260730-platform2');
     }
+    expect(how).toContain('Set up your Baseline once. Use it wherever life connects.');
     expect(pricing).toContain('$20');
     expect(pricing).toContain('$99 / year');
+    expect(faq).toContain('What Sovereign understands. What remains yours to confirm.');
+  });
+
+  it('keeps every static public section visible and composes the pages as one platform', () => {
+    expect(platformPublicCss).toContain('opacity: 1 !important');
+    expect(platformPublicCss).toContain('animation: none !important');
+    expect(platformPublicCss).toContain('.launch-page:not(.pricing-page):not(.questions-page) .launch-band');
+    expect(platformPublicCss).toContain('.pricing-page .pricing-section');
+    expect(platformPublicCss).toContain('.questions-page .faq-section');
+    expect(platformPublicCss).toContain('background: var(--platform-paper)');
+    expect(platformPublicCss).toContain('min-height: 0');
+  });
+
+  it('keeps public pages responsive and consent independently controlled', () => {
+    expect(launchCss).toContain('@media (max-width: 680px)');
+    expect(launchPolishCss).toContain('prefers-reduced-motion');
+    expect(landingCss).toContain('@media (max-width: 760px)');
+    expect(staticExperienceCss).toContain('@media (max-width: 860px)');
+    expect(staticExperienceCss).toContain('@media (max-width: 620px)');
+    expect(staticExperienceCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(staticExperienceCss).toContain('.pricing-page .pricing-hero > p:last-child');
+    expect(staticExperienceCss).toContain('.questions-page .questions-hero > p:last-child');
+    expect(staticExperienceCss).toContain('.questions-page .faq-section');
+    expect(pricing).toContain('class="launch-hero launch-hero-compact pricing-hero"');
+    expect(pricing).not.toContain('pricing-hero-detail');
+    expect(staticExperienceCss).toMatch(/@media \(max-width: 860px\)[\s\S]*?\.pricing-page \.pricing-hero > p:last-child[\s\S]*?grid-column: 1; grid-row: auto;/);
+    expect(pricing).not.toContain('class="plan-summary"');
+    expect(faq).toContain('class="launch-page questions-page"');
+    expect(faq).toContain('launch-hero-compact questions-hero');
+    expect(staticExperienceCss).toContain('overflow-x: auto;');
+    expect(staticExperienceCss).toContain('overscroll-behavior-inline: contain;');
+    expect(staticExperienceCss).toContain('.launch-links a { flex: 0 0 auto; white-space: nowrap; }');
+    expect(staticExperienceCss).not.toContain('.launch-links a:not(.launch-cta) { display: none; }');
+    expect(staticExperienceCss).toMatch(/@media \(max-width: 620px\)[\s\S]*?\.price-options \{ grid-template-columns: 1fr; \}/);
+    expect(staticExperienceCss).toContain('.launch-shell { width: min(1320px, calc(100% - 64px)); margin: 0 auto; }');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
     expect(notFound).toContain('content="noindex, nofollow"');
+    expect(notFound).toContain('/launch.css?v=20260730-cohesion');
+    expect(notFound).toContain('/launch-polish.css?v=20260730-cohesion');
+    expect(notFound).toContain('/static-release.css?v=20260730-cohesion');
+    expect(notFound).toContain('/static-experience.css?v=20260730-cohesion');
+    expect(notFound).toContain('href="https://sovereign.defrag.app/"');
+    expect(notFound).toContain('href="https://app.defrag.app/login"');
     expect(consent).toContain('You decide what another account may use.');
     expect(consent).toContain('The inviting account cannot make or change these decisions for you.');
     expect(consentCss).toContain('@media (max-width: 680px)');

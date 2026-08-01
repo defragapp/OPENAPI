@@ -8,35 +8,37 @@ const expressionField = read('./expression-field/ExpressionField.tsx');
 const workspace = read('./SovereignIntelligenceWorkspace.tsx');
 
 describe('shared Sovereign intelligence stage', () => {
-  it('demonstrates the same direct-answer authority publicly and after authentication', () => {
-    expect(landing).toContain('DIRECT UNDERSTANDING');
-    expect(landing).toContain('Your capacity is real.');
-    expect(landing).toContain('The question is whether the responsibility is actually yours.');
-    expect(landing).toContain('SUPPORTED BY / BOUNDARY RESPONSE · RESPONSIBILITY ORIENTATION · SYSTEM ROLE');
+  it('uses the same direct-answer hierarchy publicly and after authentication', () => {
+    expect(landing).toContain('EXAMPLE ANSWER');
+    expect(landing).toContain('DIRECT ANSWER');
+    expect(landing).toContain('THE PERSONAL CONNECTION');
+    expect(landing).toContain('A PRACTICAL NEXT STEP');
+    expect(landing).toContain('Why this is personal');
     expect(workspace).toContain('<SovereignAnswerView');
     expect(workspace).toContain('<RelationshipAnswer');
     expect(workspace).toContain('<SystemAnswer');
     expect(workspace).toContain('<BasisStrip');
   });
 
-  it('separates stable Baseline, temporary context, consent, and unknowns', () => {
-    expect(landing).toContain('Your intelligence begins with a stable Baseline.');
-    expect(landing).toContain('TEMPORARY_EMPHASIS / ACTIVE');
-    expect(landing).toContain('PERMISSION /');
-    expect(landing).toContain('SOURCE /');
-    expect(landing).toContain('CONSENTED');
+  it('distinguishes stable, temporary, confirmed, permitted, and unknown information', () => {
+    expect(landing).toContain('YOUR BASELINE');
+    expect(landing).toContain('WHAT MAY BE ACTIVE NOW');
+    expect(landing).toContain('YOUR CONFIRMATION');
+    expect(landing).toContain('STILL UNKNOWN');
+    expect(landing).toContain('PERMISSION / CONFIRMED');
+    expect(landing).toContain('SOURCE / CONSENTED');
     expect(expressionField).toContain('ONE CENTER · SIXTEEN EXPRESSIONS');
     expect(expressionField).toContain('Sanitized demonstration · Illustrative values · Not your Baseline');
   });
 
   it('is keyboard-ready, responsive, and reduced-motion safe', () => {
-    expect(landing).toContain('aria-label="Sovereign.OS intelligence engine"');
-    expect(landing).toContain('aria-label="Demonstration Baseline compilation');
-    expect(landing).toContain('aria-label="Self context moves into a consented relationship and then into a wider system"');
-    expect(workspace).toContain('const limit = mobile ? 3 : 5');
+    expect(landing).toContain('onKeyDown');
+    expect(landing).toContain('ArrowLeft');
+    expect(landing).toContain('aria-selected');
+    expect(landing).toContain('const limit = mobile ? 3 : 5');
     expect(engine).toContain('min-height: 44px');
-    expect(engine).toContain('@media (max-width: 680px)');
+    expect(engine).toContain('@media (max-width: 760px)');
+    expect(engine).toContain('@media (max-width: 440px)');
     expect(engine).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(engine).toContain('@media (forced-colors: active)');
   });
 });

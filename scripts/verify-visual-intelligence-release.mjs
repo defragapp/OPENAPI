@@ -35,77 +35,60 @@ requireAll('application entry', main, [
   "location.pathname === '/app'",
   '<AuthenticatedWorkspace />'
 ]);
-if (main.indexOf("import './engine-room.css'") < main.indexOf("import './public-landing-editorial.css'")) {
-  throw new Error('Engine Room must load after all retired public landing layers.');
+if (main.indexOf("import './engine-room.css'") < main.indexOf("import './engine-room-safe-area.css'")) {
+  throw new Error('Engine Room must load after its safe-area layer.');
+}
+if (main.slice(main.indexOf("import './engine-room.css'") + "import './engine-room.css'".length).includes("import './")) {
+  throw new Error('No local visual layer may load after Engine Room.');
 }
 
-requireAll('Engine Room product narrative', landing, [
+requireAll('canonical Engine Room narrative', landing, [
   'data-product-contract="baseline-first"',
   'data-answer-contract="sovereign-answer.v2"',
-  'data-viewport-contract="engine-room-v1"',
-  'KNOW YOURSELF.',
-  'UNDERSTAND THE SYSTEM.',
-  'Personal, relationship, and system intelligence built from context.',
-  '&gt; BUILD_MY_BASELINE',
-  '&gt; VIEW_ENGINE',
-  'Your intelligence begins with a stable Baseline.',
-  'INPUT / NATAL_REDUCTION',
-  'STATUS / VALIDATED',
-  'SELF',
-  'RELATIONSHIP',
-  'SYSTEM',
-  'PERMISSION /',
-  'SOURCE /',
-  'CONSENTED',
+  '<BootSequence />', '<EngineHeader />', '<TechnicalGrid />', '<DataPointField />',
+  '<HeroIntelligenceStage />', '<BaselineContextStage />', '<ConnectedScalesStage',
+  '<PublicAnswerStage />', '<TerminalStage />', '<EngineProgress />',
+  'KNOW YOURSELF.', 'UNDERSTAND THE SYSTEM.', 'Choose what fits.',
+  '&gt; BUILD_MY_BASELINE', '&gt; SEE_A_SOVEREIGN_ANSWER',
+  'Your intelligence begins with your Baseline.',
+  'YOUR BASELINE / STABLE_CONTEXT_COMPILED',
+  'WHAT MAY BE ACTIVE NOW / RESPONSIBILITY',
+  'YOUR CONFIRMATION / REQUIRED',
+  'STILL UNKNOWN / ACTUAL RESPONSE TODAY',
+  'ONE INTELLIGENCE · THREE CONNECTED SCALES',
+  'PERMISSION / CONFIRMED', 'SOURCE / CONSENTED',
   'Why do I keep taking responsibility for everyone else?',
-  'FETCH_BASELINE',
-  'APPLY_CURRENT_CONTEXT',
-  'DISTINGUISH_SIGNAL',
-  'FORM_UNDERSTANDING',
-  'Your capacity is real.',
-  'The question is whether the responsibility is actually yours.',
-  'I will do my part.',
-  'I must make this work for everyone.',
-  '&gt; READY'
+  'FETCH_BASELINE', 'APPLY_CURRENT_CONTEXT', 'DISTINGUISH_SIGNAL', 'FORM_UNDERSTANDING',
+  'Your capacity is real. The question is whether the responsibility is actually yours.',
+  'I will do my part.', 'I must make this work for everyone.', '&gt; READY'
 ]);
 
-requireAll('Engine Room behavior', landing, [
-  "type EngineState = 'hero' | 'baseline' | 'scales' | 'query' | 'ready'",
+requireAll('canonical Engine Room behavior', landing, [
   'window.requestAnimationFrame(update)',
   "window.addEventListener('scroll', requestUpdate, { passive: true })",
   "window.matchMedia('(prefers-reduced-motion: reduce)')",
-  'resolveState(next)',
-  "'--engine-progress': progress.toFixed(4)"
+  "style.setProperty('--engine-progress'",
+  'windowed(progress',
+  'phaseProgress(progress',
+  'role="tablist"', 'role="tabpanel"', 'onKeyDown=', 'ArrowLeft', 'aria-live="polite"'
 ]);
 
-requireAll('Engine Room visual accessibility', engine, [
-  '--engine-bg: #050505',
-  '--engine-ink: #f2efe8',
-  '--engine-clay: #b77b5e',
-  '--engine-sage: #829b8c',
-  '--engine-rose: #a96f72',
-  '--engine-sans:',
-  '--engine-mono:',
-  '.engine-scroll-shell { min-height: 600svh; }',
-  'position: sticky',
+requireAll('canonical Engine Room visual system', engine, [
+  '--engine-black: #050505',
+  '--engine-ink: #f2eee6',
+  '--engine-copper: #c38a67',
+  '--engine-sage: #a8b6a4',
+  '--engine-rose: #b88787',
+  '.engine-scroll-shell', 'height: 560svh', 'position: sticky',
+  '.engine-grid', '.baseline-machine', '.scale-machine', '.query-computation', '.engine-terminal',
   'min-height: 44px',
-  '@media (max-width: 900px)',
-  '@media (max-width: 680px)',
+  '@media (max-width: 900px)', '@media (max-width: 760px)', '@media (max-width: 440px)',
   '@media (prefers-reduced-motion: reduce)',
-  '@media (forced-colors: active)',
-  'env(safe-area-inset-top)',
-  'env(safe-area-inset-bottom)',
-  'env(safe-area-inset-left)',
-  'env(safe-area-inset-right)'
+  'env(safe-area-inset-top)', 'env(safe-area-inset-bottom)', 'env(safe-area-inset-left)', 'env(safe-area-inset-right)'
 ]);
 for (const prohibited of [
-  'Purple AI',
-  'OVERLAP: 68%',
-  'Compatibility score',
-  'Math.random',
-  'localStorage',
-  'font-family: var(--font-display)',
-  'border-radius: 999px'
+  'Purple AI', 'OVERLAP: 68%', 'Compatibility score', 'Math.random', 'localStorage',
+  'font-family: var(--font-display)', 'border-radius: 999px'
 ]) {
   if (`${landing}\n${engine}`.includes(prohibited)) {
     throw new Error(`Engine Room contains prohibited implementation or framing: ${prohibited}`);
@@ -115,19 +98,13 @@ for (const prohibited of [
 requireAll('canonical authenticated workspace', `${authenticated}\n${workspace}`, [
   "import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace'",
   "import { AccountExpressionField } from './expression-field/ExpressionField'",
-  'data-workspace-contract="one-room"',
-  '<SovereignIntelligenceWorkspace onboardingVerified />',
-  '<AccountExpressionField />',
+  'data-workspace-contract="one-room"', '<SovereignIntelligenceWorkspace onboardingVerified />', '<AccountExpressionField />',
   "type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'",
-  "version: 'sovereign-answer.v2'",
-  'className="basis-strip"',
-  'className="system-graph"'
+  "version: 'sovereign-answer.v2'", 'className="basis-strip"', 'className="system-graph"'
 ]);
 
 requireAll('Expression Field deterministic renderer', `${expressionField}\n${expressionFieldMath}\n${expressionFieldContract}`, [
-  'const shellPoints = fibonacciSphere(1200)',
-  'context.moveTo(centerX, centerY)',
-  'expressionAxisIds.length',
+  'const shellPoints = fibonacciSphere(1200)', 'context.moveTo(centerX, centerY)', 'expressionAxisIds.length',
   "export const EXPRESSION_FIELD_VERSION = 'expression-field.v1'",
   "export const EXPRESSION_AXIS_REGISTRY_VERSION = 'expression-axis-registry.v1'"
 ]);
@@ -135,32 +112,20 @@ if (`${expressionField}\n${expressionFieldMath}`.includes('Math.random')) {
   throw new Error('Expression Field production rendering must remain deterministic.');
 }
 requireAll('Expression Field privacy-safe Worker route', `${runtimeEntry}\n${expressionFieldWorker}`, [
-  "url.pathname === '/api/v1/expression-field'",
-  'handleExpressionFieldRequest(request, env)',
-  'const auth = await requireAuth(request, env)',
-  "value.subject === 'self'",
-  "'cache-control': 'private, no-store'",
-  "vary: 'Cookie'",
-  "state: 'unconfirmed'"
+  "url.pathname === '/api/v1/expression-field'", 'handleExpressionFieldRequest(request, env)',
+  'const auth = await requireAuth(request, env)', "value.subject === 'self'",
+  "'cache-control': 'private, no-store'", "vary: 'Cookie'", "state: 'unconfirmed'"
 ]);
 requireAll('Expression Field accessibility', expressionFieldCss, [
-  'touch-action: pan-y',
-  'touch-action: none',
-  '@media (prefers-reduced-motion: reduce)',
-  '@media (forced-colors: active)'
+  'touch-action: pan-y', 'touch-action: none', '@media (prefers-reduced-motion: reduce)', '@media (forced-colors: active)'
 ]);
 
 requireAll('system membership manager', membership, [
-  'person.identityBound === true',
-  "person.activeScopes.includes('system.include')",
-  'Add only permitted people.'
+  'person.identityBound === true', "person.activeScopes.includes('system.include')", 'Add only permitted people.'
 ]);
 requireAll('consent-safe system projection', product, [
-  'FROM system_memberships sm',
-  "cg.scope = 'system.include'",
-  "i.status = 'accepted'",
-  'cg.granted_at IS NOT NULL AND cg.revoked_at IS NULL',
-  'p.bound_account_id IS NOT NULL'
+  'FROM system_memberships sm', "cg.scope = 'system.include'", "i.status = 'accepted'",
+  'cg.granted_at IS NOT NULL AND cg.revoked_at IS NULL', 'p.bound_account_id IS NOT NULL'
 ]);
 
 for (const prohibited of ['God is telling you', 'They secretly want', 'This proves', 'You are incompatible', 'Tarot']) {
@@ -172,4 +137,4 @@ for (const prohibited of ['God is telling you', 'They secretly want', 'This prov
 balanced('Engine Room', engineCss);
 balanced('Engine Room safe area', engineSafeAreaCss);
 balanced('Expression Field', expressionFieldCss);
-console.log('Sovereign.OS Engine Room, Expression Field, and product intelligence contracts verified.');
+console.log('Sovereign.OS canonical Engine Room, Expression Field, and product intelligence contracts verified.');

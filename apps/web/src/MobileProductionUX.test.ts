@@ -5,6 +5,7 @@ const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf
 const main = read('./main.tsx');
 const landing = read('./PublicLanding.tsx');
 const engine = read('./engine-room.css');
+const safeArea = read('./engine-room-safe-area.css');
 const workspaceCss = read('./workspace-chat.css');
 const workspaceMobileCss = read('./workspace-mobile.css');
 const compositionCss = read('./interface-composition.css');
@@ -17,26 +18,38 @@ describe('production mobile and responsive experience', () => {
     expect(main).toContain("import './workspace-mobile.css'");
     expect(main).toContain("import './auth-onboarding.css'");
     expect(main).toContain("import './interface-composition.css'");
+    expect(main).toContain("import './engine-room-safe-area.css'");
     expect(main).toContain("import './engine-room.css'");
-    expect(main.indexOf("import './engine-room.css'")).toBeGreaterThan(main.indexOf("import './public-landing-editorial.css'"));
+    expect(main.indexOf("import './engine-room.css'")).toBeGreaterThan(main.indexOf("import './engine-room-safe-area.css'"));
   });
 
-  it('uses a mobile-specific vertical engine instead of shrinking the desktop stage', () => {
-    expect(landing).toContain('data-viewport-contract="engine-room-v1"');
-    expect(engine).toContain('@media (max-width: 680px)');
-    expect(engine).toMatch(/@media \(max-width: 680px\)[\s\S]*?\.engine-scroll-shell \{ min-height: 0;/);
-    expect(engine).toMatch(/@media \(max-width: 680px\)[\s\S]*?\.engine-state,[\s\S]*?position: relative;/);
-    expect(engine).toContain('.scale-node { position: relative;');
-    expect(engine).toContain('.query-step { grid-template-columns: 1fr;');
+  it('uses a deliberate small-screen Engine Room composition', () => {
+    expect(engine).toContain('@media (max-width: 760px)');
+    expect(engine).toContain('@media (max-width: 440px)');
+    expect(engine).toMatch(/@media \(max-width: 760px\)[\s\S]*?\.engine-scroll-shell \{ height: 520svh; \}/);
+    expect(engine).toContain('.engine-header { height: 62px; padding: 0 16px; }');
+    expect(engine).toContain('.engine-layer { padding: 84px 18px 26px; }');
+    expect(engine).toContain('.engine-command { min-height: 46px; width: 100%; justify-content: flex-start; }');
+    expect(engine).toContain('.answer-distinction { grid-template-columns: 1fr; }');
   });
 
-  it('keeps public commands readable and touch accessible', () => {
+  it('keeps public controls, text, and notched edges usable', () => {
     expect(engine).toContain('min-height: 44px');
-    expect(engine).toContain('.engine-command { width: 100%; min-height: 48px; }');
-    expect(engine).toContain('font-size: 1.03rem');
-    expect(engine).toContain('overflow: visible');
-    expect(engine).toContain('@media (forced-colors: active)');
+    expect(engine).toContain('font-size: 16px');
+    expect(engine).toContain('overflow: clip');
+    expect(safeArea).toContain('env(safe-area-inset-top)');
+    expect(safeArea).toContain('env(safe-area-inset-bottom)');
+    expect(safeArea).toContain('env(safe-area-inset-left)');
+    expect(safeArea).toContain('env(safe-area-inset-right)');
     expect(authCss).toContain('.auth-panel');
+  });
+
+  it('keeps the interactive scale selector accessible without hover', () => {
+    expect(landing).toContain('role="tablist"');
+    expect(landing).toContain('aria-selected={selected === index}');
+    expect(landing).toContain('onClick={() => onSelect(index)}');
+    expect(landing).toContain('onKeyDown={(event) => moveScaleFocus');
+    expect(landing).toContain("['ArrowLeft', 'ArrowRight', 'Home', 'End']");
   });
 
   it('keeps five authenticated surfaces thumb reachable and You in the menu sheet', () => {
