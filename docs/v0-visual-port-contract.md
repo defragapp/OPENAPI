@@ -73,7 +73,7 @@ Never import or recreate the archive’s mock product runtime:
 - fake billing, permissions, invitations, people, systems, or account data;
 - any component that bypasses the real OPENAPI APIs and contracts.
 
-The production repository must reject `Math.random`, mock auth, canned answer generators, fake users, and dashboard-grid behavior in the selective port.
+The selective-port source must reject mock auth, canned answer generators, fake users, dashboard-grid behavior, and nondeterministic demonstration generation. Broad dependency-bundle string guesses are not a substitute for source-level and runtime-contract verification.
 
 ## Real production architecture that remains authoritative
 
@@ -107,14 +107,45 @@ The archive visual language must extend beyond the landing to the real product s
 
 The styling layer may change presentation. It must not replace route ownership, state management, API requests, authorization, consent, billing, or AI output behavior.
 
+## Visual delivery paths
+
+All three paths are required:
+
+1. `apps/web/src/v0-visual-port.css`
+   - final Vite visual authority;
+   - owns the v0 landing and the real authenticated workspace/account language;
+   - no local CSS import may load after it.
+2. `apps/web/src/v0-platform-port.css`
+   - loads immediately before the final authority;
+   - owns real plan onboarding, Privacy/Terms, and email-code access surfaces.
+3. `apps/web/public/v0-public-port.css`
+   - loaded by `premium-public-release.css`;
+   - owns standalone How it works, Pricing, FAQ, and 404 documents.
+
+Removing or bypassing any one of these means the visual port is not sitewide.
+
+## Runtime identity
+
+`apps/web/src/v0-release-fingerprint.ts` must expose:
+
+- the exact archive SHA-256;
+- the exact founder sequence fingerprint;
+- `data-sovereign-visual-contract="v0-landing-selective-port"` on the running document;
+- archive and sequence values on the running document.
+
+This runtime identity proves which visual contract was actually compiled without relying on labels such as “canonical,” “editorial,” or “cinematic.”
+
 ## Release enforcement
 
 A production release must fail unless all of the following are true:
 
 - `PublicLanding.tsx` contains the exact archive fingerprint;
-- the required v0 sequence is present in the compiled JavaScript in order;
+- the runtime bundle contains the exact sequence fingerprint;
+- the required v0 components and copy are compiled;
+- `v0-platform-port.css` loads before `v0-visual-port.css`;
 - `v0-visual-port.css` is the final local visual import;
-- compiled CSS contains both v0 landing selectors and real workspace/account selectors;
+- compiled CSS contains v0 landing, real workspace/account, onboarding, policy, and access selectors;
+- standalone public routes load `v0-public-port.css` and contain its archive fingerprint;
 - the reconstructed `Know yourself. Understand the system. Choose what fits.` hero is absent from the compiled landing bundle;
 - archive mock-runtime markers are absent;
 - `/health` and `/ready` report the exact release SHA;
@@ -126,4 +157,4 @@ A production release must fail unless all of the following are true:
 
 Do not use the words `canonical`, `approved`, `v0`, `editorial`, or `cinematic` as evidence by themselves.
 
-A future change is valid only when the rendered component structure, copy sequence, archive fingerprint, sitewide styling, and real platform contracts all agree. Static string checks must never certify a visually different implementation as the founder v0 port.
+A future change is valid only when the rendered component structure, copy sequence, archive fingerprint, runtime sequence fingerprint, all visual delivery paths, and real platform contracts agree. Static string checks must never certify a visually different implementation as the founder v0 port.
