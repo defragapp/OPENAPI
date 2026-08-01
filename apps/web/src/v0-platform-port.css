@@ -1,0 +1,422 @@
+/* Founder v0 styling for real OPENAPI routes outside the one-room workspace. */
+body:has(.plan-onboarding),
+body:has(.sovereign-policy),
+body:has(.email-code-fallback) {
+  background:
+    radial-gradient(circle at 78% -8%, rgba(232, 221, 208, 0.055), transparent 34rem),
+    linear-gradient(rgba(255, 255, 255, 0.008) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.008) 1px, transparent 1px),
+    #0f0f0f;
+  background-size: auto, 88px 88px, 88px 88px, auto;
+  color: #f5f1e8;
+}
+
+.plan-onboarding,
+.sovereign-policy {
+  --v0-route-page: #0f0f0f;
+  --v0-route-card: #1a1a1a;
+  --v0-route-raised: #222222;
+  --v0-route-ink: #f5f1e8;
+  --v0-route-cream: #e8ddd0;
+  --v0-route-paper-ink: #141412;
+  --v0-route-muted: #a39c8f;
+  --v0-route-faint: #746f67;
+  --v0-route-line: rgba(245, 241, 232, 0.11);
+  --v0-route-line-strong: rgba(245, 241, 232, 0.23);
+  --v0-route-warm: #c89370;
+  min-height: 100svh;
+  background: transparent !important;
+  color: var(--v0-route-ink) !important;
+  font-family: var(--font-body, "Sovereign Sans", Inter, system-ui, sans-serif) !important;
+}
+
+.plan-onboarding *,
+.sovereign-policy *,
+.email-code-fallback * { box-sizing: border-box; }
+
+.plan-onboarding :where(a, button, input):focus-visible,
+.sovereign-policy :where(a, button):focus-visible,
+.email-code-fallback :where(button, input):focus-visible {
+  outline: 2px solid #e8ddd0 !important;
+  outline-offset: 4px;
+}
+
+.plan-nav,
+.sovereign-policy > .landing-nav {
+  position: sticky !important;
+  z-index: 40;
+  top: 0;
+  min-height: 64px !important;
+  border-bottom: 1px solid var(--v0-route-line) !important;
+  background: rgba(15, 15, 15, 0.82) !important;
+  backdrop-filter: blur(22px) saturate(118%);
+}
+
+.plan-nav > a,
+.sovereign-policy .landing-wordmark {
+  color: var(--v0-route-ink) !important;
+  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
+  text-decoration: none !important;
+}
+
+.plan-nav > span,
+.sovereign-policy .landing-nav nav a {
+  color: var(--v0-route-muted) !important;
+  font-family: var(--font-body, "Sovereign Sans", Inter, system-ui, sans-serif) !important;
+}
+
+.sovereign-policy .landing-nav-cta {
+  border-color: rgba(232, 221, 208, 0.78) !important;
+  background: var(--v0-route-cream) !important;
+  color: var(--v0-route-paper-ink) !important;
+}
+
+.plan-layout {
+  width: min(1240px, calc(100vw - 48px)) !important;
+  margin-inline: auto !important;
+  padding-block: clamp(64px, 8vw, 108px) !important;
+}
+
+.plan-choice {
+  min-width: 0;
+}
+
+.onboarding-progress {
+  border-color: var(--v0-route-line) !important;
+  color: var(--v0-route-faint) !important;
+}
+
+.onboarding-progress li span {
+  border-color: var(--v0-route-line-strong) !important;
+  background: var(--v0-route-card) !important;
+  color: var(--v0-route-muted) !important;
+}
+
+.onboarding-progress li.complete span,
+.onboarding-progress li.active span {
+  border-color: rgba(232, 221, 208, 0.5) !important;
+  background: var(--v0-route-cream) !important;
+  color: var(--v0-route-paper-ink) !important;
+}
+
+.plan-choice > .eyebrow,
+.policy-hero .landing-kicker,
+.policy-contact .landing-kicker {
+  color: var(--v0-route-warm) !important;
+  font-family: var(--font-subheading, "Sovereign Sans", Inter, system-ui, sans-serif) !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase;
+}
+
+.plan-choice > h1,
+.plan-visual h2,
+.onboarding-plan-grid h2,
+.policy-hero h1,
+.policy-grid h2,
+.policy-contact h2 {
+  color: var(--v0-route-ink) !important;
+  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.04em !important;
+}
+
+.plan-choice > h1,
+.policy-hero h1 {
+  max-width: 12ch;
+  font-size: clamp(3rem, 5.8vw, 5.6rem) !important;
+  line-height: 0.98 !important;
+  text-wrap: balance;
+}
+
+.plan-intro,
+.plan-visual p,
+.onboarding-plan-grid p,
+.onboarding-plan-grid li,
+.policy-hero > p,
+.policy-grid p,
+.policy-contact p {
+  color: var(--v0-route-muted) !important;
+  line-height: 1.68 !important;
+}
+
+.onboarding-plan-grid {
+  gap: 18px !important;
+}
+
+.onboarding-plan-grid > article,
+.plan-visual,
+.onboarding-baseline-preview,
+.policy-grid > article,
+.policy-contact {
+  border: 1px solid var(--v0-route-line) !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.014), transparent 30%),
+    var(--v0-route-card) !important;
+  color: var(--v0-route-ink) !important;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.32) !important;
+}
+
+.onboarding-plan-grid > article.plus-plan {
+  border-color: rgba(232, 221, 208, 0.27) !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(232, 221, 208, 0.08), transparent 20rem),
+    var(--v0-route-card) !important;
+}
+
+.onboarding-plan-grid article > header span,
+.onboarding-baseline-preview > span,
+.policy-grid > article > span {
+  color: var(--v0-route-warm) !important;
+  font-family: var(--font-subheading, "Sovereign Sans", Inter, system-ui, sans-serif) !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase;
+}
+
+.onboarding-plan-grid article > header strong {
+  color: var(--v0-route-ink) !important;
+  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+}
+
+.billing-toggle {
+  border-color: var(--v0-route-line) !important;
+  background: var(--v0-route-page) !important;
+}
+
+.billing-toggle button {
+  color: var(--v0-route-muted) !important;
+}
+
+.billing-toggle button.active {
+  background: rgba(232, 221, 208, 0.1) !important;
+  color: var(--v0-route-ink) !important;
+}
+
+.plan-onboarding .primary-button {
+  min-height: 48px !important;
+  border: 1px solid rgba(232, 221, 208, 0.78) !important;
+  border-radius: 10px !important;
+  background: var(--v0-route-cream) !important;
+  color: var(--v0-route-paper-ink) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.26) !important;
+}
+
+.plan-status {
+  color: var(--v0-route-muted) !important;
+}
+
+.plan-visual {
+  position: relative;
+  overflow: hidden;
+}
+
+.plan-visual::before {
+  position: absolute;
+  inset: -20% -20% auto 20%;
+  height: 62%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 221, 208, 0.09), transparent 70%);
+  content: "";
+  pointer-events: none;
+}
+
+.onboarding-baseline-preview {
+  position: relative;
+  z-index: 1;
+  background: rgba(10, 10, 10, 0.58) !important;
+}
+
+.onboarding-baseline-preview > div {
+  border-color: var(--v0-route-line) !important;
+  background: var(--v0-route-raised) !important;
+}
+
+.policy-hero,
+.policy-grid,
+.policy-contact,
+.sovereign-policy > .landing-footer {
+  width: min(1120px, calc(100vw - 48px)) !important;
+  margin-inline: auto !important;
+}
+
+.policy-hero {
+  padding-block: clamp(100px, 12vw, 160px) clamp(74px, 9vw, 112px) !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.policy-hero::before {
+  position: absolute;
+  z-index: -1;
+  top: 86px;
+  left: 50%;
+  width: min(840px, 92vw);
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(232, 221, 208, 0.07), transparent 70%);
+  content: "";
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.policy-effective {
+  color: var(--v0-route-faint) !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.policy-grid {
+  display: grid !important;
+  gap: 14px !important;
+}
+
+.policy-grid > article {
+  display: grid !important;
+  grid-template-columns: 56px minmax(0, 1fr) !important;
+  gap: 18px !important;
+  padding: clamp(24px, 4vw, 38px) !important;
+}
+
+.policy-grid > article > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--v0-route-line-strong);
+  border-radius: 50%;
+}
+
+.policy-contact {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 40px !important;
+  margin-block: clamp(72px, 10vw, 126px) !important;
+  padding: clamp(30px, 5vw, 58px) !important;
+}
+
+.policy-contact .landing-button {
+  flex: 0 0 auto;
+  min-height: 48px !important;
+  padding-inline: 21px !important;
+  border: 1px solid rgba(232, 221, 208, 0.78) !important;
+  border-radius: 10px !important;
+  background: var(--v0-route-cream) !important;
+  color: var(--v0-route-paper-ink) !important;
+  text-decoration: none !important;
+}
+
+.sovereign-policy > .landing-footer {
+  border-color: var(--v0-route-line) !important;
+  color: var(--v0-route-faint) !important;
+}
+
+.sovereign-policy > .landing-footer a {
+  color: var(--v0-route-muted) !important;
+}
+
+.email-code-fallback {
+  border: 1px solid rgba(245, 241, 232, 0.14) !important;
+  border-radius: 18px !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(232, 221, 208, 0.08), transparent 18rem),
+    #1a1a1a !important;
+  color: #f5f1e8 !important;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.52) !important;
+}
+
+.email-code-fallback header > p {
+  color: #c89370 !important;
+  letter-spacing: 0.16em !important;
+}
+
+.email-code-fallback h2 {
+  color: #f5f1e8 !important;
+  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  letter-spacing: -0.035em !important;
+}
+
+.email-code-copy,
+.email-code-status,
+.email-code-reset {
+  color: #a39c8f !important;
+}
+
+.email-code-fallback input {
+  border-color: rgba(245, 241, 232, 0.13) !important;
+  background: #0f0f0f !important;
+  color: #f5f1e8 !important;
+}
+
+.email-code-submit {
+  border-color: rgba(232, 221, 208, 0.78) !important;
+  background: #e8ddd0 !important;
+  color: #141412 !important;
+}
+
+@media (max-width: 860px) {
+  .plan-layout {
+    width: min(100% - 32px, 760px) !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .plan-visual {
+    min-height: 460px;
+  }
+}
+
+@media (max-width: 700px) {
+  .plan-nav,
+  .sovereign-policy > .landing-nav {
+    min-height: 60px !important;
+  }
+
+  .sovereign-policy .landing-nav nav a:not(.landing-nav-cta) {
+    display: none !important;
+  }
+
+  .plan-layout,
+  .policy-hero,
+  .policy-grid,
+  .policy-contact,
+  .sovereign-policy > .landing-footer {
+    width: calc(100vw - 32px) !important;
+  }
+
+  .onboarding-plan-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .policy-contact {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+
+  .policy-contact .landing-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .plan-choice > h1,
+  .policy-hero h1 {
+    font-size: 2.75rem !important;
+  }
+
+  .policy-grid > article {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plan-onboarding *,
+  .sovereign-policy *,
+  .email-code-fallback * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
