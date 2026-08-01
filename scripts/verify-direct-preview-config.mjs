@@ -93,7 +93,8 @@ for (const required of [
   'https://sovereign.defrag.app/',
   'https://app.defrag.app/app',
   'payload?.version !== commitSha',
-  '--editorial-page:#fbfbf8',
+  '--editorial-page:#0f0f0f',
+  '--editorial-cream:#e8ddd0',
   '/fonts/sovereign-display.woff2',
   '/fonts/sovereign-sans.woff2',
   "const CACHE_NAME = 'sovereign-public-v15'"
