@@ -2,11 +2,16 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const read = (path) => readFileSync(path, 'utf8');
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 const main = read('apps/web/src/main.tsx');
+const fingerprint = read('apps/web/src/v0-release-fingerprint.ts');
 const authenticatedWorkspace = read('apps/web/src/AuthenticatedWorkspace.tsx');
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const landing = read('apps/web/src/PublicLanding.tsx');
+const v0Platform = read('apps/web/src/v0-platform-port.css');
 const v0Visual = read('apps/web/src/v0-visual-port.css');
+const staticAuthority = read('apps/web/public/premium-public-release.css');
+const staticV0 = read('apps/web/public/v0-public-port.css');
 const expressionField = read('apps/web/src/expression-field/ExpressionField.tsx');
 const expressionFieldCss = read('apps/web/src/expression-field/expression-field.css');
 const expressionFieldMath = read('apps/web/src/expression-field/expression-field-math.ts');
@@ -14,7 +19,6 @@ const expressionFieldFixture = read('apps/web/src/expression-field/expression-fi
 const expressionFieldWorker = read('apps/sovereign-worker/src/expression-field.ts');
 const runtimeEntry = read('apps/sovereign-worker/src/runtime-entry.ts');
 const expressionFieldContract = read('packages/agent-contracts/src/expression-field.ts');
-const staticExperienceCss = read('apps/web/public/static-experience.css');
 const how = read('apps/web/public/how-it-works.html');
 const pricing = read('apps/web/public/pricing.html');
 const faq = read('apps/web/public/faq.html');
@@ -22,29 +26,34 @@ const membership = read('apps/web/src/SystemMembershipManager.tsx');
 const product = read('apps/sovereign-worker/src/db/product.ts');
 
 function requireAll(label, source, values) {
-  for (const value of values) {
-    if (!source.includes(value)) throw new Error(`${label} is missing ${value}`);
-  }
+  for (const value of values) if (!source.includes(value)) throw new Error(`${label} is missing ${value}`);
 }
 
 function rejectAll(label, source, values) {
-  for (const value of values) {
-    if (source.includes(value)) throw new Error(`${label} contains prohibited ${value}`);
-  }
+  for (const value of values) if (source.includes(value)) throw new Error(`${label} contains prohibited ${value}`);
+}
+
+function balanced(label, source) {
+  const open = (source.match(/{/g) ?? []).length;
+  const close = (source.match(/}/g) ?? []).length;
+  if (open !== close) throw new Error(`${label} CSS has unbalanced braces (${open}/${close}).`);
 }
 
 requireAll('authenticated app entry', main, [
   "import { AuthenticatedWorkspace } from './AuthenticatedWorkspace'",
+  "import { installV0ReleaseFingerprint } from './v0-release-fingerprint'",
   "import './workspace-chat.css'",
   "import './expression-field/expression-field.css'",
+  "import './v0-platform-port.css'",
   "import './v0-visual-port.css'",
+  'installV0ReleaseFingerprint();',
   "location.pathname === '/app'",
   '<AuthenticatedWorkspace />'
 ]);
+const platformImport = "import './v0-platform-port.css';";
 const v0Import = "import './v0-visual-port.css';";
-if (main.slice(main.indexOf(v0Import) + v0Import.length).includes("import './")) {
-  throw new Error('A local visual layer loads after the founder v0 visual authority.');
-}
+if (main.indexOf(platformImport) > main.indexOf(v0Import)) throw new Error('Platform route coverage loads after the final v0 authority.');
+if (main.slice(main.indexOf(v0Import) + v0Import.length).includes("import './")) throw new Error('A local visual layer loads after the founder v0 visual authority.');
 
 for (const retired of [
   'apps/web/src/experience-reconciliation.css',
@@ -54,6 +63,14 @@ for (const retired of [
   if (existsSync(retired)) throw new Error(`Retired visual override remains: ${retired}`);
   if (main.includes(retired.split('/').pop())) throw new Error(`Retired visual override is still imported: ${retired}`);
 }
+
+requireAll('runtime v0 identity', fingerprint, [
+  `V0_ARCHIVE_SHA256 = '${archiveSha}'`,
+  `V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`,
+  "dataset.sovereignVisualContract = 'v0-landing-selective-port'",
+  'dataset.sovereignV0Archive = V0_ARCHIVE_SHA256',
+  'dataset.sovereignV0Sequence = V0_SEQUENCE_FINGERPRINT'
+]);
 
 requireAll('authenticated workspace gate', authenticatedWorkspace, [
   "import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace'",
@@ -125,7 +142,7 @@ requireAll('v0 demonstration components', landing, [
   'Each person controls what may be included'
 ]);
 
-requireAll('v0 visual system and sitewide extension', v0Visual, [
+requireAll('v0 final visual authority', v0Visual, [
   `Source archive SHA-256:\n * ${archiveSha}`,
   '--v0-page: #0f0f0f',
   '--v0-cream: #e8ddd0',
@@ -148,7 +165,32 @@ requireAll('v0 visual system and sitewide extension', v0Visual, [
   '@media (prefers-reduced-motion: reduce)'
 ]);
 
-rejectAll('selective v0 port', `${landing}\n${v0Visual}`, [
+requireAll('v0 application route coverage', v0Platform, [
+  'body:has(.plan-onboarding)',
+  'body:has(.sovereign-policy)',
+  'body:has(.email-code-fallback)',
+  '.plan-nav',
+  '.onboarding-plan-grid',
+  '.policy-hero',
+  '.policy-grid',
+  '.email-code-fallback',
+  '@media (max-width: 700px)',
+  '@media (prefers-reduced-motion: reduce)'
+]);
+
+requireAll('v0 standalone route authority', `${staticAuthority}\n${staticV0}`, [
+  "@import url('/v0-public-port.css?v=20260801-founder-v0')",
+  `Archive SHA-256: ${archiveSha}`,
+  'body.launch-page',
+  '.launch-nav',
+  '.launch-hero',
+  '.journey-steps',
+  '.pricing-grid',
+  '.faq-list details',
+  '.launch-footer'
+]);
+
+rejectAll('selective v0 port', `${landing}\n${v0Platform}\n${v0Visual}`, [
   'Know yourself.',
   'Understand the system.',
   'Choose what fits.',
@@ -181,9 +223,7 @@ requireAll('Expression Field deterministic renderer', `${expressionField}\n${exp
   "export const EXPRESSION_FIELD_VERSION = 'expression-field.v1'",
   "export const EXPRESSION_AXIS_REGISTRY_VERSION = 'expression-axis-registry.v1'"
 ]);
-if (`${expressionField}\n${expressionFieldMath}`.includes('Math.random')) {
-  throw new Error('Expression Field production rendering must remain deterministic.');
-}
+if (`${expressionField}\n${expressionFieldMath}`.includes('Math.random')) throw new Error('Expression Field production rendering must remain deterministic.');
 requireAll('Expression Field privacy-safe Worker route', `${runtimeEntry}\n${expressionFieldWorker}`, [
   "url.pathname === '/api/v1/expression-field'",
   'handleExpressionFieldRequest(request, env)',
@@ -203,18 +243,6 @@ requireAll('Expression Field iOS and accessibility contract', expressionFieldCss
   'env(safe-area-inset-bottom)'
 ]);
 
-requireAll('static public support experience', staticExperienceCss, [
-  '.pricing-grid',
-  '.pricing-page .pricing-hero > p:last-child',
-  '.questions-page .questions-hero > p:last-child',
-  '.price-card-body',
-  '.plan-comparison-list',
-  '.faq-list details',
-  'min-width: 320px',
-  '@media (max-width: 860px)',
-  '@media (prefers-reduced-motion: reduce)'
-]);
-
 requireAll('static page continuity', `${how}\n${pricing}\n${faq}`, [
   'SOVEREIGN.OS',
   'Build my Baseline',
@@ -222,7 +250,8 @@ requireAll('static page continuity', `${how}\n${pricing}\n${faq}`, [
   '$99',
   '10 Sovereign AI turns each month',
   '300 Sovereign AI turns each month',
-  'permission'
+  'permission',
+  '/premium-public-release.css?v=20260730-final'
 ]);
 
 requireAll('system membership manager', membership, [
@@ -242,15 +271,12 @@ requireAll('consent-safe system projection', product, [
 ]);
 
 for (const prohibited of ['God is telling you', 'They secretly want', 'This proves', 'You are incompatible']) {
-  if (`${workspace}\n${landing}`.toLowerCase().includes(prohibited.toLowerCase())) {
-    throw new Error(`User interface contains prohibited framing: ${prohibited}`);
-  }
+  if (`${workspace}\n${landing}`.toLowerCase().includes(prohibited.toLowerCase())) throw new Error(`User interface contains prohibited framing: ${prohibited}`);
 }
 
-for (const [label, css] of [['founder v0', v0Visual], ['Expression Field', expressionFieldCss]]) {
-  const open = (css.match(/{/g) ?? []).length;
-  const close = (css.match(/}/g) ?? []).length;
-  if (open !== close) throw new Error(`${label} CSS has unbalanced braces (${open}/${close}).`);
-}
+balanced('founder v0 platform coverage', v0Platform);
+balanced('founder v0 final authority', v0Visual);
+balanced('founder v0 standalone authority', staticV0);
+balanced('Expression Field', expressionFieldCss);
 
-console.log('Sovereign.OS founder v0 selective port, real workspace, Expression Field, and product contracts verified.');
+console.log('Sovereign.OS founder v0 selective port, real workspace, Expression Field, and complete route coverage verified.');
