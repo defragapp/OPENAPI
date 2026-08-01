@@ -45,7 +45,8 @@ import './responsive-viewport-contract.css';
 import './public-landing-editorial.css';
 import './public-landing-production-lock.css';
 
-/* The public root is one continuous Engine Room; this route-owned layer is authoritative. */
+/* The public root is one continuous Engine Room; route-owned layers are authoritative. */
+import './engine-room-safe-area.css';
 import './engine-room.css';
 
 installProductionRuntime();
