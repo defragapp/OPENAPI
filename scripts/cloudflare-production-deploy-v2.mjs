@@ -12,6 +12,8 @@ const metadataPath = resolve(root, 'production-deployment.json');
 const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || '8b1954d216d65077c6480d62583fe2c2').trim();
 const apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
 const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT_SHA || '').trim();
+const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 const workerName = 'sovv-web';
 const d1Name = 'sovereign-openapi-db';
 const model = '@cf/zai-org/glm-4.7-flash';
@@ -139,7 +141,7 @@ async function verifyLiveProduction() {
   }
 
   const [home, how, pricing, faq, login, signup, app, health, notFound] = await Promise.all([
-    readText(`${publicBase}/`),
+    readText(`${publicBase}/?release=${commitSha}`),
     readText(`${publicBase}/how-it-works`),
     readText(`${publicBase}/pricing`),
     readText(`${publicBase}/faq`),
@@ -150,10 +152,10 @@ async function verifyLiveProduction() {
     readText(`${publicBase}/release-probe-not-found`)
   ]);
 
-  assertDocument('home', home, ['id="root"', 'Sovereign.OS']);
-  assertDocument('how-it-works', how, ['Sovereign.OS']);
-  assertDocument('pricing', pricing, ['Sovereign.OS', '$0', '$20', '$99']);
-  assertDocument('faq', faq, ['Sovereign.OS']);
+  assertDocument('home', home, ['id="root"', 'Sovereign']);
+  assertDocument('how-it-works', how, ['Sovereign.OS', '/premium-public-release.css?v=20260730-final']);
+  assertDocument('pricing', pricing, ['Sovereign.OS', '$0', '$20', '$99', '/premium-public-release.css?v=20260730-final']);
+  assertDocument('faq', faq, ['Sovereign.OS', '/premium-public-release.css?v=20260730-final']);
   assertDocument('login', login, ['id="root"']);
   assertDocument('signup', signup, ['id="root"']);
   assertDocument('app', app, ['id="root"']);
@@ -173,18 +175,85 @@ async function verifyLiveProduction() {
     assert(headerIncludes(document, 'x-robots-tag', 'noindex'), 'application document is indexable');
   }
 
-  const assetPath = home.text.match(/src=["'](\/assets\/[^"']+\.js)["']/)?.[1];
-  assert(assetPath, 'compiled JavaScript asset is missing');
-  const asset = await readText(`${publicBase}${assetPath}`);
-  assert(asset.response.ok && headerIncludes(asset.response, 'cache-control', 'immutable'), 'compiled JavaScript is unavailable or not immutable');
-  assertContains('compiled application', asset.text, [
+  const jsPath = home.text.match(/src=["'](\/assets\/[^"']+\.js)["']/)?.[1];
+  const cssPath = home.text.match(/href=["'](\/assets\/[^"']+\.css)["']/)?.[1];
+  assert(jsPath, 'compiled JavaScript asset is missing');
+  assert(cssPath, 'compiled CSS asset is missing');
+  const [javascript, stylesheet, staticAuthority, staticStyles] = await Promise.all([
+    readText(`${publicBase}${jsPath}`),
+    readText(`${publicBase}${cssPath}`),
+    readText(`${publicBase}/premium-public-release.css?v=20260730-final`),
+    readText(`${publicBase}/v0-public-port.css?v=20260801-founder-v0`)
+  ]);
+  assert(javascript.response.ok && headerIncludes(javascript.response, 'cache-control', 'immutable'), 'compiled JavaScript is unavailable or not immutable');
+  assert(stylesheet.response.ok && headerIncludes(stylesheet.response, 'cache-control', 'immutable'), 'compiled CSS is unavailable or not immutable');
+  assert(staticAuthority.response.ok, 'static visual authority is unavailable');
+  assert(staticStyles.response.ok, 'founder v0 static-route CSS is unavailable');
+  assertContains('static visual authority', staticAuthority.text, ["@import url('/v0-public-port.css?v=20260801-founder-v0')"]);
+  assertContains('founder v0 static-route CSS', staticStyles.text, [
+    `Archive SHA-256: ${archiveSha}`,
+    'body.launch-page',
+    '.launch-nav',
+    '.launch-hero',
+    '.journey-steps',
+    '.pricing-grid',
+    '.faq-list details',
+    '.launch-footer'
+  ]);
+
+  assertContains('compiled founder v0 application', javascript.text, [
+    sequenceFingerprint,
+    archiveSha,
+    'v0-landing-selective-port',
+    'Personal AI for real life',
+    'Healing isn’t optional.',
+    'Holding onto the pain is.',
+    'Ask about your life.',
+    'Get an answer built for you.',
+    'See the space',
+    'between you.',
+    'From one person',
+    'to the whole system.',
+    'Other AI answers',
+    'everyone the same.',
+    'Your thoughts deserve',
+    'a better place to live.',
+    'How Sovereign works it through',
+    'How Sovereign reads both of you',
+    'Illustrative permitted Baselines',
+    'No compatibility score',
+    'Each person controls what may be included',
+    'Explore this through Covenant?'
+  ]);
+  for (const prohibited of [
     'Know yourself.',
     'Understand the system.',
     'Choose what fits.',
-    'Your intelligence begins with your Baseline.',
-    'What do you want to understand?',
-    'Explore this through Covenant?'
-  ]);
+    'mock-auth',
+    'fake-answer',
+    'dashboard-grid',
+    'Demo User',
+    'generateAIResponse'
+  ]) {
+    assert(!javascript.text.includes(prohibited), `compiled application contains rejected reconstruction or mock marker: ${prohibited}`);
+  }
+
+  const compactCss = stylesheet.text.replace(/\s+/g, '');
+  for (const marker of [
+    '--v0-page:#0f0f0f',
+    '--v0-cream:#e8ddd0',
+    '.v0-hero{',
+    '.v0-story-grid{',
+    '.v0-family-map{',
+    '.intelligence-workspace{',
+    '.sovereign-composer{',
+    '.account-shell',
+    '.plan-onboarding',
+    '.sovereign-policy',
+    '.email-code-fallback'
+  ]) {
+    assert(compactCss.includes(marker), `compiled CSS is missing v0/sitewide marker: ${marker}`);
+  }
 
   const invalidWebhookBody = JSON.stringify({ id: 'evt_release_invalid', type: 'customer.subscription.updated', data: { object: {} } });
   const [session, account, checkout, webhook, signupWithoutTurnstile] = await Promise.all([
@@ -218,6 +287,16 @@ async function verifyLiveProduction() {
   return {
     health: health.json,
     ready: ready.json,
+    visualRelease: {
+      archiveSha256: archiveSha,
+      sequenceFingerprint,
+      contract: 'v0-landing-selective-port',
+      platformRouteCoverage: 'v0-platform-port.css',
+      sitewideVisualAuthority: 'v0-visual-port.css',
+      staticRouteVisualAuthority: 'v0-public-port.css',
+      javascriptAsset: jsPath,
+      cssAsset: cssPath
+    },
     probes: {
       publicDocuments: 'passed',
       pricing: 'passed',

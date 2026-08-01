@@ -9,155 +9,96 @@ const faq = readFileSync(new URL('../public/faq.html', import.meta.url), 'utf8')
 const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'utf8');
 const consent = readFileSync(new URL('../public/consent.html', import.meta.url), 'utf8');
 const consentCss = readFileSync(new URL('../public/consent.css', import.meta.url), 'utf8');
-const launchCss = readFileSync(new URL('../public/launch.css', import.meta.url), 'utf8');
-const launchPolishCss = readFileSync(new URL('../public/launch-polish.css', import.meta.url), 'utf8');
 const staticExperienceCss = readFileSync(new URL('../public/static-experience.css', import.meta.url), 'utf8');
 const platformPublicCss = readFileSync(new URL('../public/platform-public.css', import.meta.url), 'utf8');
-const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
-const hardening = readFileSync(new URL('./premium-surface-hardening.css', import.meta.url), 'utf8');
+const v0Css = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
 describe('Sovereign.OS public experience', () => {
-  it('states the current product promise and first action in the first viewport', () => {
-    expect(landing).toContain('Know yourself.');
-    expect(landing).toContain('Understand the system.');
-    expect(landing).toContain('Choose what fits.');
-    expect(landing).toContain('private AI for understanding yourself, your relationships, and the systems around you');
-    expect(landing).toContain('Build your Baseline once');
+  it('uses the supplied v0 hero and action in the first viewport', () => {
+    expect(landing).toContain('Personal AI for real life');
+    expect(landing).toContain('Healing isn’t optional.');
+    expect(landing).toContain('Holding onto the pain is.');
     expect(landing).toContain('Build my Baseline');
-    expect(landing).toContain('See how it works');
-    expect(landing).not.toContain('PERSONAL AI FOR REAL LIFE');
+    expect(landing).toContain('See a Sovereign answer');
+    expect(landing).not.toContain('Know yourself.');
   });
 
-  it('shows a recognizable question and direct answer before the Baseline explanation', () => {
-    const questionIndex = landing.indexOf('Why do I keep taking responsibility for everyone else?');
-    const answerIndex = landing.indexOf('Your capacity is real. The question is whether the responsibility is actually yours.');
-    const previewSlotIndex = landing.indexOf('<HeroAnswerPreview />');
-    const foundationSlotIndex = landing.indexOf('<section className="landing-foundation"');
-    expect(questionIndex).toBeGreaterThan(-1);
-    expect(answerIndex).toBeGreaterThan(questionIndex);
-    expect(previewSlotIndex).toBeGreaterThan(-1);
-    expect(foundationSlotIndex).toBeGreaterThan(previewSlotIndex);
-    expect(landing).toContain('EXAMPLE ANSWER');
-    expect(landing).toContain('Sanitized demonstration · Not your Baseline');
-    expect(landing.indexOf('Sanitized demonstration · Not your Baseline')).toBeLessThan(landing.indexOf('YOU ASKED'));
-  });
-
-  it('presents one intelligence environment across self, relationship, and system scales', () => {
-    expect(landing).toContain('STEP 01 · YOU');
-    expect(landing).toContain('STEP 02 · YOU + 1');
-    expect(landing).toContain('STEP 03 · YOUR WHOLE SYSTEM');
+  it('presents the v0 story sequence in its intended order', () => {
+    const values = [
+      '<RotatingQuestions />',
+      '<PersonalStory />',
+      '<RelationshipStory />',
+      '<SystemStory />',
+      '<ComparisonStory />',
+      '<FinalCallToAction />'
+    ];
+    let previous = -1;
+    for (const value of values) {
+      const index = landing.indexOf(value);
+      expect(index).toBeGreaterThan(previous);
+      previous = index;
+    }
     expect(landing).toContain('Ask about your life.');
+    expect(landing).toContain('Get an answer built for you.');
     expect(landing).toContain('See the space');
+    expect(landing).toContain('between you.');
     expect(landing).toContain('From one person');
-    expect(landing).toContain('className="visual-story-grid"');
-    expect(landing).toContain('className="story-system-map"');
+    expect(landing).toContain('to the whole system.');
+    expect(landing).toContain('Other AI answers');
+    expect(landing).toContain('everyone the same.');
+    expect(landing).toContain('Your thoughts deserve');
+    expect(landing).toContain('a better place to live.');
   });
 
-  it('uses the approved product demonstrations instead of a grid of disconnected claims', () => {
-    for (const component of ['<HeroAnswerPreview />', '<PersonalStory />', '<RelationshipStory />', '<SystemStory />', '<ReasoningPanel', '<EvidenceChips']) {
-      expect(landing).toContain(component);
+  it('uses the v0 product demonstrations instead of disconnected marketing claims', () => {
+    for (const marker of ['className="v0-story-grid"', 'className="v0-baseline-trace"', 'className="v0-flow"', 'className="v0-family-map"', 'className="v0-comparison-grid"']) {
+      expect(landing).toContain(marker);
     }
-    expect(landing).toContain('How Sovereign works it through');
-    expect(landing).toContain('How Sovereign reads both of you');
-    expect(landing).toContain('WHAT HAPPENS BETWEEN YOU');
-    expect(landing).toContain('SHARED PATTERN');
-    expect(landing).toContain('PRESSURE FIELD');
+    expect(landing).toContain('Why do I keep taking on responsibility for everyone around me?');
+    expect(landing).toContain('Why does the same conversation land so differently for me and Maya?');
+    expect(landing).toContain('Can you map my whole family?');
   });
 
-  it('keeps exact Basis fixtures secondary to plain-language value', () => {
-    for (const value of ['SUN · LEO', 'GK 13.4', 'GATE 4.11', 'GK 9', 'MARS · CANCER']) expect(landing).toContain(value);
-    expect(landing).toContain('Why this is personal');
-    expect(landing).toContain('GROUNDED IN');
-    expect(landing).toContain('Temporary context does not determine behavior.');
-    expect(landing).toContain('STILL UNKNOWN');
+  it('keeps exact Basis fixtures secondary and permission-safe', () => {
+    for (const value of ['SUN · LEO', 'GK 13.4', 'GATE 4.11', 'MARS · CANCER', 'AUTH · EMO', 'AUTH · SPLENIC']) expect(landing).toContain(value);
+    expect(landing).toContain('Grounded in');
+    expect(landing).toContain('Illustrative permitted Baselines');
+    expect(landing).toContain('No compatibility score');
+    expect(landing).toContain('No private-thought claims');
+    expect(landing).toContain('Each person controls what may be included');
   });
 
-  it('keeps relationship and system intelligence permission-bound', () => {
-    expect(landing).toContain('PERMISSION BEFORE COMPARISON');
-    expect(landing).toContain('Another person remains a person—not a data source you control.');
-    expect(landing).toContain('Bring another person’s permitted Baseline into the room.');
-    expect(landing).toContain('without claiming access to private thoughts.');
-    expect(landing).toContain('No compatibility score.');
-    expect(landing).toContain('No mind-reading.');
-    expect(landing).toContain('No one-sided access.');
-    expect(faq).toContain('It cannot know another person’s exact feelings, motives, private experience, or future behavior.');
-  });
-
-  it('keeps verified prices, plan limits, correction, and optional Covenant explicit', () => {
-    for (const phrase of ['$0', '$20', '$99', '10 Sovereign AI turns', '300 Sovereign AI turns', 'Review and correct what does not fit', 'Covenant']) {
-      expect(publicCopy).toContain(phrase);
-    }
+  it('keeps verified plans, correction, and optional Covenant available elsewhere in the real product', () => {
+    for (const phrase of ['$0', '$20', '$99', '10 Sovereign AI turns', '300 Sovereign AI turns', 'Covenant']) expect(publicCopy).toContain(phrase);
     expect(policy).toContain('Private account export is not available at launch.');
   });
 
-  it('renders the public React routes without runtime copy rewriting', () => {
+  it('renders the public React route without runtime copy rewriting', () => {
     expect(main).toContain("location.pathname === '/'");
     expect(main).toContain('<PublicLanding />');
-    expect(main).toContain('<PublicPolicy kind={publicPolicyKind} />');
+    expect(main).toContain("import './v0-visual-port.css';");
     expect(main).not.toContain('ProductLanguageRuntime');
-    expect(main).not.toMatch(/refinement|landing-v2/i);
   });
 
-  it('keeps the static public family on the cohesion release assets', () => {
-    for (const page of [how, pricing, faq]) {
-      expect(page).toContain('/launch.css?v=20260730-cohesion');
-      expect(page).toContain('/launch-polish.css?v=20260730-cohesion');
-      expect(page).toContain('/static-release.css?v=20260730-cohesion');
-      expect(page).toContain('/static-experience.css?v=20260730-cohesion');
-      expect(page).toContain('/platform-public.css?v=20260730-platform2');
+  it('applies the v0 visual system to public and authenticated surfaces', () => {
+    for (const selector of ['.v0-landing-port', '.v0-hero', '.v0-window', '.intelligence-workspace', '.intelligence-sidebar', '.sovereign-composer', '.account-shell', '.auth-panel']) {
+      expect(v0Css).toContain(selector);
     }
+    expect(v0Css).toContain('@media (max-width: 760px)');
+    expect(v0Css).toContain('@media (prefers-reduced-motion: reduce)');
+  });
+
+  it('keeps support pages, consent, and fallback routes intact', () => {
     expect(how).toContain('Set up your Baseline once. Use it wherever life connects.');
     expect(pricing).toContain('$20');
     expect(pricing).toContain('$99 / year');
     expect(faq).toContain('What Sovereign understands. What remains yours to confirm.');
-  });
-
-  it('keeps every static public section visible and composes the pages as one platform', () => {
     expect(platformPublicCss).toContain('opacity: 1 !important');
-    expect(platformPublicCss).toContain('animation: none !important');
-    expect(platformPublicCss).toContain('.launch-page:not(.pricing-page):not(.questions-page) .launch-band');
-    expect(platformPublicCss).toContain('.pricing-page .pricing-section');
-    expect(platformPublicCss).toContain('.questions-page .faq-section');
-    expect(platformPublicCss).toContain('background: var(--platform-paper)');
-    expect(platformPublicCss).toContain('min-height: 0');
-  });
-
-  it('keeps public pages responsive and consent independently controlled', () => {
-    expect(launchCss).toContain('@media (max-width: 680px)');
-    expect(launchPolishCss).toContain('prefers-reduced-motion');
-    expect(landingCss).toContain('@media (max-width: 760px)');
-    expect(hardening).toContain('.sovereign-story-step');
-    expect(hardening).toContain('@media (max-width: 680px)');
-    expect(hardening).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(hardening).toContain('@media (forced-colors: active)');
-    expect(staticExperienceCss).toContain('@media (max-width: 860px)');
     expect(staticExperienceCss).toContain('@media (max-width: 620px)');
-    expect(staticExperienceCss).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(staticExperienceCss).toContain('.pricing-page .pricing-hero > p:last-child');
-    expect(staticExperienceCss).toContain('.questions-page .questions-hero > p:last-child');
-    expect(staticExperienceCss).toContain('.questions-page .faq-section');
-    expect(pricing).toContain('class="launch-hero launch-hero-compact pricing-hero"');
-    expect(pricing).not.toContain('pricing-hero-detail');
-    expect(staticExperienceCss).toMatch(/@media \(max-width: 860px\)[\s\S]*?\.pricing-page \.pricing-hero > p:last-child[\s\S]*?grid-column: 1; grid-row: auto;/);
-    expect(pricing).not.toContain('class="plan-summary"');
-    expect(faq).toContain('class="launch-page questions-page"');
-    expect(faq).toContain('launch-hero-compact questions-hero');
-    expect(staticExperienceCss).toContain('overflow-x: auto;');
-    expect(staticExperienceCss).toContain('overscroll-behavior-inline: contain;');
-    expect(staticExperienceCss).toContain('.launch-links a { flex: 0 0 auto; white-space: nowrap; }');
-    expect(staticExperienceCss).not.toContain('.launch-links a:not(.launch-cta) { display: none; }');
-    expect(staticExperienceCss).toMatch(/@media \(max-width: 620px\)[\s\S]*?\.price-options \{ grid-template-columns: 1fr; \}/);
-    expect(staticExperienceCss).toContain('.launch-shell { width: min(1320px, calc(100% - 64px)); margin: 0 auto; }');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
     expect(notFound).toContain('content="noindex, nofollow"');
-    expect(notFound).toContain('/launch.css?v=20260730-cohesion');
-    expect(notFound).toContain('/launch-polish.css?v=20260730-cohesion');
-    expect(notFound).toContain('/static-release.css?v=20260730-cohesion');
-    expect(notFound).toContain('/static-experience.css?v=20260730-cohesion');
-    expect(notFound).toContain('href="https://sovereign.defrag.app/"');
-    expect(notFound).toContain('href="https://app.defrag.app/login"');
     expect(consent).toContain('You decide what another account may use.');
     expect(consent).toContain('The inviting account cannot make or change these decisions for you.');
     expect(consentCss).toContain('@media (max-width: 680px)');

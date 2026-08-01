@@ -14,6 +14,7 @@ import { installPublicLandingViewportContract } from './PublicLandingViewportCon
 import { PublicPolicy } from './PublicPolicy';
 import { PublicPolicyMetadata } from './PublicPolicyMetadata';
 import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
+import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
 
 /* Component foundations */
 import './styles.css';
@@ -29,7 +30,7 @@ import './unified-entry.css';
 import './account-control.css';
 import './safety-response-runtime.css';
 
-/* Shared product system, route-owned landing layout, and composition hierarchy. */
+/* Existing production product surfaces and behavior. */
 import './sovereign-cohesion.css';
 import './sovereign-modern.css';
 import './landing-production.css';
@@ -39,13 +40,17 @@ import './premium-surface-hardening.css';
 import './selective-visual-port.css';
 import './premium-platform-release.css';
 import './sovereign-visual-system.css';
-
-/* Shared typography, Expression Field, viewport behavior, then the approved v0 editorial landing contract. */
 import './typography-system.css';
 import './expression-field/expression-field.css';
 import './responsive-viewport-contract.css';
 import './public-landing-editorial.css';
 
+/* Founder v0 archive: complete route coverage, accessibility, then final visual authority. */
+import './v0-platform-port.css';
+import './v0-motion-accessibility.css';
+import './v0-visual-port.css';
+
+installV0ReleaseFingerprint();
 installProductionRuntime();
 installProductRuntime();
 installEmailCodeFallbackRuntime();

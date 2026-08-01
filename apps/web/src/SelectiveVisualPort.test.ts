@@ -3,30 +3,28 @@ import { describe, expect, it } from 'vitest';
 
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
-const hardening = readFileSync(new URL('./premium-surface-hardening.css', import.meta.url), 'utf8');
-const completion = readFileSync(new URL('./selective-visual-port.css', import.meta.url), 'utf8');
+const v0Visual = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
-describe('selective Sovereign visual port', () => {
-  it('recreates the approved self, relationship, and whole-system demonstrations', () => {
-    expect(landing).toContain('STEP 01 · YOU');
-    expect(landing).toContain('STEP 02 · YOU + 1');
-    expect(landing).toContain('STEP 03 · YOUR WHOLE SYSTEM');
-    expect(landing).toContain('visual-reasoning-panel');
-    expect(landing).toContain('className="visual-evidence-chips"');
-    expect(landing).toContain('className="relationship-baseline-pair"');
-    expect(landing).toContain('className="story-system-map"');
+describe('founder v0 selective visual port', () => {
+  it('ports the supplied self, relationship, and whole-system demonstrations', () => {
+    expect(landing).toContain('Step 01 · You');
+    expect(landing).toContain('Step 02 · You + 1');
+    expect(landing).toContain('Step 03 · Your whole system');
+    expect(landing).toContain('className="v0-flow"');
+    expect(landing).toContain('className="v0-baseline-trace"');
+    expect(landing).toContain('className="v0-family-map"');
     expect(landing).toContain('How Sovereign reads both of you');
-    expect(landing).toContain('SHARED PATTERN');
+    expect(landing).toContain('Shared pattern');
   });
 
-  it('keeps the demonstrations clearly separated from real user data', () => {
-    expect(landing).toContain('Sanitized demonstration · Not your Baseline');
-    expect(landing).toContain('Sanitized product demonstrations · Illustrative Baseline values · Not your personal result');
-    expect(landing.indexOf('Sanitized demonstration · Not your Baseline')).toBeLessThan(landing.indexOf('YOU ASKED'));
-    expect(landing).toContain('PERMISSION BEFORE COMPARISON');
-    expect(landing).toContain('No compatibility score.');
-    expect(landing).toContain('No mind-reading.');
+  it('keeps demonstrations distinct from actual user data', () => {
+    expect(landing).toContain('Illustrative Baseline');
+    expect(landing).toContain('Illustrative permitted Baselines');
+    expect(landing).toContain('Sanitized system demonstration');
+    expect(landing).toContain('No compatibility score');
+    expect(landing).toContain('No private-thought claims');
+    expect(landing).toContain('Each person controls what may be included');
   });
 
   it('preserves the canonical single-room workspace and production data sources', () => {
@@ -40,31 +38,35 @@ describe('selective Sovereign visual port', () => {
     expect(workspace).toContain('className="basis-strip"');
   });
 
-  it('ports the reference language onto existing authenticated components', () => {
-    expect(hardening).toContain('.response-thread .answer-baseline');
-    expect(hardening).toContain('.response-thread .relationship-answer > div:first-child');
-    expect(hardening).toContain('.system-overview .system-graph');
-    expect(hardening).toContain('.response-thread .basis-strip');
-    expect(hardening).toContain('@media (max-width: 680px)');
-    expect(hardening).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(hardening).toContain('@media (forced-colors: active)');
-    expect(completion).toContain('.relationship-baseline-pair');
-    expect(completion).toContain('.story-fixture-boundary');
-    expect(main).toContain("import './selective-visual-port.css';");
+  it('applies the v0 language to existing authenticated and account components', () => {
+    for (const selector of [
+      '.intelligence-workspace',
+      '.intelligence-sidebar',
+      '.intelligence-context',
+      '.sovereign-composer',
+      '.surface-heading',
+      '.account-shell',
+      '.auth-panel',
+      '.workspace-sheet'
+    ]) expect(v0Visual).toContain(selector);
+    expect(v0Visual).toContain('@media (max-width: 760px)');
+    expect(v0Visual).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(main).toContain("import './v0-visual-port.css';");
   });
 
-  it('does not introduce mock application behavior, scores, or alternate product architecture', () => {
+  it('does not introduce the archive mock runtime, scores, or alternate architecture', () => {
+    const source = `${landing}\n${v0Visual}`;
     for (const prohibited of [
       'Alignment Score',
       'Stability Index',
       'Growth Rate',
       'localStorage',
       'Math.random',
-      'Dashboard',
-      'New Chat',
-      'View Insights'
-    ]) {
-      expect(landing).not.toContain(prohibited);
-    }
+      'generateAIResponse',
+      'Demo User',
+      'dashboard-grid',
+      'mock-auth',
+      'fake-answer'
+    ]) expect(source).not.toContain(prohibited);
   });
 });

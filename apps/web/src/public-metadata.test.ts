@@ -8,40 +8,34 @@ const socialPreview = readFileSync(new URL('../public/og-sovereign.svg', import.
 const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
 
 describe('public metadata and fallback documents', () => {
-  it('uses the current self, relationship, and system positioning in document metadata', () => {
-    expect(index).toContain('Know yourself. Understand the system. Choose what fits.');
-    expect(index).toContain('Private AI for understanding yourself, your relationships, and the systems around you.');
-    expect(index).toContain('Private personal, relationship, and system intelligence');
-    expect(index).not.toContain('Personal AI for real life');
-    expect(index).not.toContain('the decisions in front of you');
+  it('uses the founder v0 promise in document metadata', () => {
+    expect(index).toContain('Healing isn’t optional. Holding onto the pain is.');
+    expect(index).toContain('Personal AI that builds your Baseline');
+    expect(index).toContain('Personal AI for real life');
+    expect(index).not.toContain('Know yourself. Understand the system. Choose what fits.');
   });
 
-  it('keeps the static 404 on the current cohesion assets and product category', () => {
+  it('keeps the static 404 on the current production assets', () => {
     for (const asset of [
       '/launch.css?v=20260730-cohesion',
       '/launch-polish.css?v=20260730-cohesion',
       '/static-release.css?v=20260730-cohesion',
       '/static-experience.css?v=20260730-cohesion'
-    ]) {
-      expect(notFound).toContain(asset);
-    }
-    expect(notFound).toContain('Private AI for personal, relationship, and system intelligence');
-    expect(notFound).not.toContain('20260728-baseline-first');
-    expect(notFound).not.toContain('20260729-visual-sync');
+    ]) expect(notFound).toContain(asset);
+    expect(notFound).toContain('This page is not part of Sovereign.OS.');
   });
 
-  it('keeps install metadata aligned with the current product category', () => {
-    expect(manifest).toContain('Private AI for understanding yourself, your relationships, and the systems around you.');
-    expect(manifest).toContain('Open your private Sovereign.OS workspace.');
-    expect(manifest).not.toContain('the decisions in front of you');
-    expect(manifest).not.toContain('private personal AI');
+  it('keeps install metadata aligned with the v0 category', () => {
+    expect(manifest).toContain('Personal AI that builds your Baseline');
+    expect(manifest).toContain('Open your private Sovereign workspace.');
+    expect(manifest).toContain('"theme_color": "#0f0f0f"');
   });
 
-  it('keeps social previews permission-safe and consistent with the hero promise', () => {
-    expect(socialPreview).toContain('Know yourself.');
-    expect(socialPreview).toContain('Understand the system.');
-    expect(socialPreview).toContain('Choose what fits.');
-    expect(socialPreview).not.toContain('Understand the people around you.');
+  it('keeps social previews consistent with the founder hero', () => {
+    expect(socialPreview).toContain('Healing isn’t optional.');
+    expect(socialPreview).toContain('Holding onto the pain is.');
+    expect(socialPreview).toContain('PERSONAL AI FOR REAL LIFE');
+    expect(socialPreview).not.toContain('Know yourself.');
   });
 
   it('retires the stale public shell instead of caching another visual release', () => {

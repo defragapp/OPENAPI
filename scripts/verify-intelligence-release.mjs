@@ -4,36 +4,19 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const read = (path) => readFileSync(resolve(root, path), 'utf8');
-const assert = (condition, message) => {
-  if (!condition) throw new Error(message);
-};
-const containsAll = (label, text, values) => {
-  for (const value of values) assert(text.includes(value), `${label} is missing: ${value}`);
-};
+const assert = (condition, message) => { if (!condition) throw new Error(message); };
+const containsAll = (label, text, values) => values.forEach((value) => assert(text.includes(value), `${label} is missing: ${value}`));
 
+const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
-const composition = read('apps/web/src/interface-composition.css');
-const hardening = read('apps/web/src/premium-surface-hardening.css');
-const completion = read('apps/web/src/selective-visual-port.css');
-const workspaceCss = [
-  read('apps/web/src/workspace-chat.css'),
-  read('apps/web/src/sovereign-cohesion.css'),
-  read('apps/web/src/sovereign-modern.css'),
-  composition,
-  hardening,
-  completion
-].join('\n');
 const landing = read('apps/web/src/PublicLanding.tsx');
-const landingCss = [
-  read('apps/web/src/public-landing.css'),
-  read('apps/web/src/sovereign-cohesion.css'),
-  read('apps/web/src/sovereign-modern.css'),
-  read('apps/web/src/landing-production.css'),
-  composition,
-  hardening,
-  completion
-].join('\n');
-const staticPublicCss = read('apps/web/public/platform-public.css');
+const fingerprint = read('apps/web/src/v0-release-fingerprint.ts');
+const v0Platform = read('apps/web/src/v0-platform-port.css');
+const v0Visual = read('apps/web/src/v0-visual-port.css');
+const staticAuthority = read('apps/web/public/premium-public-release.css');
+const staticV0 = read('apps/web/public/v0-public-port.css');
+const main = read('apps/web/src/main.tsx');
 const prompt = read('apps/sovereign-worker/src/agent/prompt-v1.ts');
 const contract = read('apps/sovereign-worker/src/agent/recognition.ts');
 const baseline = read('apps/sovereign-worker/src/baseline-contracts.ts');
@@ -41,7 +24,6 @@ const relational = read('apps/sovereign-worker/src/relational-context.ts');
 const actions = read('apps/sovereign-worker/src/interface-actions.ts');
 const scripture = read('apps/sovereign-worker/src/covenant/scripture.ts');
 const serviceWorker = read('apps/web/public/sw.js');
-const main = read('apps/web/src/main.tsx');
 const how = read('apps/web/public/how-it-works.html');
 const pricing = read('apps/web/public/pricing.html');
 const faq = read('apps/web/public/faq.html');
@@ -83,7 +65,7 @@ containsAll('canonical workspace', workspace, [
   '<BasisStrip',
   'Explore this through Covenant?',
   "action.type === 'save_to_library'",
-  'A supported path. Sovereign will not guess unavailable values.'
+  "type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'"
 ]);
 
 containsAll('relationship and system intelligence', relational, [
@@ -109,116 +91,104 @@ containsAll('verified Covenant library', scripture, [
   'boundary:'
 ]);
 
-containsAll('current public product contract', landing, [
-  'Know yourself.',
-  'Understand the system.',
-  'Choose what fits.',
-  'Sovereign.OS is a private AI for understanding yourself, your relationships, and the systems around you.',
-  'Build your Baseline once',
-  '<HeroAnswerPreview />',
+containsAll('founder v0 runtime fingerprint', fingerprint, [
+  `V0_ARCHIVE_SHA256 = '${archiveSha}'`,
+  `V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`,
+  "dataset.sovereignVisualContract = 'v0-landing-selective-port'",
+  'dataset.sovereignV0Archive = V0_ARCHIVE_SHA256',
+  'dataset.sovereignV0Sequence = V0_SEQUENCE_FINGERPRINT'
+]);
+
+containsAll('founder v0 public product contract', landing, [
+  `const V0_ARCHIVE_SHA = '${archiveSha}'`,
+  'data-visual-contract="v0-landing-selective-port"',
+  'Healing isn’t optional.',
+  'Holding onto the pain is.',
+  '<RotatingQuestions />',
   '<PersonalStory />',
   '<RelationshipStory />',
   '<SystemStory />',
-  'STEP 01 · YOU',
-  'STEP 02 · YOU + 1',
-  'STEP 03 · YOUR WHOLE SYSTEM',
-  'Sanitized product demonstrations · Illustrative Baseline values · Not your personal result',
-  'Another person remains a person—not a data source you control.',
-  'No compatibility score.',
-  'No mind-reading.',
-  'No one-sided access.'
+  '<ComparisonStory />',
+  '<FinalCallToAction />',
+  'Ask about your life.',
+  'Get an answer built for you.',
+  'See the space',
+  'between you.',
+  'From one person',
+  'to the whole system.',
+  'Other AI answers',
+  'everyone the same.',
+  'Your thoughts deserve',
+  'a better place to live.',
+  'Illustrative permitted Baselines',
+  'No compatibility score',
+  'Each person controls what may be included'
 ]);
 
-containsAll('selective visual port', `${landing}\n${hardening}\n${completion}`, [
-  'visual-reasoning-panel',
-  'className="visual-evidence-chips"',
-  'className="relationship-baseline-pair"',
-  'className="story-system-map"',
-  'How Sovereign reads both of you',
-  '.response-thread .answer-baseline',
-  '.response-thread .relationship-answer > div:first-child',
-  '.system-overview .system-graph',
-  '.response-thread .basis-strip',
-  '.relationship-baseline-pair',
-  '.story-fixture-boundary'
-]);
-
-for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'localStorage']) {
-  assert(!landing.includes(prohibited), `Public landing contains prohibited mock or scoring behavior: ${prohibited}`);
-}
-
-containsAll('responsive workspace', workspaceCss, [
-  'min-height: 44px',
-  'env(safe-area-inset-bottom)',
-  '.mobile-bottom-nav',
+containsAll('founder v0 visual components', `${landing}\n${v0Visual}`, [
+  'className="v0-baseline-trace"',
+  'className="v0-flow"',
+  'className="v0-family-map"',
+  'className="v0-comparison-grid"',
+  '.v0-hero',
+  '.v0-story-grid',
+  '.v0-family-map',
   '.intelligence-workspace',
-  '.answer-sections',
-  '@media (max-width: 700px)',
-  '@media (prefers-reduced-motion: reduce)'
-]);
-
-containsAll('responsive landing', landingCss, [
-  'min-width: 320px',
-  '.sovereign-landing',
-  '.landing-section-header',
-  '.sovereign-story-step',
-  '@media (max-width: 680px)',
-  '@media (max-width: 700px)',
-  '@media (prefers-reduced-motion: reduce)'
-]);
-
-containsAll('cross-route composition', composition, [
-  '.sovereign-landing',
+  '.sovereign-composer',
   '.account-shell',
-  '.plan-onboarding',
-  '.sovereign-policy',
-  '.public-not-found',
-  '.intelligence-workspace',
-  '--platform-clay: #c58b67',
-  '--platform-sage: #a9b8a7'
+  '@media (max-width: 760px)',
+  '@media (prefers-reduced-motion: reduce)'
 ]);
 
-containsAll('static public platform layer', staticPublicCss, [
+containsAll('founder v0 application route coverage', v0Platform, [
+  'body:has(.plan-onboarding)',
+  'body:has(.sovereign-policy)',
+  'body:has(.email-code-fallback)',
+  '.onboarding-plan-grid',
+  '.policy-grid',
+  '.email-code-fallback',
+  '@media (max-width: 700px)',
+  '@media (prefers-reduced-motion: reduce)'
+]);
+
+containsAll('founder v0 standalone route coverage', `${staticAuthority}\n${staticV0}`, [
+  "@import url('/v0-public-port.css?v=20260801-founder-v0')",
+  `Archive SHA-256: ${archiveSha}`,
   'body.launch-page',
   '.launch-nav',
+  '.launch-hero',
   '.journey-steps',
   '.pricing-grid',
-  '.questions-page .faq-section',
-  '.launch-callout',
-  '@media (max-width: 720px)'
+  '.faq-list details',
+  '.launch-footer'
 ]);
 
+for (const prohibited of ['Know yourself.', 'Understand the system.', 'Choose what fits.', 'Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'generateAIResponse', 'Demo User']) {
+  assert(!landing.includes(prohibited), `Public landing contains rejected reconstruction, mock, or scoring behavior: ${prohibited}`);
+}
+
+containsAll('final v0 visual import', main, [
+  "import { installV0ReleaseFingerprint } from './v0-release-fingerprint'",
+  "import './v0-platform-port.css'",
+  "import './v0-visual-port.css'",
+  'installV0ReleaseFingerprint();'
+]);
+const platformImport = "import './v0-platform-port.css';";
+const v0Import = "import './v0-visual-port.css';";
+assert(main.indexOf(platformImport) < main.indexOf(v0Import), 'Platform route coverage must load before final visual authority.');
+assert(!main.slice(main.indexOf(v0Import) + v0Import.length).includes("import './"), 'A local visual file loads after the founder v0 authority.');
+
 for (const [label, document] of [['How it works', how], ['Pricing', pricing], ['FAQ', faq]]) {
-  containsAll(label, document, [
-    '/platform-public.css?v=20260730-platform',
-    'SOVEREIGN.OS',
-    'Build my Baseline'
-  ]);
+  containsAll(label, document, ['SOVEREIGN.OS', 'Build my Baseline', '/premium-public-release.css?v=20260730-final']);
 }
 containsAll('Pricing entitlements', pricing, ['$0', '$20', '$99 / year', '10 Sovereign AI turns each month', '300 Sovereign AI turns each month']);
 containsAll('FAQ contract', faq, ['<details', 'What is Sovereign.OS?', 'Can I correct or remove an interpretation?']);
-
-containsAll('canonical visual imports', main, [
-  "import './sovereign-cohesion.css'",
-  "import './sovereign-modern.css'",
-  "import './landing-production.css'",
-  "import './interface-composition.css'",
-  "import './premium-surface-hardening.css'",
-  "import './selective-visual-port.css'"
-]);
 
 assert(!existsSync(resolve(root, 'apps/web/src/experience-reconciliation.css')), 'Retired visual override was restored.');
 assert(!existsSync(resolve(root, 'apps/web/src/SovereignWorkspace.tsx')), 'Duplicate authenticated workspace remains.');
 assert(!serviceWorker.includes("'/app'"), 'Private workspace navigation must not be cached.');
 
-for (const [label, css] of [
-  ['workspace', workspaceCss],
-  ['landing', landingCss],
-  ['composition', composition],
-  ['hardening', hardening],
-  ['selective visual port', completion],
-  ['static public', staticPublicCss]
-]) {
+for (const [label, css] of [['founder v0 platform', v0Platform], ['founder v0 final', v0Visual], ['founder v0 standalone', staticV0]]) {
   const open = (css.match(/{/g) ?? []).length;
   const close = (css.match(/}/g) ?? []).length;
   assert(open === close, `${label} CSS has unbalanced braces (${open}/${close}).`);
@@ -229,19 +199,13 @@ console.log(JSON.stringify({
   answerContract: 'sovereign-answer.v2',
   baselineContracts: ['baseline-source.v1', 'baseline-facets.v1'],
   publicProductContract: 'baseline-first-private-ai',
-  legacyTaglineGate: 'retired',
+  visualAuthority: 'founder-v0-selective-port',
+  archiveSha256: archiveSha,
+  sequenceFingerprint,
+  mockRuntimeImported: false,
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
-  canonicalVisualLayers: [
-    'sovereign-cohesion.css',
-    'sovereign-modern.css',
-    'landing-production.css',
-    'interface-composition.css',
-    'premium-surface-hardening.css',
-    'selective-visual-port.css',
-    'platform-public.css'
-  ],
+  canonicalVisualLayers: ['v0-platform-port.css', 'v0-visual-port.css', 'v0-public-port.css'],
   coveredSurfaces: ['home', 'how-it-works', 'pricing', 'faq', 'login', 'signup', 'onboarding', 'invitation', 'workspace', 'privacy', 'terms', 'not-found'],
-  responsiveBreakpoints: ['1080px', '1000px', '920px', '700px', '680px'],
   exactBasis: true,
   contextualCovenant: true,
   selectiveVisualPort: true

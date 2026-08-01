@@ -11,7 +11,7 @@ export type PublicLandingViewportSnapshot = {
   scrollWidth: number;
   surfaces: ViewportSurfaceMeasurement[];
   stageGaps: number[];
-  permissionStacked: boolean;
+  comparisonStacked: boolean;
 };
 
 export type PublicLandingViewportResult = {
@@ -20,19 +20,20 @@ export type PublicLandingViewportResult = {
   snapshot: PublicLandingViewportSnapshot;
 };
 
+const narrowViewportMaximum = 760;
 const requiredSurfaces = [
-  'hero-answer',
-  'baseline',
+  'hero',
   'personal-chat',
   'personal-reasoning',
   'relationship-chat',
   'relationship-reasoning',
   'system-map',
-  'permission'
+  'comparison'
 ] as const;
 
 export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSnapshot): PublicLandingViewportResult {
   const failures: string[] = [];
+  const narrow = snapshot.viewportWidth <= narrowViewportMaximum;
 
   if (snapshot.scrollWidth > snapshot.viewportWidth + 1) {
     failures.push(`horizontal overflow ${snapshot.scrollWidth}px > ${snapshot.viewportWidth}px`);
@@ -44,30 +45,34 @@ export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSna
       failures.push(`missing surface ${id}`);
       continue;
     }
-    const minimumSurfaceWidth = id === 'baseline' ? snapshot.viewportWidth - 82 : snapshot.viewportWidth - 42;
-    if (surface.width < minimumSurfaceWidth) failures.push(`${id} width ${surface.width}px < ${minimumSurfaceWidth}px`);
-    if (surface.left < 12) failures.push(`${id} left gutter ${surface.left}px < 12px`);
-    if (snapshot.viewportWidth - surface.right < 12) failures.push(`${id} right gutter ${snapshot.viewportWidth - surface.right}px < 12px`);
+
+    if (narrow) {
+      const minimumSurfaceWidth = snapshot.viewportWidth - 42;
+      if (surface.width < minimumSurfaceWidth) failures.push(`${id} width ${surface.width}px < ${minimumSurfaceWidth}px`);
+      if (surface.left < 12) failures.push(`${id} left gutter ${surface.left}px < 12px`);
+      if (snapshot.viewportWidth - surface.right < 12) failures.push(`${id} right gutter ${snapshot.viewportWidth - surface.right}px < 12px`);
+    }
+
     if (surface.layoutWidth > 0) {
       const scale = surface.width / surface.layoutWidth;
-      if (scale < .98 || scale > 1.02) failures.push(`${id} rendered scale ${scale.toFixed(3)} is not 1`);
+      if (scale < 0.98 || scale > 1.02) failures.push(`${id} rendered scale ${scale.toFixed(3)} is not 1`);
     }
   }
 
   snapshot.stageGaps.forEach((gap, index) => {
-    if (gap > 76) failures.push(`stage gap ${index + 1} is ${gap}px`);
+    if (gap > 82) failures.push(`stage gap ${index + 1} is ${gap}px`);
     if (gap < 18) failures.push(`stage gap ${index + 1} is ${gap}px`);
   });
 
-  if (!snapshot.permissionStacked) failures.push('permission section is not stacked');
+  if (narrow && !snapshot.comparisonStacked) failures.push('comparison section is not stacked');
 
   return { ok: failures.length === 0, failures, snapshot };
 }
 
 export function measurePublicLandingViewport(doc: Document = document, viewportWidth = window.innerWidth): PublicLandingViewportSnapshot {
-  const root = doc.querySelector<HTMLElement>('.sovereign-landing');
+  const root = doc.querySelector<HTMLElement>('.v0-landing-port');
   if (!root) {
-    return { viewportWidth, scrollWidth: doc.documentElement.scrollWidth, surfaces: [], stageGaps: [], permissionStacked: false };
+    return { viewportWidth, scrollWidth: doc.documentElement.scrollWidth, surfaces: [], stageGaps: [], comparisonStacked: false };
   }
 
   const surfaces = Array.from(root.querySelectorAll<HTMLElement>('[data-viewport-surface]')).map((node) => {
@@ -83,22 +88,22 @@ export function measurePublicLandingViewport(doc: Document = document, viewportW
 
   const stageGaps = Array.from(root.querySelectorAll<HTMLElement>('[data-viewport-stage]')).map((stage) => {
     const section = stage.closest<HTMLElement>('[data-viewport-section]');
-    const heading = section?.querySelector<HTMLElement>('.story-heading, .landing-hero-copy');
-    if (!heading) return 32;
+    const heading = section?.querySelector<HTMLElement>('.v0-story-heading');
+    if (!heading) return 42;
     return Math.round(stage.getBoundingClientRect().top - heading.getBoundingClientRect().bottom);
   });
 
-  const permission = root.querySelector<HTMLElement>('[data-viewport-section="permission"]');
-  const permissionHeader = permission?.querySelector<HTMLElement>('.landing-section-header');
-  const permissionBoundary = permission?.querySelector<HTMLElement>('[data-viewport-surface="permission"]');
-  const permissionStacked = Boolean(permissionHeader && permissionBoundary && permissionBoundary.getBoundingClientRect().top >= permissionHeader.getBoundingClientRect().bottom + 18);
+  const comparison = root.querySelector<HTMLElement>('[data-viewport-surface="comparison"]');
+  const comparisonCards = comparison ? Array.from(comparison.children).filter((node): node is HTMLElement => node instanceof HTMLElement) : [];
+  const comparisonStacked = comparisonCards.length >= 2
+    && comparisonCards[1]!.getBoundingClientRect().top >= comparisonCards[0]!.getBoundingClientRect().bottom + 12;
 
   return {
     viewportWidth,
     scrollWidth: doc.documentElement.scrollWidth,
     surfaces,
     stageGaps,
-    permissionStacked
+    comparisonStacked
   };
 }
 
