@@ -99,4 +99,16 @@ describe('navigation asset routing', () => {
     expect(response.status).toBe(404);
     expect(response.headers.get('cache-control')).toBe('no-store');
   });
+
+  it('preserves Expression Field authentication status through the production runtime boundary', async () => {
+    const response = await runtime.fetch(
+      new Request('https://app.defrag.app/api/v1/expression-field?mode=live'),
+      env,
+      executionContext
+    );
+
+    expect(response.status).toBe(401);
+    expect(await response.text()).toBe('Unauthorized');
+    expect(response.headers.get('cache-control')).toBe('no-store');
+  });
 });
