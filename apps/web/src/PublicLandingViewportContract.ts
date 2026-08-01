@@ -20,6 +20,7 @@ export type PublicLandingViewportResult = {
   snapshot: PublicLandingViewportSnapshot;
 };
 
+const narrowViewportMaximum = 760;
 const requiredSurfaces = [
   'hero',
   'personal-chat',
@@ -32,6 +33,7 @@ const requiredSurfaces = [
 
 export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSnapshot): PublicLandingViewportResult {
   const failures: string[] = [];
+  const narrow = snapshot.viewportWidth <= narrowViewportMaximum;
 
   if (snapshot.scrollWidth > snapshot.viewportWidth + 1) {
     failures.push(`horizontal overflow ${snapshot.scrollWidth}px > ${snapshot.viewportWidth}px`);
@@ -43,10 +45,14 @@ export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSna
       failures.push(`missing surface ${id}`);
       continue;
     }
-    const minimumSurfaceWidth = snapshot.viewportWidth - 42;
-    if (surface.width < minimumSurfaceWidth) failures.push(`${id} width ${surface.width}px < ${minimumSurfaceWidth}px`);
-    if (surface.left < 12) failures.push(`${id} left gutter ${surface.left}px < 12px`);
-    if (snapshot.viewportWidth - surface.right < 12) failures.push(`${id} right gutter ${snapshot.viewportWidth - surface.right}px < 12px`);
+
+    if (narrow) {
+      const minimumSurfaceWidth = snapshot.viewportWidth - 42;
+      if (surface.width < minimumSurfaceWidth) failures.push(`${id} width ${surface.width}px < ${minimumSurfaceWidth}px`);
+      if (surface.left < 12) failures.push(`${id} left gutter ${surface.left}px < 12px`);
+      if (snapshot.viewportWidth - surface.right < 12) failures.push(`${id} right gutter ${snapshot.viewportWidth - surface.right}px < 12px`);
+    }
+
     if (surface.layoutWidth > 0) {
       const scale = surface.width / surface.layoutWidth;
       if (scale < 0.98 || scale > 1.02) failures.push(`${id} rendered scale ${scale.toFixed(3)} is not 1`);
@@ -58,7 +64,7 @@ export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSna
     if (gap < 18) failures.push(`stage gap ${index + 1} is ${gap}px`);
   });
 
-  if (!snapshot.comparisonStacked) failures.push('comparison section is not stacked');
+  if (narrow && !snapshot.comparisonStacked) failures.push('comparison section is not stacked');
 
   return { ok: failures.length === 0, failures, snapshot };
 }
