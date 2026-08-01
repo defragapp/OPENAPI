@@ -49,6 +49,7 @@ import './public-landing-editorial.css';
 import './v0-platform-port.css';
 import './v0-motion-accessibility.css';
 import './v0-visual-port.css';
+import './v0-global-experience.css';
 
 installV0ReleaseFingerprint();
 installProductionRuntime();
