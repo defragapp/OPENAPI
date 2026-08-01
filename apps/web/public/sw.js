@@ -1,4 +1,5 @@
 const CACHE_NAME = 'sovereign-public-v15';
+const ASSET_CACHE_NAME = 'sovereign-public-assets-v16';
 const PUBLIC_SHELL = [
   '/',
   '/how-it-works',
@@ -29,17 +30,22 @@ const PUBLIC_NAVIGATION = new Set([
 ]);
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(async (cache) => {
-      await Promise.allSettled(PUBLIC_SHELL.map((path) => cache.add(path)));
-    })
-  );
+  event.waitUntil((async () => {
+    await caches.delete(CACHE_NAME);
+    await caches.delete(ASSET_CACHE_NAME);
+    const cache = await caches.open(CACHE_NAME);
+    await Promise.allSettled(PUBLIC_SHELL.map((path) => cache.add(path)));
+  })());
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+    caches.keys().then((keys) => Promise.all(
+      keys
+        .filter((key) => key !== CACHE_NAME && key !== ASSET_CACHE_NAME)
+        .map((key) => caches.delete(key))
+    ))
   );
   self.clients.claim();
 });
@@ -55,7 +61,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (PUBLIC_ASSETS.has(url.pathname) || url.pathname.startsWith('/assets/')) {
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(networkFirstAsset(request));
+    return;
+  }
+
+  if (PUBLIC_ASSETS.has(url.pathname)) {
     event.respondWith(staleWhileRevalidate(request));
   }
 });
@@ -63,7 +74,7 @@ self.addEventListener('fetch', (event) => {
 async function networkFirst(request) {
   const cache = await caches.open(CACHE_NAME);
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, { cache: 'no-store' });
     if (isCacheable(response)) await cache.put(request, response.clone());
     return response;
   } catch {
@@ -71,14 +82,36 @@ async function networkFirst(request) {
   }
 }
 
+async function networkFirstAsset(request) {
+  const cache = await caches.open(ASSET_CACHE_NAME);
+  try {
+    const response = await fetch(request, { cache: 'reload' });
+    if (!isExpectedCompiledAsset(response, request.url)) return response;
+    await cache.put(request, response.clone());
+    return response;
+  } catch {
+    const cached = await cache.match(request);
+    return cached || Response.error();
+  }
+}
+
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(request);
-  const refresh = fetch(request).then(async (response) => {
+  const refresh = fetch(request, { cache: 'no-cache' }).then(async (response) => {
     if (isCacheable(response)) await cache.put(request, response.clone());
     return response;
   }).catch(() => undefined);
   return cached || (await refresh) || Response.error();
+}
+
+function isExpectedCompiledAsset(response, requestUrl) {
+  if (!isCacheable(response)) return false;
+  const pathname = new URL(requestUrl).pathname;
+  const contentType = String(response.headers.get('content-type') || '').toLowerCase();
+  if (pathname.endsWith('.css')) return contentType.includes('text/css');
+  if (pathname.endsWith('.js')) return /(javascript|ecmascript)/.test(contentType);
+  return true;
 }
 
 function isCacheable(response) {
