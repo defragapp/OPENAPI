@@ -11,21 +11,23 @@ function fail(message) {
   throw new Error(`Main-only release guard failed: ${message}`);
 }
 
+function runGit(args, label) {
+  const result = spawnSync('git', args, {
+    cwd: root,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  if (result.error || result.status !== 0) {
+    fail(`${label}: ${String(result.stderr || result.error?.message || 'unknown git error').trim()}`);
+  }
+  return String(result.stdout || '').trim();
+}
+
 if (workersCi && branch !== 'main') {
   fail(`production builds must originate from main; received ${branch || 'an unknown branch'}`);
 }
 
-const head = spawnSync('git', ['rev-parse', 'HEAD'], {
-  cwd: root,
-  encoding: 'utf8',
-  stdio: ['ignore', 'pipe', 'pipe']
-});
-
-if (head.error || head.status !== 0) {
-  fail(`unable to resolve the checked-out commit: ${head.stderr || head.error?.message || 'unknown git error'}`);
-}
-
-const checkoutSha = String(head.stdout || '').trim();
+const checkoutSha = runGit(['rev-parse', 'HEAD'], 'unable to resolve the checked-out commit');
 if (!/^[0-9a-f]{40}$/i.test(checkoutSha)) {
   fail('the checked-out commit is not a full 40-character SHA');
 }
@@ -38,4 +40,16 @@ if (declaredSha && declaredSha !== checkoutSha) {
   fail(`declared commit ${declaredSha} does not match checkout ${checkoutSha}`);
 }
 
-console.log(`Main-only release guard verified branch=${workersCi ? branch : 'local'} commit=${checkoutSha}`);
+let currentMainSha = checkoutSha;
+if (workersCi) {
+  runGit(['fetch', '--quiet', '--depth=1', 'origin', 'refs/heads/main'], 'unable to refresh current origin/main');
+  currentMainSha = runGit(['rev-parse', 'FETCH_HEAD'], 'unable to resolve current origin/main');
+  if (!/^[0-9a-f]{40}$/i.test(currentMainSha)) {
+    fail('current origin/main is not a full 40-character SHA');
+  }
+  if (currentMainSha !== checkoutSha) {
+    fail(`commit ${checkoutSha} has been superseded by current main ${currentMainSha}; refusing a stale production release`);
+  }
+}
+
+console.log(`Main-only release guard verified branch=${workersCi ? branch : 'local'} commit=${checkoutSha} currentMain=${currentMainSha}`);
