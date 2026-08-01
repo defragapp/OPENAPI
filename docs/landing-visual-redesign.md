@@ -1,74 +1,91 @@
-# Sovereign.OS public visual contract
+# Sovereign public landing visual contract
 
-The public experience explains Sovereign.OS through a recognizable AI interaction. The focal visual is one user question becoming one interactive Sovereign answer at readable product scale.
+The authoritative implementation contract is `docs/v0-visual-port-contract.md`.
 
-## Category clarity
+The supplied founder v0 archive is the component and visual source for the public root. The root is not a later marketing reconstruction and is not an independent dashboard application.
 
-A new visitor must understand within five seconds:
+Archive SHA-256:
 
-- Sovereign.OS is a private personal AI;
-- they can ask about themselves, relationships, decisions, families, or teams;
-- the answer is grounded in a private personal foundation;
-- they begin by building a Baseline;
-- they remain responsible for deciding what fits.
+```text
+6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba
+```
 
-Framework terminology must not be required to understand the first viewport.
+## Required first viewport
 
-## Hero
-
+- Brand: `Sovereign`
 - Kicker: `PERSONAL AI FOR REAL LIFE`
-- Headline: `Ask about your life. Get an answer built around you.`
+- Headline line one: `Healing isn’t optional.`
+- Outlined line two: `Holding onto the pain is.`
 - Primary action: `Build my Baseline`
 - Secondary action: `See a Sovereign answer`
-- Trust line: `Start free · No card required · Review, correct, or reject any interpretation`
+- Trust: start free, no card required, interpretations remain reviewable
 
-The answer stage includes a recognizable `ASK SOVEREIGN` question state, a direct answer with a specific mechanism, selectable Answer, Under pressure, At its best, What fits, and Basis sections, a practical experiment, and an explicitly labeled sanitized fixture.
+The hero must preserve the archive’s centered, near-black, atmospheric editorial composition. It must not be replaced by the later `Know yourself. Understand the system. Choose what fits.` reconstruction.
 
-The authenticated answer contract remains Direct answer, Shadow, Gift, Alignment, and Basis. Public demonstration labels may translate these terms without altering the contract.
+## Required sequence
 
-It must feel like a finished AI product surface rather than a report, article, framework diagram, or generic marketing mockup.
+1. Founder v0 hero.
+2. Rotating real-life questions.
+3. `Ask about your life. Get an answer built for you.` with the self chat and reasoning flow.
+4. `See the space between you.` with two permitted Baselines and the relationship flow.
+5. `From one person to the whole system.` with the family/system map.
+6. `Other AI answers everyone the same.` comparison.
+7. `Your thoughts deserve a better place to live.` final action.
 
-## Emotional brand scene
+These are rendered component requirements. Copy-string presence alone is not sufficient.
 
-After the hero interaction is clear, the page may use the founder-approved statement:
+## Selective port boundary
 
-`Healing isn’t optional. Holding the pain is.`
+Bring across:
 
-This scene must remain visually quiet and must not imply therapy, diagnosis, guaranteed healing, required reconciliation, or a spiritual claim.
+- hero composition;
+- rotating questions;
+- chat windows;
+- Baseline evidence treatment;
+- visible reasoning flows;
+- relationship example;
+- system map;
+- comparison;
+- final action;
+- dark editorial tokens, type, spacing, depth, and motion.
 
-## Page sequence
+Do not bring across:
 
-1. Personal AI category and real Sovereign answer.
-2. Emotional brand statement after category clarity.
-3. Horizontally selectable real-life questions updating one shared answer stage.
-4. Explanation of why Sovereign does not begin with a blank prompt.
-5. Stable Baseline plus expiring current overlay, user confirmation, and visible unknown.
-6. One central quality with selectable Shadow, Gift, and Alignment behavior.
-7. Permission journey and a two-person relationship view with a full-width interaction field.
-8. A supported system map with readable people, roles, one active connection, a separate pressure field, and a quiet contextual Covenant action.
-9. Exact Basis strip and data-only source detail.
-10. Accurate Free and Sovereign+ pricing.
-11. Concrete final action and quiet enduring brand line.
+- mock authentication;
+- localStorage users;
+- canned or random answers;
+- fake dashboard data;
+- mock billing, account, consent, invitation, People, or Systems behavior.
 
-## Visual system
+## Real platform continuity
 
-Use the shared `--sov-*` tokens. Preserve near-black charcoal, warm paper, restrained clay, muted sage, quiet depth, generous space, readable editorial display type, and modern system UI type.
+The real OPENAPI platform remains authoritative for:
 
-The first viewport must make the AI interaction dominant. Avoid making a philosophy headline and a report card compete as equal focal points.
+- login, signup, invitation, onboarding, and account control;
+- Today, Explore, People, Systems, Library, and You;
+- `SovereignIntelligenceWorkspace`;
+- `sovereign-answer.v2`;
+- Baseline, current context, Basis, Alignment, relationship, system, and Covenant behavior;
+- Cloudflare Worker APIs, D1, Durable Objects, Workers AI, AI Gateway, Resend, Turnstile, and Stripe;
+- deterministic permission and consent enforcement.
 
-The page uses one focal point per scene. It avoids symbolic spiritual ornament, decorative charts, neon AI imagery, a therapy-dashboard look, generic feature grids, and repeated oversized editorial headlines without product behavior.
+## Sitewide visual application
 
-Primary containers use 20–28px radii. Compact controls use 10–14px radii or a deliberate pill. Borders remain quiet. Motion explains state or context arrival, respects reduced motion, and never prevents reading.
+The v0 visual language applies to the public root, static How it works, Pricing, FAQ, 404, login, signup, invitation, onboarding, policy pages, and the authenticated one-room workspace.
 
-## Responsive and accessible behavior
+`apps/web/src/v0-visual-port.css` is the final local visual authority for Vite-rendered surfaces.
 
-- Public headings do not exceed 68px desktop or 46px mobile.
-- Body copy is 16–18px with a readable measure.
-- All controls have visible focus and at least 44px targets.
-- Tabs and disclosures use correct semantics and keyboard behavior.
-- Exact glyphs have accessible labels.
-- No essential information depends on hover.
-- No horizontal page overflow occurs at 320px.
-- The mobile first viewport shows the category, a question, the beginning of the answer, and the primary action without a long explanatory preamble.
-- The mobile Basis strip stays one line and reveals `+N` for hidden values.
-- Source and context detail uses a bottom-sheet pattern on mobile when presented as a dialog.
+`apps/web/public/v0-public-port.css` is the final visual authority for standalone public documents through `premium-public-release.css`.
+
+## Verification
+
+Production must reject:
+
+- the `Know yourself…` reconstructed landing;
+- missing archive fingerprint;
+- wrong component order;
+- missing v0 component selectors;
+- missing workspace/account selectors;
+- mock runtime markers;
+- a local stylesheet loaded after `v0-visual-port.css`;
+- a compiled public asset that does not contain the exact v0 sequence.
