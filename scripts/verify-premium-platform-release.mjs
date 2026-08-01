@@ -19,7 +19,10 @@ const onboarding = read('apps/web/src/PlanOnboarding.tsx');
 const controls = read('apps/web/src/AccountControlCenter.tsx');
 const membership = read('apps/web/src/SystemMembershipManager.tsx');
 const v0PlatformVisual = read('apps/web/src/v0-platform-port.css');
+const v0MotionVisual = read('apps/web/src/v0-motion-accessibility.css');
 const v0Visual = read('apps/web/src/v0-visual-port.css');
+const v0GlobalVisual = read('apps/web/src/v0-global-experience.css');
+const passkeyVisual = read('apps/web/src/passkey-auth.css');
 const staticV0Visual = read('apps/web/public/v0-public-port.css');
 const publicSupport = read('apps/web/public/premium-public-release.css');
 const supportPages = ['how-it-works', 'pricing', 'faq', '404'].map((name) => read(`apps/web/public/${name}.html`));
@@ -27,17 +30,29 @@ const supportPages = ['how-it-works', 'pricing', 'faq', '404'].map((name) => rea
 for (const path of [
   'apps/web/src/v0-release-fingerprint.ts',
   'apps/web/src/v0-platform-port.css',
+  'apps/web/src/v0-motion-accessibility.css',
   'apps/web/src/v0-visual-port.css',
+  'apps/web/src/v0-global-experience.css',
+  'apps/web/src/passkey-auth.css',
   'apps/web/public/v0-public-port.css'
 ]) assert(existsSync(path), `Founder v0 release source is missing: ${path}`);
 
 const platformImport = "import './v0-platform-port.css';";
+const motionImport = "import './v0-motion-accessibility.css';";
 const v0Import = "import './v0-visual-port.css';";
+const globalImport = "import './v0-global-experience.css';";
+const passkeyImport = "import './passkey-auth.css';";
 const platformImportIndex = main.indexOf(platformImport);
+const motionImportIndex = main.indexOf(motionImport);
 const v0ImportIndex = main.indexOf(v0Import);
+const globalImportIndex = main.indexOf(globalImport);
+const passkeyImportIndex = main.indexOf(passkeyImport);
 assert(platformImportIndex >= 0, 'The founder v0 platform coverage layer is not imported.');
-assert(v0ImportIndex > platformImportIndex, 'The founder v0 final authority does not load after route coverage.');
-assert(!main.slice(v0ImportIndex + v0Import.length).includes("import './"), 'A local visual layer loads after the founder v0 authority.');
+assert(motionImportIndex > platformImportIndex, 'Reduced-motion coverage does not load after route coverage.');
+assert(v0ImportIndex > motionImportIndex, 'The founder v0 foundation does not load after reduced-motion coverage.');
+assert(globalImportIndex > v0ImportIndex, 'Global product authority does not load after the founder v0 foundation.');
+assert(passkeyImportIndex > globalImportIndex, 'Passkey styling does not load after global product authority.');
+assert(!main.slice(passkeyImportIndex + passkeyImport.length).includes("import './"), 'A local visual layer loads after the passkey-specific final authority.');
 
 requireAll('founder v0 runtime fingerprint', `${fingerprint}\n${main}`, [
   `V0_ARCHIVE_SHA256 = '${archiveSha}'`,
@@ -204,9 +219,12 @@ rejectAll('selective v0 port', productionVisualSource, [
   'Same generic dashboard'
 ]);
 
-supportPages.forEach((page) => requireAll('support page', page, ['/premium-public-release.css?v=20260730-final', 'SOVEREIGN.OS']));
+supportPages.forEach((page) => requireAll('support page', page, ['/premium-public-release.css?v=20260730-final', 'Sovereign.OS']));
 balanced('founder v0 platform coverage', v0PlatformVisual);
-balanced('founder v0 visual authority', v0Visual);
+balanced('founder v0 motion coverage', v0MotionVisual);
+balanced('founder v0 visual foundation', v0Visual);
+balanced('founder v0 global product authority', v0GlobalVisual);
+balanced('passkey-specific authority', passkeyVisual);
 balanced('founder v0 static authority', staticV0Visual);
 balanced('public support authority', publicSupport);
 

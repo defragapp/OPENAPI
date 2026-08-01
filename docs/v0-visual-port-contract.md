@@ -109,16 +109,20 @@ The styling layer may change presentation. It must not replace route ownership, 
 
 ## Visual delivery paths
 
-All three paths are required:
+The complete Vite cascade and standalone path are required:
 
-1. `apps/web/src/v0-visual-port.css`
-   - final Vite visual authority;
-   - owns the v0 landing and the real authenticated workspace/account language;
-   - no local CSS import may load after it.
-2. `apps/web/src/v0-platform-port.css`
-   - loads immediately before the final authority;
-   - owns real plan onboarding, Privacy/Terms, and email-code access surfaces.
-3. `apps/web/public/v0-public-port.css`
+1. `apps/web/src/v0-platform-port.css`
+   - owns real plan onboarding, Privacy/Terms, and email-code access foundations.
+2. `apps/web/src/v0-motion-accessibility.css`
+   - preserves the complete founder composition for reduced-motion users.
+3. `apps/web/src/v0-visual-port.css`
+   - owns the founder landing composition and the real authenticated workspace foundation.
+4. `apps/web/src/v0-global-experience.css`
+   - extends the founder language across non-landing product surfaces without replacing the landing composition.
+5. `apps/web/src/passkey-auth.css`
+   - owns passkey-specific account presentation;
+   - is the final local Vite visual authority, with no local CSS import after it.
+6. `apps/web/public/v0-public-port.css`
    - loaded by `premium-public-release.css`;
    - owns standalone How it works, Pricing, FAQ, and 404 documents.
 
@@ -142,8 +146,8 @@ A production release must fail unless all of the following are true:
 - `PublicLanding.tsx` contains the exact archive fingerprint;
 - the runtime bundle contains the exact sequence fingerprint;
 - the required v0 components and copy are compiled;
-- `v0-platform-port.css` loads before `v0-visual-port.css`;
-- `v0-visual-port.css` is the final local visual import;
+- the Vite cascade remains ordered `v0-platform-port.css` → `v0-motion-accessibility.css` → `v0-visual-port.css` → `v0-global-experience.css` → `passkey-auth.css`;
+- `passkey-auth.css` is the final local visual import;
 - compiled CSS contains v0 landing, real workspace/account, onboarding, policy, and access selectors;
 - standalone public routes load `v0-public-port.css` and contain its archive fingerprint;
 - the reconstructed `Know yourself. Understand the system. Choose what fits.` hero is absent from the compiled landing bundle;

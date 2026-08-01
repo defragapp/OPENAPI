@@ -21,8 +21,8 @@ describe('Sovereign.OS transactional email', () => {
     expect(message.text).toContain('Open Sovereign.OS:');
     expect(message.text).toContain('Questions or account support: info@defrag.app');
     expect(message.text).toContain('Do not forward it.');
-    expect(message.html).toContain('SOVEREIGN.OS');
-    expect(message.html).toContain('background:#101011');
+    expect(message.html).toContain('Sovereign.OS');
+    expect(message.html).toContain('background:#0f0f0f');
     expect(message.html).toContain('https://sovereign.defrag.app/brand-mark.svg');
     expect(message.html).toContain('border-radius:10px');
     expect(message.html).not.toContain('border-radius:999px');

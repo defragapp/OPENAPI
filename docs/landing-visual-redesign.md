@@ -73,7 +73,7 @@ The real OPENAPI platform remains authoritative for:
 
 The v0 visual language applies to the public root, static How it works, Pricing, FAQ, 404, login, signup, invitation, onboarding, policy pages, and the authenticated one-room workspace.
 
-`apps/web/src/v0-visual-port.css` is the final local visual authority for Vite-rendered surfaces.
+`apps/web/src/v0-visual-port.css` is the founder visual foundation for Vite-rendered surfaces. `v0-global-experience.css` extends it across non-landing product surfaces, and `passkey-auth.css` is the final local visual authority.
 
 `apps/web/public/v0-public-port.css` is the final visual authority for standalone public documents through `premium-public-release.css`.
 
@@ -87,5 +87,5 @@ Production must reject:
 - missing v0 component selectors;
 - missing workspace/account selectors;
 - mock runtime markers;
-- a local stylesheet loaded after `v0-visual-port.css`;
+- a local stylesheet loaded after `passkey-auth.css`, or any change to the certified Vite cascade order;
 - a compiled public asset that does not contain the exact v0 sequence.

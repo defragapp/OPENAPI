@@ -22,8 +22,10 @@ These instructions apply to the entire OPENAPI repository.
 - Preserve the exact v0 public sequence beginning with `Healing isn’t optional. Holding onto the pain is.` and ending with `Your thoughts deserve a better place to live.`
 - Port visual components and styling only. Never import the archive’s mock auth, localStorage users, canned or random answers, dashboard state, fake billing, fake consent, or fake account behavior.
 - Preserve the real OPENAPI routes, APIs, authentication, billing, consent, Baseline contracts, one-room workspace, and `sovereign-answer.v2`.
-- `apps/web/src/v0-platform-port.css` must load immediately before `apps/web/src/v0-visual-port.css` and must own onboarding, policy, and email-access surfaces.
-- `apps/web/src/v0-visual-port.css` is the final local Vite visual authority. No local CSS import may load after it.
+- The local Vite visual cascade is fixed in this order: `v0-platform-port.css`, `v0-motion-accessibility.css`, `v0-visual-port.css`, `v0-global-experience.css`, then `passkey-auth.css`.
+- `apps/web/src/v0-platform-port.css` owns onboarding, policy, and email-access foundations; `v0-motion-accessibility.css` preserves reduced-motion behavior before the founder foundation.
+- `apps/web/src/v0-visual-port.css` remains the founder archive foundation for the landing and workspace. `v0-global-experience.css` extends that language across non-landing product surfaces without replacing the certified landing composition.
+- `apps/web/src/passkey-auth.css` is the final local Vite visual authority. No local CSS import may load after it.
 - `apps/web/public/v0-public-port.css` must remain the standalone visual authority loaded through `premium-public-release.css` for How it works, Pricing, FAQ, and 404.
 - `apps/web/src/v0-release-fingerprint.ts` must expose the exact archive and founder-sequence fingerprints on the running document.
 - Do not call a visual implementation `canonical`, `approved`, `v0`, `editorial`, or `cinematic` unless the archive fingerprint, runtime sequence fingerprint, rendered component sequence, compiled asset markers, all three visual delivery paths, and sitewide selectors match the documented contract.

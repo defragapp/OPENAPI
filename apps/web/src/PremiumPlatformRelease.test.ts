@@ -16,6 +16,9 @@ const controls = read('./AccountControlCenter.tsx');
 const membership = read('./SystemMembershipManager.tsx');
 const v0Css = read('./v0-visual-port.css');
 const v0PlatformCss = read('./v0-platform-port.css');
+const v0MotionCss = read('./v0-motion-accessibility.css');
+const v0GlobalCss = read('./v0-global-experience.css');
+const passkeyCss = read('./passkey-auth.css');
 const staticV0Css = read('../public/v0-public-port.css');
 const staticAuthority = read('../public/premium-public-release.css');
 
@@ -24,17 +27,29 @@ function expectBalancedCss(source: string) {
 }
 
 describe('founder v0 selective visual port', () => {
-  it('loads complete route coverage before the final visual authority', () => {
+  it('loads the certified visual cascade in order', () => {
     const platformImport = "import './v0-platform-port.css';";
+    const motionImport = "import './v0-motion-accessibility.css';";
     const visualImport = "import './v0-visual-port.css';";
+    const globalImport = "import './v0-global-experience.css';";
+    const passkeyImport = "import './passkey-auth.css';";
     const platformIndex = main.indexOf(platformImport);
+    const motionIndex = main.indexOf(motionImport);
     const visualIndex = main.indexOf(visualImport);
+    const globalIndex = main.indexOf(globalImport);
+    const passkeyIndex = main.indexOf(passkeyImport);
     expect(platformIndex).toBeGreaterThan(-1);
-    expect(visualIndex).toBeGreaterThan(platformIndex);
-    expect(main.slice(visualIndex + visualImport.length)).not.toContain("import './");
+    expect(motionIndex).toBeGreaterThan(platformIndex);
+    expect(visualIndex).toBeGreaterThan(motionIndex);
+    expect(globalIndex).toBeGreaterThan(visualIndex);
+    expect(passkeyIndex).toBeGreaterThan(globalIndex);
+    expect(main.slice(passkeyIndex + passkeyImport.length)).not.toContain("import './");
     expect(v0Css).toContain(`Source archive SHA-256:\n * ${archiveSha}`);
     expectBalancedCss(v0PlatformCss);
+    expectBalancedCss(v0MotionCss);
     expectBalancedCss(v0Css);
+    expectBalancedCss(v0GlobalCss);
+    expectBalancedCss(passkeyCss);
   });
 
   it('emits the exact archive and sequence fingerprint at runtime', () => {

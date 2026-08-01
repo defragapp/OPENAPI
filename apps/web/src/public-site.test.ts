@@ -91,10 +91,10 @@ describe('Sovereign.OS public experience', () => {
   });
 
   it('keeps support pages, consent, and fallback routes intact', () => {
-    expect(how).toContain('Set up your Baseline once. Use it wherever life connects.');
+    expect(how).toContain('Ask about your life. Get an answer built around you.');
     expect(pricing).toContain('$20');
     expect(pricing).toContain('$99 / year');
-    expect(faq).toContain('What Sovereign understands. What remains yours to confirm.');
+    expect(faq).toContain('Clear answers about what Sovereign does—and what remains yours.');
     expect(platformPublicCss).toContain('opacity: 1 !important');
     expect(staticExperienceCss).toContain('@media (max-width: 620px)');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');

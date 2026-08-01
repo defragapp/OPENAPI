@@ -9,7 +9,10 @@ const authenticatedWorkspace = read('apps/web/src/AuthenticatedWorkspace.tsx');
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const landing = read('apps/web/src/PublicLanding.tsx');
 const v0Platform = read('apps/web/src/v0-platform-port.css');
+const v0Motion = read('apps/web/src/v0-motion-accessibility.css');
 const v0Visual = read('apps/web/src/v0-visual-port.css');
+const v0Global = read('apps/web/src/v0-global-experience.css');
+const passkeyCss = read('apps/web/src/passkey-auth.css');
 const staticAuthority = read('apps/web/public/premium-public-release.css');
 const staticV0 = read('apps/web/public/v0-public-port.css');
 const expressionField = read('apps/web/src/expression-field/ExpressionField.tsx');
@@ -45,15 +48,24 @@ requireAll('authenticated app entry', main, [
   "import './workspace-chat.css'",
   "import './expression-field/expression-field.css'",
   "import './v0-platform-port.css'",
+  "import './v0-motion-accessibility.css'",
   "import './v0-visual-port.css'",
+  "import './v0-global-experience.css'",
+  "import './passkey-auth.css'",
   'installV0ReleaseFingerprint();',
   "location.pathname === '/app'",
   '<AuthenticatedWorkspace />'
 ]);
 const platformImport = "import './v0-platform-port.css';";
+const motionImport = "import './v0-motion-accessibility.css';";
 const v0Import = "import './v0-visual-port.css';";
-if (main.indexOf(platformImport) > main.indexOf(v0Import)) throw new Error('Platform route coverage loads after the final v0 authority.');
-if (main.slice(main.indexOf(v0Import) + v0Import.length).includes("import './")) throw new Error('A local visual layer loads after the founder v0 visual authority.');
+const globalImport = "import './v0-global-experience.css';";
+const passkeyImport = "import './passkey-auth.css';";
+if (main.indexOf(platformImport) > main.indexOf(motionImport)) throw new Error('Platform route coverage loads after reduced-motion coverage.');
+if (main.indexOf(motionImport) > main.indexOf(v0Import)) throw new Error('Reduced-motion coverage loads after the founder v0 foundation.');
+if (main.indexOf(v0Import) > main.indexOf(globalImport)) throw new Error('Global product authority loads before the founder v0 foundation.');
+if (main.indexOf(globalImport) > main.indexOf(passkeyImport)) throw new Error('Passkey styling loads before global product authority.');
+if (main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("import './")) throw new Error('A local visual layer loads after the passkey-specific final authority.');
 
 for (const retired of [
   'apps/web/src/experience-reconciliation.css',
@@ -245,7 +257,7 @@ requireAll('Expression Field iOS and accessibility contract', expressionFieldCss
 ]);
 
 requireAll('static page continuity', `${how}\n${pricing}\n${faq}`, [
-  'SOVEREIGN.OS',
+  'Sovereign.OS',
   'Build my Baseline',
   '$20',
   '$99',
@@ -276,7 +288,10 @@ for (const prohibited of ['God is telling you', 'They secretly want', 'This prov
 }
 
 balanced('founder v0 platform coverage', v0Platform);
-balanced('founder v0 final authority', v0Visual);
+balanced('founder v0 motion coverage', v0Motion);
+balanced('founder v0 foundation', v0Visual);
+balanced('founder v0 global product authority', v0Global);
+balanced('passkey-specific authority', passkeyCss);
 balanced('founder v0 standalone authority', staticV0);
 balanced('Expression Field', expressionFieldCss);
 

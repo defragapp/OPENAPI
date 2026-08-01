@@ -13,7 +13,10 @@ const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const landing = read('apps/web/src/PublicLanding.tsx');
 const fingerprint = read('apps/web/src/v0-release-fingerprint.ts');
 const v0Platform = read('apps/web/src/v0-platform-port.css');
+const v0Motion = read('apps/web/src/v0-motion-accessibility.css');
 const v0Visual = read('apps/web/src/v0-visual-port.css');
+const v0Global = read('apps/web/src/v0-global-experience.css');
+const passkeyCss = read('apps/web/src/passkey-auth.css');
 const staticAuthority = read('apps/web/public/premium-public-release.css');
 const staticV0 = read('apps/web/public/v0-public-port.css');
 const main = read('apps/web/src/main.tsx');
@@ -171,16 +174,25 @@ for (const prohibited of ['Know yourself.', 'Understand the system.', 'Choose wh
 containsAll('final v0 visual import', main, [
   "import { installV0ReleaseFingerprint } from './v0-release-fingerprint'",
   "import './v0-platform-port.css'",
+  "import './v0-motion-accessibility.css'",
   "import './v0-visual-port.css'",
+  "import './v0-global-experience.css'",
+  "import './passkey-auth.css'",
   'installV0ReleaseFingerprint();'
 ]);
 const platformImport = "import './v0-platform-port.css';";
+const motionImport = "import './v0-motion-accessibility.css';";
 const v0Import = "import './v0-visual-port.css';";
-assert(main.indexOf(platformImport) < main.indexOf(v0Import), 'Platform route coverage must load before final visual authority.');
-assert(!main.slice(main.indexOf(v0Import) + v0Import.length).includes("import './"), 'A local visual file loads after the founder v0 authority.');
+const globalImport = "import './v0-global-experience.css';";
+const passkeyImport = "import './passkey-auth.css';";
+assert(main.indexOf(platformImport) < main.indexOf(motionImport), 'Platform route coverage must load before reduced-motion coverage.');
+assert(main.indexOf(motionImport) < main.indexOf(v0Import), 'Reduced-motion coverage must load before the founder v0 foundation.');
+assert(main.indexOf(v0Import) < main.indexOf(globalImport), 'Global product authority must load after the founder v0 foundation.');
+assert(main.indexOf(globalImport) < main.indexOf(passkeyImport), 'Passkey styling must load after global product authority.');
+assert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("import './"), 'A local visual file loads after the passkey-specific final authority.');
 
 for (const [label, document] of [['How it works', how], ['Pricing', pricing], ['FAQ', faq]]) {
-  containsAll(label, document, ['SOVEREIGN.OS', 'Build my Baseline', '/premium-public-release.css?v=20260730-final']);
+  containsAll(label, document, ['Sovereign.OS', 'Build my Baseline', '/premium-public-release.css?v=20260730-final']);
 }
 containsAll('Pricing entitlements', pricing, ['$0', '$20', '$99 / year', '10 Sovereign AI turns each month', '300 Sovereign AI turns each month']);
 containsAll('FAQ contract', faq, ['<details', 'What is Sovereign.OS?', 'Can I correct or remove an interpretation?']);
@@ -189,7 +201,14 @@ assert(!existsSync(resolve(root, 'apps/web/src/experience-reconciliation.css')),
 assert(!existsSync(resolve(root, 'apps/web/src/SovereignWorkspace.tsx')), 'Duplicate authenticated workspace remains.');
 assert(!serviceWorker.includes("'/app'"), 'Private workspace navigation must not be cached.');
 
-for (const [label, css] of [['founder v0 platform', v0Platform], ['founder v0 final', v0Visual], ['founder v0 standalone', staticV0]]) {
+for (const [label, css] of [
+  ['founder v0 platform', v0Platform],
+  ['founder v0 motion', v0Motion],
+  ['founder v0 foundation', v0Visual],
+  ['founder v0 global product', v0Global],
+  ['passkey-specific authority', passkeyCss],
+  ['founder v0 standalone', staticV0]
+]) {
   const open = (css.match(/{/g) ?? []).length;
   const close = (css.match(/}/g) ?? []).length;
   assert(open === close, `${label} CSS has unbalanced braces (${open}/${close}).`);
@@ -205,7 +224,7 @@ console.log(JSON.stringify({
   sequenceFingerprint,
   mockRuntimeImported: false,
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
-  canonicalVisualLayers: ['v0-platform-port.css', 'v0-visual-port.css', 'v0-public-port.css'],
+  canonicalVisualLayers: ['v0-platform-port.css', 'v0-motion-accessibility.css', 'v0-visual-port.css', 'v0-global-experience.css', 'passkey-auth.css', 'v0-public-port.css'],
   coveredSurfaces: ['home', 'how-it-works', 'pricing', 'faq', 'login', 'signup', 'onboarding', 'invitation', 'workspace', 'privacy', 'terms', 'not-found'],
   exactBasis: true,
   contextualCovenant: true,
