@@ -54,21 +54,33 @@ installDialogAccessibility();
 installPrivateAnswerExportRuntime();
 installSafetyResponseRuntime();
 
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  if (location.hostname === 'sovereign.defrag.app') {
-    window.addEventListener('load', () => {
-      void navigator.serviceWorker
-        .register('/sw.js?v=16', { updateViaCache: 'none' })
-        .then((registration) => registration.update());
-    });
-  } else {
-    window.addEventListener('load', () => {
-      void navigator.serviceWorker.getRegistrations().then((registrations) =>
-        Promise.all(registrations.map((registration) => registration.unregister()))
-      );
-    });
-  }
+function retireLegacyPublicCache(): void {
+  if (!import.meta.env.PROD || !('serviceWorker' in navigator)) return;
+
+  window.addEventListener('load', () => {
+    void (async () => {
+      const controlled = Boolean(navigator.serviceWorker.controller);
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((registration) => registration.unregister()));
+
+      if ('caches' in window) {
+        const keys = await window.caches.keys();
+        await Promise.all(
+          keys
+            .filter((key) => key.startsWith('sovereign-public'))
+            .map((key) => window.caches.delete(key))
+        );
+      }
+
+      if (controlled && window.sessionStorage.getItem('sovereign-public-cache-retired') !== 'true') {
+        window.sessionStorage.setItem('sovereign-public-cache-retired', 'true');
+        window.location.reload();
+      }
+    })().catch(() => undefined);
+  });
 }
+
+retireLegacyPublicCache();
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'

@@ -3,12 +3,14 @@ import { readFileSync } from 'node:fs';
 
 const manifest = JSON.parse(readFileSync(new URL('../public/manifest.webmanifest', import.meta.url), 'utf8'));
 const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
+const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
+const headers = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const icon = readFileSync(new URL('../public/app-icon.svg', import.meta.url), 'utf8');
 const brandMark = readFileSync(new URL('../public/brand-mark.svg', import.meta.url), 'utf8');
 
 describe('release PWA surface', () => {
-  it('provides installable metadata and one consistent application mark', () => {
+  it('provides install metadata and one consistent application mark', () => {
     expect(manifest.name).toBe('Sovereign.OS');
     expect(manifest.scope).toBe('/');
     expect(manifest.icons).toEqual(expect.arrayContaining([
@@ -23,28 +25,30 @@ describe('release PWA surface', () => {
     expect(brandMark).toContain('viewBox="0 0 48 48"');
   });
 
-  it('never caches authenticated navigation or API requests', () => {
-    expect(serviceWorker).toContain("url.pathname.startsWith('/api/')");
-    expect(serviceWorker).toContain('PUBLIC_NAVIGATION.has(url.pathname)');
-    for (const route of ['/how-it-works', '/pricing', '/faq', '/questions']) expect(serviceWorker).toContain(`'${route}'`);
-    expect(serviceWorker).not.toMatch(/PUBLIC_NAVIGATION[^;]+\/app/);
-    expect(serviceWorker).not.toMatch(/PUBLIC_SHELL[^;]+\/login/);
-    expect(serviceWorker).not.toMatch(/PUBLIC_SHELL[^;]+\/signup/);
+  it('retires every legacy service worker and Sovereign public cache', () => {
+    expect(serviceWorker).toContain("const RETIREMENT_MARKER = 'sovereign-public-cache-retired-v17'");
+    expect(serviceWorker).toContain('caches.keys()');
+    expect(serviceWorker).toContain('self.registration.unregister()');
+    expect(serviceWorker).toContain("self.clients.matchAll({ type: 'window', includeUncontrolled: true })");
+    expect(serviceWorker).toContain('client.navigate(client.url)');
+    expect(serviceWorker).not.toContain("addEventListener('fetch'");
   });
 
-  it('limits runtime caching to declared public and compiled assets', () => {
-    expect(serviceWorker).toContain('sovereign-public-v15');
-    expect(serviceWorker).toContain("'/brand-mark.svg'");
-    expect(serviceWorker).toContain("'/platform-public.css'");
-    expect(serviceWorker).toContain('PUBLIC_ASSETS.has(url.pathname)');
-    expect(serviceWorker).toContain("url.pathname.startsWith('/assets/')");
-    expect(serviceWorker).not.toContain('request.destination');
+  it('removes registrations and cached shells from the active application runtime', () => {
+    expect(main).toContain('navigator.serviceWorker.getRegistrations()');
+    expect(main).toContain('registration.unregister()');
+    expect(main).toContain("key.startsWith('sovereign-public')");
+    expect(main).toContain("window.sessionStorage.setItem('sovereign-public-cache-retired', 'true')");
+    expect(main).toContain('window.location.reload()');
+    expect(main).not.toContain(".register('/sw.js");
   });
 
-  it('refreshes public navigation before using an offline fallback', () => {
-    expect(serviceWorker).toContain('networkFirst(request)');
-    expect(serviceWorker).toContain('staleWhileRevalidate(request)');
-    expect(serviceWorker).toContain('no-store|private');
-    expect(serviceWorker).toContain("cache.match('/')");
+  it('prevents HTML and the retirement worker from being stored by browsers or the CDN', () => {
+    expect(headers).toContain('/\n  Cache-Control: no-store, no-cache, must-revalidate');
+    expect(headers).toContain('/*.html\n  Cache-Control: no-store, no-cache, must-revalidate');
+    expect(headers).toContain('/sw.js\n  Cache-Control: no-store, no-cache, must-revalidate');
+    expect(headers).toContain('CDN-Cache-Control: no-store');
+    expect(headers).toContain('Cloudflare-CDN-Cache-Control: no-store');
+    expect(headers).toContain('/assets/*\n  Cache-Control: public, max-age=31536000, immutable');
   });
 });

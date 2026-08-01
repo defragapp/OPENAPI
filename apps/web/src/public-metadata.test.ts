@@ -44,11 +44,13 @@ describe('public metadata and fallback documents', () => {
     expect(socialPreview).not.toContain('Understand the people around you.');
   });
 
-  it('invalidates the retired public shell without caching private workspace navigation', () => {
-    expect(serviceWorker).toContain("const CACHE_NAME = 'sovereign-public-v15'");
-    expect(serviceWorker).toContain("'/platform-public.css'");
+  it('retires the stale public shell instead of caching another visual release', () => {
+    expect(serviceWorker).toContain("const RETIREMENT_MARKER = 'sovereign-public-cache-retired-v17'");
+    expect(serviceWorker).toContain('self.registration.unregister()');
+    expect(serviceWorker).toContain('caches.keys()');
+    expect(serviceWorker).toContain('client.navigate(client.url)');
+    expect(serviceWorker).not.toContain("addEventListener('fetch'");
+    expect(serviceWorker).not.toContain('PUBLIC_NAVIGATION');
     expect(serviceWorker).not.toContain("  '/app',");
-    expect(serviceWorker).toContain("url.pathname.startsWith('/api/')");
-    expect(serviceWorker).toContain("if (!PUBLIC_NAVIGATION.has(url.pathname)) return;");
   });
 });

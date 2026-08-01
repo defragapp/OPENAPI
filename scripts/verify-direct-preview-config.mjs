@@ -97,7 +97,9 @@ for (const required of [
   '--editorial-cream:#e8ddd0',
   '/fonts/sovereign-display.woff2',
   '/fonts/sovereign-sans.woff2',
-  "const CACHE_NAME = 'sovereign-public-v15'"
+  "const RETIREMENT_MARKER = 'sovereign-public-cache-retired-v17'",
+  "entryDocument: 'no-store'",
+  "serviceWorkerMode: 'retired'"
 ]) {
   requireValue(parentDomainVerifier.includes(required), `Parent-domain verifier is missing ${required}`);
 }

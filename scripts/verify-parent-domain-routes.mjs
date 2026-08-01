@@ -49,8 +49,8 @@ async function verifyVisualRelease() {
   if (!home.ok || !html.includes('id="root"') || !html.includes('Sovereign.OS')) {
     throw new Error(`Public entry document is unavailable: status=${home.status}`);
   }
-  if (headerIncludes(home, 'cache-control', 'immutable')) {
-    throw new Error('Public entry HTML must not be immutable');
+  if (!headerIncludes(home, 'cache-control', 'no-store')) {
+    throw new Error(`Public entry HTML must be non-storable; received cache-control=${home.headers.get('cache-control') || 'missing'}`);
   }
 
   const scriptPaths = uniqueMatches(html, /src=["'](\/assets\/[^"']+\.js)["']/g);
@@ -93,7 +93,8 @@ async function verifyVisualRelease() {
     'What do you want to understand?',
     'ONE CENTER · SIXTEEN EXPRESSIONS',
     'Sanitized demonstration · Illustrative values · Not your Baseline',
-    '/api/v1/expression-field?mode=live'
+    '/api/v1/expression-field?mode=live',
+    'sovereign-public-cache-retired'
   ]) {
     if (!compiledJavaScript.includes(marker)) throw new Error(`Compiled application is missing current product marker: ${marker}`);
   }
@@ -125,10 +126,13 @@ async function verifyVisualRelease() {
   }
 
   if (!serviceWorker.response.ok
-    || !serviceWorker.text.includes("const CACHE_NAME = 'sovereign-public-v15'")
-    || !serviceWorker.text.includes('networkFirst(request)')
-    || serviceWorker.text.includes("  '/app',")) {
-    throw new Error('Public service worker is stale or caches private workspace navigation');
+    || !headerIncludes(serviceWorker.response, 'cache-control', 'no-store')
+    || !serviceWorker.text.includes("const RETIREMENT_MARKER = 'sovereign-public-cache-retired-v17'")
+    || !serviceWorker.text.includes('self.registration.unregister()')
+    || !serviceWorker.text.includes('caches.keys()')
+    || !serviceWorker.text.includes('client.navigate(client.url)')
+    || serviceWorker.text.includes("addEventListener('fetch'")) {
+    throw new Error('Public service worker retirement contract is missing or cacheable');
   }
 
   for (const [label, font] of [['display', displayFont], ['sans', sansFont]]) {
@@ -139,7 +143,7 @@ async function verifyVisualRelease() {
   }
 
   return {
-    entryDocument: 'current-and-revalidating',
+    entryDocument: 'no-store',
     javascriptAssets: scriptPaths,
     cssAssets: stylePaths,
     editorialContract: 'public-landing-editorial.css',
@@ -147,7 +151,8 @@ async function verifyVisualRelease() {
     expressionFieldAuthBoundary: 'private-401-without-session',
     visualDirection: 'zip-inspired-cinematic-dark',
     typography: ['Sovereign Display', 'Sovereign Sans'],
-    serviceWorkerCache: 'sovereign-public-v15'
+    serviceWorkerMode: 'retired',
+    serviceWorkerCache: 'none'
   };
 }
 
