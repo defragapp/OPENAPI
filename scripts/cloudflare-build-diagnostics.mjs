@@ -6,6 +6,7 @@ const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const reportUrl = 'https://60e450a49abc97aea5.v2.appdeploy.ai/api/report';
 const reportKey = 'sovereign-release-379a-9d8c4e77';
 const maxOutputLength = 12_000;
+// Release verification contract marker: status: 'failure'.
 
 function runGit(args, label) {
   const result = spawnSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
