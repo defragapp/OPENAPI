@@ -1,61 +1,101 @@
 import { useEffect, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, KeyboardEvent } from 'react';
 
-type EngineState = 'hero' | 'baseline' | 'scales' | 'query' | 'ready';
+const heroAnswer = {
+  question: 'Why do I keep taking responsibility for everyone else?',
+  direct: 'Your capacity is real. The question is whether the responsibility is actually yours.',
+  connection: 'The issue may not be whether you care. It may be where care becomes responsibility for outcomes that belong to other people.',
+  experiment: 'Before taking it on, ask: “Am I being asked to lead—or only to absorb the uncertainty?”'
+} as const;
 
-const dataPoints = [
-  [9, 17], [18, 72], [27, 30], [34, 84], [42, 14], [49, 64], [57, 38], [66, 79],
-  [73, 22], [81, 58], [90, 33], [94, 87], [13, 47], [23, 92], [37, 55], [53, 90],
-  [62, 9], [77, 45], [87, 73], [5, 89], [31, 8], [69, 67], [97, 13], [46, 46]
+const basisFixture = [
+  { compact: 'U✓', label: 'User-confirmed experience' },
+  { compact: 'HD G13.1', label: 'Human Design personality gate 13, line 1' },
+  { compact: 'GK ACT13', label: 'Gene Keys activation number 13' },
+  { compact: 'N LP1', label: 'Numerology life path 1' },
+  { compact: '☉ CAN 04.2°', label: 'Natal Sun, Cancer, 4.2 degrees' },
+  { compact: 'LIVE ♄ ARI 02.3°R', label: 'Live Saturn, Aries, 2.3 degrees, retrograde' }
 ] as const;
 
-const stageOrder: EngineState[] = ['hero', 'baseline', 'scales', 'query', 'ready'];
+const enginePoints = [
+  [8, 18, 0.2], [17, 72, 0.8], [25, 34, 1.4], [31, 83, 0.5],
+  [39, 14, 1.1], [47, 62, 1.8], [54, 28, 0.3], [61, 77, 1.2],
+  [69, 16, 1.6], [76, 55, 0.7], [84, 31, 1.3], [91, 74, 0.1],
+  [13, 48, 1.9], [35, 49, 0.9], [58, 46, 1.5], [81, 87, 0.4]
+] as const;
 
-function resolveState(progress: number): EngineState {
-  if (progress < .15) return 'hero';
-  if (progress < .38) return 'baseline';
-  if (progress < .65) return 'scales';
-  if (progress < .92) return 'query';
-  return 'ready';
-}
+type EngineVariables = CSSProperties & {
+  '--engine-progress': string;
+  '--hero-opacity': string;
+  '--baseline-opacity': string;
+  '--scale-opacity': string;
+  '--query-opacity': string;
+  '--terminal-opacity': string;
+  '--baseline-progress': string;
+  '--scale-progress': string;
+  '--query-progress': string;
+};
 
 export function PublicLanding() {
   const rootRef = useRef<HTMLElement>(null);
-  const [progress, setProgress] = useState(0);
-  const [engineState, setEngineState] = useState<EngineState>('hero');
   const [booting, setBooting] = useState(true);
+  const [selectedScale, setSelectedScale] = useState(0);
 
   useEffect(() => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const bootTimer = window.setTimeout(() => setBooting(false), reducedMotion ? 0 : 620);
-    let frame = 0;
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (media.matches) {
+      setBooting(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setBooting(false), 620);
+    return () => window.clearTimeout(timer);
+  }, []);
 
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    let raf = 0;
     const update = () => {
-      frame = 0;
-      const root = rootRef.current;
-      if (!root) return;
-      const start = root.offsetTop;
-      const range = Math.max(1, root.offsetHeight - window.innerHeight);
-      const next = Math.min(1, Math.max(0, (window.scrollY - start) / range));
-      setProgress(next);
-      setEngineState(resolveState(next));
+      raf = 0;
+      const rect = root.getBoundingClientRect();
+      const travel = Math.max(root.offsetHeight - window.innerHeight, 1);
+      const progress = clamp(-rect.top / travel);
+      const style = root.style;
+
+      style.setProperty('--engine-progress', progress.toFixed(4));
+      style.setProperty('--hero-opacity', windowed(progress, 0, 0.22, 0.08, true).toFixed(4));
+      style.setProperty('--baseline-opacity', windowed(progress, 0.12, 0.46, 0.1).toFixed(4));
+      style.setProperty('--scale-opacity', windowed(progress, 0.36, 0.7, 0.1).toFixed(4));
+      style.setProperty('--query-opacity', windowed(progress, 0.6, 0.93, 0.1).toFixed(4));
+      style.setProperty('--terminal-opacity', windowed(progress, 0.88, 1, 0.08, false, true).toFixed(4));
+      style.setProperty('--baseline-progress', phaseProgress(progress, 0.12, 0.46).toFixed(4));
+      style.setProperty('--scale-progress', phaseProgress(progress, 0.36, 0.7).toFixed(4));
+      style.setProperty('--query-progress', phaseProgress(progress, 0.6, 0.93).toFixed(4));
+      root.dataset.engineState = progress < 0.16
+        ? 'hero'
+        : progress < 0.41
+          ? 'baseline'
+          : progress < 0.65
+            ? 'scales'
+            : progress < 0.9
+              ? 'query'
+              : 'terminal';
     };
+
     const requestUpdate = () => {
-      if (!frame) frame = window.requestAnimationFrame(update);
+      if (!raf) raf = window.requestAnimationFrame(update);
     };
 
     update();
     window.addEventListener('scroll', requestUpdate, { passive: true });
     window.addEventListener('resize', requestUpdate);
     return () => {
-      window.clearTimeout(bootTimer);
       window.removeEventListener('scroll', requestUpdate);
       window.removeEventListener('resize', requestUpdate);
-      if (frame) window.cancelAnimationFrame(frame);
+      if (raf) window.cancelAnimationFrame(raf);
     };
   }, []);
-
-  const engineStyle = { '--engine-progress': progress.toFixed(4) } as CSSProperties;
 
   return (
     <main
@@ -63,10 +103,18 @@ export function PublicLanding() {
       className="sovereign-landing engine-room"
       data-product-contract="baseline-first"
       data-answer-contract="sovereign-answer.v2"
-      data-viewport-contract="engine-room-v1"
-      data-engine-state={engineState}
-      data-release-fingerprint="Know yourself. Understand the system. Choose what fits. Your intelligence begins with your Baseline. What do you want to understand? ONE CENTER · SIXTEEN EXPRESSIONS Sanitized demonstration · Illustrative values · Not your Baseline"
-      style={engineStyle}
+      data-engine-state="hero"
+      style={{
+        '--engine-progress': '0',
+        '--hero-opacity': '1',
+        '--baseline-opacity': '0',
+        '--scale-opacity': '0',
+        '--query-opacity': '0',
+        '--terminal-opacity': '0',
+        '--baseline-progress': '0',
+        '--scale-progress': '0',
+        '--query-progress': '0'
+      } as EngineVariables}
     >
       {booting && <BootSequence />}
       <EngineHeader />
@@ -74,30 +122,37 @@ export function PublicLanding() {
         <div className="engine-stage">
           <TechnicalGrid />
           <DataPointField />
-          <HeroState />
-          <BaselineState />
-          <ConnectedScalesState />
-          <LiveQueryState />
-          <ReadyState />
+          <HeroIntelligenceStage />
+          <BaselineContextStage />
+          <ConnectedScalesStage selected={selectedScale} onSelect={setSelectedScale} />
+          <PublicAnswerStage />
+          <TerminalStage />
+          <EngineProgress />
         </div>
+        <span id="top" className="engine-anchor engine-anchor-top" />
+        <span id="baseline" className="engine-anchor engine-anchor-baseline" />
+        <span id="scales" className="engine-anchor engine-anchor-scales" />
+        <span id="answer" className="engine-anchor engine-anchor-answer" />
+        <span id="ready" className="engine-anchor engine-anchor-ready" />
       </section>
-      <ProgressRail active={engineState} />
-      <span className="engine-screen-reader-fingerprint" aria-hidden="true">
-        Sovereign.OS private personal, relationship, and system intelligence.
-      </span>
+      <noscript>
+        <section className="engine-noscript">
+          <h1>Know yourself. Understand the system. Choose what fits.</h1>
+          <p>Sovereign.OS is a private AI for understanding yourself, your relationships, and the systems around you. Build your Baseline once, then ask naturally.</p>
+          <a href="/signup">Build my Baseline</a>
+        </section>
+      </noscript>
     </main>
   );
 }
 
 function BootSequence() {
   return (
-    <div className="engine-boot" role="status" aria-label="Initializing Sovereign.OS">
-      <div className="engine-boot-lines">
-        <span>&gt; INITIALIZING PRIVATE ENVIRONMENT</span>
-        <span>&gt; LOADING BASELINE PARSER</span>
-        <span>&gt; VERIFYING CONTEXT LAYERS</span>
-        <span>&gt; RENDER</span>
-      </div>
+    <div className="engine-boot" role="status" aria-label="Loading Sovereign.OS">
+      <span>&gt; INITIALIZING PRIVATE ENVIRONMENT</span>
+      <span>&gt; LOADING BASELINE PARSER</span>
+      <span>&gt; VERIFYING CONTEXT LAYERS</span>
+      <span>&gt; RENDER</span>
     </div>
   );
 }
@@ -105,229 +160,362 @@ function BootSequence() {
 function EngineHeader() {
   return (
     <header className="engine-header">
-      <a className="engine-brand" href="/" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
+      <a className="engine-wordmark" href="#top" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
       <nav aria-label="Public navigation">
-        <a href="#engine-product">PRODUCT</a>
+        <a href="/how-it-works">PRODUCT</a>
         <a href="/privacy">PRIVACY</a>
         <a href="/pricing">PRICING</a>
         <a href="/login">SIGN IN</a>
-        <a className="engine-command" href="/signup">&gt; BUILD_BASELINE</a>
+        <a className="engine-command engine-command-primary" href="/signup" aria-label="Build my Baseline">&gt; BUILD_BASELINE</a>
       </nav>
     </header>
   );
 }
 
 function TechnicalGrid() {
-  return (
-    <div aria-hidden="true">
-      <div className="engine-grid" />
-      <div className="engine-axis x" />
-      <div className="engine-axis y" />
-    </div>
-  );
+  return <div className="engine-grid" aria-hidden="true" />;
 }
 
 function DataPointField() {
   return (
     <div className="engine-points" aria-hidden="true">
-      {dataPoints.map(([left, top], index) => (
-        <i className="engine-point" key={`${left}-${top}`} style={{ left: `${left}%`, top: `${top}%` }} data-point={index + 1} />
+      {enginePoints.map(([left, top, delay], index) => (
+        <span
+          key={`${left}-${top}`}
+          style={{
+            left: `${left}%`,
+            top: `${top}%`,
+            animationDelay: `${delay}s`,
+            '--point-index': index
+          } as CSSProperties}
+        />
       ))}
     </div>
   );
 }
 
-function HeroState() {
+function HeroIntelligenceStage() {
   return (
-    <section className="engine-state engine-hero" aria-labelledby="engine-hero-title">
-      <div className="engine-state-inner">
-        <div className="engine-hero-copy">
-          <h1 id="engine-hero-title"><span>Know yourself.</span><span>Understand the system.</span></h1>
-          <p className="engine-copy">Personal, relationship, and system intelligence built from context.</p>
-          <div className="engine-actions">
-            <a className="engine-command" href="/signup">&gt; BUILD_MY_BASELINE</a>
-            <a className="engine-command secondary" href="#engine-product">&gt; VIEW_ENGINE</a>
-          </div>
+    <section className="engine-layer engine-hero" aria-labelledby="landing-title">
+      <div className="engine-hero-copy">
+        <p className="engine-mode">PERSONAL / RELATIONSHIP / SYSTEM INTELLIGENCE</p>
+        <h1 id="landing-title">KNOW YOURSELF.<br />UNDERSTAND THE SYSTEM.</h1>
+        <p className="engine-hero-fit">Choose what fits.</p>
+        <p className="engine-hero-body">Sovereign.OS is a private AI for understanding yourself, your relationships, and the systems around you. Build your Baseline once, then ask naturally and receive an answer grounded in the person asking.</p>
+        <div className="engine-actions">
+          <a className="engine-command engine-command-primary" href="/signup" aria-label="Build my Baseline">&gt; BUILD_MY_BASELINE</a>
+          <a className="engine-command" href="#answer" aria-label="See a Sovereign answer">&gt; SEE_A_SOVEREIGN_ANSWER</a>
         </div>
-        <div className="engine-hero-field" aria-label="Unprocessed context entering the Sovereign intelligence engine">
-          <div className="engine-crosshair" aria-hidden="true"><i /></div>
-          <div className="engine-field-readout">
-            <span>CONTEXT / UNPROCESSED</span>
-            <span>PERSON / AVAILABLE</span>
-            <span>RELATION / PERMISSION_REQUIRED</span>
-            <span>SYSTEM / UNRESOLVED</span>
-          </div>
-        </div>
+        <small>Start free · No card required · Review, correct, or reject any interpretation</small>
       </div>
+      <div className="engine-init" aria-hidden="true">&gt; INIT_BASELINE</div>
     </section>
   );
 }
 
-function BaselineState() {
+function BaselineContextStage() {
   return (
-    <section id="engine-product" className="engine-state engine-baseline" aria-labelledby="engine-baseline-title">
-      <div className="engine-state-inner">
-        <div>
-          <span className="engine-label">STATE 02 / INIT_BASELINE</span>
-          <h2 id="engine-baseline-title">Your intelligence begins with a stable Baseline.</h2>
-          <p className="engine-copy">Sovereign separates what remains structurally yours from what may be receiving more pressure or emphasis now.</p>
-        </div>
-        <BaselineMachine />
+    <section className="engine-layer engine-baseline" aria-labelledby="foundation-title">
+      <div className="engine-copy-block">
+        <p className="engine-mode">YOUR BASELINE · BASELINE / COMPILE</p>
+        <h2 id="foundation-title">Your intelligence begins with your Baseline.</h2>
+        <p>Sovereign separates what remains structurally yours from what may be receiving more pressure or emphasis now.</p>
+        <small>Temporary context does not determine behavior.</small>
       </div>
+
+      <div className="baseline-machine" aria-label="Conceptual Baseline compilation from demonstration inputs">
+        <svg viewBox="0 0 760 560" role="img" aria-labelledby="baseline-diagram-title baseline-diagram-desc">
+          <title id="baseline-diagram-title">Baseline compilation schematic</title>
+          <desc id="baseline-diagram-desc">Demonstration inputs converge into a stable personal structure with identity, decision, pressure, relationship, expression, and boundary dimensions.</desc>
+          <g className="machine-axis">
+            <path d="M380 36V524" />
+            <path d="M66 280H694" />
+            <path d="M150 86L610 474" />
+            <path d="M610 86L150 474" />
+          </g>
+          <g className="machine-frame">
+            <path d="M380 76L628 280L380 484L132 280Z" />
+            <path d="M380 144L544 280L380 416L216 280Z" />
+            <circle cx="380" cy="280" r="72" />
+          </g>
+          <g className="machine-flow">
+            <path d="M92 280H308" />
+            <path d="M452 280H668" />
+            <path d="M380 64V208" />
+            <path d="M380 352V500" />
+          </g>
+          <g className="machine-nodes">
+            {[
+              [380, 76], [628, 280], [380, 484], [132, 280],
+              [380, 144], [544, 280], [380, 416], [216, 280],
+              [380, 280]
+            ].map(([cx, cy], index) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={index === 8 ? 12 : 7} />)}
+          </g>
+        </svg>
+        <div className="machine-label label-identity">IDENTITY</div>
+        <div className="machine-label label-decision">DECISION</div>
+        <div className="machine-label label-pressure">PRESSURE</div>
+        <div className="machine-label label-relation">RELATION</div>
+        <div className="machine-label label-expression">EXPRESSION</div>
+        <div className="machine-label label-boundary">BOUNDARY</div>
+      </div>
+
+      <div className="baseline-telemetry" aria-label="Demonstration telemetry">
+        <header><span>INPUT / DEMONSTRATION</span><strong>STATUS / VALIDATED</strong></header>
+        <code>YOUR BASELINE / STABLE_CONTEXT_COMPILED</code>
+        <code>WHAT MAY BE ACTIVE NOW / RESPONSIBILITY</code>
+        <code>YOUR CONFIRMATION / REQUIRED</code>
+        <code>FACETS / Shadow · Gift · Alignment</code>
+        <code>STILL UNKNOWN / ACTUAL RESPONSE TODAY</code>
+      </div>
+
+      <PublicBasis values={basisFixture} />
     </section>
   );
 }
 
-function BaselineMachine() {
+function PublicBasis({ values }: { values: ReadonlyArray<typeof basisFixture[number]> }) {
+  const mobile = usePublicMediaQuery('(max-width: 640px)');
+  const limit = mobile ? 3 : 5;
+  const visible = values.slice(0, limit);
+
   return (
-    <div className="baseline-machine" role="img" aria-label="Demonstration Baseline compilation: raw inputs become a validated structural model">
-      <svg viewBox="0 0 720 520" aria-hidden="true">
-        <rect className="frame" x="92" y="50" width="500" height="410" />
-        <path className="axis" d="M342 50v410M92 255h500M174 88v335M510 88v335" />
-        <path className="structure" d="M174 255 250 142 342 104 438 150 510 255 450 360 342 410 244 363Z" />
-        <path className="structure" d="M250 142 438 150M174 255l336 0M244 363l206-3M342 104v306M250 142l200 218M438 150 244 363" />
-        <circle className="node active" cx="342" cy="104" r="7" />
-        <circle className="node" cx="250" cy="142" r="6" />
-        <circle className="node" cx="438" cy="150" r="6" />
-        <circle className="node active" cx="174" cy="255" r="7" />
-        <circle className="node" cx="510" cy="255" r="6" />
-        <circle className="node" cx="244" cy="363" r="6" />
-        <circle className="node active" cx="450" cy="360" r="7" />
-        <circle className="node" cx="342" cy="410" r="6" />
-        <text className="machine-label" x="310" y="82">IDENTITY</text>
-        <text className="machine-label" x="188" y="130">DECISION</text>
-        <text className="machine-label" x="458" y="138">PRESSURE</text>
-        <text className="machine-label" x="104" y="244">RELATION</text>
-        <text className="machine-label" x="522" y="244">EXPRESSION</text>
-        <text className="machine-label" x="302" y="444">BOUNDARY</text>
-      </svg>
-      <div className="engine-telemetry" aria-label="Demonstration Baseline validation telemetry">
-        <div><span>INPUT / NATAL_REDUCTION</span><strong>VALIDATED</strong></div>
-        <div><span>INPUT / BIRTH_TIME_CERTAINTY</span><strong>AVAILABLE</strong></div>
-        <div><span>INPUT / BASELINE_FACTORS</span><strong>PARSED</strong></div>
-        <div><span>IDENTITY</span><strong>VALIDATED</strong></div>
-        <div><span>DECISION</span><strong>DELIBERATE</strong></div>
-        <div><span>PRESSURE_RESPONSE</span><strong>ACTIVE</strong></div>
-        <div><span>PERMISSION_STATE</span><strong>CONFIRMED</strong></div>
+    <details className="engine-basis">
+      <summary>BASIS · Why this is personal · {values.length} supporting values</summary>
+      <div>
+        {visible.map((value) => <span key={value.compact}><b>{value.compact}</b><small>{value.label}</small></span>)}
+        {values.length > visible.length && <span><b>+{values.length - visible.length}</b><small>Additional supporting values</small></span>}
       </div>
+    </details>
+  );
+}
+
+function ConnectedScalesStage({ selected, onSelect }: { selected: number; onSelect: (index: number) => void }) {
+  const scales = [
+    ['SELF', 'What remains structurally yours.'],
+    ['RELATIONSHIP', 'What forms between two permitted people.'],
+    ['SYSTEM', 'Where roles, authority, reliance, responsibility, and pressure move.']
+  ] as const;
+
+  return (
+    <section className="engine-layer engine-scales" aria-labelledby="scale-title">
+      <div className="engine-copy-block engine-scale-copy">
+        <p className="engine-mode">ONE INTELLIGENCE · THREE CONNECTED SCALES</p>
+        <h2 id="scale-title">The question changes. The environment stays the same.</h2>
+        <p>Move from yourself to a relationship or wider system without rebuilding context from the beginning.</p>
+      </div>
+
+      <div className="scale-machine">
+        <svg viewBox="0 0 920 360" role="img" aria-label="Context moving from self to relationship to system">
+          <g className="scale-rail">
+            <path d="M120 180H800" />
+            <path className="scale-flow" d="M120 180H800" />
+          </g>
+          <g className="scale-structure self-structure">
+            <path d="M120 112L186 180L120 248L54 180Z" />
+            <circle cx="120" cy="180" r="12" />
+          </g>
+          <g className="scale-structure relationship-structure">
+            <path d="M460 104L536 180L460 256L384 180Z" />
+            <circle cx="430" cy="180" r="10" />
+            <circle cx="490" cy="180" r="10" />
+            <path d="M440 180H480" />
+          </g>
+          <g className="scale-structure system-structure">
+            <path d="M800 96L886 180L800 264L714 180Z" />
+            <circle cx="770" cy="152" r="8" />
+            <circle cx="830" cy="152" r="8" />
+            <circle cx="770" cy="208" r="8" />
+            <circle cx="830" cy="208" r="8" />
+            <path d="M770 152L830 208M830 152L770 208M770 152H830M770 208H830" />
+          </g>
+        </svg>
+        <div className="scale-label scale-label-self"><span>01</span><strong aria-label="Yourself">SELF</strong></div>
+        <div className="scale-label scale-label-relationship"><span>02</span><strong>RELATIONSHIP</strong></div>
+        <div className="scale-label scale-label-system"><span>03</span><strong>SYSTEM</strong></div>
+        <div className="permission-overlay">
+          <span>PERMISSION / CONFIRMED</span>
+          <span>CONTEXT / REDUCED</span>
+          <span>SCOPE / RELATIONSHIP</span>
+          <span>SOURCE / CONSENTED</span>
+        </div>
+      </div>
+
+      <div className="scale-selector" role="tablist" aria-label="Sovereign intelligence scales">
+        {scales.map(([label], index) => (
+          <button
+            key={label}
+            id={`engine-scale-tab-${index}`}
+            role="tab"
+            aria-selected={selected === index}
+            aria-controls="engine-scale-panel"
+            tabIndex={selected === index ? 0 : -1}
+            onClick={() => onSelect(index)}
+            onKeyDown={(event) => moveScaleFocus(event, index, scales.length, onSelect)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <div id="engine-scale-panel" className="scale-panel" role="tabpanel" aria-labelledby={`engine-scale-tab-${selected}`}>
+        <strong>{scales[selected]![0]}</strong>
+        <p>{scales[selected]![1]}</p>
+      </div>
+
+      <PermissionField />
+    </section>
+  );
+}
+
+function PermissionField() {
+  return (
+    <>
+      <SystemMap />
+      <p className="engine-trust">WHAT HAPPENS BETWEEN YOU · Their actual motive remains unknown until they speak for themselves.</p>
+      <p className="engine-trust">PERMISSION BEFORE COMPARISON · Another person remains a person—not a data source you control. No compatibility score. No mind-reading. No one-sided access to another person’s Baseline.</p>
+    </>
+  );
+}
+
+function SystemMap() {
+  return (
+    <div className="engine-system-map" aria-label="Demonstration system context">
+      <span className="system-person person-you"><b>YOU</b><small>pressure carrier</small></span>
+      <span className="system-person person-parent"><b>PARENT</b><small>formal authority</small></span>
+      <span className="system-person person-sibling"><b>SIBLING</b><small>reliance</small></span>
+      <i className="system-line line-one" aria-hidden="true" />
+      <i className="system-line line-two" aria-hidden="true" />
+      <strong>PRESSURE FIELD · RESPONSIBILITY CONCENTRATION / YOU</strong>
     </div>
   );
 }
 
-function ConnectedScalesState() {
+function PublicAnswerStage() {
+  const steps = [
+    ['01', '> FETCH_BASELINE', 'IDENTITY / LOADED · BOUNDARY_RESPONSE / LOADED · PRESSURE_PATTERN / LOADED'],
+    ['02', '> APPLY_CURRENT_CONTEXT', 'TEMPORARY_EMPHASIS / ACTIVE · SYSTEM_CONTEXT / PARTIAL'],
+    ['03', '> DISTINGUISH_SIGNAL', 'CARE / RESPONSIBILITY / CONTROL / OBLIGATION'],
+    ['04', '> FORM_UNDERSTANDING', 'ANSWER / READY']
+  ] as const;
+
   return (
-    <section className="engine-state engine-scales" aria-labelledby="engine-scales-title">
-      <div className="engine-state-inner">
-        <div className="engine-scales-copy">
-          <div>
-            <span className="engine-label">STATE 03 / CONNECTED_SCALES</span>
-            <h2 id="engine-scales-title">Move outward without rebuilding context.</h2>
+    <section className="engine-layer engine-query" aria-labelledby="questions-title">
+      <div className="query-question">
+        <p className="engine-mode">A REAL QUESTION · A PERSONAL ANSWER</p>
+        <small>EXAMPLE ANSWER · Sanitized demonstration · Not your Baseline</small>
+        <span className="engine-mode">YOU ASKED</span>
+        <h2 id="questions-title">“{heroAnswer.question}”</h2>
+        <p>Useful language first. Exact support when you want it.</p>
+      </div>
+
+      <div className="query-computation" aria-live="polite">
+        <ol>
+          {steps.map(([number, command, telemetry]) => (
+            <li key={number}>
+              <span>{number}</span>
+              <div><strong>{command}</strong><small>{telemetry}</small></div>
+            </li>
+          ))}
+        </ol>
+
+        <article className="query-answer">
+          <span>DIRECT ANSWER</span>
+          <h3>{heroAnswer.direct}</h3>
+          <strong className="engine-mode">THE PERSONAL CONNECTION</strong>
+          <p>{heroAnswer.connection}</p>
+          <div className="answer-distinction">
+            <span><small>SUPPORT</small><strong>I will do my part.</strong></span>
+            <span><small>OVER-RESPONSIBILITY</small><strong>I must make this work for everyone.</strong></span>
           </div>
-          <p className="engine-copy">The same personal foundation remains present as more people, roles, permissions, and responsibilities enter the question.</p>
-        </div>
-        <div className="scale-field" role="img" aria-label="Self context moves into a consented relationship and then into a wider system">
-          <div className="scale-vector one" aria-hidden="true" />
-          <div className="scale-vector two" aria-hidden="true" />
-          <ScaleNode className="self" title="SELF" detail="STABLE BASELINE" />
-          <ScaleNode className="relationship" title="RELATIONSHIP" detail="WHAT FORMS BETWEEN TWO" />
-          <ScaleNode className="system" title="SYSTEM" detail="ROLE · AUTHORITY · PRESSURE" />
-          <div className="permission-readout">
-            <span>PERMISSION / <b>CONFIRMED</b></span>
-            <span>CONTEXT / <b>REDUCED</b></span>
-            <span>SCOPE / <b>RELATIONSHIP</b></span>
-            <span>SOURCE / <b>CONSENTED</b></span>
-          </div>
-        </div>
+          <aside><strong>A PRACTICAL NEXT STEP</strong><p>{heroAnswer.experiment}</p></aside>
+          <div className="answer-basis"><b>SUPPORTED BY</b><span>Boundary response</span><span>Responsibility orientation</span><span>System role</span></div>
+          <a className="engine-command" href="/signup">&gt; EXAMINE_MY_ROLE_IN_THIS_SYSTEM</a>
+        </article>
       </div>
     </section>
   );
 }
 
-function ScaleNode({ className, title, detail }: { className: string; title: string; detail: string }) {
+function TerminalStage() {
   return (
-    <div className={`scale-node ${className}`}>
-      <div className="scale-node-core" aria-hidden="true" />
-      <div><strong>{title}</strong><small>{detail}</small></div>
-    </div>
-  );
-}
-
-function LiveQueryState() {
-  return (
-    <section className="engine-state engine-query" aria-labelledby="engine-query-title">
-      <div className="engine-state-inner">
-        <div className="query-question">
-          <span className="engine-label">LIVE QUESTION</span>
-          <p>Why do I keep taking responsibility for everyone else?</p>
-        </div>
-        <div>
-          <div className="query-computation" aria-label="Sovereign query computation sequence">
-            <QueryStep command="01 / FETCH_BASELINE" values={['IDENTITY / LOADED', 'BOUNDARY_RESPONSE / LOADED', 'PRESSURE_PATTERN / LOADED']} />
-            <QueryStep command="02 / APPLY_CURRENT_CONTEXT" values={['TEMPORARY_EMPHASIS / ACTIVE', 'SYSTEM_CONTEXT / PARTIAL', 'RELATIONSHIP_SCOPE / AVAILABLE']} />
-            <QueryStep command="03 / DISTINGUISH_SIGNAL" values={['CARE', 'RESPONSIBILITY', 'CONTROL', 'OBLIGATION']} />
-            <QueryStep command="04 / FORM_UNDERSTANDING" values={['STATUS / COMPLETE']} />
-          </div>
-          <div className="query-result">
-            <span className="engine-label">DIRECT UNDERSTANDING</span>
-            <h2 id="engine-query-title">Your capacity is real. The question is whether the responsibility is actually yours.</h2>
-            <div className="query-distinction">
-              <div><span>SUPPORT</span><p>I will do my part.</p></div>
-              <div><span>OVER-RESPONSIBILITY</span><p>I must make this work for everyone.</p></div>
-            </div>
-            <p className="query-basis">SUPPORTED BY / BOUNDARY RESPONSE · RESPONSIBILITY ORIENTATION · SYSTEM ROLE</p>
-            <div className="engine-actions"><a className="engine-command" href="/signup">&gt; EXAMINE_MY_ROLE_IN_THIS_SYSTEM</a></div>
-          </div>
-        </div>
+    <section className="engine-layer engine-terminal" aria-labelledby="terminal-title">
+      <p className="engine-status">&gt; READY</p>
+      <h2 id="terminal-title">Your Baseline becomes the context for every question that follows.</h2>
+      <p>Know yourself. Understand the system. Choose what fits.</p>
+      <div className="engine-actions">
+        <a className="engine-command engine-command-primary terminal-command" href="/signup" aria-label="Build my Baseline">&gt; BUILD_MY_BASELINE<span aria-hidden="true">_</span></a>
+        <a className="engine-command" href="/login">&gt; SIGN_IN</a>
       </div>
-    </section>
-  );
-}
-
-function QueryStep({ command, values }: { command: string; values: string[] }) {
-  return (
-    <div className="query-step">
-      <span>&gt; {command}</span>
-      <div>{values.map((value) => <b key={value}>{value}</b>)}</div>
-    </div>
-  );
-}
-
-function ReadyState() {
-  return (
-    <section className="engine-state engine-ready" aria-labelledby="engine-ready-title">
-      <div className="engine-state-inner">
-        <span className="engine-label">ENGINE STATUS</span>
-        <h2 id="engine-ready-title">&gt; READY</h2>
-        <p className="engine-copy">Your Baseline becomes the context for every question that follows.</p>
-        <div className="engine-actions"><a className="engine-command" href="/signup">&gt; BUILD_MY_BASELINE</a></div>
-        <nav className="engine-terminal-links" aria-label="Sovereign.OS information">
+      <div className="terminal-meta">
+        <span>SOVEREIGN+ / $20 MONTHLY / $99 YEARLY</span>
+        <nav aria-label="Footer navigation">
           <a href="/privacy">PRIVACY</a>
           <a href="/how-it-works">METHODOLOGY</a>
           <a href="/pricing">PRICING</a>
-          <a href="/login">SIGN IN</a>
+          <a href="/faq">QUESTIONS</a>
         </nav>
       </div>
     </section>
   );
 }
 
-function ProgressRail({ active }: { active: EngineState }) {
-  const current = stageOrder.indexOf(active);
-  return <div className="engine-progress-rail" aria-hidden="true">{stageOrder.map((state, index) => <span className={index <= current ? 'active' : ''} key={state} />)}</div>;
+function EngineProgress() {
+  return (
+    <aside className="engine-progress" aria-hidden="true">
+      <span>00</span>
+      <i />
+      <span>100</span>
+    </aside>
+  );
 }
 
-/*
-Release compatibility markers retained only for source-based legacy gates while they are migrated:
-<HeroAnswerPreview /> <PersonalStory /> <RelationshipStory /> <SystemStory />
-STEP 01 · YOU · STEP 02 · YOU + 1 · STEP 03 · YOUR WHOLE SYSTEM
-EXAMPLE ANSWER · Sanitized demonstration · Not your Baseline
-How Sovereign reads both of you · className="story-system-map"
-Ask about your life. · See the space · From one person
-className="visual-story-grid" · <ReasoningPanel · <EvidenceChips
-WHAT HAPPENS BETWEEN YOU · SHARED PATTERN · PRESSURE FIELD
-SUN · LEO · GK 13.4 · GATE 4.11 · GK 9 · MARS · CANCER
-Why this is personal · GROUNDED IN · Temporary context does not determine behavior. · STILL UNKNOWN
-PERMISSION BEFORE COMPARISON · Another person remains a person—not a data source you control.
-Bring another person’s permitted Baseline into the room. · without claiming access to private thoughts.
-No compatibility score. · No mind-reading. · No one-sided access.
-*/
+function usePublicMediaQuery(query: string) {
+  const [matches, setMatches] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    const update = () => setMatches(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, [query]);
+
+  return matches;
+}
+
+function moveScaleFocus(
+  event: KeyboardEvent<HTMLButtonElement>,
+  index: number,
+  count: number,
+  select: (next: number) => void
+) {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const next = event.key === 'Home'
+    ? 0
+    : event.key === 'End'
+      ? count - 1
+      : (index + (event.key === 'ArrowRight' ? 1 : -1) + count) % count;
+  select(next);
+  event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
+}
+
+function clamp(value: number) {
+  return Math.min(1, Math.max(0, value));
+}
+
+function phaseProgress(value: number, start: number, end: number) {
+  return clamp((value - start) / (end - start));
+}
+
+function windowed(
+  value: number,
+  start: number,
+  end: number,
+  fade: number,
+  visibleAtStart = false,
+  visibleAtEnd = false
+) {
+  const fadeIn = visibleAtStart ? 1 : clamp((value - start) / fade);
+  const fadeOut = visibleAtEnd ? 1 : clamp((end - value) / fade);
+  return Math.min(fadeIn, fadeOut);
+}
