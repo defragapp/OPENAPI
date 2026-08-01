@@ -51,13 +51,9 @@ const axisFacetMap: Record<ExpressionAxisId, readonly string[]> = {
 };
 
 export async function handleExpressionFieldRequest(request: Request, env: Env): Promise<Response> {
-  let auth: Awaited<ReturnType<typeof requireAuth>>;
-  try {
-    auth = await requireAuth(request, env);
-  } catch (error) {
-    if (error instanceof Response) return error;
-    throw error;
-  }
+  const authResult = await authenticateExpressionFieldRequest(request, env);
+  if (authResult instanceof Response) return authResult;
+  const auth = authResult;
 
   const url = new URL(request.url);
   const requestedMode = parseMode(url.searchParams.get('mode'));
@@ -140,6 +136,19 @@ export function buildExpressionAxisValues(input: {
     currentReady: input.currentReady === true,
     contactCount: input.contactCount ?? 0
   }));
+}
+
+async function authenticateExpressionFieldRequest(
+  request: Request,
+  env: Env
+): Promise<Awaited<ReturnType<typeof requireAuth>> | Response> {
+  try {
+    const auth = await requireAuth(request, env);
+    return auth;
+  } catch (error) {
+    if (error instanceof Response) return error;
+    throw error;
+  }
 }
 
 function buildAxis(input: {
