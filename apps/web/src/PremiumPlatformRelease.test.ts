@@ -15,6 +15,7 @@ const onboarding = read('./PlanOnboarding.tsx');
 const controls = read('./AccountControlCenter.tsx');
 const membership = read('./SystemMembershipManager.tsx');
 const v0Css = read('./v0-visual-port.css');
+const v0PlatformCss = read('./v0-platform-port.css');
 const staticV0Css = read('../public/v0-public-port.css');
 const staticAuthority = read('../public/premium-public-release.css');
 
@@ -23,12 +24,16 @@ function expectBalancedCss(source: string) {
 }
 
 describe('founder v0 selective visual port', () => {
-  it('loads the archive-backed v0 layer as the final visual authority', () => {
-    const importLine = "import './v0-visual-port.css';";
-    const index = main.indexOf(importLine);
-    expect(index).toBeGreaterThan(-1);
-    expect(main.slice(index + importLine.length)).not.toContain("import './");
+  it('loads complete route coverage before the final visual authority', () => {
+    const platformImport = "import './v0-platform-port.css';";
+    const visualImport = "import './v0-visual-port.css';";
+    const platformIndex = main.indexOf(platformImport);
+    const visualIndex = main.indexOf(visualImport);
+    expect(platformIndex).toBeGreaterThan(-1);
+    expect(visualIndex).toBeGreaterThan(platformIndex);
+    expect(main.slice(visualIndex + visualImport.length)).not.toContain("import './");
     expect(v0Css).toContain(`Source archive SHA-256:\n * ${archiveSha}`);
+    expectBalancedCss(v0PlatformCss);
     expectBalancedCss(v0Css);
   });
 
@@ -102,11 +107,23 @@ describe('founder v0 selective visual port', () => {
       '.auth-panel',
       '.workspace-sheet'
     ]) expect(v0Css).toContain(selector);
+    for (const selector of [
+      'body:has(.plan-onboarding)',
+      'body:has(.sovereign-policy)',
+      '.plan-nav',
+      '.onboarding-plan-grid',
+      '.plan-visual',
+      '.policy-hero',
+      '.policy-grid',
+      '.policy-contact',
+      '.email-code-fallback'
+    ]) expect(v0PlatformCss).toContain(selector);
     for (const selector of ['body.launch-page', '.launch-nav', '.launch-hero', '.journey-steps', '.pricing-grid', '.faq-list details', '.launch-footer']) {
       expect(staticV0Css).toContain(selector);
     }
     expect(staticAuthority).toContain("@import url('/v0-public-port.css?v=20260801-founder-v0')");
     expect(v0Css).toContain('@media (max-width: 760px)');
+    expect(v0PlatformCss).toContain('@media (max-width: 700px)');
     expect(v0Css).toContain('@media (prefers-reduced-motion: reduce)');
     expectBalancedCss(staticV0Css);
   });
@@ -135,7 +152,7 @@ describe('founder v0 selective visual port', () => {
   });
 
   it('does not import the archive mock runtime', () => {
-    const source = `${landing}\n${v0Css}\n${app}\n${workspace}`;
+    const source = `${landing}\n${v0Css}\n${v0PlatformCss}\n${app}\n${workspace}`;
     for (const prohibited of ['Math.random', 'mock-auth', 'fake-answer', 'dashboard-grid', 'Demo User', 'generateAIResponse']) {
       expect(source).not.toContain(prohibited);
     }
