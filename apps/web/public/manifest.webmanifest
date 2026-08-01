@@ -1,13 +1,13 @@
 {
   "id": "/",
-  "name": "Sovereign.OS",
+  "name": "Sovereign",
   "short_name": "Sovereign",
-  "description": "Private AI for understanding yourself, your relationships, and the systems around you.",
+  "description": "Personal AI that builds your Baseline and answers real questions about you, your relationships, and your family.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#101011",
-  "theme_color": "#101011",
+  "background_color": "#0f0f0f",
+  "theme_color": "#0f0f0f",
   "categories": ["lifestyle", "productivity"],
   "icons": [
     {
@@ -19,9 +19,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Open Sovereign.OS",
+      "name": "Open Sovereign",
       "short_name": "Open",
-      "description": "Open your private Sovereign.OS workspace.",
+      "description": "Open your private Sovereign workspace.",
       "url": "/app",
       "icons": [{ "src": "/app-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
