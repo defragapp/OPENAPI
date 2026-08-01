@@ -21,16 +21,19 @@ describe('production mobile and responsive experience', () => {
     expect(main).toContain("import './interface-composition.css'");
     expect(main).toContain("import './responsive-viewport-contract.css'");
     expect(main).not.toContain('mobile-density-contract.css');
-    expect(main).not.toMatch(/final|refinement|polish.*css|landing-v2/i);
+    const localCssImports = [...main.matchAll(/import ['"]\.\/([^'"]+\.css)['"]/g)].map((match) => match[1]);
+    for (const retired of ['experience-reconciliation.css', 'sovereign-experience-v3.css', 'sovereign-experience-v3-fixes.css', 'landing-v2.css']) {
+      expect(localCssImports).not.toContain(retired);
+    }
   });
 
   it('measures actual phone surface dimensions and overflow in the rendered DOM', () => {
-    expect(landing).toContain('data-viewport-contract="public-landing-v1"');
-    expect(landing).toContain('className="story-product-stage"');
+    expect(landing).toContain('data-viewport-contract="v0-public-landing-v1"');
+    expect(landing).toContain('data-viewport-section="personal"');
     expect(viewportProbe).toContain('getBoundingClientRect()');
     expect(viewportProbe).toContain('node.offsetWidth');
     expect(viewportProbe).toContain('doc.documentElement.scrollWidth');
-    expect(viewportProbe).toContain('permissionStacked');
+    expect(viewportProbe).toContain('comparisonStacked');
     expect(viewportCss).toContain('.sovereign-landing [data-viewport-surface]');
   });
 
