@@ -22,8 +22,11 @@ These instructions apply to the entire OPENAPI repository.
 - Preserve the exact v0 public sequence beginning with `Healing isn’t optional. Holding onto the pain is.` and ending with `Your thoughts deserve a better place to live.`
 - Port visual components and styling only. Never import the archive’s mock auth, localStorage users, canned or random answers, dashboard state, fake billing, fake consent, or fake account behavior.
 - Preserve the real OPENAPI routes, APIs, authentication, billing, consent, Baseline contracts, one-room workspace, and `sovereign-answer.v2`.
-- `apps/web/src/v0-visual-port.css` is the final local visual authority. No local CSS import may load after it.
-- Do not call a visual implementation `canonical`, `approved`, `v0`, `editorial`, or `cinematic` unless the archive fingerprint, rendered component sequence, compiled asset markers, and sitewide selectors all match the documented contract.
+- `apps/web/src/v0-platform-port.css` must load immediately before `apps/web/src/v0-visual-port.css` and must own onboarding, policy, and email-access surfaces.
+- `apps/web/src/v0-visual-port.css` is the final local Vite visual authority. No local CSS import may load after it.
+- `apps/web/public/v0-public-port.css` must remain the standalone visual authority loaded through `premium-public-release.css` for How it works, Pricing, FAQ, and 404.
+- `apps/web/src/v0-release-fingerprint.ts` must expose the exact archive and founder-sequence fingerprints on the running document.
+- Do not call a visual implementation `canonical`, `approved`, `v0`, `editorial`, or `cinematic` unless the archive fingerprint, runtime sequence fingerprint, rendered component sequence, compiled asset markers, all three visual delivery paths, and sitewide selectors match the documented contract.
 - The reconstructed `Know yourself. Understand the system. Choose what fits.` landing is not the founder v0 port and must not return as the root public experience.
 
 ## Product definition
