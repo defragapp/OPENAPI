@@ -93,14 +93,15 @@ async function verifyVisualRelease() {
   const compiledCss = styles.join('\n');
   const compactCss = compiledCss.replace(/\s+/g, '');
   for (const marker of [
-    '--editorial-page:#fbfbf8',
-    '--editorial-ink:#171815',
+    '--editorial-page:#0f0f0f',
+    '--editorial-ink:#f5f1e8',
+    '--editorial-cream:#e8ddd0',
     '.sovereign-landing{',
     '/fonts/sovereign-display.woff2',
     '/fonts/sovereign-sans.woff2'
   ]) {
     if (!compactCss.includes(marker.replace(/\s+/g, ''))) {
-      throw new Error(`Compiled CSS is missing current editorial marker: ${marker}`);
+      throw new Error(`Compiled CSS is missing current cinematic marker: ${marker}`);
     }
   }
   for (const family of ['Sovereign Display', 'Sovereign Sans']) {
@@ -126,6 +127,7 @@ async function verifyVisualRelease() {
     javascriptAssets: scriptPaths,
     cssAssets: stylePaths,
     editorialContract: 'public-landing-editorial.css',
+    visualDirection: 'zip-inspired-cinematic-dark',
     typography: ['Sovereign Display', 'Sovereign Sans'],
     serviceWorkerCache: 'sovereign-public-v15'
   };
