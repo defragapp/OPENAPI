@@ -14,26 +14,35 @@ const membership = read('./SystemMembershipManager.tsx');
 const premiumCss = read('./premium-platform-release.css');
 const visualCss = read('./sovereign-visual-system.css');
 const viewportCss = read('./responsive-viewport-contract.css');
+const editorialCss = read('./public-landing-editorial.css');
 const publicCss = read('../public/premium-public-release.css');
 const how = read('../public/how-it-works.html');
 const pricing = read('../public/pricing.html');
 const faq = read('../public/faq.html');
 const notFound = read('../public/404.html');
-const reactVisualSource = `${premiumCss}\n${visualCss}\n${viewportCss}`;
+const reactVisualSource = `${premiumCss}\n${visualCss}\n${viewportCss}\n${editorialCss}`;
 
 function expectBalancedCss(source: string) {
   expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
 }
 
 describe('premium platform release', () => {
-  it('loads the responsive contract last without an extra mobile override layer', () => {
+  it('loads one canonical public landing contract after the responsive foundation', () => {
     const visualImport = "import './sovereign-visual-system.css';";
+    const typographyImport = "import './typography-system.css';";
     const viewportImport = "import './responsive-viewport-contract.css';";
+    const editorialImport = "import './public-landing-editorial.css';";
     const visual = main.indexOf(visualImport);
+    const typography = main.indexOf(typographyImport);
     const viewport = main.indexOf(viewportImport);
+    const editorial = main.indexOf(editorialImport);
+
     expect(visual).toBeGreaterThan(-1);
-    expect(viewport).toBeGreaterThan(visual);
-    expect(main.slice(viewport + viewportImport.length)).not.toContain("import './");
+    expect(typography).toBeGreaterThan(visual);
+    expect(viewport).toBeGreaterThan(typography);
+    expect(editorial).toBeGreaterThan(viewport);
+    expect(main.slice(editorial + editorialImport.length)).not.toContain("import './");
+    expect(main).not.toContain('landing-live-correction.css');
     expect(main).not.toContain('mobile-density-contract.css');
     expect(main).not.toMatch(/final|refinement|polish.*css|landing-v2/i);
   });
@@ -54,10 +63,15 @@ describe('premium platform release', () => {
     expect(viewportCss).toContain('width: calc(100% - var(--public-mobile-left) - var(--public-mobile-right));');
     expect(viewportCss).toContain('min-height: 0;');
     expect(viewportCss).toContain('transform: none;');
+    expect(editorialCss).toContain('.sovereign-landing .landing-hero');
+    expect(editorialCss).toContain('.sovereign-landing .hero-intelligence-stage');
+    expect(editorialCss).toContain('@media (max-width: 1024px)');
+    expect(editorialCss).toContain('@media (max-width: 760px)');
+    expect(editorialCss).toContain('@media (max-width: 430px)');
   });
 
   it('measures the rendered viewport instead of checking CSS strings alone', () => {
-    expect(main).toContain("installPublicLandingViewportContract();");
+    expect(main).toContain('installPublicLandingViewportContract();');
     expect(viewportProbe).toContain('getBoundingClientRect()');
     expect(viewportProbe).toContain('node.offsetWidth');
     expect(viewportProbe).toContain('doc.documentElement.scrollWidth');
@@ -83,6 +97,7 @@ describe('premium platform release', () => {
     expect(visualCss).toContain('@keyframes sovereign-message-in');
     expect(visualCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(viewportCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(editorialCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
   it('preserves authentication, consent, and billing', () => {
@@ -98,13 +113,14 @@ describe('premium platform release', () => {
   });
 
   it('retains responsive and accessible behavior', () => {
-    for (const source of [premiumCss, visualCss, viewportCss, publicCss]) expectBalancedCss(source);
+    for (const source of [premiumCss, visualCss, viewportCss, editorialCss, publicCss]) expectBalancedCss(source);
     expect(premiumCss).toContain(':focus-visible');
     expect(visualCss).toContain('env(safe-area-inset-bottom)');
     expect(visualCss).toContain('@media print');
     expect(viewportCss).toContain('env(safe-area-inset-left)');
     expect(viewportCss).toContain('env(safe-area-inset-right)');
     expect(viewportCss).toContain('@media (max-width: 430px)');
+    expect(editorialCss).toContain(':focus-visible');
   });
 
   it('does not add dashboard scoring or mock behavior', () => {
