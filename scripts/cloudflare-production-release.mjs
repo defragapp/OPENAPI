@@ -3,6 +3,8 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const reportUrl = 'https://60e450a49abc97aea5.v2.appdeploy.ai/api/report';
+const reportKey = 'sovereign-release-379a-9d8c4e77';
 
 function fail(message) {
   throw new Error(`Cloudflare production release failed: ${message}`);
@@ -20,6 +22,27 @@ function runGit(args, label) {
   return String(result.stdout || '').trim();
 }
 
+function sanitize(value) {
+  return String(value || '')
+    .replace(/cfat_[A-Za-z0-9_-]+/g, '[redacted-cloudflare-token]')
+    .replace(/\bsk-(?:live|test|proj)?[_A-Za-z0-9-]+/g, '[redacted-api-key]')
+    .replace(/Bearer\s+[A-Za-z0-9._~-]+/gi, 'Bearer [redacted]')
+    .replace(/(CLOUDFLARE_API_TOKEN|CF_API_TOKEN|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|RESEND_API_KEY)=\S+/g, '$1=[redacted]');
+}
+
+async function report(sha, status, output = '') {
+  try {
+    await fetch(reportUrl, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ key: reportKey, sha, phase: 'deploy', stage: 'production-deploy', status, output: sanitize(output).slice(-12_000) }),
+      signal: AbortSignal.timeout(4_000)
+    });
+  } catch {
+    // Telemetry is non-authoritative and must never block production.
+  }
+}
+
 const checkoutSha = runGit(['rev-parse', 'HEAD'], 'unable to resolve the checked-out commit');
 if (!/^[0-9a-f]{40}$/i.test(checkoutSha)) {
   fail('the checked-out commit is not a full 40-character SHA');
@@ -31,6 +54,7 @@ if (declaredSha && declaredSha !== checkoutSha) {
   fail(`declared commit ${declaredSha} does not match checkout ${checkoutSha}`);
 }
 
+await report(checkoutSha, 'start');
 const result = spawnSync(process.execPath, ['scripts/cloudflare-production-deploy-v2.mjs'], {
   cwd: root,
   env: {
@@ -39,8 +63,17 @@ const result = spawnSync(process.execPath, ['scripts/cloudflare-production-deplo
     GITHUB_SHA: checkoutSha,
     APP_VERSION: checkoutSha
   },
-  stdio: 'inherit'
+  encoding: 'utf8',
+  stdio: ['ignore', 'pipe', 'pipe'],
+  maxBuffer: 64 * 1024 * 1024
 });
 
-if (result.error) fail(result.error.message);
-if (result.status !== 0) process.exit(result.status || 1);
+if (result.stdout) process.stdout.write(result.stdout);
+if (result.stderr) process.stderr.write(result.stderr);
+const output = `${String(result.stdout || '')}\n${String(result.stderr || '')}`.trim();
+if (result.error || result.status !== 0) {
+  await report(checkoutSha, 'failure', output || String(result.error?.message || `exit ${result.status}`));
+  if (result.error) fail(result.error.message);
+  process.exit(result.status || 1);
+}
+await report(checkoutSha, 'success', output);
