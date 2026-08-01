@@ -8,11 +8,15 @@ const assert = (condition, message) => { if (!condition) throw new Error(message
 const containsAll = (label, text, values) => values.forEach((value) => assert(text.includes(value), `${label} is missing: ${value}`));
 
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const landing = read('apps/web/src/PublicLanding.tsx');
+const fingerprint = read('apps/web/src/v0-release-fingerprint.ts');
+const v0Platform = read('apps/web/src/v0-platform-port.css');
 const v0Visual = read('apps/web/src/v0-visual-port.css');
+const staticAuthority = read('apps/web/public/premium-public-release.css');
+const staticV0 = read('apps/web/public/v0-public-port.css');
 const main = read('apps/web/src/main.tsx');
-const staticPublicCss = read('apps/web/public/platform-public.css');
 const prompt = read('apps/sovereign-worker/src/agent/prompt-v1.ts');
 const contract = read('apps/sovereign-worker/src/agent/recognition.ts');
 const baseline = read('apps/sovereign-worker/src/baseline-contracts.ts');
@@ -87,6 +91,14 @@ containsAll('verified Covenant library', scripture, [
   'boundary:'
 ]);
 
+containsAll('founder v0 runtime fingerprint', fingerprint, [
+  `V0_ARCHIVE_SHA256 = '${archiveSha}'`,
+  `V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`,
+  "dataset.sovereignVisualContract = 'v0-landing-selective-port'",
+  'dataset.sovereignV0Archive = V0_ARCHIVE_SHA256',
+  'dataset.sovereignV0Sequence = V0_SEQUENCE_FINGERPRINT'
+]);
+
 containsAll('founder v0 public product contract', landing, [
   `const V0_ARCHIVE_SHA = '${archiveSha}'`,
   'data-visual-contract="v0-landing-selective-port"',
@@ -128,26 +140,46 @@ containsAll('founder v0 visual components', `${landing}\n${v0Visual}`, [
   '@media (prefers-reduced-motion: reduce)'
 ]);
 
+containsAll('founder v0 application route coverage', v0Platform, [
+  'body:has(.plan-onboarding)',
+  'body:has(.sovereign-policy)',
+  'body:has(.email-code-fallback)',
+  '.onboarding-plan-grid',
+  '.policy-grid',
+  '.email-code-fallback',
+  '@media (max-width: 700px)',
+  '@media (prefers-reduced-motion: reduce)'
+]);
+
+containsAll('founder v0 standalone route coverage', `${staticAuthority}\n${staticV0}`, [
+  "@import url('/v0-public-port.css?v=20260801-founder-v0')",
+  `Archive SHA-256: ${archiveSha}`,
+  'body.launch-page',
+  '.launch-nav',
+  '.launch-hero',
+  '.journey-steps',
+  '.pricing-grid',
+  '.faq-list details',
+  '.launch-footer'
+]);
+
 for (const prohibited of ['Know yourself.', 'Understand the system.', 'Choose what fits.', 'Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'generateAIResponse', 'Demo User']) {
   assert(!landing.includes(prohibited), `Public landing contains rejected reconstruction, mock, or scoring behavior: ${prohibited}`);
 }
 
-containsAll('final v0 visual import', main, ["import './v0-visual-port.css';"]);
+containsAll('final v0 visual import', main, [
+  "import { installV0ReleaseFingerprint } from './v0-release-fingerprint'",
+  "import './v0-platform-port.css'",
+  "import './v0-visual-port.css'",
+  'installV0ReleaseFingerprint();'
+]);
+const platformImport = "import './v0-platform-port.css';";
 const v0Import = "import './v0-visual-port.css';";
+assert(main.indexOf(platformImport) < main.indexOf(v0Import), 'Platform route coverage must load before final visual authority.');
 assert(!main.slice(main.indexOf(v0Import) + v0Import.length).includes("import './"), 'A local visual file loads after the founder v0 authority.');
 
-containsAll('static public platform layer', staticPublicCss, [
-  'body.launch-page',
-  '.launch-nav',
-  '.journey-steps',
-  '.pricing-grid',
-  '.questions-page .faq-section',
-  '.launch-callout',
-  '@media (max-width: 720px)'
-]);
-
 for (const [label, document] of [['How it works', how], ['Pricing', pricing], ['FAQ', faq]]) {
-  containsAll(label, document, ['SOVEREIGN.OS', 'Build my Baseline']);
+  containsAll(label, document, ['SOVEREIGN.OS', 'Build my Baseline', '/premium-public-release.css?v=20260730-final']);
 }
 containsAll('Pricing entitlements', pricing, ['$0', '$20', '$99 / year', '10 Sovereign AI turns each month', '300 Sovereign AI turns each month']);
 containsAll('FAQ contract', faq, ['<details', 'What is Sovereign.OS?', 'Can I correct or remove an interpretation?']);
@@ -156,7 +188,7 @@ assert(!existsSync(resolve(root, 'apps/web/src/experience-reconciliation.css')),
 assert(!existsSync(resolve(root, 'apps/web/src/SovereignWorkspace.tsx')), 'Duplicate authenticated workspace remains.');
 assert(!serviceWorker.includes("'/app'"), 'Private workspace navigation must not be cached.');
 
-for (const [label, css] of [['founder v0', v0Visual], ['static public', staticPublicCss]]) {
+for (const [label, css] of [['founder v0 platform', v0Platform], ['founder v0 final', v0Visual], ['founder v0 standalone', staticV0]]) {
   const open = (css.match(/{/g) ?? []).length;
   const close = (css.match(/}/g) ?? []).length;
   assert(open === close, `${label} CSS has unbalanced braces (${open}/${close}).`);
@@ -169,9 +201,10 @@ console.log(JSON.stringify({
   publicProductContract: 'baseline-first-private-ai',
   visualAuthority: 'founder-v0-selective-port',
   archiveSha256: archiveSha,
+  sequenceFingerprint,
   mockRuntimeImported: false,
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
-  canonicalVisualLayers: ['v0-visual-port.css', 'platform-public.css'],
+  canonicalVisualLayers: ['v0-platform-port.css', 'v0-visual-port.css', 'v0-public-port.css'],
   coveredSurfaces: ['home', 'how-it-works', 'pricing', 'faq', 'login', 'signup', 'onboarding', 'invitation', 'workspace', 'privacy', 'terms', 'not-found'],
   exactBasis: true,
   contextualCovenant: true,
