@@ -32,7 +32,7 @@
     "preview:bootstrap": "node scripts/cloudflare-preview-bootstrap.mjs",
     "smoke:preview": "node --import tsx scripts/preview-smoke.ts",
     "preview:session": "node --import tsx scripts/create-preview-session.ts",
-    "production:deploy": "node scripts/assert-main-release.mjs && node scripts/cloudflare-production-deploy-v2.mjs && node scripts/verify-parent-domain-routes.mjs",
+    "production:deploy": "node scripts/cloudflare-production-release.mjs",
     "scan:production-fixtures": "node scripts/scan-production-fixtures.mjs",
     "smoke:auth": "node --import tsx scripts/auth-smoke.ts",
     "smoke:release": "node --import tsx scripts/release-smoke.ts",
