@@ -53,7 +53,7 @@ describe('Sovereign.OS public experience', () => {
   });
 
   it('uses the v0 product demonstrations instead of disconnected marketing claims', () => {
-    for (const marker of ['className="v0-story-grid"', 'className="v0-baseline-trace"', 'className="v0-flow"', 'className="v0-family-map"', 'className="v0-comparison-grid"']) {
+    for (const marker of ['className="v0-story-grid"', 'className="v0-baseline-trace"', 'function ProcessingFlow(', 'className="v0-window v0-flow"', 'className="v0-family-map"', 'className="v0-comparison-grid"']) {
       expect(landing).toContain(marker);
     }
     expect(landing).toContain('Why do I keep taking on responsibility for everyone around me?');
