@@ -45,8 +45,9 @@ import './expression-field/expression-field.css';
 import './responsive-viewport-contract.css';
 import './public-landing-editorial.css';
 
-/* Founder v0 archive: complete route coverage, then final visual authority. */
+/* Founder v0 archive: complete route coverage, accessibility, then final visual authority. */
 import './v0-platform-port.css';
+import './v0-motion-accessibility.css';
 import './v0-visual-port.css';
 
 installV0ReleaseFingerprint();
