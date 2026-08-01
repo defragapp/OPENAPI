@@ -1,4 +1,5 @@
 const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT_SHA || '').trim();
+const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 
 if (!/^[0-9a-f]{40}$/i.test(commitSha)) {
   throw new Error('A full 40-character commit SHA is required for parent-domain verification');
@@ -12,11 +13,7 @@ const redirectChecks = [
   ['https://defrag.app/app', 'https://app.defrag.app/app'],
   ['https://www.defrag.app/login', 'https://app.defrag.app/login']
 ];
-
-const healthChecks = [
-  'https://defrag.app/health',
-  'https://www.defrag.app/health'
-];
+const healthChecks = ['https://defrag.app/health', 'https://www.defrag.app/health'];
 
 function normalizeLocation(value, source) {
   if (!value) return '';
@@ -46,7 +43,7 @@ async function fetchWithTimeout(url, options = {}) {
 async function verifyVisualRelease() {
   const home = await fetchWithTimeout(`${publicBase}/?release=${commitSha}`);
   const html = await home.text();
-  if (!home.ok || !html.includes('id="root"') || !html.includes('Sovereign.OS')) {
+  if (!home.ok || !html.includes('id="root"') || !html.includes('Sovereign')) {
     throw new Error(`Public entry document is unavailable: status=${home.status}`);
   }
   if (!headerIncludes(home, 'cache-control', 'no-store')) {
@@ -85,36 +82,65 @@ async function verifyVisualRelease() {
   ]);
 
   const compiledJavaScript = scripts.join('\n');
+  const orderedMarkers = [
+    'Healing isn’t optional.',
+    'Holding onto the pain is.',
+    'Ask about your life.',
+    'Get an answer built for you.',
+    'See the space',
+    'between you.',
+    'From one person',
+    'to the whole system.',
+    'Other AI answers',
+    'everyone the same.',
+    'Your thoughts deserve',
+    'a better place to live.'
+  ];
+  let previousIndex = -1;
+  for (const marker of orderedMarkers) {
+    const index = compiledJavaScript.indexOf(marker);
+    if (index <= previousIndex) throw new Error(`Compiled founder v0 order is wrong or missing at: ${marker}`);
+    previousIndex = index;
+  }
+
   for (const marker of [
-    'Know yourself.',
-    'Understand the system.',
-    'Choose what fits.',
-    'Your intelligence begins with your Baseline.',
-    'What do you want to understand?',
-    'ONE CENTER · SIXTEEN EXPRESSIONS',
-    'Sanitized demonstration · Illustrative values · Not your Baseline',
+    archiveSha,
+    'v0-landing-selective-port',
+    'Personal AI for real life',
+    'How Sovereign works it through',
+    'How Sovereign reads both of you',
+    'Illustrative permitted Baselines',
+    'No compatibility score',
+    'Each person controls what may be included',
     '/api/v1/expression-field?mode=live',
     'sovereign-public-cache-retired'
   ]) {
-    if (!compiledJavaScript.includes(marker)) throw new Error(`Compiled application is missing current product marker: ${marker}`);
+    if (!compiledJavaScript.includes(marker)) throw new Error(`Compiled application is missing founder v0 marker: ${marker}`);
+  }
+
+  for (const prohibited of ['Know yourself.', 'Understand the system.', 'Choose what fits.', 'Math.random', 'generateAIResponse', 'Demo User']) {
+    if (compiledJavaScript.includes(prohibited)) throw new Error(`Compiled application contains rejected reconstruction or mock marker: ${prohibited}`);
   }
 
   const compiledCss = styles.join('\n');
   const compactCss = compiledCss.replace(/\s+/g, '');
   for (const marker of [
-    '--editorial-page:#0f0f0f',
-    '--editorial-ink:#f5f1e8',
-    '--editorial-cream:#e8ddd0',
-    '.sovereign-landing{',
+    '--v0-page:#0f0f0f',
+    '--v0-cream:#e8ddd0',
+    '.v0-landing-port{',
+    '.v0-hero{',
+    '.v0-story-grid{',
+    '.v0-family-map{',
+    '.v0-comparison-grid{',
+    '.intelligence-workspace{',
+    '.sovereign-composer{',
+    '.account-shell',
     '.expression-field-canvas{',
-    '.expression-field-focus{',
-    'touch-action:pan-y',
-    'touch-action:none',
     '/fonts/sovereign-display.woff2',
     '/fonts/sovereign-sans.woff2'
   ]) {
     if (!compactCss.includes(marker.replace(/\s+/g, ''))) {
-      throw new Error(`Compiled CSS is missing current cinematic marker: ${marker}`);
+      throw new Error(`Compiled CSS is missing founder v0 or preserved platform marker: ${marker}`);
     }
   }
   for (const family of ['Sovereign Display', 'Sovereign Sans']) {
@@ -146,10 +172,14 @@ async function verifyVisualRelease() {
     entryDocument: 'no-store',
     javascriptAssets: scriptPaths,
     cssAssets: stylePaths,
-    editorialContract: 'public-landing-editorial.css',
+    visualContract: 'v0-landing-selective-port',
+    archiveSha256: archiveSha,
+    visualAuthority: 'v0-visual-port.css',
+    sitewideStyling: true,
+    mockRuntimeImported: false,
     expressionFieldContract: 'expression-field.v1',
     expressionFieldAuthBoundary: 'private-401-without-session',
-    visualDirection: 'zip-inspired-cinematic-dark',
+    visualDirection: 'founder-v0-dark-editorial',
     typography: ['Sovereign Display', 'Sovereign Sans'],
     serviceWorkerMode: 'retired',
     serviceWorkerCache: 'none'
@@ -159,13 +189,9 @@ async function verifyVisualRelease() {
 async function verifyOnce() {
   for (const [source, expected] of redirectChecks) {
     const response = await fetchWithTimeout(source, { redirect: 'manual' });
-    if (response.status !== 308) {
-      throw new Error(`${source} returned ${response.status}; expected 308`);
-    }
+    if (response.status !== 308) throw new Error(`${source} returned ${response.status}; expected 308`);
     const location = normalizeLocation(response.headers.get('location'), source);
-    if (location !== expected) {
-      throw new Error(`${source} redirected to ${location || 'nothing'}; expected ${expected}`);
-    }
+    if (location !== expected) throw new Error(`${source} redirected to ${location || 'nothing'}; expected ${expected}`);
   }
 
   for (const source of healthChecks) {
