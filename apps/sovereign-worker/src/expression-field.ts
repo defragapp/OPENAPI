@@ -51,7 +51,14 @@ const axisFacetMap: Record<ExpressionAxisId, readonly string[]> = {
 };
 
 export async function handleExpressionFieldRequest(request: Request, env: Env): Promise<Response> {
-  const auth = await requireAuth(request, env);
+  let auth: Awaited<ReturnType<typeof requireAuth>>;
+  try {
+    auth = await requireAuth(request, env);
+  } catch (error) {
+    if (error instanceof Response) return error;
+    throw error;
+  }
+
   const url = new URL(request.url);
   const requestedMode = parseMode(url.searchParams.get('mode'));
   const context = asRecord(await getModelSafeBaselineContext(env, auth.accountId));
