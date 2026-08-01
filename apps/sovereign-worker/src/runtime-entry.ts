@@ -2,9 +2,18 @@ import worker, { ThreadCoordinator, queue, scheduled } from './entry';
 import type { Env } from './env';
 import { transactionalEmailProvider } from './email';
 import { handleExpressionFieldRequest } from './expression-field';
+import { requireSameOrigin } from './security/auth';
 import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/headers';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import { attachD1Bookmark, createD1RequestSession, withD1SessionEnv } from './d1-session';
+import {
+  createPasskeyLoginOptions,
+  createPasskeyRegistrationOptions,
+  deletePasskey,
+  listPasskeys,
+  verifyPasskeyLogin,
+  verifyPasskeyRegistration
+} from './auth-passkeys';
 
 const HEALTH_PATHS = new Set(['/health', '/healthz', '/ready']);
 const STRIPE_WEBHOOK_PATHS = new Set([
@@ -32,6 +41,7 @@ const PUBLIC_ROUTE_ALIASES = new Map([
   ['/questions', '/faq']
 ]);
 const THREAD_MESSAGE_PATH = /^\/api\/v1\/threads\/[^/]+\/messages$/;
+const PASSKEY_DELETE_PATH = /^\/api\/v1\/auth\/passkeys\/([^/]+)$/;
 
 const runtime = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
@@ -66,6 +76,31 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
 
   const routed = routeHostname(request, url);
   if (routed) return routed;
+
+  if (request.method === 'POST' && url.pathname === '/api/v1/auth/passkey/login/options') {
+    requireSameOrigin(request);
+    return withSecurityHeaders(await createPasskeyLoginOptions(request, env));
+  }
+  if (request.method === 'POST' && url.pathname === '/api/v1/auth/passkey/login/verify') {
+    requireSameOrigin(request);
+    return withSecurityHeaders(await verifyPasskeyLogin(request, env));
+  }
+  if (request.method === 'POST' && url.pathname === '/api/v1/auth/passkey/register/options') {
+    requireSameOrigin(request);
+    return withSecurityHeaders(await createPasskeyRegistrationOptions(request, env));
+  }
+  if (request.method === 'POST' && url.pathname === '/api/v1/auth/passkey/register/verify') {
+    requireSameOrigin(request);
+    return withSecurityHeaders(await verifyPasskeyRegistration(request, env));
+  }
+  if (request.method === 'GET' && url.pathname === '/api/v1/auth/passkeys') {
+    return withSecurityHeaders(await listPasskeys(request, env));
+  }
+  const passkeyDelete = url.pathname.match(PASSKEY_DELETE_PATH);
+  if (request.method === 'DELETE' && passkeyDelete) {
+    requireSameOrigin(request);
+    return withSecurityHeaders(await deletePasskey(request, env, decodeURIComponent(passkeyDelete[1]!)));
+  }
 
   if (DISABLED_PATH_PREFIXES.some((prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`))) {
     return withSecurityHeaders(Response.json({ error: 'not_found' }, { status: 404 }));
@@ -144,8 +179,9 @@ async function shareFirstAccountResponse(request: Request, env: Env, executionCo
 async function healthResponse(pathname: string, env: Env): Promise<Response> {
   try {
     const db = await env.DB.prepare(`SELECT 1 AS ok,
-      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_daily_capacity') AS capacity_ready`)
-      .first<{ ok: number; capacity_ready: number }>();
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_daily_capacity') AS capacity_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'auth_passkeys') AS passkeys_ready`)
+      .first<{ ok: number; capacity_ready: number; passkeys_ready: number }>();
     const aiConfig = resolveAiModelConfig(env);
     const emailProvider = transactionalEmailProvider(env);
     // Production now resolves Resend first. This retained text is the previous release verifier fingerprint:
@@ -167,6 +203,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
     const dependencies = {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
       aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing',
+      passkeys: db?.passkeys_ready === 1 ? 'configured' : 'missing',
       durableObjects: env.THREADS ? 'configured' : 'missing',
       assets: env.ASSETS ? 'configured' : 'missing',
       ai: aiConfig.provider === 'cloudflare-gateway' && env.AI && env.AI_GATEWAY_ID ? 'configured' : 'missing',
@@ -188,6 +225,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
     const ok = db?.ok === 1;
     const ready = ok
       && dependencies.aiFreeCapacity === 'configured'
+      && dependencies.passkeys === 'configured'
       && dependencies.durableObjects === 'configured'
       && dependencies.assets === 'configured'
       && dependencies.ai === 'configured'
@@ -200,7 +238,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       ...(pathname === '/ready' ? { ready } : {}),
       version: env.APP_VERSION,
       environment: env.APP_ENV,
-      migrationVersion: '0013_workers_ai_free_capacity',
+      migrationVersion: '0014_passkey_authentication',
       answerContract: 'sovereign-answer.v2',
       baselineContract: 'baseline-source.v1+baseline-facets.v1',
       dependencies
