@@ -127,7 +127,8 @@ containsAll('founder v0 public product contract', landing, [
 
 containsAll('founder v0 visual components', `${landing}\n${v0Visual}`, [
   'className="v0-baseline-trace"',
-  'className="v0-flow"',
+  'function ProcessingFlow(',
+  'className="v0-window v0-flow"',
   'className="v0-family-map"',
   'className="v0-comparison-grid"',
   '.v0-hero',
