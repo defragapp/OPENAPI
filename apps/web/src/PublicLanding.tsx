@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { LandingExpressionField } from './expression-field/ExpressionField';
 
 const personalBasis = [
   { compact: 'SUN · LEO', label: 'Natal Sun in Leo' },
@@ -64,7 +65,7 @@ export function PublicLanding() {
           <p>Most AI begins with whatever you type into a blank box. Sovereign begins with a stable, correctable reference for how you may decide, communicate, connect, lead, and respond under pressure.</p>
         </header>
         <div className="baseline-context-stage" data-viewport-surface="baseline">
-          <div className="baseline-context-core"><span>YOUR BASELINE</span><strong>Creates direction when ownership is unclear</strong><small>Stable · explorable · correctable</small></div>
+          <LandingExpressionField />
           <div className="baseline-context-line current"><span>WHAT MAY BE ACTIVE NOW</span><strong>Responsibility may deserve attention for a limited time.</strong><small>Temporary context does not determine behavior.</small></div>
           <div className="baseline-context-line confirmed"><span>YOUR CONFIRMATION</span><strong>“Yes, this is louder this week.”</strong></div>
           <div className="baseline-context-line unknown"><span>STILL UNKNOWN</span><strong>How you are actually responding today.</strong></div>

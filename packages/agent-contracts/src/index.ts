@@ -24,5 +24,5 @@ export interface PairComparisonOutput {
   unknowns: UnknownState[];
 }
 
-
+export * from './expression-field';
 export * from './model-config';

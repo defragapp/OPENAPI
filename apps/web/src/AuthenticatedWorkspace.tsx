@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AccountControlCenter } from './AccountControlCenter';
 import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
 import { SystemMembershipManager } from './SystemMembershipManager';
+import { AccountExpressionField } from './expression-field/ExpressionField';
 
 type GateState = 'checking' | 'ready' | 'error';
 
@@ -69,6 +70,7 @@ export function AuthenticatedWorkspace() {
   return (
     <div className="sovereign-app-runtime" data-workspace-contract="one-room">
       <SovereignIntelligenceWorkspace onboardingVerified />
+      <AccountExpressionField />
       <div className="sovereign-workspace-overlays" aria-label="Workspace controls">
         <AccountControlCenter />
         <SystemMembershipManager />

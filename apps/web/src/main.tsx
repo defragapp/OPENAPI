@@ -40,8 +40,9 @@ import './selective-visual-port.css';
 import './premium-platform-release.css';
 import './sovereign-visual-system.css';
 
-/* Shared typography, canonical viewport behavior, then the canonical public-route contract. */
+/* Shared typography, Expression Field, canonical viewport behavior, then the canonical public-route contract. */
 import './typography-system.css';
+import './expression-field/expression-field.css';
 import './responsive-viewport-contract.css';
 import './public-landing-editorial.css';
 
