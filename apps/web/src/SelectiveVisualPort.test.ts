@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
+const contextField = readFileSync(new URL('./ContextInteractionField.tsx', import.meta.url), 'utf8');
 const v0Visual = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
@@ -17,6 +18,20 @@ describe('founder v0 selective visual port', () => {
     expect(landing).toContain('className="v0-family-map"');
     expect(landing).toContain('How Sovereign reads both of you');
     expect(landing).toContain('The tension may be a timing gap rather than a values gap.');
+    for (const visibleStep of [
+      'Reading your Baseline',
+      'Finding the pattern',
+      'Building the distinction',
+      'Answering the real question',
+      'Keeping both people distinct',
+      'Reading each perspective',
+      'Finding the interaction',
+      'Showing what happens between you',
+      'Mapping the people',
+      'Reading roles and responsibility',
+      'Tracing the recurring pattern',
+      'Showing the whole system'
+    ]) expect(landing).toContain(visibleStep);
   });
 
   it('keeps demonstrations distinct from actual user data', () => {
@@ -37,6 +52,9 @@ describe('founder v0 selective visual port', () => {
     expect(workspace).toContain('className="relationship-answer"');
     expect(workspace).toContain('className="system-graph"');
     expect(workspace).toContain('className="basis-strip"');
+    expect(workspace).toContain('<ContextInteractionField');
+    expect(contextField).toContain('Distinct people · shared context');
+    expect(contextField).toContain('IntersectionObserver');
   });
 
   it('applies the v0 language to existing authenticated and account components', () => {
@@ -52,12 +70,14 @@ describe('founder v0 selective visual port', () => {
     ]) expect(v0Visual).toContain(selector);
     expect(v0Visual).toContain('@media (max-width: 760px)');
     expect(v0Visual).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(v0Visual).toContain(':is(.v0-flow, .v0-system-flow) li');
+    expect(v0Visual).toContain('.context-field-compact .context-field-options button { min-height: 44px;');
     expect(main).toContain("import './v0-visual-port.css';");
   });
 
   it('does not introduce the archive mock runtime, scores, or alternate architecture', () => {
     expect(landing).not.toContain('localStorage');
-    const source = `${landing}\n${v0Visual}`;
+    const source = `${landing}\n${contextField}\n${v0Visual}`;
     for (const prohibited of [
       'Alignment Score',
       'Stability Index',

@@ -58,6 +58,7 @@ Port and maintain:
 - comparison composition;
 - final call to action;
 - restrained atmospheric motion;
+- interactive line fields that keep self, each person, the interaction, and the wider system visually distinct;
 - near-black, cream, warm clay, sage, line, spacing, radius, and depth language;
 - responsive behavior and reduced-motion treatment.
 
@@ -106,6 +107,8 @@ The archive visual language must extend beyond the landing to the real product s
 - login, signup, email access, invitation, onboarding, plan, account, privacy, terms, and not-found surfaces.
 
 The styling layer may change presentation. It must not replace route ownership, state management, API requests, authorization, consent, billing, or AI output behavior.
+
+The public line fields use deterministic sanitized examples only. Matching fields inside People, Systems, and relationship answers derive their labels from the same permitted runtime context already authorized for those surfaces; they do not load additional private data, infer motive, or calculate compatibility.
 
 ## Visual delivery paths
 

@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { ContextInteractionField } from './ContextInteractionField';
+import type { ContextFieldNode } from './ContextInteractionField';
 
 type EvidencePoint = { code: string; label: string };
 type EvidenceGroup = { name?: string; accent?: string; points: readonly EvidencePoint[] };
@@ -55,32 +57,76 @@ const DUO_BASELINE: readonly EvidenceGroup[] = [
 ] as const;
 
 const SELF_FLOW: readonly FlowStep[] = [
-  { kind: 'input', title: 'What you’re feeling', body: 'The pull to fix everyone’s problems—often before your own.' },
-  { kind: 'read', title: 'What your Baseline shows', body: 'Stability may be a core value, and under stress protecting others can become a way to create safety.', chips: ['GK 13.4', 'MARS · CANCER'] },
-  { kind: 'connect', title: 'The pattern, named', body: 'Taking control is not a flaw. It may be a useful capacity that becomes over-responsibility when ownership is unclear.' },
-  { kind: 'direction', title: 'Start here', body: 'Notice the first moment responsibility moves toward you, then ask: is this actually mine to carry?' }
+  { kind: 'input', title: 'Reading your Baseline', body: 'Sovereign starts with the stable qualities most relevant to responsibility, boundaries, and pressure.' },
+  { kind: 'read', title: 'Finding the pattern', body: 'Stepping in may create stability when uncertainty rises.', chips: ['GK 13.4', 'MARS · CANCER'] },
+  { kind: 'connect', title: 'Building the distinction', body: 'The capacity to lead is real. Carrying outcomes without matching authority is where it can become over-responsibility.' },
+  { kind: 'direction', title: 'Answering the real question', body: 'The question is not whether you care. It is whether this responsibility is actually yours.' }
 ] as const;
 
 const DUO_FLOW: readonly FlowStep[] = [
-  { kind: 'input', title: 'The friction you feel', body: 'The same conversation lands calm for one person and urgent for the other.' },
+  { kind: 'input', title: 'Keeping both people distinct', body: 'Your need for time and Maya’s quicker recognition remain separate. Neither person becomes the explanation for the other.' },
   {
     kind: 'read',
-    title: 'Each Baseline, read in parallel',
+    title: 'Reading each perspective',
     body: 'Sovereign checks how each person may naturally reach clarity, using only permitted information.',
     branches: [
       { name: 'You', accent: '#e8ddd0', chips: ['GATE 22.4', 'Needs time to settle'] },
       { name: 'Maya', accent: '#7f9a8f', chips: ['GATE 57.2', 'Recognizes quickly'] }
     ]
   },
-  { kind: 'connect', title: 'What may be happening', body: 'The tension may be a timing gap rather than a values gap. Neither person has to be reduced to wrong.' },
-  { kind: 'direction', title: 'What may work for both', body: 'Name the decision and agree on a return time. One person can share an initial sense; the other can confirm after processing.' }
+  { kind: 'connect', title: 'Finding the interaction', body: 'The tension may be a timing gap rather than a values gap. Neither person has to be reduced to wrong.' },
+  { kind: 'direction', title: 'Showing what happens between you', body: 'Name the decision and agree on a return time. One person can share an initial sense; the other can confirm after processing.' }
+] as const;
+
+const SYSTEM_FLOW = [
+  { title: 'Mapping the people', body: 'Keep every permitted person visible as a distinct participant.' },
+  { title: 'Reading roles and responsibility', body: 'Separate who acts, who decides, and who carries the outcome.' },
+  { title: 'Tracing the recurring pattern', body: 'Look for where the same delay or pressure keeps moving through the group.' },
+  { title: 'Showing the whole system', body: 'Make the shared pattern visible without turning it into a verdict about anyone.' }
 ] as const;
 
 const FAMILY = [
-  { name: 'You', role: 'Parent', chips: ['SUN · LEO', 'GATE 22.4'], shares: true, x: 50, y: 15 },
-  { name: 'Maya', role: 'Partner', chips: ['SUN · VIRGO', 'GATE 57.2'], shares: false, x: 84, y: 50 },
-  { name: 'Noa', role: 'Child', chips: ['SUN · PISCES', 'GATE 22.2'], shares: true, x: 50, y: 85 },
-  { name: 'Ruth', role: 'Grandparent', chips: ['SUN · CAP', 'GATE 22.6'], shares: true, x: 16, y: 50 }
+  { name: 'You', role: 'Parent', chips: ['SUN · LEO', 'GATE 22.4'], shares: true },
+  { name: 'Maya', role: 'Partner', chips: ['SUN · VIRGO', 'GATE 57.2'], shares: false },
+  { name: 'Noa', role: 'Child', chips: ['SUN · PISCES', 'GATE 22.2'], shares: true },
+  { name: 'Ruth', role: 'Grandparent', chips: ['SUN · CAP', 'GATE 22.6'], shares: true }
+] as const;
+
+const SYSTEM_FIELD: readonly ContextFieldNode[] = FAMILY.map((member) => ({
+  id: member.name.toLowerCase(),
+  label: member.name,
+  meta: member.role,
+  detail: member.shares
+    ? `${member.name} shares the supported slower-settling facet in this example. Their actual experience still belongs to them to confirm.`
+    : `${member.name} follows a different supported route to clarity in this example. That difference is context, not a verdict.`,
+  tone: member.shares ? 'cream' : 'sage'
+}));
+
+const SELF_FIELD: readonly ContextFieldNode[] = [
+  {
+    id: 'self-baseline',
+    label: 'Your Baseline',
+    meta: 'Responsibility · boundaries',
+    detail: 'Stable qualities stay distinct from the temporary pressure surrounding the question.',
+    tone: 'cream'
+  }
+] as const;
+
+const RELATIONSHIP_FIELD: readonly ContextFieldNode[] = [
+  {
+    id: 'you',
+    label: 'You',
+    meta: 'Needs time to settle',
+    detail: 'Your permitted Baseline may support clarity that forms through time and conversation.',
+    tone: 'cream'
+  },
+  {
+    id: 'maya',
+    label: 'Maya',
+    meta: 'Recognizes quickly',
+    detail: 'Maya’s permitted Baseline may support a quicker first recognition that remains hers to confirm.',
+    tone: 'sage'
+  }
 ] as const;
 
 const COMPARISON = {
@@ -201,8 +247,9 @@ function RotatingQuestions() {
 }
 
 function PersonalStory() {
+  const sectionRef = useRevealOnce();
   return (
-    <section id="how" className="v0-story v0-story-self" data-viewport-section="personal">
+    <section ref={sectionRef} id="how" className="v0-story v0-story-self" data-viewport-section="personal">
       <StoryHeading step="Step 01 · You" title="Ask about your life." outline="Get an answer built for you.">
         You ask a real question. Sovereign reads your Baseline, then works through it step by step—turning a vague feeling into a useful distinction.
       </StoryHeading>
@@ -216,7 +263,19 @@ function PersonalStory() {
           <Message side="user">That’s exactly it. How do I start to change it?</Message>
           <ComposerPreview>Ask a question…</ComposerPreview>
         </ChatWindow>
-        <ProcessingFlow title="How Sovereign works it through" steps={SELF_FLOW} surface="personal-reasoning" />
+        <ProcessingFlow
+          title="How Sovereign works it through"
+          steps={SELF_FLOW}
+          surface="personal-reasoning"
+          field={<ContextInteractionField
+            mode="self"
+            nodes={SELF_FIELD}
+            centerLabel="The real question"
+            centerMeta="Capacity or over-responsibility"
+            centerDetail="Is this yours to lead, yours to support, or not yours to carry?"
+            compact
+          />}
+        />
       </div>
       <a className="v0-story-action" href="/signup">Try it free <span aria-hidden="true">→</span></a>
     </section>
@@ -224,8 +283,9 @@ function PersonalStory() {
 }
 
 function RelationshipStory() {
+  const sectionRef = useRevealOnce();
   return (
-    <section className="v0-story v0-story-relationship" data-viewport-section="relationship">
+    <section ref={sectionRef} className="v0-story v0-story-relationship" data-viewport-section="relationship">
       <StoryHeading step="Step 02 · You + 1" title="See the space" outline="between you.">
         Bring another person’s permitted Baseline into the room. Sovereign keeps both people distinct, then shows what the interaction may create between them.
       </StoryHeading>
@@ -238,7 +298,19 @@ function RelationshipStory() {
           </Message>
           <ComposerPreview>Ask about the two of you…</ComposerPreview>
         </ChatWindow>
-        <ProcessingFlow title="How Sovereign reads both of you" steps={DUO_FLOW} surface="relationship-reasoning" />
+        <ProcessingFlow
+          title="How Sovereign reads both of you"
+          steps={DUO_FLOW}
+          surface="relationship-reasoning"
+          field={<ContextInteractionField
+            mode="relationship"
+            nodes={RELATIONSHIP_FIELD}
+            centerLabel="Between you"
+            centerMeta="Timing interaction"
+            centerDetail="One person may need time while the other recognizes quickly. The friction can be about pace without becoming a judgment about care."
+            compact
+          />}
+        />
       </div>
       <p className="v0-consent-note">Illustrative permitted Baselines · No compatibility score · No private-thought claims</p>
       <a className="v0-story-action v0-story-action-secondary" href="/signup">Explore a relationship <span aria-hidden="true">→</span></a>
@@ -247,8 +319,9 @@ function RelationshipStory() {
 }
 
 function SystemStory() {
+  const sectionRef = useRevealOnce();
   return (
-    <section className="v0-story v0-story-system" data-viewport-section="system">
+    <section ref={sectionRef} className="v0-story v0-story-system" data-viewport-section="system">
       <StoryHeading step="Step 03 · Your whole system" title="From one person" outline="to the whole system.">
         Bring permitted Baselines, roles, and responsibility into one view. The system map appears inside the same conversation, where the pattern becomes useful.
       </StoryHeading>
@@ -364,7 +437,7 @@ function BaselineTrace({ groups }: { groups: readonly EvidenceGroup[] }) {
   );
 }
 
-function ProcessingFlow({ title, steps, surface }: { title: string; steps: readonly FlowStep[]; surface: string }) {
+function ProcessingFlow({ title, steps, surface, field }: { title: string; steps: readonly FlowStep[]; surface: string; field?: ReactNode }) {
   return (
     <article className="v0-window v0-flow" data-viewport-surface={surface}>
       <header><b aria-hidden="true" /><span>{title}</span><small>Baseline Design</small></header>
@@ -377,6 +450,7 @@ function ProcessingFlow({ title, steps, surface }: { title: string; steps: reado
             <span>{step.body}</span>
             {step.branches && <div className="v0-flow-branches">{step.branches.map((branch) => <section key={branch.name}><strong><i style={{ background: branch.accent }} />{branch.name}</strong><div>{branch.chips.map((chip) => <code key={chip}>{chip}</code>)}</div></section>)}</div>}
             {step.chips && <div className="v0-flow-chips">{step.chips.map((chip) => <code key={chip}>{chip}</code>)}</div>}
+            {field && index === 1 && <div className="v0-flow-field">{field}</div>}
           </li>
         ))}
       </ol>
@@ -385,21 +459,47 @@ function ProcessingFlow({ title, steps, surface }: { title: string; steps: reado
 }
 
 function FamilyMap() {
+  const [activeId, setActiveId] = useState('center');
+  const activeMember = FAMILY.find((member) => member.name.toLowerCase() === activeId);
   return (
     <div className="v0-family-map" aria-label="Illustrative family system map">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        {FAMILY.map((member) => <line key={member.name} x1="50" y1="50" x2={member.x} y2={member.y} className={member.shares ? 'shared' : 'different'} />)}
-      </svg>
-      <div className="v0-family-center"><span>Shared facet</span><strong>Slower<br />settling</strong><small>3 of 4</small></div>
-      {FAMILY.map((member) => (
-        <article key={member.name} className={member.shares ? 'shares' : ''} style={{ left: `${member.x}%`, top: `${member.y}%` }}>
-          <header><b>{member.name.slice(0, 1)}</b><strong>{member.name}</strong><small>{member.role}</small></header>
-          <div>{member.chips.map((chip) => <code key={chip} className={chip.startsWith('GATE 22') ? 'shared-chip' : ''}>{chip}</code>)}</div>
-        </article>
-      ))}
-      <footer><span><i />Shares the pattern</span><span><i />Different route</span></footer>
+      <ContextInteractionField
+        mode="system"
+        nodes={SYSTEM_FIELD}
+        centerLabel="Whole system"
+        centerMeta="Slower settling · 3 of 4"
+        centerDetail="Three people share one supported route to clarity while one differs. The useful question is how the group coordinates the difference."
+        onNodeSelect={setActiveId}
+      />
+      <div className="v0-family-evidence" aria-live="polite">
+        <span>{activeMember ? `Grounded in · ${activeMember.name}` : 'Grounded in · Shared pattern'}</span>
+        <div>{(activeMember?.chips ?? ['GATE 22 ×3', 'GATE 57 ×1']).map((chip) => <code key={chip} className={chip.startsWith('GATE 22') ? 'shared-chip' : ''}>{chip}</code>)}</div>
+      </div>
+      <ol className="v0-system-flow" aria-label="How Sovereign shows the whole system">
+        {SYSTEM_FLOW.map((step, index) => <li key={step.title}><i aria-hidden="true">{index + 1}</i><div><strong>{step.title}</strong><span>{step.body}</span></div></li>)}
+      </ol>
     </div>
   );
+}
+
+function useRevealOnce() {
+  const ref = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const section = ref.current;
+    if (!section) return;
+    if (!('IntersectionObserver' in window)) {
+      section.dataset.visible = 'true';
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      section.dataset.visible = 'true';
+      observer.disconnect();
+    }, { threshold: 0.18, rootMargin: '0px 0px -8%' });
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+  return ref;
 }
 
 function ComparisonPanel({ title, items, positive }: { title: string; items: readonly string[]; positive: boolean }) {

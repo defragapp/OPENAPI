@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent, ReactNode } from 'react';
+import { ContextInteractionField } from './ContextInteractionField';
+import type { ContextFieldConnection, ContextFieldNode } from './ContextInteractionField';
 
 type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
 type ApiState = 'idle' | 'loading' | 'ready' | 'error';
@@ -999,6 +1001,13 @@ function RelationshipOverview({ person, api, onPrompt }: { person: Json; api: (p
   if (error) return <EmptyState title="This relationship needs one more permission." body={error} action="Manage permissions" onAction={openConsentControls} />;
   if (!comparison) return <p className="loading-state">Loading the permitted comparison…</p>;
   const participants = comparison.participants ?? [];
+  const fieldNodes: ContextFieldNode[] = participants.slice(0, 2).map((participant: Json, index: number) => ({
+    id: String(participant.key ?? `participant-${index}`),
+    label: index === 0 ? 'You' : String(participant.label ?? person.displayName ?? 'They'),
+    meta: String(participant.facets?.[0]?.title ?? 'Permitted Baseline'),
+    detail: String(participant.facets?.[0]?.description ?? 'This permitted perspective is incomplete and remains open to correction.'),
+    tone: index === 0 ? 'cream' : 'sage'
+  }));
   return (
     <section className="relationship-overview">
       <div className="person-split">
@@ -1006,6 +1015,14 @@ function RelationshipOverview({ person, api, onPrompt }: { person: Json; api: (p
           <article key={participant.key ?? index}><span>{index === 0 ? 'YOU MAY BE BRINGING' : 'THEY MAY BE BRINGING'}</span><h2>{participant.facets?.[0]?.title ?? 'Permitted Baseline'}</h2><p>{participant.facets?.[0]?.description ?? 'This permitted facet is incomplete.'}</p></article>
         ))}
       </div>
+      <ContextInteractionField
+        mode="relationship"
+        nodes={fieldNodes}
+        centerLabel="What happens between you"
+        centerMeta="Two permitted perspectives"
+        centerDetail="Sovereign keeps each person distinct, then shows the interaction, each person’s responsibility, and what still needs to be asked directly."
+        className="workspace-context-field"
+      />
       <article className="relationship-field"><span>WHAT HAPPENS BETWEEN YOU</span><p>Ask Sovereign to synthesize the two permitted facet profiles, the interaction, each person’s responsibility, and what still needs to be asked directly.</p><button onClick={() => onPrompt(`What are ${person.displayName ?? 'this person'} and I each bringing into this relationship?`)}>Explore this relationship</button></article>
     </section>
   );
@@ -1016,6 +1033,9 @@ function SystemOverview({ system, api, onPrompt }: { system: Json; api: (path: s
   const [activeConnection, setActiveConnection] = useState(0);
   const [error, setError] = useState('');
   useEffect(() => {
+    setAnalysis(null);
+    setActiveConnection(0);
+    setError('');
     void api(`/api/v1/systems/${encodeURIComponent(system.id)}/analysis`)
       .then((data) => setAnalysis(data.analysis ?? null))
       .catch((problem) => setError(problem instanceof Error ? problem.message : 'System analysis unavailable.'));
@@ -1025,20 +1045,34 @@ function SystemOverview({ system, api, onPrompt }: { system: Json; api: (path: s
   const participants = analysis.participants ?? [];
   const edges = analysis.relationshipGraph ?? [];
   const edge = edges[activeConnection];
+  const fieldNodes: ContextFieldNode[] = participants.slice(0, 6).map((participant: Json, index: number) => ({
+    id: String(participant.key ?? `participant-${index}`),
+    label: String(participant.label ?? `Person ${index + 1}`),
+    meta: String(participant.role ?? 'Role not confirmed'),
+    detail: String(participant.facets?.[0]?.description ?? 'This participant remains distinct. Only their permitted role and Baseline context are included.'),
+    tone: index === 0 ? 'cream' : index % 3 === 1 ? 'sage' : 'warm'
+  }));
+  const fieldConnections: ContextFieldConnection[] = edges.map((item: Json) => ({ from: String(item.from), to: String(item.to) }));
+  const activeFieldConnection = edge ? { from: String(edge.from), to: String(edge.to) } : undefined;
+  const selectParticipant = (id: string) => {
+    const relatedIndex = edges.findIndex((item: Json) => String(item.from) === id || String(item.to) === id);
+    if (relatedIndex >= 0) setActiveConnection(relatedIndex);
+  };
   return (
     <section className="system-overview">
       <header><div><span>{String(analysis.system?.type ?? 'SYSTEM').replace('_', ' ')}</span><h2>{analysis.system?.label ?? system.name}</h2></div><button onClick={() => onPrompt(`How is ${system.name ?? 'this system'} functioning, and what is each person contributing?`)}>Explore this system</button></header>
       <div className="system-graph" aria-label="Supported system relationships">
-        {participants.map((participant: Json, index: number) => {
-          const relatedIndex = edges.findIndex((item: Json) => item.from === participant.key || item.to === participant.key);
-          return <button
-            key={participant.key ?? index}
-            className={index === 0 ? 'self' : ''}
-            aria-pressed={relatedIndex >= 0 && activeConnection === relatedIndex}
-            disabled={relatedIndex < 0}
-            onClick={() => setActiveConnection(relatedIndex)}
-          ><strong>{participant.label}</strong><small>{participant.role}</small><span>{index === 0 ? 'OWNER' : 'PERMITTED'}</span></button>;
-        })}
+        <ContextInteractionField
+          mode="system"
+          nodes={fieldNodes}
+          centerLabel="Whole system"
+          centerMeta={`${fieldNodes.length} permitted perspective${fieldNodes.length === 1 ? '' : 's'}`}
+          centerDetail="Roles, authority, responsibility, reliance, and communication remain visible together. Missing perspectives remain unknown."
+          connections={fieldConnections}
+          {...(activeFieldConnection ? { activeConnection: activeFieldConnection } : {})}
+          onNodeSelect={selectParticipant}
+          className="workspace-context-field context-system-graph"
+        />
       </div>
       <div className="connection-focus">
         <span>ACTIVE CONNECTION</span>
@@ -1160,10 +1194,25 @@ function AlignmentView({ sections }: { sections: SovereignAnswer['sections'] }) 
 
 function RelationshipAnswer({ sections }: { sections: SovereignAnswer['sections'] }) {
   const byId = (id: AnswerSectionId) => sections.find((section) => section.id === id);
+  const you = byId('you');
+  const other = byId('other');
+  const interaction = byId('interaction');
+  const nodes: ContextFieldNode[] = [
+    { id: 'you', label: 'You', meta: you?.label ?? 'You may be bringing', detail: you?.body ?? 'Your part remains open to correction.', tone: 'cream' },
+    { id: 'other', label: 'They', meta: other?.label ?? 'They may be bringing', detail: other?.body ?? 'Their private experience remains theirs to confirm.', tone: 'sage' }
+  ];
   return (
     <section className="relationship-answer">
-      <div><article><span>{byId('you')?.label ?? 'You may be bringing'}</span><p>{byId('you')?.body}</p></article><article><span>{byId('other')?.label ?? 'They may be bringing'}</span><p>{byId('other')?.body}</p></article></div>
-      <article className="interaction-field"><span>{byId('interaction')?.label ?? 'What happens between you'}</span><p>{byId('interaction')?.body}</p></article>
+      <ContextInteractionField
+        mode="relationship"
+        nodes={nodes}
+        centerLabel={interaction?.label ?? 'What happens between you'}
+        centerMeta="Interaction"
+        centerDetail={interaction?.body ?? 'What happens between you remains separate from either person’s identity.'}
+        className="answer-context-field"
+      />
+      <div><article><span>{you?.label ?? 'You may be bringing'}</span><p>{you?.body}</p></article><article><span>{other?.label ?? 'They may be bringing'}</span><p>{other?.body}</p></article></div>
+      <article className="interaction-field"><span>{interaction?.label ?? 'What happens between you'}</span><p>{interaction?.body}</p></article>
       {sections.filter((section) => !['you', 'other', 'interaction'].includes(section.id)).map((section) => <article key={`${section.id}-${section.label}`}><span>{section.label}</span><p>{section.body}</p></article>)}
     </section>
   );
