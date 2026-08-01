@@ -150,7 +150,7 @@ function V0Hero() {
         <p className="v0-badge"><span />Personal AI for real life</p>
         <h1>
           <span>Healing isn’t optional.</span>
-          <em>Holding onto the pain is.</em>
+          <em style={{ color: 'rgba(15, 15, 15, 0.96)', WebkitTextStroke: '1.25px rgba(232, 221, 208, 0.58)', textShadow: '0 0 1px rgba(232, 221, 208, 0.14), 0 0 38px rgba(232, 221, 208, 0.04)' }}>Holding onto the pain is.</em>
         </h1>
         <p className="v0-hero-copy">
           Sovereign is a personal AI that builds your <strong>Baseline</strong>—a stable, correctable model of how you may naturally operate—then answers real questions about yourself, your relationships, and your family. Grounded in you, never generic.
