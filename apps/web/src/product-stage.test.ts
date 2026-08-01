@@ -5,6 +5,7 @@ const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'u
 const landingStyles = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
 const hardening = readFileSync(new URL('./premium-surface-hardening.css', import.meta.url), 'utf8');
 const completion = readFileSync(new URL('./selective-visual-port.css', import.meta.url), 'utf8');
+const expressionField = readFileSync(new URL('./expression-field/ExpressionField.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 
 describe('shared Sovereign answer stage', () => {
@@ -23,7 +24,9 @@ describe('shared Sovereign answer stage', () => {
   });
 
   it('distinguishes stable, temporary, confirmed, and unknown information', () => {
-    expect(landing).toContain('YOUR BASELINE');
+    expect(landing).toContain('<LandingExpressionField />');
+    expect(expressionField).toContain('ONE CENTER · SIXTEEN EXPRESSIONS');
+    expect(expressionField).toContain('Sanitized demonstration · Illustrative values · Not your Baseline');
     expect(landing).toContain('WHAT MAY BE ACTIVE NOW');
     expect(landing).toContain('YOUR CONFIRMATION');
     expect(landing).toContain('STILL UNKNOWN');
