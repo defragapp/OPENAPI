@@ -8,6 +8,7 @@ const configs = [
   ['worker config', read('apps/sovereign-worker/wrangler.jsonc')]
 ];
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 const modelConfig = read('packages/agent-contracts/src/model-config.ts');
 const runtime = read('apps/sovereign-worker/src/runtime-entry.ts');
 const entry = read('apps/sovereign-worker/src/entry.ts');
@@ -22,7 +23,11 @@ const schema = read('docs/api-shield/sovereign-critical-api.openapi.yaml');
 const main = read('apps/web/src/main.tsx');
 const index = read('apps/web/index.html');
 const landing = read('apps/web/src/PublicLanding.tsx');
+const fingerprint = read('apps/web/src/v0-release-fingerprint.ts');
+const v0Platform = read('apps/web/src/v0-platform-port.css');
 const v0Visual = read('apps/web/src/v0-visual-port.css');
+const staticAuthority = read('apps/web/public/premium-public-release.css');
+const staticV0 = read('apps/web/public/v0-public-port.css');
 const composition = read('apps/web/src/interface-composition.css');
 const how = read('apps/web/public/how-it-works.html');
 const pricing = read('apps/web/public/pricing.html');
@@ -41,6 +46,10 @@ function assert(condition, message) {
 
 function requireAll(label, text, values) {
   for (const value of values) assert(text.includes(value), `${label} is missing ${value}`);
+}
+
+function balanced(label, source) {
+  assert((source.match(/{/g) ?? []).length === (source.match(/}/g) ?? []).length, `${label} CSS is unbalanced`);
 }
 
 const scripts = JSON.stringify(packageJson.scripts || {});
@@ -91,6 +100,7 @@ requireAll('production deploy', deploy, [
   "const model = '@cf/zai-org/glm-4.7-flash'",
   "const migrationVersion = '0013_workers_ai_free_capacity'",
   `const archiveSha = '${archiveSha}'`,
+  `const sequenceFingerprint = \`sovereign-founder-v0|`,
   'configureCloudflareFreeTier',
   "'d1', 'migrations', 'apply'",
   "'deploy', '--config', generatedConfigPath",
@@ -103,11 +113,14 @@ requireAll('production deploy', deploy, [
   "assertDocument('signup'",
   "assertDocument('app'",
   'v0-landing-selective-port',
+  'v0-platform-port.css',
+  'v0-public-port.css',
   'dailyNeuronReservationBudget: 7_500',
   'ready version is',
   "cloudflarePlanTarget: 'free'"
 ]);
 assert(!deploy.includes('Know yourself.'), 'Production deploy still certifies the rejected reconstruction');
+assert(!deploy.includes("'Math.random'"), 'Production deploy still rejects an entire compiled dependency bundle by a generic string');
 assert(!deploy.includes('/launch-polish.css?v=20260730-cohesion'), 'Production deploy still gates on a retired stylesheet fingerprint');
 
 requireAll('bundle verifier', bundle, ['CLOUDFLARE_FREE_LIMIT_BYTES = 3 * 1024 * 1024', 'INTERNAL_BUDGET_BYTES = 2_500 * 1024', 'Wrangler did not report a compressed Worker upload size']);
@@ -117,13 +130,26 @@ assert(!schema.includes('/api/v1/auth/login:'), 'Turnstile-bearing login must re
 
 requireAll('application visual entry', main, [
   "import './interface-composition.css'",
+  "import './v0-platform-port.css'",
   "import './v0-visual-port.css'",
+  "import { installV0ReleaseFingerprint } from './v0-release-fingerprint'",
+  'installV0ReleaseFingerprint();',
   '<PublicLanding />',
   '<AuthenticatedWorkspace />',
   '<PublicPolicy'
 ]);
+const platformImport = "import './v0-platform-port.css';";
 const v0Import = "import './v0-visual-port.css';";
+assert(main.indexOf(platformImport) < main.indexOf(v0Import), 'The platform coverage layer must load before the final v0 authority');
 assert(!main.slice(main.indexOf(v0Import) + v0Import.length).includes("import './"), 'A visual layer loads after the founder v0 authority');
+
+requireAll('runtime fingerprint', fingerprint, [
+  `V0_ARCHIVE_SHA256 = '${archiveSha}'`,
+  `V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`,
+  "dataset.sovereignVisualContract = 'v0-landing-selective-port'",
+  'dataset.sovereignV0Archive = V0_ARCHIVE_SHA256',
+  'dataset.sovereignV0Sequence = V0_SEQUENCE_FINGERPRINT'
+]);
 requireAll('application document', index, ['id="root"', 'Healing isn’t optional. Holding onto the pain is.', 'release-fingerprint']);
 requireAll('founder v0 component source', landing, [
   `const V0_ARCHIVE_SHA = '${archiveSha}'`,
@@ -135,6 +161,14 @@ requireAll('founder v0 component source', landing, [
   '<SystemStory />',
   '<ComparisonStory />'
 ]);
+requireAll('founder v0 platform coverage', v0Platform, [
+  'body:has(.plan-onboarding)',
+  'body:has(.sovereign-policy)',
+  'body:has(.email-code-fallback)',
+  '.onboarding-plan-grid',
+  '.policy-grid',
+  '.email-code-fallback'
+]);
 requireAll('founder v0 sitewide visual authority', v0Visual, [
   '--v0-page: #0f0f0f',
   '--v0-cream: #e8ddd0',
@@ -144,15 +178,28 @@ requireAll('founder v0 sitewide visual authority', v0Visual, [
   '.sovereign-composer',
   '.account-shell'
 ]);
+requireAll('standalone route authority', staticAuthority, ["@import url('/v0-public-port.css?v=20260801-founder-v0')"]);
+requireAll('standalone v0 visual layer', staticV0, [
+  `Archive SHA-256: ${archiveSha}`,
+  'body.launch-page',
+  '.launch-nav',
+  '.launch-hero',
+  '.journey-steps',
+  '.pricing-grid',
+  '.faq-list details',
+  '.launch-footer'
+]);
 requireAll('cross-platform composition', composition, ['.sovereign-landing', '.account-shell', '.plan-onboarding', '.sovereign-policy', '.public-not-found', '.intelligence-workspace', '@media (max-width: 700px)']);
 
-requireAll('How it works document', how, ['<body class="launch-page"', 'SOVEREIGN.OS', 'journey-steps', 'baseline-explainer']);
-requireAll('pricing document', pricing, ['<body class="launch-page pricing-page"', '$0', '$20', '$99 / year', '10 Sovereign AI turns each month', '300 Sovereign AI turns each month']);
-requireAll('FAQ document', faq, ['<body class="launch-page questions-page"', '<details', 'What is Sovereign.OS?', 'Can I correct or remove an interpretation?']);
+requireAll('How it works document', how, ['<body class="launch-page"', 'SOVEREIGN.OS', 'journey-steps', 'baseline-explainer', '/premium-public-release.css?v=20260730-final']);
+requireAll('pricing document', pricing, ['<body class="launch-page pricing-page"', '$0', '$20', '$99 / year', '10 Sovereign AI turns each month', '300 Sovereign AI turns each month', '/premium-public-release.css?v=20260730-final']);
+requireAll('FAQ document', faq, ['<body class="launch-page questions-page"', '<details', 'What is Sovereign.OS?', 'Can I correct or remove an interpretation?', '/premium-public-release.css?v=20260730-final']);
 
 for (const [label, document] of documents) {
   requireAll(label, document, ['@cf/zai-org/glm-4.7-flash', '0013_workers_ai_free_capacity']);
   assert(!document.includes('AI_MODEL=openai/gpt-5.5'), `${label} still instructs maintainers to select the retired paid model`);
 }
+
+for (const [label, css] of [['v0 platform', v0Platform], ['v0 final', v0Visual], ['v0 standalone', staticV0]]) balanced(label, css);
 
 console.log('Production release v2 verification passed.');
