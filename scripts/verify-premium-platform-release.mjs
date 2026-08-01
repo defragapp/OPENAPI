@@ -56,20 +56,32 @@ requireAll('founder v0 archive fingerprint', landing, [
   'data-viewport-contract="v0-public-landing-v1"'
 ]);
 
-const orderedLandingMarkers = [
+requireAll('founder v0 hero copy', landing, [
   'Healing isn’t optional.',
-  'Holding onto the pain is.',
+  'Holding onto the pain is.'
+]);
+
+const renderStart = landing.indexOf('export function PublicLanding()');
+const renderEnd = landing.indexOf('function V0Navigation()', renderStart);
+assert(renderStart >= 0, 'PublicLanding render function is missing.');
+assert(renderEnd > renderStart, 'PublicLanding render boundary is missing.');
+const renderedSequence = landing.slice(renderStart, renderEnd);
+const orderedLandingMarkers = [
+  '<V0Navigation />',
+  '<V0Hero />',
   '<RotatingQuestions />',
   '<PersonalStory />',
   '<RelationshipStory />',
   '<SystemStory />',
   '<ComparisonStory />',
-  '<FinalCallToAction />'
+  '<FinalCallToAction />',
+  '<V0Footer />'
 ];
 let previousIndex = -1;
 for (const marker of orderedLandingMarkers) {
-  const index = landing.indexOf(marker);
-  assert(index > previousIndex, `Founder v0 landing order is wrong at ${marker}`);
+  const index = renderedSequence.indexOf(marker);
+  assert(index >= 0, `Founder v0 rendered composition is missing ${marker}`);
+  assert(index > previousIndex, `Founder v0 rendered composition order is wrong at ${marker}`);
   previousIndex = index;
 }
 
