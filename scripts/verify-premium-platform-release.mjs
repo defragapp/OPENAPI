@@ -7,7 +7,9 @@ const rejectAll = (label, source, values) => values.forEach((value) => assert(!s
 const balanced = (label, source) => assert((source.match(/{/g) ?? []).length === (source.match(/}/g) ?? []).length, `${label} CSS is unbalanced.`);
 
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 const main = read('apps/web/src/main.tsx');
+const fingerprint = read('apps/web/src/v0-release-fingerprint.ts');
 const app = read('apps/web/src/App.tsx');
 const landing = read('apps/web/src/PublicLanding.tsx');
 const viewportProbe = read('apps/web/src/PublicLandingViewportContract.ts');
@@ -16,17 +18,36 @@ const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const onboarding = read('apps/web/src/PlanOnboarding.tsx');
 const controls = read('apps/web/src/AccountControlCenter.tsx');
 const membership = read('apps/web/src/SystemMembershipManager.tsx');
+const v0PlatformVisual = read('apps/web/src/v0-platform-port.css');
 const v0Visual = read('apps/web/src/v0-visual-port.css');
 const staticV0Visual = read('apps/web/public/v0-public-port.css');
 const publicSupport = read('apps/web/public/premium-public-release.css');
 const supportPages = ['how-it-works', 'pricing', 'faq', '404'].map((name) => read(`apps/web/public/${name}.html`));
 
-assert(existsSync('apps/web/src/v0-visual-port.css'), 'The founder v0 visual authority is missing.');
-assert(existsSync('apps/web/public/v0-public-port.css'), 'The founder v0 static-route authority is missing.');
+for (const path of [
+  'apps/web/src/v0-release-fingerprint.ts',
+  'apps/web/src/v0-platform-port.css',
+  'apps/web/src/v0-visual-port.css',
+  'apps/web/public/v0-public-port.css'
+]) assert(existsSync(path), `Founder v0 release source is missing: ${path}`);
+
+const platformImport = "import './v0-platform-port.css';";
 const v0Import = "import './v0-visual-port.css';";
+const platformImportIndex = main.indexOf(platformImport);
 const v0ImportIndex = main.indexOf(v0Import);
-assert(v0ImportIndex >= 0, 'The founder v0 visual authority is not imported.');
+assert(platformImportIndex >= 0, 'The founder v0 platform coverage layer is not imported.');
+assert(v0ImportIndex > platformImportIndex, 'The founder v0 final authority does not load after route coverage.');
 assert(!main.slice(v0ImportIndex + v0Import.length).includes("import './"), 'A local visual layer loads after the founder v0 authority.');
+
+requireAll('founder v0 runtime fingerprint', `${fingerprint}\n${main}`, [
+  `V0_ARCHIVE_SHA256 = '${archiveSha}'`,
+  `V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`,
+  "dataset.sovereignVisualContract = 'v0-landing-selective-port'",
+  'dataset.sovereignV0Archive = V0_ARCHIVE_SHA256',
+  'dataset.sovereignV0Sequence = V0_SEQUENCE_FINGERPRINT',
+  "import { installV0ReleaseFingerprint } from './v0-release-fingerprint'",
+  'installV0ReleaseFingerprint();'
+]);
 
 requireAll('founder v0 archive fingerprint', landing, [
   `const V0_ARCHIVE_SHA = '${archiveSha}'`,
@@ -95,6 +116,21 @@ requireAll('v0 visual language', v0Visual, [
   '@media (prefers-reduced-motion: reduce)'
 ]);
 
+requireAll('v0 application route coverage', v0PlatformVisual, [
+  'body:has(.plan-onboarding)',
+  'body:has(.sovereign-policy)',
+  'body:has(.email-code-fallback)',
+  '.plan-nav',
+  '.onboarding-plan-grid',
+  '.plan-visual',
+  '.policy-hero',
+  '.policy-grid',
+  '.policy-contact',
+  '.email-code-fallback',
+  '@media (max-width: 700px)',
+  '@media (prefers-reduced-motion: reduce)'
+]);
+
 requireAll('v0 static-route visual language', staticV0Visual, [
   `Archive SHA-256: ${archiveSha}`,
   'body.launch-page',
@@ -117,6 +153,7 @@ requireAll('v0 rendered viewport measurement', viewportProbe, [
   "'relationship-reasoning'",
   "'system-map'",
   "'comparison'",
+  'const narrow = snapshot.viewportWidth <= narrowViewportMaximum',
   'getBoundingClientRect()',
   'node.offsetWidth',
   'comparisonStacked',
@@ -137,7 +174,7 @@ requireAll('real authentication', app, ["path === '/login'", "path === '/signup'
 requireAll('real billing', `${onboarding}\n${controls}`, ['/api/v1/billing/checkout', '/api/v1/billing/portal']);
 requireAll('real consent', membership, ['person.identityBound === true', "person.activeScopes.includes('system.include')"]);
 
-const productionVisualSource = `${landing}\n${v0Visual}\n${app}\n${workspace}`;
+const productionVisualSource = `${landing}\n${v0PlatformVisual}\n${v0Visual}\n${app}\n${workspace}`;
 rejectAll('selective v0 port', productionVisualSource, [
   'Math.random',
   'localStorage.setItem("sovereign-user"',
@@ -150,6 +187,7 @@ rejectAll('selective v0 port', productionVisualSource, [
 ]);
 
 supportPages.forEach((page) => requireAll('support page', page, ['/premium-public-release.css?v=20260730-final', 'SOVEREIGN.OS']));
+balanced('founder v0 platform coverage', v0PlatformVisual);
 balanced('founder v0 visual authority', v0Visual);
 balanced('founder v0 static authority', staticV0Visual);
 balanced('public support authority', publicSupport);
@@ -158,7 +196,9 @@ console.log(JSON.stringify({
   ok: true,
   release: 'sovereign-v0-selective-visual-port',
   archiveSha256: archiveSha,
+  sequenceFingerprint,
   canonicalLanding: 'PublicLanding.tsx + v0-visual-port.css',
+  platformRouteCoverage: 'v0-platform-port.css',
   staticRouteVisualAuthority: 'v0-public-port.css',
   visualDirection: 'founder-v0-dark-editorial',
   portMode: 'components-and-styling-only',
