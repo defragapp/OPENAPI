@@ -63,9 +63,12 @@ describe('Baseline-first Sovereign answer UI', () => {
     for (const file of removed) expect(existsSync(file)).toBe(false);
   });
 
-  it('does not cache authenticated workspace assets', () => {
+  it('retires all browser caching rather than caching authenticated workspace assets', () => {
+    expect(serviceWorker).toContain("const RETIREMENT_MARKER = 'sovereign-public-cache-retired-v17'");
+    expect(serviceWorker).toContain('self.registration.unregister()');
+    expect(serviceWorker).toContain('caches.keys()');
+    expect(serviceWorker).not.toContain("addEventListener('fetch'");
     expect(serviceWorker).not.toContain("'/app'");
     expect(serviceWorker).not.toContain("'/intelligence-ui.js'");
-    expect(serviceWorker).toContain("'/brand-mark.svg'");
   });
 });
