@@ -61,7 +61,8 @@ requireAll('responsive viewport contract', viewport, [
   '@media (max-width: 430px)'
 ]);
 requireAll('canonical public landing contract', editorial, [
-  '--editorial-page:',
+  '--editorial-page:#0f0f0f',
+  '--editorial-cream:#e8ddd0',
   '.sovereign-landing .landing-nav',
   '.sovereign-landing .landing-hero',
   '.sovereign-landing .hero-intelligence-stage',
@@ -69,10 +70,10 @@ requireAll('canonical public landing contract', editorial, [
   '.sovereign-landing .sovereign-story-step',
   '.sovereign-landing .permission-section',
   '.sovereign-landing .pricing-preview',
-  '@media (max-width: 1024px)',
-  '@media (max-width: 760px)',
-  '@media (max-width: 430px)',
-  '@media (prefers-reduced-motion: reduce)'
+  '@media(max-width:1024px)',
+  '@media(max-width:760px)',
+  '@media(max-width:430px)',
+  '@media(prefers-reduced-motion:reduce)'
 ]);
 requireAll('rendered viewport measurement', viewportProbe, [
   'getBoundingClientRect()',
@@ -92,8 +93,9 @@ for (const [label, source] of [['premium', premium], ['visual', visual], ['respo
 
 console.log(JSON.stringify({
   ok: true,
-  release: 'sovereign-editorial-public-landing',
+  release: 'sovereign-cinematic-public-landing',
   canonicalLanding: 'public-landing-editorial.css',
+  visualDirection: 'zip-inspired-cinematic-dark',
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
   answerContract: 'sovereign-answer.v2',
   renderedViewportProbe: true
