@@ -1,47 +1,42 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
-const landingStyles = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
-const hardening = readFileSync(new URL('./premium-surface-hardening.css', import.meta.url), 'utf8');
-const completion = readFileSync(new URL('./selective-visual-port.css', import.meta.url), 'utf8');
-const expressionField = readFileSync(new URL('./expression-field/ExpressionField.tsx', import.meta.url), 'utf8');
-const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
+const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
+const landing = read('./PublicLanding.tsx');
+const engine = read('./engine-room.css');
+const expressionField = read('./expression-field/ExpressionField.tsx');
+const workspace = read('./SovereignIntelligenceWorkspace.tsx');
 
-describe('shared Sovereign answer stage', () => {
-  it('uses the same answer hierarchy publicly and after authentication', () => {
-    expect(landing).toContain('EXAMPLE ANSWER');
-    expect(landing).toContain('DIRECT ANSWER');
-    expect(landing).toContain('THE PERSONAL CONNECTION');
-    expect(landing).toContain('A PRACTICAL NEXT STEP');
-    expect(landing).toContain('Why this is personal');
-    expect(landing).toContain('visual-reasoning-panel');
-    expect(landing).toContain('className="visual-evidence-chips"');
+describe('shared Sovereign intelligence stage', () => {
+  it('demonstrates the same direct-answer authority publicly and after authentication', () => {
+    expect(landing).toContain('DIRECT UNDERSTANDING');
+    expect(landing).toContain('Your capacity is real.');
+    expect(landing).toContain('The question is whether the responsibility is actually yours.');
+    expect(landing).toContain('SUPPORTED BY / BOUNDARY RESPONSE · RESPONSIBILITY ORIENTATION · SYSTEM ROLE');
     expect(workspace).toContain('<SovereignAnswerView');
     expect(workspace).toContain('<RelationshipAnswer');
     expect(workspace).toContain('<SystemAnswer');
     expect(workspace).toContain('<BasisStrip');
   });
 
-  it('distinguishes stable, temporary, confirmed, and unknown information', () => {
-    expect(landing).toContain('<LandingExpressionField />');
+  it('separates stable Baseline, temporary context, consent, and unknowns', () => {
+    expect(landing).toContain('Your intelligence begins with a stable Baseline.');
+    expect(landing).toContain('TEMPORARY_EMPHASIS / ACTIVE');
+    expect(landing).toContain('PERMISSION /');
+    expect(landing).toContain('SOURCE /');
+    expect(landing).toContain('CONSENTED');
     expect(expressionField).toContain('ONE CENTER · SIXTEEN EXPRESSIONS');
     expect(expressionField).toContain('Sanitized demonstration · Illustrative values · Not your Baseline');
-    expect(landing).toContain('WHAT MAY BE ACTIVE NOW');
-    expect(landing).toContain('YOUR CONFIRMATION');
-    expect(landing).toContain('STILL UNKNOWN');
   });
 
   it('is keyboard-ready, responsive, and reduced-motion safe', () => {
-    expect(landing).toContain('aria-label="Permitted family system map"');
-    expect(landing).toContain('aria-pressed={activeId === member.id}');
-    expect(landing).toContain('onClick={() => setActiveId(member.id)}');
+    expect(landing).toContain('aria-label="Sovereign.OS intelligence engine"');
+    expect(landing).toContain('aria-label="Demonstration Baseline compilation');
+    expect(landing).toContain('aria-label="Self context moves into a consented relationship and then into a wider system"');
     expect(workspace).toContain('const limit = mobile ? 3 : 5');
-    expect(landingStyles).toContain('@media (max-width: 760px)');
-    expect(hardening).toContain('@media (max-width: 680px)');
-    expect(hardening).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(hardening).toContain('@media (forced-colors: active)');
-    expect(completion).toContain('@media (max-width: 680px)');
-    expect(completion).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(engine).toContain('min-height: 44px');
+    expect(engine).toContain('@media (max-width: 680px)');
+    expect(engine).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(engine).toContain('@media (forced-colors: active)');
   });
 });
