@@ -23,7 +23,8 @@ describe('shared Sovereign answer stage', () => {
   });
 
   it('distinguishes stable, temporary, confirmed, and unknown information', () => {
-    expect(landing).toContain('YOUR BASELINE');
+    expect(landing).toContain('Your intelligence begins with your Baseline.');
+    expect(landing).toContain('<LandingExpressionField />');
     expect(landing).toContain('WHAT MAY BE ACTIVE NOW');
     expect(landing).toContain('YOUR CONFIRMATION');
     expect(landing).toContain('STILL UNKNOWN');
