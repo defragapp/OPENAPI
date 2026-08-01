@@ -5,6 +5,7 @@ if (!/^[0-9a-f]{40}$/i.test(commitSha)) {
 }
 
 const publicBase = 'https://sovereign.defrag.app';
+const appBase = 'https://app.defrag.app';
 const redirectChecks = [
   ['https://defrag.app/', 'https://sovereign.defrag.app/'],
   ['https://www.defrag.app/', 'https://sovereign.defrag.app/'],
@@ -57,7 +58,7 @@ async function verifyVisualRelease() {
   if (!scriptPaths.length) throw new Error('Public entry is missing its compiled JavaScript asset');
   if (!stylePaths.length) throw new Error('Public entry is missing its compiled CSS asset');
 
-  const [scripts, styles, serviceWorker, displayFont, sansFont] = await Promise.all([
+  const [scripts, styles, serviceWorker, displayFont, sansFont, expressionFieldAuthBoundary] = await Promise.all([
     Promise.all(scriptPaths.map(async (path) => {
       const response = await fetchWithTimeout(`${publicBase}${path}`);
       const text = await response.text();
@@ -76,7 +77,11 @@ async function verifyVisualRelease() {
     })),
     fetchWithTimeout(`${publicBase}/sw.js`).then(async (response) => ({ response, text: await response.text() })),
     fetchWithTimeout(`${publicBase}/fonts/sovereign-display.woff2`).then(async (response) => ({ response, bytes: (await response.arrayBuffer()).byteLength })),
-    fetchWithTimeout(`${publicBase}/fonts/sovereign-sans.woff2`).then(async (response) => ({ response, bytes: (await response.arrayBuffer()).byteLength }))
+    fetchWithTimeout(`${publicBase}/fonts/sovereign-sans.woff2`).then(async (response) => ({ response, bytes: (await response.arrayBuffer()).byteLength })),
+    fetchWithTimeout(`${appBase}/api/v1/expression-field?mode=live`, {
+      redirect: 'manual',
+      headers: { accept: 'application/json' }
+    })
   ]);
 
   const compiledJavaScript = scripts.join('\n');
@@ -85,7 +90,10 @@ async function verifyVisualRelease() {
     'Understand the system.',
     'Choose what fits.',
     'Your intelligence begins with your Baseline.',
-    'What do you want to understand?'
+    'What do you want to understand?',
+    'ONE CENTER · SIXTEEN EXPRESSIONS',
+    'Sanitized demonstration · Illustrative values · Not your Baseline',
+    '/api/v1/expression-field?mode=live'
   ]) {
     if (!compiledJavaScript.includes(marker)) throw new Error(`Compiled application is missing current product marker: ${marker}`);
   }
@@ -97,6 +105,10 @@ async function verifyVisualRelease() {
     '--editorial-ink:#f5f1e8',
     '--editorial-cream:#e8ddd0',
     '.sovereign-landing{',
+    '.expression-field-canvas{',
+    '.expression-field-focus{',
+    'touch-action:pan-y',
+    'touch-action:none',
     '/fonts/sovereign-display.woff2',
     '/fonts/sovereign-sans.woff2'
   ]) {
@@ -106,6 +118,10 @@ async function verifyVisualRelease() {
   }
   for (const family of ['Sovereign Display', 'Sovereign Sans']) {
     if (!compiledCss.includes(family)) throw new Error(`Compiled CSS is missing self-hosted family: ${family}`);
+  }
+
+  if (expressionFieldAuthBoundary.status !== 401) {
+    throw new Error(`Private Expression Field endpoint returned ${expressionFieldAuthBoundary.status}; expected 401 without a session`);
   }
 
   if (!serviceWorker.response.ok
@@ -127,6 +143,8 @@ async function verifyVisualRelease() {
     javascriptAssets: scriptPaths,
     cssAssets: stylePaths,
     editorialContract: 'public-landing-editorial.css',
+    expressionFieldContract: 'expression-field.v1',
+    expressionFieldAuthBoundary: 'private-401-without-session',
     visualDirection: 'zip-inspired-cinematic-dark',
     typography: ['Sovereign Display', 'Sovereign Sans'],
     serviceWorkerCache: 'sovereign-public-v15'
