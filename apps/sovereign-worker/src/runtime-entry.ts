@@ -76,7 +76,7 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
   }
 
   if (request.method === 'GET' && url.pathname === '/api/v1/expression-field') {
-    return handleExpressionFieldRequest(request, env);
+    return withSecurityHeaders(await handleExpressionFieldRequest(request, env));
   }
 
   if (request.method === 'GET' && url.pathname === '/api/v1/you') {
