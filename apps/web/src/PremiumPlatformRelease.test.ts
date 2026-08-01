@@ -65,9 +65,11 @@ describe('premium platform release', () => {
     expect(viewportCss).toContain('transform: none;');
     expect(editorialCss).toContain('.sovereign-landing .landing-hero');
     expect(editorialCss).toContain('.sovereign-landing .hero-intelligence-stage');
-    expect(editorialCss).toContain('@media (max-width: 1024px)');
-    expect(editorialCss).toContain('@media (max-width: 760px)');
-    expect(editorialCss).toContain('@media (max-width: 430px)');
+    expect(editorialCss).toContain('--editorial-page:#0f0f0f');
+    expect(editorialCss).toContain('--editorial-cream:#e8ddd0');
+    expect(editorialCss).toContain('@media(max-width:1024px)');
+    expect(editorialCss).toContain('@media(max-width:760px)');
+    expect(editorialCss).toContain('@media(max-width:430px)');
   });
 
   it('measures the rendered viewport instead of checking CSS strings alone', () => {
@@ -97,7 +99,8 @@ describe('premium platform release', () => {
     expect(visualCss).toContain('@keyframes sovereign-message-in');
     expect(visualCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(viewportCss).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(editorialCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(editorialCss).toContain('@media(prefers-reduced-motion:reduce)');
+    expect(editorialCss).toContain('@keyframes sovereign-hero-field');
   });
 
   it('preserves authentication, consent, and billing', () => {
