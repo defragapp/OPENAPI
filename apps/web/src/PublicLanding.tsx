@@ -39,7 +39,7 @@ const DUO_BASELINE: readonly EvidenceGroup[] = [
     accent: '#e8ddd0',
     points: [
       { code: 'SUN · LEO', label: 'Illustrative natal Sun placement' },
-      { code: 'AUTH · EMO', label: 'Illustrative permitted decision timing' },
+      { code: 'GATE 22.4', label: 'Illustrative personality gate and line' },
       { code: 'GK 13', label: 'Illustrative Gene Key activation' }
     ]
   },
@@ -48,7 +48,7 @@ const DUO_BASELINE: readonly EvidenceGroup[] = [
     accent: '#7f9a8f',
     points: [
       { code: 'SUN · VIRGO', label: 'Illustrative natal Sun placement' },
-      { code: 'AUTH · SPLENIC', label: 'Illustrative permitted decision timing' },
+      { code: 'GATE 57.2', label: 'Illustrative personality gate and line' },
       { code: 'GK 25', label: 'Illustrative Gene Key activation' }
     ]
   }
@@ -68,8 +68,8 @@ const DUO_FLOW: readonly FlowStep[] = [
     title: 'Each Baseline, read in parallel',
     body: 'Sovereign checks how each person may naturally reach clarity, using only permitted information.',
     branches: [
-      { name: 'You', accent: '#e8ddd0', chips: ['AUTH · EMO', 'Needs time'] },
-      { name: 'Maya', accent: '#7f9a8f', chips: ['AUTH · SPLENIC', 'Recognizes now'] }
+      { name: 'You', accent: '#e8ddd0', chips: ['GATE 22.4', 'Needs time to settle'] },
+      { name: 'Maya', accent: '#7f9a8f', chips: ['GATE 57.2', 'Recognizes quickly'] }
     ]
   },
   { kind: 'connect', title: 'What may be happening', body: 'The tension may be a timing gap rather than a values gap. Neither person has to be reduced to wrong.' },
@@ -77,10 +77,10 @@ const DUO_FLOW: readonly FlowStep[] = [
 ] as const;
 
 const FAMILY = [
-  { name: 'You', role: 'Parent', chips: ['SUN · LEO', 'AUTH · EMO'], shares: true, x: 50, y: 15 },
-  { name: 'Maya', role: 'Partner', chips: ['SUN · VIRGO', 'AUTH · SPLENIC'], shares: false, x: 84, y: 50 },
-  { name: 'Noa', role: 'Child', chips: ['SUN · PISCES', 'AUTH · EMO'], shares: true, x: 50, y: 85 },
-  { name: 'Ruth', role: 'Grandparent', chips: ['SUN · CAP', 'AUTH · EMO'], shares: true, x: 16, y: 50 }
+  { name: 'You', role: 'Parent', chips: ['SUN · LEO', 'GATE 22.4'], shares: true, x: 50, y: 15 },
+  { name: 'Maya', role: 'Partner', chips: ['SUN · VIRGO', 'GATE 57.2'], shares: false, x: 84, y: 50 },
+  { name: 'Noa', role: 'Child', chips: ['SUN · PISCES', 'GATE 22.2'], shares: true, x: 50, y: 85 },
+  { name: 'Ruth', role: 'Grandparent', chips: ['SUN · CAP', 'GATE 22.6'], shares: true, x: 16, y: 50 }
 ] as const;
 
 const COMPARISON = {
@@ -256,10 +256,10 @@ function SystemStory() {
         <ChatWindow title="Sovereign — Family System" surface="system-map" wide>
           <Message side="user">Can you map my whole family? Decisions around here always seem to take forever.</Message>
           <Message side="assistant" wide>
-            Three of the four illustrative profiles share emotional decision timing, so important choices may need time to settle. That is a possible structural pattern—not a verdict about any person.
+            Three of the four illustrative profiles share a supported slower-settling decision facet, while one points toward quicker recognition. That is a possible coordination pattern—not a verdict about any person.
             <FamilyMap />
             <p className="v0-system-followup">Maya’s route to clarity may differ, which can make the mismatch feel personal when it is partly about timing. The actual experience still belongs to each person to confirm.</p>
-            <BaselineTrace groups={[{ points: [{ code: 'AUTH · EMO ×3', label: 'Three illustrative emotional-timing profiles' }, { code: 'SPLENIC ×1', label: 'One illustrative immediate-recognition profile' }] }]} />
+            <BaselineTrace groups={[{ points: [{ code: 'GATE 22 ×3', label: 'Three illustrative personality gate activations' }, { code: 'GATE 57 ×1', label: 'One illustrative personality gate activation' }] }]} />
           </Message>
           <ComposerPreview>Ask about your family…</ComposerPreview>
         </ChatWindow>
@@ -390,11 +390,11 @@ function FamilyMap() {
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
         {FAMILY.map((member) => <line key={member.name} x1="50" y1="50" x2={member.x} y2={member.y} className={member.shares ? 'shared' : 'different'} />)}
       </svg>
-      <div className="v0-family-center"><span>Shared pattern</span><strong>Emotional<br />Authority</strong><small>3 of 4</small></div>
+      <div className="v0-family-center"><span>Shared facet</span><strong>Slower<br />settling</strong><small>3 of 4</small></div>
       {FAMILY.map((member) => (
         <article key={member.name} className={member.shares ? 'shares' : ''} style={{ left: `${member.x}%`, top: `${member.y}%` }}>
           <header><b>{member.name.slice(0, 1)}</b><strong>{member.name}</strong><small>{member.role}</small></header>
-          <div>{member.chips.map((chip) => <code key={chip} className={chip === 'AUTH · EMO' ? 'shared-chip' : ''}>{chip}</code>)}</div>
+          <div>{member.chips.map((chip) => <code key={chip} className={chip.startsWith('GATE 22') ? 'shared-chip' : ''}>{chip}</code>)}</div>
         </article>
       ))}
       <footer><span><i />Shares the pattern</span><span><i />Different route</span></footer>
