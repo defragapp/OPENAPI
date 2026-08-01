@@ -184,8 +184,6 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       .first<{ ok: number; capacity_ready: number; passkeys_ready: number }>();
     const aiConfig = resolveAiModelConfig(env);
     const emailProvider = transactionalEmailProvider(env);
-    // Production now resolves Resend first. This retained text is the previous release verifier fingerprint:
-    // transactionalEmail: env.EMAIL ? 'cloudflare-binding' : env.RESEND_API_KEY ? 'resend' : 'missing'
     const authConfigured = Boolean(
       env.SESSION_SIGNING_SECRET
       && env.TURNSTILE_SECRET_KEY
@@ -238,7 +236,8 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       ...(pathname === '/ready' ? { ready } : {}),
       version: env.APP_VERSION,
       environment: env.APP_ENV,
-      migrationVersion: '0014_passkey_authentication',
+      migrationVersion: '0013_workers_ai_free_capacity',
+      latestMigrationVersion: '0014_passkey_authentication',
       answerContract: 'sovereign-answer.v2',
       baselineContract: 'baseline-source.v1+baseline-facets.v1',
       dependencies
