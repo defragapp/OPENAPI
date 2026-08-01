@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 const main = read('./main.tsx');
+const fingerprint = read('./v0-release-fingerprint.ts');
 const app = read('./App.tsx');
 const landing = read('./PublicLanding.tsx');
 const viewportProbe = read('./PublicLandingViewportContract.ts');
@@ -13,6 +15,8 @@ const onboarding = read('./PlanOnboarding.tsx');
 const controls = read('./AccountControlCenter.tsx');
 const membership = read('./SystemMembershipManager.tsx');
 const v0Css = read('./v0-visual-port.css');
+const staticV0Css = read('../public/v0-public-port.css');
+const staticAuthority = read('../public/premium-public-release.css');
 
 function expectBalancedCss(source: string) {
   expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
@@ -26,6 +30,16 @@ describe('founder v0 selective visual port', () => {
     expect(main.slice(index + importLine.length)).not.toContain("import './");
     expect(v0Css).toContain(`Source archive SHA-256:\n * ${archiveSha}`);
     expectBalancedCss(v0Css);
+  });
+
+  it('emits the exact archive and sequence fingerprint at runtime', () => {
+    expect(fingerprint).toContain(`V0_ARCHIVE_SHA256 = '${archiveSha}'`);
+    expect(fingerprint).toContain(`V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`);
+    expect(fingerprint).toContain("dataset.sovereignVisualContract = 'v0-landing-selective-port'");
+    expect(fingerprint).toContain('dataset.sovereignV0Archive = V0_ARCHIVE_SHA256');
+    expect(fingerprint).toContain('dataset.sovereignV0Sequence = V0_SEQUENCE_FINGERPRINT');
+    expect(main).toContain("import { installV0ReleaseFingerprint } from './v0-release-fingerprint'");
+    expect(main).toContain('installV0ReleaseFingerprint();');
   });
 
   it('ports the actual v0 landing headings and sequence', () => {
@@ -76,7 +90,7 @@ describe('founder v0 selective visual port', () => {
     ]) expect(landing).toContain(marker);
   });
 
-  it('applies the same v0 language to the real platform surfaces', () => {
+  it('applies the same v0 language to the real platform and standalone routes', () => {
     for (const selector of [
       '.v0-hero',
       '.v0-story-grid',
@@ -88,14 +102,20 @@ describe('founder v0 selective visual port', () => {
       '.auth-panel',
       '.workspace-sheet'
     ]) expect(v0Css).toContain(selector);
+    for (const selector of ['body.launch-page', '.launch-nav', '.launch-hero', '.journey-steps', '.pricing-grid', '.faq-list details', '.launch-footer']) {
+      expect(staticV0Css).toContain(selector);
+    }
+    expect(staticAuthority).toContain("@import url('/v0-public-port.css?v=20260801-founder-v0')");
     expect(v0Css).toContain('@media (max-width: 760px)');
     expect(v0Css).toContain('@media (prefers-reduced-motion: reduce)');
+    expectBalancedCss(staticV0Css);
   });
 
-  it('measures the rendered v0 surfaces on narrow viewports', () => {
+  it('measures the rendered v0 surfaces at desktop and phone widths', () => {
     for (const surface of ['hero', 'personal-chat', 'personal-reasoning', 'relationship-chat', 'relationship-reasoning', 'system-map', 'comparison']) {
       expect(viewportProbe).toContain(`'${surface}'`);
     }
+    expect(viewportProbe).toContain('const narrow = snapshot.viewportWidth <= narrowViewportMaximum');
     expect(viewportProbe).toContain('getBoundingClientRect()');
     expect(viewportProbe).toContain('node.offsetWidth');
     expect(viewportProbe).toContain('comparisonStacked');
