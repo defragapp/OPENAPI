@@ -1,0 +1,157 @@
+name: One-time Cloudflare v0 release monitor
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/one-time-cloudflare-v0-release-monitor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sovereign-one-time-cloudflare-v0-release
+  cancel-in-progress: false
+
+jobs:
+  trigger-monitor-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      CF_ACCOUNT_ID: 8b1954d216d65077c6480d62583fe2c2
+      CF_TRIGGER_UUID: 459985f1-3479-4be9-8497-33728bc3a56d
+      CF_TOKEN_BUILDS: ${{ secrets.CLOUDFLARE_BUILDS_API_TOKEN }}
+      CF_TOKEN_PRIMARY: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_TOKEN_LEGACY: ${{ secrets.CF_API_TOKEN }}
+      CF_DEPLOY_HOOK_URL: ${{ secrets.SOVV_WEB_DEPLOY_HOOK }}
+
+    steps:
+      - name: Check out monitor branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Resolve exact current main SHA
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          TARGET_SHA="$(git rev-parse origin/main)"
+          if [[ ! "$TARGET_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::Unable to resolve a full current main SHA."
+            exit 1
+          fi
+          echo "target_sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
+          echo "Target main SHA: $TARGET_SHA"
+
+      - name: Trigger exact Cloudflare Workers Build
+        id: cloudflare
+        shell: bash
+        env:
+          TARGET_SHA: ${{ steps.release.outputs.target_sha }}
+        run: |
+          set -euo pipefail
+          CF_TOKEN="${CF_TOKEN_BUILDS:-${CF_TOKEN_PRIMARY:-${CF_TOKEN_LEGACY:-}}}"
+          if [[ -n "$CF_TOKEN" ]]; then
+            RESPONSE="$(curl --silent --show-error --fail-with-body --retry 3 --retry-all-errors \
+              --request POST \
+              --url "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/builds/triggers/${CF_TRIGGER_UUID}/builds" \
+              --header "Authorization: Bearer ${CF_TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "{\"branch\":\"main\",\"commit_hash\":\"${TARGET_SHA}\"}")"
+            echo "trigger_method=builds_api" >> "$GITHUB_OUTPUT"
+            echo "cf_token_available=true" >> "$GITHUB_OUTPUT"
+          elif [[ -n "$CF_DEPLOY_HOOK_URL" ]]; then
+            RESPONSE="$(curl --silent --show-error --fail-with-body --retry 3 --retry-all-errors \
+              --request POST \
+              --url "$CF_DEPLOY_HOOK_URL")"
+            echo "trigger_method=deploy_hook" >> "$GITHUB_OUTPUT"
+            echo "cf_token_available=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::No encrypted Cloudflare Builds token or deploy hook is configured."
+            exit 1
+          fi
+          printf '%s' "$RESPONSE" > cloudflare-trigger.json
+          BUILD_UUID="$(node -e "const p=JSON.parse(require('fs').readFileSync('cloudflare-trigger.json','utf8')); if(!p.success||!p.result?.build_uuid){console.error(JSON.stringify(p.errors||p));process.exit(1)}; process.stdout.write(p.result.build_uuid)")"
+          echo "build_uuid=$BUILD_UUID" >> "$GITHUB_OUTPUT"
+          echo "Cloudflare build UUID: $BUILD_UUID"
+
+      - name: Monitor build and print exact failure logs
+        if: steps.cloudflare.outputs.cf_token_available == 'true'
+        shell: bash
+        env:
+          TARGET_SHA: ${{ steps.release.outputs.target_sha }}
+          BUILD_UUID: ${{ steps.cloudflare.outputs.build_uuid }}
+        run: |
+          set -euo pipefail
+          CF_TOKEN="${CF_TOKEN_BUILDS:-${CF_TOKEN_PRIMARY:-${CF_TOKEN_LEGACY:-}}}"
+          for ATTEMPT in $(seq 1 210); do
+            curl --silent --show-error --fail-with-body --retry 3 --retry-all-errors \
+              --url "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/builds/builds/${BUILD_UUID}" \
+              --header "Authorization: Bearer ${CF_TOKEN}" > cloudflare-build.json
+            STATUS="$(node -e "const p=JSON.parse(require('fs').readFileSync('cloudflare-build.json','utf8')); process.stdout.write(String(p.result?.status||'unknown'))")"
+            OUTCOME="$(node -e "const p=JSON.parse(require('fs').readFileSync('cloudflare-build.json','utf8')); process.stdout.write(String(p.result?.build_outcome||'pending'))")"
+            COMMIT="$(node -e "const p=JSON.parse(require('fs').readFileSync('cloudflare-build.json','utf8')); process.stdout.write(String(p.result?.build_trigger_metadata?.commit_hash||''))")"
+            echo "Cloudflare build: status=$STATUS outcome=$OUTCOME commit=$COMMIT"
+            if [[ -n "$COMMIT" && "$COMMIT" != "$TARGET_SHA" ]]; then
+              echo "::error::Cloudflare built $COMMIT instead of $TARGET_SHA."
+              exit 1
+            fi
+            if [[ "$STATUS" == "stopped" ]]; then
+              if [[ "$OUTCOME" == "success" ]]; then
+                exit 0
+              fi
+              curl --silent --show-error --fail-with-body \
+                --url "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/builds/builds/${BUILD_UUID}/logs" \
+                --header "Authorization: Bearer ${CF_TOKEN}" > cloudflare-build-logs.json || true
+              node <<'NODE'
+          const fs = require('fs');
+          if (!fs.existsSync('cloudflare-build-logs.json')) process.exit(0);
+          const payload = JSON.parse(fs.readFileSync('cloudflare-build-logs.json', 'utf8'));
+          for (const line of payload.result?.lines ?? []) {
+            console.error(Array.isArray(line) ? line.join(' ') : String(line));
+          }
+          NODE
+              echo "::error::Cloudflare build stopped with outcome $OUTCOME."
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "::error::Cloudflare build did not finish within 35 minutes."
+          exit 1
+
+      - name: Verify exact production SHA and founder v0 visual contract
+        shell: bash
+        env:
+          WORKERS_CI_BRANCH: main
+          WORKERS_CI_COMMIT_SHA: ${{ steps.release.outputs.target_sha }}
+        run: |
+          set -euo pipefail
+          node scripts/verify-parent-domain-routes.mjs
+
+      - name: Publish evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sovereign-v0-production-${{ steps.release.outputs.target_sha }}
+          if-no-files-found: ignore
+          retention-days: 7
+          path: |
+            cloudflare-trigger.json
+            cloudflare-build.json
+            cloudflare-build-logs.json
+
+      - name: Write release summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## Sovereign.OS founder v0 production release'
+            echo
+            echo "- Target main SHA: \`${{ steps.release.outputs.target_sha }}\`"
+            echo "- Cloudflare build UUID: \`${{ steps.cloudflare.outputs.build_uuid }}\`"
+            echo "- Trigger method: \`${{ steps.cloudflare.outputs.trigger_method }}\`"
+            echo '- Verification: exact live SHA plus founder-v0 compiled visual markers and domain routes'
+          } >> "$GITHUB_STEP_SUMMARY"
