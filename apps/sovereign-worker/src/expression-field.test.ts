@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { expressionAxisIds } from '@sovereign/agent-contracts';
-import { buildExpressionAxisValues } from './expression-field';
+import { buildExpressionAxisValues, handleExpressionFieldRequest } from './expression-field';
+import type { Env } from './env';
 
 const facets = [
   {
@@ -55,5 +56,15 @@ describe('Expression Field derivation', () => {
 
   it('is deterministic for an unchanged Baseline facet profile', () => {
     expect(buildExpressionAxisValues({ facets })).toEqual(buildExpressionAxisValues({ facets }));
+  });
+
+  it('returns the intended unauthorized response instead of surfacing a Worker 500', async () => {
+    const response = await handleExpressionFieldRequest(
+      new Request('https://app.defrag.app/api/v1/expression-field?mode=live'),
+      {} as Env
+    );
+
+    expect(response.status).toBe(401);
+    expect(await response.text()).toBe('Unauthorized');
   });
 });
