@@ -6,6 +6,7 @@ const workerConfig = JSON.parse(readFileSync('apps/sovereign-worker/wrangler.jso
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 const readme = readFileSync('README.md', 'utf8');
 const bootstrap = readFileSync('scripts/cloudflare-preview-bootstrap.mjs', 'utf8');
+const buildDiagnostics = readFileSync('scripts/cloudflare-build-diagnostics.mjs', 'utf8');
 const mainReleaseGuard = readFileSync('scripts/assert-main-release.mjs', 'utf8');
 const productionDeploy = readFileSync('scripts/cloudflare-production-deploy-v2.mjs', 'utf8');
 const productionRelease = readFileSync('scripts/cloudflare-production-release.mjs', 'utf8');
@@ -63,15 +64,44 @@ for (const [label, assets] of [['production', rootConfig.assets], ['local', work
 }
 requireValue(existsSync('apps/web/public/404.html'), 'The static 404 document is missing');
 
-requireValue(packageJson.scripts?.['verify:cloudflare-build']?.startsWith('node scripts/assert-main-release.mjs && '), 'Canonical build must begin with the main release guard');
-requireValue(packageJson.scripts?.['verify:cloudflare-build']?.includes('verify:release-config'), 'Canonical build must retain release verification');
+requireValue(packageJson.scripts?.['verify:cloudflare-build'] === 'node scripts/cloudflare-build-diagnostics.mjs', 'Canonical build must use the telemetry-wrapped release gate');
 requireValue(packageJson.scripts?.['verify:release-config'] === 'node scripts/verify-direct-preview-config.mjs', 'Release verifier must use the direct Cloudflare contract');
 requireValue(packageJson.scripts?.['preview:bootstrap'] === 'node scripts/cloudflare-preview-bootstrap.mjs', 'Preview bootstrap command drifted');
 requireValue(packageJson.scripts?.['production:deploy'] === 'node scripts/assert-main-release.mjs && node scripts/cloudflare-production-release.mjs && node scripts/verify-parent-domain-routes.mjs', 'Production deploy command drifted');
+for (const required of [
+  'scripts/assert-main-release.mjs',
+  'verify:foundation',
+  'verify:migrations',
+  'scan:secrets',
+  'scan:production-fixtures',
+  'verify:release-config',
+  'verify:production-release',
+  'verify:intelligence-release',
+  'verify:visual-intelligence',
+  'verify:premium-platform',
+  "['typecheck']",
+  "['test']",
+  "['build']",
+  'verify:worker-bundle-size',
+  "phase: 'build'",
+  "status: 'failure'",
+  'Telemetry must never become release authority'
+]) {
+  requireValue(buildDiagnostics.includes(required), `Cloudflare build diagnostics are missing ${required}`);
+}
 for (const required of ['WORKERS_CI_BRANCH', 'WORKERS_CI_COMMIT_SHA', "'refs/heads/main'", "'FETCH_HEAD'", 'has been superseded by current main']) {
   requireValue(mainReleaseGuard.includes(required), `Main release guard is missing ${required}`);
 }
-for (const required of ['WORKERS_CI_COMMIT_SHA', 'GITHUB_SHA', 'APP_VERSION', 'cloudflare-production-deploy-v2.mjs', 'declared commit']) {
+for (const required of [
+  'WORKERS_CI_COMMIT_SHA',
+  'GITHUB_SHA',
+  'APP_VERSION',
+  'cloudflare-production-deploy-v2.mjs',
+  'declared commit',
+  "phase: 'deploy'",
+  "stage: 'production-deploy'",
+  'Telemetry is non-authoritative'
+]) {
   requireValue(productionRelease.includes(required), `Production release wrapper is missing ${required}`);
 }
 
@@ -125,4 +155,4 @@ for (const required of [
 requireValue(!bootstrap.includes('AI_MODEL: process.env.AI_MODEL ||'), 'Preview bootstrap must not allow arbitrary model override');
 requireValue(!bootstrap.includes('AI_PROVIDER: process.env.AI_PROVIDER ||'), 'Preview bootstrap must not allow arbitrary provider override');
 
-console.log('Direct Cloudflare release config verified production_root=true cloudflare_builds_only=true current_main_only=true github_workflows_non_authoritative=true free_workers_ai=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
+console.log('Direct Cloudflare release config verified production_root=true cloudflare_builds_only=true current_main_only=true github_workflows_non_authoritative=true free_workers_ai=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false telemetry_non_authoritative=true');
