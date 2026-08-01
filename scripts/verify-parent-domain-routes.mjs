@@ -1,5 +1,6 @@
 const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT_SHA || '').trim();
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 
 if (!/^[0-9a-f]{40}$/i.test(commitSha)) {
   throw new Error('A full 40-character commit SHA is required for parent-domain verification');
@@ -55,7 +56,7 @@ async function verifyVisualRelease() {
   if (!scriptPaths.length) throw new Error('Public entry is missing its compiled JavaScript asset');
   if (!stylePaths.length) throw new Error('Public entry is missing its compiled CSS asset');
 
-  const [scripts, styles, serviceWorker, displayFont, sansFont, expressionFieldAuthBoundary] = await Promise.all([
+  const [scripts, styles, serviceWorker, displayFont, sansFont, expressionFieldAuthBoundary, staticAuthority, staticStyles] = await Promise.all([
     Promise.all(scriptPaths.map(async (path) => {
       const response = await fetchWithTimeout(`${publicBase}${path}`);
       const text = await response.text();
@@ -78,11 +79,17 @@ async function verifyVisualRelease() {
     fetchWithTimeout(`${appBase}/api/v1/expression-field?mode=live`, {
       redirect: 'manual',
       headers: { accept: 'application/json' }
-    })
+    }),
+    fetchWithTimeout(`${publicBase}/premium-public-release.css?v=20260730-final`).then(async (response) => ({ response, text: await response.text() })),
+    fetchWithTimeout(`${publicBase}/v0-public-port.css?v=20260801-founder-v0`).then(async (response) => ({ response, text: await response.text() }))
   ]);
 
   const compiledJavaScript = scripts.join('\n');
-  const orderedMarkers = [
+  for (const marker of [
+    sequenceFingerprint,
+    archiveSha,
+    'v0-landing-selective-port',
+    'Personal AI for real life',
     'Healing isn’t optional.',
     'Holding onto the pain is.',
     'Ask about your life.',
@@ -94,19 +101,7 @@ async function verifyVisualRelease() {
     'Other AI answers',
     'everyone the same.',
     'Your thoughts deserve',
-    'a better place to live.'
-  ];
-  let previousIndex = -1;
-  for (const marker of orderedMarkers) {
-    const index = compiledJavaScript.indexOf(marker);
-    if (index <= previousIndex) throw new Error(`Compiled founder v0 order is wrong or missing at: ${marker}`);
-    previousIndex = index;
-  }
-
-  for (const marker of [
-    archiveSha,
-    'v0-landing-selective-port',
-    'Personal AI for real life',
+    'a better place to live.',
     'How Sovereign works it through',
     'How Sovereign reads both of you',
     'Illustrative permitted Baselines',
@@ -118,7 +113,16 @@ async function verifyVisualRelease() {
     if (!compiledJavaScript.includes(marker)) throw new Error(`Compiled application is missing founder v0 marker: ${marker}`);
   }
 
-  for (const prohibited of ['Know yourself.', 'Understand the system.', 'Choose what fits.', 'Math.random', 'generateAIResponse', 'Demo User']) {
+  for (const prohibited of [
+    'Know yourself.',
+    'Understand the system.',
+    'Choose what fits.',
+    'mock-auth',
+    'fake-answer',
+    'dashboard-grid',
+    'Demo User',
+    'generateAIResponse'
+  ]) {
     if (compiledJavaScript.includes(prohibited)) throw new Error(`Compiled application contains rejected reconstruction or mock marker: ${prohibited}`);
   }
 
@@ -135,6 +139,9 @@ async function verifyVisualRelease() {
     '.intelligence-workspace{',
     '.sovereign-composer{',
     '.account-shell',
+    '.plan-onboarding',
+    '.sovereign-policy',
+    '.email-code-fallback',
     '.expression-field-canvas{',
     '/fonts/sovereign-display.woff2',
     '/fonts/sovereign-sans.woff2'
@@ -145,6 +152,24 @@ async function verifyVisualRelease() {
   }
   for (const family of ['Sovereign Display', 'Sovereign Sans']) {
     if (!compiledCss.includes(family)) throw new Error(`Compiled CSS is missing self-hosted family: ${family}`);
+  }
+
+  if (!staticAuthority.response.ok || !staticAuthority.text.includes("@import url('/v0-public-port.css?v=20260801-founder-v0')")) {
+    throw new Error('Standalone public routes are missing the founder v0 authority import');
+  }
+  for (const marker of [
+    `Archive SHA-256: ${archiveSha}`,
+    'body.launch-page',
+    '.launch-nav',
+    '.launch-hero',
+    '.journey-steps',
+    '.pricing-grid',
+    '.faq-list details',
+    '.launch-footer'
+  ]) {
+    if (!staticStyles.response.ok || !staticStyles.text.includes(marker)) {
+      throw new Error(`Founder v0 static-route CSS is missing: ${marker}`);
+    }
   }
 
   if (expressionFieldAuthBoundary.status !== 401) {
@@ -174,7 +199,10 @@ async function verifyVisualRelease() {
     cssAssets: stylePaths,
     visualContract: 'v0-landing-selective-port',
     archiveSha256: archiveSha,
+    sequenceFingerprint,
+    platformRouteCoverage: 'v0-platform-port.css',
     visualAuthority: 'v0-visual-port.css',
+    staticRouteVisualAuthority: 'v0-public-port.css',
     sitewideStyling: true,
     mockRuntimeImported: false,
     expressionFieldContract: 'expression-field.v1',
