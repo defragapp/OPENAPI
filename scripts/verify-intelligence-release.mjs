@@ -4,21 +4,36 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const read = (path) => readFileSync(resolve(root, path), 'utf8');
-const assert = (condition, message) => { if (!condition) throw new Error(message); };
+const assert = (condition, message) => {
+  if (!condition) throw new Error(message);
+};
 const containsAll = (label, text, values) => {
   for (const value of values) assert(text.includes(value), `${label} is missing: ${value}`);
 };
 
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
+const composition = read('apps/web/src/interface-composition.css');
+const hardening = read('apps/web/src/premium-surface-hardening.css');
+const completion = read('apps/web/src/selective-visual-port.css');
 const workspaceCss = [
   read('apps/web/src/workspace-chat.css'),
-  read('apps/web/src/workspace-mobile.css'),
   read('apps/web/src/sovereign-cohesion.css'),
-  read('apps/web/src/sovereign-modern.css')
+  read('apps/web/src/sovereign-modern.css'),
+  composition,
+  hardening,
+  completion
 ].join('\n');
 const landing = read('apps/web/src/PublicLanding.tsx');
-const engine = read('apps/web/src/engine-room.css');
-const engineSafeArea = read('apps/web/src/engine-room-safe-area.css');
+const landingCss = [
+  read('apps/web/src/public-landing.css'),
+  read('apps/web/src/sovereign-cohesion.css'),
+  read('apps/web/src/sovereign-modern.css'),
+  read('apps/web/src/landing-production.css'),
+  composition,
+  hardening,
+  completion
+].join('\n');
+const staticPublicCss = read('apps/web/public/platform-public.css');
 const prompt = read('apps/sovereign-worker/src/agent/prompt-v1.ts');
 const contract = read('apps/sovereign-worker/src/agent/recognition.ts');
 const baseline = read('apps/sovereign-worker/src/baseline-contracts.ts');
@@ -27,74 +42,183 @@ const actions = read('apps/sovereign-worker/src/interface-actions.ts');
 const scripture = read('apps/sovereign-worker/src/covenant/scripture.ts');
 const serviceWorker = read('apps/web/public/sw.js');
 const main = read('apps/web/src/main.tsx');
+const how = read('apps/web/public/how-it-works.html');
 const pricing = read('apps/web/public/pricing.html');
 const faq = read('apps/web/public/faq.html');
 
 containsAll('answer contract', contract, [
-  "z.literal('sovereign-answer.v2')", 'basis_refs', 'invented or unauthorized Basis reference',
-  "if (parsed.mode === 'relationship')", "if (parsed.mode === 'system')", "if (parsed.mode === 'alignment')", "if (parsed.mode === 'covenant')"
+  "z.literal('sovereign-answer.v2')",
+  'basis_refs',
+  'invented or unauthorized Basis reference',
+  "if (parsed.mode === 'relationship')",
+  "if (parsed.mode === 'system')",
+  "if (parsed.mode === 'alignment')",
+  "if (parsed.mode === 'covenant')"
 ]);
-containsAll('Baseline contracts', baseline, [
-  "BASELINE_SOURCE_VERSION = 'baseline-source.v1'", "BASELINE_FACET_CONTRACT_VERSION = 'baseline-facets.v1'",
-  'shadowExpression', 'giftExpression', 'alignmentMarkers', 'basisRefs'
-]);
-containsAll('runtime prompt', prompt, [
-  'A user does not need to report a problem', 'Keep four layers separate', 'Give the direct answer first',
-  'Alignment is not a score or rule', 'Keep the people and the interaction distinct', 'Select IDs only in basis_refs'
-]);
-containsAll('canonical workspace', workspace, [
-  "version: 'sovereign-answer.v2'", '<SovereignAnswerView', '<AlignmentView', '<RelationshipAnswer', '<SystemAnswer',
-  '<BasisStrip', 'Explore this through Covenant?', "action.type === 'save_to_library'"
-]);
-containsAll('relationship and system intelligence', relational, [
-  'pairFacetPairs', 'sharedNeeds', 'differentRoutes', 'responsibilityAuthorityMismatch', 'relationshipGraph: buildSupportedEdges'
-]);
-containsAll('contextual actions', actions, ["type: 'offer_covenant'", "type: 'show_plan'", 'confirmationRequired: true']);
-containsAll('verified Covenant library', scripture, ["translation: 'WEB'", 'biblicalParallel:', 'scripture:', 'teaching:', 'application:', 'boundary:']);
 
-containsAll('canonical Engine Room product contract', landing, [
-  'className="sovereign-landing engine-room"',
-  'data-product-contract="baseline-first"',
-  'data-answer-contract="sovereign-answer.v2"',
-  '<BootSequence />', '<EngineHeader />', '<TechnicalGrid />', '<DataPointField />',
-  '<HeroIntelligenceStage />', '<BaselineContextStage />', '<ConnectedScalesStage',
-  '<PublicAnswerStage />', '<TerminalStage />', '<EngineProgress />',
-  'KNOW YOURSELF.', 'UNDERSTAND THE SYSTEM.', 'Choose what fits.',
+containsAll('Baseline contracts', baseline, [
+  "BASELINE_SOURCE_VERSION = 'baseline-source.v1'",
+  "BASELINE_FACET_CONTRACT_VERSION = 'baseline-facets.v1'",
+  'shadowExpression',
+  'giftExpression',
+  'alignmentMarkers',
+  'basisRefs'
+]);
+
+containsAll('runtime prompt', prompt, [
+  'A user does not need to report a problem',
+  'Keep four layers separate',
+  'Give the direct answer first',
+  'Alignment is not a score or rule',
+  'Keep the people and the interaction distinct',
+  'Select IDs only in basis_refs'
+]);
+
+containsAll('canonical workspace', workspace, [
+  "version: 'sovereign-answer.v2'",
+  '<SovereignAnswerView',
+  '<AlignmentView',
+  '<RelationshipAnswer',
+  '<SystemAnswer',
+  '<BasisStrip',
+  'Explore this through Covenant?',
+  "action.type === 'save_to_library'",
+  'A supported path. Sovereign will not guess unavailable values.'
+]);
+
+containsAll('relationship and system intelligence', relational, [
+  'pairFacetPairs',
+  'sharedNeeds',
+  'differentRoutes',
+  'responsibilityAuthorityMismatch',
+  'relationshipGraph: buildSupportedEdges'
+]);
+
+containsAll('contextual actions', actions, [
+  "type: 'offer_covenant'",
+  "type: 'show_plan'",
+  'confirmationRequired: true'
+]);
+
+containsAll('verified Covenant library', scripture, [
+  "translation: 'WEB'",
+  'biblicalParallel:',
+  'scripture:',
+  'teaching:',
+  'application:',
+  'boundary:'
+]);
+
+containsAll('current public product contract', landing, [
+  'Know yourself.',
+  'Understand the system.',
+  'Choose what fits.',
   'Sovereign.OS is a private AI for understanding yourself, your relationships, and the systems around you.',
-  'Your intelligence begins with your Baseline.',
-  'ONE INTELLIGENCE · THREE CONNECTED SCALES',
-  'Why do I keep taking responsibility for everyone else?',
-  'Your capacity is real. The question is whether the responsibility is actually yours.',
-  'PERMISSION BEFORE COMPARISON',
-  '&gt; READY'
+  'Build your Baseline once',
+  '<HeroAnswerPreview />',
+  '<PersonalStory />',
+  '<RelationshipStory />',
+  '<SystemStory />',
+  'STEP 01 · YOU',
+  'STEP 02 · YOU + 1',
+  'STEP 03 · YOUR WHOLE SYSTEM',
+  'Sanitized product demonstrations · Illustrative Baseline values · Not your personal result',
+  'Another person remains a person—not a data source you control.',
+  'No compatibility score.',
+  'No mind-reading.',
+  'No one-sided access.'
 ]);
-containsAll('canonical Engine Room implementation', engine, [
-  '--engine-black: #050505', '--engine-ink: #f2eee6', '--engine-copper: #c38a67', '--engine-sage: #a8b6a4',
-  '.engine-scroll-shell', 'height: 560svh', 'position: sticky', '.baseline-machine', '.scale-machine', '.query-computation',
-  '@media (max-width: 900px)', '@media (max-width: 760px)', '@media (max-width: 440px)', '@media (prefers-reduced-motion: reduce)'
+
+containsAll('selective visual port', `${landing}\n${hardening}\n${completion}`, [
+  'visual-reasoning-panel',
+  'className="visual-evidence-chips"',
+  'className="relationship-baseline-pair"',
+  'className="story-system-map"',
+  'How Sovereign reads both of you',
+  '.response-thread .answer-baseline',
+  '.response-thread .relationship-answer > div:first-child',
+  '.system-overview .system-graph',
+  '.response-thread .basis-strip',
+  '.relationship-baseline-pair',
+  '.story-fixture-boundary'
 ]);
-containsAll('Engine Room mobile safe areas', engineSafeArea, [
-  'env(safe-area-inset-top)', 'env(safe-area-inset-bottom)', 'env(safe-area-inset-left)', 'env(safe-area-inset-right)'
-]);
-for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'localStorage', 'OVERLAP: 68%', 'border-radius: 999px']) {
-  assert(!`${landing}\n${engine}`.includes(prohibited), `Engine Room contains prohibited behavior or treatment: ${prohibited}`);
+
+for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'localStorage']) {
+  assert(!landing.includes(prohibited), `Public landing contains prohibited mock or scoring behavior: ${prohibited}`);
 }
 
 containsAll('responsive workspace', workspaceCss, [
-  'min-height: 44px', 'env(safe-area-inset-bottom)', '.mobile-bottom-nav', '.intelligence-workspace', '@media (prefers-reduced-motion: reduce)'
+  'min-height: 44px',
+  'env(safe-area-inset-bottom)',
+  '.mobile-bottom-nav',
+  '.intelligence-workspace',
+  '.answer-sections',
+  '@media (max-width: 700px)',
+  '@media (prefers-reduced-motion: reduce)'
 ]);
-containsAll('pricing entitlements', pricing, ['$0', '$20', '$99 / year', '10 Sovereign AI turns each month', '300 Sovereign AI turns each month']);
+
+containsAll('responsive landing', landingCss, [
+  'min-width: 320px',
+  '.sovereign-landing',
+  '.landing-section-header',
+  '.sovereign-story-step',
+  '@media (max-width: 680px)',
+  '@media (max-width: 700px)',
+  '@media (prefers-reduced-motion: reduce)'
+]);
+
+containsAll('cross-route composition', composition, [
+  '.sovereign-landing',
+  '.account-shell',
+  '.plan-onboarding',
+  '.sovereign-policy',
+  '.public-not-found',
+  '.intelligence-workspace',
+  '--platform-clay: #c58b67',
+  '--platform-sage: #a9b8a7'
+]);
+
+containsAll('static public platform layer', staticPublicCss, [
+  'body.launch-page',
+  '.launch-nav',
+  '.journey-steps',
+  '.pricing-grid',
+  '.questions-page .faq-section',
+  '.launch-callout',
+  '@media (max-width: 720px)'
+]);
+
+for (const [label, document] of [['How it works', how], ['Pricing', pricing], ['FAQ', faq]]) {
+  containsAll(label, document, [
+    '/platform-public.css?v=20260730-platform',
+    'SOVEREIGN.OS',
+    'Build my Baseline'
+  ]);
+}
+containsAll('Pricing entitlements', pricing, ['$0', '$20', '$99 / year', '10 Sovereign AI turns each month', '300 Sovereign AI turns each month']);
 containsAll('FAQ contract', faq, ['<details', 'What is Sovereign.OS?', 'Can I correct or remove an interpretation?']);
+
 containsAll('canonical visual imports', main, [
-  "import './engine-room-safe-area.css'", "import './engine-room.css'"
+  "import './sovereign-cohesion.css'",
+  "import './sovereign-modern.css'",
+  "import './landing-production.css'",
+  "import './interface-composition.css'",
+  "import './premium-surface-hardening.css'",
+  "import './selective-visual-port.css'"
 ]);
-assert(main.indexOf("import './engine-room.css'") > main.indexOf("import './engine-room-safe-area.css'"), 'Engine Room must load after its safe-area layer.');
-assert(!main.slice(main.indexOf("import './engine-room.css'") + "import './engine-room.css'".length).includes("import './"), 'No local visual layer may load after Engine Room.');
+
 assert(!existsSync(resolve(root, 'apps/web/src/experience-reconciliation.css')), 'Retired visual override was restored.');
 assert(!existsSync(resolve(root, 'apps/web/src/SovereignWorkspace.tsx')), 'Duplicate authenticated workspace remains.');
 assert(!serviceWorker.includes("'/app'"), 'Private workspace navigation must not be cached.');
 
-for (const [label, css] of [['workspace', workspaceCss], ['Engine Room', engine], ['Engine Room safe area', engineSafeArea]]) {
+for (const [label, css] of [
+  ['workspace', workspaceCss],
+  ['landing', landingCss],
+  ['composition', composition],
+  ['hardening', hardening],
+  ['selective visual port', completion],
+  ['static public', staticPublicCss]
+]) {
   const open = (css.match(/{/g) ?? []).length;
   const close = (css.match(/}/g) ?? []).length;
   assert(open === close, `${label} CSS has unbalanced braces (${open}/${close}).`);
@@ -105,12 +229,20 @@ console.log(JSON.stringify({
   answerContract: 'sovereign-answer.v2',
   baselineContracts: ['baseline-source.v1', 'baseline-facets.v1'],
   publicProductContract: 'baseline-first-private-ai',
-  canonicalLanding: 'Sovereign Engine Room',
+  legacyTaglineGate: 'retired',
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
-  canonicalVisualLayers: ['engine-room-safe-area.css', 'engine-room.css'],
+  canonicalVisualLayers: [
+    'sovereign-cohesion.css',
+    'sovereign-modern.css',
+    'landing-production.css',
+    'interface-composition.css',
+    'premium-surface-hardening.css',
+    'selective-visual-port.css',
+    'platform-public.css'
+  ],
   coveredSurfaces: ['home', 'how-it-works', 'pricing', 'faq', 'login', 'signup', 'onboarding', 'invitation', 'workspace', 'privacy', 'terms', 'not-found'],
-  responsiveBreakpoints: ['1120px', '900px', '760px', '440px'],
+  responsiveBreakpoints: ['1080px', '1000px', '920px', '700px', '680px'],
   exactBasis: true,
   contextualCovenant: true,
-  continuousEngine: true
+  selectiveVisualPort: true
 }, null, 2));

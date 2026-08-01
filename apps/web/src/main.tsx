@@ -29,7 +29,7 @@ import './unified-entry.css';
 import './account-control.css';
 import './safety-response-runtime.css';
 
-/* Shared product system and authenticated experience. */
+/* Shared product system, route-owned landing layout, and composition hierarchy. */
 import './sovereign-cohesion.css';
 import './sovereign-modern.css';
 import './landing-production.css';
@@ -39,15 +39,12 @@ import './premium-surface-hardening.css';
 import './selective-visual-port.css';
 import './premium-platform-release.css';
 import './sovereign-visual-system.css';
+
+/* Shared typography, Expression Field, viewport behavior, then the approved v0 editorial landing contract. */
 import './typography-system.css';
 import './expression-field/expression-field.css';
 import './responsive-viewport-contract.css';
 import './public-landing-editorial.css';
-import './public-landing-production-lock.css';
-
-/* The public root is one continuous Engine Room; route-owned layers are authoritative. */
-import './engine-room-safe-area.css';
-import './engine-room.css';
 
 installProductionRuntime();
 installProductRuntime();
