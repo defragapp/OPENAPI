@@ -3,7 +3,7 @@ import {
   EXPRESSION_FIELD_VERSION,
   expressionAxisIds,
   type ExpressionFieldResponse
-} from '@sovereign/agent-contracts';
+} from './expression-field-contract';
 
 const labels = [
   'Clarity',
