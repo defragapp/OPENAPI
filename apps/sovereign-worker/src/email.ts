@@ -88,13 +88,13 @@ export function buildSovereignEmail(template: SovereignEmailTemplate): { text: s
     footer,
     `Questions or account support: ${support}`,
     '',
-    'This message contains a private account link. Do not forward it.'
+    'This is a private account message. Do not forward it.'
   ].filter((line): line is string => typeof line === 'string').join('\n');
 
   const detailRows = details.map((detail) => `
     <tr>
-      <td style="padding:0 0 10px 0;color:#c8c0b6;font:400 14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-        <span style="color:#dda273;padding-right:8px;">•</span>${escapeHtml(detail)}
+      <td style="padding:0 0 11px;color:#a39c8f;font:400 14px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+        <span style="color:#e8ddd0;padding-right:9px;">✓</span>${escapeHtml(detail)}
       </td>
     </tr>`).join('');
 
@@ -107,45 +107,46 @@ export function buildSovereignEmail(template: SovereignEmailTemplate): { text: s
   <meta name="supported-color-schemes" content="dark">
   <title>${escapeHtml(template.title)}</title>
 </head>
-<body style="margin:0;padding:0;background:#101011;color:#f3efe8;">
+<body style="margin:0;padding:0;background:#0f0f0f;color:#f5f1e8;">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(preheader)}</div>
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#101011;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#0f0f0f;background-image:radial-gradient(circle at 50% 0%,rgba(232,221,208,.055),transparent 560px);">
     <tr>
-      <td align="center" style="padding:34px 16px 42px;">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;">
+      <td align="center" style="padding:42px 16px 50px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:620px;">
           <tr>
-            <td style="padding:0 0 20px;border-bottom:1px solid rgba(243,239,232,.14);">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+            <td style="padding:0 4px 22px;border-bottom:1px solid rgba(245,241,232,.11);">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td width="40" height="40" valign="middle" style="width:40px;height:40px;">
-                    <img src="${BRAND_MARK_URL}" width="40" height="40" alt="" style="display:block;width:40px;height:40px;border:0;border-radius:12px;">
+                  <td width="40" valign="middle">
+                    <img src="${BRAND_MARK_URL}" width="40" height="40" alt="" style="display:block;width:40px;height:40px;border:1px solid rgba(245,241,232,.16);border-radius:50%;">
                   </td>
-                  <td style="padding-left:12px;color:#f3efe8;font:800 12px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:2.1px;">SOVEREIGN.OS</td>
+                  <td style="padding-left:13px;color:#f5f1e8;font:700 17px/1 Georgia,'Times New Roman',serif;letter-spacing:-.3px;">Sovereign.OS</td>
+                  <td align="right" style="color:#746f67;font:650 10px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:1.6px;text-transform:uppercase;">Private account message</td>
                 </tr>
               </table>
             </td>
           </tr>
           <tr>
-            <td style="padding:42px 36px 38px;border:1px solid rgba(243,239,232,.14);border-top:0;border-radius:0 0 18px 18px;background:#171718;box-shadow:0 28px 80px rgba(0,0,0,.28);">
-              <p style="margin:0 0 12px;color:#dda273;font:800 11px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:1.8px;text-transform:uppercase;">${escapeHtml(template.eyebrow)}</p>
-              <h1 style="margin:0;color:#f3efe8;font:500 42px/1.02 Georgia,'Times New Roman',serif;letter-spacing:-1.7px;">${escapeHtml(template.title)}</h1>
-              <p style="margin:20px 0 0;color:#c8c0b6;font:400 16px/1.7 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">${escapeHtml(template.intro)}</p>
-              ${details.length ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top:24px;">${detailRows}</table>` : ''}
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin-top:30px;">
+            <td style="padding:48px 40px 42px;border:1px solid rgba(245,241,232,.11);border-top:0;border-radius:0 0 18px 18px;background:#151515;background-image:linear-gradient(180deg,rgba(255,255,255,.018),transparent 28%);box-shadow:0 30px 80px rgba(0,0,0,.45);">
+              <p style="margin:0 0 15px;color:#e8ddd0;font:700 10px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:2px;text-transform:uppercase;">${escapeHtml(template.eyebrow)}</p>
+              <h1 style="margin:0;max-width:520px;color:#f5f1e8;font:700 45px/1.02 Georgia,'Times New Roman',serif;letter-spacing:-2px;">${escapeHtml(template.title)}</h1>
+              <p style="margin:22px 0 0;max-width:520px;color:#a39c8f;font:400 16px/1.75 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">${escapeHtml(template.intro)}</p>
+              ${details.length ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top:26px;padding-top:22px;border-top:1px solid rgba(245,241,232,.09);">${detailRows}</table>` : ''}
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin-top:32px;">
                 <tr>
-                  <td align="center" style="border-radius:10px;background:#ece5da;">
-                    <a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:14px 22px;color:#1b1815;font:800 15px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;border-radius:10px;">${escapeHtml(template.actionLabel)}</a>
+                  <td align="center" style="border:1px solid rgba(232,221,208,.8);border-radius:10px;background:#e8ddd0;box-shadow:0 13px 34px rgba(0,0,0,.27);">
+                    <a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:15px 24px;color:#141412;font:700 14px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;border-radius:10px;">${escapeHtml(template.actionLabel)} &nbsp;→</a>
                   </td>
                 </tr>
               </table>
-              <p style="margin:24px 0 0;color:#8f887f;font:400 12px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;word-break:break-all;">Button not working? Open this private link:<br><a href="${escapeHtml(actionUrl)}" style="color:#c8c0b6;text-decoration:underline;">${escapeHtml(actionUrl)}</a></p>
+              <p style="margin:27px 0 0;color:#746f67;font:400 11px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;word-break:break-all;">Button not working? Open this private link:<br><a href="${escapeHtml(actionUrl)}" style="color:#a39c8f;text-decoration:underline;">${escapeHtml(actionUrl)}</a></p>
             </td>
           </tr>
           <tr>
-            <td style="padding:24px 8px 0;color:#817a72;font:400 12px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-              <p style="margin:0;">${escapeHtml(footer)}</p>
-              <p style="margin:10px 0 0;">Questions or account support? Reply to this email or contact <a href="mailto:${escapeHtml(support)}" style="color:#b5afa6;">${escapeHtml(support)}</a>.</p>
-              <p style="margin:10px 0 0;">This message contains a private account link. Do not forward it.</p>
+            <td style="padding:25px 8px 0;color:#746f67;font:400 12px/1.7 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+              <p style="margin:0;color:#a39c8f;">${escapeHtml(footer)}</p>
+              <p style="margin:10px 0 0;">Questions or account support? Reply or contact <a href="mailto:${escapeHtml(support)}" style="color:#e8ddd0;">${escapeHtml(support)}</a>.</p>
+              <p style="margin:10px 0 0;">This is a private account message. Do not forward it.</p>
             </td>
           </tr>
         </table>
