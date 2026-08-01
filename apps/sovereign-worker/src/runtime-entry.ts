@@ -1,6 +1,7 @@
 import worker, { ThreadCoordinator, queue, scheduled } from './entry';
 import type { Env } from './env';
 import { transactionalEmailProvider } from './email';
+import { handleExpressionFieldRequest } from './expression-field';
 import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/headers';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import { attachD1Bookmark, createD1RequestSession, withD1SessionEnv } from './d1-session';
@@ -72,6 +73,10 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
 
   if (request.method === 'GET' && HEALTH_PATHS.has(url.pathname)) {
     return healthResponse(url.pathname, env);
+  }
+
+  if (request.method === 'GET' && url.pathname === '/api/v1/expression-field') {
+    return handleExpressionFieldRequest(request, env);
   }
 
   if (request.method === 'GET' && url.pathname === '/api/v1/you') {
