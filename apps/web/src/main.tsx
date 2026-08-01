@@ -14,6 +14,7 @@ import { installPublicLandingViewportContract } from './PublicLandingViewportCon
 import { PublicPolicy } from './PublicPolicy';
 import { PublicPolicyMetadata } from './PublicPolicyMetadata';
 import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
+import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
 
 /* Component foundations */
 import './styles.css';
@@ -47,6 +48,7 @@ import './public-landing-editorial.css';
 /* Founder v0 archive: final visual authority for public and authenticated surfaces. */
 import './v0-visual-port.css';
 
+installV0ReleaseFingerprint();
 installProductionRuntime();
 installProductRuntime();
 installEmailCodeFallbackRuntime();
