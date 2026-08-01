@@ -4,6 +4,7 @@ import { App } from './App';
 import { AppErrorBoundary } from './AppErrorBoundary';
 import { AuthenticatedWorkspace } from './AuthenticatedWorkspace';
 import { EmailCodeFallback, installEmailCodeFallbackRuntime } from './EmailCodeFallback';
+import { PasskeyAuthentication } from './PasskeyAuthentication';
 import { ProductCompletionLayer, installProductRuntime } from './ProductCompletionLayer';
 import { installBaselineInputRuntime } from './BaselineInputRuntime';
 import { installDialogAccessibility } from './dialog-accessibility';
@@ -50,6 +51,7 @@ import './v0-platform-port.css';
 import './v0-motion-accessibility.css';
 import './v0-visual-port.css';
 import './v0-global-experience.css';
+import './passkey-auth.css';
 
 installV0ReleaseFingerprint();
 installProductionRuntime();
@@ -107,7 +109,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           ? <><PublicPolicyMetadata kind={publicPolicyKind} /><PublicPolicy kind={publicPolicyKind} /></>
           : isAuthenticatedWorkspace
             ? <AuthenticatedWorkspace />
-            : <><App /><EmailCodeFallback /></>}
+            : <><App /><EmailCodeFallback /><PasskeyAuthentication /></>}
     </AppErrorBoundary>
   </React.StrictMode>
 );
