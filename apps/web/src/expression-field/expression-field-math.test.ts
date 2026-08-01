@@ -9,6 +9,7 @@ import {
 } from './expression-field-math';
 
 const componentSource = readFileSync(new URL('./ExpressionField.tsx', import.meta.url), 'utf8');
+const cssSource = readFileSync(new URL('./expression-field.css', import.meta.url), 'utf8');
 
 describe('Expression Field geometry', () => {
   it('covers the full sphere with stable permanent axis directions', () => {
@@ -39,6 +40,6 @@ describe('Expression Field geometry', () => {
     expect(componentSource).toContain('context.moveTo(centerX, centerY)');
     expect(componentSource).not.toContain('Math.random');
     expect(componentSource).not.toMatch(/endpoint|end-point|tip marker/i);
-    expect(componentSource).toContain('prefers-reduced-motion: reduce');
+    expect(cssSource).toContain('@media (prefers-reduced-motion: reduce)');
   });
 });
