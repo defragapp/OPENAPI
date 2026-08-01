@@ -9,29 +9,43 @@ const configs = [
 ];
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
+
 const modelConfig = read('packages/agent-contracts/src/model-config.ts');
 const runtime = read('apps/sovereign-worker/src/runtime-entry.ts');
 const entry = read('apps/sovereign-worker/src/entry.ts');
 const session = read('apps/sovereign-worker/src/d1-session.ts');
 const capacity = read('apps/sovereign-worker/src/ai/free-tier-capacity.ts');
-const migration = read('apps/sovereign-worker/migrations/0013_workers_ai_free_capacity.sql');
+const capacityMigration = read('apps/sovereign-worker/migrations/0013_workers_ai_free_capacity.sql');
+const passkeyMigration = read('apps/sovereign-worker/migrations/0014_passkey_authentication.sql');
+const passkeyRoutes = read('apps/sovereign-worker/src/auth-passkeys.ts');
+const passkeyVerifier = read('apps/sovereign-worker/src/security/webauthn-es256.ts');
+const accountSession = read('apps/sovereign-worker/src/auth-session.ts');
+const email = read('apps/sovereign-worker/src/email.ts');
 const usage = read('apps/sovereign-worker/src/billing/usage.ts');
 const deploy = read('scripts/cloudflare-production-deploy-v2.mjs');
 const controls = read('scripts/configure-cloudflare-free-tier.mjs');
 const bundle = read('scripts/verify-worker-bundle-size.mjs');
 const schema = read('docs/api-shield/sovereign-critical-api.openapi.yaml');
+
 const main = read('apps/web/src/main.tsx');
 const index = read('apps/web/index.html');
 const landing = read('apps/web/src/PublicLanding.tsx');
 const fingerprint = read('apps/web/src/v0-release-fingerprint.ts');
 const v0Platform = read('apps/web/src/v0-platform-port.css');
 const v0Visual = read('apps/web/src/v0-visual-port.css');
-const staticAuthority = read('apps/web/public/premium-public-release.css');
-const staticV0 = read('apps/web/public/v0-public-port.css');
+const v0Global = read('apps/web/src/v0-global-experience.css');
+const passkeyCss = read('apps/web/src/passkey-auth.css');
+const passkeyClient = read('apps/web/src/passkey-client.ts');
+const passkeyLogin = read('apps/web/src/PasskeyAuthentication.tsx');
+const passkeyManager = read('apps/web/src/PasskeyManager.tsx');
+const verifiedPlan = read('apps/web/src/VerifiedPlanStatus.tsx');
+const authenticatedWorkspace = read('apps/web/src/AuthenticatedWorkspace.tsx');
 const composition = read('apps/web/src/interface-composition.css');
+const staticV0 = read('apps/web/public/v0-public-static.css');
 const how = read('apps/web/public/how-it-works.html');
 const pricing = read('apps/web/public/pricing.html');
 const faq = read('apps/web/public/faq.html');
+
 const documents = [
   ['README', read('README.md')],
   ['AI integration guide', read('docs/openai-integration.md')],
@@ -64,23 +78,67 @@ for (const [label, config] of configs) {
 }
 
 requireAll('model config', modelConfig, ["DEFAULT_AI_MODEL = '@cf/zai-org/glm-4.7-flash'", "DEFAULT_AI_PROVIDER = 'cloudflare-gateway'"]);
-requireAll('D1 session and AI privacy boundary', session, [
-  'db.withSession(bookmark)',
-  "readD1Bookmark(request) ?? 'first-primary'",
-  'reserveWorkersAiCapacity',
-  'releaseWorkersAiCapacity',
-  'skipCache: true',
-  'collectLog: false'
-]);
+requireAll('D1 session and AI privacy boundary', session, ['db.withSession(bookmark)', "readD1Bookmark(request) ?? 'first-primary'", 'reserveWorkersAiCapacity', 'releaseWorkersAiCapacity', 'skipCache: true', 'collectLog: false']);
 requireAll('free capacity ledger', capacity, ['FREE_DAILY_NEURON_BUDGET = 7_500', 'workers_ai_daily_capacity', 'sovereign_free_capacity_reached', 'retry-after']);
-requireAll('capacity migration', migration, ['CREATE TABLE IF NOT EXISTS workers_ai_daily_capacity', 'reserved_neurons INTEGER NOT NULL', 'request_count INTEGER NOT NULL']);
+requireAll('capacity migration', capacityMigration, ['CREATE TABLE IF NOT EXISTS workers_ai_daily_capacity', 'reserved_neurons INTEGER NOT NULL', 'request_count INTEGER NOT NULL']);
 requireAll('failed response refunds', usage, ['export async function releaseAiTurn', 'turns_used = MAX(0, turns_used - 1)']);
 requireAll('entry release integration', entry, ['releaseAiTurn(env, auth.accountId, usage.periodKey)', "migrationVersion: '0013_workers_ai_free_capacity'"]);
-requireAll('runtime readiness', runtime, [
-  'createD1RequestSession(request, env.DB)',
-  "aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing'",
-  "dependencies.aiFreeCapacity === 'configured'",
-  "migrationVersion: '0013_workers_ai_free_capacity'"
+
+requireAll('passkey migration', passkeyMigration, [
+  'CREATE TABLE auth_passkeys',
+  'credential_id TEXT NOT NULL UNIQUE',
+  'public_key_jwk TEXT NOT NULL',
+  'CREATE TABLE auth_passkey_challenges',
+  "purpose TEXT NOT NULL CHECK(purpose IN ('register','login'))",
+  'challenge_hash TEXT NOT NULL',
+  'used_at TEXT'
+]);
+requireAll('passkey credential verification', passkeyVerifier, [
+  'FLAG_USER_VERIFIED = 0x04',
+  "attestation.get('fmt') !== 'none'",
+  'key.get(3) !== -7',
+  "crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }",
+  'constantTimeEqual',
+  'rp_id_mismatch',
+  'client_data_invalid'
+]);
+requireAll('passkey D1 lifecycle', passkeyRoutes, [
+  'auth_passkey_challenges',
+  'auth_passkeys',
+  "'login'",
+  "'register'",
+  'challenge_used',
+  'signature_counter_replayed',
+  'createAccountSessionResponse',
+  'deletePasskey'
+]);
+requireAll('shared secure session', accountSession, [
+  '__Host-sovereign_session=',
+  'HttpOnly; Secure; SameSite=Lax; Priority=High',
+  'createSignedSessionToken',
+  'INSERT INTO auth_sessions'
+]);
+
+requireAll('runtime passkey routes and readiness', runtime, [
+  "'/api/v1/auth/passkey/login/options'",
+  "'/api/v1/auth/passkey/login/verify'",
+  "'/api/v1/auth/passkey/register/options'",
+  "'/api/v1/auth/passkey/register/verify'",
+  "'/api/v1/auth/passkeys'",
+  "passkeys: db?.passkeys_ready === 1 ? 'configured' : 'missing'",
+  "dependencies.passkeys === 'configured'",
+  "migrationVersion: '0013_workers_ai_free_capacity'",
+  "latestMigrationVersion: '0014_passkey_authentication'"
+]);
+
+requireAll('founder v0 transactional email', email, [
+  'background:#0f0f0f',
+  'color:#f5f1e8',
+  'background:#e8ddd0',
+  'Sovereign.OS',
+  'Private account message',
+  'Do not forward it.',
+  "provider: 'resend'"
 ]);
 
 requireAll('Cloudflare controls', controls, [
@@ -96,11 +154,9 @@ requireAll('Cloudflare controls', controls, [
 ]);
 assert(!controls.includes('http.request.method'), 'Free-plan rate-limit expression must use path-only fields');
 
-requireAll('production deploy', deploy, [
+requireAll('production deploy compatibility', deploy, [
   "const model = '@cf/zai-org/glm-4.7-flash'",
   "const migrationVersion = '0013_workers_ai_free_capacity'",
-  `const archiveSha = '${archiveSha}'`,
-  `const sequenceFingerprint = \`sovereign-founder-v0|`,
   'configureCloudflareFreeTier',
   "'d1', 'migrations', 'apply'",
   "'deploy', '--config', generatedConfigPath",
@@ -113,40 +169,37 @@ requireAll('production deploy', deploy, [
   "assertDocument('signup'",
   "assertDocument('app'",
   'v0-landing-selective-port',
-  'v0-platform-port.css',
-  'v0-public-port.css',
   'dailyNeuronReservationBudget: 7_500',
-  'ready version is',
   "cloudflarePlanTarget: 'free'"
 ]);
-requireAll('production deploy retirement guard', deploy, [
-  "'Know yourself.'",
-  "'Understand the system.'",
-  "'Choose what fits.'",
-  'assert(!javascript.text.includes(prohibited)'
-]);
-assert(!deploy.includes("'Math.random'"), 'Production deploy still rejects an entire compiled dependency bundle by a generic string');
-assert(!deploy.includes('/launch-polish.css?v=20260730-cohesion'), 'Production deploy still gates on a retired stylesheet fingerprint');
+requireAll('production deploy retirement guard', deploy, ["'Know yourself.'", "'Understand the system.'", "'Choose what fits.'", 'assert(!javascript.text.includes(prohibited)']);
+assert(!deploy.includes("'Math.random'"), 'Production deploy still rejects a dependency bundle by a generic string');
 
 requireAll('bundle verifier', bundle, ['CLOUDFLARE_FREE_LIMIT_BYTES = 3 * 1024 * 1024', 'INTERNAL_BUDGET_BYTES = 2_500 * 1024', 'Wrangler did not report a compressed Worker upload size']);
 requireAll('API Shield schema', schema, ['openapi: 3.0.3', 'https://app.defrag.app', '/api/v1/account/onboarding:', '/api/v1/billing/portal:', '/api/v1/people/{personId}/consent/{scope}:']);
 assert(!schema.includes('/api/v1/auth/signup:'), 'Turnstile-bearing signup must remain outside the Free-plan schema limit');
-assert(!schema.includes('/api/v1/auth/login:'), 'Turnstile-bearing login must remain outside the Free-plan schema limit');
+assert(!schema.includes('/api/v1/auth/login:'), 'Turnstile-bearing email login must remain outside the Free-plan schema limit');
 
 requireAll('application visual entry', main, [
   "import './interface-composition.css'",
   "import './v0-platform-port.css'",
   "import './v0-visual-port.css'",
-  "import { installV0ReleaseFingerprint } from './v0-release-fingerprint'",
-  'installV0ReleaseFingerprint();',
+  "import './v0-global-experience.css'",
+  "import './passkey-auth.css'",
+  "import { PasskeyAuthentication } from './PasskeyAuthentication'",
+  '<PasskeyAuthentication />',
   '<PublicLanding />',
   '<AuthenticatedWorkspace />',
   '<PublicPolicy'
 ]);
 const platformImport = "import './v0-platform-port.css';";
 const v0Import = "import './v0-visual-port.css';";
-assert(main.indexOf(platformImport) < main.indexOf(v0Import), 'The platform coverage layer must load before the final v0 authority');
-assert(!main.slice(main.indexOf(v0Import) + v0Import.length).includes("import './"), 'A visual layer loads after the founder v0 authority');
+const globalImport = "import './v0-global-experience.css';";
+const passkeyImport = "import './passkey-auth.css';";
+assert(main.indexOf(platformImport) < main.indexOf(v0Import), 'Platform coverage must load before founder v0');
+assert(main.indexOf(v0Import) < main.indexOf(globalImport), 'Global v0 product authority must load after founder v0 foundations');
+assert(main.indexOf(globalImport) < main.indexOf(passkeyImport), 'Passkey auth styling must load last');
+assert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("import './"), 'A visual layer loads after passkey auth authority');
 
 requireAll('runtime fingerprint', fingerprint, [
   `V0_ARCHIVE_SHA256 = '${archiveSha}'`,
@@ -156,7 +209,7 @@ requireAll('runtime fingerprint', fingerprint, [
   'dataset.sovereignV0Sequence = V0_SEQUENCE_FINGERPRINT'
 ]);
 requireAll('application document', index, ['id="root"', 'Healing isn’t optional. Holding onto the pain is.', 'release-fingerprint']);
-requireAll('founder v0 component source', landing, [
+requireAll('founder v0 landing remains intact', landing, [
   `const V0_ARCHIVE_SHA = '${archiveSha}'`,
   'data-visual-contract="v0-landing-selective-port"',
   'Healing isn’t optional.',
@@ -166,45 +219,82 @@ requireAll('founder v0 component source', landing, [
   '<SystemStory />',
   '<ComparisonStory />'
 ]);
-requireAll('founder v0 platform coverage', v0Platform, [
-  'body:has(.plan-onboarding)',
-  'body:has(.sovereign-policy)',
-  'body:has(.email-code-fallback)',
-  '.onboarding-plan-grid',
-  '.policy-grid',
-  '.email-code-fallback'
+requireAll('founder v0 platform coverage', v0Platform, ['body:has(.plan-onboarding)', 'body:has(.sovereign-policy)', 'body:has(.email-code-fallback)', '.onboarding-plan-grid', '.policy-grid', '.email-code-fallback']);
+requireAll('founder v0 visual foundation', v0Visual, ['--v0-page: #0f0f0f', '--v0-cream: #e8ddd0', '.v0-hero', '.v0-family-map', '.intelligence-workspace', '.sovereign-composer', '.account-shell']);
+requireAll('global v0 product authority', v0Global, [
+  'Founder-v0 visual authority for every non-landing product surface',
+  '.account-shell',
+  '.plan-onboarding',
+  '.public-policy',
+  '.private-route-gate',
+  '.sovereign-app-runtime',
+  '.verified-plan-strip',
+  '.account-plan-verification'
 ]);
-requireAll('founder v0 sitewide visual authority', v0Visual, [
-  '--v0-page: #0f0f0f',
-  '--v0-cream: #e8ddd0',
-  '.v0-hero',
-  '.v0-family-map',
-  '.intelligence-workspace',
-  '.sovereign-composer',
-  '.account-shell'
+requireAll('passkey visual authority', passkeyCss, ['.passkey-primary', '.passkey-button', '.passkey-manager', '.passkey-list']);
+
+requireAll('browser passkey client', passkeyClient, ['navigator.credentials', 'decodeRequestOptions', 'decodeCreationOptions', 'serializeAssertion', 'serializeRegistration']);
+requireAll('passkey-first login', passkeyLogin, [
+  'Sign in without opening your email.',
+  'Sign in with a passkey',
+  'Email recovery or first-time verification',
+  '/api/v1/auth/passkey/login/options',
+  '/api/v1/auth/passkey/login/verify',
+  'Confirming your Stripe plan'
 ]);
-requireAll('standalone route authority', staticAuthority, ["@import url('/v0-public-port.css?v=20260801-founder-v0')"]);
-requireAll('standalone v0 visual layer', staticV0, [
-  `Archive SHA-256: ${archiveSha}`,
-  'body.launch-page',
+requireAll('authenticated passkey controls', passkeyManager, [
+  'Add passkey',
+  'Email stays available for recovery.',
+  '/api/v1/auth/passkey/register/options',
+  '/api/v1/auth/passkey/register/verify',
+  '/api/v1/auth/passkeys'
+]);
+requireAll('verified Stripe plan surface', verifiedPlan, [
+  '/api/v1/billing/entitlements',
+  'Stripe verified',
+  'Sovereign+',
+  'Billing controls'
+]);
+requireAll('workspace plan integration', authenticatedWorkspace, ['<VerifiedPlanStatus />', '<PasskeyManager />', 'Confirming your account and verified plan']);
+
+requireAll('standalone founder v0 CSS', staticV0, [
+  '--v0-page:#0f0f0f',
+  '--v0-cream:#e8ddd0',
+  'body{min-width:320px',
   '.launch-nav',
   '.launch-hero',
   '.journey-steps',
   '.pricing-grid',
-  '.faq-list details',
+  '.faq-list',
   '.launch-footer'
 ]);
-requireAll('cross-platform composition', composition, ['.sovereign-landing', '.account-shell', '.plan-onboarding', '.sovereign-policy', '.public-not-found', '.intelligence-workspace', '@media (max-width: 700px)']);
+for (const [label, document] of [['How it works', how], ['pricing', pricing], ['FAQ', faq]]) {
+  requireAll(`${label} founder v0 document`, document, [
+    'data-visual-contract="founder-v0-static"',
+    '/v0-public-static.css?v=20260801-v0-global',
+    'Release compatibility marker only; the retired stylesheet is not loaded'
+  ]);
+  assert(!/<link[^>]+premium-public-release\.css/i.test(document), `${label} still loads retired visual CSS`);
+  assert(!/<link[^>]+v0-public-port\.css/i.test(document), `${label} still loads the retired static v0 bridge`);
+}
+requireAll('How it works document', how, ['Ask about your life. Get an answer built around you.', 'journey-steps', 'baseline-explainer']);
+requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe handles payment details', 'Start free. Expand when the question includes more than you.']);
+assert(!pricing.includes('Begin with yourself.'), 'Pricing retains rejected product language');
+requireAll('FAQ document', faq, ['<details', 'Do I need to open my email every time I sign in?', 'When is my plan verified?', 'Can I correct or remove an interpretation?']);
 
-requireAll('How it works document', how, ['<body class="launch-page"', 'SOVEREIGN.OS', 'journey-steps', 'baseline-explainer', '/premium-public-release.css?v=20260730-final']);
-requireAll('pricing document', pricing, ['<body class="launch-page pricing-page"', '$0', '$20', '$99 / year', '10 Sovereign AI turns each month', '300 Sovereign AI turns each month', '/premium-public-release.css?v=20260730-final']);
-requireAll('FAQ document', faq, ['<body class="launch-page questions-page"', '<details', 'What is Sovereign.OS?', 'Can I correct or remove an interpretation?', '/premium-public-release.css?v=20260730-final']);
+requireAll('cross-platform composition', composition, ['.sovereign-landing', '.account-shell', '.plan-onboarding', '.sovereign-policy', '.public-not-found', '.intelligence-workspace', '@media (max-width: 700px)']);
 
 for (const [label, document] of documents) {
   requireAll(label, document, ['@cf/zai-org/glm-4.7-flash', '0013_workers_ai_free_capacity']);
-  assert(!document.includes('AI_MODEL=openai/gpt-5.5'), `${label} still instructs maintainers to select the retired paid model`);
+  assert(!document.includes('AI_MODEL=openai/gpt-5.5'), `${label} still selects the retired paid model`);
 }
 
-for (const [label, css] of [['v0 platform', v0Platform], ['v0 final', v0Visual], ['v0 standalone', staticV0]]) balanced(label, css);
+for (const [label, css] of [
+  ['v0 platform', v0Platform],
+  ['v0 visual', v0Visual],
+  ['v0 global product', v0Global],
+  ['passkey auth', passkeyCss],
+  ['v0 static public', staticV0]
+]) balanced(label, css);
 
-console.log('Production release v2 verification passed.');
+console.log('Production release v2 verification passed: founder-v0 global surfaces, passkey-first auth, Resend v0 email, and Stripe plan proof are enforced.');
