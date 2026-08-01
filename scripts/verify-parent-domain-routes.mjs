@@ -6,8 +6,8 @@ if (!/^[0-9a-f]{40}$/i.test(commitSha)) {
 
 const publicBase = 'https://sovereign.defrag.app';
 const redirectChecks = [
-  ['https://defrag.app/', `${publicBase}/`],
-  ['https://www.defrag.app/', `${publicBase}/`],
+  ['https://defrag.app/', 'https://sovereign.defrag.app/'],
+  ['https://www.defrag.app/', 'https://sovereign.defrag.app/'],
   ['https://defrag.app/app', 'https://app.defrag.app/app'],
   ['https://www.defrag.app/login', 'https://app.defrag.app/login']
 ];
