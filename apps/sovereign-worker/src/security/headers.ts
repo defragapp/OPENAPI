@@ -24,6 +24,12 @@ function applyHeaders(response: Response, values: Record<string, string>, cacheC
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(values)) headers.set(name, value);
   headers.set('cache-control', cacheControl);
+  if (cacheControl.includes('no-store')) {
+    headers.set('cdn-cache-control', 'no-store');
+    headers.set('cloudflare-cdn-cache-control', 'no-store');
+    headers.set('pragma', 'no-cache');
+    headers.set('expires', '0');
+  }
   headers.delete('content-length');
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
@@ -33,5 +39,5 @@ export function withSecurityHeaders(response: Response): Response {
 }
 
 export function withDocumentSecurityHeaders(response: Response): Response {
-  return applyHeaders(response, documentSecurityHeaders, 'no-cache');
+  return applyHeaders(response, documentSecurityHeaders, 'no-store, no-cache, must-revalidate');
 }
