@@ -30,7 +30,7 @@ describe('Expression Field derivation', () => {
   it('returns every canonical axis exactly once with bounded values', () => {
     const axes = buildExpressionAxisValues({ facets });
     expect(axes).toHaveLength(expressionAxisIds.length);
-    expect(new Set(axes.map((axis) => axis.id)).toEqual(new Set(expressionAxisIds));
+    expect(new Set(axes.map((axis) => axis.id))).toEqual(new Set(expressionAxisIds));
     for (const axis of axes) {
       expect(axis.value).toBeGreaterThanOrEqual(0);
       expect(axis.value).toBeLessThanOrEqual(100);
