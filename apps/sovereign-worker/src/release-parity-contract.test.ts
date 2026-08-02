@@ -19,6 +19,7 @@ const referenceBase64 = readFileSync(
 const archiveSha256 = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 const expectedSequence = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha256}`;
 const expectedRuntimeSequence = expectedSequence.replace(archiveSha256, '${VISUAL_ARCHIVE_SHA256}');
+const expectedParentVerifierSequence = expectedSequence.replace(archiveSha256, '${expectedArchive}');
 
 describe('production release parity contract', () => {
   it('derives migration 0014 from deployed schema evidence and blocks stale readiness', () => {
@@ -35,7 +36,9 @@ describe('production release parity contract', () => {
     expect(runtime).toContain("field: 'landing-expression-field-v3'");
     expect(runtime).toContain('renderedComparisonRequired: true');
     expect(runtime).toContain(expectedRuntimeSequence);
-    expect(parentVerifier).toContain(expectedSequence);
+    expect(parentVerifier).toContain(`const expectedArchive = '${archiveSha256}'`);
+    expect(parentVerifier).toContain(expectedParentVerifierSequence);
+    expect(parentVerifier).toContain("assert(result.json?.visualRelease?.sequenceFingerprint === expectedSequence");
   });
 
   it('promotes the canonical deploy path and requires a rendered browser comparison', () => {
