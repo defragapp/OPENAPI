@@ -63,10 +63,10 @@ import './v0-restored-product-stories.css';
 import './v0-product-story-layout-repair.css';
 import './v0-product-story-layout-final.css';
 
-/* Actual mobile-first product demonstrations, passkey authority, and final opening frame. */
+/* Actual mobile-first demonstrations and opening frame, then passkey authority. */
 import './landing-product-stories-v2.css';
-import './passkey-auth.css';
 import './sovereign-opening-field.css';
+import './passkey-auth.css';
 
 installV0ReleaseFingerprint();
 installProductionRuntime();
