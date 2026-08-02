@@ -79,13 +79,6 @@ export function PublicLanding() {
     >
       <V0Navigation />
       <V0Hero />
-      {/*
-        Historical rendered-sequence markers only:
-        <RotatingQuestions />
-        <PersonalStory />
-        <RelationshipStory />
-        <SystemStory />
-      */}
       <CapabilitySummary />
       <ComparisonStory />
       <FinalCallToAction />
@@ -123,13 +116,6 @@ function V0Hero() {
           <span>Healing isn’t optional.</span>
           <em>Holding onto the pain is.</em>
         </h1>
-        <p className="v0-hero-copy">
-          Sovereign builds your <strong>Baseline</strong>—a stable, correctable understanding of how you may naturally operate—then uses it to answer real questions without treating you like an average user.
-        </p>
-        <div className="v0-actions">
-          <a className="v0-button v0-button-primary" href="/signup">Build my Baseline <span aria-hidden="true">→</span></a>
-          <a className="v0-button v0-button-secondary" href="#expression">Explore the field</a>
-        </div>
       </div>
       <LandingExpressionSlice />
     </section>
