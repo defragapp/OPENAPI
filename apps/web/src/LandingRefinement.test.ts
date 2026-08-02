@@ -99,6 +99,24 @@ describe('approved public landing v8', () => {
     expect(renderedStories).not.toContain('title="Ask about your life."');
   });
 
+  it('holds the screenshot-defined desktop rail, density, and editorial line breaks', () => {
+    for (const marker of [
+      '@media (min-width: 981px)',
+      'min-height: 690px',
+      'width: min(176px, calc(100vw - 30px))',
+      'width: min(900px, calc(100% - 56px))',
+      'min-height: 434px',
+      'min-height: 190px',
+      '.landing-story--relationship',
+      'padding-top: 112px',
+      '.landing-story--system',
+      'padding-bottom: 52px'
+    ]) expect(approvedStyles).toContain(marker);
+    expect(landing).toContain('Generic AI<br />sees the<br />prompt.<br />');
+    expect(landing).toContain('<span>Sovereign<br />sees the<br />context.</span>');
+    expect(landing).toContain('Your thoughts<br />deserve<br />a better place to live.');
+  });
+
   it('plays chat and workflow motion once, then settles', () => {
     expect(stories).toContain('useWorkflowProgress(panelRef, steps.length)');
     expect(stories).toContain('timers.push(window.setTimeout');

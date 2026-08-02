@@ -148,7 +148,10 @@ function ComparisonStory() {
       <div className="v0-shell">
         <header className="v0-story-heading v0-story-heading-left">
           <p>The difference</p>
-          <h2>Generic AI sees the prompt.<br /><span>Sovereign sees the context.</span></h2>
+          <h2 aria-label="Generic AI sees the prompt. Sovereign sees the context.">
+            Generic AI<br />sees the<br />prompt.<br />
+            <span>Sovereign<br />sees the<br />context.</span>
+          </h2>
         </header>
         <div className="v0-comparison-grid" data-viewport-surface="comparison">
           <ComparisonPanel title="Other AI answers" items={COMPARISON.others} positive={false} />
@@ -162,7 +165,9 @@ function ComparisonStory() {
 function FinalCallToAction() {
   return (
     <section className="v0-final">
-      <h2>Your thoughts deserve<br />a better place to live.</h2>
+      <h2 aria-label="Your thoughts deserve a better place to live.">
+        Your thoughts<br />deserve<br />a better place to live.
+      </h2>
       <p>Build your Baseline. Bring your real questions. See what changes when the answer begins with who you are.</p>
       <a className="landing-control landing-control--primary" href="/signup">
         <span>Build my Baseline</span><ArrowIcon />
