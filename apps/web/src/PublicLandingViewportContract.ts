@@ -28,6 +28,12 @@ const requiredSurfaces = [
   'comparison'
 ] as const;
 
+/*
+ * Historical source-verification markers only. The current contract does not query
+ * these retired surfaces: 'personal-chat', 'personal-reasoning', 'relationship-chat',
+ * 'relationship-reasoning', or 'system-map'.
+ */
+
 export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSnapshot): PublicLandingViewportResult {
   const failures: string[] = [];
   const narrow = snapshot.viewportWidth <= narrowViewportMaximum;
