@@ -43,6 +43,7 @@ import './premium-platform-release.css';
 import './sovereign-visual-system.css';
 import './typography-system.css';
 import './expression-field/expression-field.css';
+import './expression-field/expression-field-precision.css';
 import './responsive-viewport-contract.css';
 import './public-landing-editorial.css';
 
