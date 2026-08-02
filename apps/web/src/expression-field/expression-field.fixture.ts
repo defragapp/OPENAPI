@@ -2,28 +2,10 @@ import {
   EXPRESSION_AXIS_REGISTRY_VERSION,
   EXPRESSION_FIELD_VERSION,
   expressionAxisIds,
+  expressionAxisRegistryById,
   type ExpressionAxisId,
   type ExpressionFieldResponse
 } from './expression-field-contract';
-
-const labels = [
-  'Clarity',
-  'Focus',
-  'Steadiness',
-  'Urgency',
-  'Courage',
-  'Fear',
-  'Anger',
-  'Tenderness',
-  'Grief',
-  'Joy',
-  'Desire',
-  'Trust',
-  'Patience',
-  'Boundaries',
-  'Responsibility',
-  'Repair'
-] as const;
 
 const SELF_VALUES = [62, 54, 70, 46, 58, 33, 42, 66, 38, 57, 51, 64, 60, 72, 78, 55] as const;
 const RELATIONSHIP_YOU_VALUES = [56, 58, 72, 42, 61, 35, 39, 69, 44, 53, 49, 67, 79, 73, 68, 63] as const;
@@ -67,9 +49,10 @@ function buildFixture(
     axes: expressionAxisIds.map((id, index) => {
       const value = values[index] ?? 50;
       const currentDelta = currentDeltas.get(id) ?? 0;
+      const label = expressionAxisRegistryById[id].label;
       return {
         id,
-        label: labels[index]!,
+        label,
         baselineValue: Math.max(0, value - currentDelta),
         currentDelta,
         value,
@@ -77,16 +60,22 @@ function buildFixture(
         confidence: 'supported',
         facetIds: [`illustrative.${fixtureId}.${id}`],
         basisRefs: [],
-        summary: `${labels[index]} is one relative expression within this sanitized Baseline example.`,
+        summary: `${label} is one relative expression within this sanitized Baseline example. It is not a score or a verdict about the person.`,
+        giftExpression: `${label} can become a useful capacity when it has room, proportion, and awareness.`,
+        shadowExpression: `${label} can become protective when pressure narrows the available response.`,
+        repressedExpression: `When held back, ${label.toLowerCase()} may become harder to name or use directly.`,
+        overextendedExpression: `When overused, ${label.toLowerCase()} may take up more responsibility than the moment requires.`,
+        practicalDistinction: `The useful question is not whether ${label.toLowerCase()} is good or bad, but whether it is helping the person respond with choice.`,
+        contextDomain: currentDelta > 0 ? 'current_context' : expressionAxisRegistryById[id].domain,
         ...(currentDelta > 0
-          ? { activeNow: `${labels[index]} is more visible in the example’s temporary context without determining behavior.` }
+          ? { activeNow: `${label} is more visible in the example’s temporary context without determining behavior.` }
           : {})
       };
     }),
     basis: [],
     limitations: [
       'Sanitized demonstration · Illustrative values · Not your Baseline',
-      'Line length shows relative salience inside this example, not a psychological score.'
+      'Line length shows relative salience inside this example, not a psychological score or diagnosis.'
     ]
   };
 }
