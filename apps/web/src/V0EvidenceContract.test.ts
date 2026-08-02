@@ -2,44 +2,41 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
+const slice = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
+const fixture = readFileSync(new URL('./expression-field/expression-field.fixture.ts', import.meta.url), 'utf8');
+const releaseCss = readFileSync(new URL('./v0-single-example-release.css', import.meta.url), 'utf8');
 
-describe('founder v0 demonstration evidence contract', () => {
-  it('uses only supported illustrative Basis source types', () => {
-    for (const marker of [
-      'GATE 22.4',
-      'GATE 57.2',
-      'GATE 22 ×3',
-      'GATE 57 ×1',
-      'Illustrative personality gate and line',
-      'Illustrative natal Sun placement',
-      'Illustrative Gene Key activation'
-    ]) {
-      expect(landing).toContain(marker);
-    }
+describe('single-example public evidence contract', () => {
+  it('uses deterministic relative-expression data rather than unsupported identity claims', () => {
+    expect(slice).toContain('landingExpressionFieldFixture');
+    expect(slice).toContain('salienceLabel');
+    expect(slice).toContain('LANDING_AXIS_LAYOUT');
+    expect(fixture).toContain("measurementKind: 'relative_expression_salience'");
+    expect(fixture).toContain("state: 'unconfirmed'");
+    expect(fixture).toContain('basisRefs: []');
+    expect(fixture).toContain('Sanitized demonstration · Illustrative values · Not your Baseline');
 
     for (const unsupported of [
-      'AUTH ·',
-      'AUTH·',
       'Emotional Authority',
       'Splenic Authority',
-      'SPLENIC ×1'
+      'compatibility score',
+      'private-thought claims'
     ]) {
-      expect(landing).not.toContain(unsupported);
+      expect(`${slice}\n${fixture}`).not.toContain(unsupported);
     }
   });
 
-  it('keeps relationship and system claims permission-safe and confirmable', () => {
-    expect(landing).toContain('using only permitted information');
-    expect(landing).toContain('No compatibility score');
-    expect(landing).toContain('No private-thought claims');
-    expect(landing).toContain('That is a possible coordination pattern—not a verdict about any person.');
-    expect(landing).toContain('The actual experience still belongs to each person to confirm.');
-    expect(landing).toContain('Each person controls what may be included');
+  it('keeps relationship and system capability language permission-safe and confirmable', () => {
+    expect(landing).toContain('With permission, keep both people distinct');
+    expect(landing).toContain('permitted relationship or system information');
+    expect(slice).toContain('not a diagnosis, score, or claim about anyone’s internal state');
+    expect(fixture).toContain('not a score or a verdict about the person');
+    expect(fixture).toContain('without determining behavior');
   });
 
-  it('keeps the founder v0 outlined hero line visible at normal viewport scale', () => {
-    expect(landing).toContain("WebkitTextStroke: '1.25px rgba(232, 221, 208, 0.58)'");
-    expect(landing).toContain("color: 'rgba(15, 15, 15, 0.96)'");
+  it('keeps the outlined hero line visible at normal viewport scale', () => {
+    expect(releaseCss).toContain('-webkit-text-stroke: .7px rgba(232, 221, 208, .72)');
+    expect(releaseCss).toContain('color: rgba(232, 221, 208, .18) !important');
     expect(landing).toContain('Holding onto the pain is.');
   });
 });
