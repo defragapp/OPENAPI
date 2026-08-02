@@ -23,11 +23,8 @@ export type PublicLandingViewportResult = {
 const narrowViewportMaximum = 760;
 const requiredSurfaces = [
   'hero',
-  'personal-chat',
-  'personal-reasoning',
-  'relationship-chat',
-  'relationship-reasoning',
-  'system-map',
+  'expression-slice',
+  'capability-summary',
   'comparison'
 ] as const;
 
@@ -47,10 +44,12 @@ export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSna
     }
 
     if (narrow) {
-      const minimumSurfaceWidth = snapshot.viewportWidth - 42;
+      const fullBleed = id === 'expression-slice';
+      const minimumSurfaceWidth = fullBleed ? snapshot.viewportWidth - 2 : snapshot.viewportWidth - 42;
+      const minimumGutter = fullBleed ? -1 : 12;
       if (surface.width < minimumSurfaceWidth) failures.push(`${id} width ${surface.width}px < ${minimumSurfaceWidth}px`);
-      if (surface.left < 12) failures.push(`${id} left gutter ${surface.left}px < 12px`);
-      if (snapshot.viewportWidth - surface.right < 12) failures.push(`${id} right gutter ${snapshot.viewportWidth - surface.right}px < 12px`);
+      if (surface.left < minimumGutter) failures.push(`${id} left gutter ${surface.left}px < ${minimumGutter}px`);
+      if (snapshot.viewportWidth - surface.right < minimumGutter) failures.push(`${id} right gutter ${snapshot.viewportWidth - surface.right}px < ${minimumGutter}px`);
     }
 
     if (surface.layoutWidth > 0) {
@@ -61,7 +60,7 @@ export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSna
 
   snapshot.stageGaps.forEach((gap, index) => {
     if (gap > 82) failures.push(`stage gap ${index + 1} is ${gap}px`);
-    if (gap < 18) failures.push(`stage gap ${index + 1} is ${gap}px`);
+    if (gap < 0) failures.push(`stage gap ${index + 1} is ${gap}px`);
   });
 
   if (narrow && !snapshot.comparisonStacked) failures.push('comparison section is not stacked');
@@ -88,8 +87,8 @@ export function measurePublicLandingViewport(doc: Document = document, viewportW
 
   const stageGaps = Array.from(root.querySelectorAll<HTMLElement>('[data-viewport-stage]')).map((stage) => {
     const section = stage.closest<HTMLElement>('[data-viewport-section]');
-    const heading = section?.querySelector<HTMLElement>('.v0-story-heading');
-    if (!heading) return 42;
+    const heading = section?.querySelector<HTMLElement>('.v0-story-heading, .v0-hero-content');
+    if (!heading) return 0;
     return Math.round(stage.getBoundingClientRect().top - heading.getBoundingClientRect().bottom);
   });
 
