@@ -1,38 +1,7 @@
 import { LandingExpressionSlice } from './expression-field/LandingExpressionSlice';
+import { LandingProductStories } from './LandingProductStories';
 
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
-
-/*
- * Historical source-verification markers only. These strings preserve the certified
- * founder-release lineage for older build gates; none of the retired demonstrations
- * below are rendered or imported by the current one-example public experience.
- *
- * data-viewport-contract="v0-public-landing-v1"
- * Ask about your life.
- * Get an answer built for you.
- * Understand what happens
- * between you.
- * From one person
- * to the whole system.
- * className="v0-story-grid"
- * className="v0-baseline-trace"
- * function ProcessingFlow(
- * v0-window v0-flow
- * className="v0-family-map"
- * surface="personal-chat"
- * surface="personal-reasoning"
- * surface="relationship-chat"
- * surface="relationship-reasoning"
- * surface="system-map"
- * data-viewport-surface={surface}
- * How Sovereign works it through
- * How Sovereign reads both of you
- * Illustrative permitted Baselines
- * No compatibility score
- * No private-thought claims
- * Each person controls what may be included
- * <LandingExpressionFieldPreview
- */
 
 const COMPARISON = {
   others: [
@@ -49,24 +18,6 @@ const COMPARISON = {
   ]
 } as const;
 
-const CAPABILITIES = [
-  {
-    label: 'You',
-    title: 'Understand yourself',
-    body: 'Ask about a decision, a recurring pattern, pressure, boundaries, or what may be more active now.'
-  },
-  {
-    label: 'You + 1',
-    title: 'Understand a relationship',
-    body: 'With permission, keep both people distinct and see what may be happening between you.'
-  },
-  {
-    label: 'Your people',
-    title: 'Understand a system',
-    body: 'Map roles, responsibility, pressure, and recurring interaction across a family or team.'
-  }
-] as const;
-
 export function PublicLanding() {
   return (
     <main
@@ -75,18 +26,11 @@ export function PublicLanding() {
       data-answer-contract="sovereign-answer.v2"
       data-visual-contract="v0-landing-selective-port"
       data-v0-archive-sha={V0_ARCHIVE_SHA}
-      data-viewport-contract="v0-public-landing-v2"
+      data-viewport-contract="v0-public-landing-v3"
     >
       <V0Navigation />
       <V0Hero />
-      {/*
-        Certified historical sequence markers only; intentionally non-rendered:
-        <RotatingQuestions />
-        <PersonalStory />
-        <RelationshipStory />
-        <SystemStory />
-      */}
-      <CapabilitySummary />
+      <LandingProductStories />
       <ComparisonStory />
       <FinalCallToAction />
       <V0Footer />
@@ -100,7 +44,7 @@ function V0Navigation() {
       <div className="v0-shell v0-nav-inner">
         <a className="v0-wordmark" href="/" aria-label="Sovereign home">Sovereign</a>
         <nav aria-label="Public navigation">
-          <a href="#expression">How it works</a>
+          <a href="#how">How it works</a>
           <a href="/pricing">Pricing</a>
           <a href="/faq">FAQ</a>
         </nav>
@@ -125,30 +69,6 @@ function V0Hero() {
         </h1>
       </div>
       <LandingExpressionSlice />
-    </section>
-  );
-}
-
-function CapabilitySummary() {
-  return (
-    <section className="v0-capability-summary" data-viewport-section="capabilities">
-      <div className="v0-capability-summary__inner" data-viewport-surface="capability-summary">
-        <header className="v0-capability-summary__heading">
-          <h2>One place to understand what keeps happening.</h2>
-          <p>
-            Start with one question. Sovereign brings forward only the Baseline qualities, current context, and permitted relationship or system information that matter to that question.
-          </p>
-        </header>
-        <div className="v0-capability-summary__modes">
-          {CAPABILITIES.map((capability) => (
-            <article key={capability.label}>
-              <span>{capability.label}</span>
-              <h3>{capability.title}</h3>
-              <p>{capability.body}</p>
-            </article>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }
