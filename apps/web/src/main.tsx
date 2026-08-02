@@ -59,10 +59,10 @@ import './landing-expression-field-v3.css';
 import './landing-expression-field-integration.css';
 import './v0-restored-product-stories.css';
 import './v0-product-story-layout-repair.css';
-import './passkey-auth.css';
 
-/* Final landing-only layout authority. Must remain the final CSS import. */
+/* Final landing-only layout authority, followed by passkey-specific platform authority. */
 import './v0-product-story-layout-final.css';
+import './passkey-auth.css';
 
 installV0ReleaseFingerprint();
 installProductionRuntime();
