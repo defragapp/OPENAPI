@@ -39,7 +39,11 @@ export function RelationalExpressionField({
   }
 
   return (
-    <figure className={`relational-expression-field expression-field-depth-${depth}${compact ? ' is-compact' : ''}${className ? ` ${className}` : ''}`} data-expression-field-composition="relationship">
+    <figure
+      className={`relational-expression-field expression-field-depth-${depth}${compact ? ' is-compact' : ''}${className ? ` ${className}` : ''}`}
+      data-expression-field-composition="relationship"
+      data-expression-field-selection={selectedId}
+    >
       <div className="relational-expression-stage" aria-label="Two distinct Baseline Expression Fields">
         {fieldSubjects.map((subject, index) => {
           const selected = selectedId === 'interaction' || selectedId === subject.id;
@@ -59,6 +63,10 @@ export function RelationalExpressionField({
             </div>
           );
         })}
+        <div className="relational-expression-center" aria-hidden="true">
+          <span>Between you</span>
+          <strong>{interaction.meta}</strong>
+        </div>
       </div>
       <p className="expression-field-gear-note"><strong>How the gears meet.</strong> Each person stays distinct. Sovereign shows where timing and expression catch, support, or strain without turning either person into the cause.</p>
       <figcaption>
