@@ -89,7 +89,7 @@ describe('founder v0 selective visual port', () => {
       'surface="system-reasoning"',
       'v0-baseline-trace',
       'v0-workflow-panel',
-      'v0-family-map-no-globes'
+      'v0-family-system-map'
     ]) expect(stories).toContain(marker);
     expect(stories).not.toContain('LandingExpressionFieldPreview');
     expect(stories).not.toContain('sphere');
