@@ -47,7 +47,7 @@ import './expression-field/expression-field-precision.css';
 import './responsive-viewport-contract.css';
 import './public-landing-editorial.css';
 
-/* Founder authority, integrated landing field, restored product stories, then passkey authority. */
+/* Founder authority, integrated landing field, restored product stories, auth, and final responsive repair. */
 import './v0-platform-port.css';
 import './v0-motion-accessibility.css';
 import './v0-visual-port.css';
@@ -59,6 +59,7 @@ import './landing-expression-field-v3.css';
 import './landing-expression-field-integration.css';
 import './v0-restored-product-stories.css';
 import './passkey-auth.css';
+import './v0-product-story-layout-repair.css';
 
 installV0ReleaseFingerprint();
 installProductionRuntime();
