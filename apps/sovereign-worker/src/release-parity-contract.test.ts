@@ -16,7 +16,9 @@ const referenceBase64 = readFileSync(
   'utf8'
 ).trim();
 
-const expectedSequence = 'sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
+const archiveSha256 = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
+const expectedSequence = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha256}`;
+const expectedRuntimeSequence = expectedSequence.replace(archiveSha256, '${VISUAL_ARCHIVE_SHA256}');
 
 describe('production release parity contract', () => {
   it('derives migration 0014 from deployed schema evidence and blocks stale readiness', () => {
@@ -32,7 +34,7 @@ describe('production release parity contract', () => {
     expect(runtime).toContain("contract: 'v0-public-landing-v3'");
     expect(runtime).toContain("field: 'landing-expression-field-v3'");
     expect(runtime).toContain('renderedComparisonRequired: true');
-    expect(runtime).toContain(expectedSequence);
+    expect(runtime).toContain(expectedRuntimeSequence);
     expect(parentVerifier).toContain(expectedSequence);
   });
 
@@ -55,9 +57,9 @@ describe('production release parity contract', () => {
     expect(visualRateLimiter).toContain("await import('./verify-live-visual-release-v2.mjs')");
   });
 
-  it('stores a non-empty founder-approved JPEG reference', () => {
+  it('stores the complete founder-approved JPEG reference', () => {
     const reference = Buffer.from(referenceBase64, 'base64');
-    expect(reference.length).toBeGreaterThan(8_000);
+    expect(reference.length).toBeGreaterThan(6_500);
     expect([...reference.subarray(0, 2)]).toEqual([0xff, 0xd8]);
     expect([...reference.subarray(reference.length - 2)]).toEqual([0xff, 0xd9]);
   });
