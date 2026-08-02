@@ -25,7 +25,8 @@ const integrationCss = read('./landing-expression-field-integration.css');
 const lineageStoryCss = read('./v0-restored-product-stories.css');
 const isolatedStoryCss = read('./landing-product-stories-v2.css');
 const openingCss = read('./sovereign-opening-field.css');
-const premiumPublicCss = read('./public-landing-premium-v4.css');
+const premiumPublicV4Css = read('./public-landing-premium-v4.css');
+const premiumPublicV5Css = read('./public-landing-premium-v5.css');
 const passkeyCss = read('./passkey-auth.css');
 const staticV0Css = read('../public/v0-public-port.css');
 const staticAuthority = read('../public/premium-public-release.css');
@@ -47,6 +48,7 @@ describe('founder v0 selective visual port', () => {
       "import './landing-product-stories-v2.css';",
       "import './sovereign-opening-field.css';",
       "import './public-landing-premium-v4.css';",
+      "import './public-landing-premium-v5.css';",
       "import './passkey-auth.css';"
     ];
     let previous = -1;
@@ -66,7 +68,8 @@ describe('founder v0 selective visual port', () => {
       lineageStoryCss,
       isolatedStoryCss,
       openingCss,
-      premiumPublicCss,
+      premiumPublicV4Css,
+      premiumPublicV5Css,
       passkeyCss
     ]) expectBalancedCss(source);
   });
@@ -115,26 +118,32 @@ describe('founder v0 selective visual port', () => {
   });
 
   it('enforces the complete premium public page rather than a generic component stack', () => {
-    expect(landing).toContain('className="sovereign-landing v0-landing-port v0-single-example-landing public-premium-v4"');
-    expect(landing).toContain('data-public-release="premium-public-v4"');
+    expect(landing).toContain('public-premium-v4 public-premium-v5');
+    expect(landing).toContain('data-public-release="premium-public-v5"');
     expect(landing.match(/SOVEREIGN\.OS/g)?.length).toBeGreaterThanOrEqual(3);
-    expect(main).toContain("dataset.sovereignLayoutRelease = 'premium-public-v4'");
+    expect(main).toContain("dataset.sovereignLayoutRelease = 'premium-public-v5'");
 
     for (const marker of [
-      '--landing-control-cut',
-      'clip-path: var(--landing-control-cut)',
-      '.landing-hero-kicker',
-      '.landing-story__heading',
-      'grid-template-columns: 112px minmax(0, 1fr) minmax(280px, 360px)',
-      '.landing-workflow > li',
-      '.v0-comparison-grid',
-      '.v0-final h2',
+      '.public-premium-v5 .v0-wordmark',
+      'font-size: 0.94rem',
+      '.public-premium-v5 .landing-control',
+      'clip-path: none',
+      'background: transparent',
+      '.public-premium-v5 .sovereign-opening-field h1',
+      'max-width: 1060px',
+      '.public-premium-v5 .landing-story__heading',
+      'grid-template-columns: 96px minmax(0, 760px) minmax(280px, 340px)',
+      '.public-premium-v5 .landing-demo',
+      'border-radius: 4px',
+      '.public-premium-v5 .landing-workflow button > i',
+      '.public-premium-v5 .v0-comparison-positive',
+      '.public-premium-v5 .v0-final h2',
       '@media (max-width: 760px)'
-    ]) expect(premiumPublicCss).toContain(marker);
+    ]) expect(premiumPublicV5Css).toContain(marker);
 
-    expect(premiumPublicCss).not.toContain('border-radius: 999px');
-    expect(premiumPublicCss).toContain('border-radius: 0');
-    expect(premiumPublicCss).toContain('grid-template-columns: minmax(0, 1fr)');
+    expect(premiumPublicV5Css).not.toContain('border-radius: 999px');
+    expect(premiumPublicV5Css).toContain('flex-direction: column');
+    expect(premiumPublicV5Css).toContain('min-height: 300px');
   });
 
   it('applies the same founder language to the platform and standalone routes', () => {
