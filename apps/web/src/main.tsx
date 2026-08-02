@@ -61,7 +61,7 @@ import './v0-restored-product-stories.css';
 import './landing-product-stories-v2.css';
 
 /* Single approved public landing authority, then passkey authority. */
-import './public-landing-approved-v7.css';
+import './public-landing-approved-v8.css';
 import './passkey-auth.css';
 
 installV0ReleaseFingerprint();
@@ -110,9 +110,9 @@ function refreshStaleIosPageRestore(): void {
 retireLegacyPublicCache();
 refreshStaleIosPageRestore();
 
-document.documentElement.dataset.sovereignLayoutRelease = 'approved-public-v7';
+document.documentElement.dataset.sovereignLayoutRelease = 'approved-public-v8';
 document.documentElement.dataset.sovereignProductStories = 'isolated-mobile-first-v2';
-document.documentElement.dataset.sovereignMotionRelease = 'v0-motion-workflows-v7';
+document.documentElement.dataset.sovereignMotionRelease = 'v0-motion-workflows-v8';
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'
