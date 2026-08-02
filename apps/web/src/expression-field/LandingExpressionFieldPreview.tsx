@@ -56,13 +56,14 @@ export function LandingExpressionFieldPreview(props: LandingExpressionFieldPrevi
   }
   return (
     <figure className={`single-expression-field expression-field-depth-landing${props.compact ? ' is-compact' : ''}${props.className ? ` ${props.className}` : ''}`} data-expression-field-composition="self">
+      <span className="expression-field-landing-kicker">This little light of mine · one center, many expressions</span>
       <div className="single-expression-stage">
         <ExpressionFieldRenderer
           axes={props.subject.axes}
           selectedAxisId={props.subject.selectedAxisId ?? props.context.selectedAxisId}
           draggable
           variant="preview"
-          ariaLabel="Your sanitized Baseline expression field. Vector length changes from the stable Baseline value to the value shown for the example’s current context."
+          ariaLabel="A sanitized Baseline Expression Field with one stable center. Vector length shows relative salience in this example, not an emotional score or diagnosis."
         />
       </div>
       <figcaption>
