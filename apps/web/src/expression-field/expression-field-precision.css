@@ -1,0 +1,211 @@
+/* Production precision layer for the canonical Expression Field. */
+.expression-field-instrument,
+.single-expression-field,
+.relational-expression-field,
+.system-expression-field {
+  --expression-blue: #0f6fff;
+  --expression-blue-deep: #0867df;
+  --expression-blue-bright: #7ec9ff;
+  --expression-blue-white: #d8efff;
+  --expression-ink: #030914;
+  --expression-panel: #07101d;
+  --expression-line: rgba(126, 201, 255, .18);
+}
+
+.expression-field-canvas-shell {
+  border-color: var(--expression-line);
+  background:
+    radial-gradient(circle at 50% 46%, rgba(15, 111, 255, .095), transparent 44%),
+    linear-gradient(180deg, rgba(216, 239, 255, .022), transparent 36%),
+    #040b15;
+  box-shadow:
+    inset 0 1px 0 rgba(216, 239, 255, .035),
+    inset 0 0 78px rgba(8, 103, 223, .09),
+    0 28px 70px rgba(0, 0, 0, .32);
+}
+
+.expression-field-canvas {
+  touch-action: pan-y;
+}
+
+.expression-field-account .expression-field-canvas,
+.expression-field-renderer.is-draggable .expression-field-canvas {
+  touch-action: none;
+}
+
+.expression-field-introduction {
+  max-width: 42ch;
+  margin: 10px 0 0;
+  color: rgba(216, 239, 255, .62);
+  font-family: var(--font-body);
+  font-size: .83rem;
+  line-height: 1.55;
+}
+
+.expression-field-details-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.expression-field-measurement {
+  display: grid;
+  justify-items: end;
+  gap: 3px;
+  text-align: right;
+}
+
+.expression-field-measurement strong {
+  color: var(--expression-blue-white);
+  font-family: var(--font-subheading);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.expression-field-measurement small,
+.expression-field-state {
+  color: rgba(126, 201, 255, .62);
+}
+
+.expression-field-language {
+  display: grid;
+  gap: 1px;
+  margin-top: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(126, 201, 255, .12);
+  border-radius: 14px;
+  background: rgba(3, 9, 20, .72);
+}
+
+.expression-field-language > div {
+  display: grid;
+  grid-template-columns: minmax(108px, .34fr) minmax(0, 1fr);
+  gap: 18px;
+  padding: 13px 15px;
+  border-bottom: 1px solid rgba(126, 201, 255, .08);
+}
+
+.expression-field-language > div:last-child {
+  border-bottom: 0;
+}
+
+.expression-field-language span {
+  color: rgba(126, 201, 255, .68);
+  font-family: var(--font-subheading);
+  font-size: .61rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.expression-field-language p {
+  max-width: none;
+  margin: 0;
+  color: rgba(235, 246, 255, .72);
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+.expression-field-origin-label {
+  color: rgba(126, 201, 255, .48);
+}
+
+.expression-field-controls button[aria-pressed="true"] {
+  border-color: rgba(15, 111, 255, .64);
+  background: rgba(15, 111, 255, .14);
+  color: #e8f6ff;
+  box-shadow: inset 0 0 18px rgba(15, 111, 255, .06);
+}
+
+.expression-field-launcher {
+  border-color: rgba(15, 111, 255, .32);
+  background: rgba(4, 11, 21, .92);
+  color: #d8efff;
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, .4),
+    inset 0 0 24px rgba(15, 111, 255, .07);
+}
+
+.expression-field-launcher > span {
+  border-color: rgba(126, 201, 255, .65);
+  background: radial-gradient(circle, #fff 0 6%, #d8efff 8% 13%, rgba(15, 111, 255, .23) 28%, transparent 64%);
+  box-shadow: 0 0 16px rgba(15, 111, 255, .55);
+}
+
+.expression-field-focus {
+  border-color: rgba(126, 201, 255, .16);
+  background:
+    radial-gradient(circle at 52% 30%, rgba(15, 111, 255, .06), transparent 38%),
+    #060d17;
+  box-shadow: 0 36px 110px rgba(0, 0, 0, .62);
+  touch-action: pan-y;
+}
+
+.expression-field-ask,
+.expression-field-error button {
+  border-color: rgba(126, 201, 255, .48);
+  background: #d8efff;
+  color: #031020;
+}
+
+.expression-field-gear-note {
+  max-width: 54ch;
+  margin: 14px auto 0;
+  color: rgba(232, 221, 208, .54);
+  font-size: .7rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.expression-field-gear-note strong {
+  color: rgba(216, 239, 255, .78);
+  font-weight: 650;
+}
+
+.expression-field-landing-kicker {
+  display: block;
+  margin: 0 0 8px;
+  color: rgba(126, 201, 255, .62);
+  font-family: var(--font-subheading);
+  font-size: .57rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  line-height: 1.4;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (max-width: 620px) {
+  .expression-field-focus {
+    width: 100%;
+    height: min(88dvh, 760px);
+    margin: auto 0 0;
+    padding: 20px 18px max(22px, env(safe-area-inset-bottom));
+    border-radius: 24px 24px 0 0;
+  }
+
+  .expression-field-details-heading {
+    align-items: flex-end;
+  }
+
+  .expression-field-language > div {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .expression-field-canvas-shell > .expression-field-renderer {
+    height: min(390px, 82vw);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expression-field-subject,
+  .expression-field-controls button,
+  .expression-field-launcher {
+    transition: none !important;
+  }
+}
