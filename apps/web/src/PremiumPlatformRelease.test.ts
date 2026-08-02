@@ -133,7 +133,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(stories).not.toContain('globe');
   });
 
-  it('enforces the immersive hero, product windows, questions, and mobile opening', () => {
+  it('enforces the immersive hero, product windows, questions, and viewport-stable mobile opening', () => {
     for (const marker of [
       '.public-approved-v8 .v0-hero.sovereign-opening-field',
       'min-height: max(820px, calc(100svh - 74px))',
@@ -162,8 +162,13 @@ describe('founder v0 selective visual port — approved public v8', () => {
       '.landing-expression-slice__readout',
       '.landing-question-orbit__stage',
       '@keyframes landing-real-question',
-      'min-height: 1040px'
+      '--v8-stable-viewport-height',
+      'min-height: max(900px, calc(var(--v8-stable-viewport-height) - 68px + env(safe-area-inset-bottom)))',
+      'touch-action: pan-y pinch-zoom',
+      '@media (max-width: 980px) and (orientation: landscape) and (max-height: 560px)'
     ]) expect(heroExtension).toContain(marker);
+    expect(main).toContain('function installMobileViewportStability()');
+    expect(main).toContain('window.visualViewport');
     expect(approvedCss).toContain('border-radius: 999px');
     expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v8'");
     expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v8'");
