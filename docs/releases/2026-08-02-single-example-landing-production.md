@@ -23,6 +23,10 @@ Release branch: `main`
 - Tooltip remains contained within the mobile field.
 - Reduced-motion behavior remains available.
 
+## Test-contract reconciliation
+
+The public-site, selective-visual-port, viewport, public-release, product-stage, evidence, and landing-refinement tests now validate the approved single-example experience rather than requiring the retired three-demonstration wall. The production implementation was not reverted to satisfy stale assertions.
+
 ## Release verification
 
 Production must pass the repository Cloudflare build gate, including foundation checks, migration validation, release-source checks, typechecking, web and Worker tests, production builds, bundle-size verification, and deployment smoke checks.
