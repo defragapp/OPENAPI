@@ -3,11 +3,13 @@ import { describe, expect, it } from 'vitest';
 
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
-const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 const main = read('./main.tsx');
 const fingerprint = read('./v0-release-fingerprint.ts');
 const app = read('./App.tsx');
 const landing = read('./PublicLanding.tsx');
+const stories = read('./LandingProductStories.tsx');
+const field = read('./expression-field/LandingExpressionSlice.tsx');
 const viewportProbe = read('./PublicLandingViewportContract.ts');
 const authenticated = read('./AuthenticatedWorkspace.tsx');
 const workspace = read('./SovereignIntelligenceWorkspace.tsx');
@@ -18,6 +20,9 @@ const v0Css = read('./v0-visual-port.css');
 const v0PlatformCss = read('./v0-platform-port.css');
 const v0MotionCss = read('./v0-motion-accessibility.css');
 const v0GlobalCss = read('./v0-global-experience.css');
+const fieldCss = read('./landing-expression-field-v3.css');
+const integrationCss = read('./landing-expression-field-integration.css');
+const storyCss = read('./v0-restored-product-stories.css');
 const passkeyCss = read('./passkey-auth.css');
 const staticV0Css = read('../public/v0-public-port.css');
 const staticAuthority = read('../public/premium-public-release.css');
@@ -28,128 +33,79 @@ function expectBalancedCss(source: string) {
 
 describe('founder v0 selective visual port', () => {
   it('loads the certified visual cascade in order', () => {
-    const platformImport = "import './v0-platform-port.css';";
-    const motionImport = "import './v0-motion-accessibility.css';";
-    const visualImport = "import './v0-visual-port.css';";
-    const globalImport = "import './v0-global-experience.css';";
-    const passkeyImport = "import './passkey-auth.css';";
-    const platformIndex = main.indexOf(platformImport);
-    const motionIndex = main.indexOf(motionImport);
-    const visualIndex = main.indexOf(visualImport);
-    const globalIndex = main.indexOf(globalImport);
-    const passkeyIndex = main.indexOf(passkeyImport);
-    expect(platformIndex).toBeGreaterThan(-1);
-    expect(motionIndex).toBeGreaterThan(platformIndex);
-    expect(visualIndex).toBeGreaterThan(motionIndex);
-    expect(globalIndex).toBeGreaterThan(visualIndex);
-    expect(passkeyIndex).toBeGreaterThan(globalIndex);
-    expect(main.slice(passkeyIndex + passkeyImport.length)).not.toContain("import './");
-    expect(v0Css).toContain(`Source archive SHA-256:\n * ${archiveSha}`);
-    expectBalancedCss(v0PlatformCss);
-    expectBalancedCss(v0MotionCss);
-    expectBalancedCss(v0Css);
-    expectBalancedCss(v0GlobalCss);
-    expectBalancedCss(passkeyCss);
-  });
-
-  it('emits the exact archive and sequence fingerprint at runtime', () => {
-    expect(fingerprint).toContain(`V0_ARCHIVE_SHA256 = '${archiveSha}'`);
-    expect(fingerprint).toContain(`V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`);
-    expect(fingerprint).toContain("dataset.sovereignVisualContract = 'v0-landing-selective-port'");
-    expect(fingerprint).toContain('dataset.sovereignV0Archive = V0_ARCHIVE_SHA256');
-    expect(fingerprint).toContain('dataset.sovereignV0Sequence = V0_SEQUENCE_FINGERPRINT');
-    expect(main).toContain("import { installV0ReleaseFingerprint } from './v0-release-fingerprint'");
-    expect(main).toContain('installV0ReleaseFingerprint();');
-  });
-
-  it('ports the actual v0 landing headings and sequence', () => {
-    expect(landing).toContain(`const V0_ARCHIVE_SHA = '${archiveSha}'`);
-    expect(landing).toContain('data-visual-contract="v0-landing-selective-port"');
-    expect(landing).toContain('Healing isn’t optional.');
-    expect(landing).toContain('Holding onto the pain is.');
-    const renderStart = landing.indexOf('export function PublicLanding()');
-    const renderEnd = landing.indexOf('function V0Navigation()', renderStart);
-    const renderedSequence = landing.slice(renderStart, renderEnd);
-    const markers = [
-      '<RotatingQuestions />',
-      '<PersonalStory />',
-      '<RelationshipStory />',
-      '<SystemStory />',
-      '<ComparisonStory />',
-      '<FinalCallToAction />'
+    const imports = [
+      "import './v0-platform-port.css';",
+      "import './v0-motion-accessibility.css';",
+      "import './v0-visual-port.css';",
+      "import './v0-global-experience.css';",
+      "import './landing-expression-field-v3.css';",
+      "import './landing-expression-field-integration.css';",
+      "import './v0-restored-product-stories.css';",
+      "import './passkey-auth.css';"
     ];
     let previous = -1;
-    for (const marker of markers) {
-      const index = renderedSequence.indexOf(marker);
+    for (const marker of imports) {
+      const index = main.indexOf(marker);
       expect(index).toBeGreaterThan(previous);
       previous = index;
     }
-    for (const copy of [
+    expect(main.slice(previous + imports.at(-1)!.length)).not.toContain("import './");
+    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, storyCss, passkeyCss]) expectBalancedCss(source);
+  });
+
+  it('emits the exact archive and v3 landing fingerprint at runtime', () => {
+    expect(fingerprint).toContain(`V0_ARCHIVE_SHA256 = '${archiveSha}'`);
+    expect(fingerprint).toContain(`V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`);
+    expect(fingerprint).toContain("PUBLIC_LANDING_CONTRACT = 'v0-public-landing-v3'");
+    expect(fingerprint).toContain("PUBLIC_LANDING_FIELD_CONTRACT = 'landing-expression-field-v3'");
+    expect(main).toContain('installV0ReleaseFingerprint();');
+  });
+
+  it('keeps the approved hero and integrated field first', () => {
+    expect(landing).toContain(`const V0_ARCHIVE_SHA = '${archiveSha}'`);
+    expect(landing).toContain('Healing isn’t optional.');
+    expect(landing).toContain('Holding onto the pain is.');
+    expect(landing).toContain('<LandingExpressionSlice />');
+    expect(field).toContain('onPointerDown={handlePointerDown}');
+    expect(field).toContain('landing-expression-slice__tooltip');
+    expect(field).not.toContain('sphere');
+    expect(integrationCss).toContain('background: transparent');
+  });
+
+  it('restores the v0 product demonstrations and active workflows', () => {
+    expect(landing).toContain('<LandingProductStories />');
+    for (const marker of [
       'Ask about your life.',
       'Get an answer built for you.',
       'Understand what happens',
       'between you.',
       'From one person',
       'to the whole system.',
-      'Other AI answers',
-      'everyone the same.',
-      'Your thoughts deserve',
-      'a better place to live.'
-    ]) expect(landing).toContain(copy);
-  });
-
-  it('ports the v0 demonstrations rather than a generic marketing reconstruction', () => {
-    for (const marker of [
-      'className="v0-story-grid"',
-      'className="v0-baseline-trace"',
-      'function ProcessingFlow(',
-      'v0-window v0-flow',
-      'className="v0-family-map"',
       'surface="personal-chat"',
       'surface="personal-reasoning"',
       'surface="relationship-chat"',
       'surface="relationship-reasoning"',
       'surface="system-map"',
-      'data-viewport-surface="comparison"',
-      'data-viewport-surface={surface}'
-    ]) expect(landing).toContain(marker);
+      'surface="system-reasoning"',
+      'v0-baseline-trace',
+      'v0-workflow-panel',
+      'v0-family-map-no-globes'
+    ]) expect(stories).toContain(marker);
+    expect(stories).not.toContain('LandingExpressionFieldPreview');
+    expect(stories).not.toContain('sphere');
+    expect(stories).not.toContain('globe');
   });
 
-  it('applies the same v0 language to the real platform and standalone routes', () => {
-    for (const selector of [
-      '.v0-hero',
-      '.v0-story-grid',
-      '.v0-family-map',
-      '.intelligence-workspace',
-      '.intelligence-sidebar',
-      '.sovereign-composer',
-      '.account-shell',
-      '.auth-panel',
-      '.workspace-sheet'
-    ]) expect(v0Css).toContain(selector);
-    for (const selector of [
-      'body:has(.plan-onboarding)',
-      'body:has(.sovereign-policy)',
-      '.plan-nav',
-      '.onboarding-plan-grid',
-      '.plan-visual',
-      '.policy-hero',
-      '.policy-grid',
-      '.policy-contact',
-      '.email-code-fallback'
-    ]) expect(v0PlatformCss).toContain(selector);
-    for (const selector of ['body.launch-page', '.launch-nav', '.launch-hero', '.journey-steps', '.pricing-grid', '.faq-list details', '.launch-footer']) {
-      expect(staticV0Css).toContain(selector);
-    }
+  it('applies the same founder language to the platform and standalone routes', () => {
+    for (const selector of ['.v0-hero', '.v0-story-grid', '.intelligence-workspace', '.intelligence-sidebar', '.sovereign-composer', '.account-shell', '.auth-panel', '.workspace-sheet']) expect(v0Css).toContain(selector);
+    for (const selector of ['body:has(.plan-onboarding)', 'body:has(.sovereign-policy)', '.plan-nav', '.onboarding-plan-grid', '.policy-hero', '.email-code-fallback']) expect(v0PlatformCss).toContain(selector);
+    for (const selector of ['body.launch-page', '.launch-nav', '.launch-hero', '.journey-steps', '.pricing-grid', '.faq-list details', '.launch-footer']) expect(staticV0Css).toContain(selector);
     expect(staticAuthority).toContain("@import url('/v0-public-port.css?v=20260801-founder-v0')");
-    expect(v0Css).toContain('@media (max-width: 760px)');
-    expect(v0PlatformCss).toContain('@media (max-width: 700px)');
-    expect(v0Css).toContain('@media (prefers-reduced-motion: reduce)');
     expectBalancedCss(staticV0Css);
   });
 
-  it('measures the rendered v0 surfaces at desktop and phone widths', () => {
-    for (const surface of ['hero', 'personal-chat', 'personal-reasoning', 'relationship-chat', 'relationship-reasoning', 'system-map', 'comparison']) {
+  it('measures the complete rendered landing at desktop and phone widths', () => {
+    for (const surface of ['hero', 'expression-slice', 'personal-chat', 'personal-reasoning', 'relationship-chat', 'relationship-reasoning', 'system-map', 'system-reasoning', 'comparison']) {
       expect(viewportProbe).toContain(`'${surface}'`);
     }
     expect(viewportProbe).toContain('const narrow = snapshot.viewportWidth <= narrowViewportMaximum');
@@ -171,9 +127,9 @@ describe('founder v0 selective visual port', () => {
     expect(membership).toContain("person.activeScopes.includes('system.include')");
   });
 
-  it('does not import the archive mock runtime', () => {
-    const source = `${landing}\n${v0Css}\n${v0PlatformCss}\n${app}\n${workspace}`;
-    for (const prohibited of ['Math.random', 'mock-auth', 'fake-answer', 'dashboard-grid', 'Demo User', 'generateAIResponse']) {
+  it('does not import the archive mock runtime or unsupported scoring', () => {
+    const source = `${landing}\n${stories}\n${field}\n${v0Css}\n${v0PlatformCss}\n${app}\n${workspace}`;
+    for (const prohibited of ['Math.random', 'mock-auth', 'fake-answer', 'dashboard-grid', 'Demo User', 'generateAIResponse', 'Alignment Score', 'Stability Index']) {
       expect(source).not.toContain(prohibited);
     }
   });
