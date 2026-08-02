@@ -60,8 +60,9 @@ import './landing-expression-field-integration.css';
 import './v0-restored-product-stories.css';
 import './landing-product-stories-v2.css';
 
-/* Single approved public landing authority, then passkey authority. */
+/* Single approved public landing authority, interactive hero extension, then passkey authority. */
 import './public-landing-approved-v8.css';
+import './landing-hero-field-v4.css';
 import './passkey-auth.css';
 
 installV0ReleaseFingerprint();
