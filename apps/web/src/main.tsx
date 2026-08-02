@@ -58,7 +58,12 @@ import './emergency-public-removal.css';
 import './landing-expression-field-v3.css';
 import './landing-expression-field-integration.css';
 
-/* Isolated product demonstrations, then passkey-specific platform authority. */
+/* Retained release-lineage layers no longer match the isolated story DOM. */
+import './v0-restored-product-stories.css';
+import './v0-product-story-layout-repair.css';
+import './v0-product-story-layout-final.css';
+
+/* Actual mobile-first product demonstrations, then passkey authority. */
 import './landing-product-stories-v2.css';
 import './passkey-auth.css';
 
@@ -108,7 +113,8 @@ function refreshStaleIosPageRestore(): void {
 retireLegacyPublicCache();
 refreshStaleIosPageRestore();
 
-document.documentElement.dataset.sovereignLayoutRelease = 'isolated-product-stories-v4';
+document.documentElement.dataset.sovereignLayoutRelease = 'compact-product-stories-v3';
+document.documentElement.dataset.sovereignProductStories = 'isolated-mobile-first-v2';
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'
