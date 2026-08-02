@@ -21,7 +21,7 @@
     "verify:cloudflare-build": "node scripts/cloudflare-build-diagnostics.mjs",
     "verify:full": "pnpm verify:foundation && pnpm verify:migrations && pnpm scan:secrets && pnpm scan:production-fixtures && pnpm verify:release-config && pnpm verify:production-release && pnpm verify:intelligence-release && pnpm verify:visual-intelligence && pnpm verify:premium-platform && pnpm typecheck && pnpm test && pnpm build && pnpm verify:worker-bundle-size && pnpm smoke:auth && pnpm smoke:baseline && pnpm smoke:jobs && pnpm smoke:worker-gateway && pnpm smoke:stripe && pnpm smoke:product && pnpm smoke:release-closure",
     "verify:production-release": "node scripts/verify-production-release-v2.mjs",
-    "verify:live-visual-release": "node scripts/verify-live-visual-release.mjs",
+    "verify:live-visual-release": "node scripts/verify-live-visual-release-v2.mjs",
     "scan:secrets": "node scripts/scan-secrets.mjs",
     "smoke:sovereign": "node --import tsx scripts/worker-gateway-smoke.ts",
     "smoke:gateway": "node --import tsx scripts/cloudflare-gateway-smoke.ts",
