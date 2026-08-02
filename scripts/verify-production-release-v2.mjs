@@ -38,6 +38,7 @@ const v0Visual = read('apps/web/src/v0-visual-port.css');
 const v0Global = read('apps/web/src/v0-global-experience.css');
 const fieldCss = read('apps/web/src/landing-expression-field-v3.css');
 const integrationCss = read('apps/web/src/landing-expression-field-integration.css');
+const heroCss = read('apps/web/src/landing-hero-field-v4.css');
 const storyCss = read('apps/web/src/v0-restored-product-stories.css');
 const passkeyCss = read('apps/web/src/passkey-auth.css');
 const passkeyClient = read('apps/web/src/passkey-client.ts');
@@ -182,6 +183,7 @@ requireAll('application visual entry', main, [
   "import './landing-expression-field-v3.css'",
   "import './landing-expression-field-integration.css'",
   "import './v0-restored-product-stories.css'",
+  "import './landing-hero-field-v4.css'",
   "import './passkey-auth.css'",
   "import { PasskeyAuthentication } from './PasskeyAuthentication'",
   '<PasskeyAuthentication />',
@@ -196,6 +198,8 @@ const orderedImports = [
   "import './landing-expression-field-v3.css';",
   "import './landing-expression-field-integration.css';",
   "import './v0-restored-product-stories.css';",
+  "import './public-landing-approved-v8.css';",
+  "import './landing-hero-field-v4.css';",
   "import './passkey-auth.css';"
 ];
 let previousImport = -1;
@@ -223,6 +227,9 @@ requireAll('landing v3 composition', landing, [
   'Healing isn’t optional.',
   'Holding onto the pain is.',
   '<LandingExpressionSlice />',
+  '<RealLifeQuestions />',
+  'Bring the question you actually have.',
+  'Why do we keep having the same fight?',
   '<LandingProductStories />',
   '<ComparisonStory />'
 ]);
@@ -243,18 +250,25 @@ requireAll('restored landing stories', stories, [
   'v0-family-system-map'
 ]);
 rejectAll('restored landing stories', stories, ['LandingExpressionFieldPreview', 'sphere', 'globe']);
-requireAll('integrated landing field', `${field}\n${fieldCss}\n${integrationCss}`, [
+requireAll('integrated landing field', `${field}\n${fieldCss}\n${integrationCss}\n${heroCss}`, [
+  'data-field-geometry="spherical-360"',
   'onPointerDown={handlePointerDown}',
   'onPointerMove={handlePointerMove}',
-  'landing-expression-slice__tooltip',
-  'Baseline value',
-  'Live change',
-  'Current',
+  'landing-expression-slice__readout',
+  'MIN_AXIS_LENGTH',
+  'MAX_AXIS_LENGTH',
+  'Math.pow(normalized, 1.32)',
+  'buildSphereGrid',
+  'requestAnimationFrame',
+  '.landing-expression-slice__sphere-shell',
+  '.landing-question-orbit__stage',
+  'stroke: #2f93ff',
   'width: 100vw',
   'background: transparent',
   'border-radius: 0'
 ]);
-rejectAll('integrated landing field', field, ['sphere', 'globe', 'Math.random']);
+rejectAll('integrated landing field', field, ['Math.random', 'giftExpression', 'shadowExpression']);
+assert(!field.includes('<div className="landing-expression-slice__tooltip"'), 'The retired floating tooltip returned.');
 
 requireAll('founder platform coverage', v0Platform, ['body:has(.plan-onboarding)', 'body:has(.sovereign-policy)', 'body:has(.email-code-fallback)', '.onboarding-plan-grid', '.policy-grid', '.email-code-fallback']);
 requireAll('founder visual foundation', v0Visual, ['--v0-page: #0f0f0f', '--v0-cream: #e8ddd0', '.v0-hero', '.v0-family-map', '.intelligence-workspace', '.sovereign-composer', '.account-shell']);
@@ -291,9 +305,10 @@ for (const [label, css] of [
   ['v0 global', v0Global],
   ['landing field', fieldCss],
   ['field integration', integrationCss],
+  ['hero field and questions', heroCss],
   ['restored stories', storyCss],
   ['passkey auth', passkeyCss],
   ['v0 static public', staticV0]
 ]) balanced(label, css);
 
-console.log('Production release v2 verification passed: founder-v0 global surfaces, passkey-first auth, Resend v0 email, Stripe plan proof, integrated landing field, and restored product workflows are enforced.');
+console.log('Production release v2 verification passed: founder-v0 global surfaces, passkey-first auth, Resend v0 email, Stripe plan proof, interactive 360 landing field, rotating real-life questions, and restored product workflows are enforced.');
