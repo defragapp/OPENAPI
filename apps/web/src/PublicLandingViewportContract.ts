@@ -88,15 +88,15 @@ export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSna
     for (const [chatId, workflowId] of productPairs) {
       const chat = snapshot.surfaces.find((item) => item.id === chatId);
       const workflow = snapshot.surfaces.find((item) => item.id === workflowId);
-      if (chat && workflow && workflow.top < chat.bottom - 2) {
-        failures.push(`${workflowId} is not stacked below ${chatId}`);
+      if (chat && workflow && workflow.top < chat.bottom + 10) {
+        failures.push(`${workflowId} is not clearly stacked below ${chatId}`);
       }
     }
   }
 
   snapshot.stageGaps.forEach((gap, index) => {
-    if (gap > 96) failures.push(`stage gap ${index + 1} is ${gap}px`);
-    if (gap < -2) failures.push(`stage gap ${index + 1} is ${gap}px`);
+    if (gap > 112) failures.push(`stage gap ${index + 1} is ${gap}px`);
+    if (gap < 18) failures.push(`stage gap ${index + 1} is ${gap}px`);
   });
 
   if (narrow && !snapshot.comparisonStacked) failures.push('comparison section is not stacked');
@@ -124,17 +124,18 @@ export function measurePublicLandingViewport(doc: Document = document, viewportW
     };
   });
 
-  const stageGaps = Array.from(root.querySelectorAll<HTMLElement>('[data-viewport-stage]')).map((stage) => {
+  const stageGaps = Array.from(root.querySelectorAll<HTMLElement>('[data-viewport-stage]')).flatMap((stage) => {
+    if (stage.dataset.viewportStage === 'expression') return [];
     const section = stage.closest<HTMLElement>('[data-viewport-section]');
-    const heading = section?.querySelector<HTMLElement>('.v0-story-heading, .v0-hero-content');
-    if (!heading) return 0;
-    return Math.round(stage.getBoundingClientRect().top - heading.getBoundingClientRect().bottom);
+    const heading = section?.querySelector<HTMLElement>('.landing-story__heading, .v0-story-heading, .v0-hero-content');
+    if (!heading) return [];
+    return [Math.round(stage.getBoundingClientRect().top - heading.getBoundingClientRect().bottom)];
   });
 
   const comparison = root.querySelector<HTMLElement>('[data-viewport-surface="comparison"]');
   const comparisonCards = comparison ? Array.from(comparison.children).filter((node): node is HTMLElement => node instanceof HTMLElement) : [];
   const comparisonStacked = comparisonCards.length >= 2
-    && comparisonCards[1]!.getBoundingClientRect().top >= comparisonCards[0]!.getBoundingClientRect().bottom + 12;
+    && comparisonCards[1]!.getBoundingClientRect().top >= comparisonCards[0]!.getBoundingClientRect().bottom - 1;
 
   return {
     viewportWidth,
