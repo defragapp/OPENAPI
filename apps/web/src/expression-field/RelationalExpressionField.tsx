@@ -40,7 +40,7 @@ export function RelationalExpressionField({
 
   return (
     <figure className={`relational-expression-field expression-field-depth-${depth}${compact ? ' is-compact' : ''}${className ? ` ${className}` : ''}`} data-expression-field-composition="relationship">
-      <div className="relational-expression-stage" aria-label="Two distinct Baseline expression fields">
+      <div className="relational-expression-stage" aria-label="Two distinct Baseline Expression Fields">
         {fieldSubjects.map((subject, index) => {
           const selected = selectedId === 'interaction' || selectedId === subject.id;
           return (
@@ -50,7 +50,7 @@ export function RelationalExpressionField({
                 selectedAxisId={subject.selectedAxisId ?? interaction.selectedAxisId}
                 {...(selectedId === 'interaction' ? { engagementDirection: index === 0 ? 'right' as const : 'left' as const } : {})}
                 engagementPhase={0}
-                ariaLabel={`${subject.label} Baseline expression field. Vector length represents the relative values supplied by that permitted Baseline.`}
+                ariaLabel={`${subject.label} Baseline Expression Field. Every line begins at that person’s own center; length represents relative salience from permitted information.`}
               />
               <button type="button" aria-pressed={selectedId === subject.id} onClick={() => select(subject.id)}>
                 <strong>{subject.label}</strong>
@@ -60,6 +60,7 @@ export function RelationalExpressionField({
           );
         })}
       </div>
+      <p className="expression-field-gear-note"><strong>How the gears meet.</strong> Each person stays distinct. Sovereign shows where timing and expression catch, support, or strain without turning either person into the cause.</p>
       <figcaption>
         <button className="expression-field-interaction" type="button" aria-pressed={selectedId === 'interaction'} onClick={() => select('interaction')}>
           <span>{interaction.label}</span>
