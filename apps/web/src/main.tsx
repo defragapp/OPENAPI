@@ -108,8 +108,32 @@ function refreshStaleIosPageRestore(): void {
   });
 }
 
+function installMobileViewportStability(): void {
+  let frame = 0;
+
+  const syncViewport = () => {
+    window.cancelAnimationFrame(frame);
+    frame = window.requestAnimationFrame(() => {
+      const viewport = window.visualViewport;
+      const width = Math.round(viewport?.width || window.innerWidth);
+      const height = Math.round(viewport?.height || window.innerHeight);
+      document.documentElement.style.setProperty('--sovereign-viewport-height', `${height}px`);
+      document.documentElement.style.setProperty('--sovereign-viewport-width', `${width}px`);
+      document.documentElement.dataset.sovereignOrientation = width > height ? 'landscape' : 'portrait';
+    });
+  };
+
+  syncViewport();
+  window.addEventListener('resize', syncViewport, { passive: true });
+  window.addEventListener('orientationchange', syncViewport, { passive: true });
+  window.addEventListener('pageshow', syncViewport, { passive: true });
+  window.visualViewport?.addEventListener('resize', syncViewport, { passive: true });
+  window.visualViewport?.addEventListener('scroll', syncViewport, { passive: true });
+}
+
 retireLegacyPublicCache();
 refreshStaleIosPageRestore();
+installMobileViewportStability();
 
 document.documentElement.dataset.sovereignLayoutRelease = 'approved-public-v8';
 document.documentElement.dataset.sovereignProductStories = 'isolated-mobile-first-v2';
