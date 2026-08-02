@@ -27,6 +27,7 @@ const isolatedStoryCss = read('./landing-product-stories-v2.css');
 const openingCss = read('./sovereign-opening-field.css');
 const premiumPublicV4Css = read('./public-landing-premium-v4.css');
 const premiumPublicV5Css = read('./public-landing-premium-v5.css');
+const premiumPublicV6Css = read('./public-landing-premium-v6.css');
 const passkeyCss = read('./passkey-auth.css');
 const staticV0Css = read('../public/v0-public-port.css');
 const staticAuthority = read('../public/premium-public-release.css');
@@ -49,6 +50,7 @@ describe('founder v0 selective visual port', () => {
       "import './sovereign-opening-field.css';",
       "import './public-landing-premium-v4.css';",
       "import './public-landing-premium-v5.css';",
+      "import './public-landing-premium-v6.css';",
       "import './passkey-auth.css';"
     ];
     let previous = -1;
@@ -70,6 +72,7 @@ describe('founder v0 selective visual port', () => {
       openingCss,
       premiumPublicV4Css,
       premiumPublicV5Css,
+      premiumPublicV6Css,
       passkeyCss
     ]) expectBalancedCss(source);
   });
@@ -117,33 +120,37 @@ describe('founder v0 selective visual port', () => {
     expect(stories).not.toContain('globe');
   });
 
-  it('enforces the complete premium public page rather than a generic component stack', () => {
-    expect(landing).toContain('public-premium-v4 public-premium-v5');
-    expect(landing).toContain('data-public-release="premium-public-v5"');
+  it('enforces the editorial premium v6 page rather than a repeated card stack', () => {
+    expect(landing).toContain('public-premium-v4 public-premium-v5 public-premium-v6');
+    expect(landing).toContain('data-public-release="premium-public-v6"');
     expect(landing.match(/SOVEREIGN\.OS/g)?.length).toBeGreaterThanOrEqual(3);
-    expect(main).toContain("dataset.sovereignLayoutRelease = 'premium-public-v5'");
+    expect(main).toContain("dataset.sovereignLayoutRelease = 'premium-public-v6'");
 
     for (const marker of [
-      '.public-premium-v5 .v0-wordmark',
-      'font-size: 0.94rem',
-      '.public-premium-v5 .landing-control',
-      'clip-path: none',
+      '.public-premium-v6 .v0-wordmark',
+      'font-size: 1rem',
+      '.public-premium-v6 .sovereign-opening-field .v0-hero-content',
+      'align-items: flex-start',
+      '.public-premium-v6 .landing-story__stage',
+      'gap: 1px',
+      'border: 1px solid var(--v6-line-strong)',
+      '.public-premium-v6 .landing-story--relationship .landing-demo--chat',
+      'order: 2',
+      '.public-premium-v6 .landing-demo__traffic',
+      'display: none',
+      "content: 'SOVEREIGN.OS'",
+      '.public-premium-v6 .landing-message--assistant > div',
       'background: transparent',
-      '.public-premium-v5 .sovereign-opening-field h1',
-      'max-width: 1060px',
-      '.public-premium-v5 .landing-story__heading',
-      'grid-template-columns: 96px minmax(0, 760px) minmax(280px, 340px)',
-      '.public-premium-v5 .landing-demo',
-      'border-radius: 4px',
-      '.public-premium-v5 .landing-workflow button > i',
-      '.public-premium-v5 .v0-comparison-positive',
-      '.public-premium-v5 .v0-final h2',
+      '.public-premium-v6 .landing-story__heading h2 span',
+      '-webkit-text-stroke: 0',
+      '.public-premium-v6 .v0-final',
+      'text-align: left',
       '@media (max-width: 760px)'
-    ]) expect(premiumPublicV5Css).toContain(marker);
+    ]) expect(premiumPublicV6Css).toContain(marker);
 
-    expect(premiumPublicV5Css).not.toContain('border-radius: 999px');
-    expect(premiumPublicV5Css).toContain('flex-direction: column');
-    expect(premiumPublicV5Css).toContain('min-height: 300px');
+    expect(premiumPublicV6Css).not.toContain('border-radius: 999px');
+    expect(premiumPublicV6Css).toContain('flex-direction: column');
+    expect(premiumPublicV6Css).toContain('min-height: 290px');
   });
 
   it('applies the same founder language to the platform and standalone routes', () => {
