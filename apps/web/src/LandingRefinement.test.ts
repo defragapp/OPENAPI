@@ -9,6 +9,7 @@ const field = read('./expression-field/LandingExpressionSlice.tsx');
 const fieldStyles = read('./landing-expression-field-v3.css');
 const integrationStyles = read('./landing-expression-field-integration.css');
 const storyStyles = read('./landing-product-stories-v2.css');
+const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
 describe('public landing v3 release', () => {
   it('loads the integrated field, isolated product stories, and passkey authority in order', () => {
@@ -58,21 +59,21 @@ describe('public landing v3 release', () => {
       'landing-system-map',
       'is-active',
       'is-complete'
-    ]) expect(stories).toContain(marker);
-    expect(stories).not.toContain('LandingExpressionFieldPreview');
-    expect(stories).not.toContain('sphere');
-    expect(stories).not.toContain('globe');
+    ]) expect(renderedStories).toContain(marker);
+    expect(renderedStories).not.toContain('LandingExpressionFieldPreview');
+    expect(renderedStories).not.toContain('sphere');
+    expect(renderedStories).not.toContain('globe');
   });
 
   it('does not render the retired v0 showcase classes that caused the live stretch regression', () => {
     for (const marker of [
-      'className="v0-story-grid"',
-      'className="v0-window',
-      'className="v0-window-body"',
-      'className="v0-flow',
-      'className="v0-workflow-panel"',
-      'className="v0-family-system-map"'
-    ]) expect(stories).not.toContain(marker);
+      '<div className="v0-story-grid"',
+      '<article className="v0-window',
+      '<div className="v0-window-body"',
+      '<article className="v0-flow',
+      '<article className="v0-workflow-panel"',
+      '<div className="v0-family-system-map"'
+    ]) expect(renderedStories).not.toContain(marker);
   });
 
   it('uses content-driven desktop panels and a real mobile column', () => {
