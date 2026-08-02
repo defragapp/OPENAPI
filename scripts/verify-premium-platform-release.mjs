@@ -28,6 +28,7 @@ const v0GlobalVisual = read('apps/web/src/v0-global-experience.css');
 const fieldVisual = read('apps/web/src/landing-expression-field-v3.css');
 const fieldIntegration = read('apps/web/src/landing-expression-field-integration.css');
 const storyVisual = read('apps/web/src/v0-restored-product-stories.css');
+const heroVisual = read('apps/web/src/landing-hero-field-v4.css');
 const passkeyVisual = read('apps/web/src/passkey-auth.css');
 const staticV0Visual = read('apps/web/public/v0-public-port.css');
 const publicSupport = read('apps/web/public/premium-public-release.css');
@@ -42,6 +43,7 @@ for (const path of [
   'apps/web/src/landing-expression-field-v3.css',
   'apps/web/src/landing-expression-field-integration.css',
   'apps/web/src/v0-restored-product-stories.css',
+  'apps/web/src/landing-hero-field-v4.css',
   'apps/web/src/passkey-auth.css',
   'apps/web/public/v0-public-port.css'
 ]) assert(existsSync(path), `Required release source is missing: ${path}`);
@@ -54,6 +56,8 @@ const orderedImports = [
   "import './landing-expression-field-v3.css';",
   "import './landing-expression-field-integration.css';",
   "import './v0-restored-product-stories.css';",
+  "import './public-landing-approved-v8.css';",
+  "import './landing-hero-field-v4.css';",
   "import './passkey-auth.css';"
 ];
 let previousImport = -1;
@@ -85,6 +89,10 @@ requireAll('landing archive and hero contract', landing, [
   'Healing isn’t optional.',
   'Holding onto the pain is.',
   '<LandingExpressionSlice />',
+  '<RealLifeQuestions />',
+  'Bring the question you actually have.',
+  'Why do I keep taking responsibility for everyone around me?',
+  'What is mine, what is theirs, and what happens between us?',
   '<LandingProductStories />'
 ]);
 
@@ -92,6 +100,7 @@ const renderedSequence = landing.slice(landing.indexOf('export function PublicLa
 const orderedLandingMarkers = [
   '<V0Navigation />',
   '<V0Hero />',
+  '<RealLifeQuestions />',
   '<LandingProductStories />',
   '<ComparisonStory />',
   '<FinalCallToAction />',
@@ -142,20 +151,34 @@ requireAll('restored product stories', stories, [
 ]);
 rejectAll('restored product stories', stories, ['LandingExpressionFieldPreview', 'sphere', 'globe']);
 
-requireAll('integrated hero field', `${field}\n${fieldVisual}\n${fieldIntegration}`, [
+requireAll('integrated hero field', `${field}\n${fieldVisual}\n${fieldIntegration}\n${heroVisual}`, [
   'data-visual-contract="landing-expression-field-v3"',
+  'data-field-geometry="spherical-360"',
   'onPointerDown={handlePointerDown}',
   'onPointerMove={handlePointerMove}',
-  'landing-expression-slice__tooltip',
-  'Baseline value',
-  'Live change',
-  'Current',
+  'landing-expression-slice__readout',
+  'MIN_AXIS_LENGTH',
+  'MAX_AXIS_LENGTH',
+  'Math.pow(normalized, 1.32)',
+  'buildSphereGrid',
+  'requestAnimationFrame',
+  '.landing-expression-slice__sphere-shell',
+  '.landing-expression-slice__sphere-grid path',
+  'stroke: #2f93ff',
   'width: 100vw',
   'border-radius: 0',
   'background: transparent',
   'touch-action: none'
 ]);
-rejectAll('integrated hero field', field, ['sphere', 'globe', 'Math.random']);
+rejectAll('integrated hero field', field, ['Math.random', 'giftExpression', 'shadowExpression']);
+assert(!field.includes('<div className="landing-expression-slice__tooltip"'), 'The retired floating tooltip returned to the hero field.');
+
+requireAll('real-life question visual authority', heroVisual, [
+  '.landing-question-orbit',
+  '.landing-question-orbit__stage',
+  '@keyframes landing-real-question',
+  '@media (prefers-reduced-motion: reduce)'
+]);
 
 requireAll('restored story visual authority', storyVisual, [
   '.v0-restored-product-stories',
@@ -263,6 +286,7 @@ for (const [label, source] of [
   ['landing field', fieldVisual],
   ['field integration', fieldIntegration],
   ['restored product stories', storyVisual],
+  ['hero field and questions', heroVisual],
   ['passkey authority', passkeyVisual],
   ['standalone authority', staticV0Visual],
   ['public support authority', publicSupport]
@@ -274,7 +298,8 @@ console.log(JSON.stringify({
   archiveSha256: archiveSha,
   sequenceFingerprint,
   canonicalLanding: 'PublicLanding.tsx + LandingProductStories.tsx',
-  publicField: 'landing-expression-field-v3',
+  publicField: 'landing-expression-field-v3-spherical-360',
+  questionTreatment: 'rotating-real-life-questions',
   productStories: ['personal-chat-workflow', 'relationship-chat-workflow', 'system-chat-workflow'],
   visualDirection: 'founder-v0-dark-editorial',
   excludedMockRuntime: true,
