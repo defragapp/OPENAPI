@@ -13,6 +13,7 @@ const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.ts
 const v0Css = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
 const fieldCss = readFileSync(new URL('./landing-expression-field-v3.css', import.meta.url), 'utf8');
 const integrationCss = readFileSync(new URL('./landing-expression-field-integration.css', import.meta.url), 'utf8');
+const heroExtension = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
 const storiesCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
 
 describe('founder v0 public production release', () => {
@@ -31,18 +32,24 @@ describe('founder v0 public production release', () => {
     expect(sitemap).not.toContain('/app');
   });
 
-  it('uses the integrated field as the opening product visual', () => {
+  it('uses the interactive 360 field as the opening product visual', () => {
     expect(landing).toContain('data-answer-contract="sovereign-answer.v2"');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(landing).toContain('<LandingExpressionSlice />');
+    expect(landing).toContain('<RealLifeQuestions />');
     expect(field).toContain('landing-expression-slice__beam');
     expect(field).toContain('onPointerDown={handlePointerDown}');
     expect(field).toContain('role="status"');
-    expect(field).not.toContain('sphere');
+    expect(field).toContain('data-field-geometry="spherical-360"');
+    expect(field).toContain('buildSphereGrid');
+    expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(integrationCss).toContain('background: transparent');
+    expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
   });
 
-  it('restores the three chat and workflow demonstrations without field globes', () => {
+  it('restores the rotating question treatment and three workflow demonstrations without duplicate fields', () => {
+    expect(landing).toContain('Bring the question you actually have.');
+    expect(landing).toContain('Why do we keep having the same fight?');
     expect(landing).toContain('<LandingProductStories />');
     for (const marker of [
       'Ask about your life.',
@@ -63,8 +70,11 @@ describe('founder v0 public production release', () => {
   it('retains the founder hierarchy and responsive behavior', () => {
     for (const selector of ['.v0-hero', '.v0-comparison-grid', '.v0-final']) expect(v0Css).toContain(selector);
     for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip']) expect(fieldCss).toContain(selector);
+    for (const selector of ['.landing-expression-slice__sphere-shell', '.landing-question-orbit__stage', '.landing-expression-slice__readout']) expect(heroExtension).toContain(selector);
     for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storiesCss).toContain(selector);
     expect(fieldCss).toContain('@media (max-width: 760px)');
+    expect(heroExtension).toContain('@media (max-width: 760px)');
+    expect(heroExtension).toContain('@media (prefers-reduced-motion: reduce)');
     expect(storiesCss).toContain('@media (max-width: 760px)');
     expect(storiesCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
