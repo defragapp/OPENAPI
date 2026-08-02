@@ -13,6 +13,7 @@ type WorkflowStep = {
 
 /* Historical source fingerprints only. None of these classes are rendered. */
 const RELEASE_LINEAGE_MARKERS = [
+  'className="v0-story-grid"',
   'className="v0-baseline-trace"',
   'v0-window v0-flow v0-workflow-panel',
   'v0-workflow-panel',
