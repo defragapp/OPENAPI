@@ -2,7 +2,10 @@ export type ViewportSurfaceMeasurement = {
   id: string;
   left: number;
   right: number;
+  top: number;
+  bottom: number;
   width: number;
+  height: number;
   layoutWidth: number;
 };
 
@@ -32,6 +35,19 @@ const requiredSurfaces = [
   'system-reasoning',
   'comparison'
 ] as const;
+const productSurfaceIds = new Set([
+  'personal-chat',
+  'personal-reasoning',
+  'relationship-chat',
+  'relationship-reasoning',
+  'system-map',
+  'system-reasoning'
+]);
+const productPairs = [
+  ['personal-chat', 'personal-reasoning'],
+  ['relationship-chat', 'relationship-reasoning'],
+  ['system-map', 'system-reasoning']
+] as const;
 
 export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSnapshot): PublicLandingViewportResult {
   const failures: string[] = [];
@@ -57,9 +73,24 @@ export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSna
       if (snapshot.viewportWidth - surface.right < minimumGutter) failures.push(`${id} right gutter ${snapshot.viewportWidth - surface.right}px < ${minimumGutter}px`);
     }
 
+    if (productSurfaceIds.has(id)) {
+      const maximumHeight = narrow ? 1100 : 1000;
+      if (surface.height > maximumHeight) failures.push(`${id} height ${surface.height}px > ${maximumHeight}px`);
+    }
+
     if (surface.layoutWidth > 0) {
       const scale = surface.width / surface.layoutWidth;
       if (scale < 0.98 || scale > 1.02) failures.push(`${id} rendered scale ${scale.toFixed(3)} is not 1`);
+    }
+  }
+
+  if (narrow) {
+    for (const [chatId, workflowId] of productPairs) {
+      const chat = snapshot.surfaces.find((item) => item.id === chatId);
+      const workflow = snapshot.surfaces.find((item) => item.id === workflowId);
+      if (chat && workflow && workflow.top < chat.bottom - 2) {
+        failures.push(`${workflowId} is not stacked below ${chatId}`);
+      }
     }
   }
 
@@ -85,7 +116,10 @@ export function measurePublicLandingViewport(doc: Document = document, viewportW
       id: node.dataset.viewportSurface ?? 'unknown',
       left: Math.round(rect.left),
       right: Math.round(rect.right),
+      top: Math.round(rect.top),
+      bottom: Math.round(rect.bottom),
       width: Math.round(rect.width),
+      height: Math.round(rect.height),
       layoutWidth: node.offsetWidth
     };
   });
