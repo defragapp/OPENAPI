@@ -168,7 +168,7 @@ export function AccountExpressionField() {
               <div>
                 <span>YOUR BASELINE · LIVE CONTEXT</span>
                 <h2 id="expression-field-title">Expression Field</h2>
-                <p className="expression-field-introduction">This little light of mine—made visible as one stable field of capacity, feeling, protection, and gift.</p>
+                <p className="expression-field-introduction">A stable view of capacity, feeling, protection, and gift—shown without turning any expression into a verdict.</p>
               </div>
               <button type="button" onClick={() => setOpen(false)} aria-label="Close Expression Field">×</button>
             </header>
