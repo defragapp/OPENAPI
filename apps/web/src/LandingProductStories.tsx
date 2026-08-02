@@ -127,7 +127,7 @@ const FAMILY = [
 
 export function LandingProductStories() {
   return (
-    <div className="v0-restored-product-stories" data-product-stories="restored-workflows">
+    <div className="landing-stories" data-product-stories="restored-workflows">
       <PersonalStory />
       <RelationshipStory />
       <SystemStory />
@@ -138,23 +138,25 @@ export function LandingProductStories() {
 function PersonalStory() {
   const sectionRef = useRevealOnce();
   return (
-    <section ref={sectionRef} id="how" className="v0-story v0-story-self" data-viewport-section="personal">
-      <StoryHeading step="Step 01 · You" title="Ask about your life." outline="Get an answer built for you.">
-        You ask a real question. Sovereign reads your Baseline and turns the relevant context into a useful distinction.
-      </StoryHeading>
-      <div className="v0-story-grid" data-viewport-stage="personal">
-        <ChatWindow title="Sovereign — Chat" surface="personal-chat">
-          <Message side="user">Why do I keep taking on responsibility for everyone around me?</Message>
-          <Message side="assistant">
-            Your Baseline suggests stability may matter deeply to you. When someone around you is struggling, stepping in can become how you reduce uncertainty. The capacity is real; the question is whether the responsibility is actually yours.
-            <BaselineTrace groups={SELF_BASELINE} />
-          </Message>
-          <Message side="user">That’s exactly it. How do I start to change it?</Message>
-          <ComposerPreview>Ask a question…</ComposerPreview>
-        </ChatWindow>
-        <WorkflowPanel title="How Sovereign works it through" steps={SELF_FLOW} surface="personal-reasoning" />
+    <section ref={sectionRef} id="how" className="landing-story landing-story--personal" data-viewport-section="personal">
+      <div className="landing-story__shell">
+        <StoryHeading step="Step 01 · You" title="Ask about your life." outline="Get an answer built for you.">
+          You ask a real question. Sovereign reads your Baseline and turns the relevant context into a useful distinction.
+        </StoryHeading>
+        <div className="landing-story__stage" data-viewport-stage="personal">
+          <ChatWindow title="Sovereign — Chat" surface="personal-chat">
+            <Message side="user">Why do I keep taking on responsibility for everyone around me?</Message>
+            <Message side="assistant">
+              Your Baseline suggests stability may matter deeply to you. When someone around you is struggling, stepping in can become how you reduce uncertainty. The capacity is real; the question is whether the responsibility is actually yours.
+              <BaselineTrace groups={SELF_BASELINE} />
+            </Message>
+            <Message side="user">That’s exactly it. How do I start to change it?</Message>
+            <ComposerPreview>Ask a question…</ComposerPreview>
+          </ChatWindow>
+          <WorkflowPanel title="How Sovereign works it through" steps={SELF_FLOW} surface="personal-reasoning" />
+        </div>
+        <a className="landing-story__action" href="/signup">Try it free <span aria-hidden="true">→</span></a>
       </div>
-      <a className="v0-story-action" href="/signup">Try it free <span aria-hidden="true">→</span></a>
     </section>
   );
 }
@@ -162,23 +164,25 @@ function PersonalStory() {
 function RelationshipStory() {
   const sectionRef = useRevealOnce();
   return (
-    <section ref={sectionRef} className="v0-story v0-story-relationship" data-viewport-section="relationship">
-      <StoryHeading step="Step 02 · You + 1" title="Understand what happens" outline="between you.">
-        With permission, Sovereign keeps both people distinct and shows how different routes to clarity may interact.
-      </StoryHeading>
-      <div className="v0-story-grid" data-viewport-stage="relationship">
-        <ChatWindow title="Sovereign — Shared Chat" surface="relationship-chat">
-          <Message side="user">Why does the same conversation land so differently for me and Maya?</Message>
-          <Message side="assistant">
-            You may need time to talk something through before you are sure. Maya may recognize an immediate response. The clash may be about timing—not how much either of you cares.
-            <BaselineTrace groups={DUO_BASELINE} />
-          </Message>
-          <ComposerPreview>Ask about the two of you…</ComposerPreview>
-        </ChatWindow>
-        <WorkflowPanel title="How Sovereign reads both of you" steps={RELATIONSHIP_FLOW} surface="relationship-reasoning" />
+    <section ref={sectionRef} className="landing-story landing-story--relationship" data-viewport-section="relationship">
+      <div className="landing-story__shell">
+        <StoryHeading step="Step 02 · You + 1" title="Understand what happens" outline="between you.">
+          With permission, Sovereign keeps both people distinct and shows how different routes to clarity may interact.
+        </StoryHeading>
+        <div className="landing-story__stage" data-viewport-stage="relationship">
+          <ChatWindow title="Sovereign — Shared Chat" surface="relationship-chat">
+            <Message side="user">Why does the same conversation land so differently for me and Maya?</Message>
+            <Message side="assistant">
+              You may need time to talk something through before you are sure. Maya may recognize an immediate response. The clash may be about timing—not how much either of you cares.
+              <BaselineTrace groups={DUO_BASELINE} />
+            </Message>
+            <ComposerPreview>Ask about the two of you…</ComposerPreview>
+          </ChatWindow>
+          <WorkflowPanel title="How Sovereign reads both of you" steps={RELATIONSHIP_FLOW} surface="relationship-reasoning" />
+        </div>
+        <p className="landing-story__consent">Illustrative permitted Baselines · No compatibility score · No private-thought claims</p>
+        <a className="landing-story__action landing-story__action--secondary" href="/signup">Explore a relationship <span aria-hidden="true">→</span></a>
       </div>
-      <p className="v0-consent-note">Illustrative permitted Baselines · No compatibility score · No private-thought claims</p>
-      <a className="v0-story-action v0-story-action-secondary" href="/signup">Explore a relationship <span aria-hidden="true">→</span></a>
     </section>
   );
 }
@@ -186,26 +190,28 @@ function RelationshipStory() {
 function SystemStory() {
   const sectionRef = useRevealOnce();
   return (
-    <section ref={sectionRef} className="v0-story v0-story-system" data-viewport-section="system">
-      <StoryHeading step="Step 03 · Your people" title="From one person" outline="to the whole system.">
-        Bring permitted Baselines, roles, and responsibility into one view. Each person stays distinct while the shared pattern becomes visible.
-      </StoryHeading>
-      <div className="v0-story-grid v0-story-grid-system" data-viewport-stage="system">
-        <ChatWindow title="Sovereign — Family System" surface="system-map">
-          <Message side="user">Can you map my family? Decisions around here always seem to take forever.</Message>
-          <BaselineTrace groups={[{ points: [
-            { code: 'GATE 22 ×3', label: 'Three illustrative slower-settling activations' },
-            { code: 'GATE 57 ×1', label: 'One illustrative quicker-recognition activation' }
-          ] }]} />
-          <FamilySystemMap />
-          <Message side="assistant" wide>
-            Three people share a supported slower-settling decision pattern while one points toward quicker recognition. The pressure is not one person. It is the group trying to coordinate different timing without a clear return point.
-          </Message>
-          <ComposerPreview>Ask about your family…</ComposerPreview>
-        </ChatWindow>
-        <WorkflowPanel title="How Sovereign maps the system" steps={SYSTEM_FLOW} surface="system-reasoning" />
+    <section ref={sectionRef} className="landing-story landing-story--system" data-viewport-section="system">
+      <div className="landing-story__shell">
+        <StoryHeading step="Step 03 · Your people" title="From one person" outline="to the whole system.">
+          Bring permitted Baselines, roles, and responsibility into one view. Each person stays distinct while the shared pattern becomes visible.
+        </StoryHeading>
+        <div className="landing-story__stage" data-viewport-stage="system">
+          <ChatWindow title="Sovereign — Family System" surface="system-map">
+            <Message side="user">Can you map my family? Decisions around here always seem to take forever.</Message>
+            <BaselineTrace groups={[{ points: [
+              { code: 'GATE 22 ×3', label: 'Three illustrative slower-settling activations' },
+              { code: 'GATE 57 ×1', label: 'One illustrative quicker-recognition activation' }
+            ] }]} />
+            <FamilySystemMap />
+            <Message side="assistant" wide>
+              Three people share a supported slower-settling decision pattern while one points toward quicker recognition. The pressure is not one person. It is the group trying to coordinate different timing without a clear return point.
+            </Message>
+            <ComposerPreview>Ask about your family…</ComposerPreview>
+          </ChatWindow>
+          <WorkflowPanel title="How Sovereign maps the system" steps={SYSTEM_FLOW} surface="system-reasoning" />
+        </div>
+        <p className="landing-story__consent">Sanitized system demonstration · Each person controls what may be included</p>
       </div>
-      <p className="v0-consent-note">Sanitized system demonstration · Each person controls what may be included</p>
     </section>
   );
 }
@@ -217,7 +223,7 @@ function StoryHeading({ step, title, outline, children }: {
   children: ReactNode;
 }) {
   return (
-    <header className="v0-story-heading">
+    <header className="landing-story__heading">
       <p>{step}</p>
       <h2>{title}<br /><span>{outline}</span></h2>
       <div>{children}</div>
@@ -227,28 +233,31 @@ function StoryHeading({ step, title, outline, children }: {
 
 function ChatWindow({ title, surface, children }: { title: string; surface: string; children: ReactNode }) {
   return (
-    <article className="v0-window v0-chat-example" data-viewport-surface={surface}>
-      <header><i /><i /><i /><span>{title}</span></header>
-      <div className="v0-window-body">{children}</div>
+    <article className="landing-demo landing-demo--chat" data-viewport-surface={surface}>
+      <header className="landing-demo__bar">
+        <span className="landing-demo__traffic" aria-hidden="true"><i /><i /><i /></span>
+        <span>{title}</span>
+      </header>
+      <div className="landing-demo__body">{children}</div>
     </article>
   );
 }
 
 function Message({ side, children, wide = false }: { side: 'user' | 'assistant'; children: ReactNode; wide?: boolean }) {
-  return <div className={`v0-message-row v0-message-${side}`}><div className={wide ? 'v0-message-wide' : ''}>{children}</div></div>;
+  return <div className={`landing-message landing-message--${side}`}><div className={wide ? 'landing-message__wide' : ''}>{children}</div></div>;
 }
 
 function ComposerPreview({ children }: { children: ReactNode }) {
-  return <div className="v0-composer-preview"><span>{children}</span><i aria-hidden="true">→</i></div>;
+  return <div className="landing-composer"><span>{children}</span><i aria-hidden="true">→</i></div>;
 }
 
 function BaselineTrace({ groups }: { groups: readonly EvidenceGroup[] }) {
   return (
-    <div className="v0-baseline-trace">
+    <div className="landing-evidence">
       <p>Grounded in</p>
       <div>
         {groups.map((group, groupIndex) => (
-          <span className="v0-baseline-group" key={`${group.name ?? 'self'}-${groupIndex}`}>
+          <span className="landing-evidence__group" key={`${group.name ?? 'self'}-${groupIndex}`}>
             {group.name && <strong><i style={{ background: group.accent }} />{group.name}</strong>}
             {group.points.map((point) => <abbr key={point.code} title={point.label}>{point.code}</abbr>)}
           </span>
@@ -264,23 +273,27 @@ function WorkflowPanel({ title, steps, surface }: { title: string; steps: readon
   const visibleIndex = manualIndex ?? activeIndex;
 
   return (
-    <article className="v0-window v0-flow v0-workflow-panel" data-viewport-surface={surface}>
-      <header><b aria-hidden="true" /><span>{title}</span><small>Visible context</small></header>
-      <ol>
+    <article className="landing-demo landing-demo--workflow" data-viewport-surface={surface}>
+      <header className="landing-demo__bar landing-demo__bar--workflow">
+        <span className="landing-demo__status" aria-hidden="true" />
+        <span>{title}</span>
+        <small>Visible context</small>
+      </header>
+      <ol className="landing-workflow">
         {steps.map((step, index) => {
           const state = index < visibleIndex ? 'is-complete' : index === visibleIndex ? 'is-active' : 'is-upcoming';
           return (
-            <li key={step.title} className={`${state}${step.kind === 'direction' ? ' v0-flow-direction' : ''}`}>
+            <li key={step.title} className={`${state}${step.kind === 'direction' ? ' is-direction' : ''}`}>
               <button type="button" onClick={() => setManualIndex(index)} aria-current={index === visibleIndex ? 'step' : undefined}>
                 <i aria-hidden="true">{index + 1}</i>
-                <span className="v0-workflow-copy">
+                <span className="landing-workflow__copy">
                   <small>{step.kind === 'direction' ? 'Useful direction' : `Context ${index + 1}`}</small>
                   <strong>{step.title}</strong>
                   <span>{step.body}</span>
                 </span>
               </button>
               {step.branches && (
-                <div className="v0-flow-branches">
+                <div className="landing-workflow__branches">
                   {step.branches.map((branch) => (
                     <section key={branch.name}>
                       <strong><i style={{ background: branch.accent }} />{branch.name}</strong>
@@ -289,7 +302,7 @@ function WorkflowPanel({ title, steps, surface }: { title: string; steps: readon
                   ))}
                 </div>
               )}
-              {step.chips && <div className="v0-flow-chips">{step.chips.map((chip) => <code key={chip}>{chip}</code>)}</div>}
+              {step.chips && <div className="landing-workflow__chips">{step.chips.map((chip) => <code key={chip}>{chip}</code>)}</div>}
             </li>
           );
         })}
@@ -303,7 +316,7 @@ function FamilySystemMap() {
   const active = FAMILY.find((member) => member.id === activeId) ?? FAMILY[0];
 
   return (
-    <div className="v0-family-map v0-family-system-map" aria-label="Illustrative family system map">
+    <div className="landing-system-map" aria-label="Illustrative family system map">
       <svg viewBox="0 0 720 360" aria-hidden="true" focusable="false">
         <path d="M 360 180 L 118 78" />
         <path d="M 360 180 L 602 78" />
@@ -312,11 +325,11 @@ function FamilySystemMap() {
         <path className="is-secondary" d="M 118 78 C 260 24 460 24 602 78" />
         <path className="is-secondary" d="M 118 282 C 260 336 460 336 602 282" />
       </svg>
-      <div className="v0-system-map-core" aria-hidden="true">
+      <div className="landing-system-map__core" aria-hidden="true">
         <span>Shared pressure</span>
         <strong>Decision pace</strong>
       </div>
-      <div className="v0-system-map-nodes">
+      <div className="landing-system-map__nodes">
         {FAMILY.map((member, index) => (
           <button
             key={member.id}
@@ -332,7 +345,7 @@ function FamilySystemMap() {
           </button>
         ))}
       </div>
-      <div className="v0-family-evidence" aria-live="polite">
+      <div className="landing-system-map__evidence" aria-live="polite">
         <span>{active.name} · {active.role}</span>
         <strong>{active.route}</strong>
         <div>{active.chips.map((chip) => <code key={chip}>{chip}</code>)}</div>
