@@ -66,7 +66,6 @@ function V0Navigation() {
 function V0Hero() {
   return (
     <section className="v0-hero sovereign-opening-field" data-viewport-section="hero">
-      <LandingExpressionSlice />
       <div className="v0-hero-content" data-viewport-surface="hero">
         <p className="v0-badge landing-hero-kicker"><span />Personal AI for real life</p>
         <h1>
@@ -86,6 +85,7 @@ function V0Hero() {
         </div>
         <p className="sovereign-opening-trust">Private by design. Correctable by you. Shared only with permission.</p>
       </div>
+      <LandingExpressionSlice />
     </section>
   );
 }
