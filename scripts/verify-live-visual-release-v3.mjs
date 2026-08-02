@@ -90,6 +90,8 @@ async function rateLimitedFetch(input, init) {
 
 const referenceAssertionV2 = "assert(reference.length > 8_000, 'Approved visual reference is missing or unexpectedly small');";
 const referenceAssertionV3 = "assert(reference.length > 6_500, 'Approved visual reference is missing, truncated, or unexpectedly small');";
+const auditScriptStartV2 = "return `(() => {\n    const visible = (element) => {";
+const auditScriptStartV3 = "return `(async () => {\n    const deadline = Date.now() + 25_000;\n    while (!document.querySelector('.public-approved-v8') && Date.now() < deadline) {\n      await new Promise((resolveDelay) => setTimeout(resolveDelay, 100));\n    }\n    const visible = (element) => {";
 const auditNodeV2 = "const node = document.createElement('script');";
 const auditNodeV3 = "const node = document.createElement('pre');";
 const auditTypeV2 = "node.type = 'application/json';";
@@ -102,7 +104,7 @@ const scriptTagV2 = 'addScriptTag: [{ content: renderedAuditScript() }]';
 const scriptTagV3 = "addScriptTag: [{ content: renderedAuditScript() }],\n        waitForSelector: { selector: '.public-approved-v8', timeout: 30_000 }";
 
 let generated = readFileSync(sourcePath, 'utf8');
-for (const marker of [referenceAssertionV2, auditNodeV2, auditTypeV2, auditAppendV2, auditParserV2, scriptTagV2]) {
+for (const marker of [referenceAssertionV2, auditScriptStartV2, auditNodeV2, auditTypeV2, auditAppendV2, auditParserV2, scriptTagV2]) {
   if (!generated.includes(marker)) {
     throw new Error(`Visual release v3 could not locate required v2 marker: ${marker.slice(0, 80)}`);
   }
@@ -110,13 +112,14 @@ for (const marker of [referenceAssertionV2, auditNodeV2, auditTypeV2, auditAppen
 
 generated = generated
   .replace(referenceAssertionV2, referenceAssertionV3)
+  .replace(auditScriptStartV2, auditScriptStartV3)
   .replace(auditNodeV2, auditNodeV3)
   .replace(auditTypeV2, auditTypeV3)
   .replace(auditAppendV2, auditAppendV3)
   .replace(auditParserV2, auditParserV3)
   .replace(scriptTagV2, scriptTagV3);
 
-for (const marker of [referenceAssertionV3, auditNodeV3, auditTypeV3, auditAppendV3, auditParserV3, scriptTagV3]) {
+for (const marker of [referenceAssertionV3, auditScriptStartV3, auditNodeV3, auditTypeV3, auditAppendV3, auditParserV3, scriptTagV3]) {
   if (!generated.includes(marker)) {
     throw new Error(`Visual release v3 did not apply required hardening: ${marker.slice(0, 80)}`);
   }
