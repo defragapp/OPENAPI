@@ -18,6 +18,13 @@ const COMPARISON = {
   ]
 } as const;
 
+const HERO_CAPABILITIES = [
+  ['You', 'Understand yourself'],
+  ['People', 'Understand each other'],
+  ['Systems', 'See the whole dynamic'],
+  ['Library', 'Keep what matters']
+] as const;
+
 export function PublicLanding() {
   return (
     <main
@@ -60,16 +67,32 @@ function V0Navigation() {
 
 function V0Hero() {
   return (
-    <section className="v0-hero" data-viewport-section="hero">
+    <section className="v0-hero sovereign-opening-field" data-viewport-section="hero">
       <div className="v0-hero-atmosphere" aria-hidden="true"><i /><i /><i /><span /></div>
+      <div className="sovereign-opening-horizon" aria-hidden="true" />
       <div className="v0-hero-content" data-viewport-surface="hero">
         <p className="v0-badge"><span />Personal AI for real life</p>
         <h1>
           <span>Healing isn’t optional.</span>
           <em>Holding onto the pain is.</em>
         </h1>
+        <p className="sovereign-opening-copy">Sovereign helps you see what is actually happening—within you, between people, and across the systems you care about.</p>
+        <div className="sovereign-opening-actions">
+          <a className="v0-button v0-button-primary sovereign-opening-primary" href="/signup"><span aria-hidden="true">✦</span> Get started</a>
+          <a className="sovereign-opening-secondary" href="#how">See how it works <span aria-hidden="true">↓</span></a>
+        </div>
+        <p className="sovereign-opening-trust">Private by design. Correctable by you. Shared only with permission.</p>
       </div>
       <LandingExpressionSlice />
+      <div className="sovereign-opening-capabilities" aria-label="What Sovereign helps you understand">
+        {HERO_CAPABILITIES.map(([label, description], index) => (
+          <a href={index === 3 ? '/app/library' : '#how'} key={label}>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <strong>{label}</strong>
+            <small>{description}</small>
+          </a>
+        ))}
+      </div>
     </section>
   );
 }
