@@ -8,14 +8,19 @@ const assert = (condition, message) => { if (!condition) throw new Error(message
 const containsAll = (label, text, values) => values.forEach((value) => assert(text.includes(value), `${label} is missing: ${value}`));
 
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
-const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const landing = read('apps/web/src/PublicLanding.tsx');
+const stories = read('apps/web/src/LandingProductStories.tsx');
+const field = read('apps/web/src/expression-field/LandingExpressionSlice.tsx');
 const fingerprint = read('apps/web/src/v0-release-fingerprint.ts');
 const v0Platform = read('apps/web/src/v0-platform-port.css');
 const v0Motion = read('apps/web/src/v0-motion-accessibility.css');
 const v0Visual = read('apps/web/src/v0-visual-port.css');
 const v0Global = read('apps/web/src/v0-global-experience.css');
+const fieldCss = read('apps/web/src/landing-expression-field-v3.css');
+const fieldIntegration = read('apps/web/src/landing-expression-field-integration.css');
+const storyCss = read('apps/web/src/v0-restored-product-stories.css');
 const passkeyCss = read('apps/web/src/passkey-auth.css');
 const staticAuthority = read('apps/web/public/premium-public-release.css');
 const staticV0 = read('apps/web/public/v0-public-port.css');
@@ -97,6 +102,8 @@ containsAll('verified Covenant library', scripture, [
 containsAll('founder v0 runtime fingerprint', fingerprint, [
   `V0_ARCHIVE_SHA256 = '${archiveSha}'`,
   `V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`,
+  "PUBLIC_LANDING_CONTRACT = 'v0-public-landing-v3'",
+  "PUBLIC_LANDING_FIELD_CONTRACT = 'landing-expression-field-v3'",
   "dataset.sovereignVisualContract = 'v0-landing-selective-port'",
   'dataset.sovereignV0Archive = V0_ARCHIVE_SHA256',
   'dataset.sovereignV0Sequence = V0_SEQUENCE_FINGERPRINT'
@@ -105,38 +112,72 @@ containsAll('founder v0 runtime fingerprint', fingerprint, [
 containsAll('founder v0 public product contract', landing, [
   `const V0_ARCHIVE_SHA = '${archiveSha}'`,
   'data-visual-contract="v0-landing-selective-port"',
+  'data-viewport-contract="v0-public-landing-v3"',
   'Healing isn’t optional.',
   'Holding onto the pain is.',
-  '<RotatingQuestions />',
+  '<LandingExpressionSlice />',
+  '<LandingProductStories />',
+  '<ComparisonStory />',
+  '<FinalCallToAction />',
+  'Other AI answers',
+  'everyone the same.',
+  'Your thoughts deserve',
+  'a better place to live.'
+]);
+
+containsAll('restored product stories', stories, [
   '<PersonalStory />',
   '<RelationshipStory />',
   '<SystemStory />',
-  '<ComparisonStory />',
-  '<FinalCallToAction />',
   'Ask about your life.',
   'Get an answer built for you.',
   'Understand what happens',
   'between you.',
   'From one person',
   'to the whole system.',
-  'Other AI answers',
-  'everyone the same.',
-  'Your thoughts deserve',
-  'a better place to live.',
+  'surface="personal-chat"',
+  'surface="personal-reasoning"',
+  'surface="relationship-chat"',
+  'surface="relationship-reasoning"',
+  'surface="system-map"',
+  'surface="system-reasoning"',
+  'Reading your Baseline',
+  'Keeping both people distinct',
+  'Mapping the people',
   'Illustrative permitted Baselines',
   'No compatibility score',
-  'Each person controls what may be included'
+  'Each person controls what may be included',
+  'className="v0-baseline-trace"',
+  'v0-workflow-panel',
+  'v0-family-map-no-globes'
 ]);
 
-containsAll('founder v0 visual components', `${landing}\n${v0Visual}`, [
+containsAll('integrated field', `${field}\n${fieldCss}\n${fieldIntegration}`, [
+  'landing-expression-field-v3',
+  'onPointerDown={handlePointerDown}',
+  'onPointerMove={handlePointerMove}',
+  'landing-expression-slice__tooltip',
+  'Baseline value',
+  'Live change',
+  'Current',
+  '.landing-expression-slice__ambient',
+  '.landing-expression-slice__horizon',
+  'background: transparent',
+  'border-radius: 0'
+]);
+
+assert(!stories.includes('LandingExpressionFieldPreview'), 'Restored stories reintroduced the retired Expression Field globe preview.');
+for (const prohibited of ['sphere', 'globe']) {
+  assert(!stories.includes(prohibited), `Restored stories contain prohibited ${prohibited} visual language.`);
+}
+
+containsAll('founder v0 visual components', `${landing}\n${stories}\n${v0Visual}\n${storyCss}`, [
   'className="v0-baseline-trace"',
-  'function ProcessingFlow(',
-  'v0-window v0-flow',
-  'className="v0-family-map"',
+  'v0-window v0-flow v0-workflow-panel',
+  'v0-family-map-no-globes',
   'className="v0-comparison-grid"',
   '.v0-hero',
   '.v0-story-grid',
-  '.v0-family-map',
   '.intelligence-workspace',
   '.sovereign-composer',
   '.account-shell',
@@ -168,7 +209,7 @@ containsAll('founder v0 standalone route coverage', `${staticAuthority}\n${stati
 ]);
 
 for (const prohibited of ['Know yourself.', 'Understand the system.', 'Choose what fits.', 'Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'generateAIResponse', 'Demo User']) {
-  assert(!landing.includes(prohibited), `Public landing contains rejected reconstruction, mock, or scoring behavior: ${prohibited}`);
+  assert(!`${landing}\n${stories}`.includes(prohibited), `Public landing contains rejected reconstruction, mock, or scoring behavior: ${prohibited}`);
 }
 
 containsAll('final v0 visual import', main, [
@@ -177,6 +218,9 @@ containsAll('final v0 visual import', main, [
   "import './v0-motion-accessibility.css'",
   "import './v0-visual-port.css'",
   "import './v0-global-experience.css'",
+  "import './landing-expression-field-v3.css'",
+  "import './landing-expression-field-integration.css'",
+  "import './v0-restored-product-stories.css'",
   "import './passkey-auth.css'",
   'installV0ReleaseFingerprint();'
 ]);
@@ -184,11 +228,17 @@ const platformImport = "import './v0-platform-port.css';";
 const motionImport = "import './v0-motion-accessibility.css';";
 const v0Import = "import './v0-visual-port.css';";
 const globalImport = "import './v0-global-experience.css';";
+const fieldImport = "import './landing-expression-field-v3.css';";
+const integrationImport = "import './landing-expression-field-integration.css';";
+const storiesImport = "import './v0-restored-product-stories.css';";
 const passkeyImport = "import './passkey-auth.css';";
 assert(main.indexOf(platformImport) < main.indexOf(motionImport), 'Platform route coverage must load before reduced-motion coverage.');
 assert(main.indexOf(motionImport) < main.indexOf(v0Import), 'Reduced-motion coverage must load before the founder v0 foundation.');
 assert(main.indexOf(v0Import) < main.indexOf(globalImport), 'Global product authority must load after the founder v0 foundation.');
-assert(main.indexOf(globalImport) < main.indexOf(passkeyImport), 'Passkey styling must load after global product authority.');
+assert(main.indexOf(globalImport) < main.indexOf(fieldImport), 'Landing field must load after global product authority.');
+assert(main.indexOf(fieldImport) < main.indexOf(integrationImport), 'Landing field integration must load after the field geometry.');
+assert(main.indexOf(integrationImport) < main.indexOf(storiesImport), 'Restored product story authority must load after field integration.');
+assert(main.indexOf(storiesImport) < main.indexOf(passkeyImport), 'Passkey styling must load after public story authority.');
 assert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("import './"), 'A local visual file loads after the passkey-specific final authority.');
 
 for (const [label, document] of [['How it works', how], ['Pricing', pricing], ['FAQ', faq]]) {
@@ -206,6 +256,9 @@ for (const [label, css] of [
   ['founder v0 motion', v0Motion],
   ['founder v0 foundation', v0Visual],
   ['founder v0 global product', v0Global],
+  ['landing field', fieldCss],
+  ['landing field integration', fieldIntegration],
+  ['restored product stories', storyCss],
   ['passkey-specific authority', passkeyCss],
   ['founder v0 standalone', staticV0]
 ]) {
@@ -220,11 +273,12 @@ console.log(JSON.stringify({
   baselineContracts: ['baseline-source.v1', 'baseline-facets.v1'],
   publicProductContract: 'baseline-first-private-ai',
   visualAuthority: 'founder-v0-selective-port',
+  publicLandingContract: 'v0-public-landing-v3',
   archiveSha256: archiveSha,
   sequenceFingerprint,
   mockRuntimeImported: false,
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
-  canonicalVisualLayers: ['v0-platform-port.css', 'v0-motion-accessibility.css', 'v0-visual-port.css', 'v0-global-experience.css', 'passkey-auth.css', 'v0-public-port.css'],
+  canonicalVisualLayers: ['v0-platform-port.css', 'v0-motion-accessibility.css', 'v0-visual-port.css', 'v0-global-experience.css', 'landing-expression-field-v3.css', 'landing-expression-field-integration.css', 'v0-restored-product-stories.css', 'passkey-auth.css', 'v0-public-port.css'],
   coveredSurfaces: ['home', 'how-it-works', 'pricing', 'faq', 'login', 'signup', 'onboarding', 'invitation', 'workspace', 'privacy', 'terms', 'not-found'],
   exactBasis: true,
   contextualCovenant: true,
