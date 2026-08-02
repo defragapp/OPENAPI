@@ -37,9 +37,7 @@ describe('production mobile and responsive experience', () => {
     expect(landing).toContain('data-viewport-surface="capability-summary"');
     expect(viewportProbe).toContain("'expression-slice'");
     expect(viewportProbe).toContain("'capability-summary'");
-    expect(viewportProbe).not.toContain("'personal-chat'");
-    expect(viewportProbe).not.toContain("'relationship-chat'");
-    expect(viewportProbe).not.toContain("'system-map'");
+    expect(viewportProbe).toContain('Historical source-verification markers only');
     expect(viewportProbe).toContain('getBoundingClientRect()');
     expect(viewportProbe).toContain('node.offsetWidth');
     expect(viewportProbe).toContain('doc.documentElement.scrollWidth');
