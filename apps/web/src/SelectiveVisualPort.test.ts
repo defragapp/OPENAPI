@@ -12,12 +12,14 @@ const expressionCss = readFileSync(new URL('./expression-field/expression-field.
 const v0Visual = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
 const fieldCss = readFileSync(new URL('./landing-expression-field-v3.css', import.meta.url), 'utf8');
 const integrationCss = readFileSync(new URL('./landing-expression-field-integration.css', import.meta.url), 'utf8');
+const heroExtension = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
 const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('founder v0 selective visual port', () => {
-  it('ports the integrated interactive field at the opening', () => {
+  it('ports the integrated interactive 360 field at the opening', () => {
     expect(landing).toContain('<LandingExpressionSlice />');
+    expect(landing).toContain('<RealLifeQuestions />');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(field).toContain('LANDING_AXIS_LAYOUT');
     expect(field).toContain('landing-expression-slice__beam');
@@ -25,11 +27,17 @@ describe('founder v0 selective visual port', () => {
     expect(field).toContain('onPointerDown');
     expect(field).toContain('onPointerMove');
     expect(field).toContain('onPointerEnter');
-    expect(field).not.toContain('sphere');
+    expect(field).toContain('data-field-geometry="spherical-360"');
+    expect(field).toContain('buildSphereGrid');
+    expect(field).toContain('MIN_AXIS_LENGTH');
+    expect(field).toContain('MAX_AXIS_LENGTH');
+    expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(integrationCss).toContain('background: transparent');
+    expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
+    expect(heroExtension).toContain('stroke: #2f93ff');
   });
 
-  it('restores chat and workflow demonstrations without restoring expression globes', () => {
+  it('restores chat and workflow demonstrations without restoring duplicate expression fields', () => {
     expect(landing).toContain('<LandingProductStories />');
     for (const marker of [
       'surface="personal-chat"',
@@ -66,15 +74,17 @@ describe('founder v0 selective visual port', () => {
   it('applies founder language to authenticated surfaces and the complete public landing', () => {
     for (const selector of ['.intelligence-workspace', '.intelligence-sidebar', '.sovereign-composer', '.surface-heading', '.account-shell', '.auth-panel']) expect(v0Visual).toContain(selector);
     for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip']) expect(fieldCss).toContain(selector);
+    for (const selector of ['.landing-expression-slice__sphere-shell', '.landing-expression-slice__readout', '.landing-question-orbit__stage']) expect(heroExtension).toContain(selector);
     for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storyCss).toContain(selector);
     expect(expressionCss).toContain('min-height: 44px');
     expect(main).toContain("import './landing-expression-field-integration.css';");
+    expect(main).toContain("import './landing-hero-field-v4.css';");
     expect(main).toContain("import './v0-restored-product-stories.css';");
   });
 
   it('does not introduce the archive mock runtime, scores, or alternate architecture', () => {
     expect(landing).not.toContain('localStorage');
-    const source = `${landing}\n${stories}\n${field}\n${expressionRenderer}\n${relationshipField}\n${systemField}\n${v0Visual}\n${fieldCss}\n${storyCss}`;
+    const source = `${landing}\n${stories}\n${field}\n${expressionRenderer}\n${relationshipField}\n${systemField}\n${v0Visual}\n${fieldCss}\n${heroExtension}\n${storyCss}`;
     for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'generateAIResponse', 'Demo User', 'dashboard-grid', 'mock-auth', 'fake-answer']) {
       expect(source).not.toContain(prohibited);
     }
