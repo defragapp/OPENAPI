@@ -56,7 +56,7 @@ export function LandingExpressionFieldPreview(props: LandingExpressionFieldPrevi
   }
   return (
     <figure className={`single-expression-field expression-field-depth-landing${props.compact ? ' is-compact' : ''}${props.className ? ` ${props.className}` : ''}`} data-expression-field-composition="self">
-      <span className="expression-field-landing-kicker">This little light of mine · one center, many expressions</span>
+      <span className="expression-field-landing-kicker">One center · many expressions</span>
       <div className="single-expression-stage">
         <ExpressionFieldRenderer
           axes={props.subject.axes}
