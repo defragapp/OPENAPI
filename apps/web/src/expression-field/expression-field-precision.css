@@ -160,9 +160,12 @@
   position: relative;
 }
 
-.relational-expression-stage .expression-field-subject,
-.system-expression-stage .expression-field-subject {
+.relational-expression-stage .expression-field-subject {
   position: relative;
+  z-index: 2;
+}
+
+.system-expression-stage .expression-field-subject {
   z-index: 2;
 }
 
