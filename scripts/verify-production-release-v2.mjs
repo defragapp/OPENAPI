@@ -8,7 +8,7 @@ const configs = [
   ['worker config', read('apps/sovereign-worker/wrangler.jsonc')]
 ];
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
-const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 
 const modelConfig = read('packages/agent-contracts/src/model-config.ts');
 const runtime = read('apps/sovereign-worker/src/runtime-entry.ts');
@@ -30,10 +30,15 @@ const schema = read('docs/api-shield/sovereign-critical-api.openapi.yaml');
 const main = read('apps/web/src/main.tsx');
 const index = read('apps/web/index.html');
 const landing = read('apps/web/src/PublicLanding.tsx');
+const stories = read('apps/web/src/LandingProductStories.tsx');
+const field = read('apps/web/src/expression-field/LandingExpressionSlice.tsx');
 const fingerprint = read('apps/web/src/v0-release-fingerprint.ts');
 const v0Platform = read('apps/web/src/v0-platform-port.css');
 const v0Visual = read('apps/web/src/v0-visual-port.css');
 const v0Global = read('apps/web/src/v0-global-experience.css');
+const fieldCss = read('apps/web/src/landing-expression-field-v3.css');
+const integrationCss = read('apps/web/src/landing-expression-field-integration.css');
+const storyCss = read('apps/web/src/v0-restored-product-stories.css');
 const passkeyCss = read('apps/web/src/passkey-auth.css');
 const passkeyClient = read('apps/web/src/passkey-client.ts');
 const passkeyLogin = read('apps/web/src/PasskeyAuthentication.tsx');
@@ -60,6 +65,10 @@ function assert(condition, message) {
 
 function requireAll(label, text, values) {
   for (const value of values) assert(text.includes(value), `${label} is missing ${value}`);
+}
+
+function rejectAll(label, text, values) {
+  for (const value of values) assert(!text.includes(value), `${label} contains prohibited ${value}`);
 }
 
 function balanced(label, source) {
@@ -102,7 +111,7 @@ requireAll('passkey credential verification', passkeyVerifier, [
   'rp_id_mismatch',
   'client_data_invalid'
 ]);
-requireAll('passkey D1 lifecycle', passkeyRoutes, [
+requireAll('passkey lifecycle', passkeyRoutes, [
   'auth_passkey_challenges',
   'auth_passkeys',
   "'login'",
@@ -112,14 +121,8 @@ requireAll('passkey D1 lifecycle', passkeyRoutes, [
   'createAccountSessionResponse',
   'deletePasskey'
 ]);
-requireAll('shared secure session', accountSession, [
-  '__Host-sovereign_session=',
-  'HttpOnly; Secure; SameSite=Lax; Priority=High',
-  'createSignedSessionToken',
-  'INSERT INTO auth_sessions'
-]);
-
-requireAll('runtime passkey routes and readiness', runtime, [
+requireAll('secure session', accountSession, ['__Host-sovereign_session=', 'HttpOnly; Secure; SameSite=Lax; Priority=High', 'createSignedSessionToken', 'INSERT INTO auth_sessions']);
+requireAll('runtime passkey readiness', runtime, [
   "'/api/v1/auth/passkey/login/options'",
   "'/api/v1/auth/passkey/login/verify'",
   "'/api/v1/auth/passkey/register/options'",
@@ -131,16 +134,7 @@ requireAll('runtime passkey routes and readiness', runtime, [
   "latestMigrationVersion: '0014_passkey_authentication'"
 ]);
 
-requireAll('founder v0 transactional email', email, [
-  'background:#0f0f0f',
-  'color:#f5f1e8',
-  'background:#e8ddd0',
-  'Sovereign.OS',
-  'Private account message',
-  'Do not forward it.',
-  "provider: 'resend'"
-]);
-
+requireAll('transactional email', email, ['background:#0f0f0f', 'color:#f5f1e8', 'background:#e8ddd0', 'Sovereign.OS', 'Private account message', 'Do not forward it.', "provider: 'resend'"]);
 requireAll('Cloudflare controls', controls, [
   "read_replication: { mode: 'auto' }",
   'rate_limiting_interval: 60',
@@ -172,7 +166,7 @@ requireAll('production deploy compatibility', deploy, [
   'dailyNeuronReservationBudget: 7_500',
   "cloudflarePlanTarget: 'free'"
 ]);
-requireAll('production deploy retirement guard', deploy, ["'Know yourself.'", "'Understand the system.'", "'Choose what fits.'", 'assert(!javascript.text.includes(prohibited)']);
+requireAll('production retirement guard', deploy, ["'Know yourself.'", "'Understand the system.'", "'Choose what fits.'", 'assert(!javascript.text.includes(prohibited)']);
 assert(!deploy.includes("'Math.random'"), 'Production deploy still rejects a dependency bundle by a generic string');
 
 requireAll('bundle verifier', bundle, ['CLOUDFLARE_FREE_LIMIT_BYTES = 3 * 1024 * 1024', 'INTERNAL_BUDGET_BYTES = 2_500 * 1024', 'Wrangler did not report a compressed Worker upload size']);
@@ -185,6 +179,9 @@ requireAll('application visual entry', main, [
   "import './v0-platform-port.css'",
   "import './v0-visual-port.css'",
   "import './v0-global-experience.css'",
+  "import './landing-expression-field-v3.css'",
+  "import './landing-expression-field-integration.css'",
+  "import './v0-restored-product-stories.css'",
   "import './passkey-auth.css'",
   "import { PasskeyAuthentication } from './PasskeyAuthentication'",
   '<PasskeyAuthentication />',
@@ -192,96 +189,95 @@ requireAll('application visual entry', main, [
   '<AuthenticatedWorkspace />',
   '<PublicPolicy'
 ]);
-const platformImport = "import './v0-platform-port.css';";
-const v0Import = "import './v0-visual-port.css';";
-const globalImport = "import './v0-global-experience.css';";
-const passkeyImport = "import './passkey-auth.css';";
-assert(main.indexOf(platformImport) < main.indexOf(v0Import), 'Platform coverage must load before founder v0');
-assert(main.indexOf(v0Import) < main.indexOf(globalImport), 'Global v0 product authority must load after founder v0 foundations');
-assert(main.indexOf(globalImport) < main.indexOf(passkeyImport), 'Passkey auth styling must load last');
-assert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("import './"), 'A visual layer loads after passkey auth authority');
+const orderedImports = [
+  "import './v0-platform-port.css';",
+  "import './v0-visual-port.css';",
+  "import './v0-global-experience.css';",
+  "import './landing-expression-field-v3.css';",
+  "import './landing-expression-field-integration.css';",
+  "import './v0-restored-product-stories.css';",
+  "import './passkey-auth.css';"
+];
+let previousImport = -1;
+for (const marker of orderedImports) {
+  const index = main.indexOf(marker);
+  assert(index > previousImport, `Application visual import order is wrong at ${marker}`);
+  previousImport = index;
+}
+assert(!main.slice(previousImport + orderedImports.at(-1).length).includes("import './"), 'A visual layer loads after passkey auth authority');
 
 requireAll('runtime fingerprint', fingerprint, [
   `V0_ARCHIVE_SHA256 = '${archiveSha}'`,
   `V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`,
+  "PUBLIC_LANDING_CONTRACT = 'v0-public-landing-v3'",
+  "PUBLIC_LANDING_FIELD_CONTRACT = 'landing-expression-field-v3'",
   "dataset.sovereignVisualContract = 'v0-landing-selective-port'",
   'dataset.sovereignV0Archive = V0_ARCHIVE_SHA256',
   'dataset.sovereignV0Sequence = V0_SEQUENCE_FINGERPRINT'
 ]);
 requireAll('application document', index, ['id="root"', 'Healing isn’t optional. Holding onto the pain is.', 'release-fingerprint']);
-requireAll('founder v0 landing remains intact', landing, [
+requireAll('landing v3 composition', landing, [
   `const V0_ARCHIVE_SHA = '${archiveSha}'`,
   'data-visual-contract="v0-landing-selective-port"',
+  'data-viewport-contract="v0-public-landing-v3"',
   'Healing isn’t optional.',
   'Holding onto the pain is.',
+  '<LandingExpressionSlice />',
+  '<LandingProductStories />',
+  '<ComparisonStory />'
+]);
+requireAll('restored landing stories', stories, [
   '<PersonalStory />',
   '<RelationshipStory />',
   '<SystemStory />',
-  '<ComparisonStory />'
+  'surface="personal-chat"',
+  'surface="personal-reasoning"',
+  'surface="relationship-chat"',
+  'surface="relationship-reasoning"',
+  'surface="system-map"',
+  'surface="system-reasoning"',
+  'Reading your Baseline',
+  'Keeping both people distinct',
+  'Mapping the people',
+  'v0-workflow-panel',
+  'v0-family-map-no-globes'
 ]);
-requireAll('founder v0 platform coverage', v0Platform, ['body:has(.plan-onboarding)', 'body:has(.sovereign-policy)', 'body:has(.email-code-fallback)', '.onboarding-plan-grid', '.policy-grid', '.email-code-fallback']);
-requireAll('founder v0 visual foundation', v0Visual, ['--v0-page: #0f0f0f', '--v0-cream: #e8ddd0', '.v0-hero', '.v0-family-map', '.intelligence-workspace', '.sovereign-composer', '.account-shell']);
-requireAll('global v0 product authority', v0Global, [
-  'Founder-v0 visual authority for every non-landing product surface',
-  '.account-shell',
-  '.plan-onboarding',
-  '.public-policy',
-  '.private-route-gate',
-  '.sovereign-app-runtime',
-  '.verified-plan-strip',
-  '.account-plan-verification'
+rejectAll('restored landing stories', stories, ['LandingExpressionFieldPreview', 'sphere', 'globe']);
+requireAll('integrated landing field', `${field}\n${fieldCss}\n${integrationCss}`, [
+  'onPointerDown={handlePointerDown}',
+  'onPointerMove={handlePointerMove}',
+  'landing-expression-slice__tooltip',
+  'Baseline value',
+  'Live change',
+  'Current',
+  'width: 100vw',
+  'background: transparent',
+  'border-radius: 0'
 ]);
+rejectAll('integrated landing field', field, ['sphere', 'globe', 'Math.random']);
+
+requireAll('founder platform coverage', v0Platform, ['body:has(.plan-onboarding)', 'body:has(.sovereign-policy)', 'body:has(.email-code-fallback)', '.onboarding-plan-grid', '.policy-grid', '.email-code-fallback']);
+requireAll('founder visual foundation', v0Visual, ['--v0-page: #0f0f0f', '--v0-cream: #e8ddd0', '.v0-hero', '.v0-family-map', '.intelligence-workspace', '.sovereign-composer', '.account-shell']);
+requireAll('restored story visual authority', storyCss, ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-map-no-globes', '@media (max-width: 760px)', '@media (prefers-reduced-motion: reduce)']);
+requireAll('global product authority', v0Global, ['Founder-v0 visual authority for every non-landing product surface', '.account-shell', '.plan-onboarding', '.public-policy', '.private-route-gate', '.sovereign-app-runtime', '.verified-plan-strip', '.account-plan-verification']);
 requireAll('passkey visual authority', passkeyCss, ['.passkey-primary', '.passkey-button', '.passkey-manager', '.passkey-list']);
 
 requireAll('browser passkey client', passkeyClient, ['navigator.credentials', 'decodeRequestOptions', 'decodeCreationOptions', 'serializeAssertion', 'serializeRegistration']);
-requireAll('passkey-first login', passkeyLogin, [
-  'Sign in without opening your email.',
-  'Sign in with a passkey',
-  'Email recovery or first-time verification',
-  '/api/v1/auth/passkey/login/options',
-  '/api/v1/auth/passkey/login/verify',
-  'Confirming your Stripe plan'
-]);
-requireAll('authenticated passkey controls', passkeyManager, [
-  'Add passkey',
-  'Email stays available for recovery.',
-  '/api/v1/auth/passkey/register/options',
-  '/api/v1/auth/passkey/register/verify',
-  '/api/v1/auth/passkeys'
-]);
-requireAll('verified Stripe plan surface', verifiedPlan, [
-  '/api/v1/billing/entitlements',
-  'Stripe verified',
-  'Sovereign+',
-  'Billing controls'
-]);
+requireAll('passkey-first login', passkeyLogin, ['Sign in without opening your email.', 'Sign in with a passkey', 'Email recovery or first-time verification', '/api/v1/auth/passkey/login/options', '/api/v1/auth/passkey/login/verify', 'Confirming your Stripe plan']);
+requireAll('authenticated passkey controls', passkeyManager, ['Add passkey', 'Email stays available for recovery.', '/api/v1/auth/passkey/register/options', '/api/v1/auth/passkey/register/verify', '/api/v1/auth/passkeys']);
+requireAll('verified Stripe plan surface', verifiedPlan, ['/api/v1/billing/entitlements', 'Stripe verified', 'Sovereign+', 'Billing controls']);
 requireAll('workspace plan integration', authenticatedWorkspace, ['<VerifiedPlanStatus />', '<PasskeyManager />', 'Confirming your account and verified plan']);
 
-requireAll('standalone founder v0 CSS', staticV0, [
-  '--v0-page:#0f0f0f',
-  '--v0-cream:#e8ddd0',
-  'body{min-width:320px',
-  '.launch-nav',
-  '.launch-hero',
-  '.journey-steps',
-  '.pricing-grid',
-  '.faq-list',
-  '.launch-footer'
-]);
+requireAll('standalone founder CSS', staticV0, ['--v0-page:#0f0f0f', '--v0-cream:#e8ddd0', 'body{min-width:320px', '.launch-nav', '.launch-hero', '.journey-steps', '.pricing-grid', '.faq-list', '.launch-footer']);
 for (const [label, document] of [['How it works', how], ['pricing', pricing], ['FAQ', faq]]) {
-  requireAll(`${label} founder v0 document`, document, [
-    'data-visual-contract="founder-v0-static"',
-    '/v0-public-static.css?v=20260801-v0-global',
-    'Release compatibility marker only; the retired stylesheet is not loaded'
-  ]);
+  requireAll(`${label} founder document`, document, ['data-visual-contract="founder-v0-static"', '/v0-public-static.css?v=20260801-v0-global', 'Release compatibility marker only; the retired stylesheet is not loaded']);
   assert(!/<link[^>]+premium-public-release\.css/i.test(document), `${label} still loads retired visual CSS`);
-  assert(!/<link[^>]+v0-public-port\.css/i.test(document), `${label} still loads the retired static v0 bridge`);
+  assert(!/<link[^>]+v0-public-port\.css/i.test(document), `${label} still loads the retired static bridge`);
 }
 requireAll('How it works document', how, ['Ask about your life. Get an answer built around you.', 'journey-steps', 'baseline-explainer']);
 requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe handles payment details', 'Start free. Expand when the question includes more than you.']);
 assert(!pricing.includes('Begin with yourself.'), 'Pricing retains rejected product language');
 requireAll('FAQ document', faq, ['<details', 'Do I need to open my email every time I sign in?', 'When is my plan verified?', 'Can I correct or remove an interpretation?']);
-
 requireAll('cross-platform composition', composition, ['.sovereign-landing', '.account-shell', '.plan-onboarding', '.sovereign-policy', '.public-not-found', '.intelligence-workspace', '@media (max-width: 700px)']);
 
 for (const [label, document] of documents) {
@@ -292,9 +288,12 @@ for (const [label, document] of documents) {
 for (const [label, css] of [
   ['v0 platform', v0Platform],
   ['v0 visual', v0Visual],
-  ['v0 global product', v0Global],
+  ['v0 global', v0Global],
+  ['landing field', fieldCss],
+  ['field integration', integrationCss],
+  ['restored stories', storyCss],
   ['passkey auth', passkeyCss],
   ['v0 static public', staticV0]
 ]) balanced(label, css);
 
-console.log('Production release v2 verification passed: founder-v0 global surfaces, passkey-first auth, Resend v0 email, and Stripe plan proof are enforced.');
+console.log('Production release v2 verification passed: founder-v0 global surfaces, passkey-first auth, Resend v0 email, Stripe plan proof, integrated landing field, and restored product workflows are enforced.');
