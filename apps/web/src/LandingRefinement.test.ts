@@ -9,121 +9,116 @@ const field = read('./expression-field/LandingExpressionSlice.tsx');
 const fieldStyles = read('./landing-expression-field-v3.css');
 const integrationStyles = read('./landing-expression-field-integration.css');
 const storyStyles = read('./landing-product-stories-v2.css');
-const premiumV5Styles = read('./public-landing-premium-v5.css');
-const premiumV6Styles = read('./public-landing-premium-v6.css');
+const approvedStyles = read('./public-landing-approved-v7.css');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
-describe('public landing v3 release', () => {
-  it('loads the integrated field, isolated product stories, premium v6, and passkey authority in order', () => {
+describe('approved public landing v7', () => {
+  it('loads the v0 foundation, integrated field, isolated stories, approved authority, and passkey authority in order', () => {
     const fieldImport = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
+    const lineageImport = "import './v0-restored-product-stories.css';";
     const storiesImport = "import './landing-product-stories-v2.css';";
-    const premiumV5Import = "import './public-landing-premium-v5.css';";
-    const premiumV6Import = "import './public-landing-premium-v6.css';";
+    const approvedImport = "import './public-landing-approved-v7.css';";
     const passkeyImport = "import './passkey-auth.css';";
     expect(main.indexOf(integrationImport)).toBeGreaterThan(main.indexOf(fieldImport));
-    expect(main.indexOf(storiesImport)).toBeGreaterThan(main.indexOf(integrationImport));
-    expect(main.indexOf(premiumV5Import)).toBeGreaterThan(main.indexOf(storiesImport));
-    expect(main.indexOf(premiumV6Import)).toBeGreaterThan(main.indexOf(premiumV5Import));
-    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(premiumV6Import));
+    expect(main.indexOf(lineageImport)).toBeGreaterThan(main.indexOf(integrationImport));
+    expect(main.indexOf(storiesImport)).toBeGreaterThan(main.indexOf(lineageImport));
+    expect(main.indexOf(approvedImport)).toBeGreaterThan(main.indexOf(storiesImport));
+    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(approvedImport));
+    expect(main.slice(main.indexOf(passkeyImport) + passkeyImport.length)).not.toContain("import './");
+    expect(main).not.toContain("import './public-landing-premium-v6.css';");
   });
 
-  it('renders the hero field followed by the three real product demonstrations', () => {
-    expect(landing).toContain("import { LandingProductStories } from './LandingProductStories'");
-    expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
-    expect(landing).toContain('data-public-release="premium-public-v6"');
-    expect(landing).toContain('<V0Hero />');
+  it('renders the approved hero followed by the three product demonstrations', () => {
+    expect(landing).toContain('data-public-release="approved-public-v7"');
+    expect(landing).toContain('data-layout-release="v0-motion-workflows-v7"');
+    expect(landing).toContain('SOVEREIGN.OS');
+    expect(landing).toContain('Healing isn’t optional.');
+    expect(landing).toContain('Holding onto the pain is.');
+    expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('<LandingProductStories />');
-    expect(landing.indexOf('<LandingProductStories />')).toBeGreaterThan(landing.indexOf('<V0Hero />'));
-    for (const marker of ['PersonalStory', 'RelationshipStory', 'SystemStory']) expect(stories).toContain(marker);
+    expect(landing).not.toContain('sovereign-opening-capabilities');
+    expect(landing).not.toContain('HERO_CAPABILITIES');
   });
 
-  it('keeps the opening field center-emitted, draggable, and free of a globe or card', () => {
-    expect(field).toContain('onPointerDown={handlePointerDown}');
-    expect(field).toContain('onPointerMove={handlePointerMove}');
-    expect(field).toContain('landing-expression-slice__tooltip');
-    expect(field).toContain('Baseline');
-    expect(field).toContain('Live change');
-    expect(field).not.toContain('sphere');
-    expect(integrationStyles).toContain('background: transparent');
-    expect(integrationStyles).toContain('border-radius: 0');
-    expect(fieldStyles).toContain('width: 100vw');
-    expect(premiumV6Styles).toContain('min-height: clamp(330px, 34vw, 470px)');
-  });
-
-  it('renders chat, evidence, visible workflow progress, and the system map through isolated classes', () => {
+  it('uses a true radial field rather than a bottom-origin horizon fan', () => {
     for (const marker of [
+      'const CENTER_X = 790',
+      'const CENTER_Y = 314',
+      'Array.from({ length: 28 }',
+      'Eight interactive vectors',
+      'onPointerDown={handlePointerDown}',
+      'onPointerMove={handlePointerMove}',
+      'landing-expression-slice__tooltip',
+      'Baseline value',
+      'Live change',
+      'Current'
+    ]) expect(field).toContain(marker);
+    expect(field).not.toContain('landing-expression-slice__horizon');
+    expect(field).not.toContain('landing-expression-slice__grid');
+    expect(field).not.toContain('Array.from({ length: 88 }');
+    expect(field).not.toContain('sphere');
+    expect(field).not.toContain('globe');
+    expect(approvedStyles).toContain('.landing-expression-slice__horizon');
+    expect(approvedStyles).toContain('display: none');
+  });
+
+  it('uses the approved narrative and v0 chat/workflow language', () => {
+    for (const marker of [
+      'See what keeps happening.',
+      'Understand what happens between you.',
+      'See the whole system.',
+      'Reading your Baseline',
+      'Finding the pattern',
+      'Building the distinction',
+      'Answering the real question',
+      'Keeping both people distinct',
+      'Reading each perspective',
+      'Finding the interaction',
+      'Showing what happens between you',
+      'Mapping the people',
+      'Reading roles and responsibility',
+      'Tracing the recurring pattern',
+      'Showing the whole system',
       'surface="personal-chat"',
       'surface="personal-reasoning"',
       'surface="relationship-chat"',
       'surface="relationship-reasoning"',
       'surface="system-map"',
-      'surface="system-reasoning"',
-      'landing-evidence',
-      'landing-workflow',
-      'landing-system-map',
-      'is-active',
-      'is-complete'
+      'surface="system-reasoning"'
     ]) expect(renderedStories).toContain(marker);
-
-    for (const marker of [
-      'Reading your Baseline',
-      'Keeping both people distinct',
-      'Mapping the people'
-    ]) expect(stories).toContain(marker);
-
-    expect(renderedStories).not.toContain('LandingExpressionFieldPreview');
-    expect(renderedStories).not.toContain('sphere');
-    expect(renderedStories).not.toContain('globe');
+    expect(renderedStories).not.toContain('title="Ask about your life."');
   });
 
-  it('does not render the retired v0 showcase classes that caused the live stretch regression', () => {
-    for (const marker of [
-      '<div className="v0-story-grid"',
-      '<article className="v0-window',
-      '<div className="v0-window-body"',
-      '<article className="v0-flow',
-      '<article className="v0-workflow-panel"',
-      '<div className="v0-family-system-map"'
-    ]) expect(renderedStories).not.toContain(marker);
+  it('plays chat and workflow motion once, then settles', () => {
+    expect(stories).toContain('useWorkflowProgress(panelRef, steps.length)');
+    expect(stories).toContain('timers.push(window.setTimeout');
+    expect(stories).toContain("data-motion-state={visibleIndex >= steps.length - 1 ? 'settled' : 'running'}");
+    expect(stories).not.toContain('window.setInterval');
+    expect(approvedStyles).toContain('approved-message-in');
+    expect(approvedStyles).toContain(".landing-story[data-visible='true'] .landing-message");
+    expect(approvedStyles).toContain('.landing-workflow > li.is-active');
   });
 
-  it('uses content-driven desktop panels and a real mobile column', () => {
+  it('keeps iPhone sparse, naturally stacked, and reduced-motion safe', () => {
     for (const marker of [
-      '.landing-story__stage',
-      'align-items: start',
+      '@media (max-width: 760px)',
+      'width: calc(100% - 28px)',
+      'flex-direction: column',
       'height: auto',
       'min-height: 0',
-      '@media (max-width: 900px)',
-      'display: flex',
-      'flex-direction: column',
-      '@media (max-width: 760px)'
-    ]) expect(storyStyles).toContain(marker);
-    expect(storyStyles).not.toContain('min-height: 690px');
-    expect(storyStyles).not.toContain('min-height: 720px');
-    expect(storyStyles).not.toContain('height: 100%');
+      '.landing-workflow__copy > span',
+      'display: none',
+      '@media (prefers-reduced-motion: reduce)'
+    ]) expect(approvedStyles).toContain(marker);
+    expect(approvedStyles).not.toContain('border-radius: 999px');
+    expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v7'");
+    expect(main).toContain("dataset.sovereignProductStories = 'isolated-mobile-first-v2'");
+    expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v7'");
   });
 
-  it('keeps iOS touch targets, safe widths, reduced motion, and non-boxed controls', () => {
-    expect(fieldStyles).toContain('@media (max-width: 760px)');
-    expect(fieldStyles).toContain('touch-action: none');
-    expect(fieldStyles).toContain('stroke-width: 34');
-    expect(storyStyles).toContain('width: calc(100% - 24px)');
-    expect(storyStyles).toContain('min-height: 44px');
-    expect(storyStyles).toContain('border-radius: 4px');
-    expect(storyStyles).toContain('@media (max-width: 390px)');
-    expect(storyStyles).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(premiumV5Styles).toContain('clip-path: none');
-    expect(premiumV6Styles).toContain('clip-path: none');
-    expect(premiumV6Styles).toContain('border-bottom: 1px solid rgba(243, 236, 226, 0.46)');
-    expect(premiumV6Styles).not.toContain('border-radius: 999px');
-    expect(main).toContain('function refreshStaleIosPageRestore');
-    expect(main).toContain('event.persisted');
-    expect(main).toContain("dataset.sovereignLayoutRelease = 'premium-public-v6'");
-  });
-
-  it('keeps the new CSS layers structurally balanced', () => {
-    for (const source of [fieldStyles, integrationStyles, storyStyles, premiumV5Styles, premiumV6Styles]) {
+  it('keeps every active CSS layer structurally balanced', () => {
+    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
