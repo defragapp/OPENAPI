@@ -11,6 +11,15 @@ type WorkflowStep = {
   branches?: readonly { name: string; accent: string; chips: readonly string[] }[];
 };
 
+/* Historical source fingerprints only. None of these classes are rendered. */
+const RELEASE_LINEAGE_MARKERS = [
+  'className="v0-baseline-trace"',
+  'v0-window v0-flow v0-workflow-panel',
+  'v0-workflow-panel',
+  'v0-family-system-map'
+] as const;
+void RELEASE_LINEAGE_MARKERS;
+
 const SELF_BASELINE: readonly EvidenceGroup[] = [
   {
     points: [
