@@ -10,25 +10,28 @@ const fieldStyles = read('./landing-expression-field-v3.css');
 const integrationStyles = read('./landing-expression-field-integration.css');
 const storyStyles = read('./landing-product-stories-v2.css');
 const premiumV5Styles = read('./public-landing-premium-v5.css');
+const premiumV6Styles = read('./public-landing-premium-v6.css');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
 describe('public landing v3 release', () => {
-  it('loads the integrated field, isolated product stories, premium v5, and passkey authority in order', () => {
+  it('loads the integrated field, isolated product stories, premium v6, and passkey authority in order', () => {
     const fieldImport = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
     const storiesImport = "import './landing-product-stories-v2.css';";
     const premiumV5Import = "import './public-landing-premium-v5.css';";
+    const premiumV6Import = "import './public-landing-premium-v6.css';";
     const passkeyImport = "import './passkey-auth.css';";
     expect(main.indexOf(integrationImport)).toBeGreaterThan(main.indexOf(fieldImport));
     expect(main.indexOf(storiesImport)).toBeGreaterThan(main.indexOf(integrationImport));
     expect(main.indexOf(premiumV5Import)).toBeGreaterThan(main.indexOf(storiesImport));
-    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(premiumV5Import));
+    expect(main.indexOf(premiumV6Import)).toBeGreaterThan(main.indexOf(premiumV5Import));
+    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(premiumV6Import));
   });
 
   it('renders the hero field followed by the three real product demonstrations', () => {
     expect(landing).toContain("import { LandingProductStories } from './LandingProductStories'");
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
-    expect(landing).toContain('data-public-release="premium-public-v5"');
+    expect(landing).toContain('data-public-release="premium-public-v6"');
     expect(landing).toContain('<V0Hero />');
     expect(landing).toContain('<LandingProductStories />');
     expect(landing.indexOf('<LandingProductStories />')).toBeGreaterThan(landing.indexOf('<V0Hero />'));
@@ -45,7 +48,7 @@ describe('public landing v3 release', () => {
     expect(integrationStyles).toContain('background: transparent');
     expect(integrationStyles).toContain('border-radius: 0');
     expect(fieldStyles).toContain('width: 100vw');
-    expect(premiumV5Styles).toContain('min-height: clamp(310px, 36vw, 490px)');
+    expect(premiumV6Styles).toContain('min-height: clamp(330px, 34vw, 470px)');
   });
 
   it('renders chat, evidence, visible workflow progress, and the system map through isolated classes', () => {
@@ -111,15 +114,16 @@ describe('public landing v3 release', () => {
     expect(storyStyles).toContain('@media (max-width: 390px)');
     expect(storyStyles).toContain('@media (prefers-reduced-motion: reduce)');
     expect(premiumV5Styles).toContain('clip-path: none');
-    expect(premiumV5Styles).toContain('border-bottom: 1px solid rgba(238, 232, 223, 0.46)');
-    expect(premiumV5Styles).not.toContain('border-radius: 999px');
+    expect(premiumV6Styles).toContain('clip-path: none');
+    expect(premiumV6Styles).toContain('border-bottom: 1px solid rgba(243, 236, 226, 0.46)');
+    expect(premiumV6Styles).not.toContain('border-radius: 999px');
     expect(main).toContain('function refreshStaleIosPageRestore');
     expect(main).toContain('event.persisted');
-    expect(main).toContain("dataset.sovereignLayoutRelease = 'premium-public-v5'");
+    expect(main).toContain("dataset.sovereignLayoutRelease = 'premium-public-v6'");
   });
 
   it('keeps the new CSS layers structurally balanced', () => {
-    for (const source of [fieldStyles, integrationStyles, storyStyles, premiumV5Styles]) {
+    for (const source of [fieldStyles, integrationStyles, storyStyles, premiumV5Styles, premiumV6Styles]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
