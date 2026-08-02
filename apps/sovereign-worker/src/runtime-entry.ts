@@ -27,6 +27,10 @@ const DISABLED_PATH_PREFIXES = ['/api/v1/export-jobs'];
 const PARENT_HOSTS = new Set(['defrag.app', 'www.defrag.app']);
 const PUBLIC_HOST = 'sovereign.defrag.app';
 const APP_HOST = 'app.defrag.app';
+const PREVIOUS_MIGRATION_VERSION = '0013_workers_ai_free_capacity';
+const LATEST_MIGRATION_VERSION = '0014_passkey_authentication';
+const VISUAL_ARCHIVE_SHA256 = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
+const VISUAL_SEQUENCE_FINGERPRINT = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${VISUAL_ARCHIVE_SHA256}`;
 const PUBLIC_PATHS = new Set([
   '/privacy',
   '/terms',
@@ -198,8 +202,15 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && env.STRIPE_CANCEL_URL
       && env.STRIPE_PORTAL_RETURN_URL
     );
+    const migrationVersion = db?.passkeys_ready === 1
+      ? LATEST_MIGRATION_VERSION
+      : db?.capacity_ready === 1
+        ? PREVIOUS_MIGRATION_VERSION
+        : 'unknown';
+    const migrationParity = migrationVersion === LATEST_MIGRATION_VERSION;
     const dependencies = {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
+      migrationParity: migrationParity ? 'current' : 'behind',
       aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing',
       passkeys: db?.passkeys_ready === 1 ? 'configured' : 'missing',
       durableObjects: env.THREADS ? 'configured' : 'missing',
@@ -222,6 +233,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
     };
     const ok = db?.ok === 1;
     const ready = ok
+      && migrationParity
       && dependencies.aiFreeCapacity === 'configured'
       && dependencies.passkeys === 'configured'
       && dependencies.durableObjects === 'configured'
@@ -231,16 +243,26 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && dependencies.authentication === 'configured'
       && dependencies.transactionalEmail === 'resend'
       && dependencies.stripe === 'configured';
-    return withSecurityHeaders(Response.json({
+    const payload = {
       ok,
       ...(pathname === '/ready' ? { ready } : {}),
       version: env.APP_VERSION,
       environment: env.APP_ENV,
-      migrationVersion: '0013_workers_ai_free_capacity',
-      latestMigrationVersion: '0014_passkey_authentication',
+      migrationVersion,
+      latestMigrationVersion: LATEST_MIGRATION_VERSION,
       answerContract: 'sovereign-answer.v2',
       baselineContract: 'baseline-source.v1+baseline-facets.v1',
+      visualRelease: {
+        contract: 'v0-public-landing-v3',
+        field: 'landing-expression-field-v3',
+        archiveSha256: VISUAL_ARCHIVE_SHA256,
+        sequenceFingerprint: VISUAL_SEQUENCE_FINGERPRINT,
+        renderedComparisonRequired: true
+      },
       dependencies
+    };
+    return withSecurityHeaders(Response.json(payload, {
+      status: pathname === '/ready' && !ready ? 503 : 200
     }));
   } catch {
     return withSecurityHeaders(Response.json({
