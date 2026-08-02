@@ -1,0 +1,34 @@
+/* Emergency public hotfix: remove the rejected card-based field while the replacement ships. */
+.v0-single-example-landing .landing-expression-slice {
+  display: none !important;
+}
+
+.v0-single-example-landing .v0-actions .v0-button-secondary {
+  display: none !important;
+}
+
+.v0-single-example-landing .v0-hero {
+  min-height: min(100svh, 820px);
+  padding-bottom: clamp(72px, 10vw, 124px);
+}
+
+/* Remove pill-button styling from public and authenticated product controls. */
+:where(
+  .v0-button,
+  .passkey-button,
+  .passkey-primary,
+  .email-code-fallback button,
+  .plan-onboarding button,
+  .account-shell button,
+  .sovereign-composer button,
+  .product-completion-layer button
+) {
+  border-radius: 4px !important;
+}
+
+@media (max-width: 760px) {
+  .v0-single-example-landing .v0-hero {
+    min-height: auto;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+}
