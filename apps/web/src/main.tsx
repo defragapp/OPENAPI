@@ -47,13 +47,14 @@ import './expression-field/expression-field-precision.css';
 import './responsive-viewport-contract.css';
 import './public-landing-editorial.css';
 
-/* Founder foundation, global authority, one-example public release, then passkey-specific final authority. */
+/* Founder foundation, global authority, one-example public release, emergency removal, then passkey-specific final authority. */
 import './v0-platform-port.css';
 import './v0-motion-accessibility.css';
 import './v0-visual-port.css';
 import './v0-global-experience.css';
 import './v0-landing-refinement.css';
 import './v0-single-example-release.css';
+import './emergency-public-removal.css';
 import './passkey-auth.css';
 
 installV0ReleaseFingerprint();
