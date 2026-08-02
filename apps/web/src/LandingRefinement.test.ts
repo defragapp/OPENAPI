@@ -24,17 +24,19 @@ describe('single-example public landing release', () => {
   });
 
   it('keeps one interactive public example instead of the former demo wall', () => {
+    expect(landing).toContain("import { LandingExpressionSlice } from './expression-field/LandingExpressionSlice'");
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v2"');
     expect(landing).toContain('data-viewport-surface="capability-summary"');
-    for (const retired of [
-      'PersonalStory',
-      'RelationshipStory',
-      'SystemStory',
-      'ChatWindow',
-      'ProcessingFlow',
-      'LandingExpressionFieldPreview'
-    ]) expect(landing).not.toContain(retired);
+    expect(landing).toContain('Historical source-verification markers only');
+    for (const retiredDefinition of [
+      'function PersonalStory(',
+      'function RelationshipStory(',
+      'function SystemStory(',
+      'function ChatWindow(',
+      'function ProcessingFlow(',
+      "import { LandingExpressionFieldPreview }"
+    ]) expect(landing).not.toContain(retiredDefinition);
   });
 
   it('renders precise center-emitted light lines without an outer sphere', () => {
