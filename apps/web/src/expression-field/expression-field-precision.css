@@ -28,8 +28,7 @@
   touch-action: pan-y;
 }
 
-.expression-field-account .expression-field-canvas,
-.expression-field-renderer.is-draggable .expression-field-canvas {
+.expression-field-account .expression-field-canvas {
   touch-action: none;
 }
 
