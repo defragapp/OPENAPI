@@ -63,7 +63,7 @@ describe('founder v0 public production release', () => {
   it('retains the founder hierarchy and responsive behavior', () => {
     for (const selector of ['.v0-hero', '.v0-comparison-grid', '.v0-final']) expect(v0Css).toContain(selector);
     for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip']) expect(fieldCss).toContain(selector);
-    for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-map-no-globes']) expect(storiesCss).toContain(selector);
+    for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storiesCss).toContain(selector);
     expect(fieldCss).toContain('@media (max-width: 760px)');
     expect(storiesCss).toContain('@media (max-width: 760px)');
     expect(storiesCss).toContain('@media (prefers-reduced-motion: reduce)');
