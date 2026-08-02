@@ -28,13 +28,14 @@ const HERO_CAPABILITIES = [
 export function PublicLanding() {
   return (
     <main
-      className="sovereign-landing v0-landing-port v0-single-example-landing"
+      className="sovereign-landing v0-landing-port v0-single-example-landing public-premium-v4"
       data-product-contract="baseline-first"
       data-answer-contract="sovereign-answer.v2"
       data-visual-contract="v0-landing-selective-port"
       data-v0-archive-sha={V0_ARCHIVE_SHA}
       data-viewport-contract="v0-public-landing-v3"
       data-layout-release="compact-product-stories-v3"
+      data-public-release="premium-public-v4"
     >
       <V0Navigation />
       <V0Hero />
@@ -50,7 +51,7 @@ function V0Navigation() {
   return (
     <header className="v0-nav">
       <div className="v0-shell v0-nav-inner">
-        <a className="v0-wordmark" href="/" aria-label="Sovereign home">Sovereign</a>
+        <a className="v0-wordmark" href="/" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
         <nav aria-label="Public navigation">
           <a href="#how">How it works</a>
           <a href="/pricing">Pricing</a>
@@ -58,7 +59,9 @@ function V0Navigation() {
         </nav>
         <div className="v0-nav-actions">
           <a className="v0-sign-in" href="/login">Sign in</a>
-          <a className="v0-button v0-button-primary v0-button-small" href="/signup">Get started</a>
+          <a className="v0-button v0-button-primary v0-button-small landing-control landing-control--nav" href="/signup">
+            <span>Get started</span><ArrowIcon />
+          </a>
         </div>
       </div>
     </header>
@@ -71,15 +74,19 @@ function V0Hero() {
       <div className="v0-hero-atmosphere" aria-hidden="true"><i /><i /><i /><span /></div>
       <div className="sovereign-opening-horizon" aria-hidden="true" />
       <div className="v0-hero-content" data-viewport-surface="hero">
-        <p className="v0-badge"><span />Personal AI for real life</p>
+        <p className="v0-badge landing-hero-kicker"><span />Personal AI for real life</p>
         <h1>
           <span>Healing isn’t optional.</span>
           <em>Holding onto the pain is.</em>
         </h1>
         <p className="sovereign-opening-copy">Sovereign helps you see what is actually happening—within you, between people, and across the systems you care about.</p>
         <div className="sovereign-opening-actions">
-          <a className="v0-button v0-button-primary sovereign-opening-primary" href="/signup"><span aria-hidden="true">✦</span> Get started</a>
-          <a className="sovereign-opening-secondary" href="#how">See how it works <span aria-hidden="true">↓</span></a>
+          <a className="v0-button v0-button-primary sovereign-opening-primary landing-control landing-control--primary" href="/signup">
+            <span>Get started</span><ArrowIcon />
+          </a>
+          <a className="sovereign-opening-secondary landing-inline-link" href="#how">
+            <span>See how it works</span><ArrowIcon direction="down" />
+          </a>
         </div>
         <p className="sovereign-opening-trust">Private by design. Correctable by you. Shared only with permission.</p>
       </div>
@@ -107,7 +114,7 @@ function ComparisonStory() {
         </header>
         <div className="v0-comparison-grid" data-viewport-surface="comparison">
           <ComparisonPanel title="Other AI" items={COMPARISON.others} positive={false} />
-          <ComparisonPanel title="Sovereign" items={COMPARISON.sovereign} positive />
+          <ComparisonPanel title="SOVEREIGN.OS" items={COMPARISON.sovereign} positive />
         </div>
       </div>
     </section>
@@ -120,7 +127,9 @@ function FinalCallToAction() {
       <div aria-hidden="true" />
       <h2>Your thoughts deserve<br />a better place to live.</h2>
       <p>Build your Baseline. Ask your real questions. Start free.</p>
-      <a className="v0-button v0-button-primary" href="/signup">Get started free <span aria-hidden="true">→</span></a>
+      <a className="v0-button v0-button-primary landing-control landing-control--primary" href="/signup">
+        <span>Get started free</span><ArrowIcon />
+      </a>
     </section>
   );
 }
@@ -129,7 +138,7 @@ function V0Footer() {
   return (
     <footer className="v0-footer">
       <div className="v0-shell">
-        <a href="/" className="v0-wordmark">Sovereign</a>
+        <a href="/" className="v0-wordmark" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
         <nav aria-label="Footer navigation">
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
@@ -143,9 +152,17 @@ function V0Footer() {
 
 function ComparisonPanel({ title, items, positive }: { title: string; items: readonly string[]; positive: boolean }) {
   return (
-    <article className={positive ? 'v0-comparison-positive' : ''}>
+    <article className={`v0-comparison-panel${positive ? ' v0-comparison-positive' : ''}`}>
       <h3>{title}</h3>
       <ul>{items.map((item) => <li key={item}><span aria-hidden="true">{positive ? '✓' : '×'}</span>{item}</li>)}</ul>
     </article>
+  );
+}
+
+function ArrowIcon({ direction = 'right' }: { direction?: 'right' | 'down' }) {
+  return (
+    <svg className={`landing-arrow landing-arrow--${direction}`} viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M3 8h9M8.5 3.5 13 8l-4.5 4.5" />
+    </svg>
   );
 }
