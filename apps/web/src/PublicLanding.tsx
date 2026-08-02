@@ -28,14 +28,14 @@ const HERO_CAPABILITIES = [
 export function PublicLanding() {
   return (
     <main
-      className="sovereign-landing v0-landing-port v0-single-example-landing public-premium-v4 public-premium-v5"
+      className="sovereign-landing v0-landing-port v0-single-example-landing public-premium-v4 public-premium-v5 public-premium-v6"
       data-product-contract="baseline-first"
       data-answer-contract="sovereign-answer.v2"
       data-visual-contract="v0-landing-selective-port"
       data-v0-archive-sha={V0_ARCHIVE_SHA}
       data-viewport-contract="v0-public-landing-v3"
       data-layout-release="compact-product-stories-v3"
-      data-public-release="premium-public-v5"
+      data-public-release="premium-public-v6"
     >
       <V0Navigation />
       <V0Hero />
