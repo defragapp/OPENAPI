@@ -48,7 +48,7 @@ export function SystemExpressionField({
 
   return (
     <figure className={`system-expression-field expression-field-depth-${depth}${compact ? ' is-compact' : ''}${className ? ` ${className}` : ''}`} data-expression-field-composition="system">
-      <div className="system-expression-stage" aria-label={`${fieldSubjects.length} distinct Baseline expression fields. The open center represents no person; the system is shown through how the fields orient in relation to one another.`}>
+      <div className="system-expression-stage" aria-label={`${fieldSubjects.length} distinct Baseline Expression Fields. The open center represents no person; the system is shown through how the fields orient in relation to one another.`}>
         {fieldSubjects.map((subject, index) => {
           const position = positions[index]!;
           const peerIndex = activeConnection
@@ -77,7 +77,7 @@ export function SystemExpressionField({
                 selectedAxisId={subject.selectedAxisId ?? interaction.selectedAxisId}
                 {...(target ? { engagementDirection: target } : {})}
                 engagementPhase={index * 0.08}
-                ariaLabel={`${subject.label} Baseline expression field. Vector length represents the relative values supplied by that permitted Baseline.`}
+                ariaLabel={`${subject.label} Baseline Expression Field. Every line begins at that person’s own center; length represents relative salience from permitted information.`}
               />
               <button type="button" aria-pressed={selectedId === subject.id} onClick={() => select(subject.id)}>
                 <strong>{subject.label}</strong>
@@ -87,6 +87,7 @@ export function SystemExpressionField({
           );
         })}
       </div>
+      <p className="expression-field-gear-note"><strong>The whole mechanism.</strong> Like gears in one machine, each person keeps their own center while roles, pressure, responsibility, and timing shape what the system does together.</p>
       <figcaption>
         <button className="expression-field-interaction" type="button" aria-pressed={selectedId === 'interaction'} onClick={() => select('interaction')}>
           <span>{interaction.label}</span>
