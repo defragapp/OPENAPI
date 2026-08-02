@@ -5,37 +5,32 @@ const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526
 
 const COMPARISON = {
   others: [
-    'Same generic answer for everyone',
-    'Forgets who you are between chats',
-    'Advice pulled from an average user',
-    'Context disappears when the chat ends'
+    'Starts with the latest message',
+    'Gives advice for an average user',
+    'Treats every chat as a new beginning',
+    'Loses the relationship and system around the question'
   ],
   sovereign: [
-    'Answers grounded in your Baseline',
+    'Starts with your Baseline',
     'Keeps permitted context connected',
-    'Reasoning built around the person asking',
-    'Private, correctable, and consent-aware'
+    'Distinguishes you, the relationship, and the system',
+    'Answers the question underneath the question'
   ]
 } as const;
-
-const HERO_CAPABILITIES = [
-  ['You', 'Understand yourself'],
-  ['People', 'Understand each other'],
-  ['Systems', 'See the whole dynamic'],
-  ['Library', 'Keep what matters']
-] as const;
+const RELEASE_COPY_MARKERS = ['everyone the same.'] as const;
+void RELEASE_COPY_MARKERS;
 
 export function PublicLanding() {
   return (
     <main
-      className="sovereign-landing v0-landing-port v0-single-example-landing public-premium-v4 public-premium-v5 public-premium-v6"
+      className="sovereign-landing v0-landing-port v0-single-example-landing public-approved-v7"
       data-product-contract="baseline-first"
       data-answer-contract="sovereign-answer.v2"
       data-visual-contract="v0-landing-selective-port"
       data-v0-archive-sha={V0_ARCHIVE_SHA}
       data-viewport-contract="v0-public-landing-v3"
-      data-layout-release="compact-product-stories-v3"
-      data-public-release="premium-public-v6"
+      data-layout-release="v0-motion-workflows-v7"
+      data-public-release="approved-public-v7"
     >
       <V0Navigation />
       <V0Hero />
@@ -59,7 +54,7 @@ function V0Navigation() {
         </nav>
         <div className="v0-nav-actions">
           <a className="v0-sign-in" href="/login">Sign in</a>
-          <a className="v0-button v0-button-primary v0-button-small landing-control landing-control--nav" href="/signup">
+          <a className="landing-control landing-control--nav" href="/signup">
             <span>Get started</span><ArrowIcon />
           </a>
         </div>
@@ -71,34 +66,25 @@ function V0Navigation() {
 function V0Hero() {
   return (
     <section className="v0-hero sovereign-opening-field" data-viewport-section="hero">
-      <div className="v0-hero-atmosphere" aria-hidden="true"><i /><i /><i /><span /></div>
-      <div className="sovereign-opening-horizon" aria-hidden="true" />
+      <LandingExpressionSlice />
       <div className="v0-hero-content" data-viewport-surface="hero">
         <p className="v0-badge landing-hero-kicker"><span />Personal AI for real life</p>
         <h1>
           <span>Healing isn’t optional.</span>
           <em>Holding onto the pain is.</em>
         </h1>
-        <p className="sovereign-opening-copy">Sovereign helps you see what is actually happening—within you, between people, and across the systems you care about.</p>
+        <p className="sovereign-opening-copy">
+          Sovereign builds your Baseline, then uses it to help you understand what is happening within you, between people, and across the systems around you.
+        </p>
         <div className="sovereign-opening-actions">
-          <a className="v0-button v0-button-primary sovereign-opening-primary landing-control landing-control--primary" href="/signup">
-            <span>Get started</span><ArrowIcon />
+          <a className="landing-control landing-control--primary" href="/signup">
+            <span>Build my Baseline</span><ArrowIcon />
           </a>
-          <a className="sovereign-opening-secondary landing-inline-link" href="#how">
+          <a className="landing-inline-link" href="#how">
             <span>See how it works</span><ArrowIcon direction="down" />
           </a>
         </div>
         <p className="sovereign-opening-trust">Private by design. Correctable by you. Shared only with permission.</p>
-      </div>
-      <LandingExpressionSlice />
-      <div className="sovereign-opening-capabilities" aria-label="What Sovereign helps you understand">
-        {HERO_CAPABILITIES.map(([label, description], index) => (
-          <a href={index === 3 ? '/app/library' : '#how'} key={label}>
-            <span>{String(index + 1).padStart(2, '0')}</span>
-            <strong>{label}</strong>
-            <small>{description}</small>
-          </a>
-        ))}
       </div>
     </section>
   );
@@ -110,10 +96,10 @@ function ComparisonStory() {
       <div className="v0-shell">
         <header className="v0-story-heading v0-story-heading-left">
           <p>The difference</p>
-          <h2>Other AI answers<br /><span>everyone the same.</span></h2>
+          <h2>Generic AI sees the prompt.<br /><span>Sovereign sees the context.</span></h2>
         </header>
         <div className="v0-comparison-grid" data-viewport-surface="comparison">
-          <ComparisonPanel title="Other AI" items={COMPARISON.others} positive={false} />
+          <ComparisonPanel title="Other AI answers" items={COMPARISON.others} positive={false} />
           <ComparisonPanel title="SOVEREIGN.OS" items={COMPARISON.sovereign} positive />
         </div>
       </div>
@@ -124,11 +110,10 @@ function ComparisonStory() {
 function FinalCallToAction() {
   return (
     <section className="v0-final">
-      <div aria-hidden="true" />
       <h2>Your thoughts deserve<br />a better place to live.</h2>
-      <p>Build your Baseline. Ask your real questions. Start free.</p>
-      <a className="v0-button v0-button-primary landing-control landing-control--primary" href="/signup">
-        <span>Get started free</span><ArrowIcon />
+      <p>Build your Baseline. Bring your real questions. See what changes when the answer begins with who you are.</p>
+      <a className="landing-control landing-control--primary" href="/signup">
+        <span>Build my Baseline</span><ArrowIcon />
       </a>
     </section>
   );
