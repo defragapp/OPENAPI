@@ -14,17 +14,18 @@ const staticExperienceCss = readFileSync(new URL('../public/static-experience.cs
 const platformPublicCss = readFileSync(new URL('../public/platform-public.css', import.meta.url), 'utf8');
 const v0Css = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
 const releaseCss = readFileSync(new URL('./v0-single-example-release.css', import.meta.url), 'utf8');
+const fieldCss = readFileSync(new URL('./landing-expression-field-v3.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
 describe('Sovereign.OS public experience', () => {
-  it('uses the approved hero and immediate field action in the first viewport', () => {
+  it('uses the approved hero with the field directly beneath it', () => {
     expect(landing).toContain('Personal AI for real life');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Build my Baseline');
-    expect(landing).toContain('Explore the field');
     expect(landing).toContain('<LandingExpressionSlice />');
+    expect(landing).not.toContain('Build my Baseline');
+    expect(landing).not.toContain('Explore the field');
     expect(landing).not.toContain('Know yourself.');
   });
 
@@ -64,8 +65,9 @@ describe('Sovereign.OS public experience', () => {
     expect(slice).toContain('landing-expression-slice__beam');
     expect(slice).toContain('role="button"');
     expect(slice).toContain('role="status"');
-    expect(slice).toContain('Hover, focus, or tap a line.');
-    expect(slice).toContain('Why do I keep taking responsibility for everyone around me?');
+    expect(slice).toContain('Drag to rotate.');
+    expect(slice).toContain('Baseline ${axis.baselineValue}');
+    expect(slice).toContain('Live change ${formatDelta(axis.currentDelta)}');
   });
 
   it('keeps the illustrative field secondary, bounded, and permission-safe', () => {
@@ -88,18 +90,24 @@ describe('Sovereign.OS public experience', () => {
     expect(main).toContain('<PublicLanding />');
     expect(main).toContain("import './v0-visual-port.css';");
     expect(main).toContain("import './v0-single-example-release.css';");
+    expect(main).toContain("import './landing-expression-field-v3.css';");
     expect(main).not.toContain('ProductLanguageRuntime');
   });
 
-  it('applies the founder visual system and single-example release layer', () => {
+  it('applies the founder visual system and the full-width field release layer', () => {
     for (const selector of ['.v0-landing-port', '.v0-hero', '.intelligence-workspace', '.intelligence-sidebar', '.sovereign-composer', '.account-shell', '.auth-panel']) {
       expect(v0Css).toContain(selector);
     }
     for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.v0-capability-summary', '.v0-comparison-grid', '.v0-final']) {
       expect(releaseCss).toContain(selector);
     }
-    expect(releaseCss).toContain('@media (max-width: 760px)');
-    expect(releaseCss).toContain('@media (prefers-reduced-motion: reduce)');
+    for (const selector of ['.landing-expression-slice__ambient', '.landing-expression-slice__horizon', '.landing-expression-slice__tooltip']) {
+      expect(fieldCss).toContain(selector);
+    }
+    expect(fieldCss).toContain('display: block !important');
+    expect(fieldCss).toContain('border-radius: 0');
+    expect(fieldCss).toContain('@media (max-width: 760px)');
+    expect(fieldCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
   it('keeps support pages, consent, and fallback routes intact', () => {
