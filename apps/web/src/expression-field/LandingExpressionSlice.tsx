@@ -71,7 +71,7 @@ export function LandingExpressionSlice() {
         <svg
           className="landing-expression-slice__canvas"
           viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
-          role="img"
+          role="group"
           aria-label="An interactive field of eight Cloudflare-blue lines radiating from one stable point. Each line represents a relative expression in a sanitized example."
           preserveAspectRatio="xMidYMid meet"
         >
@@ -152,7 +152,7 @@ export function LandingExpressionSlice() {
         </div>
 
         <p className="landing-expression-slice__note">
-          Relative expression inside one sanitized example—not an emotion detector, diagnosis, or score.
+          Relative expression inside one sanitized example—not a diagnosis, score, or claim about anyone’s internal state.
         </p>
       </div>
     </section>
