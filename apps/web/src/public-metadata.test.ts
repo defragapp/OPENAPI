@@ -6,7 +6,8 @@ const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'u
 const manifest = readFileSync(new URL('../public/manifest.webmanifest', import.meta.url), 'utf8');
 const socialPreview = readFileSync(new URL('../public/og-sovereign.svg', import.meta.url), 'utf8');
 const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
-const mobileLayoutHotfix = readFileSync(new URL('../public/v0-product-story-layout-hotfix.css', import.meta.url), 'utf8');
+const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
+const productStories = readFileSync(new URL('./landing-product-stories-v2.css', import.meta.url), 'utf8');
 
 describe('public metadata and fallback documents', () => {
   it('uses the founder v0 promise in document metadata', () => {
@@ -16,21 +17,18 @@ describe('public metadata and fallback documents', () => {
     expect(index).not.toContain('Know yourself. Understand the system. Choose what fits.');
   });
 
-  it('loads the final mobile product-story authority after the application script', () => {
-    const script = '<script type="module" src="/src/main.tsx"></script>';
-    const hotfix = '<link rel="stylesheet" href="/v0-product-story-layout-hotfix.css?v=20260802-mobile-v1" />';
-    expect(index).toContain(script);
-    expect(index).toContain(hotfix);
-    expect(index.indexOf(hotfix)).toBeGreaterThan(index.indexOf(script));
-
+  it('delivers product-story layout through the compiled application bundle', () => {
+    expect(index).toContain('<script type="module" src="/src/main.tsx"></script>');
+    expect(index).not.toContain('v0-product-story-layout-hotfix.css');
+    expect(main).toContain("import './landing-product-stories-v2.css';");
     for (const marker of [
-      '.v0-restored-product-stories .v0-story-grid',
-      'display: flex !important',
-      'flex-direction: column !important',
-      'height: auto !important',
-      'min-height: 0 !important',
+      '.landing-story__stage',
+      'display: flex',
+      'flex-direction: column',
+      'height: auto',
+      'min-height: 0',
       '@media (max-width: 760px)'
-    ]) expect(mobileLayoutHotfix).toContain(marker);
+    ]) expect(productStories).toContain(marker);
   });
 
   it('keeps the static 404 on the current production assets', () => {
