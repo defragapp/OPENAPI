@@ -126,7 +126,8 @@ async function authenticateExpressionFieldRequest(
   env: Env
 ): Promise<Awaited<ReturnType<typeof requireAuth>> | Response> {
   try {
-    return await requireAuth(request, env);
+    const auth = await requireAuth(request, env);
+    return auth;
   } catch (error) {
     if (error instanceof Response) return error;
     throw error;
