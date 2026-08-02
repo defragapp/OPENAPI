@@ -62,7 +62,7 @@ export function LandingExpressionSlice() {
   const gridPaths = useMemo(() => buildSphereGrid(rotation), [rotation]);
   const projectedAmbient = useMemo(() => ambientRays.map((ray) => projectAmbientRay(ray, rotation)), [ambientRays, rotation]);
   const projectedAxes = useMemo(() => axes.map((axis) => projectAxis(axis, rotation)), [axes, rotation]);
-  const selected = axes.find((item) => item.axis.id === selectedId) ?? axes[0];
+  const selected = axes.find((item) => item.axis.id === selectedId) ?? firstAxis(axes);
 
   useEffect(() => {
     if (typeof window === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -296,6 +296,12 @@ function buildLandingAxes(): LandingAxis[] {
       length: MIN_AXIS_LENGTH + Math.pow(normalized, 1.32) * (MAX_AXIS_LENGTH - MIN_AXIS_LENGTH)
     };
   });
+}
+
+function firstAxis(axes: LandingAxis[]): LandingAxis {
+  const [first] = axes;
+  if (!first) throw new Error('Landing expression field requires at least one axis.');
+  return first;
 }
 
 function buildAmbientRays(): AmbientRay[] {
