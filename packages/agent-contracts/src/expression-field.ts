@@ -33,22 +33,22 @@ export interface ExpressionAxisRegistryEntry {
 }
 
 export const expressionAxisRegistry = [
-  { id: 'clarity', index: 0, label: 'Clarity', domain: 'self', direction: [0.347985, 0.9375, 0] },
-  { id: 'focus', index: 1, label: 'Focus', domain: 'self', direction: [-0.429857, 0.8125, 0.393785] },
-  { id: 'steadiness', index: 2, label: 'Steadiness', domain: 'self', direction: [0.063487, 0.6875, -0.723404] },
-  { id: 'urgency', index: 3, label: 'Urgency', domain: 'current_context', direction: [0.503056, 0.5625, 0.656147] },
-  { id: 'courage', index: 4, label: 'Courage', domain: 'self', direction: [-0.885472, 0.4375, -0.156628] },
-  { id: 'fear', index: 5, label: 'Fear', domain: 'self', direction: [0.801498, 0.3125, -0.509848] },
-  { id: 'anger', index: 6, label: 'Anger', domain: 'relationship', direction: [-0.255, 0.1875, 0.948588] },
-  { id: 'tenderness', index: 7, label: 'Tenderness', domain: 'relationship', direction: [-0.460006, 0.0625, -0.885713] },
-  { id: 'grief', index: 8, label: 'Grief', domain: 'self', direction: [0.937485, -0.0625, 0.342368] },
-  { id: 'joy', index: 9, label: 'Joy', domain: 'self', direction: [-0.907952, -0.1875, 0.374789] },
-  { id: 'desire', index: 10, label: 'Desire', domain: 'self', direction: [0.402619, -0.3125, -0.860373] },
-  { id: 'trust', index: 11, label: 'Trust', domain: 'relationship', direction: [0.269122, -0.4375, 0.858002] },
-  { id: 'patience', index: 12, label: 'Patience', domain: 'self', direction: [-0.715354, -0.5625, -0.414562] },
-  { id: 'boundaries', index: 13, label: 'Boundaries', domain: 'relationship', direction: [0.709247, -0.6875, -0.155926] },
-  { id: 'responsibility', index: 14, label: 'Responsibility', domain: 'system', direction: [-0.335278, -0.8125, 0.476899] },
-  { id: 'repair', index: 15, label: 'Repair', domain: 'relationship', direction: [-0.04472, -0.9375, -0.3451] }
+  { id: 'clarity', index: 0, label: 'Clarity', domain: 'self', direction: [0.34798527267687634, 0.9375, 0] },
+  { id: 'focus', index: 1, label: 'Focus', domain: 'self', direction: [-0.42985743923670755, 0.8125, 0.3937846263287336] },
+  { id: 'steadiness', index: 2, label: 'Steadiness', domain: 'self', direction: [0.0634871954735437, 0.6875, -0.7234038471081724] },
+  { id: 'urgency', index: 3, label: 'Urgency', domain: 'current_context', direction: [0.50305559816796, 0.5625, 0.6561469463099526] },
+  { id: 'courage', index: 4, label: 'Courage', domain: 'self', direction: [-0.8854724951825381, 0.4375, -0.156627616578974] },
+  { id: 'fear', index: 5, label: 'Fear', domain: 'self', direction: [0.8014981392972829, 0.3125, -0.5098475092642832] },
+  { id: 'anger', index: 6, label: 'Anger', domain: 'relationship', direction: [-0.25500011945061624, 0.1875, 0.9485877339920497] },
+  { id: 'tenderness', index: 7, label: 'Tenderness', domain: 'relationship', direction: [-0.46000593484912655, 0.0625, -0.8857134355442402] },
+  { id: 'grief', index: 8, label: 'Grief', domain: 'self', direction: [0.9374848892962336, -0.0625, 0.3423679779728655] },
+  { id: 'joy', index: 9, label: 'Joy', domain: 'self', direction: [-0.9079519205901849, -0.1875, 0.3747893540331617] },
+  { id: 'desire', index: 10, label: 'Desire', domain: 'self', direction: [0.4026188380305669, -0.3125, -0.8603730709773035] },
+  { id: 'trust', index: 11, label: 'Trust', domain: 'relationship', direction: [0.26912156091066985, -0.4375, 0.8580019437349805] },
+  { id: 'patience', index: 12, label: 'Patience', domain: 'self', direction: [-0.7153542789226215, -0.5625, -0.41456242669481796] },
+  { id: 'boundaries', index: 13, label: 'Boundaries', domain: 'relationship', direction: [0.709246688607407, -0.6875, -0.15592589489699188] },
+  { id: 'responsibility', index: 14, label: 'Responsibility', domain: 'system', direction: [-0.33527813688580826, -0.8125, 0.4768986484845404] },
+  { id: 'repair', index: 15, label: 'Repair', domain: 'relationship', direction: [-0.04471982743159614, -0.9375, -0.34509982184070775] }
 ] as const satisfies readonly ExpressionAxisRegistryEntry[];
 
 export const expressionAxisRegistryById = Object.freeze(Object.fromEntries(
