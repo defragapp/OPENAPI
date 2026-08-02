@@ -1,35 +1,21 @@
 import {
-  expressionAxisIds,
+  expressionAxisRegistry as sharedExpressionAxisRegistry,
+  type ExpressionAxisDirection,
   type ExpressionAxisId
 } from './expression-field-contract';
 
-export type Vec3 = readonly [number, number, number];
+export type Vec3 = ExpressionAxisDirection;
 export type Quaternion = readonly [number, number, number, number];
 
 export interface ExpressionAxisDefinition {
   id: ExpressionAxisId;
+  index: number;
   label: string;
+  domain: 'self' | 'relationship' | 'system' | 'current_context';
   direction: Vec3;
 }
 
-const labels: Record<ExpressionAxisId, string> = {
-  clarity: 'Clarity',
-  focus: 'Focus',
-  steadiness: 'Steadiness',
-  urgency: 'Urgency',
-  courage: 'Courage',
-  fear: 'Fear',
-  anger: 'Anger',
-  tenderness: 'Tenderness',
-  grief: 'Grief',
-  joy: 'Joy',
-  desire: 'Desire',
-  trust: 'Trust',
-  patience: 'Patience',
-  boundaries: 'Boundaries',
-  responsibility: 'Responsibility',
-  repair: 'Repair'
-};
+export const expressionAxisRegistry: readonly ExpressionAxisDefinition[] = sharedExpressionAxisRegistry;
 
 export function fibonacciSphere(count: number): Vec3[] {
   if (!Number.isInteger(count) || count < 2) throw new Error('Fibonacci sphere requires at least two points.');
@@ -41,14 +27,6 @@ export function fibonacciSphere(count: number): Vec3[] {
     return [Math.cos(theta) * radius, y, Math.sin(theta) * radius] as Vec3;
   });
 }
-
-const axisDirections = fibonacciSphere(expressionAxisIds.length);
-
-export const expressionAxisRegistry: readonly ExpressionAxisDefinition[] = expressionAxisIds.map((id, index) => ({
-  id,
-  label: labels[id],
-  direction: axisDirections[index]!
-}));
 
 export function quaternionFromEuler(pitch: number, yaw: number): Quaternion {
   const cy = Math.cos(yaw * 0.5);
@@ -138,7 +116,7 @@ export function scaleVector(vector: Vec3, length: number): Vec3 {
 
 export function vectorLengthForValue(value: number): number {
   const normalized = clamp(value, 0, 100) / 100;
-  return 0.18 + normalized * 0.8;
+  return 0.18 + Math.sqrt(normalized) * 0.78;
 }
 
 export function projectPoint(vector: Vec3, radius: number, centerX: number, centerY: number): readonly [number, number, number] {
