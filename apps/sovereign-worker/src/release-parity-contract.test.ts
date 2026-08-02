@@ -50,11 +50,13 @@ describe('production release parity contract', () => {
     expect(visualVerifier).toContain("method: 'Cloudflare Browser Run snapshot with full-page PNG plus deterministic normalized pixel, edge, color, and section-rhythm comparison'");
   });
 
-  it('honors the Workers Free Quick Actions rate limit and retries 429 once', () => {
+  it('honors the Workers Free Quick Actions rate limit and validates the founder reference', () => {
     expect(visualRateLimiter).toContain('minimumIntervalMs = 10_500');
     expect(visualRateLimiter).toContain("response.status !== 429");
     expect(visualRateLimiter).toContain("response.headers.get('retry-after')");
-    expect(visualRateLimiter).toContain("await import('./verify-live-visual-release-v2.mjs')");
+    expect(visualRateLimiter).toContain("sourcePath = resolve(root, 'scripts/verify-live-visual-release-v2.mjs')");
+    expect(visualRateLimiter).toContain("reference.length > 6_500");
+    expect(visualRateLimiter).toContain('await import(pathToFileURL(generatedPath).href)');
   });
 
   it('stores the complete founder-approved JPEG reference', () => {
