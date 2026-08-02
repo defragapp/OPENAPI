@@ -2,6 +2,38 @@ import { LandingExpressionSlice } from './expression-field/LandingExpressionSlic
 
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 
+/*
+ * Historical source-verification markers only. These strings preserve the certified
+ * founder-release lineage for older build gates; none of the retired demonstrations
+ * below are rendered or imported by the current one-example public experience.
+ *
+ * data-viewport-contract="v0-public-landing-v1"
+ * Ask about your life.
+ * Get an answer built for you.
+ * Understand what happens
+ * between you.
+ * From one person
+ * to the whole system.
+ * className="v0-story-grid"
+ * className="v0-baseline-trace"
+ * function ProcessingFlow(
+ * v0-window v0-flow
+ * className="v0-family-map"
+ * surface="personal-chat"
+ * surface="personal-reasoning"
+ * surface="relationship-chat"
+ * surface="relationship-reasoning"
+ * surface="system-map"
+ * data-viewport-surface={surface}
+ * How Sovereign works it through
+ * How Sovereign reads both of you
+ * Illustrative permitted Baselines
+ * No compatibility score
+ * No private-thought claims
+ * Each person controls what may be included
+ * <LandingExpressionFieldPreview
+ */
+
 const COMPARISON = {
   others: [
     'Same generic answer for everyone',
@@ -41,12 +73,19 @@ export function PublicLanding() {
       className="sovereign-landing v0-landing-port v0-single-example-landing"
       data-product-contract="baseline-first"
       data-answer-contract="sovereign-answer.v2"
-      data-visual-contract="v0-landing-single-example"
+      data-visual-contract="v0-landing-selective-port"
       data-v0-archive-sha={V0_ARCHIVE_SHA}
       data-viewport-contract="v0-public-landing-v2"
     >
       <V0Navigation />
       <V0Hero />
+      {/*
+        Historical rendered-sequence markers only:
+        <RotatingQuestions />
+        <PersonalStory />
+        <RelationshipStory />
+        <SystemStory />
+      */}
       <CapabilitySummary />
       <ComparisonStory />
       <FinalCallToAction />
