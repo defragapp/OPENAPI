@@ -82,6 +82,21 @@ describe('public landing v3 release', () => {
     expect(layoutRepair).not.toContain('min-height: 720px');
   });
 
+  it('makes the compact layout authoritative in the rendered page and refreshes stale iOS restores', () => {
+    for (const marker of [
+      'data-layout-release="compact-product-stories-v2"',
+      'data-product-story-layout-authority="compact-v2"',
+      'PRODUCT_STORY_LAYOUT_AUTHORITY',
+      'grid-template-columns: minmax(0, 1fr) !important',
+      'height: auto !important',
+      'min-height: 0 !important'
+    ]) expect(landing).toContain(marker);
+
+    expect(main).toContain('function refreshStaleIosPageRestore');
+    expect(main).toContain('event.persisted');
+    expect(main).toContain("dataset.sovereignLayoutRelease = 'compact-product-stories-v2'");
+  });
+
   it('keeps iOS sizing, touch targets, reduced motion, and non-pill controls', () => {
     expect(fieldStyles).toContain('@media (max-width: 760px)');
     expect(fieldStyles).toContain('touch-action: none');
