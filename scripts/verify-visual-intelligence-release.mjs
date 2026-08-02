@@ -168,7 +168,7 @@ requireAll('restored landing demonstrations', stories, [
   'className="v0-story-grid"',
   'className="v0-baseline-trace"',
   'v0-window v0-flow v0-workflow-panel',
-  'v0-family-map-no-globes',
+  'v0-family-system-map',
   'How Sovereign works it through',
   'How Sovereign reads both of you',
   'How Sovereign maps the system',
@@ -204,7 +204,7 @@ requireAll('restored landing visual authority', storyCss, [
   '.v0-story-grid',
   '.v0-window',
   '.v0-workflow-panel',
-  '.v0-family-map-no-globes',
+  '.v0-family-system-map',
   '@media (max-width: 760px)',
   '@media (max-width: 390px)',
   '@media (prefers-reduced-motion: reduce)'
