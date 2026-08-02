@@ -149,7 +149,7 @@ containsAll('restored product stories', stories, [
   'Each person controls what may be included',
   'className="v0-baseline-trace"',
   'v0-workflow-panel',
-  'v0-family-map-no-globes'
+  'v0-family-system-map'
 ]);
 
 containsAll('integrated field', `${field}\n${fieldCss}\n${fieldIntegration}`, [
@@ -166,7 +166,7 @@ containsAll('integrated field', `${field}\n${fieldCss}\n${fieldIntegration}`, [
   'border-radius: 0'
 ]);
 
-assert(!stories.includes('LandingExpressionFieldPreview'), 'Restored stories reintroduced the retired Expression Field globe preview.');
+assert(!stories.includes('LandingExpressionFieldPreview'), 'Restored stories reintroduced the retired Expression Field preview.');
 for (const prohibited of ['sphere', 'globe']) {
   assert(!stories.includes(prohibited), `Restored stories contain prohibited ${prohibited} visual language.`);
 }
@@ -174,7 +174,7 @@ for (const prohibited of ['sphere', 'globe']) {
 containsAll('founder v0 visual components', `${landing}\n${stories}\n${v0Visual}\n${storyCss}`, [
   'className="v0-baseline-trace"',
   'v0-window v0-flow v0-workflow-panel',
-  'v0-family-map-no-globes',
+  'v0-family-system-map',
   'className="v0-comparison-grid"',
   '.v0-hero',
   '.v0-story-grid',
