@@ -2,34 +2,31 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
-const slice = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
+const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
+const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
 const fixture = readFileSync(new URL('./expression-field/expression-field.fixture.ts', import.meta.url), 'utf8');
 const releaseCss = readFileSync(new URL('./v0-single-example-release.css', import.meta.url), 'utf8');
 
-describe('single-example public evidence contract', () => {
+describe('public evidence contract', () => {
   it('uses deterministic relative-expression data rather than unsupported identity claims', () => {
-    expect(slice).toContain('landingExpressionFieldFixture');
-    expect(slice).toContain('salienceLabel');
-    expect(slice).toContain('LANDING_AXIS_LAYOUT');
+    expect(field).toContain('landingExpressionFieldFixture');
+    expect(field).toContain('salienceLabel');
+    expect(field).toContain('LANDING_AXIS_LAYOUT');
     expect(fixture).toContain("measurementKind: 'relative_expression_salience'");
     expect(fixture).toContain("state: 'unconfirmed'");
     expect(fixture).toContain('basisRefs: []');
     expect(fixture).toContain('Sanitized demonstration · Illustrative values · Not your Baseline');
 
-    for (const unsupported of [
-      'Emotional Authority',
-      'Splenic Authority',
-      'compatibility score',
-      'private-thought claims'
-    ]) {
-      expect(`${slice}\n${fixture}`).not.toContain(unsupported);
+    for (const unsupported of ['Emotional Authority', 'Splenic Authority', 'compatibility score', 'private-thought claims']) {
+      expect(`${field}\n${fixture}`).not.toContain(unsupported);
     }
   });
 
-  it('keeps relationship and system capability language permission-safe and confirmable', () => {
-    expect(landing).toContain('With permission, keep both people distinct');
-    expect(landing).toContain('permitted relationship or system information');
-    expect(slice).toContain('not a diagnosis, score, or claim about anyone’s internal state');
+  it('keeps relationship and system evidence permission-safe and confirmable', () => {
+    expect(stories).toContain('With permission, Sovereign keeps both people distinct');
+    expect(stories).toContain('Each person controls what may be included');
+    expect(stories).toContain('No compatibility score');
+    expect(field).toContain('not a diagnosis, score, or claim about anyone’s internal state');
     expect(fixture).toContain('not a score or a verdict about the person');
     expect(fixture).toContain('without determining behavior');
   });
