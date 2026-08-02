@@ -55,7 +55,7 @@ if (declaredSha && declaredSha !== checkoutSha) {
 }
 
 await report(checkoutSha, 'start');
-const result = spawnSync(process.execPath, ['scripts/cloudflare-production-deploy-v2.mjs'], {
+const result = spawnSync(process.execPath, ['scripts/cloudflare-production-deploy-v3.mjs'], {
   cwd: root,
   env: {
     ...process.env,
