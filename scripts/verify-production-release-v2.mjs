@@ -240,7 +240,7 @@ requireAll('restored landing stories', stories, [
   'Keeping both people distinct',
   'Mapping the people',
   'v0-workflow-panel',
-  'v0-family-map-no-globes'
+  'v0-family-system-map'
 ]);
 rejectAll('restored landing stories', stories, ['LandingExpressionFieldPreview', 'sphere', 'globe']);
 requireAll('integrated landing field', `${field}\n${fieldCss}\n${integrationCss}`, [
@@ -258,7 +258,7 @@ rejectAll('integrated landing field', field, ['sphere', 'globe', 'Math.random'])
 
 requireAll('founder platform coverage', v0Platform, ['body:has(.plan-onboarding)', 'body:has(.sovereign-policy)', 'body:has(.email-code-fallback)', '.onboarding-plan-grid', '.policy-grid', '.email-code-fallback']);
 requireAll('founder visual foundation', v0Visual, ['--v0-page: #0f0f0f', '--v0-cream: #e8ddd0', '.v0-hero', '.v0-family-map', '.intelligence-workspace', '.sovereign-composer', '.account-shell']);
-requireAll('restored story visual authority', storyCss, ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-map-no-globes', '@media (max-width: 760px)', '@media (prefers-reduced-motion: reduce)']);
+requireAll('restored story visual authority', storyCss, ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map', '@media (max-width: 760px)', '@media (prefers-reduced-motion: reduce)']);
 requireAll('global product authority', v0Global, ['Founder-v0 visual authority for every non-landing product surface', '.account-shell', '.plan-onboarding', '.public-policy', '.private-route-gate', '.sovereign-app-runtime', '.verified-plan-strip', '.account-plan-verification']);
 requireAll('passkey visual authority', passkeyCss, ['.passkey-primary', '.passkey-button', '.passkey-manager', '.passkey-list']);
 
