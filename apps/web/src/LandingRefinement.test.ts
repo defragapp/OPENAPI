@@ -10,33 +10,40 @@ const fieldStyles = read('./landing-expression-field-v3.css');
 const integrationStyles = read('./landing-expression-field-integration.css');
 const storyStyles = read('./landing-product-stories-v2.css');
 const approvedStyles = read('./public-landing-approved-v8.css');
+const heroExtension = read('./landing-hero-field-v4.css');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
 describe('approved public landing v8', () => {
-  it('loads the v0 foundation, integrated field, isolated stories, approved authority, and passkey authority in order', () => {
+  it('loads the v0 foundation, field, stories, approved authority, hero extension, and passkey authority in order', () => {
     const fieldImport = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
     const lineageImport = "import './v0-restored-product-stories.css';";
     const storiesImport = "import './landing-product-stories-v2.css';";
     const approvedImport = "import './public-landing-approved-v8.css';";
+    const heroImport = "import './landing-hero-field-v4.css';";
     const passkeyImport = "import './passkey-auth.css';";
     expect(main.indexOf(integrationImport)).toBeGreaterThan(main.indexOf(fieldImport));
     expect(main.indexOf(lineageImport)).toBeGreaterThan(main.indexOf(integrationImport));
     expect(main.indexOf(storiesImport)).toBeGreaterThan(main.indexOf(lineageImport));
     expect(main.indexOf(approvedImport)).toBeGreaterThan(main.indexOf(storiesImport));
-    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(approvedImport));
+    expect(main.indexOf(heroImport)).toBeGreaterThan(main.indexOf(approvedImport));
+    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(heroImport));
     expect(main.slice(main.indexOf(passkeyImport) + passkeyImport.length)).not.toContain("import './");
     expect(main).not.toContain("import './public-landing-approved-v7.css';");
   });
 
-  it('renders the approved immersive hero followed by the three product demonstrations', () => {
+  it('renders the approved immersive hero, real-life questions, and three product demonstrations', () => {
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('data-layout-release="v0-motion-workflows-v8"');
     expect(landing).toContain('SOVEREIGN.OS');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
     expect(landing).toContain('<LandingExpressionSlice />');
+    expect(landing).toContain('<RealLifeQuestions />');
     expect(landing).toContain('<LandingProductStories />');
+    expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
+    expect(landing).toContain('Bring the question you actually have.');
+    expect(landing).toContain('Why do we keep having the same fight?');
     expect(landing).toContain('<MobileCapabilityRail />');
     expect(landing).toContain('sovereign-opening-capabilities');
     expect(landing).toContain('Sovereign helps you see what’s really happening so you can choose differently.');
@@ -45,29 +52,28 @@ describe('approved public landing v8', () => {
     expect(landing).not.toContain('HERO_CAPABILITIES');
   });
 
-  it('uses one lower-center point with Cloudflare-blue vectors and no globe or horizon', () => {
+  it('uses one stable center with value-driven 360 Cloudflare-blue measurements', () => {
     for (const marker of [
-      'const VIEWBOX_HEIGHT = 780',
-      'const CENTER_X = 600',
-      'const CENTER_Y = 680',
-      'Array.from({ length: 36 }',
-      'Array.from({ length: 28 }',
-      'Eight interactive vectors',
+      'const VIEWBOX_SIZE = 920',
+      'const CENTER = VIEWBOX_SIZE / 2',
+      'const SPHERE_RADIUS = 286',
+      'const MIN_AXIS_LENGTH = 118',
+      'const MAX_AXIS_LENGTH = 344',
+      'Array.from({ length: count }',
+      'data-field-geometry="spherical-360"',
       'onPointerDown={handlePointerDown}',
       'onPointerMove={handlePointerMove}',
-      'landing-expression-slice__tooltip',
-      'Baseline value',
-      'Live change',
-      'Current'
+      'landing-expression-slice__readout',
+      'Relative reach',
+      'buildSphereGrid',
+      'requestAnimationFrame'
     ]) expect(field).toContain(marker);
-    expect(field).not.toContain('landing-expression-slice__horizon');
-    expect(field).not.toContain('landing-expression-slice__grid');
-    expect(field).not.toContain('Array.from({ length: 88 }');
-    expect(field).not.toContain('sphere');
-    expect(field).not.toContain('globe');
+    expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(field).not.toContain('#8b5cff');
-    expect(approvedStyles).toContain('.landing-expression-slice__horizon');
-    expect(approvedStyles).toContain('display: none');
+    expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
+    expect(heroExtension).toContain('stroke: #2f93ff');
+    expect(heroExtension).toContain('height: 58%');
+    expect(heroExtension).toContain('mask-image: linear-gradient');
   });
 
   it('uses the approved narrative and v0 chat/workflow language', () => {
@@ -127,7 +133,7 @@ describe('approved public landing v8', () => {
     expect(approvedStyles).toContain('.landing-workflow > li.is-active');
   });
 
-  it('gives iPhone a purpose-built opening field, then naturally stacks product stories', () => {
+  it('gives iPhone a purpose-built opening field, rotating questions, then naturally stacks product stories', () => {
     for (const marker of [
       '@media (max-width: 760px)',
       'min-height: max(776px, calc(100svh - 68px))',
@@ -145,6 +151,9 @@ describe('approved public landing v8', () => {
       'display: none',
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(approvedStyles).toContain(marker);
+    expect(heroExtension).toContain('min-height: 1040px');
+    expect(heroExtension).toContain('.landing-question-orbit__stage');
+    expect(heroExtension).toContain('@keyframes landing-real-question');
     expect(approvedStyles).toContain('border-radius: 999px');
     expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v8'");
     expect(main).toContain("dataset.sovereignProductStories = 'isolated-mobile-first-v2'");
@@ -152,7 +161,7 @@ describe('approved public landing v8', () => {
   });
 
   it('keeps every active CSS layer structurally balanced', () => {
-    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles]) {
+    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
