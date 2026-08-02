@@ -3,6 +3,17 @@ import { LandingProductStories } from './LandingProductStories';
 
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 
+const REAL_LIFE_QUESTIONS = [
+  'Why do I keep taking responsibility for everyone around me?',
+  'Why do we keep having the same fight?',
+  'Should I say something now or wait?',
+  'Why does their silence affect me so strongly?',
+  'What is mine, what is theirs, and what happens between us?',
+  'Is this a timing mismatch or a values mismatch?',
+  'What changes when I stop playing the role everyone expects?',
+  'Does this choice fit me, or does it cost too much of me?'
+] as const;
+
 const COMPARISON = {
   others: [
     'Starts with the latest message',
@@ -34,6 +45,7 @@ export function PublicLanding() {
     >
       <V0Navigation />
       <V0Hero />
+      <RealLifeQuestions />
       <LandingProductStories />
       <ComparisonStory />
       <FinalCallToAction />
@@ -139,6 +151,30 @@ function MobileCapabilityRail() {
         <small>Save what matters.<br />Return anytime.</small>
       </a>
     </nav>
+  );
+}
+
+function RealLifeQuestions() {
+  return (
+    <section
+      className="landing-question-orbit"
+      data-viewport-section="questions"
+      aria-labelledby="landing-question-orbit-title"
+    >
+      <div className="v0-shell landing-question-orbit__inner">
+        <p className="landing-question-orbit__kicker">Real questions. Specific context.</p>
+        <h2 id="landing-question-orbit-title">Bring the question you actually have.</h2>
+        <div className="landing-question-orbit__stage" aria-hidden="true">
+          {REAL_LIFE_QUESTIONS.map((question) => <span key={question}>{question}</span>)}
+        </div>
+        <ul className="landing-question-orbit__accessible">
+          {REAL_LIFE_QUESTIONS.map((question) => <li key={question}>{question}</li>)}
+        </ul>
+        <p className="landing-question-orbit__note">
+          Sovereign separates what appears steady, what may be active now, what you have actually observed, and what is still unknown.
+        </p>
+      </div>
+    </section>
   );
 }
 
