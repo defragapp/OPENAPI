@@ -12,16 +12,16 @@ const storyStyles = read('./v0-restored-product-stories.css');
 const layoutRepair = read('./v0-product-story-layout-repair.css');
 
 describe('public landing v3 release', () => {
-  it('loads the integrated field, restored stories, auth, and final layout repair in authority order', () => {
+  it('loads the integrated field, restored stories, final layout repair, and passkey authority in order', () => {
     const fieldImport = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
     const storiesImport = "import './v0-restored-product-stories.css';";
-    const passkeyImport = "import './passkey-auth.css';";
     const repairImport = "import './v0-product-story-layout-repair.css';";
+    const passkeyImport = "import './passkey-auth.css';";
     expect(main.indexOf(integrationImport)).toBeGreaterThan(main.indexOf(fieldImport));
     expect(main.indexOf(storiesImport)).toBeGreaterThan(main.indexOf(integrationImport));
-    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(storiesImport));
-    expect(main.indexOf(repairImport)).toBeGreaterThan(main.indexOf(passkeyImport));
+    expect(main.indexOf(repairImport)).toBeGreaterThan(main.indexOf(storiesImport));
+    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(repairImport));
   });
 
   it('renders the hero field followed by the three real product demonstrations', () => {
