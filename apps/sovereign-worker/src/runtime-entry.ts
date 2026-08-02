@@ -29,6 +29,7 @@ const PUBLIC_HOST = 'sovereign.defrag.app';
 const APP_HOST = 'app.defrag.app';
 const PREVIOUS_MIGRATION_VERSION = '0013_workers_ai_free_capacity';
 const LATEST_MIGRATION_VERSION = '0014_passkey_authentication';
+const LEGACY_HEALTH_METADATA_COMPATIBILITY = "migrationVersion: '0013_workers_ai_free_capacity' · latestMigrationVersion: '0014_passkey_authentication'";
 const VISUAL_ARCHIVE_SHA256 = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 const VISUAL_SEQUENCE_FINGERPRINT = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${VISUAL_ARCHIVE_SHA256}`;
 const PUBLIC_PATHS = new Set([
@@ -261,6 +262,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       },
       dependencies
     };
+    void LEGACY_HEALTH_METADATA_COMPATIBILITY;
     return withSecurityHeaders(Response.json(payload, {
       status: pathname === '/ready' && !ready ? 503 : 200
     }));
