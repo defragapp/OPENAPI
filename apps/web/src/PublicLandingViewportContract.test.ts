@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { evaluatePublicLandingViewport } from './PublicLandingViewportContract';
-import type { PublicLandingViewportSnapshot } from './PublicLandingViewportContract';
+import type { PublicLandingViewportSnapshot, ViewportSurfaceMeasurement } from './PublicLandingViewportContract';
 
 const requiredSurfaceIds = [
   'hero',
@@ -14,21 +14,40 @@ const requiredSurfaceIds = [
   'comparison'
 ] as const;
 
+function surface(
+  id: string,
+  left: number,
+  right: number,
+  top: number,
+  height: number,
+  layoutWidth = right - left
+): ViewportSurfaceMeasurement {
+  return {
+    id,
+    left,
+    right,
+    top,
+    bottom: top + height,
+    width: right - left,
+    height,
+    layoutWidth
+  };
+}
+
 function passingPhoneSnapshot(): PublicLandingViewportSnapshot {
-  const inset = { left: 16, right: 359, width: 343, layoutWidth: 343 };
   return {
     viewportWidth: 375,
     scrollWidth: 375,
     surfaces: [
-      { id: 'hero', ...inset },
-      { id: 'expression-slice', left: 0, right: 375, width: 375, layoutWidth: 375 },
-      { id: 'personal-chat', ...inset },
-      { id: 'personal-reasoning', ...inset },
-      { id: 'relationship-chat', ...inset },
-      { id: 'relationship-reasoning', ...inset },
-      { id: 'system-map', ...inset },
-      { id: 'system-reasoning', ...inset },
-      { id: 'comparison', ...inset }
+      surface('hero', 16, 359, 0, 620),
+      surface('expression-slice', 0, 375, 620, 320),
+      surface('personal-chat', 16, 359, 1120, 510),
+      surface('personal-reasoning', 16, 359, 1648, 540),
+      surface('relationship-chat', 16, 359, 2380, 450),
+      surface('relationship-reasoning', 16, 359, 2848, 610),
+      surface('system-map', 16, 359, 3650, 760),
+      surface('system-reasoning', 16, 359, 4428, 520),
+      surface('comparison', 16, 359, 5140, 430)
     ],
     stageGaps: [42, 36, 36, 36],
     comparisonStacked: true
@@ -40,15 +59,15 @@ function passingDesktopSnapshot(): PublicLandingViewportSnapshot {
     viewportWidth: 1440,
     scrollWidth: 1440,
     surfaces: [
-      { id: 'hero', left: 220, right: 1220, width: 1000, layoutWidth: 1000 },
-      { id: 'expression-slice', left: 0, right: 1440, width: 1440, layoutWidth: 1440 },
-      { id: 'personal-chat', left: 100, right: 665, width: 565, layoutWidth: 565 },
-      { id: 'personal-reasoning', left: 713, right: 1340, width: 627, layoutWidth: 627 },
-      { id: 'relationship-chat', left: 100, right: 665, width: 565, layoutWidth: 565 },
-      { id: 'relationship-reasoning', left: 713, right: 1340, width: 627, layoutWidth: 627 },
-      { id: 'system-map', left: 100, right: 665, width: 565, layoutWidth: 565 },
-      { id: 'system-reasoning', left: 713, right: 1340, width: 627, layoutWidth: 627 },
-      { id: 'comparison', left: 160, right: 1280, width: 1120, layoutWidth: 1120 }
+      surface('hero', 220, 1220, 0, 780),
+      surface('expression-slice', 0, 1440, 780, 520),
+      surface('personal-chat', 100, 665, 1480, 560),
+      surface('personal-reasoning', 713, 1340, 1480, 610),
+      surface('relationship-chat', 100, 665, 2320, 500),
+      surface('relationship-reasoning', 713, 1340, 2320, 650),
+      surface('system-map', 100, 665, 3220, 820),
+      surface('system-reasoning', 713, 1340, 3220, 570),
+      surface('comparison', 160, 1280, 4300, 520)
     ],
     stageGaps: [58, 54, 54, 54],
     comparisonStacked: false
@@ -56,7 +75,7 @@ function passingDesktopSnapshot(): PublicLandingViewportSnapshot {
 }
 
 describe('restored landing rendered viewport contract', () => {
-  it('accepts the field and stacked product stages at phone width', () => {
+  it('accepts the field and compact stacked product stages at phone width', () => {
     expect(evaluatePublicLandingViewport(passingPhoneSnapshot())).toMatchObject({ ok: true, failures: [] });
   });
 
@@ -66,7 +85,7 @@ describe('restored landing rendered viewport contract', () => {
 
   it('rejects a desktop-scaled expression field on a phone', () => {
     const snapshot = passingPhoneSnapshot();
-    snapshot.surfaces[1] = { id: 'expression-slice', left: 72, right: 303, width: 231, layoutWidth: 520 };
+    snapshot.surfaces[1] = surface('expression-slice', 72, 303, 620, 320, 520);
     const result = evaluatePublicLandingViewport(snapshot);
     expect(result.ok).toBe(false);
     expect(result.failures.join(' ')).toContain('expression-slice width');
@@ -83,11 +102,23 @@ describe('restored landing rendered viewport contract', () => {
     expect(result.failures).toContain('comparison section is not stacked');
   });
 
-  it('rejects a missing workflow surface', () => {
-    const snapshot = passingPhoneSnapshot();
-    snapshot.surfaces = snapshot.surfaces.filter((surface) => surface.id !== 'relationship-reasoning');
-    const result = evaluatePublicLandingViewport(snapshot);
-    expect(result.failures).toContain('missing surface relationship-reasoning');
+  it('rejects missing, stretched, or side-by-side workflow surfaces', () => {
+    const missing = passingPhoneSnapshot();
+    missing.surfaces = missing.surfaces.filter((item) => item.id !== 'relationship-reasoning');
+    expect(evaluatePublicLandingViewport(missing).failures).toContain('missing surface relationship-reasoning');
+
+    const stretched = passingPhoneSnapshot();
+    const personalWorkflow = stretched.surfaces.find((item) => item.id === 'personal-reasoning')!;
+    personalWorkflow.height = 2400;
+    personalWorkflow.bottom = personalWorkflow.top + personalWorkflow.height;
+    expect(evaluatePublicLandingViewport(stretched).failures).toContain('personal-reasoning height 2400px > 1100px');
+
+    const sideBySide = passingPhoneSnapshot();
+    const chat = sideBySide.surfaces.find((item) => item.id === 'personal-chat')!;
+    const workflow = sideBySide.surfaces.find((item) => item.id === 'personal-reasoning')!;
+    workflow.top = chat.top;
+    workflow.bottom = workflow.top + workflow.height;
+    expect(evaluatePublicLandingViewport(sideBySide).failures).toContain('personal-reasoning is not stacked below personal-chat');
   });
 
   it('covers every required public surface', () => {
