@@ -21,6 +21,7 @@ const v0Global = read('apps/web/src/v0-global-experience.css');
 const fieldCss = read('apps/web/src/landing-expression-field-v3.css');
 const fieldIntegration = read('apps/web/src/landing-expression-field-integration.css');
 const storyCss = read('apps/web/src/v0-restored-product-stories.css');
+const heroVisual = read('apps/web/src/landing-hero-field-v4.css');
 const passkeyCss = read('apps/web/src/passkey-auth.css');
 const staticAuthority = read('apps/web/public/premium-public-release.css');
 const staticV0 = read('apps/web/public/v0-public-port.css');
@@ -116,6 +117,10 @@ containsAll('founder v0 public product contract', landing, [
   'Healing isn’t optional.',
   'Holding onto the pain is.',
   '<LandingExpressionSlice />',
+  '<RealLifeQuestions />',
+  'Bring the question you actually have.',
+  'Why do we keep having the same fight?',
+  'What is mine, what is theirs, and what happens between us?',
   '<LandingProductStories />',
   '<ComparisonStory />',
   '<FinalCallToAction />',
@@ -152,18 +157,33 @@ containsAll('restored product stories', stories, [
   'v0-family-system-map'
 ]);
 
-containsAll('integrated field', `${field}\n${fieldCss}\n${fieldIntegration}`, [
+containsAll('interactive 360 hero field', `${field}\n${fieldCss}\n${fieldIntegration}\n${heroVisual}`, [
   'landing-expression-field-v3',
+  'data-field-geometry="spherical-360"',
   'onPointerDown={handlePointerDown}',
   'onPointerMove={handlePointerMove}',
-  'landing-expression-slice__tooltip',
-  'Baseline value',
-  'Live change',
-  'Current',
+  'landing-expression-slice__readout',
+  'MIN_AXIS_LENGTH',
+  'MAX_AXIS_LENGTH',
+  'Math.pow(normalized, 1.32)',
+  'buildSphereGrid',
+  'requestAnimationFrame',
   '.landing-expression-slice__ambient',
-  '.landing-expression-slice__horizon',
+  '.landing-expression-slice__sphere-shell',
+  '.landing-expression-slice__sphere-grid path',
+  'stroke: #2f93ff',
   'background: transparent',
   'border-radius: 0'
+]);
+assert(!field.includes('<div className="landing-expression-slice__tooltip"'), 'The retired floating tooltip returned.');
+for (const prohibited of ['Math.random', 'giftExpression', 'shadowExpression']) {
+  assert(!field.includes(prohibited), `Interactive field contains prohibited ${prohibited}.`);
+}
+containsAll('real-life question visual authority', heroVisual, [
+  '.landing-question-orbit',
+  '.landing-question-orbit__stage',
+  '@keyframes landing-real-question',
+  '@media (prefers-reduced-motion: reduce)'
 ]);
 
 assert(!stories.includes('LandingExpressionFieldPreview'), 'Restored stories reintroduced the retired Expression Field preview.');
@@ -171,13 +191,14 @@ for (const prohibited of ['sphere', 'globe']) {
   assert(!stories.includes(prohibited), `Restored stories contain prohibited ${prohibited} visual language.`);
 }
 
-containsAll('founder v0 visual components', `${landing}\n${stories}\n${v0Visual}\n${storyCss}`, [
+containsAll('founder v0 visual components', `${landing}\n${stories}\n${v0Visual}\n${storyCss}\n${heroVisual}`, [
   'className="v0-baseline-trace"',
   'v0-window v0-flow v0-workflow-panel',
   'v0-family-system-map',
   'className="v0-comparison-grid"',
   '.v0-hero',
   '.v0-story-grid',
+  '.landing-question-orbit',
   '.intelligence-workspace',
   '.sovereign-composer',
   '.account-shell',
@@ -221,6 +242,7 @@ containsAll('final v0 visual import', main, [
   "import './landing-expression-field-v3.css'",
   "import './landing-expression-field-integration.css'",
   "import './v0-restored-product-stories.css'",
+  "import './landing-hero-field-v4.css'",
   "import './passkey-auth.css'",
   'installV0ReleaseFingerprint();'
 ]);
@@ -231,6 +253,7 @@ const globalImport = "import './v0-global-experience.css';";
 const fieldImport = "import './landing-expression-field-v3.css';";
 const integrationImport = "import './landing-expression-field-integration.css';";
 const storiesImport = "import './v0-restored-product-stories.css';";
+const heroImport = "import './landing-hero-field-v4.css';";
 const passkeyImport = "import './passkey-auth.css';";
 assert(main.indexOf(platformImport) < main.indexOf(motionImport), 'Platform route coverage must load before reduced-motion coverage.');
 assert(main.indexOf(motionImport) < main.indexOf(v0Import), 'Reduced-motion coverage must load before the founder v0 foundation.');
@@ -238,7 +261,8 @@ assert(main.indexOf(v0Import) < main.indexOf(globalImport), 'Global product auth
 assert(main.indexOf(globalImport) < main.indexOf(fieldImport), 'Landing field must load after global product authority.');
 assert(main.indexOf(fieldImport) < main.indexOf(integrationImport), 'Landing field integration must load after the field geometry.');
 assert(main.indexOf(integrationImport) < main.indexOf(storiesImport), 'Restored product story authority must load after field integration.');
-assert(main.indexOf(storiesImport) < main.indexOf(passkeyImport), 'Passkey styling must load after public story authority.');
+assert(main.indexOf(storiesImport) < main.indexOf(heroImport), 'Hero interaction authority must load after public story authority.');
+assert(main.indexOf(heroImport) < main.indexOf(passkeyImport), 'Passkey styling must load after hero interaction authority.');
 assert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("import './"), 'A local visual file loads after the passkey-specific final authority.');
 
 for (const [label, document] of [['How it works', how], ['Pricing', pricing], ['FAQ', faq]]) {
@@ -259,6 +283,7 @@ for (const [label, css] of [
   ['landing field', fieldCss],
   ['landing field integration', fieldIntegration],
   ['restored product stories', storyCss],
+  ['hero field and questions', heroVisual],
   ['passkey-specific authority', passkeyCss],
   ['founder v0 standalone', staticV0]
 ]) {
@@ -274,11 +299,13 @@ console.log(JSON.stringify({
   publicProductContract: 'baseline-first-private-ai',
   visualAuthority: 'founder-v0-selective-port',
   publicLandingContract: 'v0-public-landing-v3',
+  publicField: 'landing-expression-field-v3-spherical-360',
+  questionTreatment: 'rotating-real-life-questions',
   archiveSha256: archiveSha,
   sequenceFingerprint,
   mockRuntimeImported: false,
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
-  canonicalVisualLayers: ['v0-platform-port.css', 'v0-motion-accessibility.css', 'v0-visual-port.css', 'v0-global-experience.css', 'landing-expression-field-v3.css', 'landing-expression-field-integration.css', 'v0-restored-product-stories.css', 'passkey-auth.css', 'v0-public-port.css'],
+  canonicalVisualLayers: ['v0-platform-port.css', 'v0-motion-accessibility.css', 'v0-visual-port.css', 'v0-global-experience.css', 'landing-expression-field-v3.css', 'landing-expression-field-integration.css', 'v0-restored-product-stories.css', 'landing-hero-field-v4.css', 'passkey-auth.css', 'v0-public-port.css'],
   coveredSurfaces: ['home', 'how-it-works', 'pricing', 'faq', 'login', 'signup', 'onboarding', 'invitation', 'workspace', 'privacy', 'terms', 'not-found'],
   exactBasis: true,
   contextualCovenant: true,
