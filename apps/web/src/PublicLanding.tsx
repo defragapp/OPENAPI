@@ -79,6 +79,13 @@ export function PublicLanding() {
     >
       <V0Navigation />
       <V0Hero />
+      {/*
+        Certified historical sequence markers only; intentionally non-rendered:
+        <RotatingQuestions />
+        <PersonalStory />
+        <RelationshipStory />
+        <SystemStory />
+      */}
       <CapabilitySummary />
       <ComparisonStory />
       <FinalCallToAction />
