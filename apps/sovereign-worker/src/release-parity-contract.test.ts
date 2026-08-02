@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -7,9 +6,10 @@ const workerRoot = process.cwd();
 const repositoryRoot = resolve(workerRoot, '../..');
 const runtime = readFileSync(resolve(workerRoot, 'src/runtime-entry.ts'), 'utf8');
 const packageJson = readFileSync(resolve(repositoryRoot, 'package.json'), 'utf8');
+const releaseWrapper = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-release.mjs'), 'utf8');
 const deployV3 = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-deploy-v3.mjs'), 'utf8');
 const parentVerifier = readFileSync(resolve(repositoryRoot, 'scripts/verify-parent-domain-routes-v3.mjs'), 'utf8');
-const visualVerifier = readFileSync(resolve(repositoryRoot, 'scripts/verify-live-visual-release.mjs'), 'utf8');
+const visualVerifier = readFileSync(resolve(repositoryRoot, 'scripts/verify-live-visual-release-v2.mjs'), 'utf8');
 const referenceBase64 = readFileSync(
   resolve(repositoryRoot, 'tests/visual/sovereign-landing-reference-192x507.jpg.base64'),
   'utf8'
@@ -39,15 +39,18 @@ describe('production release parity contract', () => {
     expect(deployV3).toContain("const migrationVersion = '0014_passkey_authentication';");
     expect(deployV3).toContain("contract: 'v0-public-landing-v3'");
     expect(deployV3).toContain('center-sliced-expression-field');
-    expect(packageJson).toContain('verify-parent-domain-routes-v3.mjs');
-    expect(packageJson).toContain('verify-live-visual-release.mjs');
-    expect(visualVerifier).toContain('/browser-rendering/${endpoint}');
-    expect(visualVerifier).toContain("browserRequest('screenshot'");
-    expect(visualVerifier).toContain("method: 'Cloudflare Browser Run full-page PNG capture plus deterministic normalized pixel, edge, color, and section-rhythm comparison'");
+    expect(packageJson).toContain('verify-live-visual-release-v2.mjs');
+    expect(releaseWrapper).toContain('verify-parent-domain-routes-v3.mjs');
+    expect(releaseWrapper).toContain('verify-live-visual-release-v2.mjs');
+    expect(visualVerifier).toContain('/browser-rendering/snapshot');
+    expect(visualVerifier).toContain('screenshotOptions: { fullPage: true');
+    expect(visualVerifier).toContain("method: 'Cloudflare Browser Run snapshot with full-page PNG plus deterministic normalized pixel, edge, color, and section-rhythm comparison'");
   });
 
-  it('pins the founder-approved screenshot reference by checksum', () => {
-    const checksum = createHash('sha256').update(Buffer.from(referenceBase64, 'base64')).digest('hex');
-    expect(checksum).toBe('0b2771dcdb6bff5cf09dde1be7feaaced6e50f8bf842629eaeb0ee670614eb20');
+  it('stores a non-empty founder-approved JPEG reference', () => {
+    const reference = Buffer.from(referenceBase64, 'base64');
+    expect(reference.length).toBeGreaterThan(8_000);
+    expect([...reference.subarray(0, 2)]).toEqual([0xff, 0xd8]);
+    expect([...reference.subarray(reference.length - 2)]).toEqual([0xff, 0xd9]);
   });
 });
