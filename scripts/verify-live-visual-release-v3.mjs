@@ -37,6 +37,16 @@ async function responseContainsRenderedAudit(response, url) {
   }
 }
 
+async function isTransientBrowserTimeout(response) {
+  if (response.status !== 422) return false;
+  try {
+    const text = await response.clone().text();
+    return text.includes('A timeout was reached') || text.includes('Waiting for selector');
+  } catch {
+    return false;
+  }
+}
+
 async function rateLimitedFetch(input, init) {
   const url = requestUrl(input);
   if (!url.includes('/browser-rendering/')) return originalFetch(input, init);
@@ -50,6 +60,15 @@ async function rateLimitedFetch(input, init) {
     response = await originalFetch(input, init);
 
     if (response.status !== 429) {
+      if (await isTransientBrowserTimeout(response)) {
+        if (attempt < maximumAttempts) {
+          await response.arrayBuffer().catch(() => undefined);
+          await delay(11_000);
+          continue;
+        }
+        return response;
+      }
+
       if (await responseContainsRenderedAudit(response, url)) return response;
       if (attempt < maximumAttempts) {
         await response.arrayBuffer().catch(() => undefined);
@@ -76,11 +95,11 @@ const auditNodeV3 = "const node = document.createElement('pre');";
 const auditTypeV2 = "node.type = 'application/json';";
 const auditTypeV3 = "node.hidden = true;\n    node.setAttribute('aria-hidden', 'true');\n    node.style.display = 'none';";
 const auditAppendV2 = 'document.head.appendChild(node);';
-const auditAppendV3 = 'document.body.appendChild(node);';
+const auditAppendV3 = '(document.body || document.documentElement).appendChild(node);';
 const auditParserV2 = String.raw`const match = String(html).match(/<script[^>]+id=["']__sovereign_visual_audit["'][^>]*>([\s\S]*?)<\/script>/i);`;
 const auditParserV3 = String.raw`const match = String(html).match(/<pre[^>]+id=["']__sovereign_visual_audit["'][^>]*>([\s\S]*?)<\/pre>/i);`;
 const scriptTagV2 = 'addScriptTag: [{ content: renderedAuditScript() }]';
-const scriptTagV3 = "addScriptTag: [{ content: renderedAuditScript() }],\n        waitForSelector: { selector: '#__sovereign_visual_audit', timeout: 30_000 }";
+const scriptTagV3 = "addScriptTag: [{ content: renderedAuditScript() }],\n        waitForSelector: { selector: '.public-approved-v8', timeout: 30_000 }";
 
 let generated = readFileSync(sourcePath, 'utf8');
 for (const marker of [referenceAssertionV2, auditNodeV2, auditTypeV2, auditAppendV2, auditParserV2, scriptTagV2]) {
