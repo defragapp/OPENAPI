@@ -49,7 +49,7 @@ function passingPhoneSnapshot(): PublicLandingViewportSnapshot {
       surface('system-reasoning', 16, 359, 4428, 520),
       surface('comparison', 16, 359, 5140, 430)
     ],
-    stageGaps: [42, 36, 36, 36],
+    stageGaps: [42, 36, 36],
     comparisonStacked: true
   };
 }
@@ -69,7 +69,7 @@ function passingDesktopSnapshot(): PublicLandingViewportSnapshot {
       surface('system-reasoning', 713, 1340, 3220, 570),
       surface('comparison', 160, 1280, 4300, 520)
     ],
-    stageGaps: [58, 54, 54, 54],
+    stageGaps: [58, 54, 54],
     comparisonStacked: false
   };
 }
@@ -118,7 +118,17 @@ describe('restored landing rendered viewport contract', () => {
     const workflow = sideBySide.surfaces.find((item) => item.id === 'personal-reasoning')!;
     workflow.top = chat.top;
     workflow.bottom = workflow.top + workflow.height;
-    expect(evaluatePublicLandingViewport(sideBySide).failures).toContain('personal-reasoning is not stacked below personal-chat');
+    expect(evaluatePublicLandingViewport(sideBySide).failures).toContain('personal-reasoning is not clearly stacked below personal-chat');
+  });
+
+  it('rejects collapsed or excessive heading-to-stage spacing', () => {
+    const collapsed = passingPhoneSnapshot();
+    collapsed.stageGaps = [8, 36, 36];
+    expect(evaluatePublicLandingViewport(collapsed).failures).toContain('stage gap 1 is 8px');
+
+    const excessive = passingDesktopSnapshot();
+    excessive.stageGaps = [58, 140, 54];
+    expect(evaluatePublicLandingViewport(excessive).failures).toContain('stage gap 2 is 140px');
   });
 
   it('covers every required public surface', () => {
