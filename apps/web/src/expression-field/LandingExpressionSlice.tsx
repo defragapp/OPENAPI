@@ -101,7 +101,7 @@ export function LandingExpressionSlice() {
       className="landing-expression-slice"
       data-viewport-stage="expression"
       data-viewport-surface="expression-slice"
-      data-visual-contract="landing-expression-field-v4"
+      data-visual-contract="landing-expression-field-v3"
       data-release-copy="Illustrative Baseline · Eight interactive vectors · one stable point · relative expression in a sanitized example · not a diagnosis, score, or claim about anyone’s internal state"
       aria-label="Live Baseline expression field"
     >
