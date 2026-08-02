@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@openai/chatkit-react": "1.5.1",
+    "@sovereign/agent-contracts": "workspace:*",
     "react": "19.2.7",
     "react-dom": "19.2.7"
   },
