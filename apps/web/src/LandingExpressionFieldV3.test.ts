@@ -8,35 +8,44 @@ const stories = read('./LandingProductStories.tsx');
 const field = read('./expression-field/LandingExpressionSlice.tsx');
 const styles = read('./landing-expression-field-v3.css');
 const integration = read('./landing-expression-field-integration.css');
+const heroExtension = read('./landing-hero-field-v4.css');
 const controls = read('./emergency-public-removal.css');
 
 describe('premium rotating public Expression Field v3', () => {
-  it('loads the integrated field before restored stories and passkey authority', () => {
+  it('loads the final hero extension after the approved landing and before passkey authority', () => {
     const replacement = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
     const storiesImport = "import './v0-restored-product-stories.css';";
+    const approved = "import './public-landing-approved-v8.css';";
+    const hero = "import './landing-hero-field-v4.css';";
     const passkey = "import './passkey-auth.css';";
 
     expect(main.indexOf(integrationImport)).toBeGreaterThan(main.indexOf(replacement));
     expect(main.indexOf(storiesImport)).toBeGreaterThan(main.indexOf(integrationImport));
-    expect(main.indexOf(passkey)).toBeGreaterThan(main.indexOf(storiesImport));
+    expect(main.indexOf(hero)).toBeGreaterThan(main.indexOf(approved));
+    expect(main.indexOf(passkey)).toBeGreaterThan(main.indexOf(hero));
   });
 
-  it('places one field directly beneath the approved hero quote and before restored product stories', () => {
+  it('keeps the field in the hero and restores real-life questions before product stories', () => {
     const heroStart = landing.indexOf('function V0Hero()');
-    const heroEnd = landing.indexOf('function ComparisonStory()', heroStart);
+    const heroEnd = landing.indexOf('function MobileCapabilityRail()', heroStart);
     const hero = landing.slice(heroStart, heroEnd);
 
     expect(hero).toContain('Healing isn’t optional.');
     expect(hero).toContain('Holding onto the pain is.');
     expect(hero).toContain('<LandingExpressionSlice />');
-    expect(landing).toContain('<LandingProductStories />');
-    expect(hero).not.toContain('v0-hero-copy');
-    expect(hero).not.toContain('v0-actions');
+    expect(landing.indexOf('<RealLifeQuestions />')).toBeGreaterThan(landing.indexOf('<V0Hero />'));
+    expect(landing.indexOf('<LandingProductStories />')).toBeGreaterThan(landing.indexOf('<RealLifeQuestions />'));
+    expect(landing).toContain('Why do I keep taking responsibility for everyone around me?');
+    expect(landing).toContain('What is mine, what is theirs, and what happens between us?');
+    expect(landing).toContain('Does this choice fit me, or does it cost too much of me?');
   });
 
-  it('supports drag rotation and line-level keyboard, pointer, and touch selection', () => {
+  it('supports stable automatic rotation plus pointer and keyboard control', () => {
     for (const marker of [
+      'AUTO_ROTATION_DEGREES_PER_MS',
+      'requestAnimationFrame',
+      'prefers-reduced-motion: reduce',
       'ROTATION_LIMIT',
       'handlePointerDown',
       'handlePointerMove',
@@ -49,56 +58,52 @@ describe('premium rotating public Expression Field v3', () => {
       'onPointerCancel={handlePointerEnd}',
       'role="button"',
       'tabIndex={0}',
-      'onPointerEnter',
-      'onFocus',
-      'onClick',
       "event.key === 'ArrowLeft'",
-      "event.key === 'ArrowRight'"
+      "event.key === 'ArrowRight'",
+      "event.key === 'ArrowUp'",
+      "event.key === 'ArrowDown'"
     ]) expect(field).toContain(marker);
   });
 
-  it('shows Baseline, live change, and current values only in the selected-line tooltip', () => {
+  it('uses measurement reach for line length without a floating tooltip', () => {
     for (const marker of [
-      'Baseline value',
-      'Live change',
-      'Current',
-      'selected.axis.baselineValue',
-      'selected.axis.currentDelta',
-      'selected.axis.value',
-      'landing-expression-slice__tooltip',
-      'role="status"'
+      'MIN_AXIS_LENGTH',
+      'MAX_AXIS_LENGTH',
+      'Math.pow(normalized, 1.32)',
+      'Relative reach',
+      'landing-expression-slice__readout',
+      'data-field-geometry="spherical-360"',
+      'buildSphereGrid',
+      'buildAmbientRays',
+      'SPHERE_RADIUS'
     ]) expect(field).toContain(marker);
 
-    expect(field).toContain('const tooltipStyle = selectedGeometry');
-    expect(field).toContain('selected && tooltipStyle');
-    expect(field).not.toContain('landing-expression-slice__header');
-    expect(field).not.toContain('landing-expression-slice__question');
-    expect(field).not.toContain('landing-expression-slice__note');
+    expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
+    expect(field).not.toContain('giftExpression');
+    expect(field).not.toContain('shadowExpression');
+    expect(heroExtension).toContain('.landing-expression-slice__tooltip');
+    expect(heroExtension).toContain('display: none !important');
   });
 
-  it('renders a full-width, globe-free, center-emitted field integrated into the page', () => {
+  it('keeps the 360 field below the hero copy and uses vivid Cloudflare blue', () => {
     for (const marker of [
-      'width: 100vw',
-      'min-width: 320px',
-      'border-radius: 0',
-      'touch-action: none',
-      '.landing-expression-slice__grid line',
-      '.landing-expression-slice__ambient',
-      '.landing-expression-slice__horizon',
-      '.landing-expression-slice__origin',
-      'stroke-width: 34',
+      '.landing-expression-slice__sphere-shell',
+      '.landing-expression-slice__sphere-grid path',
+      'stroke: #2f93ff',
+      'stroke: #78c7ff',
+      'height: 58%',
+      'mask-image: linear-gradient',
+      '.landing-expression-slice__readout',
       '@media (max-width: 760px)',
-      'env(safe-area-inset-bottom)',
       '@media (prefers-reduced-motion: reduce)'
-    ]) expect(styles).toContain(marker);
+    ]) expect(heroExtension).toContain(marker);
 
+    expect(styles).toContain('touch-action: none');
     expect(integration).toContain('background: transparent');
     expect(integration).toContain('border-radius: 0');
-    expect(field).not.toContain('sphere');
-    expect(field).not.toContain('globe');
   });
 
-  it('keeps platform controls restrained and product stories free of field globes', () => {
+  it('keeps platform controls restrained and product stories free of duplicate field globes', () => {
     expect(controls).toContain('border-radius: 4px !important');
     expect(controls).not.toContain('.landing-expression-slice');
     expect(controls).not.toContain('display: none');
@@ -108,7 +113,7 @@ describe('premium rotating public Expression Field v3', () => {
   });
 
   it('keeps release stylesheets structurally balanced', () => {
-    for (const source of [styles, integration, controls]) {
+    for (const source of [styles, integration, heroExtension, controls]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
