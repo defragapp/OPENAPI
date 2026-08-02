@@ -133,7 +133,7 @@ describe('approved public landing v8', () => {
     expect(approvedStyles).toContain('.landing-workflow > li.is-active');
   });
 
-  it('gives iPhone a purpose-built opening field, rotating questions, then naturally stacks product stories', () => {
+  it('gives iPhone the same approved opening with stable viewport sizing, rotating questions, and natural story stacking', () => {
     for (const marker of [
       '@media (max-width: 760px)',
       'min-height: max(776px, calc(100svh - 68px))',
@@ -151,9 +151,16 @@ describe('approved public landing v8', () => {
       'display: none',
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(approvedStyles).toContain(marker);
-    expect(heroExtension).toContain('min-height: 1040px');
-    expect(heroExtension).toContain('.landing-question-orbit__stage');
-    expect(heroExtension).toContain('@keyframes landing-real-question');
+    for (const marker of [
+      '--v8-stable-viewport-height',
+      'min-height: max(900px, calc(var(--v8-stable-viewport-height) - 68px + env(safe-area-inset-bottom)))',
+      'touch-action: pan-y pinch-zoom',
+      '@media (max-width: 980px) and (orientation: landscape) and (max-height: 560px)',
+      '.landing-question-orbit__stage',
+      '@keyframes landing-real-question'
+    ]) expect(heroExtension).toContain(marker);
+    expect(main).toContain('function installMobileViewportStability()');
+    expect(main).toContain('window.visualViewport');
     expect(approvedStyles).toContain('border-radius: 999px');
     expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v8'");
     expect(main).toContain("dataset.sovereignProductStories = 'isolated-mobile-first-v2'");
