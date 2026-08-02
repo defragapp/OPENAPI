@@ -3,6 +3,84 @@ import { LandingProductStories } from './LandingProductStories';
 
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 
+const PRODUCT_STORY_LAYOUT_AUTHORITY = `
+.v0-landing-port .v0-restored-product-stories .v0-story-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr) !important;
+  grid-auto-rows: auto !important;
+  align-items: start !important;
+  gap: clamp(20px, 3vw, 36px) !important;
+}
+
+.v0-landing-port .v0-restored-product-stories .v0-story-grid > .v0-window,
+.v0-landing-port .v0-restored-product-stories .v0-window,
+.v0-landing-port .v0-restored-product-stories .v0-flow,
+.v0-landing-port .v0-restored-product-stories .v0-workflow-panel,
+.v0-landing-port .v0-restored-product-stories .v0-window-body,
+.v0-landing-port .v0-restored-product-stories .v0-workflow-panel ol {
+  height: auto !important;
+  min-height: 0 !important;
+  align-self: start !important;
+}
+
+.v0-landing-port .v0-restored-product-stories .v0-workflow-panel ol {
+  display: block !important;
+}
+
+.v0-landing-port .v0-restored-product-stories .v0-composer-preview {
+  margin-top: 18px !important;
+}
+
+@media (max-width: 1100px) {
+  .v0-landing-port .v0-restored-product-stories .v0-story-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 18px !important;
+  }
+
+  .v0-landing-port .v0-restored-product-stories .v0-story-grid > .v0-window {
+    width: 100% !important;
+    max-width: 860px !important;
+    margin-inline: auto !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .v0-landing-port .v0-restored-product-stories .v0-story {
+    padding-block: 58px !important;
+  }
+
+  .v0-landing-port .v0-restored-product-stories .v0-story > *,
+  .v0-landing-port .v0-restored-product-stories .v0-story-heading {
+    width: calc(100vw - 24px) !important;
+  }
+
+  .v0-landing-port .v0-restored-product-stories .v0-story-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 14px !important;
+    margin-top: 28px !important;
+  }
+
+  .v0-landing-port .v0-restored-product-stories .v0-window {
+    width: 100% !important;
+    max-width: none !important;
+    border-radius: 6px !important;
+  }
+
+  .v0-landing-port .v0-restored-product-stories .v0-window-body {
+    gap: 12px !important;
+    padding: 14px !important;
+  }
+
+  .v0-landing-port .v0-restored-product-stories .v0-workflow-panel ol {
+    padding: 16px 14px 14px !important;
+  }
+
+  .v0-landing-port .v0-restored-product-stories .v0-family-system-map {
+    min-height: 360px !important;
+  }
+}
+`;
+
 const COMPARISON = {
   others: [
     'Same generic answer for everyone',
@@ -27,7 +105,9 @@ export function PublicLanding() {
       data-visual-contract="v0-landing-selective-port"
       data-v0-archive-sha={V0_ARCHIVE_SHA}
       data-viewport-contract="v0-public-landing-v3"
+      data-layout-release="compact-product-stories-v2"
     >
+      <style data-product-story-layout-authority="compact-v2">{PRODUCT_STORY_LAYOUT_AUTHORITY}</style>
       <V0Navigation />
       <V0Hero />
       <LandingProductStories />
