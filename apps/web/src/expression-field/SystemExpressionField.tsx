@@ -47,8 +47,16 @@ export function SystemExpressionField({
   }
 
   return (
-    <figure className={`system-expression-field expression-field-depth-${depth}${compact ? ' is-compact' : ''}${className ? ` ${className}` : ''}`} data-expression-field-composition="system">
+    <figure
+      className={`system-expression-field expression-field-depth-${depth}${compact ? ' is-compact' : ''}${className ? ` ${className}` : ''}`}
+      data-expression-field-composition="system"
+      data-expression-field-selection={selectedId}
+    >
       <div className="system-expression-stage" aria-label={`${fieldSubjects.length} distinct Baseline Expression Fields. The open center represents no person; the system is shown through how the fields orient in relation to one another.`}>
+        <div className="system-expression-center" aria-hidden="true">
+          <span>{interaction.label}</span>
+          <strong>{interaction.meta}</strong>
+        </div>
         {fieldSubjects.map((subject, index) => {
           const position = positions[index]!;
           const peerIndex = activeConnection
