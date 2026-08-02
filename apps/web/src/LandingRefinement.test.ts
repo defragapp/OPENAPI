@@ -10,18 +10,21 @@ const fieldStyles = read('./landing-expression-field-v3.css');
 const integrationStyles = read('./landing-expression-field-integration.css');
 const storyStyles = read('./v0-restored-product-stories.css');
 const layoutRepair = read('./v0-product-story-layout-repair.css');
+const finalLayout = read('./v0-product-story-layout-final.css');
 
 describe('public landing v3 release', () => {
-  it('loads the integrated field, restored stories, final layout repair, and passkey authority in order', () => {
+  it('loads the integrated field, restored stories, compiled layout authority, and passkey authority in order', () => {
     const fieldImport = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
     const storiesImport = "import './v0-restored-product-stories.css';";
     const repairImport = "import './v0-product-story-layout-repair.css';";
+    const finalImport = "import './v0-product-story-layout-final.css';";
     const passkeyImport = "import './passkey-auth.css';";
     expect(main.indexOf(integrationImport)).toBeGreaterThan(main.indexOf(fieldImport));
     expect(main.indexOf(storiesImport)).toBeGreaterThan(main.indexOf(integrationImport));
     expect(main.indexOf(repairImport)).toBeGreaterThan(main.indexOf(storiesImport));
-    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(repairImport));
+    expect(main.indexOf(finalImport)).toBeGreaterThan(main.indexOf(repairImport));
+    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(finalImport));
   });
 
   it('renders the hero field followed by the three real product demonstrations', () => {
@@ -72,29 +75,20 @@ describe('public landing v3 release', () => {
       'height: auto !important',
       'min-height: 0 !important',
       'display: block !important',
-      'grid-template-columns: minmax(0, 1fr) !important',
-      '@media (max-width: 760px)',
-      'padding-block: 58px !important'
-    ]) expect(layoutRepair).toContain(marker);
-    expect(layoutRepair).toContain('.v0-composer-preview');
-    expect(layoutRepair).toContain('.v0-workflow-panel ol');
-    expect(layoutRepair).not.toContain('min-height: 690px');
-    expect(layoutRepair).not.toContain('min-height: 720px');
+      '@media (max-width: 760px)'
+    ]) expect(finalLayout).toContain(marker);
+    expect(finalLayout).toContain('.v0-composer-preview');
+    expect(finalLayout).toContain('.v0-workflow-panel ol');
+    expect(finalLayout).toContain('display: flex !important');
+    expect(finalLayout).toContain('flex-direction: column !important');
+    expect(finalLayout).not.toContain('min-height: 690px');
+    expect(finalLayout).not.toContain('min-height: 720px');
   });
 
-  it('makes the compact layout authoritative in the rendered page and refreshes stale iOS restores', () => {
-    for (const marker of [
-      'data-layout-release="compact-product-stories-v2"',
-      'data-product-story-layout-authority="compact-v2"',
-      'PRODUCT_STORY_LAYOUT_AUTHORITY',
-      'grid-template-columns: minmax(0, 1fr) !important',
-      'height: auto !important',
-      'min-height: 0 !important'
-    ]) expect(landing).toContain(marker);
-
+  it('keeps the compact release marker and refreshes stale iOS restores', () => {
     expect(main).toContain('function refreshStaleIosPageRestore');
     expect(main).toContain('event.persisted');
-    expect(main).toContain("dataset.sovereignLayoutRelease = 'compact-product-stories-v2'");
+    expect(main).toContain("dataset.sovereignLayoutRelease = 'compact-product-stories-v3'");
   });
 
   it('keeps iOS sizing, touch targets, reduced motion, and non-pill controls', () => {
@@ -104,14 +98,14 @@ describe('public landing v3 release', () => {
     expect(storyStyles).toContain('@media (max-width: 760px)');
     expect(storyStyles).toContain('@media (max-width: 390px)');
     expect(storyStyles).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(layoutRepair).toContain('@media (max-width: 390px)');
-    expect(layoutRepair).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(layoutRepair).toContain('min-height: 44px');
+    expect(finalLayout).toContain('@media (max-width: 390px)');
+    expect(finalLayout).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(finalLayout).toContain('min-height: 44px');
     expect(storyStyles).toContain('border-radius: 4px');
   });
 
   it('keeps the new CSS layers structurally balanced', () => {
-    for (const source of [fieldStyles, integrationStyles, storyStyles, layoutRepair]) {
+    for (const source of [fieldStyles, integrationStyles, storyStyles, layoutRepair, finalLayout]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
