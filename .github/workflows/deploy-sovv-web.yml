@@ -1,0 +1,60 @@
+name: Deploy sovv-web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-sovv-web-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Trigger Cloudflare Workers Build
+        env:
+          DEPLOY_HOOK: https://api.cloudflare.com/client/v4/workers/builds/deploy_hooks/cde7f6e6-9a4f-43d9-82d8-b7db7a617e71
+        run: |
+          set -euo pipefail
+          response=$(curl --fail-with-body --silent --show-error --request POST "$DEPLOY_HOOK")
+          printf '%s\n' "$response"
+
+      - name: Wait for exact production commit
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          endpoints=(
+            "https://app.defrag.app/ready"
+            "https://sovv-web.sovereign-os-api.workers.dev/ready"
+          )
+          for attempt in $(seq 1 36); do
+            all_ready=true
+            for endpoint in "${endpoints[@]}"; do
+              body=$(curl --silent --show-error --location --max-time 15 "$endpoint" || true)
+              ready=$(printf '%s' "$body" | jq -r '.ready // false' 2>/dev/null || echo false)
+              version=$(printf '%s' "$body" | jq -r '.version // empty' 2>/dev/null || true)
+              migration=$(printf '%s' "$body" | jq -r '.migrationVersion // empty' 2>/dev/null || true)
+              echo "$endpoint ready=$ready version=$version migration=$migration"
+              if [ "$ready" != "true" ] || [ "$version" != "$EXPECTED_SHA" ] || [ "$migration" != "0013_workers_ai_free_capacity" ]; then
+                all_ready=false
+              fi
+            done
+            if [ "$all_ready" = true ]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Production did not converge to $EXPECTED_SHA" >&2
+          exit 1
+
+      - name: Verify public landing
+        run: |
+          set -euo pipefail
+          html=$(curl --fail-with-body --silent --show-error --location --max-time 20 "https://sovereign.defrag.app/?release=${GITHUB_SHA}")
+          printf '%s' "$html" | grep -q 'id="root"'
+          printf '%s' "$html" | grep -q 'Sovereign'
