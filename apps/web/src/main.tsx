@@ -67,6 +67,7 @@ import './v0-product-story-layout-final.css';
 import './landing-product-stories-v2.css';
 import './sovereign-opening-field.css';
 import './public-landing-premium-v4.css';
+import './public-landing-premium-v5.css';
 import './passkey-auth.css';
 
 installV0ReleaseFingerprint();
@@ -115,7 +116,7 @@ function refreshStaleIosPageRestore(): void {
 retireLegacyPublicCache();
 refreshStaleIosPageRestore();
 
-document.documentElement.dataset.sovereignLayoutRelease = 'premium-public-v4';
+document.documentElement.dataset.sovereignLayoutRelease = 'premium-public-v5';
 document.documentElement.dataset.sovereignProductStories = 'isolated-mobile-first-v2';
 
 const isPublicHome = location.pathname === '/';
