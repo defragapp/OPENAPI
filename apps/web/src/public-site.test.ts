@@ -65,7 +65,7 @@ describe('Sovereign.OS public experience', () => {
     expect(slice).toContain('role="button"');
     expect(slice).toContain('role="status"');
     expect(slice).toContain('Hover, focus, or tap a line.');
-    expect(landing).toContain('Why do I keep taking responsibility for everyone around me?');
+    expect(slice).toContain('Why do I keep taking responsibility for everyone around me?');
   });
 
   it('keeps the illustrative field secondary, bounded, and permission-safe', () => {
