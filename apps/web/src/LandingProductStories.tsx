@@ -404,16 +404,18 @@ function useWorkflowProgress(ref: RefObject<HTMLElement | null>, length: number)
       }
     };
 
-    if (!('IntersectionObserver' in window)) reveal();
-    const observer = 'IntersectionObserver' in window
-      ? new IntersectionObserver(([entry]) => {
-          if (!entry?.isIntersecting) return;
-          reveal();
-          observer.disconnect();
-        }, { threshold: 0.42 })
-      : null;
+    let observer: IntersectionObserver | null = null;
+    if ('IntersectionObserver' in window) {
+      observer = new IntersectionObserver(([entry]) => {
+        if (!entry?.isIntersecting) return;
+        reveal();
+        observer?.disconnect();
+      }, { threshold: 0.42 });
+      observer.observe(node);
+    } else {
+      reveal();
+    }
 
-    observer?.observe(node);
     return () => {
       observer?.disconnect();
       timers.forEach((timer) => window.clearTimeout(timer));

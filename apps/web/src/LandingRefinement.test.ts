@@ -68,6 +68,14 @@ describe('approved public landing v7', () => {
       'See what keeps happening.',
       'Understand what happens between you.',
       'See the whole system.',
+      'surface="personal-chat"',
+      'surface="personal-reasoning"',
+      'surface="relationship-chat"',
+      'surface="relationship-reasoning"',
+      'surface="system-map"',
+      'surface="system-reasoning"'
+    ]) expect(renderedStories).toContain(marker);
+    for (const marker of [
       'Reading your Baseline',
       'Finding the pattern',
       'Building the distinction',
@@ -79,14 +87,8 @@ describe('approved public landing v7', () => {
       'Mapping the people',
       'Reading roles and responsibility',
       'Tracing the recurring pattern',
-      'Showing the whole system',
-      'surface="personal-chat"',
-      'surface="personal-reasoning"',
-      'surface="relationship-chat"',
-      'surface="relationship-reasoning"',
-      'surface="system-map"',
-      'surface="system-reasoning"'
-    ]) expect(renderedStories).toContain(marker);
+      'Showing the whole system'
+    ]) expect(stories).toContain(marker);
     expect(renderedStories).not.toContain('title="Ask about your life."');
   });
 
