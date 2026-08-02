@@ -47,7 +47,7 @@ import './expression-field/expression-field-precision.css';
 import './responsive-viewport-contract.css';
 import './public-landing-editorial.css';
 
-/* Founder authority, integrated landing field, restored stories, final layout repair, then passkey authority. */
+/* Founder authority, integrated landing field, restored stories, and platform controls. */
 import './v0-platform-port.css';
 import './v0-motion-accessibility.css';
 import './v0-visual-port.css';
@@ -60,6 +60,9 @@ import './landing-expression-field-integration.css';
 import './v0-restored-product-stories.css';
 import './v0-product-story-layout-repair.css';
 import './passkey-auth.css';
+
+/* Final landing-only layout authority. Must remain the final CSS import. */
+import './v0-product-story-layout-final.css';
 
 installV0ReleaseFingerprint();
 installProductionRuntime();
@@ -107,7 +110,7 @@ function refreshStaleIosPageRestore(): void {
 retireLegacyPublicCache();
 refreshStaleIosPageRestore();
 
-document.documentElement.dataset.sovereignLayoutRelease = 'compact-product-stories-v2';
+document.documentElement.dataset.sovereignLayoutRelease = 'compact-product-stories-v3';
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'
