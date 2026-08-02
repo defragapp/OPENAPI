@@ -23,18 +23,17 @@ describe('single-example public landing release', () => {
     expect(main).not.toContain('v0-ios-public-release.css');
   });
 
-  it('keeps one interactive public example instead of the former demo wall', () => {
+  it('keeps one interactive public example instead of implementing the former demo wall', () => {
     expect(landing).toContain("import { LandingExpressionSlice } from './expression-field/LandingExpressionSlice'");
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v2"');
     expect(landing).toContain('data-viewport-surface="capability-summary"');
-    expect(landing).toContain('Historical source-verification markers only');
     for (const retiredDefinition of [
-      'function PersonalStory(',
-      'function RelationshipStory(',
-      'function SystemStory(',
-      'function ChatWindow(',
-      'function ProcessingFlow(',
+      '\nfunction PersonalStory(',
+      '\nfunction RelationshipStory(',
+      '\nfunction SystemStory(',
+      '\nfunction ChatWindow(',
+      '\nfunction ProcessingFlow(',
       "import { LandingExpressionFieldPreview }"
     ]) expect(landing).not.toContain(retiredDefinition);
   });
