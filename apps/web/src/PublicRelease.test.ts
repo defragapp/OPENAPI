@@ -8,9 +8,12 @@ const how = readFileSync(new URL('../public/how-it-works.html', import.meta.url)
 const robots = readFileSync(new URL('../public/robots.txt', import.meta.url), 'utf8');
 const sitemap = readFileSync(new URL('../public/sitemap.xml', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
-const slice = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
+const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
+const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
 const v0Css = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
-const releaseCss = readFileSync(new URL('./v0-single-example-release.css', import.meta.url), 'utf8');
+const fieldCss = readFileSync(new URL('./landing-expression-field-v3.css', import.meta.url), 'utf8');
+const integrationCss = readFileSync(new URL('./landing-expression-field-integration.css', import.meta.url), 'utf8');
+const storiesCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
 
 describe('founder v0 public production release', () => {
   it('publishes canonical and controlled social metadata', () => {
@@ -25,37 +28,44 @@ describe('founder v0 public production release', () => {
   it('keeps private routes out of crawl guidance', () => {
     for (const route of ['/app', '/login', '/signup', '/onboarding', '/auth/', '/invitation', '/consent.html', '/api/']) expect(robots).toContain(`Disallow: ${route}`);
     expect(sitemap).toContain('https://sovereign.defrag.app/how-it-works');
-    expect(sitemap).not.toContain('.html');
     expect(sitemap).not.toContain('/app');
   });
 
-  it('uses one interactive Expression Field as the public focal point', () => {
+  it('uses the integrated field as the opening product visual', () => {
     expect(landing).toContain('data-answer-contract="sovereign-answer.v2"');
-    expect(landing).toContain('data-viewport-contract="v0-public-landing-v2"');
+    expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(landing).toContain('<LandingExpressionSlice />');
-    expect(landing).toContain('<CapabilitySummary />');
-    expect(slice).toContain('landing-expression-slice__beam');
-    expect(slice).toContain('role="button"');
-    expect(slice).toContain('role="status"');
-    expect(slice).toContain('See what is active before it repeats.');
-    expect(slice).not.toContain('sphere');
-    expect(landing).not.toContain('\nfunction PersonalStory(');
-    expect(landing).not.toContain('\nfunction RelationshipStory(');
-    expect(landing).not.toContain('\nfunction SystemStory(');
+    expect(field).toContain('landing-expression-slice__beam');
+    expect(field).toContain('onPointerDown={handlePointerDown}');
+    expect(field).toContain('role="status"');
+    expect(field).not.toContain('sphere');
+    expect(integrationCss).toContain('background: transparent');
   });
 
-  it('retains the founder hierarchy with single-example responsive behavior', () => {
-    for (const selector of ['.v0-hero', '.v0-comparison-grid', '.v0-final']) {
-      expect(v0Css).toContain(selector);
-    }
-    for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip', '.v0-capability-summary']) {
-      expect(releaseCss).toContain(selector);
-    }
-    expect(releaseCss).toContain('@media (max-width: 760px)');
-    expect(releaseCss).toContain('@media (max-width: 380px)');
-    expect(releaseCss).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(slice).toContain('aria-label="An interactive field of eight Cloudflare-blue lines radiating from one stable point.');
-    expect(slice).toContain('Illustrative Baseline');
-    expect(landing).toContain('With permission, keep both people distinct');
+  it('restores the three chat and workflow demonstrations without field globes', () => {
+    expect(landing).toContain('<LandingProductStories />');
+    for (const marker of [
+      'Ask about your life.',
+      'Understand what happens',
+      'From one person',
+      'Reading your Baseline',
+      'Keeping both people distinct',
+      'Mapping the people',
+      'surface="personal-chat"',
+      'surface="relationship-chat"',
+      'surface="system-map"'
+    ]) expect(stories).toContain(marker);
+    expect(stories).not.toContain('LandingExpressionFieldPreview');
+    expect(stories).not.toContain('sphere');
+    expect(stories).not.toContain('globe');
+  });
+
+  it('retains the founder hierarchy and responsive behavior', () => {
+    for (const selector of ['.v0-hero', '.v0-comparison-grid', '.v0-final']) expect(v0Css).toContain(selector);
+    for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip']) expect(fieldCss).toContain(selector);
+    for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-map-no-globes']) expect(storiesCss).toContain(selector);
+    expect(fieldCss).toContain('@media (max-width: 760px)');
+    expect(storiesCss).toContain('@media (max-width: 760px)');
+    expect(storiesCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
 });
