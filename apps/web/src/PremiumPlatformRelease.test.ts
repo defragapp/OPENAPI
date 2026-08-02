@@ -25,6 +25,7 @@ const integrationCss = read('./landing-expression-field-integration.css');
 const lineageStoryCss = read('./v0-restored-product-stories.css');
 const isolatedStoryCss = read('./landing-product-stories-v2.css');
 const approvedCss = read('./public-landing-approved-v8.css');
+const heroExtension = read('./landing-hero-field-v4.css');
 const passkeyCss = read('./passkey-auth.css');
 const staticV0Css = read('../public/v0-public-port.css');
 const staticAuthority = read('../public/premium-public-release.css');
@@ -34,7 +35,7 @@ function expectBalancedCss(source: string) {
 }
 
 describe('founder v0 selective visual port — approved public v8', () => {
-  it('loads one approved landing authority before passkey authority', () => {
+  it('loads one approved landing authority, hero extension, then passkey authority', () => {
     const imports = [
       "import './v0-platform-port.css';",
       "import './v0-motion-accessibility.css';",
@@ -45,6 +46,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
       "import './v0-restored-product-stories.css';",
       "import './landing-product-stories-v2.css';",
       "import './public-landing-approved-v8.css';",
+      "import './landing-hero-field-v4.css';",
       "import './passkey-auth.css';"
     ];
     let previous = -1;
@@ -58,7 +60,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(main).not.toContain("import './public-landing-premium-v4.css';");
     expect(main).not.toContain("import './public-landing-premium-v5.css';");
     expect(main).not.toContain("import './public-landing-premium-v6.css';");
-    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, passkeyCss]) {
+    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, passkeyCss]) {
       expectBalancedCss(source);
     }
   });
@@ -71,26 +73,31 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(main).toContain('installV0ReleaseFingerprint();');
   });
 
-  it('keeps the approved hero and immersive Baseline field first', () => {
+  it('keeps the approved hero, 360 Baseline field, and real-life questions first', () => {
     expect(landing).toContain(`const V0_ARCHIVE_SHA = '${archiveSha}'`);
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
     expect(landing).toContain('<LandingExpressionSlice />');
+    expect(landing).toContain('<RealLifeQuestions />');
+    expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
+    expect(landing).toContain('Why do I keep taking responsibility for everyone around me?');
     expect(landing).toContain('<MobileCapabilityRail />');
     expect(landing).toContain('sovereign-opening-capabilities');
     expect(landing).not.toContain('HERO_CAPABILITIES');
-    expect(field).toContain('const CENTER_X = 600');
-    expect(field).toContain('const CENTER_Y = 680');
-    expect(field).toContain('Array.from({ length: 36 }');
-    expect(field).toContain('Array.from({ length: 28 }');
-    expect(field).not.toContain('landing-expression-slice__horizon');
-    expect(field).not.toContain('landing-expression-slice__grid');
-    expect(field).not.toContain('Array.from({ length: 88 }');
-    expect(field).not.toContain('sphere');
-    expect(field).not.toContain('globe');
+    expect(field).toContain('const CENTER = VIEWBOX_SIZE / 2');
+    expect(field).toContain('const SPHERE_RADIUS = 286');
+    expect(field).toContain('const MIN_AXIS_LENGTH = 118');
+    expect(field).toContain('const MAX_AXIS_LENGTH = 344');
+    expect(field).toContain('data-field-geometry="spherical-360"');
+    expect(field).toContain('buildSphereGrid');
+    expect(field).toContain('buildAmbientRays');
+    expect(field).toContain('requestAnimationFrame');
+    expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(field).not.toContain('#8b5cff');
     expect(integrationCss).toContain('background: transparent');
+    expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
+    expect(heroExtension).toContain('stroke: #2f93ff');
   });
 
   it('uses the approved narrative and v0 motion workflow demonstrations', () => {
@@ -126,7 +133,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(stories).not.toContain('globe');
   });
 
-  it('enforces the immersive hero, v0 product windows, and purpose-built mobile opening', () => {
+  it('enforces the immersive hero, product windows, questions, and mobile opening', () => {
     for (const marker of [
       '.public-approved-v8 .v0-hero.sovereign-opening-field',
       'min-height: max(820px, calc(100svh - 74px))',
@@ -149,6 +156,14 @@ describe('founder v0 selective visual port — approved public v8', () => {
       '.landing-workflow__copy > span',
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(approvedCss).toContain(marker);
+    for (const marker of [
+      'min-height: max(940px, calc(100svh - 74px))',
+      'height: 58%',
+      '.landing-expression-slice__readout',
+      '.landing-question-orbit__stage',
+      '@keyframes landing-real-question',
+      'min-height: 1040px'
+    ]) expect(heroExtension).toContain(marker);
     expect(approvedCss).toContain('border-radius: 999px');
     expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v8'");
     expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v8'");
