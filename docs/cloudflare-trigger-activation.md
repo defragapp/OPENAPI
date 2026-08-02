@@ -19,3 +19,7 @@ Force the connected `sovv-web` Cloudflare Workers Builds project to deploy this 
 ## Reconciled visual v3 release — August 2, 2026 at 14:53 PT
 
 Trigger one clean connected Workers Build after the release-command drift was corrected. Accept this release only when `sovv-web.sovereign-os-api.workers.dev`, `sovereign.defrag.app`, and `app.defrag.app` report the exact current `main` SHA, migration `0014_passkey_authentication`, migration parity `current`, visual contract `v0-public-landing-v3`, and a passing rendered desktop/mobile Browser Run comparison against the founder-approved screenshot reference.
+
+## Interactive hero and real-life questions — August 2, 2026
+
+Deploy the exact current `main` tree containing the restored rotating real-life question treatment and the value-driven 360-degree hero field. The hero must preserve the existing landing typography and composition, keep the interactive field below the primary copy, use vivid Cloudflare blue, derive each primary line’s reach from its sanitized relative-expression value, replace the floating tooltip with a restrained fixed readout, and preserve reduced-motion and mobile behavior. Accept completion only after the full release gate, exact-SHA runtime checks, migration `0014_passkey_authentication`, custom-domain parity, and rendered desktop/mobile verification pass.
