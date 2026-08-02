@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const main = read('./main.tsx');
 const refinement = read('./v0-landing-refinement.css');
+const landingExpressionField = read('./expression-field/LandingExpressionFieldPreview.tsx');
+const accountExpressionField = read('./expression-field/ExpressionField.tsx');
 
 describe('production landing refinement', () => {
   it('loads after global founder authority and before passkey authority', () => {
@@ -32,6 +34,13 @@ describe('production landing refinement', () => {
     expect(refinement).toContain('width: min(100%, 1080px) !important');
     expect(refinement).toContain('margin: 32px auto 0 !important');
     expect(refinement).not.toContain('display: none');
+  });
+
+  it('keeps the light metaphor implicit rather than naming it as product copy', () => {
+    const expressionFieldCopy = `${landingExpressionField}\n${accountExpressionField}`;
+    expect(expressionFieldCopy).not.toContain('This little light of mine');
+    expect(landingExpressionField).toContain('One center · many expressions');
+    expect(accountExpressionField).toContain('A stable view of capacity, feeling, protection, and gift');
   });
 
   it('keeps the refinement stylesheet structurally valid', () => {
