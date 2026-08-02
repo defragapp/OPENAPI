@@ -150,7 +150,7 @@ export function LandingExpressionSlice() {
       data-viewport-surface="expression-slice"
       data-visual-contract="landing-expression-field-v3"
       data-field-geometry="spherical-360"
-      data-release-copy="Illustrative Baseline · Eight interactive measurements · one stable center · line length follows relative expression reach · not a diagnosis, compatibility score, or claim about anyone’s internal state"
+      data-release-copy="Illustrative Baseline · Eight interactive measurements · one stable center · line length follows relative expression reach · not a diagnosis, score, or claim about anyone’s internal state"
       aria-label="Interactive Baseline expression field"
     >
       <svg
