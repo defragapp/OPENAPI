@@ -4,20 +4,20 @@ import { landingExpressionFieldFixture } from './expression-field.fixture';
 import { salienceLabel, type ExpressionAxisId, type ExpressionAxisValue } from './expression-field-contract';
 
 const VIEWBOX_WIDTH = 1200;
-const VIEWBOX_HEIGHT = 620;
-const CENTER_X = 790;
-const CENTER_Y = 314;
-const ROTATION_LIMIT = 18;
+const VIEWBOX_HEIGHT = 780;
+const CENTER_X = 600;
+const CENTER_Y = 680;
+const ROTATION_LIMIT = 12;
 
 const LANDING_AXIS_LAYOUT = [
-  { id: 'clarity', angle: -164, description: 'How quickly a useful distinction becomes available.' },
-  { id: 'focus', angle: -126, description: 'Where attention can stay long enough to become useful.' },
-  { id: 'steadiness', angle: -88, description: 'What helps you remain organized while conditions change.' },
-  { id: 'courage', angle: -46, description: 'The capacity to move while uncertainty is still present.' },
-  { id: 'tenderness', angle: -4, description: 'How care remains available without taking over responsibility.' },
-  { id: 'boundaries', angle: 38, description: 'The distinction between what belongs to you and what belongs to someone else.' },
-  { id: 'responsibility', angle: 82, description: 'The pull to carry what needs doing, especially when uncertainty rises.' },
-  { id: 'repair', angle: 128, description: 'How tension can be addressed after something lands badly.' }
+  { id: 'clarity', angle: -166, description: 'How quickly a useful distinction becomes available.' },
+  { id: 'focus', angle: -143, description: 'Where attention can stay long enough to become useful.' },
+  { id: 'steadiness', angle: -120, description: 'What helps you remain organized while conditions change.' },
+  { id: 'courage', angle: -97, description: 'The capacity to move while uncertainty is still present.' },
+  { id: 'tenderness', angle: -74, description: 'How care remains available without taking over responsibility.' },
+  { id: 'boundaries', angle: -51, description: 'The distinction between what belongs to you and what belongs to someone else.' },
+  { id: 'responsibility', angle: -28, description: 'The pull to carry what needs doing, especially when uncertainty rises.' },
+  { id: 'repair', angle: -8, description: 'How tension can be addressed after something lands badly.' }
 ] as const satisfies readonly { id: ExpressionAxisId; angle: number; description: string }[];
 
 type LandingAxis = {
@@ -58,7 +58,7 @@ export function LandingExpressionSlice() {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
       const direction = event.key === 'ArrowLeft' ? -1 : 1;
-      setRotation((value) => clamp(value + direction * 3, -ROTATION_LIMIT, ROTATION_LIMIT));
+      setRotation((value) => clamp(value + direction * 2.5, -ROTATION_LIMIT, ROTATION_LIMIT));
     }
   }
 
@@ -76,7 +76,7 @@ export function LandingExpressionSlice() {
     const drag = dragState.current;
     if (!drag || drag.pointerId !== event.pointerId) return;
     const width = Math.max(event.currentTarget.getBoundingClientRect().width, 1);
-    const delta = (event.clientX - drag.startX) / width * 52;
+    const delta = (event.clientX - drag.startX) / width * 38;
     setRotation(clamp(drag.startRotation + delta, -ROTATION_LIMIT, ROTATION_LIMIT));
   }
 
@@ -90,8 +90,8 @@ export function LandingExpressionSlice() {
 
   const tooltipStyle = selectedGeometry
     ? {
-        '--landing-tooltip-x': `${clamp(selectedGeometry.tooltipX, 18, 84)}%`,
-        '--landing-tooltip-y': `${clamp(selectedGeometry.tooltipY, 18, 76)}%`
+        '--landing-tooltip-x': `${clamp(selectedGeometry.tooltipX, 14, 86)}%`,
+        '--landing-tooltip-y': `${clamp(selectedGeometry.tooltipY, 18, 73)}%`
       } as CSSProperties
     : undefined;
 
@@ -101,15 +101,15 @@ export function LandingExpressionSlice() {
       className="landing-expression-slice"
       data-viewport-stage="expression"
       data-viewport-surface="expression-slice"
-      data-visual-contract="landing-expression-field-v3"
-      data-release-copy="Illustrative Baseline · Eight interactive vectors · one stable center · relative expression in a sanitized example · not a diagnosis, score, or claim about anyone’s internal state"
+      data-visual-contract="landing-expression-field-v4"
+      data-release-copy="Illustrative Baseline · Eight interactive vectors · one stable point · relative expression in a sanitized example · not a diagnosis, score, or claim about anyone’s internal state"
       aria-label="Live Baseline expression field"
     >
       <svg
         className="landing-expression-slice__canvas"
         viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
         role="group"
-        aria-label="Eight interactive Cloudflare-blue lines radiating in all directions from one stable point. Drag to rotate. Hover, focus, or tap a line for its value."
+        aria-label="Eight interactive Cloudflare-blue vectors radiating upward and outward from one stable point. Drag to rotate. Hover, focus, or tap a vector for its value."
         preserveAspectRatio="xMidYMid slice"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -118,14 +118,14 @@ export function LandingExpressionSlice() {
       >
         <defs>
           <filter id={glowId} x="-70%" y="-70%" width="240%" height="240%">
-            <feGaussianBlur stdDeviation="3.2" result="blur" />
+            <feGaussianBlur stdDeviation="3.4" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
           <filter id={coreGlowId} x="-350%" y="-350%" width="800%" height="800%">
-            <feGaussianBlur stdDeviation="12" result="blur" />
+            <feGaussianBlur stdDeviation="15" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
@@ -133,8 +133,8 @@ export function LandingExpressionSlice() {
           </filter>
           <radialGradient id={`${id}-core`} cx="50%" cy="50%" r="50%">
             <stop offset="0" stopColor="#ffffff" />
-            <stop offset="0.22" stopColor="#d8efff" />
-            <stop offset="0.55" stopColor="#2f8cff" stopOpacity="0.86" />
+            <stop offset="0.2" stopColor="#dff2ff" />
+            <stop offset="0.54" stopColor="#2f93ff" stopOpacity="0.9" />
             <stop offset="1" stopColor="#0f6fff" stopOpacity="0" />
           </radialGradient>
           {axes.map(({ axis, angle, length }) => {
@@ -150,10 +150,10 @@ export function LandingExpressionSlice() {
                 gradientUnits="userSpaceOnUse"
               >
                 <stop offset="0" stopColor="#ffffff" />
-                <stop offset="0.09" stopColor="#d8efff" />
-                <stop offset="0.42" stopColor="#56a8ff" />
-                <stop offset="0.78" stopColor="#1683ff" stopOpacity="0.66" />
-                <stop offset="1" stopColor="#1683ff" stopOpacity="0.05" />
+                <stop offset="0.08" stopColor="#dff2ff" />
+                <stop offset="0.4" stopColor="#78c7ff" />
+                <stop offset="0.76" stopColor="#2f93ff" stopOpacity="0.7" />
+                <stop offset="1" stopColor="#2f93ff" stopOpacity="0.04" />
               </linearGradient>
             );
           })}
@@ -210,9 +210,9 @@ export function LandingExpressionSlice() {
         </g>
 
         <g className="landing-expression-slice__origin" aria-hidden="true" filter={`url(#${coreGlowId})`}>
-          <circle cx={CENTER_X} cy={CENTER_Y} r="44" fill={`url(#${id}-core)`} />
-          <circle cx={CENTER_X} cy={CENTER_Y} r="6.5" />
-          <circle cx={CENTER_X} cy={CENTER_Y} r="2.2" />
+          <circle cx={CENTER_X} cy={CENTER_Y} r="54" fill={`url(#${id}-core)`} />
+          <circle cx={CENTER_X} cy={CENTER_Y} r="7" />
+          <circle cx={CENTER_X} cy={CENTER_Y} r="2.3" />
         </g>
       </svg>
 
@@ -230,7 +230,7 @@ export function LandingExpressionSlice() {
       ) : null}
 
       <span className="landing-expression-slice__instructions">
-        Drag to rotate. Hover, focus, or tap a line to inspect its value.
+        Drag to rotate. Hover, focus, or tap a vector to inspect its value.
       </span>
     </section>
   );
@@ -245,19 +245,19 @@ function buildLandingAxes(): LandingAxis[] {
       axis,
       description: definition.description,
       angle: definition.angle,
-      length: 230 + axis.value * 2.3
+      length: 390 + axis.value * 3.25
     };
   });
 }
 
 function buildAmbientRays() {
-  return Array.from({ length: 28 }, (_, index) => {
-    const angle = -176 + index * (352 / 27);
-    const wave = Math.sin(index * 1.83) * 0.5 + 0.5;
+  return Array.from({ length: 36 }, (_, index) => {
+    const angle = -176 + index * (170 / 35);
+    const wave = Math.sin(index * 1.71) * 0.5 + 0.5;
     return {
       angle,
-      length: 240 + wave * 190 + (index % 4) * 12,
-      opacity: 0.055 + (index % 5) * 0.014,
+      length: 400 + wave * 360 + (index % 4) * 15,
+      opacity: 0.045 + (index % 6) * 0.012,
       width: 0.42 + (index % 3) * 0.14
     };
   });
@@ -272,7 +272,7 @@ function pointFor(angle: number, length: number) {
 }
 
 function geometryFor(angle: number, length: number) {
-  const point = pointFor(angle, length * 0.72);
+  const point = pointFor(angle, length * 0.66);
   return {
     tooltipX: point.x / VIEWBOX_WIDTH * 100,
     tooltipY: point.y / VIEWBOX_HEIGHT * 100
