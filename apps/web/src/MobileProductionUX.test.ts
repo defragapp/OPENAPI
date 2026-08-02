@@ -9,6 +9,7 @@ const viewportCss = readFileSync(new URL('./responsive-viewport-contract.css', i
 const fieldCss = readFileSync(new URL('./landing-expression-field-v3.css', import.meta.url), 'utf8');
 const integrationCss = readFileSync(new URL('./landing-expression-field-integration.css', import.meta.url), 'utf8');
 const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
+const approvedCss = readFileSync(new URL('./public-landing-approved-v8.css', import.meta.url), 'utf8');
 const workspaceCss = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
 const workspaceMobileCss = readFileSync(new URL('./workspace-mobile.css', import.meta.url), 'utf8');
 const compositionCss = readFileSync(new URL('./interface-composition.css', import.meta.url), 'utf8');
@@ -83,6 +84,32 @@ describe('production mobile and responsive experience', () => {
     expect(storyCss).toContain('min-height: 44px');
     expect(storyCss).toContain('border-radius: 4px');
     expect(storyCss).toContain('@media (max-width: 390px)');
+  });
+
+  it('renders the screenshot-defined mobile opening without changing the desktop narrative', () => {
+    for (const marker of [
+      'v0-wordmark--mobile',
+      'v0-mobile-menu',
+      'Sovereign helps you see what’s really happening so you can choose differently.',
+      'Private. Secure. Yours.',
+      '<MobileCapabilityRail />',
+      'Understand yourself',
+      'Understand others',
+      'Understand systems',
+      'Your library'
+    ]) expect(landing).toContain(marker);
+    for (const marker of [
+      'min-height: max(776px, calc(100svh - 68px))',
+      '.v0-wordmark--mobile',
+      '.v0-mobile-menu[open] > .v0-mobile-menu__panel',
+      '.sovereign-opening-copy--mobile',
+      '.sovereign-opening-capabilities',
+      '.landing-expression-slice__ambient--mobile',
+      'grid-template-columns: repeat(4, minmax(0, 1fr))'
+    ]) expect(approvedCss).toContain(marker);
+    expect(landing).toContain('Sovereign builds your Baseline, then uses it to help you understand');
+    expect(stories).toContain('id="relationship"');
+    expect(stories).toContain('id="system"');
   });
 
   it('retains reduced-motion support and horizontal overflow protection', () => {

@@ -42,6 +42,7 @@ export function LandingExpressionSlice() {
   const coreGlowId = `${id}-landing-expression-core`;
   const axes = useMemo(() => buildLandingAxes(), []);
   const ambientRays = useMemo(() => buildAmbientRays(), []);
+  const mobileAmbientRays = useMemo(() => buildMobileAmbientRays(), []);
   const selected = selectedId ? axes.find((item) => item.axis.id === selectedId) ?? null : null;
   const selectedGeometry = selected ? geometryFor(selected.angle + rotation, selected.length) : null;
 
@@ -178,6 +179,20 @@ export function LandingExpressionSlice() {
               />
             );
           })}
+          {mobileAmbientRays.map((ray, index) => {
+            const end = pointFor(ray.angle, ray.length);
+            return (
+              <line
+                key={`mobile-${index}`}
+                className="landing-expression-slice__ambient landing-expression-slice__ambient--mobile"
+                x1={CENTER_X}
+                y1={CENTER_Y}
+                x2={end.x}
+                y2={end.y}
+                style={{ opacity: ray.opacity, strokeWidth: ray.width }}
+              />
+            );
+          })}
         </g>
 
         <g className="landing-expression-slice__vectors">
@@ -259,6 +274,19 @@ function buildAmbientRays() {
       length: 400 + wave * 360 + (index % 4) * 15,
       opacity: 0.045 + (index % 6) * 0.012,
       width: 0.42 + (index % 3) * 0.14
+    };
+  });
+}
+
+function buildMobileAmbientRays() {
+  return Array.from({ length: 28 }, (_, index) => {
+    const angle = -173 + index * (164 / 27);
+    const wave = Math.cos(index * 1.37) * 0.5 + 0.5;
+    return {
+      angle,
+      length: 430 + wave * 330 + (index % 5) * 13,
+      opacity: 0.055 + (index % 7) * 0.01,
+      width: 0.42 + (index % 4) * 0.12
     };
   });
 }

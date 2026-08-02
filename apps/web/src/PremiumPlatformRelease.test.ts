@@ -77,10 +77,13 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
     expect(landing).toContain('<LandingExpressionSlice />');
+    expect(landing).toContain('<MobileCapabilityRail />');
+    expect(landing).toContain('sovereign-opening-capabilities');
     expect(landing).not.toContain('HERO_CAPABILITIES');
     expect(field).toContain('const CENTER_X = 600');
     expect(field).toContain('const CENTER_Y = 680');
     expect(field).toContain('Array.from({ length: 36 }');
+    expect(field).toContain('Array.from({ length: 28 }');
     expect(field).not.toContain('landing-expression-slice__horizon');
     expect(field).not.toContain('landing-expression-slice__grid');
     expect(field).not.toContain('Array.from({ length: 88 }');
@@ -123,7 +126,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(stories).not.toContain('globe');
   });
 
-  it('enforces the immersive hero, v0 product windows, and sparse mobile layout', () => {
+  it('enforces the immersive hero, v0 product windows, and purpose-built mobile opening', () => {
     for (const marker of [
       '.public-approved-v8 .v0-hero.sovereign-opening-field',
       'min-height: max(820px, calc(100svh - 74px))',
@@ -136,12 +139,17 @@ describe('founder v0 selective visual port — approved public v8', () => {
       '.public-approved-v8 .landing-workflow > li.is-active',
       'v8-message-in',
       '@media (max-width: 760px)',
-      'min-height: max(960px, calc(100svh - 68px))',
+      'min-height: max(776px, calc(100svh - 68px))',
+      '.v0-wordmark--mobile',
+      '.v0-mobile-menu[open] > .v0-mobile-menu__panel',
+      '.sovereign-opening-capabilities',
+      '.landing-expression-slice__ambient--mobile',
+      'grid-template-columns: repeat(4, minmax(0, 1fr))',
       'flex-direction: column',
       '.landing-workflow__copy > span',
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(approvedCss).toContain(marker);
-    expect(approvedCss).not.toContain('border-radius: 999px');
+    expect(approvedCss).toContain('border-radius: 999px');
     expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v8'");
     expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v8'");
   });

@@ -37,7 +37,11 @@ describe('approved public landing v8', () => {
     expect(landing).toContain('Holding onto the pain is.');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('<LandingProductStories />');
-    expect(landing).not.toContain('sovereign-opening-capabilities');
+    expect(landing).toContain('<MobileCapabilityRail />');
+    expect(landing).toContain('sovereign-opening-capabilities');
+    expect(landing).toContain('Sovereign helps you see what’s really happening so you can choose differently.');
+    expect(landing).toContain('Private. Secure. Yours.');
+    expect(landing).toContain('v0-mobile-menu');
     expect(landing).not.toContain('HERO_CAPABILITIES');
   });
 
@@ -47,6 +51,7 @@ describe('approved public landing v8', () => {
       'const CENTER_X = 600',
       'const CENTER_Y = 680',
       'Array.from({ length: 36 }',
+      'Array.from({ length: 28 }',
       'Eight interactive vectors',
       'onPointerDown={handlePointerDown}',
       'onPointerMove={handlePointerMove}',
@@ -104,10 +109,16 @@ describe('approved public landing v8', () => {
     expect(approvedStyles).toContain('.landing-workflow > li.is-active');
   });
 
-  it('keeps iPhone immersive but sparse, then naturally stacks product stories', () => {
+  it('gives iPhone a purpose-built opening field, then naturally stacks product stories', () => {
     for (const marker of [
       '@media (max-width: 760px)',
-      'min-height: max(960px, calc(100svh - 68px))',
+      'min-height: max(776px, calc(100svh - 68px))',
+      '.v0-wordmark--mobile',
+      '.v0-mobile-menu[open] > .v0-mobile-menu__panel',
+      '.sovereign-opening-copy--mobile',
+      '.sovereign-opening-capabilities',
+      '.landing-expression-slice__ambient--mobile',
+      'grid-template-columns: repeat(4, minmax(0, 1fr))',
       'width: calc(100% - 28px)',
       'flex-direction: column',
       'height: auto',
@@ -116,7 +127,7 @@ describe('approved public landing v8', () => {
       'display: none',
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(approvedStyles).toContain(marker);
-    expect(approvedStyles).not.toContain('border-radius: 999px');
+    expect(approvedStyles).toContain('border-radius: 999px');
     expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v8'");
     expect(main).toContain("dataset.sovereignProductStories = 'isolated-mobile-first-v2'");
     expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v8'");

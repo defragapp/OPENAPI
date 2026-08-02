@@ -173,7 +173,7 @@ function PersonalStory() {
 function RelationshipStory() {
   const sectionRef = useRevealOnce();
   return (
-    <section ref={sectionRef} className="landing-story landing-story--relationship" data-viewport-section="relationship">
+    <section ref={sectionRef} id="relationship" className="landing-story landing-story--relationship" data-viewport-section="relationship">
       <div className="landing-story__shell">
         <StoryHeading step="02 · You + 1" title="Understand what happens between you.">
           With permission, Sovereign keeps both people distinct. See each perspective, the interaction, and what the relationship creates between you.
@@ -198,7 +198,7 @@ function RelationshipStory() {
 function SystemStory() {
   const sectionRef = useRevealOnce();
   return (
-    <section ref={sectionRef} className="landing-story landing-story--system" data-viewport-section="system">
+    <section ref={sectionRef} id="system" className="landing-story landing-story--system" data-viewport-section="system">
       <div className="landing-story__shell">
         <StoryHeading step="03 · Your people" title="See the whole system.">
           Map roles, responsibility, pressure, and recurring patterns across a family, team, or group.
