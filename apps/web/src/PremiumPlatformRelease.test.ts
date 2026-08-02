@@ -24,10 +24,7 @@ const fieldCss = read('./landing-expression-field-v3.css');
 const integrationCss = read('./landing-expression-field-integration.css');
 const lineageStoryCss = read('./v0-restored-product-stories.css');
 const isolatedStoryCss = read('./landing-product-stories-v2.css');
-const openingCss = read('./sovereign-opening-field.css');
-const premiumPublicV4Css = read('./public-landing-premium-v4.css');
-const premiumPublicV5Css = read('./public-landing-premium-v5.css');
-const premiumPublicV6Css = read('./public-landing-premium-v6.css');
+const approvedCss = read('./public-landing-approved-v7.css');
 const passkeyCss = read('./passkey-auth.css');
 const staticV0Css = read('../public/v0-public-port.css');
 const staticAuthority = read('../public/premium-public-release.css');
@@ -36,8 +33,8 @@ function expectBalancedCss(source: string) {
   expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
 }
 
-describe('founder v0 selective visual port', () => {
-  it('loads the certified visual cascade in order', () => {
+describe('founder v0 selective visual port — approved public v7', () => {
+  it('loads one approved landing authority before passkey authority', () => {
     const imports = [
       "import './v0-platform-port.css';",
       "import './v0-motion-accessibility.css';",
@@ -47,10 +44,7 @@ describe('founder v0 selective visual port', () => {
       "import './landing-expression-field-integration.css';",
       "import './v0-restored-product-stories.css';",
       "import './landing-product-stories-v2.css';",
-      "import './sovereign-opening-field.css';",
-      "import './public-landing-premium-v4.css';",
-      "import './public-landing-premium-v5.css';",
-      "import './public-landing-premium-v6.css';",
+      "import './public-landing-approved-v7.css';",
       "import './passkey-auth.css';"
     ];
     let previous = -1;
@@ -60,24 +54,15 @@ describe('founder v0 selective visual port', () => {
       previous = index;
     }
     expect(main.slice(previous + imports.at(-1)!.length)).not.toContain("import './");
-    for (const source of [
-      v0PlatformCss,
-      v0MotionCss,
-      v0Css,
-      v0GlobalCss,
-      fieldCss,
-      integrationCss,
-      lineageStoryCss,
-      isolatedStoryCss,
-      openingCss,
-      premiumPublicV4Css,
-      premiumPublicV5Css,
-      premiumPublicV6Css,
-      passkeyCss
-    ]) expectBalancedCss(source);
+    expect(main).not.toContain("import './public-landing-premium-v4.css';");
+    expect(main).not.toContain("import './public-landing-premium-v5.css';");
+    expect(main).not.toContain("import './public-landing-premium-v6.css';");
+    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, passkeyCss]) {
+      expectBalancedCss(source);
+    }
   });
 
-  it('emits the exact archive and v3 landing fingerprint at runtime', () => {
+  it('emits the exact archive and v3 compatibility fingerprint', () => {
     expect(fingerprint).toContain(`V0_ARCHIVE_SHA256 = '${archiveSha}'`);
     expect(fingerprint).toContain(`V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`);
     expect(fingerprint).toContain("PUBLIC_LANDING_CONTRACT = 'v0-public-landing-v3'");
@@ -85,72 +70,75 @@ describe('founder v0 selective visual port', () => {
     expect(main).toContain('installV0ReleaseFingerprint();');
   });
 
-  it('keeps the approved hero and integrated field first', () => {
+  it('keeps the approved hero and true radial field first', () => {
     expect(landing).toContain(`const V0_ARCHIVE_SHA = '${archiveSha}'`);
+    expect(landing).toContain('data-public-release="approved-public-v7"');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
     expect(landing).toContain('<LandingExpressionSlice />');
-    expect(field).toContain('onPointerDown={handlePointerDown}');
-    expect(field).toContain('landing-expression-slice__tooltip');
+    expect(landing).not.toContain('HERO_CAPABILITIES');
+    expect(field).toContain('const CENTER_X = 790');
+    expect(field).toContain('const CENTER_Y = 314');
+    expect(field).toContain('Array.from({ length: 28 }');
+    expect(field).not.toContain('landing-expression-slice__horizon');
+    expect(field).not.toContain('landing-expression-slice__grid');
+    expect(field).not.toContain('Array.from({ length: 88 }');
     expect(field).not.toContain('sphere');
     expect(integrationCss).toContain('background: transparent');
   });
 
-  it('restores the v0 product demonstrations and active workflows', () => {
+  it('uses the approved narrative and v0 motion workflow demonstrations', () => {
     expect(landing).toContain('<LandingProductStories />');
     for (const marker of [
-      'Ask about your life.',
-      'Get an answer built for you.',
-      'Understand what happens',
-      'between you.',
-      'From one person',
-      'to the whole system.',
+      'See what keeps happening.',
+      'Understand what happens between you.',
+      'See the whole system.',
       'surface="personal-chat"',
       'surface="personal-reasoning"',
       'surface="relationship-chat"',
       'surface="relationship-reasoning"',
       'surface="system-map"',
       'surface="system-reasoning"',
-      'v0-baseline-trace',
-      'v0-workflow-panel',
-      'v0-family-system-map'
+      'Reading your Baseline',
+      'Finding the pattern',
+      'Building the distinction',
+      'Answering the real question',
+      'Keeping both people distinct',
+      'Reading each perspective',
+      'Finding the interaction',
+      'Showing what happens between you',
+      'Mapping the people',
+      'Reading roles and responsibility',
+      'Tracing the recurring pattern',
+      'Showing the whole system',
+      'timers.push(window.setTimeout',
+      'data-motion-state'
     ]) expect(stories).toContain(marker);
+    expect(stories).not.toContain('window.setInterval');
     expect(stories).not.toContain('LandingExpressionFieldPreview');
     expect(stories).not.toContain('sphere');
     expect(stories).not.toContain('globe');
   });
 
-  it('enforces the editorial premium v6 page rather than a repeated card stack', () => {
-    expect(landing).toContain('public-premium-v4 public-premium-v5 public-premium-v6');
-    expect(landing).toContain('data-public-release="premium-public-v6"');
-    expect(landing.match(/SOVEREIGN\.OS/g)?.length).toBeGreaterThanOrEqual(3);
-    expect(main).toContain("dataset.sovereignLayoutRelease = 'premium-public-v6'");
-
+  it('enforces the clean v0 product-window styling and sparse mobile layout', () => {
     for (const marker of [
-      '.public-premium-v6 .v0-wordmark',
-      'font-size: 1rem',
-      '.public-premium-v6 .sovereign-opening-field .v0-hero-content',
-      'align-items: flex-start',
-      '.public-premium-v6 .landing-story__stage',
-      'gap: 1px',
-      'border: 1px solid var(--v6-line-strong)',
-      '.public-premium-v6 .landing-story--relationship .landing-demo--chat',
-      'order: 2',
-      '.public-premium-v6 .landing-demo__traffic',
-      'display: none',
-      "content: 'SOVEREIGN.OS'",
-      '.public-premium-v6 .landing-message--assistant > div',
-      'background: transparent',
-      '.public-premium-v6 .landing-story__heading h2 span',
-      '-webkit-text-stroke: 0',
-      '.public-premium-v6 .v0-final',
-      'text-align: left',
-      '@media (max-width: 760px)'
-    ]) expect(premiumPublicV6Css).toContain(marker);
-
-    expect(premiumPublicV6Css).not.toContain('border-radius: 999px');
-    expect(premiumPublicV6Css).toContain('flex-direction: column');
-    expect(premiumPublicV6Css).toContain('min-height: 290px');
+      '.public-approved-v7 .v0-hero',
+      '.public-approved-v7 .landing-expression-slice',
+      '.public-approved-v7 .landing-story__stage',
+      'grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr)',
+      '.public-approved-v7 .landing-demo',
+      'border-radius: 15px',
+      '.public-approved-v7 .landing-workflow::before',
+      '.public-approved-v7 .landing-workflow > li.is-active',
+      'approved-message-in',
+      '@media (max-width: 760px)',
+      'flex-direction: column',
+      '.landing-workflow__copy > span',
+      '@media (prefers-reduced-motion: reduce)'
+    ]) expect(approvedCss).toContain(marker);
+    expect(approvedCss).not.toContain('border-radius: 999px');
+    expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v7'");
+    expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v7'");
   });
 
   it('applies the same founder language to the platform and standalone routes', () => {
