@@ -15,3 +15,7 @@ Trigger the connected Cloudflare Workers Builds production pipeline from the exa
 ## Urgent production retrigger — August 1, 2026
 
 Force the connected `sovv-web` Cloudflare Workers Builds project to deploy this exact `main` commit immediately. The live public surface must not remain on a stale release. Accept completion only after both canonical readiness endpoints report `ready: true`, the expected migration, and this exact commit, with the public cohesion pages and assets available.
+
+## Reconciled visual v3 release — August 2, 2026 at 14:53 PT
+
+Trigger one clean connected Workers Build after the release-command drift was corrected. Accept this release only when `sovv-web.sovereign-os-api.workers.dev`, `sovereign.defrag.app`, and `app.defrag.app` report the exact current `main` SHA, migration `0014_passkey_authentication`, migration parity `current`, visual contract `v0-public-landing-v3`, and a passing rendered desktop/mobile Browser Run comparison against the founder-approved screenshot reference.
