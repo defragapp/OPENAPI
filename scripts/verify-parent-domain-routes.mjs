@@ -119,28 +119,37 @@ async function verifyVisualRelease() {
     sequenceFingerprint,
     archiveSha,
     'v0-landing-selective-port',
+    'v0-public-landing-v2',
+    'v0-single-example-landing',
     'Personal AI for real life',
     'Healing isn’t optional.',
     'Holding onto the pain is.',
-    'Ask about your life.',
-    'Get an answer built for you.',
-    'Understand what happens',
-    'between you.',
-    'From one person',
-    'to the whole system.',
+    'Illustrative Baseline',
+    'See what is active before it repeats.',
+    'Hover, focus, or tap a line.',
+    'An interactive field of eight Cloudflare-blue lines radiating from one stable point.',
+    'Clarity',
+    'Focus',
+    'Steadiness',
+    'Courage',
+    'Tenderness',
+    'Boundaries',
+    'Responsibility',
+    'Repair',
+    'Why do I keep taking responsibility for everyone around me?',
+    'Relative expression inside one sanitized example',
+    'One place to understand what keeps happening.',
+    'Understand yourself',
+    'Understand a relationship',
+    'Understand a system',
     'Other AI answers',
     'everyone the same.',
     'Your thoughts deserve',
     'a better place to live.',
-    'How Sovereign works it through',
-    'How Sovereign reads both of you',
-    'Illustrative permitted Baselines',
-    'No compatibility score',
-    'Each person controls what may be included',
     '/api/v1/expression-field?mode=live',
     'sovereign-public-cache-retired'
   ]) {
-    if (!compiledJavaScript.includes(marker)) throw new Error(`Compiled application is missing founder v0 marker: ${marker}`);
+    if (!compiledJavaScript.includes(marker)) throw new Error(`Compiled application is missing single-example marker: ${marker}`);
   }
 
   for (const prohibited of [
@@ -163,8 +172,11 @@ async function verifyVisualRelease() {
     '--v0-cream:#e8ddd0',
     '.v0-landing-port{',
     '.v0-hero{',
-    '.v0-story-grid{',
-    '.v0-family-map{',
+    '.v0-single-example-landing{',
+    '.landing-expression-slice{',
+    '.landing-expression-slice__canvas{',
+    '.landing-expression-slice__tooltip{',
+    '.v0-capability-summary{',
     '.v0-comparison-grid{',
     '.intelligence-workspace{',
     '.sovereign-composer{',
@@ -177,7 +189,7 @@ async function verifyVisualRelease() {
     '/fonts/sovereign-sans.woff2'
   ]) {
     if (!compactCss.includes(marker.replace(/\s+/g, ''))) {
-      throw new Error(`Compiled CSS is missing founder v0 or preserved platform marker: ${marker}`);
+      throw new Error(`Compiled CSS is missing single-example or preserved platform marker: ${marker}`);
     }
   }
   for (const family of ['Sovereign Display', 'Sovereign Sans']) {
@@ -227,7 +239,7 @@ async function verifyVisualRelease() {
     entryDocument: 'no-store',
     javascriptAssets: scriptPaths,
     cssAssets: stylePaths,
-    visualContract: 'v0-landing-selective-port',
+    visualContract: 'v0-public-landing-v2',
     archiveSha256: archiveSha,
     sequenceFingerprint,
     platformRouteCoverage: 'v0-platform-port.css',
