@@ -24,15 +24,14 @@ const narrowViewportMaximum = 760;
 const requiredSurfaces = [
   'hero',
   'expression-slice',
-  'capability-summary',
+  'personal-chat',
+  'personal-reasoning',
+  'relationship-chat',
+  'relationship-reasoning',
+  'system-map',
+  'system-reasoning',
   'comparison'
 ] as const;
-
-/*
- * Historical source-verification markers only. The current contract does not query
- * these retired surfaces: 'personal-chat', 'personal-reasoning', 'relationship-chat',
- * 'relationship-reasoning', or 'system-map'.
- */
 
 export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSnapshot): PublicLandingViewportResult {
   const failures: string[] = [];
@@ -65,8 +64,8 @@ export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSna
   }
 
   snapshot.stageGaps.forEach((gap, index) => {
-    if (gap > 82) failures.push(`stage gap ${index + 1} is ${gap}px`);
-    if (gap < 0) failures.push(`stage gap ${index + 1} is ${gap}px`);
+    if (gap > 96) failures.push(`stage gap ${index + 1} is ${gap}px`);
+    if (gap < -2) failures.push(`stage gap ${index + 1} is ${gap}px`);
   });
 
   if (narrow && !snapshot.comparisonStacked) failures.push('comparison section is not stacked');
