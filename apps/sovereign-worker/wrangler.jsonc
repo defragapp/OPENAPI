@@ -1,3 +1,4 @@
+// Production release marker: force the connected sovv-web Workers Builds project to deploy the current main tree.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "sovereign-agent",
