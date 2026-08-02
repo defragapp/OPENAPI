@@ -127,7 +127,7 @@ const FAMILY = [
 
 export function LandingProductStories() {
   return (
-    <div className="v0-restored-product-stories" data-product-stories="restored-workflows-no-globes">
+    <div className="v0-restored-product-stories" data-product-stories="restored-workflows">
       <PersonalStory />
       <RelationshipStory />
       <SystemStory />
@@ -303,7 +303,7 @@ function FamilySystemMap() {
   const active = FAMILY.find((member) => member.id === activeId) ?? FAMILY[0];
 
   return (
-    <div className="v0-family-map v0-family-map-no-globes" aria-label="Illustrative family system map">
+    <div className="v0-family-map v0-family-system-map" aria-label="Illustrative family system map">
       <svg viewBox="0 0 720 360" aria-hidden="true" focusable="false">
         <path d="M 360 180 L 118 78" />
         <path d="M 360 180 L 602 78" />
