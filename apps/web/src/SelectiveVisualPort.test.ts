@@ -40,7 +40,7 @@ describe('founder v0 selective visual port', () => {
       'surface="system-reasoning"',
       'v0-baseline-trace',
       'v0-workflow-panel',
-      'v0-family-map-no-globes'
+      'v0-family-system-map'
     ]) expect(stories).toContain(marker);
     expect(stories).not.toContain('LandingExpressionFieldPreview');
     expect(stories).not.toContain('sphere');
@@ -66,7 +66,7 @@ describe('founder v0 selective visual port', () => {
   it('applies founder language to authenticated surfaces and the complete public landing', () => {
     for (const selector of ['.intelligence-workspace', '.intelligence-sidebar', '.sovereign-composer', '.surface-heading', '.account-shell', '.auth-panel']) expect(v0Visual).toContain(selector);
     for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip']) expect(fieldCss).toContain(selector);
-    for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-map-no-globes']) expect(storyCss).toContain(selector);
+    for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storyCss).toContain(selector);
     expect(expressionCss).toContain('min-height: 44px');
     expect(main).toContain("import './landing-expression-field-integration.css';");
     expect(main).toContain("import './v0-restored-product-stories.css';");
