@@ -5,6 +5,7 @@ const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const viewportProbe = readFileSync(new URL('./PublicLandingViewportContract.ts', import.meta.url), 'utf8');
 const viewportCss = readFileSync(new URL('./responsive-viewport-contract.css', import.meta.url), 'utf8');
+const iosReleaseCss = readFileSync(new URL('./v0-ios-public-release.css', import.meta.url), 'utf8');
 const workspaceCss = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
 const workspaceMobileCss = readFileSync(new URL('./workspace-mobile.css', import.meta.url), 'utf8');
 const compositionCss = readFileSync(new URL('./interface-composition.css', import.meta.url), 'utf8');
@@ -20,6 +21,7 @@ describe('production mobile and responsive experience', () => {
     expect(main).toContain("import './auth-onboarding.css'");
     expect(main).toContain("import './interface-composition.css'");
     expect(main).toContain("import './responsive-viewport-contract.css'");
+    expect(main).toContain("import './v0-ios-public-release.css'");
     expect(main).not.toContain('mobile-density-contract.css');
     const localCssImports = [...main.matchAll(/import ['"]\.\/([^'"]+\.css)['"]/g)].map((match) => match[1]);
     for (const retired of ['experience-reconciliation.css', 'sovereign-experience-v3.css', 'sovereign-experience-v3-fixes.css', 'landing-v2.css']) {
@@ -63,9 +65,13 @@ describe('production mobile and responsive experience', () => {
     expect(workspaceMobileCss).toContain('max-height: 86svh');
     expect(viewportCss).toContain('env(safe-area-inset-left)');
     expect(viewportCss).toContain('env(safe-area-inset-right)');
+    expect(iosReleaseCss).toContain('env(safe-area-inset-top)');
+    expect(iosReleaseCss).toContain('env(safe-area-inset-bottom)');
+    expect(iosReleaseCss).toContain('env(safe-area-inset-left)');
+    expect(iosReleaseCss).toContain('env(safe-area-inset-right)');
   });
 
-  it('keeps every mobile interaction at least 44px and prevents iOS input zoom', () => {
+  it('keeps every mobile interaction at least 44px and prevents iOS text resizing', () => {
     expect(workspaceMobileCss).toContain('.fit-controls button');
     expect(workspaceMobileCss).toContain('.composer-context-line button');
     expect(workspaceMobileCss).toContain('min-height: 44px');
@@ -73,6 +79,9 @@ describe('production mobile and responsive experience', () => {
     expect(authCss).toContain('.auth-panel');
     expect(landingCss).toContain('min-width: 320px');
     expect(landingCss).toContain('@media (max-width: 440px)');
+    expect(iosReleaseCss).toContain('min-height: 44px');
+    expect(iosReleaseCss).toContain('-webkit-text-size-adjust: 100%');
+    expect(iosReleaseCss).toContain('touch-action: manipulation');
   });
 
   it('retains visible focus, reduced-motion support, and horizontal overflow protection', () => {
@@ -81,5 +90,7 @@ describe('production mobile and responsive experience', () => {
     expect(workspaceMobileCss).toContain('overflow-x: clip');
     expect(compositionCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(viewportCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(iosReleaseCss).toContain('overflow-x: clip');
+    expect(iosReleaseCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
 });
