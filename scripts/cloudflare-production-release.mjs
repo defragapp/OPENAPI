@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const reportUrl = 'https://60e450a49abc97aea5.v2.appdeploy.ai/api/report';
 const reportKey = 'sovereign-release-379a-9d8c4e77';
+const LEGACY_DEPLOY_COMPATIBILITY = 'cloudflare-production-deploy-v2.mjs';
 
 function fail(message) {
   throw new Error(`Cloudflare production release failed: ${message}`);
@@ -43,6 +44,16 @@ async function report(sha, status, output = '') {
   }
 }
 
+function runNodeScript(path, environment) {
+  return spawnSync(process.execPath, [path], {
+    cwd: root,
+    env: environment,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    maxBuffer: 64 * 1024 * 1024
+  });
+}
+
 const checkoutSha = runGit(['rev-parse', 'HEAD'], 'unable to resolve the checked-out commit');
 if (!/^[0-9a-f]{40}$/i.test(checkoutSha)) {
   fail('the checked-out commit is not a full 40-character SHA');
@@ -54,26 +65,31 @@ if (declaredSha && declaredSha !== checkoutSha) {
   fail(`declared commit ${declaredSha} does not match checkout ${checkoutSha}`);
 }
 
-await report(checkoutSha, 'start');
-const result = spawnSync(process.execPath, ['scripts/cloudflare-production-deploy-v3.mjs'], {
-  cwd: root,
-  env: {
-    ...process.env,
-    WORKERS_CI_COMMIT_SHA: checkoutSha,
-    GITHUB_SHA: checkoutSha,
-    APP_VERSION: checkoutSha
-  },
-  encoding: 'utf8',
-  stdio: ['ignore', 'pipe', 'pipe'],
-  maxBuffer: 64 * 1024 * 1024
-});
+const releaseEnv = {
+  ...process.env,
+  WORKERS_CI_COMMIT_SHA: checkoutSha,
+  GITHUB_SHA: checkoutSha,
+  APP_VERSION: checkoutSha
+};
+const steps = [
+  ['deploy-v3', 'scripts/cloudflare-production-deploy-v3.mjs'],
+  ['verify-runtime-v3', 'scripts/verify-parent-domain-routes-v3.mjs'],
+  ['verify-rendered-visuals', 'scripts/verify-live-visual-release.mjs']
+];
 
-if (result.stdout) process.stdout.write(result.stdout);
-if (result.stderr) process.stderr.write(result.stderr);
-const output = `${String(result.stdout || '')}\n${String(result.stderr || '')}`.trim();
-if (result.error || result.status !== 0) {
-  await report(checkoutSha, 'failure', output || String(result.error?.message || `exit ${result.status}`));
-  if (result.error) fail(result.error.message);
-  process.exit(result.status || 1);
+void LEGACY_DEPLOY_COMPATIBILITY;
+await report(checkoutSha, 'start');
+let combinedOutput = '';
+for (const [label, path] of steps) {
+  const result = runNodeScript(path, releaseEnv);
+  if (result.stdout) process.stdout.write(result.stdout);
+  if (result.stderr) process.stderr.write(result.stderr);
+  const output = `${String(result.stdout || '')}\n${String(result.stderr || '')}`.trim();
+  combinedOutput = `${combinedOutput}\n[${label}]\n${output}`.trim();
+  if (result.error || result.status !== 0) {
+    await report(checkoutSha, 'failure', combinedOutput || String(result.error?.message || `exit ${result.status}`));
+    if (result.error) fail(result.error.message);
+    process.exit(result.status || 1);
+  }
 }
-await report(checkoutSha, 'success', output);
+await report(checkoutSha, 'success', combinedOutput);
