@@ -96,7 +96,18 @@ function retireLegacyPublicCache(): void {
   });
 }
 
+function refreshStaleIosPageRestore(): void {
+  if (!import.meta.env.PROD) return;
+
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) window.location.reload();
+  });
+}
+
 retireLegacyPublicCache();
+refreshStaleIosPageRestore();
+
+document.documentElement.dataset.sovereignLayoutRelease = 'compact-product-stories-v2';
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'
