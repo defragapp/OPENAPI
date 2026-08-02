@@ -10,6 +10,10 @@ const MIN_AXIS_LENGTH = 118;
 const MAX_AXIS_LENGTH = 344;
 const ROTATION_LIMIT = 32;
 const AUTO_ROTATION_DEGREES_PER_MS = 0.0018;
+const AUTO_ROTATION_FRAME_INTERVAL_MS = 48;
+const TOUCH_GESTURE_THRESHOLD = 10;
+const TOUCH_HORIZONTAL_BIAS = 1.08;
+const PAGE_SCROLL_SETTLE_MS = 180;
 const LEGACY_TOOLTIP_COMPATIBILITY = 'landing-expression-slice__tooltip · Baseline value · Live change · Current';
 void LEGACY_TOOLTIP_COMPATIBILITY;
 
@@ -43,17 +47,26 @@ type ProjectedAxis = LandingAxis & {
   rotatedDirection: Vector3;
 };
 type AmbientRay = { direction: Vector3; length: number; opacity: number; width: number };
+type DragMode = 'pending' | 'rotate' | 'scroll';
 type DragState = {
   pointerId: number;
+  pointerType: string;
   startX: number;
   startY: number;
   startRotation: Rotation;
+  mode: DragMode;
 };
 
 export function LandingExpressionSlice() {
   const [selectedId, setSelectedId] = useState<ExpressionAxisId>('clarity');
   const [rotation, setRotation] = useState<Rotation>({ yaw: 18, pitch: -7 });
+  const sectionRef = useRef<HTMLElement | null>(null);
   const dragState = useRef<DragState | null>(null);
+  const isVisible = useRef(true);
+  const isPageScrolling = useRef(false);
+  const scrollSettleTimer = useRef<number | undefined>(undefined);
+  const pointerFrame = useRef(0);
+  const pendingRotation = useRef<Rotation | null>(null);
   const id = useId().replace(/:/g, '');
   const glowId = `${id}-landing-expression-glow`;
   const coreGlowId = `${id}-landing-expression-core`;
@@ -69,27 +82,97 @@ export function LandingExpressionSlice() {
     let frame = 0;
     let last = performance.now();
     let accumulated = 0;
+    const element = sectionRef.current;
+    const observer = element && 'IntersectionObserver' in window
+      ? new IntersectionObserver(([entry]) => {
+          isVisible.current = Boolean(entry?.isIntersecting && entry.intersectionRatio > 0.03);
+        }, { threshold: [0, 0.03, 0.2] })
+      : undefined;
+
+    if (element && observer) observer.observe(element);
+
+    const handlePageScroll = () => {
+      isPageScrolling.current = true;
+      if (scrollSettleTimer.current !== undefined) window.clearTimeout(scrollSettleTimer.current);
+      scrollSettleTimer.current = window.setTimeout(() => {
+        isPageScrolling.current = false;
+      }, PAGE_SCROLL_SETTLE_MS);
+    };
+
+    window.addEventListener('scroll', handlePageScroll, { passive: true });
 
     const tick = (now: number) => {
       const elapsed = Math.min(now - last, 100);
       last = now;
-      if (!dragState.current) {
+      const canRotate = isVisible.current
+        && document.visibilityState === 'visible'
+        && !dragState.current
+        && !isPageScrolling.current;
+      if (canRotate) {
         accumulated += elapsed;
-        if (accumulated >= 42) {
+        if (accumulated >= AUTO_ROTATION_FRAME_INTERVAL_MS) {
           const step = accumulated * AUTO_ROTATION_DEGREES_PER_MS;
           accumulated = 0;
           setRotation((value) => ({ ...value, yaw: wrapAngle(value.yaw + step) }));
         }
+      } else {
+        accumulated = 0;
       }
       frame = window.requestAnimationFrame(tick);
     };
 
     frame = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(frame);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('scroll', handlePageScroll);
+      if (scrollSettleTimer.current !== undefined) window.clearTimeout(scrollSettleTimer.current);
+      window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  useEffect(() => () => {
+    if (pointerFrame.current) window.cancelAnimationFrame(pointerFrame.current);
   }, []);
 
   function selectAxis(axisId: ExpressionAxisId) {
     setSelectedId(axisId);
+  }
+
+  function queueRotation(nextRotation: Rotation) {
+    pendingRotation.current = nextRotation;
+    if (pointerFrame.current) return;
+    pointerFrame.current = window.requestAnimationFrame(() => {
+      pointerFrame.current = 0;
+      const next = pendingRotation.current;
+      pendingRotation.current = null;
+      if (next) setRotation(next);
+    });
+  }
+
+  function flushPendingRotation() {
+    if (pointerFrame.current) {
+      window.cancelAnimationFrame(pointerFrame.current);
+      pointerFrame.current = 0;
+    }
+    const next = pendingRotation.current;
+    pendingRotation.current = null;
+    if (next) setRotation(next);
+  }
+
+  function capturePointer(target: SVGSVGElement, pointerId: number) {
+    try {
+      target.setPointerCapture(pointerId);
+    } catch {
+      // Older iOS WebKit can reject capture while a native scroll gesture is resolving.
+    }
+  }
+
+  function releasePointer(target: SVGSVGElement, pointerId: number) {
+    try {
+      if (target.hasPointerCapture(pointerId)) target.releasePointerCapture(pointerId);
+    } catch {
+      // The browser may already have released capture after pointercancel.
+    }
   }
 
   function handleKeyDown(event: KeyboardEvent<SVGGElement>, axisId: ExpressionAxisId) {
@@ -113,43 +196,65 @@ export function LandingExpressionSlice() {
 
   function handlePointerDown(event: PointerEvent<SVGSVGElement>) {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
+    const immediateRotation = event.pointerType !== 'touch';
     dragState.current = {
       pointerId: event.pointerId,
+      pointerType: event.pointerType,
       startX: event.clientX,
       startY: event.clientY,
-      startRotation: rotation
+      startRotation: rotation,
+      mode: immediateRotation ? 'rotate' : 'pending'
     };
+    if (immediateRotation) capturePointer(event.currentTarget, event.pointerId);
   }
 
   function handlePointerMove(event: PointerEvent<SVGSVGElement>) {
     const drag = dragState.current;
     if (!drag || drag.pointerId !== event.pointerId) return;
+    const horizontalDistance = event.clientX - drag.startX;
+    const verticalDistance = event.clientY - drag.startY;
+
+    if (drag.mode === 'pending') {
+      if (Math.hypot(horizontalDistance, verticalDistance) < TOUCH_GESTURE_THRESHOLD) return;
+      if (Math.abs(verticalDistance) > Math.abs(horizontalDistance) * TOUCH_HORIZONTAL_BIAS) {
+        drag.mode = 'scroll';
+        return;
+      }
+      drag.mode = 'rotate';
+      capturePointer(event.currentTarget, event.pointerId);
+    }
+
+    if (drag.mode !== 'rotate') return;
+    if (event.cancelable) event.preventDefault();
     const bounds = event.currentTarget.getBoundingClientRect();
-    const yawDelta = (event.clientX - drag.startX) / Math.max(bounds.width, 1) * 140;
-    const pitchDelta = (event.clientY - drag.startY) / Math.max(bounds.height, 1) * 72;
-    setRotation({
+    const yawSensitivity = drag.pointerType === 'touch' ? 112 : 140;
+    const pitchSensitivity = drag.pointerType === 'touch' ? 48 : 72;
+    const yawDelta = horizontalDistance / Math.max(bounds.width, 1) * yawSensitivity;
+    const pitchDelta = verticalDistance / Math.max(bounds.height, 1) * pitchSensitivity;
+    queueRotation({
       yaw: wrapAngle(drag.startRotation.yaw + yawDelta),
       pitch: clamp(drag.startRotation.pitch - pitchDelta, -ROTATION_LIMIT, ROTATION_LIMIT)
     });
   }
 
   function handlePointerEnd(event: PointerEvent<SVGSVGElement>) {
-    if (dragState.current?.pointerId !== event.pointerId) return;
+    const drag = dragState.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    if (drag.mode === 'rotate') flushPendingRotation();
     dragState.current = null;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
+    releasePointer(event.currentTarget, event.pointerId);
   }
 
   return (
     <section
+      ref={sectionRef}
       id="expression"
       className="landing-expression-slice landing-expression-slice--spherical"
       data-viewport-stage="expression"
       data-viewport-surface="expression-slice"
       data-visual-contract="landing-expression-field-v3"
       data-field-geometry="spherical-360"
+      data-mobile-gesture="pan-y-horizontal-rotate"
       data-release-copy="Illustrative Baseline · Eight interactive measurements · one stable center · line length follows relative expression reach · not a diagnosis, score, or claim about anyone’s internal state"
       aria-label="Interactive Baseline expression field"
     >
@@ -157,12 +262,13 @@ export function LandingExpressionSlice() {
         className="landing-expression-slice__canvas"
         viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
         role="group"
-        aria-label="A stable blue sphere with eight interactive measurement lines radiating in every direction from one center. Longer lines show more available expression in this sanitized example. Shorter lines remain closer to the center. Drag to rotate."
+        aria-label="A stable blue sphere with eight interactive measurement lines radiating in every direction from one center. Longer lines show more available expression in this sanitized example. Shorter lines remain closer to the center. Swipe sideways or drag to rotate while vertical page scrolling remains available."
         preserveAspectRatio="xMidYMid meet"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerEnd}
         onPointerCancel={handlePointerEnd}
+        onLostPointerCapture={handlePointerEnd}
       >
         <defs>
           <filter id={glowId} x="-80%" y="-80%" width="260%" height="260%">
@@ -234,7 +340,9 @@ export function LandingExpressionSlice() {
                   tabIndex={0}
                   aria-pressed={selectedLine}
                   aria-label={`${axis.label}. ${salienceLabel(axis.value)}. Relative reach ${axis.value}. Baseline ${axis.baselineValue}. Temporary change ${formatDelta(axis.currentDelta)}. ${description}`}
-                  onPointerEnter={() => selectAxis(axis.id)}
+                  onPointerEnter={(event) => {
+                    if (event.pointerType !== 'touch') selectAxis(axis.id);
+                  }}
                   onFocus={() => selectAxis(axis.id)}
                   onClick={(event) => {
                     event.stopPropagation();
@@ -277,7 +385,8 @@ export function LandingExpressionSlice() {
       </div>
 
       <span className="landing-expression-slice__instructions">
-        Drag to rotate · select a line to inspect its relative reach
+        <span className="landing-expression-slice__instructions-desktop">Drag to rotate · select a line to inspect its relative reach</span>
+        <span className="landing-expression-slice__instructions-mobile">Swipe sideways to rotate · scroll normally · tap a line to inspect</span>
       </span>
     </section>
   );
