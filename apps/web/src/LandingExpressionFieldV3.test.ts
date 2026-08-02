@@ -69,7 +69,8 @@ describe('premium rotating public Expression Field v3', () => {
       'role="status"'
     ]) expect(field).toContain(marker);
 
-    expect(field).toContain('selected && selectedGeometry');
+    expect(field).toContain('const tooltipStyle = selectedGeometry');
+    expect(field).toContain('selected && tooltipStyle');
     expect(field).not.toContain('landing-expression-slice__header');
     expect(field).not.toContain('landing-expression-slice__question');
     expect(field).not.toContain('landing-expression-slice__note');
