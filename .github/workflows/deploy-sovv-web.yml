@@ -58,3 +58,5 @@ jobs:
           html=$(curl --fail-with-body --silent --show-error --location --max-time 20 "https://sovereign.defrag.app/?release=${GITHUB_SHA}")
           printf '%s' "$html" | grep -q 'id="root"'
           printf '%s' "$html" | grep -q 'Sovereign'
+
+# Release gate trigger: 2026-08-02T20:50:57Z
