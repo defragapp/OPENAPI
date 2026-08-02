@@ -1,10 +1,40 @@
-const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT_SHA || '').trim();
+import { spawnSync } from 'node:child_process';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const rawDeclaredSha = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
+
+function resolveCheckoutSha() {
+  const result = spawnSync('git', ['rev-parse', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  if (result.error || result.status !== 0) {
+    throw new Error(`Unable to resolve the checked-out commit for parent-domain verification: ${String(result.stderr || result.error?.message || 'unknown git error').trim()}`);
+  }
+  return String(result.stdout || '').trim();
+}
+
+const checkoutSha = resolveCheckoutSha();
+if (!/^[0-9a-f]{40}$/i.test(checkoutSha)) {
+  throw new Error('The checked-out commit is not a full 40-character SHA');
+}
+
+const declaredSha = /^[0-9a-f]{40}$/i.test(rawDeclaredSha) ? rawDeclaredSha : '';
+if (declaredSha && declaredSha !== checkoutSha) {
+  throw new Error(`Declared commit ${declaredSha} does not match checkout ${checkoutSha}`);
+}
+
+const commitSha = declaredSha || checkoutSha;
+const metadataSource = declaredSha
+  ? 'cloudflare'
+  : rawDeclaredSha
+    ? 'checkout-invalid-cloudflare-metadata-ignored'
+    : 'checkout';
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
-
-if (!/^[0-9a-f]{40}$/i.test(commitSha)) {
-  throw new Error('A full 40-character commit SHA is required for parent-domain verification');
-}
 
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
@@ -246,6 +276,7 @@ for (let attempt = 1; attempt <= 24; attempt += 1) {
     console.log(JSON.stringify({
       parentDomainsVerified: true,
       version: commitSha,
+      metadataSource,
       redirects: redirectChecks.map(([source, destination]) => ({ source, destination })),
       health: healthChecks,
       visualRelease

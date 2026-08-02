@@ -139,6 +139,9 @@ for (const required of ["read_replication: { mode: 'auto' }", 'rate_limiting_lim
   requireValue(freeTierControls.includes(required), `Cloudflare free-tier control is missing ${required}`);
 }
 for (const required of [
+  "spawnSync('git', ['rev-parse', 'HEAD']",
+  'declaredSha && declaredSha !== checkoutSha',
+  'checkout-invalid-cloudflare-metadata-ignored',
   'https://defrag.app/',
   'https://www.defrag.app/',
   'https://sovereign.defrag.app/',
