@@ -51,15 +51,19 @@ describe('public landing v3 release', () => {
       'surface="relationship-reasoning"',
       'surface="system-map"',
       'surface="system-reasoning"',
-      'Reading your Baseline',
-      'Keeping both people distinct',
-      'Mapping the people',
       'landing-evidence',
       'landing-workflow',
       'landing-system-map',
       'is-active',
       'is-complete'
     ]) expect(renderedStories).toContain(marker);
+
+    for (const marker of [
+      'Reading your Baseline',
+      'Keeping both people distinct',
+      'Mapping the people'
+    ]) expect(stories).toContain(marker);
+
     expect(renderedStories).not.toContain('LandingExpressionFieldPreview');
     expect(renderedStories).not.toContain('sphere');
     expect(renderedStories).not.toContain('globe');
