@@ -216,8 +216,7 @@ body {
 }
 
 .story-assistant-message,
-.story-baseline-card,
-.story-system-map {
+.story-baseline-card {
   border: 1px solid var(--premium-rule);
   background: #222322;
 }

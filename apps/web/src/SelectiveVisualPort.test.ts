@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest';
 
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
-const contextField = readFileSync(new URL('./ContextInteractionField.tsx', import.meta.url), 'utf8');
+const expressionRenderer = readFileSync(new URL('./expression-field/ExpressionField.tsx', import.meta.url), 'utf8');
+const relationshipField = readFileSync(new URL('./expression-field/RelationalExpressionField.tsx', import.meta.url), 'utf8');
+const systemField = readFileSync(new URL('./expression-field/SystemExpressionField.tsx', import.meta.url), 'utf8');
+const expressionCss = readFileSync(new URL('./expression-field/expression-field.css', import.meta.url), 'utf8');
 const v0Visual = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
@@ -13,7 +16,7 @@ describe('founder v0 selective visual port', () => {
     expect(landing).toContain('Step 02 · You + 1');
     expect(landing).toContain('Step 03 · Your whole system');
     expect(landing).toContain('function ProcessingFlow(');
-    expect(landing).toContain('className="v0-window v0-flow"');
+    expect(landing).toContain('v0-window v0-flow');
     expect(landing).toContain('className="v0-baseline-trace"');
     expect(landing).toContain('className="v0-family-map"');
     expect(landing).toContain('How Sovereign reads both of you');
@@ -52,9 +55,14 @@ describe('founder v0 selective visual port', () => {
     expect(workspace).toContain('className="relationship-answer"');
     expect(workspace).toContain('className="system-graph"');
     expect(workspace).toContain('className="basis-strip"');
-    expect(workspace).toContain('<ContextInteractionField');
-    expect(contextField).toContain('Distinct people · shared context');
-    expect(contextField).toContain('IntersectionObserver');
+    expect(landing).toContain('<LandingExpressionFieldPreview');
+    expect(workspace).toContain('<WorkspaceExpressionField');
+    expect(workspace).toContain('<ThreadExpressionField');
+    expect(expressionRenderer).toContain('export function ExpressionFieldRenderer');
+    expect(relationshipField).toContain('<ExpressionFieldRenderer');
+    expect(systemField).toContain('<ExpressionFieldRenderer');
+    expect(relationshipField).not.toContain('<line');
+    expect(systemField).not.toContain('system-center');
   });
 
   it('applies the v0 language to existing authenticated and account components', () => {
@@ -71,13 +79,13 @@ describe('founder v0 selective visual port', () => {
     expect(v0Visual).toContain('@media (max-width: 760px)');
     expect(v0Visual).toContain('@media (prefers-reduced-motion: reduce)');
     expect(v0Visual).toContain(':is(.v0-flow, .v0-system-flow) li');
-    expect(v0Visual).toContain('.context-field-compact .context-field-options button { min-height: 44px;');
+    expect(expressionCss).toContain('min-height: 44px');
     expect(main).toContain("import './v0-visual-port.css';");
   });
 
   it('does not introduce the archive mock runtime, scores, or alternate architecture', () => {
     expect(landing).not.toContain('localStorage');
-    const source = `${landing}\n${contextField}\n${v0Visual}`;
+    const source = `${landing}\n${expressionRenderer}\n${relationshipField}\n${systemField}\n${v0Visual}`;
     for (const prohibited of [
       'Alignment Score',
       'Stability Index',

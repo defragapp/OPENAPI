@@ -13,12 +13,29 @@ const productionRelease = readFileSync('scripts/cloudflare-production-release.mj
 const freeTierControls = readFileSync('scripts/configure-cloudflare-free-tier.mjs', 'utf8');
 const parentDomainVerifier = readFileSync('scripts/verify-parent-domain-routes.mjs', 'utf8');
 const preview = workerConfig.env?.preview;
+const expectedObservability = {
+  logs: {
+    enabled: true,
+    invocation_logs: true
+  },
+  traces: {
+    enabled: true,
+    head_sampling_rate: 0.05
+  }
+};
 
 function requireValue(condition, message) {
   if (!condition) throw new Error(message);
 }
 
 requireValue(JSON.stringify(rootConfig) === JSON.stringify(productionConfig), 'Root and direct production Wrangler configs must remain identical');
+for (const [label, observability] of [
+  ['production', rootConfig.observability],
+  ['local', workerConfig.observability],
+  ['preview', preview?.observability]
+]) {
+  requireValue(JSON.stringify(observability) === JSON.stringify(expectedObservability), `${label} observability must preserve invocation logs and five-percent traces`);
+}
 requireValue(rootConfig.name === 'sovv-web', 'Root Worker name must match production');
 requireValue(rootConfig.main === 'apps/sovereign-worker/src/runtime-entry.ts', 'Root config must use the active OPENAPI runtime');
 requireValue(rootConfig.workers_dev === true, 'Production Worker must preserve its workers.dev fallback');

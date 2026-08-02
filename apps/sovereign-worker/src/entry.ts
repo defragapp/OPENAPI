@@ -15,7 +15,7 @@ import { saveLatestInsightModule } from './db/insight-modules';
 import { canUseDevelopmentFixtures } from './runtime';
 import { clearCurrentConditions, computeCurrentConditions, parseLocationPrecision, type CurrentLocationInput, type LocationPrecision } from './baseline';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
-import { authorizeConversationContext, parseConversationContext } from './conversation-context';
+import { authorizeConversationContext, parseConversationContext, projectExpressionFieldContext } from './conversation-context';
 import { buildInterfaceActions } from './interface-actions';
 import type { SovereignAnswerAction } from './agent/recognition';
 
@@ -265,6 +265,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
 
   const entitlements = await getEntitlements(env, auth.accountId);
   const authorizedContext = await authorizeConversationContext(env, auth.accountId, selection, entitlements);
+  const expressionFieldContext = projectExpressionFieldContext(authorizedContext);
   const aiConfig = resolveAiModelConfig(env);
   if (aiConfig.provider !== 'cloudflare-gateway' || !env.AI || !env.AI_GATEWAY_ID) {
     if (!canUseDevelopmentFixtures(env)) {
@@ -333,7 +334,8 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       answer: result.answer,
       basis: result.basis,
       context: selection,
-      interfaceActions
+      interfaceActions,
+      ...(expressionFieldContext ? { expressionFieldContext } : {})
     }, traceId);
     await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'completed');
     const headers = new Headers({
@@ -350,7 +352,8 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       ? Response.json({
           answer: result.answer,
           basis: result.basis,
-          interfaceActions
+          interfaceActions,
+          ...(expressionFieldContext ? { expressionFieldContext } : {})
         }, { status: 202, headers })
       : new Response(result.text, { status: 202, headers });
   } catch (error) {

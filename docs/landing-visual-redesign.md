@@ -27,8 +27,8 @@ The hero must preserve the archive’s centered, near-black, atmospheric editori
 1. Founder v0 hero.
 2. Rotating real-life questions.
 3. `Ask about your life. Get an answer built for you.` with the self chat and reasoning flow.
-4. `See the space between you.` with two permitted Baselines and the relationship flow.
-5. `From one person to the whole system.` with the family/system map.
+4. `Understand what happens between you.` with two permitted Baselines and the relationship flow.
+5. `From one person to the whole system.` with distinct person fields and their system interaction.
 6. `Other AI answers everyone the same.` comparison.
 7. `Your thoughts deserve a better place to live.` final action.
 

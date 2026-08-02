@@ -36,6 +36,7 @@ export interface ThreadMessage {
   correction?: ThreadCorrection;
   correctionHistory?: ThreadCorrection[];
   interfaceActions?: Record<string, unknown>;
+  expressionFieldContext?: Record<string, unknown>;
 }
 
 export async function listThreads(env: Env, accountId: string): Promise<ThreadSummary[]> {
@@ -101,7 +102,8 @@ export async function listThreadMessages(env: Env, accountId: string, threadId: 
       ...(payload.context && typeof payload.context === 'object' ? { context: payload.context as Record<string, unknown> } : {}),
       ...(role === 'assistant' && (payload.answer && typeof payload.answer === 'object' ? { answer: payload.answer as Record<string, unknown> } : pendingAnswer ? { answer: pendingAnswer } : {})),
       ...(Array.isArray(payload.basis) ? { basis: payload.basis.filter((item): item is Record<string, unknown> => Boolean(item && typeof item === 'object')) } : {}),
-      ...(payload.interfaceActions && typeof payload.interfaceActions === 'object' ? { interfaceActions: payload.interfaceActions as Record<string, unknown> } : {})
+      ...(payload.interfaceActions && typeof payload.interfaceActions === 'object' ? { interfaceActions: payload.interfaceActions as Record<string, unknown> } : {}),
+      ...(payload.expressionFieldContext && typeof payload.expressionFieldContext === 'object' ? { expressionFieldContext: payload.expressionFieldContext as Record<string, unknown> } : {})
     });
     if (role === 'assistant') pendingAnswer = undefined;
   }

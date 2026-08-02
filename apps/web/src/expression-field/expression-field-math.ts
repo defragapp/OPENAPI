@@ -69,6 +69,55 @@ export function multiplyQuaternion(left: Quaternion, right: Quaternion): Quatern
   ]);
 }
 
+export function quaternionFromUnitVectors(from: Vec3, to: Vec3): Quaternion {
+  const source = normalizeVector(from);
+  const target = normalizeVector(to);
+  const dot = clamp(source[0] * target[0] + source[1] * target[1] + source[2] * target[2], -1, 1);
+
+  if (dot < -0.999999) {
+    const orthogonal: Vec3 = Math.abs(source[0]) < 0.9
+      ? [0, -source[2], source[1]]
+      : [-source[1], source[0], 0];
+    const axis = normalizeVector(orthogonal);
+    return [axis[0], axis[1], axis[2], 0];
+  }
+
+  const cross: Vec3 = [
+    source[1] * target[2] - source[2] * target[1],
+    source[2] * target[0] - source[0] * target[2],
+    source[0] * target[1] - source[1] * target[0]
+  ];
+  return normalizeQuaternion([cross[0], cross[1], cross[2], 1 + dot]);
+}
+
+export function slerpQuaternion(from: Quaternion, to: Quaternion, amount: number): Quaternion {
+  const t = clamp(amount, 0, 1);
+  let target = to;
+  let dot = from[0] * to[0] + from[1] * to[1] + from[2] * to[2] + from[3] * to[3];
+  if (dot < 0) {
+    target = [-to[0], -to[1], -to[2], -to[3]];
+    dot = -dot;
+  }
+  if (dot > 0.9995) {
+    return normalizeQuaternion([
+      from[0] + (target[0] - from[0]) * t,
+      from[1] + (target[1] - from[1]) * t,
+      from[2] + (target[2] - from[2]) * t,
+      from[3] + (target[3] - from[3]) * t
+    ]);
+  }
+  const theta = Math.acos(clamp(dot, -1, 1));
+  const sinTheta = Math.sin(theta);
+  const left = Math.sin((1 - t) * theta) / sinTheta;
+  const right = Math.sin(t * theta) / sinTheta;
+  return normalizeQuaternion([
+    from[0] * left + target[0] * right,
+    from[1] * left + target[1] * right,
+    from[2] * left + target[2] * right,
+    from[3] * left + target[3] * right
+  ]);
+}
+
 export function rotateVector(vector: Vec3, quaternion: Quaternion): Vec3 {
   const [x, y, z] = vector;
   const [qx, qy, qz, qw] = quaternion;
@@ -89,11 +138,11 @@ export function scaleVector(vector: Vec3, length: number): Vec3 {
 
 export function vectorLengthForValue(value: number): number {
   const normalized = clamp(value, 0, 100) / 100;
-  return 0.1 + normalized * 0.78;
+  return 0.18 + normalized * 0.8;
 }
 
 export function projectPoint(vector: Vec3, radius: number, centerX: number, centerY: number): readonly [number, number, number] {
-  const perspective = 1 / (1.72 - vector[2] * 0.32);
+  const perspective = 1 / (1.18 - vector[2] * 0.12);
   return [
     centerX + vector[0] * radius * perspective,
     centerY - vector[1] * radius * perspective,
@@ -123,6 +172,11 @@ export function distanceToSegment(
 function normalizeQuaternion(value: Quaternion): Quaternion {
   const length = Math.hypot(value[0], value[1], value[2], value[3]) || 1;
   return [value[0] / length, value[1] / length, value[2] / length, value[3] / length];
+}
+
+function normalizeVector(value: Vec3): Vec3 {
+  const length = Math.hypot(value[0], value[1], value[2]) || 1;
+  return [value[0] / length, value[1] / length, value[2] / length];
 }
 
 function clamp(value: number, minimum: number, maximum: number): number {

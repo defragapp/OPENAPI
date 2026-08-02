@@ -5,17 +5,17 @@ import type {
   ExpressionAxisValue,
   ExpressionFieldResponse
 } from './expression-field-contract';
-import { landingExpressionFieldFixture } from './expression-field.fixture';
 import {
   damp,
   distanceToSegment,
   expressionAxisRegistry,
-  fibonacciSphere,
   multiplyQuaternion,
   projectPoint,
   quaternionFromEuler,
+  quaternionFromUnitVectors,
   rotateVector,
   scaleVector,
+  slerpQuaternion,
   vectorLengthForValue,
   type Quaternion,
   type Vec3
@@ -30,33 +30,45 @@ interface InstrumentProps {
 }
 
 interface CanvasProps {
-  axes: ExpressionAxisValue[];
-  variant: 'landing' | 'account';
+  axes: readonly ExpressionAxisValue[];
+  variant: 'preview' | 'account';
   autoRotate: boolean;
   selectedAxisId: ExpressionAxisId;
   onSelectAxis: (id: ExpressionAxisId) => void;
   resetSignal: number;
+  engagementDirection?: ExpressionFieldEngagementDirection;
+  engagementPhase: number;
+  draggable: boolean;
+  ariaLabel: string;
+}
+
+export type ExpressionFieldEngagementDirection = 'left' | 'right' | 'up' | 'down' | 'up-left' | 'up-right' | 'down-left' | 'down-right';
+
+export interface ExpressionFieldRendererProps {
+  axes: readonly ExpressionAxisValue[];
+  selectedAxisId: ExpressionAxisId;
+  autoRotate?: boolean;
+  engagementDirection?: ExpressionFieldEngagementDirection;
+  engagementPhase?: number;
+  draggable?: boolean;
+  className?: string;
+  ariaLabel: string;
 }
 
 type Segment = { id: ExpressionAxisId; startX: number; startY: number; endX: number; endY: number };
 type PointerState = { id: number; x: number; y: number; startX: number; startY: number; moved: boolean };
 
-const shellPoints = fibonacciSphere(1200);
-const gridLines = buildGridLines();
-
-export function LandingExpressionField() {
-  return (
-    <div className="landing-expression-field">
-      <ExpressionFieldInstrument
-        snapshot={landingExpressionFieldFixture}
-        variant="landing"
-        autoRotate
-        selectedAxisId="responsibility"
-      />
-      <p>Sanitized demonstration · Illustrative values · Not your Baseline</p>
-    </div>
-  );
-}
+const engagementDirections: Record<ExpressionFieldEngagementDirection, Vec3> = {
+  left: [-1, 0, 0],
+  right: [1, 0, 0],
+  up: [0, 1, 0],
+  down: [0, -1, 0],
+  'up-left': [-0.7071, 0.7071, 0],
+  'up-right': [0.7071, 0.7071, 0],
+  'down-left': [-0.7071, -0.7071, 0],
+  'down-right': [0.7071, -0.7071, 0]
+};
+const axisDirectionById = new Map(expressionAxisRegistry.map((axis) => [axis.id, axis.direction]));
 
 export function AccountExpressionField() {
   const [snapshot, setSnapshot] = useState<ExpressionFieldResponse | null>(null);
@@ -182,13 +194,14 @@ export function ExpressionFieldInstrument({
   return (
     <section className={`expression-field-instrument expression-field-${variant}`} data-expression-field-version={snapshot.version}>
       <div className="expression-field-canvas-shell">
-        <ExpressionFieldCanvas
+        <ExpressionFieldRenderer
           axes={snapshot.axes}
-          variant={variant}
           autoRotate={autoRotate}
           selectedAxisId={selected}
           onSelectAxis={selectAxis}
           resetSignal={resetSignal}
+          draggable
+          ariaLabel="Rotatable Expression Field. Select an expression from the controls below for exact text detail."
         />
         <span className="expression-field-origin-label">ONE CENTER · SIXTEEN EXPRESSIONS</span>
       </div>
@@ -225,7 +238,47 @@ export function ExpressionFieldInstrument({
   );
 }
 
-function ExpressionFieldCanvas({ axes, variant, autoRotate, selectedAxisId, onSelectAxis, resetSignal }: CanvasProps) {
+export function ExpressionFieldRenderer({
+  axes,
+  selectedAxisId,
+  autoRotate = true,
+  engagementDirection,
+  engagementPhase = 0,
+  draggable = false,
+  className = '',
+  ariaLabel,
+  ...internal
+}: ExpressionFieldRendererProps & { onSelectAxis?: (id: ExpressionAxisId) => void; resetSignal?: number; variant?: 'preview' | 'account' }) {
+  return (
+    <div className={`expression-field-renderer${draggable ? ' is-draggable' : ''}${className ? ` ${className}` : ''}`}>
+      <ExpressionFieldCanvas
+        axes={axes}
+        variant={internal.variant ?? (draggable ? 'account' : 'preview')}
+        autoRotate={autoRotate}
+        selectedAxisId={selectedAxisId}
+        onSelectAxis={internal.onSelectAxis ?? (() => undefined)}
+        resetSignal={internal.resetSignal ?? 0}
+        {...(engagementDirection ? { engagementDirection } : {})}
+        engagementPhase={engagementPhase}
+        draggable={draggable}
+        ariaLabel={ariaLabel}
+      />
+    </div>
+  );
+}
+
+function ExpressionFieldCanvas({
+  axes,
+  variant,
+  autoRotate,
+  selectedAxisId,
+  onSelectAxis,
+  resetSignal,
+  engagementDirection,
+  engagementPhase,
+  draggable,
+  ariaLabel
+}: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rotationRef = useRef<Quaternion>(quaternionFromEuler(-0.14, 0.42));
   const velocityRef = useRef({ x: 0, y: 0 });
@@ -233,24 +286,44 @@ function ExpressionFieldCanvas({ axes, variant, autoRotate, selectedAxisId, onSe
   const visibleRef = useRef(true);
   const segmentsRef = useRef<Segment[]>([]);
   const displayedValuesRef = useRef(new Map<ExpressionAxisId, number>());
+  const requestRenderRef = useRef<() => void>(() => undefined);
   const axesById = useMemo(() => new Map(axes.map((axis) => [axis.id, axis])), [axes]);
 
   useEffect(() => {
     rotationRef.current = quaternionFromEuler(-0.14, 0.42);
     velocityRef.current = { x: 0, y: 0 };
+    requestRenderRef.current();
   }, [resetSignal]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const context = canvas?.getContext('2d');
-    if (!canvas || !context) return;
+    if (!canvas) return;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+    const renderContext: CanvasRenderingContext2D = context;
 
     const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const dprCap = variant === 'landing' ? 1.5 : 2;
+    const dprCap = variant === 'preview' ? 1.5 : 2;
+    const selectedDirection = axisDirectionById.get(selectedAxisId);
+    const engagementTarget = engagementDirection ? engagementDirections[engagementDirection] : undefined;
+    const engagementRotation = selectedDirection && engagementTarget
+      ? quaternionFromUnitVectors(selectedDirection, engagementTarget)
+      : undefined;
+    if (reduceMotion) {
+      for (const [id, axis] of axesById) displayedValuesRef.current.set(id, axis.value);
+    }
     let width = 1;
     let height = 1;
     let frame = 0;
+    let active = true;
     let previousTime = performance.now();
+
+    const start = () => {
+      if (!active || frame || !visibleRef.current || document.hidden) return;
+      previousTime = performance.now();
+      frame = requestAnimationFrame(render);
+    };
+    requestRenderRef.current = start;
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
@@ -259,7 +332,8 @@ function ExpressionFieldCanvas({ axes, variant, autoRotate, selectedAxisId, onSe
       height = Math.max(1, rect.height);
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
-      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      renderContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+      start();
     };
 
     const resizeObserver = new ResizeObserver(resize);
@@ -268,10 +342,16 @@ function ExpressionFieldCanvas({ axes, variant, autoRotate, selectedAxisId, onSe
 
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       visibleRef.current = entry?.isIntersecting ?? true;
+      if (visibleRef.current) start();
+      else if (frame) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+      }
     }, { rootMargin: '120px' });
     intersectionObserver.observe(canvas);
 
-    const render = (time: number) => {
+    function render(time: number) {
+      frame = 0;
       const delta = Math.min(0.05, Math.max(0.001, (time - previousTime) / 1000));
       previousTime = time;
       if (visibleRef.current && !document.hidden) {
@@ -285,30 +365,42 @@ function ExpressionFieldCanvas({ axes, variant, autoRotate, selectedAxisId, onSe
             rotationRef.current = multiplyQuaternion(quaternionFromEuler(0, 0.045 * delta), rotationRef.current);
           }
         }
+        const cycle = ((time / 6200 + engagementPhase) % 1 + 1) % 1;
+        const wave = (1 - Math.cos(cycle * Math.PI * 2)) / 2;
+        const engagementAmount = reduceMotion ? 0.72 : smoothstep(0.34, 0.82, wave) * 0.94;
+        const renderedRotation = engagementRotation
+          ? slerpQuaternion(rotationRef.current, engagementRotation, engagementAmount)
+          : rotationRef.current;
         drawExpressionField({
-          context,
+          context: renderContext,
           width,
           height,
           axesById,
-          rotation: rotationRef.current,
+          rotation: renderedRotation,
           selectedAxisId,
           displayedValues: displayedValuesRef.current,
           segments: segmentsRef.current,
           delta
         });
       }
-      frame = requestAnimationFrame(render);
-    };
+      if (!reduceMotion) start();
+    }
 
-    frame = requestAnimationFrame(render);
+    const visibilityChange = () => start();
+    document.addEventListener('visibilitychange', visibilityChange);
+    start();
     return () => {
+      active = false;
       cancelAnimationFrame(frame);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
+      document.removeEventListener('visibilitychange', visibilityChange);
+      requestRenderRef.current = () => undefined;
     };
-  }, [axesById, autoRotate, selectedAxisId, variant]);
+  }, [axesById, autoRotate, engagementDirection, engagementPhase, selectedAxisId, variant]);
 
   function pointerDown(event: ReactPointerEvent<HTMLCanvasElement>) {
+    if (!draggable) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     pointerRef.current = {
       id: event.pointerId,
@@ -322,6 +414,7 @@ function ExpressionFieldCanvas({ axes, variant, autoRotate, selectedAxisId, onSe
   }
 
   function pointerMove(event: ReactPointerEvent<HTMLCanvasElement>) {
+    if (!draggable) return;
     const pointer = pointerRef.current;
     if (!pointer || pointer.id !== event.pointerId) return;
     const dx = event.clientX - pointer.x;
@@ -329,14 +422,16 @@ function ExpressionFieldCanvas({ axes, variant, autoRotate, selectedAxisId, onSe
     const totalX = event.clientX - pointer.startX;
     const totalY = event.clientY - pointer.startY;
     if (!pointer.moved && Math.hypot(totalX, totalY) > 5) pointer.moved = true;
-    if (variant === 'landing' && Math.abs(totalY) > Math.abs(totalX) * 1.25) return;
+    if (variant === 'preview' && Math.abs(totalY) > Math.abs(totalX) * 1.25) return;
     rotationRef.current = multiplyQuaternion(quaternionFromEuler(dy * 0.006, dx * 0.006), rotationRef.current);
     velocityRef.current = { x: dx * 0.85, y: dy * 0.85 };
     pointer.x = event.clientX;
     pointer.y = event.clientY;
+    requestRenderRef.current();
   }
 
   function pointerUp(event: ReactPointerEvent<HTMLCanvasElement>) {
+    if (!draggable) return;
     const pointer = pointerRef.current;
     if (!pointer || pointer.id !== event.pointerId) return;
     if (!pointer.moved) {
@@ -359,11 +454,12 @@ function ExpressionFieldCanvas({ axes, variant, autoRotate, selectedAxisId, onSe
     <canvas
       ref={canvasRef}
       className="expression-field-canvas"
-      aria-label="Rotatable Expression Field. Select an expression from the controls below for exact text detail."
-      onPointerDown={pointerDown}
-      onPointerMove={pointerMove}
-      onPointerUp={pointerUp}
-      onPointerCancel={() => { pointerRef.current = null; }}
+      role="img"
+      aria-label={ariaLabel}
+      onPointerDown={draggable ? pointerDown : undefined}
+      onPointerMove={draggable ? pointerMove : undefined}
+      onPointerUp={draggable ? pointerUp : undefined}
+      onPointerCancel={draggable ? () => { pointerRef.current = null; } : undefined}
     />
   );
 }
@@ -382,7 +478,7 @@ function drawExpressionField(input: {
   const { context, width, height, rotation } = input;
   const centerX = width / 2;
   const centerY = height / 2;
-  const radius = Math.min(width, height) * 0.43;
+  const radius = Math.min(width, height) * 0.47;
   context.clearRect(0, 0, width, height);
 
   const atmosphere = context.createRadialGradient(centerX, centerY, radius * 0.15, centerX, centerY, radius * 1.18);
@@ -390,43 +486,13 @@ function drawExpressionField(input: {
   atmosphere.addColorStop(0.62, 'rgba(18, 86, 173, .035)');
   atmosphere.addColorStop(1, 'rgba(5, 18, 35, 0)');
   context.fillStyle = atmosphere;
-  context.beginPath();
-  context.arc(centerX, centerY, radius * 1.18, 0, Math.PI * 2);
-  context.fill();
-
-  context.strokeStyle = 'rgba(73, 151, 245, .16)';
-  context.lineWidth = 0.75;
-  for (const line of gridLines) {
-    context.beginPath();
-    line.forEach((point, index) => {
-      const projected = projectPoint(rotateVector(point, rotation), radius, centerX, centerY);
-      if (index === 0) context.moveTo(projected[0], projected[1]);
-      else context.lineTo(projected[0], projected[1]);
-    });
-    context.stroke();
-  }
-
-  for (const point of shellPoints) {
-    const rotated = rotateVector(point, rotation);
-    const projected = projectPoint(rotated, radius, centerX, centerY);
-    const depth = (rotated[2] + 1) / 2;
-    context.fillStyle = `rgba(68, 151, 255, ${0.1 + depth * 0.52})`;
-    context.beginPath();
-    context.arc(projected[0], projected[1], 0.55 + depth * 0.72, 0, Math.PI * 2);
-    context.fill();
-  }
-
-  context.strokeStyle = 'rgba(83, 166, 255, .38)';
-  context.lineWidth = 1;
-  context.beginPath();
-  context.arc(centerX, centerY, radius * 0.59, 0, Math.PI * 2);
-  context.stroke();
+  context.fillRect(0, 0, width, height);
 
   input.segments.length = 0;
   const layers = expressionAxisRegistry.map((definition) => {
     const axis = input.axesById.get(definition.id);
     const target = axis?.value ?? 0;
-    const current = damp(input.displayedValues.get(definition.id) ?? target, target, 6.2, input.delta);
+    const current = damp(input.displayedValues.get(definition.id) ?? axis?.baselineValue ?? target, target, 6.2, input.delta);
     input.displayedValues.set(definition.id, current);
     const direction = rotateVector(definition.direction, rotation);
     const end = projectPoint(scaleVector(direction, vectorLengthForValue(current)), radius, centerX, centerY);
@@ -472,23 +538,9 @@ function drawExpressionField(input: {
   context.fill();
 }
 
-function buildGridLines(): Vec3[][] {
-  const lines: Vec3[][] = [];
-  for (const latitude of [-60, -36, -12, 12, 36, 60]) {
-    const phi = latitude * Math.PI / 180;
-    lines.push(Array.from({ length: 73 }, (_, index) => {
-      const theta = index / 72 * Math.PI * 2;
-      return [Math.cos(phi) * Math.cos(theta), Math.sin(phi), Math.cos(phi) * Math.sin(theta)] as Vec3;
-    }));
-  }
-  for (let longitude = 0; longitude < 12; longitude += 1) {
-    const theta = longitude / 12 * Math.PI * 2;
-    lines.push(Array.from({ length: 73 }, (_, index) => {
-      const phi = -Math.PI / 2 + index / 72 * Math.PI;
-      return [Math.cos(phi) * Math.cos(theta), Math.sin(phi), Math.cos(phi) * Math.sin(theta)] as Vec3;
-    }));
-  }
-  return lines;
+function smoothstep(minimum: number, maximum: number, value: number) {
+  const normalized = Math.max(0, Math.min(1, (value - minimum) / (maximum - minimum)));
+  return normalized * normalized * (3 - 2 * normalized);
 }
 
 function placePromptInComposer(prompt: string) {

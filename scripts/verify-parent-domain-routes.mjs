@@ -1,6 +1,6 @@
 const commitSha = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMIT_SHA || '').trim();
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
-const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 
 if (!/^[0-9a-f]{40}$/i.test(commitSha)) {
   throw new Error('A full 40-character commit SHA is required for parent-domain verification');
@@ -94,7 +94,7 @@ async function verifyVisualRelease() {
     'Holding onto the pain is.',
     'Ask about your life.',
     'Get an answer built for you.',
-    'See the space',
+    'Understand what happens',
     'between you.',
     'From one person',
     'to the whole system.',

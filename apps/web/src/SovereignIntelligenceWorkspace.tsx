@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent, ReactNode } from 'react';
-import { ContextInteractionField } from './ContextInteractionField';
-import type { ContextFieldConnection, ContextFieldNode } from './ContextInteractionField';
+import { ThreadExpressionField } from './expression-field/ThreadExpressionField';
+import { WorkspaceExpressionField } from './expression-field/WorkspaceExpressionField';
+import { expressionAxisIds } from './expression-field/expression-field-contract';
+import type { ExpressionAxisId, ExpressionAxisValue } from './expression-field/expression-field-contract';
+import type { ExpressionFieldConnection, ExpressionFieldSubject } from './expression-field/expression-field-view-contract';
 
 type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
 type ApiState = 'idle' | 'loading' | 'ready' | 'error';
@@ -73,6 +76,7 @@ type ChatMessage = {
   answer?: SovereignAnswer;
   basis?: BasisValue[];
   interfaceActions?: InterfaceActionEnvelope;
+  expressionFieldContext?: Json;
   context?: Json;
   createdAt?: string;
 };
@@ -102,6 +106,8 @@ const surfaces: Array<{ name: Surface; label: string; description: string }> = [
   { name: 'Library', label: 'Library', description: 'Keep useful understanding' },
   { name: 'You', label: 'You', description: 'Baseline, plan, and control' }
 ];
+
+const expressionAxisIdSet = new Set<string>(expressionAxisIds);
 
 const exploreModes = [
   ['My Baseline', 'Show me a part of my Baseline I may not recognize yet.'],
@@ -368,7 +374,8 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
             text: payload.answer.direct_answer,
             answer: payload.answer,
             basis: Array.isArray(payload.basis) ? payload.basis.filter(isBasisValue) : [],
-            ...(isInterfaceActionEnvelope(payload.interfaceActions) ? { interfaceActions: payload.interfaceActions } : {})
+            ...(isInterfaceActionEnvelope(payload.interfaceActions) ? { interfaceActions: payload.interfaceActions } : {}),
+            ...(isExpressionFieldContext(payload.expressionFieldContext) ? { expressionFieldContext: payload.expressionFieldContext } : {})
           }
         : item));
       setApiState('ready');
@@ -1001,12 +1008,13 @@ function RelationshipOverview({ person, api, onPrompt }: { person: Json; api: (p
   if (error) return <EmptyState title="This relationship needs one more permission." body={error} action="Manage permissions" onAction={openConsentControls} />;
   if (!comparison) return <p className="loading-state">Loading the permitted comparison…</p>;
   const participants = comparison.participants ?? [];
-  const fieldNodes: ContextFieldNode[] = participants.slice(0, 2).map((participant: Json, index: number) => ({
+  const fieldSubjects: ExpressionFieldSubject[] = participants.slice(0, 2).map((participant: Json, index: number) => ({
     id: String(participant.key ?? `participant-${index}`),
     label: index === 0 ? 'You' : String(participant.label ?? person.displayName ?? 'They'),
     meta: String(participant.facets?.[0]?.title ?? 'Permitted Baseline'),
     detail: String(participant.facets?.[0]?.description ?? 'This permitted perspective is incomplete and remains open to correction.'),
-    tone: index === 0 ? 'cream' : 'sage'
+    axes: expressionAxes(participant.expressionAxes),
+    selectedAxisId: 'clarity'
   }));
   return (
     <section className="relationship-overview">
@@ -1015,12 +1023,15 @@ function RelationshipOverview({ person, api, onPrompt }: { person: Json; api: (p
           <article key={participant.key ?? index}><span>{index === 0 ? 'YOU MAY BE BRINGING' : 'THEY MAY BE BRINGING'}</span><h2>{participant.facets?.[0]?.title ?? 'Permitted Baseline'}</h2><p>{participant.facets?.[0]?.description ?? 'This permitted facet is incomplete.'}</p></article>
         ))}
       </div>
-      <ContextInteractionField
+      <WorkspaceExpressionField
         mode="relationship"
-        nodes={fieldNodes}
-        centerLabel="What happens between you"
-        centerMeta="Two permitted perspectives"
-        centerDetail="Sovereign keeps each person distinct, then shows the interaction, each person’s responsibility, and what still needs to be asked directly."
+        subjects={fieldSubjects}
+        context={{
+          label: 'What happens between you',
+          meta: 'Two permitted Baselines',
+          detail: 'Sovereign keeps each person distinct, then shows the interaction, each person’s responsibility, and what still needs to be asked directly.',
+          selectedAxisId: 'clarity'
+        }}
         className="workspace-context-field"
       />
       <article className="relationship-field"><span>WHAT HAPPENS BETWEEN YOU</span><p>Ask Sovereign to synthesize the two permitted facet profiles, the interaction, each person’s responsibility, and what still needs to be asked directly.</p><button onClick={() => onPrompt(`What are ${person.displayName ?? 'this person'} and I each bringing into this relationship?`)}>Explore this relationship</button></article>
@@ -1045,15 +1056,15 @@ function SystemOverview({ system, api, onPrompt }: { system: Json; api: (path: s
   const participants = analysis.participants ?? [];
   const edges = analysis.relationshipGraph ?? [];
   const edge = edges[activeConnection];
-  const fieldNodes: ContextFieldNode[] = participants.slice(0, 6).map((participant: Json, index: number) => ({
+  const fieldSubjects: ExpressionFieldSubject[] = participants.slice(0, 6).map((participant: Json, index: number) => ({
     id: String(participant.key ?? `participant-${index}`),
     label: String(participant.label ?? `Person ${index + 1}`),
     meta: String(participant.role ?? 'Role not confirmed'),
     detail: String(participant.facets?.[0]?.description ?? 'This participant remains distinct. Only their permitted role and Baseline context are included.'),
-    tone: index === 0 ? 'cream' : index % 3 === 1 ? 'sage' : 'warm'
+    axes: expressionAxes(participant.expressionAxes),
+    selectedAxisId: axisForConnectionType(String(edge?.type ?? 'responsibility'))
   }));
-  const fieldConnections: ContextFieldConnection[] = edges.map((item: Json) => ({ from: String(item.from), to: String(item.to) }));
-  const activeFieldConnection = edge ? { from: String(edge.from), to: String(edge.to) } : undefined;
+  const activeFieldConnection: ExpressionFieldConnection | undefined = edge ? { from: String(edge.from), to: String(edge.to) } : undefined;
   const selectParticipant = (id: string) => {
     const relatedIndex = edges.findIndex((item: Json) => String(item.from) === id || String(item.to) === id);
     if (relatedIndex >= 0) setActiveConnection(relatedIndex);
@@ -1062,15 +1073,17 @@ function SystemOverview({ system, api, onPrompt }: { system: Json; api: (path: s
     <section className="system-overview">
       <header><div><span>{String(analysis.system?.type ?? 'SYSTEM').replace('_', ' ')}</span><h2>{analysis.system?.label ?? system.name}</h2></div><button onClick={() => onPrompt(`How is ${system.name ?? 'this system'} functioning, and what is each person contributing?`)}>Explore this system</button></header>
       <div className="system-graph" aria-label="Supported system relationships">
-        <ContextInteractionField
+        <WorkspaceExpressionField
           mode="system"
-          nodes={fieldNodes}
-          centerLabel="Whole system"
-          centerMeta={`${fieldNodes.length} permitted perspective${fieldNodes.length === 1 ? '' : 's'}`}
-          centerDetail="Roles, authority, responsibility, reliance, and communication remain visible together. Missing perspectives remain unknown."
-          connections={fieldConnections}
+          subjects={fieldSubjects}
+          context={{
+            label: 'System interaction',
+            meta: `${fieldSubjects.length} permitted Baselines`,
+            detail: 'Roles, authority, responsibility, reliance, and communication remain visible without turning the system into another person. Missing perspectives remain unknown.',
+            selectedAxisId: axisForConnectionType(String(edge?.type ?? 'responsibility'))
+          }}
           {...(activeFieldConnection ? { activeConnection: activeFieldConnection } : {})}
-          onNodeSelect={selectParticipant}
+          onSelectionChange={selectParticipant}
           className="workspace-context-field context-system-graph"
         />
       </div>
@@ -1101,6 +1114,7 @@ function ResponseThread({ messages, onPrompt, onAction, onSave, onCorrection }: 
               ? <SovereignAnswerView
                   answer={message.answer}
                   basis={message.basis ?? []}
+                  {...(message.expressionFieldContext ? { expressionFieldContext: message.expressionFieldContext } : {})}
                   {...(message.interfaceActions ? { interfaceActions: message.interfaceActions } : {})}
                   latest={message.id === latestAnswerId}
                   onPrompt={onPrompt}
@@ -1114,9 +1128,10 @@ function ResponseThread({ messages, onPrompt, onAction, onSave, onCorrection }: 
   );
 }
 
-function SovereignAnswerView({ answer, basis, interfaceActions, latest, onPrompt, onAction, onSave, onCorrection }: {
+function SovereignAnswerView({ answer, basis, expressionFieldContext, interfaceActions, latest, onPrompt, onAction, onSave, onCorrection }: {
   answer: SovereignAnswer;
   basis: BasisValue[];
+  expressionFieldContext?: Json;
   interfaceActions?: InterfaceActionEnvelope;
   latest: boolean;
   onPrompt: (prompt: string) => void;
@@ -1143,9 +1158,9 @@ function SovereignAnswerView({ answer, basis, interfaceActions, latest, onPrompt
       {answer.mode === 'alignment'
         ? <AlignmentView sections={standardSections} />
         : answer.mode === 'relationship'
-          ? <RelationshipAnswer sections={standardSections} />
+          ? <RelationshipAnswer sections={standardSections} {...(expressionFieldContext ? { expressionFieldContext } : {})} />
           : answer.mode === 'system'
-            ? <SystemAnswer sections={standardSections} />
+            ? <SystemAnswer sections={standardSections} {...(expressionFieldContext ? { expressionFieldContext } : {})} />
           : answer.mode === 'covenant'
               ? <CovenantAnswer sections={standardSections} />
               : <div className="answer-sections">{standardSections.map((section) => <article className={section.id === 'experiment' ? 'answer-experiment' : ''} key={`${section.id}-${section.label}`}><span>{section.label}</span><p>{section.body}</p></article>)}</div>}
@@ -1192,25 +1207,33 @@ function AlignmentView({ sections }: { sections: SovereignAnswer['sections'] }) 
   );
 }
 
-function RelationshipAnswer({ sections }: { sections: SovereignAnswer['sections'] }) {
+function RelationshipAnswer({ sections, expressionFieldContext }: { sections: SovereignAnswer['sections']; expressionFieldContext?: Json }) {
   const byId = (id: AnswerSectionId) => sections.find((section) => section.id === id);
   const you = byId('you');
   const other = byId('other');
   const interaction = byId('interaction');
-  const nodes: ContextFieldNode[] = [
-    { id: 'you', label: 'You', meta: you?.label ?? 'You may be bringing', detail: you?.body ?? 'Your part remains open to correction.', tone: 'cream' },
-    { id: 'other', label: 'They', meta: other?.label ?? 'They may be bringing', detail: other?.body ?? 'Their private experience remains theirs to confirm.', tone: 'sage' }
-  ];
+  const fieldSubjects = expressionFieldSubjects(expressionFieldContext).slice(0, 2).map((subject, index) => ({
+    ...subject,
+    label: index === 0 ? 'You' : 'They',
+    meta: index === 0 ? you?.label ?? 'You may be bringing' : other?.label ?? 'They may be bringing',
+    detail: index === 0
+      ? you?.body ?? 'Your part remains open to correction.'
+      : other?.body ?? 'Their private experience remains theirs to confirm.',
+    selectedAxisId: 'clarity' as const
+  }));
   return (
     <section className="relationship-answer">
-      <ContextInteractionField
+      {fieldSubjects.length === 2 && <ThreadExpressionField
         mode="relationship"
-        nodes={nodes}
-        centerLabel={interaction?.label ?? 'What happens between you'}
-        centerMeta="Interaction"
-        centerDetail={interaction?.body ?? 'What happens between you remains separate from either person’s identity.'}
+        subjects={fieldSubjects}
+        context={{
+          label: interaction?.label ?? 'What happens between you',
+          meta: 'Interaction between two Baselines',
+          detail: interaction?.body ?? 'What happens between you remains separate from either person’s identity.',
+          selectedAxisId: 'clarity'
+        }}
         className="answer-context-field"
-      />
+      />}
       <div><article><span>{you?.label ?? 'You may be bringing'}</span><p>{you?.body}</p></article><article><span>{other?.label ?? 'They may be bringing'}</span><p>{other?.body}</p></article></div>
       <article className="interaction-field"><span>{interaction?.label ?? 'What happens between you'}</span><p>{interaction?.body}</p></article>
       {sections.filter((section) => !['you', 'other', 'interaction'].includes(section.id)).map((section) => <article key={`${section.id}-${section.label}`}><span>{section.label}</span><p>{section.body}</p></article>)}
@@ -1218,8 +1241,25 @@ function RelationshipAnswer({ sections }: { sections: SovereignAnswer['sections'
   );
 }
 
-function SystemAnswer({ sections }: { sections: SovereignAnswer['sections'] }) {
-  return <section className="system-answer">{sections.map((section) => <article key={`${section.id}-${section.label}`}><span>{section.label}</span><p>{section.body}</p></article>)}</section>;
+function SystemAnswer({ sections, expressionFieldContext }: { sections: SovereignAnswer['sections']; expressionFieldContext?: Json }) {
+  const system = sections.find((section) => section.id === 'system');
+  const fieldSubjects = expressionFieldSubjects(expressionFieldContext).map((subject) => ({ ...subject, selectedAxisId: 'responsibility' as const }));
+  return (
+    <section className="system-answer">
+      {fieldSubjects.length >= 2 && <ThreadExpressionField
+        mode="system"
+        subjects={fieldSubjects}
+        context={{
+          label: 'System interaction',
+          meta: `${fieldSubjects.length} permitted Baselines`,
+          detail: system?.body ?? 'The people remain distinct. The system is the interaction among their roles, responsibilities, and permitted Baseline expressions.',
+          selectedAxisId: 'responsibility'
+        }}
+        className="answer-context-field"
+      />}
+      {sections.map((section) => <article key={`${section.id}-${section.label}`}><span>{section.label}</span><p>{section.body}</p></article>)}
+    </section>
+  );
 }
 
 function CovenantAnswer({ sections }: { sections: SovereignAnswer['sections'] }) {
@@ -1455,6 +1495,64 @@ function openAccountControls() {
   window.dispatchEvent(new CustomEvent('sovereign:open-account-controls'));
 }
 
+function axisForConnectionType(type: string): ExpressionAxisId {
+  if (type === 'communication') return 'clarity';
+  if (type === 'reliance') return 'trust';
+  return 'responsibility';
+}
+
+function expressionFieldSubjects(value: unknown): ExpressionFieldSubject[] {
+  if (!isExpressionFieldContext(value)) return [];
+  return value.subjects.map((subject: Json, index: number) => ({
+    id: String(subject.id ?? `participant-${index}`),
+    label: String(subject.label ?? (index === 0 ? 'You' : `Participant ${index}`)),
+    meta: String(subject.meta ?? 'Permitted Baseline'),
+    detail: 'This field represents permitted Baseline values. Actual present experience remains theirs to confirm.',
+    axes: expressionAxes(subject.axes)
+  }));
+}
+
+function expressionAxes(value: unknown): ExpressionAxisValue[] {
+  if (!Array.isArray(value)) return [];
+  const axes = value.filter(isExpressionAxisValue);
+  if (axes.length !== expressionAxisIds.length) return [];
+  if (new Set(axes.map((axis) => axis.id)).size !== expressionAxisIds.length) return [];
+  return axes;
+}
+
+function isExpressionFieldContext(value: unknown): value is Json & { subjects: Json[] } {
+  if (!value || typeof value !== 'object') return false;
+  const context = value as Json;
+  if (!['relationship', 'system'].includes(context.kind) || !Array.isArray(context.subjects)) return false;
+  return context.subjects.length >= 2 && context.subjects.every((subject: unknown) => {
+    if (!subject || typeof subject !== 'object') return false;
+    return expressionAxes((subject as Json).axes).length === expressionAxisIds.length;
+  });
+}
+
+function isExpressionAxisValue(value: unknown): value is ExpressionAxisValue {
+  if (!value || typeof value !== 'object') return false;
+  const axis = value as Json;
+  return typeof axis.id === 'string'
+    && expressionAxisIdSet.has(axis.id)
+    && typeof axis.label === 'string'
+    && typeof axis.baselineValue === 'number'
+    && Number.isFinite(axis.baselineValue)
+    && axis.baselineValue >= 0
+    && axis.baselineValue <= 100
+    && typeof axis.currentDelta === 'number'
+    && Number.isFinite(axis.currentDelta)
+    && typeof axis.value === 'number'
+    && Number.isFinite(axis.value)
+    && axis.value >= 0
+    && axis.value <= 100
+    && ['integrated', 'under_pressure', 'mixed', 'unconfirmed'].includes(axis.state)
+    && ['supported', 'exploratory'].includes(axis.confidence)
+    && Array.isArray(axis.facetIds)
+    && Array.isArray(axis.basisRefs)
+    && typeof axis.summary === 'string';
+}
+
 function normalizeMessage(value: unknown): ChatMessage | null {
   if (!value || typeof value !== 'object') return null;
   const row = value as Json;
@@ -1466,6 +1564,7 @@ function normalizeMessage(value: unknown): ChatMessage | null {
     ...(isSovereignAnswer(row.answer) ? { answer: row.answer } : {}),
     ...(Array.isArray(row.basis) ? { basis: row.basis.filter(isBasisValue) } : {}),
     ...(isInterfaceActionEnvelope(row.interfaceActions) ? { interfaceActions: row.interfaceActions } : {}),
+    ...(isExpressionFieldContext(row.expressionFieldContext) ? { expressionFieldContext: row.expressionFieldContext } : {}),
     ...(row.context && typeof row.context === 'object' ? { context: row.context } : {}),
     ...(typeof row.createdAt === 'string' ? { createdAt: row.createdAt } : {})
   };

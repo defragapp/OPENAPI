@@ -8,7 +8,7 @@ const assert = (condition, message) => { if (!condition) throw new Error(message
 const containsAll = (label, text, values) => values.forEach((value) => assert(text.includes(value), `${label} is missing: ${value}`));
 
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
-const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const landing = read('apps/web/src/PublicLanding.tsx');
 const fingerprint = read('apps/web/src/v0-release-fingerprint.ts');
@@ -115,7 +115,7 @@ containsAll('founder v0 public product contract', landing, [
   '<FinalCallToAction />',
   'Ask about your life.',
   'Get an answer built for you.',
-  'See the space',
+  'Understand what happens',
   'between you.',
   'From one person',
   'to the whole system.',
@@ -131,7 +131,7 @@ containsAll('founder v0 public product contract', landing, [
 containsAll('founder v0 visual components', `${landing}\n${v0Visual}`, [
   'className="v0-baseline-trace"',
   'function ProcessingFlow(',
-  'className="v0-window v0-flow"',
+  'v0-window v0-flow',
   'className="v0-family-map"',
   'className="v0-comparison-grid"',
   '.v0-hero',

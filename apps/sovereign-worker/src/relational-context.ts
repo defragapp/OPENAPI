@@ -11,6 +11,8 @@ import {
   type BasisRegistryItem
 } from './baseline-contracts';
 import { getCachedBaselineFacetProfile } from './baseline-facets';
+import { buildExpressionAxisValues } from './expression-field';
+import type { ExpressionAxisValue } from '@sovereign/agent-contracts';
 
 interface BaselineRow {
   status: string;
@@ -44,6 +46,7 @@ interface ParticipantContext {
   label: string;
   role: string;
   facets: BaselineFacet[];
+  expressionAxes: ExpressionAxisValue[];
   roleContext: Record<string, unknown>;
   uncertainty: string;
   observedState: 'not_confirmed';
@@ -91,7 +94,13 @@ export async function buildPairComparison(env: Env, accountId: string, personId:
     kind: 'relationship',
     participants: [
       { ...owner, facets: visibleOwnerFacets },
-      { ...other, facets: visibleOtherFacets }
+      {
+        ...other,
+        facets: visibleOtherFacets,
+        expressionAxes: frameworkAllowed
+          ? remapAxisRefs(other.expressionAxes, 'other')
+          : other.expressionAxes.map((axis) => ({ ...axis, basisRefs: [] }))
+      }
     ],
     interaction: {
       facetPairs: pairFacetPairs(visibleOwnerFacets, visibleOtherFacets),
@@ -193,7 +202,10 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
       ...item,
       facets: frameworkAllowed
         ? remapFacetRefs(item.facets, key)
-        : item.facets.map((facet) => ({ ...facet, basisRefs: [] }))
+        : item.facets.map((facet) => ({ ...facet, basisRefs: [] })),
+      expressionAxes: frameworkAllowed
+        ? remapAxisRefs(item.expressionAxes, key)
+        : item.expressionAxes.map((axis) => ({ ...axis, basisRefs: [] }))
     });
     if (frameworkAllowed) basisRegistry.push(...prefixBasis(baseline.basisRegistry, key, 'other'));
   }
@@ -291,6 +303,7 @@ function participant(
     label,
     role,
     facets: baseline.facets,
+    expressionAxes: buildExpressionAxisValues({ facets: baseline.facets }),
     roleContext,
     uncertainty: baseline.uncertainty,
     observedState: 'not_confirmed',
@@ -314,6 +327,13 @@ function remapFacetRefs(facets: BaselineFacet[], prefix: string): BaselineFacet[
   return facets.map((facet) => ({
     ...facet,
     basisRefs: prefix ? facet.basisRefs.map((id) => `${prefix}.${id}`) : facet.basisRefs
+  }));
+}
+
+function remapAxisRefs(axes: ExpressionAxisValue[], prefix: string): ExpressionAxisValue[] {
+  return axes.map((axis) => ({
+    ...axis,
+    basisRefs: prefix ? axis.basisRefs.map((id) => `${prefix}.${id}`) : axis.basisRefs
   }));
 }
 

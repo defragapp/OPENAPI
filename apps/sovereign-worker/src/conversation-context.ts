@@ -3,6 +3,7 @@ import { getModelSafeBaselineContext } from './baseline';
 import { buildPairComparison, buildSystemAnalysis } from './relational-context';
 import { requireFeature, type EntitlementSet } from './db/entitlements';
 import { baselineFacetIds } from './baseline-contracts';
+import { expressionAxisIds } from '@sovereign/agent-contracts';
 
 export type SovereignMode = 'defrag' | 'alignment';
 export type SovereignSurface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
@@ -17,6 +18,7 @@ export interface ConversationContextSelection {
 const identifier = /^[A-Za-z0-9_-]{1,128}$/;
 const surfaces = new Set<SovereignSurface>(['Today', 'Explore', 'People', 'Systems', 'Library', 'You']);
 const safeFacetIds = new Set<string>(baselineFacetIds);
+const safeExpressionAxisIds = new Set<string>(expressionAxisIds);
 
 export function parseConversationContext(value: unknown): ConversationContextSelection {
   if (value === undefined) return { mode: 'defrag' };
@@ -66,6 +68,47 @@ export function projectModelSafeConversationContext(value: unknown): unknown {
   return project(value);
 }
 
+export function projectExpressionFieldContext(value: unknown): unknown | null {
+  const root = asRecord(value);
+  const selected = asRecord(root.selectedContext);
+  const kind = selected.kind;
+  if (kind !== 'relationship' && kind !== 'system') return null;
+  const participants = Array.isArray(selected.participants) ? selected.participants.map(asRecord) : [];
+  const subjects = participants.flatMap((participant, index) => {
+    const axes = Array.isArray(participant.expressionAxes)
+      ? participant.expressionAxes.flatMap((value) => {
+          const axis = asRecord(value);
+          if (typeof axis.id !== 'string' || typeof axis.label !== 'string') return [];
+          if (!safeExpressionAxisIds.has(axis.id)) return [];
+          if (typeof axis.baselineValue !== 'number' || typeof axis.currentDelta !== 'number' || typeof axis.value !== 'number') return [];
+          if (![axis.baselineValue, axis.currentDelta, axis.value].every(Number.isFinite)) return [];
+          if (axis.baselineValue < 0 || axis.baselineValue > 100 || axis.value < 0 || axis.value > 100) return [];
+          return [{
+            id: axis.id,
+            label: axis.label,
+            baselineValue: axis.baselineValue,
+            currentDelta: axis.currentDelta,
+            value: axis.value,
+            state: axis.state,
+            confidence: axis.confidence,
+            facetIds: [],
+            basisRefs: [],
+            summary: ''
+          }];
+        })
+      : [];
+    if (axes.length !== expressionAxisIds.length || new Set(axes.map((axis) => axis.id)).size !== expressionAxisIds.length) return [];
+    return [{
+      id: typeof participant.key === 'string' ? participant.key : `participant_${index + 1}`,
+      label: typeof participant.label === 'string' ? participant.label : index === 0 ? 'You' : `Participant ${index}`,
+      meta: typeof participant.role === 'string' ? participant.role : 'Permitted Baseline',
+      axes
+    }];
+  });
+  if (subjects.length < 2) return null;
+  return { kind, subjects };
+}
+
 function project(value: unknown): unknown {
   if (Array.isArray(value)) return value.map((item) => project(item));
   if (!value || typeof value !== 'object') return value;
@@ -89,7 +132,7 @@ function project(value: unknown): unknown {
       });
       continue;
     }
-    if (childKey === 'id' && typeof childValue === 'string' && safeFacetIds.has(childValue)) {
+    if (childKey === 'id' && typeof childValue === 'string' && (safeFacetIds.has(childValue) || safeExpressionAxisIds.has(childValue))) {
       output.id = childValue;
       continue;
     }
@@ -112,6 +155,10 @@ function project(value: unknown): unknown {
     output[childKey] = project(childValue);
   }
   return output;
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
 
 function participantReference(value: unknown): string {

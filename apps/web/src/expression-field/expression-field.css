@@ -34,8 +34,36 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.expression-field-renderer {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 1;
+}
+
+.expression-field-renderer .expression-field-canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  cursor: default;
+  touch-action: pan-y;
+}
+
+.expression-field-renderer.is-draggable .expression-field-canvas {
+  cursor: grab;
+}
+
+.expression-field-renderer.is-draggable .expression-field-canvas:active {
+  cursor: grabbing;
+}
+
+.expression-field-canvas-shell > .expression-field-renderer {
+  height: 390px;
+  aspect-ratio: auto;
+}
+
 .expression-field-account .expression-field-canvas {
-  min-height: 390px;
+  min-height: 0;
   touch-action: none;
 }
 
@@ -147,50 +175,184 @@
   color: rgba(235, 244, 250, .62);
 }
 
-.landing-expression-field {
-  display: flex;
+.single-expression-field,
+.relational-expression-field,
+.system-expression-field {
   min-width: 0;
-  min-height: 100%;
-  flex-direction: column;
-  justify-content: center;
-  padding: 22px;
-  border-right: 1px solid var(--editorial-line);
-  background: radial-gradient(circle at 50% 38%, rgba(48, 137, 255, .09), transparent 54%);
+  margin: 0;
+  color: #e8ddd0;
+  font-family: var(--font-body);
 }
 
-.landing-expression-field .expression-field-canvas-shell {
-  border-color: rgba(100, 174, 255, .16);
-  border-radius: 18px;
-  box-shadow: inset 0 0 60px rgba(15, 71, 132, .12);
+.single-expression-stage {
+  width: min(100%, 260px);
+  margin-inline: auto;
 }
 
-.landing-expression-field .expression-field-canvas {
-  min-height: 300px;
+.single-expression-field.is-compact .single-expression-stage {
+  width: min(100%, 220px);
 }
 
-.landing-expression-field .expression-field-details {
-  min-height: 104px;
-}
-
-.landing-expression-field .expression-field-details p {
-  color: rgba(232, 239, 245, .68);
-}
-
-.landing-expression-field .expression-field-controls > div {
-  max-width: calc(100% - 82px);
-}
-
-.landing-expression-field > p {
-  margin: 14px 0 0;
-  color: var(--editorial-faint);
-  font-family: var(--font-subheading);
-  font-size: .58rem;
-  line-height: 1.45;
+.single-expression-field figcaption {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin-top: -2px;
   text-align: center;
 }
 
-.sovereign-landing .baseline-context-stage > .landing-expression-field {
-  grid-row: 1 / 4;
+.single-expression-field figcaption > strong {
+  color: #f1e8dc;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  letter-spacing: -.02em;
+}
+
+.single-expression-field figcaption > span,
+.expression-field-interaction > span,
+.expression-field-context-detail > span {
+  color: rgba(232, 221, 208, .48);
+  font-family: var(--font-subheading);
+  font-size: .55rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.single-expression-field figcaption > p {
+  max-width: 42ch;
+  margin: 3px 0 0;
+  color: rgba(232, 221, 208, .58);
+  font-size: .69rem;
+  line-height: 1.5;
+}
+
+.relational-expression-stage {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 7%, 48px);
+  align-items: start;
+}
+
+.expression-field-subject {
+  min-width: 0;
+  opacity: .34;
+  transition: opacity 240ms ease, filter 240ms ease;
+}
+
+.expression-field-subject.is-selected {
+  opacity: 1;
+}
+
+.relational-expression-field .expression-field-renderer {
+  width: min(100%, 230px);
+  margin-inline: auto;
+}
+
+.relational-expression-field.is-compact .expression-field-renderer {
+  width: min(100%, 176px);
+}
+
+.expression-field-subject > button,
+.expression-field-interaction {
+  display: grid;
+  width: 100%;
+  min-height: 44px;
+  place-items: center;
+  gap: 3px;
+  padding: 4px 8px;
+  border: 0;
+  background: transparent;
+  color: rgba(232, 221, 208, .62);
+  font-family: var(--font-body);
+  text-align: center;
+  cursor: pointer;
+}
+
+.expression-field-subject > button strong {
+  color: inherit;
+  font-size: .72rem;
+  font-weight: 650;
+}
+
+.expression-field-subject > button span {
+  color: rgba(232, 221, 208, .42);
+  font-size: .58rem;
+  line-height: 1.35;
+}
+
+.expression-field-subject > button[aria-pressed="true"],
+.expression-field-interaction[aria-pressed="true"] {
+  color: #f1e8dc;
+}
+
+.relational-expression-field figcaption,
+.system-expression-field figcaption {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 5px;
+  justify-items: center;
+  margin-top: 4px;
+}
+
+.expression-field-interaction {
+  width: auto;
+  min-width: 180px;
+  padding-inline: 18px;
+  border-top: 1px solid rgba(232, 221, 208, .13);
+}
+
+.expression-field-interaction > strong {
+  color: inherit;
+  font-size: .72rem;
+  font-weight: 650;
+}
+
+.expression-field-context-detail {
+  max-width: 62ch;
+  min-height: 42px;
+  margin: 0;
+  color: rgba(232, 221, 208, .58);
+  font-size: .68rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.expression-field-context-detail > span {
+  display: block;
+  margin-bottom: 3px;
+}
+
+.system-expression-stage {
+  position: relative;
+  width: 100%;
+  min-height: 560px;
+}
+
+.system-expression-stage .expression-field-subject {
+  position: absolute;
+  width: clamp(92px, 21%, 150px);
+  transform: translate(-50%, -50%);
+}
+
+.system-expression-stage .expression-field-subject[data-field-position="top"] { top: 18%; left: 50%; }
+.system-expression-stage .expression-field-subject[data-field-position="bottom"] { top: 82%; left: 50%; }
+.system-expression-stage .expression-field-subject[data-field-position="left"] { top: 50%; left: 20%; }
+.system-expression-stage .expression-field-subject[data-field-position="right"] { top: 50%; left: 80%; }
+.system-expression-stage .expression-field-subject[data-field-position="upper-left"] { top: 28%; left: 18%; }
+.system-expression-stage .expression-field-subject[data-field-position="upper-right"] { top: 28%; left: 82%; }
+.system-expression-stage .expression-field-subject[data-field-position="bottom-left"] { top: 72%; left: 27%; }
+.system-expression-stage .expression-field-subject[data-field-position="bottom-right"] { top: 72%; left: 73%; }
+
+.system-expression-field.is-compact .system-expression-stage {
+  min-height: 440px;
+}
+
+.system-expression-field.is-compact .system-expression-stage .expression-field-subject {
+  width: clamp(78px, 23%, 118px);
 }
 
 .expression-field-launcher {
@@ -333,30 +495,16 @@
 }
 
 @media (max-width: 760px) {
-  .sovereign-landing .baseline-context-stage > .landing-expression-field {
-    grid-column: 1 / -1;
-    grid-row: auto;
-    border-right: 0;
-    border-bottom: 1px solid var(--editorial-line);
-  }
-
-  .landing-expression-field {
-    padding: 20px 16px 22px;
-  }
-
-  .landing-expression-field .expression-field-canvas-shell {
-    width: min(100%, 292px);
-    margin-inline: auto;
-  }
-
-  .landing-expression-field .expression-field-canvas {
-    min-height: 280px;
-  }
-
-  .landing-expression-field .expression-field-details {
-    width: min(100%, 340px);
-    margin-inline: auto;
-  }
+  .relational-expression-stage { gap: 8px; }
+  .relational-expression-field .expression-field-renderer { width: min(100%, 160px); }
+  .relational-expression-field.is-compact .expression-field-renderer { width: min(100%, 142px); }
+  .system-expression-stage { min-height: 420px; }
+  .system-expression-stage .expression-field-subject { width: clamp(88px, 28%, 112px); }
+  .system-expression-stage .expression-field-subject[data-field-position="top"] { top: 20%; }
+  .system-expression-stage .expression-field-subject[data-field-position="bottom"] { top: 80%; }
+  .system-expression-field.is-compact .system-expression-stage { min-height: 390px; }
+  .system-expression-field.is-compact .system-expression-stage .expression-field-subject { width: clamp(70px, 25%, 98px); }
+  .expression-field-context-detail { font-size: .72rem; }
 
   .expression-field-controls {
     align-items: center;
@@ -387,15 +535,16 @@
     border-radius: 0;
   }
 
-  .expression-field-account .expression-field-canvas {
-    min-height: min(82vw, 340px);
+  .expression-field-account .expression-field-canvas-shell > .expression-field-renderer {
+    height: min(82vw, 340px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .expression-field-launcher,
   .expression-field-focus,
-  .expression-field-canvas {
+  .expression-field-canvas,
+  .expression-field-subject {
     scroll-behavior: auto;
     transition: none !important;
   }

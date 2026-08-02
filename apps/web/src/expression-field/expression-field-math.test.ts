@@ -4,7 +4,9 @@ import {
   expressionAxisRegistry,
   fibonacciSphere,
   quaternionFromEuler,
+  quaternionFromUnitVectors,
   rotateVector,
+  slerpQuaternion,
   vectorLengthForValue
 } from './expression-field-math';
 
@@ -30,14 +32,27 @@ describe('Expression Field geometry', () => {
     expect(Math.hypot(...rotated)).toBeCloseTo(1, 8);
   });
 
-  it('contains every value inside the globe boundary', () => {
+  it('keeps every expression length bounded without an outer sphere', () => {
     expect(vectorLengthForValue(0)).toBeGreaterThan(0);
-    expect(vectorLengthForValue(100)).toBeLessThanOrEqual(0.88);
+    expect(vectorLengthForValue(100)).toBeLessThan(1);
     expect(vectorLengthForValue(52)).toBeLessThan(vectorLengthForValue(78));
+  });
+
+  it('can orient a selected expression toward another field without drawing a connector', () => {
+    const direction = expressionAxisRegistry.find((axis) => axis.id === 'clarity')!.direction;
+    const facingRight = quaternionFromUnitVectors(direction, [1, 0, 0]);
+    const aligned = rotateVector(direction, facingRight);
+    expect(aligned[0]).toBeCloseTo(1, 6);
+    expect(Math.abs(aligned[1])).toBeLessThan(0.000001);
+    expect(Math.abs(aligned[2])).toBeLessThan(0.000001);
+    const midpoint = slerpQuaternion(quaternionFromEuler(0, 0), facingRight, 0.5);
+    expect(Math.hypot(...midpoint)).toBeCloseTo(1, 8);
   });
 
   it('renders center-emitted light without endpoint geometry or random motion', () => {
     expect(componentSource).toContain('context.moveTo(centerX, centerY)');
+    expect(componentSource).not.toContain('shellPoints');
+    expect(componentSource).not.toContain('buildGridLines');
     expect(componentSource).not.toContain('Math.random');
     expect(componentSource).not.toMatch(/endpoint|end-point|tip marker/i);
     expect(cssSource).toContain('@media (prefers-reduced-motion: reduce)');

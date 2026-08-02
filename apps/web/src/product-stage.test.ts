@@ -11,7 +11,7 @@ describe('shared Sovereign intelligence stage', () => {
     expect(landing).toContain('How Sovereign reads both of you');
     expect(landing).toContain('className="v0-baseline-trace"');
     expect(landing).toContain('function ProcessingFlow(');
-    expect(landing).toContain('className="v0-window v0-flow"');
+    expect(landing).toContain('v0-window v0-flow');
     expect(landing).toContain('className="v0-family-map"');
     expect(workspace).toContain('<SovereignAnswerView');
     expect(workspace).toContain('<RelationshipAnswer');

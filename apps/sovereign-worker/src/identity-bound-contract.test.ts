@@ -41,6 +41,7 @@ describe('identity-bound multi-user contract', () => {
     expect(relational).toContain("await requireConsent(env, accountId, personId, 'system.include')");
     expect(relational).toContain('rawBirthInputShared: false');
     expect(relational).toContain('exactPrivateLocationShared: false');
+    expect(relational).toContain('expressionAxes: buildExpressionAxisValues({ facets: baseline.facets })');
     expect(relational).not.toContain('twoPlausiblePerspectives');
   });
 

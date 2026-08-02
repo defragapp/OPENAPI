@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
-const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 const main = read('./main.tsx');
 const fingerprint = read('./v0-release-fingerprint.ts');
 const app = read('./App.tsx');
@@ -87,7 +87,7 @@ describe('founder v0 selective visual port', () => {
     for (const copy of [
       'Ask about your life.',
       'Get an answer built for you.',
-      'See the space',
+      'Understand what happens',
       'between you.',
       'From one person',
       'to the whole system.',
@@ -103,7 +103,7 @@ describe('founder v0 selective visual port', () => {
       'className="v0-story-grid"',
       'className="v0-baseline-trace"',
       'function ProcessingFlow(',
-      'className="v0-window v0-flow"',
+      'v0-window v0-flow',
       'className="v0-family-map"',
       'surface="personal-chat"',
       'surface="personal-reasoning"',

@@ -42,7 +42,7 @@ describe('Sovereign.OS public experience', () => {
     }
     expect(landing).toContain('Ask about your life.');
     expect(landing).toContain('Get an answer built for you.');
-    expect(landing).toContain('See the space');
+    expect(landing).toContain('Understand what happens');
     expect(landing).toContain('between you.');
     expect(landing).toContain('From one person');
     expect(landing).toContain('to the whole system.');
@@ -53,7 +53,7 @@ describe('Sovereign.OS public experience', () => {
   });
 
   it('uses the v0 product demonstrations instead of disconnected marketing claims', () => {
-    for (const marker of ['className="v0-story-grid"', 'className="v0-baseline-trace"', 'function ProcessingFlow(', 'className="v0-window v0-flow"', 'className="v0-family-map"', 'className="v0-comparison-grid"']) {
+    for (const marker of ['className="v0-story-grid"', 'className="v0-baseline-trace"', 'function ProcessingFlow(', 'v0-window v0-flow', 'className="v0-family-map"', 'className="v0-comparison-grid"']) {
       expect(landing).toContain(marker);
     }
     expect(landing).toContain('Why do I keep taking on responsibility for everyone around me?');

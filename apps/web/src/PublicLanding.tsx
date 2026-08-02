@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { ContextInteractionField } from './ContextInteractionField';
-import type { ContextFieldNode } from './ContextInteractionField';
+import { LandingExpressionFieldPreview } from './expression-field/LandingExpressionFieldPreview';
+import {
+  landingExpressionFieldFixture,
+  landingRelationshipExpressionFieldFixtures,
+  landingSystemExpressionFieldFixtures
+} from './expression-field/expression-field.fixture';
+import type { ExpressionFieldSubject } from './expression-field/expression-field-view-contract';
 
 type EvidencePoint = { code: string; label: string };
 type EvidenceGroup = { name?: string; accent?: string; points: readonly EvidencePoint[] };
@@ -92,40 +97,42 @@ const FAMILY = [
   { name: 'Ruth', role: 'Grandparent', chips: ['SUN · CAP', 'GATE 22.6'], shares: true }
 ] as const;
 
-const SYSTEM_FIELD: readonly ContextFieldNode[] = FAMILY.map((member) => ({
+const SYSTEM_FIELD: readonly ExpressionFieldSubject[] = FAMILY.map((member, index) => ({
   id: member.name.toLowerCase(),
   label: member.name,
   meta: member.role,
+  axes: landingSystemExpressionFieldFixtures[index]!.axes,
+  selectedAxisId: 'responsibility',
   detail: member.shares
     ? `${member.name} shares the supported slower-settling facet in this example. Their actual experience still belongs to them to confirm.`
-    : `${member.name} follows a different supported route to clarity in this example. That difference is context, not a verdict.`,
-  tone: member.shares ? 'cream' : 'sage'
+    : `${member.name} follows a different supported route to clarity in this example. That difference is context, not a verdict.`
 }));
 
-const SELF_FIELD: readonly ContextFieldNode[] = [
-  {
-    id: 'self-baseline',
-    label: 'Your Baseline',
-    meta: 'Responsibility · boundaries',
-    detail: 'Stable qualities stay distinct from the temporary pressure surrounding the question.',
-    tone: 'cream'
-  }
-] as const;
+const SELF_FIELD: ExpressionFieldSubject = {
+  id: 'self-baseline',
+  label: 'Your Baseline',
+  meta: 'Responsibility · boundaries',
+  detail: 'Stable qualities stay distinct from the temporary pressure surrounding the question.',
+  axes: landingExpressionFieldFixture.axes,
+  selectedAxisId: 'responsibility'
+};
 
-const RELATIONSHIP_FIELD: readonly ContextFieldNode[] = [
+const RELATIONSHIP_FIELD: readonly ExpressionFieldSubject[] = [
   {
     id: 'you',
     label: 'You',
     meta: 'Needs time to settle',
     detail: 'Your permitted Baseline may support clarity that forms through time and conversation.',
-    tone: 'cream'
+    axes: landingRelationshipExpressionFieldFixtures.you.axes,
+    selectedAxisId: 'clarity'
   },
   {
     id: 'maya',
     label: 'Maya',
     meta: 'Recognizes quickly',
     detail: 'Maya’s permitted Baseline may support a quicker first recognition that remains hers to confirm.',
-    tone: 'sage'
+    axes: landingRelationshipExpressionFieldFixtures.maya.axes,
+    selectedAxisId: 'clarity'
   }
 ] as const;
 
@@ -267,12 +274,15 @@ function PersonalStory() {
           title="How Sovereign works it through"
           steps={SELF_FLOW}
           surface="personal-reasoning"
-          field={<ContextInteractionField
+          field={<LandingExpressionFieldPreview
             mode="self"
-            nodes={SELF_FIELD}
-            centerLabel="The real question"
-            centerMeta="Capacity or over-responsibility"
-            centerDetail="Is this yours to lead, yours to support, or not yours to carry?"
+            subject={SELF_FIELD}
+            context={{
+              label: 'Your current expression field',
+              meta: 'Based on your Baseline and current context',
+              detail: 'The stable field remains yours. Temporary context changes which expressions are more visible, not who you are.',
+              selectedAxisId: 'responsibility'
+            }}
             compact
           />}
         />
@@ -286,8 +296,8 @@ function RelationshipStory() {
   const sectionRef = useRevealOnce();
   return (
     <section ref={sectionRef} className="v0-story v0-story-relationship" data-viewport-section="relationship">
-      <StoryHeading step="Step 02 · You + 1" title="See the space" outline="between you.">
-        Bring another person’s permitted Baseline into the room. Sovereign keeps both people distinct, then shows what the interaction may create between them.
+      <StoryHeading step="Step 02 · You + 1" title="Understand what happens" outline="between you.">
+        With permission, Sovereign keeps both Baselines distinct, then shows how different routes to clarity may interact.
       </StoryHeading>
       <div className="v0-story-grid" data-viewport-stage="relationship">
         <ChatWindow title="Sovereign — Shared Chat" surface="relationship-chat">
@@ -302,12 +312,15 @@ function RelationshipStory() {
           title="How Sovereign reads both of you"
           steps={DUO_FLOW}
           surface="relationship-reasoning"
-          field={<ContextInteractionField
+          field={<LandingExpressionFieldPreview
             mode="relationship"
-            nodes={RELATIONSHIP_FIELD}
-            centerLabel="Between you"
-            centerMeta="Timing interaction"
-            centerDetail="One person may need time while the other recognizes quickly. The friction can be about pace without becoming a judgment about care."
+            subjects={RELATIONSHIP_FIELD}
+            context={{
+              label: 'Selected interaction',
+              meta: 'Timing · Decision pace',
+              detail: 'The fields briefly orient around the same expression. The engagement shows a timing interaction without turning either person into the cause.',
+              selectedAxisId: 'clarity'
+            }}
             compact
           />}
         />
@@ -323,16 +336,19 @@ function SystemStory() {
   return (
     <section ref={sectionRef} className="v0-story v0-story-system" data-viewport-section="system">
       <StoryHeading step="Step 03 · Your whole system" title="From one person" outline="to the whole system.">
-        Bring permitted Baselines, roles, and responsibility into one view. The system map appears inside the same conversation, where the pattern becomes useful.
+        Bring permitted Baselines, roles, and responsibility into one view. Each person stays distinct; the system appears through how the fields interact around the same question.
       </StoryHeading>
       <div className="v0-system-stage" data-viewport-stage="system">
         <ChatWindow title="Sovereign — Family System" surface="system-map" wide>
           <Message side="user">Can you map my whole family? Decisions around here always seem to take forever.</Message>
+          <BaselineTrace groups={[{ points: [{ code: 'GATE 22 ×3', label: 'Three illustrative personality gate activations' }, { code: 'GATE 57 ×1', label: 'One illustrative personality gate activation' }] }]} />
+          <FamilyMap />
           <Message side="assistant" wide>
             Three of the four illustrative profiles share a supported slower-settling decision facet, while one points toward quicker recognition. That is a possible coordination pattern—not a verdict about any person.
-            <FamilyMap />
+            <ol className="v0-system-flow" aria-label="How Sovereign interprets the whole system">
+              {SYSTEM_FLOW.map((step, index) => <li key={step.title}><i aria-hidden="true">{index + 1}</i><div><strong>{step.title}</strong><span>{step.body}</span></div></li>)}
+            </ol>
             <p className="v0-system-followup">Maya’s route to clarity may differ, which can make the mismatch feel personal when it is partly about timing. The actual experience still belongs to each person to confirm.</p>
-            <BaselineTrace groups={[{ points: [{ code: 'GATE 22 ×3', label: 'Three illustrative personality gate activations' }, { code: 'GATE 57 ×1', label: 'One illustrative personality gate activation' }] }]} />
           </Message>
           <ComposerPreview>Ask about your family…</ComposerPreview>
         </ChatWindow>
@@ -439,45 +455,47 @@ function BaselineTrace({ groups }: { groups: readonly EvidenceGroup[] }) {
 
 function ProcessingFlow({ title, steps, surface, field }: { title: string; steps: readonly FlowStep[]; surface: string; field?: ReactNode }) {
   return (
-    <article className="v0-window v0-flow" data-viewport-surface={surface}>
-      <header><b aria-hidden="true" /><span>{title}</span><small>Baseline Design</small></header>
-      <ol>
-        {steps.map((step, index) => (
-          <li key={step.title} className={step.kind === 'direction' ? 'v0-flow-direction' : ''}>
-            <i aria-hidden="true">{index + 1}</i>
-            <p>{step.kind === 'direction' ? 'Your next step' : `Step ${index + 1}`}</p>
-            <h3>{step.title}</h3>
-            <span>{step.body}</span>
-            {step.branches && <div className="v0-flow-branches">{step.branches.map((branch) => <section key={branch.name}><strong><i style={{ background: branch.accent }} />{branch.name}</strong><div>{branch.chips.map((chip) => <code key={chip}>{chip}</code>)}</div></section>)}</div>}
-            {step.chips && <div className="v0-flow-chips">{step.chips.map((chip) => <code key={chip}>{chip}</code>)}</div>}
-            {field && index === 1 && <div className="v0-flow-field">{field}</div>}
-          </li>
-        ))}
-      </ol>
-    </article>
+    <div className={`v0-flow-stack${field ? ' v0-flow-stack-with-field' : ''}`} data-viewport-surface={surface}>
+      {field && <div className="v0-flow-field">{field}</div>}
+      <article className="v0-window v0-flow">
+        <header><b aria-hidden="true" /><span>{title}</span><small>AI interpretation</small></header>
+        <ol>
+          {steps.map((step, index) => (
+            <li key={step.title} className={step.kind === 'direction' ? 'v0-flow-direction' : ''}>
+              <i aria-hidden="true">{index + 1}</i>
+              <p>{step.kind === 'direction' ? 'Your next step' : `Step ${index + 1}`}</p>
+              <h3>{step.title}</h3>
+              <span>{step.body}</span>
+              {step.branches && <div className="v0-flow-branches">{step.branches.map((branch) => <section key={branch.name}><strong><i style={{ background: branch.accent }} />{branch.name}</strong><div>{branch.chips.map((chip) => <code key={chip}>{chip}</code>)}</div></section>)}</div>}
+              {step.chips && <div className="v0-flow-chips">{step.chips.map((chip) => <code key={chip}>{chip}</code>)}</div>}
+            </li>
+          ))}
+        </ol>
+      </article>
+    </div>
   );
 }
 
 function FamilyMap() {
-  const [activeId, setActiveId] = useState('center');
+  const [activeId, setActiveId] = useState('interaction');
   const activeMember = FAMILY.find((member) => member.name.toLowerCase() === activeId);
   return (
     <div className="v0-family-map" aria-label="Illustrative family system map">
-      <ContextInteractionField
+      <LandingExpressionFieldPreview
         mode="system"
-        nodes={SYSTEM_FIELD}
-        centerLabel="Whole system"
-        centerMeta="Slower settling · 3 of 4"
-        centerDetail="Three people share one supported route to clarity while one differs. The useful question is how the group coordinates the difference."
-        onNodeSelect={setActiveId}
+        subjects={SYSTEM_FIELD}
+        context={{
+          label: 'System interaction',
+          meta: 'Decision pace across four Baselines',
+          detail: 'Three people share one supported route to clarity while one differs. The useful question is how the group coordinates the difference.',
+          selectedAxisId: 'responsibility'
+        }}
+        onSelectionChange={setActiveId}
       />
       <div className="v0-family-evidence" aria-live="polite">
         <span>{activeMember ? `Grounded in · ${activeMember.name}` : 'Grounded in · Shared pattern'}</span>
         <div>{(activeMember?.chips ?? ['GATE 22 ×3', 'GATE 57 ×1']).map((chip) => <code key={chip} className={chip.startsWith('GATE 22') ? 'shared-chip' : ''}>{chip}</code>)}</div>
       </div>
-      <ol className="v0-system-flow" aria-label="How Sovereign shows the whole system">
-        {SYSTEM_FLOW.map((step, index) => <li key={step.title}><i aria-hidden="true">{index + 1}</i><div><strong>{step.title}</strong><span>{step.body}</span></div></li>)}
-      </ol>
     </div>
   );
 }

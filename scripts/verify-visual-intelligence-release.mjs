@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const read = (path) => readFileSync(path, 'utf8');
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
-const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|see-the-space-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
+const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
 const main = read('apps/web/src/main.tsx');
 const fingerprint = read('apps/web/src/v0-release-fingerprint.ts');
 const authenticatedWorkspace = read('apps/web/src/AuthenticatedWorkspace.tsx');
@@ -13,13 +13,25 @@ const v0Motion = read('apps/web/src/v0-motion-accessibility.css');
 const v0Visual = read('apps/web/src/v0-visual-port.css');
 const v0Global = read('apps/web/src/v0-global-experience.css');
 const passkeyCss = read('apps/web/src/passkey-auth.css');
+const landingVisualizationCss = [
+  read('apps/web/src/public-landing-editorial.css'),
+  read('apps/web/src/premium-platform-release.css'),
+  read('apps/web/src/premium-surface-hardening.css'),
+  read('apps/web/src/responsive-viewport-contract.css'),
+  read('apps/web/src/sovereign-visual-system.css'),
+  v0Visual
+].join('\n');
 const staticAuthority = read('apps/web/public/premium-public-release.css');
 const staticV0 = read('apps/web/public/v0-public-port.css');
 const expressionField = read('apps/web/src/expression-field/ExpressionField.tsx');
 const expressionFieldCss = read('apps/web/src/expression-field/expression-field.css');
 const expressionFieldMath = read('apps/web/src/expression-field/expression-field-math.ts');
 const expressionFieldFixture = read('apps/web/src/expression-field/expression-field.fixture.ts');
+const landingExpressionField = read('apps/web/src/expression-field/LandingExpressionFieldPreview.tsx');
+const relationalExpressionField = read('apps/web/src/expression-field/RelationalExpressionField.tsx');
+const systemExpressionField = read('apps/web/src/expression-field/SystemExpressionField.tsx');
 const expressionFieldWorker = read('apps/sovereign-worker/src/expression-field.ts');
+const relationalContext = read('apps/sovereign-worker/src/relational-context.ts');
 const runtimeEntry = read('apps/sovereign-worker/src/runtime-entry.ts');
 const expressionFieldContract = read('packages/agent-contracts/src/expression-field.ts');
 const how = read('apps/web/public/how-it-works.html');
@@ -130,7 +142,7 @@ requireAll('founder v0 archive contract', landing, [
   '<FinalCallToAction />',
   'Ask about your life.',
   'Get an answer built for you.',
-  'See the space',
+  'Understand what happens',
   'between you.',
   'From one person',
   'to the whole system.',
@@ -144,7 +156,7 @@ requireAll('v0 demonstration components', landing, [
   'className="v0-story-grid"',
   'className="v0-baseline-trace"',
   'function ProcessingFlow(',
-  'className="v0-window v0-flow"',
+  'v0-window v0-flow',
   'className="v0-family-map"',
   'className="v0-comparison-grid"',
   'How Sovereign works it through',
@@ -230,11 +242,32 @@ requireAll('Expression Field authenticated composition', `${authenticatedWorkspa
   'aria-modal="true"'
 ]);
 requireAll('Expression Field deterministic renderer', `${expressionField}\n${expressionFieldMath}\n${expressionFieldContract}`, [
-  'const shellPoints = fibonacciSphere(1200)',
+  'export function ExpressionFieldRenderer',
   'context.moveTo(centerX, centerY)',
+  'quaternionFromUnitVectors',
+  'slerpQuaternion',
   'expressionAxisIds.length',
   "export const EXPRESSION_FIELD_VERSION = 'expression-field.v1'",
   "export const EXPRESSION_AXIS_REGISTRY_VERSION = 'expression-axis-registry.v1'"
+]);
+requireAll('Expression Field shared product composition', `${landing}\n${workspace}\n${landingExpressionField}\n${relationalExpressionField}\n${systemExpressionField}\n${relationalContext}`, [
+  '<LandingExpressionFieldPreview',
+  '<WorkspaceExpressionField',
+  '<ThreadExpressionField',
+  '<ExpressionFieldRenderer',
+  'data-expression-field-composition="relationship"',
+  'data-expression-field-composition="system"',
+  'buildExpressionAxisValues({ facets: baseline.facets })',
+  'expressionAxes'
+]);
+if (existsSync('apps/web/src/ContextInteractionField.tsx')) throw new Error('The retired landing-only field renderer remains.');
+if (`${relationalExpressionField}\n${systemExpressionField}`.includes('<line')) throw new Error('Relationship and system engagement must not use literal connector lines.');
+rejectAll('retired landing visualization CSS', landingVisualizationCss, [
+  'story-system-center',
+  'story-person-node',
+  'system-map-line',
+  'sovereign-line-draw',
+  'sovereign-node-breathe'
 ]);
 if (`${expressionField}\n${expressionFieldMath}`.includes('Math.random')) throw new Error('Expression Field production rendering must remain deterministic.');
 requireAll('Expression Field privacy-safe Worker route', `${runtimeEntry}\n${expressionFieldWorker}`, [
