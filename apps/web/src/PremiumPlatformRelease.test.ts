@@ -22,7 +22,10 @@ const v0MotionCss = read('./v0-motion-accessibility.css');
 const v0GlobalCss = read('./v0-global-experience.css');
 const fieldCss = read('./landing-expression-field-v3.css');
 const integrationCss = read('./landing-expression-field-integration.css');
-const storyCss = read('./v0-restored-product-stories.css');
+const lineageStoryCss = read('./v0-restored-product-stories.css');
+const isolatedStoryCss = read('./landing-product-stories-v2.css');
+const openingCss = read('./sovereign-opening-field.css');
+const premiumPublicCss = read('./public-landing-premium-v4.css');
 const passkeyCss = read('./passkey-auth.css');
 const staticV0Css = read('../public/v0-public-port.css');
 const staticAuthority = read('../public/premium-public-release.css');
@@ -41,6 +44,9 @@ describe('founder v0 selective visual port', () => {
       "import './landing-expression-field-v3.css';",
       "import './landing-expression-field-integration.css';",
       "import './v0-restored-product-stories.css';",
+      "import './landing-product-stories-v2.css';",
+      "import './sovereign-opening-field.css';",
+      "import './public-landing-premium-v4.css';",
       "import './passkey-auth.css';"
     ];
     let previous = -1;
@@ -50,7 +56,19 @@ describe('founder v0 selective visual port', () => {
       previous = index;
     }
     expect(main.slice(previous + imports.at(-1)!.length)).not.toContain("import './");
-    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, storyCss, passkeyCss]) expectBalancedCss(source);
+    for (const source of [
+      v0PlatformCss,
+      v0MotionCss,
+      v0Css,
+      v0GlobalCss,
+      fieldCss,
+      integrationCss,
+      lineageStoryCss,
+      isolatedStoryCss,
+      openingCss,
+      premiumPublicCss,
+      passkeyCss
+    ]) expectBalancedCss(source);
   });
 
   it('emits the exact archive and v3 landing fingerprint at runtime', () => {
@@ -94,6 +112,29 @@ describe('founder v0 selective visual port', () => {
     expect(stories).not.toContain('LandingExpressionFieldPreview');
     expect(stories).not.toContain('sphere');
     expect(stories).not.toContain('globe');
+  });
+
+  it('enforces the complete premium public page rather than a generic component stack', () => {
+    expect(landing).toContain('className="sovereign-landing v0-landing-port v0-single-example-landing public-premium-v4"');
+    expect(landing).toContain('data-public-release="premium-public-v4"');
+    expect(landing.match(/SOVEREIGN\.OS/g)?.length).toBeGreaterThanOrEqual(3);
+    expect(main).toContain("dataset.sovereignLayoutRelease = 'premium-public-v4'");
+
+    for (const marker of [
+      '--landing-control-cut',
+      'clip-path: var(--landing-control-cut)',
+      '.landing-hero-kicker',
+      '.landing-story__heading',
+      'grid-template-columns: 112px minmax(0, 1fr) minmax(280px, 360px)',
+      '.landing-workflow > li',
+      '.v0-comparison-grid',
+      '.v0-final h2',
+      '@media (max-width: 760px)'
+    ]) expect(premiumPublicCss).toContain(marker);
+
+    expect(premiumPublicCss).not.toContain('border-radius: 999px');
+    expect(premiumPublicCss).toContain('border-radius: 0');
+    expect(premiumPublicCss).toContain('grid-template-columns: minmax(0, 1fr)');
   });
 
   it('applies the same founder language to the platform and standalone routes', () => {
