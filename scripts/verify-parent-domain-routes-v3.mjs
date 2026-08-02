@@ -113,14 +113,17 @@ for (const marker of [
 ]) {
   assert(javascript.text.includes(marker), `compiled production JavaScript is missing ${marker}`);
 }
+
+const normalizedStylesheet = stylesheet.text.replace(/\s+/g, '');
 for (const marker of [
   '.public-approved-v8',
   '.landing-story--personal',
   '.landing-story--relationship',
   '.landing-story--system',
-  '@media(min-width:981px)'
+  '.landing-story__stage',
+  '.sovereign-opening-capabilities'
 ]) {
-  assert(stylesheet.text.replace(/\s+/g, '').includes(marker.replace(/\s+/g, '')), `compiled production CSS is missing ${marker}`);
+  assert(normalizedStylesheet.includes(marker), `compiled production CSS is missing ${marker}`);
 }
 
 console.log(JSON.stringify({
