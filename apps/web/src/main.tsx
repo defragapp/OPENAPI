@@ -47,7 +47,7 @@ import './expression-field/expression-field-precision.css';
 import './responsive-viewport-contract.css';
 import './public-landing-editorial.css';
 
-/* Founder authority and integrated opening field. */
+/* Founder v0 foundation and integrated Expression Field. */
 import './v0-platform-port.css';
 import './v0-motion-accessibility.css';
 import './v0-visual-port.css';
@@ -57,18 +57,11 @@ import './v0-single-example-release.css';
 import './emergency-public-removal.css';
 import './landing-expression-field-v3.css';
 import './landing-expression-field-integration.css';
-
-/* Retained release-lineage layers no longer match the isolated story DOM. */
 import './v0-restored-product-stories.css';
-import './v0-product-story-layout-repair.css';
-import './v0-product-story-layout-final.css';
-
-/* Actual mobile-first demonstrations, opening frame, and final public polish. */
 import './landing-product-stories-v2.css';
-import './sovereign-opening-field.css';
-import './public-landing-premium-v4.css';
-import './public-landing-premium-v5.css';
-import './public-landing-premium-v6.css';
+
+/* Single approved public landing authority, then passkey authority. */
+import './public-landing-approved-v7.css';
 import './passkey-auth.css';
 
 installV0ReleaseFingerprint();
@@ -117,8 +110,9 @@ function refreshStaleIosPageRestore(): void {
 retireLegacyPublicCache();
 refreshStaleIosPageRestore();
 
-document.documentElement.dataset.sovereignLayoutRelease = 'premium-public-v6';
+document.documentElement.dataset.sovereignLayoutRelease = 'approved-public-v7';
 document.documentElement.dataset.sovereignProductStories = 'isolated-mobile-first-v2';
+document.documentElement.dataset.sovereignMotionRelease = 'v0-motion-workflows-v7';
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'
