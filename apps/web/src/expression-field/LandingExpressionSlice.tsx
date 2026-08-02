@@ -102,13 +102,14 @@ export function LandingExpressionSlice() {
       data-viewport-stage="expression"
       data-viewport-surface="expression-slice"
       data-visual-contract="landing-expression-field-v3"
+      data-release-copy="Illustrative Baseline · See what is active before it repeats. · Hover, focus, or tap a line. · Why do I keep taking responsibility for everyone around me? · relative expression in a sanitized example · not a diagnosis, score, or claim about anyone’s internal state"
       aria-label="Live Baseline expression field"
     >
       <svg
         className="landing-expression-slice__canvas"
         viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
         role="group"
-        aria-label="A live sample Baseline shown as Cloudflare-blue expression lines radiating from one stable point. Drag to rotate. Hover, focus, or tap a line for its value."
+        aria-label="An interactive field of eight Cloudflare-blue lines radiating from one stable point. A live sample Baseline. Drag to rotate. Hover, focus, or tap a line for its value."
         preserveAspectRatio="xMidYMid slice"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
