@@ -47,13 +47,14 @@ import './expression-field/expression-field-precision.css';
 import './responsive-viewport-contract.css';
 import './public-landing-editorial.css';
 
-/* Founder v0 foundation, global product authority, landing polish, then passkey-specific final authority. */
+/* Founder v0 foundation, global product authority, landing polish, iOS release sizing, then passkey-specific final authority. */
 import './v0-platform-port.css';
 import './v0-motion-accessibility.css';
 import './v0-visual-port.css';
 import './v0-global-experience.css';
 import './v0-landing-refinement.css';
 import './v0-product-demo-polish.css';
+import './v0-ios-public-release.css';
 import './passkey-auth.css';
 
 installV0ReleaseFingerprint();
