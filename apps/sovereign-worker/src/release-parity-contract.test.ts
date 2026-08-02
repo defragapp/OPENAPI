@@ -10,6 +10,7 @@ const releaseWrapper = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-
 const deployV3 = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-deploy-v3.mjs'), 'utf8');
 const parentVerifier = readFileSync(resolve(repositoryRoot, 'scripts/verify-parent-domain-routes-v3.mjs'), 'utf8');
 const visualVerifier = readFileSync(resolve(repositoryRoot, 'scripts/verify-live-visual-release-v2.mjs'), 'utf8');
+const visualRateLimiter = readFileSync(resolve(repositoryRoot, 'scripts/verify-live-visual-release-v3.mjs'), 'utf8');
 const referenceBase64 = readFileSync(
   resolve(repositoryRoot, 'tests/visual/sovereign-landing-reference-192x507.jpg.base64'),
   'utf8'
@@ -39,12 +40,19 @@ describe('production release parity contract', () => {
     expect(deployV3).toContain("const migrationVersion = '0014_passkey_authentication';");
     expect(deployV3).toContain("contract: 'v0-public-landing-v3'");
     expect(deployV3).toContain('center-sliced-expression-field');
-    expect(packageJson).toContain('verify-live-visual-release-v2.mjs');
+    expect(packageJson).toContain('verify-live-visual-release-v3.mjs');
     expect(releaseWrapper).toContain('verify-parent-domain-routes-v3.mjs');
-    expect(releaseWrapper).toContain('verify-live-visual-release-v2.mjs');
+    expect(releaseWrapper).toContain('verify-live-visual-release-v3.mjs');
     expect(visualVerifier).toContain('/browser-rendering/snapshot');
     expect(visualVerifier).toContain('screenshotOptions: { fullPage: true');
     expect(visualVerifier).toContain("method: 'Cloudflare Browser Run snapshot with full-page PNG plus deterministic normalized pixel, edge, color, and section-rhythm comparison'");
+  });
+
+  it('honors the Workers Free Quick Actions rate limit and retries 429 once', () => {
+    expect(visualRateLimiter).toContain('minimumIntervalMs = 10_500');
+    expect(visualRateLimiter).toContain("response.status !== 429");
+    expect(visualRateLimiter).toContain("response.headers.get('retry-after')");
+    expect(visualRateLimiter).toContain("await import('./verify-live-visual-release-v2.mjs')");
   });
 
   it('stores a non-empty founder-approved JPEG reference', () => {
