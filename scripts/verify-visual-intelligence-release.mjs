@@ -25,6 +25,7 @@ const storyCss = read('apps/web/src/landing-product-stories-v2.css');
 const landingField = read('apps/web/src/expression-field/LandingExpressionSlice.tsx');
 const landingFieldCss = read('apps/web/src/landing-expression-field-v3.css');
 const landingFieldIntegration = read('apps/web/src/landing-expression-field-integration.css');
+const heroVisual = read('apps/web/src/landing-hero-field-v4.css');
 const authenticatedWorkspace = read('apps/web/src/AuthenticatedWorkspace.tsx');
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const expressionField = read('apps/web/src/expression-field/ExpressionField.tsx');
@@ -56,6 +57,7 @@ for (const path of [
   'apps/web/src/expression-field/LandingExpressionSlice.tsx',
   'apps/web/src/landing-expression-field-v3.css',
   'apps/web/src/landing-expression-field-integration.css',
+  'apps/web/src/landing-hero-field-v4.css',
   'apps/web/src/passkey-auth.css'
 ]) assert(existsSync(path), `Required visual release source is missing: ${path}`);
 
@@ -64,6 +66,7 @@ requireAll('application entry', main, [
   "import './landing-expression-field-v3.css'",
   "import './landing-expression-field-integration.css'",
   "import './landing-product-stories-v2.css'",
+  "import './landing-hero-field-v4.css'",
   "import './passkey-auth.css'",
   "dataset.sovereignProductStories = 'isolated-mobile-first-v2'",
   'installV0ReleaseFingerprint();'
@@ -72,10 +75,12 @@ requireAll('application entry', main, [
 const fieldImport = "import './landing-expression-field-v3.css';";
 const integrationImport = "import './landing-expression-field-integration.css';";
 const storyImport = "import './landing-product-stories-v2.css';";
+const heroImport = "import './landing-hero-field-v4.css';";
 const passkeyImport = "import './passkey-auth.css';";
 assert(main.indexOf(fieldImport) < main.indexOf(integrationImport), 'Field integration must load after field geometry.');
 assert(main.indexOf(integrationImport) < main.indexOf(storyImport), 'Isolated story styling must load after the opening field.');
-assert(main.indexOf(storyImport) < main.indexOf(passkeyImport), 'Passkey styling must remain the final platform authority.');
+assert(main.indexOf(storyImport) < main.indexOf(heroImport), 'Hero field extension must load after isolated story styling.');
+assert(main.indexOf(heroImport) < main.indexOf(passkeyImport), 'Passkey styling must remain the final platform authority.');
 assert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("import './"), 'A local visual file loads after passkey authority.');
 
 requireAll('runtime identity', fingerprint, [
@@ -94,6 +99,9 @@ requireAll('public landing', landing, [
   'Holding onto the pain is.',
   'Personal AI for real life',
   '<LandingExpressionSlice />',
+  '<RealLifeQuestions />',
+  'Bring the question you actually have.',
+  'Why do we keep having the same fight?',
   '<LandingProductStories />',
   '<ComparisonStory />',
   '<FinalCallToAction />',
@@ -105,7 +113,7 @@ const landingRenderStart = landing.indexOf('export function PublicLanding()');
 const landingRenderEnd = landing.indexOf('function V0Navigation()', landingRenderStart);
 assert(landingRenderStart >= 0 && landingRenderEnd > landingRenderStart, 'PublicLanding render boundary is missing.');
 const renderedLanding = landing.slice(landingRenderStart, landingRenderEnd);
-const orderedLanding = ['<V0Navigation />', '<V0Hero />', '<LandingProductStories />', '<ComparisonStory />', '<FinalCallToAction />', '<V0Footer />'];
+const orderedLanding = ['<V0Navigation />', '<V0Hero />', '<RealLifeQuestions />', '<LandingProductStories />', '<ComparisonStory />', '<FinalCallToAction />', '<V0Footer />'];
 let prior = -1;
 for (const marker of orderedLanding) {
   const index = renderedLanding.indexOf(marker);
@@ -179,22 +187,34 @@ rejectAll('mobile-first story visual authority', storyCss, [
   'height: 100%'
 ]);
 
-requireAll('integrated opening field', `${landingField}\n${landingFieldCss}\n${landingFieldIntegration}`, [
+requireAll('integrated opening field', `${landingField}\n${landingFieldCss}\n${landingFieldIntegration}\n${heroVisual}`, [
   'data-visual-contract="landing-expression-field-v3"',
+  'data-field-geometry="spherical-360"',
   'onPointerDown={handlePointerDown}',
   'onPointerMove={handlePointerMove}',
-  'landing-expression-slice__tooltip',
-  'Baseline value',
-  'Live change',
-  'Current',
+  'landing-expression-slice__readout',
+  'MIN_AXIS_LENGTH',
+  'MAX_AXIS_LENGTH',
+  'Math.pow(normalized, 1.32)',
+  'buildSphereGrid',
+  'requestAnimationFrame',
   '.landing-expression-slice__ambient',
-  '.landing-expression-slice__horizon',
+  '.landing-expression-slice__sphere-shell',
+  '.landing-expression-slice__sphere-grid path',
+  'stroke: #2f93ff',
   'background: transparent',
   'border-radius: 0',
   'width: 100vw',
   'touch-action: none'
 ]);
-rejectAll('integrated opening field', landingField, ['sphere', 'globe', 'Math.random']);
+rejectAll('integrated opening field', landingField, ['Math.random', 'giftExpression', 'shadowExpression']);
+assert(!landingField.includes('<div className="landing-expression-slice__tooltip"'), 'The retired floating tooltip returned.');
+requireAll('real-life question visual authority', heroVisual, [
+  '.landing-question-orbit',
+  '.landing-question-orbit__stage',
+  '@keyframes landing-real-question',
+  '@media (prefers-reduced-motion: reduce)'
+]);
 
 requireAll('authenticated workspace', `${authenticatedWorkspace}\n${workspace}`, [
   'data-workspace-contract="one-room"',
@@ -293,6 +313,7 @@ for (const [label, css] of [
   ['global visual authority', v0Global],
   ['landing field', landingFieldCss],
   ['landing field integration', landingFieldIntegration],
+  ['hero field and questions', heroVisual],
   ['isolated product stories', storyCss],
   ['passkey authority', passkeyCss],
   ['standalone authority', staticV0],
@@ -304,7 +325,8 @@ console.log(JSON.stringify({
   release: 'sovereign-v0-public-landing-v3-isolated-stories',
   archiveSha256: archiveSha,
   sequenceFingerprint,
-  publicField: 'landing-expression-field-v3',
+  publicField: 'landing-expression-field-v3-spherical-360',
+  questionTreatment: 'rotating-real-life-questions',
   productStoryDom: 'isolated-mobile-first-v2',
   productStories: ['personal-chat-workflow', 'relationship-chat-workflow', 'system-chat-workflow'],
   legacyStoryDomRendered: false,
