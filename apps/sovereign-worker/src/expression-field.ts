@@ -1,7 +1,9 @@
 import {
   EXPRESSION_AXIS_REGISTRY_VERSION,
   EXPRESSION_FIELD_VERSION,
+  assertExpressionFieldResponse,
   expressionAxisIds,
+  expressionAxisRegistryById,
   type ExpressionAxisId,
   type ExpressionAxisValue,
   type ExpressionFieldBasisItem,
@@ -11,25 +13,6 @@ import {
 import { getModelSafeBaselineContext } from './baseline';
 import type { Env } from './env';
 import { requireAuth } from './security/auth';
-
-const labels: Record<ExpressionAxisId, string> = {
-  clarity: 'Clarity',
-  focus: 'Focus',
-  steadiness: 'Steadiness',
-  urgency: 'Urgency',
-  courage: 'Courage',
-  fear: 'Fear',
-  anger: 'Anger',
-  tenderness: 'Tenderness',
-  grief: 'Grief',
-  joy: 'Joy',
-  desire: 'Desire',
-  trust: 'Trust',
-  patience: 'Patience',
-  boundaries: 'Boundaries',
-  responsibility: 'Responsibility',
-  repair: 'Repair'
-};
 
 const axisFacetMap: Record<ExpressionAxisId, readonly string[]> = {
   clarity: ['decision_making', 'alignment_markers'],
@@ -72,7 +55,7 @@ export async function handleExpressionFieldRequest(request: Request, env: Env): 
   }
 
   if (facets.length === 0) {
-    return privateJson(buildUnavailableResponse(requestedMode, 'building'), 200);
+    return validatedPrivateJson(buildUnavailableResponse(requestedMode, 'building'));
   }
 
   const current = asRecord(context.current);
@@ -114,13 +97,13 @@ export async function handleExpressionFieldRequest(request: Request, env: Env): 
     axes,
     basis,
     limitations: [
-      'Values show relative expression salience within your own field, not a psychological measurement or score.',
-      'Current conditions may change emphasis, but they do not determine behavior or actual emotional state.',
-      'Integrated or under-pressure expression remains unconfirmed until you provide or confirm lived context.'
+      'Values show relative expression salience within your own field, not a diagnosis, personality score, or exact measurement of emotion.',
+      'Current conditions may change which expressions are more visible, but they do not determine identity, behavior, or another person’s internal state.',
+      'Gift, protective or shadow, repressed, and overextended expressions are possibilities for reflection until you confirm how the quality is actually operating.'
     ]
   };
 
-  return privateJson(response);
+  return validatedPrivateJson(response);
 }
 
 export function buildExpressionAxisValues(input: {
@@ -143,8 +126,7 @@ async function authenticateExpressionFieldRequest(
   env: Env
 ): Promise<Awaited<ReturnType<typeof requireAuth>> | Response> {
   try {
-    const auth = await requireAuth(request, env);
-    return auth;
+    return await requireAuth(request, env);
   } catch (error) {
     if (error instanceof Response) return error;
     throw error;
@@ -158,6 +140,7 @@ function buildAxis(input: {
   currentReady: boolean;
   contactCount: number;
 }): ExpressionAxisValue {
+  const registryEntry = expressionAxisRegistryById[input.id];
   const allowedFacetIds = axisFacetMap[input.id];
   const mappedFacets = input.facets.filter((facet) => typeof facet.id === 'string' && allowedFacetIds.includes(facet.id));
   const basisRefs = unique(mappedFacets.flatMap((facet) => stringArray(facet.basisRefs)));
@@ -172,14 +155,16 @@ function buildAxis(input: {
     ? clamp(6 + Math.min(12, input.contactCount * 2), 0, 18)
     : 0;
   const primary = mappedFacets[0];
-  const title = typeof primary?.title === 'string' ? primary.title : labels[input.id];
-  const description = typeof primary?.description === 'string'
-    ? primary.description
-    : `${labels[input.id]} is available as a Baseline expression to explore.`;
+  const title = typeof primary?.title === 'string' ? primary.title : registryEntry.label;
+  const description = firstText(mappedFacets, 'description')
+    ?? `${registryEntry.label} is one expression within your Baseline that Sovereign can help you examine in ordinary language.`;
+  const giftExpression = firstText(mappedFacets, 'giftExpression');
+  const shadowExpression = firstText(mappedFacets, 'shadowExpression');
+  const practicalDistinction = firstStringFromArray(mappedFacets, 'alignmentMarkers');
 
   return {
     id: input.id,
-    label: labels[input.id],
+    label: registryEntry.label,
     baselineValue,
     currentDelta,
     value: clamp(baselineValue + currentDelta, 0, 100),
@@ -188,9 +173,19 @@ function buildAxis(input: {
     facetIds: mappedFacets.map((facet) => String(facet.id)),
     basisRefs,
     summary: description,
+    ...(giftExpression ? { giftExpression } : {}),
+    ...(shadowExpression ? {
+      shadowExpression,
+      repressedExpression: `When held back, ${lowerFirst(shadowExpression)}`,
+      overextendedExpression: `When overused, ${lowerFirst(shadowExpression)}`
+    } : {}),
+    ...(practicalDistinction ? { practicalDistinction } : {}),
     ...(active && input.currentReady
-      ? { activeNow: `${title} may be more salient for a limited time. Current context does not establish how you are expressing it.` }
-      : {})
+      ? {
+          activeNow: `${title} may be more visible for a limited time. That added emphasis does not establish how you are expressing it.`,
+          contextDomain: 'current_context' as const
+        }
+      : { contextDomain: registryEntry.domain })
   };
 }
 
@@ -213,6 +208,25 @@ function buildUnavailableResponse(mode: ExpressionFieldMode, status: 'building' 
 
 function parseMode(value: string | null): ExpressionFieldMode {
   return value === 'baseline' ? 'baseline' : 'live';
+}
+
+function validatedPrivateJson(response: ExpressionFieldResponse): Response {
+  try {
+    assertExpressionFieldResponse(response);
+    return privateJson(response);
+  } catch (error) {
+    console.error('expression_field_validation_failed', {
+      name: error instanceof Error ? error.name : 'UnknownError',
+      message: error instanceof Error ? error.message : 'Unknown validation failure'
+    });
+    return privateJson({
+      version: EXPRESSION_FIELD_VERSION,
+      registryVersion: EXPRESSION_AXIS_REGISTRY_VERSION,
+      status: 'unavailable',
+      reason: 'invalid_payload',
+      message: 'The Expression Field is temporarily unavailable.'
+    }, 503);
+  }
 }
 
 function privateJson(body: unknown, status = 200): Response {
@@ -253,6 +267,28 @@ function stableHash(value: string): number {
     hash = Math.imul(hash, 16777619);
   }
   return hash >>> 0;
+}
+
+function firstText(facets: Record<string, unknown>[], key: string): string | undefined {
+  for (const facet of facets) {
+    const value = facet[key];
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+  return undefined;
+}
+
+function firstStringFromArray(facets: Record<string, unknown>[], key: string): string | undefined {
+  for (const facet of facets) {
+    const value = facet[key];
+    if (!Array.isArray(value)) continue;
+    const found = value.find((item): item is string => typeof item === 'string' && item.trim().length > 0);
+    if (found) return found.trim();
+  }
+  return undefined;
+}
+
+function lowerFirst(value: string): string {
+  return value.length > 0 ? value[0]!.toLowerCase() + value.slice(1) : value;
 }
 
 function isBasisItem(value: Record<string, unknown>): value is Record<string, unknown> & ExpressionFieldBasisItem {
