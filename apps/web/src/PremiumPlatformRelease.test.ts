@@ -24,7 +24,7 @@ const fieldCss = read('./landing-expression-field-v3.css');
 const integrationCss = read('./landing-expression-field-integration.css');
 const lineageStoryCss = read('./v0-restored-product-stories.css');
 const isolatedStoryCss = read('./landing-product-stories-v2.css');
-const approvedCss = read('./public-landing-approved-v7.css');
+const approvedCss = read('./public-landing-approved-v8.css');
 const passkeyCss = read('./passkey-auth.css');
 const staticV0Css = read('../public/v0-public-port.css');
 const staticAuthority = read('../public/premium-public-release.css');
@@ -33,7 +33,7 @@ function expectBalancedCss(source: string) {
   expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
 }
 
-describe('founder v0 selective visual port — approved public v7', () => {
+describe('founder v0 selective visual port — approved public v8', () => {
   it('loads one approved landing authority before passkey authority', () => {
     const imports = [
       "import './v0-platform-port.css';",
@@ -44,7 +44,7 @@ describe('founder v0 selective visual port — approved public v7', () => {
       "import './landing-expression-field-integration.css';",
       "import './v0-restored-product-stories.css';",
       "import './landing-product-stories-v2.css';",
-      "import './public-landing-approved-v7.css';",
+      "import './public-landing-approved-v8.css';",
       "import './passkey-auth.css';"
     ];
     let previous = -1;
@@ -54,6 +54,7 @@ describe('founder v0 selective visual port — approved public v7', () => {
       previous = index;
     }
     expect(main.slice(previous + imports.at(-1)!.length)).not.toContain("import './");
+    expect(main).not.toContain("import './public-landing-approved-v7.css';");
     expect(main).not.toContain("import './public-landing-premium-v4.css';");
     expect(main).not.toContain("import './public-landing-premium-v5.css';");
     expect(main).not.toContain("import './public-landing-premium-v6.css';");
@@ -70,20 +71,22 @@ describe('founder v0 selective visual port — approved public v7', () => {
     expect(main).toContain('installV0ReleaseFingerprint();');
   });
 
-  it('keeps the approved hero and true radial field first', () => {
+  it('keeps the approved hero and immersive Baseline field first', () => {
     expect(landing).toContain(`const V0_ARCHIVE_SHA = '${archiveSha}'`);
-    expect(landing).toContain('data-public-release="approved-public-v7"');
+    expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).not.toContain('HERO_CAPABILITIES');
-    expect(field).toContain('const CENTER_X = 790');
-    expect(field).toContain('const CENTER_Y = 314');
-    expect(field).toContain('Array.from({ length: 28 }');
+    expect(field).toContain('const CENTER_X = 600');
+    expect(field).toContain('const CENTER_Y = 680');
+    expect(field).toContain('Array.from({ length: 36 }');
     expect(field).not.toContain('landing-expression-slice__horizon');
     expect(field).not.toContain('landing-expression-slice__grid');
     expect(field).not.toContain('Array.from({ length: 88 }');
     expect(field).not.toContain('sphere');
+    expect(field).not.toContain('globe');
+    expect(field).not.toContain('#8b5cff');
     expect(integrationCss).toContain('background: transparent');
   });
 
@@ -120,25 +123,27 @@ describe('founder v0 selective visual port — approved public v7', () => {
     expect(stories).not.toContain('globe');
   });
 
-  it('enforces the clean v0 product-window styling and sparse mobile layout', () => {
+  it('enforces the immersive hero, v0 product windows, and sparse mobile layout', () => {
     for (const marker of [
-      '.public-approved-v7 .v0-hero',
-      '.public-approved-v7 .landing-expression-slice',
-      '.public-approved-v7 .landing-story__stage',
-      'grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr)',
-      '.public-approved-v7 .landing-demo',
-      'border-radius: 15px',
-      '.public-approved-v7 .landing-workflow::before',
-      '.public-approved-v7 .landing-workflow > li.is-active',
-      'approved-message-in',
+      '.public-approved-v8 .v0-hero.sovereign-opening-field',
+      'min-height: max(820px, calc(100svh - 74px))',
+      '.public-approved-v8 .landing-expression-slice',
+      '.public-approved-v8 .landing-story__stage',
+      'grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr)',
+      '.public-approved-v8 .landing-demo',
+      'border-radius: 16px',
+      '.public-approved-v8 .landing-workflow::before',
+      '.public-approved-v8 .landing-workflow > li.is-active',
+      'v8-message-in',
       '@media (max-width: 760px)',
+      'min-height: max(960px, calc(100svh - 68px))',
       'flex-direction: column',
       '.landing-workflow__copy > span',
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(approvedCss).toContain(marker);
     expect(approvedCss).not.toContain('border-radius: 999px');
-    expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v7'");
-    expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v7'");
+    expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v8'");
+    expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v8'");
   });
 
   it('applies the same founder language to the platform and standalone routes', () => {
