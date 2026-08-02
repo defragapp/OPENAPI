@@ -9,16 +9,16 @@ const field = read('./expression-field/LandingExpressionSlice.tsx');
 const fieldStyles = read('./landing-expression-field-v3.css');
 const integrationStyles = read('./landing-expression-field-integration.css');
 const storyStyles = read('./landing-product-stories-v2.css');
-const approvedStyles = read('./public-landing-approved-v7.css');
+const approvedStyles = read('./public-landing-approved-v8.css');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
-describe('approved public landing v7', () => {
+describe('approved public landing v8', () => {
   it('loads the v0 foundation, integrated field, isolated stories, approved authority, and passkey authority in order', () => {
     const fieldImport = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
     const lineageImport = "import './v0-restored-product-stories.css';";
     const storiesImport = "import './landing-product-stories-v2.css';";
-    const approvedImport = "import './public-landing-approved-v7.css';";
+    const approvedImport = "import './public-landing-approved-v8.css';";
     const passkeyImport = "import './passkey-auth.css';";
     expect(main.indexOf(integrationImport)).toBeGreaterThan(main.indexOf(fieldImport));
     expect(main.indexOf(lineageImport)).toBeGreaterThan(main.indexOf(integrationImport));
@@ -26,12 +26,12 @@ describe('approved public landing v7', () => {
     expect(main.indexOf(approvedImport)).toBeGreaterThan(main.indexOf(storiesImport));
     expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(approvedImport));
     expect(main.slice(main.indexOf(passkeyImport) + passkeyImport.length)).not.toContain("import './");
-    expect(main).not.toContain("import './public-landing-premium-v6.css';");
+    expect(main).not.toContain("import './public-landing-approved-v7.css';");
   });
 
-  it('renders the approved hero followed by the three product demonstrations', () => {
-    expect(landing).toContain('data-public-release="approved-public-v7"');
-    expect(landing).toContain('data-layout-release="v0-motion-workflows-v7"');
+  it('renders the approved immersive hero followed by the three product demonstrations', () => {
+    expect(landing).toContain('data-public-release="approved-public-v8"');
+    expect(landing).toContain('data-layout-release="v0-motion-workflows-v8"');
     expect(landing).toContain('SOVEREIGN.OS');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
@@ -41,11 +41,12 @@ describe('approved public landing v7', () => {
     expect(landing).not.toContain('HERO_CAPABILITIES');
   });
 
-  it('uses a true radial field rather than a bottom-origin horizon fan', () => {
+  it('uses one lower-center point with Cloudflare-blue vectors and no globe or horizon', () => {
     for (const marker of [
-      'const CENTER_X = 790',
-      'const CENTER_Y = 314',
-      'Array.from({ length: 28 }',
+      'const VIEWBOX_HEIGHT = 780',
+      'const CENTER_X = 600',
+      'const CENTER_Y = 680',
+      'Array.from({ length: 36 }',
       'Eight interactive vectors',
       'onPointerDown={handlePointerDown}',
       'onPointerMove={handlePointerMove}',
@@ -59,6 +60,7 @@ describe('approved public landing v7', () => {
     expect(field).not.toContain('Array.from({ length: 88 }');
     expect(field).not.toContain('sphere');
     expect(field).not.toContain('globe');
+    expect(field).not.toContain('#8b5cff');
     expect(approvedStyles).toContain('.landing-expression-slice__horizon');
     expect(approvedStyles).toContain('display: none');
   });
@@ -97,14 +99,15 @@ describe('approved public landing v7', () => {
     expect(stories).toContain('timers.push(window.setTimeout');
     expect(stories).toContain("data-motion-state={visibleIndex >= steps.length - 1 ? 'settled' : 'running'}");
     expect(stories).not.toContain('window.setInterval');
-    expect(approvedStyles).toContain('approved-message-in');
+    expect(approvedStyles).toContain('v8-message-in');
     expect(approvedStyles).toContain(".landing-story[data-visible='true'] .landing-message");
     expect(approvedStyles).toContain('.landing-workflow > li.is-active');
   });
 
-  it('keeps iPhone sparse, naturally stacked, and reduced-motion safe', () => {
+  it('keeps iPhone immersive but sparse, then naturally stacks product stories', () => {
     for (const marker of [
       '@media (max-width: 760px)',
+      'min-height: max(960px, calc(100svh - 68px))',
       'width: calc(100% - 28px)',
       'flex-direction: column',
       'height: auto',
@@ -114,9 +117,9 @@ describe('approved public landing v7', () => {
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(approvedStyles).toContain(marker);
     expect(approvedStyles).not.toContain('border-radius: 999px');
-    expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v7'");
+    expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v8'");
     expect(main).toContain("dataset.sovereignProductStories = 'isolated-mobile-first-v2'");
-    expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v7'");
+    expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v8'");
   });
 
   it('keeps every active CSS layer structurally balanced', () => {
