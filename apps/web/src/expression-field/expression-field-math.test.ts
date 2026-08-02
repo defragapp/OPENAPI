@@ -12,9 +12,10 @@ import {
 
 const componentSource = readFileSync(new URL('./ExpressionField.tsx', import.meta.url), 'utf8');
 const cssSource = readFileSync(new URL('./expression-field.css', import.meta.url), 'utf8');
+const precisionCssSource = readFileSync(new URL('./expression-field-precision.css', import.meta.url), 'utf8');
 
 describe('Expression Field geometry', () => {
-  it('covers the full sphere with stable permanent axis directions', () => {
+  it('covers the full sphere and keeps permanent normalized registry directions', () => {
     const points = fibonacciSphere(160);
     expect(points.some(([x]) => x > 0.8)).toBe(true);
     expect(points.some(([x]) => x < -0.8)).toBe(true);
@@ -24,6 +25,10 @@ describe('Expression Field geometry', () => {
     expect(points.some(([, , z]) => z < -0.8)).toBe(true);
     expect(expressionAxisRegistry).toHaveLength(16);
     expect(new Set(expressionAxisRegistry.map((axis) => axis.id)).size).toBe(16);
+    expressionAxisRegistry.forEach((axis, index) => {
+      expect(axis.index).toBe(index);
+      expect(Math.hypot(...axis.direction)).toBeCloseTo(1, 5);
+    });
   });
 
   it('keeps vector direction normalized through rotation', () => {
@@ -32,7 +37,7 @@ describe('Expression Field geometry', () => {
     expect(Math.hypot(...rotated)).toBeCloseTo(1, 8);
   });
 
-  it('keeps every expression length bounded without an outer sphere', () => {
+  it('keeps every expression visible and bounded without endpoint geometry', () => {
     expect(vectorLengthForValue(0)).toBeGreaterThan(0);
     expect(vectorLengthForValue(100)).toBeLessThan(1);
     expect(vectorLengthForValue(52)).toBeLessThan(vectorLengthForValue(78));
@@ -49,12 +54,13 @@ describe('Expression Field geometry', () => {
     expect(Math.hypot(...midpoint)).toBeCloseTo(1, 8);
   });
 
-  it('renders center-emitted light without endpoint geometry or random motion', () => {
+  it('renders one rotating grid, center-emitted vectors, Cloudflare blue, and no random motion', () => {
+    expect(componentSource).toContain('drawRotatingGrid');
     expect(componentSource).toContain('context.moveTo(centerX, centerY)');
-    expect(componentSource).not.toContain('shellPoints');
-    expect(componentSource).not.toContain('buildGridLines');
+    expect(componentSource).toContain("'lostpointercapture'");
     expect(componentSource).not.toContain('Math.random');
     expect(componentSource).not.toMatch(/endpoint|end-point|tip marker/i);
-    expect(cssSource).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(precisionCssSource).toContain('#0f6fff');
+    expect(cssSource + precisionCssSource).toContain('@media (prefers-reduced-motion: reduce)');
   });
 });
