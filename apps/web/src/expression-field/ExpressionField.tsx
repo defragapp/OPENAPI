@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { PointerEvent as ReactPointerEvent } from 'react';
 import type {
   ExpressionAxisId,
   ExpressionAxisValue,
   ExpressionFieldResponse
+} from './expression-field-contract';
+import {
+  assertExpressionFieldResponse,
+  expressionStateLabel,
+  salienceLabel
 } from './expression-field-contract';
 import {
   damp,
@@ -56,8 +60,28 @@ export interface ExpressionFieldRendererProps {
 }
 
 type Segment = { id: ExpressionAxisId; startX: number; startY: number; endX: number; endY: number };
-type PointerState = { id: number; x: number; y: number; startX: number; startY: number; moved: boolean };
+type PointerState = {
+  id: number;
+  originX: number;
+  originY: number;
+  lastX: number;
+  lastY: number;
+  dragging: boolean;
+};
 
+type DrawInput = {
+  context: CanvasRenderingContext2D;
+  width: number;
+  height: number;
+  axesById: Map<ExpressionAxisId, ExpressionAxisValue>;
+  rotation: Quaternion;
+  selectedAxisId: ExpressionAxisId;
+  displayedValues: Map<ExpressionAxisId, number>;
+  segments: Segment[];
+  delta: number;
+};
+
+const DRAG_THRESHOLD = 5;
 const engagementDirections: Record<ExpressionFieldEngagementDirection, Vec3> = {
   left: [-1, 0, 0],
   right: [1, 0, 0],
@@ -94,11 +118,18 @@ export function AccountExpressionField() {
         setSnapshot(null);
         return;
       }
-      const body = await response.json().catch(() => ({})) as ExpressionFieldResponse & { message?: string };
-      if (!response.ok) throw new Error(body.message || 'The Expression Field is temporarily unavailable.');
+      const body: unknown = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const message = body && typeof body === 'object' && 'message' in body && typeof body.message === 'string'
+          ? body.message
+          : 'The Expression Field is temporarily unavailable.';
+        throw new Error(message);
+      }
+      assertExpressionFieldResponse(body);
       setSnapshot(body);
       setSelectedAxisId(body.axes.find((axis) => axis.currentDelta > 0)?.id ?? body.axes[0]?.id ?? 'clarity');
     } catch (problem) {
+      setSnapshot(null);
       setError(problem instanceof Error ? problem.message : 'The Expression Field is temporarily unavailable.');
     } finally {
       setLoading(false);
@@ -126,7 +157,7 @@ export function AccountExpressionField() {
         aria-label="Open Expression Field"
       >
         <span aria-hidden="true" />
-        <strong>{loading ? 'Preparing field' : 'Expression field'}</strong>
+        <strong>{loading ? 'Preparing field' : 'Expression Field'}</strong>
       </button>
 
       {open && (
@@ -134,7 +165,11 @@ export function AccountExpressionField() {
           <button className="expression-field-backdrop" type="button" aria-label="Close Expression Field" onClick={() => setOpen(false)} />
           <aside className="expression-field-focus" role="dialog" aria-modal="true" aria-labelledby="expression-field-title">
             <header>
-              <div><span>YOUR BASELINE · LIVE CONTEXT</span><h2 id="expression-field-title">Expression Field</h2></div>
+              <div>
+                <span>YOUR BASELINE · LIVE CONTEXT</span>
+                <h2 id="expression-field-title">Expression Field</h2>
+                <p className="expression-field-introduction">This little light of mine—made visible as one stable field of capacity, feeling, protection, and gift.</p>
+              </div>
               <button type="button" onClick={() => setOpen(false)} aria-label="Close Expression Field">×</button>
             </header>
 
@@ -158,7 +193,9 @@ export function AccountExpressionField() {
                     className="expression-field-ask"
                     type="button"
                     onClick={() => {
-                      placePromptInComposer(`What does ${selected.label} mean in my Expression Field, and what may be more active now?`);
+                      placePromptInComposer(
+                        `Help me understand ${selected.label} in my Expression Field. Show its gift, protective or shadow expression, what repression or overextension could look like, and what may be louder now.`
+                      );
                       setOpen(false);
                     }}
                   >
@@ -201,22 +238,18 @@ export function ExpressionFieldInstrument({
           onSelectAxis={selectAxis}
           resetSignal={resetSignal}
           draggable
-          ariaLabel="Rotatable Expression Field. Select an expression from the controls below for exact text detail."
+          ariaLabel="Rotatable Expression Field. Every line begins at one stable center. Line length shows relative expression salience, not a diagnosis or score."
         />
         <span className="expression-field-origin-label">ONE CENTER · SIXTEEN EXPRESSIONS</span>
       </div>
 
-      {selectedAxis && (
-        <div className="expression-field-details" aria-live="polite">
-          <div>
-            <span>{selectedAxis.currentDelta > 0 ? 'MORE ACTIVE NOW' : 'BASELINE EXPRESSION'}</span>
-            <h3>{selectedAxis.label}</h3>
-          </div>
-          {variant === 'account' && <strong>Relative expression · {selectedAxis.value}</strong>}
-          <p>{selectedAxis.activeNow ?? selectedAxis.summary}</p>
-          <small>{selectedAxis.state === 'unconfirmed' ? 'Actual expression remains yours to confirm.' : selectedAxis.state.replace('_', ' ')}</small>
-        </div>
-      )}
+      {selectedAxis && <ExpressionAxisDetails axis={selectedAxis} showNumeric={variant === 'account'} />}
+
+      <ul className="sr-only" aria-label="Expression Field values">
+        {snapshot.axes.map((axis) => (
+          <li key={axis.id}>{axis.label}: {salienceLabel(axis.value)}. {axis.summary}</li>
+        ))}
+      </ul>
 
       <div className="expression-field-controls">
         <div role="list" aria-label="Expression channels">
@@ -236,6 +269,39 @@ export function ExpressionFieldInstrument({
       </div>
     </section>
   );
+}
+
+function ExpressionAxisDetails({ axis, showNumeric }: { axis: ExpressionAxisValue; showNumeric: boolean }) {
+  const state = expressionStateLabel(axis.state);
+  return (
+    <div className="expression-field-details" aria-live="polite">
+      <div className="expression-field-details-heading">
+        <div>
+          <span>{axis.currentDelta > 0 ? 'MORE ACTIVE NOW' : 'BASELINE EXPRESSION'}</span>
+          <h3>{axis.label}</h3>
+        </div>
+        <div className="expression-field-measurement">
+          <strong>{salienceLabel(axis.value)}</strong>
+          {showNumeric && <small>Relative expression · {axis.value}</small>}
+        </div>
+      </div>
+      <p>{axis.activeNow ?? axis.summary}</p>
+      <small className="expression-field-state">{state}{axis.state === 'unconfirmed' ? '. Actual expression remains yours to confirm.' : ''}</small>
+      {(axis.giftExpression || axis.shadowExpression || axis.repressedExpression || axis.overextendedExpression || axis.practicalDistinction) && (
+        <div className="expression-field-language" aria-label={`${axis.label} expression possibilities`}>
+          {axis.giftExpression && <ExpressionMeaning label="Gift" text={axis.giftExpression} />}
+          {axis.shadowExpression && <ExpressionMeaning label="Protective or shadow" text={axis.shadowExpression} />}
+          {axis.repressedExpression && <ExpressionMeaning label="When held back" text={axis.repressedExpression} />}
+          {axis.overextendedExpression && <ExpressionMeaning label="When overextended" text={axis.overextendedExpression} />}
+          {axis.practicalDistinction && <ExpressionMeaning label="Useful distinction" text={axis.practicalDistinction} />}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ExpressionMeaning({ label, text }: { label: string; text: string }) {
+  return <div><span>{label}</span><p>{text}</p></div>;
 }
 
 export function ExpressionFieldRenderer({
@@ -301,8 +367,8 @@ function ExpressionFieldCanvas({
     const context = canvas.getContext('2d');
     if (!context) return;
     const renderContext: CanvasRenderingContext2D = context;
-
-    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reducedMotionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+    let reduceMotion = reducedMotionQuery.matches;
     const dprCap = variant === 'preview' ? 1.5 : 2;
     const selectedDirection = axisDirectionById.get(selectedAxisId);
     const engagementTarget = engagementDirection ? engagementDirections[engagementDirection] : undefined;
@@ -359,15 +425,15 @@ function ExpressionFieldCanvas({
           const velocity = velocityRef.current;
           if (Math.abs(velocity.x) + Math.abs(velocity.y) > 0.001) {
             rotationRef.current = multiplyQuaternion(quaternionFromEuler(velocity.y * delta, velocity.x * delta), rotationRef.current);
-            velocity.x *= Math.pow(0.055, delta);
-            velocity.y *= Math.pow(0.055, delta);
+            velocity.x *= Math.pow(0.04, delta);
+            velocity.y *= Math.pow(0.04, delta);
           } else if (autoRotate) {
-            rotationRef.current = multiplyQuaternion(quaternionFromEuler(0, 0.045 * delta), rotationRef.current);
+            rotationRef.current = multiplyQuaternion(quaternionFromEuler(0, 0.026 * delta), rotationRef.current);
           }
         }
-        const cycle = ((time / 6200 + engagementPhase) % 1 + 1) % 1;
+        const cycle = ((time / 7600 + engagementPhase) % 1 + 1) % 1;
         const wave = (1 - Math.cos(cycle * Math.PI * 2)) / 2;
-        const engagementAmount = reduceMotion ? 0.72 : smoothstep(0.34, 0.82, wave) * 0.94;
+        const engagementAmount = reduceMotion ? 0.7 : smoothstep(0.34, 0.82, wave) * 0.9;
         const renderedRotation = engagementRotation
           ? slerpQuaternion(rotationRef.current, engagementRotation, engagementAmount)
           : rotationRef.current;
@@ -386,8 +452,18 @@ function ExpressionFieldCanvas({
       if (!reduceMotion) start();
     }
 
+    function onReducedMotionChange(event: MediaQueryListEvent) {
+      reduceMotion = event.matches;
+      if (reduceMotion) {
+        velocityRef.current = { x: 0, y: 0 };
+        for (const [id, axis] of axesById) displayedValuesRef.current.set(id, axis.value);
+      }
+      start();
+    }
+
     const visibilityChange = () => start();
     document.addEventListener('visibilitychange', visibilityChange);
+    reducedMotionQuery.addEventListener('change', onReducedMotionChange);
     start();
     return () => {
       active = false;
@@ -395,127 +471,151 @@ function ExpressionFieldCanvas({
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       document.removeEventListener('visibilitychange', visibilityChange);
+      reducedMotionQuery.removeEventListener('change', onReducedMotionChange);
       requestRenderRef.current = () => undefined;
     };
   }, [axesById, autoRotate, engagementDirection, engagementPhase, selectedAxisId, variant]);
 
-  function pointerDown(event: ReactPointerEvent<HTMLCanvasElement>) {
-    if (!draggable) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    pointerRef.current = {
-      id: event.pointerId,
-      x: event.clientX,
-      y: event.clientY,
-      startX: event.clientX,
-      startY: event.clientY,
-      moved: false
-    };
-    velocityRef.current = { x: 0, y: 0 };
-  }
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !draggable) return;
 
-  function pointerMove(event: ReactPointerEvent<HTMLCanvasElement>) {
-    if (!draggable) return;
-    const pointer = pointerRef.current;
-    if (!pointer || pointer.id !== event.pointerId) return;
-    const dx = event.clientX - pointer.x;
-    const dy = event.clientY - pointer.y;
-    const totalX = event.clientX - pointer.startX;
-    const totalY = event.clientY - pointer.startY;
-    if (!pointer.moved && Math.hypot(totalX, totalY) > 5) pointer.moved = true;
-    if (variant === 'preview' && Math.abs(totalY) > Math.abs(totalX) * 1.25) return;
-    rotationRef.current = multiplyQuaternion(quaternionFromEuler(dy * 0.006, dx * 0.006), rotationRef.current);
-    velocityRef.current = { x: dx * 0.85, y: dy * 0.85 };
-    pointer.x = event.clientX;
-    pointer.y = event.clientY;
-    requestRenderRef.current();
-  }
-
-  function pointerUp(event: ReactPointerEvent<HTMLCanvasElement>) {
-    if (!draggable) return;
-    const pointer = pointerRef.current;
-    if (!pointer || pointer.id !== event.pointerId) return;
-    if (!pointer.moved) {
-      const rect = event.currentTarget.getBoundingClientRect();
-      const pointX = event.clientX - rect.left;
-      const pointY = event.clientY - rect.top;
-      const nearest = segmentsRef.current
-        .map((segment) => ({
-          id: segment.id,
-          distance: distanceToSegment(pointX, pointY, segment.startX, segment.startY, segment.endX, segment.endY)
-        }))
-        .sort((left, right) => left.distance - right.distance)[0];
-      if (nearest && nearest.distance <= 18) onSelectAxis(nearest.id);
+    function localPoint(event: PointerEvent) {
+      const rect = canvas!.getBoundingClientRect();
+      return { x: event.clientX - rect.left, y: event.clientY - rect.top };
     }
-    pointerRef.current = null;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-  }
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="expression-field-canvas"
-      role="img"
-      aria-label={ariaLabel}
-      onPointerDown={draggable ? pointerDown : undefined}
-      onPointerMove={draggable ? pointerMove : undefined}
-      onPointerUp={draggable ? pointerUp : undefined}
-      onPointerCancel={draggable ? () => { pointerRef.current = null; } : undefined}
-    />
-  );
+    function resetPointer(pointerId?: number) {
+      const pointer = pointerRef.current;
+      if (!pointer || (pointerId !== undefined && pointer.id !== pointerId)) return;
+      pointerRef.current = null;
+    }
+
+    function pointerDown(event: PointerEvent) {
+      if (pointerRef.current) return;
+      pointerRef.current = {
+        id: event.pointerId,
+        originX: event.clientX,
+        originY: event.clientY,
+        lastX: event.clientX,
+        lastY: event.clientY,
+        dragging: false
+      };
+      velocityRef.current = { x: 0, y: 0 };
+    }
+
+    function pointerMove(event: PointerEvent) {
+      const pointer = pointerRef.current;
+      if (!pointer || pointer.id !== event.pointerId) return;
+      const totalX = event.clientX - pointer.originX;
+      const totalY = event.clientY - pointer.originY;
+      if (!pointer.dragging) {
+        if (variant === 'preview' && Math.abs(totalY) > Math.abs(totalX) * 1.25) {
+          resetPointer(event.pointerId);
+          return;
+        }
+        if (Math.hypot(totalX, totalY) < DRAG_THRESHOLD) return;
+        pointer.dragging = true;
+        canvas!.setPointerCapture(event.pointerId);
+      }
+      const dx = event.clientX - pointer.lastX;
+      const dy = event.clientY - pointer.lastY;
+      rotationRef.current = multiplyQuaternion(quaternionFromEuler(dy * 0.0054, dx * 0.0054), rotationRef.current);
+      velocityRef.current = { x: dx * 0.72, y: dy * 0.72 };
+      pointer.lastX = event.clientX;
+      pointer.lastY = event.clientY;
+      requestRenderRef.current();
+    }
+
+    function pointerUp(event: PointerEvent) {
+      const pointer = pointerRef.current;
+      if (!pointer || pointer.id !== event.pointerId) return;
+      if (!pointer.dragging) {
+        const point = localPoint(event);
+        const nearest = segmentsRef.current
+          .map((segment) => ({
+            id: segment.id,
+            distance: distanceToSegment(point.x, point.y, segment.startX, segment.startY, segment.endX, segment.endY)
+          }))
+          .sort((left, right) => left.distance - right.distance)[0];
+        if (nearest && nearest.distance <= 18) onSelectAxis(nearest.id);
+      }
+      if (canvas!.hasPointerCapture(event.pointerId)) canvas!.releasePointerCapture(event.pointerId);
+      resetPointer(event.pointerId);
+    }
+
+    function pointerCancel(event: PointerEvent) {
+      if (canvas!.hasPointerCapture(event.pointerId)) canvas!.releasePointerCapture(event.pointerId);
+      resetPointer(event.pointerId);
+    }
+
+    function lostPointerCapture(event: PointerEvent) {
+      resetPointer(event.pointerId);
+    }
+
+    canvas.addEventListener('pointerdown', pointerDown);
+    canvas.addEventListener('pointermove', pointerMove);
+    canvas.addEventListener('pointerup', pointerUp);
+    canvas.addEventListener('pointercancel', pointerCancel);
+    canvas.addEventListener('lostpointercapture', lostPointerCapture);
+    return () => {
+      canvas.removeEventListener('pointerdown', pointerDown);
+      canvas.removeEventListener('pointermove', pointerMove);
+      canvas.removeEventListener('pointerup', pointerUp);
+      canvas.removeEventListener('pointercancel', pointerCancel);
+      canvas.removeEventListener('lostpointercapture', lostPointerCapture);
+    };
+  }, [draggable, onSelectAxis, variant]);
+
+  return <canvas ref={canvasRef} className="expression-field-canvas" role="img" aria-label={ariaLabel} />;
 }
 
-function drawExpressionField(input: {
-  context: CanvasRenderingContext2D;
-  width: number;
-  height: number;
-  axesById: Map<ExpressionAxisId, ExpressionAxisValue>;
-  rotation: Quaternion;
-  selectedAxisId: ExpressionAxisId;
-  displayedValues: Map<ExpressionAxisId, number>;
-  segments: Segment[];
-  delta: number;
-}) {
+function drawExpressionField(input: DrawInput) {
   const { context, width, height, rotation } = input;
   const centerX = width / 2;
   const centerY = height / 2;
-  const radius = Math.min(width, height) * 0.47;
+  const radius = Math.min(width, height) * 0.455;
   context.clearRect(0, 0, width, height);
 
-  const atmosphere = context.createRadialGradient(centerX, centerY, radius * 0.15, centerX, centerY, radius * 1.18);
-  atmosphere.addColorStop(0, 'rgba(30, 123, 232, .08)');
-  atmosphere.addColorStop(0.62, 'rgba(18, 86, 173, .035)');
-  atmosphere.addColorStop(1, 'rgba(5, 18, 35, 0)');
+  const atmosphere = context.createRadialGradient(centerX, centerY, radius * 0.12, centerX, centerY, radius * 1.16);
+  atmosphere.addColorStop(0, 'rgba(15, 111, 255, .1)');
+  atmosphere.addColorStop(0.58, 'rgba(8, 103, 223, .035)');
+  atmosphere.addColorStop(1, 'rgba(3, 12, 24, 0)');
   context.fillStyle = atmosphere;
   context.fillRect(0, 0, width, height);
+
+  drawRotatingGrid(context, rotation, radius, centerX, centerY);
 
   input.segments.length = 0;
   const layers = expressionAxisRegistry.map((definition) => {
     const axis = input.axesById.get(definition.id);
     const target = axis?.value ?? 0;
-    const current = damp(input.displayedValues.get(definition.id) ?? axis?.baselineValue ?? target, target, 6.2, input.delta);
+    const current = damp(input.displayedValues.get(definition.id) ?? axis?.baselineValue ?? target, target, 5.5, input.delta);
     input.displayedValues.set(definition.id, current);
     const direction = rotateVector(definition.direction, rotation);
     const end = projectPoint(scaleVector(direction, vectorLengthForValue(current)), radius, centerX, centerY);
-    return { definition, end, depth: direction[2] };
+    return { definition, axis, end, depth: direction[2] };
   }).sort((left, right) => left.depth - right.depth);
 
   for (const layer of layers) {
     const selected = layer.definition.id === input.selectedAxisId;
-    const alpha = selected ? 0.98 : 0.28 + ((layer.depth + 1) / 2) * 0.42;
+    const depthAlpha = 0.24 + ((layer.depth + 1) / 2) * 0.48;
+    const stateWeight = stateVisualWeight(layer.axis?.state);
+    const alpha = selected ? 0.98 : Math.min(0.78, depthAlpha * stateWeight.opacity);
     if (selected) {
-      context.strokeStyle = 'rgba(90, 182, 255, .18)';
-      context.lineWidth = 8;
+      context.strokeStyle = 'rgba(61, 155, 255, .16)';
+      context.lineWidth = 7;
       context.beginPath();
       context.moveTo(centerX, centerY);
       context.lineTo(layer.end[0], layer.end[1]);
       context.stroke();
     }
     const gradient = context.createLinearGradient(centerX, centerY, layer.end[0], layer.end[1]);
-    gradient.addColorStop(0, `rgba(228, 247, 255, ${alpha})`);
-    gradient.addColorStop(0.16, `rgba(104, 195, 255, ${alpha})`);
-    gradient.addColorStop(1, `rgba(47, 135, 255, ${alpha * 0.82})`);
+    gradient.addColorStop(0, `rgba(216, 239, 255, ${alpha})`);
+    gradient.addColorStop(0.18, `rgba(126, 201, 255, ${alpha})`);
+    gradient.addColorStop(1, `rgba(15, 111, 255, ${alpha * 0.9})`);
     context.strokeStyle = gradient;
-    context.lineWidth = selected ? 2.1 : 1.05;
+    context.lineWidth = selected ? 2.15 : 1.02 * stateWeight.width;
     context.beginPath();
     context.moveTo(centerX, centerY);
     context.lineTo(layer.end[0], layer.end[1]);
@@ -523,19 +623,69 @@ function drawExpressionField(input: {
     input.segments.push({ id: layer.definition.id, startX: centerX, startY: centerY, endX: layer.end[0], endY: layer.end[1] });
   }
 
-  const coreGlow = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * 0.14);
+  const coreGlow = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * 0.13);
   coreGlow.addColorStop(0, 'rgba(255, 255, 255, 1)');
-  coreGlow.addColorStop(0.14, 'rgba(183, 226, 255, .98)');
-  coreGlow.addColorStop(0.42, 'rgba(56, 154, 255, .46)');
-  coreGlow.addColorStop(1, 'rgba(45, 132, 255, 0)');
+  coreGlow.addColorStop(0.15, 'rgba(216, 239, 255, .98)');
+  coreGlow.addColorStop(0.42, 'rgba(61, 155, 255, .42)');
+  coreGlow.addColorStop(1, 'rgba(15, 111, 255, 0)');
   context.fillStyle = coreGlow;
   context.beginPath();
-  context.arc(centerX, centerY, radius * 0.14, 0, Math.PI * 2);
+  context.arc(centerX, centerY, radius * 0.13, 0, Math.PI * 2);
   context.fill();
-  context.fillStyle = '#f4fbff';
+  context.fillStyle = '#f7fcff';
   context.beginPath();
-  context.arc(centerX, centerY, Math.max(2.2, radius * 0.018), 0, Math.PI * 2);
+  context.arc(centerX, centerY, Math.max(2.2, radius * 0.017), 0, Math.PI * 2);
   context.fill();
+}
+
+function drawRotatingGrid(context: CanvasRenderingContext2D, rotation: Quaternion, radius: number, centerX: number, centerY: number) {
+  context.save();
+  context.lineWidth = 0.75;
+  const circles: Vec3[][] = [];
+  for (const latitude of [-60, -30, 0, 30, 60]) {
+    const phi = latitude * Math.PI / 180;
+    circles.push(Array.from({ length: 65 }, (_, index) => {
+      const theta = index / 64 * Math.PI * 2;
+      return [Math.cos(phi) * Math.cos(theta), Math.sin(phi), Math.cos(phi) * Math.sin(theta)] as Vec3;
+    }));
+  }
+  for (let longitude = 0; longitude < 6; longitude += 1) {
+    const theta = longitude / 6 * Math.PI;
+    circles.push(Array.from({ length: 65 }, (_, index) => {
+      const phi = -Math.PI / 2 + index / 64 * Math.PI;
+      return [Math.cos(phi) * Math.cos(theta), Math.sin(phi), Math.cos(phi) * Math.sin(theta)] as Vec3;
+    }));
+  }
+
+  for (const points of circles) {
+    const projected = points.map((point) => {
+      const rotated = rotateVector(point, rotation);
+      return { point: projectPoint(rotated, radius, centerX, centerY), depth: rotated[2] };
+    });
+    for (let index = 1; index < projected.length; index += 1) {
+      const previous = projected[index - 1]!;
+      const current = projected[index]!;
+      const depth = (previous.depth + current.depth) / 2;
+      context.strokeStyle = `rgba(126, 201, 255, ${0.035 + ((depth + 1) / 2) * 0.075})`;
+      context.beginPath();
+      context.moveTo(previous.point[0], previous.point[1]);
+      context.lineTo(current.point[0], current.point[1]);
+      context.stroke();
+    }
+  }
+  context.restore();
+}
+
+function stateVisualWeight(state: ExpressionAxisValue['state'] | undefined) {
+  switch (state) {
+    case 'gift':
+    case 'integrated': return { opacity: 1.08, width: 1.12 };
+    case 'protective':
+    case 'under_pressure': return { opacity: 0.94, width: 1.08 };
+    case 'repressed': return { opacity: 0.68, width: 0.82 };
+    case 'overextended': return { opacity: 1.04, width: 1.2 };
+    default: return { opacity: 1, width: 1 };
+  }
 }
 
 function smoothstep(minimum: number, maximum: number, value: number) {
