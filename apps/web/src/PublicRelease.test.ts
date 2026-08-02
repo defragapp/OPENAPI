@@ -8,7 +8,9 @@ const how = readFileSync(new URL('../public/how-it-works.html', import.meta.url)
 const robots = readFileSync(new URL('../public/robots.txt', import.meta.url), 'utf8');
 const sitemap = readFileSync(new URL('../public/sitemap.xml', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
+const slice = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
 const v0Css = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
+const releaseCss = readFileSync(new URL('./v0-single-example-release.css', import.meta.url), 'utf8');
 
 describe('founder v0 public production release', () => {
   it('publishes canonical and controlled social metadata', () => {
@@ -27,28 +29,33 @@ describe('founder v0 public production release', () => {
     expect(sitemap).not.toContain('/app');
   });
 
-  it('uses the v0 self, relationship, and system demonstrations as the public focal point', () => {
+  it('uses one interactive Expression Field as the public focal point', () => {
     expect(landing).toContain('data-answer-contract="sovereign-answer.v2"');
-    expect(landing).toContain('<PersonalStory />');
-    expect(landing).toContain('<RelationshipStory />');
-    expect(landing).toContain('<SystemStory />');
-    expect(landing).toContain('Step 01 · You');
-    expect(landing).toContain('Step 02 · You + 1');
-    expect(landing).toContain('Step 03 · Your whole system');
-    expect(landing).toContain('How Sovereign works it through');
-    expect(landing).toContain('How Sovereign reads both of you');
-    expect(landing).toContain('className="v0-family-map"');
+    expect(landing).toContain('data-viewport-contract="v0-public-landing-v2"');
+    expect(landing).toContain('<LandingExpressionSlice />');
+    expect(landing).toContain('<CapabilitySummary />');
+    expect(slice).toContain('landing-expression-slice__beam');
+    expect(slice).toContain('role="button"');
+    expect(slice).toContain('role="status"');
+    expect(slice).toContain('See what is active before it repeats.');
+    expect(slice).not.toContain('sphere');
+    expect(landing).not.toContain('\nfunction PersonalStory(');
+    expect(landing).not.toContain('\nfunction RelationshipStory(');
+    expect(landing).not.toContain('\nfunction SystemStory(');
   });
 
-  it('retains archive-specific visual hierarchy and responsive behavior', () => {
-    for (const selector of ['.v0-hero', '.v0-question-band', '.v0-story-grid', '.v0-window', '.v0-flow', '.v0-family-map', '.v0-comparison-grid', '.v0-final']) {
+  it('retains the founder hierarchy with single-example responsive behavior', () => {
+    for (const selector of ['.v0-hero', '.v0-comparison-grid', '.v0-final']) {
       expect(v0Css).toContain(selector);
     }
-    expect(v0Css).toContain('@media (max-width: 760px)');
-    expect(v0Css).toContain('@media (max-width: 430px)');
-    expect(v0Css).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(landing).toContain('aria-label="Illustrative family system map"');
-    expect(landing).toContain('Illustrative permitted Baselines');
-    expect(landing).toContain('Each person controls what may be included');
+    for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip', '.v0-capability-summary']) {
+      expect(releaseCss).toContain(selector);
+    }
+    expect(releaseCss).toContain('@media (max-width: 760px)');
+    expect(releaseCss).toContain('@media (max-width: 380px)');
+    expect(releaseCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(slice).toContain('aria-label="An interactive field of eight Cloudflare-blue lines radiating from one stable point.');
+    expect(slice).toContain('Illustrative Baseline');
+    expect(landing).toContain('With permission, keep both people distinct');
   });
 });
