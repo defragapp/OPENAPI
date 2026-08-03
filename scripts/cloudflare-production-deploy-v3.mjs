@@ -47,6 +47,14 @@ const replacements = [
   {
     from: "      contract: 'v0-public-landing-v2',",
     to: "      contract: 'v0-public-landing-v3',\n      field: 'landing-expression-field-v3',"
+  },
+  {
+    from: "  const workersDevUrl = deployOutput.match(/https:\\/\\/[^\\s]+\\.workers\\.dev/)?.[0] || null;",
+    to: "  const productionWorkersDev = false;"
+  },
+  {
+    from: "    workersDevUrl,",
+    to: "    productionWorkersDev,"
   }
 ];
 
@@ -64,10 +72,11 @@ for (const staleMarker of [
   "'See what is active before it repeats.',",
   "'Hover, focus, or tap a line.',",
   "'An interactive field of eight Cloudflare-blue lines radiating from one stable point.',",
-  "'Relative expression inside one sanitized example',"
+  "'Relative expression inside one sanitized example',",
+  'workersDevUrl'
 ]) {
   if (generated.includes(staleMarker)) {
-    throw new Error(`Production deploy v3 still contains stale landing verification: ${staleMarker}`);
+    throw new Error(`Production deploy v3 still contains stale landing or routing verification: ${staleMarker}`);
   }
 }
 if (!generated.includes("contract: 'v0-public-landing-v3'")) {
@@ -81,6 +90,9 @@ if (!generated.includes("const migrationVersion = '0014_passkey_authentication';
 }
 if (!generated.includes("dependencies?.migrationParity === 'current'")) {
   throw new Error('Production deploy v3 does not enforce migration parity');
+}
+if (!generated.includes('productionWorkersDev = false')) {
+  throw new Error('Production deploy v3 does not record workers.dev retirement');
 }
 
 writeFileSync(generatedPath, generated);
