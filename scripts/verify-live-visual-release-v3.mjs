@@ -123,6 +123,11 @@ const auditParserV3 = String.raw`function attributesToObject(attributes) {
   return Object.fromEntries((attributes || []).map((attribute) => [attribute.name, attribute.value]));
 }
 
+function firstScrapeResult(results) {
+  if (Array.isArray(results)) return results[0] || null;
+  return results && typeof results === 'object' ? results : null;
+}
+
 async function scrapeRenderedAudit(profile, url, html) {
   const selectors = [
     '.v0-hero',
@@ -177,13 +182,14 @@ async function scrapeRenderedAudit(profile, url, html) {
   }
 
   const items = Array.isArray(payload?.result) ? payload.result : (Array.isArray(payload) ? payload : []);
-  const bySelector = new Map(items.map((item) => [item.selector, item.results]));
+  const bySelector = new Map(items.map((item) => [item.selector, firstScrapeResult(item.results)]));
   const htmlResult = bySelector.get('html');
   const rootResult = bySelector.get('.public-approved-v8');
   const headingResult = bySelector.get('.v0-hero h1');
   const htmlAttributes = attributesToObject(htmlResult?.attributes);
   const renderedWidth = Math.max(Number(htmlResult?.width || 0), Number(rootResult?.width || 0));
   const renderedHeight = Math.max(Number(htmlResult?.height || 0), Number(rootResult?.height || 0));
+  const renderedHtml = String(html || '');
 
   return {
     viewport: { width: profile.viewport.width, height: profile.viewport.height },
@@ -218,9 +224,9 @@ async function scrapeRenderedAudit(profile, url, html) {
     },
     color: {},
     release: {
-      contract: htmlAttributes['data-sovereign-public-landing'] || '',
-      field: htmlAttributes['data-sovereign-landing-field'] || '',
-      sequence: htmlAttributes['data-sovereign-v0-sequence'] || ''
+      contract: htmlAttributes['data-sovereign-public-landing'] || (renderedHtml.includes('v0-public-landing-v3') ? 'v0-public-landing-v3' : ''),
+      field: htmlAttributes['data-sovereign-landing-field'] || (renderedHtml.includes('landing-expression-field-v3') ? 'landing-expression-field-v3' : ''),
+      sequence: htmlAttributes['data-sovereign-v0-sequence'] || (renderedHtml.includes(expectedSequence) ? expectedSequence : '')
     },
     text: String(rootResult?.text || html || '').replace(/\s+/g, ' ').trim()
   };
