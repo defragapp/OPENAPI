@@ -142,7 +142,7 @@ for (const marker of [
   '.account-shell',
   '.plan-onboarding',
   '.sovereign-app-runtime',
-  'var(--v8-blue-bright)'
+  'var(--route-blue-bright)'
 ]) {
   assert(compactCss.includes(marker), `compiled route stylesheet is missing ${marker}`);
 }
