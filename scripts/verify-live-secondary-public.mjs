@@ -1,5 +1,6 @@
 const publicBase = String(process.env.PUBLIC_BASE_URL || 'https://sovereign.defrag.app').replace(/\/$/, '');
 const expectedCssPath = '/v0-public-static.css?v=20260803-refined-v2';
+const routeCssPath = '/deployed-route-cohesion.css?v=20260803-route-v1';
 const expectedContract = 'founder-v0-locked-v1';
 const staticRoutes = ['/how-it-works', '/pricing', '/faq'];
 const policyRoutes = ['/privacy', '/terms'];
@@ -36,7 +37,9 @@ function assertStaticDocument(path, document) {
   assert(document.response.ok, `${path} returned ${document.response.status}`);
   for (const marker of [
     `data-secondary-visual-contract="${expectedContract}"`,
+    'data-route-cohesion="v1"',
     `href="${expectedCssPath}"`,
+    `href="${routeCssPath}"`,
     'class="launch-nav-inner"',
     'class="launch-wordmark"',
     '>SOVEREIGN.OS</a>',
@@ -65,8 +68,9 @@ assert(pricing.includes('aria-label="Sovereign.OS plans"'), '/pricing is missing
 assert(pricing.includes('class="annual-price"'), '/pricing is missing the clarified annual option');
 assert(pricing.includes('$99 / year'), '/pricing is missing the annual price hierarchy');
 
-const staticCss = await read(expectedCssPath);
+const [staticCss, routeCss] = await Promise.all([read(expectedCssPath), read(routeCssPath)]);
 assert(staticCss.response.ok, `secondary stylesheet returned ${staticCss.response.status}`);
+assert(routeCss.response.ok, `route cohesion stylesheet returned ${routeCss.response.status}`);
 for (const marker of [
   '--v0-page: #090b0e',
   '--v0-cream: #f1e9de',
@@ -92,6 +96,17 @@ for (const marker of [
 }
 assert(!staticCss.text.includes('--v0-warm'), 'secondary stylesheet still contains the retired warm token');
 assert(!staticCss.text.includes('--v0-sage'), 'secondary stylesheet still contains the retired sage token');
+for (const marker of [
+  'body.how-page .journey-steps',
+  'grid-template-columns: repeat(2, minmax(0, 1fr))',
+  'body.pricing-page .price-card',
+  'body.pricing-page .plan-comparison-list > div',
+  'body.questions-page .faq-section',
+  'body.questions-page .faq-list summary',
+  '@media (max-width: 650px)'
+]) {
+  assert(routeCss.text.includes(marker), `route cohesion stylesheet is missing ${marker}`);
+}
 
 const [home, ...policyDocuments] = await Promise.all([read('/'), ...policyRoutes.map((path) => read(path))]);
 assert(home.response.ok, `home returned ${home.response.status}`);
@@ -123,9 +138,13 @@ for (const marker of [
   '.public-secondary-page.policy-hero',
   '.public-secondary-page.policy-gridarticle',
   '.public-secondary-page.policy-contact',
+  '--route-blue:#2f93ff',
+  '.account-shell',
+  '.plan-onboarding',
+  '.sovereign-app-runtime',
   'var(--v8-blue-bright)'
 ]) {
-  assert(compactCss.includes(marker), `compiled policy stylesheet is missing ${marker}`);
+  assert(compactCss.includes(marker), `compiled route stylesheet is missing ${marker}`);
 }
 const lockedBlueAtmosphereEncodings = [
   'rgba(47,147,255,.075)',
@@ -139,4 +158,4 @@ assert(
   'compiled policy stylesheet is missing the locked blue atmosphere'
 );
 
-console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} scale=refined-v2`);
+console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} cohesion=v1`);
