@@ -36,18 +36,18 @@ describe('account journey AI, Baseline, and Stripe tiering release chain', () =>
   });
 
   it('checks entitlements and consent before AI generation, then refunds failed turns', () => {
-    const entitlementCheck = entry.indexOf('const entitlements = await getEntitlements');
-    const authorization = entry.indexOf('authorizeConversationContext');
-    const monthlyReservation = entry.indexOf('reserveAiTurn');
-    const modelRun = entry.indexOf('runSovereignResult');
-    const refund = entry.indexOf('releaseAiTurn');
+    const entitlementCheck = entry.lastIndexOf('const entitlements = await getEntitlements(env, auth.accountId)');
+    const authorization = entry.indexOf('const authorizedContext = await authorizeConversationContext', entitlementCheck);
+    const monthlyReservation = entry.indexOf('const usage = await reserveAiTurn(env, auth.accountId, entitlements.plan)', authorization);
+    const modelRun = entry.indexOf('const result = await runSovereignResult(message', monthlyReservation);
+    const refund = entry.indexOf('releaseAiTurn(env, auth.accountId, usage.periodKey)', modelRun);
     expect(entitlementCheck).toBeGreaterThan(-1);
     expect(authorization).toBeGreaterThan(entitlementCheck);
     expect(monthlyReservation).toBeGreaterThan(authorization);
     expect(modelRun).toBeGreaterThan(monthlyReservation);
     expect(refund).toBeGreaterThan(modelRun);
-    expect(entry).toContain("x-sovereign-plan': entitlements.plan");
-    expect(entry).toContain("x-sovereign-ai-remaining': String(usage.remaining)");
+    expect(entry).toContain("'x-sovereign-plan': entitlements.plan");
+    expect(entry).toContain("'x-sovereign-ai-remaining': String(usage.remaining)");
   });
 
   it('enforces permanent Free and paid Sovereign+ monthly allowances atomically in D1', () => {
