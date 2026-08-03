@@ -38,7 +38,7 @@ for (const [label, observability] of [
 }
 requireValue(rootConfig.name === 'sovv-web', 'Root Worker name must match production');
 requireValue(rootConfig.main === 'apps/sovereign-worker/src/runtime-entry.ts', 'Root config must use the active OPENAPI runtime');
-requireValue(rootConfig.workers_dev === true, 'Production Worker must preserve its workers.dev fallback');
+requireValue(rootConfig.workers_dev === false, 'Production Worker must be reachable only through approved custom domains and routes');
 requireValue(rootConfig.preview_urls === false, 'Versioned preview URLs must remain disabled');
 requireValue(rootConfig.vars?.APP_ENV === 'production', 'Root config must be production-only');
 requireValue(rootConfig.vars?.AI_MODEL === '@cf/zai-org/glm-4.7-flash', 'Production must use the Cloudflare-hosted free-tier model');
@@ -131,6 +131,7 @@ requireValue(readme.includes('Cloudflare Workers Builds connected directly to `d
 requireValue(readme.includes('Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`'), 'README Cloudflare build command drifted');
 requireValue(readme.includes('Deploy command: `pnpm production:deploy`'), 'README Cloudflare deploy command drifted');
 requireValue(readme.includes('`defrag.app/*` and `www.defrag.app/*` remain explicit Worker routes'), 'README parent-route contract drifted');
+requireValue(readme.includes('Production `workers.dev` access is disabled'), 'README must document production workers.dev retirement');
 
 for (const required of ['WORKERS_CI_COMMIT_SHA', 'APP_VERSION', "'d1', 'migrations', 'apply'", "'deploy', '--config'", 'verifyLiveProduction', 'configureCloudflareFreeTier']) {
   requireValue(productionDeploy.includes(required), `Production deploy is missing ${required}`);
@@ -175,4 +176,4 @@ for (const required of [
 requireValue(!bootstrap.includes('AI_MODEL: process.env.AI_MODEL ||'), 'Preview bootstrap must not allow arbitrary model override');
 requireValue(!bootstrap.includes('AI_PROVIDER: process.env.AI_PROVIDER ||'), 'Preview bootstrap must not allow arbitrary provider override');
 
-console.log('Direct Cloudflare release config verified production_root=true cloudflare_builds_only=true current_main_only=true github_workflows_non_authoritative=true free_workers_ai=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false telemetry_non_authoritative=true');
+console.log('Direct Cloudflare release config verified production_root=true production_workers_dev=false cloudflare_builds_only=true current_main_only=true github_workflows_non_authoritative=true free_workers_ai=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false telemetry_non_authoritative=true');
