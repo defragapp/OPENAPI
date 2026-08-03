@@ -81,7 +81,7 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
             <a className="landing-control landing-control--nav" href="/signup">Get started <span aria-hidden="true">→</span></a>
             <details className="v0-mobile-menu">
               <summary aria-label="Open navigation"><PolicyMenuIcon /></summary>
-              <nav className="v0-mobile-menu__panel" aria-label="Mobile navigation">
+              <nav className="v0-mobile-menu__panel" style={{ display: 'grid' }} aria-label="Mobile navigation">
                 <a href="/how-it-works">How it works</a>
                 <a href="/pricing">Pricing</a>
                 <a href="/faq">FAQ</a>
