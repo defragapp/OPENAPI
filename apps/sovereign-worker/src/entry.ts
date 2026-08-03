@@ -11,6 +11,7 @@ import { getEntitlements } from './db/entitlements';
 import { releaseAiTurn, reserveAiTurn } from './billing/usage';
 import { runSovereignResult } from './agent/sovereign';
 import { buildDeterministicSafetyAnswer, decideSovereignInputSafety } from './agent/input-safety';
+import { buildSafetyResponseMetadata, formatSafetyResourcesText } from './agent/safety-resources';
 import { saveLatestInsightModule } from './db/insight-modules';
 import { canUseDevelopmentFixtures } from './runtime';
 import { clearCurrentConditions, computeCurrentConditions, parseLocationPrecision, type CurrentLocationInput, type LocationPrecision } from './baseline';
@@ -192,6 +193,11 @@ function encodeMetadataHeader(value: unknown): string {
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
 
+function connectionCountry(request: Request): string | undefined {
+  const country = (request as Request & { cf?: { country?: unknown } }).cf?.country;
+  return typeof country === 'string' ? country : undefined;
+}
+
 async function handleRecognitionMessage(request: Request, env: Env, threadId: string): Promise<Response> {
   requireSameOrigin(request);
   const auth = await requireAuth(request, env);
@@ -223,21 +229,18 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
 
   if (safetyDecision.disposition !== 'standard') {
     const answer = buildDeterministicSafetyAnswer(safetyDecision);
+    const safety = buildSafetyResponseMetadata(safetyDecision, connectionCountry(request));
     const text = [
       answer.headline,
       answer.direct_answer,
-      ...answer.sections.map((section) => `${section.label.toUpperCase()}\n\n${section.body}`)
+      ...answer.sections.map((section) => `${section.label.toUpperCase()}\n\n${section.body}`),
+      ...formatSafetyResourcesText(safety)
     ].join('\n\n');
     const interfaceActions = {
       version: 2 as const,
       primary: null,
       contextual: [],
       confirmationRequired: true as const
-    };
-    const safety = {
-      version: safetyDecision.version,
-      disposition: safetyDecision.disposition,
-      category: safetyDecision.category
     };
     await appendThreadEvent(env, threadId, turn.sequence + 1, 'assistant_plan', { answer, safety }, traceId);
     await appendThreadEvent(env, threadId, turn.sequence + 2, 'assistant_response', {
@@ -250,17 +253,20 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
     }, traceId);
     await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'completed');
     const headers = new Headers({
-      'content-type': 'text/plain; charset=utf-8',
       'cache-control': 'private, no-store',
       'x-sovereign-answer-version': 'sovereign-answer.v2',
       'x-sovereign-answer-mode': answer.mode,
       'x-sovereign-answer-depth': answer.depth,
       'x-sovereign-safety-mode': answer.safety_mode,
+      'x-sovereign-safety-presentation': safety.presentation,
+      'x-sovereign-resource-catalog': safety.resourceCatalog.version,
       'x-sovereign-interface-actions': encodeMetadataHeader(interfaceActions)
     });
-    return request.headers.get('accept')?.includes('application/vnd.sovereign.answer+json')
-      ? Response.json({ answer, basis: [], interfaceActions }, { status: 202, headers })
-      : new Response(text, { status: 202, headers });
+    if (request.headers.get('accept')?.includes('application/vnd.sovereign.answer+json')) {
+      return Response.json({ answer, basis: [], interfaceActions, safety }, { status: 202, headers });
+    }
+    headers.set('content-type', 'text/plain; charset=utf-8');
+    return new Response(text, { status: 202, headers });
   }
 
   const entitlements = await getEntitlements(env, auth.accountId);
