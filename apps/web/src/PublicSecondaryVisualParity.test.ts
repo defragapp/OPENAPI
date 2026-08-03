@@ -16,6 +16,8 @@ const policy = read('./PublicPolicy.tsx');
 const policyCss = read('./public-secondary-pages-locked.css');
 const main = read('./main.tsx');
 const landing = read('./PublicLanding.tsx');
+const liveVerifier = read('../../../scripts/verify-live-secondary-public.mjs');
+const productionRelease = read('../../../scripts/cloudflare-production-release.mjs');
 
 
 describe('secondary public visual parity', () => {
@@ -85,5 +87,16 @@ describe('secondary public visual parity', () => {
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(landing).not.toContain('public-secondary-page');
+  });
+
+  it('blocks deployment until all five secondary public routes prove parity live', () => {
+    for (const route of ['/how-it-works', '/pricing', '/faq', '/privacy', '/terms']) {
+      expect(liveVerifier).toContain(`'${route}'`);
+    }
+    expect(liveVerifier).toContain("const expectedContract = 'founder-v0-locked-v1'");
+    expect(liveVerifier).toContain("const expectedCssPath = '/v0-public-static.css?v=20260803-locked-v1'");
+    expect(liveVerifier).toContain('assertSecurityHeaders');
+    expect(liveVerifier).toContain('compiled policy stylesheet');
+    expect(productionRelease).toContain("['verify-secondary-public', 'scripts/verify-live-secondary-public.mjs']");
   });
 });
