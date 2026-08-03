@@ -76,8 +76,8 @@ async function normalizeSubscriptionEvent(env: Env, event: StripeEvent): Promise
 }
 
 function notificationKind(event: NormalizedStripeEvent): BillingNotificationKind | undefined {
-  if (event.cancelAtPeriodEnd && event.status !== 'canceled') return 'cancellation_scheduled';
   if (['past_due', 'unpaid', 'incomplete'].includes(event.status)) return 'payment_attention';
+  if (event.cancelAtPeriodEnd && event.status !== 'canceled') return 'cancellation_scheduled';
   if (event.type === 'customer.subscription.deleted' || event.status === 'canceled' || event.status === 'incomplete_expired') return 'returned_to_free';
   if (event.type === 'customer.subscription.created' && ['active', 'trialing'].includes(event.status)) return 'activated';
   return undefined;
