@@ -1,6 +1,7 @@
 import type { Env } from './env';
 import { cancelAccountSubscriptions } from './billing/stripe';
 import { notifyAccountDeletionCompleted } from './account-notifications';
+import { notifyInvitationLifecycle } from './invitation-notifications';
 
 const ACCOUNT_TABLE_DELETES = [
   'auth_magic_links',
@@ -175,12 +176,34 @@ export async function cancelDeletion(env: Env, accountId: string, jobId: string)
   if (result.meta?.changes === 0) throw new Response('Deletion job not cancellable', { status: 409 });
 }
 
+async function expirePendingInvitations(env: Env): Promise<number> {
+  const rows = await env.DB.prepare(`SELECT id FROM invitations
+    WHERE status = 'pending' AND expires_at <= datetime('now')
+    ORDER BY expires_at ASC LIMIT 100`)
+    .all<{ id: string }>();
+  let expired = 0;
+
+  for (const row of rows.results ?? []) {
+    const result = await env.DB.prepare(`UPDATE invitations
+      SET status = 'expired', token_hash = NULL
+      WHERE id = ? AND status = 'pending' AND expires_at <= datetime('now')`)
+      .bind(row.id)
+      .run();
+    if ((result.meta?.changes ?? 0) !== 1) continue;
+    expired += 1;
+    await notifyInvitationLifecycle(env, { invitationId: row.id, kind: 'expired' });
+  }
+
+  return expired;
+}
+
 export async function cleanupExpired(env: Env) {
   const threadDays = retentionDays(env.THREAD_RETENTION_DAYS, 30, 7, 365);
   const auditDays = retentionDays(env.AUDIT_RETENTION_DAYS, 90, threadDays, 730);
   const threadCutoff = `-${threadDays} days`;
   const auditCutoff = `-${auditDays} days`;
 
+  const expiredInvitations = await expirePendingInvitations(env);
   const threadEvents = await env.DB.prepare("DELETE FROM thread_events WHERE created_at < datetime('now', ?)").bind(threadCutoff).run();
   const expiredThreads = await env.DB.prepare(`DELETE FROM threads
     WHERE updated_at < datetime('now', ?)
@@ -197,6 +220,7 @@ export async function cleanupExpired(env: Env) {
   await env.DB.prepare("DELETE FROM export_artifacts WHERE expires_at < datetime('now')").run();
 
   const counts = {
+    expiredInvitations,
     threadEvents: threadEvents.meta?.changes ?? 0,
     expiredThreads: expiredThreads.meta?.changes ?? 0,
     correctionNotes: correctionNotes.meta?.changes ?? 0,
