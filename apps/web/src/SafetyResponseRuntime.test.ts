@@ -55,16 +55,27 @@ function installDeterministicDom(answers: FakeAnswer[]): void {
   vi.stubGlobal('MutationObserver', TestMutationObserver);
 }
 
-function safetyAnswer(overrides: Record<string, unknown>) {
+function answer(headline: string, directAnswer: string) {
   return {
     version: 'sovereign-answer.v2',
-    headline: 'Safety response',
-    direct_answer: 'A deterministic response that is long enough to be presented clearly.',
-    safety_mode: 'grounded',
-    confidence: 'supported',
-    basis_refs: [],
-    actions: [],
-    ...overrides
+    headline,
+    direct_answer: directAnswer
+  };
+}
+
+function safety(presentation: string, category = 'substantial_distress') {
+  return {
+    version: 'sovereign-safety-response.v1',
+    presentation,
+    category,
+    resourceCatalog: {
+      version: 'sovereign-safety-resources.2026-08-02',
+      jurisdiction: 'unknown',
+      selectionSource: 'generic_fallback',
+      selectionNotice: 'Use local human support.',
+      disregardAllowed: true,
+      resources: []
+    }
   };
 }
 
@@ -74,62 +85,67 @@ afterEach(() => {
 });
 
 describe('safety response presentation runtime', () => {
-  it('labels urgent deterministic responses from the answer contract and removes ordinary controls', async () => {
-    const urgent = createAnswer('Immediate support', 'Bring in a real person now.', 'Sovereign · Baseline');
-    installDeterministicDom([urgent]);
+  it('labels emergency responses from the explicit safety response contract and removes ordinary controls', async () => {
+    const emergency = createAnswer('Immediate support', 'Bring in a real person now.', 'Sovereign · Baseline');
+    installDeterministicDom([emergency]);
     const runtime = await import('./SafetyResponseRuntime');
 
-    runtime.registerSafetyResponsePayload({ answer: safetyAnswer({
-      headline: 'Immediate support',
-      direct_answer: 'Bring in a real person now.',
-      safety_mode: 'escalate',
-      confidence: 'confirmed'
-    }) });
+    runtime.registerSafetyResponsePayload({
+      answer: answer('Immediate support', 'Bring in a real person now.'),
+      safety: safety('emergency', 'immediate_self_harm')
+    });
     runtime.applySafetyResponsePresentation();
 
-    expect(urgent.dataset.sovereignSafety).toBe('urgent');
-    expect(urgent.dataset.sovereignSafetySource).toBe('answer-contract');
-    expect(urgent.getAttribute('aria-label')).toBe('Immediate human support response');
-    expect(urgent.label.textContent).toBe('Sovereign · Immediate support');
+    expect(emergency.dataset.sovereignSafety).toBe('emergency');
+    expect(emergency.dataset.sovereignSafetyCategory).toBe('immediate_self_harm');
+    expect(emergency.dataset.sovereignSafetySource).toBe('safety-response-contract');
+    expect(emergency.getAttribute('aria-label')).toBe('Emergency human support response');
+    expect(emergency.label.textContent).toBe('Sovereign · Emergency help');
     expect(css).toContain('[data-sovereign-safety] .answer-actions');
     expect(css).toContain('[data-sovereign-safety] .answer-evidence-row');
     expect(css).toContain('display: none !important');
   });
 
-  it('distinguishes grounded and protected-boundary responses without headline allowlists', async () => {
-    const grounded = createAnswer('Any grounded headline', 'A grounded response body.');
-    const protectedBoundary = createAnswer('Any protected headline', 'A protected response body.');
-    const ordinary = createAnswer('An ordinary Baseline answer.', 'An ordinary response body.');
-    installDeterministicDom([grounded, protectedBoundary, ordinary]);
+  it('renders every supported safety presentation without headline allowlists', async () => {
+    const presentations = [
+      ['grounded', 'Sovereign · Grounded response'],
+      ['supportive_resources', 'Sovereign · Human support'],
+      ['urgent', 'Sovereign · Urgent support'],
+      ['emergency', 'Sovereign · Emergency help'],
+      ['secure_refusal', 'Sovereign · Protected boundary']
+    ] as const;
+    const answers = presentations.map(([presentation]) => createAnswer(`${presentation} headline`, `${presentation} body`));
+    const ordinary = createAnswer('ordinary headline', 'ordinary body');
+    installDeterministicDom([...answers, ordinary]);
     const runtime = await import('./SafetyResponseRuntime');
 
     runtime.registerSafetyResponsePayload([
-      { answer: safetyAnswer({ headline: 'Any grounded headline', direct_answer: 'A grounded response body.' }) },
-      { answer: safetyAnswer({
-        headline: 'Any protected headline',
-        direct_answer: 'A protected response body.',
-        confidence: 'confirmed'
-      }) },
-      { answer: safetyAnswer({
-        headline: 'An ordinary Baseline answer.',
-        direct_answer: 'An ordinary response body.',
-        safety_mode: 'standard'
-      }) }
+      ...presentations.map(([presentation]) => ({
+        answer: answer(`${presentation} headline`, `${presentation} body`),
+        safety: safety(presentation)
+      })),
+      { answer: answer('ordinary headline', 'ordinary body') }
     ]);
     runtime.applySafetyResponsePresentation();
 
-    expect(grounded.dataset.sovereignSafety).toBe('grounded');
-    expect(grounded.label.textContent).toBe('Sovereign · Grounded response');
-    expect(protectedBoundary.dataset.sovereignSafety).toBe('secure-refusal');
-    expect(protectedBoundary.label.textContent).toBe('Sovereign · Protected boundary');
+    presentations.forEach(([presentation, label], index) => {
+      expect(answers[index]!.dataset.sovereignSafety).toBe(presentation);
+      expect(answers[index]!.label.textContent).toBe(label);
+    });
     expect(ordinary.dataset.sovereignSafety).toBeUndefined();
   });
 
-  it('contains no hard-coded safety headline classifier', async () => {
+  it('rejects answer-only safety inference and contains no hard-coded headline classifier', async () => {
+    const answerOnly = createAnswer('Immediate human support matters most.', 'A response body.');
+    installDeterministicDom([answerOnly]);
+    const runtime = await import('./SafetyResponseRuntime');
+    runtime.registerSafetyResponsePayload({ answer: answer('Immediate human support matters most.', 'A response body.') });
+    runtime.applySafetyResponsePresentation();
+
+    expect(answerOnly.dataset.sovereignSafety).toBeUndefined();
     const source = readFileSync(new URL('./SafetyResponseRuntime.ts', import.meta.url), 'utf8');
     expect(source).not.toContain('SAFETY_HEADLINES');
-    expect(source).not.toContain('Immediate human support matters most.');
-    expect(source).not.toContain('Separate what is happening from what it may mean.');
-    expect(source).toContain("dataset.sovereignSafetySource = 'answer-contract'");
+    expect(source).not.toContain('presentationFromAnswer');
+    expect(source).toContain("dataset.sovereignSafetySource = 'safety-response-contract'");
   });
 });
