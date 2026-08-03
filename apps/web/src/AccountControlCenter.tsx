@@ -14,6 +14,8 @@ type LibraryItem = {
 type PersonItem = { id: string; displayName: string; invitationId?: string; invitationStatus?: string; invitationExpiresAt?: string };
 type DeletionJob = { id: string; status: string; requestedAt?: string; scheduledFor?: string };
 
+const SUPPORT_PAYMENT_URL = 'https://donate.stripe.com/7sY6oG1LDcls8s90x267S03';
+
 export function AccountControlCenter() {
   const [open, setOpen] = useState(false);
   const [library, setLibrary] = useState<LibraryItem[]>([]);
@@ -204,8 +206,22 @@ export function AccountControlCenter() {
             <p className="account-control-status" role="status" aria-live="polite">{status}</p>
 
             <nav className="account-control-links" aria-label="Account links">
-              <button onClick={openPermissions}>People & permissions</button><button onClick={() => void openBilling()} disabled={loading}>Manage billing</button><a href="https://sovereign.defrag.app/privacy">Privacy</a><a href="https://sovereign.defrag.app/terms">Terms</a><a href="mailto:info@defrag.app">Support</a>
+              <button onClick={openPermissions}>People & permissions</button>
+              <button onClick={() => void openBilling()} disabled={loading}>Manage billing</button>
+              <a href={SUPPORT_PAYMENT_URL} target="_blank" rel="noreferrer">Support development</a>
+              <a href="https://sovereign.defrag.app/privacy">Privacy</a>
+              <a href="https://sovereign.defrag.app/terms">Terms</a>
+              <a href="mailto:info@defrag.app">Contact support</a>
             </nav>
+
+            <section className="account-control-section support-development-section">
+              <div className="account-section-heading">
+                <p>VOLUNTARY SUPPORT</p>
+                <h3>Support continued Sovereign.OS development</h3>
+                <span>The secure Stripe link accepts a one-time amount from $5 to $500. Support does not grant Sovereign+ access, ownership, influence, tax-deductible status, or a promise of future features.</span>
+              </div>
+              <a className="support-development-link" href={SUPPORT_PAYMENT_URL} target="_blank" rel="noreferrer">Open secure Stripe support link</a>
+            </section>
 
             <section className="account-control-section">
               <div className="account-section-heading"><p>PENDING INVITATIONS</p><h3>Private links awaiting review</h3><span>Resending creates a new one-time link and invalidates the previous link. Server-side rate limits prevent repeated delivery.</span></div>
