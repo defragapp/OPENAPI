@@ -44,7 +44,7 @@ describe('production release parity contract', () => {
     expect(parentVerifier).toContain("assert(result.json?.visualRelease?.sequenceFingerprint === expectedSequence");
   });
 
-  it('runs deployment, route checks, rendered checks, DMARC, and evidence in that order', () => {
+  it('runs deployment, route checks, and rendered checks before recording release evidence', () => {
     expect(deployV3).toContain("const migrationVersion = '0014_passkey_authentication';");
     expect(deployV3).toContain("contract: 'v0-public-landing-v3'");
     expect(deployV3).toContain('center-sliced-expression-field');
@@ -70,32 +70,39 @@ describe('production release parity contract', () => {
       'write-cloudflare-release-evidence.mjs'
     ].map((script) => releaseWrapper.indexOf(script));
     expect(positions.every((position, index) => position >= 0 && (index === 0 || position > positions[index - 1]!))).toBe(true);
+    expect(releaseWrapper).toContain('DMARC reconciliation is non-authoritative');
+    expect(releaseWrapper).toContain("RELEASE_DMARC_VERIFIED: dmarcVerified ? 'true' : 'false'");
     expect(visualVerifier).toContain('/browser-rendering/snapshot');
     expect(visualVerifier).toContain('screenshotOptions: { fullPage: true');
     expect(visualVerifier).toContain("method: 'Cloudflare Browser Run snapshot with full-page PNG plus deterministic normalized pixel, edge, color, and section-rhythm comparison'");
   });
 
-  it('reconciles one verified DMARC record after rendered verification', () => {
+  it('keeps deterministic DMARC reconciliation as a separately reported account control', () => {
     expect(dmarcReconciler).toContain("const RECORD_NAME = '_dmarc.defrag.app'");
     expect(dmarcReconciler).toContain("v=DMARC1; p=none; sp=none; adkim=s; aspf=s; pct=100");
     expect(dmarcReconciler).toContain('existing.length > 1');
     expect(dmarcReconciler).toContain("method: 'POST'");
     expect(dmarcReconciler).toContain("method: 'PATCH'");
     expect(dmarcReconciler).toContain('records.length !== 1');
+    expect(releaseWrapper).toContain("dmarcVerified ? 'verified' : 'external-blocker'");
   });
 
-  it('persists and exposes exact-SHA release evidence only after every release gate', () => {
+  it('persists and exposes exact-SHA application release evidence after every application gate', () => {
     expect(evidenceWriter).toContain("const EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
     expect(evidenceWriter).toContain("const EVIDENCE_KIND = 'production_release_evidence'");
     expect(evidenceWriter).toContain("const ROUTE_COHESION_CONTRACT = 'sovereign-deployed-route-cohesion-v1'");
     expect(evidenceWriter).toContain("const RENDERED_VISUAL_CONTRACT = 'sovereign-rendered-page-family-audit-v1'");
+    expect(evidenceWriter).toContain("process.env.RELEASE_DMARC_VERIFIED");
+    expect(evidenceWriter).toContain("dmarcStatus: dmarcVerified ? 'verified' : 'external_blocker'");
     expect(evidenceWriter).toContain('INSERT INTO background_jobs');
     expect(evidenceWriter).toContain("'--remote'");
     expect(evidenceWriter).toContain("'--json'");
     expect(evidenceWriter).toContain('stored evidence mismatch');
     expect(releaseEvidenceRuntime).toContain("WHERE id = ?1 AND kind = 'production_release_evidence'");
     expect(releaseEvidenceRuntime).toContain("RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
+    expect(releaseEvidenceRuntime).toContain("RELEASE_MIGRATION_VERSION = '0014_passkey_authentication'");
     expect(releaseEvidenceRuntime).toContain('evidence.sha !== sha');
+    expect(releaseEvidenceRuntime).toContain("typeof evidence.dmarcVerified !== 'boolean'");
     expect(runtime).toContain("import { readProductionReleaseEvidence } from './release-evidence'");
     expect(runtime).toContain('const releaseEvidence = await readProductionReleaseEvidence(env)');
     expect(runtime).toContain('releaseEvidence,');
