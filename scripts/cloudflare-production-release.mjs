@@ -73,6 +73,12 @@ function runNodeScript(path, environment) {
   });
 }
 
+function emitResult(label, result) {
+  if (result.stdout) process.stdout.write(result.stdout);
+  if (result.stderr) process.stderr.write(result.stderr);
+  return `${String(result.stdout || '')}\n${String(result.stderr || '')}`.trim();
+}
+
 const checkoutSha = runGit(['rev-parse', 'HEAD'], 'unable to resolve the checked-out commit');
 if (!/^[0-9a-f]{40}$/i.test(checkoutSha)) {
   fail('the checked-out commit is not a full 40-character SHA');
@@ -90,24 +96,20 @@ const releaseEnv = {
   GITHUB_SHA: checkoutSha,
   APP_VERSION: checkoutSha
 };
-const steps = [
+const authoritativeSteps = [
   ['deploy-v3', 'scripts/cloudflare-production-deploy-v3.mjs'],
   ['verify-runtime-v3', 'scripts/verify-parent-domain-routes-v3.mjs'],
   ['verify-secondary-public', 'scripts/verify-live-secondary-public.mjs'],
   ['verify-route-cohesion', 'scripts/verify-live-route-cohesion.mjs'],
-  ['verify-rendered-visuals', 'scripts/verify-live-visual-release-v3.mjs'],
-  ['reconcile-dmarc', 'scripts/configure-cloudflare-dmarc.mjs'],
-  ['write-release-evidence', 'scripts/write-cloudflare-release-evidence.mjs']
+  ['verify-rendered-visuals', 'scripts/verify-live-visual-release-v3.mjs']
 ];
 
 void LEGACY_DEPLOY_COMPATIBILITY;
 await report(checkoutSha, 'start');
 let combinedOutput = '';
-for (const [label, path] of steps) {
+for (const [label, path] of authoritativeSteps) {
   const result = runNodeScript(path, releaseEnv);
-  if (result.stdout) process.stdout.write(result.stdout);
-  if (result.stderr) process.stderr.write(result.stderr);
-  const output = `${String(result.stdout || '')}\n${String(result.stderr || '')}`.trim();
+  const output = emitResult(label, result);
   combinedOutput = `${combinedOutput}\n[${label}]\n${output}`.trim();
   if (result.error || result.status !== 0) {
     await report(checkoutSha, 'failure', combinedOutput || String(result.error?.message || `exit ${result.status}`));
@@ -115,4 +117,26 @@ for (const [label, path] of steps) {
     process.exit(result.status || 1);
   }
 }
+
+const dmarcResult = runNodeScript('scripts/configure-cloudflare-dmarc.mjs', releaseEnv);
+const dmarcOutput = emitResult('reconcile-dmarc', dmarcResult);
+const dmarcVerified = !dmarcResult.error && dmarcResult.status === 0;
+combinedOutput = `${combinedOutput}\n[reconcile-dmarc:${dmarcVerified ? 'verified' : 'external-blocker'}]\n${dmarcOutput}`.trim();
+if (!dmarcVerified) {
+  process.stderr.write('[cloudflare-release] DMARC reconciliation is non-authoritative; application release evidence will record the external DNS blocker.\n');
+}
+
+const evidenceEnv = {
+  ...releaseEnv,
+  RELEASE_DMARC_VERIFIED: dmarcVerified ? 'true' : 'false'
+};
+const evidenceResult = runNodeScript('scripts/write-cloudflare-release-evidence.mjs', evidenceEnv);
+const evidenceOutput = emitResult('write-release-evidence', evidenceResult);
+combinedOutput = `${combinedOutput}\n[write-release-evidence]\n${evidenceOutput}`.trim();
+if (evidenceResult.error || evidenceResult.status !== 0) {
+  await report(checkoutSha, 'failure', combinedOutput || String(evidenceResult.error?.message || `exit ${evidenceResult.status}`));
+  if (evidenceResult.error) fail(evidenceResult.error.message);
+  process.exit(evidenceResult.status || 1);
+}
+
 await report(checkoutSha, 'success', combinedOutput);
