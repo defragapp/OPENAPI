@@ -137,11 +137,11 @@ async function scrapeRenderedAudit(profile, url, html) {
   ];
   const elements = ['html', '.public-approved-v8', ...selectors, '.v0-hero h1'];
   const response = await fetch(
-    \`https://api.cloudflare.com/client/v4/accounts/\${accountId}/browser-rendering/scrape?cacheTTL=0\`,
+    'https://api.cloudflare.com/client/v4/accounts/' + accountId + '/browser-rendering/scrape?cacheTTL=0',
     {
       method: 'POST',
       headers: {
-        authorization: \`Bearer \${apiToken}\`,
+        authorization: 'Bearer ' + apiToken,
         'content-type': 'application/json'
       },
       body: JSON.stringify({
@@ -153,13 +153,15 @@ async function scrapeRenderedAudit(profile, url, html) {
         waitForTimeout: 2_200,
         actionTimeout: 120_000,
         addStyleTag: [{
-          content: \`html { scroll-behavior: auto !important; }
-            *, *::before, *::after {
-              animation-delay: 0s !important;
-              animation-duration: 0.001ms !important;
-              animation-iteration-count: 1 !important;
-              transition-duration: 0.001ms !important;
-            }\`
+          content: [
+            'html { scroll-behavior: auto !important; }',
+            '*, *::before, *::after {',
+            'animation-delay: 0s !important;',
+            'animation-duration: 0.001ms !important;',
+            'animation-iteration-count: 1 !important;',
+            'transition-duration: 0.001ms !important;',
+            '}'
+          ].join('\n')
         }]
       }),
       signal: AbortSignal.timeout(120_000)
@@ -172,8 +174,8 @@ async function scrapeRenderedAudit(profile, url, html) {
   if (!response.ok || payload?.success === false) {
     const detail = JSON.stringify(payload?.errors || payload || text);
     throw new Error(
-      \`Cloudflare Browser Run scrape failed (\${response.status}). \`
-      + \`The release token must include Browser Rendering Write. \${redact(detail).slice(0, 900)}\`
+      'Cloudflare Browser Run scrape failed (' + response.status + '). '
+      + 'The release token must include Browser Rendering Write. ' + redact(detail).slice(0, 900)
     );
   }
 
