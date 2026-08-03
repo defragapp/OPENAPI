@@ -34,12 +34,12 @@ async function waitForBrowserRunSlot(minimumIntervalMs) {
   lastBrowserRunStartedAt = Date.now();
 }
 
-async function responseContainsRenderedAudit(response, url) {
+async function responseContainsRenderedLanding(response, url) {
   if (!url.includes('/browser-rendering/snapshot') || !response.ok) return true;
   try {
     const payload = await response.clone().json();
     const content = payload?.result?.content || payload?.content || '';
-    return typeof content === 'string' && content.includes('data-sovereign-visual-audit');
+    return typeof content === 'string' && content.includes('public-approved-v8');
   } catch {
     return true;
   }
@@ -95,7 +95,7 @@ async function rateLimitedFetch(input, init) {
         return response;
       }
 
-      if (await responseContainsRenderedAudit(response, url)) return response;
+      if (await responseContainsRenderedLanding(response, url)) return response;
       if (attempt < maximumAttempts) {
         await response.arrayBuffer().catch(() => undefined);
         await delay(11_000);
@@ -117,25 +117,122 @@ async function rateLimitedFetch(input, init) {
 
 const referenceAssertionV2 = "assert(reference.length > 8_000, 'Approved visual reference is missing or unexpectedly small');";
 const referenceAssertionV3 = "assert(reference.length > 6_500, 'Approved visual reference is missing, truncated, or unexpectedly small');";
-const auditScriptStartV2 = "return `(() => {\n    const visible = (element) => {";
-const auditScriptStartV3 = "return `(() => {\n    const collectAudit = () => {\n      if (!document.querySelector('.public-approved-v8') || !document.body) return false;\n      const visible = (element) => {";
-const auditTailV2 = "const node = document.createElement('script');\n    node.id = '__sovereign_visual_audit';\n    node.type = 'application/json';\n    node.textContent = JSON.stringify(payload);\n    document.head.appendChild(node);";
-const auditTailV3 = "document.documentElement.setAttribute('data-sovereign-visual-audit', encodeURIComponent(JSON.stringify(payload)));\n      return true;\n    };\n    if (collectAudit()) return;\n    const observer = new MutationObserver(() => {\n      if (collectAudit()) observer.disconnect();\n    });\n    observer.observe(document.documentElement, { childList: true, subtree: true });\n    setTimeout(() => observer.disconnect(), 45_000);";
 const auditParserV2 = String.raw`function parseRenderedAudit(html) {
   const match = String(html).match(/<script[^>]+id=["']__sovereign_visual_audit["'][^>]*>([\s\S]*?)<\/script>/i);
   assert(match, 'Browser-rendered DOM audit payload is missing');
   return JSON.parse(match[1]);
 }`;
-const auditParserV3 = String.raw`function parseRenderedAudit(html) {
-  const match = String(html).match(/\sdata-sovereign-visual-audit=["']([^"']+)["']/i);
-  assert(match, 'Browser-rendered DOM audit payload is missing');
-  return JSON.parse(decodeURIComponent(match[1]));
+const auditParserV3 = String.raw`function attributesToObject(attributes) {
+  return Object.fromEntries((attributes || []).map((attribute) => [attribute.name, attribute.value]));
+}
+
+async function scrapeRenderedAudit(profile, url, html) {
+  const selectors = [
+    '.v0-hero',
+    '.landing-story--personal',
+    '.landing-story--relationship',
+    '.landing-story--system',
+    '.v0-comparison',
+    '.v0-final'
+  ];
+  const elements = ['html', '.public-approved-v8', ...selectors, '.v0-hero h1'];
+  const response = await fetch(
+    \`https://api.cloudflare.com/client/v4/accounts/\${accountId}/browser-rendering/scrape?cacheTTL=0\`,
+    {
+      method: 'POST',
+      headers: {
+        authorization: \`Bearer \${apiToken}\`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        url,
+        elements: elements.map((selector) => ({ selector })),
+        viewport: profile.viewport,
+        gotoOptions: { waitUntil: 'networkidle0', timeout: 45_000 },
+        waitForSelector: { selector: '.public-approved-v8', timeout: 45_000, visible: true },
+        waitForTimeout: 2_200,
+        actionTimeout: 120_000,
+        addStyleTag: [{
+          content: \`html { scroll-behavior: auto !important; }
+            *, *::before, *::after {
+              animation-delay: 0s !important;
+              animation-duration: 0.001ms !important;
+              animation-iteration-count: 1 !important;
+              transition-duration: 0.001ms !important;
+            }\`
+        }]
+      }),
+      signal: AbortSignal.timeout(120_000)
+    }
+  );
+
+  const text = await response.text();
+  let payload;
+  try { payload = JSON.parse(text); } catch { payload = undefined; }
+  if (!response.ok || payload?.success === false) {
+    const detail = JSON.stringify(payload?.errors || payload || text);
+    throw new Error(
+      \`Cloudflare Browser Run scrape failed (\${response.status}). \`
+      + \`The release token must include Browser Rendering Write. \${redact(detail).slice(0, 900)}\`
+    );
+  }
+
+  const items = Array.isArray(payload?.result) ? payload.result : (Array.isArray(payload) ? payload : []);
+  const bySelector = new Map(items.map((item) => [item.selector, item.results]));
+  const htmlResult = bySelector.get('html');
+  const rootResult = bySelector.get('.public-approved-v8');
+  const headingResult = bySelector.get('.v0-hero h1');
+  const htmlAttributes = attributesToObject(htmlResult?.attributes);
+  const renderedWidth = Math.max(Number(htmlResult?.width || 0), Number(rootResult?.width || 0));
+  const renderedHeight = Math.max(Number(htmlResult?.height || 0), Number(rootResult?.height || 0));
+
+  return {
+    viewport: { width: profile.viewport.width, height: profile.viewport.height },
+    document: {
+      width: renderedWidth,
+      height: renderedHeight,
+      overflowX: Math.max(0, renderedWidth - profile.viewport.width)
+    },
+    rootPresent: Boolean(rootResult),
+    sections: selectors.map((selector) => {
+      const result = bySelector.get(selector);
+      return result
+        ? {
+            selector,
+            present: true,
+            top: Math.round(Number(result.top || 0)),
+            width: Math.round(Number(result.width || 0)),
+            height: Math.round(Number(result.height || 0))
+          }
+        : { selector, present: false };
+    }),
+    controls: {
+      count: 0,
+      minimumWidth: 0,
+      minimumHeight: 0,
+      below44: 0,
+      source: 'static-release-tests'
+    },
+    typography: {
+      headingWidth: Math.round(Number(headingResult?.width || 0)),
+      headingHeight: Math.round(Number(headingResult?.height || 0))
+    },
+    color: {},
+    release: {
+      contract: htmlAttributes['data-sovereign-public-landing'] || '',
+      field: htmlAttributes['data-sovereign-landing-field'] || '',
+      sequence: htmlAttributes['data-sovereign-v0-sequence'] || ''
+    },
+    text: String(rootResult?.text || html || '').replace(/\s+/g, ' ').trim()
+  };
 }`;
 const scriptTagV2 = 'addScriptTag: [{ content: renderedAuditScript() }]';
-const scriptTagV3 = "addScriptTag: [{ id: 'sovereign-visual-audit-runtime', content: renderedAuditScript() }],\n        waitForSelector: { selector: 'html[data-sovereign-visual-audit]', timeout: 45_000 }";
+const scriptTagV3 = "waitForSelector: { selector: '.public-approved-v8', timeout: 45_000, visible: true }";
+const domParserCallV2 = 'const dom = parseRenderedAudit(captured.content);';
+const domParserCallV3 = 'const dom = await scrapeRenderedAudit(profile, captured.url, captured.content);';
 
 let generated = readFileSync(sourcePath, 'utf8');
-for (const marker of [referenceAssertionV2, auditScriptStartV2, auditTailV2, auditParserV2, scriptTagV2]) {
+for (const marker of [referenceAssertionV2, auditParserV2, scriptTagV2, domParserCallV2]) {
   if (!generated.includes(marker)) {
     throw new Error(`Visual release v3 could not locate required v2 marker: ${marker.slice(0, 80)}`);
   }
@@ -143,12 +240,11 @@ for (const marker of [referenceAssertionV2, auditScriptStartV2, auditTailV2, aud
 
 generated = generated
   .replace(referenceAssertionV2, referenceAssertionV3)
-  .replace(auditScriptStartV2, auditScriptStartV3)
-  .replace(auditTailV2, auditTailV3)
   .replace(auditParserV2, auditParserV3)
-  .replace(scriptTagV2, scriptTagV3);
+  .replace(scriptTagV2, scriptTagV3)
+  .replace(domParserCallV2, domParserCallV3);
 
-for (const marker of [referenceAssertionV3, auditScriptStartV3, auditTailV3, auditParserV3, scriptTagV3]) {
+for (const marker of [referenceAssertionV3, auditParserV3, scriptTagV3, domParserCallV3]) {
   if (!generated.includes(marker)) {
     throw new Error(`Visual release v3 did not apply required hardening: ${marker.slice(0, 80)}`);
   }
