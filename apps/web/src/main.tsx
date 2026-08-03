@@ -60,10 +60,11 @@ import './landing-expression-field-integration.css';
 import './v0-restored-product-stories.css';
 import './landing-product-stories-v2.css';
 
-/* Single approved public landing authority, interactive hero extension, iOS parity, account journey, then passkey authority. */
+/* Single approved public landing authority, interactive hero extension, iOS parity, secondary public parity, account journey, then passkey authority. */
 import './public-landing-approved-v8.css';
 import './landing-hero-field-v4.css';
 import './landing-ios-parity-density-v1.css';
+import './public-secondary-pages-locked.css';
 import './account-journey.css';
 import './account-journey-structured.css';
 import './account-journey-release-cohesion.css';

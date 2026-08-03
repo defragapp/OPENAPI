@@ -1,0 +1,248 @@
+/*
+ * Privacy and Terms parity with the founder-approved public landing.
+ * This file is intentionally scoped away from PublicLanding so the frozen
+ * landing component and its visual authority remain untouched.
+ */
+
+.public-secondary-page {
+  min-width: 320px;
+  min-height: 100svh;
+  overflow-x: clip;
+  background:
+    radial-gradient(circle at 50% 3%, rgba(47, 147, 255, 0.075), transparent 31rem),
+    linear-gradient(rgba(255, 255, 255, 0.008) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.008) 1px, transparent 1px),
+    var(--v8-page);
+  background-size: auto, 88px 88px, 88px 88px, auto;
+  color: var(--v8-cream);
+}
+
+.public-secondary-page *,
+.public-secondary-page *::before,
+.public-secondary-page *::after {
+  box-sizing: border-box;
+}
+
+.public-secondary-page .policy-hero,
+.public-secondary-page .policy-grid,
+.public-secondary-page .policy-contact {
+  width: min(900px, calc(100% - 56px));
+  margin-inline: auto;
+}
+
+.public-secondary-page .policy-hero {
+  position: relative;
+  min-height: 520px;
+  padding: 118px 0 82px;
+  border-bottom: 1px solid var(--v8-line);
+}
+
+.public-secondary-page .policy-hero::after {
+  position: absolute;
+  right: -19%;
+  bottom: -24%;
+  width: 560px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(47, 147, 255, 0.1), transparent 68%);
+  content: '';
+  pointer-events: none;
+}
+
+.public-secondary-page .policy-kicker {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 17px;
+  color: rgba(120, 199, 255, 0.72);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.public-secondary-page .policy-kicker > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--v8-blue-bright);
+  box-shadow: 0 0 14px rgba(120, 199, 255, 0.78);
+}
+
+.public-secondary-page .policy-hero h1 {
+  position: relative;
+  z-index: 1;
+  max-width: 850px;
+  margin: 0;
+  color: #f4ede4;
+  font-family: var(--font-display, serif);
+  font-size: clamp(4rem, 7vw, 6.6rem);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+
+.public-secondary-page .policy-hero > p:not(.policy-kicker, .policy-effective) {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 26px 0 0;
+  color: var(--v8-muted);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.9rem;
+  line-height: 1.68;
+}
+
+.public-secondary-page .policy-effective {
+  position: relative;
+  z-index: 1;
+  margin: 20px 0 0;
+  color: var(--v8-faint);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.61rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.public-secondary-page .policy-grid {
+  padding: 84px 0;
+}
+
+.public-secondary-page .policy-grid article {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 24px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--v8-line);
+}
+
+.public-secondary-page .policy-grid article:first-child {
+  border-top: 1px solid var(--v8-line-strong);
+}
+
+.public-secondary-page .policy-grid article > span {
+  color: rgba(120, 199, 255, 0.62);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.public-secondary-page .policy-grid h2 {
+  margin: 0;
+  color: var(--v8-cream);
+  font-family: var(--font-display, serif);
+  font-size: clamp(1.55rem, 2.8vw, 2.2rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.public-secondary-page .policy-grid p {
+  max-width: 730px;
+  margin: 12px 0 0;
+  color: var(--v8-muted);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+.public-secondary-page .policy-contact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 48px;
+  align-items: end;
+  padding: 54px 0;
+  border-top: 1px solid var(--v8-line-strong);
+  border-bottom: 1px solid var(--v8-line-strong);
+  background: radial-gradient(circle at 82% 50%, rgba(47, 147, 255, 0.09), transparent 22rem);
+}
+
+.public-secondary-page .policy-contact h2 {
+  margin: 0;
+  color: #f2eade;
+  font-family: var(--font-display, serif);
+  font-size: clamp(2.8rem, 5vw, 4.7rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+.public-secondary-page .policy-contact > div > p:last-child {
+  max-width: 620px;
+  margin: 17px 0 0;
+  color: var(--v8-muted);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.public-secondary-page .policy-contact .landing-control {
+  border-color: rgba(120, 199, 255, 0.68);
+  color: #eef8ff;
+}
+
+.public-secondary-page .v0-footer nav a[aria-current='page'] {
+  color: var(--v8-cream);
+}
+
+@media (max-width: 760px) {
+  .public-secondary-page .policy-hero,
+  .public-secondary-page .policy-grid,
+  .public-secondary-page .policy-contact {
+    width: calc(100% - 40px);
+  }
+
+  .public-secondary-page .policy-hero {
+    min-height: auto;
+    padding: 94px 0 68px;
+  }
+
+  .public-secondary-page .policy-hero::after {
+    right: -70%;
+    bottom: -34%;
+  }
+
+  .public-secondary-page .policy-hero h1 {
+    font-size: clamp(3rem, 14.5vw, 4.7rem);
+    line-height: 0.94;
+  }
+
+  .public-secondary-page .policy-hero > p:not(.policy-kicker, .policy-effective) {
+    font-size: 0.84rem;
+    line-height: 1.58;
+  }
+
+  .public-secondary-page .policy-grid {
+    padding: 60px 0;
+  }
+
+  .public-secondary-page .policy-grid article {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 14px;
+    padding: 23px 0;
+  }
+
+  .public-secondary-page .policy-grid h2 {
+    font-size: 1.55rem;
+  }
+
+  .public-secondary-page .policy-grid p {
+    font-size: 0.78rem;
+    line-height: 1.62;
+  }
+
+  .public-secondary-page .policy-contact {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 48px 0;
+  }
+
+  .public-secondary-page .policy-contact h2 {
+    font-size: clamp(2.65rem, 12.4vw, 3.8rem);
+  }
+}
