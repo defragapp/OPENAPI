@@ -35,3 +35,7 @@ Trigger the connected private-repository Workers Build after aligning the canoni
 ## Final production and DMARC release — August 3, 2026 at 11:18 PT
 
 Trigger the connected private-repository Workers Build after adding deterministic `_dmarc.defrag.app` reconciliation to the canonical production deployment path. The release must create or verify exactly one monitoring-policy TXT record, then complete exact-SHA runtime, secondary-route, route-cohesion, and rendered visual verification. The DNS step uses the existing Cloudflare build credential, fails closed on ambiguous records or missing DNS Write permission, and introduces no new service, exposed secret, user-facing design, copy, route, or product behavior.
+
+## Cloudflare-owned release evidence — August 3, 2026 at 11:42 PT
+
+Trigger the connected private-repository build after removing hosted third-party telemetry from release authority. The canonical sequence must deploy the exact SHA, verify runtime and every secondary route, complete the rendered Browser Run audit, reconcile DMARC, persist one exact-SHA success record in the existing production D1 database, and expose that record through `/ready`. AppDeploy reporting remains optional diagnostics and cannot create, block, or prove a production release.
