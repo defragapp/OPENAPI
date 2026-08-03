@@ -1,0 +1,407 @@
+/*
+ * Final authority for How it works, Pricing, and FAQ.
+ * The frozen home page does not load this file.
+ */
+
+body.launch-page {
+  --route-shell: min(1120px, calc(100vw - 72px));
+  --route-reading: 720px;
+  font-size: 17px;
+  line-height: 1.62;
+}
+
+body.launch-page .launch-nav-inner,
+body.launch-page .launch-hero,
+body.launch-page .launch-section,
+body.launch-page .launch-band,
+body.launch-page .launch-footer-inner {
+  width: var(--route-shell);
+}
+
+body.launch-page .launch-hero {
+  min-height: 520px;
+  padding: 112px 0 82px;
+}
+
+body.launch-page .launch-hero-compact {
+  min-height: 500px;
+}
+
+body.launch-page .launch-hero h1 {
+  max-width: 15ch;
+  font-size: clamp(3.8rem, 6.2vw, 5.85rem);
+  line-height: 0.94;
+}
+
+body.launch-page .launch-hero > p:last-child {
+  max-width: var(--route-reading);
+  margin-top: 26px;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+body.launch-page .launch-section,
+body.launch-page .launch-band {
+  padding: clamp(78px, 8vw, 104px) 0;
+}
+
+body.launch-page .launch-heading,
+body.launch-page .pricing-details-heading {
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.72fr);
+  gap: clamp(38px, 6vw, 76px);
+  margin-bottom: 46px;
+}
+
+body.launch-page :is(
+  .launch-heading h2,
+  .pricing-details-heading h2,
+  .baseline-explainer h2,
+  .launch-callout h2
+) {
+  max-width: 13ch;
+  font-size: clamp(2.9rem, 4.8vw, 4.45rem);
+  line-height: 0.97;
+}
+
+body.launch-page :is(
+  .launch-heading > p,
+  .pricing-details-heading > p,
+  .baseline-explainer p,
+  .launch-callout p
+) {
+  font-size: 0.96rem;
+  line-height: 1.7;
+}
+
+body.launch-page :is(
+  .journey-steps p,
+  .launch-card p,
+  .price-card li,
+  .price-note,
+  .billing-note p,
+  .definition-list dd,
+  .faq-list p
+) {
+  font-size: 0.92rem;
+  line-height: 1.66;
+}
+
+/* How it works: replace the cramped five-column strip with a readable sequence. */
+body.how-page .journey-steps {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 0;
+  gap: 1px;
+  background: var(--v0-line-strong);
+}
+
+body.how-page .journey-steps article {
+  min-height: 250px;
+  padding: 32px 30px 36px;
+  border: 0;
+  background: var(--v0-page);
+}
+
+body.how-page .journey-steps article:last-child {
+  grid-column: 1 / -1;
+  min-height: 210px;
+}
+
+body.how-page .journey-steps h3 {
+  max-width: 17ch;
+  margin: 28px 0 14px;
+  font-size: 1.75rem;
+  line-height: 1.08;
+}
+
+body.how-page .baseline-explainer {
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.82fr);
+  gap: clamp(48px, 7vw, 82px);
+}
+
+body.how-page .definition-list {
+  border-top: 1px solid var(--v0-line-strong);
+}
+
+body.how-page .definition-list > div {
+  padding: 20px 0;
+}
+
+body.how-page .product-proof-window {
+  border-radius: 14px;
+}
+
+body.how-page .product-proof-grid {
+  grid-template-columns: minmax(0, 1.06fr) minmax(330px, 0.94fr);
+}
+
+body.how-page .product-proof-question {
+  font-size: clamp(1.7rem, 3vw, 2.55rem);
+  line-height: 1.08;
+}
+
+body.how-page .product-proof-answer {
+  font-size: 1rem;
+  line-height: 1.68;
+}
+
+body.how-page .support-note {
+  grid-template-columns: minmax(0, 1.2fr) auto;
+  gap: 48px;
+  align-items: end;
+}
+
+body.how-page .support-note h2 {
+  max-width: 14ch;
+  font-family: var(--v0-display);
+  font-size: clamp(2.65rem, 4.5vw, 4.1rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+body.how-page .support-note > div > p:not(.launch-kicker) {
+  max-width: 760px;
+  font-size: 0.92rem;
+  line-height: 1.68;
+}
+
+/* Pricing: give the decision one clear hierarchy and keep cards aligned. */
+body.pricing-page .pricing-grid {
+  gap: 20px;
+  align-items: stretch;
+}
+
+body.pricing-page .price-card {
+  min-height: 620px;
+  padding: 34px;
+  border-radius: 14px;
+}
+
+body.pricing-page .price-card header {
+  min-height: 128px;
+}
+
+body.pricing-page .price-card h2 {
+  max-width: 15ch;
+  margin-top: 18px;
+  font-size: 2rem;
+  line-height: 1.06;
+}
+
+body.pricing-page .price-card-body {
+  display: grid;
+  align-content: start;
+  gap: 28px;
+}
+
+body.pricing-page .price {
+  font-family: var(--v0-display);
+  font-size: clamp(3.7rem, 6vw, 5.3rem);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+body.pricing-page .price-options {
+  align-items: end;
+  gap: 24px;
+}
+
+body.pricing-page .annual-price strong {
+  font-size: 1.4rem;
+  line-height: 1.1;
+}
+
+body.pricing-page .feature-list {
+  gap: 12px;
+}
+
+body.pricing-page .feature-list li {
+  padding-left: 19px;
+}
+
+body.pricing-page .plan-comparison-list > div {
+  grid-template-columns: minmax(170px, 0.55fr) minmax(0, 0.72fr) minmax(0, 1fr);
+  gap: 28px;
+  padding: 25px 0;
+}
+
+body.pricing-page .plan-comparison-list dt {
+  font-size: 0.94rem;
+}
+
+body.pricing-page .plan-comparison-list dd {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+body.pricing-page .billing-note {
+  padding: 24px 26px;
+}
+
+/* FAQ: organize categories in a readable two-column system. */
+body.questions-page .faq-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 72px 54px;
+  align-items: start;
+}
+
+body.questions-page .faq-category {
+  min-width: 0;
+}
+
+body.questions-page .faq-list {
+  margin-top: 20px;
+  border-top: 1px solid var(--v0-line-strong);
+}
+
+body.questions-page .faq-list details {
+  margin: 0;
+  border-bottom: 1px solid var(--v0-line);
+}
+
+body.questions-page .faq-list summary {
+  min-height: 66px;
+  padding: 18px 34px 18px 0;
+  color: var(--v0-ink);
+  font-family: var(--v0-display);
+  font-size: 1.22rem;
+  font-weight: 400;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+}
+
+body.questions-page .faq-list p {
+  max-width: 62ch;
+  margin: 0 0 24px;
+}
+
+body.launch-page .launch-callout {
+  gap: 50px;
+  padding: 52px 0;
+}
+
+body.launch-page .launch-footer-inner {
+  min-height: 142px;
+}
+
+@media (max-width: 1120px) {
+  body.launch-page {
+    --route-shell: min(100% - 48px, 980px);
+  }
+
+  body.how-page .product-proof-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.pricing-page .price-card {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 860px) {
+  body.launch-page {
+    font-size: 16px;
+  }
+
+  body.launch-page .launch-heading,
+  body.launch-page .pricing-details-heading,
+  body.how-page .baseline-explainer,
+  body.how-page .support-note,
+  body.questions-page .faq-section {
+    grid-template-columns: 1fr;
+  }
+
+  body.how-page .journey-steps,
+  body.pricing-page .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.how-page .journey-steps article:last-child {
+    grid-column: auto;
+  }
+
+  body.pricing-page .plan-comparison-list > div {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  body.pricing-page .plan-comparison-list dt {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 650px) {
+  body.launch-page {
+    --route-shell: calc(100% - 30px);
+  }
+
+  body.launch-page .launch-nav {
+    height: 68px;
+  }
+
+  body.launch-page .launch-hero {
+    min-height: auto;
+    padding: 82px 0 62px;
+  }
+
+  body.launch-page .launch-hero h1 {
+    font-size: clamp(2.85rem, 13vw, 4.2rem);
+    line-height: 0.96;
+  }
+
+  body.launch-page .launch-section,
+  body.launch-page .launch-band {
+    padding: 62px 0;
+  }
+
+  body.launch-page :is(
+    .launch-heading h2,
+    .pricing-details-heading h2,
+    .baseline-explainer h2,
+    .launch-callout h2
+  ) {
+    font-size: clamp(2.5rem, 11vw, 3.55rem);
+  }
+
+  body.how-page .journey-steps article {
+    min-height: 0;
+    padding: 26px 22px 30px;
+  }
+
+  body.pricing-page .price-card {
+    padding: 26px 22px;
+  }
+
+  body.pricing-page .price-card header {
+    min-height: 0;
+  }
+
+  body.pricing-page .price-options,
+  body.pricing-page .plan-comparison-list > div {
+    grid-template-columns: 1fr;
+  }
+
+  body.pricing-page .annual-price {
+    padding-top: 18px;
+    border-top: 1px solid var(--v0-line);
+  }
+
+  body.questions-page .faq-section {
+    gap: 54px;
+  }
+
+  body.questions-page .faq-list summary {
+    font-size: 1.1rem;
+  }
+
+  body.launch-page .launch-callout {
+    align-items: start;
+    padding: 42px 0;
+  }
+
+  body.launch-page .launch-footer-inner {
+    min-height: 0;
+    padding: 34px 0;
+  }
+}
