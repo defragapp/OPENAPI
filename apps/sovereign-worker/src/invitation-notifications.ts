@@ -6,7 +6,8 @@ export type InvitationNotificationKind =
   | 'accepted'
   | 'permission_granted'
   | 'permission_revoked'
-  | 'expired';
+  | 'expired'
+  | 'revoked';
 
 export interface InvitationNotificationInput {
   invitationId: string;
@@ -167,6 +168,39 @@ function lifecycleTemplate(input: InvitationNotificationInput, displayName: stri
           'A new invitation will still require separate decisions for every requested use.'
         ],
         footer: 'Sovereign.OS does not treat silence or an expired link as consent.'
+      })
+    };
+  }
+
+  if (input.kind === 'revoked') {
+    return {
+      ownerSubject: 'A Sovereign.OS invitation was cancelled',
+      inviteeSubject: 'A Sovereign.OS invitation was cancelled',
+      owner: buildSovereignEmail({
+        eyebrow: 'Invitation cancelled',
+        title: 'The pending invitation was cancelled.',
+        intro: `The invitation for ${displayName} can no longer be used. No account was connected and no permission was granted.`,
+        actionLabel: 'Review People',
+        actionUrl,
+        details: [
+          'The cancelled one-time link is invalid.',
+          'No requested use became active.',
+          'A new invitation requires a new deliberate send action.'
+        ],
+        footer: 'Cancelling a pending invitation does not remove an already accepted connection because only pending invitations can be cancelled here.'
+      }),
+      invitee: buildSovereignEmail({
+        eyebrow: 'Invitation cancelled',
+        title: 'This private invitation was cancelled.',
+        intro: 'The sender cancelled the pending invitation before it was accepted. The one-time link can no longer be used, and no permission was granted.',
+        actionLabel: 'Open the public Sovereign.OS site',
+        actionUrl: 'https://sovereign.defrag.app/',
+        details: [
+          'No account was connected through the cancelled invitation.',
+          'Nothing was shared through the cancelled link.',
+          'A future invitation would still require separate decisions for every requested use.'
+        ],
+        footer: 'Sovereign.OS does not treat a cancelled invitation as consent.'
       })
     };
   }
