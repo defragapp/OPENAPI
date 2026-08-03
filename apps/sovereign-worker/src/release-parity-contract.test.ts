@@ -85,29 +85,27 @@ describe('production release parity contract', () => {
     expect(dmarcReconciler).toContain("method: 'POST'");
     expect(dmarcReconciler).toContain("method: 'PATCH'");
     expect(dmarcReconciler).toContain('records.length !== 1');
-    expect(releaseWrapper).toContain("dmarcVerified ? 'verified' : 'external_blocker'");
+    expect(releaseWrapper).toContain("dmarcVerified ? 'verified' : 'external-blocker'");
   });
 
-  it('persists and exposes exact-SHA application release evidence after every application gate', () => {
+  it('publishes exact-SHA application release evidence only after every application gate', () => {
     expect(evidenceWriter).toContain("const EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
-    expect(evidenceWriter).toContain("const EVIDENCE_KIND = 'production_release_evidence'");
     expect(evidenceWriter).toContain("const ROUTE_COHESION_CONTRACT = 'sovereign-deployed-route-cohesion-v1'");
     expect(evidenceWriter).toContain("const RENDERED_VISUAL_CONTRACT = 'sovereign-rendered-page-family-audit-v1'");
     expect(evidenceWriter).toContain("process.env.RELEASE_DMARC_VERIFIED");
     expect(evidenceWriter).toContain("dmarcStatus: dmarcVerified ? 'verified' : 'external_blocker'");
-    expect(evidenceWriter).toContain('INSERT INTO background_jobs');
-    expect(evidenceWriter).toContain("const API_ROOT = 'https://api.cloudflare.com/client/v4'");
-    expect(evidenceWriter).toContain("requiredEnvironment('CLOUDFLARE_API_TOKEN', ['CF_API_TOKEN'])");
-    expect(evidenceWriter).toContain('/d1/database/${databaseId}/query');
-    expect(evidenceWriter).toContain('batch: [');
-    expect(evidenceWriter).toContain('params: [recordId, EVIDENCE_KIND, payloadJson]');
-    expect(evidenceWriter).toContain('D1 batch did not confirm both the evidence write and read-back query');
-    expect(evidenceWriter).toContain('stored evidence mismatch');
+    expect(evidenceWriter).toContain("apps/web/dist/release-evidence.json");
+    expect(evidenceWriter).toContain('writeFileSync(evidenceAssetPath');
+    expect(evidenceWriter).toContain("executeWrangler(['deploy', '--config', generatedConfigPath])");
+    expect(evidenceWriter).toContain('final evidence deployment did not converge');
+    expect(evidenceWriter).toContain('finalEvidenceDeploy: true');
     expect(wranglerConfig).toMatch(/"account_id"\s*:\s*"[0-9a-f]{32}"/i);
-    expect(releaseEvidenceRuntime).toContain("WHERE id = ?1 AND kind = 'production_release_evidence'");
+    expect(releaseEvidenceRuntime).toContain('env.ASSETS.fetch');
+    expect(releaseEvidenceRuntime).toContain('release-evidence.json?sha=${sha}');
+    expect(releaseEvidenceRuntime).not.toContain('background_jobs');
+    expect(releaseEvidenceRuntime).not.toContain('env.DB.withSession');
     expect(releaseEvidenceRuntime).toContain("RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
     expect(releaseEvidenceRuntime).toContain("RELEASE_MIGRATION_VERSION = '0014_passkey_authentication'");
-    expect(releaseEvidenceRuntime).toContain("env.DB.withSession('first-primary')");
     expect(releaseEvidenceRuntime).toContain('evidence.sha !== sha');
     expect(releaseEvidenceRuntime).toContain("typeof evidence.dmarcVerified !== 'boolean'");
     expect(runtime).toContain("import { readProductionReleaseEvidence } from './release-evidence'");
