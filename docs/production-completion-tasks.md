@@ -24,8 +24,14 @@ The current `main` candidate includes:
 - [x] `sovereign.defrag.app` and `app.defrag.app` retained as production Custom Domains;
 - [x] `defrag.app/*` and `www.defrag.app/*` retained as redirect routes;
 - [x] production runtime probes restricted to approved domains rather than the retired Worker subdomain;
-- [x] safety response presentation derived from validated `sovereign-answer.v2` fields instead of fixed user-visible headlines;
-- [x] ordinary answer actions, Basis evidence, and monetization controls remain suppressed for deterministic safety responses;
+- [x] safety presentation driven by explicit `sovereign-safety-response.v1` metadata rather than answer text, headline matching, or model inference;
+- [x] distinct `grounded`, `supportive_resources`, `urgent`, `emergency`, and `secure_refusal` renderer states;
+- [x] ordinary answer actions, Basis evidence, continuation controls, and monetization controls suppressed for deterministic safety responses;
+- [x] high-contrast safety layouts, 48–52px resource actions, mobile stacking, focus treatment, and reduced-motion rules;
+- [x] versioned server-owned safety catalog with jurisdiction, provenance, official source, review date, catalog version, and fixed actions;
+- [x] coarse Cloudflare connection country used only as an optional U.S. default, with an explicit warning that it may be wrong and can be disregarded;
+- [x] unsupported or missing jurisdiction returns a generic no-contact fallback without model-written organizations, phone numbers, URLs, or emergency instructions;
+- [x] protected-system refusals do not receive unrelated crisis contacts;
 - [x] public FAQ explains plan-independent safety, interpretive limits, Basis evidence, corrections, and safety feedback;
 - [x] desktop founder-reference comparison remains enforced;
 - [x] mobile screenshot verification remains enforced at 390×844 and 430×932 for structure, sequence, typography, document height, and overflow;
@@ -85,6 +91,16 @@ These flows cannot be proven by unauthenticated release probes alone:
 - [ ] Complete $20 monthly and $99 annual Checkout in Stripe test mode.
 - [ ] Verify signed-webhook idempotency, Customer Portal return, cancellation, and failed-payment fallback to Free.
 
+## Required safety and accessibility evidence
+
+- [x] Unit coverage verifies every safety renderer state and rejects answer-only safety inference.
+- [x] Worker coverage verifies U.S. 911/988 catalog selection, unsupported-jurisdiction fallback, provenance, review date, version, and protected-boundary isolation.
+- [x] Transport coverage verifies safety occurs before entitlement/model access and reaches the browser as explicit metadata.
+- [ ] Complete authenticated browser checks for grounded, supportive-resources, urgent, emergency, and secure-refusal output on desktop and iPhone widths.
+- [ ] Complete keyboard and screen-reader review of resource regions and call/text/link controls.
+- [ ] Complete increased-text, safe-area, and mobile-keyboard review for safety output.
+- [ ] Record official-source stability and the next review date before expanding beyond the U.S. catalog.
+
 ## Required visual approval evidence
 
 - [x] Desktop 1440×900 founder-reference comparison is automated.
@@ -97,9 +113,9 @@ These flows cannot be proven by unauthenticated release probes alone:
 
 ## Issue reconciliation
 
-- `#118` risk routing is implemented and deployed in the last verified release; close only after the current candidate passes exact-SHA production evidence.
-- `#119` explicit safety presentation is now contract-driven; resource localization beyond generic emergency guidance remains a separate reviewed product decision and must never use model-invented contacts.
-- `#125` remains the production-closure issue until the Cloudflare, real-account, billing, rollback, and visual evidence above is recorded.
+- `#118` deterministic risk routing is source-complete for the accepted current categories; close only after the current candidate passes exact-SHA production evidence.
+- `#119` safety response contract, five renderer states, generic fallback, and reviewed U.S. resource catalog are source-complete. Authenticated browser and accessibility evidence remains open.
+- `#125` remains the production-closure issue until the Cloudflare, real-account, billing, rollback, safety-browser, and visual evidence above is recorded.
 - Parent issue `#117` closes only after every remaining applicable item in this ledger is complete or explicitly descoped with a recorded reason.
 
 ## Completion rule
