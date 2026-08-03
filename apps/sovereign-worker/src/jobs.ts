@@ -179,9 +179,9 @@ export async function cancelDeletion(env: Env, accountId: string, jobId: string)
 async function expirePendingInvitations(env: Env): Promise<number> {
   const rows = await env.DB.prepare(`SELECT id FROM invitations
     WHERE status = 'pending' AND expires_at <= datetime('now')
-    ORDER BY expires_at ASC LIMIT 100`)
+    ORDER BY expires_at ASC LIMIT 25`)
     .all<{ id: string }>();
-  let expired = 0;
+  const expiredIds: string[] = [];
 
   for (const row of rows.results ?? []) {
     const result = await env.DB.prepare(`UPDATE invitations
@@ -190,11 +190,13 @@ async function expirePendingInvitations(env: Env): Promise<number> {
       .bind(row.id)
       .run();
     if ((result.meta?.changes ?? 0) !== 1) continue;
-    expired += 1;
-    await notifyInvitationLifecycle(env, { invitationId: row.id, kind: 'expired' });
+    expiredIds.push(row.id);
   }
 
-  return expired;
+  await Promise.all(expiredIds.map((invitationId) =>
+    notifyInvitationLifecycle(env, { invitationId, kind: 'expired' })
+  ));
+  return expiredIds.length;
 }
 
 export async function cleanupExpired(env: Env) {
