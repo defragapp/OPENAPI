@@ -60,7 +60,17 @@ describe('Baseline-first account journey release', () => {
     expect(onboarding).toContain('$8.25/month equivalent · save $141');
     expect(onboarding).toContain('Secure checkout is temporarily unavailable. You can continue with Free and upgrade later.');
     expect(onboarding).toContain("fetch('/api/v1/billing/checkout'");
-    expect(onboarding.indexOf("fetch('/api/v1/billing/checkout'")).toBeLessThan(onboarding.lastIndexOf("await completeOnboarding('sovereign_plus')"));
+  });
+
+  it('does not complete Sovereign+ onboarding until the signed Stripe entitlement is effective', () => {
+    const confirmStart = onboarding.indexOf('async function confirm(plan: Plan)');
+    const completeStart = onboarding.indexOf('async function completeOnboarding', confirmStart);
+    const confirmBody = onboarding.slice(confirmStart, completeStart);
+    expect(confirmBody).toContain("fetch('/api/v1/billing/checkout'");
+    expect(confirmBody).toContain('location.assign(data.checkout.url)');
+    expect(confirmBody).not.toContain("completeOnboarding('sovereign_plus')");
+    expect(onboarding).toContain("if (effectivePlan === 'sovereign_plus')");
+    expect(onboarding).toContain("await completeOnboarding('sovereign_plus', controller.signal)");
   });
 
   it('requires both Baseline and onboarding completion before the private workspace renders', () => {
