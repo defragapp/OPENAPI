@@ -22,20 +22,16 @@ export type ProductionReleaseEvidence = {
 export async function readProductionReleaseEvidence(env: Env): Promise<ProductionReleaseEvidence | null> {
   const sha = String(env.APP_VERSION || '').trim();
   if (!/^[0-9a-f]{40}$/i.test(sha)) return null;
-  const session = env.DB.withSession('first-primary');
-  const record = await session.prepare(`SELECT status, payload_json
-    FROM background_jobs
-    WHERE id = ?1 AND kind = 'production_release_evidence'
-    LIMIT 1`)
-    .bind(`production-release:${sha}`)
-    .first<{ status: string; payload_json: string }>();
-  if (record?.status !== 'succeeded') return null;
+
   let parsed: unknown;
   try {
-    parsed = JSON.parse(record.payload_json);
+    const response = await env.ASSETS.fetch(new Request(`https://release-assets.invalid/release-evidence.json?sha=${sha}`));
+    if (!response.ok) return null;
+    parsed = await response.json();
   } catch {
     return null;
   }
+
   if (!parsed || typeof parsed !== 'object') return null;
   const evidence = parsed as Partial<ProductionReleaseEvidence>;
   if (evidence.contract !== RELEASE_EVIDENCE_CONTRACT
