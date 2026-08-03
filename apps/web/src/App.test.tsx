@@ -26,8 +26,10 @@ describe('Sovereign account and workspace shell', () => {
 
   it('verifies the account before mounting any private product surface', () => {
     expect(authenticatedWorkspace).toContain("fetch('/api/v1/account/onboarding'");
+    expect(authenticatedWorkspace).toContain("fetch('/api/v1/baseline/status'");
     expect(authenticatedWorkspace).toContain('location.replace(`/login?returnTo=');
-    expect(authenticatedWorkspace).toContain("location.replace('/onboarding')");
+    expect(authenticatedWorkspace).toContain("location.replace(billingReturn ? `/onboarding?billing=${encodeURIComponent(billingReturn)}` : '/onboarding')");
+    expect(authenticatedWorkspace).toContain("billingReturn === 'success'");
     expect(authenticatedWorkspace.indexOf("state !== 'ready'")).toBeLessThan(authenticatedWorkspace.indexOf('<SovereignIntelligenceWorkspace onboardingVerified />'));
     expect(app).toContain('return <PublicNotFound />');
     expect(app).not.toContain('SovereignIntelligenceWorkspace');
@@ -41,8 +43,9 @@ describe('Sovereign account and workspace shell', () => {
   });
 
   it('routes signup through explicit plan confirmation without changing prices', () => {
-    expect(app).toContain('Start free. Verify your email, then build your Baseline.');
+    expect(app).toContain('Create your account, verify your email, then build the personal foundation Sovereign uses.');
     expect(app).toContain('safeClientReturnTo');
+    expect(app).toContain("if (path === '/onboarding') return <PlanOnboarding />;");
     expect(onboarding).toContain('/api/v1/account/onboarding');
     expect(onboarding).toContain('/api/v1/billing/checkout');
     expect(onboarding).toContain('$20 / month');
