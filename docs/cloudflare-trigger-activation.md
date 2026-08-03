@@ -31,3 +31,7 @@ The canonical repository is now private. Trigger one clean connected Cloudflare 
 ## Final route-cohesion release — August 3, 2026 at 10:59 PT
 
 Trigger the connected private-repository Workers Build after aligning the canonical policy verifier with the final `--route-blue-bright` authority and adding bounded retry to non-authoritative release telemetry. This marker changes no runtime code, visual design, copy, component, route, or product behavior. Accept completion only when this exact `main` SHA is reported by both branded domains and the secondary-route, route-cohesion, and rendered page-family audits all pass.
+
+## Final production and DMARC release — August 3, 2026 at 11:18 PT
+
+Trigger the connected private-repository Workers Build after adding deterministic `_dmarc.defrag.app` reconciliation to the canonical production deployment path. The release must create or verify exactly one monitoring-policy TXT record, then complete exact-SHA runtime, secondary-route, route-cohesion, and rendered visual verification. The DNS step uses the existing Cloudflare build credential, fails closed on ambiguous records or missing DNS Write permission, and introduces no new service, exposed secret, user-facing design, copy, route, or product behavior.
