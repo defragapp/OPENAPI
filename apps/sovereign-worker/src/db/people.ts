@@ -1,5 +1,6 @@
 import type { Env } from '../env';
 import { buildSovereignEmail, sendOperationalEmail } from '../email';
+import { notifyInvitationLifecycle } from '../invitation-notifications';
 import { getEntitlements, requireFeature } from './entitlements';
 
 export const CONSENT_SCOPES = ['pair.compare', 'system.include', 'trait.display', 'framework.display', 'current_conditions.use', 'library.link', 'covenant.include'] as const;
@@ -132,6 +133,7 @@ export async function updateInvitationStatus(env: Env, accountId: string, invita
   const result = await env.DB.prepare("UPDATE invitations SET status = 'revoked', revoked_at = datetime('now'), token_hash = NULL WHERE id = ? AND account_id = ? AND status = 'pending'")
     .bind(invitationId, accountId).run();
   if ((result.meta?.changes ?? 0) === 0) throw new Response('Pending invitation not found', { status: 404 });
+  await notifyInvitationLifecycle(env, { invitationId, kind: 'revoked' });
 }
 
 export async function setConsent(env: Env, accountId: string, personId: string, scope: string, granted: boolean, actor: string, reason?: string): Promise<{ scope: ConsentScope; granted: false }> {
@@ -170,22 +172,37 @@ export async function requireConsent(env: Env, accountId: string, personId: stri
 }
 
 async function resendPendingInvitation(env: Env, accountId: string, invitationId: string): Promise<void> {
-  const row = await env.DB.prepare(`SELECT i.id, i.invited_email_normalized, i.requested_scopes_json, i.created_at
+  const row = await env.DB.prepare(`SELECT i.id, i.invited_email_normalized, i.requested_scopes_json, i.created_at, i.token_hash, i.expires_at
     FROM invitations i JOIN persons p ON p.id = i.invited_person_id
     WHERE i.id = ? AND i.account_id = ? AND p.account_id = ? AND i.status = 'pending'`)
     .bind(invitationId, accountId, accountId)
-    .first<{ id: string; invited_email_normalized: string | null; requested_scopes_json: string | null; created_at: string }>();
+    .first<{
+      id: string;
+      invited_email_normalized: string | null;
+      requested_scopes_json: string | null;
+      created_at: string;
+      token_hash: string | null;
+      expires_at: string;
+    }>();
   if (!row) throw new Response('Pending invitation not found', { status: 404 });
   const createdAt = Date.parse(row.created_at.replace(' ', 'T') + 'Z');
   const retryAfter = Math.max(0, INVITATION_RESEND_SECONDS - Math.floor((Date.now() - createdAt) / 1000));
   if (retryAfter > 0) throw Response.json({ error: 'Invitation was sent recently.', retryAfterSeconds: retryAfter }, { status: 429, headers: { 'retry-after': String(retryAfter) } });
   const email = row.invited_email_normalized?.trim().toLowerCase() ?? '';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Response('Invitation email is unavailable', { status: 409 });
+
   const requestedScopes = parseScopes(row.requested_scopes_json);
   const token = newToken();
   const tokenHash = await sha256(token);
   const invitationUrl = new URL('/invitation', env.PUBLIC_APP_URL || 'https://app.defrag.app');
   invitationUrl.searchParams.set('token', token);
+  const updated = await env.DB.prepare(`UPDATE invitations
+    SET token_hash = ?, expires_at = datetime('now', '+${INVITATION_TTL_DAYS} days'), created_at = datetime('now'), revoked_at = NULL
+    WHERE id = ? AND account_id = ? AND status = 'pending' AND created_at = ?`)
+    .bind(tokenHash, invitationId, accountId, row.created_at)
+    .run();
+  if ((updated.meta?.changes ?? 0) !== 1) throw new Response('Invitation changed before it could be resent', { status: 409 });
+
   const template = buildSovereignEmail({
     eyebrow: 'Private relationship invitation',
     title: 'You decide what this connection may use.',
@@ -199,16 +216,23 @@ async function resendPendingInvitation(env: Env, accountId: string, invitationId
     ],
     footer: 'You can deny any requested use and revoke an active permission later from your own Sovereign.OS controls.'
   });
-  await sendOperationalEmail(env, {
-    to: email,
-    subject: 'Review a private Sovereign.OS invitation',
-    ...template,
-    idempotencyKey: `${invitationId}:resend:${tokenHash.slice(0, 16)}`
-  });
-  await env.DB.prepare(`UPDATE invitations SET token_hash = ?, expires_at = datetime('now', '+${INVITATION_TTL_DAYS} days'), created_at = datetime('now'), revoked_at = NULL
-    WHERE id = ? AND account_id = ? AND status = 'pending'`)
-    .bind(tokenHash, invitationId, accountId)
-    .run();
+
+  try {
+    await sendOperationalEmail(env, {
+      to: email,
+      subject: 'Review a private Sovereign.OS invitation',
+      ...template,
+      idempotencyKey: `${invitationId}:resend:${tokenHash.slice(0, 16)}`,
+      category: 'relationship_invitation_resend'
+    });
+  } catch (error) {
+    await env.DB.prepare(`UPDATE invitations
+      SET token_hash = ?, expires_at = ?, created_at = ?
+      WHERE id = ? AND account_id = ? AND status = 'pending' AND token_hash = ?`)
+      .bind(row.token_hash, row.expires_at, row.created_at, invitationId, accountId, tokenHash)
+      .run();
+    throw error;
+  }
 }
 
 function newToken(): string {
