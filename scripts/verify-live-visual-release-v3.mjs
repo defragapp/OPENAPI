@@ -91,7 +91,7 @@ async function rateLimitedFetch(input, init) {
 const referenceAssertionV2 = "assert(reference.length > 8_000, 'Approved visual reference is missing or unexpectedly small');";
 const referenceAssertionV3 = "assert(reference.length > 6_500, 'Approved visual reference is missing, truncated, or unexpectedly small');";
 const auditScriptStartV2 = "return `(() => {\n    const visible = (element) => {";
-const auditScriptStartV3 = "return `(() => {\n    const collectAudit = () => {\n      const root = document.querySelector('.public-approved-v8');\n      if (!root || !document.body) return false;\n      const visible = (element) => {";
+const auditScriptStartV3 = "return `(() => {\n    const collectAudit = () => {\n      if (!document.querySelector('.public-approved-v8') || !document.body) return false;\n      const visible = (element) => {";
 const auditTailV2 = "const node = document.createElement('script');\n    node.id = '__sovereign_visual_audit';\n    node.type = 'application/json';\n    node.textContent = JSON.stringify(payload);\n    document.head.appendChild(node);";
 const auditTailV3 = "document.documentElement.setAttribute('data-sovereign-visual-audit', encodeURIComponent(JSON.stringify(payload)));\n      return true;\n    };\n    if (collectAudit()) return;\n    const observer = new MutationObserver(() => {\n      if (collectAudit()) observer.disconnect();\n    });\n    observer.observe(document.documentElement, { childList: true, subtree: true });\n    setTimeout(() => observer.disconnect(), 45_000);";
 const auditParserV2 = String.raw`function parseRenderedAudit(html) {
