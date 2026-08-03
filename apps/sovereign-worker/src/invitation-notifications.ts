@@ -67,7 +67,7 @@ export async function notifyInvitationLifecycle(env: Env, input: InvitationNotif
     const actionUrl = accountControlsUrl(env);
     const template = lifecycleTemplate(input, displayName, actionUrl);
     const versionKey = input.decisionVersion ? `:v${input.decisionVersion}` : '';
-    const deliveries: Promise<void>[] = [];
+    const deliveries: Promise<unknown>[] = [];
 
     if (ownerEmail) {
       deliveries.push(sendOperationalEmail(env, {
@@ -76,7 +76,7 @@ export async function notifyInvitationLifecycle(env: Env, input: InvitationNotif
         text: template.owner.text,
         html: template.owner.html,
         idempotencyKey: `invitation:${input.invitationId}:${input.kind}${versionKey}:owner`,
-        category: 'account_security'
+        category: 'consent_update'
       }));
     }
     if (inviteeEmail) {
@@ -86,7 +86,7 @@ export async function notifyInvitationLifecycle(env: Env, input: InvitationNotif
         text: template.invitee.text,
         html: template.invitee.html,
         idempotencyKey: `invitation:${input.invitationId}:${input.kind}${versionKey}:invitee`,
-        category: 'account_security'
+        category: 'consent_update'
       }));
     }
 
