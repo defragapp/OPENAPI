@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
 const workspaceGate = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
 const styles = readFileSync(new URL('./account-journey.css', import.meta.url), 'utf8');
+const structuredStyles = readFileSync(new URL('./account-journey-structured.css', import.meta.url), 'utf8');
 const entry = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const auth = readFileSync(new URL('../../sovereign-worker/src/auth-public.ts', import.meta.url), 'utf8');
 
@@ -17,6 +18,16 @@ describe('Baseline-first account journey release', () => {
     expect(onboarding).toContain('Create the personal foundation Sovereign uses.');
   });
 
+  it('captures structured birthplace context and explicit timezone confirmation', () => {
+    expect(onboarding).toContain('birthplaceCity');
+    expect(onboarding).toContain('birthplaceRegion');
+    expect(onboarding).toContain('birthplaceCountry');
+    expect(onboarding).toContain('timezoneConfirmed');
+    expect(onboarding).toContain('I confirm this timezone for the birthplace and date.');
+    expect(onboarding).toContain("[form.birthplaceCity, form.birthplaceRegion, form.birthplaceCountry]");
+    expect(onboarding).toContain("locationPrecision: 'city_or_regional'");
+  });
+
   it('keeps raw birth data outside the language-model boundary and preserves uncertainty', () => {
     expect(onboarding).toContain('Raw birth details and exact private location are not sent to the language model.');
     expect(onboarding).toContain("birthTimeCertainty: 'unknown'");
@@ -25,12 +36,19 @@ describe('Baseline-first account journey release', () => {
     expect(onboarding).toContain("baseline.status === 'partial'");
   });
 
-  it('uses real request state rather than timer-driven fake calculation progress', () => {
+  it('uses request state rather than timer-driven fake calculation progress', () => {
     expect(onboarding).toContain("setBaselineStage('validating')");
     expect(onboarding).toContain("setBaselineStage('calculating')");
     expect(onboarding).toContain("setBaselineStage('complete')");
     expect(onboarding).not.toContain('window.setInterval(');
     expect(onboarding).not.toContain('window.setTimeout(');
+  });
+
+  it('does not ask an already-onboarded Free user to choose a plan again after Baseline completion', () => {
+    expect(onboarding).toContain('accountAlreadyOnboarded');
+    expect(onboarding).toContain('setAccountAlreadyOnboarded(completed)');
+    expect(onboarding).toContain("if (accountAlreadyOnboarded)");
+    expect(onboarding).toContain("location.replace('/app')");
   });
 
   it('keeps Free legitimate and makes paid cadence explicit before Stripe checkout', () => {
@@ -41,6 +59,7 @@ describe('Baseline-first account journey release', () => {
     expect(onboarding).toContain('$8.25/month equivalent · save $141');
     expect(onboarding).toContain('Secure checkout is temporarily unavailable. You can continue with Free and upgrade later.');
     expect(onboarding).toContain("fetch('/api/v1/billing/checkout'");
+    expect(onboarding.indexOf("fetch('/api/v1/billing/checkout'")).toBeLessThan(onboarding.lastIndexOf("await completeOnboarding('sovereign_plus')"));
   });
 
   it('requires both Baseline and onboarding completion before the private workspace renders', () => {
@@ -59,12 +78,13 @@ describe('Baseline-first account journey release', () => {
     expect(auth).toContain("parsed.pathname === '/onboarding'");
   });
 
-  it('inherits the frozen landing language on desktop and iOS without loading after passkey authority', () => {
+  it('inherits the frozen landing language on desktop and iOS before final passkey authority', () => {
     expect(styles).toContain('letter-spacing: 0.22em');
     expect(styles).toContain('env(safe-area-inset-top)');
     expect(styles).toContain('env(safe-area-inset-bottom)');
     expect(styles).toContain('min-height: 48px');
     expect(styles).toContain('@media (max-width: 700px)');
-    expect(entry).toContain("import './account-journey.css';\nimport './passkey-auth.css';");
+    expect(structuredStyles).toContain('.baseline-timezone-confirmation');
+    expect(entry).toContain("import './account-journey.css';\nimport './account-journey-structured.css';\nimport './passkey-auth.css';");
   });
 });
