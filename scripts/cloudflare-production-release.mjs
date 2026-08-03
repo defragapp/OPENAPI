@@ -91,7 +91,7 @@ const releaseEnv = {
   APP_VERSION: checkoutSha
 };
 const steps = [
-  ['deploy-v3', 'scripts/cloudflare-production-deploy-v3.mjs'],
+  ['deploy-v4', 'scripts/cloudflare-production-deploy-v4.mjs'],
   ['verify-runtime-v3', 'scripts/verify-parent-domain-routes-v3.mjs'],
   ['verify-secondary-public', 'scripts/verify-live-secondary-public.mjs'],
   ['verify-route-cohesion', 'scripts/verify-live-route-cohesion.mjs'],
