@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { FormEvent } from 'react';
+import type { FormEvent, ReactNode } from 'react';
 
 type Plan = 'free' | 'sovereign_plus';
 type BillingInterval = 'monthly' | 'annual';
 type JourneyPhase = 'loading' | 'baseline' | 'baseline_building' | 'baseline_result' | 'plan' | 'error';
 type BaselineStage = 'idle' | 'validating' | 'calculating' | 'complete';
 type BirthTimeCertainty = 'exact' | 'approximate' | 'unknown';
+type BaselineField = 'birthDate' | 'birthplace' | 'birthTimezone' | 'birthTime';
 type BaselineStatus = {
   status?: string;
   uncertainty?: string;
@@ -25,10 +26,15 @@ type BaselineForm = {
   birthTimezone: string;
   birthTimeCertainty: BirthTimeCertainty;
   birthTime: string;
-  useCurrentCity: boolean;
 };
-type BaselineField = 'birthDate' | 'birthplace' | 'birthTimezone' | 'birthTime';
-type BaselineErrors = Partial<Record<BaselineField, string>>;
+type BaselineErrors = Record<BaselineField, string>;
+
+const emptyErrors = (): BaselineErrors => ({
+  birthDate: '',
+  birthplace: '',
+  birthTimezone: '',
+  birthTime: ''
+});
 
 const baselineStages = [
   ['validating', 'Checking time and place'],
@@ -44,7 +50,7 @@ export function PlanOnboarding() {
   const [status, setStatus] = useState('Loading your account…');
   const [baselineStage, setBaselineStage] = useState<BaselineStage>('idle');
   const [baseline, setBaseline] = useState<BaselineStatus | null>(null);
-  const [errors, setErrors] = useState<BaselineErrors>({});
+  const [errors, setErrors] = useState<BaselineErrors>(emptyErrors);
   const [submitting, setSubmitting] = useState(false);
   const [checkoutUnavailable, setCheckoutUnavailable] = useState(false);
   const [showBaselineReview, setShowBaselineReview] = useState(false);
@@ -53,8 +59,7 @@ export function PlanOnboarding() {
     birthplace: '',
     birthTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
     birthTimeCertainty: 'unknown',
-    birthTime: '',
-    useCurrentCity: false
+    birthTime: ''
   });
   const timeZones = useMemo(() => supportedTimeZones(), []);
 
@@ -132,7 +137,7 @@ export function PlanOnboarding() {
 
     const nextErrors = validateBaseline(form);
     setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) {
+    if (Object.values(nextErrors).some(Boolean)) {
       setStatus('Review the highlighted Baseline details.');
       return;
     }
@@ -149,7 +154,7 @@ export function PlanOnboarding() {
         birthTimezone: form.birthTimezone.trim(),
         birthTimeCertainty: form.birthTimeCertainty,
         ...(form.birthTimeCertainty === 'unknown' ? {} : { birthTime: form.birthTime }),
-        locationPrecision: form.useCurrentCity ? 'city_or_regional' : 'none'
+        locationPrecision: 'city_or_regional' as const
       };
 
       setBaselineStage('calculating');
@@ -240,7 +245,7 @@ export function PlanOnboarding() {
         'x-idempotency-key': crypto.randomUUID()
       },
       body: JSON.stringify({ plan }),
-      signal
+      ...(signal ? { signal } : {})
     });
     if (response.status === 401) {
       location.replace('/login?returnTo=%2Fonboarding');
@@ -280,7 +285,7 @@ export function PlanOnboarding() {
               <p className="plan-intro">Add the birth details you know. Sovereign.OS uses them to calculate your Baseline, then translates the result into plain language you can explore and correct.</p>
               <form className="baseline-onboarding-form" onSubmit={submitBaseline} noValidate>
                 <div className="baseline-form-grid">
-                  <Field label="Birth date" error={errors.birthDate}>
+                  <Field label="Birth date" error={errors.birthDate} errorId="baseline-birth-date-error">
                     <input
                       name="birthDate"
                       type="date"
@@ -288,11 +293,11 @@ export function PlanOnboarding() {
                       max={new Date().toISOString().slice(0, 10)}
                       onChange={(event) => updateForm('birthDate', event.target.value)}
                       aria-invalid={Boolean(errors.birthDate)}
-                      aria-describedby={errors.birthDate ? 'baseline-birthDate-error' : undefined}
+                      aria-describedby={errors.birthDate ? 'baseline-birth-date-error' : undefined}
                       required
                     />
                   </Field>
-                  <Field label="Birthplace" error={errors.birthplace}>
+                  <Field label="Birthplace" error={errors.birthplace} errorId="baseline-birthplace-error">
                     <input
                       name="birthplace"
                       type="text"
@@ -306,7 +311,7 @@ export function PlanOnboarding() {
                     />
                     <small id="baseline-birthplace-help">Use the city and region shown on the birth record when available.</small>
                   </Field>
-                  <Field label="Birthplace timezone" error={errors.birthTimezone}>
+                  <Field label="Birthplace timezone" error={errors.birthTimezone} errorId="baseline-birth-timezone-error">
                     <input
                       name="birthTimezone"
                       type="search"
@@ -317,7 +322,7 @@ export function PlanOnboarding() {
                       spellCheck={false}
                       onChange={(event) => updateForm('birthTimezone', event.target.value)}
                       aria-invalid={Boolean(errors.birthTimezone)}
-                      aria-describedby={errors.birthTimezone ? 'baseline-birthTimezone-error' : 'baseline-timezone-help'}
+                      aria-describedby={errors.birthTimezone ? 'baseline-birth-timezone-error' : 'baseline-timezone-help'}
                       required
                     />
                     <datalist id="baseline-timezone-options">
@@ -337,7 +342,14 @@ export function PlanOnboarding() {
                           name="birthTimeCertainty"
                           value={certainty}
                           checked={form.birthTimeCertainty === certainty}
-                          onChange={() => setForm((current) => ({ ...current, birthTimeCertainty: certainty, ...(certainty === 'unknown' ? { birthTime: '' } : {}) }))}
+                          onChange={() => {
+                            setForm((current) => ({
+                              ...current,
+                              birthTimeCertainty: certainty,
+                              birthTime: certainty === 'unknown' ? '' : current.birthTime
+                            }));
+                            setErrors((current) => ({ ...current, birthTime: '' }));
+                          }}
                         />
                         <span>{certainty === 'exact' ? 'Exact' : certainty === 'approximate' ? 'Approximate' : 'Unknown'}</span>
                       </label>
@@ -346,14 +358,14 @@ export function PlanOnboarding() {
                 </fieldset>
 
                 {form.birthTimeCertainty !== 'unknown' && (
-                  <Field label={form.birthTimeCertainty === 'exact' ? 'Birth time' : 'Approximate birth time'} error={errors.birthTime}>
+                  <Field label={form.birthTimeCertainty === 'exact' ? 'Birth time' : 'Approximate birth time'} error={errors.birthTime} errorId="baseline-birth-time-error">
                     <input
                       name="birthTime"
                       type="time"
                       value={form.birthTime}
                       onChange={(event) => updateForm('birthTime', event.target.value)}
                       aria-invalid={Boolean(errors.birthTime)}
-                      aria-describedby={errors.birthTime ? 'baseline-birthTime-error' : undefined}
+                      aria-describedby={errors.birthTime ? 'baseline-birth-time-error' : undefined}
                       required
                     />
                   </Field>
@@ -363,18 +375,9 @@ export function PlanOnboarding() {
                   <p className="baseline-limited-note">You can continue without a birth time. Time-dependent details will remain visibly limited rather than being guessed.</p>
                 )}
 
-                <label className="baseline-location-permission">
-                  <input
-                    type="checkbox"
-                    checked={form.useCurrentCity}
-                    onChange={(event) => setForm((current) => ({ ...current, useCurrentCity: event.target.checked }))}
-                  />
-                  <span>
-                    <strong>Use city-level location for current conditions</strong>
-                    <small>Optional. Skipping this does not block your Baseline.</small>
-                  </span>
-                </label>
-
+                <p className="baseline-current-location-note">
+                  Current conditions stay separate from your birth data. City-level current location can be enabled later from You and is never required to build a Baseline.
+                </p>
                 <p className="baseline-privacy-boundary">Raw birth details and exact private location are not sent to the language model. Sovereign receives only the reduced themes needed for an exploration.</p>
                 <button className="primary-button" type="submit" disabled={submitting}>Build my Baseline</button>
               </form>
@@ -388,8 +391,8 @@ export function PlanOnboarding() {
               <div className="baseline-progress-light" aria-hidden="true"><i /></div>
               <ol>
                 {baselineStages.map(([requiredStage, label], index) => {
-                  const state = stageState(baselineStage, requiredStage, index);
-                  return <li className={state} key={label}><span>{index + 1}</span><strong>{label}</strong></li>;
+                  const itemState = stageState(baselineStage, requiredStage, index);
+                  return <li className={itemState} key={label}><span>{index + 1}</span><strong>{label}</strong></li>;
                 })}
               </ol>
               <p>{status}</p>
@@ -438,7 +441,7 @@ export function PlanOnboarding() {
                     <li>10 Sovereign responses each UTC month</li>
                     <li>Correction controls and active-retention history</li>
                   </ul>
-                  <button className="primary-button" disabled={submitting} onClick={() => void confirm('free')}>Continue with Free</button>
+                  <button className="primary-button" type="button" disabled={submitting} onClick={() => void confirm('free')}>Continue with Free</button>
                 </article>
 
                 <article className="plus-plan">
@@ -456,7 +459,7 @@ export function PlanOnboarding() {
                     <button type="button" aria-pressed={interval === 'annual'} className={interval === 'annual' ? 'active' : ''} onClick={() => setInterval('annual')}>Annual · $99</button>
                   </div>
                   {interval === 'annual' && <p className="annual-value">$8.25/month equivalent · save $141 compared with monthly billing.</p>}
-                  <button className="primary-button" disabled={submitting} onClick={() => void confirm('sovereign_plus')}>Choose Sovereign+</button>
+                  <button className="primary-button" type="button" disabled={submitting} onClick={() => void confirm('sovereign_plus')}>Choose Sovereign+</button>
                 </article>
               </div>
               {checkoutUnavailable && (
@@ -482,17 +485,16 @@ export function PlanOnboarding() {
 
   function updateForm(field: BaselineField, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
-    setErrors((current) => ({ ...current, [field]: undefined }));
+    setErrors((current) => ({ ...current, [field]: '' }));
   }
 }
 
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
-  const id = `baseline-${label.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-')}`;
+function Field({ label, error, errorId, children }: { label: string; error: string; errorId: string; children: ReactNode }) {
   return (
     <label className={`baseline-field ${error ? 'has-error' : ''}`}>
       <span>{label}</span>
       {children}
-      {error && <small id={`${id}-error`} className="field-error">{error}</small>}
+      {error && <small id={errorId} className="field-error">{error}</small>}
     </label>
   );
 }
@@ -501,7 +503,7 @@ function ProgressItem({ number, label, state }: { number: string; label: string;
   return <li className={state === 'upcoming' ? '' : state}><span>{number}</span>{label}</li>;
 }
 
-function JourneyMessage({ eyebrow, title, body, children }: { eyebrow: string; title: string; body: string; children?: React.ReactNode }) {
+function JourneyMessage({ eyebrow, title, body, children }: { eyebrow: string; title: string; body: string; children?: ReactNode }) {
   return (
     <section className="onboarding-message" role="status" aria-live="polite">
       <p className="eyebrow">{eyebrow}</p>
@@ -513,7 +515,7 @@ function JourneyMessage({ eyebrow, title, body, children }: { eyebrow: string; t
 }
 
 function validateBaseline(form: BaselineForm): BaselineErrors {
-  const errors: BaselineErrors = {};
+  const errors = emptyErrors();
   const today = new Date().toISOString().slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(form.birthDate) || form.birthDate > today) errors.birthDate = 'Enter a valid birth date that is not in the future.';
   if (form.birthplace.trim().length < 2) errors.birthplace = 'Enter the city and region of birth.';
