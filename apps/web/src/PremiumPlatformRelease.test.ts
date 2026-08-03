@@ -27,6 +27,7 @@ const isolatedStoryCss = read('./landing-product-stories-v2.css');
 const approvedCss = read('./public-landing-approved-v8.css');
 const heroExtension = read('./landing-hero-field-v4.css');
 const passkeyCss = read('./passkey-auth.css');
+const routeCohesionCss = read('./deployed-route-cohesion.css');
 const staticV0Css = read('../public/v0-public-port.css');
 const staticAuthority = read('../public/premium-public-release.css');
 
@@ -35,7 +36,7 @@ function expectBalancedCss(source: string) {
 }
 
 describe('founder v0 selective visual port — approved public v8', () => {
-  it('loads one approved landing authority, hero extension, then passkey authority', () => {
+  it('loads one approved landing authority, hero extension, passkey authority, then final route authority', () => {
     const imports = [
       "import './v0-platform-port.css';",
       "import './v0-motion-accessibility.css';",
@@ -47,7 +48,8 @@ describe('founder v0 selective visual port — approved public v8', () => {
       "import './landing-product-stories-v2.css';",
       "import './public-landing-approved-v8.css';",
       "import './landing-hero-field-v4.css';",
-      "import './passkey-auth.css';"
+      "import './passkey-auth.css';",
+      "import './deployed-route-cohesion.css';"
     ];
     let previous = -1;
     for (const marker of imports) {
@@ -60,7 +62,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(main).not.toContain("import './public-landing-premium-v4.css';");
     expect(main).not.toContain("import './public-landing-premium-v5.css';");
     expect(main).not.toContain("import './public-landing-premium-v6.css';");
-    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, passkeyCss]) {
+    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, passkeyCss, routeCohesionCss]) {
       expectBalancedCss(source);
     }
   });

@@ -6,14 +6,16 @@ const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'u
 const iosCss = readFileSync(new URL('./landing-ios-parity-density-v1.css', import.meta.url), 'utf8');
 
 describe('landing iOS parity and density release', () => {
-  it('loads the narrow-screen authority after the hero and before passkey styles', () => {
+  it('loads the narrow-screen authority after the hero, before passkey styles, and before final route authority', () => {
     const heroImport = "import './landing-hero-field-v4.css';";
     const iosImport = "import './landing-ios-parity-density-v1.css';";
     const passkeyImport = "import './passkey-auth.css';";
+    const routeImport = "import './deployed-route-cohesion.css';";
 
     expect(main.indexOf(iosImport)).toBeGreaterThan(main.indexOf(heroImport));
     expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(iosImport));
-    expect(main.slice(main.indexOf(passkeyImport) + passkeyImport.length)).not.toContain("import './");
+    expect(main.indexOf(routeImport)).toBeGreaterThan(main.indexOf(passkeyImport));
+    expect(main.slice(main.indexOf(routeImport) + routeImport.length)).not.toContain("import './");
   });
 
   it('keeps the same Sovereign.OS identity across desktop and iOS', () => {

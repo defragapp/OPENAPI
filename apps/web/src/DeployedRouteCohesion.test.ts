@@ -84,7 +84,7 @@ describe('deployed route cohesion', () => {
   it('covers the real deployed React route roots', () => {
     expect(policy).toContain('public-secondary-page');
     expect(app).toContain('className="account-shell"');
-    expect(app).toContain('className="invitation-shell"');
+    expect(app).toContain('className="account-shell invitation-shell"');
     expect(app).toContain('className="public-not-found"');
     expect(onboarding).toContain('className="plan-onboarding"');
     expect(authenticatedWorkspace).toContain('className="private-route-gate"');
