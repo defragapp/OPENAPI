@@ -6,7 +6,9 @@ import { SystemMembershipManager } from './SystemMembershipManager';
 import { VerifiedPlanStatus } from './VerifiedPlanStatus';
 import { AccountExpressionField } from './expression-field/ExpressionField';
 
-type GateState = 'checking' | 'ready' | 'error';
+type GateState = 'checking' | 'confirming_plan' | 'ready' | 'error';
+type OnboardingStatus = { completed?: boolean; effectivePlan?: 'free' | 'sovereign_plus' };
+type BaselineStatus = { status?: string };
 
 export function AuthenticatedWorkspace() {
   const [state, setState] = useState<GateState>('checking');
@@ -19,24 +21,58 @@ export function AuthenticatedWorkspace() {
     async function verifyAccount() {
       setState('checking');
       try {
-        const response = await fetch('/api/v1/account/onboarding', {
-          headers: { accept: 'application/json' },
-          credentials: 'same-origin',
-          cache: 'no-store',
-          signal: controller.signal
-        });
+        const [onboardingResponse, baselineResponse] = await Promise.all([
+          fetch('/api/v1/account/onboarding', {
+            headers: { accept: 'application/json' },
+            credentials: 'same-origin',
+            cache: 'no-store',
+            signal: controller.signal
+          }),
+          fetch('/api/v1/baseline/status', {
+            headers: { accept: 'application/json' },
+            credentials: 'same-origin',
+            cache: 'no-store',
+            signal: controller.signal
+          })
+        ]);
 
-        if (response.status === 401) {
+        if (onboardingResponse.status === 401 || baselineResponse.status === 401) {
           location.replace(`/login?returnTo=${encodeURIComponent(returnTo)}`);
           return;
         }
-        if (!response.ok) throw new Error('Account verification is temporarily unavailable.');
+        if (!onboardingResponse.ok || !baselineResponse.ok) {
+          throw new Error('Account verification is temporarily unavailable.');
+        }
 
-        const onboarding = await response.json().catch(() => ({})) as { completed?: boolean };
-        if (!onboarding.completed) {
+        const onboarding = await onboardingResponse.json().catch(() => ({})) as OnboardingStatus;
+        const baselineBody = await baselineResponse.json().catch(() => ({})) as { baseline?: BaselineStatus };
+        const baselineReady = baselineBody.baseline?.status === 'completed' || baselineBody.baseline?.status === 'partial';
+
+        if (!baselineReady) {
           location.replace('/onboarding');
           return;
         }
+
+        if (!onboarding.completed) {
+          if (onboarding.effectivePlan === 'sovereign_plus') {
+            setState('confirming_plan');
+            const completion = await fetch('/api/v1/account/onboarding', {
+              method: 'POST',
+              credentials: 'same-origin',
+              headers: {
+                'content-type': 'application/json',
+                'x-idempotency-key': crypto.randomUUID()
+              },
+              body: JSON.stringify({ plan: 'sovereign_plus' }),
+              signal: controller.signal
+            });
+            if (!completion.ok) throw new Error('Your verified plan could not be connected to the workspace yet.');
+          } else {
+            location.replace('/onboarding');
+            return;
+          }
+        }
+
         setState('ready');
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') return;
@@ -61,7 +97,9 @@ export function AuthenticatedWorkspace() {
           <p>
             {state === 'error'
               ? 'Your workspace was not shown. Check your connection and try again.'
-              : 'Confirming your account and verified plan before the private workspace is shown.'}
+              : state === 'confirming_plan'
+                ? 'Connecting your verified Sovereign+ entitlement to the workspace.'
+                : 'Confirming your account, Baseline, and plan before the private workspace is shown.'}
           </p>
           {state === 'error' && <button onClick={() => setAttempt((value) => value + 1)}>Try again <span aria-hidden="true">→</span></button>}
         </section>
