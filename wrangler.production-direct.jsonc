@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "sovv-web",
+  "account_id": "8b1954d216d65077c6480d62583fe2c2",
   "main": "apps/sovereign-worker/src/runtime-entry.ts",
   "compatibility_date": "2026-07-20",
   "compatibility_flags": ["nodejs_compat"],
