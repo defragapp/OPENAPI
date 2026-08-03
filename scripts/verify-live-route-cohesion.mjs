@@ -20,7 +20,7 @@ const routes = [
   { name: 'terms', url: `${publicBase}/terms`, root: '.public-secondary-page', heading: '.policy-hero h1', nav: '.v0-nav', content: '.policy-grid', family: 'policy', mobile: false },
   { name: 'login', url: `${appBase}/login`, root: '.account-shell', heading: '.account-intro h1', nav: '.account-nav', content: '.account-layout', family: 'auth', mobile: true },
   { name: 'signup', url: `${appBase}/signup`, root: '.account-shell', heading: '.account-intro h1', nav: '.account-nav', content: '.account-layout', family: 'auth', mobile: true },
-  { name: 'invitation', url: `${appBase}/invitation`, root: '.invitation-shell', heading: '.auth-panel h2', nav: '.wordmark', content: '.auth-panel', family: 'invitation', mobile: true },
+  { name: 'invitation', url: `${appBase}/invite/route-cohesion-audit`, root: '.invitation-shell', heading: '.auth-panel h2', nav: '.wordmark', content: '.auth-panel', family: 'invitation', mobile: true },
   { name: 'onboarding-gate', url: `${appBase}/onboarding`, root: '.account-shell', heading: '.account-intro h1', nav: '.account-nav', content: '.account-layout', family: 'auth-redirect', mobile: false },
   { name: 'workspace-gate', url: `${appBase}/app`, root: '.account-shell', heading: '.account-intro h1', nav: '.account-nav', content: '.account-layout', family: 'auth-redirect', mobile: false },
   { name: 'not-found', url: `${appBase}/route-cohesion-not-found`, root: '.public-not-found', heading: '.public-not-found h1', nav: '.private-route-brand', content: '.public-not-found > section', family: 'not-found', mobile: true }
