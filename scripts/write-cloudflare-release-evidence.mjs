@@ -1,9 +1,16 @@
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
-const API_ROOT = 'https://api.cloudflare.com/client/v4';
+const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const sourceConfigPath = resolve(root, 'wrangler.production-direct.jsonc');
+const canonicalConfigPath = resolve(root, 'wrangler.jsonc');
+const generatedConfigPath = resolve(root, '.wrangler.release-evidence.generated.jsonc');
+const evidenceAssetPath = resolve(root, 'apps/web/dist/release-evidence.json');
 const DATABASE_NAME = 'sovereign-openapi-db';
-const EVIDENCE_KIND = 'production_release_evidence';
+const WORKER_NAME = 'sovv-web';
+const APP_BASE = 'https://app.defrag.app';
 const EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1';
 const MIGRATION_VERSION = '0014_passkey_authentication';
 const ROUTE_COHESION_CONTRACT = 'sovereign-deployed-route-cohesion-v1';
@@ -16,6 +23,7 @@ function fail(message) {
 
 function runGit(args, label) {
   const result = spawnSync('git', args, {
+    cwd: root,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   });
@@ -25,18 +33,25 @@ function runGit(args, label) {
   return String(result.stdout || '').trim();
 }
 
-function requiredEnvironment(name, fallbacks = []) {
-  for (const candidate of [name, ...fallbacks]) {
-    const value = String(process.env[candidate] || '').trim();
-    if (value) return value;
+function parseJsonOutput(output, label) {
+  const text = String(output || '').trim();
+  if (!text) fail(`${label} returned no JSON`);
+  try {
+    return JSON.parse(text);
+  } catch {
+    const starts = [text.indexOf('{'), text.indexOf('[')].filter((index) => index >= 0);
+    if (!starts.length) fail(`${label} did not return JSON: ${text.slice(0, 500)}`);
+    try {
+      return JSON.parse(text.slice(Math.min(...starts)));
+    } catch {
+      fail(`${label} returned invalid JSON: ${text.slice(0, 500)}`);
+    }
   }
-  fail(`${name} is required`);
 }
 
-function configuredAccountId() {
-  const config = readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8');
-  const match = config.match(/"account_id"\s*:\s*"([0-9a-f]{32})"/i);
-  return match?.[1] || '';
+function rows(value) {
+  if (Array.isArray(value)) return value;
+  return value?.result || value?.databases || [];
 }
 
 function resolveCommitSha() {
@@ -47,58 +62,56 @@ function resolveCommitSha() {
   return checkout;
 }
 
-function createClient(apiToken) {
-  return async function request(path, options = {}) {
-    const response = await fetch(`${API_ROOT}${path}`, {
-      method: options.method || 'GET',
-      headers: {
-        authorization: `Bearer ${apiToken}`,
-        ...(options.body === undefined ? {} : { 'content-type': 'application/json' })
-      },
-      body: options.body === undefined ? undefined : JSON.stringify(options.body),
-      signal: AbortSignal.timeout(options.timeoutMs || 30_000)
-    });
-    const text = await response.text();
-    let payload;
-    try {
-      payload = text ? JSON.parse(text) : {};
-    } catch {
-      payload = { success: false, errors: [{ message: text.slice(0, 500) }] };
-    }
-    if (!response.ok || payload?.success === false) {
-      const details = [...(payload?.errors || []), ...(payload?.messages || [])]
-        .map((item) => item?.message || String(item))
-        .join('; ');
-      fail(`Cloudflare API ${options.method || 'GET'} ${path} failed (${response.status}): ${details || text.slice(0, 500)}`);
-    }
-    return payload;
-  };
-}
-
-async function resolveAccountId(request) {
-  const explicit = String(process.env.CLOUDFLARE_ACCOUNT_ID || process.env.CF_ACCOUNT_ID || configuredAccountId()).trim();
-  if (/^[0-9a-f]{32}$/i.test(explicit)) return explicit;
-  const payload = await request('/accounts?per_page=50');
-  const accounts = Array.isArray(payload?.result) ? payload.result : [];
-  if (accounts.length !== 1 || !/^[0-9a-f]{32}$/i.test(String(accounts[0]?.id || ''))) {
-    fail('unable to resolve exactly one Cloudflare account; configure account_id in wrangler.jsonc');
+function executeWrangler(args) {
+  const result = spawnSync('pnpm', ['--filter', '@sovereign/worker', 'exec', 'wrangler', ...args], {
+    cwd: root,
+    env: process.env,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    maxBuffer: 64 * 1024 * 1024
+  });
+  if (result.error || result.status !== 0) {
+    fail(`wrangler ${args.join(' ')} failed: ${String(result.stderr || result.error?.message || `exit ${result.status}`).trim()}`);
   }
-  return String(accounts[0].id);
+  return String(result.stdout || '');
 }
 
-async function resolveDatabaseId(request, accountId) {
-  const payload = await request(`/accounts/${accountId}/d1/database?name=${encodeURIComponent(DATABASE_NAME)}&per_page=50`);
-  const databases = (Array.isArray(payload?.result) ? payload.result : [])
-    .filter((database) => database?.name === DATABASE_NAME && typeof database?.uuid === 'string');
-  if (databases.length !== 1) fail(`expected one D1 database named ${DATABASE_NAME}, found ${databases.length}`);
-  return databases[0].uuid;
+async function readReady(sha) {
+  let lastError = 'no response';
+  for (let attempt = 1; attempt <= 30; attempt += 1) {
+    try {
+      const response = await fetch(`${APP_BASE}/ready?releaseEvidence=${sha}&attempt=${attempt}`, {
+        headers: { 'cache-control': 'no-cache' },
+        signal: AbortSignal.timeout(15_000)
+      });
+      const text = await response.text();
+      const payload = JSON.parse(text);
+      const evidence = payload?.releaseEvidence;
+      if (response.ok
+        && payload?.ready === true
+        && payload?.version === sha
+        && evidence?.contract === EVIDENCE_CONTRACT
+        && evidence?.sha === sha
+        && evidence?.migrationVersion === MIGRATION_VERSION
+        && evidence?.routeCohesionContract === ROUTE_COHESION_CONTRACT
+        && evidence?.routeCohesionVerified === true
+        && evidence?.renderedVisualContract === RENDERED_VISUAL_CONTRACT
+        && evidence?.renderedVisualVerified === true
+        && evidence?.dmarcRecord === DMARC_RECORD
+        && typeof evidence?.dmarcVerified === 'boolean'
+        && (evidence?.dmarcStatus === 'verified' || evidence?.dmarcStatus === 'external_blocker')) {
+        return payload;
+      }
+      lastError = `status=${response.status} version=${payload?.version || 'missing'} evidence=${evidence?.sha || 'missing'}`;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+    }
+    if (attempt < 30) await new Promise((resolveDelay) => setTimeout(resolveDelay, 5_000));
+  }
+  fail(`final evidence deployment did not converge: ${lastError}`);
 }
 
 const sha = resolveCommitSha();
-const apiToken = requiredEnvironment('CLOUDFLARE_API_TOKEN', ['CF_API_TOKEN']);
-const request = createClient(apiToken);
-const accountId = await resolveAccountId(request);
-const databaseId = await resolveDatabaseId(request, accountId);
 const dmarcVerified = String(process.env.RELEASE_DMARC_VERIFIED || '').trim() === 'true';
 const evidence = {
   contract: EVIDENCE_CONTRACT,
@@ -113,39 +126,38 @@ const evidence = {
   dmarcStatus: dmarcVerified ? 'verified' : 'external_blocker',
   completedAt: new Date().toISOString()
 };
-const recordId = `production-release:${sha}`;
-const payloadJson = JSON.stringify(evidence);
-const upsert = `INSERT INTO background_jobs (id, account_id, kind, status, payload_json, attempts, max_attempts, run_after, last_error, created_at, updated_at)
-  VALUES (?1, NULL, ?2, 'succeeded', ?3, 0, 1, datetime('now'), NULL, datetime('now'), datetime('now'))
-  ON CONFLICT(id) DO UPDATE SET kind = excluded.kind, status = excluded.status, payload_json = excluded.payload_json,
-    attempts = 0, max_attempts = 1, run_after = datetime('now'), last_error = NULL, updated_at = datetime('now');`;
-const select = `SELECT id, kind, status, payload_json FROM background_jobs WHERE id = ?1 AND kind = ?2 LIMIT 1;`;
 
-const response = await request(`/accounts/${accountId}/d1/database/${databaseId}/query`, {
-  method: 'POST',
-  body: {
-    batch: [
-      { sql: upsert, params: [recordId, EVIDENCE_KIND, payloadJson] },
-      { sql: select, params: [recordId, EVIDENCE_KIND] }
-    ]
-  }
-});
-const results = Array.isArray(response?.result) ? response.result : [];
-if (results.length !== 2 || results.some((result) => result?.success !== true)) {
-  fail('D1 batch did not confirm both the evidence write and read-back query');
+mkdirSync(resolve(root, 'apps/web/dist'), { recursive: true });
+writeFileSync(evidenceAssetPath, `${JSON.stringify(evidence, null, 2)}\n`);
+
+const canonicalConfig = JSON.parse(readFileSync(canonicalConfigPath, 'utf8'));
+const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || process.env.CF_ACCOUNT_ID || canonicalConfig.account_id || '').trim();
+if (!/^[0-9a-f]{32}$/i.test(accountId)) fail('a valid Cloudflare account ID is required');
+if (!String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim()) {
+  fail('CLOUDFLARE_API_TOKEN is required for the final evidence deployment');
 }
-const [row] = Array.isArray(results[1]?.results) ? results[1].results : [];
-if (!row || row.id !== recordId || row.kind !== EVIDENCE_KIND || row.status !== 'succeeded') {
-  fail('the exact release-evidence row was not returned after persistence');
-}
-let stored;
+
+const databases = rows(parseJsonOutput(executeWrangler(['d1', 'list', '--json']), 'wrangler d1 list'));
+const database = databases.find((item) => item?.name === DATABASE_NAME || item?.database_name === DATABASE_NAME);
+const databaseId = database?.uuid || database?.id || database?.database_id;
+if (!databaseId) fail(`unable to resolve D1 database ${DATABASE_NAME}`);
+
+const config = JSON.parse(readFileSync(sourceConfigPath, 'utf8'));
+config.account_id = accountId;
+config.name = WORKER_NAME;
+config.vars.APP_VERSION = sha;
+config.d1_databases = [{
+  binding: 'DB',
+  database_name: DATABASE_NAME,
+  database_id: databaseId,
+  migrations_dir: 'apps/sovereign-worker/migrations'
+}];
+writeFileSync(generatedConfigPath, JSON.stringify(config, null, 2));
+
 try {
-  stored = JSON.parse(String(row.payload_json || ''));
-} catch {
-  fail('stored release evidence is not valid JSON');
+  executeWrangler(['deploy', '--config', generatedConfigPath]);
+  const ready = await readReady(sha);
+  console.log(JSON.stringify({ releaseEvidence: ready.releaseEvidence, finalEvidenceDeploy: true }, null, 2));
+} finally {
+  rmSync(generatedConfigPath, { force: true });
 }
-for (const [key, expected] of Object.entries(evidence)) {
-  if (stored?.[key] !== expected) fail(`stored evidence mismatch for ${key}`);
-}
-
-console.log(JSON.stringify({ releaseEvidence: evidence }, null, 2));
