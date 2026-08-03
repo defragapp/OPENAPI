@@ -28,13 +28,20 @@ describe('secondary public refinement release', () => {
     expect(policyCss).toContain('width: calc(100% - 28px)');
   });
 
-  it('requires real phone-width visual verification at both target sizes', () => {
+  it('requires real phone-width structural verification at both target sizes', () => {
     expect(renderedVisualVerifier).toContain("name: 'mobile-390x844'");
     expect(renderedVisualVerifier).toContain('viewport: { width: 390, height: 844');
     expect(renderedVisualVerifier).toContain("name: 'mobile-430x932'");
     expect(renderedVisualVerifier).toContain('viewport: { width: 430, height: 932');
-    expect(renderedVisualVerifier).toContain('minimumBandCorrelation: 0.08');
-    expect(renderedVisualVerifier).not.toContain('minimumBandCorrelation: 0.00');
+    expect(renderedVisualVerifier).toContain("referenceAuthority = profile.name.startsWith('desktop-') ? 'founder-reference' : 'structural-only'");
+    expect(renderedVisualVerifier).toContain("applicability: 'desktop-composition-only'");
+    expect(renderedVisualVerifier).toContain("authority: 'structural-only'");
+    expect(renderedVisualVerifier).toContain('No founder-approved viewport-specific mobile reference is stored in the repository.');
+  });
+
+  it('does not misrepresent the desktop reference as mobile visual parity', () => {
+    expect(renderedVisualVerifier).toContain("if (referenceAuthority === 'founder-reference') assertComparison(profile, comparison)");
+    expect(renderedVisualVerifier).toContain("requiredViewports: ['390x844', '430x932']");
   });
 
   it('preserves phone readability and touch-size safeguards', () => {
