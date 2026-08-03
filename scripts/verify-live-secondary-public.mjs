@@ -63,7 +63,7 @@ assert(!howItWorks.includes('Help fund continued public development.'), '/how-it
 const pricing = staticDocuments[1].text;
 assert(pricing.includes('aria-label="Sovereign.OS plans"'), '/pricing is missing the plan decision label');
 assert(pricing.includes('class="annual-price"'), '/pricing is missing the clarified annual option');
-assert(pricing.includes('$99 <small>/ year</small>'), '/pricing is missing the annual price hierarchy');
+assert(pricing.includes('$99 / year'), '/pricing is missing the annual price hierarchy');
 
 const staticCss = await read(expectedCssPath);
 assert(staticCss.response.ok, `secondary stylesheet returned ${staticCss.response.status}`);

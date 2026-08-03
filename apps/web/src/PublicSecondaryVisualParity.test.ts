@@ -64,7 +64,7 @@ describe('secondary public visual parity', () => {
     expect(pricing).toContain('aria-label="Sovereign.OS plans"');
     expect(pricing).toContain('class="annual-price"');
     expect(pricing).toContain('<span class="price-or">or</span>');
-    expect(pricing).toContain('$99 <small>/ year</small>');
+    expect(pricing).toContain('$99 / year');
     expect(staticCss).toContain('.price-options .annual-price > small');
     expect(staticCss).toContain('.price-or');
     expect(pricing).not.toContain('pricing-dashboard');
