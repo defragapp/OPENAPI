@@ -3,17 +3,19 @@ import type { Env } from './env';
 export const RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1';
 export const RELEASE_ROUTE_COHESION_CONTRACT = 'sovereign-deployed-route-cohesion-v1';
 export const RELEASE_RENDERED_VISUAL_CONTRACT = 'sovereign-rendered-page-family-audit-v1';
+export const RELEASE_MIGRATION_VERSION = '0014_passkey_authentication';
 
 export type ProductionReleaseEvidence = {
   contract: typeof RELEASE_EVIDENCE_CONTRACT;
   sha: string;
-  migrationVersion: string;
+  migrationVersion: typeof RELEASE_MIGRATION_VERSION;
   routeCohesionContract: typeof RELEASE_ROUTE_COHESION_CONTRACT;
   routeCohesionVerified: true;
   renderedVisualContract: typeof RELEASE_RENDERED_VISUAL_CONTRACT;
   renderedVisualVerified: true;
   dmarcRecord: '_dmarc.defrag.app';
-  dmarcVerified: true;
+  dmarcVerified: boolean;
+  dmarcStatus: 'verified' | 'external_blocker';
   completedAt: string;
 };
 
@@ -37,12 +39,15 @@ export async function readProductionReleaseEvidence(env: Env): Promise<Productio
   const evidence = parsed as Partial<ProductionReleaseEvidence>;
   if (evidence.contract !== RELEASE_EVIDENCE_CONTRACT
     || evidence.sha !== sha
+    || evidence.migrationVersion !== RELEASE_MIGRATION_VERSION
     || evidence.routeCohesionContract !== RELEASE_ROUTE_COHESION_CONTRACT
     || evidence.routeCohesionVerified !== true
     || evidence.renderedVisualContract !== RELEASE_RENDERED_VISUAL_CONTRACT
     || evidence.renderedVisualVerified !== true
     || evidence.dmarcRecord !== '_dmarc.defrag.app'
-    || evidence.dmarcVerified !== true
+    || typeof evidence.dmarcVerified !== 'boolean'
+    || (evidence.dmarcStatus !== 'verified' && evidence.dmarcStatus !== 'external_blocker')
+    || evidence.dmarcVerified !== (evidence.dmarcStatus === 'verified')
     || typeof evidence.completedAt !== 'string') {
     return null;
   }
