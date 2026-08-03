@@ -65,6 +65,7 @@ import './public-landing-approved-v8.css';
 import './landing-hero-field-v4.css';
 import './landing-ios-parity-density-v1.css';
 import './account-journey.css';
+import './account-journey-structured.css';
 import './passkey-auth.css';
 
 installV0ReleaseFingerprint();
