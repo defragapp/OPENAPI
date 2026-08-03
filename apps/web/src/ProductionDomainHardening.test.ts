@@ -7,6 +7,7 @@ const rootConfig = JSON.parse(readFileSync(resolve(repositoryRoot, 'wrangler.jso
 const directConfig = JSON.parse(readFileSync(resolve(repositoryRoot, 'wrangler.production-direct.jsonc'), 'utf8'));
 const releaseVerifier = readFileSync(resolve(repositoryRoot, 'scripts/verify-parent-domain-routes-v3.mjs'), 'utf8');
 const releaseConfigVerifier = readFileSync(resolve(repositoryRoot, 'scripts/verify-direct-preview-config.mjs'), 'utf8');
+const productionDeploy = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-deploy-v3.mjs'), 'utf8');
 const readme = readFileSync(resolve(repositoryRoot, 'README.md'), 'utf8');
 
 describe('production domain hardening', () => {
@@ -29,6 +30,9 @@ describe('production domain hardening', () => {
   it('does not probe or publish the retired production Worker subdomain', () => {
     expect(releaseVerifier).not.toContain('sovv-web.sovereign-os-api.workers.dev');
     expect(releaseVerifier).toContain('productionWorkersDev: false');
+    expect(productionDeploy).toContain('productionWorkersDev = false');
+    expect(productionDeploy).toContain("'workersDevUrl'");
+    expect(productionDeploy).toContain('Production deploy v3 does not record workers.dev retirement');
     expect(readme).toContain('Production `workers.dev` access is disabled');
   });
 });
