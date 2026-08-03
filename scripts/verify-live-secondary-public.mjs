@@ -110,8 +110,15 @@ for (const marker of [
 ]) {
   assert(compactCss.includes(marker), `compiled policy stylesheet is missing ${marker}`);
 }
+const lockedBlueAtmosphereEncodings = [
+  'rgba(47,147,255,.075)',
+  'rgba(47,147,255,0.075)',
+  'rgb(47 147 255/.075)',
+  'rgb(47 147 255/7.5%)',
+  '#2f93ff13'
+];
 assert(
-  compactCss.includes('rgba(47,147,255,.075)') || compactCss.includes('rgba(47,147,255,0.075)'),
+  lockedBlueAtmosphereEncodings.some((marker) => compactCss.includes(marker)),
   'compiled policy stylesheet is missing the locked blue atmosphere'
 );
 
