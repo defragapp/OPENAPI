@@ -117,4 +117,24 @@ describe('invitation lifecycle notifications', () => {
       expect(String(message.text)).toMatch(/Nothing was shared|do not expose/i);
     }
   });
+
+  it('notifies both parties when a still-pending invitation is cancelled', async () => {
+    const fetchMock = mockResend();
+    const sent = await notifyInvitationLifecycle(notificationEnv(), {
+      invitationId: 'invite_cancelled',
+      kind: 'revoked'
+    });
+
+    expect(sent).toBe(true);
+    const messages = payloads(fetchMock);
+    expect(messages).toHaveLength(2);
+    expect(messages.every((message) => message.subject === 'A Sovereign.OS invitation was cancelled')).toBe(true);
+    expect(messages.some((message) => String(message.text).includes('The cancelled one-time link is invalid.'))).toBe(true);
+    expect(messages.some((message) => String(message.text).includes('The one-time link can no longer be used'))).toBe(true);
+    for (const message of messages) {
+      expect(String(message.text)).toMatch(/No account was connected|no account was connected/i);
+      expect(String(message.text)).toMatch(/No permission was granted|no permission was granted/i);
+      expect(String(message.text)).not.toMatch(/birth date|birthplace|natal|aspect/i);
+    }
+  });
 });
