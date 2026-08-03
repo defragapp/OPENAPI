@@ -14,7 +14,7 @@ const heroExtension = read('./landing-hero-field-v4.css');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
 describe('approved public landing v8', () => {
-  it('loads the v0 foundation, field, stories, approved authority, hero extension, and passkey authority in order', () => {
+  it('loads the v0 foundation, field, stories, landing authority, passkey authority, and final route authority in order', () => {
     const fieldImport = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
     const lineageImport = "import './v0-restored-product-stories.css';";
@@ -22,13 +22,15 @@ describe('approved public landing v8', () => {
     const approvedImport = "import './public-landing-approved-v8.css';";
     const heroImport = "import './landing-hero-field-v4.css';";
     const passkeyImport = "import './passkey-auth.css';";
+    const routeImport = "import './deployed-route-cohesion.css';";
     expect(main.indexOf(integrationImport)).toBeGreaterThan(main.indexOf(fieldImport));
     expect(main.indexOf(lineageImport)).toBeGreaterThan(main.indexOf(integrationImport));
     expect(main.indexOf(storiesImport)).toBeGreaterThan(main.indexOf(lineageImport));
     expect(main.indexOf(approvedImport)).toBeGreaterThan(main.indexOf(storiesImport));
     expect(main.indexOf(heroImport)).toBeGreaterThan(main.indexOf(approvedImport));
     expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(heroImport));
-    expect(main.slice(main.indexOf(passkeyImport) + passkeyImport.length)).not.toContain("import './");
+    expect(main.indexOf(routeImport)).toBeGreaterThan(main.indexOf(passkeyImport));
+    expect(main.slice(main.indexOf(routeImport) + routeImport.length)).not.toContain("import './");
     expect(main).not.toContain("import './public-landing-approved-v7.css';");
   });
 
