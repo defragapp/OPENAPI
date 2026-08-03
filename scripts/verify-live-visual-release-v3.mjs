@@ -71,9 +71,6 @@ async function rateLimitedFetch(input, init) {
     try {
       response = await originalFetch(input, {
         ...init,
-        // The v2 caller supplies a one-shot 120 second AbortSignal. Reusing that
-        // signal across retries guarantees every later attempt is already aborted.
-        // Give each Browser Rendering attempt its own deadline instead.
         signal: AbortSignal.timeout(browserRequestTimeoutMs)
       });
     } catch (error) {
@@ -231,7 +228,9 @@ async function scrapeRenderedAudit(profile, url, html) {
 const scriptTagV2 = 'addScriptTag: [{ content: renderedAuditScript() }]';
 const scriptTagV3 = "waitForSelector: { selector: '.public-approved-v8', timeout: 45_000, visible: true }";
 const domParserCallV2 = 'const dom = parseRenderedAudit(captured.content);';
-const domParserCallV3 = 'const dom = await scrapeRenderedAudit(profile, captured.url, captured.content);';
+const domParserCallV3 = `const dom = await scrapeRenderedAudit(profile, captured.url, captured.content);
+  const screenshotMetadata = await sharp(captured.screenshot).metadata();
+  dom.document.height = Math.max(dom.document.height, Number(screenshotMetadata.height || 0));`;
 
 let generated = readFileSync(sourcePath, 'utf8');
 for (const marker of [referenceAssertionV2, auditParserV2, scriptTagV2, domParserCallV2]) {
