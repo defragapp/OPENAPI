@@ -31,17 +31,36 @@ function sanitize(value) {
     .replace(/(CLOUDFLARE_API_TOKEN|CF_API_TOKEN|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|RESEND_API_KEY)=\S+/g, '$1=[redacted]');
 }
 
+function delay(milliseconds) {
+  return new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
+}
+
 async function report(sha, status, output = '') {
-  try {
-    await fetch(reportUrl, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ key: reportKey, sha, phase: 'deploy', stage: 'production-deploy', status, output: sanitize(output).slice(-12_000) }),
-      signal: AbortSignal.timeout(4_000)
-    });
-  } catch {
-    // Telemetry is non-authoritative and must never block production.
+  const payload = JSON.stringify({
+    key: reportKey,
+    sha,
+    phase: 'deploy',
+    stage: 'production-deploy',
+    status,
+    output: sanitize(output).slice(-12_000)
+  });
+
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const response = await fetch(reportUrl, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: payload,
+        signal: AbortSignal.timeout(10_000)
+      });
+      if (response.ok) return true;
+    } catch {
+      // Retry below. Telemetry remains non-authoritative.
+    }
+    if (attempt < 3) await delay(attempt * 1_000);
   }
+
+  return false;
 }
 
 function runNodeScript(path, environment) {
