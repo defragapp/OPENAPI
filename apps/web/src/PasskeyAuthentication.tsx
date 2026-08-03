@@ -67,7 +67,7 @@ export function PasskeyAuthentication() {
   async function signInWithPasskey() {
     if (!passkeysSupported()) {
       setState('unsupported');
-      setMessage('This browser or device does not support passkeys. Use email recovery below.');
+      setMessage('This browser or device does not support passkeys. Use the email link or six-digit code below.');
       return;
     }
     setState('working');
@@ -94,7 +94,7 @@ export function PasskeyAuthentication() {
       const verified = await verifyResponse.json().catch(() => ({})) as LoginVerifyResponse;
       if (!verifyResponse.ok || verified.status !== 'success') throw new Error('passkey_verification_failed');
       setState('success');
-      setMessage('Passkey verified. Confirming your Stripe plan and opening Sovereign.OS.');
+      setMessage('Passkey verified. Confirming your account, Baseline, and plan before the private workspace opens.');
       window.setTimeout(() => location.assign(safeReturnTo(verified.next ?? returnTo)), 220);
     } catch (error) {
       setState(error instanceof DOMException && error.name === 'NotAllowedError' ? 'ready' : 'error');
@@ -106,15 +106,15 @@ export function PasskeyAuthentication() {
 
   return createPortal(
     <section className="passkey-primary" aria-labelledby="passkey-login-title">
-      <p className="eyebrow">PRIVATE ACCOUNT ACCESS</p>
-      <h2 id="passkey-login-title">Sign in without opening your email.</h2>
-      <p className="passkey-intro">Your device verifies you. Sovereign.OS then confirms whether this account has Free or Sovereign+ access before the private workspace opens.</p>
+      <p className="eyebrow">WELCOME BACK</p>
+      <h2 id="passkey-login-title">Return to your Baseline and the questions you were exploring.</h2>
+      <p className="passkey-intro">Use your device passkey, or enter your email below for a one-time link and six-digit code.</p>
       <button type="button" className="passkey-button" onClick={() => void signInWithPasskey()} disabled={state === 'working' || state === 'success'}>
         <span aria-hidden="true">◎</span>
         {state === 'working' ? 'Waiting for your device…' : state === 'success' ? 'Passkey verified' : 'Sign in with a passkey'}
       </button>
       <p className={`passkey-status ${state}`} role="status" aria-live="polite">{message}</p>
-      <div className="passkey-recovery-divider"><span>Email recovery or first-time verification</span></div>
+      <div className="passkey-recovery-divider"><span>Email link or six-digit code</span></div>
     </section>,
     mount
   );
