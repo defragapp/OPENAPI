@@ -114,13 +114,16 @@ describe('Baseline-first account journey release', () => {
     expect(cohesionStyles).toContain('@supports (-webkit-touch-callout: none)');
   });
 
-  it('loads the final cohesion layer directly before passkey authority and nothing after it', () => {
+  it('loads account cohesion, passkey authority, then the final route authority with no later CSS imports', () => {
     const sequence = "import './account-journey.css';\nimport './account-journey-structured.css';\nimport './account-journey-release-cohesion.css';\nimport './passkey-auth.css';";
+    const routeImportMarker = "import './deployed-route-cohesion.css';";
     expect(entry).toContain(sequence);
     const passkeyImport = entry.indexOf("import './passkey-auth.css';");
+    const routeImport = entry.indexOf(routeImportMarker);
     const firstRuntimeCall = entry.indexOf('installV0ReleaseFingerprint();');
     expect(passkeyImport).toBeGreaterThan(-1);
-    expect(firstRuntimeCall).toBeGreaterThan(passkeyImport);
-    expect(entry.slice(passkeyImport + "import './passkey-auth.css';".length, firstRuntimeCall)).not.toMatch(/import\s+['"].+\.css['"]/);
+    expect(routeImport).toBeGreaterThan(passkeyImport);
+    expect(firstRuntimeCall).toBeGreaterThan(routeImport);
+    expect(entry.slice(routeImport + routeImportMarker.length, firstRuntimeCall)).not.toMatch(/import\s+['"].+\.css['"]/);
   });
 });
