@@ -2,6 +2,7 @@ import worker, { ThreadCoordinator, queue, scheduled } from './entry';
 import type { Env } from './env';
 import { transactionalEmailProvider } from './email';
 import { handleExpressionFieldRequest } from './expression-field';
+import { readProductionReleaseEvidence } from './release-evidence';
 import { requireSameOrigin } from './security/auth';
 import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/headers';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
@@ -188,6 +189,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_daily_capacity') AS capacity_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'auth_passkeys') AS passkeys_ready`)
       .first<{ ok: number; capacity_ready: number; passkeys_ready: number }>();
+    const releaseEvidence = await readProductionReleaseEvidence(env);
     const aiConfig = resolveAiModelConfig(env);
     const emailProvider = transactionalEmailProvider(env);
     const authConfigured = Boolean(
@@ -261,6 +263,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
         sequenceFingerprint: VISUAL_SEQUENCE_FINGERPRINT,
         renderedComparisonRequired: true
       },
+      releaseEvidence,
       dependencies
     };
     void LEGACY_HEALTH_METADATA_COMPATIBILITY;
