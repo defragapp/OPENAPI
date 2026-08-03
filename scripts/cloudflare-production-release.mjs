@@ -75,6 +75,7 @@ const steps = [
   ['deploy-v3', 'scripts/cloudflare-production-deploy-v3.mjs'],
   ['verify-runtime-v3', 'scripts/verify-parent-domain-routes-v3.mjs'],
   ['verify-secondary-public', 'scripts/verify-live-secondary-public.mjs'],
+  ['verify-route-cohesion', 'scripts/verify-live-route-cohesion.mjs'],
   ['verify-rendered-visuals', 'scripts/verify-live-visual-release-v3.mjs']
 ];
 
