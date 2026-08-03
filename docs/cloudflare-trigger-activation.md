@@ -23,3 +23,7 @@ Trigger one clean connected Workers Build after the release-command drift was co
 ## Interactive hero and real-life questions — August 2, 2026
 
 Deploy the exact current `main` tree containing the restored rotating real-life question treatment and the value-driven 360-degree hero field. The hero must preserve the existing landing typography and composition, keep the interactive field below the primary copy, use vivid Cloudflare blue, derive each primary line’s reach from its sanitized relative-expression value, replace the floating tooltip with a restrained fixed readout, and preserve reduced-motion and mobile behavior. Accept completion only after the full release gate, exact-SHA runtime checks, migration `0014_passkey_authentication`, custom-domain parity, and rendered desktop/mobile verification pass.
+
+## Private repository release — August 3, 2026 at 10:21 PT
+
+The canonical repository is now private. Trigger one clean connected Cloudflare Workers Build from this exact `main` push to verify that the Cloudflare GitHub installation retains private-repository access. Accept completion only when the branded production domains report this exact SHA, migration `0014_passkey_authentication`, migration parity `current`, visual contract `v0-public-landing-v3`, `productionWorkersDev: false`, and successful secondary-route and rendered route-cohesion audits. GitHub Actions and deploy hooks are not release authority.
