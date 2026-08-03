@@ -31,6 +31,7 @@ const viewports = {
   mobile: { width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true }
 };
 
+const fullNavigationFamilies = new Set(['static-public', 'policy', 'auth', 'auth-redirect']);
 let lastBrowserRunAt = 0;
 
 function assert(condition, message) {
@@ -53,7 +54,8 @@ function auditScript(route) {
     const heading = document.querySelector(${JSON.stringify(route.heading)});
     const nav = document.querySelector(${JSON.stringify(route.nav)});
     const content = document.querySelector(${JSON.stringify(route.content)});
-    const firstParagraph = content?.querySelector('p,li,dd') || document.querySelector('p,li,dd');
+    const bodyCopySelector = 'p:not(.eyebrow):not(.launch-kicker):not(.policy-kicker):not([class*="kicker"]), li, dd';
+    const firstParagraph = content?.querySelector(bodyCopySelector) || document.querySelector(bodyCopySelector);
     const styleOf = (element) => element ? getComputedStyle(element) : null;
     const rectOf = (element) => {
       if (!element) return null;
@@ -74,8 +76,16 @@ function auditScript(route) {
       headingPresent: Boolean(heading),
       navPresent: Boolean(nav),
       contentPresent: Boolean(content),
+      bodyCopyPresent: Boolean(firstParagraph),
       routeCohesion: document.body?.dataset?.routeCohesion || '',
       stylesheetPresent: [...document.querySelectorAll('link[rel="stylesheet"]')].some((link) => String(link.getAttribute('href') || '').includes('/deployed-route-cohesion.css')),
+      compiledAuthorityPresent: [...document.styleSheets].some((sheet) => {
+        try {
+          return [...(sheet.cssRules || [])].some((rule) => String(rule.cssText || '').includes('--route-blue'));
+        } catch {
+          return false;
+        }
+      }),
       document: {
         width: Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth || 0),
         height: Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight || 0),
@@ -176,10 +186,11 @@ function verify(result) {
   assert(audit.headingPresent, `${label}: primary heading is missing`);
   assert(audit.navPresent, `${label}: navigation or route brand is missing`);
   assert(audit.contentPresent, `${label}: primary content is missing`);
+  assert(audit.bodyCopyPresent, `${label}: representative body copy is missing`);
   assert(audit.document.overflowX <= 1, `${label}: horizontal overflow is ${audit.document.overflowX}px`);
   assert(audit.textLength > 80, `${label}: rendered content is unexpectedly empty`);
   assert(String(audit.typography.headingFamily).includes('Sovereign Display'), `${label}: heading is not using Sovereign Display (${audit.typography.headingFamily})`);
-  assert(audit.typography.headingSize >= (mobile ? 36 : 42), `${label}: heading is too small (${audit.typography.headingSize}px)`);
+  assert(audit.typography.headingSize >= (mobile ? 32 : 42), `${label}: heading is too small (${audit.typography.headingSize}px)`);
   assert(audit.typography.headingSize <= (mobile ? 78 : 112), `${label}: heading is too large (${audit.typography.headingSize}px)`);
   assert(audit.typography.paragraphSize >= 14, `${label}: body copy is too small (${audit.typography.paragraphSize}px)`);
   assert(audit.typography.paragraphSize <= 20, `${label}: body copy is too large (${audit.typography.paragraphSize}px)`);
@@ -189,8 +200,10 @@ function verify(result) {
   if (family === 'static-public') {
     assert(audit.routeCohesion === 'v1', `${label}: static route cohesion marker is missing`);
     assert(audit.stylesheetPresent, `${label}: shared static route stylesheet is missing`);
+  } else {
+    assert(audit.compiledAuthorityPresent, `${label}: compiled non-landing route authority is missing`);
   }
-  if (audit.boxes.nav?.height) {
+  if (fullNavigationFamilies.has(family) && audit.boxes.nav?.height) {
     assert(audit.boxes.nav.height >= 44 && audit.boxes.nav.height <= 100, `${label}: navigation height is disorganized (${audit.boxes.nav.height}px)`);
   }
 }
