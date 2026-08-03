@@ -12,8 +12,8 @@ export interface BillingNotificationInput {
   eventId: string;
   accountId: string;
   kind: BillingNotificationKind;
-  interval?: BillingInterval;
-  currentPeriodEnd?: string;
+  interval?: BillingInterval | undefined;
+  currentPeriodEnd?: string | undefined;
   status: string;
   effectivePlan: PlanKey;
 }
