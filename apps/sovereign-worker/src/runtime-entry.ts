@@ -18,6 +18,7 @@ import {
 const HEALTH_PATHS = new Set(['/health', '/healthz', '/ready']);
 const STRIPE_WEBHOOK_PATHS = new Set([
   '/api/v1/stripe/webhook',
+  '/api/billing/webhook',
   '/api/stripe/webhook',
   '/api/webhooks/stripe',
   '/stripe/webhook',
