@@ -55,7 +55,7 @@ async function report(sha, status, output = '') {
       });
       if (response.ok) return true;
     } catch {
-      // Retry below. Telemetry remains non-authoritative.
+      // Retry below. Telemetry is non-authoritative and never controls release success.
     }
     if (attempt < 3) await delay(attempt * 1_000);
   }
