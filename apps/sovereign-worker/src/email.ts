@@ -1,7 +1,14 @@
 import type { Env } from './env';
 import { runtimeMode } from './runtime';
 
-export type EmailCategory = 'account_signup' | 'account_signin' | 'relationship_invitation' | 'relationship_invitation_resend' | 'operational';
+export type EmailCategory =
+  | 'account_signup'
+  | 'account_signin'
+  | 'account_security'
+  | 'relationship_invitation'
+  | 'relationship_invitation_resend'
+  | 'consent_update'
+  | 'operational';
 
 export interface EmailMessage {
   to: string;
@@ -218,13 +225,21 @@ export async function sendOperationalEmail(env: Env, message: EmailMessage): Pro
       category: message.category ?? 'operational',
       subject: message.subject,
       toHashOnly: true,
-      body: redact(message.text).slice(0, 24)
+      retryable: true,
+      redacted: redact(error instanceof Error ? error.message : 'response')
     });
-    throw new Response('Email delivery unavailable', { status: 503 });
+    throw new Response('Email delivery is temporarily unavailable', {
+      status: 503,
+      headers: { 'retry-after': '60' }
+    });
   }
 }
 
 function requestId(value: unknown): string {
-  if (value && typeof value === 'object' && 'messageId' in value && typeof value.messageId === 'string') return value.messageId;
+  if (typeof value === 'string' && value) return value;
+  if (value && typeof value === 'object') {
+    const id = (value as { id?: unknown }).id;
+    if (typeof id === 'string' && id) return id;
+  }
   return `email_${crypto.randomUUID()}`;
 }

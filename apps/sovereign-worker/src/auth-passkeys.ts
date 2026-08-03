@@ -1,6 +1,7 @@
 import type { Env } from './env';
 import { safeReturnTo } from './auth-public';
 import { createAccountSessionResponse } from './auth-session';
+import { buildSovereignEmail, sendOperationalEmail } from './email';
 import { requireAuth } from './security/auth';
 import {
   MAX_CREDENTIAL_BYTES,
@@ -15,6 +16,7 @@ import {
 } from './security/webauthn-es256';
 
 const CHALLENGE_TTL_MINUTES = 5;
+const DEFAULT_APP_URL = 'https://app.defrag.app';
 
 type ChallengePurpose = 'register' | 'login';
 type ChallengeRow = {
@@ -71,6 +73,51 @@ function randomChallenge(): string {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
   return base64Url(bytes);
+}
+
+function emailFromAuthSubject(subject?: string | null): string | undefined {
+  if (!subject?.startsWith('email:')) return undefined;
+  const email = subject.slice('email:'.length).trim().toLowerCase();
+  return email.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : undefined;
+}
+
+async function sendPasskeyAddedNotice(env: Env, accountId: string, passkeyId: string, label: string): Promise<void> {
+  try {
+    const account = await env.DB.prepare('SELECT auth_subject FROM accounts WHERE id = ?')
+      .bind(accountId)
+      .first<{ auth_subject: string }>();
+    const recipient = emailFromAuthSubject(account?.auth_subject);
+    if (!recipient) return;
+
+    const actionUrl = new URL('/app', env.PUBLIC_APP_URL || DEFAULT_APP_URL);
+    actionUrl.searchParams.set('panel', 'account');
+    const message = buildSovereignEmail({
+      eyebrow: 'Account security',
+      title: 'A passkey was added to your Sovereign.OS account.',
+      intro: `The passkey labeled “${label}” can now be used to sign in on supported devices.`,
+      actionLabel: 'Review account security',
+      actionUrl: actionUrl.toString(),
+      details: [
+        'Sovereign.OS never receives the biometric or device unlock information used by your authenticator.',
+        'Email link and six-digit code recovery remain available for the account.',
+        'Remove an unfamiliar passkey from You → Account access.'
+      ],
+      footer: 'If you did not add this passkey, sign in through email recovery, remove it, and contact info@defrag.app.'
+    });
+    await sendOperationalEmail(env, {
+      to: recipient,
+      subject: 'A passkey was added to your Sovereign.OS account',
+      text: message.text,
+      html: message.html,
+      idempotencyKey: `passkey-added:${passkeyId}`,
+      category: 'account_security'
+    });
+  } catch (error) {
+    console.warn('passkey_added_notification_failed', {
+      accountId,
+      reason: error instanceof Error ? error.name : 'response'
+    });
+  }
 }
 
 async function issueChallenge(env: Env, accountId: string | null, purpose: ChallengePurpose, origin: string, rpId: string, returnTo = '/app') {
@@ -200,9 +247,11 @@ export async function verifyPasskeyRegistration(request: Request, env: Env): Pro
     await consumeChallenge(env, challenge.id);
     const transports = (credential.response.transports ?? []).filter((value) => ['internal', 'hybrid', 'usb', 'nfc', 'ble'].includes(value)).slice(0, 8);
     const label = body.label?.trim().slice(0, 80) || 'Passkey';
+    const passkeyId = `passkey_${crypto.randomUUID()}`;
     await env.DB.prepare('INSERT INTO auth_passkeys (id, account_id, credential_id, public_key_jwk, sign_count, transports_json, label) VALUES (?, ?, ?, ?, ?, ?, ?)')
-      .bind(`passkey_${crypto.randomUUID()}`, auth.accountId, registration.credentialId, JSON.stringify(registration.publicKeyJwk), registration.signCount, JSON.stringify(transports), label)
+      .bind(passkeyId, auth.accountId, registration.credentialId, JSON.stringify(registration.publicKeyJwk), registration.signCount, JSON.stringify(transports), label)
       .run();
+    await sendPasskeyAddedNotice(env, auth.accountId, passkeyId, label);
     return noStore({ status: 'success', label });
   } catch (error) {
     const reason = error instanceof Error ? error.message : 'invalid';

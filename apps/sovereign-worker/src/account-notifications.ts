@@ -10,12 +10,17 @@ interface AccountDeletionNoticeInput {
 }
 
 const DEFAULT_APP_URL = 'https://app.defrag.app';
+const PUBLIC_SOVEREIGN_URL = 'https://sovereign.defrag.app/';
 const DEFAULT_GRACE_DAYS = 14;
 
 function emailFromAuthSubject(subject?: string | null): string | undefined {
   if (!subject?.startsWith('email:')) return undefined;
   const email = subject.slice('email:'.length).trim().toLowerCase();
-  return email.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : undefined;
+  return validEmail(email) ? email : undefined;
+}
+
+function validEmail(value?: string | null): value is string {
+  return Boolean(value && value.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
 }
 
 function accountActionUrl(env: Env): string {
@@ -71,13 +76,51 @@ export async function notifyAccountDeletionChange(
         : 'Sovereign.OS account deletion cancelled',
       ...template,
       idempotencyKey: `account-deletion:${input.jobId}:${input.state}`,
-      category: 'operational'
+      category: 'account_security'
     });
     return true;
   } catch (error) {
     console.warn('account_notification_failed', {
       kind: 'account_deletion',
       state: input.state,
+      reason: error instanceof Error ? error.name : 'response'
+    });
+    return false;
+  }
+}
+
+export async function notifyAccountDeletionCompleted(
+  env: Env,
+  recipient: string,
+  jobId: string
+): Promise<boolean> {
+  if (!validEmail(recipient)) return false;
+  try {
+    const template = buildSovereignEmail({
+      eyebrow: 'Account deletion complete',
+      title: 'Your Sovereign.OS account was deleted.',
+      intro: 'The scheduled deletion finished after the grace period. The account can no longer be opened with this identity.',
+      actionLabel: 'Open the public Sovereign.OS site',
+      actionUrl: PUBLIC_SOVEREIGN_URL,
+      details: [
+        'Active Stripe subscriptions were cancelled before deletion completed.',
+        'Private Baseline, conversations, people, systems, permissions, and saved understandings tied to the account were removed according to the deletion inventory.',
+        'Minimal billing records may remain only where payment, tax, fraud-prevention, or legal obligations require them; the account email is removed from the retained Stripe customer projection.'
+      ],
+      footer: 'This confirmation contains no private Baseline information and cannot restore the deleted account.'
+    });
+    await sendOperationalEmail(env, {
+      to: recipient,
+      subject: 'Sovereign.OS account deletion completed',
+      ...template,
+      idempotencyKey: `account-deletion:${jobId}:completed`,
+      category: 'account_security'
+    });
+    return true;
+  } catch (error) {
+    console.warn('account_notification_failed', {
+      kind: 'account_deletion',
+      state: 'completed',
       reason: error instanceof Error ? error.name : 'response'
     });
     return false;

@@ -1,5 +1,7 @@
 import type { Env } from './env';
 import { cancelAccountSubscriptions } from './billing/stripe';
+import { notifyAccountDeletionCompleted } from './account-notifications';
+import { notifyInvitationLifecycle } from './invitation-notifications';
 
 const ACCOUNT_TABLE_DELETES = [
   'auth_magic_links',
@@ -116,6 +118,12 @@ function requiredAccount(accountId?: string) {
   return accountId;
 }
 
+function emailFromAuthSubject(subject?: string | null): string | undefined {
+  if (!subject?.startsWith('email:')) return undefined;
+  const email = subject.slice('email:'.length).trim().toLowerCase();
+  return email.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : undefined;
+}
+
 export async function executeDeletion(env: Env, accountId: string, deletionJobId?: string) {
   const deletion = await env.DB.prepare(`SELECT id, status FROM deletion_jobs
     WHERE account_id = ?
@@ -126,6 +134,11 @@ export async function executeDeletion(env: Env, accountId: string, deletionJobId
     .bind(accountId, deletionJobId ?? '', deletionJobId ?? '')
     .first<{ id: string; status: string }>();
   if (!deletion) throw new Error('deletion_not_due_or_cancelled');
+
+  const account = await env.DB.prepare('SELECT auth_subject FROM accounts WHERE id = ?')
+    .bind(accountId)
+    .first<{ auth_subject: string }>();
+  const deletionRecipient = emailFromAuthSubject(account?.auth_subject);
 
   if (deletion.status === 'grace') {
     await cancelAccountSubscriptions(env, accountId, deletion.id);
@@ -151,6 +164,10 @@ export async function executeDeletion(env: Env, accountId: string, deletionJobId
     .run();
   await env.DB.prepare(`UPDATE deletion_jobs SET status = 'completed', completed_at = datetime('now')
     WHERE id = ? AND account_id = ? AND status = 'running'`).bind(deletion.id, accountId).run();
+
+  if (deletionRecipient) {
+    await notifyAccountDeletionCompleted(env, deletionRecipient, deletion.id);
+  }
 }
 
 export async function cancelDeletion(env: Env, accountId: string, jobId: string) {
@@ -159,12 +176,36 @@ export async function cancelDeletion(env: Env, accountId: string, jobId: string)
   if (result.meta?.changes === 0) throw new Response('Deletion job not cancellable', { status: 409 });
 }
 
+async function expirePendingInvitations(env: Env): Promise<number> {
+  const rows = await env.DB.prepare(`SELECT id FROM invitations
+    WHERE status = 'pending' AND expires_at <= datetime('now')
+    ORDER BY expires_at ASC LIMIT 25`)
+    .all<{ id: string }>();
+  const expiredIds: string[] = [];
+
+  for (const row of rows.results ?? []) {
+    const result = await env.DB.prepare(`UPDATE invitations
+      SET status = 'expired', token_hash = NULL
+      WHERE id = ? AND status = 'pending' AND expires_at <= datetime('now')`)
+      .bind(row.id)
+      .run();
+    if ((result.meta?.changes ?? 0) !== 1) continue;
+    expiredIds.push(row.id);
+  }
+
+  await Promise.all(expiredIds.map((invitationId) =>
+    notifyInvitationLifecycle(env, { invitationId, kind: 'expired' })
+  ));
+  return expiredIds.length;
+}
+
 export async function cleanupExpired(env: Env) {
   const threadDays = retentionDays(env.THREAD_RETENTION_DAYS, 30, 7, 365);
   const auditDays = retentionDays(env.AUDIT_RETENTION_DAYS, 90, threadDays, 730);
   const threadCutoff = `-${threadDays} days`;
   const auditCutoff = `-${auditDays} days`;
 
+  const expiredInvitations = await expirePendingInvitations(env);
   const threadEvents = await env.DB.prepare("DELETE FROM thread_events WHERE created_at < datetime('now', ?)").bind(threadCutoff).run();
   const expiredThreads = await env.DB.prepare(`DELETE FROM threads
     WHERE updated_at < datetime('now', ?)
@@ -181,6 +222,7 @@ export async function cleanupExpired(env: Env) {
   await env.DB.prepare("DELETE FROM export_artifacts WHERE expires_at < datetime('now')").run();
 
   const counts = {
+    expiredInvitations,
     threadEvents: threadEvents.meta?.changes ?? 0,
     expiredThreads: expiredThreads.meta?.changes ?? 0,
     correctionNotes: correctionNotes.meta?.changes ?? 0,

@@ -3,6 +3,7 @@ import { buildSovereignEmail, sendOperationalEmail } from './email';
 import { resolveAccount } from './db/accounts';
 import { createSignedSessionToken } from './security/auth';
 import { CONSENT_SCOPES, type ConsentScope, type InvitationStatus } from './db/people';
+import { notifyInvitationLifecycle } from './invitation-notifications';
 
 const encoder = new TextEncoder();
 const INVITATION_TTL_DAYS = 7;
@@ -117,6 +118,7 @@ export async function previewInvitation(request: Request, env: Env): Promise<Inv
   if (row.status !== 'pending') throw new Response('Invitation is no longer active', { status: 409 });
   if (!row.expires_at || sqliteTime(row.expires_at) <= Date.now()) {
     await env.DB.prepare("UPDATE invitations SET status = 'expired', token_hash = NULL WHERE id = ? AND status = 'pending'").bind(row.id).run();
+    await notifyInvitationLifecycle(env, { invitationId: row.id ?? '', kind: 'expired' });
     throw new Response('Invitation expired', { status: 410 });
   }
   return {
@@ -141,6 +143,7 @@ export async function redeemInvitation(request: Request, env: Env): Promise<Resp
   if (row.bound_account_id) return Response.json({ status: 'identity already bound' }, { status: 409 });
   if (!row.expires_at || sqliteTime(row.expires_at) <= Date.now()) {
     await env.DB.prepare("UPDATE invitations SET status = 'expired', token_hash = NULL WHERE id = ? AND status = 'pending'").bind(row.id).run();
+    await notifyInvitationLifecycle(env, { invitationId: row.id ?? '', kind: 'expired' });
     return Response.json({ status: 'expired' }, { status: 410 });
   }
   const email = row.invited_email_normalized ?? '';
@@ -163,6 +166,8 @@ export async function redeemInvitation(request: Request, env: Env): Promise<Resp
   const sessionToken = await createSignedSessionToken({ sub: subject, exp, sid: sessionId }, env.SESSION_SIGNING_SECRET);
   await env.DB.prepare("INSERT INTO auth_sessions (id, account_id, subject, session_hash, expires_at) VALUES (?, ?, ?, ?, datetime('now', '+30 days'))")
     .bind(sessionId, account.accountId, subject, await sha256(sessionToken)).run();
+  await notifyInvitationLifecycle(env, { invitationId: row.id ?? '', kind: 'accepted' });
+
   return Response.json({
     status: 'accepted',
     invitation: {
@@ -214,10 +219,18 @@ export async function decideInviteeConsent(env: Env, accountId: string, invitati
       VALUES (?, ?, ?, datetime('now'), ?, ?, ?, ?)`).bind(`consent_${crypto.randomUUID()}`, personId, scope, `invitee:${actor}`, invitationId, accountId, policyVersion).run();
   }
   const previous = await env.DB.prepare('SELECT MAX(version) AS version FROM consent_versions WHERE person_id = ? AND scope = ?').bind(personId, scope).first<{ version: number | null }>();
+  const nextVersion = (previous?.version ?? 0) + 1;
   await env.DB.prepare(`INSERT INTO consent_versions
     (id, person_id, scope, version, decision, decided_by, reason, invitation_id, decided_by_account_id, policy_version)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(`consentv_${crypto.randomUUID()}`, personId, scope, (previous?.version ?? 0) + 1, granted ? 'granted' : 'denied', actor, reason ?? null, invitationId, accountId, policyVersion).run();
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(`consentv_${crypto.randomUUID()}`, personId, scope, nextVersion, granted ? 'granted' : 'denied', actor, reason ?? null, invitationId, accountId, policyVersion).run();
   await env.DB.prepare("UPDATE persons SET consent_status = 'decision_recorded', updated_at = datetime('now') WHERE id = ? AND bound_account_id = ?").bind(personId, accountId).run();
+  await notifyInvitationLifecycle(env, {
+    invitationId,
+    kind: granted ? 'permission_granted' : 'permission_revoked',
+    scope,
+    decisionVersion: nextVersion
+  });
+
   return { scope, granted, policyVersion };
 }
 

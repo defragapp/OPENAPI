@@ -148,7 +148,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
     }
 
     setSubmitting(true);
-    setState('Sending one-time email link');
+    setState('Sending secure access email');
     setMessage('Keep this page open while the request completes.');
     setStatusTone('neutral');
     const turnstileToken = (document.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null)?.value ?? '';
@@ -184,8 +184,8 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
         resetTurnstile();
         return;
       }
-      setState('One-time email link sent');
-      setMessage('Check your inbox. The link expires in 15 minutes and can be used once.');
+      setState('One-time access email sent');
+      setMessage('Check your inbox. The one-time link and six-digit code expire in 15 minutes.');
       setStatusTone('success');
       setLinkSent(true);
     } catch {
@@ -212,20 +212,20 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
       </header>
       <div className={`account-layout ${mode === 'redeem' ? 'redeem-layout' : ''}`}>
         <section className="account-intro">
-          <p className="eyebrow">{mode === 'login' ? 'YOUR SOVEREIGN.OS' : 'START WITH YOUR BASELINE'}</p>
+          <p className="eyebrow">{mode === 'login' ? 'WELCOME BACK' : mode === 'signup' ? 'START WITH YOUR BASELINE' : 'SECURE ACCOUNT ACCESS'}</p>
           <h1>
             {mode === 'signup'
               ? 'Create your Sovereign.OS account.'
               : mode === 'redeem'
                 ? 'Opening Sovereign.OS.'
-                : 'Sign in to Sovereign.OS.'}
+                : 'Return to your Baseline and the questions you were exploring.'}
           </h1>
           <p className="lede">
             {mode === 'signup'
-              ? 'Start free. Verify your email, then build your Baseline.'
+              ? 'Create your account, verify your email, then build the personal foundation Sovereign uses.'
               : mode === 'redeem'
-                ? 'Your Sovereign.OS workspace will open in a moment.'
-                : 'Use your email and the available secure sign-in method for your account.'}
+                ? 'Your verified account will continue to the next unfinished step.'
+                : 'Enter your email. Sovereign.OS will send a one-time link and six-digit code.'}
           </p>
           {mode !== 'redeem' && (
             <ul className="account-points">
@@ -237,8 +237,8 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
         </section>
 
         <section className="auth-panel">
-          <p className="eyebrow">{mode === 'redeem' ? 'OPENING' : 'PRIVATE EMAIL ACCESS'}</p>
-          <h2>{mode === 'signup' ? 'Verify your email to begin.' : mode === 'redeem' ? 'Checking your secure link.' : 'Continue with email.'}</h2>
+          <p className="eyebrow">{mode === 'redeem' ? 'OPENING' : mode === 'signup' ? 'PRIVATE EMAIL VERIFICATION' : 'EMAIL LINK OR CODE'}</p>
+          <h2>{mode === 'signup' ? 'Verify your email to begin.' : mode === 'redeem' ? 'Checking your secure link.' : 'Use email when a passkey is not available.'}</h2>
           {mode !== 'redeem' && (
             <form onSubmit={submit} className="form-stack" noValidate>
               {mode === 'signup' && (

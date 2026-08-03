@@ -1,5 +1,6 @@
 import type { Env } from '../env';
 import { priceToSubscription, projectSubscriptionEvent, type NormalizedStripeEvent } from '../billing/stripe';
+import { notifyBillingLifecycle, type BillingNotificationKind } from '../billing/notifications';
 import { verifyStripeSignature } from '../security/stripe-signature';
 
 interface StripeEvent {
@@ -74,6 +75,14 @@ async function normalizeSubscriptionEvent(env: Env, event: StripeEvent): Promise
   };
 }
 
+function notificationKind(event: NormalizedStripeEvent): BillingNotificationKind | undefined {
+  if (['past_due', 'unpaid', 'incomplete'].includes(event.status)) return 'payment_attention';
+  if (event.cancelAtPeriodEnd && event.status !== 'canceled') return 'cancellation_scheduled';
+  if (event.type === 'customer.subscription.deleted' || event.status === 'canceled' || event.status === 'incomplete_expired') return 'returned_to_free';
+  if (event.type === 'customer.subscription.created' && ['active', 'trialing'].includes(event.status)) return 'activated';
+  return undefined;
+}
+
 export async function handleStripeWebhook(request: Request, env: Env): Promise<Response> {
   const body = await request.text();
   const signature = request.headers.get('stripe-signature') ?? '';
@@ -109,7 +118,21 @@ export async function handleStripeWebhook(request: Request, env: Env): Promise<R
   }
 
   try {
-    const projection = await projectSubscriptionEvent(env, await normalizeSubscriptionEvent(env, event));
+    const normalized = await normalizeSubscriptionEvent(env, event);
+    const projection = await projectSubscriptionEvent(env, normalized);
+    const kind = projection.applied ? notificationKind(normalized) : undefined;
+    const notificationSent = kind
+      ? await notifyBillingLifecycle(env, {
+          eventId: normalized.id,
+          accountId: normalized.accountId,
+          kind,
+          interval: normalized.interval,
+          currentPeriodEnd: normalized.currentPeriodEnd,
+          status: normalized.status,
+          effectivePlan: 'plan' in projection ? projection.plan : 'free'
+        })
+      : false;
+
     await env.DB.prepare(`UPDATE webhook_events SET processed_at = datetime('now'), error_code = NULL
       WHERE provider = 'stripe' AND event_id = ?`).bind(event.id).run();
     return Response.json({
@@ -117,6 +140,7 @@ export async function handleStripeWebhook(request: Request, env: Env): Promise<R
       projected: projection.applied,
       stale: projection.stale,
       retried: (inserted.meta?.changes ?? 0) === 0,
+      notificationSent,
       deletedAccount: 'deletedAccount' in projection && projection.deletedAccount === true
     });
   } catch (error) {
