@@ -15,7 +15,7 @@
     "verify:migrations": "node scripts/validate-migrations.mjs",
     "verify:preview-access": "node scripts/verify-preview-access.mjs",
     "verify:intelligence-release": "node scripts/verify-intelligence-release-v2.mjs",
-    "verify:visual-intelligence": "node scripts/verify-visual-intelligence-release.mjs",
+    "verify:visual-intelligence": "node scripts/verify-visual-intelligence-release-v2.mjs",
     "verify:premium-platform": "node scripts/verify-premium-platform-release.mjs",
     "verify:worker-bundle-size": "node scripts/verify-worker-bundle-size.mjs",
     "verify:cloudflare-build": "node scripts/cloudflare-build-diagnostics.mjs",
