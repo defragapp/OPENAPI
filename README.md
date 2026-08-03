@@ -25,6 +25,7 @@ The founder-approved public contract is defined in [`docs/launch-product-contrac
 - Public platform Custom Domain: `https://sovereign.defrag.app`
 - Authenticated application and API Custom Domain: `https://app.defrag.app`
 - `defrag.app/*` and `www.defrag.app/*` remain explicit Worker routes that send public traffic to Sovereign.OS and application traffic to the authenticated host
+- Production `workers.dev` access is disabled; direct Worker subdomain access is not part of the production surface
 - D1 canonical storage: `sovereign-openapi-db`
 - D1 Sessions with browser-held opaque bookmarks for sequential API consistency
 - D1 read replication in automatic mode
@@ -33,12 +34,13 @@ The founder-approved public contract is defined in [`docs/launch-product-contrac
 - Production model: `@cf/zai-org/glm-4.7-flash`
 - Personalized inference bypasses Gateway cache and persistent prompt logging
 - D1-backed daily free-capacity reservations stop inference before the account-wide Workers AI free allocation is exhausted
-- Daily capacity schema: `0013_workers_ai_free_capacity`
+- Current migration: `0014_passkey_authentication`
 - Static assets for high-volume browser delivery
 - D1-scheduled background work every 15 minutes
 - Stripe-hosted Checkout and Customer Portal
 - Stripe-signed subscription webhooks and server-side entitlements
 - Resend transactional email fallback for magic links
+- Passkey-first returning access with email verification and recovery fallback
 - Turnstile-protected signup and login
 - iOS-optimized Progressive Web App on the public hostname only
 
@@ -54,10 +56,11 @@ Cloudflare Queue and R2 are intentionally disabled. Private export is not part o
 - `sovereign-answer.v2` returns a direct answer, adaptive sections, exact Basis references, correction language, contextual actions, confidence, and safety mode.
 - Relationship and system context is built on the server after entitlement and consent checks.
 - Covenant is contextual, explicitly confirmed, and limited to retrieved or curated verified Scripture.
+- Safety presentation is driven by the validated answer contract rather than matching user-visible headlines.
 
 ## Cloudflare production release
 
-Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the sole production release authority. Merging an approved, fully gated commit to `main` authorizes Cloudflare to run the repository-owned deployment command. GitHub Actions and ad-hoc local production deploys are not release authorities.
+Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the sole production release authority. Merging an approved, fully gated commit to `main` authorizes Cloudflare to run the repository-owned deployment command. GitHub Actions, deploy hooks, and ad-hoc local production deploys are not release authorities.
 
 Use an exact, clean `main` checkout:
 
@@ -65,9 +68,9 @@ Use an exact, clean `main` checkout:
 - Deploy command: `pnpm production:deploy`
 - Commit stamp: set `WORKERS_CI_COMMIT_SHA` to the full 40-character `main` commit SHA
 
-The deployment command applies D1 migrations, preserves existing encrypted Worker secrets, configures and verifies Free-plan Cloudflare controls, stamps `APP_VERSION`, deploys `sovv-web`, and tests the public site, app, health/readiness, pricing, unauthenticated boundaries, Stripe signature rejection, disabled export route, security headers, concurrent health requests, and all four production domains. A deploy command that fails any check is not a completed release.
+The deployment command applies D1 migrations, preserves existing encrypted Worker secrets, configures and verifies Free-plan Cloudflare controls, stamps `APP_VERSION`, deploys `sovv-web`, and tests the public site, app, health/readiness, pricing, unauthenticated boundaries, Stripe signature rejection, disabled export route, security headers, concurrent health requests, and all four approved production domains. A deploy command that fails any check is not a completed release.
 
-Wrangler configuration is the source of truth for routes. Both production Custom Domains and both Defrag parent routes must remain declared in `wrangler.jsonc` and `wrangler.production-direct.jsonc`; dashboard-only routes can be overwritten by the next Wrangler deployment.
+Wrangler configuration is the source of truth for routes. Both production Custom Domains and both Defrag parent routes must remain declared in `wrangler.jsonc` and `wrangler.production-direct.jsonc`; dashboard-only routes can be overwritten by the next Wrangler deployment. Preview may use its separately named `workers.dev` environment, but production may not.
 
 Required encrypted Worker secrets:
 
@@ -77,7 +80,7 @@ Required encrypted Worker secrets:
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 
-The production deploy environment also requires a scoped `CLOUDFLARE_API_TOKEN` so the repository-owned deploy script can configure and verify D1 replication, AI Gateway controls, the Free-plan rate-limit rule, and API Shield. Secret values belong only in Cloudflare and must never be copied into repository files, logs, issues, or chat.
+The production deploy environment also requires a scoped `CLOUDFLARE_API_TOKEN` so the repository-owned deploy script can configure and verify D1 replication, AI Gateway controls, the Free-plan rate-limit rule, and API Shield. Secret values belong only in Cloudflare and must never be copied into repository files, logs, issues, deploy hooks, or chat.
 
 ## Launch billing
 
