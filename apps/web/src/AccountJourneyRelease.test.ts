@@ -73,12 +73,22 @@ describe('Baseline-first account journey release', () => {
     expect(onboarding).toContain("await completeOnboarding('sovereign_plus', controller.signal)");
   });
 
+  it('waits through a delayed Stripe webhook without opening paid access or starting checkout again', () => {
+    expect(workspaceGate).toContain("billingReturn === 'success'");
+    expect(workspaceGate).toContain('STRIPE_CONFIRMATION_ATTEMPTS = 12');
+    expect(workspaceGate).toContain('await waitForStripeConfirmation(controller.signal)');
+    expect(workspaceGate).toContain("setState('payment_pending')");
+    expect(workspaceGate).toContain('the signed subscription event has not reached your account yet');
+    expect(workspaceGate).toContain('checking again will not create another charge');
+    expect(workspaceGate).not.toContain("fetch('/api/v1/billing/checkout'");
+  });
+
   it('requires both Baseline and onboarding completion before the private workspace renders', () => {
     expect(workspaceGate).toContain("fetch('/api/v1/account/onboarding'");
     expect(workspaceGate).toContain("fetch('/api/v1/baseline/status'");
     expect(workspaceGate).toContain("baselineBody.baseline?.status === 'completed'");
     expect(workspaceGate).toContain("baselineBody.baseline?.status === 'partial'");
-    expect(workspaceGate).toContain("location.replace('/onboarding')");
+    expect(workspaceGate).toContain("location.replace(billingReturn ? `/onboarding?billing=${encodeURIComponent(billingReturn)}` : '/onboarding')");
     expect(workspaceGate).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
   });
 
