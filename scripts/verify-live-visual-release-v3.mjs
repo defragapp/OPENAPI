@@ -18,6 +18,14 @@ function requestUrl(input) {
   return input.url;
 }
 
+function isTransientFetchTimeout(error) {
+  return Boolean(
+    error
+    && typeof error === 'object'
+    && (error.name === 'TimeoutError' || error.name === 'AbortError')
+  );
+}
+
 async function waitForBrowserRunSlot(minimumIntervalMs) {
   const elapsed = Date.now() - lastBrowserRunStartedAt;
   if (lastBrowserRunStartedAt && elapsed < minimumIntervalMs) {
@@ -52,12 +60,30 @@ async function rateLimitedFetch(input, init) {
   if (!url.includes('/browser-rendering/')) return originalFetch(input, init);
 
   const minimumIntervalMs = 10_500;
+  const browserRequestTimeoutMs = 135_000;
   const maximumAttempts = 3;
   let response;
+  let lastError;
 
   for (let attempt = 1; attempt <= maximumAttempts; attempt += 1) {
     await waitForBrowserRunSlot(minimumIntervalMs);
-    response = await originalFetch(input, init);
+
+    try {
+      response = await originalFetch(input, {
+        ...init,
+        // The v2 caller supplies a one-shot 120 second AbortSignal. Reusing that
+        // signal across retries guarantees every later attempt is already aborted.
+        // Give each Browser Rendering attempt its own deadline instead.
+        signal: AbortSignal.timeout(browserRequestTimeoutMs)
+      });
+    } catch (error) {
+      lastError = error;
+      if (isTransientFetchTimeout(error) && attempt < maximumAttempts) {
+        await delay(11_000);
+        continue;
+      }
+      throw error;
+    }
 
     if (response.status !== 429) {
       if (await isTransientBrowserTimeout(response)) {
@@ -85,7 +111,8 @@ async function rateLimitedFetch(input, init) {
     }
   }
 
-  return response;
+  if (response) return response;
+  throw lastError || new Error('Cloudflare Browser Rendering did not return a response');
 }
 
 const referenceAssertionV2 = "assert(reference.length > 8_000, 'Approved visual reference is missing or unexpectedly small');";
