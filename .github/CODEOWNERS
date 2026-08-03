@@ -1,0 +1,29 @@
+# Sovereign.OS repository ownership
+# The repository owner reviews all changes by default.
+* @defragapp
+
+# Production release and Cloudflare configuration
+/apps/sovereign-worker/ @defragapp
+/wrangler.jsonc @defragapp
+/wrangler.production-direct.jsonc @defragapp
+/scripts/ @defragapp
+/.github/ @defragapp
+
+# Authentication, security, privacy, billing, and data contracts
+/apps/sovereign-worker/src/auth/ @defragapp
+/apps/sovereign-worker/src/security/ @defragapp
+/apps/sovereign-worker/src/routes/stripe.ts @defragapp
+/apps/sovereign-worker/src/billing/ @defragapp
+/apps/sovereign-worker/src/env.ts @defragapp
+/apps/sovereign-worker/migrations/ @defragapp
+/packages/stripe/ @defragapp
+/packages/contracts/ @defragapp
+/docs/privacy-model.md @defragapp
+/docs/release-gates.md @defragapp
+/docs/production-release.md @defragapp
+
+# Public legal and policy surfaces
+/apps/web/src/ @defragapp
+/docs/legal/ @defragapp
+/LICENSE @defragapp
+/SECURITY.md @defragapp
