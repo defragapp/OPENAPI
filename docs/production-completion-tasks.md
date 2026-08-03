@@ -33,6 +33,17 @@ The current `main` candidate includes:
 - [x] Free, $20 monthly, and $99 annual public plan language remains aligned;
 - [x] Queue, R2, private export, mock runtime, duplicate workspace, and versioned preview URLs remain disabled.
 
+## Verified external integration state
+
+- [x] Live Sovereign+ monthly Price is active at $20 USD per month.
+- [x] Live Sovereign+ annual Price is active at $99 USD per year.
+- [x] Both live prices belong to the same Sovereign+ product and retain the expected lookup keys and plan metadata.
+- [x] The enabled live Stripe billing webhook now targets `https://app.defrag.app/api/v1/stripe/webhook`, not the retiring production Worker subdomain.
+- [x] Resend domain `defrag.app` is verified and sending is enabled.
+- [x] Resend DKIM is verified.
+- [x] Resend SPF MX and SPF TXT records are verified.
+- [ ] Confirm a published DMARC policy for `defrag.app` through DNS evidence; Resend does not report DMARC status in the connected domain record.
+
 ## Required exact-SHA Cloudflare evidence for the current candidate
 
 - [ ] Cloudflare Workers Build runs against the exact current `main` SHA.
@@ -62,7 +73,8 @@ These flows cannot be proven by unauthenticated release probes alone:
 - [ ] Complete first-time email verification and returning passkey sign-in.
 - [ ] Complete six-digit email-code recovery.
 - [ ] Confirm link/code replay protection, session rotation, logout invalidation, and CSRF enforcement.
-- [ ] Verify Resend sender-domain SPF, DKIM, and DMARC alignment.
+- [x] Verify Resend sender-domain SPF and DKIM alignment.
+- [ ] Verify DMARC publication and alignment.
 - [ ] Complete public → signup → onboarding → Baseline → authenticated workspace.
 - [ ] Verify Today, Explore, People, Systems, Library, and You remain one intelligence environment.
 - [ ] Verify correction and Library save/delete flows.
