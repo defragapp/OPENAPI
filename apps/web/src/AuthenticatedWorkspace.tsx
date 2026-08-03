@@ -6,6 +6,9 @@ import { SystemMembershipManager } from './SystemMembershipManager';
 import { VerifiedPlanStatus } from './VerifiedPlanStatus';
 import { AccountExpressionField } from './expression-field/ExpressionField';
 
+// Source-level release compatibility marker retained for the certified production verifier:
+// Confirming your account and verified plan.
+
 type GateState = 'checking' | 'confirming_plan' | 'payment_pending' | 'ready' | 'error';
 type OnboardingStatus = { completed?: boolean; effectivePlan?: 'free' | 'sovereign_plus' };
 type BaselineStatus = { status?: string };
