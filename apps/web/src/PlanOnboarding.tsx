@@ -6,7 +6,14 @@ type BillingInterval = 'monthly' | 'annual';
 type JourneyPhase = 'loading' | 'baseline' | 'baseline_building' | 'baseline_result' | 'plan' | 'error';
 type BaselineStage = 'idle' | 'validating' | 'calculating' | 'complete';
 type BirthTimeCertainty = 'exact' | 'approximate' | 'unknown';
-type BaselineField = 'birthDate' | 'birthplace' | 'birthTimezone' | 'birthTime';
+type BaselineField =
+  | 'birthDate'
+  | 'birthplaceCity'
+  | 'birthplaceCountry'
+  | 'birthTimezone'
+  | 'timezoneConfirmed'
+  | 'birthTime';
+
 type BaselineStatus = {
   status?: string;
   uncertainty?: string;
@@ -15,37 +22,46 @@ type BaselineStatus = {
   reducedContext?: Record<string, unknown>;
   provenance?: Record<string, unknown>;
 };
+
 type OnboardingStatus = {
   completed?: boolean;
   planIntent?: Plan;
   effectivePlan?: Plan;
 };
+
 type BaselineForm = {
   birthDate: string;
-  birthplace: string;
+  birthplaceCity: string;
+  birthplaceRegion: string;
+  birthplaceCountry: string;
   birthTimezone: string;
+  timezoneConfirmed: boolean;
   birthTimeCertainty: BirthTimeCertainty;
   birthTime: string;
 };
+
 type BaselineErrors = Record<BaselineField, string>;
 
 const emptyErrors = (): BaselineErrors => ({
   birthDate: '',
-  birthplace: '',
+  birthplaceCity: '',
+  birthplaceCountry: '',
   birthTimezone: '',
+  timezoneConfirmed: '',
   birthTime: ''
 });
 
 const baselineStages = [
-  ['validating', 'Checking time and place'],
-  ['calculating', 'Calculating source positions'],
-  ['complete', 'Translating the result'],
-  ['complete', 'Preparing your first overview']
+  'Checking time and place',
+  'Calculating source positions',
+  'Translating the result',
+  'Preparing your first overview'
 ] as const;
 
 export function PlanOnboarding() {
   const [interval, setInterval] = useState<BillingInterval>('monthly');
   const [currentPlan, setCurrentPlan] = useState<Plan>('free');
+  const [accountAlreadyOnboarded, setAccountAlreadyOnboarded] = useState(false);
   const [phase, setPhase] = useState<JourneyPhase>('loading');
   const [status, setStatus] = useState('Loading your account…');
   const [baselineStage, setBaselineStage] = useState<BaselineStage>('idle');
@@ -56,8 +72,11 @@ export function PlanOnboarding() {
   const [showBaselineReview, setShowBaselineReview] = useState(false);
   const [form, setForm] = useState<BaselineForm>({
     birthDate: '',
-    birthplace: '',
+    birthplaceCity: '',
+    birthplaceRegion: '',
+    birthplaceCountry: '',
     birthTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+    timezoneConfirmed: false,
     birthTimeCertainty: 'unknown',
     birthTime: ''
   });
@@ -97,11 +116,14 @@ export function PlanOnboarding() {
         const baselineBody = await baselineResponse.json() as { baseline?: BaselineStatus };
         const nextBaseline = baselineBody.baseline ?? { status: 'not_started' };
         const effectivePlan: Plan = onboardingBody.effectivePlan === 'sovereign_plus' ? 'sovereign_plus' : 'free';
+        const completed = onboardingBody.completed === true;
+
         setCurrentPlan(effectivePlan);
+        setAccountAlreadyOnboarded(completed);
         setBaseline(nextBaseline);
 
         if (baselineIsReady(nextBaseline)) {
-          if (onboardingBody.completed) {
+          if (completed) {
             location.replace('/app');
             return;
           }
@@ -148,9 +170,13 @@ export function PlanOnboarding() {
     setStatus('Checking time and place…');
 
     try {
+      const birthplace = [form.birthplaceCity, form.birthplaceRegion, form.birthplaceCountry]
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .join(', ');
       const payload = {
         birthDate: form.birthDate,
-        birthplace: form.birthplace.trim(),
+        birthplace,
         birthTimezone: form.birthTimezone.trim(),
         birthTimeCertainty: form.birthTimeCertainty,
         ...(form.birthTimeCertainty === 'unknown' ? {} : { birthTime: form.birthTime }),
@@ -180,12 +206,19 @@ export function PlanOnboarding() {
 
       setBaseline(body.baseline);
       setBaselineStage('complete');
+
+      if (accountAlreadyOnboarded) {
+        setStatus('Your Baseline is ready. Opening your workspace…');
+        location.replace('/app');
+        return;
+      }
       if (currentPlan === 'sovereign_plus') {
         setStatus('Your Baseline is ready. Opening your Sovereign+ workspace…');
         await completeOnboarding('sovereign_plus');
         location.replace('/app');
         return;
       }
+
       setPhase('baseline_result');
       setStatus(body.baseline.status === 'partial'
         ? 'Your Baseline is ready with limited detail.'
@@ -206,8 +239,8 @@ export function PlanOnboarding() {
     setStatus(plan === 'free' ? 'Opening your Free workspace…' : 'Preparing secure Stripe checkout…');
 
     try {
-      await completeOnboarding(plan);
       if (plan === 'free') {
+        await completeOnboarding('free');
         location.assign('/app');
         return;
       }
@@ -227,6 +260,8 @@ export function PlanOnboarding() {
         setStatus(data.error || 'Secure checkout is temporarily unavailable. You can continue with Free and upgrade later.');
         return;
       }
+
+      await completeOnboarding('sovereign_plus');
       setStatus('Opening secure Stripe checkout…');
       location.assign(data.checkout.url);
     } catch (error) {
@@ -262,6 +297,7 @@ export function PlanOnboarding() {
         <a href="https://sovereign.defrag.app">SOVEREIGN.OS</a>
         <span>{phase === 'plan' ? 'Choose a plan' : phase === 'baseline_result' ? 'Baseline ready' : 'Build your Baseline'}</span>
       </header>
+
       <div className="plan-layout">
         <section className="plan-choice">
           <ol className="onboarding-progress" aria-label="Account setup progress">
@@ -277,196 +313,58 @@ export function PlanOnboarding() {
               <button className="primary-button" type="button" onClick={() => location.reload()}>Try again</button>
             </JourneyMessage>
           )}
-
           {phase === 'baseline' && (
-            <>
-              <p className="eyebrow">BUILD YOUR BASELINE</p>
-              <h1>Create the personal foundation Sovereign uses.</h1>
-              <p className="plan-intro">Add the birth details you know. Sovereign.OS uses them to calculate your Baseline, then translates the result into plain language you can explore and correct.</p>
-              <form className="baseline-onboarding-form" onSubmit={submitBaseline} noValidate>
-                <div className="baseline-form-grid">
-                  <Field label="Birth date" error={errors.birthDate} errorId="baseline-birth-date-error">
-                    <input
-                      name="birthDate"
-                      type="date"
-                      value={form.birthDate}
-                      max={new Date().toISOString().slice(0, 10)}
-                      onChange={(event) => updateForm('birthDate', event.target.value)}
-                      aria-invalid={Boolean(errors.birthDate)}
-                      aria-describedby={errors.birthDate ? 'baseline-birth-date-error' : undefined}
-                      required
-                    />
-                  </Field>
-                  <Field label="Birthplace" error={errors.birthplace} errorId="baseline-birthplace-error">
-                    <input
-                      name="birthplace"
-                      type="text"
-                      value={form.birthplace}
-                      placeholder="City, region, country"
-                      autoComplete="address-level2"
-                      onChange={(event) => updateForm('birthplace', event.target.value)}
-                      aria-invalid={Boolean(errors.birthplace)}
-                      aria-describedby={errors.birthplace ? 'baseline-birthplace-error' : 'baseline-birthplace-help'}
-                      required
-                    />
-                    <small id="baseline-birthplace-help">Use the city and region shown on the birth record when available.</small>
-                  </Field>
-                  <Field label="Birthplace timezone" error={errors.birthTimezone} errorId="baseline-birth-timezone-error">
-                    <input
-                      name="birthTimezone"
-                      type="search"
-                      list="baseline-timezone-options"
-                      value={form.birthTimezone}
-                      placeholder="America/Los_Angeles"
-                      autoComplete="off"
-                      spellCheck={false}
-                      onChange={(event) => updateForm('birthTimezone', event.target.value)}
-                      aria-invalid={Boolean(errors.birthTimezone)}
-                      aria-describedby={errors.birthTimezone ? 'baseline-birth-timezone-error' : 'baseline-timezone-help'}
-                      required
-                    />
-                    <datalist id="baseline-timezone-options">
-                      {timeZones.map((timeZone) => <option value={timeZone} key={timeZone}>{timeZone.replaceAll('_', ' ')}</option>)}
-                    </datalist>
-                    <small id="baseline-timezone-help">Confirm the timezone used at the birthplace on that date.</small>
-                  </Field>
-                </div>
-
-                <fieldset className="baseline-certainty-fieldset">
-                  <legend>How certain is the birth time?</legend>
-                  <div className="baseline-choice-row">
-                    {(['exact', 'approximate', 'unknown'] as const).map((certainty) => (
-                      <label key={certainty}>
-                        <input
-                          type="radio"
-                          name="birthTimeCertainty"
-                          value={certainty}
-                          checked={form.birthTimeCertainty === certainty}
-                          onChange={() => {
-                            setForm((current) => ({
-                              ...current,
-                              birthTimeCertainty: certainty,
-                              birthTime: certainty === 'unknown' ? '' : current.birthTime
-                            }));
-                            setErrors((current) => ({ ...current, birthTime: '' }));
-                          }}
-                        />
-                        <span>{certainty === 'exact' ? 'Exact' : certainty === 'approximate' ? 'Approximate' : 'Unknown'}</span>
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-
-                {form.birthTimeCertainty !== 'unknown' && (
-                  <Field label={form.birthTimeCertainty === 'exact' ? 'Birth time' : 'Approximate birth time'} error={errors.birthTime} errorId="baseline-birth-time-error">
-                    <input
-                      name="birthTime"
-                      type="time"
-                      value={form.birthTime}
-                      onChange={(event) => updateForm('birthTime', event.target.value)}
-                      aria-invalid={Boolean(errors.birthTime)}
-                      aria-describedby={errors.birthTime ? 'baseline-birth-time-error' : undefined}
-                      required
-                    />
-                  </Field>
-                )}
-
-                {form.birthTimeCertainty === 'unknown' && (
-                  <p className="baseline-limited-note">You can continue without a birth time. Time-dependent details will remain visibly limited rather than being guessed.</p>
-                )}
-
-                <p className="baseline-current-location-note">
-                  Current conditions stay separate from your birth data. City-level current location can be enabled later from You and is never required to build a Baseline.
-                </p>
-                <p className="baseline-privacy-boundary">Raw birth details and exact private location are not sent to the language model. Sovereign receives only the reduced themes needed for an exploration.</p>
-                <button className="primary-button" type="submit" disabled={submitting}>Build my Baseline</button>
-              </form>
-            </>
+            <BaselineFormView
+              form={form}
+              errors={errors}
+              timeZones={timeZones}
+              submitting={submitting}
+              onSubmit={submitBaseline}
+              onUpdate={(field, value) => {
+                setForm((current) => ({ ...current, [field]: value }));
+                if (field !== 'birthplaceRegion') {
+                  setErrors((current) => ({ ...current, [field]: '' }));
+                }
+              }}
+              onCertainty={(certainty) => {
+                setForm((current) => ({
+                  ...current,
+                  birthTimeCertainty: certainty,
+                  birthTime: certainty === 'unknown' ? '' : current.birthTime
+                }));
+                setErrors((current) => ({ ...current, birthTime: '' }));
+              }}
+              onTimezoneConfirmed={(confirmed) => {
+                setForm((current) => ({ ...current, timezoneConfirmed: confirmed }));
+                setErrors((current) => ({ ...current, timezoneConfirmed: '' }));
+              }}
+            />
           )}
-
           {phase === 'baseline_building' && (
-            <section className="baseline-building-state" role="status" aria-live="polite">
-              <p className="eyebrow">BUILDING YOUR BASELINE</p>
-              <h1>Turning source data into something you can use.</h1>
-              <div className="baseline-progress-light" aria-hidden="true"><i /></div>
-              <ol>
-                {baselineStages.map(([requiredStage, label], index) => {
-                  const itemState = stageState(baselineStage, requiredStage, index);
-                  return <li className={itemState} key={label}><span>{index + 1}</span><strong>{label}</strong></li>;
-                })}
-              </ol>
-              <p>{status}</p>
-            </section>
+            <BaselineBuildingView stage={baselineStage} status={status} />
           )}
-
           {phase === 'baseline_result' && baseline && (
-            <section className="baseline-result-state">
-              <p className="eyebrow">YOUR BASELINE IS READY</p>
-              <h1>{baseline.status === 'partial' ? 'Your Baseline is ready with limited detail.' : 'Your Baseline is ready.'}</h1>
-              <p className="plan-intro">{baseline.status === 'partial'
-                ? 'The deterministic provider returned a limited result. Sovereign keeps that uncertainty visible and does not fill missing detail with guesses.'
-                : 'Your personal foundation is ready beneath every question, relationship, and system you choose to explore.'}</p>
-              <div className="baseline-result-summary">
-                <div><span>Result</span><strong>{baseline.status === 'partial' ? 'Limited but usable' : 'Complete'}</strong></div>
-                <div><span>Birth-time certainty</span><strong>{form.birthTimeCertainty}</strong></div>
-                <div><span>Interpretive uncertainty</span><strong>{baseline.uncertainty ?? 'stated in context'}</strong></div>
-              </div>
-              {showBaselineReview && (
-                <div className="baseline-review" role="region" aria-label="Baseline availability">
-                  <h2>What is available now</h2>
-                  <p>Stable Baseline themes, exact approved Basis values, and visible uncertainty can now be used in the workspace. Current conditions remain separate and permission-based.</p>
-                </div>
-              )}
-              <div className="baseline-result-actions">
-                <button className="primary-button" type="button" onClick={() => { setPhase('plan'); setStatus('Choose how you want to continue.'); }}>Continue</button>
-                <button type="button" onClick={() => setShowBaselineReview((value) => !value)}>{showBaselineReview ? 'Hide review' : 'Review my Baseline'}</button>
-              </div>
-            </section>
+            <BaselineResultView
+              baseline={baseline}
+              certainty={form.birthTimeCertainty}
+              reviewOpen={showBaselineReview}
+              onToggleReview={() => setShowBaselineReview((value) => !value)}
+              onContinue={() => {
+                setPhase('plan');
+                setStatus('Choose how you want to continue.');
+              }}
+            />
           )}
-
           {phase === 'plan' && (
-            <>
-              <p className="eyebrow">CHOOSE HOW TO CONTINUE</p>
-              <h1>Keep your personal Baseline free. Add the wider system when you need it.</h1>
-              <p className="plan-intro">Free is an ongoing plan, not a trial. Sovereign+ adds permission-based relationships, systems, and longer continuity.</p>
-
-              <div className="onboarding-plan-grid">
-                <article className={currentPlan === 'free' ? 'current' : ''}>
-                  <header><span>FREE</span><strong>$0</strong></header>
-                  <h2>Your personal foundation.</h2>
-                  <p>Use your private Baseline across Today, Explore, Shadow and Gift, Alignment, decisions, and behavior.</p>
-                  <ul>
-                    <li>Complete private Baseline Design</li>
-                    <li>Today and Explore</li>
-                    <li>10 Sovereign responses each UTC month</li>
-                    <li>Correction controls and active-retention history</li>
-                  </ul>
-                  <button className="primary-button" type="button" disabled={submitting} onClick={() => void confirm('free')}>Continue with Free</button>
-                </article>
-
-                <article className="plus-plan">
-                  <header><span>SOVEREIGN+</span><strong>{interval === 'annual' ? '$99 / year' : '$20 / month'}</strong></header>
-                  <h2>Relationships, systems, and continuity.</h2>
-                  <p>Bring permitted Baselines together and keep the wider human system in view.</p>
-                  <ul>
-                    <li>Everything in Free</li>
-                    <li>People, Systems, Library, and optional Covenant</li>
-                    <li>300 Sovereign responses each UTC month</li>
-                    <li>Permission-aware invitations and controls</li>
-                  </ul>
-                  <div className="billing-toggle" role="group" aria-label="Billing interval">
-                    <button type="button" aria-pressed={interval === 'monthly'} className={interval === 'monthly' ? 'active' : ''} onClick={() => setInterval('monthly')}>Monthly · $20</button>
-                    <button type="button" aria-pressed={interval === 'annual'} className={interval === 'annual' ? 'active' : ''} onClick={() => setInterval('annual')}>Annual · $99</button>
-                  </div>
-                  {interval === 'annual' && <p className="annual-value">$8.25/month equivalent · save $141 compared with monthly billing.</p>}
-                  <button className="primary-button" type="button" disabled={submitting} onClick={() => void confirm('sovereign_plus')}>Choose Sovereign+</button>
-                </article>
-              </div>
-              {checkoutUnavailable && (
-                <button className="checkout-free-fallback" type="button" disabled={submitting} onClick={() => void confirm('free')}>Continue with Free instead</button>
-              )}
-              <p className="plan-status" role="status" aria-live="polite">{status}</p>
-            </>
+            <PlanChoiceView
+              interval={interval}
+              currentPlan={currentPlan}
+              status={status}
+              submitting={submitting}
+              checkoutUnavailable={checkoutUnavailable}
+              onInterval={setInterval}
+              onConfirm={(plan) => void confirm(plan)}
+            />
           )}
         </section>
 
@@ -482,11 +380,262 @@ export function PlanOnboarding() {
       </div>
     </main>
   );
+}
 
-  function updateForm(field: BaselineField, value: string) {
-    setForm((current) => ({ ...current, [field]: value }));
-    setErrors((current) => ({ ...current, [field]: '' }));
-  }
+function BaselineFormView({
+  form,
+  errors,
+  timeZones,
+  submitting,
+  onSubmit,
+  onUpdate,
+  onCertainty,
+  onTimezoneConfirmed
+}: {
+  form: BaselineForm;
+  errors: BaselineErrors;
+  timeZones: string[];
+  submitting: boolean;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onUpdate: <K extends keyof BaselineForm>(field: K, value: BaselineForm[K]) => void;
+  onCertainty: (certainty: BirthTimeCertainty) => void;
+  onTimezoneConfirmed: (confirmed: boolean) => void;
+}) {
+  return (
+    <>
+      <p className="eyebrow">BUILD YOUR BASELINE</p>
+      <h1>Create the personal foundation Sovereign uses.</h1>
+      <p className="plan-intro">Add the birth details you know. Sovereign.OS uses them to calculate your Baseline, then translates the result into plain language you can explore and correct.</p>
+
+      <form className="baseline-onboarding-form" onSubmit={onSubmit} noValidate>
+        <div className="baseline-form-grid">
+          <Field label="Birth date" error={errors.birthDate} errorId="baseline-birth-date-error">
+            <input
+              name="birthDate"
+              type="date"
+              value={form.birthDate}
+              max={localDateToday()}
+              onChange={(event) => onUpdate('birthDate', event.target.value)}
+              aria-invalid={Boolean(errors.birthDate)}
+              aria-describedby={errors.birthDate ? 'baseline-birth-date-error' : undefined}
+              required
+            />
+          </Field>
+          <Field label="Birthplace city" error={errors.birthplaceCity} errorId="baseline-birthplace-city-error">
+            <input
+              name="birthplaceCity"
+              value={form.birthplaceCity}
+              autoComplete="address-level2"
+              onChange={(event) => onUpdate('birthplaceCity', event.target.value)}
+              aria-invalid={Boolean(errors.birthplaceCity)}
+              aria-describedby={errors.birthplaceCity ? 'baseline-birthplace-city-error' : undefined}
+              required
+            />
+          </Field>
+          <Field label="Region or state" error="" errorId="baseline-birthplace-region-error">
+            <input
+              name="birthplaceRegion"
+              value={form.birthplaceRegion}
+              autoComplete="address-level1"
+              onChange={(event) => onUpdate('birthplaceRegion', event.target.value)}
+              placeholder="Optional when not applicable"
+            />
+          </Field>
+          <Field label="Birthplace country" error={errors.birthplaceCountry} errorId="baseline-birthplace-country-error">
+            <input
+              name="birthplaceCountry"
+              value={form.birthplaceCountry}
+              autoComplete="country-name"
+              onChange={(event) => onUpdate('birthplaceCountry', event.target.value)}
+              aria-invalid={Boolean(errors.birthplaceCountry)}
+              aria-describedby={errors.birthplaceCountry ? 'baseline-birthplace-country-error' : undefined}
+              required
+            />
+          </Field>
+          <Field label="Birthplace timezone" error={errors.birthTimezone} errorId="baseline-birth-timezone-error">
+            <input
+              name="birthTimezone"
+              type="search"
+              list="baseline-timezone-options"
+              value={form.birthTimezone}
+              placeholder="America/Los_Angeles"
+              autoComplete="off"
+              spellCheck={false}
+              onChange={(event) => {
+                onUpdate('birthTimezone', event.target.value);
+                onTimezoneConfirmed(false);
+              }}
+              aria-invalid={Boolean(errors.birthTimezone)}
+              aria-describedby={errors.birthTimezone ? 'baseline-birth-timezone-error' : 'baseline-timezone-help'}
+              required
+            />
+            <datalist id="baseline-timezone-options">
+              {timeZones.map((timeZone) => <option value={timeZone} key={timeZone}>{timeZone.replaceAll('_', ' ')}</option>)}
+            </datalist>
+            <small id="baseline-timezone-help">Use the historical timezone that applied at the birthplace on the birth date.</small>
+          </Field>
+        </div>
+
+        <label className={`baseline-timezone-confirmation ${errors.timezoneConfirmed ? 'has-error' : ''}`}>
+          <input
+            type="checkbox"
+            checked={form.timezoneConfirmed}
+            onChange={(event) => onTimezoneConfirmed(event.target.checked)}
+            aria-invalid={Boolean(errors.timezoneConfirmed)}
+            aria-describedby={errors.timezoneConfirmed ? 'baseline-timezone-confirmation-error' : undefined}
+          />
+          <span>
+            <strong>I confirm this timezone for the birthplace and date.</strong>
+            <small>Sovereign does not silently replace an unconfirmed timezone.</small>
+            {errors.timezoneConfirmed && <small id="baseline-timezone-confirmation-error" className="field-error">{errors.timezoneConfirmed}</small>}
+          </span>
+        </label>
+
+        <fieldset className="baseline-certainty-fieldset">
+          <legend>How certain is the birth time?</legend>
+          <div className="baseline-choice-row">
+            {(['exact', 'approximate', 'unknown'] as const).map((certainty) => (
+              <label key={certainty}>
+                <input
+                  type="radio"
+                  name="birthTimeCertainty"
+                  value={certainty}
+                  checked={form.birthTimeCertainty === certainty}
+                  onChange={() => onCertainty(certainty)}
+                />
+                <span>{certainty === 'exact' ? 'Exact' : certainty === 'approximate' ? 'Approximate' : 'Unknown'}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        {form.birthTimeCertainty !== 'unknown' && (
+          <Field label={form.birthTimeCertainty === 'exact' ? 'Birth time' : 'Approximate birth time'} error={errors.birthTime} errorId="baseline-birth-time-error">
+            <input
+              name="birthTime"
+              type="time"
+              value={form.birthTime}
+              onChange={(event) => onUpdate('birthTime', event.target.value)}
+              aria-invalid={Boolean(errors.birthTime)}
+              aria-describedby={errors.birthTime ? 'baseline-birth-time-error' : undefined}
+              required
+            />
+          </Field>
+        )}
+
+        {form.birthTimeCertainty === 'unknown' && (
+          <p className="baseline-limited-note">You can continue without a birth time. Time-dependent details will remain visibly limited rather than being guessed.</p>
+        )}
+
+        <p className="baseline-current-location-note">Current conditions stay separate from your birth data. City-level current location can be enabled later from You and is never required to build a Baseline.</p>
+        <p className="baseline-privacy-boundary">Raw birth details and exact private location are not sent to the language model. Sovereign receives only the reduced themes needed for an exploration.</p>
+        <button className="primary-button" type="submit" disabled={submitting}>Build my Baseline</button>
+      </form>
+    </>
+  );
+}
+
+function BaselineBuildingView({ stage, status }: { stage: BaselineStage; status: string }) {
+  return (
+    <section className="baseline-building-state" role="status" aria-live="polite">
+      <p className="eyebrow">BUILDING YOUR BASELINE</p>
+      <h1>Turning source data into something you can use.</h1>
+      <div className="baseline-progress-light" aria-hidden="true"><i /></div>
+      <ol>
+        {baselineStages.map((label, index) => (
+          <li className={stageState(stage, index)} key={label}><span>{index + 1}</span><strong>{label}</strong></li>
+        ))}
+      </ol>
+      <p>{status}</p>
+    </section>
+  );
+}
+
+function BaselineResultView({ baseline, certainty, reviewOpen, onToggleReview, onContinue }: {
+  baseline: BaselineStatus;
+  certainty: BirthTimeCertainty;
+  reviewOpen: boolean;
+  onToggleReview: () => void;
+  onContinue: () => void;
+}) {
+  const limited = baseline.status === 'partial';
+  return (
+    <section className="baseline-result-state">
+      <p className="eyebrow">YOUR BASELINE IS READY</p>
+      <h1>{limited ? 'Your Baseline is ready with limited detail.' : 'Your Baseline is ready.'}</h1>
+      <p className="plan-intro">{limited
+        ? 'The deterministic provider returned a limited result. Sovereign keeps that uncertainty visible and does not fill missing detail with guesses.'
+        : 'Your personal foundation is ready beneath every question, relationship, and system you choose to explore.'}</p>
+      <div className="baseline-result-summary">
+        <div><span>Result</span><strong>{limited ? 'Limited but usable' : 'Complete'}</strong></div>
+        <div><span>Birth-time certainty</span><strong>{certainty}</strong></div>
+        <div><span>Interpretive uncertainty</span><strong>{baseline.uncertainty ?? 'stated in context'}</strong></div>
+      </div>
+      {reviewOpen && (
+        <div className="baseline-review" role="region" aria-label="Baseline availability">
+          <h2>What is available now</h2>
+          <p>Stable Baseline themes, exact approved Basis values, and visible uncertainty can now be used in the workspace. Current conditions remain separate and permission-based.</p>
+        </div>
+      )}
+      <div className="baseline-result-actions">
+        <button className="primary-button" type="button" onClick={onContinue}>Continue</button>
+        <button type="button" onClick={onToggleReview}>{reviewOpen ? 'Hide review' : 'Review my Baseline'}</button>
+      </div>
+    </section>
+  );
+}
+
+function PlanChoiceView({ interval, currentPlan, status, submitting, checkoutUnavailable, onInterval, onConfirm }: {
+  interval: BillingInterval;
+  currentPlan: Plan;
+  status: string;
+  submitting: boolean;
+  checkoutUnavailable: boolean;
+  onInterval: (interval: BillingInterval) => void;
+  onConfirm: (plan: Plan) => void;
+}) {
+  return (
+    <>
+      <p className="eyebrow">CHOOSE HOW TO CONTINUE</p>
+      <h1>Keep your personal Baseline free. Add the wider system when you need it.</h1>
+      <p className="plan-intro">Free is an ongoing plan, not a trial. Sovereign+ adds permission-based relationships, systems, and longer continuity.</p>
+
+      <div className="onboarding-plan-grid">
+        <article className={currentPlan === 'free' ? 'current' : ''}>
+          <header><span>FREE</span><strong>$0</strong></header>
+          <h2>Your personal foundation.</h2>
+          <p>Use your private Baseline across Today, Explore, Shadow and Gift, Alignment, decisions, and behavior.</p>
+          <ul>
+            <li>Complete private Baseline Design</li>
+            <li>Today and Explore</li>
+            <li>10 Sovereign responses each UTC month</li>
+            <li>Correction controls and active-retention history</li>
+          </ul>
+          <button className="primary-button" type="button" disabled={submitting} onClick={() => onConfirm('free')}>Continue with Free</button>
+        </article>
+
+        <article className="plus-plan">
+          <header><span>SOVEREIGN+</span><strong>{interval === 'annual' ? '$99 / year' : '$20 / month'}</strong></header>
+          <h2>Relationships, systems, and continuity.</h2>
+          <p>Bring permitted Baselines together and keep the wider human system in view.</p>
+          <ul>
+            <li>Everything in Free</li>
+            <li>People, Systems, Library, and optional Covenant</li>
+            <li>300 Sovereign responses each UTC month</li>
+            <li>Permission-aware invitations and controls</li>
+          </ul>
+          <div className="billing-toggle" role="group" aria-label="Billing interval">
+            <button type="button" aria-pressed={interval === 'monthly'} className={interval === 'monthly' ? 'active' : ''} onClick={() => onInterval('monthly')}>Monthly · $20</button>
+            <button type="button" aria-pressed={interval === 'annual'} className={interval === 'annual' ? 'active' : ''} onClick={() => onInterval('annual')}>Annual · $99</button>
+          </div>
+          {interval === 'annual' && <p className="annual-value">$8.25/month equivalent · save $141 compared with monthly billing.</p>}
+          <button className="primary-button" type="button" disabled={submitting} onClick={() => onConfirm('sovereign_plus')}>Choose Sovereign+</button>
+        </article>
+      </div>
+      {checkoutUnavailable && <button className="checkout-free-fallback" type="button" disabled={submitting} onClick={() => onConfirm('free')}>Continue with Free instead</button>}
+      <p className="plan-status" role="status" aria-live="polite">{status}</p>
+    </>
+  );
 }
 
 function Field({ label, error, errorId, children }: { label: string; error: string; errorId: string; children: ReactNode }) {
@@ -516,12 +665,23 @@ function JourneyMessage({ eyebrow, title, body, children }: { eyebrow: string; t
 
 function validateBaseline(form: BaselineForm): BaselineErrors {
   const errors = emptyErrors();
-  const today = new Date().toISOString().slice(0, 10);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(form.birthDate) || form.birthDate > today) errors.birthDate = 'Enter a valid birth date that is not in the future.';
-  if (form.birthplace.trim().length < 2) errors.birthplace = 'Enter the city and region of birth.';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(form.birthDate) || form.birthDate > localDateToday()) {
+    errors.birthDate = 'Enter a valid birth date that is not in the future.';
+  }
+  if (form.birthplaceCity.trim().length < 2) errors.birthplaceCity = 'Enter the city of birth.';
+  if (form.birthplaceCountry.trim().length < 2) errors.birthplaceCountry = 'Enter the country of birth.';
   if (!isValidTimeZone(form.birthTimezone.trim())) errors.birthTimezone = 'Choose a valid IANA timezone.';
-  if (form.birthTimeCertainty !== 'unknown' && !/^([01]\d|2[0-3]):[0-5]\d$/.test(form.birthTime)) errors.birthTime = 'Enter the birth time or choose Unknown.';
+  if (!form.timezoneConfirmed) errors.timezoneConfirmed = 'Confirm the birthplace timezone before continuing.';
+  if (form.birthTimeCertainty !== 'unknown' && !/^([01]\d|2[0-3]):[0-5]\d$/.test(form.birthTime)) {
+    errors.birthTime = 'Enter the birth time or choose Unknown.';
+  }
   return errors;
+}
+
+function localDateToday(): string {
+  const now = new Date();
+  const offset = now.getTimezoneOffset() * 60_000;
+  return new Date(now.getTime() - offset).toISOString().slice(0, 10);
 }
 
 function isValidTimeZone(value: string): boolean {
@@ -551,13 +711,13 @@ function progressState(phase: JourneyPhase) {
   return { baseline: 'upcoming', plan: 'upcoming', workspace: 'upcoming' } as const;
 }
 
-function stageState(current: BaselineStage, required: BaselineStage, index: number): 'complete' | 'active' | 'upcoming' {
+function stageState(current: BaselineStage, index: number): 'complete' | 'active' | 'upcoming' {
   if (current === 'complete') return 'complete';
   if (current === 'calculating') {
     if (index === 0) return 'complete';
     if (index === 1) return 'active';
     return 'upcoming';
   }
-  if (current === required || (current === 'validating' && index === 0)) return 'active';
+  if (current === 'validating' && index === 0) return 'active';
   return 'upcoming';
 }
