@@ -70,6 +70,9 @@ import './account-journey-structured.css';
 import './account-journey-release-cohesion.css';
 import './passkey-auth.css';
 
+/* Final non-landing route authority. */
+import './deployed-route-cohesion.css';
+
 installV0ReleaseFingerprint();
 installProductionRuntime();
 installProductRuntime();
