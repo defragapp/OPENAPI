@@ -106,10 +106,13 @@ for (const marker of [
   '.public-secondary-page.policy-hero',
   '.public-secondary-page.policy-gridarticle',
   '.public-secondary-page.policy-contact',
-  'rgba(47,147,255,0.075)',
   'var(--v8-blue-bright)'
 ]) {
   assert(compactCss.includes(marker), `compiled policy stylesheet is missing ${marker}`);
 }
+assert(
+  compactCss.includes('rgba(47,147,255,.075)') || compactCss.includes('rgba(47,147,255,0.075)'),
+  'compiled policy stylesheet is missing the locked blue atmosphere'
+);
 
 console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract}`);
