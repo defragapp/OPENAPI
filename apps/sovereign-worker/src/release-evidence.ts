@@ -22,7 +22,8 @@ export type ProductionReleaseEvidence = {
 export async function readProductionReleaseEvidence(env: Env): Promise<ProductionReleaseEvidence | null> {
   const sha = String(env.APP_VERSION || '').trim();
   if (!/^[0-9a-f]{40}$/i.test(sha)) return null;
-  const record = await env.DB.prepare(`SELECT status, payload_json
+  const session = env.DB.withSession('first-primary');
+  const record = await session.prepare(`SELECT status, payload_json
     FROM background_jobs
     WHERE id = ?1 AND kind = 'production_release_evidence'
     LIMIT 1`)
