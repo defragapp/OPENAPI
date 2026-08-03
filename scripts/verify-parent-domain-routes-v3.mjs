@@ -1,7 +1,6 @@
 const commitSha = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || process.env.APP_VERSION || '').trim();
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
-const workerBase = 'https://sovv-web.sovereign-os-api.workers.dev';
 const expectedMigration = '0014_passkey_authentication';
 const expectedArchive = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 const expectedSequence = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${expectedArchive}`;
@@ -57,9 +56,7 @@ for (let attempt = 1; attempt <= 30; attempt += 1) {
       ['publicHealth', `${publicBase}/health`, false],
       ['publicReady', `${publicBase}/ready`, true],
       ['appHealth', `${appBase}/health`, false],
-      ['appReady', `${appBase}/ready`, true],
-      ['workerHealth', `${workerBase}/health`, false],
-      ['workerReady', `${workerBase}/ready`, true]
+      ['appReady', `${appBase}/ready`, true]
     ];
     const responses = await Promise.all(endpoints.map(([, url]) => readJson(url)));
     runtimeResults = {};
@@ -128,6 +125,7 @@ for (const marker of [
 
 console.log(JSON.stringify({
   parentDomainsVerified: true,
+  productionWorkersDev: false,
   version: commitSha,
   migration: {
     current: expectedMigration,
