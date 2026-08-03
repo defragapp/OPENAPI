@@ -261,7 +261,6 @@ export function PlanOnboarding() {
         return;
       }
 
-      await completeOnboarding('sovereign_plus');
       setStatus('Opening secure Stripe checkout…');
       location.assign(data.checkout.url);
     } catch (error) {
@@ -340,9 +339,7 @@ export function PlanOnboarding() {
               }}
             />
           )}
-          {phase === 'baseline_building' && (
-            <BaselineBuildingView stage={baselineStage} status={status} />
-          )}
+          {phase === 'baseline_building' && <BaselineBuildingView stage={baselineStage} status={status} />}
           {phase === 'baseline_result' && baseline && (
             <BaselineResultView
               baseline={baseline}
