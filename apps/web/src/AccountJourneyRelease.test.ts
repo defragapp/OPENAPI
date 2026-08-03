@@ -5,6 +5,7 @@ const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url)
 const workspaceGate = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
 const styles = readFileSync(new URL('./account-journey.css', import.meta.url), 'utf8');
 const structuredStyles = readFileSync(new URL('./account-journey-structured.css', import.meta.url), 'utf8');
+const cohesionStyles = readFileSync(new URL('./account-journey-release-cohesion.css', import.meta.url), 'utf8');
 const entry = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const auth = readFileSync(new URL('../../sovereign-worker/src/auth-public.ts', import.meta.url), 'utf8');
 
@@ -78,13 +79,28 @@ describe('Baseline-first account journey release', () => {
     expect(auth).toContain("parsed.pathname === '/onboarding'");
   });
 
-  it('inherits the frozen landing language on desktop and iOS before final passkey authority', () => {
+  it('inherits the frozen landing language across desktop, iOS, account, and workspace surfaces', () => {
     expect(styles).toContain('letter-spacing: 0.22em');
     expect(styles).toContain('env(safe-area-inset-top)');
     expect(styles).toContain('env(safe-area-inset-bottom)');
     expect(styles).toContain('min-height: 48px');
     expect(styles).toContain('@media (max-width: 700px)');
     expect(structuredStyles).toContain('.baseline-timezone-confirmation');
-    expect(entry).toContain("import './account-journey.css';\nimport './account-journey-structured.css';\nimport './passkey-auth.css';");
+    expect(cohesionStyles).toContain('.verified-plan-strip');
+    expect(cohesionStyles).toContain('.sovereign-app-runtime');
+    expect(cohesionStyles).toContain('.invitation-shell');
+    expect(cohesionStyles).toContain('.private-route-gate');
+    expect(cohesionStyles).toContain('env(safe-area-inset-bottom)');
+    expect(cohesionStyles).toContain('@supports (-webkit-touch-callout: none)');
+  });
+
+  it('loads the final cohesion layer directly before passkey authority and nothing after it', () => {
+    const sequence = "import './account-journey.css';\nimport './account-journey-structured.css';\nimport './account-journey-release-cohesion.css';\nimport './passkey-auth.css';";
+    expect(entry).toContain(sequence);
+    const passkeyImport = entry.indexOf("import './passkey-auth.css';");
+    const firstRuntimeCall = entry.indexOf('installV0ReleaseFingerprint();');
+    expect(passkeyImport).toBeGreaterThan(-1);
+    expect(firstRuntimeCall).toBeGreaterThan(passkeyImport);
+    expect(entry.slice(passkeyImport + "import './passkey-auth.css';".length, firstRuntimeCall)).not.toMatch(/import\s+['"].+\.css['"]/);
   });
 });
