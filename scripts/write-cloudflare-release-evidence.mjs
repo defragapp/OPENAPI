@@ -66,10 +66,10 @@ const recordId = `production-release:${sha}`;
 const payload = JSON.stringify(evidence);
 const upsert = `INSERT INTO background_jobs (id, account_id, kind, status, payload_json, attempts, max_attempts, run_after, last_error, created_at, updated_at) VALUES (${sqlLiteral(recordId)}, NULL, ${sqlLiteral(EVIDENCE_KIND)}, 'succeeded', ${sqlLiteral(payload)}, 0, 1, datetime('now'), NULL, datetime('now'), datetime('now')) ON CONFLICT(id) DO UPDATE SET kind = excluded.kind, status = excluded.status, payload_json = excluded.payload_json, attempts = 0, max_attempts = 1, run_after = datetime('now'), last_error = NULL, updated_at = datetime('now');`;
 
-run('pnpm', ['exec', 'wrangler', 'd1', 'execute', DATABASE_NAME, '--remote', '--config', 'wrangler.jsonc', '--command', upsert], 'unable to persist evidence');
+run('pnpm', ['exec', 'wrangler', 'd1', 'execute', DATABASE_NAME, '--remote', '--yes', '--config', 'wrangler.jsonc', '--command', upsert], 'unable to persist evidence');
 
 const select = `SELECT id, kind, status, payload_json FROM background_jobs WHERE id = ${sqlLiteral(recordId)} AND kind = ${sqlLiteral(EVIDENCE_KIND)} LIMIT 1;`;
-const output = run('pnpm', ['exec', 'wrangler', 'd1', 'execute', DATABASE_NAME, '--remote', '--config', 'wrangler.jsonc', '--command', select, '--json'], 'unable to verify evidence');
+const output = run('pnpm', ['exec', 'wrangler', 'd1', 'execute', DATABASE_NAME, '--remote', '--yes', '--config', 'wrangler.jsonc', '--command', select, '--json'], 'unable to verify evidence');
 const [row] = resultRows(output);
 if (!row || row.id !== recordId || row.kind !== EVIDENCE_KIND || row.status !== 'succeeded') {
   fail('the exact release-evidence row was not returned after persistence');
