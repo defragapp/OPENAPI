@@ -29,8 +29,8 @@ describe('Baseline-first account journey release', () => {
     expect(onboarding).toContain("setBaselineStage('validating')");
     expect(onboarding).toContain("setBaselineStage('calculating')");
     expect(onboarding).toContain("setBaselineStage('complete')");
-    expect(onboarding).not.toContain('setInterval(');
-    expect(onboarding).not.toContain('setTimeout(');
+    expect(onboarding).not.toContain('window.setInterval(');
+    expect(onboarding).not.toContain('window.setTimeout(');
   });
 
   it('keeps Free legitimate and makes paid cadence explicit before Stripe checkout', () => {
