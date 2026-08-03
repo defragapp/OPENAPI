@@ -58,6 +58,7 @@ const stages = [
   ['typecheck', 'pnpm', ['typecheck']],
   ['tests', 'pnpm', ['test']],
   ['build', 'pnpm', ['build']],
+  ['public-source-maps', process.execPath, ['scripts/verify-no-public-source-maps.mjs']],
   ['worker-bundle-size', 'pnpm', ['verify:worker-bundle-size']]
 ];
 
