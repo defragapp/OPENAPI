@@ -1,3 +1,5 @@
+import { pathToFileURL } from 'node:url';
+
 const API_ROOT = 'https://api.cloudflare.com/client/v4';
 const ZONE_NAME = 'defrag.app';
 const RECORD_NAME = '_dmarc.defrag.app';
@@ -82,7 +84,7 @@ export async function configureCloudflareDmarc(options = {}) {
   };
 }
 
-if (import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   configureCloudflareDmarc()
     .then((result) => console.log(JSON.stringify(result, null, 2)))
     .catch((error) => {
