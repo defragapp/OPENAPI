@@ -31,7 +31,7 @@ async function responseContainsRenderedAudit(response, url) {
   try {
     const payload = await response.clone().json();
     const content = payload?.result?.content || payload?.content || '';
-    return typeof content === 'string' && content.includes('__sovereign_visual_audit');
+    return typeof content === 'string' && content.includes('data-sovereign-visual-audit');
   } catch {
     return true;
   }
@@ -91,20 +91,24 @@ async function rateLimitedFetch(input, init) {
 const referenceAssertionV2 = "assert(reference.length > 8_000, 'Approved visual reference is missing or unexpectedly small');";
 const referenceAssertionV3 = "assert(reference.length > 6_500, 'Approved visual reference is missing, truncated, or unexpectedly small');";
 const auditScriptStartV2 = "return `(() => {\n    const visible = (element) => {";
-const auditScriptStartV3 = "return `(async () => {\n    const deadline = Date.now() + 25_000;\n    while (!document.querySelector('.public-approved-v8') && Date.now() < deadline) {\n      await new Promise((resolveDelay) => setTimeout(resolveDelay, 100));\n    }\n    const visible = (element) => {";
-const auditNodeV2 = "const node = document.createElement('script');";
-const auditNodeV3 = "const node = document.createElement('pre');";
-const auditTypeV2 = "node.type = 'application/json';";
-const auditTypeV3 = "node.hidden = true;\n    node.setAttribute('aria-hidden', 'true');\n    node.style.display = 'none';";
-const auditAppendV2 = 'document.head.appendChild(node);';
-const auditAppendV3 = '(document.body || document.documentElement).appendChild(node);';
-const auditParserV2 = String.raw`const match = String(html).match(/<script[^>]+id=["']__sovereign_visual_audit["'][^>]*>([\s\S]*?)<\/script>/i);`;
-const auditParserV3 = String.raw`const match = String(html).match(/<pre[^>]+id=["']__sovereign_visual_audit["'][^>]*>([\s\S]*?)<\/pre>/i);`;
+const auditScriptStartV3 = "return `(() => {\n    const collectAudit = () => {\n      const root = document.querySelector('.public-approved-v8');\n      if (!root || !document.body) return false;\n      const visible = (element) => {";
+const auditTailV2 = "const node = document.createElement('script');\n    node.id = '__sovereign_visual_audit';\n    node.type = 'application/json';\n    node.textContent = JSON.stringify(payload);\n    document.head.appendChild(node);";
+const auditTailV3 = "document.documentElement.setAttribute('data-sovereign-visual-audit', encodeURIComponent(JSON.stringify(payload)));\n      return true;\n    };\n    if (collectAudit()) return;\n    const observer = new MutationObserver(() => {\n      if (collectAudit()) observer.disconnect();\n    });\n    observer.observe(document.documentElement, { childList: true, subtree: true });\n    setTimeout(() => observer.disconnect(), 45_000);";
+const auditParserV2 = String.raw`function parseRenderedAudit(html) {
+  const match = String(html).match(/<script[^>]+id=["']__sovereign_visual_audit["'][^>]*>([\s\S]*?)<\/script>/i);
+  assert(match, 'Browser-rendered DOM audit payload is missing');
+  return JSON.parse(match[1]);
+}`;
+const auditParserV3 = String.raw`function parseRenderedAudit(html) {
+  const match = String(html).match(/\sdata-sovereign-visual-audit=["']([^"']+)["']/i);
+  assert(match, 'Browser-rendered DOM audit payload is missing');
+  return JSON.parse(decodeURIComponent(match[1]));
+}`;
 const scriptTagV2 = 'addScriptTag: [{ content: renderedAuditScript() }]';
-const scriptTagV3 = "addScriptTag: [{ content: renderedAuditScript() }],\n        waitForSelector: { selector: '.public-approved-v8', timeout: 30_000 }";
+const scriptTagV3 = "addScriptTag: [{ id: 'sovereign-visual-audit-runtime', content: renderedAuditScript() }],\n        waitForSelector: { selector: 'html[data-sovereign-visual-audit]', timeout: 45_000 }";
 
 let generated = readFileSync(sourcePath, 'utf8');
-for (const marker of [referenceAssertionV2, auditScriptStartV2, auditNodeV2, auditTypeV2, auditAppendV2, auditParserV2, scriptTagV2]) {
+for (const marker of [referenceAssertionV2, auditScriptStartV2, auditTailV2, auditParserV2, scriptTagV2]) {
   if (!generated.includes(marker)) {
     throw new Error(`Visual release v3 could not locate required v2 marker: ${marker.slice(0, 80)}`);
   }
@@ -113,13 +117,11 @@ for (const marker of [referenceAssertionV2, auditScriptStartV2, auditNodeV2, aud
 generated = generated
   .replace(referenceAssertionV2, referenceAssertionV3)
   .replace(auditScriptStartV2, auditScriptStartV3)
-  .replace(auditNodeV2, auditNodeV3)
-  .replace(auditTypeV2, auditTypeV3)
-  .replace(auditAppendV2, auditAppendV3)
+  .replace(auditTailV2, auditTailV3)
   .replace(auditParserV2, auditParserV3)
   .replace(scriptTagV2, scriptTagV3);
 
-for (const marker of [referenceAssertionV3, auditScriptStartV3, auditNodeV3, auditTypeV3, auditAppendV3, auditParserV3, scriptTagV3]) {
+for (const marker of [referenceAssertionV3, auditScriptStartV3, auditTailV3, auditParserV3, scriptTagV3]) {
   if (!generated.includes(marker)) {
     throw new Error(`Visual release v3 did not apply required hardening: ${marker.slice(0, 80)}`);
   }
