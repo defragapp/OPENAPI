@@ -1,5 +1,5 @@
 const publicBase = String(process.env.PUBLIC_BASE_URL || 'https://sovereign.defrag.app').replace(/\/$/, '');
-const expectedCssPath = '/v0-public-static.css?v=20260803-locked-v1';
+const expectedCssPath = '/v0-public-static.css?v=20260803-refined-v2';
 const expectedContract = 'founder-v0-locked-v1';
 const staticRoutes = ['/how-it-works', '/pricing', '/faq'];
 const policyRoutes = ['/privacy', '/terms'];
@@ -54,6 +54,17 @@ function assertStaticDocument(path, document) {
 const staticDocuments = await Promise.all(staticRoutes.map((path) => read(path)));
 staticDocuments.forEach((document, index) => assertStaticDocument(staticRoutes[index], document));
 
+const howItWorks = staticDocuments[0].text;
+assert(howItWorks.includes('class="product-proof-window"'), '/how-it-works is missing the restrained product proof');
+assert(howItWorks.includes('This progress is user-visible context—not hidden model reasoning.'), '/how-it-works does not distinguish visible progress from hidden reasoning');
+assert(howItWorks.includes('class="launch-section support-note-section"'), '/how-it-works is missing the reduced-prominence support note');
+assert(!howItWorks.includes('Help fund continued public development.'), '/how-it-works still gives development support primary-page prominence');
+
+const pricing = staticDocuments[1].text;
+assert(pricing.includes('aria-label="Sovereign.OS plans"'), '/pricing is missing the plan decision label');
+assert(pricing.includes('class="annual-price"'), '/pricing is missing the clarified annual option');
+assert(pricing.includes('$99 <small>/ year</small>'), '/pricing is missing the annual price hierarchy');
+
 const staticCss = await read(expectedCssPath);
 assert(staticCss.response.ok, `secondary stylesheet returned ${staticCss.response.status}`);
 for (const marker of [
@@ -61,6 +72,7 @@ for (const marker of [
   '--v0-cream: #f1e9de',
   '--v0-blue: #2f93ff',
   '--v0-blue-bright: #78c7ff',
+  '--v0-shell: min(1120px',
   '/fonts/sovereign-display.woff2',
   '/fonts/sovereign-sans.woff2',
   'body.launch-page',
@@ -68,8 +80,13 @@ for (const marker of [
   '.launch-mobile-menu-panel',
   '.journey-steps',
   '.pricing-grid',
+  '.price-options .annual-price > small',
+  '.product-proof-window',
+  '.support-note-section',
   '.faq-list details',
-  '.launch-footer'
+  '.launch-footer',
+  '@media (max-width: 430px)',
+  'min-height: 44px'
 ]) {
   assert(staticCss.text.includes(marker), `secondary stylesheet is missing ${marker}`);
 }
@@ -122,4 +139,4 @@ assert(
   'compiled policy stylesheet is missing the locked blue atmosphere'
 );
 
-console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract}`);
+console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} scale=refined-v2`);

@@ -114,8 +114,29 @@ async function rateLimitedFetch(input, init) {
 
 const referenceAssertionV2 = "assert(reference.length > 8_000, 'Approved visual reference is missing or unexpectedly small');";
 const referenceAssertionV3 = "assert(reference.length > 6_500, 'Approved visual reference is missing, truncated, or unexpectedly small');";
-const mobileBandCorrelationV2 = 'minimumBandCorrelation: 0.18,';
-const mobileBandCorrelationV3 = 'minimumBandCorrelation: 0.00,';
+const mobileProfileV2 = `  {
+    name: 'mobile-390x844',
+    viewport: { width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true },
+    minimumScore: 0.42,
+    minimumBandCorrelation: 0.18,
+    maximumDarkRatioDelta: 0.24
+  }
+];`;
+const mobileProfilesV3 = `  {
+    name: 'mobile-390x844',
+    viewport: { width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true },
+    minimumScore: 0.42,
+    minimumBandCorrelation: 0.08,
+    maximumDarkRatioDelta: 0.24
+  },
+  {
+    name: 'mobile-430x932',
+    viewport: { width: 430, height: 932, deviceScaleFactor: 1, isMobile: true, hasTouch: true },
+    minimumScore: 0.42,
+    minimumBandCorrelation: 0.08,
+    maximumDarkRatioDelta: 0.24
+  }
+];`;
 const auditParserV2 = String.raw`function parseRenderedAudit(html) {
   const match = String(html).match(/<script[^>]+id=["']__sovereign_visual_audit["'][^>]*>([\s\S]*?)<\/script>/i);
   assert(match, 'Browser-rendered DOM audit payload is missing');
@@ -241,7 +262,7 @@ const domParserCallV3 = `const dom = await scrapeRenderedAudit(profile, captured
   dom.document.height = Math.max(dom.document.height, Number(screenshotMetadata.height || 0));`;
 
 let generated = readFileSync(sourcePath, 'utf8');
-for (const marker of [referenceAssertionV2, mobileBandCorrelationV2, auditParserV2, scriptTagV2, domParserCallV2]) {
+for (const marker of [referenceAssertionV2, mobileProfileV2, auditParserV2, scriptTagV2, domParserCallV2]) {
   if (!generated.includes(marker)) {
     throw new Error(`Visual release v3 could not locate required v2 marker: ${marker.slice(0, 80)}`);
   }
@@ -249,12 +270,12 @@ for (const marker of [referenceAssertionV2, mobileBandCorrelationV2, auditParser
 
 generated = generated
   .replace(referenceAssertionV2, referenceAssertionV3)
-  .replace(mobileBandCorrelationV2, mobileBandCorrelationV3)
+  .replace(mobileProfileV2, mobileProfilesV3)
   .replace(auditParserV2, auditParserV3)
   .replace(scriptTagV2, scriptTagV3)
   .replace(domParserCallV2, domParserCallV3);
 
-for (const marker of [referenceAssertionV3, mobileBandCorrelationV3, auditParserV3, scriptTagV3, domParserCallV3]) {
+for (const marker of [referenceAssertionV3, mobileProfilesV3, auditParserV3, scriptTagV3, domParserCallV3]) {
   if (!generated.includes(marker)) {
     throw new Error(`Visual release v3 did not apply required hardening: ${marker.slice(0, 80)}`);
   }

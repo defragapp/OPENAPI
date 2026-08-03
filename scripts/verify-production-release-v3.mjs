@@ -17,11 +17,11 @@ const replacements = [
   ],
   [
     "['--v0-page:#0f0f0f', '--v0-cream:#e8ddd0', 'body{min-width:320px', '.launch-nav', '.launch-hero', '.journey-steps', '.pricing-grid', '.faq-list', '.launch-footer']",
-    "['--v0-page: #090b0e', '--v0-cream: #f1e9de', '--v0-blue: #2f93ff', '--v0-blue-bright: #78c7ff', 'body.launch-page {', '.launch-nav-inner', '.launch-mobile-menu-panel', '.launch-hero', '.journey-steps', '.pricing-grid', '.faq-list', '.launch-footer']"
+    "['--v0-page: #090b0e', '--v0-cream: #f1e9de', '--v0-blue: #2f93ff', '--v0-blue-bright: #78c7ff', '--v0-shell: min(1120px', 'body.launch-page {', '.launch-nav-inner', '.launch-mobile-menu-panel', '.launch-hero', '.journey-steps', '.pricing-grid', '.product-proof-window', '.support-note-section', '.faq-list', '.launch-footer']"
   ],
   [
     "['data-visual-contract=\"founder-v0-static\"', '/v0-public-static.css?v=20260801-v0-global', 'Release compatibility marker only; the retired stylesheet is not loaded']",
-    "['data-visual-contract=\"founder-v0-static\"', 'data-secondary-visual-contract=\"founder-v0-locked-v1\"', '/v0-public-static.css?v=20260803-locked-v1', 'class=\"launch-nav-inner\"', 'class=\"launch-mobile-menu-panel\"', 'Release compatibility marker only; the retired stylesheet is not loaded']"
+    "['data-visual-contract=\"founder-v0-static\"', 'data-secondary-visual-contract=\"founder-v0-locked-v1\"', '/v0-public-static.css?v=20260803-refined-v2', 'class=\"launch-nav-inner\"', 'class=\"launch-mobile-menu-panel\"', 'Release compatibility marker only; the retired stylesheet is not loaded']"
   ]
 ];
 
@@ -35,6 +35,9 @@ for (const [retiredContract, currentContract] of replacements) {
 
 if (source.includes('/v0-public-static.css?v=20260801-v0-global')) {
   throw new Error('Production release v3 still contains the retired static public stylesheet contract.');
+}
+if (source.includes('/v0-public-static.css?v=20260803-locked-v1')) {
+  throw new Error('Production release v3 still contains the pre-refinement secondary stylesheet contract.');
 }
 if (source.includes("'--v0-page:#0f0f0f'")) {
   throw new Error('Production release v3 still contains the retired standalone public page token.');

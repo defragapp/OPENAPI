@@ -12,6 +12,8 @@ const staticPages = [
 ] as const;
 
 const staticCss = read('../public/v0-public-static.css');
+const howItWorks = read('../public/how-it-works.html');
+const pricing = read('../public/pricing.html');
 const policy = read('./PublicPolicy.tsx');
 const policyCss = read('./public-secondary-pages-locked.css');
 const main = read('./main.tsx');
@@ -19,12 +21,13 @@ const landing = read('./PublicLanding.tsx');
 const liveVerifier = read('../../../scripts/verify-live-secondary-public.mjs');
 const productionRelease = read('../../../scripts/cloudflare-production-release.mjs');
 
+const refinedCssPath = '/v0-public-static.css?v=20260803-refined-v2';
 
 describe('secondary public visual parity', () => {
   it.each(staticPages)('%s uses the frozen landing identity and mobile navigation', (_label, path) => {
     const document = read(path);
     expect(document).toContain('data-secondary-visual-contract="founder-v0-locked-v1"');
-    expect(document).toContain('/v0-public-static.css?v=20260803-locked-v1');
+    expect(document).toContain(refinedCssPath);
     expect(document).toContain('class="launch-nav-inner"');
     expect(document).toContain('class="launch-wordmark"');
     expect(document).toContain('>SOVEREIGN.OS</a>');
@@ -35,11 +38,12 @@ describe('secondary public visual parity', () => {
     expect(document).toContain('© 2026 Sovereign.OS');
   });
 
-  it('uses the exact founder-v0 black, cream, and Cloudflare-blue visual tokens', () => {
+  it('uses the exact founder-v0 visual tokens with a larger readable secondary-page scale', () => {
     expect(staticCss).toContain('--v0-page: #090b0e');
     expect(staticCss).toContain('--v0-cream: #f1e9de');
     expect(staticCss).toContain('--v0-blue: #2f93ff');
     expect(staticCss).toContain('--v0-blue-bright: #78c7ff');
+    expect(staticCss).toContain('--v0-shell: min(1120px');
     expect(staticCss).toContain('font-family: "Sovereign Display"');
     expect(staticCss).toContain('font-family: "Sovereign Sans"');
     expect(staticCss).toContain('.launch-nav-inner');
@@ -50,8 +54,34 @@ describe('secondary public visual parity', () => {
     expect(staticCss).toContain('.pricing-grid');
     expect(staticCss).toContain('.faq-list details');
     expect(staticCss).toContain('.launch-footer');
+    expect(staticCss).toContain('min-height: 44px');
+    expect(staticCss).toContain('@media (max-width: 430px)');
     expect(staticCss).not.toContain('--v0-warm');
     expect(staticCss).not.toContain('--v0-sage');
+  });
+
+  it('clarifies annual pricing without adding a dashboard or alternate plan flow', () => {
+    expect(pricing).toContain('aria-label="Sovereign.OS plans"');
+    expect(pricing).toContain('class="annual-price"');
+    expect(pricing).toContain('<span class="price-or">or</span>');
+    expect(pricing).toContain('$99 <small>/ year</small>');
+    expect(staticCss).toContain('.price-options .annual-price > small');
+    expect(staticCss).toContain('.price-or');
+    expect(pricing).not.toContain('pricing-dashboard');
+    expect(pricing).not.toContain('pricing-toggle');
+  });
+
+  it('adds one restrained product moment and reduces development-support prominence', () => {
+    expect(howItWorks).toContain('class="product-proof-window"');
+    expect(howItWorks).toContain('This progress is user-visible context—not hidden model reasoning.');
+    expect(howItWorks).toContain('Reading your Baseline');
+    expect(howItWorks).toContain('Finding the pattern');
+    expect(howItWorks).toContain('Building the distinction');
+    expect(howItWorks).toContain('Answering the real question');
+    expect(howItWorks).toContain('class="launch-section support-note-section"');
+    expect(howItWorks).not.toContain('Help fund continued public development.');
+    expect(staticCss).toContain('.product-proof-window');
+    expect(staticCss).toContain('.support-note-section');
   });
 
   it('ports Privacy and Terms onto the exact landing navigation and footer', () => {
@@ -87,6 +117,8 @@ describe('secondary public visual parity', () => {
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(landing).not.toContain('public-secondary-page');
+    expect(landing).not.toContain('product-proof-window');
+    expect(landing).not.toContain('support-note-section');
   });
 
   it('blocks deployment until all five secondary public routes prove parity live', () => {
@@ -94,9 +126,11 @@ describe('secondary public visual parity', () => {
       expect(liveVerifier).toContain(`'${route}'`);
     }
     expect(liveVerifier).toContain("const expectedContract = 'founder-v0-locked-v1'");
-    expect(liveVerifier).toContain("const expectedCssPath = '/v0-public-static.css?v=20260803-locked-v1'");
+    expect(liveVerifier).toContain(`const expectedCssPath = '${refinedCssPath}'`);
     expect(liveVerifier).toContain('assertSecurityHeaders');
     expect(liveVerifier).toContain('compiled policy stylesheet');
+    expect(liveVerifier).toContain('product-proof-window');
+    expect(liveVerifier).toContain('annual-price');
     expect(productionRelease).toContain("['verify-secondary-public', 'scripts/verify-live-secondary-public.mjs']");
   });
 });
