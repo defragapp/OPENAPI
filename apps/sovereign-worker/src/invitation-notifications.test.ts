@@ -88,7 +88,8 @@ describe('invitation lifecycle notifications', () => {
       expect(String(message.text)).toContain('relationship comparison');
     }
     const headers = fetchMock.mock.calls.map(([, options]) => (options as RequestInit).headers as Record<string, string>);
-    expect(headers.every((value) => value['Idempotency-Key']?.includes('permission_granted:v4'))).toBe(true);
+    expect(headers.every((value) => value['idempotency-key']?.includes('permission_granted:v4'))).toBe(true);
+    expect(messages.every((message) => (message.tags as Array<{ name: string; value: string }>).some((tag) => tag.name === 'category' && tag.value === 'consent_update'))).toBe(true);
   });
 
   it('states that revoked permission is unavailable for new shared context', async () => {
