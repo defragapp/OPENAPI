@@ -185,6 +185,7 @@ export async function createCheckoutSession(env: Env, accountId: string, interva
     body.set('success_url', env.STRIPE_SUCCESS_URL!);
     body.set('cancel_url', env.STRIPE_CANCEL_URL!);
     body.set('client_reference_id', accountId);
+    body.set('consent_collection[terms_of_service]', 'required');
     body.set('metadata[account_id]', accountId);
     body.set('metadata[plan]', 'sovereign_plus');
     body.set('metadata[interval]', interval);
