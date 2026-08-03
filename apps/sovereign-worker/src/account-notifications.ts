@@ -10,6 +10,7 @@ interface AccountDeletionNoticeInput {
 }
 
 const DEFAULT_APP_URL = 'https://app.defrag.app';
+const PUBLIC_SOVEREIGN_URL = 'https://sovereign.defrag.app/';
 const DEFAULT_GRACE_DAYS = 14;
 
 function emailFromAuthSubject(subject?: string | null): string | undefined {
@@ -95,13 +96,12 @@ export async function notifyAccountDeletionCompleted(
 ): Promise<boolean> {
   if (!validEmail(recipient)) return false;
   try {
-    const publicUrl = new URL('/', env.PUBLIC_APP_URL || DEFAULT_APP_URL).toString();
     const template = buildSovereignEmail({
       eyebrow: 'Account deletion complete',
       title: 'Your Sovereign.OS account was deleted.',
       intro: 'The scheduled deletion finished after the grace period. The account can no longer be opened with this identity.',
       actionLabel: 'Open the public Sovereign.OS site',
-      actionUrl: publicUrl,
+      actionUrl: PUBLIC_SOVEREIGN_URL,
       details: [
         'Active Stripe subscriptions were cancelled before deletion completed.',
         'Private Baseline, conversations, people, systems, permissions, and saved understandings tied to the account were removed according to the deletion inventory.',
