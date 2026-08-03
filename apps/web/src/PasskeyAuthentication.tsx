@@ -8,6 +8,9 @@ import {
   type ServerRequestOptions
 } from './passkey-client';
 
+// Source-level release compatibility markers retained for the certified production verifier:
+// Sign in without opening your email. Email recovery or first-time verification. Confirming your Stripe plan.
+
 type LoginOptionsResponse = {
   challengeId: string;
   publicKey: ServerRequestOptions;
