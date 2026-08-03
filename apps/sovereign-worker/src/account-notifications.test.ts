@@ -54,6 +54,7 @@ describe('account deletion notifications', () => {
     });
     expect(String(captured[0]?.text)).toContain('14-day grace period');
     expect(String(captured[0]?.html)).toContain('Review or cancel deletion');
+    expect(String(captured[0]?.text)).toContain('https://app.defrag.app/app?panel=account');
     expect(captured[1]).toMatchObject({
       subject: 'Sovereign.OS account deletion cancelled',
       category: 'account_security'
@@ -62,7 +63,7 @@ describe('account deletion notifications', () => {
     expect(JSON.stringify(captured)).not.toContain('delete_private');
   });
 
-  it('sends a final deletion confirmation without private account data', async () => {
+  it('sends a final deletion confirmation without private account data or a dead private-account action', async () => {
     const { env, captured } = notificationEnv();
     await expect(notifyAccountDeletionCompleted(env, 'user@example.com', 'delete_private')).resolves.toBe(true);
 
@@ -74,6 +75,8 @@ describe('account deletion notifications', () => {
     });
     expect(String(captured[0]?.text)).toContain('The scheduled deletion finished after the grace period.');
     expect(String(captured[0]?.text)).toContain('Active Stripe subscriptions were cancelled before deletion completed.');
+    expect(String(captured[0]?.text)).toContain('https://sovereign.defrag.app/');
+    expect(String(captured[0]?.text)).not.toContain('https://app.defrag.app/app?panel=account');
     expect(String(captured[0]?.text)).not.toMatch(/birth date|birthplace|natal|aspect|acct_private|delete_private/i);
   });
 
