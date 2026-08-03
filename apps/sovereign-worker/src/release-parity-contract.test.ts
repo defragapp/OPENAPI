@@ -96,6 +96,7 @@ describe('production release parity contract', () => {
     expect(evidenceWriter).toContain("dmarcStatus: dmarcVerified ? 'verified' : 'external_blocker'");
     expect(evidenceWriter).toContain('INSERT INTO background_jobs');
     expect(evidenceWriter).toContain("'--remote'");
+    expect(evidenceWriter.match(/'--yes'/g)?.length).toBe(2);
     expect(evidenceWriter).toContain("'--json'");
     expect(evidenceWriter).toContain('stored evidence mismatch');
     expect(releaseEvidenceRuntime).toContain("WHERE id = ?1 AND kind = 'production_release_evidence'");
