@@ -48,6 +48,7 @@ function resultRows(output) {
 }
 
 const sha = resolveCommitSha();
+const dmarcVerified = String(process.env.RELEASE_DMARC_VERIFIED || '').trim() === 'true';
 const evidence = {
   contract: EVIDENCE_CONTRACT,
   sha,
@@ -57,7 +58,8 @@ const evidence = {
   renderedVisualContract: RENDERED_VISUAL_CONTRACT,
   renderedVisualVerified: true,
   dmarcRecord: DMARC_RECORD,
-  dmarcVerified: true,
+  dmarcVerified,
+  dmarcStatus: dmarcVerified ? 'verified' : 'external_blocker',
   completedAt: new Date().toISOString()
 };
 const recordId = `production-release:${sha}`;
