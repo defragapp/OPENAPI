@@ -27,3 +27,7 @@ Deploy the exact current `main` tree containing the restored rotating real-life 
 ## Private repository release — August 3, 2026 at 10:21 PT
 
 The canonical repository is now private. Trigger one clean connected Cloudflare Workers Build from this exact `main` push to verify that the Cloudflare GitHub installation retains private-repository access. Accept completion only when the branded production domains report this exact SHA, migration `0014_passkey_authentication`, migration parity `current`, visual contract `v0-public-landing-v3`, `productionWorkersDev: false`, and successful secondary-route and rendered route-cohesion audits. GitHub Actions and deploy hooks are not release authority.
+
+## Final route-cohesion release — August 3, 2026 at 10:59 PT
+
+Trigger the connected private-repository Workers Build after aligning the canonical policy verifier with the final `--route-blue-bright` authority and adding bounded retry to non-authoritative release telemetry. This marker changes no runtime code, visual design, copy, component, route, or product behavior. Accept completion only when this exact `main` SHA is reported by both branded domains and the secondary-route, route-cohesion, and rendered page-family audits all pass.
