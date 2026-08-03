@@ -1,0 +1,350 @@
+/* Final release cohesion for real product surfaces. The frozen public landing remains untouched.
+ * This file loads before passkey-auth.css; passkey-auth.css remains the final local visual authority.
+ */
+
+:where(
+  .account-shell,
+  .plan-onboarding,
+  .invitation-shell,
+  .public-policy,
+  .public-not-found,
+  .private-route-gate,
+  .sovereign-app-runtime
+) {
+  min-width: 320px;
+  overflow-x: clip;
+  color: var(--surface-ink, #f5f1e8);
+  font-family: var(--font-body, "Sovereign Sans", Inter, system-ui, sans-serif);
+}
+
+body:has(.account-shell),
+body:has(.plan-onboarding),
+body:has(.invitation-shell),
+body:has(.public-policy),
+body:has(.public-not-found),
+body:has(.private-route-gate),
+body:has(.sovereign-app-runtime) {
+  min-width: 320px;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+  background-color: #0f0f0f;
+}
+
+:where(
+  .account-shell,
+  .plan-onboarding,
+  .invitation-shell,
+  .public-policy,
+  .public-not-found,
+  .private-route-gate,
+  .sovereign-app-runtime
+) :where(button, a, input, select, textarea, summary) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(
+  .account-shell,
+  .plan-onboarding,
+  .invitation-shell,
+  .public-policy,
+  .public-not-found,
+  .private-route-gate,
+  .sovereign-app-runtime
+) :where(button, a, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--surface-cream, #e8ddd0);
+  outline-offset: 3px;
+}
+
+:where(
+  .account-shell,
+  .plan-onboarding,
+  .invitation-shell,
+  .public-policy,
+  .public-not-found,
+  .private-route-gate,
+  .sovereign-app-runtime
+) :where(button, a[role='button'], summary) {
+  min-height: 44px;
+}
+
+:where(
+  .account-shell,
+  .plan-onboarding,
+  .invitation-shell,
+  .public-policy,
+  .public-not-found,
+  .private-route-gate,
+  .sovereign-app-runtime
+) :where(h1, h2, h3, h4) {
+  font-family: var(--font-display, "Sovereign Display", Georgia, serif);
+  text-wrap: balance;
+}
+
+/* Auth, invitation, policies, and route gates share the same brand recognition. */
+.invitation-shell > .wordmark,
+.public-not-found .private-route-brand,
+.private-route-gate .private-route-brand {
+  color: var(--surface-ink, #f5f1e8);
+  font-family: var(--font-body, "Sovereign Sans", Inter, system-ui, sans-serif);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.invitation-shell {
+  min-height: var(--sovereign-viewport-height, 100svh);
+  padding:
+    calc(42px + env(safe-area-inset-top))
+    max(20px, env(safe-area-inset-right))
+    calc(42px + env(safe-area-inset-bottom))
+    max(20px, env(safe-area-inset-left));
+}
+
+.invitation-shell > .wordmark {
+  position: fixed;
+  z-index: 20;
+  top: calc(20px + env(safe-area-inset-top));
+  left: max(22px, env(safe-area-inset-left));
+  text-decoration: none;
+}
+
+.invitation-shell .auth-panel {
+  width: min(760px, 100%);
+  max-height: calc(var(--sovereign-viewport-height, 100svh) - 84px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.public-not-found,
+.private-route-gate {
+  min-height: var(--sovereign-viewport-height, 100svh);
+  padding:
+    calc(72px + env(safe-area-inset-top))
+    max(20px, env(safe-area-inset-right))
+    calc(52px + env(safe-area-inset-bottom))
+    max(20px, env(safe-area-inset-left));
+}
+
+.private-route-brand {
+  top: calc(20px + env(safe-area-inset-top));
+  left: max(22px, env(safe-area-inset-left));
+}
+
+/* The verified plan strip is product status, not a floating ad. */
+.verified-plan-strip {
+  max-width: min(430px, calc(100vw - 36px));
+  min-height: 38px;
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: 0.035em;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.28);
+}
+
+.verified-plan-strip span {
+  color: var(--surface-muted, #a39c8f);
+  font-size: 0.68rem;
+  font-weight: 650;
+}
+
+.verified-plan-strip strong {
+  overflow: hidden;
+  color: var(--surface-cream, #e8ddd0);
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+}
+
+.account-plan-verification {
+  border-color: rgba(90, 169, 255, 0.22);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(90, 169, 255, 0.1), transparent 22rem),
+    rgba(255, 255, 255, 0.018);
+}
+
+.account-plan-verification > div {
+  display: grid;
+  gap: 5px;
+}
+
+.account-plan-verification > div > small:first-child {
+  color: #8fc3ff;
+  font-size: 0.66rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.account-plan-verification button {
+  min-height: 46px;
+}
+
+/* Preserve the one-room workspace while tightening mobile and iOS behavior. */
+.sovereign-app-runtime,
+.intelligence-workspace {
+  min-height: var(--sovereign-viewport-height, 100svh);
+}
+
+.intelligence-workspace {
+  isolation: isolate;
+}
+
+.intelligence-main,
+.intelligence-scroll,
+.context-scroll,
+.account-control-dialog {
+  min-width: 0;
+}
+
+.intelligence-scroll,
+.context-scroll,
+.account-control-dialog,
+.invitation-shell .auth-panel {
+  scrollbar-color: rgba(232, 221, 208, 0.22) transparent;
+}
+
+.sovereign-composer textarea,
+.account-shell input,
+.plan-onboarding input,
+.invitation-shell input,
+.account-control-dialog input,
+.account-control-dialog textarea {
+  font-size: 16px;
+}
+
+.sovereign-composer textarea {
+  resize: none;
+}
+
+.account-control-dialog {
+  overscroll-behavior: contain;
+}
+
+.account-control-dialog > header {
+  position: sticky;
+  z-index: 4;
+  top: 0;
+  margin: calc(-1 * clamp(20px, 4vw, 34px));
+  margin-bottom: 18px;
+  padding: clamp(20px, 4vw, 34px);
+  border-bottom: 1px solid var(--surface-line, rgba(245, 241, 232, 0.11));
+  background: rgba(21, 21, 22, 0.95);
+  backdrop-filter: blur(18px);
+}
+
+@media (max-width: 900px) {
+  .verified-plan-strip {
+    top: auto;
+    right: max(12px, env(safe-area-inset-right));
+    bottom: calc(112px + env(safe-area-inset-bottom));
+    max-width: calc(100vw - max(24px, env(safe-area-inset-left) + env(safe-area-inset-right)));
+  }
+
+  .intelligence-topbar {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .mobile-bottom-nav {
+    min-height: calc(70px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .sovereign-composer {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 650px) {
+  .verified-plan-strip {
+    left: max(12px, env(safe-area-inset-left));
+    right: max(12px, env(safe-area-inset-right));
+    justify-content: center;
+  }
+
+  .verified-plan-strip span {
+    display: none;
+  }
+
+  .verified-plan-strip strong {
+    max-width: 100%;
+  }
+
+  .account-plan-verification {
+    grid-template-columns: 1fr;
+  }
+
+  .account-plan-verification button {
+    width: 100%;
+  }
+
+  .invitation-shell .auth-panel {
+    max-height: none;
+  }
+
+  .account-control-dialog > header {
+    margin: -22px -17px 18px;
+    padding: 22px 17px 18px;
+  }
+}
+
+@media (max-height: 580px) and (orientation: landscape) {
+  .verified-plan-strip {
+    right: max(10px, env(safe-area-inset-right));
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: auto;
+    max-width: min(390px, 54vw);
+  }
+
+  .invitation-shell,
+  .public-not-found,
+  .private-route-gate {
+    align-items: start;
+    padding-top: calc(64px + env(safe-area-inset-top));
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  .account-control-backdrop,
+  .workspace-sheet,
+  .intelligence-context {
+    min-height: -webkit-fill-available;
+  }
+
+  .account-control-dialog,
+  .invitation-shell .auth-panel {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(
+    .account-shell,
+    .plan-onboarding,
+    .invitation-shell,
+    .public-policy,
+    .public-not-found,
+    .private-route-gate,
+    .sovereign-app-runtime
+  ) *,
+  :where(
+    .account-shell,
+    .plan-onboarding,
+    .invitation-shell,
+    .public-policy,
+    .public-not-found,
+    .private-route-gate,
+    .sovereign-app-runtime
+  ) *::before,
+  :where(
+    .account-shell,
+    .plan-onboarding,
+    .invitation-shell,
+    .public-policy,
+    .public-not-found,
+    .private-route-gate,
+    .sovereign-app-runtime
+  ) *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
