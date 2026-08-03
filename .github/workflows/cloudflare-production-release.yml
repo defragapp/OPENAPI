@@ -5,18 +5,43 @@ on:
     branches: [main]
     paths-ignore:
       - '**/*.md'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/cloudflare-production-release.yml'
   workflow_dispatch:
 
 concurrency:
-  group: sovereign-cloudflare-production
+  group: sovereign-cloudflare-production-${{ github.event_name }}
   cancel-in-progress: false
 
 permissions:
   contents: read
 
 jobs:
+  runner-probe:
+    name: Verify production runner and credential
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Confirm runner allocation
+        run: echo 'GitHub-hosted production runner allocated.'
+
+      - name: Require Cloudflare deployment credential
+        shell: bash
+        run: |
+          if [[ -z "$CLOUDFLARE_API_TOKEN" ]]; then
+            echo 'CLOUDFLARE_API_TOKEN repository secret is required.' >&2
+            exit 1
+          fi
+          echo 'Cloudflare deployment credential is available.'
+
   release:
     name: Verify and deploy current main
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
