@@ -59,4 +59,4 @@ jobs:
           printf '%s' "$html" | grep -q 'id="root"'
           printf '%s' "$html" | grep -q 'Sovereign'
 
-# Release gate trigger: 2026-08-02T20:50:57Z
+# Release gate trigger: 2026-08-03T10:43:29Z
