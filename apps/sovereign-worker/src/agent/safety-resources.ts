@@ -92,15 +92,30 @@ export function buildSafetyResponseMetadata(
 ): SovereignSafetyResponseMetadata {
   const presentation = presentationForDecision(decision);
   const normalizedCountry = connectionCountry?.trim().toUpperCase();
-  const resources: SovereignSafetyResourceEntry[] = [];
 
+  if (presentation === 'secure_refusal') {
+    return {
+      version: 'sovereign-safety-response.v1',
+      disposition: decision.disposition,
+      category: decision.category,
+      presentation,
+      resourceCatalog: {
+        version: 'sovereign-safety-resources.2026-08-02',
+        jurisdiction: 'unknown',
+        selectionSource: 'generic_fallback',
+        selectionNotice: '',
+        disregardAllowed: true,
+        resources: []
+      }
+    };
+  }
+
+  const resources: SovereignSafetyResourceEntry[] = [];
   if (normalizedCountry === 'US') {
     if (presentation === 'emergency' || (presentation === 'urgent' && emergencyCategories.has(decision.category))) {
       resources.push(emergencyServices);
     }
-    if (presentation !== 'secure_refusal' && crisisSupportCategories.has(decision.category)) {
-      resources.push(crisisSupport);
-    }
+    if (crisisSupportCategories.has(decision.category)) resources.push(crisisSupport);
   }
 
   return {
@@ -129,6 +144,7 @@ export function buildSafetyResponseMetadata(
 }
 
 export function formatSafetyResourcesText(metadata: SovereignSafetyResponseMetadata): string[] {
+  if (metadata.presentation === 'secure_refusal' || !metadata.resourceCatalog.selectionNotice) return [];
   if (metadata.resourceCatalog.resources.length === 0) {
     return ['HUMAN SUPPORT', metadata.resourceCatalog.selectionNotice];
   }
