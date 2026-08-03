@@ -260,22 +260,53 @@ const domParserCallV2 = 'const dom = parseRenderedAudit(captured.content);';
 const domParserCallV3 = `const dom = await scrapeRenderedAudit(profile, captured.url, captured.content);
   const screenshotMetadata = await sharp(captured.screenshot).metadata();
   dom.document.height = Math.max(dom.document.height, Number(screenshotMetadata.height || 0));`;
+const comparisonAssertionV2 = '  assertComparison(profile, comparison);';
+const comparisonAssertionV3 = `  const referenceAuthority = profile.name.startsWith('desktop-') ? 'founder-reference' : 'structural-only';
+  if (referenceAuthority === 'founder-reference') assertComparison(profile, comparison);`;
+const resultViewportV2 = `    viewport: profile.viewport,
+    url: captured.url,`;
+const resultViewportV3 = `    viewport: profile.viewport,
+    referenceAuthority,
+    url: captured.url,`;
+const reportReferenceV2 = `  reference: {
+    source: 'founder-approved screenshot supplied 2026-08-02',
+    size: { width: 192, height: 507 },
+    sha256: referenceSha256
+  },`;
+const reportReferenceV3 = `  reference: {
+    source: 'founder-approved desktop composition screenshot supplied 2026-08-02',
+    size: { width: 192, height: 507 },
+    sha256: referenceSha256,
+    applicability: 'desktop-composition-only'
+  },
+  mobileEvidence: {
+    authority: 'structural-only',
+    reason: 'No founder-approved viewport-specific mobile reference is stored in the repository.',
+    requiredViewports: ['390x844', '430x932']
+  },`;
+const reportMethodV2 = "  method: 'Cloudflare Browser Run snapshot with full-page PNG plus deterministic normalized pixel, edge, color, and section-rhythm comparison',";
+const reportMethodV3 = "  method: 'Cloudflare Browser Run full-page screenshots; founder-reference comparison for desktop and structural overflow, sequence, typography, and section-order verification for mobile',";
 
 let generated = readFileSync(sourcePath, 'utf8');
-for (const marker of [referenceAssertionV2, mobileProfileV2, auditParserV2, scriptTagV2, domParserCallV2]) {
-  if (!generated.includes(marker)) {
-    throw new Error(`Visual release v3 could not locate required v2 marker: ${marker.slice(0, 80)}`);
+const replacements = [
+  [referenceAssertionV2, referenceAssertionV3],
+  [mobileProfileV2, mobileProfilesV3],
+  [auditParserV2, auditParserV3],
+  [scriptTagV2, scriptTagV3],
+  [domParserCallV2, domParserCallV3],
+  [comparisonAssertionV2, comparisonAssertionV3],
+  [resultViewportV2, resultViewportV3],
+  [reportReferenceV2, reportReferenceV3],
+  [reportMethodV2, reportMethodV3]
+];
+
+for (const [from] of replacements) {
+  if (!generated.includes(from)) {
+    throw new Error(`Visual release v3 could not locate required v2 marker: ${from.slice(0, 80)}`);
   }
 }
-
-generated = generated
-  .replace(referenceAssertionV2, referenceAssertionV3)
-  .replace(mobileProfileV2, mobileProfilesV3)
-  .replace(auditParserV2, auditParserV3)
-  .replace(scriptTagV2, scriptTagV3)
-  .replace(domParserCallV2, domParserCallV3);
-
-for (const marker of [referenceAssertionV3, mobileProfilesV3, auditParserV3, scriptTagV3, domParserCallV3]) {
+for (const [from, to] of replacements) generated = generated.replace(from, to);
+for (const [, marker] of replacements) {
   if (!generated.includes(marker)) {
     throw new Error(`Visual release v3 did not apply required hardening: ${marker.slice(0, 80)}`);
   }
