@@ -1,0 +1,58 @@
+/* Structured birthplace and timezone confirmation for Baseline-first onboarding. */
+
+.baseline-timezone-confirmation {
+  display: grid;
+  min-height: 52px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 13px;
+  padding: 15px 16px;
+  border: 1px solid var(--v0-route-line, rgba(245, 241, 232, 0.11));
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.014);
+  color: var(--v0-route-ink, #f5f1e8);
+  cursor: pointer;
+}
+
+.baseline-timezone-confirmation.has-error {
+  border-color: rgba(216, 160, 154, 0.72);
+}
+
+.baseline-timezone-confirmation input {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  accent-color: #5aa9ff;
+}
+
+.baseline-timezone-confirmation > span {
+  display: grid;
+  gap: 4px;
+}
+
+.baseline-timezone-confirmation strong {
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.baseline-timezone-confirmation small,
+.baseline-current-location-note {
+  color: var(--v0-route-muted, #a39c8f);
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.baseline-current-location-note {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--v0-route-line, rgba(245, 241, 232, 0.11));
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.012);
+}
+
+@media (max-width: 700px) {
+  .baseline-timezone-confirmation,
+  .baseline-current-location-note {
+    padding-inline: 14px;
+  }
+}
