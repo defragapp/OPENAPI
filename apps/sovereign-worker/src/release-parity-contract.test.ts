@@ -8,6 +8,8 @@ const runtime = readFileSync(resolve(workerRoot, 'src/runtime-entry.ts'), 'utf8'
 const packageJson = readFileSync(resolve(repositoryRoot, 'package.json'), 'utf8');
 const releaseWrapper = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-release.mjs'), 'utf8');
 const deployV3 = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-deploy-v3.mjs'), 'utf8');
+const deployV4 = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-deploy-v4.mjs'), 'utf8');
+const dmarcReconciler = readFileSync(resolve(repositoryRoot, 'scripts/configure-cloudflare-dmarc.mjs'), 'utf8');
 const parentVerifier = readFileSync(resolve(repositoryRoot, 'scripts/verify-parent-domain-routes-v3.mjs'), 'utf8');
 const visualVerifier = readFileSync(resolve(repositoryRoot, 'scripts/verify-live-visual-release-v2.mjs'), 'utf8');
 const visualRateLimiter = readFileSync(resolve(repositoryRoot, 'scripts/verify-live-visual-release-v3.mjs'), 'utf8');
@@ -46,11 +48,23 @@ describe('production release parity contract', () => {
     expect(deployV3).toContain("contract: 'v0-public-landing-v3'");
     expect(deployV3).toContain('center-sliced-expression-field');
     expect(packageJson).toContain('verify-live-visual-release-v3.mjs');
+    expect(releaseWrapper).toContain('cloudflare-production-deploy-v4.mjs');
     expect(releaseWrapper).toContain('verify-parent-domain-routes-v3.mjs');
     expect(releaseWrapper).toContain('verify-live-visual-release-v3.mjs');
     expect(visualVerifier).toContain('/browser-rendering/snapshot');
     expect(visualVerifier).toContain('screenshotOptions: { fullPage: true');
     expect(visualVerifier).toContain("method: 'Cloudflare Browser Run snapshot with full-page PNG plus deterministic normalized pixel, edge, color, and section-rhythm comparison'");
+  });
+
+  it('reconciles one verified DMARC record after the canonical deploy', () => {
+    expect(deployV4).toContain("configureCloudflareDmarc");
+    expect(deployV4).toContain("cloudflare-production-deploy-v3.mjs");
+    expect(dmarcReconciler).toContain("const RECORD_NAME = '_dmarc.defrag.app'");
+    expect(dmarcReconciler).toContain("v=DMARC1; p=none; sp=none; adkim=s; aspf=s; pct=100");
+    expect(dmarcReconciler).toContain('existing.length > 1');
+    expect(dmarcReconciler).toContain("method: 'POST'");
+    expect(dmarcReconciler).toContain("method: 'PATCH'");
+    expect(dmarcReconciler).toContain('records.length !== 1');
   });
 
   it('honors the Workers Free Quick Actions rate limit and validates the founder reference', () => {
