@@ -1,5 +1,6 @@
 import type { Env } from './env';
 import { cancelAccountSubscriptions } from './billing/stripe';
+import { notifyAccountDeletionCompleted } from './account-notifications';
 
 const ACCOUNT_TABLE_DELETES = [
   'auth_magic_links',
@@ -116,6 +117,12 @@ function requiredAccount(accountId?: string) {
   return accountId;
 }
 
+function emailFromAuthSubject(subject?: string | null): string | undefined {
+  if (!subject?.startsWith('email:')) return undefined;
+  const email = subject.slice('email:'.length).trim().toLowerCase();
+  return email.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : undefined;
+}
+
 export async function executeDeletion(env: Env, accountId: string, deletionJobId?: string) {
   const deletion = await env.DB.prepare(`SELECT id, status FROM deletion_jobs
     WHERE account_id = ?
@@ -126,6 +133,11 @@ export async function executeDeletion(env: Env, accountId: string, deletionJobId
     .bind(accountId, deletionJobId ?? '', deletionJobId ?? '')
     .first<{ id: string; status: string }>();
   if (!deletion) throw new Error('deletion_not_due_or_cancelled');
+
+  const account = await env.DB.prepare('SELECT auth_subject FROM accounts WHERE id = ?')
+    .bind(accountId)
+    .first<{ auth_subject: string }>();
+  const deletionRecipient = emailFromAuthSubject(account?.auth_subject);
 
   if (deletion.status === 'grace') {
     await cancelAccountSubscriptions(env, accountId, deletion.id);
@@ -151,6 +163,10 @@ export async function executeDeletion(env: Env, accountId: string, deletionJobId
     .run();
   await env.DB.prepare(`UPDATE deletion_jobs SET status = 'completed', completed_at = datetime('now')
     WHERE id = ? AND account_id = ? AND status = 'running'`).bind(deletion.id, accountId).run();
+
+  if (deletionRecipient) {
+    await notifyAccountDeletionCompleted(env, deletionRecipient, deletion.id);
+  }
 }
 
 export async function cancelDeletion(env: Env, accountId: string, jobId: string) {
