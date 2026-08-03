@@ -8,17 +8,19 @@ type FakeAnswer = {
   dataset: Record<string, string>;
   attributes: Map<string, string>;
   headline: FakeTextNode;
+  directAnswer: FakeTextNode;
   label: FakeTextNode;
   querySelector: (selector: string) => FakeTextNode | null;
   setAttribute: (name: string, value: string) => void;
   getAttribute: (name: string) => string | null;
 };
 
-function createAnswer(headline: string, label = 'Sovereign'): FakeAnswer {
+function createAnswer(headline: string, directAnswer: string, label = 'Sovereign'): FakeAnswer {
   const answer: FakeAnswer = {
     dataset: {},
     attributes: new Map(),
     headline: { textContent: headline },
+    directAnswer: { textContent: directAnswer },
     label: { textContent: label },
     querySelector: () => null,
     setAttribute(name, value) {
@@ -30,9 +32,11 @@ function createAnswer(headline: string, label = 'Sovereign'): FakeAnswer {
   };
   answer.querySelector = (selector) => selector === 'h2'
     ? answer.headline
-    : selector === 'header > span'
-      ? answer.label
-      : null;
+    : selector === '.direct-answer'
+      ? answer.directAnswer
+      : selector === 'header > span'
+        ? answer.label
+        : null;
   return answer;
 }
 
@@ -51,20 +55,40 @@ function installDeterministicDom(answers: FakeAnswer[]): void {
   vi.stubGlobal('MutationObserver', TestMutationObserver);
 }
 
+function safetyAnswer(overrides: Record<string, unknown>) {
+  return {
+    version: 'sovereign-answer.v2',
+    headline: 'Safety response',
+    direct_answer: 'A deterministic response that is long enough to be presented clearly.',
+    safety_mode: 'grounded',
+    confidence: 'supported',
+    basis_refs: [],
+    actions: [],
+    ...overrides
+  };
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.resetModules();
 });
 
 describe('safety response presentation runtime', () => {
-  it('labels urgent deterministic responses and removes ordinary answer controls', async () => {
-    const urgent = createAnswer('Immediate human support matters most.', 'Sovereign · Baseline');
+  it('labels urgent deterministic responses from the answer contract and removes ordinary controls', async () => {
+    const urgent = createAnswer('Immediate support', 'Bring in a real person now.', 'Sovereign · Baseline');
     installDeterministicDom([urgent]);
-    const { installSafetyResponseRuntime } = await import('./SafetyResponseRuntime');
+    const runtime = await import('./SafetyResponseRuntime');
 
-    installSafetyResponseRuntime();
+    runtime.registerSafetyResponsePayload({ answer: safetyAnswer({
+      headline: 'Immediate support',
+      direct_answer: 'Bring in a real person now.',
+      safety_mode: 'escalate',
+      confidence: 'confirmed'
+    }) });
+    runtime.applySafetyResponsePresentation();
 
     expect(urgent.dataset.sovereignSafety).toBe('urgent');
+    expect(urgent.dataset.sovereignSafetySource).toBe('answer-contract');
     expect(urgent.getAttribute('aria-label')).toBe('Immediate human support response');
     expect(urgent.label.textContent).toBe('Sovereign · Immediate support');
     expect(css).toContain('[data-sovereign-safety] .answer-actions');
@@ -72,19 +96,40 @@ describe('safety response presentation runtime', () => {
     expect(css).toContain('display: none !important');
   });
 
-  it('recognizes grounded and protected-boundary deterministic responses only', async () => {
-    const grounded = createAnswer('Separate what is happening from what it may mean.');
-    const protectedBoundary = createAnswer('Private system details stay protected.');
-    const ordinary = createAnswer('An ordinary Baseline answer.');
+  it('distinguishes grounded and protected-boundary responses without headline allowlists', async () => {
+    const grounded = createAnswer('Any grounded headline', 'A grounded response body.');
+    const protectedBoundary = createAnswer('Any protected headline', 'A protected response body.');
+    const ordinary = createAnswer('An ordinary Baseline answer.', 'An ordinary response body.');
     installDeterministicDom([grounded, protectedBoundary, ordinary]);
-    const { installSafetyResponseRuntime } = await import('./SafetyResponseRuntime');
+    const runtime = await import('./SafetyResponseRuntime');
 
-    installSafetyResponseRuntime();
+    runtime.registerSafetyResponsePayload([
+      { answer: safetyAnswer({ headline: 'Any grounded headline', direct_answer: 'A grounded response body.' }) },
+      { answer: safetyAnswer({
+        headline: 'Any protected headline',
+        direct_answer: 'A protected response body.',
+        confidence: 'confirmed'
+      }) },
+      { answer: safetyAnswer({
+        headline: 'An ordinary Baseline answer.',
+        direct_answer: 'An ordinary response body.',
+        safety_mode: 'standard'
+      }) }
+    ]);
+    runtime.applySafetyResponsePresentation();
 
     expect(grounded.dataset.sovereignSafety).toBe('grounded');
     expect(grounded.label.textContent).toBe('Sovereign · Grounded response');
     expect(protectedBoundary.dataset.sovereignSafety).toBe('secure-refusal');
     expect(protectedBoundary.label.textContent).toBe('Sovereign · Protected boundary');
     expect(ordinary.dataset.sovereignSafety).toBeUndefined();
+  });
+
+  it('contains no hard-coded safety headline classifier', async () => {
+    const source = readFileSync(new URL('./SafetyResponseRuntime.ts', import.meta.url), 'utf8');
+    expect(source).not.toContain('SAFETY_HEADLINES');
+    expect(source).not.toContain('Immediate human support matters most.');
+    expect(source).not.toContain('Separate what is happening from what it may mean.');
+    expect(source).toContain("dataset.sovereignSafetySource = 'answer-contract'");
   });
 });
