@@ -18,10 +18,13 @@ describe('public AI transparency', () => {
     }
   });
 
-  it('uses validated answer fields instead of headline classification for safety presentation', () => {
-    expect(safetyRuntime).toContain("answer.safety_mode === 'escalate'");
-    expect(safetyRuntime).toContain("answer.safety_mode !== 'grounded'");
-    expect(safetyRuntime).toContain("dataset.sovereignSafetySource = 'answer-contract'");
+  it('uses the explicit safety response contract instead of answer or headline inference', () => {
+    expect(safetyRuntime).toContain("safety.version !== 'sovereign-safety-response.v1'");
+    for (const presentation of ['grounded', 'supportive_resources', 'urgent', 'emergency', 'secure_refusal']) {
+      expect(safetyRuntime).toContain(`'${presentation}'`);
+    }
+    expect(safetyRuntime).toContain("dataset.sovereignSafetySource = 'safety-response-contract'");
     expect(safetyRuntime).not.toContain('SAFETY_HEADLINES');
+    expect(safetyRuntime).not.toContain('presentationFromAnswer');
   });
 });
