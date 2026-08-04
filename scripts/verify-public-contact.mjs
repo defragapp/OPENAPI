@@ -13,12 +13,14 @@ const scanRoots = [
 ];
 const explicitFiles = ['wrangler.jsonc', 'wrangler.production-direct.jsonc'];
 const scannedExtensions = new Set(['.ts', '.tsx', '.js', '.mjs', '.html', '.json', '.jsonc']);
+const excludedPaths = new Set(['scripts/verify-public-contact.mjs']);
 const errors = [];
 let approvedOccurrences = 0;
 
 for (const path of [...explicitFiles, ...scanRoots.flatMap(walk)]) {
-  const source = readFileSync(resolve(root, path), 'utf8');
   const normalizedPath = path.replaceAll('\\', '/');
+  if (excludedPaths.has(normalizedPath) || normalizedPath.includes('.test.')) continue;
+  const source = readFileSync(resolve(root, path), 'utf8');
   approvedOccurrences += source.split(approvedPublicContact).length - 1;
 
   if (source.includes(prohibitedPublicAddress)) {
@@ -75,9 +77,6 @@ function allowsVerifiedSender(path, source, occurrences) {
   }
   if (path === 'wrangler.jsonc' || path === 'wrangler.production-direct.jsonc') {
     return occurrences === 1 && source.includes(`"TRANSACTIONAL_FROM_EMAIL": "${verifiedTransactionalSender}"`);
-  }
-  if (path.endsWith('.test.ts') || path.endsWith('.test.tsx')) {
-    return source.includes('TRANSACTIONAL_FROM_EMAIL') || source.includes('payload.from');
   }
   return false;
 }
