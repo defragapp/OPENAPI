@@ -1,5 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
+import { setTimeout as delay } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 import {
   deliverReleaseReport,
@@ -12,6 +13,11 @@ const reportUrl = String(process.env.RELEASE_REPORT_URL || '').trim();
 const reportKey = String(process.env.RELEASE_REPORT_KEY || '').trim();
 const reportTransport = process.env.RELEASE_REPORT_TRANSPORT === 'query' ? 'query' : 'post';
 const LEGACY_DEPLOY_COMPATIBILITY = 'cloudflare-production-deploy-v2.mjs';
+const browserRunRetryDelayMs = Math.min(
+  120_000,
+  Math.max(15_000, Number(process.env.BROWSER_RUN_RATE_LIMIT_RETRY_MS || 65_000) || 65_000)
+);
+const browserRunMaxAttempts = 3;
 let reportSkipLogged = false;
 
 function fail(message) {
@@ -77,6 +83,40 @@ function emitResult(label, result) {
   return `${String(result.stdout || '')}\n${String(result.stderr || '')}`.trim();
 }
 
+function isBrowserRunRateLimit(output) {
+  return /(?:\(429\)|\b429\b|Rate limit exceeded|["']?code["']?\s*:\s*2001)/i.test(String(output || ''));
+}
+
+async function runAuthoritativeStep(label, path, environment) {
+  const retryable = label === 'verify-route-cohesion';
+  const maxAttempts = retryable ? browserRunMaxAttempts : 1;
+  let collectedOutput = '';
+  let result;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    result = runNodeScript(path, environment);
+    const output = emitResult(label, result);
+    collectedOutput = `${collectedOutput}\n[attempt:${attempt}/${maxAttempts}]\n${output}`.trim();
+
+    if (!result.error && result.status === 0) {
+      return { result, output: collectedOutput };
+    }
+
+    const rateLimited = retryable && isBrowserRunRateLimit(output);
+    if (!rateLimited || attempt >= maxAttempts) {
+      return { result, output: collectedOutput };
+    }
+
+    process.stderr.write(
+      `[cloudflare-release] stage=${label} status=retry reason=browser-run-rate-limit `
+      + `attempt=${attempt}/${maxAttempts} waitMs=${browserRunRetryDelayMs}\n`
+    );
+    await delay(browserRunRetryDelayMs);
+  }
+
+  return { result, output: collectedOutput };
+}
+
 const checkoutSha = runGit(['rev-parse', 'HEAD'], 'unable to resolve the checked-out commit');
 if (!/^[0-9a-f]{40}$/i.test(checkoutSha)) {
   fail('the checked-out commit is not a full 40-character SHA');
@@ -106,13 +146,14 @@ void LEGACY_DEPLOY_COMPATIBILITY;
 await report(checkoutSha, 'start');
 let combinedOutput = '';
 for (const [label, path] of authoritativeSteps) {
-  const result = runNodeScript(path, releaseEnv);
-  const output = emitResult(label, result);
+  const step = await runAuthoritativeStep(label, path, releaseEnv);
+  const result = step.result;
+  const output = step.output;
   combinedOutput = `${combinedOutput}\n[${label}]\n${output}`.trim();
-  if (result.error || result.status !== 0) {
-    await report(checkoutSha, 'failure', combinedOutput || String(result.error?.message || `exit ${result.status}`));
-    if (result.error) fail(result.error.message);
-    process.exit(result.status || 1);
+  if (!result || result.error || result.status !== 0) {
+    await report(checkoutSha, 'failure', combinedOutput || String(result?.error?.message || `exit ${result?.status}`));
+    if (result?.error) fail(result.error.message);
+    process.exit(result?.status || 1);
   }
 }
 
