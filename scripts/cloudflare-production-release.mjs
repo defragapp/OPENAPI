@@ -8,9 +8,11 @@ import {
 } from './release-report-client.mjs';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const reportUrl = 'https://60e450a49abc97aea5.v2.appdeploy.ai/api/report';
-const reportKey = 'sovereign-release-379a-9d8c4e77';
+const reportUrl = String(process.env.RELEASE_REPORT_URL || '').trim();
+const reportKey = String(process.env.RELEASE_REPORT_KEY || '').trim();
+const reportTransport = process.env.RELEASE_REPORT_TRANSPORT === 'query' ? 'query' : 'post';
 const LEGACY_DEPLOY_COMPATIBILITY = 'cloudflare-production-deploy-v2.mjs';
+let reportSkipLogged = false;
 
 function fail(message) {
   throw new Error(`Cloudflare production release failed: ${message}`);
@@ -29,6 +31,14 @@ function runGit(args, label) {
 }
 
 async function report(sha, status, output = '') {
+  if (!reportUrl || !reportKey) {
+    if (!reportSkipLogged) {
+      console.log('[cloudflare-release-report] phase=deploy delivery=skipped reason=endpoint-unconfigured');
+      reportSkipLogged = true;
+    }
+    return false;
+  }
+
   const result = await deliverReleaseReport({
     url: reportUrl,
     key: reportKey,
@@ -37,7 +47,7 @@ async function report(sha, status, output = '') {
     stage: 'production-deploy',
     status,
     output,
-    transport: 'query',
+    transport: reportTransport,
     attempts: 3,
     timeoutMs: 10_000
   });

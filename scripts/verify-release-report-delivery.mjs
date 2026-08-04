@@ -1,10 +1,14 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   deliverReleaseReport,
   formatReleaseReportDelivery,
   sanitizeReleaseReportOutput
 } from './release-report-client.mjs';
 
+const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const sha = '992e5a153516d7acf51f070ac1250cade69b78af';
 
 let retryCalls = 0;
@@ -95,4 +99,12 @@ assert.equal(redacted.includes(fakeCloudflareToken), false);
 assert.equal(redacted.includes(fakeBearer), false);
 assert.equal(redacted.includes(fakeApiKey), false);
 
-console.log('Release report delivery verified retries=3 http-diagnostics=true redaction=true query-transport=true');
+for (const script of ['scripts/cloudflare-build-diagnostics.mjs', 'scripts/cloudflare-production-release.mjs']) {
+  const source = readFileSync(resolve(root, script), 'utf8');
+  assert.match(source, /process\.env\.RELEASE_REPORT_URL/);
+  assert.match(source, /process\.env\.RELEASE_REPORT_KEY/);
+  assert.match(source, /delivery=skipped reason=endpoint-unconfigured/);
+  assert.equal(source.includes('.v2.appdeploy.ai/api/report'), false);
+}
+
+console.log('Release report delivery verified retries=3 http-diagnostics=true redaction=true query-transport=true configured-ingress-only=true');
