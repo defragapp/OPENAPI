@@ -27,14 +27,16 @@ const staticPages = [
 ] as const;
 
 describe('deployed route cohesion', () => {
-  it('loads the mounted-platform authority last after passkey and route foundations', () => {
+  it('keeps the certified route CSS last while mounting the platform authority before React', () => {
     const passkey = main.indexOf("import './passkey-auth.css';");
     const cohesion = main.indexOf("import './deployed-route-cohesion.css';");
-    const platform = main.indexOf("import './platform-visual-cohesion-v1.css';");
     expect(passkey).toBeGreaterThan(-1);
     expect(cohesion).toBeGreaterThan(passkey);
-    expect(platform).toBeGreaterThan(cohesion);
-    expect(main.slice(platform + 1)).not.toContain("import './");
+    expect(main.slice(cohesion + 1)).not.toContain("import './");
+    expect(main).toContain("import platformVisualCohesionUrl from './platform-visual-cohesion-v1.css?url'");
+    expect(main).toContain('function installPlatformVisualCohesion(): void');
+    expect(main).toContain("link.dataset.sovereignPlatformCohesion = 'v1'");
+    expect(main.indexOf('installPlatformVisualCohesion();')).toBeLessThan(main.indexOf('installV0ReleaseFingerprint();'));
     expect(main).toContain("dataset.sovereignPlatformCohesion = 'v1'");
   });
 
@@ -95,7 +97,8 @@ describe('deployed route cohesion', () => {
     expect(platformAuthority).toContain('@media (max-width: 820px)');
     expect(platformAuthority).toContain('@media (max-width: 560px)');
     expect(platformAuthority).toContain('env(safe-area-inset-bottom)');
-    expect(platformAuthority).toContain('min-height: 44px');
+    expect(platformAuthority).toContain('width: 44px');
+    expect(platformAuthority).toContain('height: 44px');
     expect(platformAuthority).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
