@@ -70,8 +70,9 @@ import './account-journey-structured.css';
 import './account-journey-release-cohesion.css';
 import './passkey-auth.css';
 
-/* Final non-landing route authority. */
+/* Final non-landing route and mounted-platform authority. */
 import './deployed-route-cohesion.css';
+import './platform-visual-cohesion-v1.css';
 
 installV0ReleaseFingerprint();
 installProductionRuntime();
@@ -146,6 +147,7 @@ installMobileViewportStability();
 document.documentElement.dataset.sovereignLayoutRelease = 'approved-public-v8';
 document.documentElement.dataset.sovereignProductStories = 'isolated-mobile-first-v2';
 document.documentElement.dataset.sovereignMotionRelease = 'v0-motion-workflows-v8';
+document.documentElement.dataset.sovereignPlatformCohesion = 'v1';
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'
