@@ -87,6 +87,29 @@ function isBrowserRunRateLimit(output) {
   return /(?:\(429\)|\b429\b|Rate limit exceeded|["']?code["']?\s*:\s*2001)/i.test(String(output || ''));
 }
 
+function publishFailureProgress(sha, stage, output, environment) {
+  const summary = sanitizeReleaseReportOutput(output || `${stage} failed`).slice(-6_000);
+  const progressResult = runNodeScript('scripts/write-cloudflare-release-progress.mjs', {
+    ...environment,
+    WORKERS_CI_COMMIT_SHA: sha,
+    GITHUB_SHA: sha,
+    APP_VERSION: sha,
+    RELEASE_PROGRESS_STAGE: stage,
+    RELEASE_PROGRESS_STATUS: 'failure',
+    RELEASE_PROGRESS_SUMMARY: summary
+  });
+  const progressOutput = emitResult('write-release-progress', progressResult);
+  if (progressResult.error || progressResult.status !== 0) {
+    process.stderr.write(
+      `[cloudflare-release] stage=write-release-progress status=failure originalStage=${stage} `
+      + `detail=${sanitizeReleaseReportOutput(progressOutput || progressResult.error?.message || `exit ${progressResult.status}`).slice(-800)}\n`
+    );
+    return false;
+  }
+  process.stderr.write(`[cloudflare-release] stage=write-release-progress status=success originalStage=${stage}\n`);
+  return true;
+}
+
 async function runAuthoritativeStep(label, path, environment) {
   const retryable = label === 'verify-route-cohesion';
   const maxAttempts = retryable ? browserRunMaxAttempts : 1;
@@ -145,16 +168,19 @@ const authoritativeSteps = [
 void LEGACY_DEPLOY_COMPATIBILITY;
 await report(checkoutSha, 'start');
 let combinedOutput = '';
+let primaryDeploymentComplete = false;
 for (const [label, path] of authoritativeSteps) {
   const step = await runAuthoritativeStep(label, path, releaseEnv);
   const result = step.result;
   const output = step.output;
   combinedOutput = `${combinedOutput}\n[${label}]\n${output}`.trim();
   if (!result || result.error || result.status !== 0) {
+    if (primaryDeploymentComplete) publishFailureProgress(checkoutSha, label, output, releaseEnv);
     await report(checkoutSha, 'failure', combinedOutput || String(result?.error?.message || `exit ${result?.status}`));
     if (result?.error) fail(result.error.message);
     process.exit(result?.status || 1);
   }
+  if (label === 'deploy-v3') primaryDeploymentComplete = true;
 }
 
 const dmarcResult = runNodeScript('scripts/configure-cloudflare-dmarc.mjs', releaseEnv);
@@ -173,6 +199,7 @@ const evidenceResult = runNodeScript('scripts/write-cloudflare-release-evidence.
 const evidenceOutput = emitResult('write-release-evidence', evidenceResult);
 combinedOutput = `${combinedOutput}\n[write-release-evidence]\n${evidenceOutput}`.trim();
 if (evidenceResult.error || evidenceResult.status !== 0) {
+  publishFailureProgress(checkoutSha, 'write-release-evidence', evidenceOutput || evidenceResult.error?.message || `exit ${evidenceResult.status}`, releaseEnv);
   await report(checkoutSha, 'failure', combinedOutput || String(evidenceResult.error?.message || `exit ${evidenceResult.status}`));
   if (evidenceResult.error) fail(evidenceResult.error.message);
   process.exit(evidenceResult.status || 1);
