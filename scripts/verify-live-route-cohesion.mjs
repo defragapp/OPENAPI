@@ -28,7 +28,7 @@ const routes = [
   { name: 'terms', url: `${publicBase}/terms`, root: '.public-secondary-page', heading: '.policy-hero h1', nav: '.v0-nav', content: '.policy-grid', family: 'policy', mobile: false },
   { name: 'login', url: `${appBase}/login`, root: '.account-shell', heading: '.account-intro h1', nav: '.account-nav', content: '.account-layout', family: 'auth', mobile: true },
   { name: 'signup', url: `${appBase}/signup`, root: '.account-shell', heading: '.account-intro h1', nav: '.account-nav', content: '.account-layout', family: 'auth', mobile: true },
-  { name: 'invitation', url: `${appBase}/invitation?token=route-cohesion-audit`, root: '.invitation-shell', heading: '.auth-panel h1', nav: '.wordmark', content: '.auth-panel', family: 'invitation', mobile: true },
+  { name: 'invitation', url: `${appBase}/invitation?token=route-cohesion-audit`, root: '.invitation-shell', heading: '.auth-panel h1', nav: '.wordmark', content: '.auth-panel', family: 'invitation', mobile: true, waitUntil: 'load' },
   { name: 'onboarding-gate', url: `${appBase}/onboarding`, root: '.account-shell', heading: '.account-intro h1', nav: '.account-nav', content: '.account-layout', family: 'auth-redirect', mobile: false },
   { name: 'workspace-gate', url: `${appBase}/app`, root: '.account-shell', heading: '.account-intro h1', nav: '.account-nav', content: '.account-layout', family: 'auth-redirect', mobile: false },
   { name: 'not-found', url: `${appBase}/route-cohesion-not-found`, root: '.public-not-found', heading: '.public-not-found h1', nav: '.private-route-brand', content: '.public-not-found > section', family: 'not-found', mobile: true }
@@ -88,7 +88,7 @@ function productionSnapshotBody(route, profileName) {
     url: `${route.url}${route.url.includes('?') ? '&' : '?'}release=${encodeURIComponent(commitSha)}&routeAudit=${profileName}`,
     formats: ['content', 'screenshot'],
     viewport: viewports[profileName],
-    gotoOptions: { waitUntil: 'networkidle0', timeout: 45_000 },
+    gotoOptions: { waitUntil: route.waitUntil || 'networkidle0', timeout: 45_000 },
     waitForSelector: { selector: auditMarkerSelector, timeout: 45_000 },
     waitForTimeout: 100,
     actionTimeout: 120_000,
@@ -130,6 +130,7 @@ function verifyAuditTransportContract() {
   assert(new URL(invitationRoute.url).pathname === '/invitation', 'invitation audit URL does not mount InvitationPage');
   assert(new URL(invitationRoute.url).searchParams.get('token') === 'route-cohesion-audit', 'invitation audit URL does not provide deterministic token input');
   assert(invitationRoute.heading === '.auth-panel h1', 'invitation audit heading selector does not match InvitationPage');
+  assert(invitationRoute.waitUntil === 'load', 'invitation audit does not avoid token-preview network-idle deadlock');
 
   for (const route of routes) {
     const pathname = new URL(route.url).pathname;
@@ -149,6 +150,7 @@ function verifyAuditTransportContract() {
     assert(scriptUrl.searchParams.get('content') === route.content, `${route.name}/desktop: audit content selector changed in transport`);
     assert(scriptUrl.searchParams.get('deadline') === String(auditDeadlineMs), `${route.name}/desktop: audit deadline changed in transport`);
     assert(scriptUrl.searchParams.get('poll') === String(auditPollIntervalMs), `${route.name}/desktop: audit polling interval changed in transport`);
+    assert(request.gotoOptions.waitUntil === (route.waitUntil || 'networkidle0'), `${route.name}/desktop: Browser Run navigation condition changed in transport`);
     assert(!('content' in request.addScriptTag[0]), `${route.name}/desktop: Browser Run still injects inline script content blocked by production CSP`);
     assert(request.waitForSelector.selector === auditMarkerSelector, `${route.name}/desktop: Browser Run does not wait for audit completion`);
   }
