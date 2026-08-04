@@ -1,33 +1,46 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent, PointerEvent } from 'react';
 import { landingExpressionFieldFixture } from './expression-field.fixture';
-import { salienceLabel, type ExpressionAxisId, type ExpressionAxisValue } from './expression-field-contract';
+import {
+  expressionAxisIds,
+  expressionAxisRegistryById,
+  salienceLabel,
+  type ExpressionAxisId,
+  type ExpressionAxisValue
+} from './expression-field-contract';
 
 const VIEWBOX_SIZE = 920;
 const CENTER = VIEWBOX_SIZE / 2;
 const SPHERE_RADIUS = 286;
 const MIN_AXIS_LENGTH = 118;
 const MAX_AXIS_LENGTH = 344;
-const ROTATION_LIMIT = 32;
+const ROTATION_LIMIT = 72;
 const AUTO_ROTATION_DEGREES_PER_MS = 0.0018;
+const TOOLTIP_WIDTH = 202;
+const TOOLTIP_HEIGHT = 68;
+const TOOLTIP_GAP = 16;
+const INTERACTION_PAUSE_MS = 6200;
 const LEGACY_TOOLTIP_COMPATIBILITY = 'landing-expression-slice__tooltip · Baseline value · Live change · Current';
 void LEGACY_TOOLTIP_COMPATIBILITY;
 
-const LANDING_AXIS_LAYOUT = [
-  { id: 'clarity', azimuth: -152, elevation: -18, description: 'How quickly a useful distinction becomes available.' },
-  { id: 'focus', azimuth: -108, elevation: 24, description: 'Where attention can stay long enough to become useful.' },
-  { id: 'steadiness', azimuth: -58, elevation: -34, description: 'What helps you remain organized while conditions change.' },
-  { id: 'courage', azimuth: -12, elevation: 38, description: 'The capacity to move while uncertainty is still present.' },
-  { id: 'tenderness', azimuth: 38, elevation: -10, description: 'How care remains available without taking over responsibility.' },
-  { id: 'boundaries', azimuth: 86, elevation: 31, description: 'The distinction between what belongs to you and what belongs to someone else.' },
-  { id: 'responsibility', azimuth: 134, elevation: -29, description: 'The pull to carry what needs doing, especially when uncertainty rises.' },
-  { id: 'repair', azimuth: 176, elevation: 16, description: 'How tension can be addressed after something lands badly.' }
-] as const satisfies readonly {
-  id: ExpressionAxisId;
-  azimuth: number;
-  elevation: number;
-  description: string;
-}[];
+const AXIS_DESCRIPTIONS: Record<ExpressionAxisId, string> = {
+  clarity: 'How quickly a useful distinction becomes available.',
+  focus: 'Where attention can stay long enough to become useful.',
+  steadiness: 'What helps you remain organized while conditions change.',
+  urgency: 'How strongly the moment pulls for an immediate response.',
+  courage: 'The capacity to move while uncertainty is still present.',
+  fear: 'How threat, uncertainty, or consequence becomes noticeable.',
+  anger: 'The force that appears when a limit, need, or value is crossed.',
+  tenderness: 'How care remains available without taking over responsibility.',
+  grief: 'How loss, change, or unmet meaning asks to be acknowledged.',
+  joy: 'How aliveness, pleasure, and connection become available.',
+  desire: 'The pull toward what feels meaningful, wanted, or unfinished.',
+  trust: 'How safety and reliance become possible without certainty.',
+  patience: 'The capacity to let timing reveal what pressure cannot.',
+  boundaries: 'The distinction between what belongs to you and what belongs to someone else.',
+  responsibility: 'The pull to carry what needs doing, especially when uncertainty rises.',
+  repair: 'How tension can be addressed after something lands badly.'
+};
 
 type Vector3 = { x: number; y: number; z: number };
 type Rotation = { yaw: number; pitch: number };
@@ -49,11 +62,18 @@ type DragState = {
   startY: number;
   startRotation: Rotation;
 };
+type TooltipPlacement = {
+  x: number;
+  y: number;
+  connectorX: number;
+  connectorY: number;
+};
 
 export function LandingExpressionSlice() {
   const [selectedId, setSelectedId] = useState<ExpressionAxisId>('clarity');
   const [rotation, setRotation] = useState<Rotation>({ yaw: 18, pitch: -7 });
   const dragState = useRef<DragState | null>(null);
+  const pauseUntil = useRef(0);
   const id = useId().replace(/:/g, '');
   const glowId = `${id}-landing-expression-glow`;
   const coreGlowId = `${id}-landing-expression-core`;
@@ -63,6 +83,8 @@ export function LandingExpressionSlice() {
   const projectedAmbient = useMemo(() => ambientRays.map((ray) => projectAmbientRay(ray, rotation)), [ambientRays, rotation]);
   const projectedAxes = useMemo(() => axes.map((axis) => projectAxis(axis, rotation)), [axes, rotation]);
   const selected = axes.find((item) => item.axis.id === selectedId) ?? firstAxis(axes);
+  const selectedProjected = projectedAxes.find((item) => item.axis.id === selected.axis.id) ?? firstProjectedAxis(projectedAxes);
+  const tooltip = placeTooltip(selectedProjected.projected);
 
   useEffect(() => {
     if (typeof window === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -73,13 +95,15 @@ export function LandingExpressionSlice() {
     const tick = (now: number) => {
       const elapsed = Math.min(now - last, 100);
       last = now;
-      if (!dragState.current) {
+      if (!dragState.current && now >= pauseUntil.current) {
         accumulated += elapsed;
         if (accumulated >= 42) {
           const step = accumulated * AUTO_ROTATION_DEGREES_PER_MS;
           accumulated = 0;
           setRotation((value) => ({ ...value, yaw: wrapAngle(value.yaw + step) }));
         }
+      } else {
+        accumulated = 0;
       }
       frame = window.requestAnimationFrame(tick);
     };
@@ -88,7 +112,12 @@ export function LandingExpressionSlice() {
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
+  function pauseRotation(duration = INTERACTION_PAUSE_MS) {
+    pauseUntil.current = performance.now() + duration;
+  }
+
   function selectAxis(axisId: ExpressionAxisId) {
+    pauseRotation();
     setSelectedId(axisId);
   }
 
@@ -100,12 +129,14 @@ export function LandingExpressionSlice() {
     }
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
+      pauseRotation();
       const direction = event.key === 'ArrowLeft' ? -1 : 1;
       setRotation((value) => ({ ...value, yaw: wrapAngle(value.yaw + direction * 4) }));
       return;
     }
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
       event.preventDefault();
+      pauseRotation();
       const direction = event.key === 'ArrowUp' ? -1 : 1;
       setRotation((value) => ({ ...value, pitch: clamp(value.pitch + direction * 3, -ROTATION_LIMIT, ROTATION_LIMIT) }));
     }
@@ -113,6 +144,7 @@ export function LandingExpressionSlice() {
 
   function handlePointerDown(event: PointerEvent<SVGSVGElement>) {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
+    pauseRotation();
     event.currentTarget.setPointerCapture(event.pointerId);
     dragState.current = {
       pointerId: event.pointerId,
@@ -126,8 +158,8 @@ export function LandingExpressionSlice() {
     const drag = dragState.current;
     if (!drag || drag.pointerId !== event.pointerId) return;
     const bounds = event.currentTarget.getBoundingClientRect();
-    const yawDelta = (event.clientX - drag.startX) / Math.max(bounds.width, 1) * 140;
-    const pitchDelta = (event.clientY - drag.startY) / Math.max(bounds.height, 1) * 72;
+    const yawDelta = (event.clientX - drag.startX) / Math.max(bounds.width, 1) * 160;
+    const pitchDelta = (event.clientY - drag.startY) / Math.max(bounds.height, 1) * 110;
     setRotation({
       yaw: wrapAngle(drag.startRotation.yaw + yawDelta),
       pitch: clamp(drag.startRotation.pitch - pitchDelta, -ROTATION_LIMIT, ROTATION_LIMIT)
@@ -137,6 +169,7 @@ export function LandingExpressionSlice() {
   function handlePointerEnd(event: PointerEvent<SVGSVGElement>) {
     if (dragState.current?.pointerId !== event.pointerId) return;
     dragState.current = null;
+    pauseRotation(2600);
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
@@ -150,14 +183,15 @@ export function LandingExpressionSlice() {
       data-viewport-surface="expression-slice"
       data-visual-contract="landing-expression-field-v3"
       data-field-geometry="spherical-360"
-      data-release-copy="Illustrative Baseline · Eight interactive measurements · one stable center · line length follows relative expression reach · not a diagnosis, score, or claim about anyone’s internal state"
+      data-field-axis-count={expressionAxisIds.length}
+      data-release-copy="Illustrative Baseline · Sixteen interactive measurements · one stable center · line length follows relative expression reach · not a diagnosis, score, or claim about anyone’s internal state"
       aria-label="Interactive Baseline expression field"
     >
       <svg
         className="landing-expression-slice__canvas"
         viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
         role="group"
-        aria-label="A stable blue sphere with eight interactive measurement lines radiating in every direction from one center. Longer lines show more available expression in this sanitized example. Shorter lines remain closer to the center. Drag to rotate."
+        aria-label="A stable blue sphere with sixteen interactive measurement lines radiating in every direction from one center. Longer lines show more available expression in this sanitized example. Shorter lines remain closer to the center. Drag to rotate."
         preserveAspectRatio="xMidYMid meet"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -225,7 +259,7 @@ export function LandingExpressionSlice() {
             .map(({ axis, description, projected }) => {
               const selectedLine = axis.id === selectedId;
               const path = `M ${CENTER} ${CENTER} L ${projected.x.toFixed(2)} ${projected.y.toFixed(2)}`;
-              const depthOpacity = 0.62 + projected.depth * 0.38;
+              const depthOpacity = 0.54 + projected.depth * 0.46;
               return (
                 <g
                   key={axis.id}
@@ -234,7 +268,6 @@ export function LandingExpressionSlice() {
                   tabIndex={0}
                   aria-pressed={selectedLine}
                   aria-label={`${axis.label}. ${salienceLabel(axis.value)}. Relative reach ${axis.value}. Baseline ${axis.baselineValue}. Temporary change ${formatDelta(axis.currentDelta)}. ${description}`}
-                  onPointerEnter={() => selectAxis(axis.id)}
                   onFocus={() => selectAxis(axis.id)}
                   onClick={(event) => {
                     event.stopPropagation();
@@ -246,12 +279,19 @@ export function LandingExpressionSlice() {
                     className="landing-expression-slice__aura"
                     d={path}
                     filter={`url(#${glowId})`}
-                    style={{ opacity: selectedLine ? 0.88 : depthOpacity * 0.45 }}
+                    style={{ opacity: selectedLine ? 0.88 : depthOpacity * 0.38 }}
                   />
                   <path
                     className="landing-expression-slice__beam"
                     d={path}
-                    style={{ opacity: selectedLine ? 1 : depthOpacity }}
+                    style={{ opacity: selectedLine ? 1 : depthOpacity * 0.88 }}
+                  />
+                  <circle
+                    className="landing-expression-slice__endpoint"
+                    cx={projected.x}
+                    cy={projected.y}
+                    r={selectedLine ? 4.1 : 2.25}
+                    style={{ opacity: selectedLine ? 1 : depthOpacity * 0.72 }}
                   />
                   <path className="landing-expression-slice__hit" d={path} />
                 </g>
@@ -264,9 +304,34 @@ export function LandingExpressionSlice() {
           <circle cx={CENTER} cy={CENTER} r="7" />
           <circle cx={CENTER} cy={CENTER} r="2.4" />
         </g>
+
+        <g className="landing-expression-slice__tooltip" aria-hidden="true">
+          <line
+            className="landing-expression-slice__tooltip-connector"
+            x1={selectedProjected.projected.x}
+            y1={selectedProjected.projected.y}
+            x2={tooltip.connectorX}
+            y2={tooltip.connectorY}
+          />
+          <g transform={`translate(${tooltip.x.toFixed(2)} ${tooltip.y.toFixed(2)})`}>
+            <rect
+              className="landing-expression-slice__tooltip-panel"
+              width={TOOLTIP_WIDTH}
+              height={TOOLTIP_HEIGHT}
+              rx="8"
+            />
+            <text className="landing-expression-slice__tooltip-title" x="14" y="22">{selected.axis.label}</text>
+            <text className="landing-expression-slice__tooltip-value" x="14" y="42">
+              Reach {selected.axis.value} · {salienceLabel(selected.axis.value)}
+            </text>
+            <text className="landing-expression-slice__tooltip-meta" x="14" y="57">
+              Baseline {selected.axis.baselineValue}{selected.axis.currentDelta !== 0 ? ` · temporary ${formatDelta(selected.axis.currentDelta)}` : ''}
+            </text>
+          </g>
+        </g>
       </svg>
 
-      <div className="landing-expression-slice__readout" role="status" aria-live="polite">
+      <div className="landing-expression-slice__readout landing-expression-slice__readout--accessible" role="status" aria-live="polite">
         <span>Relative expression · sanitized example</span>
         <strong>{selected.axis.label}</strong>
         <p>{selected.description}</p>
@@ -285,14 +350,15 @@ export function LandingExpressionSlice() {
 
 function buildLandingAxes(): LandingAxis[] {
   const axisById = new Map(landingExpressionFieldFixture.axes.map((axis) => [axis.id, axis]));
-  return LANDING_AXIS_LAYOUT.map((definition) => {
-    const axis = axisById.get(definition.id);
-    if (!axis) throw new Error(`Missing landing expression axis: ${definition.id}`);
+  return expressionAxisIds.map((axisId) => {
+    const axis = axisById.get(axisId);
+    if (!axis) throw new Error(`Missing landing expression axis: ${axisId}`);
     const normalized = clamp(axis.value / 100, 0, 1);
+    const [x, y, z] = expressionAxisRegistryById[axisId].direction;
     return {
       axis,
-      description: definition.description,
-      direction: directionFromAngles(definition.azimuth, definition.elevation),
+      description: AXIS_DESCRIPTIONS[axisId],
+      direction: { x, y, z },
       length: MIN_AXIS_LENGTH + Math.pow(normalized, 1.32) * (MAX_AXIS_LENGTH - MIN_AXIS_LENGTH)
     };
   });
@@ -304,8 +370,14 @@ function firstAxis(axes: LandingAxis[]): LandingAxis {
   return first;
 }
 
+function firstProjectedAxis(axes: ProjectedAxis[]): ProjectedAxis {
+  const [first] = axes;
+  if (!first) throw new Error('Landing expression field requires at least one projected axis.');
+  return first;
+}
+
 function buildAmbientRays(): AmbientRay[] {
-  const count = 64;
+  const count = 72;
   const goldenAngle = Math.PI * (3 - Math.sqrt(5));
   return Array.from({ length: count }, (_, index) => {
     const y = 1 - index / (count - 1) * 2;
@@ -315,8 +387,8 @@ function buildAmbientRays(): AmbientRay[] {
     return {
       direction: { x: Math.cos(theta) * radius, y, z: Math.sin(theta) * radius },
       length: 142 + wave * 178 + (index % 5) * 4,
-      opacity: 0.055 + (index % 7) * 0.011,
-      width: 0.42 + (index % 4) * 0.12
+      opacity: 0.046 + (index % 7) * 0.009,
+      width: 0.38 + (index % 4) * 0.1
     };
   });
 }
@@ -371,16 +443,6 @@ function projectAmbientRay(ray: AmbientRay, rotation: Rotation) {
   };
 }
 
-function directionFromAngles(azimuth: number, elevation: number): Vector3 {
-  const azimuthRadians = radians(azimuth);
-  const elevationRadians = radians(elevation);
-  return {
-    x: Math.cos(elevationRadians) * Math.cos(azimuthRadians),
-    y: Math.sin(elevationRadians),
-    z: Math.cos(elevationRadians) * Math.sin(azimuthRadians)
-  };
-}
-
 function rotateDirection(point: Vector3, rotation: Rotation): Vector3 {
   const yaw = radians(rotation.yaw);
   const pitch = radians(rotation.pitch);
@@ -400,6 +462,19 @@ function projectDirection(direction: Vector3, length: number): ProjectedPoint {
     x: CENTER + direction.x * length * perspective,
     y: CENTER + direction.y * length * perspective,
     depth
+  };
+}
+
+function placeTooltip(point: ProjectedPoint): TooltipPlacement {
+  const placeRight = point.x <= CENTER;
+  const proposedX = placeRight ? point.x + TOOLTIP_GAP : point.x - TOOLTIP_WIDTH - TOOLTIP_GAP;
+  const x = clamp(proposedX, 18, VIEWBOX_SIZE - TOOLTIP_WIDTH - 18);
+  const y = clamp(point.y - TOOLTIP_HEIGHT / 2, 20, VIEWBOX_SIZE - TOOLTIP_HEIGHT - 20);
+  return {
+    x,
+    y,
+    connectorX: placeRight ? x : x + TOOLTIP_WIDTH,
+    connectorY: clamp(point.y, y + 12, y + TOOLTIP_HEIGHT - 12)
   };
 }
 
