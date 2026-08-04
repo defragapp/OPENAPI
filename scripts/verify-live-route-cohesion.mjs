@@ -11,6 +11,7 @@ const commitSha = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB
 const publicBase = String(process.env.PUBLIC_SITE_URL || 'https://sovereign.defrag.app').replace(/\/$/, '');
 const appBase = String(process.env.PUBLIC_APP_URL || 'https://app.defrag.app').replace(/\/$/, '');
 const routeStylesheet = '/deployed-route-cohesion.css?v=20260803-route-v1';
+const auditAttribute = 'data-sovereign-route-cohesion-audit';
 
 const routes = [
   { name: 'how-it-works', url: `${publicBase}/how-it-works`, root: 'body.launch-page', heading: '.launch-hero h1', nav: '.launch-nav', content: 'main', family: 'static-public', mobile: true },
@@ -114,12 +115,35 @@ function auditScript(route) {
     const bytes = new TextEncoder().encode(JSON.stringify(payload));
     let binary = '';
     for (const byte of bytes) binary += String.fromCharCode(byte);
-    const node = document.createElement('meta');
-    node.id = '__sovereign_route_cohesion_audit';
-    node.name = 'sovereign-route-cohesion-audit';
-    node.content = btoa(binary);
-    document.head.appendChild(node);
+    document.documentElement.setAttribute(${JSON.stringify(auditAttribute)}, btoa(binary));
   })();`;
+}
+
+function decodeAuditPayload(html, label) {
+  const attributeMatch = String(html || '').match(new RegExp(`\\b${auditAttribute}=["']([^"']+)["']`, 'i'));
+  assert(attributeMatch, `${label}: rendered audit payload is missing`);
+  try {
+    return JSON.parse(Buffer.from(attributeMatch[1], 'base64').toString('utf8'));
+  } catch {
+    throw new Error(`Route cohesion verification failed: ${label}: rendered audit payload is invalid`);
+  }
+}
+
+function verifyAuditTransportContract() {
+  const publicRoutes = routes.filter((route) => ['how-it-works', 'pricing', 'faq', 'privacy', 'terms'].includes(route.name));
+  for (const route of publicRoutes) {
+    const pathname = new URL(route.url).pathname;
+    const sample = { pathname, routeCohesion: route.family === 'static-public' ? 'v1' : '' };
+    const encoded = Buffer.from(JSON.stringify(sample), 'utf8').toString('base64');
+    const html = `<!doctype html><html ${auditAttribute}="${encoded}"><head></head><body></body></html>`;
+    const decoded = decodeAuditPayload(html, `${route.name}/desktop`);
+    assert(decoded.pathname === pathname, `${route.name}/desktop: audit transport changed the route pathname`);
+    assert(
+      auditScript(route).includes(`document.documentElement.setAttribute(${JSON.stringify(auditAttribute)}`),
+      `${route.name}/desktop: audit writer does not use the shared rendered-root attribute`
+    );
+  }
+  console.log(`Route cohesion audit transport verified routes=${publicRoutes.map((route) => route.name).join(',')} attribute=${auditAttribute}`);
 }
 
 async function waitForBrowserSlot() {
@@ -168,16 +192,7 @@ async function capture(route, profileName) {
 
   const result = payload?.result || payload;
   const html = String(result?.content || '');
-  const metaMatch = html.match(/<meta\b[^>]*\bname=["']sovereign-route-cohesion-audit["'][^>]*>/i);
-  assert(metaMatch, `${route.name}/${profileName}: rendered audit payload is missing`);
-  const contentMatch = metaMatch[0].match(/\bcontent=["']([^"']+)["']/i);
-  assert(contentMatch, `${route.name}/${profileName}: rendered audit payload content is missing`);
-  let audit;
-  try {
-    audit = JSON.parse(Buffer.from(contentMatch[1], 'base64').toString('utf8'));
-  } catch {
-    throw new Error(`Route cohesion verification failed: ${route.name}/${profileName}: rendered audit payload is invalid`);
-  }
+  const audit = decodeAuditPayload(html, `${route.name}/${profileName}`);
   const screenshot = Buffer.from(String(result?.screenshot || ''), 'base64');
   return {
     route: route.name,
@@ -219,34 +234,38 @@ function verify(result) {
   }
 }
 
-assert(apiToken, 'Cloudflare Browser Rendering token is unavailable');
-assert(/^[0-9a-f]{40}$/i.test(commitSha), 'A full release commit SHA is required');
+if (process.argv.includes('--self-test')) {
+  verifyAuditTransportContract();
+} else {
+  assert(apiToken, 'Cloudflare Browser Rendering token is unavailable');
+  assert(/^[0-9a-f]{40}$/i.test(commitSha), 'A full release commit SHA is required');
 
-const results = [];
-for (const route of routes) {
-  const desktop = await capture(route, 'desktop');
-  verify(desktop);
-  results.push(desktop);
-  if (route.mobile) {
-    const mobile = await capture(route, 'mobile');
-    verify(mobile);
-    results.push(mobile);
+  const results = [];
+  for (const route of routes) {
+    const desktop = await capture(route, 'desktop');
+    verify(desktop);
+    results.push(desktop);
+    if (route.mobile) {
+      const mobile = await capture(route, 'mobile');
+      verify(mobile);
+      results.push(mobile);
+    }
   }
-}
 
-console.log(JSON.stringify({
-  ok: true,
-  release: 'sovereign-deployed-route-cohesion-v1',
-  commitSha,
-  stylesheet: routeStylesheet,
-  pages: routes.map((route) => route.name),
-  results: results.map((result) => ({
-    route: result.route,
-    family: result.family,
-    profile: result.profile,
-    screenshotSha256: result.screenshotSha256,
-    document: result.audit.document,
-    boxes: result.audit.boxes,
-    typography: result.audit.typography
-  }))
-}, null, 2));
+  console.log(JSON.stringify({
+    ok: true,
+    release: 'sovereign-deployed-route-cohesion-v1',
+    commitSha,
+    stylesheet: routeStylesheet,
+    pages: routes.map((route) => route.name),
+    results: results.map((result) => ({
+      route: result.route,
+      family: result.family,
+      profile: result.profile,
+      screenshotSha256: result.screenshotSha256,
+      document: result.audit.document,
+      boxes: result.audit.boxes,
+      typography: result.audit.typography
+    }))
+  }, null, 2));
+}
