@@ -1,6 +1,7 @@
 const DEFAULT_ATTEMPTS = 3;
 const DEFAULT_TIMEOUT_MS = 10_000;
 const DEFAULT_MAX_OUTPUT_LENGTH = 12_000;
+const DEFAULT_QUERY_OUTPUT_LENGTH = 1_800;
 const DEFAULT_MAX_RESPONSE_LENGTH = 1_000;
 
 export function sanitizeReleaseReportOutput(value) {
@@ -23,6 +24,35 @@ async function responseText(response) {
   }
 }
 
+function releaseReportRequest(url, report, transport, attempt, timeoutMs) {
+  if (transport === 'query') {
+    const target = new URL(url);
+    for (const [key, value] of Object.entries(report)) target.searchParams.set(key, String(value));
+    target.searchParams.set('nonce', `${Date.now()}-${attempt}`);
+    return {
+      url: target.toString(),
+      init: {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          'cache-control': 'no-store'
+        },
+        signal: AbortSignal.timeout(timeoutMs)
+      }
+    };
+  }
+
+  return {
+    url,
+    init: {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(report),
+      signal: AbortSignal.timeout(timeoutMs)
+    }
+  };
+}
+
 export async function deliverReleaseReport({
   url,
   key,
@@ -31,6 +61,7 @@ export async function deliverReleaseReport({
   stage,
   status,
   output = '',
+  transport = 'post',
   fetchImpl = fetch,
   attempts = DEFAULT_ATTEMPTS,
   timeoutMs = DEFAULT_TIMEOUT_MS,
@@ -39,15 +70,17 @@ export async function deliverReleaseReport({
   if (!url || !key) throw new Error('release report delivery requires a URL and key');
   if (!/^[0-9a-f]{40}$/i.test(String(sha || ''))) throw new Error('release report delivery requires a full commit SHA');
   if (!phase || !stage || !status) throw new Error('release report delivery requires phase, stage, and status');
+  if (!['post', 'query'].includes(transport)) throw new Error('release report delivery requires a supported transport');
 
-  const payload = JSON.stringify({
+  const outputLimit = transport === 'query' ? DEFAULT_QUERY_OUTPUT_LENGTH : DEFAULT_MAX_OUTPUT_LENGTH;
+  const report = {
     key,
     sha,
     phase,
     stage,
     status,
-    output: sanitizeReleaseReportOutput(output).slice(-DEFAULT_MAX_OUTPUT_LENGTH)
-  });
+    output: sanitizeReleaseReportOutput(output).slice(-outputLimit)
+  };
 
   let lastResult = {
     ok: false,
@@ -59,12 +92,8 @@ export async function deliverReleaseReport({
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      const response = await fetchImpl(url, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: payload,
-        signal: AbortSignal.timeout(timeoutMs)
-      });
+      const request = releaseReportRequest(url, report, transport, attempt, timeoutMs);
+      const response = await fetchImpl(request.url, request.init);
       const body = await responseText(response);
       if (response.ok) {
         return {
