@@ -1,4 +1,6 @@
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || '8b1954d216d65077c6480d62583fe2c2').trim();
 const apiToken = String(
@@ -11,6 +13,7 @@ const commitSha = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB
 const publicBase = String(process.env.PUBLIC_SITE_URL || 'https://sovereign.defrag.app').replace(/\/$/, '');
 const appBase = String(process.env.PUBLIC_APP_URL || 'https://app.defrag.app').replace(/\/$/, '');
 const routeStylesheet = '/deployed-route-cohesion.css?v=20260803-route-v1';
+const auditScriptPath = '/route-cohesion-audit.js';
 const auditAttribute = 'data-sovereign-route-cohesion-audit';
 const auditMarkerSelector = `html[${auditAttribute}]`;
 const auditDeadlineMs = 30_000;
@@ -53,161 +56,17 @@ function redact(value) {
     .replace(/Bearer\s+[A-Za-z0-9._~-]+/gi, 'Bearer [redacted]');
 }
 
-function auditScript(route) {
-  const serializationFallback = Buffer.from(JSON.stringify({
-    pathname: '',
-    auditError: 'audit payload serialization failed'
-  }), 'utf8').toString('base64');
-
-  return `(() => {
-    const attribute = ${JSON.stringify(auditAttribute)};
-    const rootSelector = ${JSON.stringify(route.root)};
-    const headingSelector = ${JSON.stringify(route.heading)};
-    const navSelector = ${JSON.stringify(route.nav)};
-    const contentSelector = ${JSON.stringify(route.content)};
-    const deadline = Date.now() + ${auditDeadlineMs};
-    const pollInterval = ${auditPollIntervalMs};
-    const serializationFallback = ${JSON.stringify(serializationFallback)};
-    let started = false;
-
-    const errorMessage = (error) => {
-      if (error && typeof error === 'object' && 'name' in error && 'message' in error) {
-        return String(error.name) + ': ' + String(error.message);
-      }
-      return String(error || 'unknown browser audit error');
-    };
-
-    const encode = (payload) => {
-      const bytes = new TextEncoder().encode(JSON.stringify(payload));
-      let binary = '';
-      for (const byte of bytes) binary += String.fromCharCode(byte);
-      return btoa(binary);
-    };
-
-    const publish = (payload) => {
-      const documentRoot = document.documentElement;
-      if (!documentRoot) return false;
-      try {
-        documentRoot.setAttribute(attribute, encode(payload));
-      } catch {
-        try {
-          documentRoot.setAttribute(attribute, serializationFallback);
-        } catch {
-          return false;
-        }
-      }
-      return documentRoot.hasAttribute(attribute);
-    };
-
-    const inspect = () => {
-      try {
-        const documentRoot = document.documentElement;
-        const body = document.body;
-        const root = document.querySelector(rootSelector);
-
-        if (!documentRoot || !body || !root) {
-          if (Date.now() < deadline) {
-            setTimeout(inspect, pollInterval);
-            return;
-          }
-          publish({
-            pathname: location.pathname,
-            rootPresent: Boolean(root),
-            auditError: 'route root did not become available before the browser audit deadline'
-          });
-          return;
-        }
-
-        const heading = document.querySelector(headingSelector);
-        const nav = document.querySelector(navSelector);
-        const content = document.querySelector(contentSelector);
-        const bodyCopySelector = 'p:not(.eyebrow):not(.launch-kicker):not(.policy-kicker):not([class*="kicker"]), li, dd';
-        const firstParagraph = content?.querySelector(bodyCopySelector) || document.querySelector(bodyCopySelector);
-        const styleOf = (element) => element ? getComputedStyle(element) : null;
-        const rectOf = (element) => {
-          if (!element) return null;
-          const rect = element.getBoundingClientRect();
-          return {
-            width: Math.round(rect.width),
-            height: Math.round(rect.height),
-            top: Math.round(rect.top + scrollY),
-            left: Math.round(rect.left + scrollX)
-          };
-        };
-        const headingStyle = styleOf(heading);
-        const paragraphStyle = styleOf(firstParagraph);
-        const rootStyle = styleOf(root);
-        const payload = {
-          pathname: location.pathname,
-          rootPresent: Boolean(root),
-          headingPresent: Boolean(heading),
-          navPresent: Boolean(nav),
-          contentPresent: Boolean(content),
-          bodyCopyPresent: Boolean(firstParagraph),
-          routeCohesion: body.dataset?.routeCohesion || '',
-          stylesheetPresent: [...document.querySelectorAll('link[rel="stylesheet"]')].some((link) => String(link.getAttribute('href') || '').includes('/deployed-route-cohesion.css')),
-          compiledAuthorityPresent: [...document.styleSheets].some((sheet) => {
-            try {
-              return [...(sheet.cssRules || [])].some((rule) => String(rule.cssText || '').includes('--route-blue'));
-            } catch {
-              return false;
-            }
-          }),
-          document: {
-            width: Math.max(documentRoot.scrollWidth, body.scrollWidth || 0),
-            height: Math.max(documentRoot.scrollHeight, body.scrollHeight || 0),
-            overflowX: Math.max(0, Math.max(documentRoot.scrollWidth, body.scrollWidth || 0) - innerWidth)
-          },
-          boxes: {
-            root: rectOf(root),
-            heading: rectOf(heading),
-            nav: rectOf(nav),
-            content: rectOf(content)
-          },
-          typography: {
-            headingFamily: headingStyle?.fontFamily || '',
-            headingSize: parseFloat(headingStyle?.fontSize || '0'),
-            headingLineHeight: parseFloat(headingStyle?.lineHeight || '0'),
-            paragraphFamily: paragraphStyle?.fontFamily || '',
-            paragraphSize: parseFloat(paragraphStyle?.fontSize || '0'),
-            paragraphLineHeight: parseFloat(paragraphStyle?.lineHeight || '0')
-          },
-          color: {
-            rootBackground: rootStyle?.backgroundColor || '',
-            bodyBackground: getComputedStyle(body).backgroundColor
-          },
-          textLength: (body.innerText || '').replace(/\\s+/g, ' ').trim().length,
-          auditError: ''
-        };
-        publish(payload);
-      } catch (error) {
-        publish({
-          pathname: location.pathname,
-          auditError: errorMessage(error)
-        });
-      }
-    };
-
-    const start = () => {
-      if (started) return;
-      started = true;
-      try {
-        inspect();
-      } catch (error) {
-        publish({
-          pathname: location.pathname,
-          auditError: errorMessage(error)
-        });
-      }
-    };
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', start, { once: true });
-      setTimeout(start, 0);
-    } else {
-      start();
-    }
-  })();`;
+function auditScriptUrl(route, baseUrl = route.url) {
+  const url = new URL(auditScriptPath, baseUrl);
+  url.searchParams.set('attribute', auditAttribute);
+  url.searchParams.set('root', route.root);
+  url.searchParams.set('heading', route.heading);
+  url.searchParams.set('nav', route.nav);
+  url.searchParams.set('content', route.content);
+  url.searchParams.set('deadline', String(auditDeadlineMs));
+  url.searchParams.set('poll', String(auditPollIntervalMs));
+  if (commitSha) url.searchParams.set('release', commitSha);
+  return url.toString();
 }
 
 function auditAttributeMatch(html) {
@@ -237,7 +96,7 @@ function productionSnapshotBody(route, profileName) {
     addStyleTag: [{
       content: 'html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}'
     }],
-    addScriptTag: [{ content: auditScript(route) }]
+    addScriptTag: [{ url: auditScriptUrl(route) }]
   };
 }
 
@@ -248,7 +107,8 @@ function preflightSnapshotBody() {
     heading: '#route-cohesion-preflight h1',
     nav: 'nav',
     content: '#route-cohesion-preflight',
-    family: 'static-public'
+    family: 'static-public',
+    url: `${publicBase}/`
   };
   return {
     route,
@@ -261,15 +121,24 @@ function preflightSnapshotBody() {
       waitForTimeout: 50,
       actionTimeout: 120_000,
       screenshotOptions: { fullPage: false, type: 'png', captureBeyondViewport: false },
-      addScriptTag: [{ content: auditScript(route) }]
+      addScriptTag: [{ url: auditScriptUrl(route, publicBase) }]
     }
   };
 }
 
 function verifyAuditTransportContract() {
+  const auditSource = readFileSync(resolve('apps/web/public/route-cohesion-audit.js'), 'utf8');
+  assert(auditSource.includes('document.currentScript'), 'external Browser Run audit asset cannot read its route configuration');
+  assert(auditSource.includes('setTimeout(inspect, pollInterval)'), 'external Browser Run audit asset lacks bounded root polling');
+  assert(auditSource.includes("document.addEventListener('DOMContentLoaded', start"), 'external Browser Run audit asset lacks document readiness handling');
+  assert(auditSource.includes('documentRoot.setAttribute(attribute'), 'external Browser Run audit asset does not publish the shared rendered-root attribute');
+  assert(auditSource.includes('auditError'), 'external Browser Run audit asset cannot publish explicit runtime errors');
+  assert(!auditSource.includes('how-it-works'), '/how-it-works has a route-specific audit exception');
+
   const preflight = preflightSnapshotBody();
   assert(preflight.request.waitForSelector.selector === auditMarkerSelector, 'Browser Run preflight does not wait for the shared audit marker');
-  assert(preflight.request.addScriptTag[0]?.content === auditScript(preflight.route), 'Browser Run preflight does not use the shared audit script');
+  assert(preflight.request.addScriptTag[0]?.url?.startsWith(`${publicBase}${auditScriptPath}?`), 'Browser Run preflight does not use the CSP-compatible external audit asset');
+  assert(!('content' in preflight.request.addScriptTag[0]), 'Browser Run preflight still injects an inline audit script');
 
   for (const route of routes) {
     const pathname = new URL(route.url).pathname;
@@ -277,22 +146,23 @@ function verifyAuditTransportContract() {
     const encoded = Buffer.from(JSON.stringify(sample), 'utf8').toString('base64');
     const html = `<!doctype html><html ${auditAttribute}="${encoded}"><head></head><body></body></html>`;
     const decoded = decodeAuditPayload(html, `${route.name}/desktop`);
-    const script = auditScript(route);
     const request = productionSnapshotBody(route, 'desktop');
+    const scriptUrl = new URL(request.addScriptTag[0].url);
 
     assert(decoded.pathname === pathname, `${route.name}/desktop: audit transport changed the route pathname`);
-    assert(script.includes(`const deadline = Date.now() + ${auditDeadlineMs};`), `${route.name}/desktop: audit script lacks a bounded readiness deadline`);
-    assert(script.includes(`setTimeout(inspect, pollInterval);`), `${route.name}/desktop: audit script lacks bounded root polling`);
-    assert(script.includes("document.addEventListener('DOMContentLoaded', start"), `${route.name}/desktop: audit script lacks document readiness handling`);
-    assert(script.includes('catch (error)'), `${route.name}/desktop: audit script lacks top-level exception handling`);
-    assert(script.includes('auditError'), `${route.name}/desktop: audit script cannot publish explicit runtime errors`);
-    assert(script.includes('documentRoot.setAttribute(attribute'), `${route.name}/desktop: audit writer does not use the shared rendered-root attribute`);
+    assert(scriptUrl.origin === new URL(route.url).origin, `${route.name}/desktop: audit asset is not same-origin with the rendered route`);
+    assert(scriptUrl.pathname === auditScriptPath, `${route.name}/desktop: audit asset path is incorrect`);
+    assert(scriptUrl.searchParams.get('root') === route.root, `${route.name}/desktop: audit root selector changed in transport`);
+    assert(scriptUrl.searchParams.get('heading') === route.heading, `${route.name}/desktop: audit heading selector changed in transport`);
+    assert(scriptUrl.searchParams.get('nav') === route.nav, `${route.name}/desktop: audit navigation selector changed in transport`);
+    assert(scriptUrl.searchParams.get('content') === route.content, `${route.name}/desktop: audit content selector changed in transport`);
+    assert(scriptUrl.searchParams.get('deadline') === String(auditDeadlineMs), `${route.name}/desktop: audit deadline changed in transport`);
+    assert(scriptUrl.searchParams.get('poll') === String(auditPollIntervalMs), `${route.name}/desktop: audit polling interval changed in transport`);
+    assert(!('content' in request.addScriptTag[0]), `${route.name}/desktop: Browser Run still injects inline script content blocked by production CSP`);
     assert(request.waitForSelector.selector === auditMarkerSelector, `${route.name}/desktop: Browser Run does not wait for audit completion`);
   }
 
-  const howItWorksScript = auditScript(routes[0]);
-  assert(!howItWorksScript.includes('how-it-works'), '/how-it-works has a route-specific audit exception');
-  console.log(`Pure route cohesion audit contract verified routes=${routes.map((route) => route.name).join(',')} marker=${auditMarkerSelector}; live Browser Run not exercised`);
+  console.log(`Pure route cohesion audit contract verified routes=${routes.map((route) => route.name).join(',')} marker=${auditMarkerSelector} transport=same-origin-external-script; live Browser Run not exercised`);
 }
 
 async function waitForBrowserSlot() {
@@ -434,6 +304,7 @@ if (process.argv.includes('--self-test')) {
     release: 'sovereign-deployed-route-cohesion-v1',
     commitSha,
     stylesheet: routeStylesheet,
+    auditScript: auditScriptPath,
     browserTransportPreflight: true,
     pages: routes.map((route) => route.name),
     results: results.map((result) => ({
