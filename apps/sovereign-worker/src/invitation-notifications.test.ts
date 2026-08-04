@@ -10,7 +10,7 @@ function notificationEnv(): Env {
   return {
     APP_ENV: 'production',
     PUBLIC_APP_URL: 'https://app.defrag.app',
-    PUBLIC_CONTACT_EMAIL: 'info@defrag.app',
+    PUBLIC_CONTACT_EMAIL: 'info@sovereign.os',
     TRANSACTIONAL_FROM_EMAIL: 'info@defrag.app',
     RESEND_API_KEY: 're_test_invitation',
     DB: {
@@ -70,6 +70,7 @@ describe('invitation lifecycle notifications', () => {
     for (const message of messages) {
       expect(String(message.text)).toContain('does not grant blanket access');
       expect(String(message.text)).not.toMatch(/birth date|birthplace|natal|exact private location:/i);
+      expect(message.reply_to).toBe('info@sovereign.os');
     }
   });
 

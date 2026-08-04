@@ -19,14 +19,14 @@ describe('Sovereign.OS transactional email', () => {
 
     expect(message.text).toContain('SOVEREIGN.OS');
     expect(message.text).toContain('Open Sovereign.OS:');
-    expect(message.text).toContain('Questions or account support: info@defrag.app');
+    expect(message.text).toContain('Questions or account support: info@sovereign.os');
     expect(message.text).toContain('Do not forward it.');
     expect(message.html).toContain('Sovereign.OS');
     expect(message.html).toContain('background:#0f0f0f');
     expect(message.html).toContain('https://sovereign.defrag.app/brand-mark.svg');
     expect(message.html).toContain('border-radius:10px');
     expect(message.html).not.toContain('border-radius:999px');
-    expect(message.html).toContain('mailto:info@defrag.app');
+    expect(message.html).toContain('mailto:info@sovereign.os');
     expect(message.html).not.toContain('<script');
   });
 
@@ -75,7 +75,7 @@ describe('Sovereign.OS transactional email', () => {
       RESEND_API_KEY: 're_test_key',
       EMAIL: { send: bindingSend },
       TRANSACTIONAL_FROM_EMAIL: 'info@defrag.app',
-      PUBLIC_CONTACT_EMAIL: 'info@defrag.app'
+      PUBLIC_CONTACT_EMAIL: 'info@sovereign.os'
     } as unknown as Env;
 
     expect(transactionalEmailProvider(env)).toBe('resend');
@@ -94,7 +94,7 @@ describe('Sovereign.OS transactional email', () => {
     const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
     const payload = JSON.parse(String(options.body));
     expect(payload.from).toBe('Sovereign.OS <info@defrag.app>');
-    expect(payload.reply_to).toBe('info@defrag.app');
+    expect(payload.reply_to).toBe('info@sovereign.os');
     expect(payload.tags).toEqual(expect.arrayContaining([
       { name: 'product', value: 'sovereign-os' },
       { name: 'category', value: 'account_signin' },

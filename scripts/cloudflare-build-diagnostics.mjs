@@ -50,6 +50,7 @@ const stages = [
   ['migrations', 'pnpm', ['verify:migrations']],
   ['secrets-scan', 'pnpm', ['scan:secrets']],
   ['production-fixtures', 'pnpm', ['scan:production-fixtures']],
+  ['public-contact', process.execPath, ['scripts/verify-public-contact.mjs']],
   ['release-config', 'pnpm', ['verify:release-config']],
   ['production-release', 'pnpm', ['verify:production-release']],
   ['intelligence-release', 'pnpm', ['verify:intelligence-release']],

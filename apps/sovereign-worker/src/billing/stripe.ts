@@ -185,6 +185,8 @@ export async function createCheckoutSession(env: Env, accountId: string, interva
     body.set('success_url', env.STRIPE_SUCCESS_URL!);
     body.set('cancel_url', env.STRIPE_CANCEL_URL!);
     body.set('client_reference_id', accountId);
+    body.set('consent_collection[terms_of_service]', 'required');
+    body.set('automatic_tax[enabled]', 'true');
     body.set('metadata[account_id]', accountId);
     body.set('metadata[plan]', 'sovereign_plus');
     body.set('metadata[interval]', interval);
@@ -195,7 +197,10 @@ export async function createCheckoutSession(env: Env, accountId: string, interva
     body.set('allow_promotion_codes', 'true');
     body.set('integration_identifier', await checkoutIntegrationIdentifier(stableKey));
     const customer = await linkedStripeCustomerId(env, accountId);
-    if (customer) body.set('customer', customer);
+    if (customer) {
+      body.set('customer', customer);
+      body.set('customer_update[address]', 'auto');
+    }
     const session = await stripeRequest<{ id: string; url?: string }>(env, '/checkout/sessions', body, stableKey);
     return {
       sessionId: session.id,
