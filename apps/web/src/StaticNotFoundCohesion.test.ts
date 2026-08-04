@@ -41,6 +41,7 @@ describe('real static 404 cohesion', () => {
     expect(routeVerifier).toContain("heading: '.public-not-found h1'");
     expect(routeVerifier).toContain("nav: '.private-route-brand'");
     expect(routeVerifier).toContain("content: '.public-not-found > section'");
+    expect(routeVerifier).toContain("content: '.public-not-found > section', family: 'static-public'");
     expect(auditScript).toContain(':not(.not-found-code)');
   });
 
