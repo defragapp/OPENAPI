@@ -94,6 +94,15 @@ function isBrowserRunRateLimit(status, payload, text = '') {
   return /(?:\bcode["']?\s*:\s*2001|rate limit exceeded)/i.test(String(text || ''));
 }
 
+function isBrowserRunTransientRequestTimeout(status, payload) {
+  if (status !== 422) return false;
+  const errors = Array.isArray(payload?.errors) ? payload.errors : [];
+  return errors.some((entry) => (
+    Number(entry?.code) === 6002
+    && /^request timed out$/i.test(String(entry?.detail || '').trim())
+  ));
+}
+
 function auditScriptUrl(route, baseUrl = route.url) {
   const url = new URL(auditScriptPath, baseUrl);
   url.searchParams.set('attribute', auditAttribute);
@@ -180,6 +189,9 @@ function verifyAuditTransportContract() {
   assert(isBrowserRunRateLimit(429, { errors: [{ code: 2001, message: 'Rate limit exceeded' }] }), 'HTTP 429 is not recognized as a Browser Run throttle');
   assert(isBrowserRunRateLimit(200, { success: false, errors: [{ code: 2001, message: 'Rate limit exceeded' }] }), 'Browser Run code 2001 is not recognized without HTTP 429');
   assert(!isBrowserRunRateLimit(422, { errors: [{ code: 6002, message: 'Navigation timeout' }] }), 'Unrelated Browser Run failures are incorrectly retried');
+  assert(isBrowserRunTransientRequestTimeout(422, { errors: [{ code: 6002, message: 'A timeout was reached', detail: 'Request timed out' }] }), 'Transient Browser Run request timeout is not recognized');
+  assert(!isBrowserRunTransientRequestTimeout(422, { errors: [{ code: 6002, message: 'A timeout was reached', detail: 'Navigation timeout of 45000 ms exceeded' }] }), 'Navigation timeout is incorrectly retried as a transient request timeout');
+  assert(!isBrowserRunTransientRequestTimeout(422, { errors: [{ code: 6002, message: 'A timeout was reached', detail: 'Waiting for selector failed' }] }), 'Selector timeout is incorrectly retried as a transient request timeout');
 
   for (const route of routes) {
     const pathname = new URL(route.url).pathname;
@@ -230,10 +242,16 @@ async function browserSnapshot(request, label) {
     let payload;
     try { payload = JSON.parse(text); } catch { payload = undefined; }
     const rateLimited = isBrowserRunRateLimit(response.status, payload, text);
-    if ((!response.ok || payload?.success === false) && rateLimited && attempt < browserRunRequestMaxAttempts) {
-      const waitMs = browserRunRetryDelay(response.headers);
+    const transientRequestTimeout = isBrowserRunTransientRequestTimeout(response.status, payload);
+    const retryReason = rateLimited
+      ? 'browser-run-rate-limit'
+      : transientRequestTimeout
+        ? 'browser-run-request-timeout'
+        : '';
+    if ((!response.ok || payload?.success === false) && retryReason && attempt < browserRunRequestMaxAttempts) {
+      const waitMs = rateLimited ? browserRunRetryDelay(response.headers) : browserRunRetryFloorMs;
       console.warn(
-        `[route-cohesion] label=${label} status=retry reason=browser-run-rate-limit `
+        `[route-cohesion] label=${label} status=retry reason=${retryReason} `
         + `http=${response.status} attempt=${attempt}/${browserRunRequestMaxAttempts} waitMs=${waitMs}`
       );
       await delay(waitMs);
