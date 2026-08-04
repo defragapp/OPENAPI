@@ -1,6 +1,11 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  deliverReleaseReport,
+  formatReleaseReportDelivery,
+  sanitizeReleaseReportOutput
+} from './release-report-client.mjs';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const reportUrl = 'https://60e450a49abc97aea5.v2.appdeploy.ai/api/report';
@@ -16,29 +21,26 @@ function runGit(args, label) {
   return String(result.stdout || '').trim();
 }
 
-function sanitize(value) {
-  return String(value || '')
-    .replace(/cfat_[A-Za-z0-9_-]+/g, '[redacted-cloudflare-token]')
-    .replace(/\bsk-(?:live|test|proj)?[_A-Za-z0-9-]+/g, '[redacted-api-key]')
-    .replace(/Bearer\s+[A-Za-z0-9._~-]+/gi, 'Bearer [redacted]')
-    .replace(/(CLOUDFLARE_API_TOKEN|CF_API_TOKEN|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|RESEND_API_KEY)=\S+/g, '$1=[redacted]');
-}
-
 function outputTail(stdout, stderr) {
-  return sanitize(`${String(stdout || '')}\n${String(stderr || '')}`.trim()).slice(-maxOutputLength);
+  return sanitizeReleaseReportOutput(`${String(stdout || '')}\n${String(stderr || '')}`.trim()).slice(-maxOutputLength);
 }
 
 async function report(sha, stage, status, output = '') {
-  try {
-    await fetch(reportUrl, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ key: reportKey, sha, phase: 'build', stage, status, output }),
-      signal: AbortSignal.timeout(4_000)
-    });
-  } catch {
-    // Telemetry must never become release authority or block the canonical gate.
-  }
+  const result = await deliverReleaseReport({
+    url: reportUrl,
+    key: reportKey,
+    sha,
+    phase: 'build',
+    stage,
+    status,
+    output,
+    attempts: 3,
+    timeoutMs: 10_000
+  });
+  const message = formatReleaseReportDelivery(result, { phase: 'build', stage, status });
+  if (result.ok) console.log(message);
+  else console.warn(message);
+  return result.ok;
 }
 
 const checkoutSha = runGit(['rev-parse', 'HEAD'], 'unable to resolve checkout SHA');

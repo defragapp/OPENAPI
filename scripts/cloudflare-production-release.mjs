@@ -1,6 +1,11 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  deliverReleaseReport,
+  formatReleaseReportDelivery,
+  sanitizeReleaseReportOutput
+} from './release-report-client.mjs';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const reportUrl = 'https://60e450a49abc97aea5.v2.appdeploy.ai/api/report';
@@ -23,44 +28,26 @@ function runGit(args, label) {
   return String(result.stdout || '').trim();
 }
 
-function sanitize(value) {
-  return String(value || '')
-    .replace(/cfat_[A-Za-z0-9_-]+/g, '[redacted-cloudflare-token]')
-    .replace(/\bsk-(?:live|test|proj)?[_A-Za-z0-9-]+/g, '[redacted-api-key]')
-    .replace(/Bearer\s+[A-Za-z0-9._~-]+/gi, 'Bearer [redacted]')
-    .replace(/(CLOUDFLARE_API_TOKEN|CF_API_TOKEN|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|RESEND_API_KEY)=\S+/g, '$1=[redacted]');
-}
-
-function delay(milliseconds) {
-  return new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
-}
-
 async function report(sha, status, output = '') {
-  const payload = JSON.stringify({
+  const result = await deliverReleaseReport({
+    url: reportUrl,
     key: reportKey,
     sha,
     phase: 'deploy',
     stage: 'production-deploy',
     status,
-    output: sanitize(output).slice(-12_000)
+    output,
+    attempts: 3,
+    timeoutMs: 10_000
   });
-
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
-    try {
-      const response = await fetch(reportUrl, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: payload,
-        signal: AbortSignal.timeout(10_000)
-      });
-      if (response.ok) return true;
-    } catch {
-      // Retry below. Telemetry is non-authoritative and never controls release success.
-    }
-    if (attempt < 3) await delay(attempt * 1_000);
-  }
-
-  return false;
+  const message = formatReleaseReportDelivery(result, {
+    phase: 'deploy',
+    stage: 'production-deploy',
+    status
+  });
+  if (result.ok) console.log(message);
+  else console.warn(message);
+  return result.ok;
 }
 
 function runNodeScript(path, environment) {
@@ -139,4 +126,4 @@ if (evidenceResult.error || evidenceResult.status !== 0) {
   process.exit(evidenceResult.status || 1);
 }
 
-await report(checkoutSha, 'success', combinedOutput);
+await report(checkoutSha, 'success', sanitizeReleaseReportOutput(combinedOutput));
