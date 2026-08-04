@@ -32,7 +32,7 @@ export interface SovereignEmailTemplate {
 }
 
 const DEFAULT_FROM_ADDRESS = 'info@defrag.app';
-const DEFAULT_PUBLIC_CONTACT = 'info@defrag.app';
+const DEFAULT_PUBLIC_CONTACT = 'info@sovereign.os';
 const BRAND_MARK_URL = 'https://sovereign.defrag.app/brand-mark.svg';
 
 function validRecipient(to: string): boolean { return to.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to); }
