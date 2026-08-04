@@ -111,10 +111,13 @@ function auditScript(route) {
       },
       textLength: (document.body?.innerText || '').replace(/\\s+/g, ' ').trim().length
     };
-    const node = document.createElement('script');
+    const bytes = new TextEncoder().encode(JSON.stringify(payload));
+    let binary = '';
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    const node = document.createElement('meta');
     node.id = '__sovereign_route_cohesion_audit';
-    node.type = 'application/json';
-    node.textContent = JSON.stringify(payload);
+    node.name = 'sovereign-route-cohesion-audit';
+    node.content = btoa(binary);
     document.head.appendChild(node);
   })();`;
 }
@@ -140,6 +143,7 @@ async function capture(route, profileName) {
       },
       body: JSON.stringify({
         url,
+        formats: ['content', 'screenshot'],
         viewport,
         gotoOptions: { waitUntil: 'networkidle0', timeout: 45_000 },
         waitForSelector: { selector: route.root, timeout: 45_000, visible: true },
@@ -164,9 +168,16 @@ async function capture(route, profileName) {
 
   const result = payload?.result || payload;
   const html = String(result?.content || '');
-  const match = html.match(/<script[^>]+id=["']__sovereign_route_cohesion_audit["'][^>]*>([\s\S]*?)<\/script>/i);
-  assert(match, `${route.name}/${profileName}: rendered audit payload is missing`);
-  const audit = JSON.parse(match[1]);
+  const metaMatch = html.match(/<meta\b[^>]*\bname=["']sovereign-route-cohesion-audit["'][^>]*>/i);
+  assert(metaMatch, `${route.name}/${profileName}: rendered audit payload is missing`);
+  const contentMatch = metaMatch[0].match(/\bcontent=["']([^"']+)["']/i);
+  assert(contentMatch, `${route.name}/${profileName}: rendered audit payload content is missing`);
+  let audit;
+  try {
+    audit = JSON.parse(Buffer.from(contentMatch[1], 'base64').toString('utf8'));
+  } catch {
+    throw new Error(`Route cohesion verification failed: ${route.name}/${profileName}: rendered audit payload is invalid`);
+  }
   const screenshot = Buffer.from(String(result?.screenshot || ''), 'base64');
   return {
     route: route.name,
