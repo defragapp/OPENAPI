@@ -28,7 +28,7 @@ const routes = [
   { name: 'terms', url: `${publicBase}/terms`, root: '.public-secondary-page', heading: '.policy-hero h1', nav: '.v0-nav', content: '.policy-grid', family: 'policy', mobile: false },
   { name: 'login', url: `${appBase}/login`, root: '.account-shell', heading: '.account-intro h1', nav: '.account-nav', content: '.account-layout', family: 'auth', mobile: true },
   { name: 'signup', url: `${appBase}/signup`, root: '.account-shell', heading: '.account-intro h1', nav: '.account-nav', content: '.account-layout', family: 'auth', mobile: true },
-  { name: 'invitation', url: `${appBase}/invite/route-cohesion-audit`, root: '.invitation-shell', heading: '.auth-panel h2', nav: '.wordmark', content: '.auth-panel', family: 'invitation', mobile: true },
+  { name: 'invitation', url: `${appBase}/invitation?token=route-cohesion-audit`, root: '.invitation-shell', heading: '.auth-panel h1', nav: '.wordmark', content: '.auth-panel', family: 'invitation', mobile: true },
   { name: 'onboarding-gate', url: `${appBase}/onboarding`, root: '.account-shell', heading: '.account-intro h1', nav: '.account-nav', content: '.account-layout', family: 'auth-redirect', mobile: false },
   { name: 'workspace-gate', url: `${appBase}/app`, root: '.account-shell', heading: '.account-intro h1', nav: '.account-nav', content: '.account-layout', family: 'auth-redirect', mobile: false },
   { name: 'not-found', url: `${appBase}/route-cohesion-not-found`, root: '.public-not-found', heading: '.public-not-found h1', nav: '.private-route-brand', content: '.public-not-found > section', family: 'not-found', mobile: true }
@@ -124,6 +124,12 @@ function verifyAuditTransportContract() {
   assert(preflight.request.waitForSelector.selector === auditMarkerSelector, 'Browser Run preflight does not wait for the shared audit marker');
   assert(preflight.request.addScriptTag[0]?.url?.startsWith(`${publicBase}${auditScriptPath}?`), 'Browser Run preflight does not use the CSP-compatible external audit asset');
   assert(!('content' in preflight.request.addScriptTag[0]), 'Browser Run preflight still injects an inline audit script');
+
+  const invitationRoute = routes.find((route) => route.name === 'invitation');
+  assert(invitationRoute, 'invitation route audit contract is missing');
+  assert(new URL(invitationRoute.url).pathname === '/invitation', 'invitation audit URL does not mount InvitationPage');
+  assert(new URL(invitationRoute.url).searchParams.get('token') === 'route-cohesion-audit', 'invitation audit URL does not provide deterministic token input');
+  assert(invitationRoute.heading === '.auth-panel h1', 'invitation audit heading selector does not match InvitationPage');
 
   for (const route of routes) {
     const pathname = new URL(route.url).pathname;
