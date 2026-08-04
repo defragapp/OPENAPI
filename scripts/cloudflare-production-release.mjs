@@ -37,6 +37,7 @@ async function report(sha, status, output = '') {
     stage: 'production-deploy',
     status,
     output,
+    transport: 'query',
     attempts: 3,
     timeoutMs: 10_000
   });
