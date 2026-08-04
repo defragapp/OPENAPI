@@ -102,7 +102,10 @@ for (const required of [
   'verify:worker-bundle-size',
   "phase: 'build'",
   "status: 'failure'",
-  'Telemetry must never become release authority'
+  'process.env.RELEASE_REPORT_URL',
+  'process.env.RELEASE_REPORT_KEY',
+  'delivery=skipped reason=endpoint-unconfigured',
+  'transport: reportTransport'
 ]) {
   requireValue(buildDiagnostics.includes(required), `Cloudflare build diagnostics are missing ${required}`);
 }
@@ -117,7 +120,10 @@ for (const required of [
   'declared commit',
   "phase: 'deploy'",
   "stage: 'production-deploy'",
-  'Telemetry is non-authoritative'
+  'process.env.RELEASE_REPORT_URL',
+  'process.env.RELEASE_REPORT_KEY',
+  'delivery=skipped reason=endpoint-unconfigured',
+  'transport: reportTransport'
 ]) {
   requireValue(productionRelease.includes(required), `Production release wrapper is missing ${required}`);
 }
