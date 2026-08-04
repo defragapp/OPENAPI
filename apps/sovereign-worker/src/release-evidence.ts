@@ -22,6 +22,7 @@ export type ProductionReleaseEvidence = {
 export async function readProductionReleaseEvidence(env: Env): Promise<ProductionReleaseEvidence | null> {
   const sha = String(env.APP_VERSION || '').trim();
   if (!/^[0-9a-f]{40}$/i.test(sha)) return null;
+  if (!env.ASSETS) return null;
 
   let parsed: unknown;
   try {
