@@ -67,6 +67,19 @@ describe('navigation asset routing', () => {
     expect(response.headers.get('x-robots-tag')).toBe('noindex, nofollow');
   });
 
+  it('serves unknown extensionless app navigation from the React entry document', async () => {
+    let assetUrl = '';
+    const response = await runtime.fetch(
+      new Request('https://app.defrag.app/route-cohesion-not-found?source=audit'),
+      assetEnvironment((request) => { assetUrl = request.url; }),
+      executionContext
+    );
+
+    expect(response.status).toBe(200);
+    expect(assetUrl).toBe('https://app.defrag.app/');
+    expect(response.headers.get('x-robots-tag')).toBe('noindex, nofollow');
+  });
+
   it('serves React policy routes from the entry document', async () => {
     let assetUrl = '';
     await runtime.fetch(
@@ -87,6 +100,18 @@ describe('navigation asset routing', () => {
     );
 
     expect(assetUrl).toBe('https://app.defrag.app/consent.html?token=invitation');
+  });
+
+  it('does not route unknown file-like paths through the React entry document', async () => {
+    let assetRequested = false;
+    const response = await runtime.fetch(
+      new Request('https://app.defrag.app/missing-script.js'),
+      assetEnvironment(() => { assetRequested = true; }),
+      executionContext
+    );
+
+    expect(assetRequested).toBe(false);
+    expect(response.status).toBe(404);
   });
 
   it('returns a Worker 404 for an unknown Worker-first path', async () => {
