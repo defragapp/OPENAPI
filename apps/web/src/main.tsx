@@ -16,6 +16,7 @@ import { PublicPolicy } from './PublicPolicy';
 import { PublicPolicyMetadata } from './PublicPolicyMetadata';
 import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
 import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
+import platformVisualCohesionUrl from './platform-visual-cohesion-v1.css?url';
 
 /* Component foundations */
 import './styles.css';
@@ -70,10 +71,19 @@ import './account-journey-structured.css';
 import './account-journey-release-cohesion.css';
 import './passkey-auth.css';
 
-/* Final non-landing route and mounted-platform authority. */
+/* Final bundled non-landing route authority. */
 import './deployed-route-cohesion.css';
-import './platform-visual-cohesion-v1.css';
 
+function installPlatformVisualCohesion(): void {
+  if (document.head.querySelector('link[data-sovereign-platform-cohesion="v1"]')) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = platformVisualCohesionUrl;
+  link.dataset.sovereignPlatformCohesion = 'v1';
+  document.head.append(link);
+}
+
+installPlatformVisualCohesion();
 installV0ReleaseFingerprint();
 installProductionRuntime();
 installProductRuntime();
