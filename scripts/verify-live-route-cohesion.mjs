@@ -101,28 +101,10 @@ function productionSnapshotBody(route, profileName) {
 }
 
 function preflightSnapshotBody() {
-  const route = {
-    name: 'transport-preflight',
-    root: '#route-cohesion-preflight',
-    heading: '#route-cohesion-preflight h1',
-    nav: 'nav',
-    content: '#route-cohesion-preflight',
-    family: 'static-public',
-    url: `${publicBase}/`
-  };
+  const route = routes[0];
   return {
     route,
-    request: {
-      html: '<!doctype html><html><head><style>body{font:16px/1.5 sans-serif}h1{font:48px/1.1 serif}</style></head><body data-route-cohesion="v1"><nav>Preflight navigation</nav><main id="route-cohesion-preflight"><h1>Browser audit preflight</h1><p>Rendered content used to prove injected script execution.</p></main></body></html>',
-      formats: ['content', 'screenshot'],
-      viewport: viewports.desktop,
-      gotoOptions: { waitUntil: 'domcontentloaded', timeout: 45_000 },
-      waitForSelector: { selector: auditMarkerSelector, timeout: 45_000 },
-      waitForTimeout: 50,
-      actionTimeout: 120_000,
-      screenshotOptions: { fullPage: false, type: 'png', captureBeyondViewport: false },
-      addScriptTag: [{ url: auditScriptUrl(route, publicBase) }]
-    }
+    request: productionSnapshotBody(route, 'desktop')
   };
 }
 
@@ -136,6 +118,9 @@ function verifyAuditTransportContract() {
   assert(!auditSource.includes('how-it-works'), '/how-it-works has a route-specific audit exception');
 
   const preflight = preflightSnapshotBody();
+  assert(preflight.route.name === 'how-it-works', 'Browser Run preflight is not anchored to the first real production route');
+  assert(!('html' in preflight.request), 'Browser Run preflight still uses supplied HTML that cannot load the external audit script');
+  assert(preflight.request.url.startsWith(`${publicBase}/how-it-works?`), 'Browser Run preflight does not render the real /how-it-works route');
   assert(preflight.request.waitForSelector.selector === auditMarkerSelector, 'Browser Run preflight does not wait for the shared audit marker');
   assert(preflight.request.addScriptTag[0]?.url?.startsWith(`${publicBase}${auditScriptPath}?`), 'Browser Run preflight does not use the CSP-compatible external audit asset');
   assert(!('content' in preflight.request.addScriptTag[0]), 'Browser Run preflight still injects an inline audit script');
@@ -221,15 +206,11 @@ function missingAuditPayloadError(route, profileName, snapshot) {
 }
 
 async function verifyBrowserTransportPreflight() {
-  const { route, request } = preflightSnapshotBody();
-  const snapshot = await browserSnapshot(request, 'transport-preflight/desktop');
-  if (!auditAttributeMatch(snapshot.html)) throw missingAuditPayloadError(route, 'desktop', snapshot);
-  const audit = decodeAuditPayload(snapshot.html, 'transport-preflight/desktop');
-  assert(!audit.auditError, `transport-preflight/desktop: browser audit failed: ${audit.auditError}`);
-  assert(audit.rootPresent, 'transport-preflight/desktop: synthetic route root is missing');
-  assert(audit.headingPresent, 'transport-preflight/desktop: synthetic heading is missing');
-  assert(audit.contentPresent, 'transport-preflight/desktop: synthetic content is missing');
-  console.log('Cloudflare Browser Run audit transport preflight passed');
+  const { route } = preflightSnapshotBody();
+  const result = await capture(route, 'desktop');
+  verify(result);
+  console.log(`Cloudflare Browser Run audit transport preflight passed route=${result.route}/${result.profile}`);
+  return result;
 }
 
 async function capture(route, profileName) {
@@ -285,13 +266,15 @@ if (process.argv.includes('--self-test')) {
   assert(apiToken, 'Cloudflare Browser Rendering token is unavailable');
   assert(/^[0-9a-f]{40}$/i.test(commitSha), 'A full release commit SHA is required');
 
-  await verifyBrowserTransportPreflight();
+  const preflight = await verifyBrowserTransportPreflight();
 
-  const results = [];
+  const results = [preflight];
   for (const route of routes) {
-    const desktop = await capture(route, 'desktop');
-    verify(desktop);
-    results.push(desktop);
+    if (route.name !== preflight.route) {
+      const desktop = await capture(route, 'desktop');
+      verify(desktop);
+      results.push(desktop);
+    }
     if (route.mobile) {
       const mobile = await capture(route, 'mobile');
       verify(mobile);
