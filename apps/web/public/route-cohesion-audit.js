@@ -67,7 +67,7 @@
       const heading = headingSelector ? document.querySelector(headingSelector) : null;
       const nav = navSelector ? document.querySelector(navSelector) : null;
       const content = contentSelector ? document.querySelector(contentSelector) : null;
-      const bodyCopySelector = 'p:not(.eyebrow):not(.launch-kicker):not(.policy-kicker):not([class*="kicker"]), li, dd';
+      const bodyCopySelector = 'p:not(.eyebrow):not(.launch-kicker):not(.policy-kicker):not(.not-found-code):not([class*="kicker"]), li, dd';
       const firstParagraph = content?.querySelector(bodyCopySelector) || document.querySelector(bodyCopySelector);
       const styleOf = (element) => element ? getComputedStyle(element) : null;
       const rectOf = (element) => {

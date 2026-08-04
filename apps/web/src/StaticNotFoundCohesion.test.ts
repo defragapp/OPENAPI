@@ -5,6 +5,7 @@ const read = (relativePath: string) => readFileSync(new URL(relativePath, import
 
 const document = read('../public/404.html');
 const visual = read('../public/not-found-route.css');
+const auditScript = read('../public/route-cohesion-audit.js');
 const routeVerifier = read('../../../scripts/verify-live-route-cohesion.mjs');
 
 describe('real static 404 cohesion', () => {
@@ -40,6 +41,7 @@ describe('real static 404 cohesion', () => {
     expect(routeVerifier).toContain("heading: '.public-not-found h1'");
     expect(routeVerifier).toContain("nav: '.private-route-brand'");
     expect(routeVerifier).toContain("content: '.public-not-found > section'");
+    expect(auditScript).toContain(':not(.not-found-code)');
   });
 
   it('provides editorial desktop composition and iPhone-safe stacking', () => {
