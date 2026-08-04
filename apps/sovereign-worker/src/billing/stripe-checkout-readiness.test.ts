@@ -38,7 +38,10 @@ function captureStripeRequest() {
   return requests;
 }
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
 
 describe('Stripe Checkout production readiness', () => {
   it.each([
