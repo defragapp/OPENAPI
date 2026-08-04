@@ -36,7 +36,7 @@ describe('public metadata and fallback documents', () => {
       '/v0-public-static.css?v=20260803-refined-v2',
       '/not-found-route.css?v=20260804-cohesion-v1',
       '/deployed-route-cohesion.css?v=20260803-route-v1'
-    ];
+    ] as const;
 
     for (const asset of assets) expect(notFound).toContain(asset);
     expect(notFound.indexOf(assets[1])).toBeGreaterThan(notFound.indexOf(assets[0]));
