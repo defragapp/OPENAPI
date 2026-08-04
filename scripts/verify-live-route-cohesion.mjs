@@ -19,6 +19,18 @@ const auditMarkerSelector = `html[${auditAttribute}]`;
 const auditDeadlineMs = 30_000;
 const auditPollIntervalMs = 50;
 const browserEndpoint = `https://api.cloudflare.com/client/v4/accounts/${accountId}/browser-rendering/snapshot?timeout=120000&waitForTimeout=1800&cacheTTL=0`;
+const browserRunIntervalMs = Math.min(
+  60_000,
+  Math.max(12_000, Math.trunc(Number(process.env.BROWSER_RUN_REQUEST_INTERVAL_MS || 15_000) || 15_000))
+);
+const browserRunRetryFloorMs = Math.min(
+  120_000,
+  Math.max(browserRunIntervalMs, Math.trunc(Number(process.env.BROWSER_RUN_RETRY_FLOOR_MS || 15_000) || 15_000))
+);
+const browserRunRequestMaxAttempts = Math.min(
+  5,
+  Math.max(2, Math.trunc(Number(process.env.BROWSER_RUN_REQUEST_MAX_ATTEMPTS || 4) || 4))
+);
 
 const routes = [
   { name: 'how-it-works', url: `${publicBase}/how-it-works`, root: 'body.launch-page', heading: '.launch-hero h1', nav: '.launch-nav', content: 'main', family: 'static-public', mobile: true },
@@ -54,6 +66,32 @@ function redact(value) {
   return String(value || '')
     .replace(/cfat_[A-Za-z0-9_-]+/g, '[redacted-cloudflare-token]')
     .replace(/Bearer\s+[A-Za-z0-9._~-]+/gi, 'Bearer [redacted]');
+}
+
+function parseRetryAfter(value, now = Date.now()) {
+  const text = String(value || '').trim();
+  if (!text) return 0;
+  if (/^\d+(?:\.\d+)?$/.test(text)) return Math.max(0, Math.ceil(Number(text) * 1_000));
+  const timestamp = Date.parse(text);
+  return Number.isFinite(timestamp) ? Math.max(0, timestamp - now) : 0;
+}
+
+function parseRateLimitReset(value) {
+  const match = String(value || '').match(/\bt=(\d+(?:\.\d+)?)/i);
+  return match ? Math.max(0, Math.ceil(Number(match[1]) * 1_000)) : 0;
+}
+
+function browserRunRetryDelay(headers, now = Date.now()) {
+  const retryAfterMs = parseRetryAfter(headers?.get?.('retry-after'), now);
+  const rateLimitResetMs = parseRateLimitReset(headers?.get?.('ratelimit'));
+  return Math.min(120_000, Math.max(browserRunRetryFloorMs, retryAfterMs + 1_000, rateLimitResetMs + 1_000));
+}
+
+function isBrowserRunRateLimit(status, payload, text = '') {
+  if (status === 429) return true;
+  const errors = Array.isArray(payload?.errors) ? payload.errors : [];
+  if (errors.some((entry) => Number(entry?.code) === 2001 || /rate limit exceeded/i.test(String(entry?.message || '')))) return true;
+  return /(?:\bcode["']?\s*:\s*2001|rate limit exceeded)/i.test(String(text || ''));
 }
 
 function auditScriptUrl(route, baseUrl = route.url) {
@@ -132,6 +170,17 @@ function verifyAuditTransportContract() {
   assert(invitationRoute.heading === '.auth-panel h1', 'invitation audit heading selector does not match InvitationPage');
   assert(invitationRoute.waitUntil === 'load', 'invitation audit does not avoid token-preview network-idle deadlock');
 
+  assert(browserRunIntervalMs >= 12_000, 'Browser Run request interval is below the free-plan safety floor');
+  assert(browserRunRequestMaxAttempts >= 2 && browserRunRequestMaxAttempts <= 5, 'Browser Run per-request retry bound is invalid');
+  assert(parseRetryAfter('12', 0) === 12_000, 'Retry-After seconds are not parsed correctly');
+  assert(parseRetryAfter(new Date(20_000).toUTCString(), 0) === 20_000, 'Retry-After HTTP date is not parsed correctly');
+  assert(parseRetryAfter('invalid', 0) === 0, 'Invalid Retry-After values are not ignored');
+  assert(parseRateLimitReset('"default";r=0;t=9') === 9_000, 'Ratelimit reset seconds are not parsed correctly');
+  assert(browserRunRetryDelay(new Headers({ 'retry-after': '12', ratelimit: '"default";r=0;t=9' }), 0) >= 13_000, 'Browser Run retry delay does not honor response headers');
+  assert(isBrowserRunRateLimit(429, { errors: [{ code: 2001, message: 'Rate limit exceeded' }] }), 'HTTP 429 is not recognized as a Browser Run throttle');
+  assert(isBrowserRunRateLimit(200, { success: false, errors: [{ code: 2001, message: 'Rate limit exceeded' }] }), 'Browser Run code 2001 is not recognized without HTTP 429');
+  assert(!isBrowserRunRateLimit(422, { errors: [{ code: 6002, message: 'Navigation timeout' }] }), 'Unrelated Browser Run failures are incorrectly retried');
+
   for (const route of routes) {
     const pathname = new URL(route.url).pathname;
     const sample = { pathname, routeCohesion: route.family === 'static-public' ? 'v1' : '', auditError: '' };
@@ -155,39 +204,55 @@ function verifyAuditTransportContract() {
     assert(request.waitForSelector.selector === auditMarkerSelector, `${route.name}/desktop: Browser Run does not wait for audit completion`);
   }
 
-  console.log(`Pure route cohesion audit contract verified routes=${routes.map((route) => route.name).join(',')} marker=${auditMarkerSelector} transport=same-origin-external-script; live Browser Run not exercised`);
+  console.log(`Pure route cohesion audit contract verified routes=${routes.map((route) => route.name).join(',')} marker=${auditMarkerSelector} transport=same-origin-external-script requestIntervalMs=${browserRunIntervalMs} requestAttempts=${browserRunRequestMaxAttempts}; live Browser Run not exercised`);
 }
 
 async function waitForBrowserSlot() {
-  const interval = 10_500;
   const elapsed = Date.now() - lastBrowserRunAt;
-  if (lastBrowserRunAt && elapsed < interval) await delay(interval - elapsed);
+  if (lastBrowserRunAt && elapsed < browserRunIntervalMs) await delay(browserRunIntervalMs - elapsed);
   lastBrowserRunAt = Date.now();
 }
 
 async function browserSnapshot(request, label) {
-  await waitForBrowserSlot();
-  const response = await fetch(browserEndpoint, {
-    method: 'POST',
-    headers: {
-      authorization: `Bearer ${apiToken}`,
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify(request),
-    signal: AbortSignal.timeout(135_000)
-  });
+  for (let attempt = 1; attempt <= browserRunRequestMaxAttempts; attempt += 1) {
+    await waitForBrowserSlot();
+    const response = await fetch(browserEndpoint, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${apiToken}`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(request),
+      signal: AbortSignal.timeout(135_000)
+    });
 
-  const text = await response.text();
-  let payload;
-  try { payload = JSON.parse(text); } catch { payload = undefined; }
-  if (!response.ok || payload?.success === false) {
-    throw new Error(`Route cohesion browser audit failed for ${label} (${response.status}): ${redact(JSON.stringify(payload?.errors || payload || text)).slice(0, 800)}`);
+    const text = await response.text();
+    let payload;
+    try { payload = JSON.parse(text); } catch { payload = undefined; }
+    const rateLimited = isBrowserRunRateLimit(response.status, payload, text);
+    if ((!response.ok || payload?.success === false) && rateLimited && attempt < browserRunRequestMaxAttempts) {
+      const waitMs = browserRunRetryDelay(response.headers);
+      console.warn(
+        `[route-cohesion] label=${label} status=retry reason=browser-run-rate-limit `
+        + `http=${response.status} attempt=${attempt}/${browserRunRequestMaxAttempts} waitMs=${waitMs}`
+      );
+      await delay(waitMs);
+      continue;
+    }
+    if (!response.ok || payload?.success === false) {
+      throw new Error(
+        `Route cohesion browser audit failed for ${label} (${response.status}) attempt=${attempt}/${browserRunRequestMaxAttempts}: `
+        + redact(JSON.stringify(payload?.errors || payload || text)).slice(0, 800)
+      );
+    }
+
+    const result = payload?.result || payload || {};
+    const html = String(result?.content || '');
+    const screenshot = Buffer.from(String(result?.screenshot || ''), 'base64');
+    return { responseStatus: response.status, result, html, screenshot };
   }
 
-  const result = payload?.result || payload || {};
-  const html = String(result?.content || '');
-  const screenshot = Buffer.from(String(result?.screenshot || ''), 'base64');
-  return { responseStatus: response.status, result, html, screenshot };
+  throw new Error(`Route cohesion browser audit failed for ${label}: retry loop exhausted without a response`);
 }
 
 function routeRootHint(route) {
