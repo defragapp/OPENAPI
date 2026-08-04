@@ -118,6 +118,10 @@ These flows cannot be proven by unauthenticated release probes alone:
 - `#125` remains the production-closure issue until the Cloudflare, real-account, billing, rollback, safety-browser, and visual evidence above is recorded.
 - Parent issue `#117` closes only after every remaining applicable item in this ledger is complete or explicitly descoped with a recorded reason.
 
+## Release retrigger — August 4, 2026
+
+A fresh `main` commit was issued after the production-readiness merge to retrigger the repository-connected Cloudflare Workers Build without changing application behavior. The build remains authoritative only when the deployed `/ready` response reports this exact resulting commit and all release evidence passes.
+
 ## Completion rule
 
 Production is complete only when all applicable live evidence above is recorded for one exact `main` SHA. Repository checks, dry runs, the previous successful deployment, or dashboard configuration without source parity do not substitute for exact-SHA production verification.
