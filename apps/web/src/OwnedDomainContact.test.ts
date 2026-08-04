@@ -9,9 +9,10 @@ const emailSmoke = readFileSync(new URL('../../../scripts/email-smoke.ts', impor
 const publicAndEmailCopy = `${policy}\n${consent}\n${email}`;
 
 describe('owned-domain contact and transactional delivery', () => {
-  it('publishes only an address on the domain the project owns', () => {
-    expect(publicAndEmailCopy).toContain('info@defrag.app');
-    expect(publicAndEmailCopy).not.toContain('info@sovereign.os');
+  it('publishes only the approved Sovereign.OS public contact address', () => {
+    expect(publicAndEmailCopy).toContain('info@sovereign.os');
+    expect(publicAndEmailCopy).not.toContain('support@defrag.app');
+    expect(publicAndEmailCopy).not.toMatch(/[A-Za-z0-9._%+-]+@gmail\.com/i);
   });
 
   it('routes production transactional delivery through Resend before any fallback binding', () => {
