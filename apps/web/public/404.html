@@ -3,31 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0d0d0e">
+  <meta name="theme-color" content="#090b0e">
   <meta name="description" content="The requested page is not part of Sovereign.OS.">
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="/app-icon.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/launch.css?v=20260730-cohesion">
-  <link rel="stylesheet" href="/launch-polish.css?v=20260730-cohesion">
-  <link rel="stylesheet" href="/static-release.css?v=20260730-cohesion">
-  <link rel="stylesheet" href="/static-experience.css?v=20260730-cohesion">
-  <link rel="stylesheet" href="/premium-public-release.css?v=20260730-final">
+  <link rel="stylesheet" href="/v0-public-static.css?v=20260803-refined-v2">
+  <link rel="stylesheet" href="/deployed-route-cohesion.css?v=20260803-route-v1">
   <title>Page not found · Sovereign.OS</title>
 </head>
-<body class="launch-page not-found-page">
+<body class="launch-page not-found-page" data-visual-contract="founder-v0-static" data-secondary-visual-contract="founder-v0-locked-v1" data-route-cohesion="v1">
   <div class="launch-shell">
     <header class="launch-nav">
-      <a class="launch-wordmark" href="https://sovereign.defrag.app/">SOVEREIGN.OS</a>
-      <nav class="launch-links" aria-label="Public navigation"><a href="https://sovereign.defrag.app/how-it-works">How it works</a><a href="https://sovereign.defrag.app/pricing">Pricing</a><a href="https://sovereign.defrag.app/faq">Questions</a><a href="https://app.defrag.app/login">Sign in</a><a class="launch-cta" href="https://app.defrag.app/signup">Build my Baseline</a></nav>
+      <div class="launch-nav-inner">
+        <a class="launch-wordmark private-route-brand" href="https://sovereign.defrag.app/" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
+        <nav class="launch-links" aria-label="Public navigation">
+          <a href="https://sovereign.defrag.app/how-it-works">How it works</a>
+          <a href="https://sovereign.defrag.app/pricing">Pricing</a>
+          <a href="https://sovereign.defrag.app/faq">FAQ</a>
+        </nav>
+        <div class="launch-nav-actions">
+          <a class="launch-sign-in" href="https://app.defrag.app/login">Sign in</a>
+          <a class="launch-cta" href="https://app.defrag.app/signup">Get started <span aria-hidden="true">→</span></a>
+          <details class="launch-mobile-menu">
+            <summary aria-label="Open navigation"><span class="launch-mobile-menu-icon" aria-hidden="true"></span></summary>
+            <nav class="launch-mobile-menu-panel" aria-label="Mobile navigation">
+              <a href="https://sovereign.defrag.app/how-it-works">How it works</a>
+              <a href="https://sovereign.defrag.app/pricing">Pricing</a>
+              <a href="https://sovereign.defrag.app/faq">FAQ</a>
+              <a href="https://app.defrag.app/login">Sign in</a>
+            </nav>
+          </details>
+        </div>
+      </div>
     </header>
-    <main class="not-found-main">
+    <main class="not-found-main public-not-found">
       <section class="not-found-stage" aria-labelledby="not-found-heading">
         <p class="not-found-code" aria-hidden="true">404</p>
         <div class="not-found-copy">
           <p class="launch-kicker">NOT FOUND</p>
           <h1 id="not-found-heading">This page is not part of Sovereign.OS.</h1>
-          <p>The address may have changed, or the link may be incomplete. Return to the public site, or sign in to continue to your private workspace.</p>
+          <p>The address may have changed, or the link may be incomplete. Return to the public product, or sign in to continue to your private workspace.</p>
           <div class="not-found-actions">
             <a class="launch-button primary" href="https://sovereign.defrag.app/">Return home</a>
             <a class="launch-button" href="https://app.defrag.app/login">Sign in</a>
@@ -35,7 +51,18 @@
         </div>
       </section>
     </main>
-    <footer class="launch-footer"><span>Sovereign.OS · Private AI for personal, relationship, and system intelligence</span><nav><a href="https://sovereign.defrag.app/privacy">Privacy</a><a href="https://sovereign.defrag.app/terms">Terms</a><a href="https://sovereign.defrag.app/pricing">Pricing</a></nav></footer>
+    <footer class="launch-footer">
+      <div class="launch-footer-inner">
+        <a class="launch-footer-wordmark" href="https://sovereign.defrag.app/">SOVEREIGN.OS</a>
+        <nav aria-label="Footer navigation">
+          <a href="https://sovereign.defrag.app/privacy">Privacy</a>
+          <a href="https://sovereign.defrag.app/terms">Terms</a>
+          <a href="https://sovereign.defrag.app/pricing">Pricing</a>
+          <a href="https://sovereign.defrag.app/how-it-works#support">Support</a>
+        </nav>
+        <p>© 2026 Sovereign.OS</p>
+      </div>
+    </footer>
   </div>
 </body>
 </html>
