@@ -1,0 +1,873 @@
+/*
+ * sovereign-platform-cohesion-v1
+ * Final visual authority for every non-landing React surface.
+ * The frozen founder-v0 landing is intentionally not targeted here.
+ */
+
+:where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) {
+  --cohesion-page: #090b0e;
+  --cohesion-page-deep: #06080b;
+  --cohesion-panel: rgba(21, 24, 29, 0.9);
+  --cohesion-panel-raised: rgba(27, 31, 37, 0.94);
+  --cohesion-ink: #f1e9de;
+  --cohesion-muted: rgba(229, 220, 209, 0.72);
+  --cohesion-faint: rgba(229, 220, 209, 0.46);
+  --cohesion-line: rgba(241, 233, 222, 0.11);
+  --cohesion-line-strong: rgba(241, 233, 222, 0.2);
+  --cohesion-blue: #2f93ff;
+  --cohesion-blue-bright: #78c7ff;
+  --cohesion-blue-soft: rgba(47, 147, 255, 0.12);
+  --cohesion-shell: min(1240px, calc(100vw - 80px));
+  --cohesion-reading: 760px;
+}
+
+body:has(.sovereign-app-runtime),
+body:has(.account-shell),
+body:has(.plan-onboarding),
+body:has(.invitation-shell),
+body:has(.private-route-gate),
+body:has(.public-not-found),
+body:has(.public-secondary-page) {
+  background:
+    radial-gradient(circle at 73% 8%, rgba(47, 147, 255, 0.09), transparent 31rem),
+    radial-gradient(circle at 20% 74%, rgba(241, 233, 222, 0.025), transparent 30rem),
+    var(--cohesion-page);
+  color: var(--cohesion-ink);
+}
+
+:where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) :where(button, a, input, textarea, select, summary) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Account, authentication, onboarding, and policy surfaces. */
+.account-nav,
+.plan-nav,
+.public-secondary-page .v0-shell.v0-nav-inner,
+.public-secondary-page .policy-hero,
+.public-secondary-page .policy-grid,
+.public-secondary-page .policy-contact,
+.public-secondary-page .v0-footer > .v0-shell {
+  width: var(--cohesion-shell) !important;
+}
+
+.account-layout {
+  width: var(--cohesion-shell) !important;
+  grid-template-columns: minmax(0, 1.12fr) minmax(440px, 520px) !important;
+  gap: clamp(72px, 8vw, 132px) !important;
+  padding: clamp(72px, 8vw, 118px) 0 110px !important;
+}
+
+.account-intro {
+  max-width: 680px !important;
+}
+
+.account-intro h1 {
+  max-width: 11ch !important;
+  font-size: clamp(4rem, 6.2vw, 6.5rem) !important;
+  line-height: 0.91 !important;
+}
+
+.account-intro .lede {
+  max-width: 58ch !important;
+  font-size: 1.02rem !important;
+}
+
+.account-points {
+  margin-top: 38px !important;
+  border-top: 1px solid var(--cohesion-line);
+}
+
+.account-points li {
+  min-height: 58px;
+  align-items: center;
+  border-bottom: 1px solid var(--cohesion-line);
+}
+
+.auth-panel {
+  padding: clamp(34px, 4vw, 48px) !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.025), transparent 46%),
+    radial-gradient(circle at 100% 0, rgba(47, 147, 255, 0.1), transparent 24rem),
+    rgba(20, 23, 28, 0.96) !important;
+  box-shadow: 0 36px 110px rgba(0, 0, 0, 0.46) !important;
+}
+
+.auth-panel h2,
+.passkey-primary h2 {
+  font-size: clamp(2.55rem, 3.8vw, 3.55rem) !important;
+  line-height: 0.98 !important;
+}
+
+.auth-panel :where(input, select, textarea),
+.plan-onboarding :where(input, select, textarea) {
+  min-height: 54px !important;
+  border-radius: 9px !important;
+}
+
+.public-secondary-page .policy-hero {
+  min-height: 610px !important;
+  padding: 132px 0 96px !important;
+}
+
+.public-secondary-page .policy-hero h1 {
+  max-width: 13ch !important;
+  font-size: clamp(4.4rem, 7vw, 7rem) !important;
+}
+
+.public-secondary-page .policy-grid {
+  padding: 100px 0 112px !important;
+}
+
+.public-secondary-page .policy-grid article {
+  padding: 38px 0 !important;
+}
+
+.public-secondary-page .policy-grid p {
+  max-width: 860px !important;
+  font-size: 0.98rem !important;
+}
+
+/* Authenticated single-room workspace. */
+.sovereign-app-runtime {
+  min-height: 100svh;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 76% 9%, rgba(47, 147, 255, 0.07), transparent 30rem),
+    linear-gradient(rgba(255,255,255,0.006) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.006) 1px, transparent 1px),
+    var(--cohesion-page-deep);
+  background-size: auto, 96px 96px, 96px 96px, auto;
+}
+
+.sovereign-app-runtime .intelligence-workspace {
+  min-height: 100svh;
+  background: transparent;
+  color: var(--cohesion-ink);
+}
+
+.sovereign-app-runtime .intelligence-sidebar {
+  width: 252px;
+  padding: calc(26px + env(safe-area-inset-top)) 18px calc(22px + env(safe-area-inset-bottom));
+  border-right: 1px solid var(--cohesion-line);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.018), transparent 32%),
+    rgba(7, 9, 12, 0.9);
+  box-shadow: 20px 0 70px rgba(0,0,0,0.22);
+}
+
+.sovereign-app-runtime .intelligence-brand {
+  min-height: 54px;
+  padding: 0 6px 18px;
+  border-bottom: 1px solid var(--cohesion-line);
+  color: var(--cohesion-ink);
+  letter-spacing: 0.18em;
+}
+
+.sovereign-app-runtime .intelligence-brand > span {
+  display: none;
+}
+
+.sovereign-app-runtime .intelligence-brand strong {
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.sovereign-app-runtime .intelligence-sidebar nav {
+  gap: 6px;
+  margin-top: 24px;
+}
+
+.sovereign-app-runtime .intelligence-sidebar nav button {
+  min-height: 48px;
+  grid-template-columns: 1fr;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: var(--cohesion-muted);
+}
+
+.sovereign-app-runtime .intelligence-sidebar nav button:hover {
+  border-color: var(--cohesion-line);
+  background: rgba(255,255,255,0.025);
+  color: var(--cohesion-ink);
+}
+
+.sovereign-app-runtime .intelligence-sidebar nav button.active {
+  border-color: rgba(120, 199, 255, 0.38);
+  background:
+    linear-gradient(90deg, rgba(47, 147, 255, 0.13), rgba(47, 147, 255, 0.025));
+  color: var(--cohesion-ink);
+  box-shadow: inset 2px 0 0 var(--cohesion-blue-bright);
+}
+
+.sovereign-app-runtime .intelligence-sidebar nav button strong {
+  font-size: 0.82rem;
+  font-weight: 620;
+}
+
+.sovereign-app-runtime .recent-threads {
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--cohesion-line);
+}
+
+.sovereign-app-runtime .recent-threads > p {
+  margin-inline: 8px;
+  color: var(--cohesion-faint);
+  font-size: 0.64rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.sovereign-app-runtime .recent-threads button {
+  min-height: 42px;
+  padding-inline: 8px;
+  color: var(--cohesion-faint);
+}
+
+.sovereign-app-runtime .new-conversation {
+  margin-top: auto;
+  border: 0;
+  border-top: 1px solid var(--cohesion-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--cohesion-ink);
+  text-align: left;
+}
+
+.sovereign-app-runtime .intelligence-main {
+  min-height: 100svh;
+  margin-left: 252px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.sovereign-app-runtime .intelligence-workspace.context-open .intelligence-main {
+  margin-right: 420px;
+}
+
+.sovereign-app-runtime .intelligence-topbar {
+  min-height: 78px;
+  padding: 14px clamp(28px, 4vw, 58px);
+  border-bottom: 1px solid var(--cohesion-line);
+  background: rgba(8, 10, 13, 0.78);
+  backdrop-filter: blur(22px);
+}
+
+.sovereign-app-runtime .intelligence-topbar > div:first-of-type {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sovereign-app-runtime .intelligence-topbar > div:first-of-type strong {
+  font-family: var(--font-subheading, "Sovereign Sans", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sovereign-app-runtime .intelligence-topbar > div:first-of-type span::before {
+  content: '·';
+}
+
+.sovereign-app-runtime .intelligence-topbar em {
+  color: var(--cohesion-muted);
+  font-size: 0.78rem;
+  font-style: normal;
+}
+
+.sovereign-app-runtime .topbar-actions button {
+  min-width: 96px;
+  border: 1px solid var(--cohesion-line);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+}
+
+.sovereign-app-runtime .intelligence-scroll {
+  width: min(100%, 1240px);
+  padding: clamp(60px, 7vw, 104px) clamp(34px, 5vw, 76px) 220px;
+}
+
+.sovereign-app-runtime .surface-home {
+  width: 100%;
+}
+
+.sovereign-app-runtime .surface-heading {
+  display: grid;
+  max-width: none;
+  grid-template-columns: minmax(0, 1.18fr) minmax(280px, 0.62fr);
+  column-gap: clamp(56px, 8vw, 124px);
+  align-items: end;
+  margin-bottom: clamp(52px, 7vw, 86px);
+  padding-bottom: 42px;
+  border-bottom: 1px solid var(--cohesion-line);
+}
+
+.sovereign-app-runtime .surface-heading > p {
+  grid-column: 1 / -1;
+  margin-bottom: 16px;
+  color: rgba(120,199,255,0.78);
+  font-size: 0.66rem;
+  letter-spacing: 0.17em;
+}
+
+.sovereign-app-runtime .surface-heading h1 {
+  max-width: 12ch;
+  margin: 0;
+  font-size: clamp(3.8rem, 6vw, 6.7rem);
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+}
+
+.sovereign-app-runtime .surface-heading > span {
+  max-width: 42ch;
+  padding-bottom: 10px;
+  color: var(--cohesion-muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.sovereign-app-runtime .baseline-preparing,
+.sovereign-app-runtime .baseline-invitation,
+.sovereign-app-runtime .incomplete-state,
+.sovereign-app-runtime .loading-state {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-height: 470px;
+  padding: clamp(36px, 6vw, 72px);
+  border: 1px solid var(--cohesion-line);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 82% 22%, rgba(47,147,255,0.11), transparent 25rem),
+    linear-gradient(145deg, rgba(255,255,255,0.026), transparent 42%),
+    var(--cohesion-panel);
+  box-shadow: 0 32px 92px rgba(0,0,0,0.28);
+}
+
+.sovereign-app-runtime .baseline-preparing {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.7fr);
+  align-content: center;
+  column-gap: 70px;
+}
+
+.sovereign-app-runtime .baseline-preparing > p {
+  grid-column: 1 / -1;
+  margin: 0 0 20px;
+  color: rgba(120,199,255,0.78);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.sovereign-app-runtime .baseline-preparing h1 {
+  max-width: 14ch;
+  margin: 0;
+  font-size: clamp(3.15rem, 5vw, 5.75rem);
+  line-height: 0.94;
+}
+
+.sovereign-app-runtime .baseline-preparing > span {
+  align-self: end;
+  color: var(--cohesion-muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.sovereign-app-runtime .baseline-preparing > button {
+  grid-column: 2;
+  width: fit-content;
+  min-height: 48px;
+  margin-top: 26px;
+  padding: 0 18px;
+  border: 0;
+  border-bottom: 1px solid rgba(120,199,255,0.7);
+  border-radius: 0;
+  background: transparent;
+  color: var(--cohesion-ink);
+}
+
+.sovereign-app-runtime .today-facet-view {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.9fr);
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--cohesion-line);
+  border-radius: 20px;
+  background: var(--cohesion-line);
+  box-shadow: 0 32px 92px rgba(0,0,0,0.26);
+}
+
+.sovereign-app-runtime .today-facet-view > header {
+  grid-column: 1 / -1;
+  min-height: 330px;
+  padding: clamp(38px, 6vw, 72px);
+  background:
+    radial-gradient(circle at 80% 24%, rgba(47,147,255,0.13), transparent 25rem),
+    var(--cohesion-panel);
+}
+
+.sovereign-app-runtime .today-facet-view > header h1 {
+  max-width: 13ch;
+  margin: 14px 0 20px;
+  font-size: clamp(3.2rem, 5vw, 5.7rem);
+  line-height: 0.94;
+}
+
+.sovereign-app-runtime .today-facet-view > header > span {
+  display: block;
+  max-width: 62ch;
+  color: var(--cohesion-muted);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.sovereign-app-runtime .today-insight-lines {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-column: 1 / -1;
+  gap: 1px;
+  background: var(--cohesion-line);
+}
+
+.sovereign-app-runtime .today-insight-lines article {
+  min-height: 210px;
+  padding: 30px;
+  background: var(--cohesion-panel-raised);
+}
+
+.sovereign-app-runtime .today-insight-lines p {
+  margin-top: 16px;
+  color: var(--cohesion-muted);
+  line-height: 1.68;
+}
+
+.sovereign-app-runtime .today-continuations {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-column: 1 / -1;
+  gap: 1px;
+  background: var(--cohesion-line);
+}
+
+.sovereign-app-runtime .today-continuations button {
+  min-height: 76px;
+  padding: 18px 22px;
+  border: 0;
+  background: rgba(8,10,13,0.94);
+  color: var(--cohesion-ink);
+  text-align: left;
+}
+
+.sovereign-app-runtime .today-continuations button:hover {
+  background: var(--cohesion-blue-soft);
+}
+
+.sovereign-app-runtime .account-summary {
+  max-width: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-radius: 18px;
+  box-shadow: 0 28px 86px rgba(0,0,0,0.25);
+}
+
+.sovereign-app-runtime .account-summary article,
+.sovereign-app-runtime .account-summary > button {
+  min-height: 160px;
+  padding: 28px;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.022), transparent 54%),
+    var(--cohesion-panel);
+}
+
+.sovereign-app-runtime .account-summary article strong {
+  font-size: 1rem;
+  line-height: 1.48;
+}
+
+.sovereign-app-runtime .account-summary > button {
+  min-height: 70px;
+}
+
+.sovereign-app-runtime .explore-editorial,
+.sovereign-app-runtime .person-split,
+.sovereign-app-runtime .relationship-field,
+.sovereign-app-runtime .system-overview,
+.sovereign-app-runtime .library-grid,
+.sovereign-app-runtime .response-thread,
+.sovereign-app-runtime .sovereign-answer,
+.sovereign-app-runtime .baseline-builder,
+.sovereign-app-runtime .baseline-reveal {
+  border-color: var(--cohesion-line);
+}
+
+.sovereign-app-runtime .sovereign-answer {
+  overflow: hidden;
+  border: 1px solid var(--cohesion-line);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 88% 4%, rgba(47,147,255,0.08), transparent 28rem),
+    var(--cohesion-panel);
+  box-shadow: 0 34px 100px rgba(0,0,0,0.3);
+}
+
+.sovereign-app-runtime .sovereign-answer > header,
+.sovereign-app-runtime .sovereign-answer > .direct-answer,
+.sovereign-app-runtime .sovereign-answer > .answer-sections,
+.sovereign-app-runtime .sovereign-answer > .answer-evidence-row,
+.sovereign-app-runtime .sovereign-answer > .answer-limit,
+.sovereign-app-runtime .sovereign-answer > .answer-actions {
+  padding-inline: clamp(30px, 5vw, 64px);
+}
+
+.sovereign-app-runtime .sovereign-answer > header {
+  padding-top: clamp(38px, 6vw, 70px);
+}
+
+.sovereign-app-runtime .sovereign-answer > header h2 {
+  max-width: 16ch;
+  margin: 14px 0 0;
+  font-size: clamp(3rem, 5vw, 5.5rem);
+  line-height: 0.94;
+}
+
+.sovereign-app-runtime .direct-answer {
+  max-width: 70ch;
+  color: var(--cohesion-muted);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.sovereign-app-runtime .sovereign-composer {
+  position: fixed;
+  z-index: 45;
+  right: max(28px, calc((100vw - 252px - 980px) / 2));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  left: max(280px, calc(252px + (100vw - 252px - 980px) / 2));
+  width: auto;
+  max-width: 980px;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--cohesion-line-strong);
+  border-radius: 18px;
+  background: rgba(13,16,20,0.94);
+  box-shadow: 0 34px 100px rgba(0,0,0,0.48);
+  backdrop-filter: blur(24px);
+}
+
+.sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
+  right: 448px;
+}
+
+.sovereign-app-runtime .composer-context-line {
+  min-height: 34px;
+  padding: 2px 8px 10px;
+  border-bottom: 1px solid var(--cohesion-line);
+}
+
+.sovereign-app-runtime .composer-entry {
+  align-items: end;
+  padding-top: 10px;
+}
+
+.sovereign-app-runtime .sovereign-composer textarea {
+  min-height: 58px;
+  max-height: 180px;
+  padding: 14px 16px;
+  border: 0;
+  background: rgba(5,7,9,0.66);
+  color: var(--cohesion-ink);
+  font-size: 16px;
+}
+
+.sovereign-app-runtime .composer-send {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: var(--cohesion-ink);
+  color: #0a0c0f;
+}
+
+.sovereign-app-runtime .intelligence-context {
+  width: 420px;
+  border-left: 1px solid var(--cohesion-line);
+  background: rgba(11,14,18,0.97);
+  box-shadow: -24px 0 80px rgba(0,0,0,0.34);
+}
+
+.sovereign-app-runtime .intelligence-context > header {
+  min-height: 88px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--cohesion-line);
+}
+
+.sovereign-app-runtime .context-scroll {
+  padding: 24px;
+}
+
+.sovereign-app-runtime .mobile-bottom-nav {
+  display: none;
+}
+
+/* Tablet and iPhone workspace. */
+@media (max-width: 1080px) {
+  :where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) {
+    --cohesion-shell: min(100% - 48px, 980px);
+  }
+
+  .account-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(390px, 460px) !important;
+    gap: 52px !important;
+  }
+
+  .sovereign-app-runtime .intelligence-workspace.context-open .intelligence-main {
+    margin-right: 0;
+  }
+
+  .sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
+    right: 28px;
+  }
+
+  .sovereign-app-runtime .intelligence-context {
+    position: fixed;
+    z-index: 70;
+    right: 0;
+  }
+}
+
+@media (max-width: 820px) {
+  .account-layout,
+  .plan-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .account-intro,
+  .auth-panel {
+    max-width: 720px !important;
+  }
+
+  .sovereign-app-runtime .intelligence-sidebar {
+    display: none;
+  }
+
+  .sovereign-app-runtime .intelligence-main {
+    margin-left: 0;
+    padding-bottom: calc(78px + env(safe-area-inset-bottom));
+  }
+
+  .sovereign-app-runtime .intelligence-topbar {
+    min-height: calc(66px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right));
+  }
+
+  .sovereign-app-runtime .mobile-menu-trigger {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    border-color: var(--cohesion-line);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .sovereign-app-runtime .intelligence-scroll {
+    width: 100%;
+    padding: 44px max(20px, env(safe-area-inset-left)) 210px max(20px, env(safe-area-inset-right));
+  }
+
+  .sovereign-app-runtime .surface-heading {
+    grid-template-columns: 1fr;
+    row-gap: 22px;
+    margin-bottom: 42px;
+    padding-bottom: 30px;
+  }
+
+  .sovereign-app-runtime .surface-heading h1 {
+    font-size: clamp(3.2rem, 10vw, 5.4rem);
+  }
+
+  .sovereign-app-runtime .surface-heading > span {
+    max-width: 58ch;
+  }
+
+  .sovereign-app-runtime .baseline-preparing {
+    grid-template-columns: 1fr;
+    min-height: 430px;
+    padding: 38px;
+  }
+
+  .sovereign-app-runtime .baseline-preparing > span,
+  .sovereign-app-runtime .baseline-preparing > button {
+    grid-column: 1;
+  }
+
+  .sovereign-app-runtime .today-insight-lines,
+  .sovereign-app-runtime .today-continuations,
+  .sovereign-app-runtime .account-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .sovereign-app-runtime .today-facet-view {
+    grid-template-columns: 1fr;
+  }
+
+  .sovereign-app-runtime .today-insight-lines article {
+    min-height: 0;
+  }
+
+  .sovereign-app-runtime .sovereign-composer,
+  .sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
+    right: max(10px, env(safe-area-inset-right));
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    left: max(10px, env(safe-area-inset-left));
+    max-width: none;
+    border-radius: 16px;
+  }
+
+  .sovereign-app-runtime .mobile-bottom-nav {
+    position: fixed;
+    z-index: 60;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    min-height: calc(66px + env(safe-area-inset-bottom));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding: 6px max(6px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(6px, env(safe-area-inset-left));
+    border-top: 1px solid var(--cohesion-line);
+    background: rgba(8,10,13,0.96);
+    backdrop-filter: blur(24px);
+  }
+
+  .sovereign-app-runtime .mobile-bottom-nav button {
+    min-height: 52px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--cohesion-faint);
+  }
+
+  .sovereign-app-runtime .mobile-bottom-nav button.active {
+    background: var(--cohesion-blue-soft);
+    color: var(--cohesion-ink);
+  }
+
+  .sovereign-app-runtime .intelligence-context {
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    max-height: min(84svh, 760px);
+    border-top: 1px solid var(--cohesion-line-strong);
+    border-left: 0;
+    border-radius: 22px 22px 0 0;
+  }
+}
+
+@media (max-width: 560px) {
+  :where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) {
+    --cohesion-shell: calc(100% - 28px);
+  }
+
+  .account-layout,
+  .plan-layout {
+    padding: 40px 0 72px !important;
+  }
+
+  .account-intro h1,
+  .public-secondary-page .policy-hero h1 {
+    font-size: clamp(3rem, 14vw, 4.75rem) !important;
+  }
+
+  .auth-panel {
+    padding: 24px !important;
+    border-radius: 14px !important;
+  }
+
+  .sovereign-app-runtime .intelligence-topbar > div:first-of-type strong,
+  .sovereign-app-runtime .intelligence-topbar em {
+    display: none;
+  }
+
+  .sovereign-app-runtime .topbar-actions {
+    margin-left: auto;
+  }
+
+  .sovereign-app-runtime .topbar-actions button {
+    min-width: 88px;
+  }
+
+  .sovereign-app-runtime .intelligence-scroll {
+    padding-top: 34px;
+    padding-inline: max(14px, env(safe-area-inset-left)) max(14px, env(safe-area-inset-right));
+  }
+
+  .sovereign-app-runtime .surface-heading h1,
+  .sovereign-app-runtime .baseline-preparing h1,
+  .sovereign-app-runtime .today-facet-view > header h1,
+  .sovereign-app-runtime .sovereign-answer > header h2 {
+    font-size: clamp(2.75rem, 13vw, 4.25rem);
+    line-height: 0.95;
+  }
+
+  .sovereign-app-runtime .surface-heading > span,
+  .sovereign-app-runtime .baseline-preparing > span,
+  .sovereign-app-runtime .today-facet-view > header > span,
+  .sovereign-app-runtime .direct-answer {
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+
+  .sovereign-app-runtime .baseline-preparing,
+  .sovereign-app-runtime .baseline-invitation,
+  .sovereign-app-runtime .incomplete-state {
+    min-height: 0;
+    padding: 28px 22px;
+    border-radius: 16px;
+  }
+
+  .sovereign-app-runtime .today-facet-view,
+  .sovereign-app-runtime .sovereign-answer,
+  .sovereign-app-runtime .account-summary {
+    border-radius: 16px;
+  }
+
+  .sovereign-app-runtime .today-facet-view > header,
+  .sovereign-app-runtime .today-insight-lines article,
+  .sovereign-app-runtime .account-summary article,
+  .sovereign-app-runtime .account-summary > button {
+    padding: 24px 22px;
+  }
+
+  .sovereign-app-runtime .sovereign-composer {
+    padding: 8px;
+  }
+
+  .sovereign-app-runtime .composer-context-line {
+    font-size: 0.68rem;
+  }
+
+  .sovereign-app-runtime .composer-context-line span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sovereign-app-runtime .composer-send {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) *,
+  :where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) *::before,
+  :where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
