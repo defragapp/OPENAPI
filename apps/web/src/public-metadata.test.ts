@@ -32,13 +32,18 @@ describe('public metadata and fallback documents', () => {
   });
 
   it('keeps the static 404 on the current production assets', () => {
-    for (const asset of [
-      '/launch.css?v=20260730-cohesion',
-      '/launch-polish.css?v=20260730-cohesion',
-      '/static-release.css?v=20260730-cohesion',
-      '/static-experience.css?v=20260730-cohesion'
-    ]) expect(notFound).toContain(asset);
+    const assets = [
+      '/v0-public-static.css?v=20260803-refined-v2',
+      '/not-found-route.css?v=20260804-cohesion-v1',
+      '/deployed-route-cohesion.css?v=20260803-route-v1'
+    ];
+
+    for (const asset of assets) expect(notFound).toContain(asset);
+    expect(notFound.indexOf(assets[1])).toBeGreaterThan(notFound.indexOf(assets[0]));
+    expect(notFound.indexOf(assets[2])).toBeGreaterThan(notFound.indexOf(assets[1]));
+    expect(notFound).toContain('data-route-cohesion="v1"');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
+    expect(notFound).not.toContain('<link rel="stylesheet" href="/launch.css?v=20260730-cohesion">');
   });
 
   it('keeps install metadata aligned with the v0 category', () => {
