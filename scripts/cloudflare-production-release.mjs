@@ -12,6 +12,7 @@ const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const reportUrl = String(process.env.RELEASE_REPORT_URL || '').trim();
 const reportKey = String(process.env.RELEASE_REPORT_KEY || '').trim();
 const reportTransport = process.env.RELEASE_REPORT_TRANSPORT === 'query' ? 'query' : 'post';
+const productionHealthUrl = 'https://app.defrag.app/health';
 const LEGACY_DEPLOY_COMPATIBILITY = 'cloudflare-production-deploy-v2.mjs';
 const browserRunRetryDelayMs = Math.min(
   120_000,
@@ -65,6 +66,20 @@ async function report(sha, status, output = '') {
   if (result.ok) console.log(message);
   else console.warn(message);
   return result.ok;
+}
+
+async function liveCandidateIsDeployed(sha) {
+  try {
+    const response = await fetch(productionHealthUrl, {
+      headers: { accept: 'application/json', 'cache-control': 'no-cache' },
+      signal: AbortSignal.timeout(10_000)
+    });
+    if (!response.ok) return false;
+    const payload = await response.json().catch(() => null);
+    return payload?.version === sha;
+  } catch {
+    return false;
+  }
 }
 
 function runNodeScript(path, environment) {
@@ -168,19 +183,24 @@ const authoritativeSteps = [
 void LEGACY_DEPLOY_COMPATIBILITY;
 await report(checkoutSha, 'start');
 let combinedOutput = '';
-let primaryDeploymentComplete = false;
 for (const [label, path] of authoritativeSteps) {
   const step = await runAuthoritativeStep(label, path, releaseEnv);
   const result = step.result;
   const output = step.output;
   combinedOutput = `${combinedOutput}\n[${label}]\n${output}`.trim();
   if (!result || result.error || result.status !== 0) {
-    if (primaryDeploymentComplete) publishFailureProgress(checkoutSha, label, output, releaseEnv);
+    const candidateIsLive = label !== 'deploy-v3' || await liveCandidateIsDeployed(checkoutSha);
+    if (candidateIsLive) {
+      publishFailureProgress(checkoutSha, label, output, releaseEnv);
+    } else {
+      process.stderr.write(
+        `[cloudflare-release] stage=write-release-progress status=skipped originalStage=${label} reason=candidate-not-live\n`
+      );
+    }
     await report(checkoutSha, 'failure', combinedOutput || String(result?.error?.message || `exit ${result?.status}`));
     if (result?.error) fail(result.error.message);
     process.exit(result?.status || 1);
   }
-  if (label === 'deploy-v3') primaryDeploymentComplete = true;
 }
 
 const dmarcResult = runNodeScript('scripts/configure-cloudflare-dmarc.mjs', releaseEnv);
