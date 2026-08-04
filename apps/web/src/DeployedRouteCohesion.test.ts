@@ -27,15 +27,19 @@ const staticPages = [
 ] as const;
 
 describe('deployed route cohesion', () => {
-  it('keeps the certified route CSS last while mounting the platform authority before React', () => {
+  it('keeps the certified route CSS last while installing platform authority synchronously before React', () => {
     const passkey = main.indexOf("import './passkey-auth.css';");
     const cohesion = main.indexOf("import './deployed-route-cohesion.css';");
     expect(passkey).toBeGreaterThan(-1);
     expect(cohesion).toBeGreaterThan(passkey);
     expect(main.slice(cohesion + 1)).not.toContain("import './");
-    expect(main).toContain("import platformVisualCohesionUrl from './platform-visual-cohesion-v1.css?url'");
+    expect(main).toContain("import platformVisualCohesionCss from './platform-visual-cohesion-v1.css?inline'");
     expect(main).toContain('function installPlatformVisualCohesion(): void');
-    expect(main).toContain("link.dataset.sovereignPlatformCohesion = 'v1'");
+    expect(main).toContain("style.dataset.sovereignPlatformCohesion = 'v1'");
+    expect(main).toContain('style.textContent = platformVisualCohesionCss');
+    expect(main).toContain('document.head.append(style)');
+    expect(main).not.toContain('platformVisualCohesionUrl');
+    expect(main).not.toContain("link.rel = 'stylesheet'");
     expect(main.indexOf('installPlatformVisualCohesion();')).toBeLessThan(main.indexOf('installV0ReleaseFingerprint();'));
     expect(main).toContain("dataset.sovereignPlatformCohesion = 'v1'");
   });
