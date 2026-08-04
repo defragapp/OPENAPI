@@ -125,11 +125,12 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
     return shareFirstAccountResponse(request, env, executionContext);
   }
 
-  if ((request.method === 'GET' || request.method === 'HEAD') && isNavigationAssetPath(url.pathname)) {
+  const appNavigationFallback = isAppNavigationFallback(request, url);
+  if ((request.method === 'GET' || request.method === 'HEAD') && (isNavigationAssetPath(url.pathname) || appNavigationFallback)) {
     if (!env.ASSETS) {
       return withSecurityHeaders(Response.json({ error: 'assets_unavailable' }, { status: 503 }));
     }
-    const assetRequest = navigationAssetRequest(request, url.pathname);
+    const assetRequest = navigationAssetRequest(request, url.pathname, appNavigationFallback);
     return documentResponse(await env.ASSETS.fetch(assetRequest), url.hostname.toLowerCase());
   }
 
@@ -338,8 +339,15 @@ function isNavigationAssetPath(pathname: string): boolean {
     || isApplicationPagePath(pathname);
 }
 
-function navigationAssetRequest(request: Request, pathname: string): Request {
-  if (!isSpaDocumentPath(pathname)) return request;
+function isAppNavigationFallback(request: Request, url: URL): boolean {
+  if ((request.method !== 'GET' && request.method !== 'HEAD') || url.hostname.toLowerCase() !== APP_HOST) return false;
+  if (HEALTH_PATHS.has(url.pathname) || STRIPE_WEBHOOK_PATHS.has(url.pathname) || url.pathname.startsWith('/api/')) return false;
+  const segment = url.pathname.split('/').filter(Boolean).at(-1) || '';
+  return Boolean(segment) && !segment.includes('.');
+}
+
+function navigationAssetRequest(request: Request, pathname: string, forceSpaDocument = false): Request {
+  if (!forceSpaDocument && !isSpaDocumentPath(pathname)) return request;
   const target = new URL(request.url);
   target.pathname = '/';
   target.search = '';
