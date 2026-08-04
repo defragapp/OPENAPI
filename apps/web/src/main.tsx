@@ -16,7 +16,7 @@ import { PublicPolicy } from './PublicPolicy';
 import { PublicPolicyMetadata } from './PublicPolicyMetadata';
 import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
 import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
-import platformVisualCohesionUrl from './platform-visual-cohesion-v1.css?url';
+import platformVisualCohesionCss from './platform-visual-cohesion-v1.css?inline';
 
 /* Component foundations */
 import './styles.css';
@@ -75,12 +75,11 @@ import './passkey-auth.css';
 import './deployed-route-cohesion.css';
 
 function installPlatformVisualCohesion(): void {
-  if (document.head.querySelector('link[data-sovereign-platform-cohesion="v1"]')) return;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = platformVisualCohesionUrl;
-  link.dataset.sovereignPlatformCohesion = 'v1';
-  document.head.append(link);
+  if (document.head.querySelector('style[data-sovereign-platform-cohesion="v1"]')) return;
+  const style = document.createElement('style');
+  style.dataset.sovereignPlatformCohesion = 'v1';
+  style.textContent = platformVisualCohesionCss;
+  document.head.append(style);
 }
 
 installPlatformVisualCohesion();
