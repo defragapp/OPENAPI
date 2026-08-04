@@ -1,0 +1,458 @@
+/*
+ * Sovereign.OS sitewide cohesion refinement v2.
+ *
+ * Loaded through the existing synchronous platform cohesion installer so the
+ * frozen founder landing, account journey, and authenticated one-room workspace
+ * share one final wordmark, spacing rhythm, and interaction finish without
+ * replacing route ownership or product behavior.
+ */
+
+:root {
+  --sovereign-wordmark-family: var(--font-subheading, "Sovereign Sans", "Avenir Next", "Helvetica Neue", Arial, sans-serif);
+  --sovereign-wordmark-size: 0.69rem;
+  --sovereign-wordmark-tracking: 0.22em;
+}
+
+:where(
+  .v0-wordmark,
+  .account-nav .wordmark,
+  .plan-nav .wordmark,
+  .private-route-brand strong,
+  .intelligence-brand strong,
+  .public-secondary-page .v0-wordmark,
+  .launch-wordmark,
+  .launch-brand
+) {
+  color: #f1e9de !important;
+  font-family: var(--sovereign-wordmark-family) !important;
+  font-size: var(--sovereign-wordmark-size) !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: var(--sovereign-wordmark-tracking) !important;
+  text-transform: uppercase !important;
+  white-space: nowrap;
+}
+
+/* The hero field remains the frozen composition; this layer only improves its
+   semantic vectors, endpoint readout, and center-anchored interaction finish. */
+.public-approved-v8 .landing-expression-slice__canvas {
+  top: 96% !important;
+  filter: drop-shadow(0 0 48px rgba(26, 124, 255, 0.24));
+}
+
+.public-approved-v8 .landing-expression-slice__vector {
+  cursor: pointer;
+  outline: none;
+}
+
+.public-approved-v8 .landing-expression-slice__beam {
+  stroke-width: 1.45px;
+  filter: drop-shadow(0 0 5px rgba(47, 147, 255, 0.78));
+}
+
+.public-approved-v8 .landing-expression-slice__aura {
+  stroke-width: 6px;
+  opacity: 0.42;
+}
+
+.public-approved-v8 .landing-expression-slice__endpoint {
+  fill: rgba(126, 201, 255, 0.82);
+  stroke: rgba(223, 245, 255, 0.66);
+  stroke-width: 0.8px;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 5px rgba(47, 147, 255, 0.72));
+  transition: r 180ms ease, opacity 180ms ease;
+}
+
+.public-approved-v8 .landing-expression-slice__vector:is(:hover, :focus-visible, .is-selected) .landing-expression-slice__endpoint {
+  fill: #eef9ff;
+  stroke: #78c7ff;
+  filter: drop-shadow(0 0 9px rgba(120, 199, 255, 0.95));
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip {
+  display: block !important;
+  pointer-events: none;
+  filter: drop-shadow(0 16px 34px rgba(0, 0, 0, 0.48));
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-connector {
+  stroke: rgba(120, 199, 255, 0.62);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-panel {
+  fill: rgba(8, 12, 18, 0.92);
+  stroke: rgba(120, 199, 255, 0.42);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-title {
+  fill: #f1e9de;
+  font-family: var(--font-display, "Sovereign Display", Georgia, serif);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-value {
+  fill: rgba(120, 199, 255, 0.9);
+  font-family: var(--font-subheading, "Sovereign Sans", sans-serif);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-meta {
+  fill: rgba(213, 226, 238, 0.62);
+  font-family: var(--font-body, sans-serif);
+  font-size: 9px;
+  letter-spacing: 0.025em;
+}
+
+.public-approved-v8 .landing-expression-slice__readout--accessible {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Questions now form a quiet editorial bridge below the hero instead of
+   competing with the field center and selected-vector readout. */
+.public-approved-v8 .landing-question-orbit {
+  position: relative !important;
+  z-index: 9;
+  display: grid;
+  min-height: 188px !important;
+  height: auto !important;
+  place-items: center;
+  overflow: hidden !important;
+  border-top: 1px solid rgba(241, 233, 222, 0.08) !important;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.08) !important;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(47, 147, 255, 0.05), transparent 30rem),
+    rgba(255, 255, 255, 0.008) !important;
+  pointer-events: none;
+}
+
+.public-approved-v8 .landing-question-orbit__inner {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  display: grid;
+  justify-items: center;
+  width: min(820px, calc(100vw - 48px)) !important;
+  padding: 42px 0 46px !important;
+  transform: none !important;
+  text-align: center;
+}
+
+.public-approved-v8 .landing-question-orbit__kicker {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 0 18px !important;
+  overflow: visible !important;
+  clip: auto !important;
+  color: rgba(120, 199, 255, 0.72) !important;
+  font-family: var(--font-subheading, "Sovereign Sans", sans-serif) !important;
+  font-size: 0.58rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.17em !important;
+  text-transform: uppercase;
+  white-space: normal !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage {
+  width: min(780px, 100%) !important;
+  height: 66px !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage span {
+  padding-inline: 28px !important;
+  color: rgba(241, 233, 222, 0.86) !important;
+  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-size: clamp(1.28rem, 2.35vw, 1.82rem) !important;
+  font-weight: 400 !important;
+  line-height: 1.16 !important;
+  letter-spacing: -0.025em !important;
+}
+
+/* Account entry uses the same restrained atmosphere and hierarchy as the
+   landing, while preserving the real email, passkey, Turnstile, and redeem flow. */
+.account-shell {
+  min-height: 100svh;
+  background:
+    radial-gradient(circle at 73% 10%, rgba(47, 147, 255, 0.095), transparent 32rem),
+    linear-gradient(rgba(255, 255, 255, 0.006) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.006) 1px, transparent 1px),
+    #080a0d !important;
+  background-size: auto, 96px 96px, 96px 96px, auto !important;
+}
+
+.account-nav {
+  min-height: 74px !important;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.09) !important;
+  background: rgba(8, 10, 13, 0.78) !important;
+  backdrop-filter: blur(22px) saturate(118%);
+}
+
+.account-nav > a:last-child {
+  color: rgba(229, 220, 209, 0.72) !important;
+  font-family: var(--font-subheading, "Sovereign Sans", sans-serif) !important;
+  font-size: 0.72rem !important;
+  text-decoration: none;
+}
+
+.account-layout {
+  align-items: center !important;
+}
+
+.account-intro {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.account-intro .eyebrow,
+.auth-panel .eyebrow {
+  color: rgba(120, 199, 255, 0.76) !important;
+  font-family: var(--font-subheading, "Sovereign Sans", sans-serif) !important;
+  font-size: 0.61rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.17em !important;
+}
+
+.account-intro h1 {
+  color: #f1e9de !important;
+  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.account-intro .lede {
+  color: rgba(229, 220, 209, 0.7) !important;
+  font-family: var(--font-subheading, "Sovereign Sans", sans-serif) !important;
+}
+
+.account-points li {
+  color: rgba(229, 220, 209, 0.68) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.5 !important;
+}
+
+.auth-panel {
+  border: 1px solid rgba(241, 233, 222, 0.12) !important;
+  border-radius: 16px !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.026), transparent 46%),
+    radial-gradient(circle at 100% 0, rgba(47, 147, 255, 0.1), transparent 24rem),
+    rgba(18, 21, 26, 0.96) !important;
+  box-shadow: 0 34px 104px rgba(0, 0, 0, 0.46) !important;
+}
+
+.auth-panel h2 {
+  max-width: 12ch;
+  color: #f1e9de !important;
+  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.045em !important;
+}
+
+.auth-panel :where(input, select, textarea) {
+  border-color: rgba(241, 233, 222, 0.14) !important;
+  background: rgba(5, 7, 10, 0.58) !important;
+  color: #f1e9de !important;
+}
+
+.auth-panel :where(input, select, textarea):focus {
+  border-color: rgba(120, 199, 255, 0.64) !important;
+  box-shadow: 0 0 0 3px rgba(47, 147, 255, 0.1) !important;
+}
+
+.auth-panel .primary-button {
+  min-height: 52px !important;
+  border-radius: 7px !important;
+  background: #e8ddd0 !important;
+  color: #111316 !important;
+  font-family: var(--font-subheading, "Sovereign Sans", sans-serif) !important;
+  font-weight: 700 !important;
+}
+
+/* Keep the authenticated platform in the same visual family without turning
+   the one-room product into a different shell or dashboard. */
+.sovereign-app-runtime .intelligence-brand {
+  min-height: 54px;
+  align-items: center;
+}
+
+.sovereign-app-runtime .intelligence-topbar,
+.sovereign-app-runtime .intelligence-sidebar,
+.sovereign-app-runtime .sovereign-composer {
+  border-color: rgba(241, 233, 222, 0.1) !important;
+}
+
+.sovereign-app-runtime .surface-heading h1,
+.sovereign-app-runtime .baseline-preparing h1,
+.sovereign-app-runtime .today-facet-view h1,
+.sovereign-app-runtime .explore-editorial h1,
+.sovereign-app-runtime .relationship-overview h1,
+.sovereign-app-runtime .system-overview h1 {
+  color: #f1e9de !important;
+  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.sovereign-app-runtime :where(.surface-heading > span, .workspace-intro, .section-introduction) {
+  color: rgba(229, 220, 209, 0.7) !important;
+  font-family: var(--font-subheading, "Sovereign Sans", sans-serif) !important;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --sovereign-wordmark-size: 0.64rem;
+    --sovereign-wordmark-tracking: 0.19em;
+  }
+
+  .public-approved-v8 .landing-expression-slice__canvas {
+    top: 97% !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice__tooltip-title {
+    font-size: 18px;
+  }
+
+  .public-approved-v8 .landing-question-orbit {
+    min-height: 154px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__inner {
+    width: calc(100vw - 32px) !important;
+    padding: 30px 0 34px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__kicker {
+    margin-bottom: 12px !important;
+    font-size: 0.54rem !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__stage {
+    height: 62px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__stage span {
+    padding-inline: 12px !important;
+    font-size: clamp(1.04rem, 5.6vw, 1.32rem) !important;
+  }
+
+  .account-nav,
+  .account-layout {
+    width: min(100%, calc(100vw - 36px)) !important;
+  }
+
+  .account-nav {
+    min-height: 68px !important;
+  }
+
+  .account-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 42px !important;
+    padding: 52px 0 72px !important;
+  }
+
+  .account-intro {
+    max-width: 680px !important;
+  }
+
+  .account-intro h1 {
+    max-width: 12ch !important;
+    font-size: clamp(3.1rem, 12vw, 5rem) !important;
+    line-height: 0.92 !important;
+  }
+
+  .account-intro .lede {
+    max-width: 48ch !important;
+    font-size: 0.94rem !important;
+  }
+
+  .account-points {
+    margin-top: 28px !important;
+  }
+
+  .account-points li {
+    min-height: 52px !important;
+  }
+
+  .auth-panel {
+    padding: 28px 22px !important;
+  }
+
+  .auth-panel h2 {
+    font-size: clamp(2.25rem, 9vw, 3.2rem) !important;
+  }
+
+  .sovereign-app-runtime .intelligence-scroll {
+    padding-inline: 20px !important;
+  }
+
+  .sovereign-app-runtime .surface-heading {
+    grid-template-columns: minmax(0, 1fr) !important;
+    row-gap: 20px !important;
+    margin-bottom: 42px !important;
+    padding-bottom: 28px !important;
+  }
+
+  .sovereign-app-runtime .surface-heading h1 {
+    max-width: 12ch !important;
+    font-size: clamp(3rem, 12vw, 4.8rem) !important;
+  }
+
+  .sovereign-app-runtime .surface-heading > span {
+    max-width: 46ch !important;
+    padding-bottom: 0 !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .public-approved-v8 .landing-expression-slice__tooltip-panel {
+    fill: rgba(8, 12, 18, 0.95);
+  }
+
+  .account-layout {
+    gap: 34px !important;
+    padding-top: 40px !important;
+  }
+
+  .account-intro h1 {
+    font-size: clamp(2.8rem, 13.5vw, 4.25rem) !important;
+  }
+
+  .account-points li {
+    font-size: 0.77rem !important;
+  }
+
+  .auth-panel {
+    border-radius: 14px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-approved-v8 .landing-expression-slice__endpoint,
+  .public-approved-v8 .landing-expression-slice__vector,
+  .auth-panel :where(input, button, a),
+  .sovereign-app-runtime :where(button, a) {
+    transition: none !important;
+  }
+}
