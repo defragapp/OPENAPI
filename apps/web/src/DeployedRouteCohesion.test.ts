@@ -5,6 +5,7 @@ const read = (relativePath: string) => readFileSync(new URL(relativePath, import
 
 const main = read('./main.tsx');
 const reactAuthority = read('./deployed-route-cohesion.css');
+const platformAuthority = read('./platform-visual-cohesion-v1.css');
 const staticAuthority = read('../public/deployed-route-cohesion.css');
 const howItWorks = read('../public/how-it-works.html');
 const pricing = read('../public/pricing.html');
@@ -13,6 +14,7 @@ const policy = read('./PublicPolicy.tsx');
 const app = read('./App.tsx');
 const onboarding = read('./PlanOnboarding.tsx');
 const authenticatedWorkspace = read('./AuthenticatedWorkspace.tsx');
+const workspace = read('./SovereignIntelligenceWorkspace.tsx');
 const routeVerifier = read('../../../scripts/verify-live-route-cohesion.mjs');
 const secondaryVerifier = read('../../../scripts/verify-live-secondary-public.mjs');
 const productionRelease = read('../../../scripts/cloudflare-production-release.mjs');
@@ -25,26 +27,31 @@ const staticPages = [
 ] as const;
 
 describe('deployed route cohesion', () => {
-  it('loads one final scoped authority after the legacy account and passkey layers', () => {
+  it('loads the mounted-platform authority last after passkey and route foundations', () => {
     const passkey = main.indexOf("import './passkey-auth.css';");
     const cohesion = main.indexOf("import './deployed-route-cohesion.css';");
+    const platform = main.indexOf("import './platform-visual-cohesion-v1.css';");
     expect(passkey).toBeGreaterThan(-1);
     expect(cohesion).toBeGreaterThan(passkey);
-    expect(main.slice(cohesion + 1)).not.toContain("import './");
+    expect(platform).toBeGreaterThan(cohesion);
+    expect(main.slice(platform + 1)).not.toContain("import './");
+    expect(main).toContain("dataset.sovereignPlatformCohesion = 'v1'");
   });
 
-  it('keeps the frozen landing outside the new React route authority', () => {
-    expect(reactAuthority).toContain('.account-shell');
-    expect(reactAuthority).toContain('.plan-onboarding');
-    expect(reactAuthority).toContain('.invitation-shell');
-    expect(reactAuthority).toContain('.public-not-found');
-    expect(reactAuthority).toContain('.private-route-gate');
-    expect(reactAuthority).toContain('.public-secondary-page');
-    expect(reactAuthority).toContain('.sovereign-app-runtime');
-    expect(reactAuthority).not.toContain('.public-approved-v8 .v0-hero');
-    expect(reactAuthority).not.toContain('.landing-story--personal');
-    expect(reactAuthority).not.toContain('.landing-story--relationship');
-    expect(reactAuthority).not.toContain('.landing-story--system');
+  it('keeps the frozen landing outside both non-landing authorities', () => {
+    for (const authority of [reactAuthority, platformAuthority]) {
+      expect(authority).toContain('.account-shell');
+      expect(authority).toContain('.plan-onboarding');
+      expect(authority).toContain('.invitation-shell');
+      expect(authority).toContain('.public-not-found');
+      expect(authority).toContain('.private-route-gate');
+      expect(authority).toContain('.public-secondary-page');
+      expect(authority).toContain('.sovereign-app-runtime');
+      expect(authority).not.toContain('.public-approved-v8 .v0-hero');
+      expect(authority).not.toContain('.landing-story--personal');
+      expect(authority).not.toContain('.landing-story--relationship');
+      expect(authority).not.toContain('.landing-story--system');
+    }
   });
 
   it('uses one route token system for typography, spacing, and brand color', () => {
@@ -63,6 +70,33 @@ describe('deployed route cohesion', () => {
     ]) {
       expect(reactAuthority).toContain(marker);
     }
+  });
+
+  it('styles the actual mounted single-room workspace at desktop and iPhone widths', () => {
+    for (const mountedClass of [
+      'intelligence-sidebar',
+      'intelligence-main',
+      'intelligence-topbar',
+      'intelligence-scroll',
+      'surface-heading',
+      'baseline-preparing',
+      'today-facet-view',
+      'today-insight-lines',
+      'today-continuations',
+      'account-summary',
+      'sovereign-composer',
+      'intelligence-context',
+      'mobile-bottom-nav'
+    ]) {
+      expect(workspace).toContain(mountedClass);
+      expect(platformAuthority).toContain(`.${mountedClass}`);
+    }
+    expect(platformAuthority).toContain('sovereign-platform-cohesion-v1');
+    expect(platformAuthority).toContain('@media (max-width: 820px)');
+    expect(platformAuthority).toContain('@media (max-width: 560px)');
+    expect(platformAuthority).toContain('env(safe-area-inset-bottom)');
+    expect(platformAuthority).toContain('min-height: 44px');
+    expect(platformAuthority).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
   it.each(staticPages)('%s loads the same final static route authority', (_label, document) => {
