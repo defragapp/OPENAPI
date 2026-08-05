@@ -54,9 +54,13 @@ describe('deployed route cohesion', () => {
     expect(main).toContain("dataset.sovereignHeroComposition = 'v2'");
     expect(productionReadiness).toContain('--production-nav-height: 80px');
     expect(productionReadiness).toContain('calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))');
+    expect(heroComposition).toContain('min-height: max(940px');
     expect(heroComposition).toContain('padding: clamp(70px, 8vh, 96px) 32px 360px');
     expect(heroComposition).toContain('font-size: clamp(4.1rem, 4.9vw, 5.8rem)');
-    expect(heroComposition).toContain('width: min(1080px, 78vw)');
+    expect(heroComposition).toContain('height: 58% !important');
+    expect(heroComposition).toContain('min-height: 440px !important');
+    expect(heroComposition).toContain('width: min(1480px, 118vw)');
+    expect(heroComposition).not.toContain('width: min(1080px, 78vw)');
   });
 
   it('keeps the frozen landing outside both non-landing authorities', () => {

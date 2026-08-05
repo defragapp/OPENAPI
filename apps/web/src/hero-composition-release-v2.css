@@ -1,14 +1,16 @@
-/* Final hero composition authority. Keeps the headline, supporting copy, actions, and Expression Field in separate visual zones. */
+/* Final hero composition authority. Keeps the headline, supporting copy, actions, and Expression Field in separate visual zones without shrinking the founder-approved field. */
 
 @media (min-width: 901px) {
   .public-approved-v8 .v0-hero.sovereign-opening-field {
-    min-height: max(900px, calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))) !important;
+    min-height: max(940px, calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))) !important;
     padding: clamp(70px, 8vh, 96px) 32px 360px !important;
     align-items: start !important;
     justify-items: center !important;
   }
 
   .public-approved-v8 .v0-hero-content {
+    position: relative !important;
+    z-index: 6 !important;
     width: min(1120px, calc(100vw - 96px)) !important;
     max-width: 1120px !important;
     margin-inline: auto !important;
@@ -55,14 +57,14 @@
     right: 0 !important;
     bottom: 0 !important;
     left: 0 !important;
-    height: 330px !important;
-    min-height: 330px !important;
+    height: 58% !important;
+    min-height: 440px !important;
   }
 
   .public-approved-v8 .landing-expression-slice__canvas {
     top: 100% !important;
     left: 50% !important;
-    width: min(1080px, 78vw) !important;
+    width: min(1480px, 118vw) !important;
     transform: translate3d(-50%, -50%, 0) !important;
   }
 
@@ -73,24 +75,26 @@
 
 @media (min-width: 1600px) and (min-height: 900px) {
   .public-approved-v8 .v0-hero.sovereign-opening-field {
+    min-height: max(980px, calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))) !important;
     padding-bottom: 380px !important;
   }
 
   .public-approved-v8 .landing-expression-slice {
-    height: 350px !important;
-    min-height: 350px !important;
+    min-height: 470px !important;
   }
 }
 
 @media (max-width: 900px) {
   .public-approved-v8 .v0-hero.sovereign-opening-field {
-    min-height: max(760px, calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))) !important;
-    padding: clamp(34px, 5vh, 48px) 16px calc(272px + env(safe-area-inset-bottom)) !important;
+    min-height: max(900px, calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))) !important;
+    padding: clamp(34px, 5vh, 48px) 16px calc(420px + env(safe-area-inset-bottom)) !important;
     align-items: start !important;
     justify-items: center !important;
   }
 
   .public-approved-v8 .v0-hero-content {
+    position: relative !important;
+    z-index: 6 !important;
     width: 100% !important;
     max-width: calc(100vw - 32px) !important;
     margin-inline: auto !important;
@@ -125,16 +129,16 @@
   .public-approved-v8 .landing-expression-slice {
     top: auto !important;
     right: 0 !important;
-    bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+    bottom: 0 !important;
     left: 0 !important;
-    height: 244px !important;
-    min-height: 244px !important;
+    height: clamp(500px, 62svh, 580px) !important;
+    min-height: clamp(500px, 62svh, 580px) !important;
   }
 
   .public-approved-v8 .landing-expression-slice__canvas {
     top: 100% !important;
     left: 50% !important;
-    width: min(620px, 150vw) !important;
+    width: min(860px, 220vw) !important;
     transform: translate3d(-50%, -50%, 0) !important;
   }
 
@@ -145,29 +149,20 @@
 
 @media (max-width: 430px) {
   .public-approved-v8 .v0-hero.sovereign-opening-field {
-    min-height: max(740px, calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))) !important;
-    padding-bottom: calc(252px + env(safe-area-inset-bottom)) !important;
+    min-height: max(900px, calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))) !important;
+    padding-bottom: calc(420px + env(safe-area-inset-bottom)) !important;
   }
 
   .public-approved-v8 .v0-hero h1 {
     font-size: clamp(2.5rem, 10.4vw, 3.35rem) !important;
   }
-
-  .public-approved-v8 .landing-expression-slice {
-    height: 226px !important;
-    min-height: 226px !important;
-  }
-
-  .public-approved-v8 .landing-expression-slice__canvas {
-    width: min(570px, 146vw) !important;
-  }
 }
 
 @media (max-height: 760px) and (min-width: 901px) {
   .public-approved-v8 .v0-hero.sovereign-opening-field {
-    min-height: 780px !important;
+    min-height: 860px !important;
     padding-top: 48px !important;
-    padding-bottom: 320px !important;
+    padding-bottom: 360px !important;
   }
 
   .public-approved-v8 .v0-hero h1 {
@@ -175,8 +170,12 @@
   }
 
   .public-approved-v8 .landing-expression-slice {
-    height: 292px !important;
-    min-height: 292px !important;
+    height: 52% !important;
+    min-height: 420px !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice__canvas {
+    width: min(1280px, 108vw) !important;
   }
 }
 
