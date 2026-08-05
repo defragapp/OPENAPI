@@ -14,10 +14,12 @@ import { PublicLanding } from './PublicLanding';
 import { installPublicLandingViewportContract } from './PublicLandingViewportContract';
 import { PublicPolicy } from './PublicPolicy';
 import { PublicPolicyMetadata } from './PublicPolicyMetadata';
+import { installReleaseInteractionRuntime } from './release-interaction-runtime';
 import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
 import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
 import platformVisualCohesionCss from './platform-visual-cohesion-v1.css?inline';
 import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline';
+import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline';
 
 /* Component foundations */
 import './styles.css';
@@ -79,11 +81,12 @@ function installPlatformVisualCohesion(): void {
   if (document.head.querySelector('style[data-sovereign-platform-cohesion="v1"]')) return;
   const style = document.createElement('style');
   style.dataset.sovereignPlatformCohesion = 'v1';
-  style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}`;
+  style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}\n${workspaceMobileReleaseCss}`;
   document.head.append(style);
 }
 
 installPlatformVisualCohesion();
+installReleaseInteractionRuntime();
 installV0ReleaseFingerprint();
 installProductionRuntime();
 installProductRuntime();
