@@ -8,6 +8,7 @@ const reactAuthority = read('./deployed-route-cohesion.css');
 const platformAuthority = read('./platform-visual-cohesion-v1.css');
 const mobileRelease = read('./workspace-mobile-release-v3.css');
 const productionReadiness = read('./production-readiness-visual-v1.css');
+const heroComposition = read('./hero-composition-release-v2.css');
 const mobileUtilities = read('./WorkspaceMobileUtilities.tsx');
 const staticAuthority = read('../public/deployed-route-cohesion.css');
 const howItWorks = read('../public/how-it-works.html');
@@ -40,17 +41,22 @@ describe('deployed route cohesion', () => {
     expect(main).toContain("import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline'");
     expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline'");
     expect(main).toContain("import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline'");
+    expect(main).toContain("import heroCompositionReleaseCss from './hero-composition-release-v2.css?inline'");
     expect(main).toContain('function installPlatformVisualCohesion(): void');
     expect(main).toContain("style.dataset.sovereignPlatformCohesion = 'v1'");
-    expect(main).toContain('style.textContent = `${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}`');
+    expect(main).toContain('style.textContent = `${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}\\n${heroCompositionReleaseCss}`');
     expect(main).toContain('document.head.append(style)');
     expect(main).not.toContain('platformVisualCohesionUrl');
     expect(main).not.toContain("link.rel = 'stylesheet'");
     expect(main.indexOf('installPlatformVisualCohesion();')).toBeLessThan(main.indexOf('installV0ReleaseFingerprint();'));
     expect(main).toContain("dataset.sovereignPlatformCohesion = 'v1'");
     expect(main).toContain("dataset.sovereignProductionReadiness = 'desktop-ios-v1'");
+    expect(main).toContain("dataset.sovereignHeroComposition = 'v2'");
     expect(productionReadiness).toContain('--production-nav-height: 80px');
     expect(productionReadiness).toContain('calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))');
+    expect(heroComposition).toContain('padding: clamp(70px, 8vh, 96px) 32px 360px');
+    expect(heroComposition).toContain('font-size: clamp(4.1rem, 4.9vw, 5.8rem)');
+    expect(heroComposition).toContain('width: min(1080px, 78vw)');
   });
 
   it('keeps the frozen landing outside both non-landing authorities', () => {
