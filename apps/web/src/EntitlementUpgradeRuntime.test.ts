@@ -1,0 +1,32 @@
+import { readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+
+const read = (relativePath: string) => readFileSync(new URL(relativePath, import.meta.url), 'utf8');
+const layer = read('./ProductCompletionLayer.tsx');
+const entitlements = read('../../sovereign-worker/src/db/entitlements.ts');
+
+describe('visible entitlement handoff', () => {
+  it('keeps server-side feature denial authoritative', () => {
+    expect(entitlements).toContain("throw new Response('Feature unavailable', { status: 403 })");
+    expect(layer).toContain("response.status === 403");
+    expect(layer).toContain('inspectEntitlementResponse(response.clone(), path)');
+    expect(layer).toContain('/feature unavailable|plan required|upgrade/i');
+  });
+
+  it('maps each advertised paid capability to a clear Sovereign+ explanation', () => {
+    for (const feature of ['people', 'systems', 'library', 'covenant']) {
+      expect(layer).toContain(`${feature}: {`);
+    }
+    expect(layer).toContain("window.dispatchEvent(new CustomEvent<PlanNotice>('sovereign:plan-required'");
+    expect(layer).toContain('Review Sovereign+ plans');
+    expect(layer).toContain('Continue with Free');
+    expect(layer).toContain('Free remains available for your Baseline, Today, and personal Explore questions.');
+  });
+
+  it('turns free-plan rejected control actions into a handled user journey', () => {
+    expect(layer).toContain("window.addEventListener('unhandledrejection'");
+    expect(layer).toContain('event.preventDefault();');
+    expect(layer).toContain("/turn limit|monthly.*limit/i");
+    expect(layer).toContain("Sovereign+ includes 300 AI turns each month.");
+  });
+});
