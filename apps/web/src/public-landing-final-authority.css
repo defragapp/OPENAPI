@@ -1,0 +1,629 @@
+/*
+ * Final public landing authority.
+ *
+ * This file intentionally owns only the public home surface. It is injected
+ * after the legacy visual layers so the approved landing no longer changes
+ * according to import order. The purpose is bounded editorial composition:
+ * one contained hero, one contained question bridge, three readable product
+ * demonstrations, one comparison, and one closing action.
+ */
+
+.public-approved-v8 {
+  --landing-shell: min(1180px, calc(100vw - 64px));
+  --landing-page: #090b0e;
+  --landing-panel: #171a1f;
+  --landing-panel-raised: #1d2026;
+  --landing-ink: #f1e9de;
+  --landing-muted: rgba(226, 218, 207, 0.68);
+  --landing-faint: rgba(226, 218, 207, 0.42);
+  --landing-line: rgba(241, 233, 222, 0.1);
+  --landing-blue: #2f93ff;
+  --landing-blue-bright: #78c7ff;
+  min-width: 320px;
+  overflow-x: clip;
+  background: var(--landing-page);
+}
+
+/* Opening composition */
+.public-approved-v8 .v0-hero.sovereign-opening-field {
+  position: relative !important;
+  display: grid !important;
+  place-items: start center !important;
+  min-height: max(820px, calc(var(--sovereign-viewport-height, 100svh) - 74px)) !important;
+  max-height: 920px !important;
+  padding: clamp(68px, 7vh, 86px) 24px 390px !important;
+  overflow: hidden !important;
+  border-bottom: 1px solid var(--landing-line) !important;
+  background:
+    radial-gradient(circle at 50% 86%, rgba(30, 124, 233, 0.13), transparent 28rem),
+    radial-gradient(circle at 50% 14%, rgba(255, 255, 255, 0.018), transparent 22rem),
+    linear-gradient(180deg, #090b0e 0%, #080b10 100%) !important;
+}
+
+.public-approved-v8 .v0-hero-content {
+  position: relative !important;
+  z-index: 8 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: min(1040px, 100%) !important;
+  max-width: 1040px !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
+.public-approved-v8 .landing-hero-kicker {
+  margin-bottom: 22px !important;
+}
+
+.public-approved-v8 .v0-hero h1 {
+  width: 100% !important;
+  max-width: 1040px !important;
+  margin: 0 auto !important;
+  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-size: clamp(4rem, 6.25vw, 6.75rem) !important;
+  font-weight: 470 !important;
+  line-height: 0.91 !important;
+  letter-spacing: -0.052em !important;
+  text-wrap: balance !important;
+}
+
+.public-approved-v8 .v0-hero h1 > span,
+.public-approved-v8 .v0-hero h1 > em {
+  display: block !important;
+}
+
+.public-approved-v8 .v0-hero h1 > em {
+  margin-top: 8px !important;
+}
+
+.public-approved-v8 .sovereign-opening-copy {
+  max-width: 660px !important;
+  margin: 22px auto 0 !important;
+  font-size: 0.98rem !important;
+  line-height: 1.62 !important;
+}
+
+.public-approved-v8 .sovereign-opening-actions {
+  margin-top: 21px !important;
+  gap: 30px !important;
+}
+
+.public-approved-v8 .sovereign-opening-trust {
+  margin-top: 13px !important;
+}
+
+.public-approved-v8 .sovereign-opening-capabilities {
+  display: none !important;
+}
+
+.public-approved-v8 .landing-expression-slice {
+  position: absolute !important;
+  inset: auto 0 0 !important;
+  z-index: 3 !important;
+  width: 100% !important;
+  height: 420px !important;
+  min-height: 420px !important;
+  max-height: 420px !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+.public-approved-v8 .landing-expression-slice__canvas {
+  position: absolute !important;
+  inset: auto auto auto 50% !important;
+  top: 100% !important;
+  width: min(1260px, 94vw) !important;
+  height: auto !important;
+  aspect-ratio: 1 !important;
+  transform: translate3d(-50%, -50%, 0) !important;
+  transform-origin: center !important;
+  pointer-events: auto !important;
+}
+
+.public-approved-v8 .landing-expression-slice__instructions {
+  right: max(24px, calc((100vw - 1180px) / 2)) !important;
+  bottom: 16px !important;
+}
+
+/* Bridge between the opening and product demonstrations. */
+.public-approved-v8 .landing-question-orbit {
+  min-height: 0 !important;
+  padding: 78px 24px 84px !important;
+  border-bottom: 1px solid var(--landing-line) !important;
+}
+
+.public-approved-v8 .landing-question-orbit__inner {
+  width: min(900px, 100%) !important;
+  margin: 0 auto !important;
+}
+
+.public-approved-v8 .landing-question-orbit h2 {
+  max-width: 760px !important;
+  margin: 12px auto 0 !important;
+  font-size: clamp(2.35rem, 4.2vw, 4.15rem) !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.042em !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage {
+  min-height: 76px !important;
+  margin-top: 27px !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage span {
+  font-size: clamp(1.08rem, 1.9vw, 1.48rem) !important;
+  line-height: 1.35 !important;
+}
+
+.public-approved-v8 .landing-question-orbit__note {
+  max-width: 650px !important;
+  margin: 24px auto 0 !important;
+  font-size: 0.83rem !important;
+  line-height: 1.58 !important;
+}
+
+/* Three product demonstrations. */
+.public-approved-v8 .landing-stories {
+  width: 100% !important;
+  background: var(--landing-page) !important;
+}
+
+.public-approved-v8 .landing-story {
+  position: relative !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 108px 0 116px !important;
+  overflow: clip !important;
+  border-top: 0 !important;
+  border-bottom: 1px solid var(--landing-line) !important;
+}
+
+.public-approved-v8 .landing-story__shell {
+  width: var(--landing-shell) !important;
+  max-width: 1180px !important;
+  margin: 0 auto !important;
+}
+
+.public-approved-v8 .landing-story__heading {
+  width: min(760px, 100%) !important;
+  max-width: 760px !important;
+  margin: 0 auto 52px !important;
+  text-align: center !important;
+}
+
+.public-approved-v8 .landing-story__heading > p {
+  margin: 0 !important;
+  font-size: 0.67rem !important;
+  letter-spacing: 0.18em !important;
+}
+
+.public-approved-v8 .landing-story__heading h2 {
+  max-width: 760px !important;
+  margin: 14px auto 0 !important;
+  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-size: clamp(2.8rem, 4.8vw, 4.65rem) !important;
+  font-weight: 470 !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.045em !important;
+  text-wrap: balance !important;
+}
+
+.public-approved-v8 .landing-story__heading > div {
+  max-width: 650px !important;
+  margin: 20px auto 0 !important;
+  font-size: 0.96rem !important;
+  line-height: 1.62 !important;
+}
+
+.public-approved-v8 .landing-story__stage {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  gap: 24px !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.public-approved-v8 .landing-demo {
+  min-width: 0 !important;
+  min-height: 610px !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(241, 233, 222, 0.11) !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 24%),
+    var(--landing-panel) !important;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.34) !important;
+}
+
+.public-approved-v8 .landing-demo__bar {
+  min-height: 52px !important;
+  padding: 0 18px !important;
+}
+
+.public-approved-v8 .landing-demo__body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+  padding: 26px !important;
+}
+
+.public-approved-v8 .landing-message {
+  max-width: 92% !important;
+  font-size: 0.88rem !important;
+  line-height: 1.55 !important;
+}
+
+.public-approved-v8 .landing-message--user {
+  align-self: flex-end !important;
+  max-width: 78% !important;
+}
+
+.public-approved-v8 .landing-evidence {
+  margin-top: 16px !important;
+}
+
+.public-approved-v8 .landing-composer {
+  min-height: 48px !important;
+  margin-top: auto !important;
+}
+
+.public-approved-v8 .landing-workflow {
+  margin: 0 !important;
+  padding: 18px 20px 24px !important;
+}
+
+.public-approved-v8 .landing-workflow > li {
+  min-height: 112px !important;
+}
+
+.public-approved-v8 .landing-workflow button {
+  padding: 18px 0 !important;
+}
+
+.public-approved-v8 .landing-workflow__copy > strong {
+  font-size: 0.94rem !important;
+}
+
+.public-approved-v8 .landing-workflow__copy > span {
+  font-size: 0.79rem !important;
+  line-height: 1.48 !important;
+}
+
+.public-approved-v8 .landing-system-map {
+  margin: 18px 0 0 !important;
+}
+
+.public-approved-v8 .landing-story__consent {
+  margin: 24px auto 0 !important;
+  font-size: 0.65rem !important;
+}
+
+/* Comparison section. */
+.public-approved-v8 .v0-comparison {
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 118px 24px 124px !important;
+  overflow: clip !important;
+  border-bottom: 1px solid var(--landing-line) !important;
+}
+
+.public-approved-v8 .v0-comparison > .v0-shell {
+  display: grid !important;
+  grid-template-columns: minmax(300px, 0.82fr) minmax(0, 1.35fr) !important;
+  align-items: center !important;
+  gap: 72px !important;
+  width: var(--landing-shell) !important;
+  max-width: 1180px !important;
+  margin: 0 auto !important;
+}
+
+.public-approved-v8 .v0-comparison .v0-story-heading-left {
+  width: auto !important;
+  max-width: 430px !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+.public-approved-v8 .v0-comparison .v0-story-heading h2 {
+  margin: 14px 0 0 !important;
+  font-size: clamp(3.2rem, 5vw, 5.35rem) !important;
+  line-height: 0.91 !important;
+  letter-spacing: -0.052em !important;
+}
+
+.public-approved-v8 .v0-comparison-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.public-approved-v8 .v0-comparison-panel {
+  min-height: 360px !important;
+  padding: 28px 25px !important;
+  border-radius: 16px !important;
+}
+
+.public-approved-v8 .v0-comparison-panel h3 {
+  font-size: 1rem !important;
+}
+
+.public-approved-v8 .v0-comparison-panel li {
+  font-size: 0.82rem !important;
+  line-height: 1.45 !important;
+}
+
+/* Closing action. */
+.public-approved-v8 .v0-final {
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 138px 24px 146px !important;
+  overflow: hidden !important;
+}
+
+.public-approved-v8 .v0-final h2 {
+  max-width: 1040px !important;
+  margin: 0 auto !important;
+  font-size: clamp(3.8rem, 6.5vw, 6.7rem) !important;
+  line-height: 0.9 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.public-approved-v8 .v0-final p {
+  max-width: 620px !important;
+  margin: 28px auto 0 !important;
+  font-size: 0.98rem !important;
+  line-height: 1.62 !important;
+}
+
+.public-approved-v8 .v0-final .landing-control {
+  margin-top: 28px !important;
+}
+
+.public-approved-v8 .v0-footer {
+  min-height: 76px !important;
+  padding: 0 24px !important;
+}
+
+@media (max-width: 900px) {
+  .public-approved-v8 {
+    --landing-shell: min(100% - 32px, 680px);
+  }
+
+  .public-approved-v8 .v0-hero.sovereign-opening-field {
+    min-height: max(800px, calc(var(--sovereign-viewport-height, 100svh) - 68px)) !important;
+    max-height: 880px !important;
+    padding: clamp(42px, 5vh, 56px) 16px 345px !important;
+  }
+
+  .public-approved-v8 .v0-hero-content {
+    width: min(100%, 620px) !important;
+  }
+
+  .public-approved-v8 .v0-hero h1 {
+    max-width: 12ch !important;
+    font-size: clamp(2.75rem, 10.8vw, 4.25rem) !important;
+    line-height: 0.94 !important;
+    letter-spacing: -0.048em !important;
+  }
+
+  .public-approved-v8 .v0-hero .v0-mobile-line-break {
+    display: block !important;
+  }
+
+  .public-approved-v8 .v0-hero .v0-desktop-space {
+    display: none !important;
+  }
+
+  .public-approved-v8 .sovereign-opening-copy {
+    max-width: 34ch !important;
+    margin-top: 18px !important;
+    font-size: 0.91rem !important;
+    line-height: 1.55 !important;
+  }
+
+  .public-approved-v8 .sovereign-opening-actions {
+    margin-top: 18px !important;
+    gap: 22px !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice {
+    height: 360px !important;
+    min-height: 360px !important;
+    max-height: 360px !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice__canvas {
+    width: min(780px, 190vw) !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit {
+    padding: 70px 16px 76px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit h2 {
+    font-size: clamp(2.2rem, 8vw, 3.35rem) !important;
+  }
+
+  .public-approved-v8 .landing-story {
+    padding: 88px 0 96px !important;
+  }
+
+  .public-approved-v8 .landing-story__heading {
+    margin-bottom: 42px !important;
+  }
+
+  .public-approved-v8 .landing-story__heading h2 {
+    font-size: clamp(2.55rem, 8.8vw, 3.85rem) !important;
+  }
+
+  .public-approved-v8 .landing-story__stage {
+    grid-template-columns: 1fr !important;
+    gap: 18px !important;
+  }
+
+  .public-approved-v8 .landing-demo {
+    min-height: 0 !important;
+  }
+
+  .public-approved-v8 .landing-demo--chat {
+    min-height: 560px !important;
+  }
+
+  .public-approved-v8 .landing-demo--workflow {
+    min-height: 520px !important;
+  }
+
+  .public-approved-v8 .v0-comparison {
+    padding: 92px 16px 100px !important;
+  }
+
+  .public-approved-v8 .v0-comparison > .v0-shell {
+    grid-template-columns: 1fr !important;
+    gap: 46px !important;
+  }
+
+  .public-approved-v8 .v0-comparison .v0-story-heading-left {
+    max-width: 560px !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+  }
+
+  .public-approved-v8 .v0-comparison .v0-story-heading h2 {
+    font-size: clamp(3rem, 10.5vw, 4.5rem) !important;
+  }
+
+  .public-approved-v8 .v0-final {
+    padding: 108px 18px 116px !important;
+  }
+
+  .public-approved-v8 .v0-final h2 {
+    font-size: clamp(3.05rem, 11vw, 4.8rem) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .public-approved-v8 {
+    --landing-shell: calc(100vw - 30px);
+  }
+
+  .public-approved-v8 .v0-hero.sovereign-opening-field {
+    min-height: 790px !important;
+    max-height: 850px !important;
+    padding-bottom: 335px !important;
+  }
+
+  .public-approved-v8 .landing-hero-kicker {
+    margin-bottom: 18px !important;
+  }
+
+  .public-approved-v8 .v0-hero h1 {
+    font-size: clamp(2.55rem, 11.8vw, 3.45rem) !important;
+  }
+
+  .public-approved-v8 .sovereign-opening-actions {
+    flex-direction: column !important;
+    gap: 9px !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice {
+    height: 340px !important;
+    min-height: 340px !important;
+    max-height: 340px !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice__canvas {
+    width: min(720px, 188vw) !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit {
+    padding-block: 62px 68px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__stage {
+    min-height: 88px !important;
+  }
+
+  .public-approved-v8 .landing-story {
+    padding-block: 76px 82px !important;
+  }
+
+  .public-approved-v8 .landing-story__heading {
+    margin-bottom: 34px !important;
+  }
+
+  .public-approved-v8 .landing-story__heading h2 {
+    font-size: clamp(2.35rem, 10.8vw, 3.15rem) !important;
+  }
+
+  .public-approved-v8 .landing-story__heading > div {
+    font-size: 0.9rem !important;
+  }
+
+  .public-approved-v8 .landing-demo__body {
+    padding: 20px !important;
+  }
+
+  .public-approved-v8 .landing-message {
+    max-width: 100% !important;
+  }
+
+  .public-approved-v8 .landing-message--user {
+    max-width: 88% !important;
+  }
+
+  .public-approved-v8 .landing-workflow {
+    padding-inline: 16px !important;
+  }
+
+  .public-approved-v8 .v0-comparison-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .public-approved-v8 .v0-comparison-panel {
+    min-height: 0 !important;
+  }
+
+  .public-approved-v8 .v0-final {
+    padding-block: 94px 102px !important;
+  }
+
+  .public-approved-v8 .v0-final h2 {
+    font-size: clamp(2.85rem, 12vw, 3.8rem) !important;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 901px) {
+  .public-approved-v8 .v0-hero.sovereign-opening-field {
+    min-height: 790px !important;
+    max-height: 840px !important;
+    padding-top: 48px !important;
+    padding-bottom: 360px !important;
+  }
+
+  .public-approved-v8 .v0-hero h1 {
+    font-size: clamp(3.65rem, 5.6vw, 5.7rem) !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice {
+    height: 390px !important;
+    min-height: 390px !important;
+    max-height: 390px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-approved-v8 .landing-demo,
+  .public-approved-v8 .landing-message,
+  .public-approved-v8 .landing-workflow > li,
+  .public-approved-v8 .landing-question-orbit__stage span {
+    transition: none !important;
+    animation: none !important;
+  }
+}
