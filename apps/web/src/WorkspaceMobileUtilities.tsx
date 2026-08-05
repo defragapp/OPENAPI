@@ -61,25 +61,33 @@ export function WorkspaceMobileUtilities() {
   if (!mobile || !mount) return null;
 
   return createPortal(
-    <section className="workspace-mobile-utilities" aria-labelledby="workspace-mobile-utilities-title">
-      <div className="workspace-mobile-utilities-heading">
-        <span>WORKSPACE</span>
-        <h3 id="workspace-mobile-utilities-title">Context and controls</h3>
-        <p>Keep the current question clear, then open the deeper tools only when needed.</p>
-      </div>
-      <VerifiedPlanStatus expanded />
-      <div className="workspace-mobile-utility-actions">
-        <button type="button" onClick={() => openAfterContextClose(() => document.querySelector<HTMLButtonElement>('.expression-field-launcher')?.click())}>
-          <strong>Expression Field</strong><span>Open your center-emitted view</span>
-        </button>
-        <button type="button" onClick={() => openAfterContextClose(() => document.querySelector<HTMLButtonElement>('.system-membership-trigger')?.click())}>
-          <strong>System members</strong><span>Manage permitted inclusion</span>
-        </button>
-        <button type="button" onClick={() => openAfterContextClose(() => window.dispatchEvent(new CustomEvent('sovereign:open-account-controls')))}>
-          <strong>Account & Library</strong><span>Plan, billing, permissions, and saved work</span>
-        </button>
-      </div>
-    </section>,
+    <details className="workspace-mobile-utilities">
+      <summary>
+        <span className="workspace-mobile-utilities-summary-copy">
+          <strong>Workspace tools</strong>
+          <span>Plan, context, account, and system controls</span>
+        </span>
+      </summary>
+      <section className="workspace-mobile-utilities-content" aria-labelledby="workspace-mobile-utilities-title">
+        <div className="workspace-mobile-utilities-heading">
+          <span>WORKSPACE</span>
+          <h3 id="workspace-mobile-utilities-title">Context and controls</h3>
+          <p>Open deeper tools only when they are useful to the question in front of you.</p>
+        </div>
+        <VerifiedPlanStatus expanded />
+        <div className="workspace-mobile-utility-actions">
+          <button type="button" onClick={() => openAfterContextClose(() => document.querySelector<HTMLButtonElement>('.expression-field-launcher')?.click())}>
+            <strong>Expression Field</strong><span>Open your center-emitted view</span>
+          </button>
+          <button type="button" onClick={() => openAfterContextClose(() => document.querySelector<HTMLButtonElement>('.system-membership-trigger')?.click())}>
+            <strong>System members</strong><span>Manage permitted inclusion</span>
+          </button>
+          <button type="button" onClick={() => openAfterContextClose(() => window.dispatchEvent(new CustomEvent('sovereign:open-account-controls')))}>
+            <strong>Account & Library</strong><span>Plan, billing, permissions, and saved work</span>
+          </button>
+        </div>
+      </section>
+    </details>,
     mount
   );
 }
