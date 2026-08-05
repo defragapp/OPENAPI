@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 
 const read = (relativePath: string) => readFileSync(new URL(relativePath, import.meta.url), 'utf8');
 const layer = read('./ProductCompletionLayer.tsx');
+const routeAuthority = read('./PublicRouteAuthorityRuntime.ts');
+const main = read('./main.tsx');
 const entitlements = read('../../sovereign-worker/src/db/entitlements.ts');
 
 describe('visible entitlement handoff', () => {
@@ -21,6 +23,14 @@ describe('visible entitlement handoff', () => {
     expect(layer).toContain('Review Sovereign+ plans');
     expect(layer).toContain('Continue with Free');
     expect(layer).toContain('Free remains available for your Baseline, Today, and personal Explore questions.');
+  });
+
+  it('routes authenticated upgrade handoffs to the public pricing authority', () => {
+    expect(routeAuthority).toContain("const PUBLIC_ORIGIN = 'https://sovereign.defrag.app'");
+    expect(routeAuthority).toContain("a[href=\"/pricing\"]");
+    expect(routeAuthority).toContain('anchor.href = `${PUBLIC_ORIGIN}/pricing`');
+    expect(main).toContain("import { installPublicRouteAuthorityRuntime } from './PublicRouteAuthorityRuntime'");
+    expect(main).toContain('installPublicRouteAuthorityRuntime();');
   });
 
   it('turns free-plan rejected control actions into a handled user journey', () => {
