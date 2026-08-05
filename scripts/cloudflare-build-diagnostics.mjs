@@ -71,6 +71,13 @@ const stages = [
   ['premium-platform', 'pnpm', ['verify:premium-platform']],
   ['typecheck', 'pnpm', ['typecheck']],
   ['tests', 'pnpm', ['test']],
+  ['auth-smoke', 'pnpm', ['smoke:auth']],
+  ['baseline-smoke', 'pnpm', ['smoke:baseline']],
+  ['jobs-smoke', 'pnpm', ['smoke:jobs']],
+  ['worker-gateway-smoke', 'pnpm', ['smoke:worker-gateway']],
+  ['stripe-smoke', 'pnpm', ['smoke:stripe']],
+  ['product-smoke', 'pnpm', ['smoke:product']],
+  ['release-closure-smoke', 'pnpm', ['smoke:release-closure']],
   ['build', 'pnpm', ['build']],
   ['public-source-maps', process.execPath, ['scripts/verify-no-public-source-maps.mjs']],
   ['worker-bundle-size', 'pnpm', ['verify:worker-bundle-size']]
