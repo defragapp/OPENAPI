@@ -72,7 +72,7 @@ describe('premium rotating public Expression Field v3', () => {
     ]) expect(field).toContain(marker);
   });
 
-  it('renders all sixteen value-driven measurements with a compact endpoint tooltip', () => {
+  it('renders all sixteen value-driven measurements with a compact outward endpoint tooltip', () => {
     for (const marker of [
       'expressionAxisIds',
       'expressionAxisRegistryById',
@@ -89,10 +89,18 @@ describe('premium rotating public Expression Field v3', () => {
       'SPHERE_RADIUS',
       'TOOLTIP_WIDTH',
       'placeTooltip',
+      'const horizontalExit = Math.abs(deltaX) >= Math.abs(deltaY)',
+      'deltaX >= 0 ? point.x + TOOLTIP_GAP',
+      'deltaY >= 0 ? point.y + TOOLTIP_GAP',
       '<g className="landing-expression-slice__tooltip"',
-      'landing-expression-slice__endpoint'
+      'landing-expression-slice__endpoint',
+      'data-reach-tier={reachTier}',
+      'const beamWidth = selectedLine',
+      'const beamOpacity = selectedLine',
+      'const auraOpacity = selectedLine'
     ]) expect(field).toContain(marker);
 
+    expect(field).not.toContain('const placeRight = point.x <= CENTER');
     expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(field).not.toContain('giftExpression');
     expect(field).not.toContain('shadowExpression');
