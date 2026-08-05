@@ -154,21 +154,27 @@ describe('premium rotating public Expression Field v3', () => {
     expect(productionReadiness).toContain('width: min(1240px, 94vw) !important');
   });
 
-  it('separates the headline and field into protected desktop and phone zones', () => {
+  it('protects the hero copy while preserving the founder desktop and phone field scale', () => {
     for (const marker of [
       '@media (min-width: 901px)',
+      'min-height: max(940px',
       'padding: clamp(70px, 8vh, 96px) 32px 360px',
       'font-size: clamp(4.1rem, 4.9vw, 5.8rem)',
-      'height: 330px !important',
-      'width: min(1080px, 78vw)',
+      'z-index: 6 !important',
+      'height: 58% !important',
+      'min-height: 440px !important',
+      'width: min(1480px, 118vw)',
       '@media (max-width: 900px)',
-      'padding: clamp(34px, 5vh, 48px) 16px calc(272px + env(safe-area-inset-bottom))',
+      'min-height: max(900px',
+      'padding: clamp(34px, 5vh, 48px) 16px calc(420px + env(safe-area-inset-bottom))',
       'font-size: clamp(2.65rem, 10.6vw, 3.8rem)',
-      'height: 244px !important',
-      'width: min(620px, 150vw)'
+      'height: clamp(500px, 62svh, 580px) !important',
+      'width: min(860px, 220vw)'
     ]) expect(heroComposition).toContain(marker);
     expect(heroComposition).toContain('.public-approved-v8 .sovereign-opening-capabilities');
     expect(heroComposition).toContain('display: none !important');
+    expect(heroComposition).not.toContain('height: 330px !important');
+    expect(heroComposition).not.toContain('height: 244px !important');
   });
 
   it('moves rotating questions below the hero and keeps public, account, and workspace branding cohesive', () => {
