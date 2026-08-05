@@ -59,7 +59,7 @@ function V0Navigation() {
     <header className="v0-nav">
       <div className="v0-shell v0-nav-inner">
         <a className="v0-wordmark v0-wordmark--desktop" href="/" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
-        <a className="v0-wordmark v0-wordmark--mobile" href="/" aria-label="Sovereign home">Sovereign</a>
+        <a className="v0-wordmark v0-wordmark--mobile" href="/" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
         <nav aria-label="Public navigation">
           <a href="#how">How it works</a>
           <a href="/pricing">Pricing</a>
