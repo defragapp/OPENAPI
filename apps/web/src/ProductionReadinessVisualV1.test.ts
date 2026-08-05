@@ -7,6 +7,7 @@ const landing = read('./PublicLanding.tsx');
 const css = read('./production-readiness-visual-v1.css');
 const runtime = read('./production-readiness-runtime.ts');
 const field = read('./expression-field/LandingExpressionSlice.tsx');
+const mobileUtilities = read('./WorkspaceMobileUtilities.tsx');
 const routeVerifier = read('../../../scripts/verify-live-route-cohesion.mjs');
 const visualVerifier = read('../../../scripts/verify-live-visual-release-v3.mjs');
 const release = read('../../../scripts/cloudflare-production-release.mjs');
@@ -72,17 +73,39 @@ describe('desktop and iOS production readiness v1', () => {
     expect(field).toContain('y1={selectedProjected.projected.y}');
   });
 
-  it('preserves iOS safe areas, full-screen sizing, and non-overlapping mobile field placement', () => {
+  it('uses a restrained phone scale and keeps the complete field inside the opening', () => {
     for (const marker of [
       '@media (max-width: 900px)',
-      '--production-nav-height: 68px',
+      '--production-nav-height: 64px',
       'env(safe-area-inset-bottom)',
-      'height: clamp(230px, 30%, 286px)',
-      'width: min(760px, 190vw)',
+      'min-height: max(660px',
+      'font-size: clamp(2.9rem, 11.2vw, 4.25rem)',
+      'height: clamp(212px, 27%, 258px)',
+      'width: min(660px, 165vw)',
       '@media (max-width: 430px)',
-      'min-height: max(724px',
-      'width: min(720px, 188vw)'
+      'min-height: max(640px',
+      'width: min(590px, 154vw)'
     ]) expect(css).toContain(marker);
+    expect(css).not.toContain('15.2vw');
+    expect(css).not.toContain('220vw');
+  });
+
+  it('organizes policy, account, onboarding, and workspace pages with one mobile hierarchy', () => {
+    for (const marker of [
+      '.public-secondary-page .policy-hero h1',
+      'font-size: clamp(2.55rem, 9.8vw, 3.85rem)',
+      '.account-shell .account-intro h1',
+      'font-size: clamp(2.4rem, 9.2vw, 3.6rem)',
+      '.sovereign-app-runtime .surface-heading h1',
+      'font-size: clamp(2rem, 8.8vw, 2.85rem)',
+      'calc(178px + env(safe-area-inset-bottom))',
+      'bottom: calc(68px + env(safe-area-inset-bottom))',
+      'grid-template-columns: minmax(0, 1fr) 44px',
+      'min-height: calc(64px + env(safe-area-inset-bottom))'
+    ]) expect(css).toContain(marker);
+    expect(mobileUtilities).toContain('<details className="workspace-mobile-utilities">');
+    expect(mobileUtilities).toContain('Workspace tools');
+    expect(mobileUtilities).toContain('workspace-mobile-utilities-content');
   });
 
   it('keeps every public and account page inside rendered desktop and phone verification', () => {
