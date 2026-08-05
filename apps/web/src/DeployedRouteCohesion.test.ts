@@ -8,7 +8,7 @@ const reactAuthority = read('./deployed-route-cohesion.css');
 const platformAuthority = read('./platform-visual-cohesion-v1.css');
 const mobileRelease = read('./workspace-mobile-release-v3.css');
 const productionReadiness = read('./production-readiness-visual-v1.css');
-const heroComposition = read('./hero-composition-release-v2.css');
+const finalLandingAuthority = read('./public-landing-final-authority.css');
 const mobileUtilities = read('./WorkspaceMobileUtilities.tsx');
 const staticAuthority = read('../public/deployed-route-cohesion.css');
 const howItWorks = read('../public/how-it-works.html');
@@ -31,7 +31,7 @@ const staticPages = [
 ] as const;
 
 describe('deployed route cohesion', () => {
-  it('keeps the certified route CSS last while installing final authorities synchronously before React', () => {
+  it('keeps certified route CSS last while installing one final bounded landing authority before React', () => {
     const passkey = main.indexOf("import './passkey-auth.css';");
     const cohesion = main.indexOf("import './deployed-route-cohesion.css';");
     expect(passkey).toBeGreaterThan(-1);
@@ -41,26 +41,26 @@ describe('deployed route cohesion', () => {
     expect(main).toContain("import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline'");
     expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline'");
     expect(main).toContain("import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline'");
-    expect(main).toContain("import heroCompositionReleaseCss from './hero-composition-release-v2.css?inline'");
+    expect(main).toContain("import publicLandingFinalAuthorityCss from './public-landing-final-authority.css?inline'");
     expect(main).toContain('function installPlatformVisualCohesion(): void');
     expect(main).toContain("style.dataset.sovereignPlatformCohesion = 'v1'");
-    expect(main).toContain('style.textContent = `${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}\\n${heroCompositionReleaseCss}`');
+    expect(main).toContain('style.textContent = `${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}\\n${publicLandingFinalAuthorityCss}`');
     expect(main).toContain('document.head.append(style)');
     expect(main).not.toContain('platformVisualCohesionUrl');
     expect(main).not.toContain("link.rel = 'stylesheet'");
+    expect(main).not.toContain('heroCompositionReleaseCss');
     expect(main.indexOf('installPlatformVisualCohesion();')).toBeLessThan(main.indexOf('installV0ReleaseFingerprint();'));
     expect(main).toContain("dataset.sovereignPlatformCohesion = 'v1'");
     expect(main).toContain("dataset.sovereignProductionReadiness = 'desktop-ios-v1'");
-    expect(main).toContain("dataset.sovereignHeroComposition = 'v2'");
+    expect(main).toContain("dataset.sovereignHeroComposition = 'v3-bounded'");
     expect(productionReadiness).toContain('--production-nav-height: 80px');
     expect(productionReadiness).toContain('calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))');
-    expect(heroComposition).toContain('min-height: max(940px');
-    expect(heroComposition).toContain('padding: clamp(70px, 8vh, 96px) 32px 360px');
-    expect(heroComposition).toContain('font-size: clamp(4.1rem, 4.9vw, 5.8rem)');
-    expect(heroComposition).toContain('height: 58% !important');
-    expect(heroComposition).toContain('min-height: 440px !important');
-    expect(heroComposition).toContain('width: min(1480px, 118vw)');
-    expect(heroComposition).not.toContain('width: min(1080px, 78vw)');
+    expect(finalLandingAuthority).toContain('max-height: 920px !important');
+    expect(finalLandingAuthority).toContain('height: 420px !important');
+    expect(finalLandingAuthority).toContain('width: min(1260px, 94vw) !important');
+    expect(finalLandingAuthority).toContain('padding: 108px 0 116px !important');
+    expect(finalLandingAuthority).toContain('grid-template-columns: repeat(2, minmax(0, 1fr)) !important');
+    expect(finalLandingAuthority).not.toContain('width: min(1480px, 118vw)');
   });
 
   it('keeps the frozen landing outside both non-landing authorities', () => {
