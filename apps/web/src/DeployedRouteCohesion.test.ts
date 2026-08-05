@@ -6,6 +6,8 @@ const read = (relativePath: string) => readFileSync(new URL(relativePath, import
 const main = read('./main.tsx');
 const reactAuthority = read('./deployed-route-cohesion.css');
 const platformAuthority = read('./platform-visual-cohesion-v1.css');
+const mobileRelease = read('./workspace-mobile-release-v3.css');
+const mobileUtilities = read('./WorkspaceMobileUtilities.tsx');
 const staticAuthority = read('../public/deployed-route-cohesion.css');
 const howItWorks = read('../public/how-it-works.html');
 const pricing = read('../public/pricing.html');
@@ -27,7 +29,7 @@ const staticPages = [
 ] as const;
 
 describe('deployed route cohesion', () => {
-  it('keeps the certified route CSS last while installing platform authority synchronously before React', () => {
+  it('keeps the certified route CSS last while installing final authorities synchronously before React', () => {
     const passkey = main.indexOf("import './passkey-auth.css';");
     const cohesion = main.indexOf("import './deployed-route-cohesion.css';");
     expect(passkey).toBeGreaterThan(-1);
@@ -35,9 +37,10 @@ describe('deployed route cohesion', () => {
     expect(main.slice(cohesion + 1)).not.toContain("import './");
     expect(main).toContain("import platformVisualCohesionCss from './platform-visual-cohesion-v1.css?inline'");
     expect(main).toContain("import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline'");
+    expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline'");
     expect(main).toContain('function installPlatformVisualCohesion(): void');
     expect(main).toContain("style.dataset.sovereignPlatformCohesion = 'v1'");
-    expect(main).toContain('style.textContent = `${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}`');
+    expect(main).toContain('style.textContent = `${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}`');
     expect(main).toContain('document.head.append(style)');
     expect(main).not.toContain('platformVisualCohesionUrl');
     expect(main).not.toContain("link.rel = 'stylesheet'");
@@ -105,6 +108,27 @@ describe('deployed route cohesion', () => {
     expect(platformAuthority).toContain('width: 44px');
     expect(platformAuthority).toContain('height: 44px');
     expect(platformAuthority).toContain('@media (prefers-reduced-motion: reduce)');
+  });
+
+  it('collapses mobile utility overlays into one closed context sheet and compact composer', () => {
+    expect(authenticatedWorkspace).toContain('className="workspace-desktop-plan-status"');
+    expect(authenticatedWorkspace).toContain('<WorkspaceMobileUtilities />');
+    expect(mobileUtilities).toContain('createPortal');
+    expect(mobileUtilities).toContain('<VerifiedPlanStatus expanded />');
+    expect(mobileUtilities).toContain('Expression Field');
+    expect(mobileUtilities).toContain('System members');
+    expect(mobileUtilities).toContain('Account & Library');
+    expect(mobileRelease).toContain('.workspace-desktop-plan-status');
+    expect(mobileRelease).toContain('.expression-field-launcher');
+    expect(mobileRelease).toContain('.system-membership-trigger');
+    expect(mobileRelease).toContain('display: none !important');
+    expect(mobileRelease).toContain('.composer-context-line');
+    expect(mobileRelease).toContain('grid-template-columns: minmax(0, 1fr) 48px');
+    expect(mobileRelease).toContain('visibility: hidden !important');
+    expect(mobileRelease).toContain('.intelligence-workspace.context-open .intelligence-context');
+    expect(mobileRelease).toContain('.explore-mode-list');
+    expect(mobileRelease).toContain('overflow-x: auto !important');
+    expect(mobileRelease).toContain('calc(196px + env(safe-area-inset-bottom))');
   });
 
   it.each(staticPages)('%s loads the same final static route authority', (_label, document) => {
