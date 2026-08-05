@@ -12,6 +12,7 @@ const heroExtension = read('./landing-hero-field-v4.css');
 const cohesionRefinement = read('./sitewide-cohesion-refinement-v2.css');
 const mobileRelease = read('./workspace-mobile-release-v3.css');
 const productionReadiness = read('./production-readiness-visual-v1.css');
+const heroComposition = read('./hero-composition-release-v2.css');
 const interactionRuntime = read('./release-interaction-runtime.ts');
 const controls = read('./emergency-public-removal.css');
 
@@ -31,7 +32,9 @@ describe('premium rotating public Expression Field v3', () => {
     expect(main).toContain("import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline';");
     expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline';");
     expect(main).toContain("import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline';");
-    expect(main).toContain('`${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}`');
+    expect(main).toContain("import heroCompositionReleaseCss from './hero-composition-release-v2.css?inline';");
+    expect(main).toContain('`${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}\\n${heroCompositionReleaseCss}`');
+    expect(main).toContain("dataset.sovereignHeroComposition = 'v2'");
     expect(main).toContain('installProductionReadinessRuntime();');
     expect(main).toContain('installReleaseInteractionRuntime();');
   });
@@ -151,6 +154,23 @@ describe('premium rotating public Expression Field v3', () => {
     expect(productionReadiness).toContain('width: min(1240px, 94vw) !important');
   });
 
+  it('separates the headline and field into protected desktop and phone zones', () => {
+    for (const marker of [
+      '@media (min-width: 901px)',
+      'padding: clamp(70px, 8vh, 96px) 32px 360px',
+      'font-size: clamp(4.1rem, 4.9vw, 5.8rem)',
+      'height: 330px !important',
+      'width: min(1080px, 78vw)',
+      '@media (max-width: 900px)',
+      'padding: clamp(34px, 5vh, 48px) 16px calc(272px + env(safe-area-inset-bottom))',
+      'font-size: clamp(2.65rem, 10.6vw, 3.8rem)',
+      'height: 244px !important',
+      'width: min(620px, 150vw)'
+    ]) expect(heroComposition).toContain(marker);
+    expect(heroComposition).toContain('.public-approved-v8 .sovereign-opening-capabilities');
+    expect(heroComposition).toContain('display: none !important');
+  });
+
   it('moves rotating questions below the hero and keeps public, account, and workspace branding cohesive', () => {
     for (const marker of [
       '--sovereign-wordmark-family',
@@ -183,7 +203,7 @@ describe('premium rotating public Expression Field v3', () => {
   });
 
   it('keeps release stylesheets structurally balanced', () => {
-    for (const source of [styles, integration, heroExtension, cohesionRefinement, mobileRelease, productionReadiness, controls]) {
+    for (const source of [styles, integration, heroExtension, cohesionRefinement, mobileRelease, productionReadiness, heroComposition, controls]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
