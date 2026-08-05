@@ -143,6 +143,9 @@ describe('premium rotating public Expression Field v3', () => {
       '.account-shell',
       '.auth-panel',
       '.sovereign-app-runtime .surface-heading h1',
+      '.sovereign-app-runtime .mobile-menu-trigger::before',
+      'content: "SOVEREIGN.OS"',
+      '.sovereign-app-runtime .intelligence-topbar > div:first-of-type > strong',
       '@media (max-width: 900px)',
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(cohesionRefinement).toContain(marker);
