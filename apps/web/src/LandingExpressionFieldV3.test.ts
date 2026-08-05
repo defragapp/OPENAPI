@@ -12,12 +12,12 @@ const heroExtension = read('./landing-hero-field-v4.css');
 const cohesionRefinement = read('./sitewide-cohesion-refinement-v2.css');
 const mobileRelease = read('./workspace-mobile-release-v3.css');
 const productionReadiness = read('./production-readiness-visual-v1.css');
-const heroComposition = read('./hero-composition-release-v2.css');
+const finalAuthority = read('./public-landing-final-authority.css');
 const interactionRuntime = read('./release-interaction-runtime.ts');
 const controls = read('./emergency-public-removal.css');
 
 describe('premium rotating public Expression Field v3', () => {
-  it('loads the final hero extension before passkey authority and installs all final authorities synchronously', () => {
+  it('loads the public component layers and installs one bounded landing authority last', () => {
     const replacement = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
     const storiesImport = "import './v0-restored-product-stories.css';";
@@ -32,9 +32,10 @@ describe('premium rotating public Expression Field v3', () => {
     expect(main).toContain("import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline';");
     expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline';");
     expect(main).toContain("import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline';");
-    expect(main).toContain("import heroCompositionReleaseCss from './hero-composition-release-v2.css?inline';");
-    expect(main).toContain('`${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}\\n${heroCompositionReleaseCss}`');
-    expect(main).toContain("dataset.sovereignHeroComposition = 'v2'");
+    expect(main).toContain("import publicLandingFinalAuthorityCss from './public-landing-final-authority.css?inline';");
+    expect(main).toContain('`${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}\\n${publicLandingFinalAuthorityCss}`');
+    expect(main).not.toContain('heroCompositionReleaseCss');
+    expect(main).toContain("dataset.sovereignHeroComposition = 'v3-bounded'");
     expect(main).toContain('installProductionReadinessRuntime();');
     expect(main).toContain('installReleaseInteractionRuntime();');
   });
@@ -154,27 +155,28 @@ describe('premium rotating public Expression Field v3', () => {
     expect(productionReadiness).toContain('width: min(1240px, 94vw) !important');
   });
 
-  it('protects the hero copy while preserving the founder desktop and phone field scale', () => {
+  it('bounds the opening field and the complete public page at desktop and phone widths', () => {
     for (const marker of [
-      '@media (min-width: 901px)',
-      'min-height: max(940px',
-      'padding: clamp(70px, 8vh, 96px) 32px 360px',
-      'font-size: clamp(4.1rem, 4.9vw, 5.8rem)',
-      'z-index: 6 !important',
-      'height: 58% !important',
-      'min-height: 440px !important',
-      'width: min(1480px, 118vw)',
+      'max-height: 920px !important',
+      'padding: clamp(68px, 7vh, 86px) 24px 390px !important',
+      'font-size: clamp(4rem, 6.25vw, 6.75rem) !important',
+      'height: 420px !important',
+      'width: min(1260px, 94vw) !important',
+      '.public-approved-v8 .landing-story',
+      'padding: 108px 0 116px !important',
+      'grid-template-columns: repeat(2, minmax(0, 1fr)) !important',
+      '.public-approved-v8 .v0-comparison',
+      '.public-approved-v8 .v0-final',
       '@media (max-width: 900px)',
-      'min-height: max(900px',
-      'padding: clamp(34px, 5vh, 48px) 16px calc(420px + env(safe-area-inset-bottom))',
-      'font-size: clamp(2.65rem, 10.6vw, 3.8rem)',
-      'height: clamp(500px, 62svh, 580px) !important',
-      'width: min(860px, 220vw)'
-    ]) expect(heroComposition).toContain(marker);
-    expect(heroComposition).toContain('.public-approved-v8 .sovereign-opening-capabilities');
-    expect(heroComposition).toContain('display: none !important');
-    expect(heroComposition).not.toContain('height: 330px !important');
-    expect(heroComposition).not.toContain('height: 244px !important');
+      'max-height: 880px !important',
+      'height: 360px !important',
+      '@media (max-width: 560px)',
+      'height: 340px !important'
+    ]) expect(finalAuthority).toContain(marker);
+    expect(finalAuthority).toContain('.public-approved-v8 .sovereign-opening-capabilities');
+    expect(finalAuthority).toContain('display: none !important');
+    expect(finalAuthority).not.toContain('width: min(1480px, 118vw)');
+    expect(finalAuthority).not.toContain('height: clamp(500px, 62svh, 580px)');
   });
 
   it('moves rotating questions below the hero and keeps public, account, and workspace branding cohesive', () => {
@@ -209,7 +211,7 @@ describe('premium rotating public Expression Field v3', () => {
   });
 
   it('keeps release stylesheets structurally balanced', () => {
-    for (const source of [styles, integration, heroExtension, cohesionRefinement, mobileRelease, productionReadiness, heroComposition, controls]) {
+    for (const source of [styles, integration, heroExtension, cohesionRefinement, mobileRelease, productionReadiness, finalAuthority, controls]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
