@@ -9,10 +9,11 @@ const field = read('./expression-field/LandingExpressionSlice.tsx');
 const styles = read('./landing-expression-field-v3.css');
 const integration = read('./landing-expression-field-integration.css');
 const heroExtension = read('./landing-hero-field-v4.css');
+const cohesionRefinement = read('./sitewide-cohesion-refinement-v2.css');
 const controls = read('./emergency-public-removal.css');
 
 describe('premium rotating public Expression Field v3', () => {
-  it('loads the final hero extension after the approved landing and before passkey authority', () => {
+  it('loads the final hero extension before passkey authority and installs the cohesion refinement synchronously', () => {
     const replacement = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
     const storiesImport = "import './v0-restored-product-stories.css';";
@@ -24,6 +25,8 @@ describe('premium rotating public Expression Field v3', () => {
     expect(main.indexOf(storiesImport)).toBeGreaterThan(main.indexOf(integrationImport));
     expect(main.indexOf(hero)).toBeGreaterThan(main.indexOf(approved));
     expect(main.indexOf(passkey)).toBeGreaterThan(main.indexOf(hero));
+    expect(main).toContain("import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline';");
+    expect(main).toContain('`${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}`');
   });
 
   it('keeps the field in the hero and restores real-life questions before product stories', () => {
@@ -39,11 +42,13 @@ describe('premium rotating public Expression Field v3', () => {
     expect(landing).toContain('Why do I keep taking responsibility for everyone around me?');
     expect(landing).toContain('What is mine, what is theirs, and what happens between us?');
     expect(landing).toContain('Does this choice fit me, or does it cost too much of me?');
+    expect(landing).toContain('className="v0-wordmark v0-wordmark--mobile" href="/" aria-label="Sovereign.OS home">SOVEREIGN.OS');
   });
 
   it('supports stable automatic rotation plus pointer and keyboard control', () => {
     for (const marker of [
       'AUTO_ROTATION_DEGREES_PER_MS',
+      'INTERACTION_PAUSE_MS',
       'requestAnimationFrame',
       'prefers-reduced-motion: reduce',
       'ROTATION_LIMIT',
@@ -61,12 +66,18 @@ describe('premium rotating public Expression Field v3', () => {
       "event.key === 'ArrowLeft'",
       "event.key === 'ArrowRight'",
       "event.key === 'ArrowUp'",
-      "event.key === 'ArrowDown'"
+      "event.key === 'ArrowDown'",
+      'yaw: wrapAngle',
+      'pitch: clamp'
     ]) expect(field).toContain(marker);
   });
 
-  it('uses measurement reach for line length without a floating tooltip', () => {
+  it('renders all sixteen value-driven measurements with a compact endpoint tooltip', () => {
     for (const marker of [
+      'expressionAxisIds',
+      'expressionAxisRegistryById',
+      'data-field-axis-count={expressionAxisIds.length}',
+      'Sixteen interactive measurements',
       'MIN_AXIS_LENGTH',
       'MAX_AXIS_LENGTH',
       'Math.pow(normalized, 1.32)',
@@ -75,7 +86,11 @@ describe('premium rotating public Expression Field v3', () => {
       'data-field-geometry="spherical-360"',
       'buildSphereGrid',
       'buildAmbientRays',
-      'SPHERE_RADIUS'
+      'SPHERE_RADIUS',
+      'TOOLTIP_WIDTH',
+      'placeTooltip',
+      '<g className="landing-expression-slice__tooltip"',
+      'landing-expression-slice__endpoint'
     ]) expect(field).toContain(marker);
 
     expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
@@ -83,6 +98,10 @@ describe('premium rotating public Expression Field v3', () => {
     expect(field).not.toContain('shadowExpression');
     expect(heroExtension).toContain('.landing-expression-slice__tooltip');
     expect(heroExtension).toContain('display: none !important');
+    expect(cohesionRefinement).toContain('.public-approved-v8 .landing-expression-slice__tooltip');
+    expect(cohesionRefinement).toContain('display: block !important');
+    expect(cohesionRefinement).toContain('.landing-expression-slice__tooltip-panel');
+    expect(cohesionRefinement).toContain('.landing-expression-slice__tooltip-connector');
   });
 
   it('keeps the 360 field below the hero copy and uses vivid Cloudflare blue', () => {
@@ -101,6 +120,24 @@ describe('premium rotating public Expression Field v3', () => {
     expect(styles).toContain('touch-action: none');
     expect(integration).toContain('background: transparent');
     expect(integration).toContain('border-radius: 0');
+    expect(cohesionRefinement).toContain('top: 96% !important');
+  });
+
+  it('moves rotating questions below the hero and keeps public, account, and workspace branding cohesive', () => {
+    for (const marker of [
+      '--sovereign-wordmark-family',
+      '.v0-wordmark',
+      '.account-nav .wordmark',
+      '.intelligence-brand strong',
+      '.public-approved-v8 .landing-question-orbit',
+      'min-height: 188px !important',
+      'font-family: var(--font-display',
+      '.account-shell',
+      '.auth-panel',
+      '.sovereign-app-runtime .surface-heading h1',
+      '@media (max-width: 900px)',
+      '@media (prefers-reduced-motion: reduce)'
+    ]) expect(cohesionRefinement).toContain(marker);
   });
 
   it('keeps platform controls restrained and product stories free of duplicate field globes', () => {
@@ -113,7 +150,7 @@ describe('premium rotating public Expression Field v3', () => {
   });
 
   it('keeps release stylesheets structurally balanced', () => {
-    for (const source of [styles, integration, heroExtension, controls]) {
+    for (const source of [styles, integration, heroExtension, cohesionRefinement, controls]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
