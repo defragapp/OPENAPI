@@ -403,6 +403,45 @@
     font-size: clamp(2.25rem, 9vw, 3.2rem) !important;
   }
 
+  .sovereign-app-runtime .mobile-menu-trigger {
+    width: auto !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .sovereign-app-runtime .mobile-menu-trigger::before {
+    content: "SOVEREIGN.OS";
+    display: block;
+    color: #f1e9de;
+    font-family: var(--sovereign-wordmark-family);
+    font-size: var(--sovereign-wordmark-size);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: var(--sovereign-wordmark-tracking);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .sovereign-app-runtime .intelligence-topbar > div:first-of-type > strong,
+  .sovereign-app-runtime .intelligence-topbar > div:first-of-type > span {
+    display: none !important;
+  }
+
+  .sovereign-app-runtime .intelligence-topbar > div:first-of-type > em {
+    color: rgba(229, 220, 209, 0.62) !important;
+    font-family: var(--font-subheading, "Sovereign Sans", sans-serif) !important;
+    font-size: 0.64rem !important;
+    font-style: normal !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase;
+  }
+
   .sovereign-app-runtime .intelligence-scroll {
     padding-inline: 20px !important;
   }
