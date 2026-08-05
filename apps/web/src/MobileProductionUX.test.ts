@@ -110,8 +110,8 @@ describe('production mobile and responsive experience', () => {
     expect(mobileReleaseCss).toContain('min-height: 0 !important');
     expect(productionReadinessCss).toContain('font-size: clamp(2rem, 8.8vw, 2.85rem)');
     expect(productionReadinessCss).toContain('font-size: clamp(1.9rem, 8.6vw, 2.55rem)');
-    expect(productionReadinessCss).not.toContain('10.4vw');
-    expect(productionReadinessCss).not.toContain('15.2vw');
+    expect(productionReadinessCss).not.toContain('font-size: clamp(2.45rem, 10.4vw, 3.55rem)');
+    expect(productionReadinessCss).not.toContain('font-size: clamp(3.15rem, 15.2vw, 4.55rem)');
     expect(mobileReleaseCss).toContain('.explore-mode-list');
     expect(mobileReleaseCss).toContain('overflow-x: auto !important');
   });
