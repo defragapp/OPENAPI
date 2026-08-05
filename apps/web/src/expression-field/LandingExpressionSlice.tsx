@@ -16,9 +16,9 @@ const MIN_AXIS_LENGTH = 118;
 const MAX_AXIS_LENGTH = 344;
 const ROTATION_LIMIT = 72;
 const AUTO_ROTATION_DEGREES_PER_MS = 0.0018;
-const TOOLTIP_WIDTH = 202;
-const TOOLTIP_HEIGHT = 68;
-const TOOLTIP_GAP = 16;
+const TOOLTIP_WIDTH = 184;
+const TOOLTIP_HEIGHT = 64;
+const TOOLTIP_GAP = 14;
 const INTERACTION_PAUSE_MS = 6200;
 const LEGACY_TOOLTIP_COMPATIBILITY = 'landing-expression-slice__tooltip · Baseline value · Live change · Current';
 void LEGACY_TOOLTIP_COMPATIBILITY;
@@ -260,10 +260,16 @@ export function LandingExpressionSlice() {
               const selectedLine = axis.id === selectedId;
               const path = `M ${CENTER} ${CENTER} L ${projected.x.toFixed(2)} ${projected.y.toFixed(2)}`;
               const depthOpacity = 0.54 + projected.depth * 0.46;
+              const normalizedReach = clamp(axis.value / 100, 0, 1);
+              const reachTier = axis.value >= 70 ? 'primary' : axis.value >= 50 ? 'supporting' : 'background';
+              const beamOpacity = selectedLine ? 1 : depthOpacity * (0.36 + normalizedReach * 0.56);
+              const auraOpacity = selectedLine ? 0.88 : depthOpacity * (0.1 + normalizedReach * 0.32);
+              const beamWidth = selectedLine ? 2.35 : 0.78 + normalizedReach * 1.08;
               return (
                 <g
                   key={axis.id}
                   className={`landing-expression-slice__vector${selectedLine ? ' is-selected' : ''}`}
+                  data-reach-tier={reachTier}
                   role="button"
                   tabIndex={0}
                   aria-pressed={selectedLine}
@@ -279,19 +285,19 @@ export function LandingExpressionSlice() {
                     className="landing-expression-slice__aura"
                     d={path}
                     filter={`url(#${glowId})`}
-                    style={{ opacity: selectedLine ? 0.88 : depthOpacity * 0.38 }}
+                    style={{ opacity: auraOpacity }}
                   />
                   <path
                     className="landing-expression-slice__beam"
                     d={path}
-                    style={{ opacity: selectedLine ? 1 : depthOpacity * 0.88 }}
+                    style={{ opacity: beamOpacity, strokeWidth: beamWidth }}
                   />
                   <circle
                     className="landing-expression-slice__endpoint"
                     cx={projected.x}
                     cy={projected.y}
-                    r={selectedLine ? 4.1 : 2.25}
-                    style={{ opacity: selectedLine ? 1 : depthOpacity * 0.72 }}
+                    r={selectedLine ? 4.1 : 1.8 + normalizedReach * 1.1}
+                    style={{ opacity: selectedLine ? 1 : depthOpacity * (0.42 + normalizedReach * 0.48) }}
                   />
                   <path className="landing-expression-slice__hit" d={path} />
                 </g>
@@ -320,11 +326,11 @@ export function LandingExpressionSlice() {
               height={TOOLTIP_HEIGHT}
               rx="8"
             />
-            <text className="landing-expression-slice__tooltip-title" x="14" y="22">{selected.axis.label}</text>
-            <text className="landing-expression-slice__tooltip-value" x="14" y="42">
+            <text className="landing-expression-slice__tooltip-title" x="13" y="21">{selected.axis.label}</text>
+            <text className="landing-expression-slice__tooltip-value" x="13" y="40">
               Reach {selected.axis.value} · {salienceLabel(selected.axis.value)}
             </text>
-            <text className="landing-expression-slice__tooltip-meta" x="14" y="57">
+            <text className="landing-expression-slice__tooltip-meta" x="13" y="55">
               Baseline {selected.axis.baselineValue}{selected.axis.currentDelta !== 0 ? ` · temporary ${formatDelta(selected.axis.currentDelta)}` : ''}
             </text>
           </g>
@@ -466,15 +472,22 @@ function projectDirection(direction: Vector3, length: number): ProjectedPoint {
 }
 
 function placeTooltip(point: ProjectedPoint): TooltipPlacement {
-  const placeRight = point.x <= CENTER;
-  const proposedX = placeRight ? point.x + TOOLTIP_GAP : point.x - TOOLTIP_WIDTH - TOOLTIP_GAP;
+  const deltaX = point.x - CENTER;
+  const deltaY = point.y - CENTER;
+  const horizontalExit = Math.abs(deltaX) >= Math.abs(deltaY);
+  const proposedX = horizontalExit
+    ? (deltaX >= 0 ? point.x + TOOLTIP_GAP : point.x - TOOLTIP_WIDTH - TOOLTIP_GAP)
+    : point.x - TOOLTIP_WIDTH / 2;
+  const proposedY = horizontalExit
+    ? point.y - TOOLTIP_HEIGHT / 2
+    : (deltaY >= 0 ? point.y + TOOLTIP_GAP : point.y - TOOLTIP_HEIGHT - TOOLTIP_GAP);
   const x = clamp(proposedX, 18, VIEWBOX_SIZE - TOOLTIP_WIDTH - 18);
-  const y = clamp(point.y - TOOLTIP_HEIGHT / 2, 20, VIEWBOX_SIZE - TOOLTIP_HEIGHT - 20);
+  const y = clamp(proposedY, 20, VIEWBOX_SIZE - TOOLTIP_HEIGHT - 20);
   return {
     x,
     y,
-    connectorX: placeRight ? x : x + TOOLTIP_WIDTH,
-    connectorY: clamp(point.y, y + 12, y + TOOLTIP_HEIGHT - 12)
+    connectorX: clamp(point.x, x + 10, x + TOOLTIP_WIDTH - 10),
+    connectorY: clamp(point.y, y + 10, y + TOOLTIP_HEIGHT - 10)
   };
 }
 
