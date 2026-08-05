@@ -7,7 +7,7 @@ import { getEntitlements, requireFeature } from './db/entitlements';
 import { ensureThread, appendThreadEvent, listThreadMessages, listThreads, recordCorrection, setThreadCovenant, touchThread } from './db/threads';
 import { getTurn, startTurn, updateTurnStatus } from './db/turns';
 import { assertSovereignOutputSafety } from './agent/safety';
-import { runSovereignStream } from './agent/sovereign';
+import { runSovereignResult, runSovereignStream } from './agent/sovereign';
 import { handleStripeWebhook } from './routes/stripe';
 import { canUseDevelopmentFixtures, serviceUnavailable } from './runtime';
 import { createInvitation, createPerson, listPeople, requireConsent, setConsent, updateInvitationStatus, type InvitationStatus, type RelationshipMetadataInput } from './db/people';
@@ -424,7 +424,15 @@ app.post('/api/v1/explore', async (context) => {
 app.post('/api/v1/threads/:threadId/messages', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
-  const body = await context.req.json<{ message?: string; context?: { surface?: string } }>();
+  const body = await context.req.json<{
+    message?: string;
+    context?: {
+      surface?: string;
+      personId?: string;
+      systemId?: string;
+      covenantEnabled?: boolean;
+    };
+  }>();
   const message = body.message?.trim();
   if (!message) return context.json({ error: 'Message required' }, 400);
 
@@ -433,7 +441,46 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
 
   const entitlements = await getEntitlements(context.env, auth.accountId);
   const threadId = context.req.param('threadId');
+  const personId = body.context?.personId?.trim() || undefined;
+  const systemId = body.context?.systemId?.trim() || undefined;
+  if (personId && systemId) return context.json({ error: 'Choose either one person or one system for a single question.' }, 400);
+
+  if (personId) {
+    requireFeature(entitlements, 'people.compare');
+    await requireConsent(context.env, auth.accountId, personId, 'pair.compare');
+    await requireConsent(context.env, auth.accountId, personId, 'trait.display');
+  }
+
+  if (systemId) {
+    const system = await context.env.DB.prepare('SELECT system_type FROM systems WHERE id = ? AND account_id = ?')
+      .bind(systemId, auth.accountId)
+      .first<{ system_type: string }>();
+    if (!system) return context.json({ error: 'System not found' }, 404);
+    const feature = ['family', 'household', 'friendship_group'].includes(system.system_type)
+      ? 'systems.family'
+      : 'systems.team';
+    requireFeature(entitlements, feature);
+  }
+
   await ensureThread(context.env, auth.accountId, threadId, body.context?.surface?.toLowerCase() ?? 'personal');
+  const covenantEnabled = body.context?.covenantEnabled === true;
+  if (covenantEnabled) {
+    requireFeature(entitlements, 'covenant.lens');
+    const thread = await context.env.DB.prepare('SELECT covenant_enabled FROM threads WHERE id = ? AND account_id = ?')
+      .bind(threadId, auth.accountId)
+      .first<{ covenant_enabled: number }>();
+    if (thread?.covenant_enabled !== 1) {
+      return context.json({ error: 'Covenant must be explicitly enabled for this question.' }, 409);
+    }
+    if (personId) await requireConsent(context.env, auth.accountId, personId, 'covenant.include');
+  }
+
+  const messageContext = {
+    surface: body.context?.surface ?? 'Today',
+    ...(personId ? { personId } : {}),
+    ...(systemId ? { systemId } : {}),
+    covenantEnabled
+  };
   await touchThread(context.env, auth.accountId, threadId, message);
   const coordinator = context.env.THREADS.get(context.env.THREADS.idFromName(`${auth.accountId}:${threadId}`));
   const coordination = await coordinator.fetch('https://thread.internal/turn', {
@@ -451,7 +498,7 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
   if (!isSovereignRuntimeReady(context.env)) {
     if (!canUseDevelopmentFixtures(context.env)) return serviceUnavailable('Sovereign is temporarily unavailable. Cloudflare AI Gateway is not configured, and nothing was guessed or saved as an interpretation.');
     await startTurn(context.env, auth.accountId, threadId, idempotencyKey, turn.sequence);
-    await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { text: message, surface: body.context?.surface ?? 'Today' }, traceId);
+    await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { text: message, context: messageContext }, traceId);
     const fallbackText = 'Development fallback only. The OPENAPI-owned Baseline engine is available only after its provider calls complete.\n\nCurrent amplification: no live current-condition result is available here, so nothing is treated as certainty.\n\nObserved behavior: nothing has been confirmed in this turn.\n\nUnknown actual state: only you can confirm what is true today. Does this match today?';
     assertSovereignOutputSafety(fallbackText);
     await appendThreadEvent(context.env, threadId, turn.sequence + 1, 'assistant_development_response', { developmentFallback: true, text: fallbackText }, traceId);
@@ -466,10 +513,45 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
 
   const usage = await reserveAiTurn(context.env, auth.accountId, entitlements.plan);
   await startTurn(context.env, auth.accountId, threadId, idempotencyKey, turn.sequence);
-  await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { text: message, surface: body.context?.surface ?? 'Today' }, traceId);
+  await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { text: message, context: messageContext }, traceId);
+  const sovereignContext = {
+    env: context.env,
+    accountId: auth.accountId,
+    threadId,
+    traceId,
+    covenantEnabled,
+    plan: entitlements.plan,
+    ...(personId ? { personId } : {}),
+    ...(systemId ? { systemId } : {})
+  };
+  const wantsStructuredAnswer = context.req.header('accept')?.includes('application/vnd.sovereign.answer+json') === true;
+
+  if (wantsStructuredAnswer) {
+    try {
+      const result = await runSovereignResult(message, sovereignContext);
+      await appendThreadEvent(context.env, threadId, turn.sequence + 1, 'assistant_response', {
+        redacted: true,
+        text: result.text,
+        answer: result.answer,
+        basis: result.basis
+      }, traceId);
+      await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'completed');
+      return context.json({ text: result.text, answer: result.answer, basis: result.basis }, 202, {
+        'x-sovereign-plan': entitlements.plan,
+        'x-sovereign-ai-remaining': String(usage.remaining)
+      });
+    } catch (error) {
+      await Promise.all([
+        updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'failed', 'gateway_start_failed'),
+        releaseAiTurn(context.env, auth.accountId, usage.periodKey)
+      ]);
+      throw error;
+    }
+  }
+
   let stream: ReadableStream<string>;
   try {
-    stream = await runSovereignStream(message, { env: context.env, accountId: auth.accountId, threadId, traceId, covenantEnabled: false, plan: entitlements.plan });
+    stream = await runSovereignStream(message, sovereignContext);
   } catch (error) {
     await Promise.all([
       updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'failed', 'gateway_start_failed'),
