@@ -13,6 +13,7 @@ const approvedCss = readFileSync(new URL('./public-landing-approved-v8.css', imp
 const workspaceCss = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
 const workspaceMobileCss = readFileSync(new URL('./workspace-mobile.css', import.meta.url), 'utf8');
 const mobileReleaseCss = readFileSync(new URL('./workspace-mobile-release-v3.css', import.meta.url), 'utf8');
+const productionReadinessCss = readFileSync(new URL('./production-readiness-visual-v1.css', import.meta.url), 'utf8');
 const mobileUtilities = readFileSync(new URL('./WorkspaceMobileUtilities.tsx', import.meta.url), 'utf8');
 const compositionCss = readFileSync(new URL('./interface-composition.css', import.meta.url), 'utf8');
 const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
@@ -21,7 +22,7 @@ const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', i
 const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
 
 describe('production mobile and responsive experience', () => {
-  it('loads the integrated field, product story, and final screenshot correction layers in order', () => {
+  it('loads the integrated field, product story, and final responsive authority in order', () => {
     expect(main).toContain("import './public-landing.css'");
     expect(main).toContain("import './workspace-chat.css'");
     expect(main).toContain("import './workspace-mobile.css'");
@@ -31,8 +32,10 @@ describe('production mobile and responsive experience', () => {
     expect(main).toContain("import './landing-expression-field-integration.css'");
     expect(main).toContain("import './v0-restored-product-stories.css'");
     expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline'");
+    expect(main).toContain("import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline'");
     expect(main.indexOf("import './v0-restored-product-stories.css'"))
       .toBeGreaterThan(main.indexOf("import './landing-expression-field-integration.css'"));
+    expect(main).toContain('${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}');
   });
 
   it('measures the field and every restored product surface in the rendered DOM', () => {
@@ -57,6 +60,9 @@ describe('production mobile and responsive experience', () => {
     expect(compositionCss).toContain('.plan-choice');
     expect(compositionCss).toContain('.surface-heading');
     expect(compositionCss).toContain('.answer-sections');
+    expect(productionReadinessCss).toContain('.public-secondary-page .policy-hero h1');
+    expect(productionReadinessCss).toContain('.account-shell .account-intro h1');
+    expect(productionReadinessCss).toContain('.sovereign-app-runtime .surface-heading h1');
   });
 
   it('keeps five primary workspace surfaces thumb reachable and You in the menu sheet', () => {
@@ -65,14 +71,17 @@ describe('production mobile and responsive experience', () => {
     expect(workspace).toContain('You · Baseline, plan, permissions, and account');
     expect(workspaceCss).toContain('grid-template-columns: repeat(5, 1fr)');
     expect(workspaceCss).toContain('min-height: 56px');
-    expect(mobileReleaseCss).toContain('min-height: calc(70px + env(safe-area-inset-bottom))');
+    expect(productionReadinessCss).toContain('min-height: calc(64px + env(safe-area-inset-bottom))');
   });
 
-  it('uses one expandable mobile control layer instead of simultaneous fixed overlays', () => {
+  it('uses one collapsed mobile control layer instead of simultaneous fixed overlays', () => {
     expect(authenticatedWorkspace).toContain('className="workspace-desktop-plan-status"');
     expect(authenticatedWorkspace).toContain('<WorkspaceMobileUtilities />');
     expect(mobileUtilities).toContain('createPortal');
     expect(mobileUtilities).toContain("'.intelligence-context .context-scroll'");
+    expect(mobileUtilities).toContain('<details className="workspace-mobile-utilities">');
+    expect(mobileUtilities).toContain('Workspace tools');
+    expect(mobileUtilities).toContain('workspace-mobile-utilities-content');
     expect(mobileUtilities).toContain('<VerifiedPlanStatus expanded />');
     expect(mobileUtilities).toContain('Expression Field');
     expect(mobileUtilities).toContain('System members');
@@ -84,32 +93,35 @@ describe('production mobile and responsive experience', () => {
     expect(mobileReleaseCss).toContain('visibility: hidden !important');
     expect(mobileReleaseCss).toContain('pointer-events: none !important');
     expect(mobileReleaseCss).toContain('.intelligence-workspace.context-open .intelligence-context');
+    expect(productionReadinessCss).toContain('.workspace-mobile-utilities > summary');
+    expect(productionReadinessCss).toContain('.workspace-mobile-utilities[open] > summary::after');
   });
 
   it('keeps the composer compact and reserves the complete fixed-control footprint', () => {
     expect(mobileReleaseCss).toContain('.composer-context-line');
-    expect(mobileReleaseCss).toContain('grid-template-columns: minmax(0, 1fr) 48px');
-    expect(mobileReleaseCss).toContain('height: 48px !important');
-    expect(mobileReleaseCss).toContain('bottom: calc(76px + env(safe-area-inset-bottom))');
-    expect(mobileReleaseCss).toContain('calc(196px + env(safe-area-inset-bottom))');
+    expect(productionReadinessCss).toContain('grid-template-columns: minmax(0, 1fr) 44px');
+    expect(productionReadinessCss).toContain('height: 44px !important');
+    expect(productionReadinessCss).toContain('bottom: calc(68px + env(safe-area-inset-bottom))');
+    expect(productionReadinessCss).toContain('calc(178px + env(safe-area-inset-bottom))');
   });
 
-  it('keeps mobile Today and Explore content readable without clipping or tab overflow', () => {
+  it('keeps mobile Today and Explore content readable without oversized headings or clipping', () => {
     expect(mobileReleaseCss).toContain('.today-facet-view > header');
     expect(mobileReleaseCss).toContain('min-height: 0 !important');
-    expect(mobileReleaseCss).toContain('font-size: clamp(2.45rem, 10.4vw, 3.55rem)');
+    expect(productionReadinessCss).toContain('font-size: clamp(2rem, 8.8vw, 2.85rem)');
+    expect(productionReadinessCss).toContain('font-size: clamp(1.9rem, 8.6vw, 2.55rem)');
+    expect(productionReadinessCss).not.toContain('10.4vw');
+    expect(productionReadinessCss).not.toContain('15.2vw');
     expect(mobileReleaseCss).toContain('.explore-mode-list');
-    expect(mobileReleaseCss).toContain('flex-wrap: nowrap !important');
     expect(mobileReleaseCss).toContain('overflow-x: auto !important');
-    expect(mobileReleaseCss).toContain('min-width: max-content !important');
   });
 
   it('protects public and workspace controls around notched edges', () => {
     expect(workspaceCss).toContain('env(safe-area-inset-bottom)');
     expect(workspaceMobileCss).toContain('env(safe-area-inset-left)');
     expect(workspaceMobileCss).toContain('env(safe-area-inset-right)');
-    expect(mobileReleaseCss).toContain('env(safe-area-inset-left)');
-    expect(mobileReleaseCss).toContain('env(safe-area-inset-right)');
+    expect(productionReadinessCss).toContain('env(safe-area-inset-left)');
+    expect(productionReadinessCss).toContain('env(safe-area-inset-right)');
     expect(viewportCss).toContain('env(safe-area-inset-left)');
     expect(viewportCss).toContain('env(safe-area-inset-right)');
     expect(fieldCss).toContain('env(safe-area-inset-top)');
@@ -142,7 +154,6 @@ describe('production mobile and responsive experience', () => {
       'Your library'
     ]) expect(landing).toContain(marker);
     for (const marker of [
-      'min-height: max(776px, calc(100svh - 68px))',
       '.v0-wordmark--mobile',
       '.v0-mobile-menu[open] > .v0-mobile-menu__panel',
       '.sovereign-opening-copy--mobile',
@@ -150,6 +161,9 @@ describe('production mobile and responsive experience', () => {
       '.landing-expression-slice__ambient--mobile',
       'grid-template-columns: repeat(4, minmax(0, 1fr))'
     ]) expect(approvedCss).toContain(marker);
+    expect(productionReadinessCss).toContain('min-height: max(660px');
+    expect(productionReadinessCss).toContain('width: min(660px, 165vw)');
+    expect(productionReadinessCss).not.toContain('220vw');
     expect(landing).toContain('Sovereign builds your Baseline, then uses it to help you understand');
     expect(stories).toContain('id="relationship"');
     expect(stories).toContain('id="system"');
@@ -159,7 +173,7 @@ describe('production mobile and responsive experience', () => {
     expect(workspaceCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(landingCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(workspaceMobileCss).toContain('overflow-x: clip');
-    expect(mobileReleaseCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(productionReadinessCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(compositionCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(viewportCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(fieldCss).toContain('@media (prefers-reduced-motion: reduce)');
