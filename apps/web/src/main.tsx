@@ -13,6 +13,7 @@ import { installProductionReadinessRuntime } from './production-readiness-runtim
 import { installProductionRuntime } from './ProductionRuntime';
 import { PublicLanding } from './PublicLanding';
 import { installPublicLandingViewportContract } from './PublicLandingViewportContract';
+import { installPublicRouteAuthorityRuntime } from './PublicRouteAuthorityRuntime';
 import { PublicPolicy } from './PublicPolicy';
 import { PublicPolicyMetadata } from './PublicPolicyMetadata';
 import { installReleaseInteractionRuntime } from './release-interaction-runtime';
@@ -96,6 +97,7 @@ installProductionRuntime();
 installProductRuntime();
 installEmailCodeFallbackRuntime();
 installBaselineInputRuntime();
+installPublicRouteAuthorityRuntime();
 installDialogAccessibility();
 installPrivateAnswerExportRuntime();
 installSafetyResponseRuntime();
