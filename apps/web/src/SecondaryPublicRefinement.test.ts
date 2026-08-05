@@ -40,7 +40,9 @@ describe('secondary public refinement release', () => {
   });
 
   it('does not misrepresent the desktop reference as mobile visual parity', () => {
-    expect(renderedVisualVerifier).toContain("if (referenceAuthority === 'founder-reference') assertComparison(profile, comparison)");
+    expect(renderedVisualVerifier).toContain("if (referenceAuthority === 'founder-reference') {");
+    expect(renderedVisualVerifier).toContain('assertComparison(profile, comparison);');
+    expect(renderedVisualVerifier).toContain("throw new Error(message + '; visualDiagnostic=' + JSON.stringify(visualDiagnostic));");
     expect(renderedVisualVerifier).toContain("requiredViewports: ['390x844', '430x932']");
   });
 
