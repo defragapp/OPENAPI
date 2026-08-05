@@ -10,10 +10,12 @@ const styles = read('./landing-expression-field-v3.css');
 const integration = read('./landing-expression-field-integration.css');
 const heroExtension = read('./landing-hero-field-v4.css');
 const cohesionRefinement = read('./sitewide-cohesion-refinement-v2.css');
+const mobileRelease = read('./workspace-mobile-release-v3.css');
+const interactionRuntime = read('./release-interaction-runtime.ts');
 const controls = read('./emergency-public-removal.css');
 
 describe('premium rotating public Expression Field v3', () => {
-  it('loads the final hero extension before passkey authority and installs the cohesion refinement synchronously', () => {
+  it('loads the final hero extension before passkey authority and installs all final authorities synchronously', () => {
     const replacement = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
     const storiesImport = "import './v0-restored-product-stories.css';";
@@ -26,7 +28,9 @@ describe('premium rotating public Expression Field v3', () => {
     expect(main.indexOf(hero)).toBeGreaterThan(main.indexOf(approved));
     expect(main.indexOf(passkey)).toBeGreaterThan(main.indexOf(hero));
     expect(main).toContain("import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline';");
-    expect(main).toContain('`${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}`');
+    expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline';");
+    expect(main).toContain('`${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}`');
+    expect(main).toContain('installReleaseInteractionRuntime();');
   });
 
   it('keeps the field in the hero and restores real-life questions before product stories', () => {
@@ -72,7 +76,7 @@ describe('premium rotating public Expression Field v3', () => {
     ]) expect(field).toContain(marker);
   });
 
-  it('renders all sixteen value-driven measurements with a compact outward endpoint tooltip', () => {
+  it('renders all sixteen value-driven measurements with compact endpoint detail after selection', () => {
     for (const marker of [
       'expressionAxisIds',
       'expressionAxisRegistryById',
@@ -108,11 +112,14 @@ describe('premium rotating public Expression Field v3', () => {
     expect(heroExtension).toContain('display: none !important');
     expect(cohesionRefinement).toContain('.public-approved-v8 .landing-expression-slice__tooltip');
     expect(cohesionRefinement).toContain('display: block !important');
-    expect(cohesionRefinement).toContain('.landing-expression-slice__tooltip-panel');
-    expect(cohesionRefinement).toContain('.landing-expression-slice__tooltip-connector');
+    expect(mobileRelease).toContain('.landing-expression-slice[data-inspecting="true"] .landing-expression-slice__tooltip');
+    expect(mobileRelease).toContain('visibility: hidden');
+    expect(mobileRelease).toContain('.landing-expression-slice[data-inspecting="true"] .landing-expression-slice__readout--accessible');
+    expect(interactionRuntime).toContain("field.dataset.inspecting = 'true'");
+    expect(interactionRuntime).toContain("event.key === 'Escape'");
   });
 
-  it('keeps the 360 field below the hero copy and uses vivid Cloudflare blue', () => {
+  it('keeps the 360 field below the hero copy and makes the complete density visible', () => {
     for (const marker of [
       '.landing-expression-slice__sphere-shell',
       '.landing-expression-slice__sphere-grid path',
@@ -129,6 +136,11 @@ describe('premium rotating public Expression Field v3', () => {
     expect(integration).toContain('background: transparent');
     expect(integration).toContain('border-radius: 0');
     expect(cohesionRefinement).toContain('top: 96% !important');
+    expect(mobileRelease).toContain('width: min(1440px, calc(100vw - 24px)) !important');
+    expect(mobileRelease).toContain('.landing-expression-slice__ambient');
+    expect(mobileRelease).toContain('[data-reach-tier="primary"]');
+    expect(mobileRelease).toContain('[data-reach-tier="supporting"]');
+    expect(mobileRelease).toContain('[data-reach-tier="background"]');
   });
 
   it('moves rotating questions below the hero and keeps public, account, and workspace branding cohesive', () => {
@@ -161,7 +173,7 @@ describe('premium rotating public Expression Field v3', () => {
   });
 
   it('keeps release stylesheets structurally balanced', () => {
-    for (const source of [styles, integration, heroExtension, cohesionRefinement, controls]) {
+    for (const source of [styles, integration, heroExtension, cohesionRefinement, mobileRelease, controls]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
