@@ -41,7 +41,9 @@ describe('shared Sovereign intelligence stage', () => {
     expect(field).toContain('tabIndex={0}');
     expect(field).toContain('onPointerDown');
     expect(field).toContain('onPointerMove');
-    expect(field).toContain('onPointerEnter');
+    expect(field).toContain('onFocus={() => selectAxis(axis.id)}');
+    expect(field).toContain('onClick={(event) =>');
+    expect(field).toContain('onKeyDown={(event) => handleKeyDown(event, axis.id)}');
     expect(field).toContain('prefers-reduced-motion: reduce');
     expect(stories).toContain('aria-current');
     expect(workspace).toContain('const limit = mobile ? 3 : 5');
