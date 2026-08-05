@@ -9,6 +9,7 @@ import { ProductCompletionLayer, installProductRuntime } from './ProductCompleti
 import { installBaselineInputRuntime } from './BaselineInputRuntime';
 import { installDialogAccessibility } from './dialog-accessibility';
 import { installPrivateAnswerExportRuntime } from './PrivateAnswerExportRuntime';
+import { installProductionReadinessRuntime } from './production-readiness-runtime';
 import { installProductionRuntime } from './ProductionRuntime';
 import { PublicLanding } from './PublicLanding';
 import { installPublicLandingViewportContract } from './PublicLandingViewportContract';
@@ -20,6 +21,7 @@ import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
 import platformVisualCohesionCss from './platform-visual-cohesion-v1.css?inline';
 import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline';
 import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline';
+import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline';
 
 /* Component foundations */
 import './styles.css';
@@ -81,11 +83,12 @@ function installPlatformVisualCohesion(): void {
   if (document.head.querySelector('style[data-sovereign-platform-cohesion="v1"]')) return;
   const style = document.createElement('style');
   style.dataset.sovereignPlatformCohesion = 'v1';
-  style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}\n${workspaceMobileReleaseCss}`;
+  style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}\n${workspaceMobileReleaseCss}\n${productionReadinessVisualCss}`;
   document.head.append(style);
 }
 
 installPlatformVisualCohesion();
+installProductionReadinessRuntime();
 installReleaseInteractionRuntime();
 installV0ReleaseFingerprint();
 installProductionRuntime();
@@ -161,6 +164,7 @@ document.documentElement.dataset.sovereignLayoutRelease = 'approved-public-v8';
 document.documentElement.dataset.sovereignProductStories = 'isolated-mobile-first-v2';
 document.documentElement.dataset.sovereignMotionRelease = 'v0-motion-workflows-v8';
 document.documentElement.dataset.sovereignPlatformCohesion = 'v1';
+document.documentElement.dataset.sovereignProductionReadiness = 'desktop-ios-v1';
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'
