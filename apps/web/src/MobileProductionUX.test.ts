@@ -12,13 +12,16 @@ const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', impor
 const approvedCss = readFileSync(new URL('./public-landing-approved-v8.css', import.meta.url), 'utf8');
 const workspaceCss = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
 const workspaceMobileCss = readFileSync(new URL('./workspace-mobile.css', import.meta.url), 'utf8');
+const mobileReleaseCss = readFileSync(new URL('./workspace-mobile-release-v3.css', import.meta.url), 'utf8');
+const mobileUtilities = readFileSync(new URL('./WorkspaceMobileUtilities.tsx', import.meta.url), 'utf8');
 const compositionCss = readFileSync(new URL('./interface-composition.css', import.meta.url), 'utf8');
 const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
 const authCss = readFileSync(new URL('./auth-onboarding.css', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
+const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
 
 describe('production mobile and responsive experience', () => {
-  it('loads the integrated field and restored product story layers in order', () => {
+  it('loads the integrated field, product story, and final screenshot correction layers in order', () => {
     expect(main).toContain("import './public-landing.css'");
     expect(main).toContain("import './workspace-chat.css'");
     expect(main).toContain("import './workspace-mobile.css'");
@@ -27,6 +30,7 @@ describe('production mobile and responsive experience', () => {
     expect(main).toContain("import './landing-expression-field-v3.css'");
     expect(main).toContain("import './landing-expression-field-integration.css'");
     expect(main).toContain("import './v0-restored-product-stories.css'");
+    expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline'");
     expect(main.indexOf("import './v0-restored-product-stories.css'"))
       .toBeGreaterThan(main.indexOf("import './landing-expression-field-integration.css'"));
   });
@@ -61,12 +65,51 @@ describe('production mobile and responsive experience', () => {
     expect(workspace).toContain('You · Baseline, plan, permissions, and account');
     expect(workspaceCss).toContain('grid-template-columns: repeat(5, 1fr)');
     expect(workspaceCss).toContain('min-height: 56px');
+    expect(mobileReleaseCss).toContain('min-height: calc(70px + env(safe-area-inset-bottom))');
+  });
+
+  it('uses one expandable mobile control layer instead of simultaneous fixed overlays', () => {
+    expect(authenticatedWorkspace).toContain('className="workspace-desktop-plan-status"');
+    expect(authenticatedWorkspace).toContain('<WorkspaceMobileUtilities />');
+    expect(mobileUtilities).toContain('createPortal');
+    expect(mobileUtilities).toContain("'.intelligence-context .context-scroll'");
+    expect(mobileUtilities).toContain('<VerifiedPlanStatus expanded />');
+    expect(mobileUtilities).toContain('Expression Field');
+    expect(mobileUtilities).toContain('System members');
+    expect(mobileUtilities).toContain('Account & Library');
+    expect(mobileReleaseCss).toContain('.workspace-desktop-plan-status');
+    expect(mobileReleaseCss).toContain('.sovereign-app-runtime > .expression-field-launcher');
+    expect(mobileReleaseCss).toContain('.sovereign-app-runtime .system-membership-trigger');
+    expect(mobileReleaseCss).toContain('display: none !important');
+    expect(mobileReleaseCss).toContain('visibility: hidden !important');
+    expect(mobileReleaseCss).toContain('pointer-events: none !important');
+    expect(mobileReleaseCss).toContain('.intelligence-workspace.context-open .intelligence-context');
+  });
+
+  it('keeps the composer compact and reserves the complete fixed-control footprint', () => {
+    expect(mobileReleaseCss).toContain('.composer-context-line');
+    expect(mobileReleaseCss).toContain('grid-template-columns: minmax(0, 1fr) 48px');
+    expect(mobileReleaseCss).toContain('height: 48px !important');
+    expect(mobileReleaseCss).toContain('bottom: calc(76px + env(safe-area-inset-bottom))');
+    expect(mobileReleaseCss).toContain('calc(196px + env(safe-area-inset-bottom))');
+  });
+
+  it('keeps mobile Today and Explore content readable without clipping or tab overflow', () => {
+    expect(mobileReleaseCss).toContain('.today-facet-view > header');
+    expect(mobileReleaseCss).toContain('min-height: 0 !important');
+    expect(mobileReleaseCss).toContain('font-size: clamp(2.45rem, 10.4vw, 3.55rem)');
+    expect(mobileReleaseCss).toContain('.explore-mode-list');
+    expect(mobileReleaseCss).toContain('flex-wrap: nowrap !important');
+    expect(mobileReleaseCss).toContain('overflow-x: auto !important');
+    expect(mobileReleaseCss).toContain('min-width: max-content !important');
   });
 
   it('protects public and workspace controls around notched edges', () => {
     expect(workspaceCss).toContain('env(safe-area-inset-bottom)');
     expect(workspaceMobileCss).toContain('env(safe-area-inset-left)');
     expect(workspaceMobileCss).toContain('env(safe-area-inset-right)');
+    expect(mobileReleaseCss).toContain('env(safe-area-inset-left)');
+    expect(mobileReleaseCss).toContain('env(safe-area-inset-right)');
     expect(viewportCss).toContain('env(safe-area-inset-left)');
     expect(viewportCss).toContain('env(safe-area-inset-right)');
     expect(fieldCss).toContain('env(safe-area-inset-top)');
@@ -74,7 +117,7 @@ describe('production mobile and responsive experience', () => {
     expect(integrationCss).toContain('@media (max-width: 760px)');
   });
 
-  it('keeps mobile interactions usable and avoids pill-shaped controls', () => {
+  it('keeps mobile interactions usable and avoids pill-shaped primary controls', () => {
     expect(workspaceMobileCss).toContain('min-height: 44px');
     expect(workspaceCss).toContain('font-size: 1rem');
     expect(authCss).toContain('.auth-panel');
@@ -116,6 +159,7 @@ describe('production mobile and responsive experience', () => {
     expect(workspaceCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(landingCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(workspaceMobileCss).toContain('overflow-x: clip');
+    expect(mobileReleaseCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(compositionCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(viewportCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(fieldCss).toContain('@media (prefers-reduced-motion: reduce)');
