@@ -11,7 +11,9 @@ describe('public evidence contract', () => {
   it('uses deterministic relative-expression data rather than unsupported identity claims', () => {
     expect(field).toContain('landingExpressionFieldFixture');
     expect(field).toContain('salienceLabel');
-    expect(field).toContain('LANDING_AXIS_LAYOUT');
+    expect(field).toContain('expressionAxisRegistryById');
+    expect(field).toContain('buildLandingAxes');
+    expect(field).toContain('Math.pow(normalized, 1.32)');
     expect(fixture).toContain("measurementKind: 'relative_expression_salience'");
     expect(fixture).toContain("state: 'unconfirmed'");
     expect(fixture).toContain('basisRefs: []');
