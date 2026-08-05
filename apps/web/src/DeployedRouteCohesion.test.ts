@@ -34,9 +34,10 @@ describe('deployed route cohesion', () => {
     expect(cohesion).toBeGreaterThan(passkey);
     expect(main.slice(cohesion + 1)).not.toContain("import './");
     expect(main).toContain("import platformVisualCohesionCss from './platform-visual-cohesion-v1.css?inline'");
+    expect(main).toContain("import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline'");
     expect(main).toContain('function installPlatformVisualCohesion(): void');
     expect(main).toContain("style.dataset.sovereignPlatformCohesion = 'v1'");
-    expect(main).toContain('style.textContent = platformVisualCohesionCss');
+    expect(main).toContain('style.textContent = `${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}`');
     expect(main).toContain('document.head.append(style)');
     expect(main).not.toContain('platformVisualCohesionUrl');
     expect(main).not.toContain("link.rel = 'stylesheet'");
