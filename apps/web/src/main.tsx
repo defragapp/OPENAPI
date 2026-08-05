@@ -22,6 +22,7 @@ import platformVisualCohesionCss from './platform-visual-cohesion-v1.css?inline'
 import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline';
 import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline';
 import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline';
+import heroCompositionReleaseCss from './hero-composition-release-v2.css?inline';
 
 /* Component foundations */
 import './styles.css';
@@ -83,7 +84,7 @@ function installPlatformVisualCohesion(): void {
   if (document.head.querySelector('style[data-sovereign-platform-cohesion="v1"]')) return;
   const style = document.createElement('style');
   style.dataset.sovereignPlatformCohesion = 'v1';
-  style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}\n${workspaceMobileReleaseCss}\n${productionReadinessVisualCss}`;
+  style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}\n${workspaceMobileReleaseCss}\n${productionReadinessVisualCss}\n${heroCompositionReleaseCss}`;
   document.head.append(style);
 }
 
@@ -165,6 +166,7 @@ document.documentElement.dataset.sovereignProductStories = 'isolated-mobile-firs
 document.documentElement.dataset.sovereignMotionRelease = 'v0-motion-workflows-v8';
 document.documentElement.dataset.sovereignPlatformCohesion = 'v1';
 document.documentElement.dataset.sovereignProductionReadiness = 'desktop-ios-v1';
+document.documentElement.dataset.sovereignHeroComposition = 'v2';
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'
