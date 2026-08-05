@@ -1,0 +1,444 @@
+/* Final production-readiness authority for desktop, iOS, and authenticated product surfaces. */
+
+:root {
+  --production-nav-height: 80px;
+}
+
+html[data-sovereign-production-readiness="desktop-ios-v1"] {
+  scroll-padding-top: var(--production-nav-height);
+}
+
+/* One desktop navigation scale across landing, policy, account, and static public routes. */
+.public-approved-v8 .v0-nav,
+.public-secondary-page .v0-nav,
+.account-shell .account-nav,
+.plan-onboarding .account-nav,
+.launch-page .launch-nav {
+  min-height: var(--production-nav-height) !important;
+  height: var(--production-nav-height) !important;
+}
+
+.public-approved-v8 .v0-nav {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 70 !important;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.09) !important;
+  background: rgba(9, 11, 14, 0.92) !important;
+  backdrop-filter: blur(22px) saturate(118%) !important;
+}
+
+.public-approved-v8 .v0-nav-inner {
+  width: min(1280px, calc(100% - 64px)) !important;
+  grid-template-columns: minmax(170px, 1fr) auto minmax(210px, 1fr) !important;
+  gap: 32px !important;
+}
+
+.public-approved-v8 .v0-wordmark,
+.public-secondary-page .v0-wordmark,
+.account-shell .wordmark,
+.plan-onboarding .wordmark,
+.launch-page .launch-wordmark,
+.sovereign-app-runtime .intelligence-brand strong {
+  font-family: var(--sovereign-wordmark-family, var(--font-body, "Sovereign Sans", sans-serif)) !important;
+  font-size: 0.82rem !important;
+  font-weight: 760 !important;
+  letter-spacing: 0.2em !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.public-approved-v8 .v0-nav nav {
+  gap: clamp(26px, 3vw, 42px) !important;
+}
+
+.public-approved-v8 .v0-nav nav a,
+.public-approved-v8 .v0-sign-in,
+.public-approved-v8 .landing-control--nav {
+  display: inline-flex !important;
+  min-height: 44px !important;
+  align-items: center !important;
+  font-size: 0.82rem !important;
+  line-height: 1 !important;
+}
+
+.public-approved-v8 .v0-nav-actions {
+  gap: clamp(18px, 2.2vw, 30px) !important;
+}
+
+/* Dynamic full-screen opening. Copy remains above the field instead of sitting over vector lines. */
+.public-approved-v8 .v0-hero.sovereign-opening-field {
+  position: relative !important;
+  display: grid !important;
+  min-height: max(760px, calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))) !important;
+  padding: clamp(86px, 10vh, 128px) 24px 0 !important;
+  place-items: start center !important;
+  overflow: hidden !important;
+}
+
+.public-approved-v8 .v0-hero-content {
+  z-index: 12 !important;
+  width: min(980px, 100%) !important;
+  max-width: calc(100vw - 48px) !important;
+}
+
+.public-approved-v8 .v0-hero h1 {
+  font-size: clamp(4.6rem, 8vw, 8.35rem) !important;
+  line-height: 0.89 !important;
+}
+
+.public-approved-v8 .sovereign-opening-copy {
+  max-width: 700px !important;
+  margin-top: 28px !important;
+  font-size: clamp(0.98rem, 1.2vw, 1.08rem) !important;
+}
+
+.public-approved-v8 .sovereign-opening-actions {
+  margin-top: 24px !important;
+}
+
+.public-approved-v8 .sovereign-opening-trust {
+  margin-top: 15px !important;
+}
+
+.public-approved-v8 .landing-expression-slice {
+  top: auto !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  height: clamp(315px, 39%, 430px) !important;
+  min-height: 315px !important;
+  pointer-events: none !important;
+}
+
+.public-approved-v8 .landing-expression-slice__canvas {
+  top: 100% !important;
+  left: 50% !important;
+  width: min(1240px, 94vw) !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  transform: translate3d(-50%, -50%, 0) !important;
+  transform-origin: center !important;
+  pointer-events: auto !important;
+  touch-action: pan-y pinch-zoom !important;
+}
+
+/* Small endpoint readout: shown only after click or keyboard inspection. */
+.public-approved-v8 .landing-expression-slice__tooltip {
+  display: block !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: opacity 150ms ease, visibility 150ms ease !important;
+}
+
+.public-approved-v8 .landing-expression-slice[data-inspecting="true"] .landing-expression-slice__tooltip {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-panel {
+  width: 148px !important;
+  height: 50px !important;
+  rx: 7px !important;
+  fill: rgba(7, 12, 19, 0.94) !important;
+  stroke: rgba(120, 199, 255, 0.34) !important;
+  stroke-width: 1px !important;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-connector {
+  stroke: rgba(120, 199, 255, 0.58) !important;
+  stroke-width: 0.8px !important;
+  vector-effect: non-scaling-stroke !important;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-title {
+  fill: #eef7ff !important;
+  font-family: var(--font-body, sans-serif) !important;
+  font-size: 10px !important;
+  font-weight: 720 !important;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-value {
+  fill: rgba(190, 224, 250, 0.82) !important;
+  font-family: var(--font-body, sans-serif) !important;
+  font-size: 7.5px !important;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-meta {
+  fill: rgba(190, 224, 250, 0.58) !important;
+  font-family: var(--font-body, sans-serif) !important;
+  font-size: 6.6px !important;
+}
+
+.public-approved-v8 .landing-expression-slice__readout--accessible {
+  pointer-events: none !important;
+}
+
+/* Questions are a real transition below the hero, not an overlapping layer. */
+.public-approved-v8 .landing-question-orbit {
+  position: relative !important;
+  z-index: 9 !important;
+  display: grid !important;
+  min-height: 176px !important;
+  height: auto !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.07) !important;
+  background: #090b0e !important;
+  pointer-events: none !important;
+}
+
+.public-approved-v8 .landing-question-orbit__inner {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  width: min(760px, calc(100vw - 48px)) !important;
+  min-height: 112px !important;
+  padding: 28px 0 !important;
+  transform: none !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage {
+  width: min(720px, 100%) !important;
+  height: 64px !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage span {
+  padding-inline: 28px !important;
+  font-family: var(--font-display, serif) !important;
+  font-size: clamp(1.18rem, 2vw, 1.62rem) !important;
+  font-weight: 430 !important;
+  line-height: 1.24 !important;
+}
+
+/* Page-by-page sizing and organization. */
+.public-approved-v8 .landing-story,
+.public-approved-v8 .v0-comparison,
+.public-approved-v8 .v0-final {
+  padding-top: clamp(92px, 9vw, 138px) !important;
+  padding-bottom: clamp(92px, 9vw, 138px) !important;
+}
+
+.public-approved-v8 .landing-story__shell,
+.public-approved-v8 .v0-comparison > .v0-shell,
+.public-approved-v8 .v0-final {
+  width: min(1180px, calc(100% - 64px)) !important;
+  margin-inline: auto !important;
+}
+
+.public-approved-v8 .landing-story__stage,
+.public-approved-v8 .v0-comparison-grid {
+  gap: clamp(18px, 2vw, 28px) !important;
+}
+
+.public-secondary-page main,
+.account-shell .account-layout,
+.plan-onboarding .plan-layout,
+.launch-page main {
+  width: min(1180px, calc(100% - 64px)) !important;
+  margin-inline: auto !important;
+}
+
+.public-secondary-page p,
+.public-secondary-page li,
+.account-shell p,
+.account-shell li,
+.plan-onboarding p,
+.plan-onboarding li,
+.launch-page p,
+.launch-page li {
+  font-size: max(0.94rem, 15px) !important;
+  line-height: 1.62 !important;
+}
+
+.account-shell .auth-panel,
+.plan-onboarding .plan-panel,
+.invitation-shell .auth-panel {
+  max-width: 760px !important;
+}
+
+.sovereign-app-runtime .intelligence-scroll {
+  width: min(100%, 1180px) !important;
+}
+
+.sovereign-app-runtime .surface-heading,
+.sovereign-app-runtime .sovereign-answer,
+.sovereign-app-runtime .response-thread {
+  min-width: 0 !important;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --production-nav-height: 68px;
+  }
+
+  .public-approved-v8 .v0-nav-inner {
+    width: calc(100% - 36px) !important;
+    grid-template-columns: 1fr auto !important;
+    gap: 18px !important;
+  }
+
+  .public-approved-v8 .v0-nav nav,
+  .public-approved-v8 .v0-sign-in,
+  .public-approved-v8 .landing-control--nav,
+  .public-approved-v8 .v0-wordmark--desktop {
+    display: none !important;
+  }
+
+  .public-approved-v8 .v0-wordmark--mobile,
+  .public-approved-v8 .v0-mobile-menu {
+    display: block !important;
+  }
+
+  .public-approved-v8 .v0-mobile-menu summary {
+    display: grid !important;
+    width: 44px !important;
+    height: 44px !important;
+    place-items: center !important;
+  }
+
+  .public-approved-v8 .v0-hero.sovereign-opening-field {
+    min-height: max(740px, calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))) !important;
+    padding: clamp(48px, 7vh, 72px) 18px calc(82px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .public-approved-v8 .v0-hero-content {
+    max-width: calc(100vw - 36px) !important;
+  }
+
+  .public-approved-v8 .v0-hero h1 {
+    font-size: clamp(3.35rem, 15vw, 5.1rem) !important;
+    line-height: 0.9 !important;
+  }
+
+  .public-approved-v8 .landing-hero-kicker {
+    margin-bottom: 20px !important;
+  }
+
+  .public-approved-v8 .sovereign-opening-copy {
+    max-width: 34ch !important;
+    margin-top: 22px !important;
+    font-size: 0.94rem !important;
+    line-height: 1.58 !important;
+  }
+
+  .public-approved-v8 .sovereign-opening-actions {
+    gap: 20px !important;
+    margin-top: 20px !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice {
+    bottom: calc(82px + env(safe-area-inset-bottom)) !important;
+    height: clamp(230px, 30%, 286px) !important;
+    min-height: 230px !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice__canvas {
+    width: min(760px, 190vw) !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice__tooltip {
+    display: block !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice[data-inspecting="true"] .landing-expression-slice__readout--accessible {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit {
+    min-height: 154px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__inner {
+    width: calc(100vw - 32px) !important;
+    min-height: 96px !important;
+    padding: 20px 0 !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__stage {
+    height: 62px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__stage span {
+    padding-inline: 14px !important;
+    font-size: clamp(1.02rem, 5vw, 1.28rem) !important;
+  }
+
+  .public-approved-v8 .landing-story,
+  .public-approved-v8 .v0-comparison,
+  .public-approved-v8 .v0-final {
+    padding-top: 78px !important;
+    padding-bottom: 78px !important;
+  }
+
+  .public-approved-v8 .landing-story__shell,
+  .public-approved-v8 .v0-comparison > .v0-shell,
+  .public-approved-v8 .v0-final,
+  .public-secondary-page main,
+  .account-shell .account-layout,
+  .plan-onboarding .plan-layout,
+  .launch-page main {
+    width: calc(100% - 36px) !important;
+  }
+
+  .public-approved-v8 .landing-story__stage,
+  .public-approved-v8 .v0-comparison-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .public-approved-v8 .v0-hero.sovereign-opening-field {
+    min-height: max(724px, calc(var(--sovereign-viewport-height, 100svh) - var(--production-nav-height))) !important;
+    padding-top: 44px !important;
+  }
+
+  .public-approved-v8 .v0-hero h1 {
+    font-size: clamp(3.15rem, 15.2vw, 4.55rem) !important;
+  }
+
+  .public-approved-v8 .sovereign-opening-actions {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice {
+    height: 228px !important;
+    min-height: 228px !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice__canvas {
+    width: min(720px, 188vw) !important;
+  }
+}
+
+@media (max-height: 700px) and (min-width: 901px) {
+  .public-approved-v8 .v0-hero.sovereign-opening-field {
+    min-height: 700px !important;
+    padding-top: 56px !important;
+  }
+
+  .public-approved-v8 .v0-hero h1 {
+    font-size: clamp(4rem, 7.2vw, 6.3rem) !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice {
+    height: 285px !important;
+    min-height: 285px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-approved-v8 .landing-expression-slice__tooltip {
+    transition: none !important;
+  }
+}
