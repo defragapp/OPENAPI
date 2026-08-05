@@ -4,6 +4,7 @@ import { PasskeyManager } from './PasskeyManager';
 import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
 import { SystemMembershipManager } from './SystemMembershipManager';
 import { VerifiedPlanStatus } from './VerifiedPlanStatus';
+import { WorkspaceMobileUtilities } from './WorkspaceMobileUtilities';
 import { AccountExpressionField } from './expression-field/ExpressionField';
 
 // Source-level release compatibility marker retained for the certified production verifier:
@@ -141,8 +142,9 @@ export function AuthenticatedWorkspace() {
 
   return (
     <div className="sovereign-app-runtime" data-workspace-contract="one-room">
-      <VerifiedPlanStatus />
+      <div className="workspace-desktop-plan-status"><VerifiedPlanStatus /></div>
       <SovereignIntelligenceWorkspace onboardingVerified />
+      <WorkspaceMobileUtilities />
       <AccountExpressionField />
       <PasskeyManager />
       <div className="sovereign-workspace-overlays" aria-label="Workspace controls">
