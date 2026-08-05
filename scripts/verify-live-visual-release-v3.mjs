@@ -262,7 +262,43 @@ const domParserCallV3 = `const dom = await scrapeRenderedAudit(profile, captured
   dom.document.height = Math.max(dom.document.height, Number(screenshotMetadata.height || 0));`;
 const comparisonAssertionV2 = '  assertComparison(profile, comparison);';
 const comparisonAssertionV3 = `  const referenceAuthority = profile.name.startsWith('desktop-') ? 'founder-reference' : 'structural-only';
-  if (referenceAuthority === 'founder-reference') assertComparison(profile, comparison);`;
+  const summarizeBands = (values) => Array.from({ length: 16 }, (_, index) => {
+    const start = index * 4;
+    const slice = Array.from(values.slice(start, start + 4));
+    return Number((slice.reduce((sum, value) => sum + value, 0) / slice.length).toFixed(3));
+  });
+  const visualDiagnostic = {
+    profile: profile.name,
+    document: dom.document,
+    sections: dom.sections.map((section) => ({
+      selector: section.selector,
+      top: section.top,
+      height: section.height,
+      topRatio: Number((section.top / Math.max(dom.document.height, 1)).toFixed(4)),
+      heightRatio: Number((section.height / Math.max(dom.document.height, 1)).toFixed(4))
+    })),
+    comparison: {
+      score: Number(comparison.score.toFixed(4)),
+      bandCorrelation: Number(comparison.bandCorrelation.toFixed(4)),
+      lumaCorrelation: Number(comparison.lumaCorrelation.toFixed(4)),
+      edgeCorrelation: Number(comparison.edgeCorrelation.toFixed(4)),
+      darkRatioDelta: Number(comparison.darkRatioDelta.toFixed(4)),
+      edgeDensityRatio: Number(comparison.edgeDensityRatio.toFixed(4))
+    },
+    bands: {
+      reference: summarizeBands(referenceFeatures.bandProfile),
+      actual: summarizeBands(actualFeatures.bandProfile)
+    }
+  };
+  console.log('[visual-release-diagnostic] ' + JSON.stringify(visualDiagnostic));
+  if (referenceAuthority === 'founder-reference') {
+    try {
+      assertComparison(profile, comparison);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(message + '; visualDiagnostic=' + JSON.stringify(visualDiagnostic));
+    }
+  }`;
 const resultViewportV2 = `    viewport: profile.viewport,
     url: captured.url,`;
 const resultViewportV3 = `    viewport: profile.viewport,
