@@ -11,6 +11,7 @@ const integration = read('./landing-expression-field-integration.css');
 const heroExtension = read('./landing-hero-field-v4.css');
 const cohesionRefinement = read('./sitewide-cohesion-refinement-v2.css');
 const mobileRelease = read('./workspace-mobile-release-v3.css');
+const productionReadiness = read('./production-readiness-visual-v1.css');
 const interactionRuntime = read('./release-interaction-runtime.ts');
 const controls = read('./emergency-public-removal.css');
 
@@ -29,7 +30,9 @@ describe('premium rotating public Expression Field v3', () => {
     expect(main.indexOf(passkey)).toBeGreaterThan(main.indexOf(hero));
     expect(main).toContain("import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline';");
     expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline';");
-    expect(main).toContain('`${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}`');
+    expect(main).toContain("import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline';");
+    expect(main).toContain('`${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}`');
+    expect(main).toContain('installProductionReadinessRuntime();');
     expect(main).toContain('installReleaseInteractionRuntime();');
   });
 
@@ -115,6 +118,9 @@ describe('premium rotating public Expression Field v3', () => {
     expect(mobileRelease).toContain('.landing-expression-slice[data-inspecting="true"] .landing-expression-slice__tooltip');
     expect(mobileRelease).toContain('visibility: hidden');
     expect(mobileRelease).toContain('.landing-expression-slice[data-inspecting="true"] .landing-expression-slice__readout--accessible');
+    expect(productionReadiness).toContain('.landing-expression-slice[data-inspecting="true"] .landing-expression-slice__tooltip');
+    expect(productionReadiness).toContain('width: 148px !important');
+    expect(productionReadiness).toContain('height: 50px !important');
     expect(interactionRuntime).toContain("field.dataset.inspecting = 'true'");
     expect(interactionRuntime).toContain("event.key === 'Escape'");
   });
@@ -141,6 +147,8 @@ describe('premium rotating public Expression Field v3', () => {
     expect(mobileRelease).toContain('[data-reach-tier="primary"]');
     expect(mobileRelease).toContain('[data-reach-tier="supporting"]');
     expect(mobileRelease).toContain('[data-reach-tier="background"]');
+    expect(productionReadiness).toContain('height: clamp(315px, 39%, 430px) !important');
+    expect(productionReadiness).toContain('width: min(1240px, 94vw) !important');
   });
 
   it('moves rotating questions below the hero and keeps public, account, and workspace branding cohesive', () => {
@@ -161,6 +169,8 @@ describe('premium rotating public Expression Field v3', () => {
       '@media (max-width: 900px)',
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(cohesionRefinement).toContain(marker);
+    expect(productionReadiness).toContain('min-height: 176px !important');
+    expect(productionReadiness).toContain('position: sticky !important');
   });
 
   it('keeps platform controls restrained and product stories free of duplicate field globes', () => {
@@ -173,7 +183,7 @@ describe('premium rotating public Expression Field v3', () => {
   });
 
   it('keeps release stylesheets structurally balanced', () => {
-    for (const source of [styles, integration, heroExtension, cohesionRefinement, mobileRelease, controls]) {
+    for (const source of [styles, integration, heroExtension, cohesionRefinement, mobileRelease, productionReadiness, controls]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
