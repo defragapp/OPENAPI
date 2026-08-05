@@ -1,8 +1,8 @@
-let installed = false;
-let selectedBirthTimezone = readStoredTimezone();
-
 const STORAGE_KEY = 'sovereign-baseline-birth-timezone';
 const BASELINE_ENDPOINT = '/api/v1/baseline/onboarding';
+
+let installed = false;
+let selectedBirthTimezone = readStoredTimezone();
 
 export function installBaselineInputRuntime(): void {
   if (installed || typeof document === 'undefined') return;
