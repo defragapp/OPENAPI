@@ -17,6 +17,7 @@ import { PublicPolicyMetadata } from './PublicPolicyMetadata';
 import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
 import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
 import platformVisualCohesionCss from './platform-visual-cohesion-v1.css?inline';
+import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline';
 
 /* Component foundations */
 import './styles.css';
@@ -78,7 +79,7 @@ function installPlatformVisualCohesion(): void {
   if (document.head.querySelector('style[data-sovereign-platform-cohesion="v1"]')) return;
   const style = document.createElement('style');
   style.dataset.sovereignPlatformCohesion = 'v1';
-  style.textContent = platformVisualCohesionCss;
+  style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}`;
   document.head.append(style);
 }
 
