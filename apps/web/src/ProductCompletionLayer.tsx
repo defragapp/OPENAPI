@@ -55,10 +55,17 @@ interface InvitationRecord {
   decisions: Record<string, 'granted' | 'denied'>;
 }
 
+type PlanNotice = {
+  feature: 'people' | 'systems' | 'library' | 'covenant' | 'ai';
+  title: string;
+  description: string;
+};
+
 export function installProductRuntime(): void {
   if (runtimeInstalled || typeof window === 'undefined') return;
   runtimeInstalled = true;
   installFetchObserver();
+  installEntitlementRejectionObserver();
   installTurnstileRenderer();
 }
 
@@ -72,8 +79,76 @@ function installFetchObserver(): void {
     if (response.ok && /^\/api\/v1\/auth\/logout(-all)?$/.test(path)) {
       window.setTimeout(() => window.location.assign('/login'), 80);
     }
+
+    if (response.status === 403 || (response.status === 429 && isAiTurnPath(path))) {
+      void inspectEntitlementResponse(response.clone(), path);
+    }
     return response;
   }) as typeof window.fetch;
+}
+
+function installEntitlementRejectionObserver(): void {
+  window.addEventListener('unhandledrejection', (event) => {
+    const message = event.reason instanceof Error ? event.reason.message : String(event.reason || '');
+    if (!/feature unavailable|turn limit|monthly.*limit/i.test(message)) return;
+    event.preventDefault();
+    dispatchPlanNotice(message, location.pathname);
+  });
+}
+
+async function inspectEntitlementResponse(response: Response, path: string): Promise<void> {
+  const text = await response.text().catch(() => '');
+  if (response.status === 403 && !/feature unavailable|plan required|upgrade/i.test(text)) return;
+  dispatchPlanNotice(text, path);
+}
+
+function dispatchPlanNotice(message: string, path: string): void {
+  const feature = featureForPath(path);
+  const copy = planCopy(feature, message);
+  window.dispatchEvent(new CustomEvent<PlanNotice>('sovereign:plan-required', { detail: { feature, ...copy } }));
+}
+
+function featureForPath(path: string): PlanNotice['feature'] {
+  if (/\/people|\/invitations/.test(path)) return 'people';
+  if (/\/systems/.test(path)) return 'systems';
+  if (/\/library/.test(path)) return 'library';
+  if (/\/covenant/.test(path)) return 'covenant';
+  return 'ai';
+}
+
+function isAiTurnPath(path: string): boolean {
+  return /^\/api\/v1\/threads\/[^/]+\/messages$/.test(path);
+}
+
+function planCopy(feature: PlanNotice['feature'], message: string): Pick<PlanNotice, 'title' | 'description'> {
+  if (/turn limit|monthly.*limit/i.test(message)) {
+    return {
+      title: 'This month’s AI turns have been used.',
+      description: 'Your Baseline and saved account data remain available. Sovereign+ includes 300 AI turns each month.'
+    };
+  }
+  return ({
+    people: {
+      title: 'Relationship comparison is part of Sovereign+.',
+      description: 'Invite another person, keep both Baselines distinct, and use only the permissions each person approved.'
+    },
+    systems: {
+      title: 'Family and team systems are part of Sovereign+.',
+      description: 'Map roles, authority, responsibility, reliance, communication, pressure, and missing perspectives.'
+    },
+    library: {
+      title: 'Library continuity is part of Sovereign+.',
+      description: 'Deliberately save useful understandings and return to them without turning Sovereign.OS into a journal.'
+    },
+    covenant: {
+      title: 'The optional Covenant lens is part of Sovereign+.',
+      description: 'Add clearly separated Christian teaching and cited Scripture only when you explicitly choose it.'
+    },
+    ai: {
+      title: 'This capability needs Sovereign+.',
+      description: 'Review the plan that unlocks the requested context while keeping your existing Baseline and account intact.'
+    }
+  } as const)[feature];
 }
 
 function installTurnstileRenderer(): void {
@@ -118,6 +193,7 @@ function installTurnstileRenderer(): void {
 
 export function ProductCompletionLayer() {
   const [controlsOpen, setControlsOpen] = useState(false);
+  const [planNotice, setPlanNotice] = useState<PlanNotice | null>(null);
   const [people, setPeople] = useState<PersonRecord[]>([]);
   const [invitations, setInvitations] = useState<InvitationRecord[]>([]);
   const [status, setStatus] = useState('');
@@ -125,27 +201,39 @@ export function ProductCompletionLayer() {
 
   useEffect(() => {
     const open = () => {
+      setPlanNotice(null);
       setControlsOpen(true);
       void refreshControls();
     };
+    const requirePlan = (event: Event) => {
+      const detail = (event as CustomEvent<PlanNotice>).detail;
+      if (!detail?.title) return;
+      setControlsOpen(false);
+      setPlanNotice(detail);
+    };
     window.addEventListener('sovereign:open-consent-controls', open);
-    return () => window.removeEventListener('sovereign:open-consent-controls', open);
+    window.addEventListener('sovereign:plan-required', requirePlan);
+    return () => {
+      window.removeEventListener('sovereign:open-consent-controls', open);
+      window.removeEventListener('sovereign:plan-required', requirePlan);
+    };
   }, []);
 
   useEffect(() => {
-    if (!controlsOpen) return;
+    if (!controlsOpen && !planNotice) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
       setControlsOpen(false);
+      setPlanNotice(null);
     };
     window.addEventListener('keydown', closeOnEscape);
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', closeOnEscape);
     };
-  }, [controlsOpen]);
+  }, [controlsOpen, planNotice]);
 
   async function api(path: string, init: RequestInit = {}) {
     const response = await fetch(path, {
@@ -198,6 +286,25 @@ export function ProductCompletionLayer() {
 
   return (
     <>
+      {planNotice && (
+        <div className="completion-backdrop" role="presentation" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setPlanNotice(null);
+        }}>
+          <section className="completion-dialog plan-required-dialog" role="dialog" aria-modal="true" aria-labelledby="plan-required-title">
+            <header className="completion-dialog-header">
+              <div><p className="eyebrow">SOVEREIGN+</p><h2 id="plan-required-title">{planNotice.title}</h2></div>
+              <button className="quiet-button" onClick={() => setPlanNotice(null)} autoFocus>Close</button>
+            </header>
+            <p className="completion-intro">{planNotice.description}</p>
+            <p className="empty-copy">Free remains available for your Baseline, Today, and personal Explore questions. Upgrading never changes your existing Baseline.</p>
+            <div className="completion-actions">
+              <a className="primary-button" href="/pricing">Review Sovereign+ plans</a>
+              <button className="secondary-button" onClick={() => setPlanNotice(null)}>Continue with Free</button>
+            </div>
+          </section>
+        </div>
+      )}
+
       {controlsOpen && (
         <div className="completion-backdrop" role="presentation" onMouseDown={(event) => {
           if (event.target === event.currentTarget) setControlsOpen(false);
