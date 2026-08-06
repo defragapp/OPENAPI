@@ -167,12 +167,17 @@ if (declaredSha && declaredSha !== checkoutSha) {
   fail(`declared commit ${declaredSha} does not match checkout ${checkoutSha}`);
 }
 
+const requestedBrowserAttempts = Math.trunc(Number(process.env.BROWSER_RUN_REQUEST_MAX_ATTEMPTS || 4) || 4);
+const requestedBrowserInterval = Math.trunc(Number(process.env.BROWSER_RUN_REQUEST_INTERVAL_MS || 20_000) || 20_000);
+const requestedBrowserRetryFloor = Math.trunc(Number(process.env.BROWSER_RUN_RETRY_FLOOR_MS || 30_000) || 30_000);
 const releaseEnv = {
   ...process.env,
   WORKERS_CI_COMMIT_SHA: checkoutSha,
   GITHUB_SHA: checkoutSha,
   APP_VERSION: checkoutSha,
-  BROWSER_RUN_REQUEST_MAX_ATTEMPTS: process.env.BROWSER_RUN_REQUEST_MAX_ATTEMPTS || '2'
+  BROWSER_RUN_REQUEST_MAX_ATTEMPTS: String(Math.max(4, Math.min(5, requestedBrowserAttempts))),
+  BROWSER_RUN_REQUEST_INTERVAL_MS: String(Math.max(20_000, Math.min(60_000, requestedBrowserInterval))),
+  BROWSER_RUN_RETRY_FLOOR_MS: String(Math.max(30_000, Math.min(120_000, requestedBrowserRetryFloor)))
 };
 const authoritativeSteps = [
   ['deploy-v3', 'scripts/cloudflare-production-deploy-v3.mjs'],
