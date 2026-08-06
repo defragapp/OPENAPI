@@ -73,7 +73,7 @@ requireValue(preview?.assets?.not_found_handling === '404-page', 'Preview assets
 requireValue(!preview?.r2_buckets?.length, 'R2 must remain disabled for visual-review preview');
 requireValue(!preview?.queues?.producers?.length && !preview?.queues?.consumers?.length, 'Queue must remain disabled for visual-review preview');
 requireValue(!workerConfig.r2_buckets?.length, 'Package-level Worker config must not declare R2');
-requireValue(!workerConfig.queues?.producers?.length && !workerConfig.queues?.consumers?.length, 'Package-level Worker config must not declare Queue');
+requireValue(!workerConfig.queues?.producers?.length && !workerConfig.queues?.consumers?.length, 'Queue must remain disabled for visual-review preview');
 for (const [label, assets] of [['production', rootConfig.assets], ['local', workerConfig.assets], ['preview', preview?.assets]]) {
   for (const pathname of ['/', '/login', '/signup', '/onboarding', '/app', '/app/*', '/auth/*', '/invitation', '/consent.html', '/privacy', '/terms']) {
     requireValue(assets?.run_worker_first?.includes(pathname), `${label} assets must run the Worker first for ${pathname}`);
@@ -123,7 +123,13 @@ for (const required of [
   'process.env.RELEASE_REPORT_URL',
   'process.env.RELEASE_REPORT_KEY',
   'delivery=skipped reason=endpoint-unconfigured',
-  'transport: reportTransport'
+  'transport: reportTransport',
+  'BROWSER_RUN_REQUEST_MAX_ATTEMPTS',
+  'Math.max(4, Math.min(5, requestedBrowserAttempts))',
+  'BROWSER_RUN_REQUEST_INTERVAL_MS',
+  'Math.max(20_000, Math.min(60_000, requestedBrowserInterval))',
+  'BROWSER_RUN_RETRY_FLOOR_MS',
+  'Math.max(30_000, Math.min(120_000, requestedBrowserRetryFloor))'
 ]) {
   requireValue(productionRelease.includes(required), `Production release wrapper is missing ${required}`);
 }
