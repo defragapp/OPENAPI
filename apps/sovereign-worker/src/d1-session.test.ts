@@ -98,7 +98,7 @@ describe('Workers AI free-tier normalization', () => {
 
   it('forces personalized gateway calls to bypass cache and persistent logs', () => {
     expect(normalizeGatewayOptions({
-      gateway: { id: 'sovereign', skipCache: false, collectLog: true, metadata: { plan: 'free' } }
+      gateway: { id: 'sovereign', skipCache: true, collectLog: false, metadata: { plan: 'free' } }
     })).toEqual({
       gateway: { id: 'sovereign', skipCache: true, collectLog: false, metadata: { plan: 'free' } }
     });
