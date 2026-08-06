@@ -132,7 +132,7 @@ ${JSON.stringify(registry.map(({ id, display, uncertainty }) => ({ id, display, 
     {
       gateway: {
         id: env.AI_GATEWAY_ID,
-        skipCache: false,
+        skipCache: true,
         collectLog: false,
         metadata: {
           response_contract: BASELINE_FACET_CONTRACT_VERSION,
