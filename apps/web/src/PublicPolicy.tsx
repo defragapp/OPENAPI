@@ -116,9 +116,9 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
         <div>
           <p className="policy-kicker"><span />QUESTIONS OR REQUESTS</p>
           <h2>Talk to a person.</h2>
-          <p>Send privacy requests, account questions, billing concerns, public inquiries, or safety feedback to info@sovereign.os.</p>
+          <p>Send privacy requests, account questions, billing concerns, public inquiries, or safety feedback to support@defrag.app.</p>
         </div>
-        <a className="landing-control" href="mailto:info@sovereign.os">Email Sovereign.OS <span aria-hidden="true">→</span></a>
+        <a className="landing-control" href="mailto:support@defrag.app">Email Sovereign.OS <span aria-hidden="true">→</span></a>
       </section>
 
       <footer className="v0-footer">
@@ -128,7 +128,7 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
             <a aria-current={privacy ? 'page' : undefined} href="/privacy">Privacy</a>
             <a aria-current={!privacy ? 'page' : undefined} href="/terms">Terms</a>
             <a href="/pricing">Pricing</a>
-            <a href="mailto:info@sovereign.os">Contact</a>
+            <a href="mailto:support@defrag.app">Contact</a>
           </nav>
           <p>© 2026 Sovereign.OS</p>
         </div>

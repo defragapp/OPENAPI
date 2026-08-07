@@ -7,7 +7,7 @@ const releaseLabel = appVersion.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 18) || '
 const defaultRecipient = `delivered+sovereign-${releaseLabel}@resend.dev`;
 const recipient = String(process.env.EMAIL_SMOKE_TEST_RECIPIENT || defaultRecipient).trim().toLowerCase();
 const fromAddress = String(process.env.TRANSACTIONAL_FROM_EMAIL || 'info@defrag.app').trim().toLowerCase();
-const contactAddress = String(process.env.PUBLIC_CONTACT_EMAIL || 'info@sovereign.os').trim().toLowerCase();
+const contactAddress = String(process.env.PUBLIC_CONTACT_EMAIL || 'support@defrag.app').trim().toLowerCase();
 const deliveryTimeoutMs = Math.max(15_000, Number(process.env.EMAIL_SMOKE_TIMEOUT_MS || 120_000));
 
 if (!apiKey) throw new Error('RESEND_API_KEY is required for the live email smoke test.');

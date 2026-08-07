@@ -10,8 +10,8 @@ const publicAndEmailCopy = `${policy}\n${consent}\n${email}`;
 
 describe('owned-domain contact and transactional delivery', () => {
   it('publishes only the approved Sovereign.OS public contact address', () => {
-    expect(publicAndEmailCopy).toContain('info@sovereign.os');
-    expect(publicAndEmailCopy).not.toContain('support@defrag.app');
+    expect(publicAndEmailCopy).toContain('support@defrag.app');
+    expect(publicAndEmailCopy).not.toContain('info@sovereign.os');
     expect(publicAndEmailCopy).not.toMatch(/[A-Za-z0-9._%+-]+@gmail\.com/i);
   });
 
