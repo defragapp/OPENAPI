@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
 const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
-const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
+const space = readFileSync(new URL('./SovereignIntelligenceSpace.tsx', import.meta.url), 'utf8');
 const expressionRenderer = readFileSync(new URL('./expression-field/ExpressionField.tsx', import.meta.url), 'utf8');
 const relationshipField = readFileSync(new URL('./expression-field/RelationalExpressionField.tsx', import.meta.url), 'utf8');
 const systemField = readFileSync(new URL('./expression-field/SystemExpressionField.tsx', import.meta.url), 'utf8');
@@ -60,24 +60,24 @@ describe('founder v0 selective visual port', () => {
     expect(stories).not.toContain('globe');
   });
 
-  it('preserves the canonical single-room workspace and production data sources', () => {
-    expect(workspace).toContain("type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'");
-    expect(workspace).toContain("accept': 'application/vnd.sovereign.answer+json'");
-    expect(workspace).toContain("api('/api/v1/people')");
-    expect(workspace).toContain("api('/api/v1/systems')");
-    expect(workspace).toContain("api('/api/v1/today')");
-    expect(workspace).toContain('className="relationship-answer"');
-    expect(workspace).toContain('className="system-graph"');
-    expect(workspace).toContain('className="basis-strip"');
-    expect(workspace).toContain('<WorkspaceExpressionField');
-    expect(workspace).toContain('<ThreadExpressionField');
+  it('preserves the canonical single-room space and production data sources', () => {
+    expect(space).toContain("type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'");
+    expect(space).toContain("accept': 'application/vnd.sovereign.answer+json'");
+    expect(space).toContain("api('/api/v1/people')");
+    expect(space).toContain("api('/api/v1/systems')");
+    expect(space).toContain("api('/api/v1/today')");
+    expect(space).toContain('className="relationship-answer"');
+    expect(space).toContain('className="system-graph"');
+    expect(space).toContain('className="basis-strip"');
+    expect(space).toContain('<SpaceExpressionField');
+    expect(space).toContain('<ThreadExpressionField');
     expect(expressionRenderer).toContain('export function ExpressionFieldRenderer');
     expect(relationshipField).toContain('<ExpressionFieldRenderer');
     expect(systemField).toContain('<ExpressionFieldRenderer');
   });
 
   it('applies founder language to authenticated surfaces and the complete public landing', () => {
-    for (const selector of ['.intelligence-workspace', '.intelligence-sidebar', '.sovereign-composer', '.surface-heading', '.account-shell', '.auth-panel']) expect(v0Visual).toContain(selector);
+    for (const selector of ['.intelligence-space', '.intelligence-sidebar', '.sovereign-composer', '.surface-heading', '.account-shell', '.auth-panel']) expect(v0Visual).toContain(selector);
     for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip']) expect(fieldCss).toContain(selector);
     for (const selector of ['.landing-expression-slice__sphere-shell', '.landing-expression-slice__readout', '.landing-question-orbit__stage']) expect(heroExtension).toContain(selector);
     for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storyCss).toContain(selector);

@@ -5,7 +5,7 @@ const controls = readFileSync(new URL('./AccountControlCenter.tsx', import.meta.
 const dialogRuntime = readFileSync(new URL('./dialog-accessibility.ts', import.meta.url), 'utf8');
 const styles = readFileSync(new URL('./account-control.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
-const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
+const authenticatedSpace = readFileSync(new URL('./AuthenticatedSpace.tsx', import.meta.url), 'utf8');
 
 describe('mounted Account and Library controls', () => {
   it('exposes Library rename and delete through account-scoped endpoints', () => {
@@ -54,10 +54,10 @@ describe('mounted Account and Library controls', () => {
   });
 
   it('mounts and styles the control center only with the authenticated experience', () => {
-    expect(main).toContain("import { AuthenticatedWorkspace } from './AuthenticatedWorkspace'");
-    expect(main).toContain('<AuthenticatedWorkspace />');
-    expect(authenticatedWorkspace).toContain("import { AccountControlCenter } from './AccountControlCenter'");
-    expect(authenticatedWorkspace).toContain('<AccountControlCenter />');
+    expect(main).toContain("import { AuthenticatedSpace } from './AuthenticatedSpace'");
+    expect(main).toContain('<AuthenticatedSpace />');
+    expect(authenticatedSpace).toContain("import { AccountControlCenter } from './AccountControlCenter'");
+    expect(authenticatedSpace).toContain('<AccountControlCenter />');
     expect(main).toContain("import './account-control.css'");
     expect(main).toContain('installDialogAccessibility()');
     expect(styles).toContain('.account-control-dialog');

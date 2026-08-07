@@ -86,7 +86,7 @@ describe('Sovereign.OS public experience', () => {
   });
 
   it('applies the founder visual system and restored product authority', () => {
-    for (const selector of ['.v0-landing-port', '.v0-hero', '.intelligence-workspace', '.sovereign-composer', '.account-shell', '.auth-panel']) expect(v0Css).toContain(selector);
+    for (const selector of ['.v0-landing-port', '.v0-hero', '.intelligence-space', '.sovereign-composer', '.account-shell', '.auth-panel']) expect(v0Css).toContain(selector);
     for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storyCss).toContain(selector);
     expect(storyCss).toContain('@media (max-width: 760px)');
     expect(storyCss).toContain('@media (prefers-reduced-motion: reduce)');

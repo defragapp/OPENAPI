@@ -249,7 +249,7 @@ app.get('/api/v1/you', async (context) => {
       sharing: {
         mode: 'public-link-only',
         url: 'https://sovereign.defrag.app',
-        includesPrivateWorkspaceData: false
+        includesPrivateSpaceData: false
       }
     },
     billing: '/api/v1/billing/entitlements',

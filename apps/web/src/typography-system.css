@@ -72,7 +72,7 @@
   .baseline-context-line > strong,
   .living-question,
   .response-headline,
-  .workspace-title,
+  .space-title,
   .surface-title,
   .page-title,
   .section-title,
@@ -100,7 +100,7 @@
   .story-heading-copy > p,
   .policy-lede,
   .auth-intro,
-  .workspace-intro
+  .space-intro
 ) {
   font-family: var(--font-subheading) !important;
   font-kerning: normal;

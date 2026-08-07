@@ -2,18 +2,18 @@
 
 ## Verification status
 
-The `/workspace/SOVV` read-only checkout was inspected at commit `a3db94bccc75089723bef0cf5ff36c47064bd789`. The checkout remained read-only and no SOVV files were modified.
+The `/space/SOVV` read-only checkout was inspected at commit `a3db94bccc75089723bef0cf5ff36c47064bd789`. The checkout remained read-only and no SOVV files were modified.
 
 ## Verified source files
 
-- Auth/session: `/workspace/SOVV/apps/worker/src/auth.ts`
-- Session cookie compatibility: `/workspace/SOVV/apps/worker/src/routes/auth-cookie-compat.ts`
-- Baseline routes and reduced dataset status: `/workspace/SOVV/apps/worker/src/baseline.ts`
-- Baseline computation and NASA/JPL Horizons path: `/workspace/SOVV/apps/worker/src/baseline-compiler.ts`
-- Library retrieval: `/workspace/SOVV/apps/worker/src/history.ts`
-- Entitlements: `/workspace/SOVV/apps/worker/src/entitlements.ts`
-- Worker bindings: `/workspace/SOVV/apps/worker/wrangler.toml`
-- Public route specification: `/workspace/SOVV/lib/api-spec/openapi.yaml`
+- Auth/session: `/space/SOVV/apps/worker/src/auth.ts`
+- Session cookie compatibility: `/space/SOVV/apps/worker/src/routes/auth-cookie-compat.ts`
+- Baseline routes and reduced dataset status: `/space/SOVV/apps/worker/src/baseline.ts`
+- Baseline computation and NASA/JPL Horizons path: `/space/SOVV/apps/worker/src/baseline-compiler.ts`
+- Library retrieval: `/space/SOVV/apps/worker/src/history.ts`
+- Entitlements: `/space/SOVV/apps/worker/src/entitlements.ts`
+- Worker bindings: `/space/SOVV/apps/worker/wrangler.toml`
+- Public route specification: `/space/SOVV/lib/api-spec/openapi.yaml`
 
 ## Contracts
 
@@ -23,7 +23,7 @@ The `/workspace/SOVV` read-only checkout was inspected at commit `a3db94bccc7508
 | `getBaselineSummary` | `GET /api/baseline` in `baseline.ts` | No body | `{ baseline, datasetStatus }` | SOVV session auth or JWT fallback in SOVV | OPENAPI reduces this to status/source refs and does not expose raw DOB/TOB/POB. |
 | `getBaselineDimension` | `GET /api/baseline/dataset` in `baseline.ts` | No body | status, computedAt, failureReason, identityAnchors, traitCount | SOVV session auth | OPENAPI uses this as reduced dimension availability. Framework detail remains collapsed. |
 | `getCurrentConditions` | `getCurrentSkySnapshot()` in `baseline-compiler.ts` | Function call currently takes rounded lat/lng in SOVV internals | `LiveSkySnapshot` with current bodies from JPL Horizons | Not exposed as standalone HTTP route | No verified standalone route exists yet, so OPENAPI fails closed in production and uses labeled fixtures only in local/test. |
-| `searchLibrary` | `GET /api/library` handled by `history.ts` | query params `q`, `limit`, optional `workspace_source` | `{ items }` | `getAuthUser` via `__sov_session` cookie | OPENAPI stores only reduced item id/title/source metadata for retrieval. |
+| `searchLibrary` | `GET /api/library` handled by `history.ts` | query params `q`, `limit`, optional `space_source` | `{ items }` | `getAuthUser` via `__sov_session` cookie | OPENAPI stores only reduced item id/title/source metadata for retrieval. |
 | `resolveExistingEntitlements` | `resolveEntitlements()` in `entitlements.ts` | EntitlementUser object from DB | feature booleans and effective tier | Server-side only | Transitional reference; OPENAPI Stripe projection remains future canonical source. |
 
 ## Adapter runtime behavior

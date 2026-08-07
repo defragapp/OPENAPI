@@ -57,8 +57,8 @@ export interface ReducedCurrentCondition {
 
 const REFERENCE_COMMIT = 'a3db94bccc75089723bef0cf5ff36c47064bd789';
 const REFERENCE_FILES = [
-  '/workspace/SOVV/apps/worker/src/baseline-compiler.ts',
-  '/workspace/SOVV/apps/worker/src/routes/explain-stream.ts'
+  '/space/SOVV/apps/worker/src/baseline-compiler.ts',
+  '/space/SOVV/apps/worker/src/routes/explain-stream.ts'
 ];
 
 const PLANET_IDS: Record<string, string> = {

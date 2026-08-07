@@ -37,7 +37,7 @@ The current `main` candidate includes:
 - [x] mobile screenshot verification remains enforced at 390×844 and 430×932 for structure, sequence, typography, document height, and overflow;
 - [x] mobile comparison scores are labeled diagnostic-only until viewport-specific founder-approved references exist;
 - [x] Free, $20 monthly, and $99 annual public plan language remains aligned;
-- [x] Queue, R2, private export, mock runtime, duplicate workspace, and versioned preview URLs remain disabled.
+- [x] Queue, R2, private export, mock runtime, duplicate space, and versioned preview URLs remain disabled.
 
 ## Verified external integration state
 
@@ -81,7 +81,7 @@ These flows cannot be proven by unauthenticated release probes alone:
 - [ ] Confirm link/code replay protection, session rotation, logout invalidation, and CSRF enforcement.
 - [x] Verify Resend sender-domain SPF and DKIM alignment.
 - [ ] Verify DMARC publication and alignment.
-- [ ] Complete public → signup → onboarding → Baseline → authenticated workspace.
+- [ ] Complete public → signup → onboarding → Baseline → authenticated space.
 - [ ] Verify Today, Explore, People, Systems, Library, and You remain one intelligence environment.
 - [ ] Verify correction and Library save/delete flows.
 - [ ] Verify invitation → consent → relationship → system inclusion → revocation → blocked-after-revocation.

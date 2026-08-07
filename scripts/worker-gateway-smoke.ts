@@ -48,7 +48,7 @@ function fakeEnv(): Env {
       const gateway = (options as any)?.gateway;
       if (gateway?.id !== 'sovereign' || gateway?.skipCache !== true || gateway?.collectLog !== false || gateway?.metadata?.plan !== 'free' || gateway?.metadata?.response_contract !== 'sovereign-answer.v2' || !gateway?.metadata?.account_ref) throw new Error('invalid gateway metadata');
       if (JSON.stringify(options).includes('acct_')) throw new Error('raw account id leaked');
-      if (JSON.stringify(input).match(/birth date|birth time|latitude|exactPrivateLocation|workspace\/SOVV/i)) throw new Error('private model input leaked');
+      if (JSON.stringify(input).match(/birth date|birth time|latitude|exactPrivateLocation|space\/SOVV/i)) throw new Error('private model input leaked');
       return { result: { output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({
         version: 'sovereign-answer.v2',
         mode: 'baseline',

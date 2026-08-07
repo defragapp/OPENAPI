@@ -48,7 +48,7 @@ describe('public metadata and fallback documents', () => {
 
   it('keeps install metadata aligned with the v0 category', () => {
     expect(manifest).toContain('Personal AI that builds your Baseline');
-    expect(manifest).toContain('Open your private Sovereign workspace.');
+    expect(manifest).toContain('Open your private Sovereign space.');
     expect(manifest).toContain('"theme_color": "#0f0f0f"');
   });
 

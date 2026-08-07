@@ -21,4 +21,4 @@ export type ExpressionFieldContext = {
   selectedAxisId: ExpressionAxisId;
 };
 
-export type ExpressionFieldDepth = 'landing' | 'thread' | 'workspace';
+export type ExpressionFieldDepth = 'landing' | 'thread' | 'space';

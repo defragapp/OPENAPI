@@ -7,7 +7,7 @@ const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.ts
 const fieldStyles = readFileSync(new URL('./landing-expression-field-v3.css', import.meta.url), 'utf8');
 const heroStyles = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
 const storyStyles = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
-const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
+const space = readFileSync(new URL('./SovereignIntelligenceSpace.tsx', import.meta.url), 'utf8');
 
 describe('shared Sovereign intelligence stage', () => {
   it('uses the integrated field, real-life questions, restored chats, and authenticated answer hierarchy', () => {
@@ -20,10 +20,10 @@ describe('shared Sovereign intelligence stage', () => {
     expect(stories).toContain('Sovereign — Chat');
     expect(stories).toContain('Sovereign — Shared Chat');
     expect(stories).toContain('Sovereign — Family System');
-    expect(workspace).toContain('<SovereignAnswerView');
-    expect(workspace).toContain('<RelationshipAnswer');
-    expect(workspace).toContain('<SystemAnswer');
-    expect(workspace).toContain('<BasisStrip');
+    expect(space).toContain('<SovereignAnswerView');
+    expect(space).toContain('<RelationshipAnswer');
+    expect(space).toContain('<SystemAnswer');
+    expect(space).toContain('<BasisStrip');
   });
 
   it('keeps expression, evidence, and actual experience distinct', () => {
@@ -46,7 +46,7 @@ describe('shared Sovereign intelligence stage', () => {
     expect(field).toContain('onKeyDown={(event) => handleKeyDown(event, axis.id)}');
     expect(field).toContain('prefers-reduced-motion: reduce');
     expect(stories).toContain('aria-current');
-    expect(workspace).toContain('const limit = mobile ? 3 : 5');
+    expect(space).toContain('const limit = mobile ? 3 : 5');
     expect(fieldStyles).toContain('@media (max-width: 760px)');
     expect(fieldStyles).toContain('@media (prefers-reduced-motion: reduce)');
     expect(heroStyles).toContain('@media (max-width: 760px)');

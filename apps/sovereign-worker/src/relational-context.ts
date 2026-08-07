@@ -186,10 +186,17 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
   for (const member of members.results ?? []) {
     ordinal += 1;
     const personId = member.id ?? '';
-    await requireConsent(env, accountId, personId, 'system.include');
-    await requireConsent(env, accountId, personId, 'trait.display');
+    const includesConsent = await hasConsent(env, accountId, personId, 'system.include');
+    const traitConsent = await hasConsent(env, accountId, personId, 'trait.display');
     const frameworkAllowed = await hasConsent(env, accountId, personId, 'framework.display');
-    if (!member.bound_account_id) throw new Response('Every invited member must have a bound identity and Baseline.', { status: 409 });
+
+    if (!includesConsent || !traitConsent) {
+      continue; // Fail closed: gracefully omit unconsented member from prompt context
+    }
+
+    if (!member.bound_account_id) {
+      continue; // Skip unbound identities gracefully
+    }
     const baseline = await loadStructuredBaseline(env, member.bound_account_id);
     const key = `member_${ordinal}`;
     const roleContext = {

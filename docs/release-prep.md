@@ -90,7 +90,7 @@ Covenant is opt-in per turn. The local fixture provider supports the configured 
 
 ## Sharing and deletion
 
-Private account export is disabled for launch. Public sharing includes only the Sovereign.OS public link and no private workspace data. Deletion enters a grace state and executes only through tested jobs with auditable completion records.
+Private account export is disabled for launch. Public sharing includes only the Sovereign.OS public link and no private space data. Deletion enters a grace state and executes only through tested jobs with auditable completion records.
 
 ## Incident response notes
 

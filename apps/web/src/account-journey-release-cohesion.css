@@ -177,13 +177,13 @@ body:has(.sovereign-app-runtime) {
   min-height: 46px;
 }
 
-/* Preserve the one-room workspace while tightening mobile and iOS behavior. */
+/* Preserve the one-room space while tightening mobile and iOS behavior. */
 .sovereign-app-runtime,
-.intelligence-workspace {
+.intelligence-space {
   min-height: var(--sovereign-viewport-height, 100svh);
 }
 
-.intelligence-workspace {
+.intelligence-space {
   isolation: isolate;
 }
 
@@ -303,7 +303,7 @@ body:has(.sovereign-app-runtime) {
 
 @supports (-webkit-touch-callout: none) {
   .account-control-backdrop,
-  .workspace-sheet,
+  .space-sheet,
   .intelligence-context {
     min-height: -webkit-fill-available;
   }

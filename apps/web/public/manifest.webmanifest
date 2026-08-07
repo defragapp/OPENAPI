@@ -21,7 +21,7 @@
     {
       "name": "Open Sovereign",
       "short_name": "Open",
-      "description": "Open your private Sovereign workspace.",
+      "description": "Open your private Sovereign space.",
       "url": "/app",
       "icons": [{ "src": "/app-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
     }

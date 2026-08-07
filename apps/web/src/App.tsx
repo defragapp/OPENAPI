@@ -52,7 +52,7 @@ function PublicNotFound() {
       <section>
         <span>PAGE NOT FOUND</span>
         <h1>This page is not part of Sovereign.OS.</h1>
-        <p>Return to the public product or sign in to open your private workspace.</p>
+        <p>Return to the public product or sign in to open your private space.</p>
         <div>
           <a href="https://sovereign.defrag.app">Open Sovereign.OS</a>
           <a href="/login">Sign in</a>
@@ -437,7 +437,7 @@ function InvitationPage() {
                 );
               })}
             </div>
-            <p className="consent-completion-note">Every requested use needs its own decision before the shared workspace opens.</p>
+            <p className="consent-completion-note">Every requested use needs its own decision before the shared space opens.</p>
             <button className="primary-button" disabled={!completed || Boolean(savingScope)} onClick={() => location.assign('/app')}>Open Sovereign.OS</button>
           </section>
         )}

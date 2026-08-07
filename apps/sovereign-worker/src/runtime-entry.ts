@@ -177,7 +177,7 @@ async function shareFirstAccountResponse(request: Request, env: Env, executionCo
       sharing: {
         mode: 'public-link-only',
         url: `https://${PUBLIC_HOST}`,
-        includesPrivateWorkspaceData: false
+        includesPrivateSpaceData: false
       }
     }
   }, { status: response.status, headers }));

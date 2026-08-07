@@ -128,7 +128,7 @@ body:has(.public-secondary-page) {
   font-size: 0.98rem !important;
 }
 
-/* Authenticated single-room workspace. */
+/* Authenticated single-room space. */
 .sovereign-app-runtime {
   min-height: 100svh;
   isolation: isolate;
@@ -140,7 +140,7 @@ body:has(.public-secondary-page) {
   background-size: auto, 96px 96px, 96px 96px, auto;
 }
 
-.sovereign-app-runtime .intelligence-workspace {
+.sovereign-app-runtime .intelligence-space {
   min-height: 100svh;
   background: transparent;
   color: var(--cohesion-ink);
@@ -242,7 +242,7 @@ body:has(.public-secondary-page) {
   grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
-.sovereign-app-runtime .intelligence-workspace.context-open .intelligence-main {
+.sovereign-app-runtime .intelligence-space.context-open .intelligence-main {
   margin-right: 420px;
 }
 
@@ -558,7 +558,7 @@ body:has(.public-secondary-page) {
   backdrop-filter: blur(24px);
 }
 
-.sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
+.sovereign-app-runtime .intelligence-space.context-open .sovereign-composer {
   right: 448px;
 }
 
@@ -612,7 +612,7 @@ body:has(.public-secondary-page) {
   display: none;
 }
 
-/* Tablet and iPhone workspace. */
+/* Tablet and iPhone space. */
 @media (max-width: 1080px) {
   :where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) {
     --cohesion-shell: min(100% - 48px, 980px);
@@ -623,11 +623,11 @@ body:has(.public-secondary-page) {
     gap: 52px !important;
   }
 
-  .sovereign-app-runtime .intelligence-workspace.context-open .intelligence-main {
+  .sovereign-app-runtime .intelligence-space.context-open .intelligence-main {
     margin-right: 0;
   }
 
-  .sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
+  .sovereign-app-runtime .intelligence-space.context-open .sovereign-composer {
     right: 28px;
   }
 
@@ -719,7 +719,7 @@ body:has(.public-secondary-page) {
   }
 
   .sovereign-app-runtime .sovereign-composer,
-  .sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
+  .sovereign-app-runtime .intelligence-space.context-open .sovereign-composer {
     right: max(10px, env(safe-area-inset-right));
     bottom: calc(76px + env(safe-area-inset-bottom));
     left: max(10px, env(safe-area-inset-left));

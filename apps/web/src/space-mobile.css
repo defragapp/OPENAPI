@@ -1,4 +1,4 @@
-.intelligence-workspace {
+.intelligence-space {
   min-height: 100svh;
   min-height: 100dvh;
   overflow-x: clip;
@@ -53,7 +53,7 @@
     padding-right: max(5px, env(safe-area-inset-right));
   }
 
-  .workspace-sheet > section,
+  .space-sheet > section,
   .source-drawer > section,
   .intelligence-context {
     padding-left: max(20px, env(safe-area-inset-left));

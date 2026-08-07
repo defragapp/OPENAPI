@@ -147,7 +147,7 @@
   letter-spacing: .14em;
 }
 
-.intelligence-workspace :is(.guided-start-grid button, .control-links a):focus-visible {
+.intelligence-space :is(.guided-start-grid button, .control-links a):focus-visible {
   outline: 2px solid var(--vi-clay);
   outline-offset: 3px;
 }

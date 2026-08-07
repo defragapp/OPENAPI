@@ -153,7 +153,7 @@ function installFetchObserver(): void {
         storeD1Bookmark(nextBookmark);
       }
 
-      if (response.status === 401 && isWorkspaceLocation()) {
+      if (response.status === 401 && isSpaceLocation()) {
         setTimeout(() => location.assign(`/login?returnTo=${encodeURIComponent(location.pathname + location.search)}`), 50);
       }
 
@@ -290,11 +290,11 @@ export async function sharePublicPlatform(): Promise<void> {
   try {
     if (navigator.share) {
       await navigator.share(data);
-      showNotice('Sovereign.OS shared. No private workspace data was included.');
+      showNotice('Sovereign.OS shared. No private space data was included.');
       return;
     }
     await navigator.clipboard.writeText(PUBLIC_SHARE_URL);
-    showNotice('Public Sovereign.OS link copied. No private workspace data was included.');
+    showNotice('Public Sovereign.OS link copied. No private space data was included.');
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') return;
     showNotice('Sharing is unavailable in this browser.', PUBLIC_SHARE_URL, 'Open public site');
@@ -342,7 +342,7 @@ function resolveRequestUrl(input: RequestInfo | URL): URL {
   return new URL(input, location.href);
 }
 
-function isWorkspaceLocation(): boolean {
+function isSpaceLocation(): boolean {
   return location.pathname === '/app'
     || location.pathname.startsWith('/app/')
     || !['/', '/login', '/signup', '/auth/redeem', '/invitation', '/privacy', '/terms'].includes(location.pathname);

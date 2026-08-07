@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
-const workspaceGate = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
+const spaceGate = readFileSync(new URL('./AuthenticatedSpace.tsx', import.meta.url), 'utf8');
 const styles = readFileSync(new URL('./account-journey.css', import.meta.url), 'utf8');
 const structuredStyles = readFileSync(new URL('./account-journey-structured.css', import.meta.url), 'utf8');
 const cohesionStyles = readFileSync(new URL('./account-journey-release-cohesion.css', import.meta.url), 'utf8');
@@ -74,22 +74,22 @@ describe('Baseline-first account journey release', () => {
   });
 
   it('waits through a delayed Stripe webhook without opening paid access or starting checkout again', () => {
-    expect(workspaceGate).toContain("billingReturn === 'success'");
-    expect(workspaceGate).toContain('STRIPE_CONFIRMATION_ATTEMPTS = 12');
-    expect(workspaceGate).toContain('await waitForStripeConfirmation(controller.signal)');
-    expect(workspaceGate).toContain("setState('payment_pending')");
-    expect(workspaceGate).toContain('the signed subscription event has not reached your account yet');
-    expect(workspaceGate).toContain('checking again will not create another charge');
-    expect(workspaceGate).not.toContain("fetch('/api/v1/billing/checkout'");
+    expect(spaceGate).toContain("billingReturn === 'success'");
+    expect(spaceGate).toContain('STRIPE_CONFIRMATION_ATTEMPTS = 12');
+    expect(spaceGate).toContain('await waitForStripeConfirmation(controller.signal)');
+    expect(spaceGate).toContain("setState('payment_pending')");
+    expect(spaceGate).toContain('the signed subscription event has not reached your account yet');
+    expect(spaceGate).toContain('checking again will not create another charge');
+    expect(spaceGate).not.toContain("fetch('/api/v1/billing/checkout'");
   });
 
-  it('requires both Baseline and onboarding completion before the private workspace renders', () => {
-    expect(workspaceGate).toContain("fetch('/api/v1/account/onboarding'");
-    expect(workspaceGate).toContain("fetch('/api/v1/baseline/status'");
-    expect(workspaceGate).toContain("baselineBody.baseline?.status === 'completed'");
-    expect(workspaceGate).toContain("baselineBody.baseline?.status === 'partial'");
-    expect(workspaceGate).toContain("location.replace(billingReturn ? `/onboarding?billing=${encodeURIComponent(billingReturn)}` : '/onboarding')");
-    expect(workspaceGate).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
+  it('requires both Baseline and onboarding completion before the private space renders', () => {
+    expect(spaceGate).toContain("fetch('/api/v1/account/onboarding'");
+    expect(spaceGate).toContain("fetch('/api/v1/baseline/status'");
+    expect(spaceGate).toContain("baselineBody.baseline?.status === 'completed'");
+    expect(spaceGate).toContain("baselineBody.baseline?.status === 'partial'");
+    expect(spaceGate).toContain("location.replace(billingReturn ? `/onboarding?billing=${encodeURIComponent(billingReturn)}` : '/onboarding')");
+    expect(spaceGate).toContain('<SovereignIntelligenceSpace onboardingVerified />');
   });
 
   it('preserves secure account routing and avoids account enumeration', () => {
@@ -99,7 +99,7 @@ describe('Baseline-first account journey release', () => {
     expect(auth).toContain("parsed.pathname === '/onboarding'");
   });
 
-  it('inherits the frozen landing language across desktop, iOS, account, and workspace surfaces', () => {
+  it('inherits the frozen landing language across desktop, iOS, account, and space surfaces', () => {
     expect(styles).toContain('letter-spacing: 0.22em');
     expect(styles).toContain('env(safe-area-inset-top)');
     expect(styles).toContain('env(safe-area-inset-bottom)');

@@ -10,7 +10,7 @@ const styles = read('./landing-expression-field-v3.css');
 const integration = read('./landing-expression-field-integration.css');
 const heroExtension = read('./landing-hero-field-v4.css');
 const cohesionRefinement = read('./sitewide-cohesion-refinement-v2.css');
-const mobileRelease = read('./workspace-mobile-release-v3.css');
+const mobileRelease = read('./space-mobile-release-v3.css');
 const productionReadiness = read('./production-readiness-visual-v1.css');
 const finalAuthority = read('./public-landing-final-authority.css');
 const interactionRuntime = read('./release-interaction-runtime.ts');
@@ -30,10 +30,10 @@ describe('premium rotating public Expression Field v3', () => {
     expect(main.indexOf(hero)).toBeGreaterThan(main.indexOf(approved));
     expect(main.indexOf(passkey)).toBeGreaterThan(main.indexOf(hero));
     expect(main).toContain("import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline';");
-    expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline';");
+    expect(main).toContain("import spaceMobileReleaseCss from './space-mobile-release-v3.css?inline';");
     expect(main).toContain("import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline';");
     expect(main).toContain("import publicLandingFinalAuthorityCss from './public-landing-final-authority.css?inline';");
-    expect(main).toContain('`${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}\\n${publicLandingFinalAuthorityCss}`');
+    expect(main).toContain('`${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${spaceMobileReleaseCss}\\n${productionReadinessVisualCss}\\n${publicLandingFinalAuthorityCss}`');
     expect(main).not.toContain('heroCompositionReleaseCss');
     expect(main).toContain("dataset.sovereignHeroComposition = 'v3-bounded'");
     expect(main).toContain('installProductionReadinessRuntime();');
@@ -179,7 +179,7 @@ describe('premium rotating public Expression Field v3', () => {
     expect(finalAuthority).not.toContain('height: clamp(500px, 62svh, 580px)');
   });
 
-  it('moves rotating questions below the hero and keeps public, account, and workspace branding cohesive', () => {
+  it('moves rotating questions below the hero and keeps public, account, and space branding cohesive', () => {
     for (const marker of [
       '--sovereign-wordmark-family',
       '.v0-wordmark',

@@ -538,10 +538,10 @@ body {
   box-shadow: 0 34px 90px rgba(0, 0, 0, .3);
 }
 
-/* Canonical one-room workspace */
+/* Canonical one-room space */
 
 .sovereign-app-runtime,
-.intelligence-workspace {
+.intelligence-space {
   background:
     radial-gradient(circle at 68% -14%, rgba(207, 147, 109, .055), transparent 34rem),
     var(--sov-page);
@@ -609,7 +609,7 @@ body {
   margin-left: 236px;
 }
 
-.intelligence-workspace.context-open .intelligence-main {
+.intelligence-space.context-open .intelligence-main {
   margin-right: 370px;
 }
 
@@ -646,7 +646,7 @@ body {
 .baseline-builder h1,
 .explore-editorial h2,
 .empty-state h2,
-.workspace-arrival h1 {
+.space-arrival h1 {
   font-family: var(--serif);
   font-weight: 500;
   letter-spacing: -.045em;
@@ -886,7 +886,7 @@ body {
 .baseline-builder,
 .baseline-reveal,
 .empty-state,
-.workspace-arrival {
+.space-arrival {
   border: 1px solid var(--premium-rule);
   border-radius: var(--premium-radius-large);
   background:
@@ -1218,7 +1218,7 @@ body {
 
 /* Drawers, account controls, system membership */
 
-.workspace-sheet > section,
+.space-sheet > section,
 .source-drawer > section,
 .account-control-dialog,
 .system-membership-dialog {
@@ -1241,7 +1241,7 @@ body {
 
 .account-control-dialog > header,
 .system-membership-dialog > header,
-.workspace-sheet > section > header,
+.space-sheet > section > header,
 .source-drawer > section > header {
   border-bottom: 1px solid var(--premium-rule);
 }
@@ -1330,7 +1330,7 @@ body {
     margin-left: 216px;
   }
 
-  .intelligence-workspace.context-open .intelligence-main {
+  .intelligence-space.context-open .intelligence-main {
     margin-right: 0;
   }
 

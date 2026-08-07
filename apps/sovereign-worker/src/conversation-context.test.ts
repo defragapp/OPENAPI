@@ -13,7 +13,7 @@ describe('conversation context input', () => {
   it('rejects ambiguous identifiers, unsafe identifiers, and invented surfaces', () => {
     expect(() => parseConversationContext({ personId: '../other' })).toThrow();
     expect(() => parseConversationContext({ personId: 'p1', systemId: 's1' })).toThrow();
-    expect(() => parseConversationContext({ surface: 'Workspace' })).toThrow();
+    expect(() => parseConversationContext({ surface: 'Space' })).toThrow();
     expect(() => parseConversationContext({ surface: 'Covenant' })).toThrow();
   });
 

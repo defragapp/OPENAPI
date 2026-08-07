@@ -6,10 +6,10 @@ const read = (relativePath: string) => readFileSync(new URL(relativePath, import
 const main = read('./main.tsx');
 const reactAuthority = read('./deployed-route-cohesion.css');
 const platformAuthority = read('./platform-visual-cohesion-v1.css');
-const mobileRelease = read('./workspace-mobile-release-v3.css');
+const mobileRelease = read('./space-mobile-release-v3.css');
 const productionReadiness = read('./production-readiness-visual-v1.css');
 const finalLandingAuthority = read('./public-landing-final-authority.css');
-const mobileUtilities = read('./WorkspaceMobileUtilities.tsx');
+const mobileUtilities = read('./SpaceMobileUtilities.tsx');
 const staticAuthority = read('../public/deployed-route-cohesion.css');
 const howItWorks = read('../public/how-it-works.html');
 const pricing = read('../public/pricing.html');
@@ -17,8 +17,8 @@ const faq = read('../public/faq.html');
 const policy = read('./PublicPolicy.tsx');
 const app = read('./App.tsx');
 const onboarding = read('./PlanOnboarding.tsx');
-const authenticatedWorkspace = read('./AuthenticatedWorkspace.tsx');
-const workspace = read('./SovereignIntelligenceWorkspace.tsx');
+const authenticatedSpace = read('./AuthenticatedSpace.tsx');
+const space = read('./SovereignIntelligenceSpace.tsx');
 const routeVerifier = read('../../../scripts/verify-live-route-cohesion.mjs');
 const secondaryVerifier = read('../../../scripts/verify-live-secondary-public.mjs');
 const productionRelease = read('../../../scripts/cloudflare-production-release.mjs');
@@ -39,12 +39,12 @@ describe('deployed route cohesion', () => {
     expect(main.slice(cohesion + 1)).not.toContain("import './");
     expect(main).toContain("import platformVisualCohesionCss from './platform-visual-cohesion-v1.css?inline'");
     expect(main).toContain("import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline'");
-    expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline'");
+    expect(main).toContain("import spaceMobileReleaseCss from './space-mobile-release-v3.css?inline'");
     expect(main).toContain("import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline'");
     expect(main).toContain("import publicLandingFinalAuthorityCss from './public-landing-final-authority.css?inline'");
     expect(main).toContain('function installPlatformVisualCohesion(): void');
     expect(main).toContain("style.dataset.sovereignPlatformCohesion = 'v1'");
-    expect(main).toContain('style.textContent = `${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}\\n${publicLandingFinalAuthorityCss}`');
+    expect(main).toContain('style.textContent = `${platformVisualCohesionCss}\\n${sitewideCohesionRefinementCss}\\n${spaceMobileReleaseCss}\\n${productionReadinessVisualCss}\\n${publicLandingFinalAuthorityCss}`');
     expect(main).toContain('document.head.append(style)');
     expect(main).not.toContain('platformVisualCohesionUrl');
     expect(main).not.toContain("link.rel = 'stylesheet'");
@@ -97,7 +97,7 @@ describe('deployed route cohesion', () => {
     }
   });
 
-  it('styles the actual mounted single-room workspace at desktop and iPhone widths', () => {
+  it('styles the actual mounted single-room space at desktop and iPhone widths', () => {
     for (const mountedClass of [
       'intelligence-sidebar',
       'intelligence-main',
@@ -113,7 +113,7 @@ describe('deployed route cohesion', () => {
       'intelligence-context',
       'mobile-bottom-nav'
     ]) {
-      expect(workspace).toContain(mountedClass);
+      expect(space).toContain(mountedClass);
       expect(platformAuthority).toContain(`.${mountedClass}`);
     }
     expect(platformAuthority).toContain('sovereign-platform-cohesion-v1');
@@ -126,21 +126,21 @@ describe('deployed route cohesion', () => {
   });
 
   it('collapses mobile utility overlays into one closed context sheet and compact composer', () => {
-    expect(authenticatedWorkspace).toContain('className="workspace-desktop-plan-status"');
-    expect(authenticatedWorkspace).toContain('<WorkspaceMobileUtilities />');
+    expect(authenticatedSpace).toContain('className="space-desktop-plan-status"');
+    expect(authenticatedSpace).toContain('<SpaceMobileUtilities />');
     expect(mobileUtilities).toContain('createPortal');
     expect(mobileUtilities).toContain('<VerifiedPlanStatus expanded />');
     expect(mobileUtilities).toContain('Expression Field');
     expect(mobileUtilities).toContain('System members');
     expect(mobileUtilities).toContain('Account & Library');
-    expect(mobileRelease).toContain('.workspace-desktop-plan-status');
+    expect(mobileRelease).toContain('.space-desktop-plan-status');
     expect(mobileRelease).toContain('.expression-field-launcher');
     expect(mobileRelease).toContain('.system-membership-trigger');
     expect(mobileRelease).toContain('display: none !important');
     expect(mobileRelease).toContain('.composer-context-line');
     expect(mobileRelease).toContain('grid-template-columns: minmax(0, 1fr) 48px');
     expect(mobileRelease).toContain('visibility: hidden !important');
-    expect(mobileRelease).toContain('.intelligence-workspace.context-open .intelligence-context');
+    expect(mobileRelease).toContain('.intelligence-space.context-open .intelligence-context');
     expect(mobileRelease).toContain('.explore-mode-list');
     expect(mobileRelease).toContain('overflow-x: auto !important');
     expect(mobileRelease).toContain('calc(196px + env(safe-area-inset-bottom))');
@@ -168,8 +168,8 @@ describe('deployed route cohesion', () => {
     expect(app).toContain('className="account-shell invitation-shell"');
     expect(app).toContain('className="public-not-found"');
     expect(onboarding).toContain('className="plan-onboarding"');
-    expect(authenticatedWorkspace).toContain('className="private-route-gate"');
-    expect(authenticatedWorkspace).toContain('className="sovereign-app-runtime"');
+    expect(authenticatedSpace).toContain('className="private-route-gate"');
+    expect(authenticatedSpace).toContain('className="sovereign-app-runtime"');
   });
 
   it('audits every deployed page family at rendered desktop and phone widths', () => {
@@ -183,7 +183,7 @@ describe('deployed route cohesion', () => {
       'signup',
       'invitation',
       'onboarding-gate',
-      'workspace-gate',
+      'space-gate',
       'not-found'
     ]) {
       expect(routeVerifier).toContain(`name: '${route}'`);

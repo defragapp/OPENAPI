@@ -27,7 +27,7 @@ export interface CurrentConditions {
 }
 
 export interface LibrarySearchResult {
-  items: Array<{ id: string; title: string; workspaceSource: string; createdAt?: string | undefined }>;
+  items: Array<{ id: string; title: string; spaceSource: string; createdAt?: string | undefined }>;
 }
 
 export interface ExistingIdentity {
@@ -145,10 +145,10 @@ export async function getCurrentConditions(env: Env, personId: string): Promise<
 
 export async function searchLibrary(env: Env, query: string, options: AdapterOptions = {}): Promise<AdapterEnvelope<LibrarySearchResult>> {
   const params = new URLSearchParams({ q: query, limit: '10' });
-  const response = await callSovv<{ items?: Array<{ id?: string; title?: string; workspace_source?: string; created_at?: string }> }>(env, `/api/library?${params}`, { method: 'GET' }, { items: [] }, { cookieHeader: options.cookieHeader });
+  const response = await callSovv<{ items?: Array<{ id?: string; title?: string; space_source?: string; created_at?: string }> }>(env, `/api/library?${params}`, { method: 'GET' }, { items: [] }, { cookieHeader: options.cookieHeader });
   return {
     ...response,
-    data: { items: (response.data.items ?? []).map((item) => (() => { const mapped: { id: string; title: string; workspaceSource: string; createdAt?: string | undefined } = { id: item.id ?? '', title: item.title ?? 'Untitled', workspaceSource: item.workspace_source ?? 'UNKNOWN' }; if (item.created_at) mapped.createdAt = item.created_at; return mapped; })()) }
+    data: { items: (response.data.items ?? []).map((item) => (() => { const mapped: { id: string; title: string; spaceSource: string; createdAt?: string | undefined } = { id: item.id ?? '', title: item.title ?? 'Untitled', spaceSource: item.space_source ?? 'UNKNOWN' }; if (item.created_at) mapped.createdAt = item.created_at; return mapped; })()) }
   };
 }
 

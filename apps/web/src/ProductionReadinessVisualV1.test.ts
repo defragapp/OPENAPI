@@ -7,7 +7,7 @@ const landing = read('./PublicLanding.tsx');
 const css = read('./production-readiness-visual-v1.css');
 const runtime = read('./production-readiness-runtime.ts');
 const field = read('./expression-field/LandingExpressionSlice.tsx');
-const mobileUtilities = read('./WorkspaceMobileUtilities.tsx');
+const mobileUtilities = read('./SpaceMobileUtilities.tsx');
 const routeVerifier = read('../../../scripts/verify-live-route-cohesion.mjs');
 const visualVerifier = read('../../../scripts/verify-live-visual-release-v3.mjs');
 const release = read('../../../scripts/cloudflare-production-release.mjs');
@@ -18,7 +18,7 @@ describe('desktop and iOS production readiness v1', () => {
   it('installs the final authority after every prior platform layer', () => {
     expect(main).toContain("import { installProductionReadinessRuntime } from './production-readiness-runtime'");
     expect(main).toContain("import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline'");
-    expect(main).toContain('${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}');
+    expect(main).toContain('${spaceMobileReleaseCss}\\n${productionReadinessVisualCss}');
     expect(main.indexOf('installProductionReadinessRuntime();')).toBeLessThan(main.indexOf('installReleaseInteractionRuntime();'));
     expect(main).toContain("dataset.sovereignProductionReadiness = 'desktop-ios-v1'");
   });
@@ -90,7 +90,7 @@ describe('desktop and iOS production readiness v1', () => {
     expect(css).not.toContain('220vw');
   });
 
-  it('organizes policy, account, onboarding, and workspace pages with one mobile hierarchy', () => {
+  it('organizes policy, account, onboarding, and space pages with one mobile hierarchy', () => {
     for (const marker of [
       '.public-secondary-page .policy-hero h1',
       'font-size: clamp(2.55rem, 9.8vw, 3.85rem)',
@@ -103,9 +103,9 @@ describe('desktop and iOS production readiness v1', () => {
       'grid-template-columns: minmax(0, 1fr) 44px',
       'min-height: calc(64px + env(safe-area-inset-bottom))'
     ]) expect(css).toContain(marker);
-    expect(mobileUtilities).toContain('<details className="workspace-mobile-utilities">');
-    expect(mobileUtilities).toContain('Workspace tools');
-    expect(mobileUtilities).toContain('workspace-mobile-utilities-content');
+    expect(mobileUtilities).toContain('<details className="space-mobile-utilities">');
+    expect(mobileUtilities).toContain('Space tools');
+    expect(mobileUtilities).toContain('space-mobile-utilities-content');
   });
 
   it('keeps every public and account page inside rendered desktop and phone verification', () => {
@@ -119,7 +119,7 @@ describe('desktop and iOS production readiness v1', () => {
       'signup',
       'invitation',
       'onboarding-gate',
-      'workspace-gate',
+      'space-gate',
       'not-found'
     ]) expect(routeVerifier).toContain(`name: '${route}'`);
     expect(routeVerifier).toContain('width: 1440, height: 900');

@@ -26,8 +26,8 @@ const landingField = read('apps/web/src/expression-field/LandingExpressionSlice.
 const landingFieldCss = read('apps/web/src/landing-expression-field-v3.css');
 const landingFieldIntegration = read('apps/web/src/landing-expression-field-integration.css');
 const heroVisual = read('apps/web/src/landing-hero-field-v4.css');
-const authenticatedWorkspace = read('apps/web/src/AuthenticatedWorkspace.tsx');
-const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
+const authenticatedSpace = read('apps/web/src/AuthenticatedSpace.tsx');
+const space = read('apps/web/src/SovereignIntelligenceSpace.tsx');
 const expressionField = read('apps/web/src/expression-field/ExpressionField.tsx');
 const expressionFieldCss = read('apps/web/src/expression-field/expression-field.css');
 const expressionFieldMath = read('apps/web/src/expression-field/expression-field-math.ts');
@@ -216,14 +216,14 @@ requireAll('real-life question visual authority', heroVisual, [
   '@media (prefers-reduced-motion: reduce)'
 ]);
 
-requireAll('authenticated workspace', `${authenticatedWorkspace}\n${workspace}`, [
-  'data-workspace-contract="one-room"',
-  '<SovereignIntelligenceWorkspace onboardingVerified />',
+requireAll('authenticated space', `${authenticatedSpace}\n${space}`, [
+  'data-space-contract="one-room"',
+  '<SovereignIntelligenceSpace onboardingVerified />',
   "type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'",
   "version: 'sovereign-answer.v2'",
   'className="system-graph"',
   'className="basis-strip"',
-  '<WorkspaceExpressionField',
+  '<SpaceExpressionField',
   '<ThreadExpressionField'
 ]);
 
@@ -288,7 +288,7 @@ requireAll('founder visual foundation', `${v0Visual}\n${v0Global}\n${v0Motion}`,
   '.v0-hero',
   '.v0-comparison-grid',
   '.v0-final',
-  '.intelligence-workspace',
+  '.intelligence-space',
   '.sovereign-composer',
   '.account-shell'
 ]);
@@ -331,6 +331,6 @@ console.log(JSON.stringify({
   productStories: ['personal-chat-workflow', 'relationship-chat-workflow', 'system-chat-workflow'],
   legacyStoryDomRendered: false,
   mobileNaturalHeightRequired: true,
-  canonicalWorkspace: 'SovereignIntelligenceWorkspace',
+  canonicalSpace: 'SovereignIntelligenceSpace',
   answerContract: 'sovereign-answer.v2'
 }, null, 2));

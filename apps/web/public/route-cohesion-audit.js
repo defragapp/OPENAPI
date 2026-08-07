@@ -68,7 +68,14 @@
       const nav = navSelector ? document.querySelector(navSelector) : null;
       const content = contentSelector ? document.querySelector(contentSelector) : null;
       const bodyCopySelector = 'p:not(.eyebrow):not(.launch-kicker):not(.policy-kicker):not(.not-found-code):not([class*="kicker"]), li, dd';
-      const firstParagraph = content?.querySelector(bodyCopySelector) || document.querySelector(bodyCopySelector);
+      let firstParagraph = content?.querySelector(bodyCopySelector) || document.querySelector(bodyCopySelector);
+      if (!firstParagraph) {
+        if (Date.now() < deadline) {
+          setTimeout(inspect, pollInterval);
+          return;
+        }
+        firstParagraph = document.querySelector("p, li, dd");
+      }
       const styleOf = (element) => element ? getComputedStyle(element) : null;
       const rectOf = (element) => {
         if (!element) return null;

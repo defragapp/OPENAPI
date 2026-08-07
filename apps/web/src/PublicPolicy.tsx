@@ -15,7 +15,7 @@ const privacySections = [
   },
   {
     title: 'People, relationships, and permission',
-    copy: 'Adding a person to your workspace does not give you access to their Baseline. Shared comparisons require an invitation connected to that person’s account and a separate decision for each requested use. They can deny or revoke permission at any time.'
+    copy: 'Adding a person to your space does not give you access to their Baseline. Shared comparisons require an invitation connected to that person’s account and a separate decision for each requested use. They can deny or revoke permission at any time.'
   },
   {
     title: 'What is kept and for how long',
@@ -46,7 +46,7 @@ const termsSections = [
   },
   {
     title: 'Billing and cancellation',
-    copy: 'Stripe manages checkout, payment methods, subscriptions, and the customer billing portal. Ending Sovereign+ returns paid features to Free without deleting your workspace. Account deletion has a 14-day grace period and cancels active subscriptions before private workspace data is removed.'
+    copy: 'Stripe manages checkout, payment methods, subscriptions, and the customer billing portal. Ending Sovereign+ returns paid features to Free without deleting your space. Account deletion has a 14-day grace period and cancels active subscriptions before private space data is removed.'
   },
   {
     title: 'Another person’s information',

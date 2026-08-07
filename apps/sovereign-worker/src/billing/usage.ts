@@ -46,7 +46,7 @@ export async function reserveAiTurn(env: Env, accountId: string, plan: string, n
     const retryAfterSeconds = Math.max(1, Math.ceil((Date.parse(resetsAt) - now.getTime()) / 1000));
     throw Response.json({
       error: 'monthly_allowance_reached',
-      message: 'Your monthly Sovereign AI allowance has been used. Your saved workspace remains available.',
+      message: 'Your monthly Sovereign AI allowance has been used. Your saved space remains available.',
       allowance,
       resetsAt
     }, {

@@ -13,7 +13,7 @@ function openAfterContextClose(action: () => void): void {
   window.setTimeout(action, 140);
 }
 
-export function WorkspaceMobileUtilities() {
+export function SpaceMobileUtilities() {
   const [mobile, setMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia(mobileQuery).matches);
   const [mount, setMount] = useState<HTMLElement | null>(null);
 
@@ -35,14 +35,14 @@ export function WorkspaceMobileUtilities() {
     const install = () => {
       const context = document.querySelector<HTMLElement>('.intelligence-context .context-scroll');
       if (!context) return;
-      const existing = context.querySelector<HTMLElement>(':scope > .workspace-mobile-utilities-mount');
+      const existing = context.querySelector<HTMLElement>(':scope > .space-mobile-utilities-mount');
       if (existing) {
         currentMount = existing;
         setMount(existing);
         return;
       }
       const nextMount = document.createElement('div');
-      nextMount.className = 'workspace-mobile-utilities-mount';
+      nextMount.className = 'space-mobile-utilities-mount';
       context.prepend(nextMount);
       currentMount = nextMount;
       setMount(nextMount);
@@ -61,21 +61,21 @@ export function WorkspaceMobileUtilities() {
   if (!mobile || !mount) return null;
 
   return createPortal(
-    <details className="workspace-mobile-utilities">
+    <details className="space-mobile-utilities">
       <summary>
-        <span className="workspace-mobile-utilities-summary-copy">
-          <strong>Workspace tools</strong>
+        <span className="space-mobile-utilities-summary-copy">
+          <strong>Space tools</strong>
           <span>Plan, context, account, and system controls</span>
         </span>
       </summary>
-      <section className="workspace-mobile-utilities-content" aria-labelledby="workspace-mobile-utilities-title">
-        <div className="workspace-mobile-utilities-heading">
+      <section className="space-mobile-utilities-content" aria-labelledby="space-mobile-utilities-title">
+        <div className="space-mobile-utilities-heading">
           <span>WORKSPACE</span>
-          <h3 id="workspace-mobile-utilities-title">Context and controls</h3>
+          <h3 id="space-mobile-utilities-title">Context and controls</h3>
           <p>Open deeper tools only when they are useful to the question in front of you.</p>
         </div>
         <VerifiedPlanStatus expanded />
-        <div className="workspace-mobile-utility-actions">
+        <div className="space-mobile-utility-actions">
           <button type="button" onClick={() => openAfterContextClose(() => document.querySelector<HTMLButtonElement>('.expression-field-launcher')?.click())}>
             <strong>Expression Field</strong><span>Open your center-emitted view</span>
           </button>

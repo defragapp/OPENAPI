@@ -136,8 +136,8 @@ The exact source layer does not measure personality. The facet layer is interpre
 - Never let the model write or complete a Basis value.
 - Never display another person’s exact framework data without `framework.display`.
 - Never use a one-sided owner entry as access to another person’s private Baseline.
-- Keep the conversation dominant over workspace chrome.
-- Use one canonical authenticated workspace.
+- Keep the conversation dominant over space chrome.
+- Use one canonical authenticated space.
 - Keep users in control of correction, consent, continuity, and deletion.
 
 ## Approved public summary

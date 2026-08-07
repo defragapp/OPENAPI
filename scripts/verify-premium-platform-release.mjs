@@ -16,8 +16,8 @@ const landing = read('apps/web/src/PublicLanding.tsx');
 const stories = read('apps/web/src/LandingProductStories.tsx');
 const field = read('apps/web/src/expression-field/LandingExpressionSlice.tsx');
 const viewportProbe = read('apps/web/src/PublicLandingViewportContract.ts');
-const authenticated = read('apps/web/src/AuthenticatedWorkspace.tsx');
-const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
+const authenticated = read('apps/web/src/AuthenticatedSpace.tsx');
+const space = read('apps/web/src/SovereignIntelligenceSpace.tsx');
 const onboarding = read('apps/web/src/PlanOnboarding.tsx');
 const controls = read('apps/web/src/AccountControlCenter.tsx');
 const membership = read('apps/web/src/SystemMembershipManager.tsx');
@@ -204,7 +204,7 @@ requireAll('founder v0 visual language', v0Visual, [
   '.v0-family-map',
   '.v0-comparison-grid',
   '.v0-final',
-  '.intelligence-workspace',
+  '.intelligence-space',
   '.sovereign-composer',
   '.account-shell',
   '.auth-panel'
@@ -249,9 +249,9 @@ requireAll('rendered viewport measurement', viewportProbe, [
   'runPublicLandingViewportContract'
 ]);
 
-requireAll('canonical workspace', `${authenticated}\n${workspace}`, [
-  'data-workspace-contract="one-room"',
-  '<SovereignIntelligenceWorkspace onboardingVerified />',
+requireAll('canonical space', `${authenticated}\n${space}`, [
+  'data-space-contract="one-room"',
+  '<SovereignIntelligenceSpace onboardingVerified />',
   "type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'",
   "version: 'sovereign-answer.v2'",
   '/api/v1/threads/',
@@ -263,7 +263,7 @@ requireAll('real authentication', app, ["path === '/login'", "path === '/signup'
 requireAll('real billing', `${onboarding}\n${controls}`, ['/api/v1/billing/checkout', '/api/v1/billing/portal']);
 requireAll('real consent', membership, ['person.identityBound === true', "person.activeScopes.includes('system.include')"]);
 
-const productionSource = `${landing}\n${stories}\n${field}\n${v0PlatformVisual}\n${v0Visual}\n${app}\n${workspace}`;
+const productionSource = `${landing}\n${stories}\n${field}\n${v0PlatformVisual}\n${v0Visual}\n${app}\n${space}`;
 rejectAll('selective v0 port', productionSource, [
   'Math.random',
   'localStorage.setItem("sovereign-user"',
@@ -303,7 +303,7 @@ console.log(JSON.stringify({
   productStories: ['personal-chat-workflow', 'relationship-chat-workflow', 'system-chat-workflow'],
   visualDirection: 'founder-v0-dark-editorial',
   excludedMockRuntime: true,
-  canonicalWorkspace: 'SovereignIntelligenceWorkspace',
+  canonicalSpace: 'SovereignIntelligenceSpace',
   answerContract: 'sovereign-answer.v2',
   renderedViewportProbe: true
 }, null, 2));

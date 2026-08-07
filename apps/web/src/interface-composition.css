@@ -1,5 +1,5 @@
 /* Sovereign.OS platform composition.
-   One hierarchy across public product, account, onboarding, policy, consent, workspace, and error surfaces. */
+   One hierarchy across public product, account, onboarding, policy, consent, space, and error surfaces. */
 
 :root {
   --sov-reading: 68ch;
@@ -22,12 +22,12 @@
   --platform-shadow: 0 32px 90px rgba(0, 0, 0, .34);
 }
 
-:where(.sovereign-landing, .account-shell, .plan-onboarding, .sovereign-policy, .public-not-found, .intelligence-workspace) {
+:where(.sovereign-landing, .account-shell, .plan-onboarding, .sovereign-policy, .public-not-found, .intelligence-space) {
   color-scheme: dark;
   text-rendering: geometricPrecision;
 }
 
-:where(.sovereign-landing, .account-shell, .plan-onboarding, .sovereign-policy, .public-not-found, .intelligence-workspace)
+:where(.sovereign-landing, .account-shell, .plan-onboarding, .sovereign-policy, .public-not-found, .intelligence-space)
 :where(a, button, input, textarea, select, summary):focus-visible {
   outline: 2px solid var(--platform-sage);
   outline-offset: 3px;
@@ -441,21 +441,21 @@
 .public-not-found section > div { display: flex; flex-wrap: wrap; gap: 10px; }
 .public-not-found section a { min-height: 48px; display: inline-flex; align-items: center; padding: 0 18px; border: 1px solid var(--platform-line); border-radius: 999px; color: var(--platform-ink); text-decoration: none; }
 
-/* Authenticated workspace */
-.intelligence-workspace {
-  --workspace-rail: 252px;
+/* Authenticated space */
+.intelligence-space {
+  --space-rail: 252px;
   min-height: 100svh;
   background: var(--platform-bg);
 }
 
 .intelligence-sidebar {
-  width: var(--workspace-rail);
+  width: var(--space-rail);
   padding: 18px 16px;
   border-right: 1px solid var(--platform-line);
   background: #0e100f;
 }
 
-.intelligence-main { margin-left: var(--workspace-rail); }
+.intelligence-main { margin-left: var(--space-rail); }
 .intelligence-brand { min-height: 58px; }
 .intelligence-sidebar nav { gap: 5px; }
 .intelligence-sidebar nav button {

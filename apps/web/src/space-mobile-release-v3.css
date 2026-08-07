@@ -1,7 +1,7 @@
 /* Final screenshot-driven release correction for the public Expression Field and authenticated mobile shell. */
 
-.workspace-mobile-utilities-mount,
-.workspace-mobile-utilities {
+.space-mobile-utilities-mount,
+.space-mobile-utilities {
   display: none;
 }
 
@@ -64,37 +64,37 @@
 }
 
 @media (max-width: 820px) {
-  .workspace-desktop-plan-status,
+  .space-desktop-plan-status,
   .sovereign-app-runtime > .expression-field-launcher,
   .sovereign-app-runtime .system-membership-trigger {
     display: none !important;
   }
 
-  .workspace-mobile-utilities-mount,
-  .workspace-mobile-utilities {
+  .space-mobile-utilities-mount,
+  .space-mobile-utilities {
     display: block;
   }
 
-  .workspace-mobile-utilities {
+  .space-mobile-utilities {
     margin: 0 0 22px;
     padding: 0 0 22px;
     border-bottom: 1px solid rgba(241, 233, 222, 0.11);
   }
 
-  .workspace-mobile-utilities-heading {
+  .space-mobile-utilities-heading {
     display: grid;
     gap: 7px;
     margin-bottom: 14px;
   }
 
-  .workspace-mobile-utilities-heading > span {
+  .space-mobile-utilities-heading > span {
     color: rgba(120, 199, 255, 0.78);
     font-size: 0.61rem;
     font-weight: 750;
     letter-spacing: 0.16em;
   }
 
-  .workspace-mobile-utilities-heading h3 {
+  .space-mobile-utilities-heading h3 {
     margin: 0;
     color: #f1e9de;
     font-family: var(--font-display, "Sovereign Display", Georgia, serif);
@@ -103,14 +103,14 @@
     letter-spacing: -0.04em;
   }
 
-  .workspace-mobile-utilities-heading p {
+  .space-mobile-utilities-heading p {
     margin: 0;
     color: rgba(229, 220, 209, 0.66);
     font-size: 0.83rem;
     line-height: 1.55;
   }
 
-  .workspace-mobile-utilities .account-plan-verification {
+  .space-mobile-utilities .account-plan-verification {
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 14px !important;
@@ -121,17 +121,17 @@
     background: rgba(47, 147, 255, 0.06) !important;
   }
 
-  .workspace-mobile-utilities .account-plan-verification button {
+  .space-mobile-utilities .account-plan-verification button {
     width: 100% !important;
     min-height: 46px !important;
   }
 
-  .workspace-mobile-utility-actions {
+  .space-mobile-utility-actions {
     display: grid;
     gap: 8px;
   }
 
-  .workspace-mobile-utility-actions button {
+  .space-mobile-utility-actions button {
     display: grid;
     min-height: 58px;
     gap: 3px;
@@ -143,7 +143,7 @@
     text-align: left;
   }
 
-  .workspace-mobile-utility-actions button span {
+  .space-mobile-utility-actions button span {
     color: rgba(229, 220, 209, 0.54);
     font-size: 0.72rem;
   }
@@ -166,7 +166,7 @@
     margin-left: auto !important;
   }
 
-  .sovereign-app-runtime .topbar-actions .workspace-status {
+  .sovereign-app-runtime .topbar-actions .space-status {
     display: none !important;
   }
 
@@ -261,7 +261,7 @@
   }
 
   .sovereign-app-runtime .sovereign-composer,
-  .sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
+  .sovereign-app-runtime .intelligence-space.context-open .sovereign-composer {
     position: fixed !important;
     z-index: 58 !important;
     right: max(10px, env(safe-area-inset-right)) !important;
@@ -336,7 +336,7 @@
     transition: transform 220ms ease, opacity 180ms ease, visibility 180ms ease !important;
   }
 
-  .sovereign-app-runtime .intelligence-workspace.context-open .intelligence-context {
+  .sovereign-app-runtime .intelligence-space.context-open .intelligence-context {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;

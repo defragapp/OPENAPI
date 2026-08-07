@@ -22,13 +22,13 @@ describe('SOVV adapter contracts', () => {
     vi.stubGlobal('fetch', vi.fn(async (url: URL | RequestInfo) => {
       const pathname = new URL(String(url)).pathname;
       if (pathname === '/api/baseline') return Response.json({ baseline: { redacted: true }, datasetStatus: 'ready' });
-      if (pathname === '/api/library') return Response.json({ items: [{ id: 'l1', title: 'Saved map', workspace_source: 'DEFRAG' }] });
+      if (pathname === '/api/library') return Response.json({ items: [{ id: 'l1', title: 'Saved map', space_source: 'DEFRAG' }] });
       return Response.json({}, { status: 404 });
     }));
     const baseline = await getBaselineSummary(env, 'self');
     const library = await searchLibrary(env, 'map');
     expect(baseline.data.status).toBe('ready');
     expect(JSON.stringify(baseline)).not.toMatch(/dob|tob|pob|birth|latitude|longitude/i);
-    expect(library.data.items[0]?.workspaceSource).toBe('DEFRAG');
+    expect(library.data.items[0]?.spaceSource).toBe('DEFRAG');
   });
 });

@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest';
 const read = (relativePath: string) => readFileSync(new URL(relativePath, import.meta.url), 'utf8');
 const runtime = read('./BaselineInputRuntime.ts');
 const main = read('./main.tsx');
-const workspace = read('./SovereignIntelligenceWorkspace.tsx');
+const space = read('./SovereignIntelligenceSpace.tsx');
 
 describe('Baseline birthplace timezone correction', () => {
-  it('installs before the authenticated workspace can submit Baseline input', () => {
+  it('installs before the authenticated space can submit Baseline input', () => {
     expect(main).toContain("import { installBaselineInputRuntime } from './BaselineInputRuntime'");
     expect(main).toContain('installBaselineInputRuntime();');
     expect(main.indexOf('installBaselineInputRuntime();')).toBeLessThan(main.indexOf('ReactDOM.createRoot'));
@@ -25,7 +25,7 @@ describe('Baseline birthplace timezone correction', () => {
   });
 
   it('overrides the browser-local fallback with the timezone the user reviewed', () => {
-    expect(workspace).toContain('birthTimezone: timezone');
+    expect(space).toContain('birthTimezone: timezone');
     expect(runtime).toContain('payload.birthTimezone = timezone');
     expect(runtime).toContain("throw new Error('Choose a valid birthplace time zone before building your Baseline.')");
     expect(runtime.indexOf('payload.birthTimezone = timezone')).toBeLessThan(runtime.indexOf('nativeFetch(input, { ...init, body: JSON.stringify(payload) })'));

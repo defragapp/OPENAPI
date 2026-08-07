@@ -41,7 +41,7 @@ Production customer access remains application-owned:
 - Stripe Checkout for upgrades;
 - Stripe Customer Portal for payment method, cancellation, and subscription management;
 - Stripe webhooks projected into D1;
-- cancellation or payment failure resolves safely to Free without deleting the workspace.
+- cancellation or payment failure resolves safely to Free without deleting the space.
 
 Cloudflare Access must not be used as the Sovereign+ paywall. Access policies do not replace Stripe subscription state or application consent rules.
 
@@ -63,7 +63,7 @@ Cloudflare Access must not be used as the Sovereign+ paywall. Access policies do
 - family, household, friendship group, workplace, and team Systems;
 - Library continuity;
 - optional Covenant lens;
-- consent-aware invitations and public-link sharing that never includes private workspace data.
+- consent-aware invitations and public-link sharing that never includes private space data.
 
 Private account export is not part of the launch product.
 

@@ -67,7 +67,7 @@ The web application provides:
 
 - the public Sovereign.OS experience;
 - authentication and onboarding;
-- the single-room intelligence workspace;
+- the single-room intelligence space;
 - Today, Explore, People, Systems, Library, and You;
 - consent and invitation controls;
 - responsive mobile and iOS safe-area behavior;

@@ -63,7 +63,7 @@ The real OPENAPI platform remains authoritative for:
 
 - login, signup, invitation, onboarding, and account control;
 - Today, Explore, People, Systems, Library, and You;
-- `SovereignIntelligenceWorkspace`;
+- `SovereignIntelligenceSpace`;
 - `sovereign-answer.v2`;
 - Baseline, current context, Basis, Alignment, relationship, system, and Covenant behavior;
 - Cloudflare Worker APIs, D1, Durable Objects, Workers AI, AI Gateway, Resend, Turnstile, and Stripe;
@@ -71,7 +71,7 @@ The real OPENAPI platform remains authoritative for:
 
 ## Sitewide visual application
 
-The v0 visual language applies to the public root, static How it works, Pricing, FAQ, 404, login, signup, invitation, onboarding, policy pages, and the authenticated one-room workspace.
+The v0 visual language applies to the public root, static How it works, Pricing, FAQ, 404, login, signup, invitation, onboarding, policy pages, and the authenticated one-room space.
 
 `apps/web/src/v0-visual-port.css` is the founder visual foundation for Vite-rendered surfaces. `v0-global-experience.css` extends it across non-landing product surfaces, and `passkey-auth.css` is the final local visual authority.
 
@@ -85,7 +85,7 @@ Production must reject:
 - missing archive fingerprint;
 - wrong component order;
 - missing v0 component selectors;
-- missing workspace/account selectors;
+- missing space/account selectors;
 - mock runtime markers;
 - a local stylesheet loaded after `passkey-auth.css`, or any change to the certified Vite cascade order;
 - a compiled public asset that does not contain the exact v0 sequence.
