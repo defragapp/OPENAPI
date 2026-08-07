@@ -606,6 +606,54 @@ function persistAssistantStream(stream: ReadableStream<string>, onComplete: (tex
   }));
 }
 
+
+app.post('/api/tts', async (context) => {
+  requireSameOrigin(context.req.raw);
+  await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ text?: string }>();
+  const text = body.text?.trim();
+
+  if (!text) {
+    return context.json({ error: 'Text required' }, 400);
+  }
+
+  // Edge caching based on hashed text
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const cacheKey = new Request(`https://cache.local/tts/${hashHex}`);
+
+  const cache = (caches as any).default as Cache;
+  let response = await cache.match(cacheKey);
+
+  if (!response) {
+    if (!context.env.AI) {
+      return context.json({ error: 'AI binding not configured' }, 503);
+    }
+
+    let audioBuffer;
+    try {
+      audioBuffer = await context.env.AI.run('@cf/deepgram/aura-2-en', { text }) as ArrayBuffer;
+    } catch (e) {
+      console.error('TTS Generation failed:', e);
+      return context.json({ error: 'TTS Generation failed' }, 500);
+    }
+
+    response = new Response(audioBuffer, {
+      headers: {
+        'content-type': 'audio/wav',
+        'cache-control': 'public, max-age=86400',
+      },
+    });
+
+    context.executionCtx.waitUntil(cache.put(cacheKey, response.clone()));
+  }
+
+  return response;
+});
+
 app.onError((error, context) => {
   if (error instanceof Response) return error;
   return context.json({ error: 'Internal error' }, 500);
