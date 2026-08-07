@@ -2,9 +2,9 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { extname, join, relative, resolve } from 'node:path';
 
 const root = resolve('.');
-const approvedPublicContact = 'info@sovereign.os';
+const approvedPublicContact = 'support@defrag.app';
 const verifiedTransactionalSender = 'info@defrag.app';
-const prohibitedPublicAddress = 'support@defrag.app';
+const prohibitedPublicAddress = 'info@sovereign.os';
 const scanRoots = [
   'apps/web/src',
   'apps/web/public',

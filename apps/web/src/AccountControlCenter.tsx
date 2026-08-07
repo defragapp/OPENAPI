@@ -211,7 +211,7 @@ export function AccountControlCenter() {
               <a href={SUPPORT_PAYMENT_URL} target="_blank" rel="noreferrer">Support development</a>
               <a href="https://sovereign.defrag.app/privacy">Privacy</a>
               <a href="https://sovereign.defrag.app/terms">Terms</a>
-              <a href="mailto:info@sovereign.os">Contact support</a>
+              <a href="mailto:support@defrag.app">Contact support</a>
             </nav>
 
             <section className="account-control-section support-development-section">

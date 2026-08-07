@@ -19953,7 +19953,7 @@ __name(buildCurrentBasisRegistry, "buildCurrentBasisRegistry");
 // apps/sovereign-worker/src/email.ts
 init_runtime();
 var DEFAULT_FROM_ADDRESS = "info@defrag.app";
-var DEFAULT_PUBLIC_CONTACT = "info@sovereign.os";
+var DEFAULT_PUBLIC_CONTACT = "support@defrag.app";
 var BRAND_MARK_URL = "https://sovereign.defrag.app/brand-mark.svg";
 function validRecipient(to) {
   return to.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to);
@@ -20042,7 +20042,7 @@ function buildSovereignEmail(template) {
   <title>${escapeHtml(template.title)}</title>
 </head>
 <body style="margin:0;padding:0;background:#0f0f0f;color:#f5f1e8;">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(preheader)}</div>
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;background:#e8ddd0;">${escapeHtml(preheader)}</div>
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#0f0f0f;background-image:radial-gradient(circle at 50% 0%,rgba(232,221,208,.055),transparent 560px);">
     <tr>
       <td align="center" style="padding:42px 16px 50px;">
@@ -20054,7 +20054,7 @@ function buildSovereignEmail(template) {
                   <td width="40" valign="middle">
                     <img src="${BRAND_MARK_URL}" width="40" height="40" alt="" style="display:block;width:40px;height:40px;border:1px solid rgba(245,241,232,.16);border-radius:50%;">
                   </td>
-                  <td style="padding-left:13px;color:#f5f1e8;font:700 17px/1 Georgia,'Times New Roman',serif;letter-spacing:-.3px;">Sovereign.OS</td>
+                  <td style="padding-left:13px;color:#f5f1e8;font:700 17px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:-.3px;">Sovereign.OS</td>
                   <td align="right" style="color:#746f67;font:650 10px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:1.6px;text-transform:uppercase;">Private account message</td>
                 </tr>
               </table>
@@ -20063,13 +20063,13 @@ function buildSovereignEmail(template) {
           <tr>
             <td style="padding:48px 40px 42px;border:1px solid rgba(245,241,232,.11);border-top:0;border-radius:0 0 18px 18px;background:#151515;background-image:linear-gradient(180deg,rgba(255,255,255,.018),transparent 28%);box-shadow:0 30px 80px rgba(0,0,0,.45);">
               <p style="margin:0 0 15px;color:#e8ddd0;font:700 10px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:2px;text-transform:uppercase;">${escapeHtml(template.eyebrow)}</p>
-              <h1 style="margin:0;max-width:520px;color:#f5f1e8;font:700 45px/1.02 Georgia,'Times New Roman',serif;letter-spacing:-2px;">${escapeHtml(template.title)}</h1>
+              <h1 style="margin:0;max-width:520px;color:#f5f1e8;font:700 45px/1.02 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:-2px;">${escapeHtml(template.title)}</h1>
               <p style="margin:22px 0 0;max-width:520px;color:#a39c8f;font:400 16px/1.75 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">${escapeHtml(template.intro)}</p>
               ${details.length ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top:26px;padding-top:22px;border-top:1px solid rgba(245,241,232,.09);">${detailRows}</table>` : ""}
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin-top:32px;">
                 <tr>
-                  <td align="center" style="border:1px solid rgba(232,221,208,.8);border-radius:10px;background:#e8ddd0;box-shadow:0 13px 34px rgba(0,0,0,.27);">
-                    <a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:15px 24px;color:#141412;font:700 14px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;border-radius:10px;">${escapeHtml(template.actionLabel)} &nbsp;\u2192</a>
+                  <td align="center" style="border:1px solid #00e5ff;border-radius:10px;background:#00e5ff;box-shadow:0 0 15px rgba(0,229,255,0.4);">
+                    <a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:15px 24px;color:#000000;font:700 14px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;border-radius:10px;">${escapeHtml(template.actionLabel)} &nbsp;\u2192</a>
                   </td>
                 </tr>
               </table>
@@ -25776,7 +25776,7 @@ async function sendPasskeyAddedNotice(env, accountId, passkeyId, label) {
         "Email link and six-digit code recovery remain available for the account.",
         "Remove an unfamiliar passkey from You \u2192 Account access."
       ],
-      footer: "If you did not add this passkey, sign in through email recovery, remove it, and contact info@sovereign.os."
+      footer: "If you did not add this passkey, sign in through email recovery, remove it, and contact support@defrag.app."
     });
     await sendOperationalEmail(env, {
       to: recipient,
@@ -26115,7 +26115,7 @@ async function healthResponse(pathname, env) {
       birthplaceGeocoder: "disabled",
       authentication: authConfigured ? "configured" : "missing",
       transactionalEmail: emailProvider,
-      publicContactEmail: env.PUBLIC_CONTACT_EMAIL || "info@sovereign.os",
+      publicContactEmail: env.PUBLIC_CONTACT_EMAIL || "support@defrag.app",
       transactionalFromEmail: env.TRANSACTIONAL_FROM_EMAIL || "info@defrag.app",
       legacySovvAdapter: env.SOVV_INTERNAL_BASE_URL ? "configured" : "disabled",
       stripe: stripeConfigured2 ? "configured" : "missing",

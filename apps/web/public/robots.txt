@@ -5,14 +5,13 @@ Allow: /pricing
 Allow: /faq
 Allow: /privacy
 Allow: /terms
-Disallow: /app
-Disallow: /app/
+Disallow: /app/*
+Disallow: /api/*
 Disallow: /login
 Disallow: /signup
 Disallow: /onboarding
-Disallow: /auth/
+Disallow: /auth/*
 Disallow: /invitation
 Disallow: /consent.html
-Disallow: /api/
 
 Sitemap: https://sovereign.defrag.app/sitemap.xml
