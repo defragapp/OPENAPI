@@ -66,7 +66,7 @@ function invalidCodeResponse(): Response {
 
 export async function verifyTurnstile(env: Env, token?: string, ip?: string, expectedAction?: string): Promise<void> {
   if (runtimeMode(env) === 'test' && token === 'test-turnstile-pass') return;
-  if (!env.TURNSTILE_SECRET_KEY) { if (env.APP_ENV === 'production') throw new Error('FATAL: TURNSTILE_SECRET_KEY is undefined in production environment.'); throw turnstileProblem('unavailable', 503); }
+  if (!env.TURNSTILE_SECRET_KEY) throw turnstileProblem('unavailable', 503);
   if (!token) throw turnstileProblem('required');
   if (token.length > MAX_TURNSTILE_TOKEN_LENGTH) throw turnstileProblem('invalid');
   const body = new FormData();
@@ -79,7 +79,7 @@ export async function verifyTurnstile(env: Env, token?: string, ip?: string, exp
   const result = await response.json().catch(() => ({ success: false })) as { success?: boolean; hostname?: string; action?: string; 'error-codes'?: string[] };
   if (!result.success) {
     const codes = result['error-codes'] ?? [];
-    if (codes.includes('invalid-input-secret')) { if (runtimeMode(env) !== 'test' && env.TURNSTILE_SECRET_KEY !== 'secret') console.error('turnstile_configuration_error', { invalidSecret: true }); throw turnstileProblem('unavailable', 503); }
+    if (codes.includes('invalid-input-secret')) { if (runtimeMode(env) !== 'test') console.error('turnstile_configuration_error', { invalidSecret: true }); throw turnstileProblem('unavailable', 503); }
     if (codes.includes('internal-error')) throw turnstileProblem('unavailable', 503);
     if (codes.includes('timeout-or-duplicate')) throw turnstileProblem('expired_or_used');
     throw turnstileProblem('invalid');
