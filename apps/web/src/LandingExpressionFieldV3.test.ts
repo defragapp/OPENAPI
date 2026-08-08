@@ -53,7 +53,7 @@ describe('premium rotating public Expression Field v3', () => {
     expect(landing).toContain('Why do I keep taking responsibility for everyone around me?');
     expect(landing).toContain('What is mine, what is theirs, and what happens between us?');
     expect(landing).toContain('Does this choice fit me, or does it cost too much of me?');
-    expect(landing).toContain('className="v0-wordmark v0-wordmark--mobile" href="/" aria-label="Sovereign.OS home">SOVEREIGN.OS');
+    expect(landing).toContain('className="v0-wordmark v0-wordmark--mobile" href="/" aria-label="Sovereign.OS home"><BrandMark />');
   });
 
   it('supports stable automatic rotation plus pointer and keyboard control', () => {

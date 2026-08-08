@@ -19,7 +19,7 @@ describe('landing iOS parity and density release', () => {
   });
 
   it('keeps the same Sovereign.OS identity across desktop and iOS', () => {
-    expect(landing).toContain('SOVEREIGN.OS');
+    expect(landing).toContain('<BrandMark />');
     expect(landing).toContain('v0-wordmark--mobile');
     expect(iosCss).toContain("content: 'SOVEREIGN.OS'");
     expect(iosCss).toContain('font-family: var(--font-sans, sans-serif)');
