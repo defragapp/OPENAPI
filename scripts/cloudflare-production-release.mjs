@@ -22,6 +22,9 @@ const browserRunMaxAttempts = 1;
 const browserVerificationLabels = new Set(['verify-route-cohesion', 'verify-rendered-visuals']);
 let reportSkipLogged = false;
 
+const apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
+if (!apiToken) fail('CLOUDFLARE_API_TOKEN is required for production deployment');
+
 function fail(message) {
   throw new Error(`Cloudflare production release failed: ${message}`);
 }
