@@ -1,0 +1,143 @@
+name: PR #195 Verification
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
+
+concurrency:
+  group: pr-195-verification-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  verify:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.number == 195
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout pull request merge result
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Enable pnpm 9.15.9
+        shell: bash
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm --version
+
+      - name: Record verification environment
+        shell: bash
+        run: |
+          mkdir -p .ci-pr195-logs
+          {
+            echo "node=$(node --version)"
+            echo "pnpm=$(pnpm --version)"
+            echo "checkout_sha=$(git rev-parse HEAD)"
+            echo "pr_head=${{ github.event.pull_request.head.sha || github.sha }}"
+            echo "base_sha=${{ github.event.pull_request.base.sha || 'workflow-dispatch' }}"
+          } | tee .ci-pr195-logs/environment.log
+
+      - name: Run verification matrix
+        id: verification
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p .ci-pr195-logs
+          summary=".ci-pr195-logs/summary.md"
+          failures=0
+
+          {
+            echo "## PR #195 verification"
+            echo
+            echo "| Check | Exit code |"
+            echo "|---|---:|"
+          } > "$summary"
+
+          run_check() {
+            local name="$1"
+            shift
+            local log=".ci-pr195-logs/${name}.log"
+
+            echo "::group::${name}"
+            "$@" 2>&1 | tee "$log"
+            local status=${PIPESTATUS[0]}
+            echo "EXIT_CODE=${status}" | tee -a "$log"
+            echo "::endgroup::"
+            echo "| ${name} | ${status} |" >> "$summary"
+
+            if [ "$status" -ne 0 ]; then
+              failures=$((failures + 1))
+            fi
+          }
+
+          run_check install pnpm install --frozen-lockfile
+          run_check verify_foundation pnpm verify:foundation
+          run_check scan_secrets pnpm scan:secrets
+          run_check scan_production_fixtures pnpm scan:production-fixtures
+          run_check vitest_auth_public pnpm --filter @sovereign/worker exec vitest run src/auth-public.test.ts
+          run_check smoke_release_closure pnpm smoke:release-closure
+          run_check lint pnpm lint
+          run_check typecheck pnpm typecheck
+          run_check test pnpm test
+          run_check build pnpm build
+          run_check verify_worker_bundle_size pnpm verify:worker-bundle-size
+          run_check verify_cloudflare_build pnpm verify:cloudflare-build
+
+          cat "$summary" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$failures" -ne 0 ]; then
+            echo "${failures} verification command(s) failed." >&2
+            exit 1
+          fi
+
+      - name: Upload verification logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-195-verify-logs
+          path: .ci-pr195-logs/
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Post verification result to PR #195
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          VERIFICATION_OUTCOME: ${{ steps.verification.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const status = process.env.VERIFICATION_OUTCOME === 'success' ? 'PASS' : 'FAIL';
+            const body = [
+              'PR #195 temporary verification result: **' + status + '**',
+              '',
+              'Workflow run: ' + process.env.RUN_URL,
+              'Logs artifact: pr-195-verify-logs (retained for 7 days).',
+              '',
+              'No merge or deployment was performed.'
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 195,
+              body
+            });
