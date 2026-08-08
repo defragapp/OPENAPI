@@ -108,15 +108,15 @@ body:has(.account-shell),body:has(.plan-onboarding),body:has(.invitation-page),b
 .private-route-brand { position:fixed;top:26px;left:28px;display:flex;align-items:center;gap:10px;color:var(--surface-ink);text-decoration:none; }
 .private-route-brand>span { display:grid;width:34px;height:34px;place-items:center;border:1px solid var(--surface-line-strong);border-radius:50%;font-family:var(--v0-display); }
 
-/* Authenticated space visual authority */
+/* Authenticated workspace visual authority */
 .sovereign-app-runtime { min-height:100svh;background:var(--surface-page)!important;color:var(--surface-ink); }
-.sovereign-app-runtime :where(.intelligence-space,.sovereign-space,.space-shell) { background:transparent!important;color:var(--surface-ink);font-family:var(--v0-sans); }
-.sovereign-app-runtime :where(aside,nav,header,.space-sidebar,.intelligence-sidebar,.space-rail) { border-color:var(--surface-line)!important;background:rgba(15,15,15,.82)!important;backdrop-filter:blur(20px); }
-.sovereign-app-runtime :where(.space-card,.intelligence-card,.answer-card,.thread-card,.panel,.surface-panel,.today-card,.explore-card) { border:1px solid var(--surface-line)!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(255,255,255,.014),transparent 30%),var(--surface-card)!important;box-shadow:0 20px 55px rgba(0,0,0,.27)!important; }
-.sovereign-app-runtime :where(h1,h2,h3,.space-title,.section-title) { color:var(--surface-ink)!important;font-family:var(--v0-display)!important;letter-spacing:-.03em!important; }
+.sovereign-app-runtime :where(.intelligence-workspace,.sovereign-workspace,.workspace-shell) { background:transparent!important;color:var(--surface-ink);font-family:var(--v0-sans); }
+.sovereign-app-runtime :where(aside,nav,header,.workspace-sidebar,.intelligence-sidebar,.workspace-rail) { border-color:var(--surface-line)!important;background:rgba(15,15,15,.82)!important;backdrop-filter:blur(20px); }
+.sovereign-app-runtime :where(.workspace-card,.intelligence-card,.answer-card,.thread-card,.panel,.surface-panel,.today-card,.explore-card) { border:1px solid var(--surface-line)!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(255,255,255,.014),transparent 30%),var(--surface-card)!important;box-shadow:0 20px 55px rgba(0,0,0,.27)!important; }
+.sovereign-app-runtime :where(h1,h2,h3,.workspace-title,.section-title) { color:var(--surface-ink)!important;font-family:var(--v0-display)!important;letter-spacing:-.03em!important; }
 .sovereign-app-runtime :where(p,small,.muted,.secondary-copy) { color:var(--surface-muted)!important; }
-.sovereign-app-runtime :where(button,.space-action,.composer-action) { border-color:var(--surface-line-strong)!important;border-radius:9px!important; }
-.sovereign-app-runtime :where(button[aria-current='page'],button.active,.nav-item.active,.space-action.primary,.composer-submit) { border-color:rgba(232,221,208,.75)!important;background:var(--surface-cream)!important;color:#141412!important; }
+.sovereign-app-runtime :where(button,.workspace-action,.composer-action) { border-color:var(--surface-line-strong)!important;border-radius:9px!important; }
+.sovereign-app-runtime :where(button[aria-current='page'],button.active,.nav-item.active,.workspace-action.primary,.composer-submit) { border-color:rgba(232,221,208,.75)!important;background:var(--surface-cream)!important;color:#141412!important; }
 .sovereign-app-runtime :where(input,textarea,.sovereign-composer) { border-color:var(--surface-line-strong)!important;border-radius:14px!important;background:rgba(255,255,255,.024)!important;color:var(--surface-ink)!important;box-shadow:none!important; }
 .sovereign-app-runtime .sovereign-composer { box-shadow:0 20px 60px rgba(0,0,0,.35)!important; }
 

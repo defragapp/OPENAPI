@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const layer = readFileSync(new URL('./ProductCompletionLayer.tsx', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
-const space = readFileSync(new URL('./SovereignIntelligenceSpace.tsx', import.meta.url), 'utf8');
+const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const css = readFileSync(new URL('./product-completion.css', import.meta.url), 'utf8');
 
 describe('product completion layer', () => {
@@ -20,13 +20,13 @@ describe('product completion layer', () => {
     expect(layer).not.toContain('TURNSTILE_SECRET_KEY');
   });
 
-  it('keeps pair and system responses inside their authoritative space surfaces', () => {
-    expect(space).toContain('/comparison');
-    expect(space).toContain('/analysis');
-    expect(space).toContain('comparison.participants');
-    expect(space).toContain('analysis.participants');
-    expect(space).toContain('WHAT HAPPENS BETWEEN YOU');
-    expect(space).toContain('Pressure field');
+  it('keeps pair and system responses inside their authoritative workspace surfaces', () => {
+    expect(workspace).toContain('/comparison');
+    expect(workspace).toContain('/analysis');
+    expect(workspace).toContain('comparison.participants');
+    expect(workspace).toContain('analysis.participants');
+    expect(workspace).toContain('WHAT HAPPENS BETWEEN YOU');
+    expect(workspace).toContain('Pressure field');
     expect(layer).not.toContain('sovereign:relational-result');
     expect(layer).not.toContain('RelationalResultDialog');
   });
@@ -37,7 +37,7 @@ describe('product completion layer', () => {
     expect(layer).toContain('Include in a system');
     expect(layer).toContain('stop using');
     expect(layer).toContain('Cancel invitation');
-    expect(layer).toContain('Remove from space');
+    expect(layer).toContain('Remove from workspace');
     expect(layer).toContain('Do not allow');
     expect(layer).not.toContain('grant on behalf');
   });

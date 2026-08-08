@@ -9,7 +9,7 @@ const containsAll = (label, text, values) => values.forEach((value) => assert(te
 
 const archiveSha = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;
-const space = read('apps/web/src/SovereignIntelligenceSpace.tsx');
+const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const landing = read('apps/web/src/PublicLanding.tsx');
 const stories = read('apps/web/src/LandingProductStories.tsx');
 const field = read('apps/web/src/expression-field/LandingExpressionSlice.tsx');
@@ -65,7 +65,7 @@ containsAll('runtime prompt', prompt, [
   'Select IDs only in basis_refs'
 ]);
 
-containsAll('canonical space', space, [
+containsAll('canonical workspace', workspace, [
   "version: 'sovereign-answer.v2'",
   '<SovereignAnswerView',
   '<AlignmentView',
@@ -199,7 +199,7 @@ containsAll('founder v0 visual components', `${landing}\n${stories}\n${v0Visual}
   '.v0-hero',
   '.v0-story-grid',
   '.landing-question-orbit',
-  '.intelligence-space',
+  '.intelligence-workspace',
   '.sovereign-composer',
   '.account-shell',
   '@media (max-width: 760px)',
@@ -272,8 +272,8 @@ containsAll('Pricing entitlements', pricing, ['$0', '$20', '$99 / year', '10 Sov
 containsAll('FAQ contract', faq, ['<details', 'What is Sovereign.OS?', 'Can I correct or remove an interpretation?']);
 
 assert(!existsSync(resolve(root, 'apps/web/src/experience-reconciliation.css')), 'Retired visual override was restored.');
-assert(!existsSync(resolve(root, 'apps/web/src/SovereignSpace.tsx')), 'Duplicate authenticated space remains.');
-assert(!serviceWorker.includes("'/app'"), 'Private space navigation must not be cached.');
+assert(!existsSync(resolve(root, 'apps/web/src/SovereignWorkspace.tsx')), 'Duplicate authenticated workspace remains.');
+assert(!serviceWorker.includes("'/app'"), 'Private workspace navigation must not be cached.');
 
 for (const [label, css] of [
   ['founder v0 platform', v0Platform],
@@ -304,9 +304,9 @@ console.log(JSON.stringify({
   archiveSha256: archiveSha,
   sequenceFingerprint,
   mockRuntimeImported: false,
-  canonicalSpace: 'SovereignIntelligenceSpace',
+  canonicalWorkspace: 'SovereignIntelligenceWorkspace',
   canonicalVisualLayers: ['v0-platform-port.css', 'v0-motion-accessibility.css', 'v0-visual-port.css', 'v0-global-experience.css', 'landing-expression-field-v3.css', 'landing-expression-field-integration.css', 'v0-restored-product-stories.css', 'landing-hero-field-v4.css', 'passkey-auth.css', 'v0-public-port.css'],
-  coveredSurfaces: ['home', 'how-it-works', 'pricing', 'faq', 'login', 'signup', 'onboarding', 'invitation', 'space', 'privacy', 'terms', 'not-found'],
+  coveredSurfaces: ['home', 'how-it-works', 'pricing', 'faq', 'login', 'signup', 'onboarding', 'invitation', 'workspace', 'privacy', 'terms', 'not-found'],
   exactBasis: true,
   contextualCovenant: true,
   selectiveVisualPort: true

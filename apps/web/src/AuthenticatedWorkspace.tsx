@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AccountControlCenter } from './AccountControlCenter';
 import { PasskeyManager } from './PasskeyManager';
-import { SovereignIntelligenceSpace } from './SovereignIntelligenceSpace';
+import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
 import { SystemMembershipManager } from './SystemMembershipManager';
 import { VerifiedPlanStatus } from './VerifiedPlanStatus';
-import { SpaceMobileUtilities } from './SpaceMobileUtilities';
+import { WorkspaceMobileUtilities } from './WorkspaceMobileUtilities';
 import { AccountExpressionField } from './expression-field/ExpressionField';
 
 // Source-level release compatibility marker retained for the certified production verifier:
@@ -17,7 +17,7 @@ type BaselineStatus = { status?: string };
 const STRIPE_CONFIRMATION_ATTEMPTS = 12;
 const STRIPE_CONFIRMATION_DELAY_MS = 1_500;
 
-export function AuthenticatedSpace() {
+export function AuthenticatedWorkspace() {
   const [state, setState] = useState<GateState>('checking');
   const [attempt, setAttempt] = useState(0);
   const returnTo = `${location.pathname}${location.search}`;
@@ -77,7 +77,7 @@ export function AuthenticatedSpace() {
                 body: JSON.stringify({ plan: 'sovereign_plus' }),
                 signal: controller.signal
               });
-              if (!completion.ok) throw new Error('Your verified plan could not be connected to the space yet.');
+              if (!completion.ok) throw new Error('Your verified plan could not be connected to the workspace yet.');
               setState('ready');
               return;
             }
@@ -123,12 +123,12 @@ export function AuthenticatedSpace() {
           <h1>{failed ? 'Sovereign.OS could not open yet.' : pendingPayment ? 'Your payment is still being confirmed.' : 'Opening Sovereign.OS.'}</h1>
           <p>
             {failed
-              ? 'Your space was not shown. Check your connection and try again.'
+              ? 'Your workspace was not shown. Check your connection and try again.'
               : pendingPayment
                 ? 'Stripe returned successfully, but the signed subscription event has not reached your account yet. Sovereign+ remains locked until that authoritative event arrives; checking again will not create another charge.'
                 : state === 'confirming_plan'
-                  ? 'Confirming the signed Stripe entitlement and connecting it to your private space.'
-                  : 'Confirming your account, Baseline, and plan before the private space is shown.'}
+                  ? 'Confirming the signed Stripe entitlement and connecting it to your private workspace.'
+                  : 'Confirming your account, Baseline, and plan before the private workspace is shown.'}
           </p>
           {(failed || pendingPayment) && (
             <button onClick={() => setAttempt((value) => value + 1)}>
@@ -141,13 +141,13 @@ export function AuthenticatedSpace() {
   }
 
   return (
-    <div className="sovereign-app-runtime" data-space-contract="one-room">
-      <div className="space-desktop-plan-status"><VerifiedPlanStatus /></div>
-      <SovereignIntelligenceSpace onboardingVerified />
-      <SpaceMobileUtilities />
+    <div className="sovereign-app-runtime" data-workspace-contract="one-room">
+      <div className="workspace-desktop-plan-status"><VerifiedPlanStatus /></div>
+      <SovereignIntelligenceWorkspace onboardingVerified />
+      <WorkspaceMobileUtilities />
       <AccountExpressionField />
       <PasskeyManager />
-      <div className="sovereign-space-overlays" aria-label="Space controls">
+      <div className="sovereign-workspace-overlays" aria-label="Workspace controls">
         <AccountControlCenter />
         <SystemMembershipManager />
       </div>

@@ -45,7 +45,7 @@ const passkeyClient = read('apps/web/src/passkey-client.ts');
 const passkeyLogin = read('apps/web/src/PasskeyAuthentication.tsx');
 const passkeyManager = read('apps/web/src/PasskeyManager.tsx');
 const verifiedPlan = read('apps/web/src/VerifiedPlanStatus.tsx');
-const authenticatedSpace = read('apps/web/src/AuthenticatedSpace.tsx');
+const authenticatedWorkspace = read('apps/web/src/AuthenticatedWorkspace.tsx');
 const composition = read('apps/web/src/interface-composition.css');
 const staticV0 = read('apps/web/public/v0-public-static.css');
 const how = read('apps/web/public/how-it-works.html');
@@ -188,7 +188,7 @@ requireAll('application visual entry', main, [
   "import { PasskeyAuthentication } from './PasskeyAuthentication'",
   '<PasskeyAuthentication />',
   '<PublicLanding />',
-  '<AuthenticatedSpace />',
+  '<AuthenticatedWorkspace />',
   '<PublicPolicy'
 ]);
 const orderedImports = [
@@ -271,7 +271,7 @@ rejectAll('integrated landing field', field, ['Math.random', 'giftExpression', '
 assert(!field.includes('<div className="landing-expression-slice__tooltip"'), 'The retired floating tooltip returned.');
 
 requireAll('founder platform coverage', v0Platform, ['body:has(.plan-onboarding)', 'body:has(.sovereign-policy)', 'body:has(.email-code-fallback)', '.onboarding-plan-grid', '.policy-grid', '.email-code-fallback']);
-requireAll('founder visual foundation', v0Visual, ['--v0-page: #0f0f0f', '--v0-cream: #e8ddd0', '.v0-hero', '.v0-family-map', '.intelligence-space', '.sovereign-composer', '.account-shell']);
+requireAll('founder visual foundation', v0Visual, ['--v0-page: #0f0f0f', '--v0-cream: #e8ddd0', '.v0-hero', '.v0-family-map', '.intelligence-workspace', '.sovereign-composer', '.account-shell']);
 requireAll('restored story visual authority', storyCss, ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map', '@media (max-width: 760px)', '@media (prefers-reduced-motion: reduce)']);
 requireAll('global product authority', v0Global, ['Founder-v0 visual authority for every non-landing product surface', '.account-shell', '.plan-onboarding', '.public-policy', '.private-route-gate', '.sovereign-app-runtime', '.verified-plan-strip', '.account-plan-verification']);
 requireAll('passkey visual authority', passkeyCss, ['.passkey-primary', '.passkey-button', '.passkey-manager', '.passkey-list']);
@@ -280,7 +280,7 @@ requireAll('browser passkey client', passkeyClient, ['navigator.credentials', 'd
 requireAll('passkey-first login', passkeyLogin, ['Sign in without opening your email.', 'Sign in with a passkey', 'Email recovery or first-time verification', '/api/v1/auth/passkey/login/options', '/api/v1/auth/passkey/login/verify', 'Confirming your Stripe plan']);
 requireAll('authenticated passkey controls', passkeyManager, ['Add passkey', 'Email stays available for recovery.', '/api/v1/auth/passkey/register/options', '/api/v1/auth/passkey/register/verify', '/api/v1/auth/passkeys']);
 requireAll('verified Stripe plan surface', verifiedPlan, ['/api/v1/billing/entitlements', 'Stripe verified', 'Sovereign+', 'Billing controls']);
-requireAll('space plan integration', authenticatedSpace, ['<VerifiedPlanStatus />', '<PasskeyManager />', 'Confirming your account and verified plan']);
+requireAll('workspace plan integration', authenticatedWorkspace, ['<VerifiedPlanStatus />', '<PasskeyManager />', 'Confirming your account and verified plan']);
 
 requireAll('standalone founder CSS', staticV0, ['--v0-page:#0f0f0f', '--v0-cream:#e8ddd0', 'body{min-width:320px', '.launch-nav', '.launch-hero', '.journey-steps', '.pricing-grid', '.faq-list', '.launch-footer']);
 for (const [label, document] of [['How it works', how], ['pricing', pricing], ['FAQ', faq]]) {
@@ -292,7 +292,7 @@ requireAll('How it works document', how, ['Ask about your life. Get an answer bu
 requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe handles payment details', 'Start free. Expand when the question includes more than you.']);
 assert(!pricing.includes('Begin with yourself.'), 'Pricing retains rejected product language');
 requireAll('FAQ document', faq, ['<details', 'Do I need to open my email every time I sign in?', 'When is my plan verified?', 'Can I correct or remove an interpretation?']);
-requireAll('cross-platform composition', composition, ['.sovereign-landing', '.account-shell', '.plan-onboarding', '.sovereign-policy', '.public-not-found', '.intelligence-space', '@media (max-width: 700px)']);
+requireAll('cross-platform composition', composition, ['.sovereign-landing', '.account-shell', '.plan-onboarding', '.sovereign-policy', '.public-not-found', '.intelligence-workspace', '@media (max-width: 700px)']);
 
 for (const [label, document] of documents) {
   requireAll(label, document, ['@cf/zai-org/glm-4.7-flash', '0013_workers_ai_free_capacity']);

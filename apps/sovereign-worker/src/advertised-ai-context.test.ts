@@ -2,13 +2,13 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const worker = readFileSync(new URL('./index.ts', import.meta.url), 'utf8');
-const space = readFileSync(new URL('../../web/src/SovereignIntelligenceSpace.tsx', import.meta.url), 'utf8');
+const workspace = readFileSync(new URL('../../web/src/SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const agent = readFileSync(new URL('./agent/sovereign.ts', import.meta.url), 'utf8');
 
 describe('advertised AI context transport', () => {
-  it('keeps the authenticated space and worker on the structured answer contract', () => {
-    expect(space).toContain("'accept': 'application/vnd.sovereign.answer+json'");
-    expect(space).toContain('body: JSON.stringify({ message: clean, context: messageContext })');
+  it('keeps the authenticated workspace and worker on the structured answer contract', () => {
+    expect(workspace).toContain("'accept': 'application/vnd.sovereign.answer+json'");
+    expect(workspace).toContain('body: JSON.stringify({ message: clean, context: messageContext })');
     expect(worker).toContain("context.req.header('accept')?.includes('application/vnd.sovereign.answer+json')");
     expect(worker).toContain('const result = await runSovereignResult(message, sovereignContext)');
     expect(worker).toContain('return context.json({ text: result.text, answer: result.answer, basis: result.basis }');

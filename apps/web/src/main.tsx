@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import { AppErrorBoundary } from './AppErrorBoundary';
-import { AuthenticatedSpace } from './AuthenticatedSpace';
+import { AuthenticatedWorkspace } from './AuthenticatedWorkspace';
 import { EmailCodeFallback, installEmailCodeFallbackRuntime } from './EmailCodeFallback';
 import { PasskeyAuthentication } from './PasskeyAuthentication';
 import { ProductCompletionLayer, installProductRuntime } from './ProductCompletionLayer';
@@ -21,7 +21,7 @@ import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
 import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
 import platformVisualCohesionCss from './platform-visual-cohesion-v1.css?inline';
 import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline';
-import spaceMobileReleaseCss from './space-mobile-release-v3.css?inline';
+import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline';
 import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline';
 import publicLandingFinalAuthorityCss from './public-landing-final-authority.css?inline';
 
@@ -30,8 +30,8 @@ import './styles.css';
 import './product-completion.css';
 import './public-landing.css';
 import './public-release.css';
-import './space-chat.css';
-import './space-mobile.css';
+import './workspace-chat.css';
+import './workspace-mobile.css';
 import './system-membership.css';
 import './auth-onboarding.css';
 import './email-code-fallback.css';
@@ -85,7 +85,7 @@ function installPlatformVisualCohesion(): void {
   if (document.head.querySelector('style[data-sovereign-platform-cohesion="v1"]')) return;
   const style = document.createElement('style');
   style.dataset.sovereignPlatformCohesion = 'v1';
-  style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}\n${spaceMobileReleaseCss}\n${productionReadinessVisualCss}\n${publicLandingFinalAuthorityCss}`;
+  style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}\n${workspaceMobileReleaseCss}\n${productionReadinessVisualCss}\n${publicLandingFinalAuthorityCss}`;
   document.head.append(style);
 }
 
@@ -177,7 +177,7 @@ const publicPolicyKind = location.pathname === '/privacy'
     ? 'terms'
     : null;
 const isDirectPublicSurface = isPublicHome || publicPolicyKind !== null;
-const isAuthenticatedSpace = location.pathname === '/app' || location.pathname.startsWith('/app/');
+const isAuthenticatedWorkspace = location.pathname === '/app' || location.pathname.startsWith('/app/');
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -187,8 +187,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         ? <PublicLanding />
         : publicPolicyKind
           ? <><PublicPolicyMetadata kind={publicPolicyKind} /><PublicPolicy kind={publicPolicyKind} /></>
-          : isAuthenticatedSpace
-            ? <AuthenticatedSpace />
+          : isAuthenticatedWorkspace
+            ? <AuthenticatedWorkspace />
             : <><App /><EmailCodeFallback /><PasskeyAuthentication /></>}
     </AppErrorBoundary>
   </React.StrictMode>

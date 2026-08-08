@@ -6,14 +6,14 @@ SOVV was inspected read-only at commit `a3db94bccc75089723bef0cf5ff36c47064bd789
 
 The minimum current-condition layer was ported from these reference areas:
 
-- `/space/SOVV/apps/worker/src/baseline-compiler.ts`
+- `/workspace/SOVV/apps/worker/src/baseline-compiler.ts`
   - `PLANET_IDS`
   - `eclipticLongitudeToSign`
   - Horizons observer query construction
   - sequential body fetching to avoid Horizons rate limits
   - six-hour cache window
   - city-level coordinate rounding precedent
-- `/space/SOVV/apps/worker/src/routes/explain-stream.ts`
+- `/workspace/SOVV/apps/worker/src/routes/explain-stream.ts`
   - confirms current sky was consumed as reduced timing context inside Defrag streaming, not exposed as a reusable route
 
 ## Classification

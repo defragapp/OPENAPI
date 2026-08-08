@@ -1,6 +1,6 @@
 /* Cohesive Sovereign visual system.
    This layer translates the approved editorial references into the public site,
-   authenticated space, and iOS-sized responsive experience without changing product logic. */
+   authenticated workspace, and iOS-sized responsive experience without changing product logic. */
 
 :root {
   --visual-page: #0a0b0a;
@@ -589,9 +589,9 @@ body {
   }
 }
 
-/* Authenticated space */
+/* Authenticated workspace */
 
-.intelligence-space {
+.intelligence-workspace {
   background:
     linear-gradient(rgba(255, 255, 255, .01) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, .01) 1px, transparent 1px),
@@ -694,7 +694,7 @@ body {
 .explore-editorial h2,
 .baseline-builder h1,
 .baseline-reveal h1,
-.space-arrival h1,
+.workspace-arrival h1,
 .empty-state h2 {
   font-size: clamp(3rem, 5.7vw, 5rem);
   line-height: .94;
@@ -704,7 +704,7 @@ body {
 .explore-editorial,
 .baseline-builder,
 .baseline-reveal,
-.space-arrival,
+.workspace-arrival,
 .empty-state,
 .sovereign-answer,
 .account-summary {
@@ -843,7 +843,7 @@ body {
   backdrop-filter: blur(26px);
 }
 
-.space-sheet > section,
+.workspace-sheet > section,
 .source-drawer > section,
 .account-control-dialog,
 .system-membership-dialog {
@@ -1039,7 +1039,7 @@ body {
   .explore-editorial h2,
   .baseline-builder h1,
   .baseline-reveal h1,
-  .space-arrival h1,
+  .workspace-arrival h1,
   .empty-state h2 {
     font-size: clamp(2.65rem, 13vw, 4rem);
   }
@@ -1048,7 +1048,7 @@ body {
   .explore-editorial,
   .baseline-builder,
   .baseline-reveal,
-  .space-arrival,
+  .workspace-arrival,
   .empty-state,
   .sovereign-answer,
   .account-summary {
@@ -1122,7 +1122,7 @@ body {
     background: rgba(23, 24, 23, .97);
   }
 
-  .space-sheet > section,
+  .workspace-sheet > section,
   .source-drawer > section,
   .account-control-dialog,
   .system-membership-dialog {
@@ -1173,7 +1173,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .sovereign-landing *,
-  .intelligence-space * {
+  .intelligence-workspace * {
     animation: none !important;
     scroll-behavior: auto !important;
     transition-duration: .01ms !important;

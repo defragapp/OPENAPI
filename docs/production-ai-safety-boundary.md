@@ -41,7 +41,7 @@ Grounded, urgent, and secure-refusal responses contain:
 
 When immediate danger is explicit, the response directs the user toward local emergency services, the nearest emergency department, and a trusted person without guessing the user’s location or inventing local resources.
 
-The authenticated space gives deterministic safety answers a distinct presentation and suppresses ordinary evidence, correction, saving, continuation, Covenant, and plan controls.
+The authenticated workspace gives deterministic safety answers a distinct presentation and suppresses ordinary evidence, correction, saving, continuation, Covenant, and plan controls.
 
 ## Privacy and Cloudflare controls
 

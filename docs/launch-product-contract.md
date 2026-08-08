@@ -45,7 +45,7 @@ The Baseline facet profile is versioned, validated, interpretive, and tied to ex
 
 ## Relationship and system consent
 
-A space owner may request access, cancel an invitation, remove a person from their space, or stop using shared context. A space owner may never grant consent on behalf of another person.
+A workspace owner may request access, cancel an invitation, remove a person from their workspace, or stop using shared context. A workspace owner may never grant consent on behalf of another person.
 
 The server rechecks identity, entitlement, and the required scope on every shared use. Revocation blocks future use immediately.
 
@@ -71,7 +71,7 @@ Free is permanent, not a trial or Stripe subscription.
 - Sovereign+: $20 monthly or $99 annually, 300 turns per UTC month.
 - People, Systems, Library, Covenant, and consent-aware shared use remain Sovereign+ capabilities.
 
-Stripe Checkout, Portal, products, prices, lookup keys, and server entitlement enforcement remain authoritative. Payment failure, cancellation, or expiration returns the account safely to Free without deleting the space.
+Stripe Checkout, Portal, products, prices, lookup keys, and server entitlement enforcement remain authoritative. Payment failure, cancellation, or expiration returns the account safely to Free without deleting the workspace.
 
 The two founder-approved support products are public on the How it works and Questions surfaces. They use Stripe-hosted one-time custom-amount Payment Links and remain voluntary, entitlement-neutral contributions. They do not purchase access, subscription benefits, ownership, influence, tax-deductible status, or a promise of future features. Support payments must never enter the Sovereign+ entitlement projection path.
 

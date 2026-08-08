@@ -25,7 +25,7 @@ Read these sources first and treat them as approval boundaries:
 - `docs/product-language-system.md`
 - `docs/inner-recognition-intelligence.md`
 - `apps/web/src/App.tsx`
-- `apps/web/src/SovereignIntelligenceSpace.tsx`
+- `apps/web/src/SovereignIntelligenceWorkspace.tsx`
 - `apps/web/src/PrivateAnswerExportRuntime.ts`
 - `apps/web/src/styles.css`
 - `apps/web/src/interface-composition.css`

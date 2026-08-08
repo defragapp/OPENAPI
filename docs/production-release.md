@@ -22,7 +22,7 @@ Production is released from one exact commit on `main`. Non-production branch bu
 
 `sovereign.os` is a product name, not an owned or delegated public domain. Do not publish links or email addresses at `sovereign.os`. `sovereign.app` is a separately registrable `.app` domain and must not be used unless it is purchased and added to Cloudflare.
 
-Private account export is disabled for launch. Sharing sends only the public Sovereign.OS link and includes no private space data.
+Private account export is disabled for launch. Sharing sends only the public Sovereign.OS link and includes no private workspace data.
 
 ## Required encrypted Worker secrets
 

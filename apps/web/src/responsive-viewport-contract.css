@@ -523,7 +523,7 @@
   .sovereign-landing .hero-intelligence-stage,
   .sovereign-landing .hero-answer,
   .sovereign-landing [data-viewport-surface],
-  .intelligence-space .response-thread > * {
+  .intelligence-workspace .response-thread > * {
     animation: none !important;
     transition: none !important;
     transform: none !important;

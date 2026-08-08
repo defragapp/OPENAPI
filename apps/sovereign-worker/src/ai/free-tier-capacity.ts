@@ -80,7 +80,7 @@ function freeCapacityResponse(now: Date, requestedNeurons: number): Response {
   const retryAfterSeconds = Math.max(1, Math.ceil((Date.parse(resetsAt) - now.getTime()) / 1_000));
   return Response.json({
     error: 'sovereign_free_capacity_reached',
-    message: 'Sovereign has reached today’s shared free AI capacity. Your space and saved understanding remain available.',
+    message: 'Sovereign has reached today’s shared free AI capacity. Your workspace and saved understanding remain available.',
     retryable: true,
     requestedNeurons,
     dailyReservationBudget: FREE_DAILY_NEURON_BUDGET,

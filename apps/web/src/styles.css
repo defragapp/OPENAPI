@@ -256,7 +256,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .side-rail nav button.active span { border-color: var(--sov-clay-line-soft); color: var(--clay-light); }
 .side-rail > p { margin: auto 8px 0; color: var(--faint); font-size: .67rem; line-height: 1.45; }
 
-.space-frame {
+.workspace-frame {
   width: min(calc(100% - 220px), 1180px);
   margin-left: max(220px, calc((100vw - 1180px + 220px) / 2));
   padding: 28px 34px 190px;
@@ -729,7 +729,7 @@ details p { margin: 0 0 16px; color: var(--muted); font-size: .82rem; }
 
 @media (max-width: 900px) {
   .side-rail { width: 190px; }
-  .space-frame { width: calc(100% - 190px); margin-left: 190px; padding-inline: 24px; }
+  .workspace-frame { width: calc(100% - 190px); margin-left: 190px; padding-inline: 24px; }
   .composer { left: 214px; right: 24px; }
   .hero-card { grid-template-columns: 1fr; }
   .account-layout { grid-template-columns: 1fr; gap: 38px; }
@@ -739,7 +739,7 @@ details p { margin: 0 0 16px; color: var(--muted); font-size: .82rem; }
 
 @media (max-width: 680px) {
   .side-rail { display: none; }
-  .space-frame {
+  .workspace-frame {
     width: 100%;
     margin: 0;
     padding: calc(env(safe-area-inset-top) + 18px) 14px calc(env(safe-area-inset-bottom) + 190px);

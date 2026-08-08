@@ -128,7 +128,7 @@ export function PlanOnboarding() {
             return;
           }
           if (effectivePlan === 'sovereign_plus') {
-            setStatus('Opening your Sovereign+ space…');
+            setStatus('Opening your Sovereign+ workspace…');
             await completeOnboarding('sovereign_plus', controller.signal);
             location.replace('/app');
             return;
@@ -208,12 +208,12 @@ export function PlanOnboarding() {
       setBaselineStage('complete');
 
       if (accountAlreadyOnboarded) {
-        setStatus('Your Baseline is ready. Opening your space…');
+        setStatus('Your Baseline is ready. Opening your workspace…');
         location.replace('/app');
         return;
       }
       if (currentPlan === 'sovereign_plus') {
-        setStatus('Your Baseline is ready. Opening your Sovereign+ space…');
+        setStatus('Your Baseline is ready. Opening your Sovereign+ workspace…');
         await completeOnboarding('sovereign_plus');
         location.replace('/app');
         return;
@@ -236,7 +236,7 @@ export function PlanOnboarding() {
     if (submitting) return;
     setSubmitting(true);
     setCheckoutUnavailable(false);
-    setStatus(plan === 'free' ? 'Opening your Free space…' : 'Preparing secure Stripe checkout…');
+    setStatus(plan === 'free' ? 'Opening your Free workspace…' : 'Preparing secure Stripe checkout…');
 
     try {
       if (plan === 'free') {
@@ -303,7 +303,7 @@ export function PlanOnboarding() {
             <ProgressItem number="1" label="Account" state="complete" />
             <ProgressItem number="2" label="Baseline" state={progress.baseline} />
             <ProgressItem number="3" label="Plan" state={progress.plan} />
-            <ProgressItem number="4" label="Space" state={progress.space} />
+            <ProgressItem number="4" label="Workspace" state={progress.workspace} />
           </ol>
 
           {phase === 'loading' && <JourneyMessage eyebrow="ACCOUNT SETUP" title="Preparing your private account." body={status} />}
@@ -571,7 +571,7 @@ function BaselineResultView({ baseline, certainty, reviewOpen, onToggleReview, o
       {reviewOpen && (
         <div className="baseline-review" role="region" aria-label="Baseline availability">
           <h2>What is available now</h2>
-          <p>Stable Baseline themes, exact approved Basis values, and visible uncertainty can now be used in the space. Current conditions remain separate and permission-based.</p>
+          <p>Stable Baseline themes, exact approved Basis values, and visible uncertainty can now be used in the workspace. Current conditions remain separate and permission-based.</p>
         </div>
       )}
       <div className="baseline-result-actions">
@@ -702,10 +702,10 @@ function baselineIsReady(baseline: BaselineStatus): boolean {
 }
 
 function progressState(phase: JourneyPhase) {
-  if (phase === 'plan') return { baseline: 'complete', plan: 'active', space: 'upcoming' } as const;
-  if (phase === 'baseline_result') return { baseline: 'complete', plan: 'upcoming', space: 'upcoming' } as const;
-  if (phase === 'baseline' || phase === 'baseline_building') return { baseline: 'active', plan: 'upcoming', space: 'upcoming' } as const;
-  return { baseline: 'upcoming', plan: 'upcoming', space: 'upcoming' } as const;
+  if (phase === 'plan') return { baseline: 'complete', plan: 'active', workspace: 'upcoming' } as const;
+  if (phase === 'baseline_result') return { baseline: 'complete', plan: 'upcoming', workspace: 'upcoming' } as const;
+  if (phase === 'baseline' || phase === 'baseline_building') return { baseline: 'active', plan: 'upcoming', workspace: 'upcoming' } as const;
+  return { baseline: 'upcoming', plan: 'upcoming', workspace: 'upcoming' } as const;
 }
 
 function stageState(current: BaselineStage, index: number): 'complete' | 'active' | 'upcoming' {

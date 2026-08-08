@@ -97,7 +97,7 @@ export function PasskeyAuthentication() {
       const verified = await verifyResponse.json().catch(() => ({})) as LoginVerifyResponse;
       if (!verifyResponse.ok || verified.status !== 'success') throw new Error('passkey_verification_failed');
       setState('success');
-      setMessage('Passkey verified. Confirming your account, Baseline, and plan before the private space opens.');
+      setMessage('Passkey verified. Confirming your account, Baseline, and plan before the private workspace opens.');
       window.setTimeout(() => location.assign(safeReturnTo(verified.next ?? returnTo)), 220);
     } catch (error) {
       setState(error instanceof DOMException && error.name === 'NotAllowedError' ? 'ready' : 'error');

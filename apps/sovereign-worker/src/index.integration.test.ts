@@ -126,7 +126,7 @@ describe('authenticated Today and Explore smoke flow', () => {
       sharing: {
         mode: 'public-link-only',
         url: 'https://sovereign.defrag.app',
-        includesPrivateSpaceData: false
+        includesPrivateWorkspaceData: false
       }
     });
   });

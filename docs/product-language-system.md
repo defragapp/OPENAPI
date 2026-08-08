@@ -1,6 +1,6 @@
 # Sovereign.OS product language system
 
-Use this guide for public pages, authentication, onboarding, the authenticated space, AI answers, errors, and release tests.
+Use this guide for public pages, authentication, onboarding, the authenticated workspace, AI answers, errors, and release tests.
 
 ## Product definition
 

@@ -6,7 +6,7 @@ import type {
   ExpressionFieldSubject
 } from './expression-field-view-contract';
 
-type SpaceExpressionFieldProps =
+type WorkspaceExpressionFieldProps =
   | {
       mode: 'relationship';
       subjects: readonly ExpressionFieldSubject[];
@@ -22,15 +22,15 @@ type SpaceExpressionFieldProps =
       onSelectionChange?: (id: string) => void;
     };
 
-export function SpaceExpressionField(props: SpaceExpressionFieldProps) {
+export function WorkspaceExpressionField(props: WorkspaceExpressionFieldProps) {
   if (props.mode === 'relationship') {
-    return <RelationalExpressionField subjects={props.subjects} interaction={props.context} depth="space" className={props.className ?? ''} />;
+    return <RelationalExpressionField subjects={props.subjects} interaction={props.context} depth="workspace" className={props.className ?? ''} />;
   }
   return (
     <SystemExpressionField
       subjects={props.subjects}
       interaction={props.context}
-      depth="space"
+      depth="workspace"
       className={props.className ?? ''}
       {...(props.activeConnection ? { activeConnection: props.activeConnection } : {})}
       {...(props.onSelectionChange ? { onSelectionChange: props.onSelectionChange } : {})}

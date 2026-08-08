@@ -2,7 +2,7 @@
 
 Status: product reference and implementation planning document.
 
-This document preserves the expanded question universe for Baseline Design and maps it to the current Sovereign.OS product, public landing experience, How It Works page, FAQ, and the authenticated single-room space.
+This document preserves the expanded question universe for Baseline Design and maps it to the current Sovereign.OS product, public landing experience, How It Works page, FAQ, and the authenticated single-room workspace.
 
 It does **not** replace the canonical contracts in:
 
@@ -18,7 +18,7 @@ Where this document describes a useful question that the current deterministic o
 This strategy was checked against the current repository implementation and product sources:
 
 - `apps/web/src/PublicLanding.tsx`
-- `apps/web/src/SovereignIntelligenceSpace.tsx`
+- `apps/web/src/SovereignIntelligenceWorkspace.tsx`
 - `apps/web/public/how-it-works.html`
 - `apps/web/public/faq.html`
 - `apps/sovereign-worker/src/agent/prompt-v1.ts`
@@ -722,7 +722,7 @@ The current authenticated architecture already has the correct top-level surface
 - Library
 - You
 
-Do not add a new navigation destination for every question category. Use this question universe to make the existing space feel more capable and immediately useful.
+Do not add a new navigation destination for every question category. Use this question universe to make the existing workspace feel more capable and immediately useful.
 
 ## 9.1 Today
 
@@ -1321,7 +1321,7 @@ The next improvement should expand the questions demonstrated without replacing 
 
 ## Finding 2: the internal product already has the right breadth in code
 
-`SovereignIntelligenceSpace.tsx` already includes Explore modes for Baseline, Shadow and Gift, Alignment, decisions, communication, love, learning, leadership, boundaries, pressure, and family role.
+`SovereignIntelligenceWorkspace.tsx` already includes Explore modes for Baseline, Shadow and Gift, Alignment, decisions, communication, love, learning, leadership, boundaries, pressure, and family role.
 
 The question universe should become:
 
@@ -1413,7 +1413,7 @@ This strategy is successfully reflected in the product when:
 
 1. A new visitor can name at least five real questions Sovereign can help with.
 2. The landing demonstrates self, decision, relationship, and system intelligence without becoming a dashboard.
-3. The authenticated space offers useful entry points before the user writes a perfect prompt.
+3. The authenticated workspace offers useful entry points before the user writes a perfect prompt.
 4. Answers create a specific, practical distinction rather than generic coaching.
 5. Stable Baseline, temporary current context, user observation, relationship interaction, system structure, and unknown state remain visibly separate.
 6. Another person is represented only through permitted information and possibility language.

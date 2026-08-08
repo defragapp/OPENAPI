@@ -10,7 +10,7 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Primary user language is plain-language Baseline; astrology, Human Design, Gene Keys, numerology, and implementation detail are not required to understand the result.
 - Pair analysis uses two real reduced Baseline datasets and requires active, identity-bound invitee consent.
 - Family and team analysis uses participant-level Baseline context and materially changes the analysis.
-- A space owner cannot grant consent on behalf of another person.
+- A workspace owner cannot grant consent on behalf of another person.
 - Revocation immediately blocks future pair and system analysis.
 - Covenant is a primary capability but remains explicit per question or thread.
 - A Scripture lens is suggested subtly, retrieved from an approved source, and never presented as proof of motive, diagnosis, future behavior, or God's exact intent.
@@ -54,7 +54,7 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Sovereign+ monthly and annual Checkout work in Stripe test mode.
 - Webhooks project active and trialing subscriptions to Sovereign+ and all other relevant states safely to Free.
 - Protected endpoints enforce entitlements server-side.
-- Cancellation or payment failure does not delete the space.
+- Cancellation or payment failure does not delete the workspace.
 - Billing Portal returns to the authenticated application.
 - The two public donation Payment Links remain active and use one-time custom-amount prices.
 - Donation Payment Links remain outside the subscription entitlement projection path.

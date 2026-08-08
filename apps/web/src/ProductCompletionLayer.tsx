@@ -322,7 +322,7 @@ export function ProductCompletionLayer() {
               </div>
               <button className="quiet-button" onClick={() => setControlsOpen(false)} autoFocus>Close</button>
             </header>
-            <p className="completion-intro">A connection never creates blanket access. Review active permissions, stop a specific use, cancel a pending invitation, or remove a person from your space.</p>
+            <p className="completion-intro">A connection never creates blanket access. Review active permissions, stop a specific use, cancel a pending invitation, or remove a person from your workspace.</p>
             <p className="result-status" role="status" aria-live="polite">{status}</p>
 
             <section className="completion-section">
@@ -347,7 +347,7 @@ export function ProductCompletionLayer() {
                           onClick={() => mutate(
                             `Stopping use of ${scopeTitle(scope)}…`,
                             `/api/v1/people/${encodeURIComponent(person.id)}/consent/${encodeURIComponent(scope)}`,
-                            { method: 'PUT', body: JSON.stringify({ granted: false, reason: 'Space owner stopped using this scope.' }) }
+                            { method: 'PUT', body: JSON.stringify({ granted: false, reason: 'Workspace owner stopped using this scope.' }) }
                           )}
                         >
                           {scopeTitle(scope)} · stop using
@@ -373,7 +373,7 @@ export function ProductCompletionLayer() {
                       className="danger-button"
                       disabled={loading}
                       onClick={() => {
-                        if (!window.confirm(`Remove ${person.displayName} and all consented relationship/system links from this space?`)) return;
+                        if (!window.confirm(`Remove ${person.displayName} and all consented relationship/system links from this workspace?`)) return;
                         void mutate(
                           'Removing person and linked shared context…',
                           `/api/v1/people/${encodeURIComponent(person.id)}`,
@@ -381,7 +381,7 @@ export function ProductCompletionLayer() {
                         );
                       }}
                     >
-                      Remove from space
+                      Remove from workspace
                     </button>
                   </div>
                 </article>

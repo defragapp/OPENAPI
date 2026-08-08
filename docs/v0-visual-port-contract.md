@@ -83,9 +83,9 @@ Preserve the existing OPENAPI application and server behavior:
 - React/Vite client;
 - Cloudflare Worker runtime;
 - D1, Durable Objects, Workers AI, AI Gateway, Turnstile, Resend, and Stripe;
-- authenticated one-room space;
+- authenticated one-room workspace;
 - navigation: Today, Explore, People, Systems, Library, You;
-- `SovereignIntelligenceSpace`;
+- `SovereignIntelligenceWorkspace`;
 - `sovereign-answer.v2`;
 - Baseline and current-context separation;
 - permission-bound People and Systems;
@@ -97,7 +97,7 @@ Preserve the existing OPENAPI application and server behavior:
 
 The archive visual language must extend beyond the landing to the real product surfaces:
 
-- authenticated space shell;
+- authenticated workspace shell;
 - navigation and top bar;
 - Today, Explore, People, Systems, Library, and You;
 - composer and contextual controls;
@@ -121,7 +121,7 @@ The complete Vite cascade and standalone path are required:
 2. `apps/web/src/v0-motion-accessibility.css`
    - preserves the complete founder composition for reduced-motion users.
 3. `apps/web/src/v0-visual-port.css`
-   - owns the founder landing composition and the real authenticated space foundation.
+   - owns the founder landing composition and the real authenticated workspace foundation.
 4. `apps/web/src/v0-global-experience.css`
    - extends the founder language across non-landing product surfaces without replacing the landing composition.
 5. `apps/web/src/passkey-auth.css`
@@ -153,7 +153,7 @@ A production release must fail unless all of the following are true:
 - the required v0 components and copy are compiled;
 - the Vite cascade remains ordered `v0-platform-port.css` → `v0-motion-accessibility.css` → `v0-visual-port.css` → `v0-global-experience.css` → `passkey-auth.css`;
 - `passkey-auth.css` is the final local visual import;
-- compiled CSS contains v0 landing, real space/account, onboarding, policy, and access selectors;
+- compiled CSS contains v0 landing, real workspace/account, onboarding, policy, and access selectors;
 - standalone public routes load `v0-public-port.css` and contain its archive fingerprint;
 - the reconstructed `Know yourself. Understand the system. Choose what fits.` hero is absent from the compiled landing bundle;
 - archive mock-runtime markers are absent;

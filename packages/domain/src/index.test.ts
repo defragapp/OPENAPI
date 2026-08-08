@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-describe('space package', () => {
+describe('workspace package', () => {
   it('is wired into verification', () => {
     expect(true).toBe(true);
   });

@@ -11,8 +11,8 @@ const landing = read('./PublicLanding.tsx');
 const stories = read('./LandingProductStories.tsx');
 const field = read('./expression-field/LandingExpressionSlice.tsx');
 const viewportProbe = read('./PublicLandingViewportContract.ts');
-const authenticated = read('./AuthenticatedSpace.tsx');
-const space = read('./SovereignIntelligenceSpace.tsx');
+const authenticated = read('./AuthenticatedWorkspace.tsx');
+const workspace = read('./SovereignIntelligenceWorkspace.tsx');
 const onboarding = read('./PlanOnboarding.tsx');
 const controls = read('./AccountControlCenter.tsx');
 const membership = read('./SystemMembershipManager.tsx');
@@ -177,7 +177,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
   });
 
   it('applies the same founder language to the platform and standalone routes', () => {
-    for (const selector of ['.v0-hero', '.v0-story-grid', '.intelligence-space', '.intelligence-sidebar', '.sovereign-composer', '.account-shell', '.auth-panel', '.space-sheet']) expect(v0Css).toContain(selector);
+    for (const selector of ['.v0-hero', '.v0-story-grid', '.intelligence-workspace', '.intelligence-sidebar', '.sovereign-composer', '.account-shell', '.auth-panel', '.workspace-sheet']) expect(v0Css).toContain(selector);
     for (const selector of ['body:has(.plan-onboarding)', 'body:has(.sovereign-policy)', '.plan-nav', '.onboarding-plan-grid', '.policy-hero', '.email-code-fallback']) expect(v0PlatformCss).toContain(selector);
     for (const selector of ['body.launch-page', '.launch-nav', '.launch-hero', '.journey-steps', '.pricing-grid', '.faq-list details', '.launch-footer']) expect(staticV0Css).toContain(selector);
     expect(staticAuthority).toContain("@import url('/v0-public-port.css?v=20260801-founder-v0')");
@@ -195,11 +195,11 @@ describe('founder v0 selective visual port — approved public v8', () => {
   });
 
   it('preserves the real OPENAPI architecture and production behavior', () => {
-    expect(authenticated).toContain('data-space-contract="one-room"');
-    expect(authenticated).toContain('<SovereignIntelligenceSpace onboardingVerified />');
-    expect(space).toContain("type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'");
-    expect(space).toContain("version: 'sovereign-answer.v2'");
-    for (const path of ['/api/v1/today', '/api/v1/people', '/api/v1/systems', '/api/v1/threads/']) expect(space).toContain(path);
+    expect(authenticated).toContain('data-workspace-contract="one-room"');
+    expect(authenticated).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
+    expect(workspace).toContain("type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'");
+    expect(workspace).toContain("version: 'sovereign-answer.v2'");
+    for (const path of ['/api/v1/today', '/api/v1/people', '/api/v1/systems', '/api/v1/threads/']) expect(workspace).toContain(path);
     for (const route of ["path === '/login'", "path === '/signup'", "path === '/invitation'", "path === '/onboarding'"]) expect(app).toContain(route);
     expect(app).toContain('__TURNSTILE_SITE_KEY__');
     expect(onboarding).toContain('/api/v1/billing/checkout');
@@ -208,7 +208,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
   });
 
   it('does not import the archive mock runtime or unsupported scoring', () => {
-    const source = `${landing}\n${stories}\n${field}\n${v0Css}\n${v0PlatformCss}\n${app}\n${space}`;
+    const source = `${landing}\n${stories}\n${field}\n${v0Css}\n${v0PlatformCss}\n${app}\n${workspace}`;
     for (const prohibited of ['Math.random', 'mock-auth', 'fake-answer', 'dashboard-grid', 'Demo User', 'generateAIResponse', 'Alignment Score', 'Stability Index']) {
       expect(source).not.toContain(prohibited);
     }

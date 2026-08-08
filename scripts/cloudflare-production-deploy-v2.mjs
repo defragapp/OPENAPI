@@ -258,7 +258,7 @@ async function verifyLiveProduction() {
     '.landing-expression-slice__tooltip{',
     '.v0-capability-summary{',
     '.v0-comparison-grid{',
-    '.intelligence-space{',
+    '.intelligence-workspace{',
     '.sovereign-composer{',
     '.account-shell',
     '.plan-onboarding',

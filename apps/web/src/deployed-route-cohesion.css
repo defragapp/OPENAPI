@@ -3,7 +3,7 @@
  *
  * This file is imported last. It does not target PublicLanding. It reconciles
  * the older clay/sage product layers, the founder-v0 blue editorial system,
- * auth/onboarding, policy pages, route gates, and the one-room space into
+ * auth/onboarding, policy pages, route gates, and the one-room workspace into
  * one readable typography and spacing contract.
  */
 
@@ -685,23 +685,23 @@ body:has(.sovereign-app-runtime) {
   text-decoration: none;
 }
 
-/* One-room space: preserve product structure while removing the old visual split. */
+/* One-room workspace: preserve product structure while removing the old visual split. */
 .sovereign-app-runtime {
   min-height: 100svh;
   background: var(--route-page);
   font-size: 16px;
 }
 
-.sovereign-app-runtime :where(.intelligence-space, .intelligence-main, .intelligence-context, .space-sheet section, .account-control-dialog) {
+.sovereign-app-runtime :where(.intelligence-workspace, .intelligence-main, .intelligence-context, .workspace-sheet section, .account-control-dialog) {
   color: var(--route-ink);
 }
 
-.sovereign-app-runtime :where(.intelligence-rail, .intelligence-topbar, .intelligence-context, .sovereign-composer, .space-sheet section, .account-control-dialog) {
+.sovereign-app-runtime :where(.intelligence-rail, .intelligence-topbar, .intelligence-context, .sovereign-composer, .workspace-sheet section, .account-control-dialog) {
   border-color: var(--route-line);
   background-color: rgba(14, 17, 21, 0.94);
 }
 
-.sovereign-app-runtime :where(.intelligence-topbar h1, .intelligence-context h2, .space-sheet h2, .account-control-dialog h2) {
+.sovereign-app-runtime :where(.intelligence-topbar h1, .intelligence-context h2, .workspace-sheet h2, .account-control-dialog h2) {
   color: var(--route-ink);
   font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
   font-weight: 400 !important;

@@ -2,7 +2,7 @@
  * Sovereign.OS sitewide cohesion refinement v2.
  *
  * Loaded through the existing synchronous platform cohesion installer so the
- * frozen founder landing, account journey, and authenticated one-room space
+ * frozen founder landing, account journey, and authenticated one-room workspace
  * share one final wordmark, spacing rhythm, and interaction finish without
  * replacing route ownership or product behavior.
  */
@@ -315,7 +315,7 @@
   letter-spacing: -0.055em !important;
 }
 
-.sovereign-app-runtime :where(.surface-heading > span, .space-intro, .section-introduction) {
+.sovereign-app-runtime :where(.surface-heading > span, .workspace-intro, .section-introduction) {
   color: rgba(229, 220, 209, 0.7) !important;
   font-family: var(--font-subheading, "Sovereign Sans", sans-serif) !important;
 }

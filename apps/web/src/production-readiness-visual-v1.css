@@ -534,12 +534,12 @@ html[data-sovereign-production-readiness="desktop-ios-v1"] {
     line-height: 1.62 !important;
   }
 
-  .sovereign-app-runtime .space-mobile-utilities {
+  .sovereign-app-runtime .workspace-mobile-utilities {
     margin-bottom: 18px !important;
     padding-bottom: 18px !important;
   }
 
-  .sovereign-app-runtime .space-mobile-utilities > summary {
+  .sovereign-app-runtime .workspace-mobile-utilities > summary {
     display: grid !important;
     min-height: 54px !important;
     grid-template-columns: minmax(0, 1fr) auto !important;
@@ -551,50 +551,50 @@ html[data-sovereign-production-readiness="desktop-ios-v1"] {
     list-style: none !important;
   }
 
-  .sovereign-app-runtime .space-mobile-utilities > summary::-webkit-details-marker {
+  .sovereign-app-runtime .workspace-mobile-utilities > summary::-webkit-details-marker {
     display: none !important;
   }
 
-  .sovereign-app-runtime .space-mobile-utilities > summary::after {
+  .sovereign-app-runtime .workspace-mobile-utilities > summary::after {
     color: rgba(120, 199, 255, 0.8) !important;
     content: "+" !important;
     font-size: 1.15rem !important;
   }
 
-  .sovereign-app-runtime .space-mobile-utilities[open] > summary::after {
+  .sovereign-app-runtime .workspace-mobile-utilities[open] > summary::after {
     content: "−" !important;
   }
 
-  .sovereign-app-runtime .space-mobile-utilities-summary-copy {
+  .sovereign-app-runtime .workspace-mobile-utilities-summary-copy {
     display: grid !important;
     gap: 3px !important;
   }
 
-  .sovereign-app-runtime .space-mobile-utilities-summary-copy strong {
+  .sovereign-app-runtime .workspace-mobile-utilities-summary-copy strong {
     font-size: 0.86rem !important;
     font-weight: 700 !important;
   }
 
-  .sovereign-app-runtime .space-mobile-utilities-summary-copy span {
+  .sovereign-app-runtime .workspace-mobile-utilities-summary-copy span {
     color: rgba(229, 220, 209, 0.56) !important;
     font-size: 0.7rem !important;
   }
 
-  .sovereign-app-runtime .space-mobile-utilities-content {
+  .sovereign-app-runtime .workspace-mobile-utilities-content {
     padding-top: 12px !important;
   }
 
-  .sovereign-app-runtime .space-mobile-utilities-heading h3 {
+  .sovereign-app-runtime .workspace-mobile-utilities-heading h3 {
     font-size: 1.45rem !important;
     line-height: 1.08 !important;
   }
 
-  .sovereign-app-runtime .space-mobile-utilities-heading p {
+  .sovereign-app-runtime .workspace-mobile-utilities-heading p {
     font-size: 0.8rem !important;
     line-height: 1.5 !important;
   }
 
-  .sovereign-app-runtime .space-mobile-utility-actions button {
+  .sovereign-app-runtime .workspace-mobile-utility-actions button {
     min-height: 52px !important;
     padding: 10px 12px !important;
   }
@@ -611,7 +611,7 @@ html[data-sovereign-production-readiness="desktop-ios-v1"] {
   }
 
   .sovereign-app-runtime .sovereign-composer,
-  .sovereign-app-runtime .intelligence-space.context-open .sovereign-composer {
+  .sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
     right: max(8px, env(safe-area-inset-right)) !important;
     bottom: calc(68px + env(safe-area-inset-bottom)) !important;
     left: max(8px, env(safe-area-inset-left)) !important;
