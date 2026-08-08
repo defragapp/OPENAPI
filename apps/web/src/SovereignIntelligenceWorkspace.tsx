@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useTTS } from './hooks/useTTS';
 import type { FormEvent, KeyboardEvent, ReactNode } from 'react';
 import { ThreadExpressionField } from './expression-field/ThreadExpressionField';
 import { WorkspaceExpressionField } from './expression-field/WorkspaceExpressionField';
@@ -1151,42 +1150,9 @@ function SovereignAnswerView({ answer, basis, expressionFieldContext, interfaceA
   const openPlans = () => location.assign('/pricing');
   const unknown = answer.sections.find((section) => section.id === 'unknowns');
   const standardSections = answer.sections.filter((section) => section.id !== 'unknowns');
-
-  const { state: ttsState, toggle: toggleTTS } = useTTS();
-  const answerFullText = useMemo(() => {
-    return [
-      answer.headline,
-      answer.direct_answer,
-      ...standardSections.map(s => s.label + '. ' + s.body)
-    ].join('\n\n');
-  }, [answer, standardSections]);
-
-  const onListenClick = () => {
-    toggleTTS(answerFullText);
-  };
-
   return (
     <section className={`sovereign-answer answer-${answer.mode}`} aria-label={`${answer.mode.replace('_', ' ')} answer`}>
-      <header><span>Sovereign · {modeLabel(answer.mode)}</span><h2>{answer.headline}</h2>
-        {latest && (
-          <button
-            className="tts-listen-button"
-            onClick={onListenClick}
-            aria-label={ttsState === 'playing' ? "Pause audio" : "Listen to answer"}
-            style={{
-              background: 'none', border: 'none', color: 'inherit', cursor: 'pointer',
-              opacity: ttsState === 'loading' ? 0.5 : 1, transition: 'opacity 0.2s',
-              display: 'inline-flex', alignItems: 'center', marginLeft: '12px'
-            }}
-          >
-            {ttsState === 'playing' ? (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-            ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            )}
-          </button>
-        )}
-</header>
+      <header><span>Sovereign · {modeLabel(answer.mode)}</span><h2>{answer.headline}</h2></header>
       <p className="direct-answer">{answer.direct_answer}</p>
 
       {answer.mode === 'alignment'
