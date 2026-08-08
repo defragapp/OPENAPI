@@ -1,9 +1,10 @@
+import { BrandMark } from './BrandMark';
 type PolicyKind = 'privacy' | 'terms';
 
 const privacySections = [
   {
     title: 'Information you provide',
-    copy: 'Sovereign.OS uses your name and email to operate your account. To build a Baseline, you may provide a birth date, birthplace, birthplace timezone, birth-time certainty, and a birth time when known. You choose the location precision used for current context.'
+    copy: '<BrandMark /> uses your name and email to operate your account. To build a Baseline, you may provide a birth date, birthplace, birthplace timezone, birth-time certainty, and a birth time when known. You choose the location precision used for current context.'
   },
   {
     title: 'How Baseline details are used',
@@ -23,22 +24,22 @@ const privacySections = [
   },
   {
     title: 'Your controls',
-    copy: 'You can correct a response, decide what enters Library, revoke shared-context permission, manage billing, and request account deletion with a 14-day grace period. Private account export is not available at launch. Public sharing sends only the public Sovereign.OS link.'
+    copy: 'You can correct a response, decide what enters Library, revoke shared-context permission, manage billing, and request account deletion with a 14-day grace period. Private account export is not available at launch. Public sharing sends only the public <BrandMark /> link.'
   }
 ] as const;
 
 const termsSections = [
   {
-    title: 'What Sovereign.OS provides',
-    copy: 'Sovereign.OS is a private intelligence platform for understanding yourself, your relationships, and the groups around you. It uses an interpretive Baseline, permitted current context, user-confirmed information, and consented relationship or system context to form responses.'
+    title: 'What <BrandMark /> provides',
+    copy: '<BrandMark /> is a private intelligence platform for understanding yourself, your relationships, and the groups around you. It uses an interpretive Baseline, permitted current context, user-confirmed information, and consented relationship or system context to form responses.'
   },
   {
     title: 'Interpretive limits',
-    copy: 'The Baseline may draw on astrology, partial Human Design and Gene Keys signals, and numerology. These are symbolic interpretive frameworks, not scientifically verified psychological measurements. Sovereign.OS does not diagnose, predict, establish hidden motives, or determine what another person feels.'
+    copy: 'The Baseline may draw on astrology, partial Human Design and Gene Keys signals, and numerology. These are symbolic interpretive frameworks, not scientifically verified psychological measurements. <BrandMark /> does not diagnose, predict, establish hidden motives, or determine what another person feels.'
   },
   {
     title: 'Your judgment and safety',
-    copy: 'Sovereign.OS can offer reflection, questions, and practical options, but it does not replace medical, mental-health, legal, financial, emergency, or other qualified professional support. You remain responsible for decisions made with or without the product.'
+    copy: '<BrandMark /> can offer reflection, questions, and practical options, but it does not replace medical, mental-health, legal, financial, emergency, or other qualified professional support. You remain responsible for decisions made with or without the product.'
   },
   {
     title: 'Plans and usage',
@@ -69,7 +70,7 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
     >
       <header className="v0-nav">
         <div className="v0-shell v0-nav-inner">
-          <a className="v0-wordmark v0-wordmark--desktop" href="/" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
+          <a className="v0-wordmark v0-wordmark--desktop" href="/"><BrandMark /></a>
           <a className="v0-wordmark v0-wordmark--mobile" href="/" aria-label="Sovereign.OS home">Sovereign</a>
           <nav aria-label="Public navigation">
             <a href="/how-it-works">How it works</a>
@@ -94,7 +95,7 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
 
       <section className="policy-hero">
         <p className="policy-kicker"><span />{privacy ? 'PRIVACY' : 'TERMS'}</p>
-        <h1>{privacy ? 'How Sovereign.OS handles your information.' : 'Terms for using Sovereign.OS.'}</h1>
+        <h1>{privacy ? 'How <BrandMark /> handles your information.' : 'Terms for using <BrandMark />.'}</h1>
         <p>
           {privacy
             ? 'This page explains what the product collects, what reaches the language model, how long information is kept, and the choices you control.'
@@ -103,7 +104,7 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
         <p className="policy-effective">Effective July 26, 2026</p>
       </section>
 
-      <section className="policy-grid" aria-label={privacy ? 'Privacy details' : 'Terms details'}>
+      <section className="policy-grid prose prose-invert max-w-none" aria-label={privacy ? 'Privacy details' : 'Terms details'}>
         {sections.map((section, index) => (
           <article key={section.title}>
             <span>{String(index + 1).padStart(2, '0')}</span>
@@ -123,7 +124,7 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
 
       <footer className="v0-footer">
         <div className="v0-shell">
-          <a href="/" className="v0-wordmark" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
+          <a href="/" className="v0-wordmark"><BrandMark /></a>
           <nav aria-label="Footer navigation">
             <a aria-current={privacy ? 'page' : undefined} href="/privacy">Privacy</a>
             <a aria-current={!privacy ? 'page' : undefined} href="/terms">Terms</a>

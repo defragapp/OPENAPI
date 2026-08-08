@@ -37,7 +37,7 @@ describe('approved public landing v8', () => {
   it('renders the approved immersive hero, real-life questions, and three product demonstrations', () => {
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('data-layout-release="v0-motion-workflows-v8"');
-    expect(landing).toContain('SOVEREIGN.OS');
+    expect(landing).toContain('<BrandMark />');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
     expect(landing).toContain('<LandingExpressionSlice />');

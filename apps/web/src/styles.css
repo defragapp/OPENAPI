@@ -838,3 +838,4 @@ details p { margin: 0 0 16px; color: var(--muted); font-size: .82rem; }
     transition-duration: .01ms !important;
   }
 }
+:root { scrollbar-gutter: stable; }

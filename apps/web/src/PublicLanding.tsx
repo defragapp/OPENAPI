@@ -1,3 +1,4 @@
+import { BrandMark } from './BrandMark';
 import { LandingExpressionSlice } from './expression-field/LandingExpressionSlice';
 import { LandingProductStories } from './LandingProductStories';
 
@@ -58,8 +59,8 @@ function V0Navigation() {
   return (
     <header className="v0-nav">
       <div className="v0-shell v0-nav-inner">
-        <a className="v0-wordmark v0-wordmark--desktop" href="/" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
-        <a className="v0-wordmark v0-wordmark--mobile" href="/" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
+        <a className="v0-wordmark v0-wordmark--desktop" href="/" aria-label="Sovereign.OS home"><BrandMark /></a>
+        <a className="v0-wordmark v0-wordmark--mobile" href="/" aria-label="Sovereign.OS home"><BrandMark /></a>
         <nav aria-label="Public navigation">
           <a href="#how">How it works</a>
           <a href="/pricing">Pricing</a>
@@ -191,7 +192,7 @@ function ComparisonStory() {
         </header>
         <div className="v0-comparison-grid" data-viewport-surface="comparison">
           <ComparisonPanel title="Other AI answers" items={COMPARISON.others} positive={false} />
-          <ComparisonPanel title="SOVEREIGN.OS" items={COMPARISON.sovereign} positive />
+          <ComparisonPanel title="<BrandMark />" items={COMPARISON.sovereign} positive />
         </div>
       </div>
     </section>
@@ -216,7 +217,7 @@ function V0Footer() {
   return (
     <footer className="v0-footer">
       <div className="v0-shell">
-        <a href="/" className="v0-wordmark" aria-label="Sovereign.OS home">SOVEREIGN.OS</a>
+        <a href="/" className="v0-wordmark" aria-label="Sovereign.OS home"><BrandMark /></a>
         <nav aria-label="Footer navigation">
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
