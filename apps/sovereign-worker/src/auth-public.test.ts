@@ -1,5 +1,11 @@
-import { describe, expect, it } from 'vitest';
-import { safeReturnTo } from './auth-public';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { safeReturnTo, verifyTurnstile } from './auth-public';
+import type { Env } from './env';
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 describe('safe authentication return routing', () => {
   it('preserves only approved in-app destinations', () => {
@@ -14,5 +20,22 @@ describe('safe authentication return routing', () => {
     expect(safeReturnTo('/pricing.html')).toBe('/app');
     expect(safeReturnTo('/app\\evil')).toBe('/app');
     expect(safeReturnTo(null)).toBe('/app');
+  });
+});
+
+
+describe('Turnstile production failure handling', () => {
+  it('preserves the 503 response contract when the secret is unavailable', async () => {
+    const env = { APP_ENV: 'production' } as unknown as Env;
+    await expect(verifyTurnstile(env, 'token')).rejects.toMatchObject({ status: 503 });
+  });
+
+  it('logs invalid production secrets regardless of their literal value', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ success: false, 'error-codes': ['invalid-input-secret'] })));
+    const env = { APP_ENV: 'production', TURNSTILE_SECRET_KEY: 'secret' } as unknown as Env;
+
+    await expect(verifyTurnstile(env, 'token')).rejects.toMatchObject({ status: 503 });
+    expect(error).toHaveBeenCalledWith('turnstile_configuration_error', { invalidSecret: true });
   });
 });
