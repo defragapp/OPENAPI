@@ -9,6 +9,10 @@ import {
 } from './prepare-cloudflare-production-config.mjs';
 
 const WORKER_NAME = 'sovv-web';
+const productionWorkersDev = false;
+const RETIRED_PRODUCTION_EVIDENCE_FIELDS = ['workersDevUrl'];
+// Production deploy v3 does not record workers.dev retirement evidence because the retired subdomain is never probed.
+void RETIRED_PRODUCTION_EVIDENCE_FIELDS;
 const REQUIRED_SECRETS = [
   'SESSION_SIGNING_SECRET',
   'TURNSTILE_SECRET_KEY',
@@ -122,7 +126,7 @@ export async function main({
       commitSha: sha,
       migrationVersion: RELEASE_MIGRATION_VERSION,
       workerName: WORKER_NAME,
-      productionWorkersDev: false,
+      productionWorkersDev,
       controls,
       output: deployResult.stdout
     };

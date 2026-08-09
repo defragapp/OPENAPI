@@ -1,4 +1,4 @@
-import { orchestrateRelease } from './release-orchestrator.mjs';
+import { DEFAULT_POST_DEPLOY_CHECKS, orchestrateRelease } from './release-orchestrator.mjs';
 
 // Static compatibility markers retained for the repository's direct-release verifier.
 // The legacy v2 filename is descriptive only; the orchestrator never imports or executes it.
@@ -22,6 +22,18 @@ const RELEASE_WRAPPER_COMPATIBILITY = [
   'Math.max(30_000, Math.min(120_000, requestedBrowserRetryFloor))'
 ];
 void RELEASE_WRAPPER_COMPATIBILITY;
+
+const RELEASE_WRAPPER_LIVE_GATES = [
+  ['verify-runtime-v3', 'scripts/verify-parent-domain-routes-v3.mjs'],
+  ['verify-secondary-public', 'scripts/verify-live-secondary-public.mjs'],
+  ['verify-route-cohesion', 'scripts/verify-live-route-cohesion.mjs'],
+  ['verify-rendered-visuals', 'scripts/verify-live-visual-release-v3.mjs']
+];
+for (const [label, path] of RELEASE_WRAPPER_LIVE_GATES) {
+  if (!DEFAULT_POST_DEPLOY_CHECKS.some((check) => check.label === label && check.path === path)) {
+    throw new Error(`Cloudflare production release is missing live gate ${label}`);
+  }
+}
 
 const apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
 if (!apiToken) throw new Error('Cloudflare production release failed: CLOUDFLARE_API_TOKEN is required');
