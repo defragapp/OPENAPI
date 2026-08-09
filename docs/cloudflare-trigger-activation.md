@@ -43,3 +43,7 @@ Trigger the connected private-repository build after removing hosted third-party
 ## Release-gate retrigger — August 6, 2026 at 20:47 PT
 
 Trigger one clean connected Cloudflare Workers Build from this exact `main` push. Accept completion only when both canonical readiness endpoints report `ready: true`, migration `0014_passkey_authentication`, migration parity `current`, and this exact commit, and the public landing plus cohesion assets are visibly live.
+
+## Single-deploy D1 release evidence — August 9, 2026
+
+Trigger one clean connected Cloudflare Workers Build from this exact `main` push after introducing migration `0015_release_evidence` and the in-process single-deploy orchestrator. Accept completion only when the remote D1 migration ledger records `0015_release_evidence.sql`, exactly one Worker deployment occurs, both branded domains report this exact commit with migration parity `current`, and their `/health` and `/ready` responses expose the matching D1-backed release evidence. Reconcile `_dmarc.defrag.app` to the monitoring policy during the same release; GitHub Actions remain outside release authority.
