@@ -25,7 +25,7 @@ Production is connected directly to `defragapp/OPENAPI` on `main`.
 - Repository root: `/`
 - Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
 - Deploy command: `pnpm production:deploy`
-- Production deploy implementation: `scripts/cloudflare-production-deploy-v2.mjs`
+- Production deploy implementation: `scripts/cloudflare-production-deploy-v3.mjs`, coordinated by `scripts/release-orchestrator.mjs`
 - Cloudflare control implementation: `scripts/configure-cloudflare-free-tier.mjs`
 
 GitHub Actions, Cloudflare Pages, duplicate production Workers, Queue, and R2 are not supported release paths.
@@ -37,7 +37,7 @@ A release is complete only when the exact Workers Builds commit:
 3. configures and verifies Cloudflare Free-plan controls;
 4. deploys the exact commit SHA;
 5. reports that SHA from `/health` and `/ready`;
-6. reports migration `0013_workers_ai_free_capacity`;
+6. reports migration `0015_release_evidence`;
 7. passes live public, application, authentication, billing, security-header, and 404 probes.
 
 ## Product contract

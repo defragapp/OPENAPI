@@ -1,113 +1,145 @@
-import { readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { randomBytes } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { pathToFileURL } from 'node:url';
+import { applyD1Migrations, parseWranglerJson, runWranglerCli, wranglerFailure, wranglerRows } from './d1-utils.mjs';
+import { assertReleaseSha, RELEASE_MIGRATION_VERSION } from './release-evidence-lib.mjs';
+import {
+  cleanupProductionConfig,
+  prepareProductionConfig
+} from './prepare-cloudflare-production-config.mjs';
 
-const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const sourcePath = resolve(root, 'scripts/cloudflare-production-deploy-v2.mjs');
-const generatedPath = resolve(root, 'scripts/.cloudflare-production-deploy-v3.generated.mjs');
-
-const replacements = [
-  {
-    from: "const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|rotating-real-life-questions|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;",
-    to: "const sequenceFingerprint = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha}`;"
-  },
-  {
-    from: "const migrationVersion = '0013_workers_ai_free_capacity';",
-    to: "const migrationVersion = '0014_passkey_authentication';"
-  },
-  {
-    from: "      assert(ready.json?.migrationVersion === migrationVersion, 'migration version mismatch');",
-    to: "      assert(ready.json?.migrationVersion === migrationVersion, 'migration version mismatch');\n      assert(ready.json?.latestMigrationVersion === migrationVersion, 'latest migration version mismatch');\n      assert(ready.json?.dependencies?.migrationParity === 'current', 'migration parity is not current');\n      assert(ready.json?.visualRelease?.contract === 'v0-public-landing-v3', 'visual contract mismatch');\n      assert(ready.json?.visualRelease?.field === 'landing-expression-field-v3', 'field contract mismatch');\n      assert(ready.json?.visualRelease?.sequenceFingerprint === sequenceFingerprint, 'visual sequence mismatch');"
-  },
-  {
-    from: "  assert(health.json?.dependencies?.stripe === 'configured', 'Stripe is not configured');",
-    to: "  assert(health.json?.dependencies?.stripe === 'configured', 'Stripe is not configured');\n  assert(health.json?.dependencies?.passkeys === 'configured', 'passkeys are not configured');\n  assert(health.json?.dependencies?.migrationParity === 'current', 'health migration parity is not current');\n  assert(health.json?.migrationVersion === migrationVersion, 'health migration version mismatch');\n  assert(health.json?.latestMigrationVersion === migrationVersion, 'health latest migration version mismatch');\n  assert(health.json?.visualRelease?.contract === 'v0-public-landing-v3', 'health visual contract mismatch');\n  assert(health.json?.visualRelease?.field === 'landing-expression-field-v3', 'health field contract mismatch');\n  assert(health.json?.visualRelease?.sequenceFingerprint === sequenceFingerprint, 'health visual sequence mismatch');"
-  },
-  {
-    from: "    'v0-landing-selective-port',\n    'v0-public-landing-v2',",
-    to: "    'v0-landing-selective-port',\n    'v0-public-landing-v3',"
-  },
-  {
-    from: "    'See what is active before it repeats.',",
-    to: "    'Bring the question you actually have.',"
-  },
-  {
-    from: "    'Hover, focus, or tap a line.',",
-    to: "    'Drag to rotate · select a line to inspect its relative reach',"
-  },
-  {
-    from: "    'An interactive field of eight Cloudflare-blue lines radiating from one stable point.',",
-    to: "    'spherical-360',"
-  },
-  {
-    from: "    'Relative expression inside one sanitized example',",
-    to: "    'Relative expression · sanitized example',"
-  },
-  {
-    from: "      contract: 'v0-public-landing-v2',",
-    to: "      contract: 'v0-public-landing-v3',\n      field: 'landing-expression-field-v3',"
-  },
-  {
-    from: "  const workersDevUrl = deployOutput.match(/https:\\/\\/[^\\s]+\\.workers\\.dev/)?.[0] || null;",
-    to: "  const productionWorkersDev = false;"
-  },
-  {
-    from: "    workersDevUrl,",
-    to: "    productionWorkersDev,"
-  }
+const WORKER_NAME = 'sovv-web';
+const REQUIRED_SECRETS = [
+  'SESSION_SIGNING_SECRET',
+  'TURNSTILE_SECRET_KEY',
+  'RESEND_API_KEY',
+  'STRIPE_SECRET_KEY',
+  'STRIPE_WEBHOOK_SECRET'
 ];
 
-let generated = readFileSync(sourcePath, 'utf8');
-for (const replacement of replacements) {
-  if (!generated.includes(replacement.from)) {
-    throw new Error(`Production deploy v3 could not locate required v2 release marker: ${replacement.from.slice(0, 120)}`);
-  }
-  generated = generated.replace(replacement.from, replacement.to);
+function resolveCheckoutSha() {
+  const declared = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
+  if (declared) return assertReleaseSha(declared);
+  const result = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  if (result.error || result.status !== 0) throw new Error('Unable to resolve the checked-out commit SHA');
+  return assertReleaseSha(result.stdout);
 }
 
-for (const staleMarker of [
-  '|rotating-real-life-questions|',
-  "'v0-public-landing-v2',",
-  "'See what is active before it repeats.',",
-  "'Hover, focus, or tap a line.',",
-  "'An interactive field of eight Cloudflare-blue lines radiating from one stable point.',",
-  "'Relative expression inside one sanitized example',",
-  'workersDevUrl'
-]) {
-  if (generated.includes(staleMarker)) {
-    throw new Error(`Production deploy v3 still contains stale landing or routing verification: ${staleMarker}`);
+export async function ensureProductionSecrets({
+  runWrangler,
+  fetchImpl = fetch,
+  accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || process.env.CF_ACCOUNT_ID || '').trim(),
+  apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim(),
+  turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '').trim()
+}) {
+  const result = runWrangler(['secret', 'list', '--name', WORKER_NAME, '--format', 'json']);
+  const failure = wranglerFailure(result, 'wrangler secret list');
+  if (failure) throw failure;
+  const existing = new Set(
+    wranglerRows(parseWranglerJson(result.stdout || result.stderr, 'wrangler secret list'))
+      .map((entry) => entry?.name)
+      .filter(Boolean)
+  );
+  const additions = {};
+  if (!existing.has('SESSION_SIGNING_SECRET')) {
+    additions.SESSION_SIGNING_SECRET = randomBytes(48).toString('base64url');
   }
-}
-if (!generated.includes("contract: 'v0-public-landing-v3'")) {
-  throw new Error('Production deploy v3 did not promote the visual contract to v3');
-}
-if (!generated.includes("field: 'landing-expression-field-v3'")) {
-  throw new Error('Production deploy v3 did not publish the field contract');
-}
-if (!generated.includes("const migrationVersion = '0014_passkey_authentication';")) {
-  throw new Error('Production deploy v3 did not promote the migration contract to 0014');
-}
-if (!generated.includes("dependencies?.migrationParity === 'current'")) {
-  throw new Error('Production deploy v3 does not enforce migration parity');
-}
-if (!generated.includes('productionWorkersDev = false')) {
-  throw new Error('Production deploy v3 does not record workers.dev retirement');
+  if (!existing.has('TURNSTILE_SECRET_KEY') && accountId && apiToken && turnstileSiteKey) {
+    const response = await fetchImpl(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/challenges/widgets/${encodeURIComponent(turnstileSiteKey)}`,
+      { headers: { authorization: `Bearer ${apiToken}` }, signal: AbortSignal.timeout(15_000) }
+    );
+    if (response.ok) {
+      const payload = await response.json().catch(() => null);
+      if (payload?.result?.secret) additions.TURNSTILE_SECRET_KEY = payload.result.secret;
+    }
+  }
+  if (Object.keys(additions).length) {
+    const writeResult = runWrangler(['secret', 'bulk', '--name', WORKER_NAME], { input: JSON.stringify(additions) });
+    const writeFailure = wranglerFailure(writeResult, 'wrangler secret bulk');
+    if (writeFailure) throw writeFailure;
+  }
+  const configured = new Set([...existing, ...Object.keys(additions)]);
+  const missing = REQUIRED_SECRETS.filter((name) => !configured.has(name));
+  if (missing.length) throw new Error(`Production secrets are missing from ${WORKER_NAME}: ${missing.join(', ')}`);
+  return { configured: [...configured].sort() };
 }
 
-writeFileSync(generatedPath, generated);
-try {
-  const result = spawnSync(process.execPath, [generatedPath], {
-    cwd: root,
-    env: process.env,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-    maxBuffer: 64 * 1024 * 1024
+async function configureProductionControls({ accountId, apiToken, databaseId }) {
+  const { configureCloudflareFreeTier } = await import('./configure-cloudflare-free-tier.mjs');
+  return configureCloudflareFreeTier({
+    accountId,
+    apiToken,
+    databaseId,
+    gatewayId: 'sovereign',
+    zoneName: 'defrag.app'
   });
-  if (result.stdout) process.stdout.write(result.stdout);
-  if (result.stderr) process.stderr.write(result.stderr);
-  if (result.error) throw result.error;
-  if (result.status !== 0) process.exit(result.status || 1);
-} finally {
-  rmSync(generatedPath, { force: true });
+}
+
+export async function main({
+  runWrangler = runWranglerCli,
+  generatedConfigPath,
+  commitSha = resolveCheckoutSha(),
+  databaseId,
+  applyMigrations = true,
+  prepareConfig = prepareProductionConfig,
+  ensureSecrets = ensureProductionSecrets,
+  configureControls = configureProductionControls,
+  cleanupConfig = cleanupProductionConfig,
+  fetchImpl = fetch
+} = {}) {
+  const sha = assertReleaseSha(commitSha);
+  let prepared;
+  let ownsConfig = false;
+  let deployInvoked = false;
+  try {
+    if (!generatedConfigPath || !databaseId) {
+      prepared = prepareConfig({ commitSha: sha, runWrangler, generatedConfigPath });
+      generatedConfigPath = prepared.generatedConfigPath;
+      databaseId = prepared.databaseId;
+      ownsConfig = true;
+    }
+    if (applyMigrations) {
+      const migrationResult = applyD1Migrations({ configPath: generatedConfigPath, runWrangler });
+      const migrationFailure = wranglerFailure(migrationResult, 'wrangler d1 migrations apply');
+      if (migrationFailure) return { status: 'failed', stage: 'migrations', deploys: 0, output: migrationFailure.message };
+    }
+
+    await ensureSecrets({ runWrangler, fetchImpl });
+    const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || process.env.CF_ACCOUNT_ID || '').trim();
+    const apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
+    const controls = await configureControls({ accountId, apiToken, databaseId });
+
+    deployInvoked = true;
+    const deployResult = runWrangler(['deploy', '--config', generatedConfigPath]);
+    const deployFailure = wranglerFailure(deployResult, 'wrangler deploy');
+    if (deployFailure) {
+      return { status: 'failed', stage: 'deploy', deploys: 1, output: deployFailure.message };
+    }
+    return {
+      status: 'ok',
+      deploys: 1,
+      commitSha: sha,
+      migrationVersion: RELEASE_MIGRATION_VERSION,
+      workerName: WORKER_NAME,
+      productionWorkersDev: false,
+      controls,
+      output: deployResult.stdout
+    };
+  } catch (error) {
+    return {
+      status: 'failed',
+      stage: deployInvoked ? 'deploy' : 'prepare',
+      deploys: deployInvoked ? 1 : 0,
+      output: error instanceof Error ? error.message : String(error)
+    };
+  } finally {
+    if (ownsConfig && generatedConfigPath) cleanupConfig(generatedConfigPath);
+  }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const result = await main();
+  console.log(JSON.stringify(result, null, 2));
+  if (result.status !== 'ok') process.exitCode = 1;
 }

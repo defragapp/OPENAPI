@@ -35,7 +35,7 @@ The founder-approved public contract is defined in [`docs/launch-product-contrac
 - Personalized inference bypasses Gateway cache and persistent prompt logging
 - D1-backed daily free-capacity reservations stop inference before the account-wide Workers AI free allocation is exhausted
 - Daily Workers AI capacity ledger introduced by migration `0013_workers_ai_free_capacity`
-- Current migration: `0014_passkey_authentication`
+- Current migration: `0015_release_evidence`
 - Static assets for high-volume browser delivery
 - D1-scheduled background work every 15 minutes
 - Stripe-hosted Checkout and Customer Portal

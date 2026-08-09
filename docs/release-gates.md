@@ -63,7 +63,7 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 ## Reliability
 
 - Cloudflare Workers Builds is green for the exact approved `main` commit.
-- D1 migrations apply locally and remotely through `0013_workers_ai_free_capacity`.
+- D1 migrations apply locally and remotely through `0015_release_evidence`.
 - D1 Sessions preserve sequential API consistency and reject invalid bookmarks.
 - Thread ordering survives concurrent requests.
 - Invitation redemption and consent decisions are race-safe and one-time.

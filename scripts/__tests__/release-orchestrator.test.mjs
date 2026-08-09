@@ -1,0 +1,144 @@
+import { describe, expect, it, vi } from 'vitest';
+import { orchestrateRelease } from '../release-orchestrator.mjs';
+
+const sha = 'c'.repeat(40);
+
+function harness({ preFailure = false, migrationFailure = false, deployFailure = false, postFailure = false, evidenceFailure = false } = {}) {
+  const state = { evidenceB64: null, progressB64: null };
+  const runWrangler = vi.fn((args) => {
+    if (args[0] === 'd1' && args[1] === 'migrations') {
+      return migrationFailure ? { status: 1, stderr: 'migration failed' } : { status: 0, stdout: 'applied' };
+    }
+    if (args[0] === 'deploy') {
+      return deployFailure ? { status: 1, stderr: 'deploy failed' } : { status: 0, stdout: 'deployed' };
+    }
+    return { status: 0, stdout: '[]' };
+  });
+  const runNode = vi.fn((path) => {
+    if (preFailure && path.includes('pre-check')) return { status: 1, stderr: 'pre failed' };
+    if (postFailure && path.includes('post-check')) return { status: 1, stderr: 'post failed' };
+    return { status: 0, stdout: 'ok' };
+  });
+  const d1Execute = vi.fn(({ sql }) => {
+    if (sql.includes('INSERT INTO release_evidence')) {
+      if (evidenceFailure) return { status: 1, stderr: 'evidence write failed' };
+      state.evidenceB64 = sql.match(/'([A-Za-z0-9+/]+={0,2})', 'success'/)?.[1] || null;
+      return { status: 0, stdout: '[{"results":[]}]' };
+    }
+    if (sql.includes('SELECT evidence_b64')) {
+      return { status: 0, stdout: JSON.stringify([{ results: state.evidenceB64 ? [{ evidence_b64: state.evidenceB64 }] : [] }]) };
+    }
+    if (sql.includes('INSERT INTO release_progress')) {
+      state.progressB64 = sql.match(/'([A-Za-z0-9+/]+={0,2})', datetime\('now'\)/)?.[1] || null;
+      return { status: 0, stdout: '[{"results":[]}]' };
+    }
+    if (sql.includes('SELECT summary_b64')) {
+      return { status: 0, stdout: JSON.stringify([{ results: state.progressB64 ? [{ summary_b64: state.progressB64 }] : [] }]) };
+    }
+    return { status: 0, stdout: '[{"results":[]}]' };
+  });
+  const fetchImpl = vi.fn(async () => {
+    const evidence = state.evidenceB64
+      ? JSON.parse(Buffer.from(state.evidenceB64, 'base64').toString('utf8'))
+      : null;
+    return Response.json({
+      ok: true,
+      ready: true,
+      version: sha,
+      migrationVersion: '0015_release_evidence',
+      latestMigrationVersion: '0015_release_evidence',
+      dependencies: { migrationParity: 'current' },
+      releaseEvidence: evidence
+    });
+  });
+  return {
+    state,
+    runWrangler,
+    runNode,
+    d1Execute,
+    fetchImpl,
+    options: {
+      sha,
+      runWrangler,
+      runNode,
+      d1Execute,
+      fetchImpl,
+      preDeployChecks: [{ label: 'pre', path: 'pre-check.mjs' }],
+      postDeployChecks: [{ label: 'post', path: 'post-check.mjs' }],
+      prepareConfig: async () => ({
+        generatedConfigPath: '/tmp/sovereign-release-test.jsonc',
+        databaseId: 'database-id',
+        databaseName: 'sovereign-openapi-db'
+      }),
+      cleanupConfig: vi.fn(),
+      deployOptions: {
+        ensureSecrets: async () => ({ configured: [] }),
+        configureControls: async () => ({ configured: true })
+      },
+      reconcileDmarc: async () => ({ verified: true, output: 'verified' }),
+      evidenceAttempts: 1,
+      evidenceDelayMs: 0,
+      browserRunRetryDelayMs: 0,
+      ...(migrationFailure ? { applyMigrations: () => ({ status: 1, stderr: 'migration failed' }) } : {})
+    }
+  };
+}
+
+function deployCalls(runWrangler) {
+  return runWrangler.mock.calls.filter(([args]) => args[0] === 'deploy').length;
+}
+
+describe('single-deploy release orchestrator', () => {
+  it('pre-deploy failure performs zero deployments', async () => {
+    const test = harness({ preFailure: true });
+    const result = await orchestrateRelease(test.options);
+    expect(result.status).toBe('pre-deploy-failed');
+    expect(result.deploys).toBe(0);
+    expect(deployCalls(test.runWrangler)).toBe(0);
+  });
+
+  it('migration failure performs zero deployments and no progress write', async () => {
+    const test = harness({ migrationFailure: true });
+    const result = await orchestrateRelease(test.options);
+    expect(result.status).toBe('migration-failed');
+    expect(result.deploys).toBe(0);
+    expect(deployCalls(test.runWrangler)).toBe(0);
+    expect(test.d1Execute).not.toHaveBeenCalled();
+  });
+
+  it('successful release performs exactly one deploy and converges full evidence', async () => {
+    const test = harness();
+    const result = await orchestrateRelease(test.options);
+    expect(result.status).toBe('success');
+    expect(result.deploys).toBe(1);
+    expect(deployCalls(test.runWrangler)).toBe(1);
+    expect(result.evidence.releaseEvidence.sha).toBe(sha);
+    expect(test.fetchImpl).toHaveBeenCalledTimes(4);
+  });
+
+  it('post-deploy failure performs one deploy and persists failure progress', async () => {
+    const test = harness({ postFailure: true });
+    const result = await orchestrateRelease(test.options);
+    expect(result.status).toBe('post-deploy-failed');
+    expect(result.deploys).toBe(1);
+    expect(deployCalls(test.runWrangler)).toBe(1);
+    expect(result.progress.persisted).toBe(true);
+  });
+
+  it('evidence-writing failure performs one deploy, persists progress, and never redeploys', async () => {
+    const test = harness({ evidenceFailure: true });
+    const result = await orchestrateRelease(test.options);
+    expect(result.status).toBe('evidence-failed');
+    expect(result.deploys).toBe(1);
+    expect(deployCalls(test.runWrangler)).toBe(1);
+    expect(result.progress.persisted).toBe(true);
+  });
+
+  it('failed wrangler deploy is counted as one invocation', async () => {
+    const test = harness({ deployFailure: true });
+    const result = await orchestrateRelease(test.options);
+    expect(result.status).toBe('deploy-failed');
+    expect(result.deploys).toBe(1);
+    expect(deployCalls(test.runWrangler)).toBe(1);
+  });
+});

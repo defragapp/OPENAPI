@@ -26,16 +26,50 @@ const replacements = [
   [
     "'A visual layer loads after passkey auth authority'",
     "'A visual layer loads after deployed route cohesion authority'"
+  ],
+  [
+    "const passkeyMigration = read('apps/sovereign-worker/migrations/0014_passkey_authentication.sql');",
+    "const passkeyMigration = read('apps/sovereign-worker/migrations/0014_passkey_authentication.sql');\nconst releaseMigration = read('apps/sovereign-worker/migrations/0015_release_evidence.sql');\nconst releaseEvidenceRuntime = read('apps/sovereign-worker/src/release-evidence.ts');\nconst releaseEvidenceLibrary = read('scripts/release-evidence-lib.mjs');\nconst releaseOrchestrator = read('scripts/release-orchestrator.mjs');"
+  ],
+  [
+    "const deploy = read('scripts/cloudflare-production-deploy-v2.mjs');",
+    "const deploy = read('scripts/cloudflare-production-deploy-v3.mjs');"
+  ],
+  [
+    "  \"migrationVersion: '0013_workers_ai_free_capacity'\",\n  \"latestMigrationVersion: '0014_passkey_authentication'\"",
+    "  \"const LATEST_MIGRATION_VERSION = '0015_release_evidence'\",\n  \"releaseEvidenceStore: releaseSchemaReady ? 'configured' : 'missing'\",\n  \"dependencies.releaseEvidenceStore === 'configured'\""
+  ],
+  [
+    "requireAll('passkey credential verification', passkeyVerifier, [",
+    "requireAll('release evidence migration', releaseMigration, ['CREATE TABLE release_evidence', 'CREATE TABLE release_progress', \"status TEXT NOT NULL CHECK(status = 'success')\", \"status TEXT NOT NULL CHECK(status = 'failure')\"]);\nrequireAll('D1 release evidence runtime', releaseEvidenceRuntime, ['env.DB.prepare', \"status = 'success'\", \"RELEASE_MIGRATION_VERSION = '0015_release_evidence'\"]);\nrequireAll('release evidence orchestration', `${releaseEvidenceLibrary}\\n${releaseOrchestrator}`, ['upsertReleaseEvidenceSql', 'upsertReleaseProgressSql', 'applyD1Migrations', 'writeReleaseEvidence', 'writeReleaseProgress']);\n\nrequireAll('passkey credential verification', passkeyVerifier, ["
   ]
 ];
 
-for (const [retiredContract, currentContract] of replacements) {
+function replaceOnce(retiredContract, currentContract) {
   const occurrences = source.split(retiredContract).length - 1;
   if (occurrences !== 1) {
     throw new Error(`Production release v3 compatibility update expected one retired contract occurrence but found ${occurrences}: ${retiredContract.slice(0, 96)}`);
   }
   source = source.replace(retiredContract, currentContract);
 }
+
+for (const [retiredContract, currentContract] of replacements) replaceOnce(retiredContract, currentContract);
+
+const deployBlock = /requireAll\('production deploy compatibility', deploy, \[[\s\S]*?assert\(!deploy\.includes\("'Math\.random'"\), 'Production deploy still rejects a dependency bundle by a generic string'\);/;
+const deployMatches = source.match(deployBlock);
+if (!deployMatches || deployMatches.length !== 1) {
+  throw new Error('Production release v3 could not replace the legacy deployment compatibility block.');
+}
+source = source.replace(deployBlock, `requireAll('single-deploy production release', \`${'${deploy}'}\\n${'${releaseOrchestrator}'}\`, [
+  'export async function main',
+  "runWrangler(['deploy', '--config', generatedConfigPath])",
+  'applyD1Migrations',
+  'postDeployChecks',
+  'writeReleaseEvidence',
+  'writeReleaseProgress',
+  'persistFailure'
+]);
+assert(!deploy.includes('cloudflare-production-deploy-v2.mjs'), 'Production v3 must never execute the legacy v2 deployment script');`);
 
 if (source.includes('/v0-public-static.css?v=20260801-v0-global')) {
   throw new Error('Production release v3 still contains the retired static public stylesheet contract.');

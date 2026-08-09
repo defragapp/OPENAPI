@@ -67,7 +67,7 @@ Before production promotion, verify preview behavior for Today, Explore, People,
 
 Health and readiness may report application version, runtime mode, D1 readiness, Durable Object readiness, SOVV configuration, AI provider/Gateway configuration, Stripe configuration, migration version, and degraded state. They must not reveal tokens, account IDs, provider payloads, exact locations, or private topology.
 
-Production readiness currently depends on migration `0013_workers_ai_free_capacity` and the presence of the daily AI capacity ledger.
+Production readiness depends on migration `0015_release_evidence`, the applied D1 migration ledger, the release evidence/progress tables, passkeys, and the daily AI capacity ledger.
 
 ## Privacy verification
 

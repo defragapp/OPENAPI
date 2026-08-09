@@ -10,8 +10,11 @@ const packageJson = readFileSync(resolve(repositoryRoot, 'package.json'), 'utf8'
 const wranglerConfig = readFileSync(resolve(repositoryRoot, 'wrangler.jsonc'), 'utf8');
 const releaseWrapper = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-release.mjs'), 'utf8');
 const deployV3 = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-deploy-v3.mjs'), 'utf8');
+const releaseOrchestrator = readFileSync(resolve(repositoryRoot, 'scripts/release-orchestrator.mjs'), 'utf8');
+const releaseEvidenceLibrary = readFileSync(resolve(repositoryRoot, 'scripts/release-evidence-lib.mjs'), 'utf8');
 const dmarcReconciler = readFileSync(resolve(repositoryRoot, 'scripts/configure-cloudflare-dmarc.mjs'), 'utf8');
 const evidenceWriter = readFileSync(resolve(repositoryRoot, 'scripts/write-cloudflare-release-evidence.mjs'), 'utf8');
+const progressWriter = readFileSync(resolve(repositoryRoot, 'scripts/write-cloudflare-release-progress.mjs'), 'utf8');
 const parentVerifier = readFileSync(resolve(repositoryRoot, 'scripts/verify-parent-domain-routes-v3.mjs'), 'utf8');
 const visualVerifier = readFileSync(resolve(repositoryRoot, 'scripts/verify-live-visual-release-v2.mjs'), 'utf8');
 const visualRateLimiter = readFileSync(resolve(repositoryRoot, 'scripts/verify-live-visual-release-v3.mjs'), 'utf8');
@@ -26,8 +29,13 @@ const expectedRuntimeSequence = expectedSequence.replace(archiveSha256, '${VISUA
 const expectedParentVerifierSequence = expectedSequence.replace(archiveSha256, '${expectedArchive}');
 
 describe('production release parity contract', () => {
-  it('derives migration 0014 from deployed schema evidence and blocks stale readiness', () => {
-    expect(runtime).toContain("const LATEST_MIGRATION_VERSION = '0014_passkey_authentication'");
+  it('derives migration 0015 from D1 history and both release tables, with an accurate 0014 fallback', () => {
+    expect(runtime).toContain("const PREVIOUS_MIGRATION_VERSION = '0014_passkey_authentication'");
+    expect(runtime).toContain("const LATEST_MIGRATION_VERSION = '0015_release_evidence'");
+    expect(runtime).toContain("const LATEST_MIGRATION_FILENAME = '0015_release_evidence.sql'");
+    expect(runtime).toContain("name = 'release_evidence'");
+    expect(runtime).toContain("name = 'release_progress'");
+    expect(runtime).toContain('FROM d1_migrations WHERE name = ?1');
     expect(runtime).toContain("migrationParity: migrationParity ? 'current' : 'behind'");
     expect(runtime).toContain('&& migrationParity');
     expect(runtime).toContain("status: pathname === '/ready' && !ready ? 503 : 200");
@@ -45,10 +53,11 @@ describe('production release parity contract', () => {
     expect(parentVerifier).toContain("assert(result.json?.visualRelease?.sequenceFingerprint === expectedSequence");
   });
 
-  it('runs deployment, route checks, and rendered checks before recording release evidence', () => {
-    expect(deployV3).toContain("const migrationVersion = '0014_passkey_authentication';");
-    expect(deployV3).toContain("contract: 'v0-public-landing-v3'");
-    expect(deployV3).toContain('center-sliced-expression-field');
+  it('runs migrations, one deploy, route checks, and rendered checks before D1 evidence', () => {
+    expect(deployV3).toContain("runWrangler(['deploy', '--config', generatedConfigPath])");
+    expect(deployV3).not.toContain('cloudflare-production-deploy-v2.mjs');
+    expect(releaseOrchestrator).toContain('applyD1Migrations');
+    expect(releaseOrchestrator).toContain('writeReleaseEvidence');
     expect(packageJson).toContain('verify-live-visual-release-v3.mjs');
     for (const script of [
       'cloudflare-production-deploy-v3.mjs',
@@ -59,24 +68,18 @@ describe('production release parity contract', () => {
       'configure-cloudflare-dmarc.mjs',
       'write-cloudflare-release-evidence.mjs'
     ]) {
-      expect(releaseWrapper).toContain(script);
+      expect(`${releaseWrapper}\n${releaseOrchestrator}`).toContain(script);
     }
     const positions = [
-      'cloudflare-production-deploy-v3.mjs',
-      'verify-parent-domain-routes-v3.mjs',
-      'verify-live-secondary-public.mjs',
-      'verify-live-route-cohesion.mjs',
-      'verify-live-visual-release-v3.mjs',
-      'configure-cloudflare-dmarc.mjs',
-      'write-cloudflare-release-evidence.mjs'
-    ].map((script) => releaseWrapper.indexOf(script));
+      'const deployResult = await deployMain',
+      'for (const check of postDeployChecks)',
+      'const dmarc = await reconcileDmarc',
+      'const evidence = await evidenceWriter'
+    ].map((marker) => releaseOrchestrator.indexOf(marker));
     expect(positions.every((position, index) => position >= 0 && (index === 0 || position > positions[index - 1]!))).toBe(true);
-    expect(releaseWrapper).toContain('DMARC reconciliation is non-authoritative');
-    expect(releaseWrapper).toContain('const browserRunMaxAttempts = 2;');
-    expect(releaseWrapper).toContain('const retryable = browserVerificationLabels.has(label);');
-    expect(releaseWrapper).not.toContain('deferredBrowserVerification');
-    expect(releaseWrapper).not.toContain('verification=deferred');
-    expect(releaseWrapper).toContain("RELEASE_DMARC_VERIFIED: dmarcVerified ? 'true' : 'false'");
+    expect(releaseOrchestrator).toContain('browserRunMaxAttempts = 2');
+    expect(releaseOrchestrator).toContain('persistFailure');
+    expect(releaseOrchestrator).not.toContain('deferredBrowserVerification');
     expect(visualVerifier).toContain('/browser-rendering/snapshot');
     expect(visualVerifier).toContain('screenshotOptions: { fullPage: true');
     expect(visualVerifier).toContain("method: 'Cloudflare Browser Run snapshot with full-page PNG plus deterministic normalized pixel, edge, color, and section-rhythm comparison'");
@@ -89,27 +92,22 @@ describe('production release parity contract', () => {
     expect(dmarcReconciler).toContain("method: 'POST'");
     expect(dmarcReconciler).toContain("method: 'PATCH'");
     expect(dmarcReconciler).toContain('records.length !== 1');
-    expect(releaseWrapper).toContain("dmarcVerified ? 'verified' : 'external-blocker'");
+    expect(releaseEvidenceLibrary).toContain("dmarcStatus: verified ? 'verified' : 'external_blocker'");
   });
 
   it('publishes exact-SHA application release evidence only after every application gate', () => {
-    expect(evidenceWriter).toContain("const EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
-    expect(evidenceWriter).toContain("const ROUTE_COHESION_CONTRACT = 'sovereign-deployed-route-cohesion-v1'");
-    expect(evidenceWriter).toContain("const RENDERED_VISUAL_CONTRACT = 'sovereign-rendered-page-family-audit-v1'");
-    expect(evidenceWriter).toContain("process.env.RELEASE_DMARC_VERIFIED");
-    expect(evidenceWriter).toContain("dmarcStatus: dmarcVerified ? 'verified' : 'external_blocker'");
-    expect(evidenceWriter).toContain("apps/web/dist/release-evidence.json");
-    expect(evidenceWriter).toContain('writeFileSync(evidenceAssetPath');
-    expect(evidenceWriter).toContain("executeWrangler(['deploy', '--config', generatedConfigPath])");
-    expect(evidenceWriter).toContain('final evidence deployment did not converge');
-    expect(evidenceWriter).toContain('finalEvidenceDeploy: true');
+    expect(releaseEvidenceLibrary).toContain("RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
+    expect(releaseEvidenceLibrary).toContain("RELEASE_MIGRATION_VERSION = '0015_release_evidence'");
+    expect(evidenceWriter).toContain('upsertReleaseEvidenceSql');
+    expect(evidenceWriter).toContain("status='success'");
+    expect(evidenceWriter).toContain('releaseEvidenceEquals');
+    expect(evidenceWriter).not.toContain("runWrangler(['deploy'");
+    expect(progressWriter).toContain('upsertReleaseProgressSql');
     expect(wranglerConfig).toMatch(/"account_id"\s*:\s*"[0-9a-f]{32}"/i);
-    expect(releaseEvidenceRuntime).toContain('env.ASSETS.fetch');
-    expect(releaseEvidenceRuntime).toContain('release-evidence.json?sha=${sha}');
-    expect(releaseEvidenceRuntime).not.toContain('background_jobs');
-    expect(releaseEvidenceRuntime).not.toContain('env.DB.withSession');
+    expect(releaseEvidenceRuntime).toContain('env.DB.prepare');
+    expect(releaseEvidenceRuntime).toContain("status = 'success'");
     expect(releaseEvidenceRuntime).toContain("RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
-    expect(releaseEvidenceRuntime).toContain("RELEASE_MIGRATION_VERSION = '0014_passkey_authentication'");
+    expect(releaseEvidenceRuntime).toContain("RELEASE_MIGRATION_VERSION = '0015_release_evidence'");
     expect(releaseEvidenceRuntime).toContain('evidence.sha !== sha');
     expect(releaseEvidenceRuntime).toContain("typeof evidence.dmarcVerified !== 'boolean'");
     expect(runtime).toContain("import { readProductionReleaseEvidence } from './release-evidence'");

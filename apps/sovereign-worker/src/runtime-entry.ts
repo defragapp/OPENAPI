@@ -29,9 +29,11 @@ const DISABLED_PATH_PREFIXES = ['/api/v1/export-jobs'];
 const PARENT_HOSTS = new Set(['defrag.app', 'www.defrag.app']);
 const PUBLIC_HOST = 'sovereign.defrag.app';
 const APP_HOST = 'app.defrag.app';
-const PREVIOUS_MIGRATION_VERSION = '0013_workers_ai_free_capacity';
-const LATEST_MIGRATION_VERSION = '0014_passkey_authentication';
-const LEGACY_HEALTH_METADATA_COMPATIBILITY = "migrationVersion: '0013_workers_ai_free_capacity' · latestMigrationVersion: '0014_passkey_authentication'";
+const CAPACITY_MIGRATION_VERSION = '0013_workers_ai_free_capacity';
+const PREVIOUS_MIGRATION_VERSION = '0014_passkey_authentication';
+const LATEST_MIGRATION_VERSION = '0015_release_evidence';
+const LATEST_MIGRATION_FILENAME = '0015_release_evidence.sql';
+const LEGACY_HEALTH_METADATA_COMPATIBILITY = "migrationVersion: '0014_passkey_authentication' · latestMigrationVersion: '0015_release_evidence'";
 const VISUAL_ARCHIVE_SHA256 = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 const VISUAL_SEQUENCE_FINGERPRINT = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${VISUAL_ARCHIVE_SHA256}`;
 const PUBLIC_PATHS = new Set([
@@ -187,8 +189,25 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
   try {
     const db = await env.DB.prepare(`SELECT 1 AS ok,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_daily_capacity') AS capacity_ready,
-      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'auth_passkeys') AS passkeys_ready`)
-      .first<{ ok: number; capacity_ready: number; passkeys_ready: number }>();
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'auth_passkeys') AS passkeys_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'release_evidence') AS release_evidence_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'release_progress') AS release_progress_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'd1_migrations') AS migration_history_ready`)
+      .first<{
+        ok: number;
+        capacity_ready: number;
+        passkeys_ready: number;
+        release_evidence_ready: number;
+        release_progress_ready: number;
+        migration_history_ready: number;
+      }>();
+    const migrationHistory = db?.migration_history_ready === 1
+      ? await env.DB.prepare(`SELECT EXISTS(
+          SELECT 1 FROM d1_migrations WHERE name = ?1
+        ) AS release_migration_applied`)
+        .bind(LATEST_MIGRATION_FILENAME)
+        .first<{ release_migration_applied: number }>()
+      : null;
     const releaseEvidence = await readProductionReleaseEvidence(env);
     const aiConfig = resolveAiModelConfig(env);
     const emailProvider = transactionalEmailProvider(env);
@@ -206,17 +225,23 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && env.STRIPE_CANCEL_URL
       && env.STRIPE_PORTAL_RETURN_URL
     );
-    const migrationVersion = db?.passkeys_ready === 1
+    const releaseSchemaReady = db?.release_evidence_ready === 1
+      && db?.release_progress_ready === 1
+      && migrationHistory?.release_migration_applied === 1;
+    const migrationVersion = releaseSchemaReady
       ? LATEST_MIGRATION_VERSION
-      : db?.capacity_ready === 1
+      : db?.passkeys_ready === 1
         ? PREVIOUS_MIGRATION_VERSION
-        : 'unknown';
+        : db?.capacity_ready === 1
+          ? CAPACITY_MIGRATION_VERSION
+          : 'unknown';
     const migrationParity = migrationVersion === LATEST_MIGRATION_VERSION;
     const dependencies = {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
       migrationParity: migrationParity ? 'current' : 'behind',
       aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing',
       passkeys: db?.passkeys_ready === 1 ? 'configured' : 'missing',
+      releaseEvidenceStore: releaseSchemaReady ? 'configured' : 'missing',
       durableObjects: env.THREADS ? 'configured' : 'missing',
       assets: env.ASSETS ? 'configured' : 'missing',
       ai: aiConfig.provider === 'cloudflare-gateway' && env.AI && env.AI_GATEWAY_ID ? 'configured' : 'missing',
@@ -240,6 +265,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && migrationParity
       && dependencies.aiFreeCapacity === 'configured'
       && dependencies.passkeys === 'configured'
+      && dependencies.releaseEvidenceStore === 'configured'
       && dependencies.durableObjects === 'configured'
       && dependencies.assets === 'configured'
       && dependencies.ai === 'configured'

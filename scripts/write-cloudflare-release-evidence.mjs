@@ -1,163 +1,126 @@
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
+import { executeD1, parseWranglerJson, runWranglerCli, wranglerFailure, wranglerRows } from './d1-utils.mjs';
+import {
+  assertReleaseSha,
+  createReleaseEvidence,
+  decodeBase64Json,
+  encodeBase64Json,
+  releaseEvidenceEquals,
+  RELEASE_MIGRATION_VERSION,
+  upsertReleaseEvidenceSql,
+  validateReleaseEvidence
+} from './release-evidence-lib.mjs';
+import { DEFAULT_PRODUCTION_CONFIG_PATH } from './prepare-cloudflare-production-config.mjs';
 
-const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const sourceConfigPath = resolve(root, 'wrangler.production-direct.jsonc');
-const canonicalConfigPath = resolve(root, 'wrangler.jsonc');
-const generatedConfigPath = resolve(root, '.wrangler.release-evidence.generated.jsonc');
-const evidenceAssetPath = resolve(root, 'apps/web/dist/release-evidence.json');
-const DATABASE_NAME = 'sovereign-openapi-db';
-const WORKER_NAME = 'sovv-web';
-const APP_BASE = 'https://app.defrag.app';
-const EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1';
-const MIGRATION_VERSION = '0014_passkey_authentication';
-const ROUTE_COHESION_CONTRACT = 'sovereign-deployed-route-cohesion-v1';
-const RENDERED_VISUAL_CONTRACT = 'sovereign-rendered-page-family-audit-v1';
-const DMARC_RECORD = '_dmarc.defrag.app';
+const PRODUCTION_ENDPOINTS = [
+  'https://app.defrag.app/ready',
+  'https://app.defrag.app/health',
+  'https://sovereign.defrag.app/ready',
+  'https://sovereign.defrag.app/health'
+];
 
-function fail(message) {
-  throw new Error(`Cloudflare release evidence failed: ${message}`);
+function firstD1Row(result, label) {
+  const failure = wranglerFailure(result, label);
+  if (failure) throw failure;
+  const rows = wranglerRows(parseWranglerJson(result.stdout || result.stderr, label));
+  return rows[0] || null;
 }
 
-function runGit(args, label) {
-  const result = spawnSync('git', args, {
-    cwd: root,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe']
-  });
-  if (result.error || result.status !== 0) {
-    fail(`${label}: ${String(result.stderr || result.error?.message || `exit ${result.status}`).trim()}`);
-  }
-  return String(result.stdout || '').trim();
-}
-
-function parseJsonOutput(output, label) {
-  const text = String(output || '').trim();
-  if (!text) fail(`${label} returned no JSON`);
-  try {
-    return JSON.parse(text);
-  } catch {
-    const starts = [text.indexOf('{'), text.indexOf('[')].filter((index) => index >= 0);
-    if (!starts.length) fail(`${label} did not return JSON: ${text.slice(0, 500)}`);
-    try {
-      return JSON.parse(text.slice(Math.min(...starts)));
-    } catch {
-      fail(`${label} returned invalid JSON: ${text.slice(0, 500)}`);
-    }
-  }
-}
-
-function rows(value) {
-  if (Array.isArray(value)) return value;
-  return value?.result || value?.databases || [];
-}
-
-function resolveCommitSha() {
-  const declared = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
-  const checkout = runGit(['rev-parse', 'HEAD'], 'unable to resolve checkout SHA');
-  if (!/^[0-9a-f]{40}$/i.test(checkout)) fail('checkout SHA is invalid');
-  if (declared && declared !== checkout) fail(`declared commit ${declared} does not match checkout ${checkout}`);
-  return checkout;
-}
-
-function executeWrangler(args) {
-  const result = spawnSync('pnpm', ['--filter', '@sovereign/worker', 'exec', 'wrangler', ...args], {
-    cwd: root,
-    env: process.env,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-    maxBuffer: 64 * 1024 * 1024
-  });
-  if (result.error || result.status !== 0) {
-    fail(`wrangler ${args.join(' ')} failed: ${String(result.stderr || result.error?.message || `exit ${result.status}`).trim()}`);
-  }
-  return String(result.stdout || '');
-}
-
-async function readReady(sha) {
-  let lastError = 'no response';
-  for (let attempt = 1; attempt <= 30; attempt += 1) {
-    try {
-      const response = await fetch(`${APP_BASE}/ready?releaseEvidence=${sha}&attempt=${attempt}`, {
-        headers: { 'cache-control': 'no-cache' },
-        signal: AbortSignal.timeout(15_000)
-      });
-      const text = await response.text();
-      const payload = JSON.parse(text);
-      const evidence = payload?.releaseEvidence;
-      if (response.ok
-        && payload?.ready === true
-        && payload?.version === sha
-        && evidence?.contract === EVIDENCE_CONTRACT
-        && evidence?.sha === sha
-        && evidence?.migrationVersion === MIGRATION_VERSION
-        && evidence?.routeCohesionContract === ROUTE_COHESION_CONTRACT
-        && evidence?.routeCohesionVerified === true
-        && evidence?.renderedVisualContract === RENDERED_VISUAL_CONTRACT
-        && evidence?.renderedVisualVerified === true
-        && evidence?.dmarcRecord === DMARC_RECORD
-        && typeof evidence?.dmarcVerified === 'boolean'
-        && (evidence?.dmarcStatus === 'verified' || evidence?.dmarcStatus === 'external_blocker')) {
-        return payload;
-      }
-      lastError = `status=${response.status} version=${payload?.version || 'missing'} evidence=${evidence?.sha || 'missing'}`;
-    } catch (error) {
-      lastError = error instanceof Error ? error.message : String(error);
-    }
-    if (attempt < 30) await new Promise((resolveDelay) => setTimeout(resolveDelay, 5_000));
-  }
-  fail(`final evidence deployment did not converge: ${lastError}`);
-}
-
-const sha = resolveCommitSha();
-const dmarcVerified = String(process.env.RELEASE_DMARC_VERIFIED || '').trim() === 'true';
-const evidence = {
-  contract: EVIDENCE_CONTRACT,
+export async function convergeReleaseEvidence({
   sha,
-  migrationVersion: MIGRATION_VERSION,
-  routeCohesionContract: ROUTE_COHESION_CONTRACT,
-  routeCohesionVerified: true,
-  renderedVisualContract: RENDERED_VISUAL_CONTRACT,
-  renderedVisualVerified: true,
-  dmarcRecord: DMARC_RECORD,
-  dmarcVerified,
-  dmarcStatus: dmarcVerified ? 'verified' : 'external_blocker',
-  completedAt: new Date().toISOString()
-};
-
-mkdirSync(resolve(root, 'apps/web/dist'), { recursive: true });
-writeFileSync(evidenceAssetPath, `${JSON.stringify(evidence, null, 2)}\n`);
-
-const canonicalConfig = JSON.parse(readFileSync(canonicalConfigPath, 'utf8'));
-const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || process.env.CF_ACCOUNT_ID || canonicalConfig.account_id || '').trim();
-if (!/^[0-9a-f]{32}$/i.test(accountId)) fail('a valid Cloudflare account ID is required');
-if (!String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim()) {
-  fail('CLOUDFLARE_API_TOKEN is required for the final evidence deployment');
+  evidence,
+  fetchImpl = fetch,
+  endpoints = PRODUCTION_ENDPOINTS,
+  attempts = 30,
+  delayMs = 5_000
+}) {
+  let lastError = 'no response';
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    let allMatch = true;
+    for (const endpoint of endpoints) {
+      try {
+        const response = await fetchImpl(`${endpoint}?releaseEvidence=${sha}&attempt=${attempt}`, {
+          headers: { 'cache-control': 'no-cache' },
+          signal: AbortSignal.timeout(15_000)
+        });
+        const payload = await response.json().catch(() => null);
+        const isReadyEndpoint = endpoint.endsWith('/ready');
+        const matches = response.ok
+          && payload?.version === sha
+          && payload?.migrationVersion === RELEASE_MIGRATION_VERSION
+          && payload?.latestMigrationVersion === RELEASE_MIGRATION_VERSION
+          && payload?.dependencies?.migrationParity === 'current'
+          && (!isReadyEndpoint || payload?.ready === true)
+          && validateReleaseEvidence(payload?.releaseEvidence, sha)
+          && releaseEvidenceEquals(payload.releaseEvidence, evidence);
+        if (!matches) {
+          allMatch = false;
+          lastError = `${endpoint} status=${response.status} version=${payload?.version || 'missing'} evidence=${payload?.releaseEvidence?.sha || 'missing'}`;
+          break;
+        }
+      } catch (error) {
+        allMatch = false;
+        lastError = `${endpoint} ${error instanceof Error ? error.message : String(error)}`;
+        break;
+      }
+    }
+    if (allMatch) return true;
+    if (attempt < attempts) await new Promise((resolveDelay) => setTimeout(resolveDelay, delayMs));
+  }
+  throw new Error(`Release evidence did not converge across production endpoints: ${lastError}`);
 }
 
-const databases = rows(parseJsonOutput(executeWrangler(['d1', 'list', '--json']), 'wrangler d1 list'));
-const database = databases.find((item) => item?.name === DATABASE_NAME || item?.database_name === DATABASE_NAME);
-const databaseId = database?.uuid || database?.id || database?.database_id;
-if (!databaseId) fail(`unable to resolve D1 database ${DATABASE_NAME}`);
+export async function writeReleaseEvidence({
+  sha,
+  dmarcVerified = false,
+  configPath = DEFAULT_PRODUCTION_CONFIG_PATH,
+  runWrangler = runWranglerCli,
+  d1Execute = executeD1,
+  fetchImpl = fetch,
+  endpoints = PRODUCTION_ENDPOINTS,
+  attempts = 30,
+  delayMs = 5_000,
+  completedAt
+} = {}) {
+  const normalizedSha = assertReleaseSha(sha);
+  const evidence = createReleaseEvidence({ sha: normalizedSha, dmarcVerified, completedAt });
+  const writeResult = d1Execute({
+    configPath,
+    runWrangler,
+    sql: upsertReleaseEvidenceSql(normalizedSha, encodeBase64Json(evidence))
+  });
+  const writeFailure = wranglerFailure(writeResult, 'D1 release evidence upsert');
+  if (writeFailure) throw writeFailure;
 
-const config = JSON.parse(readFileSync(sourceConfigPath, 'utf8'));
-config.account_id = accountId;
-config.name = WORKER_NAME;
-config.vars.APP_VERSION = sha;
-config.d1_databases = [{
-  binding: 'DB',
-  database_name: DATABASE_NAME,
-  database_id: databaseId,
-  migrations_dir: 'apps/sovereign-worker/migrations'
-}];
-writeFileSync(generatedConfigPath, JSON.stringify(config, null, 2));
+  const readResult = d1Execute({
+    configPath,
+    runWrangler,
+    sql: `SELECT evidence_b64 FROM release_evidence WHERE sha='${normalizedSha}' AND status='success' LIMIT 1;`
+  });
+  const row = firstD1Row(readResult, 'D1 release evidence readback');
+  if (!row?.evidence_b64) throw new Error('D1 release evidence readback returned no successful evidence');
+  const readback = decodeBase64Json(row.evidence_b64);
+  if (!validateReleaseEvidence(readback, normalizedSha) || !releaseEvidenceEquals(readback, evidence)) {
+    throw new Error('D1 release evidence readback did not exactly match the written evidence');
+  }
 
-try {
-  executeWrangler(['deploy', '--config', generatedConfigPath]);
-  const ready = await readReady(sha);
-  console.log(JSON.stringify({ releaseEvidence: ready.releaseEvidence, finalEvidenceDeploy: true }, null, 2));
-} finally {
-  rmSync(generatedConfigPath, { force: true });
+  await convergeReleaseEvidence({
+    sha: normalizedSha,
+    evidence,
+    fetchImpl,
+    endpoints,
+    attempts,
+    delayMs
+  });
+  return { releaseEvidence: readback, finalEvidenceDeploy: false, converged: true };
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const sha = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
+  const result = await writeReleaseEvidence({
+    sha,
+    dmarcVerified: String(process.env.RELEASE_DMARC_VERIFIED || '').trim() === 'true',
+    configPath: String(process.env.WRANGLER_RELEASE_CONFIG_PATH || DEFAULT_PRODUCTION_CONFIG_PATH)
+  });
+  console.log(JSON.stringify(result, null, 2));
 }
