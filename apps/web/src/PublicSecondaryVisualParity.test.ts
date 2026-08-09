@@ -95,6 +95,10 @@ describe('secondary public visual parity', () => {
     expect(policy).toContain('className="v0-mobile-menu"');
     expect(policy).toContain('className="v0-footer"');
     expect(policy).toContain('© 2026 Sovereign.OS');
+    expect(policy).toContain("'How Sovereign.OS handles your information.'");
+    expect(policy).toContain("'Terms for using Sovereign.OS.'");
+    expect(policy).not.toContain("copy: '<BrandMark />");
+    expect(policy).not.toContain("title: 'What <BrandMark />");
   });
 
   it('keeps policy styling scoped away from the frozen landing', () => {
