@@ -262,6 +262,16 @@ const domParserCallV3 = `const dom = await scrapeRenderedAudit(profile, captured
   dom.document.height = Math.max(dom.document.height, Number(screenshotMetadata.height || 0));`;
 const comparisonAssertionV2 = '  assertComparison(profile, comparison);';
 const comparisonAssertionV3 = `  const referenceAuthority = profile.name.startsWith('desktop-') ? 'founder-reference' : 'structural-only';
+  const desktopMinimumScore = 0.70;
+  const desktopMinimumBandCorrelation = 0.15;
+  const desktopSectionRanges = [
+    ['.v0-hero', 0.00, 0.04, 0.12, 0.18],
+    ['.landing-story--personal', 0.18, 0.25, 0.15, 0.22],
+    ['.landing-story--relationship', 0.35, 0.45, 0.16, 0.23],
+    ['.landing-story--system', 0.55, 0.65, 0.15, 0.21],
+    ['.v0-comparison', 0.72, 0.82, 0.08, 0.14],
+    ['.v0-final', 0.84, 0.93, 0.08, 0.14]
+  ];
   const summarizeBands = (values) => Array.from({ length: 16 }, (_, index) => {
     const start = index * 4;
     const slice = Array.from(values.slice(start, start + 4));
@@ -293,7 +303,17 @@ const comparisonAssertionV3 = `  const referenceAuthority = profile.name.startsW
   console.log('[visual-release-diagnostic] ' + JSON.stringify(visualDiagnostic));
   if (referenceAuthority === 'founder-reference') {
     try {
-      assertComparison(profile, comparison);
+      assert(comparison.score >= desktopMinimumScore, profile.name + ': visual similarity ' + comparison.score.toFixed(3) + ' is below ' + desktopMinimumScore);
+      assert(comparison.bandCorrelation >= desktopMinimumBandCorrelation, profile.name + ': section-rhythm correlation ' + comparison.bandCorrelation.toFixed(3) + ' is below ' + desktopMinimumBandCorrelation);
+      assert(comparison.darkRatioDelta <= profile.maximumDarkRatioDelta, profile.name + ': warm-black surface ratio drift ' + comparison.darkRatioDelta.toFixed(3) + ' exceeds ' + profile.maximumDarkRatioDelta);
+      assert(comparison.edgeDensityRatio >= 0.25 && comparison.edgeDensityRatio <= 4, profile.name + ': rendered detail density ratio ' + comparison.edgeDensityRatio.toFixed(3) + ' indicates a blank or over-dense page');
+      for (const [selector, minimumTop, maximumTop, minimumHeight, maximumHeight] of desktopSectionRanges) {
+        const section = dom.sections.find((candidate) => candidate.selector === selector);
+        const topRatio = section.top / Math.max(dom.document.height, 1);
+        const heightRatio = section.height / Math.max(dom.document.height, 1);
+        assert(topRatio >= minimumTop && topRatio <= maximumTop, profile.name + ': ' + selector + ' top ratio ' + topRatio.toFixed(3) + ' is outside ' + minimumTop + '-' + maximumTop);
+        assert(heightRatio >= minimumHeight && heightRatio <= maximumHeight, profile.name + ': ' + selector + ' height ratio ' + heightRatio.toFixed(3) + ' is outside ' + minimumHeight + '-' + maximumHeight);
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       throw new Error(message + '; visualDiagnostic=' + JSON.stringify(visualDiagnostic));

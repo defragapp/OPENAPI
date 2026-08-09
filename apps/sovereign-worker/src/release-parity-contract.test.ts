@@ -123,6 +123,10 @@ describe('production release parity contract', () => {
     expect(visualRateLimiter).toContain("response.headers.get('retry-after')");
     expect(visualRateLimiter).toContain("sourcePath = resolve(root, 'scripts/verify-live-visual-release-v2.mjs')");
     expect(visualRateLimiter).toContain("reference.length > 6_500");
+    expect(visualRateLimiter).toContain('const desktopMinimumScore = 0.70;');
+    expect(visualRateLimiter).toContain('const desktopMinimumBandCorrelation = 0.15;');
+    expect(visualRateLimiter).toContain('const desktopSectionRanges = [');
+    expect(visualRateLimiter).toContain("['.v0-final', 0.84, 0.93, 0.08, 0.14]");
     expect(visualRateLimiter).toContain('await import(pathToFileURL(generatedPath).href)');
   });
 
