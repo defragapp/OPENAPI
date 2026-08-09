@@ -48,7 +48,7 @@ pnpm verify:cloudflare-build
 pnpm preview:bootstrap
 ```
 
-The preview must apply all migrations through `0015_release_evidence`, use the same structured-output adapter as production, bypass personalized Gateway caching, disable persistent prompt logging, and return controlled capacity errors without charging monthly turns for missing answers.
+The preview must apply all migrations through `0015_release_evidence`; `0013_workers_ai_free_capacity` remains the historical capacity-ledger foundation. It must use the same structured-output adapter as production, bypass personalized Gateway caching, disable persistent prompt logging, and return controlled capacity errors without charging monthly turns for missing answers.
 
 Protect the entire preview hostname with Cloudflare Access before accepting it as founder-review evidence. Then verify `/health`, `/healthz`, `/ready`, the public pages, authenticated product surfaces, the disabled private-export boundary, and test-mode billing.
 
