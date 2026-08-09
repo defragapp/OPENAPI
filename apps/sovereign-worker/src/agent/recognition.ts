@@ -67,6 +67,7 @@ const basisRegistryItemSchema = z.object({
   display: z.string().min(1).max(120),
   accessibleLabel: z.string().min(1).max(260),
   computedAt: z.string().min(1),
+  expiresAt: z.string().min(1).optional(),
   uncertainty: z.enum(['low', 'medium', 'high']),
   provenance: z.string().min(1).max(240),
   subject: z.enum(['self', 'other', 'relationship'])
@@ -93,7 +94,20 @@ function visit(value: unknown, output: Map<string, BasisRegistryItem>): void {
   if (Array.isArray(record.basisRegistry)) {
     for (const raw of record.basisRegistry) {
       const parsed = basisRegistryItemSchema.safeParse(raw);
-      if (parsed.success && !isProhibitedBasisDisplay(parsed.data.display)) output.set(parsed.data.id, parsed.data);
+      if (parsed.success && !isProhibitedBasisDisplay(parsed.data.display)) {
+        const item = parsed.data;
+        output.set(item.id, {
+          id: item.id,
+          category: item.category,
+          display: item.display,
+          accessibleLabel: item.accessibleLabel,
+          computedAt: item.computedAt,
+          ...(item.expiresAt ? { expiresAt: item.expiresAt } : {}),
+          uncertainty: item.uncertainty,
+          provenance: item.provenance,
+          subject: item.subject
+        });
+      }
     }
   }
   for (const child of Object.values(record)) visit(child, output);
@@ -123,6 +137,9 @@ export function parseSovereignAnswer(raw: string, registry: BasisRegistryItem[])
   if (parsed.mode === 'system') {
     if (parsed.depth !== 'deep') throw new Error('System answers require deep depth');
     requireSectionIds(parsed, ['system', 'responsibility', 'unknowns']);
+  }
+  if (parsed.mode === 'shadow_gift') {
+    requireSectionIds(parsed, ['shadow', 'gift']);
   }
   if (parsed.mode === 'alignment') {
     const labels = new Set(parsed.sections.map((section) => section.label.toLowerCase()));

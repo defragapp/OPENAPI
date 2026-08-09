@@ -134,6 +134,7 @@ export interface BasisRegistryItem {
   display: string;
   accessibleLabel: string;
   computedAt: string;
+  expiresAt?: string;
   uncertainty: DataUncertainty;
   provenance: string;
   subject: 'self' | 'other' | 'relationship';

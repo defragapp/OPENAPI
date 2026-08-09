@@ -365,15 +365,13 @@ body:has(.private-route-gate) {
 .intelligence-brand > span,
 .private-route-brand > span { border-color: var(--v0-line-strong) !important; background: rgba(232, 221, 208, 0.04) !important; color: var(--v0-cream) !important; }
 .intelligence-sidebar nav button,
-.mobile-bottom-nav button,
 .intelligence-topbar button,
 .new-conversation,
 .account-nav > a:last-child { border-color: transparent; color: var(--v0-muted) !important; }
 .intelligence-sidebar nav button:hover,
-.intelligence-sidebar nav button.active,
-.mobile-bottom-nav button.active { background: rgba(232, 221, 208, 0.075) !important; color: var(--v0-ink) !important; }
+.intelligence-sidebar nav button.active { background: rgba(232, 221, 208, 0.075) !important; color: var(--v0-ink) !important; }
 .intelligence-sidebar nav button.active::before,
-.mobile-bottom-nav button.active::before { background: var(--v0-cream) !important; }
+.intelligence-sidebar nav button.active::before { background: var(--v0-cream) !important; }
 .intelligence-topbar { border-bottom: 1px solid var(--v0-line) !important; backdrop-filter: blur(22px) saturate(118%); }
 .intelligence-topbar > div:first-of-type strong,
 .intelligence-topbar > div:first-of-type em { color: var(--v0-ink) !important; }
@@ -409,11 +407,9 @@ body:has(.private-route-gate) {
 .system-overview > span { color: var(--v0-muted) !important; }
 
 .surface-home article,
-.today-facet-view article,
 .explore-editorial article,
 .relationship-overview article,
 .system-overview article,
-.library-grid article,
 .context-scroll section,
 .baseline-invitation,
 .baseline-builder,
@@ -446,7 +442,6 @@ body:has(.private-route-gate) {
 .primary-action,
 .empty-state button,
 .baseline-invitation button { border-color: rgba(232, 221, 208, 0.78) !important; background: var(--v0-cream) !important; color: var(--v0-paper-ink) !important; box-shadow: 0 11px 28px rgba(0, 0, 0, 0.24); }
-.mobile-bottom-nav { border-color: var(--v0-line) !important; background: rgba(15, 15, 15, 0.92) !important; backdrop-filter: blur(22px); }
 .workspace-sheet > section,
 .covenant-confirmation,
 .account-control-panel,

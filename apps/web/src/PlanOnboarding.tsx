@@ -16,6 +16,10 @@ type BaselineField =
 
 type BaselineStatus = {
   status?: string;
+  ready?: boolean;
+  readinessState?: string;
+  readinessMessage?: string;
+  nextAction?: string;
   uncertainty?: string;
   providerStatus?: string;
   facetProfileStatus?: string;
@@ -199,9 +203,9 @@ export function PlanOnboarding() {
         location.replace('/login?returnTo=%2Fonboarding');
         return;
       }
-      const body = await response.json().catch(() => ({})) as { baseline?: BaselineStatus; error?: string };
+      const body = await response.json().catch(() => ({})) as { baseline?: BaselineStatus; error?: string; message?: string };
       if (!response.ok || !body.baseline) {
-        throw new Error(body.error || 'Your Baseline could not be completed yet.');
+        throw new Error(body.message || body.error || 'Your Baseline could not be completed yet.');
       }
 
       setBaseline(body.baseline);
@@ -220,9 +224,7 @@ export function PlanOnboarding() {
       }
 
       setPhase('baseline_result');
-      setStatus(body.baseline.status === 'partial'
-        ? 'Your Baseline is ready with limited detail.'
-        : 'Your Baseline is ready.');
+      setStatus('Your Baseline is ready.');
     } catch (error) {
       setPhase('baseline');
       setBaselineStage('idle');
@@ -555,16 +557,13 @@ function BaselineResultView({ baseline, certainty, reviewOpen, onToggleReview, o
   onToggleReview: () => void;
   onContinue: () => void;
 }) {
-  const limited = baseline.status === 'partial';
   return (
     <section className="baseline-result-state">
       <p className="eyebrow">YOUR BASELINE IS READY</p>
-      <h1>{limited ? 'Your Baseline is ready with limited detail.' : 'Your Baseline is ready.'}</h1>
-      <p className="plan-intro">{limited
-        ? 'The deterministic provider returned a limited result. Sovereign keeps that uncertainty visible and does not fill missing detail with guesses.'
-        : 'Your personal foundation is ready beneath every question, relationship, and system you choose to explore.'}</p>
+      <h1>Your Baseline is ready.</h1>
+      <p className="plan-intro">Your exact source and validated plain-language facet profile are ready beneath every question, relationship, and system you choose to explore.</p>
       <div className="baseline-result-summary">
-        <div><span>Result</span><strong>{limited ? 'Limited but usable' : 'Complete'}</strong></div>
+        <div><span>Result</span><strong>Source and facets validated</strong></div>
         <div><span>Birth-time certainty</span><strong>{certainty}</strong></div>
         <div><span>Interpretive uncertainty</span><strong>{baseline.uncertainty ?? 'stated in context'}</strong></div>
       </div>
@@ -612,7 +611,7 @@ function PlanChoiceView({ interval, currentPlan, status, submitting, checkoutUna
         </article>
 
         <article className="plus-plan">
-          <header><span>SOVEREIGN+</span><strong>{interval === 'annual' ? '$99 / year' : '$20 / month'}</strong></header>
+          <header><span>SOVEREIGN+</span><strong>{interval === 'annual' ? 'Annual billing' : 'Monthly billing'}</strong></header>
           <h2>Relationships, systems, and continuity.</h2>
           <p>Bring permitted Baselines together and keep the wider human system in view.</p>
           <ul>
@@ -622,10 +621,10 @@ function PlanChoiceView({ interval, currentPlan, status, submitting, checkoutUna
             <li>Permission-aware invitations and controls</li>
           </ul>
           <div className="billing-toggle" role="group" aria-label="Billing interval">
-            <button type="button" aria-pressed={interval === 'monthly'} className={interval === 'monthly' ? 'active' : ''} onClick={() => onInterval('monthly')}>Monthly · $20</button>
-            <button type="button" aria-pressed={interval === 'annual'} className={interval === 'annual' ? 'active' : ''} onClick={() => onInterval('annual')}>Annual · $99</button>
+            <button type="button" aria-pressed={interval === 'monthly'} className={interval === 'monthly' ? 'active' : ''} onClick={() => onInterval('monthly')}>Monthly billing</button>
+            <button type="button" aria-pressed={interval === 'annual'} className={interval === 'annual' ? 'active' : ''} onClick={() => onInterval('annual')}>Annual billing</button>
           </div>
-          {interval === 'annual' && <p className="annual-value">$8.25/month equivalent · save $141 compared with monthly billing.</p>}
+          <p className="annual-value">Stripe checkout shows the current price before you confirm.</p>
           <button className="primary-button" type="button" disabled={submitting} onClick={() => onConfirm('sovereign_plus')}>Choose Sovereign+</button>
         </article>
       </div>
@@ -698,7 +697,9 @@ function supportedTimeZones(): string[] {
 }
 
 function baselineIsReady(baseline: BaselineStatus): boolean {
-  return baseline.status === 'completed' || baseline.status === 'partial';
+  return baseline.status === 'completed'
+    && baseline.ready === true
+    && baseline.facetProfileStatus === 'ready';
 }
 
 function progressState(phase: JourneyPhase) {

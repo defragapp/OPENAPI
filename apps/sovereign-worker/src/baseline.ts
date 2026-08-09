@@ -17,6 +17,14 @@ export type BirthTimeCertainty = 'exact' | 'approximate' | 'unknown';
 export type LocationPrecision = 'none' | 'approximate' | 'city_or_regional' | 'ephemeral_current' | 'stored_permitted' | 'geocentric';
 export interface BaselineInput { birthDate?: string; birthTime?: string; birthTimeCertainty?: BirthTimeCertainty; birthplace?: string; birthTimezone?: string; locationPrecision?: LocationPrecision; }
 export interface CurrentLocationInput { latitude?: number; longitude?: number; }
+export type BaselineReadinessState = 'not_started' | 'source_computing' | 'source_unavailable' | 'source_invalid' | 'facet_profile_preparing' | 'ready';
+export interface BaselineReadiness {
+  ready: boolean;
+  state: BaselineReadinessState;
+  message: string;
+  nextAction: 'continue_onboarding' | 'retry_baseline' | 'review_baseline' | 'open_workspace';
+  retryable: boolean;
+}
 const LOCATION_PRECISIONS: readonly LocationPrecision[] = ['none', 'approximate', 'city_or_regional', 'ephemeral_current', 'stored_permitted', 'geocentric'];
 const VERSION = 'openapi-baseline-engine-v3';
 const SOVV_REFERENCE_COMMIT = 'a3db94bccc75089723bef0cf5ff36c47064bd789';
@@ -206,11 +214,20 @@ export async function persistBaseline(env: Env, accountId: string, input: Baseli
     (computed.reducedContext as Record<string, unknown>).facetProfileStatus = facetProfile ? 'ready' : 'pending';
   }
   await env.DB.prepare(`INSERT OR REPLACE INTO baseline_onboarding (account_id, input_hash, protected_input_json, reduced_context_json, computation_version, provenance_json, status, uncertainty, last_computed_at, provider_status, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, datetime('now'))`).bind(accountId, inputHash, JSON.stringify(protectedInput), JSON.stringify(computed.reducedContext), computed.computationVersion, JSON.stringify(computed.provenance), computed.status, computed.uncertainty, computed.providerStatus).run();
+  const ready = computed.status === 'completed' && facetProfile !== null;
   return {
-    status: computed.status,
+    status: ready ? 'completed' : computed.status === 'completed' ? 'preparing' : computed.status,
+    ready,
     uncertainty: computed.uncertainty,
     reducedContext: computed.reducedContext,
     facetProfileStatus: facetProfile ? 'ready' : 'pending',
+    readinessState: ready ? 'ready' : computed.status === 'completed' ? 'facet_profile_preparing' : 'source_unavailable',
+    message: ready
+      ? 'Your Baseline is ready.'
+      : computed.status === 'completed'
+        ? 'The exact Baseline source was saved, but its plain-language facet profile did not finish validating.'
+        : 'The Baseline source could not be calculated, so Sovereign will not substitute a generic answer.',
+    nextAction: 'retry_baseline' as const,
     provenance: computed.provenance,
     computationVersion: computed.computationVersion
   };
@@ -227,7 +244,75 @@ export async function computeConfiguredBaseline(env: Env, input: BaselineInput) 
 export async function getBaselineStatus(env: Env, accountId: string) {
   const row = await env.DB.prepare('SELECT status, uncertainty, reduced_context_json, provenance_json, computation_version, last_computed_at, provider_status FROM baseline_onboarding WHERE account_id = ?').bind(accountId).first<{ status: string; uncertainty: string; reduced_context_json: string; provenance_json: string; computation_version: string; last_computed_at: string; provider_status: string }>();
   if (!row) return { status: 'not_started' };
-  return { status: row.status, uncertainty: row.uncertainty, reducedContext: JSON.parse(row.reduced_context_json), provenance: JSON.parse(row.provenance_json), computationVersion: row.computation_version, lastComputedAt: row.last_computed_at, providerStatus: row.provider_status };
+  const readiness = await getBaselineReadiness(env, accountId);
+  return {
+    status: readiness.ready ? 'completed' : row.status === 'completed' ? 'preparing' : row.status,
+    ready: readiness.ready,
+    readinessState: readiness.state,
+    readinessMessage: readiness.message,
+    nextAction: readiness.nextAction,
+    facetProfileStatus: readiness.ready ? 'ready' : 'pending',
+    uncertainty: row.uncertainty,
+    reducedContext: JSON.parse(row.reduced_context_json),
+    provenance: JSON.parse(row.provenance_json),
+    computationVersion: row.computation_version,
+    lastComputedAt: row.last_computed_at,
+    providerStatus: row.provider_status
+  };
+}
+
+export async function getBaselineReadiness(env: Env, accountId: string): Promise<BaselineReadiness> {
+  const row = await env.DB.prepare('SELECT status, reduced_context_json, provider_status FROM baseline_onboarding WHERE account_id = ?')
+    .bind(accountId)
+    .first<{ status: string; reduced_context_json: string; provider_status: string }>();
+  if (!row) return baselineReadiness('not_started', 'Build your Baseline before asking Sovereign a question.', 'continue_onboarding', false);
+  if (row.status === 'partial' || row.provider_status !== 'computed') {
+    return baselineReadiness('source_unavailable', 'The Baseline source could not be calculated. Your account and saved data remain unchanged.', 'retry_baseline', true);
+  }
+  if (row.status !== 'completed') {
+    return baselineReadiness('source_computing', 'The Baseline source is still being calculated. Sovereign has not generated an answer.', 'continue_onboarding', true);
+  }
+  const reduced = safeStoredRecord(row.reduced_context_json);
+  const source = baselineSourceDataSchema.safeParse(reduced.sourceData);
+  if (!source.success) {
+    return baselineReadiness('source_invalid', 'The saved Baseline source is incomplete or invalid. No generic substitute will be used.', 'review_baseline', false);
+  }
+  const registry = buildBaselineBasisRegistry(source.data);
+  const cachedProfile = await getCachedBaselineFacetProfile(env, accountId);
+  const profile = baselineFacetProfileSchema.safeParse(cachedProfile ?? reduced.facetProfile);
+  if (!profile.success) {
+    return baselineReadiness('facet_profile_preparing', 'The exact Baseline source is saved, but the plain-language facet profile is still being prepared.', 'retry_baseline', true);
+  }
+  try {
+    validateFacetProfileBasis(profile.data, registry);
+  } catch {
+    return baselineReadiness('facet_profile_preparing', 'The Baseline facet profile did not pass exact Basis validation. No answer will be generated until it does.', 'retry_baseline', true);
+  }
+  return baselineReadiness('ready', 'Your Baseline source and validated facet profile are ready.', 'open_workspace', false);
+}
+
+export async function requireCompletedBaseline(env: Env, accountId: string): Promise<BaselineReadiness> {
+  const readiness = await getBaselineReadiness(env, accountId);
+  if (readiness.ready) return readiness;
+  throw Response.json({
+    type: 'https://sovereign.defrag.app/problems/baseline-required',
+    error: 'baseline_required',
+    code: readiness.state,
+    message: readiness.message,
+    nextAction: readiness.nextAction,
+    retryable: readiness.retryable
+  }, {
+    status: readiness.state === 'source_invalid' ? 422 : 409,
+    headers: { 'cache-control': 'private, no-store' }
+  });
+}
+
+function baselineReadiness(state: BaselineReadinessState, message: string, nextAction: BaselineReadiness['nextAction'], retryable: boolean): BaselineReadiness {
+  return { ready: state === 'ready', state, message, nextAction, retryable };
+}
+
+function safeStoredRecord(value: string): Record<string, unknown> {
+  try { return asRecord(JSON.parse(value)); } catch { return {}; }
 }
 
 export async function computeCurrentConditions(env: Env, accountId: string, mode: LocationPrecision, input: CurrentLocationInput = {}) {
@@ -332,8 +417,11 @@ function sanitizeBaselineForModel(value: unknown, cachedFacetProfile: unknown) {
       facetProfile = null;
     }
   }
+  const ready = baseline.status === 'completed' && sourceData !== null && facetProfile !== null;
   return {
-    status: baseline.status,
+    status: ready ? 'completed' : baseline.status === 'not_started' ? 'not_started' : 'preparing',
+    ready,
+    facetProfileStatus: ready ? 'ready' : 'incomplete',
     uncertainty: baseline.uncertainty,
     providerStatus: baseline.providerStatus,
     computationVersion: baseline.computationVersion,
@@ -347,7 +435,7 @@ function sanitizeBaselineForModel(value: unknown, cachedFacetProfile: unknown) {
       sovvRuntimeDependency: false
     },
     reducedContext: {
-      facetProfileStatus: facetProfile ? 'ready' : 'incomplete',
+      facetProfileStatus: ready ? 'ready' : 'incomplete',
       facetProfile,
       uncertainty: reduced.uncertainty,
       unknownActualState: reduced.unknownActualState,
@@ -392,6 +480,7 @@ function asRecord(value: unknown): Record<string, unknown> {
 
 function buildCurrentBasisRegistry(value: Record<string, unknown>): BasisRegistryItem[] {
   const computedAt = typeof value.computedAt === 'string' ? value.computedAt : new Date(0).toISOString();
+  const expiresAt = typeof value.expiresAt === 'string' ? value.expiresAt : undefined;
   const provenance = value.source === 'OPENAPI_PORTED_HORIZONS'
     ? 'Server current-position calculation'
     : value.source === 'OPENAPI_SANITIZED_FIXTURE'
@@ -413,6 +502,7 @@ function buildCurrentBasisRegistry(value: Record<string, unknown>): BasisRegistr
       display: `LIVE ${symbol} ${signCodes[factor.sign] ?? factor.sign.slice(0, 3).toUpperCase()} ${factor.displayDegree}${factor.retrograde === true ? 'R' : ''}`,
       accessibleLabel: `Current ${factor.body} in ${factor.sign} at ${factor.displayDegree}${factor.retrograde === true ? ', retrograde' : ''}`,
       computedAt,
+      ...(expiresAt ? { expiresAt } : {}),
       uncertainty: factor.uncertainty === 'low' || factor.uncertainty === 'medium' ? factor.uncertainty : 'high',
       provenance,
       subject: 'self'
@@ -429,6 +519,7 @@ function buildCurrentBasisRegistry(value: Record<string, unknown>): BasisRegistr
       display: `LIVE ${currentGlyph} ${aspectGlyphs[contact.aspect] ?? contact.aspect} ${natalGlyph} ${contact.orb.toFixed(1)}°`,
       accessibleLabel: `Current ${contact.currentBody} ${contact.aspect} natal ${contact.natalBody}, ${contact.orb.toFixed(1)} degree orb`,
       computedAt,
+      ...(expiresAt ? { expiresAt } : {}),
       uncertainty: contact.uncertainty === 'low' || contact.uncertainty === 'medium' ? contact.uncertainty : 'high',
       provenance,
       subject: 'self'

@@ -49,6 +49,20 @@ describe('sovereign-answer.v2', () => {
     expect(composeSovereignAnswerText(parsed)).not.toContain('☉ CAN 04.2°');
   });
 
+  it('preserves server-owned expiry provenance for current Basis values', () => {
+    const current: BasisRegistryItem = {
+      ...registry[0]!,
+      id: 'live.pluto',
+      category: 'live',
+      display: 'LIVE ♇ AQU 04.0°R',
+      accessibleLabel: 'Current Pluto in Aquarius at 4.0 degrees, retrograde',
+      expiresAt: '2026-07-28T18:00:00.000Z'
+    };
+    const parsed = parseSovereignAnswer(answer({ basis_refs: ['live.pluto'] }), [current]);
+    expect(attachBasisValues(parsed, [current])).toEqual([current]);
+    expect(attachBasisValues(parsed, [current])[0]?.expiresAt).toBe(current.expiresAt);
+  });
+
   it('rejects an invented Basis reference', () => {
     expect(() => parseSovereignAnswer(answer({ basis_refs: ['natal.invented'] }), registry))
       .toThrow(/invented or unauthorized Basis reference/);
@@ -77,6 +91,15 @@ describe('sovereign-answer.v2', () => {
     ];
     expect(parseSovereignAnswer(answer({ mode: 'relationship', depth: 'deep', sections }), registry).mode)
       .toBe('relationship');
+  });
+
+  it('requires both pressure overreach and observable Gift expression in shadow-and-gift mode', () => {
+    expect(parseSovereignAnswer(answer({ mode: 'shadow_gift' }), registry).mode).toBe('shadow_gift');
+    expect(() => parseSovereignAnswer(answer({
+      mode: 'shadow_gift',
+      depth: 'focused',
+      sections: [{ id: 'shadow', label: 'Shadow', body: 'A valid capacity can overreach under pressure when ownership remains implicit.' }]
+    }), registry)).toThrow(/missing gift/);
   });
 
   it('collects only explicit validated Basis registry entries', () => {

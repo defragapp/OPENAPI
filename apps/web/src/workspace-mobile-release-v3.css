@@ -238,34 +238,12 @@
     line-height: 1.62 !important;
   }
 
-  .sovereign-app-runtime .explore-mode-list {
-    display: flex !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    flex-wrap: nowrap !important;
-    gap: 8px !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    padding: 2px 2px 12px !important;
-    scroll-snap-type: x proximity;
-    scrollbar-width: thin;
-  }
-
-  .sovereign-app-runtime .explore-mode-list button {
-    width: auto !important;
-    min-width: max-content !important;
-    flex: 0 0 auto !important;
-    white-space: nowrap !important;
-    scroll-snap-align: start;
-  }
-
   .sovereign-app-runtime .sovereign-composer,
   .sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
     position: fixed !important;
     z-index: 58 !important;
     right: max(10px, env(safe-area-inset-right)) !important;
-    bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
     left: max(10px, env(safe-area-inset-left)) !important;
     width: auto !important;
     max-width: none !important;
@@ -304,17 +282,6 @@
     height: 48px !important;
     min-height: 48px !important;
     border-radius: 10px !important;
-  }
-
-  .sovereign-app-runtime .mobile-bottom-nav {
-    z-index: 60 !important;
-    min-height: calc(70px + env(safe-area-inset-bottom)) !important;
-    height: calc(70px + env(safe-area-inset-bottom)) !important;
-    padding: 5px max(5px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(5px, env(safe-area-inset-left)) !important;
-  }
-
-  .sovereign-app-runtime .mobile-bottom-nav button {
-    min-height: 58px !important;
   }
 
   .sovereign-app-runtime .intelligence-context {
@@ -444,9 +411,6 @@
     padding: 26px 20px !important;
   }
 
-  .sovereign-app-runtime .mobile-bottom-nav small {
-    font-size: 0.61rem !important;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

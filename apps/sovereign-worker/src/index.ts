@@ -15,7 +15,7 @@ import { addSystemMember, analyzeSystem, cancelDeletionJob, createDeletionJob, c
 import { createCheckoutSession, createPortalSession, normalizeStripeFixtureEvent, projectSubscriptionEvent, type BillingInterval } from './billing/stripe';
 import { getAiUsage, releaseAiTurn, reserveAiTurn } from './billing/usage';
 import { requestMagicLink, redeemMagicLink, logout } from './auth-public';
-import { clearCurrentConditions, computeCurrentConditions, getBaselineStatus, getModelSafeBaselineContext, parseLocationPrecision, persistBaseline, type LocationPrecision } from './baseline';
+import { clearCurrentConditions, computeCurrentConditions, getBaselineStatus, getModelSafeBaselineContext, parseLocationPrecision, persistBaseline, requireCompletedBaseline, type LocationPrecision } from './baseline';
 import { runDueJobs, runOneJob } from './jobs';
 import { applyBiblicalLens, assertCovenantSafe, retrieveScripture } from './covenant/scripture';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
@@ -107,6 +107,7 @@ app.post('/api/v1/account/onboarding', async (context) => {
   const auth = await requireAuth(context.req.raw, context.env);
   const body = await context.req.json<{ plan?: 'free' | 'sovereign_plus' }>();
   if (!body.plan || !['free', 'sovereign_plus'].includes(body.plan)) return context.json({ error: 'Valid plan required' }, 400);
+  await requireCompletedBaseline(context.env, auth.accountId);
   await context.env.DB.prepare(`UPDATE accounts
     SET plan_intent = ?, onboarding_completed_at = COALESCE(onboarding_completed_at, datetime('now')), updated_at = datetime('now')
     WHERE id = ?`)
@@ -261,6 +262,15 @@ app.post('/api/v1/baseline/onboarding', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
   const result = await persistBaseline(context.env, auth.accountId, await context.req.json());
+  if (!result.ready) {
+    return context.json({
+      type: 'https://sovereign.defrag.app/problems/baseline-not-ready',
+      error: result.readinessState,
+      message: result.message,
+      nextAction: result.nextAction,
+      baseline: result
+    }, result.status === 'partial' ? 503 : 409);
+  }
   return context.json({ baseline: result }, 201);
 });
 
@@ -424,6 +434,7 @@ app.post('/api/v1/explore', async (context) => {
 app.post('/api/v1/threads/:threadId/messages', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
+  await requireCompletedBaseline(context.env, auth.accountId);
   const body = await context.req.json<{
     message?: string;
     context?: {

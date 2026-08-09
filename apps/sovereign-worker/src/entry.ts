@@ -14,7 +14,7 @@ import { buildDeterministicSafetyAnswer, decideSovereignInputSafety } from './ag
 import { buildSafetyResponseMetadata, formatSafetyResourcesText } from './agent/safety-resources';
 import { saveLatestInsightModule } from './db/insight-modules';
 import { canUseDevelopmentFixtures } from './runtime';
-import { clearCurrentConditions, computeCurrentConditions, parseLocationPrecision, type CurrentLocationInput, type LocationPrecision } from './baseline';
+import { clearCurrentConditions, computeCurrentConditions, parseLocationPrecision, requireCompletedBaseline, type CurrentLocationInput, type LocationPrecision } from './baseline';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import { authorizeConversationContext, parseConversationContext, projectExpressionFieldContext } from './conversation-context';
 import { buildInterfaceActions } from './interface-actions';
@@ -201,6 +201,7 @@ function connectionCountry(request: Request): string | undefined {
 async function handleRecognitionMessage(request: Request, env: Env, threadId: string): Promise<Response> {
   requireSameOrigin(request);
   const auth = await requireAuth(request, env);
+  await requireCompletedBaseline(env, auth.accountId);
   const body = await request.json().catch(() => ({})) as { message?: string; context?: unknown };
   const message = body.message?.trim();
   if (!message) return Response.json({ error: 'Message required' }, { status: 400 });
@@ -276,7 +277,7 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
   if (aiConfig.provider !== 'cloudflare-gateway' || !env.AI || !env.AI_GATEWAY_ID) {
     if (!canUseDevelopmentFixtures(env)) {
       await updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'failed', 'gateway_unavailable');
-      return Response.json({ error: 'Sovereign is temporarily unavailable. Your message remains in this private conversation, but no response was generated.' }, { status: 503 });
+      return answerServiceUnavailable();
     }
     const fallback = {
       version: 'sovereign-answer.v2' as const,
@@ -367,8 +368,19 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'failed', 'recognition_failed'),
       releaseAiTurn(env, auth.accountId, usage.periodKey)
     ]);
-    throw error;
+    if (error instanceof Response) throw error;
+    return answerServiceUnavailable();
   }
+}
+
+function answerServiceUnavailable(): Response {
+  return Response.json({
+    type: 'https://sovereign.defrag.app/problems/answer-service-unavailable',
+    error: 'answer_service_unavailable',
+    message: 'Sovereign is temporarily unavailable. Your private conversation and Baseline remain unchanged, and no answer was generated.',
+    nextAction: 'retry_message',
+    retryable: true
+  }, { status: 503, headers: { 'cache-control': 'private, no-store' } });
 }
 
 export { ThreadCoordinator };

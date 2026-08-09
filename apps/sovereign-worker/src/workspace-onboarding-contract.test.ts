@@ -7,8 +7,17 @@ const capacityMigration = readFileSync(new URL('../migrations/0013_workers_ai_fr
 const auth = readFileSync(new URL('./auth-public.ts', import.meta.url), 'utf8');
 const index = readFileSync(new URL('./index.ts', import.meta.url), 'utf8');
 const entry = readFileSync(new URL('./entry.ts', import.meta.url), 'utf8');
+const baseline = readFileSync(new URL('./baseline.ts', import.meta.url), 'utf8');
 const runtime = readFileSync(new URL('./runtime-entry.ts', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('../../web/src/PlanOnboarding.tsx', import.meta.url), 'utf8');
+const authenticatedWorkspace = readFileSync(new URL('../../web/src/AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
+const workspace = readFileSync(new URL('../../web/src/SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
+const permissions = readFileSync(new URL('../../web/src/ProductCompletionLayer.tsx', import.meta.url), 'utf8');
+const systemPermissions = readFileSync(new URL('../../web/src/SystemMembershipManager.tsx', import.meta.url), 'utf8');
+const entitlements = readFileSync(new URL('./db/entitlements.ts', import.meta.url), 'utf8');
+const people = readFileSync(new URL('./db/people.ts', import.meta.url), 'utf8');
+const workspaceCss = readFileSync(new URL('../../web/src/deployed-route-cohesion.css', import.meta.url), 'utf8');
+const entryCss = readFileSync(new URL('../../web/src/main.tsx', import.meta.url), 'utf8');
 
  describe('account onboarding, recovery, and conversation persistence', () => {
   it('adds an explicit, account-scoped plan confirmation state', () => {
@@ -24,6 +33,100 @@ const onboarding = readFileSync(new URL('../../web/src/PlanOnboarding.tsx', impo
     expect(auth).toContain('createdAccount');
     expect(auth).toContain("onboarding?.onboarding_completed_at ? safeReturnTo(returnTo) : '/onboarding'");
     expect(runtime).toContain("pathname === '/onboarding'");
+  });
+
+  it('requires a structurally valid Baseline before onboarding completion or message persistence', () => {
+    expect(index).toContain('await requireCompletedBaseline(context.env, auth.accountId)');
+    expect(entry).toContain('await requireCompletedBaseline(env, auth.accountId)');
+    expect(entry.indexOf('await requireCompletedBaseline(env, auth.accountId)'))
+      .toBeLessThan(entry.indexOf('await ensureThread(env, auth.accountId, threadId'));
+    expect(baseline).toContain("error: 'baseline_required'");
+    expect(baseline).toContain("type: 'https://sovereign.defrag.app/problems/baseline-required'");
+    expect(baseline).toContain('baselineSourceDataSchema.safeParse');
+    expect(baseline).toContain('baselineFacetProfileSchema.safeParse');
+    expect(baseline).toContain('validateFacetProfileBasis(profile.data, registry)');
+  });
+
+  it('resumes onboarding until both source and facet profile are ready', () => {
+    for (const source of [onboarding, authenticatedWorkspace, workspace]) {
+      expect(source).toContain("status === 'completed'");
+      expect(source).toContain("ready === true");
+      expect(source).toContain("facetProfileStatus === 'ready'");
+      expect(source).not.toContain("status === 'partial'");
+    }
+  });
+
+  it('contains no authenticated prompt-card menu or retired mobile destination bar', () => {
+    for (const retired of ['surfacePrompts', 'exploreModes', 'question-rail', 'explore-mode-list', 'mobile-bottom-nav', 'library-grid', 'account-summary']) {
+      expect(workspace).not.toContain(retired);
+      expect(workspaceCss).not.toContain(retired);
+    }
+    expect(workspace).toContain('composerExamples');
+    expect(workspace).toContain('composer-example');
+    expect(workspace).not.toContain('Ask a follow-up');
+  });
+
+  it('renders exact accessible Basis values with responsive limits and expiry protection', () => {
+    expect(workspace).toContain('const limit = mobile ? 3 : 5');
+    expect(workspace).toContain('{value.display}');
+    expect(workspace).toContain('aria-label={value.accessibleLabel}');
+    expect(workspace).toContain('available.length - limit');
+    expect(workspace).toContain("if (value.category !== 'live') return true");
+    expect(workspace).toContain('expiry > Date.now()');
+    expect(baseline).toContain("current.status === 'ready' ? buildCurrentBasisRegistry(reduced) : []");
+    expect(workspace).toContain("current?.status === 'ready' ? `On");
+  });
+
+  it('returns state-specific recovery for unavailable answers and unrestorable threads', () => {
+    expect(entry).toContain("error: 'answer_service_unavailable'");
+    expect(entry).toContain("nextAction: 'retry_message'");
+    expect(workspace).toContain('That conversation could not be restored.');
+    expect(workspace).toContain('Your Baseline, permissions, and other saved conversations remain unchanged.');
+  });
+
+  it('keeps permissions visible, specific, and revocable from You', () => {
+    for (const label of ['Current context', 'Permissions', 'People and invitations', 'System permissions', 'Data and privacy', 'Accessibility']) {
+      expect(workspace).toContain(label);
+    }
+    expect(workspace).toContain('There is no global “share everything” control.');
+    expect(permissions).toContain("granted: false");
+    expect(permissions).toContain("status: 'revoked'");
+    expect(permissions).toContain("method: 'DELETE'");
+    expect(systemPermissions).toContain('sovereign:open-system-membership');
+  });
+
+  it('uses real entitlement features before exposing paid task controls and preserves continuity', () => {
+    for (const feature of ['people.compare', 'systems.family', 'systems.team', 'library.continuity']) {
+      expect(workspace).toContain(feature);
+    }
+    expect(workspace).toContain("sessionStorage.setItem('sovereign:upgrade-continuity'");
+    expect(workspace).toContain("get('billing') !== 'success'");
+    expect(onboarding).not.toMatch(/\$99|\$20|\$8\.25|save \$141/);
+    expect(entitlements).toContain("error: 'entitlement_required'");
+    expect(entitlements).toContain("nextAction: 'review_plan'");
+    expect(people).toContain("error: 'permission_denied'");
+    expect(people).toContain("nextAction: 'review_permissions'");
+  });
+
+  it('keeps the composer mobile-safe and examples still under reduced motion', () => {
+    expect(workspaceCss).toContain('env(safe-area-inset-bottom)');
+    expect(workspaceCss).toContain('min-height: 44px');
+    expect(workspaceCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(workspaceCss).toContain('.composer-example');
+    expect(workspace).toContain("matchMedia('(prefers-reduced-motion: reduce)')");
+  });
+
+  it('keeps answers complete without opening Basis provenance and uses validated actions only', () => {
+    expect(workspace.indexOf('<p className="direct-answer">'))
+      .toBeLessThan(workspace.indexOf('<BasisStrip values={basis} />'));
+    expect(workspace).toContain('trustedAnswerActions');
+    expect(workspace).toContain('interfaceActions?.primary');
+    expect(workspace).not.toContain('const primaryAction = answer.actions');
+  });
+
+  it('keeps passkey authentication as the final stylesheet authority', () => {
+    expect(entryCss.indexOf("import './deployed-route-cohesion.css'"))
+      .toBeLessThan(entryCss.indexOf("import './passkey-auth.css'"));
   });
 
   it('stores hashed, expiring, one-use email recovery codes with attempt limits', () => {

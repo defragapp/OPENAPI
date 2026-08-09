@@ -608,10 +608,6 @@ body:has(.public-secondary-page) {
   padding: 24px;
 }
 
-.sovereign-app-runtime .mobile-bottom-nav {
-  display: none;
-}
-
 /* Tablet and iPhone workspace. */
 @media (max-width: 1080px) {
   :where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) {
@@ -721,38 +717,10 @@ body:has(.public-secondary-page) {
   .sovereign-app-runtime .sovereign-composer,
   .sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
     right: max(10px, env(safe-area-inset-right));
-    bottom: calc(76px + env(safe-area-inset-bottom));
+    bottom: max(10px, env(safe-area-inset-bottom));
     left: max(10px, env(safe-area-inset-left));
     max-width: none;
     border-radius: 16px;
-  }
-
-  .sovereign-app-runtime .mobile-bottom-nav {
-    position: fixed;
-    z-index: 60;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    display: grid;
-    min-height: calc(66px + env(safe-area-inset-bottom));
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    padding: 6px max(6px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(6px, env(safe-area-inset-left));
-    border-top: 1px solid var(--cohesion-line);
-    background: rgba(8,10,13,0.96);
-    backdrop-filter: blur(24px);
-  }
-
-  .sovereign-app-runtime .mobile-bottom-nav button {
-    min-height: 52px;
-    border: 0;
-    border-radius: 8px;
-    background: transparent;
-    color: var(--cohesion-faint);
-  }
-
-  .sovereign-app-runtime .mobile-bottom-nav button.active {
-    background: var(--cohesion-blue-soft);
-    color: var(--cohesion-ink);
   }
 
   .sovereign-app-runtime .intelligence-context {

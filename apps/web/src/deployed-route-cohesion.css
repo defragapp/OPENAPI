@@ -722,11 +722,11 @@ body:has(.sovereign-app-runtime) {
   color: #eef8ff;
 }
 
-.sovereign-app-runtime :where(.secondary-action, .baseline-back, .intelligence-rail button, .mobile-bottom-nav button) {
+.sovereign-app-runtime :where(.secondary-action, .baseline-back, .intelligence-rail button) {
   color: var(--route-muted);
 }
 
-.sovereign-app-runtime :where(.intelligence-rail button.active, .mobile-bottom-nav button.active) {
+.sovereign-app-runtime .intelligence-rail button.active {
   background: var(--route-blue-soft);
   color: var(--route-ink);
 }
@@ -976,5 +976,530 @@ body:has(.sovereign-app-runtime) {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+/* Authenticated intelligence workspace refinement. Public landing selectors remain untouched. */
+.sovereign-app-runtime {
+  --route-blue: #c89370;
+  --route-blue-bright: #e8ddd0;
+  --route-blue-soft: rgba(200, 147, 112, 0.1);
+  --sov-sage: #839b8f;
+  --sov-clay-line: rgba(200, 147, 112, 0.48);
+  --sov-clay-line-soft: rgba(200, 147, 112, 0.24);
+  --sov-clay-hover: rgba(200, 147, 112, 0.07);
+  --sov-clay-glow: rgba(200, 147, 112, 0.055);
+  --sov-clay-glow-strong: rgba(200, 147, 112, 0.08);
+  --sov-focus-ring: rgba(200, 147, 112, 0.14);
+}
+
+body:has(.sovereign-app-runtime) {
+  background:
+    radial-gradient(circle at 52% -8%, rgba(232, 221, 208, 0.045), transparent 35rem),
+    var(--route-page);
+}
+
+.sovereign-app-runtime .intelligence-workspace {
+  min-height: 100svh;
+  background: transparent;
+}
+
+.sovereign-app-runtime .intelligence-sidebar {
+  width: 232px;
+  padding-inline: 15px;
+  border-color: var(--route-line);
+  background: rgba(9, 11, 14, 0.94);
+  transition: width 180ms ease;
+}
+
+.sovereign-app-runtime .intelligence-main {
+  margin-left: 232px;
+  transition: margin 180ms ease;
+}
+
+.sovereign-app-runtime .rail-collapse {
+  position: absolute;
+  top: calc(28px + env(safe-area-inset-top));
+  right: -15px;
+  display: grid;
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+  place-items: center;
+  border: 1px solid var(--route-line-strong);
+  border-radius: 50%;
+  background: var(--route-page-soft);
+  color: var(--route-muted);
+  cursor: pointer;
+}
+
+.sovereign-app-runtime .intelligence-sidebar nav button {
+  min-height: 44px;
+  grid-template-columns: 1fr;
+  border-radius: 8px;
+}
+
+.sovereign-app-runtime .intelligence-sidebar nav button.active {
+  background: rgba(232, 221, 208, 0.055);
+  color: var(--route-ink);
+}
+
+.sovereign-app-runtime .recent-threads {
+  border-top: 1px solid var(--route-line);
+  padding-top: 22px;
+}
+
+.sovereign-app-runtime .recent-threads button {
+  color: var(--route-faint);
+}
+
+.sovereign-app-runtime .rail-collapsed .intelligence-sidebar {
+  width: 76px;
+  align-items: center;
+}
+
+.sovereign-app-runtime .rail-collapsed .intelligence-main {
+  margin-left: 76px;
+}
+
+.sovereign-app-runtime .rail-collapsed :where(.intelligence-brand strong, .intelligence-sidebar nav button strong, .recent-threads) {
+  display: none;
+}
+
+.sovereign-app-runtime .rail-collapsed .intelligence-sidebar nav {
+  width: 44px;
+}
+
+.sovereign-app-runtime .rail-collapsed .intelligence-sidebar nav button {
+  width: 44px;
+  padding: 0;
+}
+
+.sovereign-app-runtime .rail-collapsed .intelligence-sidebar nav button::before {
+  content: attr(aria-label);
+  overflow: hidden;
+  width: 1.35em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sovereign-app-runtime .rail-collapsed .new-conversation {
+  width: 44px;
+  overflow: hidden;
+  padding: 0;
+  color: transparent;
+  white-space: nowrap;
+}
+
+.sovereign-app-runtime .rail-collapsed .new-conversation span {
+  color: var(--route-ink);
+}
+
+.sovereign-app-runtime .intelligence-topbar {
+  min-height: 64px;
+  background: rgba(9, 11, 14, 0.86);
+}
+
+.sovereign-app-runtime .intelligence-topbar > div:first-of-type {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.sovereign-app-runtime .intelligence-topbar > div:first-of-type em {
+  color: var(--route-faint);
+  font-size: 0.72rem;
+  font-style: normal;
+}
+
+.sovereign-app-runtime .intelligence-scroll {
+  width: min(100%, 900px);
+  padding: clamp(52px, 8vh, 92px) 30px 176px;
+}
+
+.sovereign-app-runtime :where(.today-home, .explore-home) {
+  display: grid;
+  min-height: min(52vh, 460px);
+  align-content: center;
+}
+
+.sovereign-app-runtime .today-facet-view {
+  display: block;
+  max-width: 720px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.sovereign-app-runtime .today-facet-view header {
+  margin-bottom: 38px;
+}
+
+.sovereign-app-runtime .today-facet-view header > p,
+.sovereign-app-runtime .surface-heading > p {
+  color: var(--sov-clay);
+}
+
+.sovereign-app-runtime .today-facet-view h1,
+.sovereign-app-runtime .surface-heading h1 {
+  max-width: 17ch;
+  margin: 8px 0 16px;
+  font-size: clamp(2.4rem, 5vw, 4rem) !important;
+  line-height: 0.98;
+}
+
+.sovereign-app-runtime .today-facet-view header > span,
+.sovereign-app-runtime .surface-heading > span {
+  display: block;
+  max-width: 62ch;
+  color: var(--route-muted);
+  font-size: 0.98rem;
+  line-height: 1.68;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.sovereign-app-runtime :where(.today-steady, .today-current) {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.32fr) minmax(0, 1fr);
+  gap: 24px;
+  margin: 0;
+  padding: 18px 0;
+  border-top: 1px solid var(--route-line);
+  color: var(--route-muted);
+}
+
+.sovereign-app-runtime :where(.today-steady, .today-current) strong {
+  color: var(--route-ink);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.sovereign-app-runtime .surface-heading {
+  margin-bottom: 28px;
+}
+
+.sovereign-app-runtime .entitlement-required {
+  display: grid;
+  max-width: 650px;
+  min-height: min(48vh, 420px);
+  align-content: center;
+}
+
+.sovereign-app-runtime .entitlement-required > p {
+  margin: 0;
+  color: var(--sov-clay);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sovereign-app-runtime .entitlement-required h1 {
+  max-width: 14ch;
+  margin: 10px 0 18px;
+  font-size: clamp(2.4rem, 5vw, 4rem) !important;
+  line-height: 0.98;
+}
+
+.sovereign-app-runtime .entitlement-required > span {
+  max-width: 58ch;
+  color: var(--route-muted);
+  line-height: 1.68;
+}
+
+.sovereign-app-runtime .entitlement-required > button {
+  width: max-content;
+  min-height: 44px;
+  margin-top: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--route-ink);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.sovereign-app-runtime .sovereign-composer {
+  width: min(calc(100% - 56px), 820px);
+  margin-bottom: calc(18px + env(safe-area-inset-bottom));
+  padding: 10px 12px 11px;
+  border-color: var(--route-line-strong);
+  border-radius: 16px;
+  background: rgba(21, 24, 29, 0.96);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+}
+
+.sovereign-app-runtime .composer-context-line {
+  min-height: 30px;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--route-line);
+  padding: 0 4px 7px;
+}
+
+.sovereign-app-runtime .composer-context-line > span {
+  overflow: hidden;
+  margin: 0;
+  color: var(--route-faint);
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sovereign-app-runtime .composer-context-line button {
+  min-height: 30px;
+  padding: 0 5px;
+  border: 0;
+  background: transparent;
+  color: var(--route-muted);
+  cursor: pointer;
+  font-size: 0.68rem;
+}
+
+.sovereign-app-runtime .composer-example {
+  display: block;
+  min-height: 28px;
+  padding: 10px 5px 0;
+  color: var(--route-faint);
+  font-size: 0.76rem;
+  animation: composer-example-arrive 700ms ease both;
+}
+
+.sovereign-app-runtime .composer-entry {
+  align-items: end;
+}
+
+.sovereign-app-runtime .sovereign-composer textarea {
+  min-height: 56px;
+  padding: 12px 5px 5px;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.sovereign-app-runtime .composer-send {
+  border: 1px solid rgba(232, 221, 208, 0.72) !important;
+  background: var(--route-ink) !important;
+  color: var(--route-page) !important;
+}
+
+.sovereign-app-runtime .composer-send:disabled {
+  opacity: 0.32;
+}
+
+.sovereign-app-runtime .basis-strip {
+  width: max-content;
+  max-width: 100%;
+  margin-top: 24px;
+  padding-inline: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--route-muted) !important;
+  text-align: left;
+}
+
+.sovereign-app-runtime .basis-strip strong {
+  margin-right: 10px;
+  color: var(--route-faint);
+  font-family: inherit;
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sovereign-app-runtime .basis-strip :where(span, b)::before {
+  content: none;
+}
+
+.sovereign-app-runtime .basis-values {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sovereign-app-runtime .basis-values > span {
+  display: inline-flex;
+  min-width: 0;
+}
+
+.sovereign-app-runtime .basis-values b {
+  overflow: hidden;
+  color: var(--route-ink);
+  font-weight: 540;
+  text-overflow: ellipsis;
+}
+
+.sovereign-app-runtime .basis-values i {
+  margin-inline: 7px;
+  color: var(--route-faint);
+  font-style: normal;
+}
+
+.sovereign-app-runtime .basis-strip > em {
+  margin-left: 9px;
+  color: var(--sov-clay);
+  font-style: normal;
+}
+
+.sovereign-app-runtime .basis-strip > i:last-child {
+  margin-left: 8px;
+  color: var(--route-faint);
+}
+
+.sovereign-app-runtime .answer-evidence-row {
+  margin-top: 30px;
+  padding-top: 18px;
+  border-top: 1px solid var(--route-line);
+}
+
+.sovereign-app-runtime .answer-sections article {
+  padding-top: 24px;
+  border-top: 1px solid var(--route-line);
+}
+
+.sovereign-app-runtime .library-list,
+.sovereign-app-runtime .account-settings-index {
+  display: grid;
+  max-width: 760px;
+  border-top: 1px solid var(--route-line);
+}
+
+.sovereign-app-runtime :where(.library-list, .account-settings-index) > button {
+  display: grid;
+  min-height: 72px;
+  align-content: center;
+  gap: 5px;
+  padding: 15px 4px;
+  border: 0;
+  border-bottom: 1px solid var(--route-line);
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--route-ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+.sovereign-app-runtime .library-list > button {
+  grid-template-columns: minmax(190px, 0.42fr) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.sovereign-app-runtime :where(.library-list, .account-settings-index) > button:hover {
+  background: rgba(232, 221, 208, 0.025) !important;
+}
+
+.sovereign-app-runtime :where(.library-list, .account-settings-index) span {
+  display: grid;
+  gap: 3px;
+}
+
+.sovereign-app-runtime :where(.library-list, .account-settings-index) small {
+  color: var(--route-faint);
+  font-size: 0.7rem;
+}
+
+.sovereign-app-runtime .library-list p {
+  margin: 0;
+  color: var(--route-muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.sovereign-app-runtime .control-section {
+  padding: 22px 0 0;
+  border: 0;
+  border-top: 1px solid var(--route-line);
+  border-radius: 0;
+  background: transparent;
+}
+
+.sovereign-app-runtime .workspace-sheet nav {
+  display: grid;
+  margin-top: 16px;
+  border-top: 1px solid var(--route-line);
+}
+
+.sovereign-app-runtime .workspace-sheet nav button {
+  display: grid;
+  min-height: 58px;
+  padding: 10px 2px;
+  border: 0;
+  border-bottom: 1px solid var(--route-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--route-ink);
+  text-align: left;
+}
+
+.sovereign-app-runtime .workspace-sheet nav button small {
+  color: var(--route-faint);
+  font-size: 0.7rem;
+}
+
+@keyframes composer-example-arrive {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 920px) {
+  .sovereign-app-runtime .intelligence-main,
+  .sovereign-app-runtime .rail-collapsed .intelligence-main {
+    margin-left: 0;
+  }
+
+  .sovereign-app-runtime .rail-collapse {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .sovereign-app-runtime .intelligence-scroll {
+    padding: 44px 18px 174px;
+  }
+
+  .sovereign-app-runtime :where(.today-home, .explore-home) {
+    min-height: min(50vh, 390px);
+  }
+
+  .sovereign-app-runtime .today-facet-view h1,
+  .sovereign-app-runtime .surface-heading h1 {
+    font-size: clamp(2.2rem, 11vw, 3.15rem) !important;
+  }
+
+  .sovereign-app-runtime :where(.today-steady, .today-current) {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .sovereign-app-runtime .sovereign-composer {
+    bottom: 0;
+    width: calc(100% - 20px);
+    margin-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+
+  .sovereign-app-runtime .composer-context-line > span {
+    max-width: calc(100% - 104px);
+  }
+
+  .sovereign-app-runtime .library-list > button {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .sovereign-app-runtime :where(.intelligence-topbar button, .workspace-sheet button, .source-drawer button, .account-settings-index button, .library-list button) {
+    min-height: 44px;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sovereign-app-runtime .composer-example {
+    animation: none;
   }
 }

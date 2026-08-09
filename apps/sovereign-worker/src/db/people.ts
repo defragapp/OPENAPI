@@ -168,7 +168,19 @@ export async function hasConsent(env: Env, accountId: string, personId: string, 
 
 export async function requireConsent(env: Env, accountId: string, personId: string, scope: ConsentScope): Promise<void> {
   await requireScopeFeature(env, accountId, scope);
-  if (!(await hasConsent(env, accountId, personId, scope))) throw new Response('Consent denied', { status: 403 });
+  if (!(await hasConsent(env, accountId, personId, scope))) {
+    throw Response.json({
+      type: 'https://sovereign.defrag.app/problems/permission-denied',
+      error: 'permission_denied',
+      scope,
+      message: 'This person has not granted the required permission, or the permission was revoked. Their private data remains unavailable.',
+      nextAction: 'review_permissions',
+      retryable: false
+    }, {
+      status: 403,
+      headers: { 'cache-control': 'private, no-store' }
+    });
+  }
 }
 
 async function resendPendingInvitation(env: Env, accountId: string, invitationId: string): Promise<void> {

@@ -255,13 +255,6 @@ body { background: var(--modern-bg); color: var(--modern-text); }
   }
   .composer-context-line { font-size: .68rem; }
   .intelligence-context { position: fixed; z-index: 80; inset: 0 0 0 8%; width: auto; border-radius: 24px 0 0 24px; box-shadow: -30px 0 80px rgba(0,0,0,.45); }
-  .mobile-bottom-nav {
-    min-height: calc(62px + env(safe-area-inset-bottom));
-    padding-bottom: env(safe-area-inset-bottom);
-    border-top: 1px solid var(--modern-line);
-    background: color-mix(in srgb,var(--modern-bg) 94%,transparent);
-    backdrop-filter: blur(22px);
-  }
 }
 
 @media (max-width: 620px) {

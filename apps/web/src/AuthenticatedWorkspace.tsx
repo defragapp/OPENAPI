@@ -12,7 +12,7 @@ import { AccountExpressionField } from './expression-field/ExpressionField';
 
 type GateState = 'checking' | 'confirming_plan' | 'payment_pending' | 'ready' | 'error';
 type OnboardingStatus = { completed?: boolean; effectivePlan?: 'free' | 'sovereign_plus' };
-type BaselineStatus = { status?: string };
+type BaselineStatus = { status?: string; ready?: boolean; facetProfileStatus?: string; readinessState?: string };
 
 const STRIPE_CONFIRMATION_ATTEMPTS = 12;
 const STRIPE_CONFIRMATION_DELAY_MS = 1_500;
@@ -57,7 +57,9 @@ export function AuthenticatedWorkspace() {
 
           const onboarding = await onboardingResponse.json().catch(() => ({})) as OnboardingStatus;
           const baselineBody = await baselineResponse.json().catch(() => ({})) as { baseline?: BaselineStatus };
-          const baselineReady = baselineBody.baseline?.status === 'completed' || baselineBody.baseline?.status === 'partial';
+          const baselineReady = baselineBody.baseline?.status === 'completed'
+            && baselineBody.baseline.ready === true
+            && baselineBody.baseline.facetProfileStatus === 'ready';
 
           if (!baselineReady) {
             location.replace(billingReturn ? `/onboarding?billing=${encodeURIComponent(billingReturn)}` : '/onboarding');

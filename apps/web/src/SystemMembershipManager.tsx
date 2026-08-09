@@ -47,6 +47,12 @@ export function SystemMembershipManager() {
     if (open) void refresh();
   }, [open]);
 
+  useEffect(() => {
+    const show = () => setOpen(true);
+    window.addEventListener('sovereign:open-system-membership', show);
+    return () => window.removeEventListener('sovereign:open-system-membership', show);
+  }, []);
+
   const selectedSystem = systems.find((system) => system.id === systemId) ?? null;
   const eligible = useMemo(() => people.filter((person) =>
     person.identityBound === true && Array.isArray(person.activeScopes) && person.activeScopes.includes('system.include')

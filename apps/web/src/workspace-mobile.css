@@ -48,11 +48,6 @@
     resize: none;
   }
 
-  .mobile-bottom-nav {
-    padding-left: max(5px, env(safe-area-inset-left));
-    padding-right: max(5px, env(safe-area-inset-right));
-  }
-
   .workspace-sheet > section,
   .source-drawer > section,
   .intelligence-context {

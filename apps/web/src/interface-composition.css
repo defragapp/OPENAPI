@@ -514,8 +514,6 @@
   box-shadow: 0 22px 70px rgba(0,0,0,.2);
 }
 
-.question-rail { padding-top: 14px; border-top: 1px solid var(--platform-line); }
-.question-rail button { min-height: 44px; border-radius: 999px; }
 .response-thread { max-width: 860px; margin-inline: auto; }
 .user-question { max-width: 580px; border-radius: 20px 20px 5px 20px; }
 .sovereign-answer > header h2 { max-width: 20ch; }

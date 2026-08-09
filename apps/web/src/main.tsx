@@ -76,10 +76,9 @@ import './public-secondary-pages-locked.css';
 import './account-journey.css';
 import './account-journey-structured.css';
 import './account-journey-release-cohesion.css';
-import './passkey-auth.css';
-
-/* Final bundled non-landing route authority. */
 import './deployed-route-cohesion.css';
+/* Passkey authentication remains the final CSS authority required by AGENTS.md. */
+import './passkey-auth.css';
 
 function installPlatformVisualCohesion(): void {
   if (document.head.querySelector('style[data-sovereign-platform-cohesion="v1"]')) return;
