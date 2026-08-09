@@ -49,8 +49,11 @@ const onboarding = readFileSync(new URL('../../web/src/PlanOnboarding.tsx', impo
     expect(entry).not.toContain("'user_message', { redacted: true");
   });
 
-  it('reports the current capacity migration from the authoritative production health layer', () => {
-    expect(runtime).toContain("migrationVersion: '0013_workers_ai_free_capacity'");
+  it('reports the current migration from the authoritative production health layer', () => {
+    expect(runtime).toContain("CAPACITY_MIGRATION_VERSION = '0013_workers_ai_free_capacity'");
+    expect(runtime).toContain("PREVIOUS_MIGRATION_VERSION = '0014_passkey_authentication'");
+    expect(runtime).toContain("LATEST_MIGRATION_VERSION = '0015_release_evidence'");
+    expect(runtime).toContain('const migrationVersion = releaseSchemaReady');
     expect(runtime).toContain("answerContract: 'sovereign-answer.v2'");
   });
 });
