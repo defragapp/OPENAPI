@@ -72,6 +72,10 @@ describe('production release parity contract', () => {
     ].map((script) => releaseWrapper.indexOf(script));
     expect(positions.every((position, index) => position >= 0 && (index === 0 || position > positions[index - 1]!))).toBe(true);
     expect(releaseWrapper).toContain('DMARC reconciliation is non-authoritative');
+    expect(releaseWrapper).toContain('const browserRunMaxAttempts = 2;');
+    expect(releaseWrapper).toContain('const retryable = browserVerificationLabels.has(label);');
+    expect(releaseWrapper).not.toContain('deferredBrowserVerification');
+    expect(releaseWrapper).not.toContain('verification=deferred');
     expect(releaseWrapper).toContain("RELEASE_DMARC_VERIFIED: dmarcVerified ? 'true' : 'false'");
     expect(visualVerifier).toContain('/browser-rendering/snapshot');
     expect(visualVerifier).toContain('screenshotOptions: { fullPage: true');
