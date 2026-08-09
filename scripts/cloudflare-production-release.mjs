@@ -18,7 +18,7 @@ const browserRunRetryDelayMs = Math.min(
   120_000,
   Math.max(15_000, Number(process.env.BROWSER_RUN_RATE_LIMIT_RETRY_MS || 65_000) || 65_000)
 );
-const browserRunMaxAttempts = 1;
+const browserRunMaxAttempts = 2;
 const browserVerificationLabels = new Set(['verify-route-cohesion', 'verify-rendered-visuals']);
 let reportSkipLogged = false;
 
@@ -130,7 +130,7 @@ function publishFailureProgress(sha, stage, output, environment) {
 }
 
 async function runAuthoritativeStep(label, path, environment) {
-  const retryable = label === 'verify-route-cohesion';
+  const retryable = browserVerificationLabels.has(label);
   const maxAttempts = retryable ? browserRunMaxAttempts : 1;
   let collectedOutput = '';
   let result;
@@ -193,7 +193,6 @@ const authoritativeSteps = [
 void LEGACY_DEPLOY_COMPATIBILITY;
 await report(checkoutSha, 'start');
 let combinedOutput = '';
-let deferredBrowserVerification = null;
 for (const [label, path] of authoritativeSteps) {
   const step = await runAuthoritativeStep(label, path, releaseEnv);
   const result = step.result;
@@ -210,27 +209,9 @@ for (const [label, path] of authoritativeSteps) {
     }
     await report(checkoutSha, 'failure', combinedOutput || String(result?.error?.message || `exit ${result?.status}`));
 
-    const browserRunBlocked = Boolean(
-      candidateIsLive
-      && browserVerificationLabels.has(label)
-      && isBrowserRunRateLimit(output)
-    );
-    if (browserRunBlocked) {
-      deferredBrowserVerification = { label };
-      break;
-    }
-
     if (result?.error) fail(result.error.message);
     process.exit(result?.status || 1);
   }
-}
-
-if (deferredBrowserVerification) {
-  process.stderr.write(
-    `[cloudflare-release] deployment=success verification=deferred reason=browser-run-rate-limit `
-    + `stage=${deferredBrowserVerification.label} commit=${checkoutSha}\n`
-  );
-  process.exit(0);
 }
 
 const dmarcResult = runNodeScript('scripts/configure-cloudflare-dmarc.mjs', releaseEnv);
