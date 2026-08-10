@@ -2,13 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import type { ReactNode, RefObject } from 'react';
 
 type EvidencePoint = { code: string; label: string };
-type EvidenceGroup = { name?: string; accent?: string; points: readonly EvidencePoint[] };
+type EvidenceGroup = { name?: string; points: readonly EvidencePoint[] };
 type WorkflowStep = {
   kind: 'input' | 'read' | 'connect' | 'direction';
   title: string;
   body: string;
   chips?: readonly string[];
-  branches?: readonly { name: string; accent: string; chips: readonly string[] }[];
 };
 
 /* Historical source fingerprints only. None of these classes are rendered. */
@@ -38,18 +37,14 @@ const SELF_BASELINE: readonly EvidenceGroup[] = [
 const DUO_BASELINE: readonly EvidenceGroup[] = [
   {
     name: 'You',
-    accent: '#e8ddd0',
     points: [
-      { code: 'GATE 22.4', label: 'Illustrative personality gate and line' },
-      { code: 'Needs time', label: 'Illustrative slower route to clarity' }
+      { code: 'GATE 22.4', label: 'Illustrative personality gate and line' }
     ]
   },
   {
-    name: 'Maya',
-    accent: '#7f9a8f',
+    name: 'Partner',
     points: [
-      { code: 'GATE 57.2', label: 'Illustrative personality gate and line' },
-      { code: 'Recognizes quickly', label: 'Illustrative immediate route to clarity' }
+      { code: 'GATE 57.2', label: 'Illustrative personality gate and line' }
     ]
   }
 ] as const;
@@ -78,61 +73,11 @@ const SELF_FLOW: readonly WorkflowStep[] = [
   }
 ] as const;
 
-const RELATIONSHIP_FLOW: readonly WorkflowStep[] = [
-  {
-    kind: 'input',
-    title: 'Keeping both people distinct',
-    body: 'Your need for time and Maya’s quicker recognition remain separate and equally visible.'
-  },
-  {
-    kind: 'read',
-    title: 'Reading each perspective',
-    body: 'Sovereign reads how each person may naturally reach clarity, using only permitted information.',
-    branches: [
-      { name: 'You', accent: '#e8ddd0', chips: ['Needs time', 'Processes aloud'] },
-      { name: 'Maya', accent: '#7f9a8f', chips: ['Recognizes quickly', 'Answers directly'] }
-    ]
-  },
-  {
-    kind: 'connect',
-    title: 'Finding the interaction',
-    body: 'One person’s pause can feel like avoidance while the other person’s speed can feel like pressure.'
-  },
-  {
-    kind: 'direction',
-    title: 'Showing what happens between you',
-    body: 'The conflict may be about pace, not care. A return time gives both routes room to work.'
-  }
-] as const;
-
-const SYSTEM_FLOW: readonly WorkflowStep[] = [
-  {
-    kind: 'input',
-    title: 'Mapping the people',
-    body: 'Each person, role, and permitted Baseline stays visible as part of one shared environment.'
-  },
-  {
-    kind: 'read',
-    title: 'Reading roles and responsibility',
-    body: 'Sovereign separates who acts, who decides, and who is expected to carry the result.'
-  },
-  {
-    kind: 'connect',
-    title: 'Tracing the recurring pattern',
-    body: 'Uncertainty keeps moving toward the person the family relies on to stabilize it.'
-  },
-  {
-    kind: 'direction',
-    title: 'Showing the whole system',
-    body: 'The pattern changes when responsibility becomes explicit instead of automatically returning to one person.'
-  }
-] as const;
-
 const FAMILY = [
-  { id: 'you', name: 'You', role: 'Stabilizer', route: 'Carries resolution', chips: ['ROLE · STABILIZER', 'RESPONSIBILITY'] },
-  { id: 'maya', name: 'Maya', role: 'Partner', route: 'Decides quickly', chips: ['GATE 57.2', 'QUICK CLARITY'] },
-  { id: 'noa', name: 'Noa', role: 'Child', route: 'Waits for direction', chips: ['DEPENDENCE', 'FOLLOW-THROUGH'] },
-  { id: 'ruth', name: 'Ruth', role: 'Grandparent', route: 'Holds authority', chips: ['AUTHORITY', 'EXPECTATION'] }
+  { id: 'you', name: 'You', role: 'Stabilizer', route: 'Carries resolution' },
+  { id: 'partner', name: 'Partner', role: 'Catalyst', route: 'Moves decisions forward' },
+  { id: 'child', name: 'Child', role: 'Observer', route: 'Waits for direction' },
+  { id: 'elder', name: 'Elder', role: 'Anchor', route: 'Holds expectation' }
 ] as const;
 
 export function LandingProductStories() {
@@ -178,16 +123,16 @@ function RelationshipStory() {
         <StoryHeading step="02 · You + 1" title="Understand what happens between you.">
           With permission, Sovereign keeps both people distinct. See each perspective, the interaction, and what the relationship creates between you.
         </StoryHeading>
-        <div className="landing-story__stage" data-viewport-stage="relationship">
+        <div className="landing-story__stage landing-story__stage--relationship" data-viewport-stage="relationship">
           <ChatWindow title="Sovereign — Shared Chat" surface="relationship-chat">
-            <Message side="user">Why does the same conversation feel urgent to Maya and unfinished to me?</Message>
+            <Message side="user">Why does the same conversation feel urgent to my partner and unfinished to me?</Message>
             <Message side="assistant">
-              You may need time to settle into clarity. Maya may recognize her position quickly. The friction is not necessarily about commitment; it may be about pace.
+              You may need time to settle into clarity. Your partner may recognize a position quickly. The friction is not necessarily about commitment; it may be about pace.
               <BaselineTrace groups={DUO_BASELINE} />
             </Message>
             <ComposerPreview>Ask about the two of you…</ComposerPreview>
           </ChatWindow>
-          <WorkflowPanel title="How Sovereign reads both of you" steps={RELATIONSHIP_FLOW} surface="relationship-reasoning" />
+          <RelationshipContext />
         </div>
         <p className="landing-story__consent">Illustrative permitted Baselines · No compatibility score · No private-thought claims</p>
       </div>
@@ -203,20 +148,16 @@ function SystemStory() {
         <StoryHeading step="03 · Your people" title="See the whole system.">
           Map roles, responsibility, pressure, and recurring patterns across a family, team, or group.
         </StoryHeading>
-        <div className="landing-story__stage" data-viewport-stage="system">
+        <div className="landing-story__stage landing-story__stage--system" data-viewport-stage="system">
           <ChatWindow title="Sovereign — Family System" surface="system-map">
             <Message side="user">Why does every family decision eventually become my job to resolve?</Message>
             <Message side="assistant">
               The family may rely on you to stabilize uncertainty. Once that role becomes expected, everyone organizes around it—so even small decisions return to you.
-              <BaselineTrace groups={[{ points: [
-                { code: 'ROLE · STABILIZER', label: 'Illustrative recurring system role' },
-                { code: 'RESPONSIBILITY', label: 'Illustrative concentration of responsibility' }
-              ] }]} />
             </Message>
             <FamilySystemMap />
             <ComposerPreview>Ask about your family…</ComposerPreview>
           </ChatWindow>
-          <WorkflowPanel title="How Sovereign maps the system" steps={SYSTEM_FLOW} surface="system-reasoning" />
+          <SystemContext />
         </div>
         <p className="landing-story__consent">Sanitized system demonstration · Each person controls what may be included</p>
       </div>
@@ -259,18 +200,74 @@ function ComposerPreview({ children }: { children: ReactNode }) {
 }
 
 function BaselineTrace({ groups }: { groups: readonly EvidenceGroup[] }) {
+  const entries = groups.flatMap((group) => [
+    ...(group.name ? [{ text: group.name, label: `${group.name} Baseline`, subject: true }] : []),
+    ...group.points.map((point) => ({ text: point.code, label: point.label, subject: false }))
+  ]);
   return (
-    <div className="landing-evidence">
-      <p>Grounded in</p>
-      <div>
-        {groups.map((group, groupIndex) => (
-          <span className="landing-evidence__group" key={`${group.name ?? 'self'}-${groupIndex}`}>
-            {group.name && <strong><i style={{ background: group.accent }} />{group.name}</strong>}
-            {group.points.map((point) => <abbr key={point.code} title={point.label}>{point.code}</abbr>)}
+    <div className="landing-evidence" aria-label={`Basis. ${entries.map((entry) => entry.text).join('. ')}`}>
+      <strong>Basis</strong>
+      <span className="landing-evidence__values">
+        {entries.map((entry, index) => (
+          <span key={`${entry.text}-${index}`} className={entry.subject ? 'landing-evidence__subject' : 'landing-evidence__code'} title={entry.label}>
+            <i aria-hidden="true"> · </i>{entry.text}
           </span>
         ))}
-      </div>
+      </span>
     </div>
+  );
+}
+
+function RelationshipContext() {
+  return (
+    <article className="landing-demo landing-demo--context landing-demo--relationship-context" data-viewport-surface="relationship-reasoning">
+      <header className="landing-demo__bar landing-demo__bar--context">
+        <span>Keeping both people distinct</span>
+        <small>Permitted context</small>
+      </header>
+      <div className="landing-context-view landing-context-view--relationship">
+        <section>
+          <small>You</small>
+          <strong>Clarity may take time.</strong>
+          <span>A pause can be part of processing rather than disengagement.</span>
+        </section>
+        <section>
+          <small>Partner</small>
+          <strong>Clarity may arrive quickly.</strong>
+          <span>A direct answer can be certainty rather than pressure.</span>
+        </section>
+        <div className="landing-context-distinction">
+          <small>Between you</small>
+          <strong>Different timing can be mistaken for different commitment.</strong>
+          <span>The useful distinction is pace, not who cares more.</span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function SystemContext() {
+  return (
+    <article className="landing-demo landing-demo--context landing-demo--system-context" data-viewport-surface="system-reasoning">
+      <header className="landing-demo__bar landing-demo__bar--context">
+        <span>Mapping the people</span>
+        <small>System context</small>
+      </header>
+      <div className="landing-context-view landing-context-view--system">
+        <section>
+          <small>Roles</small>
+          <strong>Who stabilizes, moves, observes, or anchors.</strong>
+        </section>
+        <section>
+          <small>Responsibility</small>
+          <strong>Where decisions and outcomes keep returning.</strong>
+        </section>
+        <section>
+          <small>Movement</small>
+          <strong>What changes when one person stops carrying the familiar role.</strong>
+        </section>
+      </div>
+    </article>
   );
 }
 
@@ -305,16 +302,6 @@ function WorkflowPanel({ title, steps, surface }: { title: string; steps: readon
                   <span>{step.body}</span>
                 </span>
               </button>
-              {step.branches && (
-                <div className="landing-workflow__branches">
-                  {step.branches.map((branch) => (
-                    <section key={branch.name}>
-                      <strong><i style={{ background: branch.accent }} />{branch.name}</strong>
-                      <div>{branch.chips.map((chip) => <code key={chip}>{chip}</code>)}</div>
-                    </section>
-                  ))}
-                </div>
-              )}
               {step.chips && <div className="landing-workflow__chips">{step.chips.map((chip) => <code key={chip}>{chip}</code>)}</div>}
             </li>
           );
@@ -376,7 +363,6 @@ function FamilySystemMap() {
       <div className="landing-system-map__evidence" aria-live="polite">
         <span>{active.name} · {active.role}</span>
         <strong>{active.route}</strong>
-        <div>{active.chips.map((chip) => <code key={chip}>{chip}</code>)}</div>
       </div>
     </div>
   );
