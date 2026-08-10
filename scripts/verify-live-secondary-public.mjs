@@ -60,6 +60,11 @@ staticDocuments.forEach((document, index) => assertStaticDocument(staticRoutes[i
 const howItWorks = staticDocuments[0].text;
 assert(howItWorks.includes('class="product-proof-window"'), '/how-it-works is missing the restrained product proof');
 assert(howItWorks.includes('This progress is user-visible context—not hidden model reasoning.'), '/how-it-works does not distinguish visible progress from hidden reasoning');
+assert(howItWorks.includes('class="launch-section worlds-proof-section"'), '/how-it-works is missing the Worlds product proof');
+assert(howItWorks.includes('See the pattern. Then step into it.'), '/how-it-works is missing the Worlds positioning');
+assert(howItWorks.includes('src="/worlds-how-it-works.svg"'), '/how-it-works is missing the Worlds illustration');
+assert(howItWorks.includes('relative expression salience'), '/how-it-works is missing the Expression Field measurement boundary');
+assert(howItWorks.includes('A peek into the structure—not a literal place, prediction, or spiritual portal.'), '/how-it-works does not keep the World illustration boundary explicit');
 assert(howItWorks.includes('class="launch-section support-note-section"'), '/how-it-works is missing the reduced-prominence support note');
 assert(!howItWorks.includes('Help fund continued public development.'), '/how-it-works still gives development support primary-page prominence');
 
@@ -68,9 +73,15 @@ assert(pricing.includes('aria-label="Sovereign.OS plans"'), '/pricing is missing
 assert(pricing.includes('class="annual-price"'), '/pricing is missing the clarified annual option');
 assert(pricing.includes('$99 / year'), '/pricing is missing the annual price hierarchy');
 
-const [staticCss, routeCss] = await Promise.all([read(expectedCssPath), read(routeCssPath)]);
+const [staticCss, routeCss, worldsIllustration] = await Promise.all([
+  read(expectedCssPath),
+  read(routeCssPath),
+  read('/worlds-how-it-works.svg')
+]);
 assert(staticCss.response.ok, `secondary stylesheet returned ${staticCss.response.status}`);
 assert(routeCss.response.ok, `route cohesion stylesheet returned ${routeCss.response.status}`);
+assert(worldsIllustration.response.ok, `Worlds illustration returned ${worldsIllustration.response.status}`);
+assert(worldsIllustration.text.includes('Sovereign Worlds illustrative scene'), 'Worlds illustration is missing its accessible title');
 for (const marker of [
   '--v0-page: #090b0e',
   '--v0-cream: #f1e9de',
@@ -99,6 +110,10 @@ assert(!staticCss.text.includes('--v0-sage'), 'secondary stylesheet still contai
 for (const marker of [
   'body.how-page .journey-steps',
   'grid-template-columns: repeat(2, minmax(0, 1fr))',
+  'body.how-page .worlds-proof-window',
+  'body.how-page .worlds-aperture',
+  'body.how-page .worlds-field-instrument',
+  'body.how-page .worlds-proof-flow',
   'body.pricing-page .price-card',
   'body.pricing-page .plan-comparison-list > div',
   'body.questions-page .faq-section',
@@ -158,4 +173,4 @@ assert(
   'compiled policy stylesheet is missing the locked blue atmosphere'
 );
 
-console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} cohesion=v1`);
+console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} cohesion=v1 worlds=illustrative`);
