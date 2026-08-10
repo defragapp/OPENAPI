@@ -435,7 +435,8 @@ function isApplicationPagePath(pathname: string): boolean {
 function isPrivateApplicationPagePath(pathname: string): boolean {
   return pathname === '/app'
     || pathname.startsWith('/app/')
-    || pathname === '/onboarding';
+    || pathname === '/onboarding'
+    || pathname === '/consent.html';
 }
 
 function isNavigationAssetPath(pathname: string): boolean {
