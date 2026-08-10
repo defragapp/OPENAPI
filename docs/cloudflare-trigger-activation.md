@@ -47,3 +47,7 @@ Trigger one clean connected Cloudflare Workers Build from this exact `main` push
 ## Single-deploy D1 release evidence — August 9, 2026
 
 Trigger one clean connected Cloudflare Workers Build from this exact `main` push after introducing migration `0015_release_evidence` and the in-process single-deploy orchestrator. Accept completion only when the remote D1 migration ledger records `0015_release_evidence.sql`, exactly one Worker deployment occurs, both branded domains report this exact commit with migration parity `current`, and their `/health` and `/ready` responses expose the matching D1-backed release evidence. Reconcile `_dmarc.defrag.app` to the monitoring policy during the same release; GitHub Actions remain outside release authority.
+
+## Exact-SHA release gate retrigger — August 10, 2026
+
+Trigger one clean connected Cloudflare Workers Build from this exact `main` push. Accept completion only when the canonical readiness surfaces report `ready: true`, migration `0015_release_evidence`, migration parity `current`, and this exact commit, and the public landing plus cohesion assets are live.
