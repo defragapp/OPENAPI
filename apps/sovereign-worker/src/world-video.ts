@@ -72,7 +72,9 @@ export async function handleWorldVideoRequest(request: Request, env: Env): Promi
     }, 503);
   }
 
-  const field = await expressionFieldSnapshot(request, env);
+  const fieldResult = await expressionFieldSnapshot(request, env);
+  if (fieldResult instanceof Response) return fieldResult;
+  const field = fieldResult;
   if (field.status !== 'ready' && field.status !== 'baseline_only') {
     return privateJson({
       error: 'expression_field_unavailable',
@@ -169,12 +171,19 @@ export async function handleWorldVideoRequest(request: Request, env: Env): Promi
   });
 }
 
-async function expressionFieldSnapshot(request: Request, env: Env): Promise<ExpressionFieldResponse> {
+async function expressionFieldSnapshot(request: Request, env: Env): Promise<ExpressionFieldResponse | Response> {
   const response = await handleExpressionFieldRequest(request, env);
-  if (!response.ok) throw response;
-  const payload: unknown = await response.json();
-  assertExpressionFieldResponse(payload);
-  return payload;
+  if (!response.ok) return response;
+  try {
+    const payload: unknown = await response.json();
+    assertExpressionFieldResponse(payload);
+    return payload;
+  } catch {
+    return privateJson({
+      error: 'expression_field_invalid',
+      message: 'The Expression Field did not pass the World source boundary.'
+    }, 503);
+  }
 }
 
 function worldsVideoConfigured(env: Env): boolean {
