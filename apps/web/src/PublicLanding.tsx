@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { BrandMark } from './BrandMark';
 import { LandingExpressionSlice } from './expression-field/LandingExpressionSlice';
 import { LandingProductStories } from './LandingProductStories';
@@ -100,10 +101,10 @@ function V0Hero() {
           </em>
         </h1>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
-          Sovereign builds your Baseline, then uses it to help you understand what is happening within you, between people, and across the systems around you.
+          Sovereign maps your Baseline, then translates what is happening within you, between people, and across the systems around you.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
-          Sovereign helps you see what’s really happening so you can choose differently.
+          Sovereign maps your Baseline, then translates what is happening within you, between people, and around you.
         </p>
         <div className="sovereign-opening-actions">
           <a className="landing-control landing-control--primary" href="/signup">
@@ -192,7 +193,7 @@ function ComparisonStory() {
         </header>
         <div className="v0-comparison-grid" data-viewport-surface="comparison">
           <ComparisonPanel title="Other AI answers" items={COMPARISON.others} positive={false} />
-          <ComparisonPanel title="<BrandMark />" items={COMPARISON.sovereign} positive />
+          <ComparisonPanel title={<BrandMark />} items={COMPARISON.sovereign} positive />
         </div>
       </div>
     </section>
@@ -229,7 +230,7 @@ function V0Footer() {
   );
 }
 
-function ComparisonPanel({ title, items, positive }: { title: string; items: readonly string[]; positive: boolean }) {
+function ComparisonPanel({ title, items, positive }: { title: ReactNode; items: readonly string[]; positive: boolean }) {
   return (
     <article className={`v0-comparison-panel${positive ? ' v0-comparison-positive' : ''}`}>
       <h3>{title}</h3>
