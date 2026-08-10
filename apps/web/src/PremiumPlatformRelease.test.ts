@@ -26,6 +26,7 @@ const lineageStoryCss = read('./v0-restored-product-stories.css');
 const isolatedStoryCss = read('./landing-product-stories-v2.css');
 const approvedCss = read('./public-landing-approved-v8.css');
 const heroExtension = read('./landing-hero-field-v4.css');
+const finalAuthority = read('./public-landing-final-authority.css');
 const passkeyCss = read('./passkey-auth.css');
 const routeCohesionCss = read('./deployed-route-cohesion.css');
 const staticV0Css = read('../public/v0-public-port.css');
@@ -62,7 +63,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(main).not.toContain("import './public-landing-premium-v4.css';");
     expect(main).not.toContain("import './public-landing-premium-v5.css';");
     expect(main).not.toContain("import './public-landing-premium-v6.css';");
-    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, passkeyCss, routeCohesionCss]) {
+    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, passkeyCss, routeCohesionCss]) {
       expectBalancedCss(source);
     }
   });
@@ -80,12 +81,15 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
+    expect(landing).toContain('Sovereign maps your Baseline, then translates what is happening within you, between people, and across the systems around you.');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('<RealLifeQuestions />');
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
     expect(landing).toContain('Why do I keep taking responsibility for everyone around me?');
     expect(landing).toContain('<MobileCapabilityRail />');
     expect(landing).toContain('sovereign-opening-capabilities');
+    expect(landing).toContain('title={<BrandMark />}');
+    expect(landing).not.toContain('title="<BrandMark />"');
     expect(landing).not.toContain('HERO_CAPABILITIES');
     expect(field).toContain('const CENTER = VIEWBOX_SIZE / 2');
     expect(field).toContain('const SPHERE_RADIUS = 286');
@@ -102,7 +106,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(heroExtension).toContain('stroke: #2f93ff');
   });
 
-  it('uses the approved narrative and v0 motion workflow demonstrations', () => {
+  it('keeps one visible reasoning flow and uses context-specific relationship and system demonstrations', () => {
     expect(landing).toContain('<LandingProductStories />');
     for (const marker of [
       'See what keeps happening.',
@@ -119,20 +123,43 @@ describe('founder v0 selective visual port — approved public v8', () => {
       'Building the distinction',
       'Answering the real question',
       'Keeping both people distinct',
-      'Reading each perspective',
-      'Finding the interaction',
-      'Showing what happens between you',
+      'Clarity may take time.',
+      'Clarity may arrive quickly.',
+      'Between you',
       'Mapping the people',
-      'Reading roles and responsibility',
-      'Tracing the recurring pattern',
-      'Showing the whole system',
+      'Roles',
+      'Responsibility',
+      'Movement',
       'timers.push(window.setTimeout',
       'data-motion-state'
     ]) expect(stories).toContain(marker);
+    expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
+    expect(stories).toContain('<RelationshipContext />');
+    expect(stories).toContain('<SystemContext />');
+    expect(stories).not.toContain("name: 'Maya'");
+    expect(stories).not.toContain("name: 'Noa'");
+    expect(stories).not.toContain("name: 'Ruth'");
+    expect(stories).not.toContain("code: 'Needs time'");
+    expect(stories).not.toContain("code: 'Recognizes quickly'");
     expect(stories).not.toContain('window.setInterval');
     expect(stories).not.toContain('LandingExpressionFieldPreview');
     expect(stories).not.toContain('sphere');
     expect(stories).not.toContain('globe');
+  });
+
+  it('presents public Basis as quiet exact metadata instead of interpretation chips', () => {
+    expect(stories).toContain('<strong>Basis</strong>');
+    expect(stories).toContain("{ code: 'GK 13.4'");
+    expect(stories).toContain("{ code: 'GATE 4.11'");
+    expect(stories).toContain("{ code: 'MARS · CANCER'");
+    expect(stories).toContain("{ code: 'GATE 22.4'");
+    expect(stories).toContain("{ code: 'GATE 57.2'");
+    expect(stories).not.toContain('<p>Grounded in</p>');
+    expect(finalAuthority).toContain('.landing-evidence__code');
+    expect(finalAuthority).toContain('font-family: ui-monospace');
+    expect(finalAuthority).toContain('color: rgba(226, 218, 207, 0.48)');
+    expect(finalAuthority).toContain('.landing-demo--context');
+    expect(finalAuthority).toContain('.landing-story__stage--system');
   });
 
   it('enforces the immersive hero, product windows, questions, and viewport-stable mobile opening', () => {
