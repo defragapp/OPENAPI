@@ -17,6 +17,7 @@ export function WorldVideoLauncher() {
   const [state, setState] = useState<WorldState>('idle');
   const [message, setMessage] = useState('');
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [reduceMotion, setReduceMotion] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
@@ -31,6 +32,14 @@ export function WorldVideoLauncher() {
       .then((payload) => setStatus(payload))
       .catch(() => undefined);
     return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReduceMotion(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
   }, []);
 
   useEffect(() => {
@@ -106,7 +115,7 @@ export function WorldVideoLauncher() {
               <video
                 ref={videoRef}
                 src={videoUrl}
-                autoPlay
+                autoPlay={!reduceMotion}
                 muted
                 loop
                 playsInline
