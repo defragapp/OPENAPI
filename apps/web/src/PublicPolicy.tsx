@@ -16,7 +16,7 @@ const privacySections = [
   },
   {
     title: 'Optional Worlds video',
-    copy: 'When private Worlds video is enabled and you choose to generate one, Sovereign reduces permitted Expression Field values to coarse visual instructions such as visibility, tempo, weight, thresholds, traversability, reconnection, and stability. The video renderer does not receive your raw Baseline, birth details, exact private location, account identity, Basis values, conversations, or another person’s data. Sovereign proxies the generated video to your authenticated browser and does not store the video at launch.'
+    copy: 'When private Worlds video is enabled and you choose to generate one, Sovereign reduces permitted Expression Field values to coarse visual instructions such as visibility, tempo, weight, thresholds, traversability, reconnection, and stability. Cloudflare AI Gateway routes those sanitized instructions to a supported third-party video model. The renderer does not receive your raw Baseline, birth details, exact private location, account identity, Basis values, conversations, or another person’s data. Sovereign proxies the generated video to your authenticated browser and does not store the video at launch; the third-party model processes the sanitized request and output under its applicable service terms.'
   },
   {
     title: 'People, relationships, and permission',
