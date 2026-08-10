@@ -25,10 +25,16 @@ describe('authenticated Worlds experience', () => {
   it('plays provider media only from a local blob URL and revokes it', () => {
     expect(launcher).toContain('URL.createObjectURL(blob)');
     expect(launcher).toContain('URL.revokeObjectURL');
-    expect(launcher).toContain('autoPlay');
+    expect(launcher).toContain('autoPlay={!reduceMotion}');
     expect(launcher).toContain('muted');
     expect(launcher).toContain('loop');
     expect(launcher).toContain('playsInline');
+  });
+
+  it('respects reduced-motion preferences for generated video playback', () => {
+    expect(launcher).toContain("window.matchMedia('(prefers-reduced-motion: reduce)')");
+    expect(launcher).toContain("query.addEventListener('change', update)");
+    expect(css).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
   it('uses the restrained monochrome world-first visual language', () => {
