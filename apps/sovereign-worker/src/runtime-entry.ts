@@ -3,10 +3,11 @@ import type { Env } from './env';
 import { transactionalEmailProvider } from './email';
 import { handleExpressionFieldRequest } from './expression-field';
 import { readProductionReleaseEvidence } from './release-evidence';
-import { requireSameOrigin } from './security/auth';
+import { requireAuth, requireSameOrigin } from './security/auth';
 import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/headers';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import { attachD1Bookmark, createD1RequestSession, withD1SessionEnv } from './d1-session';
+import { handleWorldVideoRequest, handleWorldVideoStatusRequest, WORLD_VIDEO_CONTRACT } from './world-video';
 import {
   createPasskeyLoginOptions,
   createPasskeyRegistrationOptions,
@@ -24,6 +25,16 @@ const STRIPE_WEBHOOK_PATHS = new Set([
   '/api/webhooks/stripe',
   '/stripe/webhook',
   '/webhooks/stripe'
+]);
+const PUBLIC_API_ROUTES = new Set([
+  'POST /api/v1/auth/signup',
+  'POST /api/v1/auth/login',
+  'GET /api/v1/auth/redeem',
+  'POST /api/v1/auth/redeem',
+  'POST /api/v1/auth/passkey/login/options',
+  'POST /api/v1/auth/passkey/login/verify',
+  'GET /api/v1/invitations/preview',
+  'POST /api/v1/invitations/redeem'
 ]);
 const DISABLED_PATH_PREFIXES = ['/api/v1/export-jobs'];
 const PARENT_HOSTS = new Set(['defrag.app', 'www.defrag.app']);
@@ -86,6 +97,12 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
   const routed = routeHostname(request, url);
   if (routed) return routed;
 
+  const apiBoundary = await enforcePrivateApiBoundary(request, url, env);
+  if (apiBoundary) return apiBoundary;
+
+  const pageBoundary = await enforcePrivatePageBoundary(request, url, env);
+  if (pageBoundary) return pageBoundary;
+
   if (request.method === 'POST' && url.pathname === '/api/v1/auth/passkey/login/options') {
     requireSameOrigin(request);
     return withSecurityHeaders(await createPasskeyLoginOptions(request, env));
@@ -119,6 +136,14 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
     return healthResponse(url.pathname, env);
   }
 
+  if (request.method === 'GET' && url.pathname === '/api/v1/worlds/video/status') {
+    return withSecurityHeaders(await handleWorldVideoStatusRequest(request, env));
+  }
+
+  if (request.method === 'POST' && url.pathname === '/api/v1/worlds/video') {
+    return withSecurityHeaders(await handleWorldVideoRequest(request, env));
+  }
+
   if (request.method === 'GET' && url.pathname === '/api/v1/expression-field') {
     return withSecurityHeaders(await handleExpressionFieldRequest(request, env));
   }
@@ -136,6 +161,45 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
   }
 
   return applicationResponse(request, url.pathname, env, executionContext);
+}
+
+async function enforcePrivateApiBoundary(request: Request, url: URL, env: Env): Promise<Response | undefined> {
+  if (!url.pathname.startsWith('/api/v1/') || PUBLIC_API_ROUTES.has(`${request.method.toUpperCase()} ${url.pathname}`)) return undefined;
+  try {
+    await requireAuth(request, env);
+    return undefined;
+  } catch (error) {
+    if (error instanceof Response) return withSecurityHeaders(privateBoundaryResponse(error));
+    throw error;
+  }
+}
+
+async function enforcePrivatePageBoundary(request: Request, url: URL, env: Env): Promise<Response | undefined> {
+  if (url.hostname.toLowerCase() !== APP_HOST
+    || (request.method !== 'GET' && request.method !== 'HEAD')
+    || !isPrivateApplicationPagePath(url.pathname)) return undefined;
+  try {
+    await requireAuth(request, env);
+    return undefined;
+  } catch (error) {
+    if (!(error instanceof Response)) throw error;
+    if (error.status !== 401) return withSecurityHeaders(privateBoundaryResponse(error));
+    const login = new URL(`https://${APP_HOST}/login`);
+    login.searchParams.set('returnTo', `${url.pathname}${url.search}`);
+    return withSecurityHeaders(Response.redirect(login.toString(), 302));
+  }
+}
+
+function privateBoundaryResponse(response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set('cache-control', 'private, no-store');
+  headers.set('vary', 'Cookie, Authorization');
+  headers.delete('content-length');
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
 }
 
 async function applicationResponse(request: Request, pathname: string, env: Env, executionContext: ExecutionContext): Promise<Response> {
@@ -246,6 +310,8 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       assets: env.ASSETS ? 'configured' : 'missing',
       ai: aiConfig.provider === 'cloudflare-gateway' && env.AI && env.AI_GATEWAY_ID ? 'configured' : 'missing',
       aiGateway: env.AI_GATEWAY_ID ? 'configured' : 'missing',
+      worldsVideo: env.WORLDS_VIDEO_ENABLED === 'true' && env.AI && env.AI_GATEWAY_ID ? 'enabled' : 'disabled',
+      worldsVideoContract: WORLD_VIDEO_CONTRACT,
       baselineEngine: env.BASELINE_HORIZONS_URL ? 'configured' : 'missing',
       baselineObserver: 'Earth geocenter 500@399',
       birthplaceGeocoder: 'disabled',
@@ -356,6 +422,12 @@ function isApplicationPagePath(pathname: string): boolean {
     || pathname === '/invitation'
     || pathname === '/consent.html'
     || pathname.startsWith('/auth/');
+}
+
+function isPrivateApplicationPagePath(pathname: string): boolean {
+  return pathname === '/app'
+    || pathname.startsWith('/app/')
+    || pathname === '/onboarding';
 }
 
 function isNavigationAssetPath(pathname: string): boolean {
