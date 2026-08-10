@@ -26,11 +26,12 @@ describe('private launch boundary and Worlds video', () => {
     expect(runtime).toContain("headers.set('cache-control', 'private, no-store')");
   });
 
-  it('requires a session before private app and onboarding documents are served', () => {
+  it('requires a session before private workspace, onboarding, and consent documents are served', () => {
     expect(runtime).toContain('enforcePrivatePageBoundary(request, url, env)');
     expect(runtime).toContain("pathname === '/app'");
     expect(runtime).toContain("pathname.startsWith('/app/')");
     expect(runtime).toContain("pathname === '/onboarding'");
+    expect(runtime).toContain("pathname === '/consent.html'");
     expect(runtime).toContain("login.searchParams.set('returnTo'");
     expect(runtime).toContain("Response.redirect(login.toString(), 302)");
   });
