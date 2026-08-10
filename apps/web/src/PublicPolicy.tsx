@@ -15,6 +15,10 @@ const privacySections = [
     copy: 'Sovereign sends only the context permitted for your question. Raw birth details, exact private location, and unrelated account history are excluded. Unsaved thread content and complete AI responses are scheduled for deletion after 30 days.'
   },
   {
+    title: 'Optional Worlds video',
+    copy: 'When private Worlds video is enabled and you choose to generate one, Sovereign reduces permitted Expression Field values to coarse visual instructions such as visibility, tempo, weight, thresholds, traversability, reconnection, and stability. The video renderer does not receive your raw Baseline, birth details, exact private location, account identity, Basis values, conversations, or another person’s data. Sovereign proxies the generated video to your authenticated browser and does not store the video at launch.'
+  },
+  {
     title: 'People, relationships, and permission',
     copy: 'Adding a person to your workspace does not give you access to their Baseline. Shared comparisons require an invitation connected to that person’s account and a separate decision for each requested use. They can deny or revoke permission at any time.'
   },
@@ -38,12 +42,16 @@ const termsSections = [
     copy: 'The Baseline may draw on astrology, partial Human Design and Gene Keys signals, and numerology. These are symbolic interpretive frameworks, not scientifically verified psychological measurements. Sovereign.OS does not diagnose, predict, establish hidden motives, or determine what another person feels.'
   },
   {
+    title: 'Worlds is illustrative',
+    copy: 'Worlds is an optional visualization mode derived from your permitted Expression Field. A generated environment is an illustrative representation, not a prediction, diagnosis, emotional measurement, literal account of your life, or statement about another person. Worlds is self-only at launch.'
+  },
+  {
     title: 'Your judgment and safety',
     copy: 'Sovereign.OS can offer reflection, questions, and practical options, but it does not replace medical, mental-health, legal, financial, emergency, or other qualified professional support. You remain responsible for decisions made with or without the product.'
   },
   {
     title: 'Plans and usage',
-    copy: 'Free is a permanent plan with Baseline, Today, Explore, and 10 Sovereign responses per UTC calendar month. Sovereign+ is $20 monthly or $99 annually and includes 300 monthly responses plus consented People, Systems, Library continuity, and the optional Covenant lens.'
+    copy: 'Free is a permanent plan with Baseline, Today, Explore, and 10 Sovereign responses per UTC calendar month. Sovereign+ is $20 monthly or $99 annually and includes 300 monthly responses plus consented People, Systems, Library continuity, and the optional Covenant lens. When Worlds video is enabled, the interface shows its AI-turn cost before each generation.'
   },
   {
     title: 'Billing and cancellation',
@@ -98,10 +106,10 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
         <h1>{privacy ? 'How Sovereign.OS handles your information.' : 'Terms for using Sovereign.OS.'}</h1>
         <p>
           {privacy
-            ? 'This page explains what the product collects, what reaches the language model, how long information is kept, and the choices you control.'
+            ? 'This page explains what the product collects, what reaches the language model or optional renderer, how long information is kept, and the choices you control.'
             : 'These terms explain the product’s interpretive limits, account and billing rules, consent requirements, and where your own judgment remains essential.'}
         </p>
-        <p className="policy-effective">Effective July 26, 2026</p>
+        <p className="policy-effective">Effective August 9, 2026</p>
       </section>
 
       <section className="policy-grid prose prose-invert max-w-none" aria-label={privacy ? 'Privacy details' : 'Terms details'}>
