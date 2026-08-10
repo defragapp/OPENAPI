@@ -83,7 +83,14 @@ export async function handleWorldVideoRequest(request: Request, env: Env): Promi
   }
 
   const turnCost = worldVideoTurnCost(env);
-  const reservation = await reserveAiTurns(env, auth.accountId, entitlements.plan, turnCost);
+  let reservation: Awaited<ReturnType<typeof reserveAiTurns>>;
+  try {
+    reservation = await reserveAiTurns(env, auth.accountId, entitlements.plan, turnCost);
+  } catch (error) {
+    if (error instanceof Response) return error;
+    throw error;
+  }
+
   let providerResult: unknown;
   try {
     providerResult = await env.AI!.run(
