@@ -37,7 +37,7 @@ function expectBalancedCss(source: string) {
 }
 
 describe('founder v0 selective visual port — approved public v8', () => {
-  it('loads one approved landing authority, hero extension, passkey authority, then final route authority', () => {
+  it('loads one approved landing authority, hero extension, route cohesion, then final passkey authority', () => {
     const imports = [
       "import './v0-platform-port.css';",
       "import './v0-motion-accessibility.css';",
@@ -49,8 +49,8 @@ describe('founder v0 selective visual port — approved public v8', () => {
       "import './landing-product-stories-v2.css';",
       "import './public-landing-approved-v8.css';",
       "import './landing-hero-field-v4.css';",
-      "import './passkey-auth.css';",
-      "import './deployed-route-cohesion.css';"
+      "import './deployed-route-cohesion.css';",
+      "import './passkey-auth.css';"
     ];
     let previous = -1;
     for (const marker of imports) {
