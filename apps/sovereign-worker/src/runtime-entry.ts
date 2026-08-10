@@ -67,8 +67,16 @@ const runtime = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
     const session = createD1RequestSession(request, env.DB);
     const requestEnv = session ? withD1SessionEnv(env, session) : env;
-    const response = await dispatchRequest(request, requestEnv, executionContext);
-    return attachD1Bookmark(response, session);
+    try {
+      const response = await dispatchRequest(request, requestEnv, executionContext);
+      return attachD1Bookmark(response, session);
+    } catch (error) {
+      if (error instanceof Response) {
+        return attachD1Bookmark(withSecurityHeaders(privateBoundaryResponse(error)), session);
+      }
+      console.error('runtime_request_failed', { error: error instanceof Error ? error.name : 'unknown' });
+      return attachD1Bookmark(withSecurityHeaders(Response.json({ error: 'internal_error' }, { status: 500 })), session);
+    }
   },
   queue,
   scheduled
