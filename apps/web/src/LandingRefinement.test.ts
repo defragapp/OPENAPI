@@ -11,26 +11,27 @@ const integrationStyles = read('./landing-expression-field-integration.css');
 const storyStyles = read('./landing-product-stories-v2.css');
 const approvedStyles = read('./public-landing-approved-v8.css');
 const heroExtension = read('./landing-hero-field-v4.css');
+const finalAuthority = read('./public-landing-final-authority.css');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
 describe('approved public landing v8', () => {
-  it('loads the v0 foundation, field, stories, landing authority, passkey authority, and final route authority in order', () => {
+  it('loads the v0 foundation, field, stories, landing authority, route cohesion, and passkey authority in order', () => {
     const fieldImport = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
     const lineageImport = "import './v0-restored-product-stories.css';";
     const storiesImport = "import './landing-product-stories-v2.css';";
     const approvedImport = "import './public-landing-approved-v8.css';";
     const heroImport = "import './landing-hero-field-v4.css';";
-    const passkeyImport = "import './passkey-auth.css';";
     const routeImport = "import './deployed-route-cohesion.css';";
+    const passkeyImport = "import './passkey-auth.css';";
     expect(main.indexOf(integrationImport)).toBeGreaterThan(main.indexOf(fieldImport));
     expect(main.indexOf(lineageImport)).toBeGreaterThan(main.indexOf(integrationImport));
     expect(main.indexOf(storiesImport)).toBeGreaterThan(main.indexOf(lineageImport));
     expect(main.indexOf(approvedImport)).toBeGreaterThan(main.indexOf(storiesImport));
     expect(main.indexOf(heroImport)).toBeGreaterThan(main.indexOf(approvedImport));
-    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(heroImport));
-    expect(main.indexOf(routeImport)).toBeGreaterThan(main.indexOf(passkeyImport));
-    expect(main.slice(main.indexOf(routeImport) + routeImport.length)).not.toContain("import './");
+    expect(main.indexOf(routeImport)).toBeGreaterThan(main.indexOf(heroImport));
+    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(routeImport));
+    expect(main.slice(main.indexOf(passkeyImport) + passkeyImport.length)).not.toContain("import './");
     expect(main).not.toContain("import './public-landing-approved-v7.css';");
   });
 
@@ -48,9 +49,11 @@ describe('approved public landing v8', () => {
     expect(landing).toContain('Why do we keep having the same fight?');
     expect(landing).toContain('<MobileCapabilityRail />');
     expect(landing).toContain('sovereign-opening-capabilities');
-    expect(landing).toContain('Sovereign helps you see what’s really happening so you can choose differently.');
+    expect(landing).toContain('Sovereign maps your Baseline, then translates what is happening within you, between people, and around you.');
     expect(landing).toContain('Private. Secure. Yours.');
     expect(landing).toContain('v0-mobile-menu');
+    expect(landing).toContain('title={<BrandMark />}');
+    expect(landing).not.toContain('title="<BrandMark />"');
     expect(landing).not.toContain('HERO_CAPABILITIES');
   });
 
@@ -78,7 +81,7 @@ describe('approved public landing v8', () => {
     expect(heroExtension).toContain('mask-image: linear-gradient');
   });
 
-  it('uses the approved narrative and v0 chat/workflow language', () => {
+  it('uses one reasoning flow, relationship perspective context, and a map-first system view', () => {
     for (const marker of [
       'See what keeps happening.',
       'Understand what happens between you.',
@@ -96,15 +99,36 @@ describe('approved public landing v8', () => {
       'Building the distinction',
       'Answering the real question',
       'Keeping both people distinct',
-      'Reading each perspective',
-      'Finding the interaction',
-      'Showing what happens between you',
+      'Clarity may take time.',
+      'Clarity may arrive quickly.',
+      'Between you',
       'Mapping the people',
-      'Reading roles and responsibility',
-      'Tracing the recurring pattern',
-      'Showing the whole system'
+      'Roles',
+      'Responsibility',
+      'Movement'
     ]) expect(stories).toContain(marker);
+    expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
+    expect(stories).toContain('<RelationshipContext />');
+    expect(stories).toContain('<SystemContext />');
+    expect(stories).not.toContain("name: 'Maya'");
+    expect(stories).not.toContain("name: 'Noa'");
+    expect(stories).not.toContain("name: 'Ruth'");
     expect(renderedStories).not.toContain('title="Ask about your life."');
+  });
+
+  it('keeps source codes as quiet Basis metadata rather than interpretation chips', () => {
+    expect(stories).toContain('<strong>Basis</strong>');
+    expect(stories).toContain("{ code: 'GK 13.4'");
+    expect(stories).toContain("{ code: 'GATE 4.11'");
+    expect(stories).toContain("{ code: 'MARS · CANCER'");
+    expect(stories).toContain("{ code: 'GATE 22.4'");
+    expect(stories).toContain("{ code: 'GATE 57.2'");
+    expect(stories).not.toContain('<p>Grounded in</p>');
+    expect(stories).not.toContain("code: 'Needs time'");
+    expect(stories).not.toContain("code: 'Recognizes quickly'");
+    expect(finalAuthority).toContain('.landing-evidence__code');
+    expect(finalAuthority).toContain('.landing-demo--context');
+    expect(finalAuthority).toContain('.landing-story__stage--system');
   });
 
   it('holds the screenshot-defined desktop rail, density, and editorial line breaks', () => {
@@ -125,7 +149,7 @@ describe('approved public landing v8', () => {
     expect(landing).toContain('Your thoughts<br />deserve<br />a better place to live.');
   });
 
-  it('plays chat and workflow motion once, then settles', () => {
+  it('plays the single reasoning workflow once, then settles', () => {
     expect(stories).toContain('useWorkflowProgress(panelRef, steps.length)');
     expect(stories).toContain('timers.push(window.setTimeout');
     expect(stories).toContain("data-motion-state={visibleIndex >= steps.length - 1 ? 'settled' : 'running'}");
@@ -170,7 +194,7 @@ describe('approved public landing v8', () => {
   });
 
   it('keeps every active CSS layer structurally balanced', () => {
-    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension]) {
+    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
