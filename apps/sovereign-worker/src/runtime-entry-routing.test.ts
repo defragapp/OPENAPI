@@ -54,10 +54,27 @@ describe('public route aliases', () => {
 });
 
 describe('navigation asset routing', () => {
-  it('serves known application routes from the React entry document', async () => {
+  it('redirects unauthenticated private workspace routes before any SPA document is served', async () => {
     let assetUrl = '';
     const response = await runtime.fetch(
       new Request('https://app.defrag.app/app/thread_123?view=detail'),
+      assetEnvironment((request) => { assetUrl = request.url; }),
+      executionContext
+    );
+
+    expect(response.status).toBe(302);
+    expect(assetUrl).toBe('');
+    const location = new URL(response.headers.get('location')!);
+    expect(location.origin).toBe('https://app.defrag.app');
+    expect(location.pathname).toBe('/login');
+    expect(location.searchParams.get('returnTo')).toBe('/app/thread_123?view=detail');
+    expect(response.headers.get('cache-control')).toBe('no-store');
+  });
+
+  it('serves public account routes from the React entry document', async () => {
+    let assetUrl = '';
+    const response = await runtime.fetch(
+      new Request('https://app.defrag.app/login?returnTo=%2Fapp'),
       assetEnvironment((request) => { assetUrl = request.url; }),
       executionContext
     );
@@ -78,15 +95,19 @@ describe('navigation asset routing', () => {
     expect(assetUrl).toBe('https://sovereign.defrag.app/');
   });
 
-  it('keeps standalone navigation documents on their own asset paths', async () => {
+  it('protects the standalone consent manager before its private document is served', async () => {
     let assetUrl = '';
-    await runtime.fetch(
+    const response = await runtime.fetch(
       new Request('https://app.defrag.app/consent.html?token=invitation'),
       assetEnvironment((request) => { assetUrl = request.url; }),
       executionContext
     );
 
-    expect(assetUrl).toBe('https://app.defrag.app/consent.html?token=invitation');
+    expect(response.status).toBe(302);
+    expect(assetUrl).toBe('');
+    const location = new URL(response.headers.get('location')!);
+    expect(location.pathname).toBe('/login');
+    expect(location.searchParams.get('returnTo')).toBe('/consent.html?token=invitation');
   });
 
   it('returns a Worker 404 for an unknown Worker-first path', async () => {
