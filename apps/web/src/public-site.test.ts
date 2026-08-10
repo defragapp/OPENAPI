@@ -23,6 +23,7 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).toContain('Personal AI for real life');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
+    expect(landing).toContain('Sovereign maps your Baseline, then translates what is happening within you, between people, and across the systems around you.');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(field).toContain('Drag to rotate');
     expect(field).toContain('landing-expression-slice__tooltip');
@@ -45,7 +46,7 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).toContain('Your thoughts deserve');
   });
 
-  it('shows real chat examples with visible user-facing workflows', () => {
+  it('shows one visible reasoning flow plus relationship and system context', () => {
     for (const marker of [
       'surface="personal-chat"',
       'surface="personal-reasoning"',
@@ -56,17 +57,27 @@ describe('Sovereign.OS public experience', () => {
       'Reading your Baseline',
       'Finding the pattern',
       'Keeping both people distinct',
-      'Finding the interaction',
+      'Clarity may take time.',
+      'Between you',
       'Mapping the people',
-      'Showing the whole system'
+      'Movement'
     ]) expect(stories).toContain(marker);
+    expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
     expect(stories).toContain("aria-current={index === visibleIndex ? 'step' : undefined}");
+    expect(stories).toContain('<RelationshipContext />');
+    expect(stories).toContain('<SystemContext />');
   });
 
-  it('keeps relationship and system examples permission-safe and removes field globes', () => {
+  it('keeps relationship and system examples permission-safe, anonymous, and source-aware', () => {
     expect(stories).toContain('With permission, Sovereign keeps both people distinct');
     expect(stories).toContain('Each person controls what may be included');
     expect(stories).toContain('No compatibility score');
+    expect(stories).toContain('<strong>Basis</strong>');
+    expect(stories).not.toContain("name: 'Maya'");
+    expect(stories).not.toContain("name: 'Noa'");
+    expect(stories).not.toContain("name: 'Ruth'");
+    expect(stories).not.toContain("code: 'Needs time'");
+    expect(stories).not.toContain("code: 'Recognizes quickly'");
     expect(stories).not.toContain('LandingExpressionFieldPreview');
     expect(stories).not.toContain('sphere');
     expect(stories).not.toContain('globe');
