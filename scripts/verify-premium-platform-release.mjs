@@ -29,6 +29,7 @@ const fieldVisual = read('apps/web/src/landing-expression-field-v3.css');
 const fieldIntegration = read('apps/web/src/landing-expression-field-integration.css');
 const storyVisual = read('apps/web/src/v0-restored-product-stories.css');
 const heroVisual = read('apps/web/src/landing-hero-field-v4.css');
+const finalLandingAuthority = read('apps/web/src/public-landing-final-authority.css');
 const passkeyVisual = read('apps/web/src/passkey-auth.css');
 const staticV0Visual = read('apps/web/public/v0-public-port.css');
 const publicSupport = read('apps/web/public/premium-public-release.css');
@@ -44,6 +45,7 @@ for (const path of [
   'apps/web/src/landing-expression-field-integration.css',
   'apps/web/src/v0-restored-product-stories.css',
   'apps/web/src/landing-hero-field-v4.css',
+  'apps/web/src/public-landing-final-authority.css',
   'apps/web/src/passkey-auth.css',
   'apps/web/public/v0-public-port.css'
 ]) assert(existsSync(path), `Required release source is missing: ${path}`);
@@ -88,13 +90,16 @@ requireAll('landing archive and hero contract', landing, [
   'Personal AI for real life',
   'Healing isn’t optional.',
   'Holding onto the pain is.',
+  'Sovereign maps your Baseline, then translates what is happening within you, between people, and across the systems around you.',
   '<LandingExpressionSlice />',
   '<RealLifeQuestions />',
   'Bring the question you actually have.',
   'Why do I keep taking responsibility for everyone around me?',
   'What is mine, what is theirs, and what happens between us?',
-  '<LandingProductStories />'
+  '<LandingProductStories />',
+  'title={<BrandMark />}'
 ]);
+assert(!landing.includes('title="<BrandMark />"'), 'Comparison renders the BrandMark as a string instead of the component.');
 
 const renderedSequence = landing.slice(landing.indexOf('export function PublicLanding()'), landing.indexOf('function V0Navigation()'));
 const orderedLandingMarkers = [
@@ -134,13 +139,16 @@ requireAll('restored product stories', stories, [
   'Building the distinction',
   'Answering the real question',
   'Keeping both people distinct',
-  'Reading each perspective',
-  'Finding the interaction',
-  'Showing what happens between you',
+  'Clarity may take time.',
+  'Clarity may arrive quickly.',
+  'Between you',
   'Mapping the people',
-  'Reading roles and responsibility',
-  'Tracing the recurring pattern',
-  'Showing the whole system',
+  'Roles',
+  'Responsibility',
+  'Movement',
+  '<RelationshipContext />',
+  '<SystemContext />',
+  '<strong>Basis</strong>',
   'className="v0-baseline-trace"',
   'v0-workflow-panel',
   'v0-family-system-map',
@@ -149,7 +157,28 @@ requireAll('restored product stories', stories, [
   'No private-thought claims',
   'Each person controls what may be included'
 ]);
-rejectAll('restored product stories', stories, ['LandingExpressionFieldPreview', 'sphere', 'globe']);
+assert((stories.match(/<WorkflowPanel /g) ?? []).length === 1, 'Public stories must render one detailed reasoning flow, not repeat it for relationship and system examples.');
+rejectAll('restored product stories', stories, [
+  'LandingExpressionFieldPreview',
+  'sphere',
+  'globe',
+  "name: 'Maya'",
+  "name: 'Noa'",
+  "name: 'Ruth'",
+  "code: 'Needs time'",
+  "code: 'Recognizes quickly'",
+  '<p>Grounded in</p>'
+]);
+
+requireAll('converged public Basis and context styling', finalLandingAuthority, [
+  '.landing-evidence__code',
+  'font-family: ui-monospace',
+  'color: rgba(226, 218, 207, 0.48)',
+  '.landing-demo--context',
+  '.landing-context-view--relationship',
+  '.landing-context-view--system',
+  '.landing-story__stage--system'
+]);
 
 requireAll('integrated hero field', `${field}\n${fieldVisual}\n${fieldIntegration}\n${heroVisual}`, [
   'data-visual-contract="landing-expression-field-v3"',
@@ -287,6 +316,7 @@ for (const [label, source] of [
   ['field integration', fieldIntegration],
   ['restored product stories', storyVisual],
   ['hero field and questions', heroVisual],
+  ['final landing authority', finalLandingAuthority],
   ['passkey authority', passkeyVisual],
   ['standalone authority', staticV0Visual],
   ['public support authority', publicSupport]
@@ -300,7 +330,7 @@ console.log(JSON.stringify({
   canonicalLanding: 'PublicLanding.tsx + LandingProductStories.tsx',
   publicField: 'landing-expression-field-v3-spherical-360',
   questionTreatment: 'rotating-real-life-questions',
-  productStories: ['personal-chat-workflow', 'relationship-chat-workflow', 'system-chat-workflow'],
+  productStories: ['personal-chat-workflow', 'relationship-chat-context', 'system-map-context'],
   visualDirection: 'founder-v0-dark-editorial',
   excludedMockRuntime: true,
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
