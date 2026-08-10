@@ -165,6 +165,340 @@ body.how-page .support-note > div > p:not(.launch-kicker) {
   line-height: 1.68;
 }
 
+/* Worlds: keep the answer primary, then show an optional spatial translation. */
+body.how-page .worlds-proof-section {
+  position: relative;
+}
+
+body.how-page .worlds-proof-section::before {
+  position: absolute;
+  inset: 8% -18% auto;
+  height: 620px;
+  background: radial-gradient(circle at 62% 48%, rgba(47, 147, 255, 0.085), transparent 42rem);
+  content: "";
+  pointer-events: none;
+}
+
+body.how-page .worlds-proof-heading,
+body.how-page .worlds-proof-window,
+body.how-page .worlds-proof-principles {
+  position: relative;
+  z-index: 1;
+}
+
+body.how-page .worlds-proof-window {
+  overflow: hidden;
+  border: 1px solid var(--v0-line-strong);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 53% 18%, rgba(120, 199, 255, 0.045), transparent 28rem),
+    #0d1015;
+  box-shadow: 0 36px 96px rgba(0, 0, 0, 0.4);
+}
+
+body.how-page .worlds-proof-topbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--v0-line);
+  color: var(--v0-faint);
+  font-size: 0.61rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+body.how-page .worlds-proof-topbar > span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--v0-blue-bright);
+  box-shadow: 0 0 16px rgba(120, 199, 255, 0.42);
+}
+
+body.how-page .worlds-proof-topbar strong {
+  color: var(--v0-cream);
+  font-weight: 600;
+}
+
+body.how-page .worlds-proof-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(370px, 1.25fr) minmax(250px, 0.7fr);
+  min-height: 560px;
+}
+
+body.how-page .worlds-proof-copy,
+body.how-page .worlds-field {
+  min-width: 0;
+  padding: clamp(28px, 4vw, 42px);
+}
+
+body.how-page .worlds-proof-copy {
+  border-right: 1px solid var(--v0-line);
+}
+
+body.how-page .worlds-proof-question {
+  margin: 0;
+  color: var(--v0-cream);
+  font-family: var(--v0-display);
+  font-size: clamp(1.85rem, 3vw, 2.7rem);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+}
+
+body.how-page .worlds-proof-answer,
+body.how-page .worlds-proof-distinction p,
+body.how-page .worlds-proof-note,
+body.how-page .worlds-aperture figcaption,
+body.how-page .worlds-field-list dd,
+body.how-page .worlds-proof-flow small,
+body.how-page .worlds-proof-principles span {
+  color: var(--v0-muted);
+  font-size: 0.82rem;
+  line-height: 1.62;
+}
+
+body.how-page .worlds-proof-answer {
+  margin: 26px 0 0;
+}
+
+body.how-page .worlds-proof-distinction {
+  margin-top: 34px;
+  padding: 18px 0 0 18px;
+  border-top: 1px solid var(--v0-line);
+  border-left: 2px solid rgba(120, 199, 255, 0.58);
+}
+
+body.how-page .worlds-proof-distinction > span,
+body.how-page .worlds-field-heading > span {
+  color: var(--v0-blue-bright);
+  font-size: 0.59rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+body.how-page .worlds-proof-distinction p {
+  margin: 9px 0 0;
+}
+
+body.how-page .worlds-proof-note {
+  margin: 28px 0 0;
+  color: var(--v0-faint);
+}
+
+body.how-page .worlds-aperture {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  margin: 0;
+  place-items: center;
+  padding: 30px 18px 24px;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(120, 199, 255, 0.04), transparent 25rem),
+    #0a0d11;
+}
+
+body.how-page .worlds-aperture::before {
+  position: absolute;
+  inset: 9% 7%;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 47%, rgba(9, 11, 14, 0.52) 72%, #090b0e 100%);
+  content: "";
+  pointer-events: none;
+}
+
+body.how-page .worlds-aperture img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: min(100%, 620px);
+  height: auto;
+  filter: saturate(0.92) contrast(1.02);
+}
+
+body.how-page .worlds-aperture figcaption {
+  position: relative;
+  z-index: 2;
+  max-width: 44ch;
+  margin-top: -4px;
+  text-align: center;
+  color: var(--v0-faint);
+}
+
+body.how-page .worlds-field {
+  border-left: 1px solid var(--v0-line);
+  background: rgba(255, 255, 255, 0.012);
+}
+
+body.how-page .worlds-field-heading {
+  display: grid;
+  gap: 5px;
+}
+
+body.how-page .worlds-field-heading small {
+  color: var(--v0-faint);
+  font-size: 0.66rem;
+}
+
+body.how-page .worlds-field-instrument {
+  position: relative;
+  width: min(100%, 240px);
+  aspect-ratio: 1;
+  margin: 34px auto 28px;
+  border: 1px solid rgba(120, 199, 255, 0.08);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(120, 199, 255, 0.055) 0 2px, transparent 3px),
+    repeating-radial-gradient(circle, transparent 0 23%, rgba(120, 199, 255, 0.065) 23.5% 24%, transparent 24.5% 47%),
+    linear-gradient(rgba(120, 199, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 199, 255, 0.03) 1px, transparent 1px);
+  background-size: auto, auto, 50% 50%, 50% 50%;
+}
+
+body.how-page .worlds-field-instrument i {
+  --axis-opacity: calc(0.22 + (var(--world-axis-emphasis) * 0.65));
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--world-axis-length) / 2);
+  height: 1px;
+  transform-origin: 0 50%;
+  transform: rotate(atan2(var(--world-axis-y), var(--world-axis-x)));
+  background: linear-gradient(90deg, rgba(120, 199, 255, var(--axis-opacity)), rgba(241, 233, 222, var(--axis-opacity)));
+  opacity: var(--axis-opacity);
+}
+
+body.how-page .worlds-field-instrument i::after {
+  position: absolute;
+  right: -2px;
+  top: -2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(241, 233, 222, 0.84);
+  content: "";
+}
+
+body.how-page .worlds-field-instrument b {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #f4ede4;
+  box-shadow: 0 0 20px rgba(120, 199, 255, 0.65);
+  transform: translate(-50%, -50%);
+}
+
+body.how-page .worlds-field-list {
+  margin: 0;
+  border-top: 1px solid var(--v0-line);
+}
+
+body.how-page .worlds-field-list > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--v0-line);
+}
+
+body.how-page .worlds-field-list dt {
+  color: var(--v0-cream);
+  font-size: 0.74rem;
+}
+
+body.how-page .worlds-field-list dd {
+  margin: 0;
+  color: var(--v0-faint);
+  font-size: 0.7rem;
+}
+
+body.how-page .worlds-proof-flow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--v0-line);
+  list-style: none;
+}
+
+body.how-page .worlds-proof-flow li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  min-width: 0;
+  padding: 22px;
+  border-right: 1px solid var(--v0-line);
+}
+
+body.how-page .worlds-proof-flow li:last-child {
+  border-right: 0;
+}
+
+body.how-page .worlds-proof-flow li > span {
+  color: var(--v0-blue-bright);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+}
+
+body.how-page .worlds-proof-flow strong,
+body.how-page .worlds-proof-flow small {
+  display: block;
+}
+
+body.how-page .worlds-proof-flow strong {
+  color: var(--v0-cream);
+  font-family: var(--v0-display);
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+body.how-page .worlds-proof-flow small {
+  margin-top: 5px;
+}
+
+body.how-page .worlds-proof-principles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 22px;
+  border-top: 1px solid var(--v0-line-strong);
+  border-bottom: 1px solid var(--v0-line-strong);
+}
+
+body.how-page .worlds-proof-principles > div {
+  min-width: 0;
+  padding: 22px 24px;
+  border-right: 1px solid var(--v0-line);
+}
+
+body.how-page .worlds-proof-principles > div:last-child {
+  border-right: 0;
+}
+
+body.how-page .worlds-proof-principles strong,
+body.how-page .worlds-proof-principles span {
+  display: block;
+}
+
+body.how-page .worlds-proof-principles strong {
+  color: var(--v0-cream);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+body.how-page .worlds-proof-principles span {
+  margin-top: 5px;
+  font-size: 0.75rem;
+}
+
 /* Pricing: give the decision one clear hierarchy and keep cards aligned. */
 body.pricing-page .pricing-grid {
   gap: 20px;
@@ -291,8 +625,24 @@ body.launch-page .launch-footer-inner {
     --route-shell: min(100% - 48px, 980px);
   }
 
-  body.how-page .product-proof-grid {
+  body.how-page .product-proof-grid,
+  body.how-page .worlds-proof-layout {
     grid-template-columns: 1fr;
+  }
+
+  body.how-page .worlds-proof-copy,
+  body.how-page .worlds-field {
+    border-right: 0;
+    border-left: 0;
+  }
+
+  body.how-page .worlds-proof-copy,
+  body.how-page .worlds-aperture {
+    border-bottom: 1px solid var(--v0-line);
+  }
+
+  body.how-page .worlds-field-instrument {
+    width: min(260px, 64vw);
   }
 
   body.pricing-page .price-card {
@@ -320,6 +670,25 @@ body.launch-page .launch-footer-inner {
 
   body.how-page .journey-steps article:last-child {
     grid-column: auto;
+  }
+
+  body.how-page .worlds-proof-flow,
+  body.how-page .worlds-proof-principles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.how-page .worlds-proof-flow li:nth-child(2),
+  body.how-page .worlds-proof-principles > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  body.how-page .worlds-proof-flow li:nth-child(-n+2),
+  body.how-page .worlds-proof-principles > div:nth-child(-n+2) {
+    border-bottom: 1px solid var(--v0-line);
+  }
+
+  body.how-page .worlds-proof-principles > div:last-child {
+    grid-column: 1 / -1;
   }
 
   body.pricing-page .plan-comparison-list > div {
@@ -367,6 +736,43 @@ body.launch-page .launch-footer-inner {
   body.how-page .journey-steps article {
     min-height: 0;
     padding: 26px 22px 30px;
+  }
+
+  body.how-page .worlds-proof-topbar {
+    grid-template-columns: auto 1fr;
+    padding: 0 16px;
+  }
+
+  body.how-page .worlds-proof-topbar small {
+    display: none;
+  }
+
+  body.how-page .worlds-proof-copy,
+  body.how-page .worlds-field {
+    padding: 26px 22px;
+  }
+
+  body.how-page .worlds-aperture {
+    padding: 22px 6px 18px;
+  }
+
+  body.how-page .worlds-proof-flow,
+  body.how-page .worlds-proof-principles {
+    grid-template-columns: 1fr;
+  }
+
+  body.how-page .worlds-proof-flow li,
+  body.how-page .worlds-proof-flow li:nth-child(2),
+  body.how-page .worlds-proof-principles > div,
+  body.how-page .worlds-proof-principles > div:nth-child(2) {
+    grid-column: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--v0-line);
+  }
+
+  body.how-page .worlds-proof-flow li:last-child,
+  body.how-page .worlds-proof-principles > div:last-child {
+    border-bottom: 0;
   }
 
   body.pricing-page .price-card {
