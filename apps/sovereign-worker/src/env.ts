@@ -35,6 +35,9 @@ export interface Env {
   ASTRONOMY_API_URL?: string;
   AI_FREE_MONTHLY_TURNS?: string;
   AI_SOVEREIGN_PLUS_MONTHLY_TURNS?: string;
+  WORLDS_VIDEO_ENABLED?: string;
+  WORLDS_VIDEO_MODEL?: string;
+  WORLDS_VIDEO_TURN_COST?: string;
   THREAD_RETENTION_DAYS?: string;
   AUDIT_RETENTION_DAYS?: string;
   BASELINE_GEOCODER_URL?: string;
