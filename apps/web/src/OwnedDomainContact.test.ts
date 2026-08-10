@@ -6,11 +6,12 @@ const consent = readFileSync(new URL('../public/consent.html', import.meta.url),
 const email = readFileSync(new URL('../../sovereign-worker/src/email.ts', import.meta.url), 'utf8');
 const runtime = readFileSync(new URL('../../sovereign-worker/src/runtime-entry.ts', import.meta.url), 'utf8');
 const emailSmoke = readFileSync(new URL('../../../scripts/email-smoke.ts', import.meta.url), 'utf8');
-const publicAndEmailCopy = `${policy}\n${consent}\n${email}`;
+const publicAndEmailCopy = `${policy}\n${consent}\n${email}\n${runtime}\n${emailSmoke}`;
 
 describe('owned-domain contact and transactional delivery', () => {
-  it('publishes only the approved Sovereign.OS public contact address', () => {
-    expect(publicAndEmailCopy).toContain('info@sovereign.os');
+  it('publishes only the approved owned public contact address', () => {
+    expect(publicAndEmailCopy).toContain('info@defrag.app');
+    expect(publicAndEmailCopy).not.toMatch(/[A-Za-z0-9._%+-]+@sovereign\.os/i);
     expect(publicAndEmailCopy).not.toContain('support@defrag.app');
     expect(publicAndEmailCopy).not.toMatch(/[A-Za-z0-9._%+-]+@gmail\.com/i);
   });
