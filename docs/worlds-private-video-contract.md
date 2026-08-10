@@ -73,6 +73,8 @@ The inference request uses:
 - `collectLog: false` so the render prompt and provider response are not retained as AI Gateway payload logs by this request path;
 - non-identifying product metadata only.
 
+Cloudflare Zero Data Retention is not assumed for the Runway video path. Provider-side processing and retention remain governed by the applicable Cloudflare and third-party service terms; any provider change requires a fresh privacy review before activation.
+
 The model response URL is validated server-side. Sovereign fetches the generated video and streams it through the authenticated Worker with `private, no-store`. The provider URL is not exposed to the browser. Sovereign does not persist the generated video.
 
 ## Entitlement and cost boundary
