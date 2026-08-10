@@ -8,10 +8,11 @@ afterEach(() => {
 });
 
 describe('safe authentication return routing', () => {
-  it('preserves only approved in-app destinations', () => {
+  it('preserves only approved private destinations', () => {
     expect(safeReturnTo('/app')).toBe('/app');
     expect(safeReturnTo('/app/relationship?person=p_1')).toBe('/app/relationship?person=p_1');
     expect(safeReturnTo('/onboarding')).toBe('/onboarding');
+    expect(safeReturnTo('/consent.html?token=invitation')).toBe('/consent.html?token=invitation');
   });
 
   it('rejects external, protocol-relative, malformed, and unrelated destinations', () => {

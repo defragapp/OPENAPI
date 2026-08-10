@@ -12,8 +12,8 @@ const MAX_TURNSTILE_TOKEN_LENGTH = 2048;
 const MAX_MAGIC_LINKS_PER_IP_WINDOW = 10;
 const EMAIL_CODE_TTL_MINUTES = 10;
 const EMAIL_CODE_MAX_ATTEMPTS = 5;
-const TERMS_VERSION = '2026-07-26';
-const PRIVACY_VERSION = '2026-07-26';
+const TERMS_VERSION = '2026-08-09';
+const PRIVACY_VERSION = '2026-08-09';
 
 export function normalizeEmail(email: string): string { return email.trim().toLowerCase(); }
 function validEmail(email: string): boolean { return email.length <= MAX_EMAIL_LENGTH && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
@@ -50,7 +50,10 @@ export function safeReturnTo(value: unknown, fallback = '/app'): string {
   if (typeof value !== 'string' || value.length > 512 || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback;
   try {
     const parsed = new URL(value, 'https://app.defrag.app');
-    const allowed = parsed.pathname === '/app' || parsed.pathname.startsWith('/app/') || parsed.pathname === '/onboarding';
+    const allowed = parsed.pathname === '/app'
+      || parsed.pathname.startsWith('/app/')
+      || parsed.pathname === '/onboarding'
+      || parsed.pathname === '/consent.html';
     return allowed ? `${parsed.pathname}${parsed.search}` : fallback;
   } catch {
     return fallback;

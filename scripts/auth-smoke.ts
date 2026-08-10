@@ -112,7 +112,7 @@ async function main() {
     throw new Error(`redeem did not create hardened cookie status=${redeemed.status}`);
   }
   const account = env.accountsBySubject.get('email:user@example.com');
-  if (!account?.terms_accepted_at || account.terms_version !== '2026-07-26' || account.privacy_version !== '2026-07-26') {
+  if (!account?.terms_accepted_at || account.terms_version !== '2026-08-09' || account.privacy_version !== '2026-08-09') {
     throw new Error('signup policy acceptance was not persisted');
   }
 

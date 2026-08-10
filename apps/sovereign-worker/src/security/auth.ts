@@ -5,6 +5,7 @@ import { resolveExistingIdentity } from '../adapters/sovv';
 
 const encoder = new TextEncoder();
 const MAX_SESSION_TOKEN_LENGTH = 4096;
+const authCache = new WeakMap<Request, Promise<AuthContext>>();
 
 function unauthorized(): never {
   throw new Response('Unauthorized', { status: 401 });
@@ -35,7 +36,15 @@ export async function createSignedSessionToken(payload: { sub: string; exp?: num
   return `${unsigned}.${base64UrlEncode(signature)}`;
 }
 
-export async function requireAuth(request: Request, env: Env): Promise<AuthContext> {
+export function requireAuth(request: Request, env: Env): Promise<AuthContext> {
+  const cached = authCache.get(request);
+  if (cached) return cached;
+  const pending = resolveAuth(request, env);
+  authCache.set(request, pending);
+  return pending;
+}
+
+async function resolveAuth(request: Request, env: Env): Promise<AuthContext> {
   const sovvCookie = readCookie(request, '__sov_session');
   if (sovvCookie && env.SOVV_INTERNAL_BASE_URL) {
     const identity = await resolveExistingIdentity(env, `__sov_session=${sovvCookie}`);
