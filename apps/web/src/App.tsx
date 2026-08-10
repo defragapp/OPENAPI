@@ -450,7 +450,10 @@ function safeClientReturnTo(value: unknown, fallback = '/app'): string {
   if (typeof value !== 'string' || value.length > 512 || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback;
   try {
     const parsed = new URL(value, location.origin);
-    const allowed = parsed.pathname === '/app' || parsed.pathname.startsWith('/app/') || parsed.pathname === '/onboarding';
+    const allowed = parsed.pathname === '/app'
+      || parsed.pathname.startsWith('/app/')
+      || parsed.pathname === '/onboarding'
+      || parsed.pathname === '/consent.html';
     return allowed ? `${parsed.pathname}${parsed.search}` : fallback;
   } catch {
     return fallback;
