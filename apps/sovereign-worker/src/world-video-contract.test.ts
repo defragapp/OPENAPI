@@ -6,6 +6,7 @@ const auth = readFileSync(new URL('./security/auth.ts', import.meta.url), 'utf8'
 const worldVideo = readFileSync(new URL('./world-video.ts', import.meta.url), 'utf8');
 const usage = readFileSync(new URL('./billing/usage.ts', import.meta.url), 'utf8');
 const headers = readFileSync(new URL('./security/headers.ts', import.meta.url), 'utf8');
+const wrangler = readFileSync(new URL('../../../wrangler.jsonc', import.meta.url), 'utf8');
 
 describe('private launch boundary and Worlds video', () => {
   it('makes v1 APIs private by default with a narrow public ingress allowlist', () => {
@@ -32,6 +33,13 @@ describe('private launch boundary and Worlds video', () => {
     expect(runtime).toContain("pathname === '/onboarding'");
     expect(runtime).toContain("login.searchParams.set('returnTo'");
     expect(runtime).toContain("Response.redirect(login.toString(), 302)");
+  });
+
+  it('turns thrown HTTP responses into secured runtime responses instead of accidental 500s', () => {
+    expect(runtime).toContain('if (error instanceof Response)');
+    expect(runtime).toContain('withSecurityHeaders(privateBoundaryResponse(error))');
+    expect(runtime).toContain("console.error('runtime_request_failed'");
+    expect(runtime).not.toContain('console.error(error)');
   });
 
   it('reuses authentication for the same request across the edge and route handlers', () => {
@@ -70,12 +78,19 @@ describe('private launch boundary and Worlds video', () => {
     expect(worldVideo).toContain("endsWith('.cloudfront.net')");
   });
 
-  it('charges a bounded atomic AI allowance and restores it only when generation throws', () => {
+  it('charges a bounded atomic AI allowance, returns allowance responses, and restores only failed inference', () => {
     expect(usage).toContain('export async function reserveAiTurns');
     expect(usage).toContain('ai_usage_windows.turns_used + excluded.turns_used <= ?');
     expect(usage).toContain('export async function releaseAiTurns');
     expect(worldVideo).toContain('reserveAiTurns(env, auth.accountId, entitlements.plan, turnCost)');
+    expect(worldVideo).toContain('if (error instanceof Response) return error');
     expect(worldVideo).toContain('releaseAiTurns(env, auth.accountId, reservation.periodKey, turnCost)');
+  });
+
+  it('ships video generation disabled until Cloudflare billing and spend gates are activated', () => {
+    expect(wrangler).toContain('"WORLDS_VIDEO_ENABLED": "false"');
+    expect(wrangler).toContain('"WORLDS_VIDEO_MODEL": "runwayml/gen-4.5"');
+    expect(wrangler).toContain('"WORLDS_VIDEO_TURN_COST": "25"');
   });
 
   it('allows only local blob playback in the authenticated document CSP', () => {
