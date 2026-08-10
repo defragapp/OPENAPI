@@ -125,6 +125,6 @@ Production deployment requires one exact commit with:
 - reviewed privacy and retention behavior;
 - no private inputs, secrets, unconsented context, or hidden reasoning in traces;
 - default-deny `/api/v1/*` authentication with an explicit public ingress allowlist;
-- authenticated Worker gating for `/app`, `/app/*`, and `/onboarding` before private SPA documents are served;
+- authenticated Worker gating for `/app`, `/app/*`, `/onboarding`, and `/consent.html` before private documents are served;
 - Worlds remaining hidden unless its feature flag is on and its Cloudflare Unified Billing credits and spend-limit checks have been completed;
 - explicit approval.
