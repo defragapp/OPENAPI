@@ -12,9 +12,9 @@ describe('production account creation contract', () => {
     expect(auth).toContain("if (row.purpose === 'signup' && !row.terms_accepted_at)");
   });
 
-  it('persists policy versions and hardens the host-only session cookie', () => {
-    expect(auth).toContain("const TERMS_VERSION = '2026-07-26'");
-    expect(auth).toContain("const PRIVACY_VERSION = '2026-07-26'");
+  it('persists current policy versions and hardens the host-only session cookie', () => {
+    expect(auth).toContain("const TERMS_VERSION = '2026-08-09'");
+    expect(auth).toContain("const PRIVACY_VERSION = '2026-08-09'");
     expect(auth).toContain('terms_accepted_at = ?, terms_version = ?, privacy_version = ?');
     expect(auth).toContain('SameSite=Lax; Priority=High');
     for (const column of ['terms_accepted_at', 'terms_version', 'privacy_version']) {
