@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" role="img" aria-labelledby="title desc">
+  <title id="title">Sovereign Worlds illustrative scene</title>
+  <desc id="desc">A dark architectural opening reveals a structured interior scene with paths moving from concentrated pressure toward clearer separation and repair.</desc>
+  <defs>
+    <radialGradient id="room" cx="52%" cy="42%" r="72%">
+      <stop offset="0" stop-color="#29313a"/>
+      <stop offset=".38" stop-color="#171d24"/>
+      <stop offset=".74" stop-color="#0f1318"/>
+      <stop offset="1" stop-color="#090b0e"/>
+    </radialGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#12161b"/>
+      <stop offset=".5" stop-color="#1a2027"/>
+      <stop offset="1" stop-color="#0d1116"/>
+    </linearGradient>
+    <linearGradient id="warm" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f1e9de" stop-opacity=".08"/>
+      <stop offset=".55" stop-color="#f1e9de" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#78c7ff" stop-opacity=".18"/>
+    </linearGradient>
+    <linearGradient id="path" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#2f93ff" stop-opacity=".15"/>
+      <stop offset=".55" stop-color="#78c7ff" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#f1e9de" stop-opacity=".88"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <clipPath id="oculus"><ellipse cx="480" cy="356" rx="386" ry="318"/></clipPath>
+  </defs>
+
+  <rect width="960" height="720" fill="#090b0e"/>
+  <g clip-path="url(#oculus)">
+    <rect x="80" y="34" width="800" height="650" fill="url(#room)"/>
+    <ellipse cx="555" cy="255" rx="250" ry="170" fill="#78c7ff" opacity=".045" filter="url(#soft)"/>
+    <ellipse cx="522" cy="298" rx="340" ry="230" fill="#f1e9de" opacity=".035" filter="url(#soft)"/>
+
+    <!-- room / system geometry -->
+    <path d="M112 600 L336 388 L624 388 L852 602 Z" fill="url(#floor)" stroke="#f1e9de" stroke-opacity=".08"/>
+    <path d="M112 600 L112 158 L336 318 L336 388" fill="#10151a" stroke="#f1e9de" stroke-opacity=".08"/>
+    <path d="M852 602 L852 158 L624 318 L624 388" fill="#11161c" stroke="#f1e9de" stroke-opacity=".08"/>
+    <path d="M336 318 L624 318 L624 388 L336 388 Z" fill="#1b222a" stroke="#f1e9de" stroke-opacity=".1"/>
+
+    <!-- shelves / workload on left -->
+    <g fill="#171e25" stroke="#f1e9de" stroke-opacity=".1">
+      <rect x="145" y="225" width="122" height="52" rx="4"/>
+      <rect x="145" y="284" width="154" height="44" rx="4"/>
+      <rect x="145" y="335" width="133" height="48" rx="4"/>
+      <rect x="178" y="391" width="144" height="42" rx="4"/>
+      <rect x="152" y="441" width="164" height="50" rx="4"/>
+    </g>
+    <g fill="none" stroke="#c9d8e7" stroke-opacity=".12">
+      <path d="M170 248 C262 274 244 352 322 382"/>
+      <path d="M174 304 C255 322 268 356 327 389"/>
+      <path d="M176 359 C238 370 281 389 332 397"/>
+      <path d="M204 412 C268 420 301 414 342 408"/>
+      <path d="M180 465 C249 455 294 430 344 416"/>
+    </g>
+
+    <!-- routes open on right -->
+    <g fill="none" stroke="url(#path)" stroke-width="2">
+      <path d="M489 489 C570 464 632 423 702 360 C738 327 766 282 803 229"/>
+      <path d="M494 500 C590 506 671 486 736 443 C774 418 800 389 829 352" opacity=".72"/>
+      <path d="M489 510 C562 544 622 565 694 568 C755 571 796 552 835 529" opacity=".46"/>
+    </g>
+
+    <!-- shared center / anonymous figure -->
+    <circle cx="480" cy="412" r="24" fill="#0c1014" stroke="#f1e9de" stroke-opacity=".5"/>
+    <path d="M451 468 C458 437 469 425 480 425 C491 425 503 438 509 468 L520 560 L440 560 Z" fill="#0a0d10" stroke="#f1e9de" stroke-opacity=".34"/>
+
+    <!-- structural anchors -->
+    <g fill="#78c7ff">
+      <circle cx="343" cy="409" r="4"/>
+      <circle cx="494" cy="492" r="4"/>
+      <circle cx="702" cy="360" r="4"/>
+      <circle cx="736" cy="443" r="4"/>
+    </g>
+    <g fill="#f1e9de" opacity=".72">
+      <circle cx="333" cy="398" r="2.5"/>
+      <circle cx="803" cy="229" r="2.5"/>
+      <circle cx="829" cy="352" r="2.5"/>
+    </g>
+  </g>
+
+  <!-- architectural aperture, intentionally not a glowing portal -->
+  <ellipse cx="480" cy="356" rx="388" ry="320" fill="none" stroke="#f1e9de" stroke-opacity=".08" stroke-width="22"/>
+  <ellipse cx="480" cy="356" rx="386" ry="318" fill="none" stroke="#f1e9de" stroke-opacity=".24" stroke-width="1"/>
+  <ellipse cx="480" cy="356" rx="406" ry="336" fill="none" stroke="#78c7ff" stroke-opacity=".1" stroke-width="1"/>
+
+  <g font-family="Arial, sans-serif" font-size="13" fill="#f1e9de">
+    <text x="108" y="156" fill="#a39c8f" letter-spacing="2">INSIDE THE PATTERN</text>
+    <text x="136" y="211">pressure stays close</text>
+    <text x="347" y="380">recognition</text>
+    <text x="672" y="326">distance opens</text>
+    <text x="751" y="421">repair becomes possible</text>
+  </g>
+</svg>
