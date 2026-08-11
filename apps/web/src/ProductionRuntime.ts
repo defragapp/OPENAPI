@@ -1,4 +1,4 @@
-const PUBLIC_SHARE_URL = 'https://sovereign.defrag.app';
+const PUBLIC_SHARE_URL = 'https://sovereign.app';
 const TERMS_URL = `${PUBLIC_SHARE_URL}/terms`;
 const PRIVACY_URL = `${PUBLIC_SHARE_URL}/privacy`;
 const PRODUCTION_TURNSTILE_SITE_KEY = '0x4AAAAAADhGIF8-iOLIg8MU';
