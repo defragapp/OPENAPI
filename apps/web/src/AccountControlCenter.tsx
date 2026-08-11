@@ -209,8 +209,8 @@ export function AccountControlCenter() {
               <button onClick={openPermissions}>People & permissions</button>
               <button onClick={() => void openBilling()} disabled={loading}>Manage billing</button>
               <a href={SUPPORT_PAYMENT_URL} target="_blank" rel="noreferrer">Support development</a>
-              <a href="https://sovereign.defrag.app/privacy">Privacy</a>
-              <a href="https://sovereign.defrag.app/terms">Terms</a>
+              <a href="https://sovereign.app/privacy">Privacy</a>
+              <a href="https://sovereign.app/terms">Terms</a>
               <a href="mailto:info@sovereign.os">Contact support</a>
             </nav>
 
