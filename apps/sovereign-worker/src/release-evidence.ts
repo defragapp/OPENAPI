@@ -26,7 +26,7 @@ export type ProductionReleaseEvidence = {
   routeCohesionVerified: true;
   renderedVisualContract: typeof RELEASE_RENDERED_VISUAL_CONTRACT;
   renderedVisualVerified: true;
-  dmarcRecord: '_dmarc.defrag.app';
+  dmarcRecord: '_dmarc.sovereign.os';
   dmarcVerified: boolean;
   dmarcStatus: 'verified' | 'external_blocker';
   completedAt: string;
@@ -58,7 +58,7 @@ export async function readProductionReleaseEvidence(env: Env): Promise<Productio
     || evidence.routeCohesionVerified !== true
     || evidence.renderedVisualContract !== RELEASE_RENDERED_VISUAL_CONTRACT
     || evidence.renderedVisualVerified !== true
-    || evidence.dmarcRecord !== '_dmarc.defrag.app'
+    || evidence.dmarcRecord !== '_dmarc.sovereign.os'
     || typeof evidence.dmarcVerified !== 'boolean'
     || (evidence.dmarcStatus !== 'verified' && evidence.dmarcStatus !== 'external_blocker')
     || evidence.dmarcVerified !== (evidence.dmarcStatus === 'verified')
