@@ -16,7 +16,7 @@ import {
 } from './security/webauthn-es256';
 
 const CHALLENGE_TTL_MINUTES = 5;
-const DEFAULT_APP_URL = 'https://app.defrag.app';
+const DEFAULT_APP_URL = 'https://app.sovereign.app';
 
 type ChallengePurpose = 'register' | 'login';
 type ChallengeRow = {
@@ -63,7 +63,7 @@ function invalidPasskey(reason = 'invalid_passkey', status = 400): Response {
 function relyingParty(request: Request): { origin: string; rpId: string } {
   const url = new URL(request.url);
   const hostname = url.hostname.toLowerCase();
-  if (hostname === 'defrag.app' || hostname.endsWith('.defrag.app')) return { origin: url.origin, rpId: 'defrag.app' };
+  if (hostname === 'sovereign.app' || hostname.endsWith('.sovereign.app')) return { origin: url.origin, rpId: 'sovereign.app' };
   if (hostname.endsWith('.workers.dev')) return { origin: url.origin, rpId: hostname };
   if (hostname === 'localhost' || hostname === '127.0.0.1') return { origin: url.origin, rpId: hostname };
   throw new Response('Passkeys are unavailable on this host', { status: 400 });
