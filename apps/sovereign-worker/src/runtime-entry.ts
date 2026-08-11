@@ -37,9 +37,11 @@ const PUBLIC_API_ROUTES = new Set([
   'POST /api/v1/invitations/redeem'
 ]);
 const DISABLED_PATH_PREFIXES = ['/api/v1/export-jobs'];
-const PARENT_HOSTS = new Set(['defrag.app', 'www.defrag.app']);
-const PUBLIC_HOST = 'sovereign.defrag.app';
-const APP_HOST = 'app.defrag.app';
+const PARENT_HOSTS = new Set(['www.sovereign.app']);
+const PUBLIC_HOST = 'sovereign.app';
+const APP_HOST = 'app.sovereign.app';
+const PRIMARY_PUBLIC_EMAIL = 'info@sovereign.os';
+const REQUIRED_PUBLIC_ALIASES = ['info@sovereign.app', 'contact@sovereign.app'] as const;
 const CAPACITY_MIGRATION_VERSION = '0013_workers_ai_free_capacity';
 const PREVIOUS_MIGRATION_VERSION = '0014_passkey_authentication';
 const LATEST_MIGRATION_VERSION = '0015_release_evidence';
@@ -283,10 +285,18 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
     const releaseEvidence = await readProductionReleaseEvidence(env);
     const aiConfig = resolveAiModelConfig(env);
     const emailProvider = transactionalEmailProvider(env);
+    const configuredAliases = String(env.PUBLIC_CONTACT_ALIASES || '')
+      .split(',')
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean);
+    const mailIdentityConfigured = env.PUBLIC_CONTACT_EMAIL?.trim().toLowerCase() === PRIMARY_PUBLIC_EMAIL
+      && env.TRANSACTIONAL_FROM_EMAIL?.trim().toLowerCase() === PRIMARY_PUBLIC_EMAIL
+      && REQUIRED_PUBLIC_ALIASES.every((alias) => configuredAliases.includes(alias));
     const authConfigured = Boolean(
       env.SESSION_SIGNING_SECRET
       && env.TURNSTILE_SECRET_KEY
       && emailProvider === 'resend'
+      && mailIdentityConfigured
     );
     const stripeConfigured = Boolean(
       env.STRIPE_SECRET_KEY
@@ -325,8 +335,10 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       birthplaceGeocoder: 'disabled',
       authentication: authConfigured ? 'configured' : 'missing',
       transactionalEmail: emailProvider,
-      publicContactEmail: env.PUBLIC_CONTACT_EMAIL || 'info@sovereign.os',
-      transactionalFromEmail: env.TRANSACTIONAL_FROM_EMAIL || 'info@defrag.app',
+      mailIdentity: mailIdentityConfigured ? 'configured' : 'missing',
+      publicContactEmail: PRIMARY_PUBLIC_EMAIL,
+      publicContactAliases: [...REQUIRED_PUBLIC_ALIASES],
+      transactionalFromEmail: PRIMARY_PUBLIC_EMAIL,
       legacySovvAdapter: env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'disabled',
       stripe: stripeConfigured ? 'configured' : 'missing',
       stripeWebhookPaths: [...STRIPE_WEBHOOK_PATHS],
@@ -346,6 +358,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && dependencies.baselineEngine === 'configured'
       && dependencies.authentication === 'configured'
       && dependencies.transactionalEmail === 'resend'
+      && dependencies.mailIdentity === 'configured'
       && dependencies.stripe === 'configured';
     const payload = {
       ok,
