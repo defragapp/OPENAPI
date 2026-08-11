@@ -49,7 +49,7 @@ function parseSqliteTimestamp(value?: string | null): number {
 export function safeReturnTo(value: unknown, fallback = '/app'): string {
   if (typeof value !== 'string' || value.length > 512 || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback;
   try {
-    const parsed = new URL(value, 'https://app.defrag.app');
+    const parsed = new URL(value, 'https://app.sovereign.app');
     const allowed = parsed.pathname === '/app'
       || parsed.pathname.startsWith('/app/')
       || parsed.pathname === '/onboarding'
