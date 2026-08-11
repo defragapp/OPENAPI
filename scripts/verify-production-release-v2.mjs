@@ -91,7 +91,13 @@ requireAll('model config', modelConfig, ["DEFAULT_AI_MODEL = '@cf/zai-org/glm-4.
 requireAll('D1 session and AI privacy boundary', session, ['db.withSession(bookmark)', "readD1Bookmark(request) ?? 'first-primary'", 'reserveWorkersAiCapacity', 'releaseWorkersAiCapacity', 'skipCache: true', 'collectLog: false']);
 requireAll('free capacity ledger', capacity, ['FREE_DAILY_NEURON_BUDGET = 7_500', 'workers_ai_daily_capacity', 'sovereign_free_capacity_reached', 'retry-after']);
 requireAll('capacity migration', capacityMigration, ['CREATE TABLE IF NOT EXISTS workers_ai_daily_capacity', 'reserved_neurons INTEGER NOT NULL', 'request_count INTEGER NOT NULL']);
-requireAll('failed response refunds', usage, ['export async function releaseAiTurn', 'turns_used = MAX(0, turns_used - 1)']);
+requireAll('failed response refunds', usage, [
+  'export async function releaseAiTurn',
+  'return releaseAiTurns(env, accountId, periodKey, 1)',
+  'export async function releaseAiTurns',
+  'turns_used = MAX(0, turns_used - ?)',
+  '.bind(count, accountId, periodKey)'
+]);
 requireAll('entry release integration', entry, ['releaseAiTurn(env, auth.accountId, usage.periodKey)', "migrationVersion: '0013_workers_ai_free_capacity'"]);
 
 requireAll('passkey migration', passkeyMigration, [
