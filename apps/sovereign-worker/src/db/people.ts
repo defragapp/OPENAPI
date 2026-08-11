@@ -170,7 +170,7 @@ export async function requireConsent(env: Env, accountId: string, personId: stri
   await requireScopeFeature(env, accountId, scope);
   if (!(await hasConsent(env, accountId, personId, scope))) {
     throw Response.json({
-      type: 'https://sovereign.defrag.app/problems/permission-denied',
+      type: 'https://sovereign.app/problems/permission-denied',
       error: 'permission_denied',
       scope,
       message: 'This person has not granted the required permission, or the permission was revoked. Their private data remains unavailable.',
@@ -206,7 +206,7 @@ async function resendPendingInvitation(env: Env, accountId: string, invitationId
   const requestedScopes = parseScopes(row.requested_scopes_json);
   const token = newToken();
   const tokenHash = await sha256(token);
-  const invitationUrl = new URL('/invitation', env.PUBLIC_APP_URL || 'https://app.defrag.app');
+  const invitationUrl = new URL('/invitation', env.PUBLIC_APP_URL || 'https://app.sovereign.app');
   invitationUrl.searchParams.set('token', token);
   const updated = await env.DB.prepare(`UPDATE invitations
     SET token_hash = ?, expires_at = datetime('now', '+${INVITATION_TTL_DAYS} days'), created_at = datetime('now'), revoked_at = NULL
