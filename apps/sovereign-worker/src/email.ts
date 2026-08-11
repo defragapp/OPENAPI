@@ -31,9 +31,9 @@ export interface SovereignEmailTemplate {
   contactEmail?: string;
 }
 
-const DEFAULT_FROM_ADDRESS = 'info@defrag.app';
+const DEFAULT_FROM_ADDRESS = 'info@sovereign.os';
 const DEFAULT_PUBLIC_CONTACT = 'info@sovereign.os';
-const BRAND_MARK_URL = 'https://sovereign.defrag.app/brand-mark.svg';
+const BRAND_MARK_URL = 'https://sovereign.app/brand-mark.svg';
 
 function validRecipient(to: string): boolean { return to.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to); }
 function validAddress(value?: string): value is string { return Boolean(value && validRecipient(value.trim())); }
@@ -56,11 +56,15 @@ function safeActionUrl(value: string): string {
 }
 
 function fromAddress(env: Env): string {
-  return validAddress(env.TRANSACTIONAL_FROM_EMAIL) ? env.TRANSACTIONAL_FROM_EMAIL.trim() : DEFAULT_FROM_ADDRESS;
+  const configured = validAddress(env.TRANSACTIONAL_FROM_EMAIL) ? env.TRANSACTIONAL_FROM_EMAIL.trim().toLowerCase() : DEFAULT_FROM_ADDRESS;
+  if (runtimeMode(env) === 'production' && configured !== DEFAULT_FROM_ADDRESS) throw new Error('transactional_sender_must_be_info_at_sovereign_os');
+  return configured;
 }
 
 function contactAddress(env: Env): string {
-  return validAddress(env.PUBLIC_CONTACT_EMAIL) ? env.PUBLIC_CONTACT_EMAIL.trim() : DEFAULT_PUBLIC_CONTACT;
+  const configured = validAddress(env.PUBLIC_CONTACT_EMAIL) ? env.PUBLIC_CONTACT_EMAIL.trim().toLowerCase() : DEFAULT_PUBLIC_CONTACT;
+  if (runtimeMode(env) === 'production' && configured !== DEFAULT_PUBLIC_CONTACT) throw new Error('public_contact_must_be_info_at_sovereign_os');
+  return configured;
 }
 
 function safeTag(value: string): string {
@@ -69,7 +73,7 @@ function safeTag(value: string): string {
 
 export function transactionalEmailProvider(env: Env): 'resend' | 'cloudflare-binding' | 'missing' {
   if (env.RESEND_API_KEY) return 'resend';
-  if (env.EMAIL) return 'cloudflare-binding';
+  if (runtimeMode(env) !== 'production' && env.EMAIL) return 'cloudflare-binding';
   return 'missing';
 }
 
@@ -100,7 +104,7 @@ export function buildSovereignEmail(template: SovereignEmailTemplate): { text: s
 
   const detailRows = details.map((detail) => `
     <tr>
-      <td style="padding:0 0 11px;color:#a39c8f;font:400 14px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+      <td style="padding:0 0 11px;color:#a39c8f;font:400 14px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif;">
         <span style="color:#e8ddd0;padding-right:9px;">✓</span>${escapeHtml(detail)}
       </td>
     </tr>`).join('');
@@ -110,13 +114,14 @@ export function buildSovereignEmail(template: SovereignEmailTemplate): { text: s
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="color-scheme" content="dark">
   <meta name="supported-color-schemes" content="dark">
   <title>${escapeHtml(template.title)}</title>
 </head>
 <body style="margin:0;padding:0;background:#0f0f0f;color:#f5f1e8;">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(preheader)}</div>
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#0f0f0f;background-image:radial-gradient(circle at 50% 0%,rgba(232,221,208,.055),transparent 560px);">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#0f0f0f" style="width:100%;background-color:#0f0f0f;">
     <tr>
       <td align="center" style="padding:42px 16px 50px;">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:620px;">
@@ -125,35 +130,35 @@ export function buildSovereignEmail(template: SovereignEmailTemplate): { text: s
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td width="40" valign="middle">
-                    <img src="${BRAND_MARK_URL}" width="40" height="40" alt="" style="display:block;width:40px;height:40px;border:1px solid rgba(245,241,232,.16);border-radius:50%;">
+                    <img src="${BRAND_MARK_URL}" width="40" height="40" border="0" alt="Sovereign.OS" style="display:block;width:40px;height:40px;border:1px solid rgba(245,241,232,.16);border-radius:50%;">
                   </td>
-                  <td style="padding-left:13px;color:#f5f1e8;font:700 17px/1 Georgia,'Times New Roman',serif;letter-spacing:-.3px;">Sovereign.OS</td>
-                  <td align="right" style="color:#746f67;font:650 10px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:1.6px;text-transform:uppercase;">Private account message</td>
+                  <td style="padding-left:13px;color:#f5f1e8;font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:17px;font-weight:700;letter-spacing:-.3px;">Sovereign.OS</td>
+                  <td align="right" style="color:#746f67;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif;font-size:10px;line-height:12px;font-weight:650;letter-spacing:1.6px;text-transform:uppercase;">Private account message</td>
                 </tr>
               </table>
             </td>
           </tr>
           <tr>
-            <td style="padding:48px 40px 42px;border:1px solid rgba(245,241,232,.11);border-top:0;border-radius:0 0 18px 18px;background:#151515;background-image:linear-gradient(180deg,rgba(255,255,255,.018),transparent 28%);box-shadow:0 30px 80px rgba(0,0,0,.45);">
-              <p style="margin:0 0 15px;color:#e8ddd0;font:700 10px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:2px;text-transform:uppercase;">${escapeHtml(template.eyebrow)}</p>
-              <h1 style="margin:0;max-width:520px;color:#f5f1e8;font:700 45px/1.02 Georgia,'Times New Roman',serif;letter-spacing:-2px;">${escapeHtml(template.title)}</h1>
-              <p style="margin:22px 0 0;max-width:520px;color:#a39c8f;font:400 16px/1.75 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">${escapeHtml(template.intro)}</p>
+            <td bgcolor="#151515" style="padding:48px 40px 42px;border:1px solid rgba(245,241,232,.11);border-top:0;border-radius:0 0 18px 18px;background-color:#151515;box-shadow:0 30px 80px rgba(0,0,0,.45);">
+              <p style="margin:0 0 15px;color:#e8ddd0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">${escapeHtml(template.eyebrow)}</p>
+              <h1 style="margin:0;max-width:520px;color:#f5f1e8;font-family:Georgia,'Times New Roman',serif;font-size:45px;line-height:46px;font-weight:700;letter-spacing:-2px;">${escapeHtml(template.title)}</h1>
+              <p style="margin:22px 0 0;max-width:520px;color:#a39c8f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif;font-size:16px;line-height:28px;font-weight:400;">${escapeHtml(template.intro)}</p>
               ${details.length ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top:26px;padding-top:22px;border-top:1px solid rgba(245,241,232,.09);">${detailRows}</table>` : ''}
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin-top:32px;">
                 <tr>
-                  <td align="center" style="border:1px solid rgba(232,221,208,.8);border-radius:10px;background:#e8ddd0;box-shadow:0 13px 34px rgba(0,0,0,.27);">
-                    <a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:15px 24px;color:#141412;font:700 14px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;border-radius:10px;">${escapeHtml(template.actionLabel)} &nbsp;→</a>
+                  <td align="center" bgcolor="#e8ddd0" style="border:1px solid rgba(232,221,208,.8);border-radius:10px;background-color:#e8ddd0;box-shadow:0 13px 34px rgba(0,0,0,.27);">
+                    <a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:15px 24px;color:#141412;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif;font-size:14px;line-height:17px;font-weight:700;text-decoration:none;border-radius:10px;">${escapeHtml(template.actionLabel)} &nbsp;→</a>
                   </td>
                 </tr>
               </table>
-              <p style="margin:27px 0 0;color:#746f67;font:400 11px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;word-break:break-all;">Button not working? Open this private link:<br><a href="${escapeHtml(actionUrl)}" style="color:#a39c8f;text-decoration:underline;">${escapeHtml(actionUrl)}</a></p>
+              <p style="margin:27px 0 0;color:#746f67;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif;font-size:11px;line-height:18px;font-weight:400;word-break:break-all;">Button not working? Open this private link:<br><a href="${escapeHtml(actionUrl)}" style="color:#a39c8f;text-decoration:underline;">${escapeHtml(actionUrl)}</a></p>
             </td>
           </tr>
           <tr>
-            <td style="padding:25px 8px 0;color:#746f67;font:400 12px/1.7 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-              <p style="margin:0;color:#a39c8f;">${escapeHtml(footer)}</p>
-              <p style="margin:10px 0 0;">Questions or account support? Reply or contact <a href="mailto:${escapeHtml(support)}" style="color:#e8ddd0;">${escapeHtml(support)}</a>.</p>
-              <p style="margin:10px 0 0;">This is a private account message. Do not forward it.</p>
+            <td style="padding:25px 8px 0;color:#746f67;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif;font-size:12px;line-height:20px;font-weight:400;">
+              <p style="margin:0;color:#a39c8f;font-size:12px;line-height:20px;">${escapeHtml(footer)}</p>
+              <p style="margin:10px 0 0;font-size:12px;line-height:20px;">Questions or account support? Reply or contact <a href="mailto:${escapeHtml(support)}" style="color:#e8ddd0;">${escapeHtml(support)}</a>.</p>
+              <p style="margin:10px 0 0;font-size:12px;line-height:20px;">This is a private account message. Do not forward it.</p>
             </td>
           </tr>
         </table>
@@ -206,7 +211,7 @@ export async function sendOperationalEmail(env: Env, message: EmailMessage): Pro
       return { provider: 'resend', id: payload.id ?? `email_${crypto.randomUUID()}`, retryable: false };
     }
 
-    if (env.EMAIL) {
+    if (runtimeMode(env) !== 'production' && env.EMAIL) {
       const result = await env.EMAIL.send({
         from,
         to: message.to,
@@ -217,7 +222,7 @@ export async function sendOperationalEmail(env: Env, message: EmailMessage): Pro
       return { provider: 'cloudflare-email-binding', id: requestId(result), retryable: false };
     }
 
-    throw new Error('provider_missing');
+    throw new Error('resend_required');
   } catch (error) {
     console.warn('email_delivery_failed', {
       provider: transactionalEmailProvider(env),
