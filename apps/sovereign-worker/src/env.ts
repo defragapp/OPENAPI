@@ -14,6 +14,7 @@ export interface Env {
   RESEND_API_KEY?: string;
   TRANSACTIONAL_FROM_EMAIL?: string;
   PUBLIC_CONTACT_EMAIL?: string;
+  PUBLIC_CONTACT_ALIASES?: string;
   EMAIL_SMOKE_TEST_RECIPIENT?: string;
   STRIPE_SECRET_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
