@@ -1,4 +1,4 @@
-const PUBLIC_ORIGIN = 'https://sovereign.defrag.app';
+const PUBLIC_ORIGIN = 'https://sovereign.app';
 
 let installed = false;
 
