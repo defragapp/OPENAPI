@@ -15,4 +15,4 @@ Disallow: /invitation
 Disallow: /consent.html
 Disallow: /api/
 
-Sitemap: https://sovereign.defrag.app/sitemap.xml
+Sitemap: https://sovereign.app/sitemap.xml
