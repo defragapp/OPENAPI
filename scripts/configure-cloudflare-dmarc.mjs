@@ -1,8 +1,8 @@
 import { pathToFileURL } from 'node:url';
 
 const API_ROOT = 'https://api.cloudflare.com/client/v4';
-const ZONE_NAME = 'defrag.app';
-const RECORD_NAME = '_dmarc.defrag.app';
+const ZONE_NAME = 'sovereign.os';
+const RECORD_NAME = '_dmarc.sovereign.os';
 const RECORD_CONTENT = 'v=DMARC1; p=none; sp=none; adkim=s; aspf=s; pct=100';
 
 function requiredEnvironment(name, fallbacks = []) {
