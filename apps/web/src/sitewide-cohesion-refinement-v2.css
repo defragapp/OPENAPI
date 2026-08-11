@@ -320,6 +320,100 @@
   font-family: var(--font-subheading, "Sovereign Sans", sans-serif) !important;
 }
 
+/* Keep authenticated surfaces calm and document-like on desktop. */
+@media (min-width: 901px) {
+  .sovereign-app-runtime .intelligence-scroll {
+    width: min(100%, 1120px) !important;
+    padding: 42px clamp(32px, 4vw, 56px) 196px !important;
+  }
+
+  .sovereign-app-runtime .surface-heading {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 0.52fr) !important;
+    column-gap: clamp(32px, 5vw, 72px) !important;
+    margin-bottom: 36px !important;
+    padding-bottom: 24px !important;
+  }
+
+  .sovereign-app-runtime .surface-heading h1,
+  .sovereign-app-runtime .baseline-preparing h1,
+  .sovereign-app-runtime .today-facet-view > header h1,
+  .sovereign-app-runtime .sovereign-answer > header h2 {
+    max-width: 16ch !important;
+    font-size: clamp(2.45rem, 3.6vw, 3.6rem) !important;
+    line-height: 1.02 !important;
+    letter-spacing: -0.045em !important;
+  }
+
+  .sovereign-app-runtime .baseline-preparing,
+  .sovereign-app-runtime .baseline-invitation,
+  .sovereign-app-runtime .incomplete-state,
+  .sovereign-app-runtime .loading-state {
+    min-height: 0 !important;
+    padding: 36px 40px !important;
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.015) !important;
+    box-shadow: none !important;
+  }
+
+  .sovereign-app-runtime .today-facet-view {
+    grid-template-columns: minmax(0, 1fr) !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .sovereign-app-runtime .today-facet-view > header {
+    min-height: 0 !important;
+    padding: 0 0 32px !important;
+    border-bottom: 1px solid rgba(241, 233, 222, 0.1) !important;
+    background: transparent !important;
+  }
+
+  .sovereign-app-runtime .today-insight-lines,
+  .sovereign-app-runtime .today-continuations {
+    gap: clamp(22px, 3vw, 40px) !important;
+    background: transparent !important;
+  }
+
+  .sovereign-app-runtime .today-insight-lines article {
+    min-height: 0 !important;
+    padding: 24px 0 !important;
+    border-bottom: 1px solid rgba(241, 233, 222, 0.1) !important;
+    background: transparent !important;
+  }
+
+  .sovereign-app-runtime .today-continuations button {
+    min-height: 52px !important;
+    padding: 14px 0 !important;
+    border-bottom: 1px solid rgba(241, 233, 222, 0.1) !important;
+    background: transparent !important;
+  }
+
+  .sovereign-app-runtime .account-summary {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .sovereign-app-runtime .account-summary article,
+  .sovereign-app-runtime .account-summary > button {
+    min-height: 0 !important;
+    padding: 18px 0 !important;
+    border-bottom: 1px solid rgba(241, 233, 222, 0.1) !important;
+    background: transparent !important;
+  }
+
+  .sovereign-app-runtime .sovereign-answer {
+    border-radius: 12px !important;
+    box-shadow: none !important;
+  }
+}
+
 @media (max-width: 900px) {
   :root {
     --sovereign-wordmark-size: 0.64rem;

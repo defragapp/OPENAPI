@@ -183,8 +183,7 @@ async function enforcePrivateApiBoundary(request: Request, url: URL, env: Env): 
 }
 
 async function enforcePrivatePageBoundary(request: Request, url: URL, env: Env): Promise<Response | undefined> {
-  if (url.hostname.toLowerCase() !== APP_HOST
-    || (request.method !== 'GET' && request.method !== 'HEAD')
+  if ((request.method !== 'GET' && request.method !== 'HEAD')
     || !isPrivateApplicationPagePath(url.pathname)) return undefined;
   try {
     await requireAuth(request, env);

@@ -31,12 +31,13 @@ const staticPages = [
 ] as const;
 
 describe('deployed route cohesion', () => {
-  it('keeps certified route CSS last while installing one final bounded landing authority before React', () => {
-    const passkey = main.indexOf("import './passkey-auth.css';");
+  it('keeps deployed route cohesion immediately before the final passkey authority', () => {
+    const passkeyMarker = "import './passkey-auth.css';";
+    const passkey = main.indexOf(passkeyMarker);
     const cohesion = main.indexOf("import './deployed-route-cohesion.css';");
-    expect(passkey).toBeGreaterThan(-1);
-    expect(cohesion).toBeGreaterThan(passkey);
-    expect(main.slice(cohesion + 1)).not.toContain("import './");
+    expect(cohesion).toBeGreaterThan(-1);
+    expect(passkey).toBeGreaterThan(cohesion);
+    expect(main.slice(passkey + passkeyMarker.length)).not.toContain("import './");
     expect(main).toContain("import platformVisualCohesionCss from './platform-visual-cohesion-v1.css?inline'");
     expect(main).toContain("import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline'");
     expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline'");

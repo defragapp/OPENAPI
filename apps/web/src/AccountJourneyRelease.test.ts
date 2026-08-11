@@ -34,7 +34,16 @@ describe('Baseline-first account journey release', () => {
     expect(onboarding).toContain("birthTimeCertainty: 'unknown'");
     expect(onboarding).toContain("form.birthTimeCertainty === 'unknown'");
     expect(onboarding).toContain('Time-dependent details will remain visibly limited rather than being guessed.');
-    expect(onboarding).toContain("baseline.status === 'partial'");
+    expect(onboarding).toContain("baseline.uncertainty ?? 'stated in context'");
+  });
+
+  it('does not advance while the facet profile is still pending', () => {
+    const pendingCheck = onboarding.indexOf('if (!baselineIsReady(body.baseline))');
+    const readyResult = onboarding.indexOf("setPhase('baseline_result')", pendingCheck);
+    expect(pendingCheck).toBeGreaterThan(-1);
+    expect(onboarding.slice(pendingCheck, readyResult)).toContain("setPhase('baseline')");
+    expect(onboarding.slice(pendingCheck, readyResult)).toContain("setBaselineStage('idle')");
+    expect(onboarding.slice(pendingCheck, readyResult)).toContain('body.baseline.readinessMessage');
   });
 
   it('uses request state rather than timer-driven fake calculation progress', () => {
@@ -87,7 +96,8 @@ describe('Baseline-first account journey release', () => {
     expect(workspaceGate).toContain("fetch('/api/v1/account/onboarding'");
     expect(workspaceGate).toContain("fetch('/api/v1/baseline/status'");
     expect(workspaceGate).toContain("baselineBody.baseline?.status === 'completed'");
-    expect(workspaceGate).toContain("baselineBody.baseline?.status === 'partial'");
+    expect(workspaceGate).toContain("baselineBody.baseline.ready === true");
+    expect(workspaceGate).toContain("baselineBody.baseline.facetProfileStatus === 'ready'");
     expect(workspaceGate).toContain("location.replace(billingReturn ? `/onboarding?billing=${encodeURIComponent(billingReturn)}` : '/onboarding')");
     expect(workspaceGate).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
   });
@@ -114,16 +124,16 @@ describe('Baseline-first account journey release', () => {
     expect(cohesionStyles).toContain('@supports (-webkit-touch-callout: none)');
   });
 
-  it('loads account cohesion, passkey authority, then the final route authority with no later CSS imports', () => {
-    const sequence = "import './account-journey.css';\nimport './account-journey-structured.css';\nimport './account-journey-release-cohesion.css';\nimport './passkey-auth.css';";
-    const routeImportMarker = "import './deployed-route-cohesion.css';";
+  it('loads account cohesion and route cohesion before the final passkey authority', () => {
+    const sequence = "import './account-journey.css';\nimport './account-journey-structured.css';\nimport './account-journey-release-cohesion.css';\nimport './deployed-route-cohesion.css';\nimport './passkey-auth.css';";
+    const passkeyImportMarker = "import './passkey-auth.css';";
     expect(entry).toContain(sequence);
-    const passkeyImport = entry.indexOf("import './passkey-auth.css';");
-    const routeImport = entry.indexOf(routeImportMarker);
+    const routeImport = entry.indexOf("import './deployed-route-cohesion.css';");
+    const passkeyImport = entry.indexOf(passkeyImportMarker);
     const firstRuntimeCall = entry.indexOf('installV0ReleaseFingerprint();');
-    expect(passkeyImport).toBeGreaterThan(-1);
-    expect(routeImport).toBeGreaterThan(passkeyImport);
-    expect(firstRuntimeCall).toBeGreaterThan(routeImport);
-    expect(entry.slice(routeImport + routeImportMarker.length, firstRuntimeCall)).not.toMatch(/import\s+['"].+\.css['"]/);
+    expect(routeImport).toBeGreaterThan(-1);
+    expect(passkeyImport).toBeGreaterThan(routeImport);
+    expect(firstRuntimeCall).toBeGreaterThan(passkeyImport);
+    expect(entry.slice(passkeyImport + passkeyImportMarker.length, firstRuntimeCall)).not.toMatch(/import\s+['"].+\.css['"]/);
   });
 });

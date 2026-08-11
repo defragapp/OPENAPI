@@ -33,6 +33,7 @@ const entryCss = readFileSync(new URL('../../web/src/main.tsx', import.meta.url)
     expect(auth).toContain('createdAccount');
     expect(auth).toContain("onboarding?.onboarding_completed_at ? safeReturnTo(returnTo) : '/onboarding'");
     expect(runtime).toContain("pathname === '/onboarding'");
+    expect(runtime).not.toContain('url.hostname.toLowerCase() !== APP_HOST');
   });
 
   it('requires a structurally valid Baseline before onboarding completion or message persistence', () => {

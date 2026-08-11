@@ -145,7 +145,7 @@ export function PlanOnboarding() {
         }
 
         setPhase('baseline');
-        setStatus('Add the birth details you know.');
+        setStatus(nextBaseline.readinessMessage || 'Add the birth details you know.');
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') return;
         setPhase('error');
@@ -209,6 +209,13 @@ export function PlanOnboarding() {
       }
 
       setBaseline(body.baseline);
+      if (!baselineIsReady(body.baseline)) {
+        setPhase('baseline');
+        setBaselineStage('idle');
+        setStatus(body.baseline.readinessMessage || body.message || 'Your source data is saved, but the facet profile is not ready yet. Try Baseline again.');
+        return;
+      }
+
       setBaselineStage('complete');
 
       if (accountAlreadyOnboarded) {
@@ -287,7 +294,10 @@ export function PlanOnboarding() {
       location.replace('/login?returnTo=%2Fonboarding');
       throw new Error('Sign-in required.');
     }
-    if (!response.ok) throw new Error('That plan could not be confirmed. Please try again.');
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({})) as { error?: string; message?: string };
+      throw new Error(body.message || body.error || 'That plan could not be confirmed. Please try again.');
+    }
   }
 
   const progress = progressState(phase);
@@ -320,6 +330,7 @@ export function PlanOnboarding() {
               errors={errors}
               timeZones={timeZones}
               submitting={submitting}
+              notice={baseline && !baselineIsReady(baseline) ? status : undefined}
               onSubmit={submitBaseline}
               onUpdate={(field, value) => {
                 setForm((current) => ({ ...current, [field]: value }));
@@ -386,6 +397,7 @@ function BaselineFormView({
   errors,
   timeZones,
   submitting,
+  notice,
   onSubmit,
   onUpdate,
   onCertainty,
@@ -395,6 +407,7 @@ function BaselineFormView({
   errors: BaselineErrors;
   timeZones: string[];
   submitting: boolean;
+  notice: string | undefined;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onUpdate: <K extends keyof BaselineForm>(field: K, value: BaselineForm[K]) => void;
   onCertainty: (certainty: BirthTimeCertainty) => void;
@@ -405,6 +418,7 @@ function BaselineFormView({
       <p className="eyebrow">BUILD YOUR BASELINE</p>
       <h1>Create the personal foundation Sovereign uses.</h1>
       <p className="plan-intro">Add the birth details you know. Sovereign.OS uses them to calculate your Baseline, then translates the result into plain language you can explore and correct.</p>
+      {notice && <p className="plan-status baseline-retry-status" role="status" aria-live="polite">{notice}</p>}
 
       <form className="baseline-onboarding-form" onSubmit={onSubmit} noValidate>
         <div className="baseline-form-grid">
