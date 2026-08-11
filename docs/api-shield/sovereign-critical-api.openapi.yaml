@@ -9,7 +9,7 @@ info:
     limited to the first 1 KB of a request body. sovereign-answer.v2 output is
     validated inside the Worker, not by API Shield.
 servers:
-  - url: https://app.defrag.app
+  - url: https://app.sovereign.app
 paths:
   /api/v1/account/onboarding:
     post:
