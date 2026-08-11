@@ -12,7 +12,7 @@ function resolveCheckoutSha() {
     stdio: ['ignore', 'pipe', 'pipe']
   });
   if (result.error || result.status !== 0) {
-    throw new Error(`Unable to resolve the checked-out commit for parent-domain verification: ${String(result.stderr || result.error?.message || 'unknown git error').trim()}`);
+    throw new Error(`Unable to resolve the checked-out commit for Sovereign-domain verification: ${String(result.stderr || result.error?.message || 'unknown git error').trim()}`);
   }
   return String(result.stdout || '').trim();
 }
@@ -34,11 +34,13 @@ const metadataSource = declaredSha
     ? 'checkout-invalid-cloudflare-metadata-ignored'
     : 'checkout';
 
-const LEGACY_PARENT_VERIFIER_MARKERS = [
-  'https://defrag.app/',
-  'https://www.defrag.app/',
-  'https://sovereign.defrag.app/',
-  'https://app.defrag.app/app',
+const SOVEREIGN_DOMAIN_VERIFIER_MARKERS = [
+  'https://sovereign.app/',
+  'https://www.sovereign.app/',
+  'https://app.sovereign.app/app',
+  'info@sovereign.os',
+  'info@sovereign.app',
+  'contact@sovereign.app',
   'payload?.version !== commitSha',
   '--v0-page:#0f0f0f',
   '--v0-cream:#e8ddd0',
@@ -48,7 +50,7 @@ const LEGACY_PARENT_VERIFIER_MARKERS = [
   "entryDocument: 'no-store'",
   "serviceWorkerMode: 'retired'"
 ];
-void LEGACY_PARENT_VERIFIER_MARKERS;
+void SOVEREIGN_DOMAIN_VERIFIER_MARKERS;
 void metadataSource;
 
 const result = spawnSync(process.execPath, ['scripts/verify-parent-domain-routes-v3.mjs'], {
