@@ -4,7 +4,7 @@ export const RELEASE_MIGRATION_FILENAME = '0015_release_evidence.sql';
 export const RELEASE_ROUTE_COHESION_CONTRACT = 'sovereign-deployed-route-cohesion-v1';
 export const RELEASE_RENDERED_VISUAL_CONTRACT = 'sovereign-rendered-page-family-audit-v1';
 export const RELEASE_PROGRESS_CONTRACT = 'sovereign-production-release-progress.v1';
-export const RELEASE_DMARC_RECORD = '_dmarc.defrag.app';
+export const RELEASE_DMARC_RECORD = '_dmarc.sovereign.os';
 export const MAX_RELEASE_PROGRESS_SUMMARY_LENGTH = 2_000;
 const RELEASE_EVIDENCE_KEYS = [
   'contract',
