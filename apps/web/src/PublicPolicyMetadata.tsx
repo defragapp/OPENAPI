@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 
 type PolicyKind = 'privacy' | 'terms';
 
+const PUBLIC_ORIGIN = 'https://sovereign.app';
+
 const metadata: Record<PolicyKind, { title: string; description: string; path: string }> = {
   privacy: {
     title: 'Sovereign.OS privacy',
@@ -18,7 +20,7 @@ const metadata: Record<PolicyKind, { title: string; description: string; path: s
 export function PublicPolicyMetadata({ kind }: { kind: PolicyKind }) {
   useEffect(() => {
     const selected = metadata[kind];
-    const canonical = `https://sovereign.defrag.app${selected.path}`;
+    const canonical = `${PUBLIC_ORIGIN}${selected.path}`;
     document.title = selected.title;
     setMeta('name', 'description', selected.description);
     setMeta('name', 'robots', 'index, follow, max-image-preview:large');
@@ -27,11 +29,11 @@ export function PublicPolicyMetadata({ kind }: { kind: PolicyKind }) {
     setMeta('property', 'og:title', selected.title);
     setMeta('property', 'og:description', selected.description);
     setMeta('property', 'og:url', canonical);
-    setMeta('property', 'og:image', 'https://sovereign.defrag.app/og-sovereign.svg');
+    setMeta('property', 'og:image', `${PUBLIC_ORIGIN}/og-sovereign.svg`);
     setMeta('name', 'twitter:card', 'summary_large_image');
     setMeta('name', 'twitter:title', selected.title);
     setMeta('name', 'twitter:description', selected.description);
-    setMeta('name', 'twitter:image', 'https://sovereign.defrag.app/og-sovereign.svg');
+    setMeta('name', 'twitter:image', `${PUBLIC_ORIGIN}/og-sovereign.svg`);
     let link = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!link) {
       link = document.createElement('link');
