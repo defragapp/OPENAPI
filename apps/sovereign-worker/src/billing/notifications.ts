@@ -18,7 +18,7 @@ export interface BillingNotificationInput {
   effectivePlan: PlanKey;
 }
 
-const DEFAULT_APP_URL = 'https://app.defrag.app';
+const DEFAULT_APP_URL = 'https://app.sovereign.app';
 
 function emailFromAuthSubject(subject?: string | null): string | undefined {
   if (!subject?.startsWith('email:')) return undefined;
