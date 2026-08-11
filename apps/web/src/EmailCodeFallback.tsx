@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 
 const EMAIL_CODE_READY = 'sovereign:email-code-ready';
+const APP_ORIGIN = 'https://app.sovereign.app';
 let installed = false;
 
 type CodeReadyDetail = { email: string; returnTo: string };
@@ -140,7 +141,7 @@ function validEmail(value: string): boolean {
 function safeReturnTo(value: unknown, fallback = '/app'): string {
   if (typeof value !== 'string' || value.length > 512 || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback;
   try {
-    const parsed = new URL(value, 'https://app.defrag.app');
+    const parsed = new URL(value, APP_ORIGIN);
     const allowed = parsed.pathname === '/app'
       || parsed.pathname.startsWith('/app/')
       || parsed.pathname === '/onboarding'
