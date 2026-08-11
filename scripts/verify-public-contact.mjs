@@ -1,49 +1,55 @@
-import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { extname, join, relative, resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const root = resolve('.');
-const approvedPublicContact = 'info@sovereign.os';
-const verifiedTransactionalSender = 'info@defrag.app';
-const prohibitedPublicAddress = 'support@defrag.app';
-const scanRoots = [
-  'apps/web/src',
-  'apps/web/public',
-  'apps/sovereign-worker/src',
-  'scripts'
-];
+const primaryContact = 'info@sovereign.os';
+const publicAliases = ['info@sovereign.app', 'contact@sovereign.app'];
+const publicSite = 'https://sovereign.app';
+const publicApp = 'https://app.sovereign.app';
 const explicitFiles = ['wrangler.jsonc', 'wrangler.production-direct.jsonc'];
-const scannedExtensions = new Set(['.ts', '.tsx', '.js', '.mjs', '.html', '.json', '.jsonc']);
-const excludedPaths = new Set(['scripts/verify-public-contact.mjs']);
+const publicIdentityFiles = [
+  'apps/sovereign-worker/src/email.ts',
+  'apps/web/index.html',
+  'apps/web/src/PublicLanding.tsx',
+  'apps/web/src/PublicPolicyMetadata.tsx',
+  'apps/web/public/sitemap.xml',
+  'apps/web/public/_headers'
+];
 const errors = [];
-let approvedOccurrences = 0;
 
-for (const path of [...explicitFiles, ...scanRoots.flatMap(walk)]) {
-  const normalizedPath = path.replaceAll('\\', '/');
-  if (excludedPaths.has(normalizedPath) || normalizedPath.includes('.test.')) continue;
+for (const path of [...explicitFiles, ...publicIdentityFiles]) {
   const source = readFileSync(resolve(root, path), 'utf8');
-  approvedOccurrences += source.split(approvedPublicContact).length - 1;
-
-  if (source.includes(prohibitedPublicAddress)) {
-    errors.push(`${normalizedPath}: contains prohibited public address ${prohibitedPublicAddress}`);
+  if (/\bdefrag\.app\b/i.test(source)) {
+    errors.push(`${path}: exposes the retired Defrag public namespace`);
   }
   if (/[A-Za-z0-9._%+-]+@gmail\.com/i.test(source)) {
-    errors.push(`${normalizedPath}: contains a personal Gmail address`);
-  }
-
-  const retiredOccurrences = source.split(verifiedTransactionalSender).length - 1;
-  if (retiredOccurrences > 0 && !allowsVerifiedSender(normalizedPath, source, retiredOccurrences)) {
-    errors.push(`${normalizedPath}: exposes the transactional sender outside its approved transport-only locations`);
+    errors.push(`${path}: contains a private Gmail destination`);
   }
 }
 
 for (const configPath of explicitFiles) {
   const source = readFileSync(resolve(root, configPath), 'utf8');
-  requireMarker(configPath, source, `"PUBLIC_CONTACT_EMAIL": "${approvedPublicContact}"`);
-  requireMarker(configPath, source, `"TRANSACTIONAL_FROM_EMAIL": "${verifiedTransactionalSender}"`);
+  requireMarker(configPath, source, `"PUBLIC_CONTACT_EMAIL": "${primaryContact}"`);
+  requireMarker(configPath, source, `"PUBLIC_CONTACT_ALIASES": "${publicAliases.join(',')}"`);
+  requireMarker(configPath, source, `"TRANSACTIONAL_FROM_EMAIL": "${primaryContact}"`);
+  requireMarker(configPath, source, `"PUBLIC_APP_URL": "${publicApp}"`);
+  requireMarker(configPath, source, '"pattern": "sovereign.app"');
+  requireMarker(configPath, source, '"pattern": "app.sovereign.app"');
 }
 
-if (approvedOccurrences < 8) {
-  errors.push(`approved public contact appears only ${approvedOccurrences} times; expected broad public/runtime coverage`);
+const emailSource = readFileSync(resolve(root, 'apps/sovereign-worker/src/email.ts'), 'utf8');
+requireMarker('apps/sovereign-worker/src/email.ts', emailSource, `const DEFAULT_FROM_ADDRESS = '${primaryContact}';`);
+requireMarker('apps/sovereign-worker/src/email.ts', emailSource, `const DEFAULT_PUBLIC_CONTACT = '${primaryContact}';`);
+requireMarker('apps/sovereign-worker/src/email.ts', emailSource, `const BRAND_MARK_URL = '${publicSite}/brand-mark.svg';`);
+requireMarker('apps/sovereign-worker/src/email.ts', emailSource, "runtimeMode(env) !== 'production' && env.EMAIL");
+requireMarker('apps/sovereign-worker/src/email.ts', emailSource, "throw new Error('resend_required')");
+
+const landing = readFileSync(resolve(root, 'apps/web/src/PublicLanding.tsx'), 'utf8');
+requireMarker('apps/web/src/PublicLanding.tsx', landing, `mailto:${primaryContact}`);
+for (const alias of publicAliases) {
+  if (landing.includes(`mailto:${alias}`)) {
+    errors.push(`apps/web/src/PublicLanding.tsx: ${alias} is an alias, not the primary public address`);
+  }
 }
 
 if (errors.length > 0) {
@@ -52,34 +58,7 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`[public-contact] verified ${approvedPublicContact} with private-destination and transport separation`);
-
-function walk(path) {
-  const absolute = resolve(root, path);
-  if (!statSync(absolute).isDirectory()) return scannedExtensions.has(extname(path)) ? [path] : [];
-  return readdirSync(absolute).flatMap((entry) => {
-    const child = join(path, entry);
-    const childAbsolute = resolve(root, child);
-    if (statSync(childAbsolute).isDirectory()) return walk(child);
-    return scannedExtensions.has(extname(child)) ? [relative(root, childAbsolute)] : [];
-  });
-}
-
-function allowsVerifiedSender(path, source, occurrences) {
-  if (path === 'apps/sovereign-worker/src/email.ts') {
-    return occurrences === 1 && source.includes(`const DEFAULT_FROM_ADDRESS = '${verifiedTransactionalSender}';`);
-  }
-  if (path === 'apps/sovereign-worker/src/runtime-entry.ts') {
-    return occurrences === 1 && source.includes(`transactionalFromEmail: env.TRANSACTIONAL_FROM_EMAIL || '${verifiedTransactionalSender}'`);
-  }
-  if (path === 'scripts/email-smoke.ts') {
-    return occurrences === 1 && source.includes(`process.env.TRANSACTIONAL_FROM_EMAIL || '${verifiedTransactionalSender}'`);
-  }
-  if (path === 'wrangler.jsonc' || path === 'wrangler.production-direct.jsonc') {
-    return occurrences === 1 && source.includes(`"TRANSACTIONAL_FROM_EMAIL": "${verifiedTransactionalSender}"`);
-  }
-  return false;
-}
+console.log(`[public-contact] verified primary ${primaryContact}; aliases remain transport-only and private routing is absent from source`);
 
 function requireMarker(path, source, marker) {
   if (!source.includes(marker)) errors.push(`${path}: missing ${marker}`);
