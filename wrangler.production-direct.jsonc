@@ -19,28 +19,25 @@
   },
   "routes": [
     {
-      "pattern": "sovereign.defrag.app",
+      "pattern": "sovereign.app",
       "custom_domain": true
     },
     {
-      "pattern": "app.defrag.app",
+      "pattern": "www.sovereign.app",
       "custom_domain": true
     },
     {
-      "pattern": "defrag.app/*",
-      "zone_name": "defrag.app"
-    },
-    {
-      "pattern": "www.defrag.app/*",
-      "zone_name": "defrag.app"
+      "pattern": "app.sovereign.app",
+      "custom_domain": true
     }
   ],
   "vars": {
     "APP_ENV": "production",
     "APP_VERSION": "__APP_VERSION__",
-    "PUBLIC_APP_URL": "https://app.defrag.app",
+    "PUBLIC_APP_URL": "https://app.sovereign.app",
     "PUBLIC_CONTACT_EMAIL": "info@sovereign.os",
-    "TRANSACTIONAL_FROM_EMAIL": "info@defrag.app",
+    "PUBLIC_CONTACT_ALIASES": "info@sovereign.app,contact@sovereign.app",
+    "TRANSACTIONAL_FROM_EMAIL": "info@sovereign.os",
     "AI_PROVIDER": "cloudflare-gateway",
     "AI_MODEL": "@cf/zai-org/glm-4.7-flash",
     "AI_GATEWAY_ID": "sovereign",
@@ -53,10 +50,10 @@
     "AUDIT_RETENTION_DAYS": "90",
     "STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY": "price_1Te0g9Bk78yJ8Hww8fFZCqhm",
     "STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL": "price_1Tq6nPBk78yJ8Hwwm0pxg4hH",
-    "STRIPE_SUCCESS_URL": "https://app.defrag.app/app?billing=success",
-    "STRIPE_CANCEL_URL": "https://app.defrag.app/app?billing=cancelled",
-    "STRIPE_PORTAL_RETURN_URL": "https://app.defrag.app/app?billing=portal",
-    "TURNSTILE_EXPECTED_HOSTNAME": "app.defrag.app",
+    "STRIPE_SUCCESS_URL": "https://app.sovereign.app/app?billing=success",
+    "STRIPE_CANCEL_URL": "https://app.sovereign.app/app?billing=cancelled",
+    "STRIPE_PORTAL_RETURN_URL": "https://app.sovereign.app/app?billing=portal",
+    "TURNSTILE_EXPECTED_HOSTNAME": "app.sovereign.app",
     "SCRIPTURE_TRANSLATION": "WEB",
     "BASELINE_HORIZONS_URL": "https://ssd.jpl.nasa.gov/api/horizons.api",
     "BASELINE_PROVIDER_TIMEOUT_MS": "8000"
