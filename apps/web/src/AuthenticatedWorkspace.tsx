@@ -117,7 +117,7 @@ export function AuthenticatedWorkspace() {
     const failed = state === 'error';
     return (
       <main className="private-route-gate">
-        <a className="private-route-brand" href="https://sovereign.defrag.app">
+        <a className="private-route-brand" href="https://sovereign.app">
           <span aria-hidden="true">S</span>
           <strong>SOVEREIGN.OS</strong>
         </a>
