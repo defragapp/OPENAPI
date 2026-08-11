@@ -23,7 +23,8 @@ type InvitationNotificationContext = {
   owner_subject: string | null;
 };
 
-const DEFAULT_APP_URL = 'https://app.defrag.app';
+const DEFAULT_APP_URL = 'https://app.sovereign.app';
+const PUBLIC_SITE_URL = 'https://sovereign.app/';
 
 const scopeLabels: Record<ConsentScope, string> = {
   'pair.compare': 'relationship comparison',
@@ -194,7 +195,7 @@ function lifecycleTemplate(input: InvitationNotificationInput, displayName: stri
         title: 'This private invitation was cancelled.',
         intro: 'The sender cancelled the pending invitation before it was accepted. The one-time link can no longer be used, and no permission was granted.',
         actionLabel: 'Open the public Sovereign.OS site',
-        actionUrl: 'https://sovereign.defrag.app/',
+        actionUrl: PUBLIC_SITE_URL,
         details: [
           'No account was connected through the cancelled invitation.',
           'Nothing was shared through the cancelled link.',
