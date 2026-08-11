@@ -9,8 +9,8 @@ interface AccountDeletionNoticeInput {
   graceDays?: number;
 }
 
-const DEFAULT_APP_URL = 'https://app.defrag.app';
-const PUBLIC_SOVEREIGN_URL = 'https://sovereign.defrag.app/';
+const DEFAULT_APP_URL = 'https://app.sovereign.app';
+const PUBLIC_SOVEREIGN_URL = 'https://sovereign.app/';
 const DEFAULT_GRACE_DAYS = 14;
 
 function emailFromAuthSubject(subject?: string | null): string | undefined {
