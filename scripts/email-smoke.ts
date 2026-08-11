@@ -6,25 +6,25 @@ const appVersion = String(process.env.GITHUB_SHA || process.env.WORKERS_CI_COMMI
 const releaseLabel = appVersion.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 18) || 'manual';
 const defaultRecipient = `delivered+sovereign-${releaseLabel}@resend.dev`;
 const recipient = String(process.env.EMAIL_SMOKE_TEST_RECIPIENT || defaultRecipient).trim().toLowerCase();
-const fromAddress = String(process.env.TRANSACTIONAL_FROM_EMAIL || 'info@defrag.app').trim().toLowerCase();
+const fromAddress = String(process.env.TRANSACTIONAL_FROM_EMAIL || 'info@sovereign.os').trim().toLowerCase();
 const contactAddress = String(process.env.PUBLIC_CONTACT_EMAIL || 'info@sovereign.os').trim().toLowerCase();
 const deliveryTimeoutMs = Math.max(15_000, Number(process.env.EMAIL_SMOKE_TIMEOUT_MS || 120_000));
 
 if (!apiKey) throw new Error('RESEND_API_KEY is required for the live email smoke test.');
 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) throw new Error('EMAIL_SMOKE_TEST_RECIPIENT must be a valid email address.');
-if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fromAddress)) throw new Error('TRANSACTIONAL_FROM_EMAIL must be a valid email address.');
-if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactAddress)) throw new Error('PUBLIC_CONTACT_EMAIL must be a valid email address.');
+if (fromAddress !== 'info@sovereign.os') throw new Error('TRANSACTIONAL_FROM_EMAIL must be info@sovereign.os for production verification.');
+if (contactAddress !== 'info@sovereign.os') throw new Error('PUBLIC_CONTACT_EMAIL must be info@sovereign.os for production verification.');
 
 const template = buildSovereignEmail({
   eyebrow: 'Delivery verification',
   title: 'Sovereign.OS email is configured.',
   intro: 'This operational test confirms that the production Resend integration can deliver the same branded template used for account access and permission invitations.',
   actionLabel: 'Open Sovereign.OS',
-  actionUrl: 'https://app.defrag.app/login',
+  actionUrl: 'https://app.sovereign.app/login',
   details: [
     `Release: ${appVersion.slice(0, 40)}`,
-    'Sender authentication must match the verified Resend domain.',
-    'Reply handling uses the public Sovereign.OS contact address.'
+    'Sender authentication must match the verified Sovereign.OS Resend domain.',
+    'Reply handling uses the public info@sovereign.os identity.'
   ],
   footer: 'No account action is required. This message was generated only to verify transactional email delivery.',
   contactEmail: contactAddress
