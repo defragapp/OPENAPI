@@ -109,8 +109,8 @@ export function PasskeyAuthentication() {
 
   return createPortal(
     <section className="passkey-primary" aria-labelledby="passkey-login-title">
-      <p className="eyebrow">WELCOME BACK</p>
-      <h2 id="passkey-login-title">Return to your Baseline and the questions you were exploring.</h2>
+      <p className="eyebrow">SECURE SIGN-IN</p>
+      <h2 id="passkey-login-title">Choose a secure way to sign in.</h2>
       <p className="passkey-intro">Use your device passkey, or enter your email below for a one-time link and six-digit code.</p>
       <button type="button" className="passkey-button" onClick={() => void signInWithPasskey()} disabled={state === 'working' || state === 'success'}>
         <span aria-hidden="true">◎</span>

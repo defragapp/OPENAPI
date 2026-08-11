@@ -8,8 +8,10 @@ describe('one authoritative intelligence response', () => {
   it('renders only the sovereign-answer.v2 contract in the main conversation', () => {
     expect(workspace).toContain("version: 'sovereign-answer.v2'");
     expect(workspace).toContain('<SovereignAnswerView');
-    expect(workspace).toContain('Why this is personal');
+    expect(workspace).toContain('<p className="direct-answer">');
+    expect(workspace).toContain('<BasisStrip values={basis} />');
     expect(workspace).toContain('Still unknown');
+    expect(workspace).toContain('answer.correction_prompt');
     expect(workspace).toContain('onCorrection');
   });
 

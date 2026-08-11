@@ -65,13 +65,13 @@ describe('production mobile and responsive experience', () => {
     expect(productionReadinessCss).toContain('.sovereign-app-runtime .surface-heading h1');
   });
 
-  it('keeps five primary workspace surfaces thumb reachable and You in the menu sheet', () => {
-    expect(workspace).toContain('className="mobile-bottom-nav"');
-    expect(workspace).toContain("surfaces.filter((item) => item.name !== 'You')");
-    expect(workspace).toContain('You · Baseline, plan, permissions, and account');
-    expect(workspaceCss).toContain('grid-template-columns: repeat(5, 1fr)');
-    expect(workspaceCss).toContain('min-height: 56px');
-    expect(productionReadinessCss).toContain('min-height: calc(64px + env(safe-area-inset-bottom))');
+  it('keeps all six workspace surfaces reachable through one mobile menu sheet', () => {
+    expect(workspace).toContain('className="mobile-menu-trigger"');
+    expect(workspace).toContain('className="workspace-sheet"');
+    expect(workspace).toContain('aria-label="Workspace destinations"');
+    expect(workspace).toContain('surfaces.map((item)');
+    expect(workspace).toContain("{ name: 'You', label: 'You', description: 'Baseline, plan, and control' }");
+    expect(workspace).not.toContain('mobile-bottom-nav');
   });
 
   it('uses one collapsed mobile control layer instead of simultaneous fixed overlays', () => {
@@ -101,7 +101,7 @@ describe('production mobile and responsive experience', () => {
     expect(mobileReleaseCss).toContain('.composer-context-line');
     expect(productionReadinessCss).toContain('grid-template-columns: minmax(0, 1fr) 44px');
     expect(productionReadinessCss).toContain('height: 44px !important');
-    expect(productionReadinessCss).toContain('bottom: calc(68px + env(safe-area-inset-bottom))');
+    expect(productionReadinessCss).toContain('bottom: max(8px, env(safe-area-inset-bottom))');
     expect(productionReadinessCss).toContain('calc(178px + env(safe-area-inset-bottom))');
   });
 
@@ -112,8 +112,11 @@ describe('production mobile and responsive experience', () => {
     expect(productionReadinessCss).toContain('font-size: clamp(1.9rem, 8.6vw, 2.55rem)');
     expect(productionReadinessCss).not.toContain('font-size: clamp(2.45rem, 10.4vw, 3.55rem)');
     expect(productionReadinessCss).not.toContain('font-size: clamp(3.15rem, 15.2vw, 4.55rem)');
-    expect(mobileReleaseCss).toContain('.explore-mode-list');
-    expect(mobileReleaseCss).toContain('overflow-x: auto !important');
+    expect(workspace).toContain('className="today-steady"');
+    expect(workspace).toContain('className="today-current"');
+    expect(workspace).toContain('surface-home explore-home');
+    expect(workspace).toContain('composerExamples');
+    expect(mobileReleaseCss).not.toContain('.explore-mode-list');
   });
 
   it('protects public and workspace controls around notched edges', () => {
@@ -145,7 +148,7 @@ describe('production mobile and responsive experience', () => {
     for (const marker of [
       'v0-wordmark--mobile',
       'v0-mobile-menu',
-      'Sovereign helps you see what’s really happening so you can choose differently.',
+      'Sovereign maps your Baseline, then translates what is happening within you, between people, and around you.',
       'Private. Secure. Yours.',
       '<MobileCapabilityRail />',
       'Understand yourself',
@@ -164,7 +167,7 @@ describe('production mobile and responsive experience', () => {
     expect(productionReadinessCss).toContain('min-height: max(660px');
     expect(productionReadinessCss).toContain('width: min(660px, 165vw)');
     expect(productionReadinessCss).not.toContain('220vw');
-    expect(landing).toContain('Sovereign builds your Baseline, then uses it to help you understand');
+    expect(landing).toContain('Sovereign maps your Baseline, then translates what is happening within you, between people, and across the systems around you.');
     expect(stories).toContain('id="relationship"');
     expect(stories).toContain('id="system"');
   });

@@ -19,6 +19,8 @@ describe('release evidence library', () => {
     expect(releaseEvidenceEquals(decoded, evidence)).toBe(true);
     expect(validateReleaseEvidence({ ...decoded, unexpected: true }, sha)).toBe(false);
     expect(releaseEvidenceEquals({ ...decoded, unexpected: true }, evidence)).toBe(false);
+    expect(validateReleaseEvidence({ ...decoded, dmarcVerified: false, dmarcStatus: 'external_blocker' }, sha)).toBe(false);
+    expect(() => createReleaseEvidence({ sha, dmarcVerified: false })).toThrow(/Verified DMARC/);
   });
 
   it('generates constrained upserts only after validating identifiers', () => {

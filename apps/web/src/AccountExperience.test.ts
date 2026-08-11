@@ -23,7 +23,9 @@ describe('account access experience', () => {
     expect(app).toContain('Create your account, verify your email, then build the personal foundation Sovereign uses.');
     expect(app).toContain('Return to your Baseline and the questions you were exploring.');
     expect(app).toContain('Enter your email. Sovereign.OS will send a one-time link and six-digit code.');
+    expect(passkey).toContain('Choose a secure way to sign in.');
     expect(passkey).toContain('Use your device passkey, or enter your email below for a one-time link and six-digit code.');
+    expect(passkey).not.toContain('Return to your Baseline and the questions you were exploring.');
     expect(app).not.toMatch(/spiritual promise|one private link|no password/i);
     expect(passkey).not.toMatch(/password reset|forgot password/i);
   });

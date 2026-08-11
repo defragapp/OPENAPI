@@ -12,9 +12,11 @@ const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('unified Sovereign intelligence experience', () => {
   it('offers useful Baseline questions before an incident is supplied', () => {
-    for (const phrase of ['What remains steady in me?', 'What may be louder right now?', 'My Baseline', 'Shadow & Gift', 'Alignment', 'Learning', 'Family Role']) {
+    for (const phrase of ['Ask what feels louder than usual.', 'Ask what remains steady beneath today.', 'Ask what you actually want to understand.', 'Ask why a useful capacity changes under pressure.']) {
       expect(workspace).toContain(phrase);
     }
+    expect(workspace).toContain('composerExamples');
+    expect(workspace).not.toContain('surfacePrompts');
   });
 
   it('treats Today, Explore, People, Systems, Library, and You as one intelligence', () => {
@@ -43,7 +45,7 @@ describe('unified Sovereign intelligence experience', () => {
   it('keeps each message attached to the context used for the question', () => {
     expect(workspace).toContain('const messageContext = {');
     expect(workspace).toContain("role: 'user', text: clean, context: messageContext");
-    expect(workspace).toContain("role: 'assistant', text: '', context: messageContext");
+    expect(workspace).toContain("role: 'assistant', text: 'Connecting your Baseline', context: messageContext");
     expect(workspace).toContain("...(row.context && typeof row.context === 'object' ? { context: row.context } : {})");
   });
 
@@ -57,7 +59,8 @@ describe('unified Sovereign intelligence experience', () => {
 
   it('exposes permission and account controls without a permanent Covenant toggle', () => {
     expect(workspace).toContain("new CustomEvent('sovereign:open-consent-controls')");
-    expect(workspace).toContain('PEOPLE AND PERMISSIONS');
+    expect(workspace).toContain('PERMISSIONS');
+    expect(workspace).toContain('Each person and system use stays separate.');
     expect(workspace).toContain('PRIVACY AND SAVED DATA');
     expect(workspace).toContain('PLAN AND BILLING');
     expect(workspace).not.toContain('COVENANT PREFERENCE');

@@ -8,6 +8,7 @@ const reactAuthority = read('./deployed-route-cohesion.css');
 const platformAuthority = read('./platform-visual-cohesion-v1.css');
 const mobileRelease = read('./workspace-mobile-release-v3.css');
 const productionReadiness = read('./production-readiness-visual-v1.css');
+const workspaceAuthorities = [reactAuthority, platformAuthority, mobileRelease, productionReadiness].join('\n');
 const finalLandingAuthority = read('./public-landing-final-authority.css');
 const mobileUtilities = read('./WorkspaceMobileUtilities.tsx');
 const staticAuthority = read('../public/deployed-route-cohesion.css');
@@ -107,15 +108,19 @@ describe('deployed route cohesion', () => {
       'surface-heading',
       'baseline-preparing',
       'today-facet-view',
-      'today-insight-lines',
-      'today-continuations',
-      'account-summary',
+      'today-steady',
+      'today-current',
+      'explore-home',
+      'account-settings-index',
       'sovereign-composer',
-      'intelligence-context',
-      'mobile-bottom-nav'
+      'intelligence-context'
     ]) {
       expect(workspace).toContain(mountedClass);
-      expect(platformAuthority).toContain(`.${mountedClass}`);
+      expect(workspaceAuthorities).toContain(`.${mountedClass}`);
+    }
+    for (const retiredClass of ['today-insight-lines', 'explore-mode-list', 'mobile-bottom-nav', 'account-summary']) {
+      expect(workspace).not.toContain(retiredClass);
+      expect(reactAuthority).not.toContain(retiredClass);
     }
     expect(platformAuthority).toContain('sovereign-platform-cohesion-v1');
     expect(platformAuthority).toContain('@media (max-width: 820px)');
@@ -142,9 +147,11 @@ describe('deployed route cohesion', () => {
     expect(mobileRelease).toContain('grid-template-columns: minmax(0, 1fr) 48px');
     expect(mobileRelease).toContain('visibility: hidden !important');
     expect(mobileRelease).toContain('.intelligence-workspace.context-open .intelligence-context');
-    expect(mobileRelease).toContain('.explore-mode-list');
-    expect(mobileRelease).toContain('overflow-x: auto !important');
-    expect(mobileRelease).toContain('calc(196px + env(safe-area-inset-bottom))');
+    expect(reactAuthority).toContain('.explore-home');
+    expect(reactAuthority).toContain('.composer-example');
+    expect(productionReadiness).toContain('calc(178px + env(safe-area-inset-bottom))');
+    expect(productionReadiness).toContain('bottom: max(8px, env(safe-area-inset-bottom))');
+    expect(mobileRelease).not.toContain('.explore-mode-list');
   });
 
   it.each(staticPages)('%s loads the same final static route authority', (_label, document) => {

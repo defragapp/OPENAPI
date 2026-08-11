@@ -42,7 +42,7 @@ export function decodeBase64Json(value) {
 
 export function createReleaseEvidence({ sha, dmarcVerified = false, completedAt = new Date().toISOString() }) {
   const normalizedSha = assertReleaseSha(sha);
-  const verified = dmarcVerified === true;
+  if (dmarcVerified !== true) throw new Error('Verified DMARC is required for successful release evidence');
   return {
     contract: RELEASE_EVIDENCE_CONTRACT,
     sha: normalizedSha,
@@ -52,8 +52,8 @@ export function createReleaseEvidence({ sha, dmarcVerified = false, completedAt 
     renderedVisualContract: RELEASE_RENDERED_VISUAL_CONTRACT,
     renderedVisualVerified: true,
     dmarcRecord: RELEASE_DMARC_RECORD,
-    dmarcVerified: verified,
-    dmarcStatus: verified ? 'verified' : 'external_blocker',
+    dmarcVerified: true,
+    dmarcStatus: 'verified',
     completedAt
   };
 }
@@ -73,9 +73,8 @@ export function validateReleaseEvidence(value, expectedSha) {
     && value.renderedVisualContract === RELEASE_RENDERED_VISUAL_CONTRACT
     && value.renderedVisualVerified === true
     && value.dmarcRecord === RELEASE_DMARC_RECORD
-    && typeof value.dmarcVerified === 'boolean'
-    && (value.dmarcStatus === 'verified' || value.dmarcStatus === 'external_blocker')
-    && value.dmarcVerified === (value.dmarcStatus === 'verified')
+    && value.dmarcVerified === true
+    && value.dmarcStatus === 'verified'
     && typeof value.completedAt === 'string'
     && Number.isFinite(Date.parse(value.completedAt))
   );

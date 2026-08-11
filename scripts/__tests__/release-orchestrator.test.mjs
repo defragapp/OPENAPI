@@ -3,7 +3,7 @@ import { orchestrateRelease } from '../release-orchestrator.mjs';
 
 const sha = 'c'.repeat(40);
 
-function harness({ preFailure = false, migrationFailure = false, deployFailure = false, postFailure = false, evidenceFailure = false } = {}) {
+function harness({ preFailure = false, dmarcFailure = false, migrationFailure = false, deployFailure = false, postFailure = false, evidenceFailure = false } = {}) {
   const state = { evidenceB64: null, progressB64: null };
   const runWrangler = vi.fn((args) => {
     if (args[0] === 'd1' && args[1] === 'migrations') {
@@ -75,7 +75,9 @@ function harness({ preFailure = false, migrationFailure = false, deployFailure =
         ensureSecrets: async () => ({ configured: [] }),
         configureControls: async () => ({ configured: true })
       },
-      reconcileDmarc: async () => ({ verified: true, output: 'verified' }),
+      reconcileDmarc: async () => dmarcFailure
+        ? ({ verified: false, output: 'DNS write permission missing' })
+        : ({ verified: true, output: 'verified' }),
       evidenceAttempts: 1,
       evidenceDelayMs: 0,
       browserRunRetryDelayMs: 0,
@@ -95,6 +97,15 @@ describe('single-deploy release orchestrator', () => {
     expect(result.status).toBe('pre-deploy-failed');
     expect(result.deploys).toBe(0);
     expect(deployCalls(test.runWrangler)).toBe(0);
+  });
+
+  it('DMARC failure is a preflight blocker and performs zero deployments', async () => {
+    const test = harness({ dmarcFailure: true });
+    const result = await orchestrateRelease(test.options);
+    expect(result.status).toBe('dmarc-preflight-failed');
+    expect(result.deploys).toBe(0);
+    expect(deployCalls(test.runWrangler)).toBe(0);
+    expect(test.d1Execute).not.toHaveBeenCalled();
   });
 
   it('migration failure performs zero deployments and no progress write', async () => {

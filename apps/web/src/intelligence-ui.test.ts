@@ -22,7 +22,7 @@ describe('Baseline-first Sovereign answer UI', () => {
     expect(workspace).toContain('<SovereignAnswerView');
     expect(workspace).toContain('<BasisStrip values={basis}');
     expect(workspace).toContain('value.accessibleLabel');
-    expect(workspace).toContain('Calculated {formatDate(value.computedAt)}');
+    expect(workspace).toContain('Calculated · {formatDate(value.computedAt)}');
   });
 
   it('renders structured Alignment without a score or gauge', () => {

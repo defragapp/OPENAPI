@@ -26,8 +26,10 @@ describe('authenticated product flow', () => {
   it('makes Stripe-backed tier choice explicit', () => {
     expect(onboarding).toContain('Continue with Free');
     expect(onboarding).toContain('Choose Sovereign+');
-    expect(onboarding).toContain('$99 / year');
-    expect(onboarding).toContain('$20 / month');
+    expect(onboarding).toContain('Annual billing');
+    expect(onboarding).toContain('Monthly billing');
+    expect(onboarding).toContain('Stripe checkout shows the current price before you confirm.');
+    expect(onboarding).not.toMatch(/\$99|\$20|\$8\.25|save \$141/);
     expect(onboarding).toContain("fetch('/api/v1/billing/checkout'");
   });
 
@@ -42,7 +44,9 @@ describe('authenticated product flow', () => {
   it('renders entitlement-aware plan actions without weakening the answer contract', () => {
     expect(workspace).toContain('interfaceActions: payload.interfaceActions');
     expect(workspace).toContain("action?.type === 'show_plan'");
-    expect(workspace).toContain("location.assign('/pricing')");
+    expect(workspace).toContain("sessionStorage.setItem('sovereign:upgrade-continuity'");
+    expect(workspace).toContain("setSurface('You')");
+    expect(workspace).toContain('onShowPlan(primaryPlanAction.feature)');
     expect(workspace).toContain('libraryPlanAction');
     expect(workspace).toContain('covenantPlanAction');
   });

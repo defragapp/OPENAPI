@@ -9,15 +9,15 @@ let source = readFileSync(sourcePath, 'utf8');
 const replacements = [
   [
     "  \"import './passkey-auth.css'\",\n  'installV0ReleaseFingerprint();'",
-    "  \"import './passkey-auth.css'\",\n  \"import './deployed-route-cohesion.css'\",\n  'installV0ReleaseFingerprint();'"
+    "  \"import './deployed-route-cohesion.css'\",\n  \"import './passkey-auth.css'\",\n  'installV0ReleaseFingerprint();'"
   ],
   [
     "assert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes(\"import './\"), 'A local visual file loads after the passkey-specific final authority.');",
-    "const routeCohesionImport = \"import './deployed-route-cohesion.css';\";\nassert(main.indexOf(passkeyImport) < main.indexOf(routeCohesionImport), 'The final non-landing route authority must load after passkey-specific styling.');\nassert(!main.slice(main.indexOf(routeCohesionImport) + routeCohesionImport.length).includes(\"import './\"), 'A local visual file loads after the final deployed route authority.');"
+    "const routeCohesionImport = \"import './deployed-route-cohesion.css';\";\nassert(main.indexOf(routeCohesionImport) < main.indexOf(passkeyImport), 'Route cohesion styling must load before the final passkey authority.');\nassert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes(\"import './\"), 'A local visual file loads after the passkey-specific final authority.');"
   ],
   [
     "'landing-hero-field-v4.css', 'passkey-auth.css', 'v0-public-port.css'",
-    "'landing-hero-field-v4.css', 'passkey-auth.css', 'deployed-route-cohesion.css', 'v0-public-port.css'"
+    "'landing-hero-field-v4.css', 'deployed-route-cohesion.css', 'passkey-auth.css', 'v0-public-port.css'"
   ]
 ];
 
@@ -29,8 +29,8 @@ for (const [retiredContract, currentContract] of replacements) {
   source = source.replace(retiredContract, currentContract);
 }
 
-if (source.includes('A local visual file loads after the passkey-specific final authority.')) {
-  throw new Error('Intelligence release v2 still treats passkey styling as the final global visual authority.');
+if (source.includes('main.indexOf(passkeyImport) < main.indexOf(routeCohesionImport)')) {
+  throw new Error('Intelligence release v2 places route cohesion after the final passkey authority.');
 }
 
 try {

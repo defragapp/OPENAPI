@@ -7,16 +7,18 @@ function fakeUsage(initial = 0): { env: Env; used: () => number } {
   const db = {
     prepare(sql: string) {
       return {
-        bind(_accountId: string, _periodKey: string, limit?: number) {
+        bind(...args: unknown[]) {
           return {
             async first() {
               if (sql.startsWith('SELECT turns_used')) return turnsUsed ? { turns_used: turnsUsed } : null;
-              if (turnsUsed >= Number(limit)) return null;
-              turnsUsed += 1;
+              const count = Number(args[2]);
+              const allowance = Number(args[3]);
+              if (turnsUsed + count > allowance) return null;
+              turnsUsed += count;
               return { turns_used: turnsUsed };
             },
             async run() {
-              if (sql.startsWith('UPDATE ai_usage_windows')) turnsUsed = Math.max(0, turnsUsed - 1);
+              if (sql.startsWith('UPDATE ai_usage_windows')) turnsUsed = Math.max(0, turnsUsed - Number(args[0]));
               return { success: true };
             }
           };

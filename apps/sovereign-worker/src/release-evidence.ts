@@ -27,8 +27,8 @@ export type ProductionReleaseEvidence = {
   renderedVisualContract: typeof RELEASE_RENDERED_VISUAL_CONTRACT;
   renderedVisualVerified: true;
   dmarcRecord: '_dmarc.defrag.app';
-  dmarcVerified: boolean;
-  dmarcStatus: 'verified' | 'external_blocker';
+  dmarcVerified: true;
+  dmarcStatus: 'verified';
   completedAt: string;
 };
 
@@ -59,9 +59,8 @@ export async function readProductionReleaseEvidence(env: Env): Promise<Productio
     || evidence.renderedVisualContract !== RELEASE_RENDERED_VISUAL_CONTRACT
     || evidence.renderedVisualVerified !== true
     || evidence.dmarcRecord !== '_dmarc.defrag.app'
-    || typeof evidence.dmarcVerified !== 'boolean'
-    || (evidence.dmarcStatus !== 'verified' && evidence.dmarcStatus !== 'external_blocker')
-    || evidence.dmarcVerified !== (evidence.dmarcStatus === 'verified')
+    || evidence.dmarcVerified !== true
+    || evidence.dmarcStatus !== 'verified'
     || typeof evidence.completedAt !== 'string'
     || !Number.isFinite(Date.parse(evidence.completedAt))) {
     return null;

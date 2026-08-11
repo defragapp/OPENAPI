@@ -107,6 +107,7 @@ export async function orchestrateRelease({
   let generatedConfigPath;
   let deploys = 0;
   let migrationsApplied = false;
+  let dmarc;
   const environment = {
     ...process.env,
     WORKERS_CI_COMMIT_SHA: normalizedSha,
@@ -149,6 +150,16 @@ export async function orchestrateRelease({
       if (result.error || result.status !== 0) {
         return { status: 'pre-deploy-failed', stage: check.label, deploys, output: result.combined };
       }
+    }
+
+    dmarc = await reconcileDmarc({ runNode, environment });
+    if (dmarc?.verified !== true) {
+      return {
+        status: 'dmarc-preflight-failed',
+        deploys,
+        output: dmarc?.output || 'DMARC verification failed',
+        dmarc
+      };
     }
 
     let prepared;
@@ -196,7 +207,6 @@ export async function orchestrateRelease({
       }
     }
 
-    const dmarc = await reconcileDmarc({ runNode, environment });
     try {
       const evidence = await evidenceWriter({
         sha: normalizedSha,

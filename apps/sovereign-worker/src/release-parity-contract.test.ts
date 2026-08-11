@@ -53,7 +53,7 @@ describe('production release parity contract', () => {
     expect(parentVerifier).toContain("assert(result.json?.visualRelease?.sequenceFingerprint === expectedSequence");
   });
 
-  it('runs migrations, one deploy, route checks, and rendered checks before D1 evidence', () => {
+  it('verifies DMARC before migrations, one deploy, route checks, rendered checks, and D1 evidence', () => {
     expect(deployV3).toContain("runWrangler(['deploy', '--config', generatedConfigPath])");
     expect(deployV3).not.toContain('cloudflare-production-deploy-v2.mjs');
     expect(releaseOrchestrator).toContain('applyD1Migrations');
@@ -71,9 +71,11 @@ describe('production release parity contract', () => {
       expect(`${releaseWrapper}\n${releaseOrchestrator}`).toContain(script);
     }
     const positions = [
+      'dmarc = await reconcileDmarc',
+      'prepared = await prepareConfig',
+      'const migrationResult = applyMigrations',
       'const deployResult = await deployMain',
       'for (const check of postDeployChecks)',
-      'const dmarc = await reconcileDmarc',
       'const evidence = await evidenceWriter'
     ].map((marker) => releaseOrchestrator.indexOf(marker));
     expect(positions.every((position, index) => position >= 0 && (index === 0 || position > positions[index - 1]!))).toBe(true);
@@ -92,7 +94,9 @@ describe('production release parity contract', () => {
     expect(dmarcReconciler).toContain("method: 'POST'");
     expect(dmarcReconciler).toContain("method: 'PATCH'");
     expect(dmarcReconciler).toContain('records.length !== 1');
-    expect(releaseEvidenceLibrary).toContain("dmarcStatus: verified ? 'verified' : 'external_blocker'");
+    expect(releaseOrchestrator).toContain("status: 'dmarc-preflight-failed'");
+    expect(releaseEvidenceLibrary).toContain("dmarcStatus: 'verified'");
+    expect(releaseEvidenceLibrary).not.toContain('external_blocker');
   });
 
   it('publishes exact-SHA application release evidence only after every application gate', () => {
@@ -109,7 +113,7 @@ describe('production release parity contract', () => {
     expect(releaseEvidenceRuntime).toContain("RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
     expect(releaseEvidenceRuntime).toContain("RELEASE_MIGRATION_VERSION = '0015_release_evidence'");
     expect(releaseEvidenceRuntime).toContain('evidence.sha !== sha');
-    expect(releaseEvidenceRuntime).toContain("typeof evidence.dmarcVerified !== 'boolean'");
+    expect(releaseEvidenceRuntime).toContain('evidence.dmarcVerified !== true');
     expect(runtime).toContain("import { readProductionReleaseEvidence } from './release-evidence'");
     expect(runtime).toContain('const releaseEvidence = await readProductionReleaseEvidence(env)');
     expect(runtime).toContain('releaseEvidence,');

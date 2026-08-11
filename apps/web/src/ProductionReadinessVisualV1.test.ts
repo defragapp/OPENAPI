@@ -99,9 +99,9 @@ describe('desktop and iOS production readiness v1', () => {
       '.sovereign-app-runtime .surface-heading h1',
       'font-size: clamp(2rem, 8.8vw, 2.85rem)',
       'calc(178px + env(safe-area-inset-bottom))',
-      'bottom: calc(68px + env(safe-area-inset-bottom))',
+      'bottom: max(8px, env(safe-area-inset-bottom))',
       'grid-template-columns: minmax(0, 1fr) 44px',
-      'min-height: calc(64px + env(safe-area-inset-bottom))'
+      'height: 44px !important'
     ]) expect(css).toContain(marker);
     expect(mobileUtilities).toContain('<details className="workspace-mobile-utilities">');
     expect(mobileUtilities).toContain('Workspace tools');

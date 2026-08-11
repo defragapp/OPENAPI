@@ -61,12 +61,13 @@ describe('Baseline-first account journey release', () => {
     expect(onboarding).toContain("location.replace('/app')");
   });
 
-  it('keeps Free legitimate and makes paid cadence explicit before Stripe checkout', () => {
+  it('keeps Free legitimate and makes paid cadence and the live-price handoff explicit', () => {
     expect(onboarding).toContain("useState<BillingInterval>('monthly')");
     expect(onboarding).toContain('Continue with Free');
-    expect(onboarding).toContain('$20 / month');
-    expect(onboarding).toContain('$99 / year');
-    expect(onboarding).toContain('$8.25/month equivalent · save $141');
+    expect(onboarding).toContain('Monthly billing');
+    expect(onboarding).toContain('Annual billing');
+    expect(onboarding).toContain('Stripe checkout shows the current price before you confirm.');
+    expect(onboarding).not.toMatch(/\$99|\$20|\$8\.25|save \$141/);
     expect(onboarding).toContain('Secure checkout is temporarily unavailable. You can continue with Free and upgrade later.');
     expect(onboarding).toContain("fetch('/api/v1/billing/checkout'");
   });
@@ -125,12 +126,19 @@ describe('Baseline-first account journey release', () => {
   });
 
   it('loads account cohesion and route cohesion before the final passkey authority', () => {
-    const sequence = "import './account-journey.css';\nimport './account-journey-structured.css';\nimport './account-journey-release-cohesion.css';\nimport './deployed-route-cohesion.css';\nimport './passkey-auth.css';";
+    const accountImports = [
+      "import './account-journey.css';",
+      "import './account-journey-structured.css';",
+      "import './account-journey-release-cohesion.css';"
+    ];
     const passkeyImportMarker = "import './passkey-auth.css';";
-    expect(entry).toContain(sequence);
     const routeImport = entry.indexOf("import './deployed-route-cohesion.css';");
     const passkeyImport = entry.indexOf(passkeyImportMarker);
     const firstRuntimeCall = entry.indexOf('installV0ReleaseFingerprint();');
+    for (const marker of accountImports) {
+      expect(entry.indexOf(marker)).toBeGreaterThan(-1);
+      expect(entry.indexOf(marker)).toBeLessThan(routeImport);
+    }
     expect(routeImport).toBeGreaterThan(-1);
     expect(passkeyImport).toBeGreaterThan(routeImport);
     expect(firstRuntimeCall).toBeGreaterThan(passkeyImport);

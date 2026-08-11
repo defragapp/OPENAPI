@@ -35,21 +35,24 @@ describe('Sovereign account and workspace shell', () => {
     expect(app).not.toContain('SovereignIntelligenceWorkspace');
   });
 
-  it('keeps Today Baseline-first and correction-ready', () => {
-    for (const phrase of ['Your Baseline', 'More relevant now', 'What changes under pressure?', 'Gift expression', 'Where this may matter', 'Not today']) {
+  it('keeps Today Baseline-first, qualified, and correction-ready', () => {
+    for (const phrase of ['Your Baseline is active.', 'What remains steady', 'Temporary current context', 'Not today']) {
       expect(workspace).toContain(phrase);
     }
-    expect(workspace).toContain('Current context does not determine your behavior.');
+    expect(workspace).toContain('It does not determine your behavior.');
+    expect(workspace).toContain('Your actual response');
   });
 
-  it('routes signup through explicit plan confirmation without changing prices', () => {
+  it('routes signup through explicit plan confirmation without duplicating live prices', () => {
     expect(app).toContain('Create your account, verify your email, then build the personal foundation Sovereign uses.');
     expect(app).toContain('safeClientReturnTo');
     expect(app).toContain("if (path === '/onboarding') return <PlanOnboarding />;");
     expect(onboarding).toContain('/api/v1/account/onboarding');
     expect(onboarding).toContain('/api/v1/billing/checkout');
-    expect(onboarding).toContain('$20 / month');
-    expect(onboarding).toContain('$99 / year');
+    expect(onboarding).toContain('Monthly billing');
+    expect(onboarding).toContain('Annual billing');
+    expect(onboarding).toContain('Stripe checkout shows the current price before you confirm.');
+    expect(onboarding).not.toMatch(/\$99|\$20|\$8\.25|save \$141/);
   });
 
   it('allows pinch zoom and includes mobile-safe controls', () => {

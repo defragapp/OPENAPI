@@ -54,7 +54,7 @@ describe('account journey AI, Baseline, and Stripe tiering release chain', () =>
     expect(usage).toContain('free: 10');
     expect(usage).toContain('sovereign_plus: 300');
     expect(usage).toContain('ON CONFLICT(account_id, period_key) DO UPDATE SET');
-    expect(usage).toContain('WHERE ai_usage_windows.turns_used < ?');
+    expect(usage).toContain('WHERE ai_usage_windows.turns_used + excluded.turns_used <= ?');
     expect(usage).toContain("error: 'monthly_allowance_reached'");
     expect(entitlements).toContain("if (!row) return { plan: 'free', features: ['baseline.today', 'baseline.explore']");
   });

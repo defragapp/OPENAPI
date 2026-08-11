@@ -13,19 +13,15 @@ const replacements = [
   ],
   [
     "  'apps/web/src/passkey-auth.css',\n  'apps/web/public/v0-public-port.css'",
-    "  'apps/web/src/passkey-auth.css',\n  'apps/web/src/deployed-route-cohesion.css',\n  'apps/web/public/v0-public-port.css'"
+    "  'apps/web/src/deployed-route-cohesion.css',\n  'apps/web/src/passkey-auth.css',\n  'apps/web/public/v0-public-port.css'"
   ],
   [
     "  \"import './landing-hero-field-v4.css';\",\n  \"import './passkey-auth.css';\"\n];",
-    "  \"import './landing-hero-field-v4.css';\",\n  \"import './passkey-auth.css';\",\n  \"import './deployed-route-cohesion.css';\"\n];"
-  ],
-  [
-    "assert(!main.slice(previousImport + orderedImports.at(-1).length).includes(\"import './\"), 'A local visual layer loads after passkey authority.');",
-    "assert(!main.slice(previousImport + orderedImports.at(-1).length).includes(\"import './\"), 'A local visual layer loads after the final deployed route authority.');"
+    "  \"import './landing-hero-field-v4.css';\",\n  \"import './deployed-route-cohesion.css';\",\n  \"import './passkey-auth.css';\"\n];"
   ],
   [
     "  ['passkey authority', passkeyVisual],\n  ['standalone authority', staticV0Visual],",
-    "  ['passkey authority', passkeyVisual],\n  ['final route authority', routeCohesionVisual],\n  ['standalone authority', staticV0Visual],"
+    "  ['route cohesion authority', routeCohesionVisual],\n  ['passkey authority', passkeyVisual],\n  ['standalone authority', staticV0Visual],"
   ]
 ];
 
@@ -37,8 +33,8 @@ for (const [retiredContract, currentContract] of replacements) {
   source = source.replace(retiredContract, currentContract);
 }
 
-if (source.includes('A local visual layer loads after passkey authority.')) {
-  throw new Error('Premium platform release v2 still treats passkey styling as the final visual authority.');
+if (source.includes("\"import './passkey-auth.css';\",\n  \"import './deployed-route-cohesion.css';\"")) {
+  throw new Error('Premium platform release v2 places route cohesion after the final passkey authority.');
 }
 
 try {

@@ -131,7 +131,7 @@ describe('authenticated Today and Explore smoke flow', () => {
     });
   });
 
-  it('captures correction feedback and rejects duplicate turns', async () => {
+  it('captures correction feedback and rejects messages until the Baseline is complete', async () => {
     const env = fakeEnv();
     const headers = { ...(await authHeader()), origin: 'https://app.test', 'content-type': 'application/json' };
     const correction = await dispatch(new Request('https://app.test/api/v1/threads/t1/corrections', {
@@ -150,14 +150,16 @@ describe('authenticated Today and Explore smoke flow', () => {
     });
 
     const first = await dispatch(request(), env);
-    expect(first.status).toBe(202);
-    const firstText = await first.text();
-    expect(firstText).toContain('Your Baseline is still being prepared.');
-    expect(firstText).toContain('No quality or current state is being guessed.');
+    expect(first.status).toBe(409);
+    await expect(first.json()).resolves.toMatchObject({
+      error: 'baseline_required',
+      code: 'not_started',
+      nextAction: 'continue_onboarding'
+    });
 
     const duplicate = await dispatch(request(), env);
-    expect(duplicate.status).toBe(200);
-    await expect(duplicate.json()).resolves.toEqual({ duplicate: true, status: 'completed', sequence: 1 });
+    expect(duplicate.status).toBe(409);
+    await expect(duplicate.json()).resolves.toMatchObject({ error: 'baseline_required' });
   });
 
   it('requires idempotency keys before creating Stripe handoffs', async () => {

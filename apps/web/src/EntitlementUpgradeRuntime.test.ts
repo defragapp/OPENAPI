@@ -9,7 +9,10 @@ const entitlements = read('../../sovereign-worker/src/db/entitlements.ts');
 
 describe('visible entitlement handoff', () => {
   it('keeps server-side feature denial authoritative', () => {
-    expect(entitlements).toContain("throw new Response('Feature unavailable', { status: 403 })");
+    expect(entitlements).toContain('throw Response.json({');
+    expect(entitlements).toContain("error: 'entitlement_required'");
+    expect(entitlements).toContain("nextAction: 'review_plan'");
+    expect(entitlements).toContain("'cache-control': 'private, no-store'");
     expect(layer).toContain("response.status === 403");
     expect(layer).toContain('inspectEntitlementResponse(response.clone(), path)');
     expect(layer).toContain('/feature unavailable|plan required|upgrade/i');
