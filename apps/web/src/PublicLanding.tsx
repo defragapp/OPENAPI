@@ -222,7 +222,7 @@ function V0Footer() {
         <nav aria-label="Footer navigation">
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
-          <a href="mailto:info@defrag.app">Contact</a>
+          <a href="mailto:info@sovereign.os">Contact</a>
         </nav>
         <p>© 2026 Sovereign.OS</p>
       </div>
