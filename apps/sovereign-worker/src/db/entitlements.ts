@@ -18,7 +18,7 @@ export async function getEntitlements(env: Env, accountId: string): Promise<Enti
 export function requireFeature(entitlements: EntitlementSet, feature: string): void {
   if (!entitlements.features.includes(feature)) {
     throw Response.json({
-      type: 'https://sovereign.defrag.app/problems/entitlement-required',
+      type: 'https://sovereign.app/problems/entitlement-required',
       error: 'entitlement_required',
       feature,
       message: 'This capability is not included in the account’s current server-confirmed plan. Your Baseline, draft, and private data remain unchanged.',
