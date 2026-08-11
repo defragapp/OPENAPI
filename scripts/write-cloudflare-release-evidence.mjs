@@ -13,10 +13,10 @@ import {
 import { DEFAULT_PRODUCTION_CONFIG_PATH } from './prepare-cloudflare-production-config.mjs';
 
 const PRODUCTION_ENDPOINTS = [
-  'https://app.defrag.app/ready',
-  'https://app.defrag.app/health',
-  'https://sovereign.defrag.app/ready',
-  'https://sovereign.defrag.app/health'
+  'https://app.sovereign.app/ready',
+  'https://app.sovereign.app/health',
+  'https://sovereign.app/ready',
+  'https://sovereign.app/health'
 ];
 
 function firstD1Row(result, label) {
@@ -50,9 +50,15 @@ export async function convergeReleaseEvidence({
           && payload?.migrationVersion === RELEASE_MIGRATION_VERSION
           && payload?.latestMigrationVersion === RELEASE_MIGRATION_VERSION
           && payload?.dependencies?.migrationParity === 'current'
+          && payload?.dependencies?.transactionalEmail === 'resend'
+          && payload?.dependencies?.mailIdentity === 'configured'
+          && payload?.dependencies?.publicContactEmail === 'info@sovereign.os'
+          && payload?.dependencies?.transactionalFromEmail === 'info@sovereign.os'
           && (!isReadyEndpoint || payload?.ready === true)
           && validateReleaseEvidence(payload?.releaseEvidence, sha)
-          && releaseEvidenceEquals(payload.releaseEvidence, evidence);
+          && releaseEvidenceEquals(payload.releaseEvidence, evidence)
+          && !JSON.stringify(payload).includes('defrag.app')
+          && !JSON.stringify(payload).includes('@gmail.com');
         if (!matches) {
           allMatch = false;
           lastError = `${endpoint} status=${response.status} version=${payload?.version || 'missing'} evidence=${payload?.releaseEvidence?.sha || 'missing'}`;
