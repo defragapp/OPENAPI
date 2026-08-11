@@ -24,7 +24,7 @@ export async function configureCloudflareFreeTier(options = {}) {
   const apiToken = String(options.apiToken || process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
   const databaseId = String(options.databaseId || process.env.D1_DATABASE_ID || '').trim();
   const gatewayId = String(options.gatewayId || process.env.AI_GATEWAY_ID || 'sovereign').trim();
-  const zoneName = String(options.zoneName || 'defrag.app').trim();
+  const zoneName = String(options.zoneName || 'sovereign.app').trim();
   if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required to configure free-tier controls');
   if (!apiToken) throw new Error('CLOUDFLARE_API_TOKEN is required to configure free-tier controls');
   if (!databaseId) throw new Error('D1 database ID is required to enable read replication');
@@ -242,8 +242,8 @@ async function configureApiShield(client, zoneId) {
   const operationsPayload = await client.request(`/zones/${zoneId}/api_gateway/operations?feature=schema_info&page=1&per_page=5000`);
   const existing = operationsPayload.result || [];
   const missing = CRITICAL_OPERATIONS
-    .filter(([method, endpoint]) => !existing.some((item) => item.host === 'app.defrag.app' && item.method === method && item.endpoint === endpoint))
-    .map(([method, endpoint]) => ({ method, host: 'app.defrag.app', endpoint }));
+    .filter(([method, endpoint]) => !existing.some((item) => item.host === 'app.sovereign.app' && item.method === method && item.endpoint === endpoint))
+    .map(([method, endpoint]) => ({ method, host: 'app.sovereign.app', endpoint }));
   if (missing.length) {
     await client.request(`/zones/${zoneId}/api_gateway/operations`, { method: 'POST', body: missing });
   }
@@ -261,7 +261,7 @@ async function configureApiShield(client, zoneId) {
   if (schemaVerification.result?.validation_enabled !== true) throw new Error('API Shield schema is not active');
   if (settingVerification.result?.validation_default_mitigation_action !== 'block') throw new Error('API Shield blocking is not active');
   const managed = operationVerification.result || [];
-  const missingAfter = CRITICAL_OPERATIONS.filter(([method, endpoint]) => !managed.some((item) => item.host === 'app.defrag.app' && item.method === method && item.endpoint === endpoint));
+  const missingAfter = CRITICAL_OPERATIONS.filter(([method, endpoint]) => !managed.some((item) => item.host === 'app.sovereign.app' && item.method === method && item.endpoint === endpoint));
   if (missingAfter.length) throw new Error(`API Shield Endpoint Management is missing ${missingAfter.length} critical operations`);
 
   return {
