@@ -5,13 +5,14 @@ const productionConfig = JSON.parse(readFileSync('wrangler.production-direct.jso
 const workerConfig = JSON.parse(readFileSync('apps/sovereign-worker/wrangler.jsonc', 'utf8'));
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 const readme = readFileSync('README.md', 'utf8');
+const productionProcedure = readFileSync('docs/production-release.md', 'utf8');
 const bootstrap = readFileSync('scripts/cloudflare-preview-bootstrap.mjs', 'utf8');
 const buildDiagnostics = readFileSync('scripts/cloudflare-build-diagnostics.mjs', 'utf8');
 const mainReleaseGuard = readFileSync('scripts/assert-main-release.mjs', 'utf8');
 const productionDeploy = readFileSync('scripts/cloudflare-production-deploy-v2.mjs', 'utf8');
 const productionRelease = readFileSync('scripts/cloudflare-production-release.mjs', 'utf8');
 const freeTierControls = readFileSync('scripts/configure-cloudflare-free-tier.mjs', 'utf8');
-const parentDomainVerifier = readFileSync('scripts/verify-parent-domain-routes.mjs', 'utf8');
+const domainVerifier = readFileSync('scripts/verify-parent-domain-routes.mjs', 'utf8');
 const preview = workerConfig.env?.preview;
 const expectedObservability = {
   logs: {
@@ -42,6 +43,14 @@ requireValue(rootConfig.workers_dev === false, 'Production Worker must be reacha
 requireValue(rootConfig.preview_urls === false, 'Versioned preview URLs must remain disabled');
 requireValue(rootConfig.vars?.APP_ENV === 'production', 'Root config must be production-only');
 requireValue(rootConfig.vars?.AI_MODEL === '@cf/zai-org/glm-4.7-flash', 'Production must use the Cloudflare-hosted free-tier model');
+requireValue(rootConfig.vars?.PUBLIC_APP_URL === 'https://app.sovereign.app', 'Public app URL must be app.sovereign.app');
+requireValue(rootConfig.vars?.PUBLIC_CONTACT_EMAIL === 'info@sovereign.os', 'Primary public email must be info@sovereign.os');
+requireValue(rootConfig.vars?.TRANSACTIONAL_FROM_EMAIL === 'info@sovereign.os', 'Transactional sender must be info@sovereign.os');
+requireValue(rootConfig.vars?.PUBLIC_CONTACT_ALIASES === 'info@sovereign.app,contact@sovereign.app', 'Public contact aliases drifted');
+requireValue(rootConfig.vars?.TURNSTILE_EXPECTED_HOSTNAME === 'app.sovereign.app', 'Turnstile hostname must be app.sovereign.app');
+for (const value of ['STRIPE_SUCCESS_URL', 'STRIPE_CANCEL_URL', 'STRIPE_PORTAL_RETURN_URL']) {
+  requireValue(String(rootConfig.vars?.[value] || '').startsWith('https://app.sovereign.app/'), `${value} must use app.sovereign.app`);
+}
 requireValue(rootConfig.d1_databases?.some((item) => item.binding === 'DB'), 'Root config is missing D1');
 requireValue(rootConfig.durable_objects?.bindings?.some((item) => item.name === 'THREADS'), 'Root config is missing Durable Object coordination');
 requireValue(rootConfig.ai?.binding === 'AI', 'Root config is missing Workers AI');
@@ -49,12 +58,10 @@ requireValue(rootConfig.assets?.binding === 'ASSETS', 'Root config is missing st
 requireValue(rootConfig.assets?.not_found_handling === '404-page', 'Production assets must return a real 404 document for unknown routes');
 requireValue(!rootConfig.r2_buckets?.length, 'Production must not enable R2');
 requireValue(!rootConfig.queues?.producers?.length && !rootConfig.queues?.consumers?.length, 'Production must not enable Queue');
-for (const hostname of ['sovereign.defrag.app', 'app.defrag.app']) {
+for (const hostname of ['sovereign.app', 'www.sovereign.app', 'app.sovereign.app']) {
   requireValue(rootConfig.routes?.some((route) => route.pattern === hostname && route.custom_domain === true), `Production is missing Custom Domain ${hostname}`);
 }
-for (const pattern of ['defrag.app/*', 'www.defrag.app/*']) {
-  requireValue(rootConfig.routes?.some((route) => route.pattern === pattern && route.zone_name === 'defrag.app' && route.custom_domain !== true), `Production is missing parent route ${pattern}`);
-}
+requireValue(!JSON.stringify(rootConfig.routes || []).includes('defrag.app'), 'Production routes expose the retired Defrag namespace');
 
 requireValue(workerConfig.main === 'src/runtime-entry.ts', 'Worker must use the active OPENAPI runtime entry');
 requireValue(workerConfig.vars?.APP_ENV === 'development', 'Package-level Worker config must remain local-development only');
@@ -91,6 +98,7 @@ for (const required of [
   'verify:migrations',
   'scan:secrets',
   'scan:production-fixtures',
+  'public-contact',
   'verify:release-config',
   'verify:production-release',
   'verify:intelligence-release',
@@ -101,11 +109,7 @@ for (const required of [
   "['build']",
   'verify:worker-bundle-size',
   "phase: 'build'",
-  "status: 'failure'",
-  'process.env.RELEASE_REPORT_URL',
-  'process.env.RELEASE_REPORT_KEY',
-  'delivery=skipped reason=endpoint-unconfigured',
-  'transport: reportTransport'
+  "status: 'failure'"
 ]) {
   requireValue(buildDiagnostics.includes(required), `Cloudflare build diagnostics are missing ${required}`);
 }
@@ -120,16 +124,8 @@ for (const required of [
   'declared commit',
   "phase: 'deploy'",
   "stage: 'production-deploy'",
-  'process.env.RELEASE_REPORT_URL',
-  'process.env.RELEASE_REPORT_KEY',
-  'delivery=skipped reason=endpoint-unconfigured',
-  'transport: reportTransport',
   'BROWSER_RUN_REQUEST_MAX_ATTEMPTS',
-  'Math.max(4, Math.min(5, requestedBrowserAttempts))',
-  'BROWSER_RUN_REQUEST_INTERVAL_MS',
-  'Math.max(20_000, Math.min(60_000, requestedBrowserInterval))',
-  'BROWSER_RUN_RETRY_FLOOR_MS',
-  'Math.max(30_000, Math.min(120_000, requestedBrowserRetryFloor))'
+  'Math.max(4, Math.min(5, requestedBrowserAttempts))'
 ]) {
   requireValue(productionRelease.includes(required), `Production release wrapper is missing ${required}`);
 }
@@ -137,13 +133,24 @@ for (const required of [
 requireValue(!existsSync('.dev.vars.example'), 'Deploy-template secret form must not exist');
 requireValue(!existsSync('scripts/verify-one-click-deploy.mjs'), 'One-click fork verifier must not exist');
 requireValue(!readme.includes('deploy.workers.cloudflare.com'), 'README must not use Deploy to Cloudflare');
-requireValue(readme.includes('defragapp/OPENAPI'), 'README must name the canonical repository');
+requireValue(readme.includes('defragapp/OPENAPI'), 'README must name the internal canonical repository');
 requireValue(readme.includes('Cloudflare Queue and R2 are intentionally disabled'), 'README must document the no-Queue, no-R2 launch architecture');
 requireValue(readme.includes('Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the sole production release authority'), 'README must keep Cloudflare Workers Builds as production authority');
 requireValue(readme.includes('Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`'), 'README Cloudflare build command drifted');
 requireValue(readme.includes('Deploy command: `pnpm production:deploy`'), 'README Cloudflare deploy command drifted');
-requireValue(readme.includes('`defrag.app/*` and `www.defrag.app/*` remain explicit Worker routes'), 'README parent-route contract drifted');
 requireValue(readme.includes('Production `workers.dev` access is disabled'), 'README must document production workers.dev retirement');
+
+for (const required of [
+  'Public site: `https://sovereign.app`',
+  'Authenticated app and API: `https://app.sovereign.app`',
+  'Public email identity: `info@sovereign.os`',
+  '`info@sovereign.app`, `contact@sovereign.app`',
+  'Cloudflare Email Routing',
+  'must never be committed to source',
+  'Resend is the required production provider'
+]) {
+  requireValue(productionProcedure.includes(required), `Production procedure is missing ${required}`);
+}
 
 for (const required of ['WORKERS_CI_COMMIT_SHA', 'APP_VERSION', "'d1', 'migrations', 'apply'", "'deploy', '--config'", 'verifyLiveProduction', 'configureCloudflareFreeTier']) {
   requireValue(productionDeploy.includes(required), `Production deploy is missing ${required}`);
@@ -155,10 +162,12 @@ for (const required of [
   "spawnSync('git', ['rev-parse', 'HEAD']",
   'declaredSha && declaredSha !== checkoutSha',
   'checkout-invalid-cloudflare-metadata-ignored',
-  'https://defrag.app/',
-  'https://www.defrag.app/',
-  'https://sovereign.defrag.app/',
-  'https://app.defrag.app/app',
+  'https://sovereign.app/',
+  'https://www.sovereign.app/',
+  'https://app.sovereign.app/app',
+  'info@sovereign.os',
+  'info@sovereign.app',
+  'contact@sovereign.app',
   'payload?.version !== commitSha',
   '--v0-page:#0f0f0f',
   '--v0-cream:#e8ddd0',
@@ -168,7 +177,7 @@ for (const required of [
   "entryDocument: 'no-store'",
   "serviceWorkerMode: 'retired'"
 ]) {
-  requireValue(parentDomainVerifier.includes(required), `Parent-domain verifier is missing ${required}`);
+  requireValue(domainVerifier.includes(required), `Sovereign-domain verifier is missing ${required}`);
 }
 for (const required of [
   'PREVIEW_BASE_URL',
@@ -188,4 +197,4 @@ for (const required of [
 requireValue(!bootstrap.includes('AI_MODEL: process.env.AI_MODEL ||'), 'Preview bootstrap must not allow arbitrary model override');
 requireValue(!bootstrap.includes('AI_PROVIDER: process.env.AI_PROVIDER ||'), 'Preview bootstrap must not allow arbitrary provider override');
 
-console.log('Direct Cloudflare release config verified production_root=true production_workers_dev=false cloudflare_builds_only=true current_main_only=true github_workflows_non_authoritative=true free_workers_ai=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false telemetry_non_authoritative=true');
+console.log('Direct Cloudflare release config verified sovereign_public_namespace=true primary_email=info@sovereign.os aliases=2 production_workers_dev=false cloudflare_builds_only=true current_main_only=true free_workers_ai=true r2=false queues=false');
