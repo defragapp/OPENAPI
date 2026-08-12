@@ -18,6 +18,16 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Founder-approved support links remain publicly visible on the How it works and Questions surfaces.
 - Support contributions are one-time, voluntary, and entitlement-neutral. They do not replace Free or Sovereign+ and do not purchase product access, ownership, influence, tax-deductible status, or future-feature commitments.
 
+## Language and comprehension
+
+- `product-language-system.md` remains the only user-facing language authority; no product, visual, strategy, or release document defines a competing hero, product promise, named model, or explanation of how Sovereign works.
+- The founder-locked root hero and visual sequence remain exact, while immediately adjacent copy makes the product category, interaction, and first action understandable.
+- Applicable self, relationship, system, Library, Expression Field, and Worlds surfaces inherit the same movement: capacity beneath the pattern, possible expression, what happens between people, and supported continuation or change conditions.
+- Interpretive language preserves uncertainty: confirmed observations may use direct language; derived interpretations use possibility language and expose unknowns.
+- Contribution is not presented as causation, feedback as blame, or multi-person context as evidence that harm is mutual.
+- Expression Field and Alignment language remains qualitative and does not imply calibrated psychological precision.
+- Audits, strategies, deployment markers, and historical release records are not treated as language or product authority.
+
 ## Security and privacy
 
 - All mutations are authenticated.

@@ -2,6 +2,12 @@
 
 All tools return reduced, typed data. Tool errors must be safe to show and must never leak secrets or raw upstream payloads.
 
+## Semantic inheritance
+
+Tools provide authorized evidence, facts, observations, provenance, uncertainty, and permitted context. They do not create a second interpretation layer. The Sovereign answer contract applies the explanatory movement defined in `product-language-system.md` and `inner-recognition-intelligence.md`.
+
+A tool must never diagnose, infer an absent person's motive or exact emotion, convert relative expression into a psychological score, or treat interaction as proof of interpersonal causation. Relationship and system tools preserve each participant, permission boundary, supplied role context, and unknown state. Safety handling takes precedence over completing a mutual-pattern explanation.
+
 ## Personal
 
 - `get_my_baseline_summary(personId, focus?, verbosity?)`

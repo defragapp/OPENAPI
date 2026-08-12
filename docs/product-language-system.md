@@ -8,6 +8,18 @@ Sovereign.OS is a private personal AI for understanding yourself, your relations
 
 This file is the canonical source for user-facing product language. Positioning, intelligence, visual, public-page, and release documents may explain or enforce this language, but must not define a competing hero, product promise, or explanation of how Sovereign works.
 
+## Documentation authority and inheritance
+
+Use the following order when documents overlap:
+
+1. this file governs user-facing language, voice, terminology, and explanatory sequence;
+2. `launch-product-contract.md` governs the included product and approval boundary;
+3. `inner-recognition-intelligence.md` governs intelligence, answer, and Basis behavior;
+4. safety, privacy, consent, visual, architecture, tool, and release contracts govern their named implementation boundaries while inheriting the first three;
+5. audits, strategies, implementation plans, deployment markers, and release records provide context or evidence only.
+
+A subordinate document may quote required language for enforcement. If its wording or sequence conflicts with this file or the founder-locked visual contract, follow the applicable authority and correct the subordinate document rather than creating a third variant.
+
 ## The Sovereign lens
 
 Sovereign uses one explanatory movement across self, relationships, decisions, systems, and Worlds:
@@ -22,6 +34,17 @@ The compact product explanation is:
 `Sovereign helps you see the capacity beneath a pattern, how it may be expressing, what happens between people, and what may be keeping the pattern in place—so you can see what could change.`
 
 This is an explanatory lens, not a new feature, score, diagnosis, causal model, or top-level product. Do not name it the Emotional Field Model in the interface. The established product objects remain Baseline, Expression Field, People, Systems, Library, and Worlds.
+
+### Certainty register
+
+The memorable sequence may use direct imperative language: `See how it is expressing.` User-facing interpretation must preserve the evidence level:
+
+- use `is expressing` only for behavior or context the user has directly supplied or confirmed;
+- use `may be expressing` for Baseline-derived, current-context, relational, or system interpretation;
+- use `what keeps the pattern going` only when continuation conditions are observed or confirmed;
+- otherwise use `what may be keeping the pattern going` and keep unknowns visible.
+
+This distinction changes certainty, not the underlying explanatory movement.
 
 ### Responsibility boundary
 
@@ -56,9 +79,11 @@ Baseline Design is the personal intelligence foundation. It gives Sovereign a co
 
 `Healing isn’t optional. Holding the pain is.`
 
-Use the emotional statement only after the product category and interaction are clear. It is not a therapy claim, diagnosis, required reconciliation, or guaranteed outcome.
+Outside the founder-locked root hero, use the emotional statement only after the product category and interaction are clear. It is not a therapy claim, diagnosis, required reconciliation, or guaranteed outcome.
 
 On the founder-locked root landing, the approved visual sequence places this statement in the hero. The supporting copy immediately below it must make the product and Sovereign lens understandable. Do not create a second competing hero in another language document.
+
+The root hero uses the founder-locked wording `Healing isn’t optional. Holding onto the pain is.` The shorter `Holding the pain is.` form is a secondary campaign or editorial line only. These are intentional scoped variants, not interchangeable root-hero copy.
 
 ### Enduring brand line
 

@@ -1,5 +1,7 @@
 # Sovereign.OS launch surface
 
+Status: route, access, plan, and launch-acceptance boundary. This document inherits user-facing language from `docs/product-language-system.md` and product scope from `docs/launch-product-contract.md`; it does not define alternate page copy or positioning.
+
 ## One product, three boundaries
 
 ### Public
@@ -14,6 +16,8 @@ The public site stays open and contains only:
 - `/login` and `/signup`.
 
 The public site never needs private Baseline data and never receives Stripe secret keys.
+
+Each public route has a distinct explanatory job while inheriting the same language authority: the root introduces the product and interaction; How It Works explains the operating sequence; Pricing states plans and entitlements; FAQ explains limits, consent, privacy, and billing. These pages may adapt depth, but they must not introduce a competing hero, product promise, named framework, or causal claim.
 
 ### Protected preview
 

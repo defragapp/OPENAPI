@@ -18,7 +18,7 @@ The platform uses one explanatory movement across those capabilities: see the ca
 
 Defrag, Alignment, and Covenant are internal capabilities of one agent. They are not separate top-level applications.
 
-The founder-approved public contract is defined in [`docs/launch-product-contract.md`](docs/launch-product-contract.md). The Layer A–D intelligence model, `sovereign-answer.v2`, and exact Basis contract are defined in [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md).
+User-facing language is governed by [`docs/product-language-system.md`](docs/product-language-system.md). The founder-approved product boundary is defined in [`docs/launch-product-contract.md`](docs/launch-product-contract.md). The Layer A–D intelligence model, `sovereign-answer.v2`, and exact Basis contract are defined in [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md). Safety, privacy, visual, architecture, and release documents inherit those authorities within their own scope; audits, strategies, and release records are supporting or historical documents and do not redefine them.
 
 ## Production architecture
 
@@ -95,10 +95,14 @@ Account deletion uses a 14-day grace period. When execution becomes due, every n
 
 ## Start here
 
+- [`docs/product-language-system.md`](docs/product-language-system.md)
 - [`docs/launch-product-contract.md`](docs/launch-product-contract.md)
 - [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md)
-- [`docs/architecture.md`](docs/architecture.md)
+- [`docs/production-ai-safety-boundary.md`](docs/production-ai-safety-boundary.md)
 - [`docs/privacy-model.md`](docs/privacy-model.md)
+- [`docs/v0-visual-port-contract.md`](docs/v0-visual-port-contract.md)
+- [`docs/worlds-experience-contract.md`](docs/worlds-experience-contract.md)
+- [`docs/architecture.md`](docs/architecture.md)
 - [`docs/tool-contracts.md`](docs/tool-contracts.md)
 - [`docs/release-gates.md`](docs/release-gates.md)
 

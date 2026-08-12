@@ -1,6 +1,6 @@
-# Sovereign.OS canonical product positioning
+# Sovereign.OS product positioning companion
 
-This document explains product positioning. `docs/product-language-system.md` is the single source of truth for public language and authenticated surface copy. Claims remain subject to live entitlements and deterministic privacy and consent enforcement.
+Status: supporting positioning reference. This document inherits `docs/product-language-system.md` and does not independently authorize user-facing copy, hero sequence, terminology, or product promises. Claims remain subject to the launch product contract, live entitlements, and deterministic privacy and consent enforcement.
 
 ## Product category
 
@@ -36,7 +36,7 @@ This explains how the experience differs from a blank generic AI conversation.
 
 **Healing isn’t optional. Holding the pain is.**
 
-This is a founder-approved campaign statement. It may appear only after the product category and interaction are understood. It must not be used as a therapy claim, diagnosis, command to reconcile, or guarantee of emotional outcome.
+This is a founder-approved campaign statement. Outside the founder-locked root hero, it may appear only after the product category and interaction are understood. It must not be used as a therapy claim, diagnosis, command to reconcile, or guarantee of emotional outcome.
 
 ### Enduring brand line
 

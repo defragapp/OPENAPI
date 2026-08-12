@@ -4,12 +4,14 @@ Status: product reference and implementation planning document.
 
 This document preserves the expanded question universe for Baseline Design and maps it to the current Sovereign.OS product, public landing experience, How It Works page, FAQ, and the authenticated single-room workspace.
 
-It does **not** replace the canonical contracts in:
+It does **not** replace the governing contracts in:
 
 - `AGENTS.md`
+- `docs/product-language-system.md`
 - `docs/launch-product-contract.md`
 - `docs/inner-recognition-intelligence.md`
-- `docs/landing-experience-audit.md`
+
+`docs/landing-experience-audit.md` is supporting design history. Where this strategy or that audit conflicts with a governing contract, the governing contract wins.
 
 Where this document describes a useful question that the current deterministic or interpretive data cannot answer by itself, the product must ask for user context, label the result as a possibility, or keep the answer unknown. It must never fill missing framework data or turn interpretation into measured psychological fact.
 
@@ -23,6 +25,7 @@ This strategy was checked against the current repository implementation and prod
 - `apps/web/public/faq.html`
 - `apps/sovereign-worker/src/agent/prompt-v1.ts`
 - `apps/sovereign-worker/src/agent/sovereign.ts`
+- `docs/product-language-system.md`
 - `docs/launch-product-contract.md`
 - `docs/inner-recognition-intelligence.md`
 - `docs/landing-experience-audit.md`

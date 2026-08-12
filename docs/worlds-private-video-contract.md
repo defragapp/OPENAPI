@@ -2,6 +2,8 @@
 
 Status: launch implementation and activation boundary.
 
+This contract inherits the language, responsibility, intelligence, Expression Field, and Worlds boundaries in `product-language-system.md`, `inner-recognition-intelligence.md`, and `worlds-experience-contract.md`. It defines private video execution only and does not create a separate interpretation or product promise.
+
 ## Product role
 
 Worlds is an immersive visualization mode inside the authenticated Sovereign.OS workspace. It is not a separate product, top-level navigation category, pricing architecture, dashboard, social feed, or general-purpose AI video generator.
@@ -21,6 +23,8 @@ The production chain is:
 Temporary current context may modulate the Expression Field before rendering. It changes temporary conditions only; it does not redefine the Baseline or assert a user’s emotional state.
 
 Every World behavior must remain traceable back through the Expression Field to permitted Baseline facets and server-approved Basis. The video provider is never an interpretive authority.
+
+A World may make an already-supported distinction spatially noticeable: the capacity beneath a pattern, its possible expression, an interaction, or a condition that may reinforce or change the pattern. It must not complete missing parts of that movement, increase certainty, infer another person's contribution, or make harm appear mutual.
 
 ## Renderer boundary
 

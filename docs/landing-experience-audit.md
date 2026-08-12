@@ -1,5 +1,7 @@
 # Landing experience audit and revised architecture
 
+Status: historical design audit and supporting rationale. The current root composition is governed by `docs/v0-visual-port-contract.md`; user-facing language is governed by `docs/product-language-system.md`. This audit does not override either contract.
+
 ## Production audit
 
 The July 29 release has a strong warm-black and paper palette, a considered serif/sans relationship, credible privacy language, keyboard-accessible examples, and accurate Baseline, relationship, system, Basis, pricing, and consent product truths.
@@ -21,7 +23,7 @@ Within five seconds, a first-time visitor must understand:
 - the user remains responsible for deciding what fits;
 - the first action is `Build my Baseline`.
 
-The founder-approved emotional line `Healing isn’t optional. Holding the pain is.` remains part of the brand voice, but it follows product clarity. It is not the category definition and must not become a therapy or diagnosis claim.
+The founder-approved emotional line remains first in the founder-locked hero sequence. Product clarity must appear in the immediately adjacent kicker, supporting definition, recognizable question, answer demonstration, and actions. The emotional line is not the category definition and must not become a therapy or diagnosis claim.
 
 The enduring line `Know yourself. Understand the system. Choose what fits.` remains a brand close, not the only product explanation.
 
@@ -29,7 +31,7 @@ The enduring line `Know yourself. Understand the system. Choose what fits.` rema
 
 | Section | Visitor question | Product truth | Visual / interaction | CTA and mobile behavior |
 | --- | --- | --- | --- | --- |
-| Hero | What is this and what can I do? | Sovereign.OS is a private personal AI. | Recognizable user question, interactive Sovereign answer, plain-language tabs, quiet Basis. | Build my Baseline / See a Sovereign answer; category, question, answer beginning, and CTA remain visible on mobile. |
+| Hero | What is this and what can I do? | Sovereign.OS is a private personal AI. | Founder-locked emotional hero with an immediately adjacent product definition and actions; the recognizable question and answer begin in the next required stage. | Build my Baseline / See a Sovereign answer; definition and actions remain clear on mobile. |
 | Brand meaning | Why does this matter? | Understanding can separate pain, identity, relationship interaction, and system reinforcement without diagnosis. | Quiet editorial statement after the product interaction. | No competing CTA. |
 | Questions | Can it help with my real life? | One AI supports self, decisions, relationships, and systems. | Real-life question rail updating one shared answer stage. | Keyboard tabs; horizontally scrollable without page overflow. |
 | Difference | Why not use a blank chat? | Sovereign starts with a private Baseline and adds only chosen context. | Baseline, temporary current context, confirmation, and unknown state remain separate. | No competing CTA. |
