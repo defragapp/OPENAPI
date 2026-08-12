@@ -38,7 +38,7 @@ Trigger the connected private-repository Workers Build after adding deterministi
 
 ## Cloudflare-owned release evidence — August 3, 2026 at 11:42 PT
 
-Trigger the connected private-repository build after removing hosted third-party telemetry from release authority. The canonical sequence must deploy the exact SHA, verify runtime and every secondary route, complete the rendered Browser Run audit, reconcile DMARC, persist one exact-SHA success record in the existing production D1 database, and expose that record through `/ready`. AppDeploy reporting remains optional diagnostics and cannot create, block, or prove a production release.
+Trigger the connected private-repository build after removing hosted third-party telemetry from release authority. The canonical sequence must verify the publicly served DMARC value without mutating DNS, deploy the exact SHA, verify runtime and every secondary route, complete the rendered Browser Run audit, persist one exact-SHA success record in the existing production D1 database, and expose that record through `/ready`. AppDeploy reporting remains optional diagnostics and cannot create, block, or prove a production release.
 
 ## Release-gate retrigger — August 6, 2026 at 20:47 PT
 

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { configureCloudflareDmarc } from '../configure-cloudflare-dmarc.mjs';
 import { orchestrateRelease } from '../release-orchestrator.mjs';
 
 const sha = 'c'.repeat(40);
@@ -151,5 +152,54 @@ describe('single-deploy release orchestrator', () => {
     expect(result.status).toBe('deploy-failed');
     expect(result.deploys).toBe(1);
     expect(deployCalls(test.runWrangler)).toBe(1);
+  });
+});
+
+describe('DMARC release preflight', () => {
+  it('verifies the exact publicly served TXT record without authenticated zone access', async () => {
+    const fetchImpl = vi.fn(async () => Response.json({
+      Status: 0,
+      Answer: [{
+        name: '_dmarc.defrag.app.',
+        type: 16,
+        TTL: 3600,
+        data: '"v=DMARC1; p=none; sp=none; adkim=s; aspf=s; pct=100"'
+      }]
+    }));
+
+    await expect(configureCloudflareDmarc({ fetchImpl })).resolves.toMatchObject({
+      recordName: '_dmarc.defrag.app',
+      content: 'v=DMARC1; p=none; sp=none; adkim=s; aspf=s; pct=100',
+      operation: 'verified-public-dns'
+    });
+    expect(fetchImpl).toHaveBeenCalledOnce();
+    expect(fetchImpl.mock.calls[0][0]).toContain('cloudflare-dns.com/dns-query');
+    expect(fetchImpl.mock.calls[0][1].headers).toEqual({ accept: 'application/dns-json' });
+  });
+
+  it('fails closed when the public DMARC value differs', async () => {
+    const fetchImpl = vi.fn(async () => Response.json({
+      Status: 0,
+      Answer: [{ name: '_dmarc.defrag.app.', type: 16, TTL: 300, data: '"v=DMARC1; p=reject"' }]
+    }));
+
+    await expect(configureCloudflareDmarc({ fetchImpl })).rejects.toThrow(
+      'Public DNS must serve exactly one verified _dmarc.defrag.app TXT record'
+    );
+  });
+
+  it('fails closed when public DNS serves duplicate DMARC records', async () => {
+    const data = '"v=DMARC1; p=none; sp=none; adkim=s; aspf=s; pct=100"';
+    const fetchImpl = vi.fn(async () => Response.json({
+      Status: 0,
+      Answer: [
+        { name: '_dmarc.defrag.app.', type: 16, TTL: 300, data },
+        { name: '_dmarc.defrag.app.', type: 16, TTL: 300, data }
+      ]
+    }));
+
+    await expect(configureCloudflareDmarc({ fetchImpl })).rejects.toThrow(
+      'Public DNS must serve exactly one verified _dmarc.defrag.app TXT record'
+    );
   });
 });

@@ -87,13 +87,15 @@ describe('production release parity contract', () => {
     expect(visualVerifier).toContain("method: 'Cloudflare Browser Run snapshot with full-page PNG plus deterministic normalized pixel, edge, color, and section-rhythm comparison'");
   });
 
-  it('keeps deterministic DMARC reconciliation as a separately reported account control', () => {
+  it('verifies the publicly served DMARC value before deployment without mutating DNS', () => {
     expect(dmarcReconciler).toContain("const RECORD_NAME = '_dmarc.defrag.app'");
     expect(dmarcReconciler).toContain("v=DMARC1; p=none; sp=none; adkim=s; aspf=s; pct=100");
-    expect(dmarcReconciler).toContain('existing.length > 1');
-    expect(dmarcReconciler).toContain("method: 'POST'");
-    expect(dmarcReconciler).toContain("method: 'PATCH'");
+    expect(dmarcReconciler).toContain('https://cloudflare-dns.com/dns-query');
+    expect(dmarcReconciler).toContain("accept: 'application/dns-json'");
     expect(dmarcReconciler).toContain('records.length !== 1');
+    expect(dmarcReconciler).not.toContain("method: 'POST'");
+    expect(dmarcReconciler).not.toContain("method: 'PATCH'");
+    expect(dmarcReconciler).not.toContain('authorization:');
     expect(releaseOrchestrator).toContain("status: 'dmarc-preflight-failed'");
     expect(releaseEvidenceLibrary).toContain("dmarcStatus: 'verified'");
     expect(releaseEvidenceLibrary).not.toContain('external_blocker');
