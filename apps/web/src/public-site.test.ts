@@ -23,7 +23,7 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).toContain('Personal AI for real life');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Sovereign maps your Baseline, then translates what is happening within you, between people, and across the systems around you.');
+    expect(landing).toContain('Sovereign begins with the capacity beneath a pattern—showing how it may express, what happens between people, and what could change.');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(field).toContain('Drag to rotate');
     expect(field).toContain('landing-expression-slice__tooltip');
@@ -54,8 +54,10 @@ describe('Sovereign.OS public experience', () => {
       'surface="relationship-reasoning"',
       'surface="system-map"',
       'surface="system-reasoning"',
-      'Reading your Baseline',
-      'Finding the pattern',
+      'Seeing the capacity beneath it',
+      'Seeing how it is expressing',
+      'Seeing what keeps it going',
+      'Seeing what could change',
       'Keeping both people distinct',
       'Clarity may take time.',
       'Between you',
@@ -104,7 +106,7 @@ describe('Sovereign.OS public experience', () => {
   });
 
   it('keeps support pages, consent, and fallback routes intact', () => {
-    expect(how).toContain('Ask about your life. Get an answer built around you.');
+    expect(how).toContain('See the pattern clearly enough to understand what could change.');
     expect(pricing).toContain('$20');
     expect(pricing).toContain('$99 / year');
     expect(faq).toContain('Clear answers about what Sovereign does—and what remains yours.');

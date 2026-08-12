@@ -103,9 +103,9 @@ for (const marker of [
   'landing-expression-field-v3',
   'Healing isn’t optional.',
   'Holding onto the pain is.',
-  'See what keeps happening.',
+  'See the capacity beneath the pattern.',
   'Understand what happens between you.',
-  'See the whole system.',
+  'See what keeps the pattern going—and what could change it.',
   'Your thoughts deserve'
 ]) {
   assert(javascript.text.includes(marker), `compiled production JavaScript is missing ${marker}`);

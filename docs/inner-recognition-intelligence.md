@@ -2,6 +2,19 @@
 
 This document defines the canonical Baseline information model, answer contract, Basis validation, relationship and system context, and Covenant behavior.
 
+## Shared explanatory lens
+
+When it applies to the user's question, Sovereign makes one movement visible:
+
+1. the valid or useful capacity beneath a pattern;
+2. how that capacity may be expressing;
+3. what happens between people or across the system;
+4. the supported conditions that may keep the pattern going and what could change.
+
+`sovereign-answer.v2` expresses this without a new schema: `steady` carries capacity; `active_now`, `shadow`, and `gift` carry expression; `interaction` and `system` carry what happens between people; and `responsibility`, `unknowns`, `alignment`, and `experiment` carry continuation and possible change. A narrow factual answer does not force all four parts.
+
+The fourth part is conditional and non-blaming. Contribution is not causation. Feedback is not blame. Understanding a pattern does not make harm mutual. Safety handling overrides completion of the lens when abuse, coercion, immediate danger, or a serious power imbalance is present.
+
 ## Four-layer information model
 
 ### Layer A — exact source data
@@ -94,6 +107,8 @@ type SovereignAnswerV2 = {
 Focused answers serve narrow facts and follow-ups. Standard is the normal Baseline default. Deep is the default for a full interpretation, relationship comparison, or system analysis.
 
 Standard and deep answers provide a direct answer plus two to five relevant sections. A question is asked first only when missing information materially blocks a responsible answer. Exploration does not always become an action plan.
+
+Recurring-pattern answers use the existing section contract to show the useful capacity and its expression. When permitted relationship or system context is relevant, they also show the interaction and supported continuation or change conditions. They never invent another person's contribution, treat an inferred feedback loop as fact, or imply that the user's response caused another person's harmful behavior.
 
 ## Basis
 
@@ -192,3 +207,5 @@ Tests must prove:
 - contextual, confirmed, retrieved-passage Covenant behavior;
 - consent and entitlement enforcement;
 - complete answers even when the Basis drawer is never opened.
+- recurring-pattern answers connect capacity, expression, applicable interaction, and possible continuation or change without adding causal certainty or blame;
+- abuse, coercion, danger, and serious power imbalance cases do not receive mutualizing feedback-loop language.

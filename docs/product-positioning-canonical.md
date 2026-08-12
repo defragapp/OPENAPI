@@ -1,6 +1,6 @@
 # Sovereign.OS canonical product positioning
 
-This document is the source of truth for public language, authenticated surface copy, and product implementation. Claims remain subject to live entitlements and deterministic privacy and consent enforcement.
+This document explains product positioning. `docs/product-language-system.md` is the single source of truth for public language and authenticated surface copy. Claims remain subject to live entitlements and deterministic privacy and consent enforcement.
 
 ## Product category
 
@@ -15,6 +15,8 @@ A new visitor should understand the interaction immediately:
 5. Confirm, correct, reject, or save what helps.
 
 Unlike an AI that begins with a blank prompt, Sovereign begins with the user’s Baseline and adds current, relational, system, or Covenant context only when the user chooses and the required permission exists.
+
+Across those contexts, Sovereign follows one explanatory movement: see the capacity beneath a pattern; see how that capacity may be expressing; see what happens between people; and see what may be keeping the pattern going and what could change it. This is the shared logic beneath existing capabilities, not another named framework or product surface.
 
 ## Brand architecture
 
@@ -36,11 +38,11 @@ This explains how the experience differs from a blank generic AI conversation.
 
 This is a founder-approved campaign statement. It may appear only after the product category and interaction are understood. It must not be used as a therapy claim, diagnosis, command to reconcile, or guarantee of emotional outcome.
 
-### Enduring brand line and current public hero
+### Enduring brand line
 
 **Know yourself. Understand the system. Choose what fits.**
 
-This is the enduring Sovereign.OS brand line and the approved current hero. It must be supported immediately by the plain product definition and a recognizable Sovereign product moment.
+This is an enduring secondary brand line. It is not the root public hero. The founder-locked root sequence begins with **Healing isn’t optional. Holding onto the pain is.** and ends with **Your thoughts deserve a better place to live.**
 
 ## Core position
 
@@ -146,19 +148,17 @@ Sovereign.OS is a private personal AI for questions about yourself, your relatio
 
 Sovereign.OS turns Baseline Design into a private AI for personal, relationship, and system intelligence. Plain-language insight comes first. Exact supporting data remains available beneath it. You decide what fits.
 
-## Approved public hero
+## Root public hero contract
 
 Headline:
 
-**Know yourself.**
+**Healing isn’t optional.**
 
-**Understand the system.**
-
-**Choose what fits.**
+**Holding onto the pain is.**
 
 Supporting definition:
 
-**Sovereign.OS is a private AI for understanding yourself, your relationships, and the systems around you. Build your Baseline once, then ask naturally and receive an answer grounded in the person asking.**
+**Sovereign begins with the capacity beneath a pattern. It shows how that capacity may be expressing, what happens between people, and what may be keeping the pattern in place—so you can see what could change.**
 
 Primary action:
 

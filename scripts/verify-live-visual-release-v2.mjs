@@ -348,9 +348,9 @@ function assertDom(profile, dom) {
   for (const requiredText of [
     'Healing isn’t optional.',
     'Holding onto the pain is.',
-    'See what keeps happening.',
+    'See the capacity beneath the pattern.',
     'Understand what happens between you.',
-    'See the whole system.',
+    'See what keeps the pattern going—and what could change it.',
     'Generic AI sees the prompt.',
     'Your thoughts deserve a better place to live.'
   ]) {

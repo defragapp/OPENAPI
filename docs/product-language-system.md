@@ -6,6 +6,33 @@ Use this guide for public pages, authentication, onboarding, the authenticated w
 
 Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the groups around you. It starts with your Baseline Design, then adds only the current, relational, and system context you choose.
 
+This file is the canonical source for user-facing product language. Positioning, intelligence, visual, public-page, and release documents may explain or enforce this language, but must not define a competing hero, product promise, or explanation of how Sovereign works.
+
+## The Sovereign lens
+
+Sovereign uses one explanatory movement across self, relationships, decisions, systems, and Worlds:
+
+1. **See the capacity beneath the pattern.** Baseline identifies the valid or useful capacity that may be involved.
+2. **See how that capacity is expressing.** Sovereign distinguishes steady, active-now, protective, Shadow, Gift, repressed, overextended, and integrated possibilities without turning them into fixed identities.
+3. **See what happens between people.** Permission-bound relationship and system context keeps each person distinct and examines the interaction itself.
+4. **See what keeps the pattern going—and what could change it.** Sovereign examines supported roles, responsibility, authority, pressure, observations, unknowns, Alignment, repair, and a testable change in conditions.
+
+The compact product explanation is:
+
+`Sovereign helps you see the capacity beneath a pattern, how it may be expressing, what happens between people, and what may be keeping the pattern in place—so you can see what could change.`
+
+This is an explanatory lens, not a new feature, score, diagnosis, causal model, or top-level product. Do not name it the Emotional Field Model in the interface. The established product objects remain Baseline, Expression Field, People, Systems, Library, and Worlds.
+
+### Responsibility boundary
+
+Use these distinctions wherever interaction or recurrence is discussed:
+
+- contribution is not causation;
+- feedback is not blame;
+- understanding a pattern does not make harm mutual;
+- another person's motive, exact emotion, or private state remains unknown unless that person supplies it;
+- safety takes precedence over pattern analysis when abuse, coercion, immediate danger, or a serious power imbalance is present.
+
 A public visitor should understand the interaction before learning framework terminology:
 
 - ask Sovereign a natural-language question;
@@ -30,6 +57,8 @@ Baseline Design is the personal intelligence foundation. It gives Sovereign a co
 `Healing isn’t optional. Holding the pain is.`
 
 Use the emotional statement only after the product category and interaction are clear. It is not a therapy claim, diagnosis, required reconciliation, or guaranteed outcome.
+
+On the founder-locked root landing, the approved visual sequence places this statement in the hero. The supporting copy immediately below it must make the product and Sovereign lens understandable. Do not create a second competing hero in another language document.
 
 ### Enduring brand line
 
@@ -110,11 +139,11 @@ Covenant answers use **Biblical parallel**, **Scripture**, **Teaching**, **Appli
 
 ## Public page copy
 
-Hero:
+Root landing supporting copy:
 
 - Kicker: `PERSONAL AI FOR REAL LIFE`
-- Headline: `Ask about your life. Get an answer built around you.`
-- Body: `Sovereign.OS is a private personal AI for understanding yourself, your relationships, and the decisions in front of you. Build your Baseline once, then ask naturally and receive answers grounded in the person asking.`
+- Founder hero: `Healing isn’t optional. Holding onto the pain is.`
+- Body: `Sovereign begins with the capacity beneath a pattern. It shows how that capacity may be expressing, what happens between people, and what may be keeping the pattern in place—so you can see what could change.`
 - Primary action: `Build my Baseline`
 - Secondary action: `See a Sovereign answer`
 - Trust line: `Start free · No card required · Review, correct, or reject any interpretation`

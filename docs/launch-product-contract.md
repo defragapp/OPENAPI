@@ -6,6 +6,15 @@ Status: canonical implementation and approval boundary.
 
 Sovereign.OS is a Baseline-first AI platform for self, relationship, and system intelligence. The launch candidate must provide useful personal exploration without an incident and real permission-bound multi-user behavior.
 
+The platform uses one explanatory lens across every applicable surface:
+
+1. capacity beneath the pattern;
+2. how the capacity may be expressing;
+3. what happens between people;
+4. what may keep the pattern going and what could change it.
+
+This lens must be implemented through existing Baseline, Expression Field, answer, People, Systems, Library, and Worlds contracts. It must not become another top-level product, score, diagnosis, or claim of interpersonal causation.
+
 The approval candidate includes:
 
 - private Baseline creation with unknown birth time supported;
@@ -38,6 +47,8 @@ Every answer preserves the difference between:
 
 The main answer uses plain language. Exact source values appear only in Basis.
 
+For a recurring-pattern question, an applicable answer must connect the useful capacity, its observable expression, the interaction or system when other people are involved, and the supported conditions that may reinforce or change the pattern. Contribution is not causation, feedback is not blame, and harm must never be reframed as mutual merely because more than one person is present.
+
 ## Baseline accuracy
 
 The exact source contract may include natal body, sign, numeric longitude, display degree, retrograde state, verified aspects and orb, partial Human Design personality gate and line activations, partial Gene Keys activation numbers, numerology, computation version, uncertainty, provenance, exact current positions, and deterministic current or pair contacts.
@@ -48,7 +59,7 @@ The Baseline facet profile is versioned, validated, interpretive, and tied to ex
 
 ## Expression Field and Worlds
 
-The Expression Field is a deterministic, authenticated representation of relative expression salience derived from permitted Baseline facets. It is not emotion detection, diagnosis, compatibility scoring, or an AI-authored artwork layer.
+The Expression Field is a deterministic, authenticated representation of relative expression emphasis derived from permitted Baseline facets. It answers how a capacity may be expressing; it is not emotion detection, diagnosis, compatibility scoring, calibrated psychological measurement, or an AI-authored artwork layer.
 
 The Worlds chain is:
 

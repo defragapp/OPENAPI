@@ -52,23 +52,23 @@ const DUO_BASELINE: readonly EvidenceGroup[] = [
 const SELF_FLOW: readonly WorkflowStep[] = [
   {
     kind: 'input',
-    title: 'Reading your Baseline',
-    body: 'Sovereign brings forward the qualities connected to responsibility, steadiness, and pressure.'
+    title: 'Seeing the capacity beneath it',
+    body: 'Sovereign brings forward the useful capacity connected to responsibility, steadiness, and pressure.'
   },
   {
     kind: 'read',
-    title: 'Finding the pattern',
-    body: 'When uncertainty rises, becoming the responsible one may restore a sense of order.',
+    title: 'Seeing how it is expressing',
+    body: 'When uncertainty rises, the capacity for steadiness may express as becoming responsible for everyone.',
     chips: ['GK 13.4', 'MARS · CANCER']
   },
   {
     kind: 'connect',
-    title: 'Building the distinction',
-    body: 'Helping uses your capacity. Carrying the outcome makes you responsible for what you cannot control.'
+    title: 'Seeing what keeps it going',
+    body: 'Helping uses your capacity. Carrying the outcome can teach the group to return responsibility to you.'
   },
   {
     kind: 'direction',
-    title: 'Answering the real question',
+    title: 'Seeing what could change',
     body: 'Care can remain. Ownership can return to the person it belongs to.'
   }
 ] as const;
@@ -95,8 +95,8 @@ function PersonalStory() {
   return (
     <section ref={sectionRef} id="how" className="landing-story landing-story--personal" data-viewport-section="personal">
       <div className="landing-story__shell">
-        <StoryHeading step="01 · You" title="See what keeps happening.">
-          Bring a real question. Sovereign reads the relevant parts of your Baseline, finds the pattern, and answers the deeper question underneath it.
+        <StoryHeading step="01 · You" title="See the capacity beneath the pattern.">
+          Bring a real question. Sovereign begins with the useful capacity underneath, then shows how it may be expressing under pressure.
         </StoryHeading>
         <div className="landing-story__stage" data-viewport-stage="personal">
           <ChatWindow title="Sovereign — Chat" surface="personal-chat">
@@ -145,8 +145,8 @@ function SystemStory() {
   return (
     <section ref={sectionRef} id="system" className="landing-story landing-story--system" data-viewport-section="system">
       <div className="landing-story__shell">
-        <StoryHeading step="03 · Your people" title="See the whole system.">
-          Map roles, responsibility, pressure, and recurring patterns across a family, team, or group.
+        <StoryHeading step="03 · Your people" title="See what keeps the pattern going—and what could change it.">
+          Map supported roles, responsibility, authority, pressure, and possible change across a family, team, or group.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--system" data-viewport-stage="system">
           <ChatWindow title="Sovereign — Family System" surface="system-map">

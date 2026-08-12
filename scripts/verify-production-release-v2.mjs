@@ -249,7 +249,7 @@ requireAll('restored landing stories', stories, [
   'surface="relationship-reasoning"',
   'surface="system-map"',
   'surface="system-reasoning"',
-  'Reading your Baseline',
+  'Seeing the capacity beneath it',
   'Keeping both people distinct',
   'Mapping the people',
   'v0-workflow-panel',

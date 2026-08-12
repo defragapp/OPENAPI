@@ -168,7 +168,7 @@ export function AccountExpressionField() {
               <div>
                 <span>YOUR BASELINE · LIVE CONTEXT</span>
                 <h2 id="expression-field-title">Expression Field</h2>
-                <p className="expression-field-introduction">A stable view of capacity, feeling, protection, and gift—shown without turning any expression into a verdict.</p>
+                <p className="expression-field-introduction">See how a Baseline capacity may be expressing—steady, active, protective, overextended, or at its best—without turning it into a verdict.</p>
               </div>
               <button type="button" onClick={() => setOpen(false)} aria-label="Close Expression Field">×</button>
             </header>
@@ -238,12 +238,12 @@ export function ExpressionFieldInstrument({
           onSelectAxis={selectAxis}
           resetSignal={resetSignal}
           draggable
-          ariaLabel="Rotatable Expression Field. Every line begins at one stable center. Line length shows relative expression salience, not a diagnosis or score."
+          ariaLabel="Rotatable Expression Field. Every line begins at one stable center. Line length shows qualitative expression emphasis, not a diagnosis, score, or exact measurement."
         />
         <span className="expression-field-origin-label">ONE CENTER · SIXTEEN EXPRESSIONS</span>
       </div>
 
-      {selectedAxis && <ExpressionAxisDetails axis={selectedAxis} showNumeric={variant === 'account'} />}
+      {selectedAxis && <ExpressionAxisDetails axis={selectedAxis} />}
 
       <ul className="sr-only" aria-label="Expression Field values">
         {snapshot.axes.map((axis) => (
@@ -271,7 +271,7 @@ export function ExpressionFieldInstrument({
   );
 }
 
-function ExpressionAxisDetails({ axis, showNumeric }: { axis: ExpressionAxisValue; showNumeric: boolean }) {
+function ExpressionAxisDetails({ axis }: { axis: ExpressionAxisValue }) {
   const state = expressionStateLabel(axis.state);
   return (
     <div className="expression-field-details" aria-live="polite">
@@ -282,7 +282,7 @@ function ExpressionAxisDetails({ axis, showNumeric }: { axis: ExpressionAxisValu
         </div>
         <div className="expression-field-measurement">
           <strong>{salienceLabel(axis.value)}</strong>
-          {showNumeric && <small>Relative expression · {axis.value}</small>}
+          <small>Relative emphasis</small>
         </div>
       </div>
       <p>{axis.activeNow ?? axis.summary}</p>

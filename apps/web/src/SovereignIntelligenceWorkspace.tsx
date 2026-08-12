@@ -102,11 +102,11 @@ type WorkspaceState = {
 };
 
 const surfaces: Array<{ name: Surface; label: string; description: string }> = [
-  { name: 'Today', label: 'Today', description: 'What is active now' },
-  { name: 'Explore', label: 'Explore', description: 'Understand any part of you' },
-  { name: 'People', label: 'People', description: 'Understand both sides' },
-  { name: 'Systems', label: 'Systems', description: 'See the whole group' },
-  { name: 'Library', label: 'Library', description: 'Keep useful understanding' },
+  { name: 'Today', label: 'Today', description: 'See how it may be expressing now' },
+  { name: 'Explore', label: 'Explore', description: 'See the capacity beneath a pattern' },
+  { name: 'People', label: 'People', description: 'See what happens between you' },
+  { name: 'Systems', label: 'Systems', description: 'See what keeps the pattern going' },
+  { name: 'Library', label: 'Library', description: 'Keep what could change it' },
   { name: 'You', label: 'You', description: 'Baseline, plan, and control' }
 ];
 
@@ -767,7 +767,7 @@ function BaselineBuilder({ api, onCancel, onComplete }: {
       <div className="baseline-builder-layout">
         <div className="baseline-builder-main">
           <h1 id="baseline-builder-title">Build your Baseline.</h1>
-          <p>These details create the private personal foundation Sovereign uses across self, decisions, relationships, and systems.</p>
+          <p>These details create the private foundation Sovereign uses to see the capacity beneath patterns across self, decisions, relationships, and systems.</p>
 
           {step === 1 && (
             <form onSubmit={continueFromDetails} className="baseline-step-form">
@@ -913,7 +913,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   if (surface === 'Explore') return <ExploreHome workspace={workspace} />;
   if (surface === 'People') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="People" title="Understand the relationship from both sides." body="Choose someone who has connected their account and permitted comparison, or invite a person to begin." />
+      <SurfaceHeading kicker="People" title="See what happens between you." body="With permission, keep both people distinct while examining the interaction, what each person can own, and what still needs to be asked directly." />
       {selectedPerson
         ? <RelationshipOverview person={selectedPerson} api={api} />
         : <EmptyState title="Bring one relationship into view." body="A name alone does not create access. The other person connects their account and chooses what Sovereign may use." action="Invite or choose someone" onAction={onOpenContext} />}
@@ -921,7 +921,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   );
   if (surface === 'Systems') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="Systems" title="See how the whole group functions." body="Choose a family, household, team, workplace, friendship group, or custom system. Keep roles, authority, responsibility, pressure, and perspective in view." />
+      <SurfaceHeading kicker="Systems" title="See what keeps the pattern going—and what could change it." body="Choose a permitted group and keep roles, authority, responsibility, pressure, observations, and missing perspectives in view." />
       {selectedSystem
         ? <SystemOverview system={selectedSystem} api={api} />
         : <EmptyState title="Bring the whole structure into view." body="Choose a permitted group to see supported roles, authority, responsibility, pressure, and the perspectives that remain missing." action="Choose a system" onAction={onOpenContext} />}
@@ -929,7 +929,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   );
   if (surface === 'Library') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="Library" title="Keep what changes your understanding." body="Return to useful Baseline insights, alignment distinctions, relationship understandings, and system views. Library is not a journal or transcript archive." />
+      <SurfaceHeading kicker="Library" title="Keep the distinction that could change the pattern." body="Return to useful Baseline capacities, expression distinctions, relationship understandings, and system views. Library is not a journal or transcript archive." />
       <LibraryGrid library={workspace.library} onPrompt={onPrompt} />
     </div>
   );
@@ -986,8 +986,8 @@ function TodayFacetView({ facets, current, registry }: { facets: Json[]; current
     <section className="today-facet-view">
       <header>
         <p>Today</p>
-        <h1>Your Baseline is active.</h1>
-        <span>Ask what you actually want to understand. Sovereign can begin with what remains steady without requiring temporary current context.</span>
+        <h1>Begin with what remains steady.</h1>
+        <span>See the capacity beneath what is happening, then distinguish anything that may be expressing more strongly today.</span>
       </header>
       <p className="today-steady"><strong>What remains steady</strong>{core?.description ?? 'Your validated Baseline remains available beneath the conversation.'}</p>
       <p className="today-current" data-state={current?.status ?? 'not_started'}><strong>Temporary current context</strong>{active ? `${active.title} is supported as temporarily more relevant. It does not determine your behavior.` : current?.status === 'ready' ? `On${current?.reduced?.expiresAt ? ` until ${formatCurrentExpiry(current.reduced.expiresAt)}` : ''}. No temporary factor is being elevated above your stable Baseline here.` : current?.status === 'expired' ? 'Expired. It will not be shown as live or used until you refresh it.' : current?.status === 'unavailable' ? 'Unavailable. Your stable Baseline remains unchanged.' : 'Off. Your stable Baseline remains available.'}</p>
@@ -1002,7 +1002,7 @@ function ExploreHome({ workspace }: { workspace: WorkspaceState }) {
     : [];
   return (
     <div className="surface-home explore-home">
-      <SurfaceHeading kicker="Explore" title="Ask what you actually want to understand." body="Sovereign will determine whether the question calls for your stable Baseline, Shadow and Gift, Alignment, a decision pattern, or temporary current context." />
+      <SurfaceHeading kicker="Explore" title="See the capacity beneath the pattern." body="Ask what you actually want to understand. Sovereign can distinguish the capacity, its expression, the relevant interaction or system, and what could change—without forcing every question into all four parts." />
       <BasisStrip values={registry} />
     </div>
   );

@@ -8,6 +8,8 @@ The experience hierarchy is:
 
 `Exact Baseline source data → Baseline facets → Expression Field → World spatial spec → illustrative World`
 
+Worlds preserves the same explanatory movement as the rest of Sovereign: capacity beneath the pattern → possible expression → interaction → continuation or changed conditions. It spatializes that movement; it does not add a second interpretation.
+
 Question-specific synthesis selects what deserves attention. It does not rewrite exact source values or invent new Expression Field measurements.
 
 Temporary current context may change emphasis for a limited time. It never changes the stable Baseline or establishes identity, motive, behavior, emotion, or outcome.
@@ -49,7 +51,7 @@ A World spatial spec must never contain raw birth input, exact private location,
 
 `expression-field.v1` remains the structural visual source beneath Worlds.
 
-The 16 stable expression axes retain their registry identity and stable directions. A World may spatialize selected expressions, but it must not change the meaning of the underlying field or present relative expression salience as a measured psychological score.
+The 16 stable expression axes retain their registry identity and stable directions. A World may spatialize selected expressions, but it must not change the meaning of the underlying field or present relative expression emphasis as a measured psychological score.
 
 Useful spatial translations include:
 
@@ -166,3 +168,5 @@ Provide:
 The World is valuable only when it makes a supported distinction easier to notice.
 
 If a scene merely decorates the answer, duplicates the prose, or invents psychological certainty, do not render it.
+
+A World must never make interpersonal harm appear mutually caused merely because it visualizes feedback. Contribution is not causation, feedback is not blame, and supported safety boundaries remain visible in every state.

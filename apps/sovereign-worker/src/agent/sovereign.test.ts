@@ -13,6 +13,10 @@ describe('Sovereign runtime behavior contract', () => {
     expect(sovereignRuntimePromptV2).toContain('Do not turn every answer into an action plan');
     expect(sovereignRuntimePromptV2).toContain('Shadow and Gift');
     expect(sovereignRuntimePromptV2).toContain('Alignment is not a score');
+    expect(sovereignRuntimePromptV2).toContain('See the capacity beneath the pattern.');
+    expect(sovereignRuntimePromptV2).toContain('See how that capacity may be expressing.');
+    expect(sovereignRuntimePromptV2).toContain('See what happens between people or across the system.');
+    expect(sovereignRuntimePromptV2).toContain('See what may keep the pattern going—and what could change it.');
   });
 
   it('keeps exact data, interpretation, current context, and synthesis separate', () => {

@@ -55,7 +55,7 @@ describe('founder v0 public production release', () => {
       'Ask about your life.',
       'Understand what happens',
       'From one person',
-      'Reading your Baseline',
+      'Seeing the capacity beneath it',
       'Keeping both people distinct',
       'Mapping the people',
       'surface="personal-chat"',

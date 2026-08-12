@@ -157,7 +157,21 @@ export function parseSovereignAnswer(raw: string, registry: BasisRegistryItem[])
       }
     }
   }
+  validatePatternLensCoherence(parsed);
   return trimAnswer(parsed);
+}
+
+function validatePatternLensCoherence(answer: SovereignAnswerV2): void {
+  const ids = new Set(answer.sections.map((section) => section.id));
+  const includesExpression = ids.has('shadow') || ids.has('gift') || ids.has('active_now');
+  const includesInteraction = ids.has('interaction') || ids.has('system');
+  if (!includesExpression || !includesInteraction) return;
+
+  for (const id of ['steady', 'responsibility', 'unknowns'] as const) {
+    if (!ids.has(id)) {
+      throw new Error(`A pattern answer that connects expression and interaction is missing ${id}`);
+    }
+  }
 }
 
 function requireSectionIds(answer: SovereignAnswerV2, required: Array<SovereignAnswerV2['sections'][number]['id']>): void {

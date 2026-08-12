@@ -39,6 +39,10 @@ function answer(overrides: Record<string, unknown> = {}) {
   });
 }
 
+function section(id: 'steady' | 'shadow' | 'interaction' | 'responsibility' | 'unknowns', label: string) {
+  return { id, label, body: `${label} remains a supported, correctable interpretation rather than a fixed verdict.` };
+}
+
 describe('sovereign-answer.v2', () => {
   it('validates a useful answer and attaches exact server-owned Basis values', () => {
     const parsed = parseSovereignAnswer(answer(), registry);
@@ -91,6 +95,26 @@ describe('sovereign-answer.v2', () => {
     ];
     expect(parseSovereignAnswer(answer({ mode: 'relationship', depth: 'deep', sections }), registry).mode)
       .toBe('relationship');
+  });
+
+  it('accepts a complete capacity, expression, interaction, and continuation lens', () => {
+    const sections = [
+      section('steady', 'The capacity'),
+      section('shadow', 'How it may be expressing'),
+      section('interaction', 'What happens between you'),
+      section('responsibility', 'What each person can own'),
+      section('unknowns', 'What remains unknown')
+    ];
+    expect(parseSovereignAnswer(answer({ sections }), registry).sections).toHaveLength(5);
+  });
+
+  it('rejects a partial pattern lens that joins expression to interaction without boundaries', () => {
+    const sections = [
+      section('shadow', 'How it may be expressing'),
+      section('interaction', 'What happens between you')
+    ];
+    expect(() => parseSovereignAnswer(answer({ sections }), registry))
+      .toThrow('A pattern answer that connects expression and interaction is missing steady');
   });
 
   it('requires both pressure overreach and observable Gift expression in shadow-and-gift mode', () => {

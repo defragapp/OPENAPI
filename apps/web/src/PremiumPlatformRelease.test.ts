@@ -81,7 +81,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Sovereign maps your Baseline, then translates what is happening within you, between people, and across the systems around you.');
+    expect(landing).toContain('Sovereign begins with the capacity beneath a pattern—showing how it may express, what happens between people, and what could change.');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('<RealLifeQuestions />');
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
@@ -109,19 +109,19 @@ describe('founder v0 selective visual port — approved public v8', () => {
   it('keeps one visible reasoning flow and uses context-specific relationship and system demonstrations', () => {
     expect(landing).toContain('<LandingProductStories />');
     for (const marker of [
-      'See what keeps happening.',
+      'See the capacity beneath the pattern.',
       'Understand what happens between you.',
-      'See the whole system.',
+      'See what keeps the pattern going—and what could change it.',
       'surface="personal-chat"',
       'surface="personal-reasoning"',
       'surface="relationship-chat"',
       'surface="relationship-reasoning"',
       'surface="system-map"',
       'surface="system-reasoning"',
-      'Reading your Baseline',
-      'Finding the pattern',
-      'Building the distinction',
-      'Answering the real question',
+      'Seeing the capacity beneath it',
+      'Seeing how it is expressing',
+      'Seeing what keeps it going',
+      'Seeing what could change',
       'Keeping both people distinct',
       'Clarity may take time.',
       'Clarity may arrive quickly.',

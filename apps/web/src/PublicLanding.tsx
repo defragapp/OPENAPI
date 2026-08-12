@@ -101,10 +101,10 @@ function V0Hero() {
           </em>
         </h1>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
-          Sovereign maps your Baseline, then translates what is happening within you, between people, and across the systems around you.
+          Sovereign begins with the capacity beneath a pattern—showing how it may express, what happens between people, and what could change.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
-          Sovereign maps your Baseline, then translates what is happening within you, between people, and around you.
+          See the capacity beneath a pattern, how it may express, what happens between people, and what could change.
         </p>
         <div className="sovereign-opening-actions">
           <a className="landing-control landing-control--primary" href="/signup">
@@ -206,7 +206,7 @@ function FinalCallToAction() {
       <h2 aria-label="Your thoughts deserve a better place to live.">
         Your thoughts<br />deserve<br />a better place to live.
       </h2>
-      <p>Build your Baseline. Bring your real questions. See what changes when the answer begins with who you are.</p>
+      <p>Build your Baseline. Bring your real questions. See what is underneath, what keeps happening, and what could change.</p>
       <a className="landing-control landing-control--primary" href="/signup">
         <span>Build my Baseline</span><ArrowIcon />
       </a>

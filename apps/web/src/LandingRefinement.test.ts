@@ -49,7 +49,7 @@ describe('approved public landing v8', () => {
     expect(landing).toContain('Why do we keep having the same fight?');
     expect(landing).toContain('<MobileCapabilityRail />');
     expect(landing).toContain('sovereign-opening-capabilities');
-    expect(landing).toContain('Sovereign maps your Baseline, then translates what is happening within you, between people, and around you.');
+    expect(landing).toContain('See the capacity beneath a pattern, how it may express, what happens between people, and what could change.');
     expect(landing).toContain('Private. Secure. Yours.');
     expect(landing).toContain('v0-mobile-menu');
     expect(landing).toContain('title={<BrandMark />}');
@@ -69,7 +69,7 @@ describe('approved public landing v8', () => {
       'onPointerDown={handlePointerDown}',
       'onPointerMove={handlePointerMove}',
       'landing-expression-slice__readout',
-      'Relative reach',
+      'relative emphasis',
       'buildSphereGrid',
       'requestAnimationFrame'
     ]) expect(field).toContain(marker);
@@ -83,9 +83,9 @@ describe('approved public landing v8', () => {
 
   it('uses one reasoning flow, relationship perspective context, and a map-first system view', () => {
     for (const marker of [
-      'See what keeps happening.',
+      'See the capacity beneath the pattern.',
       'Understand what happens between you.',
-      'See the whole system.',
+      'See what keeps the pattern going—and what could change it.',
       'surface="personal-chat"',
       'surface="personal-reasoning"',
       'surface="relationship-chat"',
@@ -94,10 +94,10 @@ describe('approved public landing v8', () => {
       'surface="system-reasoning"'
     ]) expect(renderedStories).toContain(marker);
     for (const marker of [
-      'Reading your Baseline',
-      'Finding the pattern',
-      'Building the distinction',
-      'Answering the real question',
+      'Seeing the capacity beneath it',
+      'Seeing how it is expressing',
+      'Seeing what keeps it going',
+      'Seeing what could change',
       'Keeping both people distinct',
       'Clarity may take time.',
       'Clarity may arrive quickly.',

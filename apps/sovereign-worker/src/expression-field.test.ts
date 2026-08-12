@@ -54,6 +54,13 @@ describe('Expression Field derivation', () => {
     expect(live!.state).toBe('unconfirmed');
   });
 
+  it('derives stable emphasis from permitted facet support rather than an axis-name hash', () => {
+    const first = buildExpressionAxisValues({ facets });
+    const second = buildExpressionAxisValues({ facets });
+    expect(first).toEqual(second);
+    expect(first.every((axis) => axis.baselineValue >= 28 && axis.baselineValue <= 76)).toBe(true);
+  });
+
   it('is deterministic for an unchanged Baseline facet profile', () => {
     expect(buildExpressionAxisValues({ facets })).toEqual(buildExpressionAxisValues({ facets }));
   });

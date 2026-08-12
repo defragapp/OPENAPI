@@ -14,6 +14,8 @@ Canonical repository: `defragapp/OPENAPI`.
 
 Sovereign.OS is a Baseline-first AI platform for understanding yourself, your relationships, and the human systems around you. One Sovereign agent helps a person explore a structured Baseline, distinguish stable qualities from temporary current context, compare consented Baselines, examine Alignment, and understand families, households, teams, friendships, and workplaces.
 
+The platform uses one explanatory movement across those capabilities: see the capacity beneath a pattern, see how that capacity may be expressing, see what happens between people, and see what may keep the pattern going and what could change it. This is implemented through the existing Baseline, Expression Field, answer, People, Systems, Library, and Worlds contracts; it is not a separate product or claim of interpersonal causation.
+
 Defrag, Alignment, and Covenant are internal capabilities of one agent. They are not separate top-level applications.
 
 The founder-approved public contract is defined in [`docs/launch-product-contract.md`](docs/launch-product-contract.md). The Layer A–D intelligence model, `sovereign-answer.v2`, and exact Basis contract are defined in [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md).

@@ -417,7 +417,7 @@ function BaselineFormView({
     <>
       <p className="eyebrow">BUILD YOUR BASELINE</p>
       <h1>Create the personal foundation Sovereign uses.</h1>
-      <p className="plan-intro">Add the birth details you know. Sovereign.OS uses them to calculate your Baseline, then translates the result into plain language you can explore and correct.</p>
+      <p className="plan-intro">Add the birth details you know. Sovereign.OS uses them to calculate your Baseline—the private foundation for seeing the capacity beneath patterns in plain language you can explore and correct.</p>
       {notice && <p className="plan-status baseline-retry-status" role="status" aria-live="polite">{notice}</p>}
 
       <form className="baseline-onboarding-form" onSubmit={onSubmit} noValidate>

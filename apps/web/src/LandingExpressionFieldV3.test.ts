@@ -92,7 +92,7 @@ describe('premium rotating public Expression Field v3', () => {
       'MIN_AXIS_LENGTH',
       'MAX_AXIS_LENGTH',
       'Math.pow(normalized, 1.32)',
-      'Relative reach',
+      'relative emphasis',
       'landing-expression-slice__readout',
       'data-field-geometry="spherical-360"',
       'buildSphereGrid',
@@ -115,6 +115,7 @@ describe('premium rotating public Expression Field v3', () => {
     expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(field).not.toContain('giftExpression');
     expect(field).not.toContain('shadowExpression');
+    expect(field).not.toMatch(/Reach \{selected\.axis\.value\}|Relative reach \$\{axis\.value\}/);
     expect(heroExtension).toContain('.landing-expression-slice__tooltip');
     expect(heroExtension).toContain('display: none !important');
     expect(cohesionRefinement).toContain('.public-approved-v8 .landing-expression-slice__tooltip');

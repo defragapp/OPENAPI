@@ -97,7 +97,7 @@ export async function handleExpressionFieldRequest(request: Request, env: Env): 
     axes,
     basis,
     limitations: [
-      'Values show relative expression salience within your own field, not a diagnosis, personality score, or exact measurement of emotion.',
+      'The field uses qualitative expression-emphasis buckets. Renderer values position the visualization; they are not psychological scores or exact measurements of emotion.',
       'Current conditions may change which expressions are more visible, but they do not determine identity, behavior, or another person’s internal state.',
       'Gift, protective or shadow, repressed, and overextended expressions are possibilities for reflection until you confirm how the quality is actually operating.'
     ]
@@ -145,12 +145,16 @@ function buildAxis(input: {
   const allowedFacetIds = axisFacetMap[input.id];
   const mappedFacets = input.facets.filter((facet) => typeof facet.id === 'string' && allowedFacetIds.includes(facet.id));
   const basisRefs = unique(mappedFacets.flatMap((facet) => stringArray(facet.basisRefs)));
-  const seedSource = mappedFacets.map((facet) => [
-    facet.id,
-    facet.uncertainty,
-    stringArray(facet.basisRefs).sort()
-  ]);
-  const baselineValue = clamp(34 + (stableHash(`${input.id}:${JSON.stringify(seedSource)}`) % 31) + Math.min(6, basisRefs.length * 2), 28, 72);
+  const supportWeight = mappedFacets.reduce((total, facet) => {
+    if (facet.uncertainty === 'low') return total + 8;
+    if (facet.uncertainty === 'medium') return total + 5;
+    return total + 2;
+  }, 0);
+  const baselineValue = clamp(
+    30 + Math.min(28, mappedFacets.length * 8) + Math.min(12, basisRefs.length * 3) + Math.min(8, supportWeight),
+    28,
+    76
+  );
   const active = mappedFacets.some((facet) => typeof facet.id === 'string' && input.activeFacetIds.has(facet.id));
   const currentDelta = input.currentReady && active
     ? clamp(6 + Math.min(12, input.contactCount * 2), 0, 18)
@@ -259,15 +263,6 @@ function unique(values: string[]): string[] {
 
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.max(minimum, Math.min(maximum, Math.round(value)));
-}
-
-function stableHash(value: string): number {
-  let hash = 2166136261;
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
 }
 
 function firstText(facets: Record<string, unknown>[], key: string): string | undefined {

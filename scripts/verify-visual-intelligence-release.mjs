@@ -138,7 +138,7 @@ requireAll('isolated landing demonstrations', stories, [
   'surface="relationship-reasoning"',
   'surface="system-map"',
   'surface="system-reasoning"',
-  'Reading your Baseline',
+  'Seeing the capacity beneath it',
   'Keeping both people distinct',
   'Mapping the people',
   'Illustrative permitted Baselines',

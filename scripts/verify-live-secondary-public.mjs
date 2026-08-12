@@ -63,7 +63,7 @@ assert(howItWorks.includes('This progress is user-visible context—not hidden m
 assert(howItWorks.includes('class="launch-section worlds-proof-section"'), '/how-it-works is missing the Worlds product proof');
 assert(howItWorks.includes('See the pattern. Then step into it.'), '/how-it-works is missing the Worlds positioning');
 assert(howItWorks.includes('src="/worlds-how-it-works.svg"'), '/how-it-works is missing the Worlds illustration');
-assert(howItWorks.includes('relative expression salience'), '/how-it-works is missing the Expression Field measurement boundary');
+assert(howItWorks.includes('qualitative expression emphasis'), '/how-it-works is missing the Expression Field measurement boundary');
 assert(howItWorks.includes('A peek into the structure—not a literal place, prediction, or spiritual portal.'), '/how-it-works does not keep the World illustration boundary explicit');
 assert(howItWorks.includes('class="launch-section support-note-section"'), '/how-it-works is missing the reduced-prominence support note');
 assert(!howItWorks.includes('Help fund continued public development.'), '/how-it-works still gives development support primary-page prominence');

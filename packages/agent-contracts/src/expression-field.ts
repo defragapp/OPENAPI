@@ -121,6 +121,11 @@ export function salienceLabel(value: number): 'Quiet' | 'Present' | 'More active
   return 'Highly emphasized';
 }
 
+/** User-facing language for the qualitative emphasis represented by renderer values. */
+export function expressionEmphasisLabel(value: number): ReturnType<typeof salienceLabel> {
+  return salienceLabel(value);
+}
+
 export function expressionStateLabel(state: ExpressionState): string {
   switch (state) {
     case 'gift': return 'Gift expression';

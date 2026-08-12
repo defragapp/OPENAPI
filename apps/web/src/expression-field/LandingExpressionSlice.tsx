@@ -273,7 +273,7 @@ export function LandingExpressionSlice() {
                   role="button"
                   tabIndex={0}
                   aria-pressed={selectedLine}
-                  aria-label={`${axis.label}. ${salienceLabel(axis.value)}. Relative reach ${axis.value}. Baseline ${axis.baselineValue}. Temporary change ${formatDelta(axis.currentDelta)}. ${description}`}
+                  aria-label={`${axis.label}. ${salienceLabel(axis.value)} relative emphasis. ${axis.currentDelta !== 0 ? 'Temporarily more active. ' : ''}${description}`}
                   onFocus={() => selectAxis(axis.id)}
                   onClick={(event) => {
                     event.stopPropagation();
@@ -328,27 +328,26 @@ export function LandingExpressionSlice() {
             />
             <text className="landing-expression-slice__tooltip-title" x="13" y="21">{selected.axis.label}</text>
             <text className="landing-expression-slice__tooltip-value" x="13" y="40">
-              Reach {selected.axis.value} · {salienceLabel(selected.axis.value)}
+              {salienceLabel(selected.axis.value)} · relative emphasis
             </text>
             <text className="landing-expression-slice__tooltip-meta" x="13" y="55">
-              Baseline {selected.axis.baselineValue}{selected.axis.currentDelta !== 0 ? ` · temporary ${formatDelta(selected.axis.currentDelta)}` : ''}
+              Baseline expression{selected.axis.currentDelta !== 0 ? ' · active now' : ''}
             </text>
           </g>
         </g>
       </svg>
 
       <div className="landing-expression-slice__readout landing-expression-slice__readout--accessible" role="status" aria-live="polite">
-        <span>Relative expression · sanitized example</span>
+        <span>Qualitative expression emphasis · sanitized example</span>
         <strong>{selected.axis.label}</strong>
         <p>{selected.description}</p>
         <small>
-          Relative reach {selected.axis.value} · Baseline {selected.axis.baselineValue}
-          {selected.axis.currentDelta !== 0 ? ` · temporary change ${formatDelta(selected.axis.currentDelta)}` : ''}
+          Baseline expression{selected.axis.currentDelta !== 0 ? ' · temporarily more active' : ''}
         </small>
       </div>
 
       <span className="landing-expression-slice__instructions">
-        Drag to rotate · select a line to inspect its relative reach
+        Drag to rotate · select a line to inspect how it may be expressing
       </span>
     </section>
   );
@@ -493,10 +492,6 @@ function placeTooltip(point: ProjectedPoint): TooltipPlacement {
 
 function pathFromPoints(points: ProjectedPoint[]) {
   return points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(' ');
-}
-
-function formatDelta(value: number) {
-  return value > 0 ? `+${value}` : String(value);
 }
 
 function radians(degrees: number) {

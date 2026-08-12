@@ -74,10 +74,10 @@ describe('secondary public visual parity', () => {
   it('adds one restrained product moment and reduces development-support prominence', () => {
     expect(howItWorks).toContain('class="product-proof-window"');
     expect(howItWorks).toContain('This progress is user-visible context—not hidden model reasoning.');
-    expect(howItWorks).toContain('Reading your Baseline');
-    expect(howItWorks).toContain('Finding the pattern');
-    expect(howItWorks).toContain('Building the distinction');
-    expect(howItWorks).toContain('Answering the real question');
+    expect(howItWorks).toContain('Seeing the capacity beneath it');
+    expect(howItWorks).toContain('Seeing how it is expressing');
+    expect(howItWorks).toContain('Seeing what keeps it going');
+    expect(howItWorks).toContain('Seeing what could change');
     expect(howItWorks).toContain('class="launch-section support-note-section"');
     expect(howItWorks).not.toContain('Help fund continued public development.');
     expect(staticCss).toContain('.product-proof-window');

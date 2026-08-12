@@ -43,6 +43,9 @@ These instructions apply to the entire OPENAPI repository.
 - Alignment is a structured comparison, never a score, gauge, or model-text sentiment calculation.
 - The canonical authenticated implementation is `SovereignIntelligenceWorkspace`.
 - Visual explanation must come from Baseline facets, Shadow and Gift, Alignment, relationships, systems, current context, and exact Basis data.
+- `docs/product-language-system.md` is the single source of truth for user-facing product language. Other documents may explain or enforce it but must not define a competing hero or product promise.
+- Across applicable self, relationship, system, Library, Expression Field, and Worlds surfaces, preserve one explanatory movement: capacity beneath the pattern → how the capacity may be expressing → what happens between people → what may keep the pattern going and what could change.
+- This movement is not another named framework or top-level product. Contribution is not causation, feedback is not blame, and pattern analysis must never mutualize harm.
 
 ## Typography contract
 - Treat `apps/web/src/typography-system.css` as the platform-wide typography source of truth.
