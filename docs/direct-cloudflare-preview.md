@@ -33,7 +33,7 @@ Configure:
 - `CLOUDFLARE_WORKERS_SUBDOMAIN=sovereign-os-api`
 - `AI_PROVIDER=cloudflare-gateway`
 - `AI_MODEL=@cf/zai-org/glm-4.7-flash`
-- `AI_GATEWAY_ID=sovereign`
+- `AI_GATEWAY_ID=sovereign-ai-gateway`
 
 Turnstile, email, and Stripe test-mode settings may be added for authenticated acceptance testing. Never attach live Stripe credentials to preview.
 

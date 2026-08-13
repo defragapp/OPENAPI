@@ -11,7 +11,7 @@ Configure preview and production separately. Do not reuse production IDs in loca
 - D1 read replication: automatic mode in production.
 - Durable Object: `ThreadCoordinator` for turn ordering.
 - AI binding: `AI` with `AI_PROVIDER=cloudflare-gateway`.
-- AI Gateway: `AI_GATEWAY_ID=sovereign`.
+- AI Gateway: `AI_GATEWAY_ID=sovereign-ai-gateway`.
 - Workers AI model: `AI_MODEL=@cf/zai-org/glm-4.7-flash`.
 - Global free-capacity ledger: migration `0013_workers_ai_free_capacity`.
 - SOVV adapter: service binding or authenticated internal URL plus contract version `1`.

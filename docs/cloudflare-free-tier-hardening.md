@@ -99,7 +99,7 @@ A turn is reserved atomically before generation. When generation fails, the mont
 
 ## AI Gateway and per-IP protection
 
-The deploy script updates and verifies the existing `sovereign` gateway with:
+The deploy script updates and verifies the existing `sovereign-ai-gateway` gateway with:
 
 - 50 requests per 60 seconds;
 - sliding rate-limit technique;

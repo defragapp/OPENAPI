@@ -148,7 +148,7 @@ describe('production mobile and responsive experience', () => {
     for (const marker of [
       'v0-wordmark--mobile',
       'v0-mobile-menu',
-      'Sovereign maps your Baseline, then translates what is happening within you, between people, and around you.',
+      'See the capacity beneath a pattern, how it may express, what happens between people, and what could change.',
       'Private. Secure. Yours.',
       '<MobileCapabilityRail />',
       'Understand yourself',
@@ -167,7 +167,7 @@ describe('production mobile and responsive experience', () => {
     expect(productionReadinessCss).toContain('min-height: max(660px');
     expect(productionReadinessCss).toContain('width: min(660px, 165vw)');
     expect(productionReadinessCss).not.toContain('220vw');
-    expect(landing).toContain('Sovereign maps your Baseline, then translates what is happening within you, between people, and across the systems around you.');
+    expect(landing).toContain('Sovereign begins with the capacity beneath a pattern—showing how it may express, what happens between people, and what could change.');
     expect(stories).toContain('id="relationship"');
     expect(stories).toContain('id="system"');
   });

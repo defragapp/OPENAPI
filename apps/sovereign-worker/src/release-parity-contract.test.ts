@@ -39,6 +39,7 @@ describe('production release parity contract', () => {
     expect(runtime).toContain("migrationParity: migrationParity ? 'current' : 'behind'");
     expect(runtime).toContain('&& migrationParity');
     expect(runtime).toContain("status: pathname === '/ready' && !ready ? 503 : 200");
+    expect(runtime).toContain("...(pathname === '/ready' ? { sha: env.APP_VERSION } : {})");
     expect(runtime).toContain('migrationVersion,');
     expect(runtime).toContain('latestMigrationVersion: LATEST_MIGRATION_VERSION');
   });
@@ -119,6 +120,8 @@ describe('production release parity contract', () => {
     expect(runtime).toContain("import { readProductionReleaseEvidence } from './release-evidence'");
     expect(runtime).toContain('const releaseEvidence = await readProductionReleaseEvidence(env)');
     expect(runtime).toContain('releaseEvidence,');
+    expect(runtime).toContain("aiGatewayId: env.AI_GATEWAY_ID || 'missing'");
+    expect(runtime).toContain("publicContactEmail: env.PUBLIC_CONTACT_EMAIL || 'info@defrag.app'");
   });
 
   it('honors the Workers Free Quick Actions rate limit and validates the founder reference', () => {

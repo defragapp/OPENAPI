@@ -28,7 +28,7 @@ describe('shared Sovereign intelligence stage', () => {
 
   it('keeps expression, evidence, and actual experience distinct', () => {
     expect(field).toContain('Illustrative Baseline');
-    expect(field).toContain('Relative expression · sanitized example');
+    expect(field).toContain('Qualitative expression emphasis · sanitized example');
     expect(field).toContain('not a diagnosis, score, or claim about anyone’s internal state');
     expect(field).toContain('line length follows relative expression reach');
     expect(stories).toContain('With permission, Sovereign keeps both people distinct');

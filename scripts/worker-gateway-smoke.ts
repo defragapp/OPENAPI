@@ -100,13 +100,13 @@ function fakeEnv(): Env {
     async all() { return { results: [] }; }
   }; } }; } } as unknown as D1Database;
   return {
-    APP_ENV: 'test', APP_VERSION: 'worker-gateway-smoke', AI_PROVIDER: config.provider, AI_MODEL: config.model, AI_GATEWAY_ID: 'sovereign',
+    APP_ENV: 'test', APP_VERSION: 'worker-gateway-smoke', AI_PROVIDER: config.provider, AI_MODEL: config.model, AI_GATEWAY_ID: 'sovereign-ai-gateway',
     STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db,
     THREADS: { idFromName: (name: string) => ({ name }) as DurableObjectId, get: () => ({ fetch: async () => Response.json({ sequence: ++seq, duplicate: false }) }) as unknown as DurableObjectStub } as unknown as DurableObjectNamespace,
     AI: { async run(model: string, input: unknown, options?: unknown) {
       if (model !== config.model) throw new Error(`invalid model ${redact(model)}`);
       const gateway = (options as any)?.gateway;
-      if (gateway?.id !== 'sovereign' || gateway?.skipCache !== true || gateway?.collectLog !== false || gateway?.metadata?.plan !== 'free' || gateway?.metadata?.response_contract !== 'sovereign-answer.v2' || !gateway?.metadata?.account_ref) throw new Error('invalid gateway metadata');
+      if (gateway?.id !== 'sovereign-ai-gateway' || gateway?.skipCache !== true || gateway?.collectLog !== false || gateway?.metadata?.plan !== 'free' || gateway?.metadata?.response_contract !== 'sovereign-answer.v2' || !gateway?.metadata?.account_ref) throw new Error('invalid gateway metadata');
       if (JSON.stringify(options).includes('acct_')) throw new Error('raw account id leaked');
       if (JSON.stringify(input).match(/"birthDate"|"birthTime"|"birthplace"|"latitude"|workspace\/SOVV/i)) throw new Error('private model input leaked');
       return { output_text: JSON.stringify({

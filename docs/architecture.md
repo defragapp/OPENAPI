@@ -158,7 +158,7 @@ The production deploy configures and verifies:
 
 ### AI Gateway
 
-- gateway ID: `sovereign`;
+- gateway ID: `sovereign-ai-gateway`;
 - cache TTL: zero;
 - persistent request-content logging: disabled;
 - global rate limit: 50 requests per 60 seconds;

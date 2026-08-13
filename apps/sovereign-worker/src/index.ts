@@ -33,6 +33,7 @@ async function healthPayload(env: Env) {
     .first<{ ok: number; capacity_ready: number }>();
   return {
     ok: db?.ok === 1,
+    sha: env.APP_VERSION,
     version: env.APP_VERSION,
     environment: env.APP_ENV,
     migrationVersion: '0013_workers_ai_free_capacity',
@@ -43,6 +44,7 @@ async function healthPayload(env: Env) {
       assets: env.ASSETS ? 'configured' : 'missing',
       ai: aiDependencyStatus(env),
       aiGateway: env.AI_GATEWAY_ID ? 'configured' : 'missing',
+      aiGatewayId: env.AI_GATEWAY_ID || 'missing',
       baselineEngine: baselineDependencyStatus(env),
       legacySovvAdapter: env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'disabled',
       stripe: env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET ? 'configured' : 'disabled',

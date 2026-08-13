@@ -23,6 +23,8 @@ const expectedObservability = {
     head_sampling_rate: 0.05
   }
 };
+const expectedGatewayId = 'sovereign-ai-gateway';
+const expectedPublicContact = 'info@defrag.app';
 
 function requireValue(condition, message) {
   if (!condition) throw new Error(message);
@@ -42,6 +44,8 @@ requireValue(rootConfig.workers_dev === false, 'Production Worker must be reacha
 requireValue(rootConfig.preview_urls === false, 'Versioned preview URLs must remain disabled');
 requireValue(rootConfig.vars?.APP_ENV === 'production', 'Root config must be production-only');
 requireValue(rootConfig.vars?.AI_MODEL === '@cf/zai-org/glm-4.7-flash', 'Production must use the Cloudflare-hosted free-tier model');
+requireValue(rootConfig.vars?.AI_GATEWAY_ID === expectedGatewayId, `Production must use AI Gateway ${expectedGatewayId}`);
+requireValue(rootConfig.vars?.PUBLIC_CONTACT_EMAIL === expectedPublicContact, `Production public contact must be ${expectedPublicContact}`);
 requireValue(rootConfig.d1_databases?.some((item) => item.binding === 'DB'), 'Root config is missing D1');
 requireValue(rootConfig.durable_objects?.bindings?.some((item) => item.name === 'THREADS'), 'Root config is missing Durable Object coordination');
 requireValue(rootConfig.ai?.binding === 'AI', 'Root config is missing Workers AI');
@@ -59,11 +63,13 @@ for (const pattern of ['defrag.app/*', 'www.defrag.app/*']) {
 requireValue(workerConfig.main === 'src/runtime-entry.ts', 'Worker must use the active OPENAPI runtime entry');
 requireValue(workerConfig.vars?.APP_ENV === 'development', 'Package-level Worker config must remain local-development only');
 requireValue(workerConfig.vars?.AI_MODEL === '@cf/zai-org/glm-4.7-flash', 'Local Worker must use the Cloudflare-hosted model');
+requireValue(workerConfig.vars?.AI_GATEWAY_ID === expectedGatewayId, `Local Worker must use AI Gateway ${expectedGatewayId}`);
 requireValue(preview?.name === 'sovereign-openapi-preview', 'Preview Worker name drifted');
 requireValue(preview?.workers_dev === true, 'Preview must deploy to workers.dev');
 requireValue(preview?.preview_urls === false, 'Versioned preview URLs must remain disabled');
 requireValue(preview?.vars?.APP_ENV === 'preview', 'Preview environment must be explicit');
 requireValue(preview?.vars?.AI_MODEL === '@cf/zai-org/glm-4.7-flash', 'Preview must use the Cloudflare-hosted model');
+requireValue(preview?.vars?.AI_GATEWAY_ID === expectedGatewayId, `Preview must use AI Gateway ${expectedGatewayId}`);
 requireValue(preview?.d1_databases?.some((item) => item.binding === 'DB'), 'Preview is missing D1');
 requireValue(preview?.durable_objects?.bindings?.some((item) => item.name === 'THREADS'), 'Preview is missing Durable Object coordination');
 requireValue(preview?.ai?.binding === 'AI', 'Preview is missing Workers AI');

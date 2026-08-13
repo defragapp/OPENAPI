@@ -146,7 +146,7 @@ describe('desktop and iOS production readiness v1', () => {
     ]) expect(buildDiagnostics).toContain(`['${stage}'`);
     expect(workerGatewaySmoke).toContain("provider=${config.provider}");
     expect(workerGatewaySmoke).toContain("contract=sovereign-answer.v2");
-    expect(workerGatewaySmoke).toContain("AI_GATEWAY_ID: 'sovereign'");
+    expect(workerGatewaySmoke).toContain("AI_GATEWAY_ID: 'sovereign-ai-gateway'");
   });
 
   it('keeps every release stylesheet structurally balanced', () => {

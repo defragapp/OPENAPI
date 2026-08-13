@@ -23,7 +23,7 @@ export async function configureCloudflareFreeTier(options = {}) {
   const accountId = String(options.accountId || process.env.CLOUDFLARE_ACCOUNT_ID || '').trim();
   const apiToken = String(options.apiToken || process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
   const databaseId = String(options.databaseId || process.env.D1_DATABASE_ID || '').trim();
-  const gatewayId = String(options.gatewayId || process.env.AI_GATEWAY_ID || 'sovereign').trim();
+  const gatewayId = String(options.gatewayId || process.env.AI_GATEWAY_ID || 'sovereign-ai-gateway').trim();
   const zoneName = String(options.zoneName || 'defrag.app').trim();
   if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required to configure free-tier controls');
   if (!apiToken) throw new Error('CLOUDFLARE_API_TOKEN is required to configure free-tier controls');

@@ -41,7 +41,7 @@ describe('mounted Account and Library controls', () => {
     expect(controls).toContain("new CustomEvent('sovereign:open-consent-controls')");
     expect(controls).toContain('https://sovereign.defrag.app/privacy');
     expect(controls).toContain('https://sovereign.defrag.app/terms');
-    expect(controls).toContain('mailto:info@sovereign.os');
+    expect(controls).toContain('mailto:info@defrag.app');
   });
 
   it('installs a reusable focus trap and restores focus after dialogs close', () => {

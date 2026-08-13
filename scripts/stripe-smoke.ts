@@ -22,7 +22,7 @@ function fakeEnv(): Env {
       };
     }
   } as unknown as D1Database;
-  return { APP_ENV: 'test', APP_VERSION: 'stripe-smoke', AI_PROVIDER: 'cloudflare-gateway', AI_MODEL: '@cf/zai-org/glm-4.7-flash', AI_GATEWAY_ID: 'sovereign', STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY: 'price_test_sovereign_monthly', STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL: 'price_test_sovereign_annual', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db, THREADS: {} as DurableObjectNamespace } as Env;
+  return { APP_ENV: 'test', APP_VERSION: 'stripe-smoke', AI_PROVIDER: 'cloudflare-gateway', AI_MODEL: '@cf/zai-org/glm-4.7-flash', AI_GATEWAY_ID: 'sovereign-ai-gateway', STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY: 'price_test_sovereign_monthly', STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL: 'price_test_sovereign_annual', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret', DB: db, THREADS: {} as DurableObjectNamespace } as Env;
 }
 
 async function main() {

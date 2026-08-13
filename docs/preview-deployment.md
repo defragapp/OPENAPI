@@ -15,7 +15,7 @@ Configure these values only in the secure preview environment:
 - `PREVIEW_BASE_URL`
 - `PREVIEW_SESSION_SIGNING_SECRET`
 - `AI_PROVIDER=cloudflare-gateway`
-- `AI_GATEWAY_ID=sovereign`
+- `AI_GATEWAY_ID=sovereign-ai-gateway`
 - `AI_MODEL=@cf/zai-org/glm-4.7-flash`
 - optional sanitized `SOVV_BASE_URL`
 - optional Stripe test-mode keys, price IDs, and return URLs

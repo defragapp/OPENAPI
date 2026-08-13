@@ -57,7 +57,7 @@ describe('Cloudflare Gateway answer adapter', () => {
       APP_VERSION: 'test',
       AI_PROVIDER: 'cloudflare-gateway',
       AI_MODEL: '@cf/zai-org/glm-4.7-flash',
-      AI_GATEWAY_ID: 'sovereign',
+      AI_GATEWAY_ID: 'sovereign-ai-gateway',
       STRIPE_SECRET_KEY: '',
       STRIPE_WEBHOOK_SECRET: '',
       SESSION_SIGNING_SECRET: 'test',
@@ -127,7 +127,7 @@ describe('Cloudflare Gateway answer adapter', () => {
     expect(calls[0]?.input).toMatchObject({ max_output_tokens: 3_200 });
     expect(calls[0]?.options).toMatchObject({
       gateway: {
-        id: 'sovereign',
+        id: 'sovereign-ai-gateway',
         skipCache: true,
         collectLog: false,
         metadata: { plan: 'free', response_contract: 'sovereign-answer.v2' }

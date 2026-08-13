@@ -133,7 +133,7 @@ function fakeEnv(): Env {
     APP_VERSION: 'product-smoke',
     AI_PROVIDER: 'cloudflare-gateway',
     AI_MODEL: '@cf/zai-org/glm-4.7-flash',
-    AI_GATEWAY_ID: 'sovereign',
+    AI_GATEWAY_ID: 'sovereign-ai-gateway',
     STRIPE_SECRET_KEY: '',
     STRIPE_WEBHOOK_SECRET: '',
     STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY: 'price_test_sovereign_monthly',

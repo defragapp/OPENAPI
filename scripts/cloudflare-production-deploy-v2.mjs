@@ -361,7 +361,7 @@ try {
   const missing = requiredSecrets.filter((name) => !configuredSecrets.has(name));
   if (missing.length) throw new Error(`Production secrets are missing from ${workerName}: ${missing.join(', ')}`);
 
-  const controls = await configureCloudflareFreeTier({ accountId, apiToken, databaseId, gatewayId: 'sovereign', zoneName: 'defrag.app' });
+  const controls = await configureCloudflareFreeTier({ accountId, apiToken, databaseId, gatewayId: 'sovereign-ai-gateway', zoneName: 'defrag.app' });
   const deployOutput = runWrangler(['deploy', '--config', generatedConfigPath]);
   const workersDevUrl = deployOutput.match(/https:\/\/[^\s]+\.workers\.dev/)?.[0] || null;
   const verification = await verifyLiveProduction();

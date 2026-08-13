@@ -36,7 +36,7 @@ describe('Sovereign account and workspace shell', () => {
   });
 
   it('keeps Today Baseline-first, qualified, and correction-ready', () => {
-    for (const phrase of ['Your Baseline is active.', 'What remains steady', 'Temporary current context', 'Not today']) {
+    for (const phrase of ['Your Baseline is ready.', 'What remains steady', 'Temporary current context', 'Not today']) {
       expect(workspace).toContain(phrase);
     }
     expect(workspace).toContain('It does not determine your behavior.');

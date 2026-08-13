@@ -75,7 +75,7 @@ async function configureProductionControls({ accountId, apiToken, databaseId }) 
     accountId,
     apiToken,
     databaseId,
-    gatewayId: 'sovereign',
+    gatewayId: 'sovereign-ai-gateway',
     zoneName: 'defrag.app'
   });
 }

@@ -14,7 +14,7 @@ The reviewed runtime configuration is:
 
 ```text
 AI_PROVIDER=cloudflare-gateway
-AI_GATEWAY_ID=sovereign
+AI_GATEWAY_ID=sovereign-ai-gateway
 AI_MODEL=@cf/zai-org/glm-4.7-flash
 AI_FREE_MONTHLY_TURNS=10
 AI_SOVEREIGN_PLUS_MONTHLY_TURNS=300
