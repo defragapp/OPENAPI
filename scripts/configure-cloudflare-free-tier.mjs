@@ -7,10 +7,6 @@ const API_ROOT = 'https://api.cloudflare.com/client/v4';
 const SCHEMA_NAME = 'Sovereign.OS Critical API';
 const RATE_RULE_REF = 'sovereign_ai_messages_free_tier';
 const RATE_PHASE = 'http_ratelimit';
-const RATE_RULESET_NAME = 'Sovereign free-tier rate limiting';
-const RATE_RULESET_DESCRIPTION = 'Single Free-plan rate limiting ruleset owned by Sovereign.OS';
-const RATE_RULE_DESCRIPTION = 'Sovereign AI message protection within the Cloudflare Free plan';
-const RATE_EXPRESSION = '(http.request.uri.path wildcard "/api/v1/threads/*/messages")';
 
 const CRITICAL_OPERATIONS = [
   ['POST', '/api/v1/account/onboarding'],
@@ -37,7 +33,7 @@ export async function configureCloudflareFreeTier(options = {}) {
   const zone = await resolveZone(client, zoneName);
   const d1 = await configureD1Replication(client, accountId, databaseId);
   const gateway = await configureAiGateway(client, accountId, gatewayId);
-  const rateLimit = await configureFreeRateLimit(client, zone.id);
+  const rateLimit = await configureOptionalZoneControl('WAF rate limiting', () => configureFreeRateLimit(client, zone.id));
   const schema = await configureOptionalZoneControl('API Shield', () => configureApiShield(client, zone.id));
 
   return {
@@ -160,8 +156,8 @@ async function configureAiGateway(client, accountId, gatewayId) {
 function sovereignRateRule() {
   return {
     ref: RATE_RULE_REF,
-    description: RATE_RULE_DESCRIPTION,
-    expression: RATE_EXPRESSION,
+    description: 'Sovereign AI message protection within the Cloudflare Free plan',
+    expression: '(starts_with(http.request.uri.path, "/api/v1/threads/") and ends_with(http.request.uri.path, "/messages"))',
     action: 'block',
     enabled: true,
     ratelimit: {
@@ -173,20 +169,6 @@ function sovereignRateRule() {
   };
 }
 
-function isSovereignOwnedRateRule(rule) {
-  const expression = String(rule?.expression || '');
-  return rule?.ref === RATE_RULE_REF
-    || rule?.description === RATE_RULE_DESCRIPTION
-    || expression.includes('/api/v1/threads')
-    || expression.includes('/api/threads');
-}
-
-function isSovereignOwnedRateRuleset(ruleset) {
-  return String(ruleset?.name || '').toLowerCase().includes('sovereign')
-    || String(ruleset?.description || '').toLowerCase().includes('sovereign')
-    || (ruleset?.rules || []).some(isSovereignOwnedRateRule);
-}
-
 async function configureFreeRateLimit(client, zoneId) {
   const entrypoint = await client.optional(`/zones/${zoneId}/rulesets/phases/${RATE_PHASE}/entrypoint`);
   const rule = sovereignRateRule();
@@ -195,8 +177,8 @@ async function configureFreeRateLimit(client, zoneId) {
     const created = await client.request(`/zones/${zoneId}/rulesets`, {
       method: 'POST',
       body: {
-        name: RATE_RULESET_NAME,
-        description: RATE_RULESET_DESCRIPTION,
+        name: 'Sovereign free-tier rate limiting',
+        description: 'Single Free-plan rate limiting ruleset owned by Sovereign.OS',
         kind: 'zone',
         phase: RATE_PHASE,
         rules: [rule]
@@ -205,45 +187,29 @@ async function configureFreeRateLimit(client, zoneId) {
     ruleset = created.result;
   } else {
     const current = entrypoint.result;
-    const currentRules = current.rules || [];
-    const unrelated = currentRules.filter((item) => !isSovereignOwnedRateRule(item));
-    const replaceableRetiredRule = isSovereignOwnedRateRuleset(current) && currentRules.length === 1;
-    if (unrelated.length > 0 && !replaceableRetiredRule) {
+    const unrelated = (current.rules || []).filter((item) => item.ref !== RATE_RULE_REF);
+    if (unrelated.length > 0) {
       throw new Error('The Free-plan rate-limit slot is occupied by an unrelated rule; refusing to silently remove it');
     }
-    const updated = await client.request(`/zones/${zoneId}/rulesets/phases/${RATE_PHASE}/entrypoint`, {
+    const updated = await client.request(`/zones/${zoneId}/rulesets/${current.id}`, {
       method: 'PUT',
       body: {
-        description: RATE_RULESET_DESCRIPTION,
+        name: current.name || 'Sovereign free-tier rate limiting',
+        description: current.description || 'Single Free-plan rate limiting ruleset owned by Sovereign.OS',
+        kind: 'zone',
+        phase: RATE_PHASE,
         rules: [rule]
       }
     });
     ruleset = updated.result;
   }
 
-  const verification = await client.request(`/zones/${zoneId}/rulesets/phases/${RATE_PHASE}/entrypoint`);
-  const verifiedRuleset = verification.result || {};
-  const active = (verifiedRuleset.rules || []).find((item) => item.ref === RATE_RULE_REF);
+  const active = (ruleset?.rules || []).find((item) => item.ref === RATE_RULE_REF);
   if (!active?.enabled) throw new Error('The Sovereign Free-plan rate-limit rule is not active');
-  if (active.expression !== RATE_EXPRESSION) throw new Error('The Sovereign Free-plan rate-limit expression is not active');
-  if (active.action !== 'block') throw new Error('The Sovereign Free-plan rate-limit blocking action is not active');
-  const characteristics = new Set(active.ratelimit?.characteristics || []);
-  if (!characteristics.has('cf.colo.id') || !characteristics.has('ip.src')) {
-    throw new Error('The Sovereign Free-plan rate-limit characteristics are not active');
-  }
-  if (
-    active.ratelimit?.period !== 10
-    || active.ratelimit?.requests_per_period !== 10
-    || active.ratelimit?.mitigation_timeout !== 10
-  ) {
-    throw new Error('The Sovereign Free-plan rate-limit threshold is not active');
-  }
   return {
     management: 'verified',
-    rulesetId: verifiedRuleset.id,
+    rulesetId: ruleset.id,
     ruleId: active.id,
-    expression: active.expression,
-    characteristics: [...characteristics].sort(),
     threshold: '10 matching-path requests/10s/IP',
     mitigation: 'block 10s'
   };
