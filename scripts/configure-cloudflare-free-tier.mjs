@@ -174,12 +174,16 @@ function sovereignRateRule() {
 }
 
 function isSovereignOwnedRateRule(rule) {
-  return rule?.ref === RATE_RULE_REF || rule?.description === RATE_RULE_DESCRIPTION;
+  const expression = String(rule?.expression || '');
+  return rule?.ref === RATE_RULE_REF
+    || rule?.description === RATE_RULE_DESCRIPTION
+    || expression.includes('/api/v1/threads')
+    || expression.includes('/api/threads');
 }
 
 function isSovereignOwnedRateRuleset(ruleset) {
-  return ruleset?.name === RATE_RULESET_NAME
-    || ruleset?.description === RATE_RULESET_DESCRIPTION
+  return String(ruleset?.name || '').toLowerCase().includes('sovereign')
+    || String(ruleset?.description || '').toLowerCase().includes('sovereign')
     || (ruleset?.rules || []).some(isSovereignOwnedRateRule);
 }
 
@@ -207,20 +211,17 @@ async function configureFreeRateLimit(client, zoneId) {
     if (unrelated.length > 0 && !replaceableRetiredRule) {
       throw new Error('The Free-plan rate-limit slot is occupied by an unrelated rule; refusing to silently remove it');
     }
-    const updated = await client.request(`/zones/${zoneId}/rulesets/${current.id}`, {
+    const updated = await client.request(`/zones/${zoneId}/rulesets/phases/${RATE_PHASE}/entrypoint`, {
       method: 'PUT',
       body: {
-        name: RATE_RULESET_NAME,
         description: RATE_RULESET_DESCRIPTION,
-        kind: 'zone',
-        phase: RATE_PHASE,
         rules: [rule]
       }
     });
     ruleset = updated.result;
   }
 
-  const verification = await client.request(`/zones/${zoneId}/rulesets/${ruleset.id}`);
+  const verification = await client.request(`/zones/${zoneId}/rulesets/phases/${RATE_PHASE}/entrypoint`);
   const verifiedRuleset = verification.result || {};
   const active = (verifiedRuleset.rules || []).find((item) => item.ref === RATE_RULE_REF);
   if (!active?.enabled) throw new Error('The Sovereign Free-plan rate-limit rule is not active');

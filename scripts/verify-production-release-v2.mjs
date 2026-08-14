@@ -149,6 +149,7 @@ requireAll('Cloudflare controls', controls, [
   'collect_logs: false',
   'sovereign_ai_messages_free_tier',
   'const rateLimit = await configureFreeRateLimit(client, zone.id);',
+  'const updated = await client.request(`/zones/${zoneId}/rulesets/phases/${RATE_PHASE}/entrypoint`',
   'http.request.uri.path wildcard "/api/v1/threads/*/messages"',
   'The Sovereign Free-plan rate-limit expression is not active',
   'The Sovereign Free-plan rate-limit threshold is not active',
