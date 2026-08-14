@@ -10,7 +10,7 @@ The production system consists of:
 - one Cloudflare Worker named `sovv-web`;
 - D1 as canonical storage;
 - one Durable Object per thread for sequencing and idempotency;
-- Cloudflare Workers AI through the `sovereign` AI Gateway;
+- Cloudflare Workers AI through the `sovereign-ai-gateway` AI Gateway;
 - Turnstile, Resend, and Stripe;
 - static assets served by the same Worker;
 - Cloudflare Workers Builds as the only supported build and deployment authority.
@@ -153,8 +153,9 @@ The production deploy configures and verifies:
 
 - read replication mode: `auto`;
 - request-scoped D1 Sessions;
-- migration `0013_workers_ai_free_capacity`;
-- readiness failure when the capacity ledger is missing.
+- capacity ledger introduced by migration `0013_workers_ai_free_capacity`;
+- current schema parity through migration `0015_release_evidence`;
+- readiness failure when the capacity ledger or release-evidence store is missing.
 
 ### AI Gateway
 

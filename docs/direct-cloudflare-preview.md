@@ -10,7 +10,7 @@ The repository-root `wrangler.jsonc` is the authoritative production configurati
 - URL: `https://sovereign-openapi-preview.sovereign-os-api.workers.dev`
 - D1: `sovereign-openapi-preview-db`
 - Durable Object: `ThreadCoordinator`
-- AI: Workers AI binding through AI Gateway `sovereign`
+- AI: Workers AI binding through AI Gateway `sovereign-ai-gateway`
 - Model: `@cf/zai-org/glm-4.7-flash`
 - Assets: compiled Sovereign.OS web application
 - Background cleanup: scheduled D1 work

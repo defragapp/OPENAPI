@@ -57,4 +57,4 @@ A semantic risk model, jurisdiction-specific resource catalog, separate “Trans
 
 ## Release evidence
 
-Production is releasable only when the repository-owned `pnpm verify:cloudflare-build` gate passes and the Worker development endpoint, `app.defrag.app`, and `sovereign.defrag.app` all report the same exact commit, `ready=true`, and migration `0013_workers_ai_free_capacity`.
+Production is releasable only when the repository-owned `pnpm verify:cloudflare-build` gate passes, `app.defrag.app` and `sovereign.defrag.app` report the same exact commit with `ready=true` and migration `0015_release_evidence`, and the retired workers.dev hostname remains unavailable.

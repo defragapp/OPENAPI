@@ -54,7 +54,7 @@ pnpm build:preview
 
 ## Preview bootstrap
 
-`pnpm preview:bootstrap` resolves or creates the isolated preview D1 database, writes a temporary Wrangler configuration, applies migrations through `0013_workers_ai_free_capacity`, uploads only preview secrets, deploys the preview Worker, writes sanitized deployment metadata, and removes the temporary configuration.
+`pnpm preview:bootstrap` resolves or creates the isolated preview D1 database, writes a temporary Wrangler configuration, applies migrations through `0015_release_evidence`, uploads only preview secrets, deploys the preview Worker, writes sanitized deployment metadata, and removes the temporary configuration.
 
 The script must not be used for production. It must not attach a production route or delete preview state.
 

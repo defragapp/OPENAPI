@@ -5,7 +5,7 @@
 Public Sovereign inference uses Cloudflare Workers AI through the existing AI Gateway:
 
 ```text
-Authenticated Sovereign Worker → AI binding → AI Gateway `sovereign` → @cf/zai-org/glm-4.7-flash
+Authenticated Sovereign Worker → AI binding → AI Gateway `sovereign-ai-gateway` → @cf/zai-org/glm-4.7-flash
 ```
 
 The Worker does not read a personal or project OpenAI API key. The former `openai/gpt-5.5` Unified Billing path is retired for production because the current release is designed around Cloudflare-hosted Free-plan inference.
@@ -44,7 +44,7 @@ Stripe subscription webhooks project the effective Free or Sovereign+ plan into 
 
 The Workers AI adapter also reserves conservative daily capacity in D1 before each hosted-model call. The production budget is intentionally below Cloudflare's account-wide free allocation so the platform returns a controlled capacity response before the provider hard limit is reached. Failed generation releases the daily reservation and refunds the user's monthly turn.
 
-The required capacity schema is migration `0013_workers_ai_free_capacity`. Production readiness fails unless that ledger exists.
+Migration `0013_workers_ai_free_capacity` introduced the required capacity ledger. Current production schema parity is migration `0015_release_evidence`; readiness fails unless both the capacity ledger and release-evidence store exist.
 
 ## Failure behavior
 

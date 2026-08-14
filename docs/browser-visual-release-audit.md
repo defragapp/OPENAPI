@@ -59,19 +59,20 @@ Open these production endpoints and record the exact response:
 ```text
 https://sovereign.defrag.app/health
 https://sovereign.defrag.app/ready
-https://sovv-web.sovereign-os-api.workers.dev/health
-https://sovv-web.sovereign-os-api.workers.dev/ready
+https://app.defrag.app/health
+https://app.defrag.app/ready
 ```
 
 Confirm:
 
-- both domains return the same deployed Git SHA;
+- both branded domains return the same deployed Git SHA;
 - the SHA equals the intended `main` commit;
 - readiness is true;
-- migration is `0013_workers_ai_free_capacity` or the newer canonical migration if the repository has advanced;
+- migration is `0015_release_evidence`;
 - static assets are served by `sovv-web`;
 - no stale service-worker cache is masking the release;
-- the public domain and Worker domain are not serving different application shells;
+- the public and authenticated domains are not serving different application shells;
+- the retired `sovv-web.sovereign-os-api.workers.dev` hostname remains unavailable;
 - security headers, same-origin behavior, and private response cache controls remain intact.
 
 If the release is stale, identify whether the cause is Workers Builds, asset caching, the service worker, a failed verification gate, or a domain route mismatch. Fix the repository or Cloudflare configuration through the canonical path. Do not add a second deployment path.

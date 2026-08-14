@@ -32,7 +32,7 @@ User-facing language is governed by [`docs/product-language-system.md`](docs/pro
 - D1 Sessions with browser-held opaque bookmarks for sequential API consistency
 - D1 read replication in automatic mode
 - SQLite Durable Objects for thread coordination
-- Cloudflare Workers AI through AI Gateway `sovereign`
+- Cloudflare Workers AI through AI Gateway `sovereign-ai-gateway`
 - Production model: `@cf/zai-org/glm-4.7-flash`
 - Personalized inference bypasses Gateway cache and persistent prompt logging
 - D1-backed daily free-capacity reservations stop inference before the account-wide Workers AI free allocation is exhausted

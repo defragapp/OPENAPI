@@ -8,9 +8,9 @@ Prepared for the `defragapp/OPENAPI` production architecture.
 - Production Worker: `sovv-web`.
 - D1 binding: `DB`.
 - D1 database: `sovereign-openapi-db`.
-- Current migration: `0013_workers_ai_free_capacity`.
+- Current migration: `0015_release_evidence`.
 - Migrations directory: `apps/sovereign-worker/migrations`.
-- AI Gateway ID: `sovereign`.
+- AI Gateway ID: `sovereign-ai-gateway`.
 - AI model: `@cf/zai-org/glm-4.7-flash` through the Workers AI binding.
 - Answer contract: `sovereign-answer.v2`.
 - Queue and R2: disabled.

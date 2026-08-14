@@ -4,15 +4,13 @@ This file tracks unresolved production evidence. It is not release authority. Th
 
 ## Last fully verified production release
 
-The last fully verified deployment before the current hardening candidate is:
+The last fully verified deployment before the current candidate is:
 
-- commit `51398e015a7b6becfcd52a0cc81e134cc02296b0`;
-- migration `0014_passkey_authentication`;
-- 197 web tests and 205 Worker tests passed;
-- public and application health/readiness passed on the approved domains;
-- parent-domain redirects, security headers, public documents, pricing, unauthenticated boundaries, Turnstile rejection, Stripe signature rejection, bundle limits, and rendered screenshots passed;
-- desktop founder-reference comparison passed;
-- 390×844 and 430×932 mobile renders had no horizontal overflow and preserved the required section sequence.
+- commit `79df7bb3b1defa51b6256043add02abdcef320ef`;
+- migration `0015_release_evidence` with migration parity current;
+- public and application health/readiness passed on the branded domains;
+- D1-backed route-cohesion, rendered page-family, and DMARC evidence is verified;
+- the retired workers.dev hostname is unavailable.
 
 That deployment is evidence for the previous exact SHA only. It does not approve later commits.
 
@@ -48,7 +46,7 @@ The current `main` candidate includes:
 - [x] Resend domain `defrag.app` is verified and sending is enabled.
 - [x] Resend DKIM is verified.
 - [x] Resend SPF MX and SPF TXT records are verified.
-- [ ] Confirm a published DMARC policy for `defrag.app` through DNS evidence; Resend does not report DMARC status in the connected domain record.
+- [x] Confirm a published DMARC policy for `defrag.app` through DNS evidence and persist the verification in release evidence.
 
 ## Required exact-SHA Cloudflare evidence for the current candidate
 
@@ -56,7 +54,7 @@ The current `main` candidate includes:
 - [ ] `pnpm verify:cloudflare-build` completes without a repository gate, typecheck, test, build, or compressed-size failure.
 - [ ] `pnpm production:deploy` completes for that same SHA.
 - [ ] `/health`, `/healthz`, and `/ready` succeed through `sovereign.defrag.app` and `app.defrag.app`.
-- [ ] `/ready` reports the exact candidate SHA and migration `0014_passkey_authentication`.
+- [ ] `/ready` reports the exact candidate SHA and migration `0015_release_evidence`.
 - [ ] The production Worker no longer exposes the `sovv-web.sovereign-os-api.workers.dev` endpoint.
 - [ ] Parent-domain redirects and branded 404 behavior still pass.
 - [ ] The previous stable Worker version and the new deployment/version identifiers are recorded for rollback.

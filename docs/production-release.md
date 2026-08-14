@@ -13,9 +13,10 @@ Production is released from one exact commit on `main`. Non-production branch bu
 - D1: `sovereign-openapi-db`
 - D1 Sessions and automatic read replication
 - Durable Object: `ThreadCoordinator`
-- AI: Cloudflare Workers AI through AI Gateway `sovereign`
+- AI: Cloudflare Workers AI through AI Gateway `sovereign-ai-gateway`
 - Model: `@cf/zai-org/glm-4.7-flash`
-- Daily capacity ledger: migration `0013_workers_ai_free_capacity`
+- Daily capacity ledger introduced by migration `0013_workers_ai_free_capacity`
+- Current release-evidence schema: migration `0015_release_evidence`
 - Assets: compiled web application
 - Background cleanup: scheduled D1 work every 15 minutes
 - R2 and Queue: disabled
@@ -41,6 +42,8 @@ The Cloudflare build/deploy environment also requires:
 - `VITE_TURNSTILE_SITE_KEY`
 
 These are configured as Cloudflare Workers Builds variables or secrets, not prepended to one command in a shell chain.
+
+Workers Builds REST maintenance uses a separate user-scoped API token with `Workers Builds Configuration: Edit`. Account-scoped tokens are rejected by the Builds API. That management credential does not replace the build token selected by the production trigger's `build_token_uuid`.
 
 ## Transactional email
 
@@ -78,7 +81,7 @@ corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-buil
 pnpm production:deploy
 ```
 
-The build gate verifies release configuration, migrations through `0013_workers_ai_free_capacity`, secret and fixture scans, intelligence and visual contracts, type checks, Worker and web tests, production build, and compressed Worker size.
+The build gate verifies release configuration, migrations through `0015_release_evidence`, secret and fixture scans, intelligence and visual contracts, type checks, Worker and web tests, production build, and compressed Worker size.
 
 The deploy command requires the exact Cloudflare build commit SHA. It resolves the existing D1 database, applies forward-only migrations, preserves encrypted Worker secrets, configures Free-plan Cloudflare controls, deploys that exact commit, and runs live probes. It fails closed when required secrets or runtime dependencies are missing.
 
@@ -99,7 +102,7 @@ Merging the approved commit to `main` authorizes Cloudflare Workers Builds to ex
 The deploy command must confirm:
 
 - public and app hostnames serve the exact commit;
-- `/ready` reports migration `0013_workers_ai_free_capacity`;
+- `/ready` reports migration `0015_release_evidence`;
 - D1, D1 Sessions, authentication, AI Gateway, Workers AI capacity, Resend, Stripe, and scheduled cleanup are configured;
 - `dependencies.transactionalEmail` is exactly `resend`;
 - pricing shows Free, $20 monthly, and $99 annual without legacy export or unapproved support placement;
