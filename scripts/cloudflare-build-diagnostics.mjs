@@ -6,6 +6,7 @@ import {
   formatReleaseReportDelivery,
   sanitizeReleaseReportOutput
 } from './release-report-client.mjs';
+import { writeReleaseProgress } from './write-cloudflare-release-progress.mjs';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const reportUrl = String(process.env.RELEASE_REPORT_URL || '').trim();
@@ -54,6 +55,20 @@ async function report(sha, stage, status, output = '') {
   return result.ok;
 }
 
+async function persistBuildFailure(sha, stage, output) {
+  try {
+    await writeReleaseProgress({
+      sha,
+      stage: `build-${stage}`,
+      summary: output || `${stage} failed without output`,
+      configPath: resolve(root, 'wrangler.jsonc')
+    });
+    console.log(`[cloudflare-release-progress] phase=build stage=${stage} persistence=success`);
+  } catch {
+    console.warn(`[cloudflare-release-progress] phase=build stage=${stage} persistence=unavailable`);
+  }
+}
+
 const checkoutSha = runGit(['rev-parse', 'HEAD'], 'unable to resolve checkout SHA');
 if (!/^[0-9a-f]{40}$/i.test(checkoutSha)) throw new Error('Cloudflare build checkout is not a full commit SHA');
 
@@ -98,6 +113,7 @@ for (const [stage, command, args] of stages) {
   const output = outputTail(result.stdout, result.stderr);
   if (result.error || result.status !== 0) {
     await report(checkoutSha, stage, 'failure', output || String(result.error?.message || `exit ${result.status}`));
+    await persistBuildFailure(checkoutSha, stage, output || String(result.error?.message || `exit ${result.status}`));
     console.error(`[cloudflare-release] stage=${stage} status=failure exit=${String(result.status ?? 'error')}`);
     process.exit(result.status || 1);
   }
