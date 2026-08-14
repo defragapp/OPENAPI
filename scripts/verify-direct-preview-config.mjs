@@ -14,6 +14,7 @@ const freeTierControls = readFileSync('scripts/configure-cloudflare-free-tier.mj
 const parentDomainVerifier = readFileSync('scripts/verify-parent-domain-routes.mjs', 'utf8');
 const preview = workerConfig.env?.preview;
 const expectedObservability = {
+  enabled: true,
   logs: {
     enabled: true,
     invocation_logs: true
