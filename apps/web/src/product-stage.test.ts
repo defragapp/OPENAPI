@@ -10,15 +10,15 @@ const storyStyles = readFileSync(new URL('./v0-restored-product-stories.css', im
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 
 describe('shared Sovereign intelligence stage', () => {
-  it('uses the integrated field, real-life questions, restored chats, and authenticated answer hierarchy', () => {
+  it('uses the integrated field, real-life questions, refined demonstrations, and authenticated answer hierarchy', () => {
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('<RealLifeQuestions />');
     expect(landing).toContain('<LandingProductStories />');
     expect(field).toContain('landing-expression-slice__beam');
     expect(field).toContain('landing-expression-slice__readout');
     expect(field).toContain('data-field-geometry="spherical-360"');
-    expect(stories).toContain('Sovereign — Chat');
-    expect(stories).toContain('Sovereign — Shared Chat');
+    expect(stories).toContain('Sovereign — Personal');
+    expect(stories).toContain('Sovereign — Relationship');
     expect(stories).toContain('Sovereign — Family System');
     expect(workspace).toContain('<SovereignAnswerView');
     expect(workspace).toContain('<RelationshipAnswer');
@@ -26,14 +26,16 @@ describe('shared Sovereign intelligence stage', () => {
     expect(workspace).toContain('<BasisStrip');
   });
 
-  it('keeps expression, evidence, and actual experience distinct', () => {
+  it('keeps expression, evidence, permission, and actual experience distinct', () => {
     expect(field).toContain('Illustrative Baseline');
     expect(field).toContain('Qualitative expression emphasis · sanitized example');
     expect(field).toContain('not a diagnosis, score, or claim about anyone’s internal state');
     expect(field).toContain('line length follows relative expression reach');
-    expect(stories).toContain('With permission, Sovereign keeps both people distinct');
+    expect(stories).toContain('With permission, Sovereign keeps each person’s supplied context distinct');
     expect(stories).toContain('Each person controls what may be included');
-    expect(stories).toContain('v0-baseline-trace');
+    expect(stories).toContain('Illustrative permitted Baselines · No compatibility score · No private-thought claims');
+    expect(stories).toContain('className="landing-evidence"');
+    expect(stories).toContain('<strong>Basis</strong>');
   });
 
   it('is responsive, interactive, and reduced-motion safe', () => {
