@@ -118,15 +118,15 @@ describe('secondary public visual parity', () => {
     expect(policyCss).not.toContain('.public-approved-v8 .landing-story');
   });
 
-  it('loads secondary parity after the landing and iOS authorities without changing the landing contract', () => {
+  it('loads secondary parity after the landing and iOS authorities while the injected refinement remains final', () => {
     const landingAuthority = main.indexOf("import './public-landing-approved-v8.css'");
     const iosAuthority = main.indexOf("import './landing-ios-parity-density-v1.css'");
     const secondaryAuthority = main.indexOf("import './public-secondary-pages-locked.css'");
-    const refinementAuthority = main.indexOf("import './experience-refinement-v1.css'");
     expect(landingAuthority).toBeGreaterThan(-1);
     expect(iosAuthority).toBeGreaterThan(landingAuthority);
     expect(secondaryAuthority).toBeGreaterThan(iosAuthority);
-    expect(refinementAuthority).toBeGreaterThan(secondaryAuthority);
+    expect(main).toContain("import experienceRefinementCss from './experience-refinement-v1.css?inline'");
+    expect(main).toContain('style.textContent += `\\n${experienceRefinementCss}`;');
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(landing).not.toContain('public-secondary-page');
