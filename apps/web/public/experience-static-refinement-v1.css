@@ -1,0 +1,137 @@
+/*
+ * Sovereign.OS static public experience refinement v1.
+ * Shared by How it works, Pricing, and FAQ after deployed-route-cohesion.css.
+ * Presentation only: no route, entitlement, billing, or product behavior changes.
+ */
+
+body.launch-page {
+  --v0-blue: #e8ddd0;
+  --v0-blue-bright: #fffaf3;
+  --v0-page: #090b0e;
+  --v0-panel: #121417;
+  --v0-cream: #f1e9de;
+  --v0-muted: rgba(229, 220, 209, 0.68);
+  --v0-faint: rgba(229, 220, 209, 0.44);
+  --v0-line: rgba(241, 233, 222, 0.08);
+  --v0-line-strong: rgba(241, 233, 222, 0.14);
+  background: #090b0e;
+  color: #f1e9de;
+}
+
+body.launch-page .launch-nav {
+  border-bottom-color: rgba(241, 233, 222, 0.08);
+  background: rgba(9, 11, 14, 0.88);
+  backdrop-filter: blur(18px) saturate(108%);
+}
+
+body.launch-page :is(.launch-kicker, .price-tag, .plan-audience) {
+  color: rgba(241, 233, 222, 0.58);
+}
+
+body.launch-page :is(.launch-cta, .launch-button.primary) {
+  border-color: #e8ddd0;
+  background: #e8ddd0;
+  color: #101214;
+  box-shadow: none;
+}
+
+body.launch-page :is(.launch-cta, .launch-button.primary):is(:hover, :focus-visible) {
+  border-color: #fff7ed;
+  background: #fff7ed;
+  transform: translateY(-1px);
+}
+
+body.launch-page .launch-button:not(.primary) {
+  border-color: rgba(241, 233, 222, 0.16);
+  background: transparent;
+  color: rgba(241, 233, 222, 0.82);
+  box-shadow: none;
+}
+
+body.launch-page :is(.price-card, .billing-note, .launch-card, .product-proof-window) {
+  box-shadow: none;
+}
+
+body.launch-page .price-card.featured {
+  border-color: rgba(241, 233, 222, 0.22);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 28%), #121417;
+}
+
+body.launch-page .product-proof-topbar > span,
+body.how-page .worlds-proof-topbar > span {
+  background: rgba(241, 233, 222, 0.72);
+  box-shadow: 0 0 14px rgba(241, 233, 222, 0.16);
+}
+
+body.how-page .worlds-proof-section::before {
+  background: radial-gradient(circle at 62% 48%, rgba(241, 233, 222, 0.035), transparent 42rem);
+}
+
+body.how-page .worlds-proof-window {
+  background:
+    radial-gradient(circle at 53% 18%, rgba(241, 233, 222, 0.025), transparent 28rem),
+    #0d0f12;
+  box-shadow: 0 30px 84px rgba(0, 0, 0, 0.34);
+}
+
+body.how-page .worlds-proof-distinction {
+  border-left-color: rgba(241, 233, 222, 0.42);
+}
+
+body.how-page :is(.worlds-proof-distinction > span, .worlds-field-heading > span, .worlds-proof-flow li > span) {
+  color: rgba(241, 233, 222, 0.64);
+}
+
+body.how-page .worlds-aperture {
+  background:
+    radial-gradient(circle at 50% 48%, rgba(241, 233, 222, 0.02), transparent 25rem),
+    #0a0c0f;
+}
+
+body.how-page .worlds-aperture img {
+  filter: saturate(0.18) contrast(1.04) brightness(0.94);
+}
+
+body.how-page .worlds-field-instrument {
+  border-color: rgba(241, 233, 222, 0.1);
+  background:
+    radial-gradient(circle, rgba(241, 233, 222, 0.07) 0 2px, transparent 3px),
+    repeating-radial-gradient(circle, transparent 0 23%, rgba(241, 233, 222, 0.06) 23.5% 24%, transparent 24.5% 47%),
+    linear-gradient(rgba(241, 233, 222, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(241, 233, 222, 0.025) 1px, transparent 1px);
+  background-size: auto, auto, 50% 50%, 50% 50%;
+}
+
+body.how-page .worlds-field-instrument i {
+  background: linear-gradient(90deg, rgba(241, 233, 222, var(--axis-opacity)), rgba(255, 250, 243, var(--axis-opacity)));
+}
+
+body.how-page .worlds-field-instrument b {
+  background: #f4ede4;
+  box-shadow: 0 0 18px rgba(241, 233, 222, 0.26);
+}
+
+body.launch-page :is(a, button, summary) {
+  transition-duration: 160ms;
+  transition-timing-function: ease-out;
+}
+
+@media (max-width: 650px) {
+  body.launch-page .launch-hero {
+    padding-top: 82px;
+  }
+
+  body.launch-page .launch-hero h1 {
+    text-wrap: balance;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.launch-page *,
+  body.launch-page *::before,
+  body.launch-page *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
