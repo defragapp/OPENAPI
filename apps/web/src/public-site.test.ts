@@ -12,9 +12,11 @@ const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'u
 const consent = readFileSync(new URL('../public/consent.html', import.meta.url), 'utf8');
 const consentCss = readFileSync(new URL('../public/consent.css', import.meta.url), 'utf8');
 const staticExperienceCss = readFileSync(new URL('../public/static-experience.css', import.meta.url), 'utf8');
+const staticRefinementCss = readFileSync(new URL('../public/experience-static-refinement-v1.css', import.meta.url), 'utf8');
 const platformPublicCss = readFileSync(new URL('../public/platform-public.css', import.meta.url), 'utf8');
 const v0Css = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
 const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
+const refinementCss = readFileSync(new URL('./experience-refinement-v1.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${stories}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
@@ -23,7 +25,8 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).toContain('Personal AI for real life');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Sovereign begins with the capacity beneath a pattern—showing how it may express, what happens between people, and what could change.');
+    expect(landing).toContain('Sovereign begins with the capacity beneath a pattern.');
+    expect(landing).toContain('See a Sovereign answer');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(field).toContain('Drag to rotate');
     expect(field).toContain('landing-expression-slice__tooltip');
@@ -32,21 +35,21 @@ describe('Sovereign.OS public experience', () => {
 
   it('presents the intended product sequence in order', () => {
     const rendered = landing.slice(landing.indexOf('export function PublicLanding()'), landing.indexOf('function V0Navigation()'));
-    const values = ['<V0Navigation />', '<V0Hero />', '<LandingProductStories />', '<ComparisonStory />', '<FinalCallToAction />', '<V0Footer />'];
+    const values = ['<V0Navigation />', '<V0Hero />', '<RealLifeQuestions />', '<LandingProductStories />', '<ComparisonStory />', '<FinalCallToAction />', '<V0Footer />'];
     let previous = -1;
     for (const value of values) {
       const index = rendered.indexOf(value);
       expect(index).toBeGreaterThan(previous);
       previous = index;
     }
-    expect(stories).toContain('Ask about your life.');
+    expect(landing).toContain('Start with what’s actually happening.');
     expect(stories).toContain('Understand what happens');
     expect(stories).toContain('From one person');
-    expect(landing).toContain('Other AI answers');
+    expect(landing).toContain('Generic AI');
     expect(landing).toContain('Your thoughts deserve');
   });
 
-  it('shows one visible reasoning flow plus relationship and system context', () => {
+  it('shows one visible structural flow plus relationship and system context', () => {
     for (const marker of [
       'surface="personal-chat"',
       'surface="personal-reasoning"',
@@ -54,14 +57,14 @@ describe('Sovereign.OS public experience', () => {
       'surface="relationship-reasoning"',
       'surface="system-map"',
       'surface="system-reasoning"',
-      'Seeing the capacity beneath it',
-      'Seeing how it is expressing',
-      'Seeing what keeps it going',
-      'Seeing what could change',
+      'Capacity beneath the pattern',
+      'How pressure changes the expression',
+      'What may keep it going',
+      'What could change',
       'Keeping both people distinct',
       'Clarity may take time.',
       'Between you',
-      'Mapping the people',
+      'System structure',
       'Movement'
     ]) expect(stories).toContain(marker);
     expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
@@ -71,7 +74,7 @@ describe('Sovereign.OS public experience', () => {
   });
 
   it('keeps relationship and system examples permission-safe, anonymous, and source-aware', () => {
-    expect(stories).toContain('With permission, Sovereign keeps both people distinct');
+    expect(stories).toContain('With permission, Sovereign keeps each person’s supplied context distinct');
     expect(stories).toContain('Each person controls what may be included');
     expect(stories).toContain('No compatibility score');
     expect(stories).toContain('<strong>Basis</strong>');
@@ -85,6 +88,14 @@ describe('Sovereign.OS public experience', () => {
     expect(stories).not.toContain('globe');
   });
 
+  it('keeps retired chatbot phrasing out of active public copy', () => {
+    for (const phrase of [
+      'Ask about your life. Get an answer built around you.',
+      'What do you want to understand?',
+      'Bring the question you already have.'
+    ]) expect(publicCopy).not.toContain(phrase);
+  });
+
   it('keeps verified plans, correction, and optional Covenant available elsewhere', () => {
     for (const phrase of ['$0', '$20', '$99', '10 Sovereign AI turns', '300 Sovereign AI turns', 'Covenant']) expect(publicCopy).toContain(phrase);
     expect(policy).toContain('Private account export is not available at launch.');
@@ -95,21 +106,28 @@ describe('Sovereign.OS public experience', () => {
     expect(main).toContain('<PublicLanding />');
     expect(main).toContain("import './landing-expression-field-integration.css';");
     expect(main).toContain("import './v0-restored-product-stories.css';");
+    expect(main).toContain("import experienceRefinementCss from './experience-refinement-v1.css?inline';");
     expect(main).not.toContain('ProductLanguageRuntime');
   });
 
-  it('applies the founder visual system and restored product authority', () => {
+  it('applies the founder visual system and bounded monochrome refinement authorities', () => {
     for (const selector of ['.v0-landing-port', '.v0-hero', '.intelligence-workspace', '.sovereign-composer', '.account-shell', '.auth-panel']) expect(v0Css).toContain(selector);
     for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storyCss).toContain(selector);
     expect(storyCss).toContain('@media (max-width: 760px)');
     expect(storyCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(refinementCss).toContain('--landing-blue: #e8ddd0 !important');
+    expect(staticRefinementCss).toContain('--v0-blue: #e8ddd0');
+    expect(staticRefinementCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
   it('keeps support pages, consent, and fallback routes intact', () => {
     expect(how).toContain('See the pattern clearly enough to understand what could change.');
+    expect(how).toContain('/experience-static-refinement-v1.css');
     expect(pricing).toContain('$20');
     expect(pricing).toContain('$99 / year');
+    expect(pricing).toContain('/experience-static-refinement-v1.css');
     expect(faq).toContain('Clear answers about what Sovereign does—and what remains yours.');
+    expect(faq).toContain('/experience-static-refinement-v1.css');
     expect(platformPublicCss).toContain('opacity: 1 !important');
     expect(staticExperienceCss).toContain('@media (max-width: 620px)');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
