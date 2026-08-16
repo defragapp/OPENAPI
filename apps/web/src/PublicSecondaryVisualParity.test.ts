@@ -12,6 +12,7 @@ const staticPages = [
 ] as const;
 
 const staticCss = read('../public/v0-public-static.css');
+const staticRefinementCss = read('../public/experience-static-refinement-v1.css');
 const howItWorks = read('../public/how-it-works.html');
 const pricing = read('../public/pricing.html');
 const policy = read('./PublicPolicy.tsx');
@@ -22,12 +23,14 @@ const liveVerifier = read('../../../scripts/verify-live-secondary-public.mjs');
 const productionRelease = read('../../../scripts/cloudflare-production-release.mjs');
 
 const refinedCssPath = '/v0-public-static.css?v=20260803-refined-v2';
+const refinementCssPath = '/experience-static-refinement-v1.css?v=20260816-refinement-v1';
 
 describe('secondary public visual parity', () => {
   it.each(staticPages)('%s uses the frozen landing identity and mobile navigation', (_label, path) => {
     const document = read(path);
     expect(document).toContain('data-secondary-visual-contract="founder-v0-locked-v1"');
     expect(document).toContain(refinedCssPath);
+    expect(document).toContain(refinementCssPath);
     expect(document).toContain('class="launch-nav-inner"');
     expect(document).toContain('class="launch-wordmark"');
     expect(document).toContain('>SOVEREIGN.OS</a>');
@@ -38,7 +41,7 @@ describe('secondary public visual parity', () => {
     expect(document).toContain('© 2026 Sovereign.OS');
   });
 
-  it('uses the exact founder-v0 visual tokens with a larger readable secondary-page scale', () => {
+  it('uses the founder-v0 foundation with the final monochrome secondary-page authority', () => {
     expect(staticCss).toContain('--v0-page: #090b0e');
     expect(staticCss).toContain('--v0-cream: #f1e9de');
     expect(staticCss).toContain('--v0-blue: #2f93ff');
@@ -58,6 +61,9 @@ describe('secondary public visual parity', () => {
     expect(staticCss).toContain('@media (max-width: 430px)');
     expect(staticCss).not.toContain('--v0-warm');
     expect(staticCss).not.toContain('--v0-sage');
+    expect(staticRefinementCss).toContain('--v0-blue: #e8ddd0');
+    expect(staticRefinementCss).toContain('--v0-blue-bright: #fffaf3');
+    expect(staticRefinementCss).toContain('background: #090b0e');
   });
 
   it('clarifies annual pricing without adding a dashboard or alternate plan flow', () => {
@@ -73,11 +79,12 @@ describe('secondary public visual parity', () => {
 
   it('adds one restrained product moment and reduces development-support prominence', () => {
     expect(howItWorks).toContain('class="product-proof-window"');
-    expect(howItWorks).toContain('This progress is user-visible context—not hidden model reasoning.');
-    expect(howItWorks).toContain('Seeing the capacity beneath it');
-    expect(howItWorks).toContain('Seeing how it is expressing');
-    expect(howItWorks).toContain('Seeing what keeps it going');
-    expect(howItWorks).toContain('Seeing what could change');
+    expect(howItWorks).toContain('This is user-visible context—not hidden model reasoning.');
+    expect(howItWorks).toContain('without exposing chain-of-thought');
+    expect(howItWorks).toContain('Capacity beneath it');
+    expect(howItWorks).toContain('Pressure expression');
+    expect(howItWorks).toContain('What may keep it going');
+    expect(howItWorks).toContain('What could change');
     expect(howItWorks).toContain('class="launch-section support-note-section"');
     expect(howItWorks).not.toContain('Help fund continued public development.');
     expect(staticCss).toContain('.product-proof-window');
@@ -115,9 +122,11 @@ describe('secondary public visual parity', () => {
     const landingAuthority = main.indexOf("import './public-landing-approved-v8.css'");
     const iosAuthority = main.indexOf("import './landing-ios-parity-density-v1.css'");
     const secondaryAuthority = main.indexOf("import './public-secondary-pages-locked.css'");
+    const refinementAuthority = main.indexOf("import './experience-refinement-v1.css'");
     expect(landingAuthority).toBeGreaterThan(-1);
     expect(iosAuthority).toBeGreaterThan(landingAuthority);
     expect(secondaryAuthority).toBeGreaterThan(iosAuthority);
+    expect(refinementAuthority).toBeGreaterThan(secondaryAuthority);
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(landing).not.toContain('public-secondary-page');
@@ -131,8 +140,10 @@ describe('secondary public visual parity', () => {
     }
     expect(liveVerifier).toContain("const expectedContract = 'founder-v0-locked-v1'");
     expect(liveVerifier).toContain(`const expectedCssPath = '${refinedCssPath}'`);
+    expect(liveVerifier).toContain(`const refinementCssPath = '${refinementCssPath}'`);
     expect(liveVerifier).toContain('assertSecurityHeaders');
-    expect(liveVerifier).toContain('compiled policy stylesheet');
+    expect(liveVerifier).toContain('static refinement stylesheet');
+    expect(liveVerifier).toContain('compiled final refinement');
     expect(liveVerifier).toContain('product-proof-window');
     expect(liveVerifier).toContain('annual-price');
     expect(productionRelease).toContain("['verify-secondary-public', 'scripts/verify-live-secondary-public.mjs']");
