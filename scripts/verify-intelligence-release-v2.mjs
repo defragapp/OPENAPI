@@ -4,33 +4,28 @@ import { pathToFileURL } from 'node:url';
 
 const sourcePath = resolve('scripts/verify-intelligence-release.mjs');
 const temporaryPath = resolve(`scripts/.verify-intelligence-release-v2-${process.pid}.mjs`);
-let source = readFileSync(sourcePath, 'utf8');
+const source = readFileSync(sourcePath, 'utf8');
+const main = readFileSync(resolve('apps/web/src/main.tsx'), 'utf8');
 
-const replacements = [
-  [
-    "  \"import './passkey-auth.css'\",\n  'installV0ReleaseFingerprint();'",
-    "  \"import './deployed-route-cohesion.css'\",\n  \"import './passkey-auth.css'\",\n  'installV0ReleaseFingerprint();'"
-  ],
-  [
-    "assert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes(\"import './\"), 'A local visual file loads after the passkey-specific final authority.');",
-    "const routeCohesionImport = \"import './deployed-route-cohesion.css';\";\nassert(main.indexOf(routeCohesionImport) < main.indexOf(passkeyImport), 'Route cohesion styling must load before the final passkey authority.');\nassert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes(\"import './\"), 'A local visual file loads after the passkey-specific final authority.');"
-  ],
-  [
-    "'landing-hero-field-v4.css', 'passkey-auth.css', 'v0-public-port.css'",
-    "'landing-hero-field-v4.css', 'deployed-route-cohesion.css', 'passkey-auth.css', 'v0-public-port.css'"
-  ]
-];
+const routeCohesionImport = "import './deployed-route-cohesion.css';";
+const passkeyImport = "import './passkey-auth.css';";
+const refinementImport = "import experienceRefinementCss from './experience-refinement-v1.css?inline';";
+const refinementAppend = 'style.textContent += `\\n${experienceRefinementCss}`;';
 
-for (const [retiredContract, currentContract] of replacements) {
-  const occurrences = source.split(retiredContract).length - 1;
-  if (occurrences !== 1) {
-    throw new Error(`Intelligence release v2 compatibility update expected one retired contract occurrence but found ${occurrences}: ${retiredContract.slice(0, 120)}`);
-  }
-  source = source.replace(retiredContract, currentContract);
+if (!main.includes(routeCohesionImport)) {
+  throw new Error('Intelligence release v2 is missing deployed route cohesion.');
 }
-
-if (source.includes('main.indexOf(passkeyImport) < main.indexOf(routeCohesionImport)')) {
-  throw new Error('Intelligence release v2 places route cohesion after the final passkey authority.');
+if (!main.includes(passkeyImport)) {
+  throw new Error('Intelligence release v2 is missing the passkey visual authority.');
+}
+if (main.indexOf(routeCohesionImport) >= main.indexOf(passkeyImport)) {
+  throw new Error('Intelligence release v2 places route cohesion after the final passkey stylesheet authority.');
+}
+if (!main.includes(refinementImport) || !main.includes(refinementAppend)) {
+  throw new Error('Intelligence release v2 is missing the bounded experience refinement authority.');
+}
+if (main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("import './")) {
+  throw new Error('Intelligence release v2 found a local stylesheet import after the passkey authority.');
 }
 
 try {
