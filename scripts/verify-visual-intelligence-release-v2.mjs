@@ -18,15 +18,20 @@ for (const marker of [
 
 const routeCohesionImport = "import './deployed-route-cohesion.css';";
 const passkeyImport = "import './passkey-auth.css';";
+const retiredFingerprintOutput = '\n  sequenceFingerprint,\n';
 if (main.indexOf(routeCohesionImport) >= main.indexOf(passkeyImport)) {
   throw new Error('Visual intelligence release v2 places route cohesion after the final passkey stylesheet authority.');
 }
 if (main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("import './")) {
   throw new Error('Visual intelligence release v2 found a local stylesheet import after passkey authority.');
 }
+if (source.split(retiredFingerprintOutput).length - 1 !== 1) {
+  throw new Error('Visual intelligence release v2 could not isolate the historical sequence fingerprint output.');
+}
+const activeSource = source.replace(retiredFingerprintOutput, '\n');
 
 try {
-  writeFileSync(temporaryPath, source, 'utf8');
+  writeFileSync(temporaryPath, activeSource, 'utf8');
   await import(`${pathToFileURL(temporaryPath).href}?release=${Date.now()}`);
 } finally {
   rmSync(temporaryPath, { force: true });
