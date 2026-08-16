@@ -160,6 +160,72 @@
   box-shadow: 0 0 0 3px rgba(241, 233, 222, 0.065) !important;
 }
 
+/* Onboarding, policy, fallback, and private gate surfaces inherit the same quiet route language. */
+:where(.plan-onboarding, .public-secondary-page, .public-not-found, .private-route-gate) {
+  --route-blue: #e8ddd0 !important;
+  --route-blue-bright: #fffaf3 !important;
+  --route-page: #090b0e !important;
+  --route-ink: #f1e9de !important;
+}
+
+:where(.plan-onboarding, .public-secondary-page, .public-not-found, .private-route-gate) :where(.eyebrow, .policy-kicker, .route-kicker) {
+  color: rgba(241, 233, 222, 0.58) !important;
+}
+
+.plan-onboarding {
+  background:
+    radial-gradient(circle at 72% 8%, rgba(241, 233, 222, 0.025), transparent 30rem),
+    #090b0e !important;
+}
+
+.plan-onboarding .plan-nav {
+  border-bottom-color: rgba(241, 233, 222, 0.08) !important;
+  background: rgba(9, 11, 14, 0.86) !important;
+  backdrop-filter: blur(18px) saturate(108%);
+}
+
+.plan-onboarding :where(.primary-button, .baseline-primary) {
+  border-color: var(--refine-paper) !important;
+  background: var(--refine-paper) !important;
+  color: #101214 !important;
+  box-shadow: none !important;
+}
+
+.plan-onboarding :where(.plan-card, .onboarding-baseline-preview, .baseline-result-card, .journey-message) {
+  box-shadow: none !important;
+}
+
+.plan-onboarding :where(input, select):focus {
+  border-color: rgba(241, 233, 222, 0.48) !important;
+  box-shadow: 0 0 0 3px rgba(241, 233, 222, 0.06) !important;
+}
+
+.public-secondary-page {
+  background:
+    radial-gradient(circle at 50% 0, rgba(241, 233, 222, 0.018), transparent 26rem),
+    #090b0e !important;
+}
+
+.public-secondary-page :where(.policy-card, .policy-contact, .policy-grid article) {
+  box-shadow: none !important;
+}
+
+.public-secondary-page :where(a, button):focus-visible,
+.public-not-found :where(a, button):focus-visible,
+.plan-onboarding :where(a, button):focus-visible {
+  outline-color: rgba(241, 233, 222, 0.72) !important;
+}
+
+.public-not-found {
+  background: #090b0e !important;
+}
+
+.public-not-found section > div > a:first-child {
+  border-color: var(--refine-paper) !important;
+  background: var(--refine-paper) !important;
+  color: #101214 !important;
+}
+
 /* Workspace: reduce dashboard chrome and make the conversation the focal plane. */
 .sovereign-app-runtime .intelligence-workspace {
   background: var(--refine-page) !important;
@@ -330,7 +396,9 @@
   .topbar-actions > button,
   .composer-send,
   .composer-context-line button
-) {
+),
+.plan-onboarding :where(button, a),
+.public-secondary-page :where(button, a) {
   transition-duration: 160ms !important;
   transition-timing-function: ease-out !important;
 }
@@ -365,12 +433,16 @@
 
 @media (prefers-reduced-motion: reduce) {
   .public-approved-v8 *,
-  .sovereign-app-runtime * {
+  .sovereign-app-runtime *,
+  .plan-onboarding *,
+  .public-secondary-page * {
     scroll-behavior: auto !important;
   }
 
   .public-approved-v8 :where(.landing-control, .landing-inline-link, .landing-expression-slice__endpoint),
-  .sovereign-app-runtime :where(button, a, .composer-example) {
+  .sovereign-app-runtime :where(button, a, .composer-example),
+  .plan-onboarding :where(button, a),
+  .public-secondary-page :where(button, a) {
     transition: none !important;
     animation: none !important;
     transform: none !important;
