@@ -24,6 +24,7 @@ import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css
 import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline';
 import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline';
 import publicLandingFinalAuthorityCss from './public-landing-final-authority.css?inline';
+import experienceRefinementCss from './experience-refinement-v1.css?inline';
 
 /* Component foundations */
 import './styles.css';
@@ -84,7 +85,7 @@ function installPlatformVisualCohesion(): void {
   if (document.head.querySelector('style[data-sovereign-platform-cohesion="v1"]')) return;
   const style = document.createElement('style');
   style.dataset.sovereignPlatformCohesion = 'v1';
-  style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}\n${workspaceMobileReleaseCss}\n${productionReadinessVisualCss}\n${publicLandingFinalAuthorityCss}`;
+  style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}\n${workspaceMobileReleaseCss}\n${productionReadinessVisualCss}\n${publicLandingFinalAuthorityCss}\n${experienceRefinementCss}`;
   document.head.append(style);
 }
 
