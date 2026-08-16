@@ -26,6 +26,8 @@ const landingField = read('apps/web/src/expression-field/LandingExpressionSlice.
 const landingFieldCss = read('apps/web/src/landing-expression-field-v3.css');
 const landingFieldIntegration = read('apps/web/src/landing-expression-field-integration.css');
 const heroVisual = read('apps/web/src/landing-hero-field-v4.css');
+const refinement = read('apps/web/src/experience-refinement-v1.css');
+const routeCohesionCss = read('apps/web/src/deployed-route-cohesion.css');
 const authenticatedWorkspace = read('apps/web/src/AuthenticatedWorkspace.tsx');
 const workspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 const expressionField = read('apps/web/src/expression-field/ExpressionField.tsx');
@@ -47,6 +49,7 @@ const v0Global = read('apps/web/src/v0-global-experience.css');
 const passkeyCss = read('apps/web/src/passkey-auth.css');
 const staticAuthority = read('apps/web/public/premium-public-release.css');
 const staticV0 = read('apps/web/public/v0-public-port.css');
+const staticRefinement = read('apps/web/public/experience-static-refinement-v1.css');
 const how = read('apps/web/public/how-it-works.html');
 const pricing = read('apps/web/public/pricing.html');
 const faq = read('apps/web/public/faq.html');
@@ -58,7 +61,10 @@ for (const path of [
   'apps/web/src/landing-expression-field-v3.css',
   'apps/web/src/landing-expression-field-integration.css',
   'apps/web/src/landing-hero-field-v4.css',
-  'apps/web/src/passkey-auth.css'
+  'apps/web/src/experience-refinement-v1.css',
+  'apps/web/src/deployed-route-cohesion.css',
+  'apps/web/src/passkey-auth.css',
+  'apps/web/public/experience-static-refinement-v1.css'
 ]) assert(existsSync(path), `Required visual release source is missing: ${path}`);
 
 requireAll('application entry', main, [
@@ -67,7 +73,10 @@ requireAll('application entry', main, [
   "import './landing-expression-field-integration.css'",
   "import './landing-product-stories-v2.css'",
   "import './landing-hero-field-v4.css'",
+  "import './deployed-route-cohesion.css'",
   "import './passkey-auth.css'",
+  "import experienceRefinementCss from './experience-refinement-v1.css?inline'",
+  'style.textContent += `\\n${experienceRefinementCss}`',
   "dataset.sovereignProductStories = 'isolated-mobile-first-v2'",
   'installV0ReleaseFingerprint();'
 ]);
@@ -76,13 +85,16 @@ const fieldImport = "import './landing-expression-field-v3.css';";
 const integrationImport = "import './landing-expression-field-integration.css';";
 const storyImport = "import './landing-product-stories-v2.css';";
 const heroImport = "import './landing-hero-field-v4.css';";
+const routeCohesionImport = "import './deployed-route-cohesion.css';";
 const passkeyImport = "import './passkey-auth.css';";
 assert(main.indexOf(fieldImport) < main.indexOf(integrationImport), 'Field integration must load after field geometry.');
 assert(main.indexOf(integrationImport) < main.indexOf(storyImport), 'Isolated story styling must load after the opening field.');
 assert(main.indexOf(storyImport) < main.indexOf(heroImport), 'Hero field extension must load after isolated story styling.');
-assert(main.indexOf(heroImport) < main.indexOf(passkeyImport), 'Passkey styling must remain the final platform authority.');
-assert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("import './"), 'A local visual file loads after passkey authority.');
+assert(main.indexOf(heroImport) < main.indexOf(routeCohesionImport), 'Route cohesion styling must load after hero interaction authority.');
+assert(main.indexOf(routeCohesionImport) < main.indexOf(passkeyImport), 'Route cohesion styling must load before the final passkey stylesheet authority.');
+assert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("import './"), 'A local stylesheet import loads after passkey authority.');
 
+/* The sequence fingerprint preserves founder archive provenance; active UI copy is verified separately below. */
 requireAll('runtime identity', fingerprint, [
   `V0_ARCHIVE_SHA256 = '${archiveSha}'`,
   `V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`,
@@ -98,16 +110,21 @@ requireAll('public landing', landing, [
   'Healing isn’t optional.',
   'Holding onto the pain is.',
   'Personal AI for real life',
+  'Sovereign begins with the capacity beneath a pattern.',
+  'See a Sovereign answer',
   '<LandingExpressionSlice />',
   '<RealLifeQuestions />',
-  'Bring the question you actually have.',
+  'Start with what’s actually happening.',
   'Why do we keep having the same fight?',
   '<LandingProductStories />',
   '<ComparisonStory />',
   '<FinalCallToAction />',
-  'Other AI answers',
+  'Generic AI',
   'Your thoughts deserve'
 ]);
+for (const retired of ['Ask about your life.', 'What do you want to understand?', 'Bring the question you already have.', 'Bring the question you actually have.']) {
+  assert(!landing.includes(retired), `Public landing contains retired language: ${retired}`);
+}
 
 const landingRenderStart = landing.indexOf('export function PublicLanding()');
 const landingRenderEnd = landing.indexOf('function V0Navigation()', landingRenderStart);
@@ -138,14 +155,20 @@ requireAll('isolated landing demonstrations', stories, [
   'surface="relationship-reasoning"',
   'surface="system-map"',
   'surface="system-reasoning"',
-  'Seeing the capacity beneath it',
+  'Capacity beneath the pattern',
+  'How pressure changes the expression',
+  'What may keep it going',
+  'What could change',
   'Keeping both people distinct',
-  'Mapping the people',
+  'System structure',
   'Illustrative permitted Baselines',
   'No compatibility score',
   'No private-thought claims',
   'Each person controls what may be included'
 ]);
+for (const retired of ['Ask about your life.', 'Get an answer built for you.', 'Bring the question']) {
+  assert(!stories.includes(retired), `Landing demonstrations contain retired language: ${retired}`);
+}
 
 const renderedStoriesStart = stories.indexOf('export function LandingProductStories()');
 assert(renderedStoriesStart >= 0, 'LandingProductStories render source is missing.');
@@ -187,7 +210,7 @@ rejectAll('mobile-first story visual authority', storyCss, [
   'height: 100%'
 ]);
 
-requireAll('integrated opening field', `${landingField}\n${landingFieldCss}\n${landingFieldIntegration}\n${heroVisual}`, [
+requireAll('integrated opening field foundation', `${landingField}\n${landingFieldCss}\n${landingFieldIntegration}\n${heroVisual}`, [
   'data-visual-contract="landing-expression-field-v3"',
   'data-field-geometry="spherical-360"',
   'onPointerDown={handlePointerDown}',
@@ -201,11 +224,17 @@ requireAll('integrated opening field', `${landingField}\n${landingFieldCss}\n${l
   '.landing-expression-slice__ambient',
   '.landing-expression-slice__sphere-shell',
   '.landing-expression-slice__sphere-grid path',
-  'stroke: #2f93ff',
   'background: transparent',
   'border-radius: 0',
   'width: 100vw',
   'touch-action: none'
+]);
+requireAll('final opening field presentation', refinement, [
+  '--landing-blue: #e8ddd0 !important',
+  '--landing-blue-bright: #fffaf3 !important',
+  '.landing-expression-slice__beam',
+  'fill: rgba(241, 233, 222, 0.72) !important',
+  '-webkit-text-stroke: 1.15px rgba(241, 233, 222, 0.82)'
 ]);
 rejectAll('integrated opening field', landingField, ['Math.random', 'giftExpression', 'shadowExpression']);
 assert(!landingField.includes('<div className="landing-expression-slice__tooltip"'), 'The retired floating tooltip returned.');
@@ -221,10 +250,22 @@ requireAll('authenticated workspace', `${authenticatedWorkspace}\n${workspace}`,
   '<SovereignIntelligenceWorkspace onboardingVerified />',
   "type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You'",
   "version: 'sovereign-answer.v2'",
+  'What is active for you now?',
+  'Look closer at the pattern.',
+  'Understand what happens between you.',
+  'See how the whole system functions.',
+  'Keep what changes your understanding.',
   'className="system-graph"',
   'className="basis-strip"',
   '<WorkspaceExpressionField',
   '<ThreadExpressionField'
+]);
+requireAll('final workspace presentation', refinement, [
+  '.sovereign-app-runtime .intelligence-sidebar',
+  '.sovereign-app-runtime .sovereign-composer',
+  '.sovereign-app-runtime .intelligence-context',
+  '--refine-paper: #e8ddd0',
+  '--refine-page: #080a0d'
 ]);
 
 requireAll('deterministic Expression Field', `${expressionField}\n${expressionFieldMath}\n${expressionFieldContract}\n${expressionFieldFixture}`, [
@@ -275,11 +316,13 @@ requireAll('consent-safe system membership', `${membership}\n${product}`, [
   "await requireConsent(env, accountId, personId, 'system.include')"
 ]);
 
-requireAll('application route coverage', v0Platform, [
+requireAll('application route coverage', `${v0Platform}\n${routeCohesionCss}\n${refinement}`, [
   'body:has(.plan-onboarding)',
   'body:has(.sovereign-policy)',
   'body:has(.email-code-fallback)',
-  '@media (max-width: 700px)',
+  '.public-secondary-page',
+  '.private-route-gate',
+  ':where(.plan-onboarding, .public-secondary-page, .public-not-found, .private-route-gate)',
   '@media (prefers-reduced-motion: reduce)'
 ]);
 requireAll('founder visual foundation', `${v0Visual}\n${v0Global}\n${v0Motion}`, [
@@ -292,9 +335,11 @@ requireAll('founder visual foundation', `${v0Visual}\n${v0Global}\n${v0Motion}`,
   '.sovereign-composer',
   '.account-shell'
 ]);
-requireAll('standalone routes', `${staticAuthority}\n${staticV0}\n${how}\n${pricing}\n${faq}`, [
+requireAll('standalone routes', `${staticAuthority}\n${staticV0}\n${staticRefinement}\n${how}\n${pricing}\n${faq}`, [
   "@import url('/v0-public-port.css?v=20260801-founder-v0')",
   `Archive SHA-256: ${archiveSha}`,
+  '/experience-static-refinement-v1.css?v=20260816-refinement-v1',
+  '--v0-blue: #e8ddd0',
   'Sovereign.OS',
   'Build my Baseline',
   '$20',
@@ -315,20 +360,23 @@ for (const [label, css] of [
   ['landing field integration', landingFieldIntegration],
   ['hero field and questions', heroVisual],
   ['isolated product stories', storyCss],
+  ['route cohesion authority', routeCohesionCss],
+  ['experience refinement', refinement],
   ['passkey authority', passkeyCss],
   ['standalone authority', staticV0],
+  ['standalone refinement', staticRefinement],
   ['authenticated Expression Field', expressionFieldCss]
 ]) balanced(label, css);
 
 console.log(JSON.stringify({
   ok: true,
-  release: 'sovereign-v0-public-landing-v3-isolated-stories',
+  release: 'sovereign-v0-public-landing-v3-refined-experience',
   archiveSha256: archiveSha,
   sequenceFingerprint,
   publicField: 'landing-expression-field-v3-spherical-360',
-  questionTreatment: 'rotating-real-life-questions',
+  questionTreatment: 'situational-real-life-questions',
   productStoryDom: 'isolated-mobile-first-v2',
-  productStories: ['personal-chat-workflow', 'relationship-chat-workflow', 'system-chat-workflow'],
+  productStories: ['personal-chat-workflow', 'relationship-context', 'system-context'],
   legacyStoryDomRendered: false,
   mobileNaturalHeightRequired: true,
   canonicalWorkspace: 'SovereignIntelligenceWorkspace',
