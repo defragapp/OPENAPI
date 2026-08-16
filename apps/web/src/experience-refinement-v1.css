@@ -112,7 +112,7 @@
   color: var(--refine-muted) !important;
 }
 
-/* Account entry: one neutral visual language, no blue halo or focus glow. */
+/* Account entry: direct, calm, and visually subordinate to the actual form. */
 .account-shell {
   background:
     radial-gradient(circle at 73% 10%, rgba(241, 233, 222, 0.035), transparent 32rem),
@@ -121,9 +121,31 @@
     var(--refine-page) !important;
 }
 
+.account-layout {
+  column-gap: clamp(44px, 7vw, 96px) !important;
+}
+
+.account-intro {
+  max-width: 600px !important;
+}
+
 .account-intro .eyebrow,
 .auth-panel .eyebrow {
   color: rgba(241, 233, 222, 0.62) !important;
+}
+
+.account-intro .lede {
+  max-width: 46ch !important;
+}
+
+.account-intro-note {
+  max-width: 48ch;
+  margin: 22px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid rgba(241, 233, 222, 0.09);
+  color: rgba(229, 220, 209, 0.5);
+  font-size: 0.82rem;
+  line-height: 1.58;
 }
 
 .auth-panel {
@@ -222,6 +244,18 @@
   margin-inline: auto !important;
 }
 
+.sovereign-app-runtime .surface-heading {
+  border-bottom-color: rgba(241, 233, 222, 0.08) !important;
+}
+
+.sovereign-app-runtime .surface-heading > p {
+  color: rgba(229, 220, 209, 0.4) !important;
+}
+
+.sovereign-app-runtime .surface-heading > span {
+  max-width: 48ch !important;
+}
+
 .sovereign-app-runtime .sovereign-answer {
   border: 1px solid rgba(241, 233, 222, 0.08) !important;
   background: rgba(255, 255, 255, 0.012) !important;
@@ -302,6 +336,10 @@
 }
 
 @media (max-width: 900px) {
+  .account-layout {
+    gap: 34px !important;
+  }
+
   .sovereign-app-runtime .sovereign-composer {
     width: calc(100% - 24px) !important;
     border-radius: 14px !important;
@@ -317,6 +355,11 @@
   .public-approved-v8 .sovereign-opening-trust {
     max-width: 28ch;
     text-align: center;
+  }
+
+  .account-intro-note {
+    margin-top: 16px;
+    padding-top: 14px;
   }
 }
 
