@@ -212,33 +212,29 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
       </header>
       <div className={`account-layout ${mode === 'redeem' ? 'redeem-layout' : ''}`}>
         <section className="account-intro">
-          <p className="eyebrow">{mode === 'login' ? 'WELCOME BACK' : mode === 'signup' ? 'START WITH YOUR BASELINE' : 'SECURE ACCOUNT ACCESS'}</p>
+          <p className="eyebrow">{mode === 'login' ? 'PRIVATE ACCOUNT ACCESS' : mode === 'signup' ? 'START FREE' : 'SECURE ACCOUNT ACCESS'}</p>
           <h1>
             {mode === 'signup'
               ? 'Create your Sovereign.OS account.'
               : mode === 'redeem'
                 ? 'Opening Sovereign.OS.'
-                : 'Return to your Baseline and the questions you were exploring.'}
+                : 'Sign in to Sovereign.OS.'}
           </h1>
           <p className="lede">
             {mode === 'signup'
-              ? 'Create your account, verify your email, then build the personal foundation Sovereign uses.'
+              ? 'Start free. Verify your email, then build your Baseline.'
               : mode === 'redeem'
                 ? 'Your verified account will continue to the next unfinished step.'
-                : 'Enter your email. Sovereign.OS will send a one-time link and six-digit code.'}
+                : 'Use your email and the secure sign-in method available for your account.'}
           </p>
-          {mode !== 'redeem' && (
-            <ul className="account-points">
-              <li>Bring a decision into view with your Baseline underneath it</li>
-              <li>Understand a relationship without guessing another person’s motives</li>
-              <li>See roles and responsibility across a family, household, or team</li>
-            </ul>
+          {mode === 'signup' && (
+            <p className="account-intro-note">Your Baseline becomes the private personal foundation Sovereign uses across self, decisions, relationships, and systems.</p>
           )}
         </section>
 
         <section className="auth-panel">
-          <p className="eyebrow">{mode === 'redeem' ? 'OPENING' : mode === 'signup' ? 'PRIVATE EMAIL VERIFICATION' : 'EMAIL LINK OR CODE'}</p>
-          <h2>{mode === 'signup' ? 'Verify your email to begin.' : mode === 'redeem' ? 'Checking your secure link.' : 'Use email when a passkey is not available.'}</h2>
+          <p className="eyebrow">{mode === 'redeem' ? 'OPENING' : mode === 'signup' ? 'EMAIL VERIFICATION' : 'EMAIL LINK OR CODE'}</p>
+          <h2>{mode === 'signup' ? 'Verify your email to begin.' : mode === 'redeem' ? 'Checking your secure link.' : 'Continue with email.'}</h2>
           {mode !== 'redeem' && (
             <form onSubmit={submit} className="form-stack" noValidate>
               {mode === 'signup' && (
@@ -391,7 +387,7 @@ function InvitationPage() {
       <section className="auth-panel" data-invitation-state={invitationState} aria-labelledby="invitation-title">
         <p className="eyebrow">PRIVATE CONSENT</p>
         <h1 id="invitation-title">Choose what this connection may use.</h1>
-        <p className="lede">Accepting an invitation does not give another person blanket access. Review each requested use separately; you can change your choices later.</p>
+        <p className="lede">An invitation does not grant blanket access. Review each requested use separately; you can change your choices later.</p>
         <div className={`status-note ${statusTone}`} role={phase === 'error' ? 'alert' : 'status'} aria-live="polite"><span>{state}</span></div>
 
         {!invitation && (
@@ -415,7 +411,7 @@ function InvitationPage() {
                 {requestedScopes.map((scope) => <div key={scope}><span><strong>{scopeLabel(scope)}</strong><small>{scopeDescription(scope)}</small></span></div>)}
               </div>
             </section>
-            <button className="primary-button" onClick={acceptInvitation} disabled={accepting}>{accepting ? 'Connecting invitation…' : 'Verify me and review each choice'}</button>
+            <button className="primary-button" onClick={acceptInvitation} disabled={accepting}>{accepting ? 'Connecting invitation…' : 'Accept invitation and review choices'}</button>
           </div>
         )}
 
