@@ -1,6 +1,7 @@
 const publicBase = String(process.env.PUBLIC_BASE_URL || 'https://sovereign.defrag.app').replace(/\/$/, '');
 const expectedCssPath = '/v0-public-static.css?v=20260803-refined-v2';
 const routeCssPath = '/deployed-route-cohesion.css?v=20260803-route-v1';
+const refinementCssPath = '/experience-static-refinement-v1.css?v=20260816-refinement-v1';
 const expectedContract = 'founder-v0-locked-v1';
 const staticRoutes = ['/how-it-works', '/pricing', '/faq'];
 const policyRoutes = ['/privacy', '/terms'];
@@ -40,6 +41,7 @@ function assertStaticDocument(path, document) {
     'data-route-cohesion="v1"',
     `href="${expectedCssPath}"`,
     `href="${routeCssPath}"`,
+    `href="${refinementCssPath}"`,
     'class="launch-nav-inner"',
     'class="launch-wordmark"',
     '>SOVEREIGN.OS</a>',
@@ -59,7 +61,8 @@ staticDocuments.forEach((document, index) => assertStaticDocument(staticRoutes[i
 
 const howItWorks = staticDocuments[0].text;
 assert(howItWorks.includes('class="product-proof-window"'), '/how-it-works is missing the restrained product proof');
-assert(howItWorks.includes('This progress is user-visible context—not hidden model reasoning.'), '/how-it-works does not distinguish visible progress from hidden reasoning');
+assert(howItWorks.includes('This is user-visible context—not hidden model reasoning.'), '/how-it-works does not distinguish visible context from hidden model reasoning');
+assert(howItWorks.includes('without exposing chain-of-thought'), '/how-it-works does not keep hidden reasoning out of the product proof');
 assert(howItWorks.includes('class="launch-section worlds-proof-section"'), '/how-it-works is missing the Worlds product proof');
 assert(howItWorks.includes('See the pattern. Then step into it.'), '/how-it-works is missing the Worlds positioning');
 assert(howItWorks.includes('src="/worlds-how-it-works.svg"'), '/how-it-works is missing the Worlds illustration');
@@ -73,13 +76,15 @@ assert(pricing.includes('aria-label="Sovereign.OS plans"'), '/pricing is missing
 assert(pricing.includes('class="annual-price"'), '/pricing is missing the clarified annual option');
 assert(pricing.includes('$99 / year'), '/pricing is missing the annual price hierarchy');
 
-const [staticCss, routeCss, worldsIllustration] = await Promise.all([
+const [staticCss, routeCss, refinementCss, worldsIllustration] = await Promise.all([
   read(expectedCssPath),
   read(routeCssPath),
+  read(refinementCssPath),
   read('/worlds-how-it-works.svg')
 ]);
 assert(staticCss.response.ok, `secondary stylesheet returned ${staticCss.response.status}`);
 assert(routeCss.response.ok, `route cohesion stylesheet returned ${routeCss.response.status}`);
+assert(refinementCss.response.ok, `static refinement stylesheet returned ${refinementCss.response.status}`);
 assert(worldsIllustration.response.ok, `Worlds illustration returned ${worldsIllustration.response.status}`);
 assert(worldsIllustration.text.includes('Sovereign Worlds illustrative scene'), 'Worlds illustration is missing its accessible title');
 for (const marker of [
@@ -107,6 +112,16 @@ for (const marker of [
 }
 assert(!staticCss.text.includes('--v0-warm'), 'secondary stylesheet still contains the retired warm token');
 assert(!staticCss.text.includes('--v0-sage'), 'secondary stylesheet still contains the retired sage token');
+for (const marker of [
+  '--v0-blue: #e8ddd0',
+  '--v0-blue-bright: #fffaf3',
+  'background: #090b0e',
+  'body.how-page .worlds-aperture img',
+  'filter: saturate(0.18)',
+  '@media (prefers-reduced-motion: reduce)'
+]) {
+  assert(refinementCss.text.includes(marker), `static refinement stylesheet is missing ${marker}`);
+}
 for (const marker of [
   'body.how-page .journey-steps',
   'grid-template-columns: repeat(2, minmax(0, 1fr))',
@@ -161,16 +176,16 @@ for (const marker of [
 ]) {
   assert(compactCss.includes(marker), `compiled route stylesheet is missing ${marker}`);
 }
-const lockedBlueAtmosphereEncodings = [
-  'rgba(47,147,255,.075)',
-  'rgba(47,147,255,0.075)',
-  'rgb(47 147 255/.075)',
-  'rgb(47 147 255/7.5%)',
-  '#2f93ff13'
+const finalRefinementEncodings = [
+  '--refine-paper:#e8ddd0',
+  '--refine-page:#080a0d',
+  '--route-blue:#e8ddd0!important',
+  '--landing-blue:#e8ddd0!important'
 ];
-assert(
-  lockedBlueAtmosphereEncodings.some((marker) => compactCss.includes(marker)),
-  'compiled policy stylesheet is missing the locked blue atmosphere'
-);
+for (const marker of finalRefinementEncodings) {
+  assert(compactCss.includes(marker), `compiled final refinement is missing ${marker}`);
+}
+assert(compactCss.includes('-webkit-text-stroke:'), 'compiled final refinement is missing the founder outline treatment');
+assert(compactCss.includes('.sovereign-app-runtime.sovereign-composer') || compactCss.includes('.sovereign-app-runtime .sovereign-composer'), 'compiled final refinement is missing the workspace composer authority');
 
-console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} cohesion=v1 worlds=illustrative`);
+console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} cohesion=v1 refinement=v1 worlds=illustrative`);
