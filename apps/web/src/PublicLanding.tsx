@@ -18,16 +18,16 @@ const REAL_LIFE_QUESTIONS = [
 
 const COMPARISON = {
   others: [
-    'Starts with the latest message',
-    'Gives advice for an average user',
-    'Treats every chat as a new beginning',
-    'Loses the relationship and system around the question'
+    'Begins with the current conversation',
+    'Context can fragment across separate chats',
+    'Often treats each problem independently',
+    'May not retain the relationship or system around the question'
   ],
   sovereign: [
     'Starts with your Baseline',
     'Keeps permitted context connected',
     'Distinguishes you, the relationship, and the system',
-    'Answers the question underneath the question'
+    'Keeps evidence, interpretation, and unknowns visible'
   ]
 } as const;
 const RELEASE_COPY_MARKERS = ['everyone the same.'] as const;
@@ -163,8 +163,8 @@ function RealLifeQuestions() {
       aria-labelledby="landing-question-orbit-title"
     >
       <div className="v0-shell landing-question-orbit__inner">
-        <p className="landing-question-orbit__kicker">Bring the question you already have</p>
-        <h2 id="landing-question-orbit-title">Ask about your life. Get an answer built around you.</h2>
+        <p className="landing-question-orbit__kicker">Real life, not a blank prompt</p>
+        <h2 id="landing-question-orbit-title">Start with what’s actually happening.</h2>
         <div className="landing-question-orbit__stage" aria-hidden="true">
           {REAL_LIFE_QUESTIONS.map((question) => <span key={question}>{question}</span>)}
         </div>
@@ -191,7 +191,7 @@ function ComparisonStory() {
           </h2>
         </header>
         <div className="v0-comparison-grid" data-viewport-surface="comparison">
-          <ComparisonPanel title="Other AI answers" items={COMPARISON.others} positive={false} />
+          <ComparisonPanel title="Generic AI" items={COMPARISON.others} positive={false} />
           <ComparisonPanel title={<BrandMark />} items={COMPARISON.sovereign} positive />
         </div>
       </div>
@@ -205,7 +205,7 @@ function FinalCallToAction() {
       <h2 aria-label="Your thoughts deserve a better place to live.">
         Your thoughts<br />deserve<br />a better place to live.
       </h2>
-      <p>Build your Baseline. Bring the question you actually have. Keep the answer, the context, and what is still unknown connected.</p>
+      <p>Use your Baseline as the starting point. Keep the answer, the context, and what is still unknown connected.</p>
       <a className="landing-control landing-control--primary" href="/signup">
         <span>Build my Baseline</span><ArrowIcon />
       </a>
