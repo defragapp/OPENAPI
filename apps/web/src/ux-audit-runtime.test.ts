@@ -15,8 +15,10 @@ describe('workspace UX audit', () => {
   });
 
   it('provides meaningful first-run guidance without administrative incomplete states', () => {
-    expect(workspace).toContain('Ask what you actually want to understand.');
-    expect(workspace).toContain('Ask what remains steady beneath today.');
+    expect(workspace).toContain('What feels different today?');
+    expect(workspace).toContain('What still feels steady underneath it?');
+    expect(workspace).toContain('Describe the pattern you want to look at.');
+    expect(workspace).toContain('Where does this change under pressure?');
     expect(workspace).toContain('Your intelligence begins with your Baseline.');
     expect(workspace).toContain('Build my Baseline');
     expect(workspace).not.toContain('INCOMPLETE');
