@@ -140,11 +140,18 @@ async function configureAiGateway(client, accountId, gatewayId) {
       technique: result.rate_limiting_technique || 'sliding'
     };
   } catch (error) {
-    if (error?.status !== 404) throw error;
+    const status = Number(error?.status || 0);
+    const authCode = Number(error?.payload?.errors?.[0]?.code || 0);
+    const managementUnavailable = status === 404 || status === 401 || status === 403 || authCode === 10000;
+    if (!managementUnavailable) throw error;
     return {
       id: gatewayId,
       management: 'unavailable',
-      reason: 'Cloudflare AI Gateway management API returned 404 for this account or token',
+      reason: status === 404
+        ? 'Cloudflare AI Gateway management API is unavailable for this account or credential'
+        : 'Cloudflare AI Gateway management requires a credential accepted by the AI Gateway management API; continuing with per-request privacy controls',
+      status: status || undefined,
+      code: authCode || undefined,
       perRequestPrivacy: {
         skipCache: true,
         collectLog: false
