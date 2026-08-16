@@ -9,12 +9,19 @@ const robots = readFileSync(new URL('../public/robots.txt', import.meta.url), 'u
 const sitemap = readFileSync(new URL('../public/sitemap.xml', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
+const language = readFileSync(new URL('../../../docs/product-language-system.md', import.meta.url), 'utf8');
 const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
 const v0Css = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
 const fieldCss = readFileSync(new URL('./landing-expression-field-v3.css', import.meta.url), 'utf8');
 const integrationCss = readFileSync(new URL('./landing-expression-field-integration.css', import.meta.url), 'utf8');
 const heroExtension = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
 const storiesCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
+
+const retiredInterfacePhrases = [
+  'Ask about your life. Get an answer built around you.',
+  'What do you want to understand?',
+  'Bring the question you already have.'
+] as const;
 
 describe('founder v0 public production release', () => {
   it('publishes canonical and controlled social metadata', () => {
@@ -47,17 +54,17 @@ describe('founder v0 public production release', () => {
     expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
   });
 
-  it('restores the rotating question treatment and three workflow demonstrations without duplicate fields', () => {
-    expect(landing).toContain('Bring the question you actually have.');
+  it('keeps recognition situational and the three demonstrations structurally distinct', () => {
+    expect(landing).toContain('Start with what’s actually happening.');
     expect(landing).toContain('Why do we keep having the same fight?');
     expect(landing).toContain('<LandingProductStories />');
     for (const marker of [
-      'Ask about your life.',
-      'Understand what happens',
-      'From one person',
-      'Seeing the capacity beneath it',
+      'See the capacity beneath the pattern.',
+      'Understand what happens between you.',
+      'See what keeps the pattern going—and what could change it.',
+      'Capacity beneath the pattern',
       'Keeping both people distinct',
-      'Mapping the people',
+      'System structure',
       'surface="personal-chat"',
       'surface="relationship-chat"',
       'surface="system-map"'
@@ -65,6 +72,17 @@ describe('founder v0 public production release', () => {
     expect(stories).not.toContain('LandingExpressionFieldPreview');
     expect(stories).not.toContain('sphere');
     expect(stories).not.toContain('globe');
+  });
+
+  it('keeps retired chatbot phrasing out of active public language', () => {
+    for (const phrase of retiredInterfacePhrases) {
+      expect(landing).not.toContain(phrase);
+      expect(stories).not.toContain(phrase);
+      expect(how).not.toContain(phrase);
+      expect(pricing).not.toContain(phrase);
+      expect(questions).not.toContain(phrase);
+    }
+    expect(language).toContain('## Retired and prohibited phrasing');
   });
 
   it('retains the founder hierarchy and responsive behavior', () => {
