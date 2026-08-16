@@ -58,8 +58,8 @@ Use these distinctions wherever interaction or recurrence is discussed:
 
 A public visitor should understand the interaction before learning framework terminology:
 
-- ask Sovereign a natural-language question;
-- receive a direct answer built around the person asking;
+- start with the real situation, decision, relationship, or recurring pattern;
+- receive the direct answer before technical detail;
 - see what is supported, interpretive, confirmed, or still unknown;
 - explore more deeply only when it is useful.
 
@@ -71,9 +71,11 @@ Baseline Design is the personal intelligence foundation. It gives Sovereign a co
 
 `Private personal AI for real life.`
 
-### Interaction promise
+### Interaction principle
 
-`Ask about your life. Get an answer built around you.`
+`See the pattern. See what could change.`
+
+This is not a chatbot invitation. Do not frame the product with generic open-ended prompts. Start from recognizable situations and make the relevant structure visible.
 
 ### Emotional brand statement
 
@@ -97,7 +99,7 @@ Write in clear, adult language. Be calm, specific, and direct. State the central
 
 Use uncertainty words only where uncertainty requires them. Do not weaken every sentence.
 
-Do not use generic coaching, inspirational filler, therapy voice, diagnosis, spiritual certainty, specialist-first language, or verdicts about another person.
+Do not use generic coaching, inspirational filler, therapy voice, diagnosis, spiritual certainty, specialist-first language, generic chatbot invitations, or verdicts about another person.
 
 ## Core terms
 
@@ -176,21 +178,21 @@ Root landing supporting copy:
 Primary section language:
 
 - `WHY SOVEREIGN EXISTS`
-- `BRING THE QUESTION YOU ALREADY HAVE`
+- `START WITH WHAT’S ACTUALLY HAPPENING`
 - `WHY THIS AI IS DIFFERENT`
 - `ONE QUALITY · MORE THAN ONE EXPRESSION`
 - `TWO PEOPLE · SHARED WITH PERMISSION`
 - `FAMILIES · TEAMS · HUMAN SYSTEMS`
 - `CLEAR ANSWER FIRST`
 
-The first visible answer should use a real-life question, such as:
+The recognition transition should use one real-life situation at a time, such as:
 
 - `Why do I keep taking responsibility for everyone else?`
 - `Does this decision fit who I am now?`
 - `Why does the same moment land differently for us?`
 - `Why does this responsibility keep landing with me?`
 
-Do not open the public page with framework terminology, source abbreviations, or a philosophy-only headline.
+Do not open the public page with framework terminology, source abbreviations, a philosophy-only headline, or a generic chatbot invitation.
 
 ## Authentication
 
@@ -202,7 +204,7 @@ Signup:
 Login:
 
 - Headline: `Sign in to Sovereign.OS.`
-- Body: `Use your email and the available secure sign-in method for your account.`
+- Body: `Use your email and the secure sign-in method available for your account.`
 
 Do not use privacy slogans or spiritual promises in account access copy.
 
@@ -222,26 +224,27 @@ Unknown birth time is a supported path. Explain which outputs remain unavailable
 Today:
 
 - `What is active for you now?`
-- `Begin with what remains steady in your Baseline, then see which parts may be more relevant today.`
+- `Begin with what remains steady in your Baseline, then see what may be louder today.`
 
 Explore:
 
-- `What do you want to understand?`
+- `Look closer at the pattern.`
+- `Examine a pattern, decision, pressure point, or recurring tension against your Baseline.`
 
 People:
 
-- `Understand the relationship from both sides.`
-- `Choose someone who has connected their account and permitted comparison, or invite a person to begin.`
+- `Understand what happens between you.`
+- `Keep each person distinct, then examine the interaction itself.`
 
 Systems:
 
-- `See how the whole group functions.`
-- `Choose a family, household, team, workplace, friendship group, or custom system. Keep roles, authority, responsibility, pressure, and perspective in view.`
+- `See how the whole system functions.`
+- `Keep roles, authority, responsibility, pressure, and perspective in view.`
 
 Library:
 
 - `Keep what changes your understanding.`
-- `Save useful Baseline insights, alignment distinctions, relationship understandings, and system views. Library is not a journal or transcript archive.`
+- `Return to distinctions worth carrying forward. Library is not a journal or transcript archive.`
 
 You:
 
@@ -251,7 +254,7 @@ You:
 
 Free:
 
-- `A personal AI built around you.`
+- `Personal intelligence grounded in your Baseline.`
 - $0, permanent, no card.
 - 10 Sovereign AI turns each month.
 
@@ -263,9 +266,17 @@ Sovereign+:
 
 Do not alter live prices, products, lookup keys, or entitlement descriptions.
 
-## Prohibited phrasing
+## Retired and prohibited phrasing
 
-Avoid:
+Never use these as active product/interface language:
+
+- `Ask about your life.`;
+- `Ask about your life. Get an answer built around you.`;
+- `What do you want to understand?`;
+- `Bring the question you already have.`;
+- generic variants such as `What would you like to explore?`, `Ask anything.`, or `Tell me what's on your mind.`.
+
+Also avoid:
 
 - “possible interaction vector”;
 - “calculated solution”;
