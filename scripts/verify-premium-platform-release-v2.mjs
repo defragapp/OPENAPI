@@ -62,6 +62,10 @@ const replacements = [
   [
     "  ['passkey authority', passkeyVisual],\n  ['standalone authority', staticV0Visual],",
     "  ['route cohesion authority', routeCohesionVisual],\n  ['experience refinement', refinementVisual],\n  ['passkey authority', passkeyVisual],\n  ['standalone authority', staticV0Visual],\n  ['standalone refinement', staticRefinementVisual],"
+  ],
+  [
+    "  sequenceFingerprint,\n",
+    ""
   ]
 ];
 
