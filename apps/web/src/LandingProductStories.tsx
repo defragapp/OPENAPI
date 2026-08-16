@@ -10,15 +10,13 @@ type WorkflowStep = {
   chips?: readonly string[];
 };
 
-/* Historical source fingerprints only. None of these classes are rendered. */
+/* Historical visual fingerprints only. None of these classes are rendered. */
 const RELEASE_LINEAGE_MARKERS = [
   'className="v0-story-grid"',
   'className="v0-baseline-trace"',
   'v0-window v0-flow v0-workflow-panel',
   'v0-workflow-panel',
   'v0-family-system-map',
-  'Ask about your life.',
-  'Get an answer built for you.',
   'From one person',
   'to the whole system.'
 ] as const;
@@ -52,23 +50,23 @@ const DUO_BASELINE: readonly EvidenceGroup[] = [
 const SELF_FLOW: readonly WorkflowStep[] = [
   {
     kind: 'input',
-    title: 'Seeing the capacity beneath it',
+    title: 'Capacity beneath the pattern',
     body: 'Sovereign brings forward the useful capacity connected to responsibility, steadiness, and pressure.'
   },
   {
     kind: 'read',
-    title: 'Seeing how it is expressing',
+    title: 'How pressure changes the expression',
     body: 'When uncertainty rises, the capacity for steadiness may express as becoming responsible for everyone.',
     chips: ['GK 13.4', 'MARS · CANCER']
   },
   {
     kind: 'connect',
-    title: 'Seeing what keeps it going',
+    title: 'What may keep it going',
     body: 'Helping uses your capacity. Carrying the outcome can teach the group to return responsibility to you.'
   },
   {
     kind: 'direction',
-    title: 'Seeing what could change',
+    title: 'What could change',
     body: 'Care can remain. Ownership can return to the person it belongs to.'
   }
 ] as const;
@@ -96,19 +94,19 @@ function PersonalStory() {
     <section ref={sectionRef} id="how" className="landing-story landing-story--personal" data-viewport-section="personal">
       <div className="landing-story__shell">
         <StoryHeading step="01 · You" title="See the capacity beneath the pattern.">
-          Bring a real question. Sovereign begins with the useful capacity underneath, then shows how it may be expressing under pressure.
+          Sovereign begins with the useful capacity underneath the situation, then separates the capacity itself from how pressure may be changing its expression.
         </StoryHeading>
         <div className="landing-story__stage" data-viewport-stage="personal">
-          <ChatWindow title="Sovereign — Chat" surface="personal-chat">
+          <ChatWindow title="Sovereign — Personal" surface="personal-chat">
             <Message side="user">Why do I keep becoming responsible for everyone else’s stability?</Message>
             <Message side="assistant">
               Your Baseline supports steadiness and responsibility. Under pressure, that strength can turn into carrying outcomes you do not control. The useful distinction is between helping and becoming responsible for whether everyone is okay.
               <BaselineTrace groups={SELF_BASELINE} />
             </Message>
             <Message side="user">How do I stop without feeling selfish?</Message>
-            <ComposerPreview>Ask a follow-up…</ComposerPreview>
+            <ComposerPreview>What changes if I stop carrying the outcome?</ComposerPreview>
           </ChatWindow>
-          <WorkflowPanel title="How Sovereign works it through" steps={SELF_FLOW} surface="personal-reasoning" />
+          <WorkflowPanel title="How the distinction is built" steps={SELF_FLOW} surface="personal-reasoning" />
         </div>
       </div>
     </section>
@@ -121,16 +119,16 @@ function RelationshipStory() {
     <section ref={sectionRef} id="relationship" className="landing-story landing-story--relationship" data-viewport-section="relationship">
       <div className="landing-story__shell">
         <StoryHeading step="02 · You + 1" title="Understand what happens between you.">
-          With permission, Sovereign keeps both people distinct. See each perspective, the interaction, and what the relationship creates between you.
+          With permission, Sovereign keeps each person’s supplied context distinct, then examines the interaction without claiming motives or private feelings.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--relationship" data-viewport-stage="relationship">
-          <ChatWindow title="Sovereign — Shared Chat" surface="relationship-chat">
+          <ChatWindow title="Sovereign — Relationship" surface="relationship-chat">
             <Message side="user">Why does the same conversation feel urgent to my partner and unfinished to me?</Message>
             <Message side="assistant">
               You may need time to settle into clarity. Your partner may recognize a position quickly. The friction is not necessarily about commitment; it may be about pace.
               <BaselineTrace groups={DUO_BASELINE} />
             </Message>
-            <ComposerPreview>Ask about the two of you…</ComposerPreview>
+            <ComposerPreview>What keeps happening between us?</ComposerPreview>
           </ChatWindow>
           <RelationshipContext />
         </div>
@@ -146,7 +144,7 @@ function SystemStory() {
     <section ref={sectionRef} id="system" className="landing-story landing-story--system" data-viewport-section="system">
       <div className="landing-story__shell">
         <StoryHeading step="03 · Your people" title="See what keeps the pattern going—and what could change it.">
-          Map supported roles, responsibility, authority, pressure, and possible change across a family, team, or group.
+          Keep roles, responsibility, authority, pressure, and perspective in view across a family, team, or group.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--system" data-viewport-stage="system">
           <ChatWindow title="Sovereign — Family System" surface="system-map">
@@ -155,7 +153,7 @@ function SystemStory() {
               The family may rely on you to stabilize uncertainty. Once that role becomes expected, everyone organizes around it—so even small decisions return to you.
             </Message>
             <FamilySystemMap />
-            <ComposerPreview>Ask about your family…</ComposerPreview>
+            <ComposerPreview>Where does responsibility keep returning?</ComposerPreview>
           </ChatWindow>
           <SystemContext />
         </div>
@@ -234,7 +232,7 @@ function RelationshipContext() {
         <section>
           <small>Partner</small>
           <strong>Clarity may arrive quickly.</strong>
-          <span>A direct answer can be certainty rather than pressure.</span>
+          <span>A direct answer can reflect certainty rather than pressure.</span>
         </section>
         <div className="landing-context-distinction">
           <small>Between you</small>
@@ -250,8 +248,8 @@ function SystemContext() {
   return (
     <article className="landing-demo landing-demo--context landing-demo--system-context" data-viewport-surface="system-reasoning">
       <header className="landing-demo__bar landing-demo__bar--context">
-        <span>Mapping the people</span>
-        <small>System context</small>
+        <span>System structure</span>
+        <small>Permitted context</small>
       </header>
       <div className="landing-context-view landing-context-view--system">
         <section>
@@ -386,7 +384,7 @@ function useWorkflowProgress(ref: RefObject<HTMLElement | null>, length: number)
         return;
       }
       for (let step = 0; step < length; step += 1) {
-        timers.push(window.setTimeout(() => setIndex(step), 420 + step * 920));
+        timers.push(window.setTimeout(() => setIndex(step), 240 + step * 620));
       }
     };
 
@@ -396,7 +394,7 @@ function useWorkflowProgress(ref: RefObject<HTMLElement | null>, length: number)
         if (!entry?.isIntersecting) return;
         reveal();
         observer?.disconnect();
-      }, { threshold: 0.42 });
+      }, { threshold: 0.34 });
       observer.observe(node);
     } else {
       reveal();
