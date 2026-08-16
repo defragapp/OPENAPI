@@ -102,23 +102,23 @@ type WorkspaceState = {
 };
 
 const surfaces: Array<{ name: Surface; label: string; description: string }> = [
-  { name: 'Today', label: 'Today', description: 'See how it may be expressing now' },
-  { name: 'Explore', label: 'Explore', description: 'See the capacity beneath a pattern' },
-  { name: 'People', label: 'People', description: 'See what happens between you' },
-  { name: 'Systems', label: 'Systems', description: 'See what keeps the pattern going' },
-  { name: 'Library', label: 'Library', description: 'Keep what could change it' },
-  { name: 'You', label: 'You', description: 'Baseline, plan, and control' }
+  { name: 'Today', label: 'Today', description: 'What is active for you now' },
+  { name: 'Explore', label: 'Explore', description: 'Look closer at the pattern' },
+  { name: 'People', label: 'People', description: 'Understand what happens between you' },
+  { name: 'Systems', label: 'Systems', description: 'See how the whole system functions' },
+  { name: 'Library', label: 'Library', description: 'Keep what changes your understanding' },
+  { name: 'You', label: 'You', description: 'Baseline, plan, permissions, and account' }
 ];
 
 const expressionAxisIdSet = new Set<string>(expressionAxisIds);
 
 const composerExamples: Record<Surface, string[]> = {
-  Today: ['Ask what feels louder than usual.', 'Ask what remains steady beneath today.'],
-  Explore: ['Ask what you actually want to understand.', 'Ask why a useful capacity changes under pressure.'],
-  People: ['Ask what each of you may be bringing into the interaction.'],
-  Systems: ['Ask where responsibility and authority have separated.'],
+  Today: ['What feels different today?', 'What still feels steady underneath it?'],
+  Explore: ['Describe the pattern you want to look at.', 'Where does this change under pressure?'],
+  People: ['What keeps happening between you?'],
+  Systems: ['Where does responsibility keep landing?'],
   Library: ['Continue from a distinction you chose to keep.'],
-  You: ['Ask what your Baseline can and cannot support.']
+  You: ['What does my Baseline support here?']
 };
 
 export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: { onboardingVerified?: boolean }) {
@@ -265,9 +265,9 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     clearResponseProgress();
     const phases = [
       'Connecting your Baseline',
-      workspace.today?.current?.status === 'ready' ? 'Checking what is active now' : 'Separating what is steady from what is inferred',
+      workspace.today?.current?.status === 'ready' ? 'Checking current context' : 'Separating what is steady from what is inferred',
       'Separating what is known from what is inferred',
-      'Building the answer'
+      'Preparing the answer'
     ];
     let phase = 0;
     const show = () => {
@@ -281,7 +281,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       if (phase >= phases.length - 1) return clearResponseProgress();
       phase += 1;
       show();
-    }, 1_600);
+    }, 1_200);
   }
 
   function startNewThread(nextSurface: Surface = surface) {
@@ -632,7 +632,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
                 onBlur={() => setComposerFocused(false)}
                 placeholder={composerPlaceholder(surface)}
                 rows={2}
-                aria-label={`Ask Sovereign from ${surface}`}
+                aria-label={`Message Sovereign from ${surface}`}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter' && !event.shiftKey) {
                     event.preventDefault();
@@ -865,9 +865,9 @@ function BaselineReveal({ result, today, onOpenToday, onCurrentContext }: {
     <section className="baseline-reveal">
       <p>Your Baseline is ready.</p>
       <h1>{core?.title ?? 'Your personal foundation is ready to explore.'}</h1>
-      <span>{core?.description ?? 'Sovereign can now keep a stable, correctable personal foundation beneath questions about decisions, relationships, pressure, and change.'}</span>
+      <span>{core?.description ?? 'Sovereign can now keep a stable, correctable personal foundation beneath decisions, relationships, pressure, and change.'}</span>
       <BasisStrip values={support.filter(isBasisValue)} />
-      <p className="baseline-reveal-distinction">{communication?.description ?? decisions?.description ?? pressure?.description ?? 'Your Baseline is ready beneath the questions you choose to ask.'}</p>
+      <p className="baseline-reveal-distinction">{communication?.description ?? decisions?.description ?? pressure?.description ?? 'Your Baseline is ready beneath the situations you examine.'}</p>
       <div className="baseline-current-choice">
         <span>{currentReady ? 'Current context is available · Your stable Baseline remains separate.' : 'Current context is off · Your Baseline remains available.'}</span>
         <button onClick={onCurrentContext}>Choose whether to add it</button>
@@ -913,29 +913,29 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   if (surface === 'Explore') return <ExploreHome workspace={workspace} />;
   if (surface === 'People') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="People" title="See what happens between you." body="With permission, keep both people distinct while examining the interaction, what each person can own, and what still needs to be asked directly." />
+      <SurfaceHeading kicker="People" title="Understand what happens between you." body="Keep each person distinct, then examine the interaction itself, what each person can own, and what still needs to be asked directly." />
       {selectedPerson
         ? <RelationshipOverview person={selectedPerson} api={api} />
-        : <EmptyState title="Bring one relationship into view." body="A name alone does not create access. The other person connects their account and chooses what Sovereign may use." action="Invite or choose someone" onAction={onOpenContext} />}
+        : <EmptyState title="Choose one relationship to examine." body="A name alone does not create access. The other person connects their account and chooses what Sovereign may use." action="Invite or choose someone" onAction={onOpenContext} />}
     </div>
   );
   if (surface === 'Systems') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="Systems" title="See what keeps the pattern going—and what could change it." body="Choose a permitted group and keep roles, authority, responsibility, pressure, observations, and missing perspectives in view." />
+      <SurfaceHeading kicker="Systems" title="See how the whole system functions." body="Keep roles, authority, responsibility, pressure, observations, and missing perspectives in view." />
       {selectedSystem
         ? <SystemOverview system={selectedSystem} api={api} />
-        : <EmptyState title="Bring the whole structure into view." body="Choose a permitted group to see supported roles, authority, responsibility, pressure, and the perspectives that remain missing." action="Choose a system" onAction={onOpenContext} />}
+        : <EmptyState title="Choose a system to examine." body="Choose a permitted group to see supported roles, authority, responsibility, pressure, and the perspectives that remain missing." action="Choose a system" onAction={onOpenContext} />}
     </div>
   );
   if (surface === 'Library') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="Library" title="Keep the distinction that could change the pattern." body="Return to useful Baseline capacities, expression distinctions, relationship understandings, and system views. Library is not a journal or transcript archive." />
+      <SurfaceHeading kicker="Library" title="Keep what changes your understanding." body="Return to useful Baseline distinctions, relationship understandings, and system views. Library is not a journal or transcript archive." />
       <LibraryGrid library={workspace.library} onPrompt={onPrompt} />
     </div>
   );
   return (
     <div className="surface-home">
-      <SurfaceHeading kicker="You" title="Your personal foundation and control." body="Keep your Baseline, current context, people, privacy, plan, and account together." />
+      <SurfaceHeading kicker="You" title="Your Baseline, plan, permissions, and account." body="Keep stable Baseline data, temporary context, permissions, privacy, plan, and account controls together." />
       <AccountSummary workspace={workspace} onOpenContext={onOpenContext} onBuildBaseline={onBuildBaseline} />
     </div>
   );
@@ -956,8 +956,8 @@ function BaselineInvitation({ onBuild }: { onBuild: () => void }) {
       </div>
       <div className="baseline-foundation-visual" aria-hidden="true"><span /><span /><span /><i /></div>
       <div className="baseline-composer-preview">
-        <strong>Ask something grounded in your Baseline…</strong>
-        <span>Your future questions and explorations will draw from your personal foundation.</span>
+        <strong>Your Baseline stays beneath every exploration.</strong>
+        <span>Future questions and saved distinctions draw from the same personal foundation.</span>
       </div>
     </section>
   );
@@ -986,8 +986,8 @@ function TodayFacetView({ facets, current, registry }: { facets: Json[]; current
     <section className="today-facet-view">
       <header>
         <p>Today</p>
-        <h1>Begin with what remains steady.</h1>
-        <span>See the capacity beneath what is happening, then distinguish anything that may be expressing more strongly today.</span>
+        <h1>What is active for you now?</h1>
+        <span>Begin with what remains steady in your Baseline, then see what may be louder today.</span>
       </header>
       <p className="today-steady"><strong>What remains steady</strong>{core?.description ?? 'Your validated Baseline remains available beneath the conversation.'}</p>
       <p className="today-current" data-state={current?.status ?? 'not_started'}><strong>Temporary current context</strong>{active ? `${active.title} is supported as temporarily more relevant. It does not determine your behavior.` : current?.status === 'ready' ? `On${current?.reduced?.expiresAt ? ` until ${formatCurrentExpiry(current.reduced.expiresAt)}` : ''}. No temporary factor is being elevated above your stable Baseline here.` : current?.status === 'expired' ? 'Expired. It will not be shown as live or used until you refresh it.' : current?.status === 'unavailable' ? 'Unavailable. Your stable Baseline remains unchanged.' : 'Off. Your stable Baseline remains available.'}</p>
@@ -1002,7 +1002,7 @@ function ExploreHome({ workspace }: { workspace: WorkspaceState }) {
     : [];
   return (
     <div className="surface-home explore-home">
-      <SurfaceHeading kicker="Explore" title="See the capacity beneath the pattern." body="Ask what you actually want to understand. Sovereign can distinguish the capacity, its expression, the relevant interaction or system, and what could change—without forcing every question into all four parts." />
+      <SurfaceHeading kicker="Explore" title="Look closer at the pattern." body="Examine a pattern, decision, pressure point, or recurring tension against your Baseline. Sovereign can separate the capacity, its expression, relevant interactions or systems, and what could change without forcing every situation into all four parts." />
       <BasisStrip values={registry} />
     </div>
   );
@@ -1394,7 +1394,7 @@ function ContextPanel(props: {
   if (props.surface === 'Systems') return <SystemControls {...props} />;
   if (props.surface === 'Library') return <LibraryGrid library={props.workspace.library} onPrompt={props.setDraft} compact />;
   if (props.surface === 'You') return <YouControls {...props} />;
-  return <div className="context-stack context-summary"><p className="context-intro">Sovereign will select only the validated Baseline facets and exact Basis values that materially support the question you choose to ask.</p><small>Temporary current context remains separate and is used only while it is enabled, unexpired, and relevant.</small></div>;
+  return <div className="context-stack context-summary"><p className="context-intro">Sovereign selects only the validated Baseline facets and exact Basis values that materially support the situation you are examining.</p><small>Temporary current context remains separate and is used only while it is enabled, unexpired, and relevant.</small></div>;
 }
 
 function PeopleControls({ workspace, selectedPerson, setSelectedPerson, api, refresh }: any) {
@@ -1740,12 +1740,12 @@ function modeLabel(mode: SovereignAnswer['mode']) {
 }
 
 function composerPlaceholder(surface: Surface) {
-  return surface === 'People' ? 'Ask about this relationship…'
-    : surface === 'Systems' ? 'Ask about this system…'
-      : surface === 'Explore' ? 'Ask about a quality, choice, behavior, or direction…'
+  return surface === 'People' ? 'What keeps happening between you?'
+    : surface === 'Systems' ? 'Where does the pressure keep landing?'
+      : surface === 'Explore' ? 'Describe the pattern you want to look at…'
         : surface === 'Library' ? 'Continue from something you saved…'
-          : surface === 'You' ? 'Ask about your Baseline or personal context…'
-            : 'Ask about what feels relevant now…';
+          : surface === 'You' ? 'What does my Baseline support here?'
+            : 'What feels different today?';
 }
 
 function newThreadId(surface: Surface) {
