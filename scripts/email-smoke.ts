@@ -38,25 +38,33 @@ const env = {
   PUBLIC_CONTACT_EMAIL: contactAddress
 } as unknown as Env;
 
-const result = await sendOperationalEmail(env, {
-  to: recipient,
-  subject: `Sovereign.OS email delivery verified · ${appVersion.slice(0, 7)}`,
-  ...template,
-  idempotencyKey: `sovereign-email-smoke-${releaseLabel}`,
-  category: 'operational'
+async function main(): Promise<void> {
+  const result = await sendOperationalEmail(env, {
+    to: recipient,
+    subject: `Sovereign.OS email delivery verified · ${appVersion.slice(0, 7)}`,
+    ...template,
+    idempotencyKey: `sovereign-email-smoke-${releaseLabel}`,
+    category: 'operational'
+  });
+
+  const delivery = await waitForDelivery(result.id, deliveryTimeoutMs);
+
+  console.log(JSON.stringify({
+    ok: delivery.lastEvent === 'delivered',
+    provider: result.provider,
+    providerMessageId: result.id,
+    lastEvent: delivery.lastEvent,
+    recipientDomain: recipient.split('@')[1],
+    fromDomain: fromAddress.split('@')[1],
+    version: appVersion
+  }, null, 2));
+}
+
+main().catch((error) => {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`Email smoke failed: ${message}`);
+  process.exit(1);
 });
-
-const delivery = await waitForDelivery(result.id, deliveryTimeoutMs);
-
-console.log(JSON.stringify({
-  ok: delivery.lastEvent === 'delivered',
-  provider: result.provider,
-  providerMessageId: result.id,
-  lastEvent: delivery.lastEvent,
-  recipientDomain: recipient.split('@')[1],
-  fromDomain: fromAddress.split('@')[1],
-  version: appVersion
-}, null, 2));
 
 async function waitForDelivery(emailId: string, timeoutMs: number): Promise<{ lastEvent: string }> {
   const deadline = Date.now() + timeoutMs;

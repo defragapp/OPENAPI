@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 const checks = [
   ['node', ['scripts/scan-production-fixtures.mjs']],
   ['node', ['scripts/verify-direct-preview-config.mjs']],
-  ['node', ['scripts/verify-production-release-v2.mjs']],
+  ['node', ['scripts/verify-production-release-v3.mjs', 'scripts/verify-production-release-v2.mjs']],
   ['node', ['--import', 'tsx', 'scripts/release-closure-smoke.ts']],
   ['git', ['diff', '--check']]
 ] as const;
