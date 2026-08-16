@@ -12,10 +12,11 @@ const storyStyles = read('./landing-product-stories-v2.css');
 const approvedStyles = read('./public-landing-approved-v8.css');
 const heroExtension = read('./landing-hero-field-v4.css');
 const finalAuthority = read('./public-landing-final-authority.css');
+const refinement = read('./experience-refinement-v1.css');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
 describe('approved public landing v8', () => {
-  it('loads the v0 foundation, field, stories, landing authority, route cohesion, and passkey authority in order', () => {
+  it('loads the founder foundation and appends one bounded refinement authority', () => {
     const fieldImport = "import './landing-expression-field-v3.css';";
     const integrationImport = "import './landing-expression-field-integration.css';";
     const lineageImport = "import './v0-restored-product-stories.css';";
@@ -32,10 +33,12 @@ describe('approved public landing v8', () => {
     expect(main.indexOf(routeImport)).toBeGreaterThan(main.indexOf(heroImport));
     expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(routeImport));
     expect(main.slice(main.indexOf(passkeyImport) + passkeyImport.length)).not.toContain("import './");
+    expect(main).toContain("import experienceRefinementCss from './experience-refinement-v1.css?inline';");
+    expect(main).toContain('style.textContent += `\\n${experienceRefinementCss}`;');
     expect(main).not.toContain("import './public-landing-approved-v7.css';");
   });
 
-  it('renders the approved immersive hero, real-life questions, and three product demonstrations', () => {
+  it('renders the founder hero, situational recognition, and three product demonstrations', () => {
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('data-layout-release="v0-motion-workflows-v8"');
     expect(landing).toContain('<BrandMark />');
@@ -45,19 +48,20 @@ describe('approved public landing v8', () => {
     expect(landing).toContain('<RealLifeQuestions />');
     expect(landing).toContain('<LandingProductStories />');
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
-    expect(landing).toContain('Bring the question you actually have.');
+    expect(landing).toContain('Start with what’s actually happening.');
     expect(landing).toContain('Why do we keep having the same fight?');
     expect(landing).toContain('<MobileCapabilityRail />');
     expect(landing).toContain('sovereign-opening-capabilities');
-    expect(landing).toContain('See the capacity beneath a pattern, how it may express, what happens between people, and what could change.');
-    expect(landing).toContain('Private. Secure. Yours.');
+    expect(landing).toContain('See the capacity beneath a pattern, how it may be expressing, what happens between people, and what could change.');
+    expect(landing).toContain('Start free · No card required');
+    expect(landing).toContain('See a Sovereign answer');
     expect(landing).toContain('v0-mobile-menu');
     expect(landing).toContain('title={<BrandMark />}');
     expect(landing).not.toContain('title="<BrandMark />"');
     expect(landing).not.toContain('HERO_CAPABILITIES');
   });
 
-  it('uses one stable center with value-driven 360 Cloudflare-blue measurements', () => {
+  it('keeps the 360 field geometry while final presentation authority is monochrome', () => {
     for (const marker of [
       'const VIEWBOX_SIZE = 920',
       'const CENTER = VIEWBOX_SIZE / 2',
@@ -76,12 +80,15 @@ describe('approved public landing v8', () => {
     expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(field).not.toContain('#8b5cff');
     expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
-    expect(heroExtension).toContain('stroke: #2f93ff');
     expect(heroExtension).toContain('height: 58%');
     expect(heroExtension).toContain('mask-image: linear-gradient');
+    expect(refinement).toContain('--landing-blue: #e8ddd0 !important');
+    expect(refinement).toContain('.landing-expression-slice__beam');
+    expect(refinement).toContain('fill: rgba(241, 233, 222, 0.72) !important');
+    expect(refinement).toContain('-webkit-text-stroke: 1.15px rgba(241, 233, 222, 0.82)');
   });
 
-  it('uses one reasoning flow, relationship perspective context, and a map-first system view', () => {
+  it('uses one structural flow, relationship perspective context, and a map-first system view', () => {
     for (const marker of [
       'See the capacity beneath the pattern.',
       'Understand what happens between you.',
@@ -94,15 +101,15 @@ describe('approved public landing v8', () => {
       'surface="system-reasoning"'
     ]) expect(renderedStories).toContain(marker);
     for (const marker of [
-      'Seeing the capacity beneath it',
-      'Seeing how it is expressing',
-      'Seeing what keeps it going',
-      'Seeing what could change',
+      'Capacity beneath the pattern',
+      'How pressure changes the expression',
+      'What may keep it going',
+      'What could change',
       'Keeping both people distinct',
       'Clarity may take time.',
       'Clarity may arrive quickly.',
       'Between you',
-      'Mapping the people',
+      'System structure',
       'Roles',
       'Responsibility',
       'Movement'
@@ -113,7 +120,8 @@ describe('approved public landing v8', () => {
     expect(stories).not.toContain("name: 'Maya'");
     expect(stories).not.toContain("name: 'Noa'");
     expect(stories).not.toContain("name: 'Ruth'");
-    expect(renderedStories).not.toContain('title="Ask about your life."');
+    expect(renderedStories).not.toContain('Ask about your life.');
+    expect(renderedStories).not.toContain('Bring the question');
   });
 
   it('keeps source codes as quiet Basis metadata rather than interpretation chips', () => {
@@ -149,9 +157,10 @@ describe('approved public landing v8', () => {
     expect(landing).toContain('Your thoughts<br />deserve<br />a better place to live.');
   });
 
-  it('plays the single reasoning workflow once, then settles', () => {
+  it('plays the single structural workflow once, then settles quickly', () => {
     expect(stories).toContain('useWorkflowProgress(panelRef, steps.length)');
     expect(stories).toContain('timers.push(window.setTimeout');
+    expect(stories).toContain('240 + step * 620');
     expect(stories).toContain("data-motion-state={visibleIndex >= steps.length - 1 ? 'settled' : 'running'}");
     expect(stories).not.toContain('window.setInterval');
     expect(approvedStyles).toContain('v8-message-in');
@@ -194,7 +203,7 @@ describe('approved public landing v8', () => {
   });
 
   it('keeps every active CSS layer structurally balanced', () => {
-    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority]) {
+    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
