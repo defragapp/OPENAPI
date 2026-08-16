@@ -10,6 +10,8 @@ Archive SHA-256:
 6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba
 ```
 
+The archive fingerprint preserves design provenance. Active user-facing wording inherits `docs/product-language-system.md`; historical archive strings are not current copy requirements.
+
 ## Required first viewport
 
 - Brand: `Sovereign`
@@ -25,14 +27,14 @@ The hero must preserve the archive’s centered, near-black, atmospheric editori
 ## Required sequence
 
 1. Founder v0 hero.
-2. Rotating real-life questions.
-3. `Ask about your life. Get an answer built for you.` with the self chat and reasoning flow.
-4. `Understand what happens between you.` with two permitted Baselines and the relationship flow.
-5. `From one person to the whole system.` with distinct person fields and their system interaction.
-6. `Other AI answers everyone the same.` comparison.
+2. Situational recognition: `Start with what’s actually happening.` with one rotating real-life question at a time.
+3. Personal demonstration: `See the capacity beneath the pattern.` with the self chat, quiet Basis metadata, and visible answer structure.
+4. Relationship demonstration: `Understand what happens between you.` with two permitted Baselines and the relationship context.
+5. System demonstration: `See what keeps the pattern going—and what could change it.` with distinct people, roles, responsibility, authority, pressure, and system interaction.
+6. Concise generic-AI / Sovereign comparison focused on current-conversation context versus Baseline + permitted connected context.
 7. `Your thoughts deserve a better place to live.` final action.
 
-These are rendered component requirements. Copy-string presence alone is not sufficient.
+These are rendered component requirements. Copy-string presence alone is not sufficient. Retired chatbot phrases must not be restored merely because they appeared in the founder archive.
 
 ## Selective port boundary
 
@@ -42,7 +44,7 @@ Bring across:
 - rotating questions;
 - chat windows;
 - Baseline evidence treatment;
-- visible reasoning flows;
+- visible answer-structure flows;
 - relationship example;
 - system map;
 - comparison;
@@ -73,9 +75,9 @@ The real OPENAPI platform remains authoritative for:
 
 The v0 visual language applies to the public root, static How it works, Pricing, FAQ, 404, login, signup, invitation, onboarding, policy pages, and the authenticated one-room workspace.
 
-`apps/web/src/v0-visual-port.css` is the founder visual foundation for Vite-rendered surfaces. `v0-global-experience.css` extends it across non-landing product surfaces, and `passkey-auth.css` is the final local visual authority.
+`apps/web/src/v0-visual-port.css` remains the founder visual foundation. `v0-global-experience.css`, route-cohesion authorities, and `passkey-auth.css` preserve the established route implementation. `apps/web/src/experience-refinement-v1.css` is appended through the existing synchronous cohesion installer as the bounded final presentation refinement; it is not another local stylesheet import and must not change product behavior.
 
-`apps/web/public/v0-public-port.css` is the final visual authority for standalone public documents through `premium-public-release.css`.
+Standalone How it works, Pricing, and FAQ retain the founder static foundation and route-cohesion layer, then load `apps/web/public/experience-static-refinement-v1.css` as the final static presentation authority.
 
 ## Verification
 
@@ -84,8 +86,10 @@ Production must reject:
 - the `Know yourself…` reconstructed landing;
 - missing archive fingerprint;
 - wrong component order;
+- retired active chatbot language;
 - missing v0 component selectors;
 - missing workspace/account selectors;
 - mock runtime markers;
-- a local stylesheet loaded after `passkey-auth.css`, or any change to the certified Vite cascade order;
-- a compiled public asset that does not contain the exact v0 sequence.
+- a local stylesheet loaded after `passkey-auth.css`, or any change to the certified local Vite import order;
+- a compiled asset missing the founder provenance fingerprint;
+- a compiled experience in which the final monochrome refinement authority is absent.
