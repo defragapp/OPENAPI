@@ -21,11 +21,19 @@ const replacements = [
   ],
   [
     "['data-visual-contract=\"founder-v0-static\"', '/v0-public-static.css?v=20260801-v0-global', 'Release compatibility marker only; the retired stylesheet is not loaded']",
-    "['data-visual-contract=\"founder-v0-static\"', 'data-secondary-visual-contract=\"founder-v0-locked-v1\"', 'data-route-cohesion=\"v1\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', 'class=\"launch-nav-inner\"', 'class=\"launch-mobile-menu-panel\"', 'Release compatibility marker only; the retired stylesheet is not loaded']"
+    "['data-visual-contract=\"founder-v0-static\"', 'data-secondary-visual-contract=\"founder-v0-locked-v1\"', 'data-route-cohesion=\"v1\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260816-refinement-v1', 'class=\"launch-nav-inner\"', 'class=\"launch-mobile-menu-panel\"', 'Release compatibility marker only; the retired stylesheet is not loaded']"
   ],
   [
     "const passkeyMigration = read('apps/sovereign-worker/migrations/0014_passkey_authentication.sql');",
     "const passkeyMigration = read('apps/sovereign-worker/migrations/0014_passkey_authentication.sql');\nconst releaseMigration = read('apps/sovereign-worker/migrations/0015_release_evidence.sql');\nconst releaseEvidenceRuntime = read('apps/sovereign-worker/src/release-evidence.ts');\nconst releaseEvidenceLibrary = read('scripts/release-evidence-lib.mjs');\nconst releaseOrchestrator = read('scripts/release-orchestrator.mjs');"
+  ],
+  [
+    "const heroCss = read('apps/web/src/landing-hero-field-v4.css');\nconst storyCss = read('apps/web/src/v0-restored-product-stories.css');",
+    "const heroCss = read('apps/web/src/landing-hero-field-v4.css');\nconst refinementCss = read('apps/web/src/experience-refinement-v1.css');\nconst storyCss = read('apps/web/src/v0-restored-product-stories.css');"
+  ],
+  [
+    "const staticV0 = read('apps/web/public/v0-public-static.css');\nconst how = read('apps/web/public/how-it-works.html');",
+    "const staticV0 = read('apps/web/public/v0-public-static.css');\nconst staticRefinement = read('apps/web/public/experience-static-refinement-v1.css');\nconst how = read('apps/web/public/how-it-works.html');"
   ],
   [
     "const deploy = read('scripts/cloudflare-production-deploy-v2.mjs');",
@@ -38,6 +46,34 @@ const replacements = [
   [
     "requireAll('passkey credential verification', passkeyVerifier, [",
     "requireAll('release evidence migration', releaseMigration, ['CREATE TABLE release_evidence', 'CREATE TABLE release_progress', \"status TEXT NOT NULL CHECK(status = 'success')\", \"status TEXT NOT NULL CHECK(status = 'failure')\"]);\nrequireAll('D1 release evidence runtime', releaseEvidenceRuntime, ['env.DB.prepare', \"status = 'success'\", \"RELEASE_MIGRATION_VERSION = '0015_release_evidence'\"]);\nrequireAll('release evidence orchestration', `${releaseEvidenceLibrary}\\n${releaseOrchestrator}`, ['upsertReleaseEvidenceSql', 'upsertReleaseProgressSql', 'applyD1Migrations', 'writeReleaseEvidence', 'writeReleaseProgress']);\n\nrequireAll('passkey credential verification', passkeyVerifier, ["
+  ],
+  [
+    "  'Bring the question you actually have.',",
+    "  'Start with what’s actually happening.',"
+  ],
+  [
+    "  'Seeing the capacity beneath it',\n  'Keeping both people distinct',\n  'Mapping the people',",
+    "  'Capacity beneath the pattern',\n  'Keeping both people distinct',\n  'System structure',"
+  ],
+  [
+    "  'stroke: #2f93ff',\n  'width: 100vw',",
+    "  'width: 100vw',"
+  ],
+  [
+    "assert(!field.includes('<div className=\"landing-expression-slice__tooltip\"'), 'The retired floating tooltip returned.');",
+    "assert(!field.includes('<div className=\"landing-expression-slice__tooltip\"'), 'The retired floating tooltip returned.');\nrequireAll('final experience refinement', refinementCss, ['--landing-blue: #e8ddd0 !important', '--route-blue: #e8ddd0 !important', '-webkit-text-stroke: 1.15px rgba(241, 233, 222, 0.82)', '.sovereign-app-runtime .sovereign-composer']);\nrequireAll('final static refinement', staticRefinement, ['--v0-blue: #e8ddd0', '--v0-blue-bright: #fffaf3', '@media (prefers-reduced-motion: reduce)']);"
+  ],
+  [
+    "requireAll('How it works document', how, ['Ask about your life. Get an answer built around you.', 'journey-steps', 'baseline-explainer']);",
+    "requireAll('How it works document', how, ['See the pattern clearly enough to understand what could change.', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260816-refinement-v1']);"
+  ],
+  [
+    "requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe handles payment details', 'Start free. Expand when the question includes more than you.']);",
+    "requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe handles payment details', 'Start free. Add more context when it belongs.', '/experience-static-refinement-v1.css?v=20260816-refinement-v1']);"
+  ],
+  [
+    "  ['passkey auth', passkeyCss],\n  ['v0 static public', staticV0]",
+    "  ['experience refinement', refinementCss],\n  ['passkey auth', passkeyCss],\n  ['v0 static public', staticV0],\n  ['static experience refinement', staticRefinement]"
   ]
 ];
 
@@ -78,6 +114,12 @@ if (source.includes("'--v0-page:#0f0f0f'")) {
 }
 if (!source.includes("import './deployed-route-cohesion.css'")) {
   throw new Error('Production release v3 is missing the deployed route cohesion visual layer.');
+}
+if (!source.includes('/experience-static-refinement-v1.css?v=20260816-refinement-v1')) {
+  throw new Error('Production release v3 is missing the final static refinement contract.');
+}
+if (source.includes('Bring the question you actually have.') || source.includes('Ask about your life. Get an answer built around you.')) {
+  throw new Error('Production release v3 still enforces retired active product language.');
 }
 
 try {

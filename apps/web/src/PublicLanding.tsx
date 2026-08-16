@@ -18,16 +18,16 @@ const REAL_LIFE_QUESTIONS = [
 
 const COMPARISON = {
   others: [
-    'Starts with the latest message',
-    'Gives advice for an average user',
-    'Treats every chat as a new beginning',
-    'Loses the relationship and system around the question'
+    'Begins with the current conversation',
+    'Context can fragment across separate chats',
+    'Often treats each problem independently',
+    'May not retain the relationship or system around the question'
   ],
   sovereign: [
     'Starts with your Baseline',
     'Keeps permitted context connected',
     'Distinguishes you, the relationship, and the system',
-    'Answers the question underneath the question'
+    'Keeps evidence, interpretation, and unknowns visible'
   ]
 } as const;
 const RELEASE_COPY_MARKERS = ['everyone the same.'] as const;
@@ -101,26 +101,25 @@ function V0Hero() {
           </em>
         </h1>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
-          Sovereign begins with the capacity beneath a pattern—showing how it may express, what happens between people, and what could change.
+          Sovereign begins with the capacity beneath a pattern. It shows how that capacity may be expressing, what happens between people, and what may be keeping the pattern in place—so you can see what could change.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
-          See the capacity beneath a pattern, how it may express, what happens between people, and what could change.
+          See the capacity beneath a pattern, how it may be expressing, what happens between people, and what could change.
         </p>
         <div className="sovereign-opening-actions">
           <a className="landing-control landing-control--primary" href="/signup">
             <SparkIcon />
-            <span className="v0-desktop-only">Build my Baseline</span>
-            <span className="v0-mobile-only">Get started</span>
+            <span>Build my Baseline</span>
             <ArrowIcon />
           </a>
           <a className="landing-inline-link" href="#how">
-            <span>See how it works</span><ArrowIcon direction="down" />
+            <span>See a Sovereign answer</span><ArrowIcon direction="down" />
           </a>
         </div>
         <p className="sovereign-opening-trust">
           <LockIcon />
-          <span className="v0-desktop-only">Private by design. Correctable by you. Shared only with permission.</span>
-          <span className="v0-mobile-only">Private. Secure. Yours.</span>
+          <span className="v0-desktop-only">Start free · No card required · Review, correct, or reject any interpretation</span>
+          <span className="v0-mobile-only">Start free · No card required</span>
         </p>
       </div>
       <LandingExpressionSlice />
@@ -139,8 +138,8 @@ function MobileCapabilityRail() {
       </a>
       <a href="#relationship">
         <CapabilityIcon kind="people" />
-        <strong>Understand others</strong>
-        <small>Build better<br />relationships.</small>
+        <strong>Understand relationships</strong>
+        <small>See what happens<br />between you.</small>
       </a>
       <a href="#system">
         <CapabilityIcon kind="system" />
@@ -150,7 +149,7 @@ function MobileCapabilityRail() {
       <a href="/login">
         <CapabilityIcon kind="library" />
         <strong>Your library</strong>
-        <small>Save what matters.<br />Return anytime.</small>
+        <small>Keep what changes<br />your understanding.</small>
       </a>
     </nav>
   );
@@ -164,8 +163,8 @@ function RealLifeQuestions() {
       aria-labelledby="landing-question-orbit-title"
     >
       <div className="v0-shell landing-question-orbit__inner">
-        <p className="landing-question-orbit__kicker">Real questions. Specific context.</p>
-        <h2 id="landing-question-orbit-title">Bring the question you actually have.</h2>
+        <p className="landing-question-orbit__kicker">Real life, not a blank prompt</p>
+        <h2 id="landing-question-orbit-title">Start with what’s actually happening.</h2>
         <div className="landing-question-orbit__stage" aria-hidden="true">
           {REAL_LIFE_QUESTIONS.map((question) => <span key={question}>{question}</span>)}
         </div>
@@ -173,7 +172,7 @@ function RealLifeQuestions() {
           {REAL_LIFE_QUESTIONS.map((question) => <li key={question}>{question}</li>)}
         </ul>
         <p className="landing-question-orbit__note">
-          Sovereign separates what appears steady, what may be active now, what you have actually observed, and what is still unknown.
+          Sovereign keeps what is steady, what may be active now, what you have observed, and what is still unknown separate.
         </p>
       </div>
     </section>
@@ -185,14 +184,14 @@ function ComparisonStory() {
     <section className="v0-comparison" data-viewport-section="comparison">
       <div className="v0-shell">
         <header className="v0-story-heading v0-story-heading-left">
-          <p>The difference</p>
+          <p>Why this AI is different</p>
           <h2 aria-label="Generic AI sees the prompt. Sovereign sees the context.">
             Generic AI<br />sees the<br />prompt.<br />
             <span>Sovereign<br />sees the<br />context.</span>
           </h2>
         </header>
         <div className="v0-comparison-grid" data-viewport-surface="comparison">
-          <ComparisonPanel title="Other AI answers" items={COMPARISON.others} positive={false} />
+          <ComparisonPanel title="Generic AI" items={COMPARISON.others} positive={false} />
           <ComparisonPanel title={<BrandMark />} items={COMPARISON.sovereign} positive />
         </div>
       </div>
@@ -206,7 +205,7 @@ function FinalCallToAction() {
       <h2 aria-label="Your thoughts deserve a better place to live.">
         Your thoughts<br />deserve<br />a better place to live.
       </h2>
-      <p>Build your Baseline. Bring your real questions. See what is underneath, what keeps happening, and what could change.</p>
+      <p>Use your Baseline as the starting point. Keep the answer, the context, and what is still unknown connected.</p>
       <a className="landing-control landing-control--primary" href="/signup">
         <span>Build my Baseline</span><ArrowIcon />
       </a>

@@ -4,41 +4,25 @@ import { pathToFileURL } from 'node:url';
 
 const sourcePath = resolve('scripts/verify-visual-intelligence-release.mjs');
 const temporaryPath = resolve(`scripts/.verify-visual-intelligence-release-v2-${process.pid}.mjs`);
-let source = readFileSync(sourcePath, 'utf8');
+const source = readFileSync(sourcePath, 'utf8');
+const main = readFileSync(resolve('apps/web/src/main.tsx'), 'utf8');
 
-const replacements = [
-  [
-    "const passkeyCss = read('apps/web/src/passkey-auth.css');\nconst staticAuthority = read('apps/web/public/premium-public-release.css');",
-    "const passkeyCss = read('apps/web/src/passkey-auth.css');\nconst routeCohesionCss = read('apps/web/src/deployed-route-cohesion.css');\nconst staticAuthority = read('apps/web/public/premium-public-release.css');"
-  ],
-  [
-    "  'apps/web/src/landing-hero-field-v4.css',\n  'apps/web/src/passkey-auth.css'\n])",
-    "  'apps/web/src/landing-hero-field-v4.css',\n  'apps/web/src/deployed-route-cohesion.css',\n  'apps/web/src/passkey-auth.css'\n])"
-  ],
-  [
-    "  \"import './landing-hero-field-v4.css'\",\n  \"import './passkey-auth.css'\",\n  \"dataset.sovereignProductStories = 'isolated-mobile-first-v2'\"",
-    "  \"import './landing-hero-field-v4.css'\",\n  \"import './deployed-route-cohesion.css'\",\n  \"import './passkey-auth.css'\",\n  \"dataset.sovereignProductStories = 'isolated-mobile-first-v2'\""
-  ],
-  [
-    "const passkeyImport = \"import './passkey-auth.css';\";\nassert(main.indexOf(fieldImport) < main.indexOf(integrationImport), 'Field integration must load after field geometry.');\nassert(main.indexOf(integrationImport) < main.indexOf(storyImport), 'Isolated story styling must load after the opening field.');\nassert(main.indexOf(storyImport) < main.indexOf(heroImport), 'Hero field extension must load after isolated story styling.');\nassert(main.indexOf(heroImport) < main.indexOf(passkeyImport), 'Passkey styling must remain the final platform authority.');\nassert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes(\"import './\"), 'A local visual file loads after passkey authority.');",
-    "const passkeyImport = \"import './passkey-auth.css';\";\nconst routeCohesionImport = \"import './deployed-route-cohesion.css';\";\nassert(main.indexOf(fieldImport) < main.indexOf(integrationImport), 'Field integration must load after field geometry.');\nassert(main.indexOf(integrationImport) < main.indexOf(storyImport), 'Isolated story styling must load after the opening field.');\nassert(main.indexOf(storyImport) < main.indexOf(heroImport), 'Hero field extension must load after isolated story styling.');\nassert(main.indexOf(heroImport) < main.indexOf(routeCohesionImport), 'Route cohesion styling must load after hero interaction authority.');\nassert(main.indexOf(routeCohesionImport) < main.indexOf(passkeyImport), 'Route cohesion styling must load before the final passkey authority.');\nassert(!main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes(\"import './\"), 'A local visual file loads after passkey authority.');"
-  ],
-  [
-    "  ['passkey authority', passkeyCss],\n  ['standalone authority', staticV0],",
-    "  ['route cohesion authority', routeCohesionCss],\n  ['passkey authority', passkeyCss],\n  ['standalone authority', staticV0],"
-  ]
-];
-
-for (const [retiredContract, currentContract] of replacements) {
-  const occurrences = source.split(retiredContract).length - 1;
-  if (occurrences !== 1) {
-    throw new Error(`Visual intelligence release v2 compatibility update expected one retired contract occurrence but found ${occurrences}: ${retiredContract.slice(0, 120)}`);
-  }
-  source = source.replace(retiredContract, currentContract);
+for (const marker of [
+  "import './deployed-route-cohesion.css';",
+  "import './passkey-auth.css';",
+  "import experienceRefinementCss from './experience-refinement-v1.css?inline';",
+  'style.textContent += `\\n${experienceRefinementCss}`;'
+]) {
+  if (!main.includes(marker)) throw new Error(`Visual intelligence release v2 is missing ${marker}`);
 }
 
-if (source.includes('main.indexOf(passkeyImport) < main.indexOf(routeCohesionImport)')) {
-  throw new Error('Visual intelligence release v2 places route cohesion after the final passkey authority.');
+const routeCohesionImport = "import './deployed-route-cohesion.css';";
+const passkeyImport = "import './passkey-auth.css';";
+if (main.indexOf(routeCohesionImport) >= main.indexOf(passkeyImport)) {
+  throw new Error('Visual intelligence release v2 places route cohesion after the final passkey stylesheet authority.');
+}
+if (main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("import './")) {
+  throw new Error('Visual intelligence release v2 found a local stylesheet import after passkey authority.');
 }
 
 try {

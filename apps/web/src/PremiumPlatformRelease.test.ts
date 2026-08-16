@@ -27,17 +27,19 @@ const isolatedStoryCss = read('./landing-product-stories-v2.css');
 const approvedCss = read('./public-landing-approved-v8.css');
 const heroExtension = read('./landing-hero-field-v4.css');
 const finalAuthority = read('./public-landing-final-authority.css');
+const refinement = read('./experience-refinement-v1.css');
 const passkeyCss = read('./passkey-auth.css');
 const routeCohesionCss = read('./deployed-route-cohesion.css');
 const staticV0Css = read('../public/v0-public-port.css');
 const staticAuthority = read('../public/premium-public-release.css');
+const staticRefinement = read('../public/experience-static-refinement-v1.css');
 
 function expectBalancedCss(source: string) {
   expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
 }
 
 describe('founder v0 selective visual port — approved public v8', () => {
-  it('loads one approved landing authority, hero extension, route cohesion, then final passkey authority', () => {
+  it('loads the founder stack and appends one bounded final refinement authority', () => {
     const imports = [
       "import './v0-platform-port.css';",
       "import './v0-motion-accessibility.css';",
@@ -59,16 +61,18 @@ describe('founder v0 selective visual port — approved public v8', () => {
       previous = index;
     }
     expect(main.slice(previous + imports.at(-1)!.length)).not.toContain("import './");
+    expect(main).toContain("import experienceRefinementCss from './experience-refinement-v1.css?inline';");
+    expect(main).toContain('style.textContent += `\\n${experienceRefinementCss}`;');
     expect(main).not.toContain("import './public-landing-approved-v7.css';");
     expect(main).not.toContain("import './public-landing-premium-v4.css';");
     expect(main).not.toContain("import './public-landing-premium-v5.css';");
     expect(main).not.toContain("import './public-landing-premium-v6.css';");
-    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, passkeyCss, routeCohesionCss]) {
+    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, refinement, passkeyCss, routeCohesionCss, staticRefinement]) {
       expectBalancedCss(source);
     }
   });
 
-  it('emits the exact archive and v3 compatibility fingerprint', () => {
+  it('preserves the archive compatibility fingerprint as historical provenance', () => {
     expect(fingerprint).toContain(`V0_ARCHIVE_SHA256 = '${archiveSha}'`);
     expect(fingerprint).toContain(`V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`);
     expect(fingerprint).toContain("PUBLIC_LANDING_CONTRACT = 'v0-public-landing-v3'");
@@ -76,15 +80,17 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(main).toContain('installV0ReleaseFingerprint();');
   });
 
-  it('keeps the approved hero, 360 Baseline field, and real-life questions first', () => {
+  it('keeps the approved hero, 360 Baseline field, and situational recognition first', () => {
     expect(landing).toContain(`const V0_ARCHIVE_SHA = '${archiveSha}'`);
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Sovereign begins with the capacity beneath a pattern—showing how it may express, what happens between people, and what could change.');
+    expect(landing).toContain('Sovereign begins with the capacity beneath a pattern.');
+    expect(landing).toContain('See a Sovereign answer');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('<RealLifeQuestions />');
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
+    expect(landing).toContain('Start with what’s actually happening.');
     expect(landing).toContain('Why do I keep taking responsibility for everyone around me?');
     expect(landing).toContain('<MobileCapabilityRail />');
     expect(landing).toContain('sovereign-opening-capabilities');
@@ -103,10 +109,11 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(field).not.toContain('#8b5cff');
     expect(integrationCss).toContain('background: transparent');
     expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
-    expect(heroExtension).toContain('stroke: #2f93ff');
+    expect(refinement).toContain('--landing-blue: #e8ddd0 !important');
+    expect(refinement).toContain('-webkit-text-stroke: 1.15px rgba(241, 233, 222, 0.82)');
   });
 
-  it('keeps one visible reasoning flow and uses context-specific relationship and system demonstrations', () => {
+  it('keeps one visible structural flow and uses context-specific relationship and system demonstrations', () => {
     expect(landing).toContain('<LandingProductStories />');
     for (const marker of [
       'See the capacity beneath the pattern.',
@@ -118,19 +125,19 @@ describe('founder v0 selective visual port — approved public v8', () => {
       'surface="relationship-reasoning"',
       'surface="system-map"',
       'surface="system-reasoning"',
-      'Seeing the capacity beneath it',
-      'Seeing how it is expressing',
-      'Seeing what keeps it going',
-      'Seeing what could change',
+      'Capacity beneath the pattern',
+      'How pressure changes the expression',
+      'What may keep it going',
+      'What could change',
       'Keeping both people distinct',
       'Clarity may take time.',
       'Clarity may arrive quickly.',
       'Between you',
-      'Mapping the people',
+      'System structure',
       'Roles',
       'Responsibility',
       'Movement',
-      'timers.push(window.setTimeout',
+      '240 + step * 620',
       'data-motion-state'
     ]) expect(stories).toContain(marker);
     expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
@@ -162,7 +169,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(finalAuthority).toContain('.landing-story__stage--system');
   });
 
-  it('enforces the immersive hero, product windows, questions, and viewport-stable mobile opening', () => {
+  it('enforces the founder layout, product windows, recognition, and viewport-stable mobile opening', () => {
     for (const marker of [
       '.public-approved-v8 .v0-hero.sovereign-opening-field',
       'min-height: max(820px, calc(100svh - 74px))',
@@ -203,11 +210,12 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v8'");
   });
 
-  it('applies the same founder language to the platform and standalone routes', () => {
+  it('applies the founder language to platform and standalone routes with final monochrome refinements', () => {
     for (const selector of ['.v0-hero', '.v0-story-grid', '.intelligence-workspace', '.intelligence-sidebar', '.sovereign-composer', '.account-shell', '.auth-panel', '.workspace-sheet']) expect(v0Css).toContain(selector);
     for (const selector of ['body:has(.plan-onboarding)', 'body:has(.sovereign-policy)', '.plan-nav', '.onboarding-plan-grid', '.policy-hero', '.email-code-fallback']) expect(v0PlatformCss).toContain(selector);
     for (const selector of ['body.launch-page', '.launch-nav', '.launch-hero', '.journey-steps', '.pricing-grid', '.faq-list details', '.launch-footer']) expect(staticV0Css).toContain(selector);
     expect(staticAuthority).toContain("@import url('/v0-public-port.css?v=20260801-founder-v0')");
+    expect(staticRefinement).toContain('--v0-blue: #e8ddd0');
     expectBalancedCss(staticV0Css);
   });
 

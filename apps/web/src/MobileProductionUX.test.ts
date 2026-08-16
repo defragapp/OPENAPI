@@ -70,7 +70,7 @@ describe('production mobile and responsive experience', () => {
     expect(workspace).toContain('className="workspace-sheet"');
     expect(workspace).toContain('aria-label="Workspace destinations"');
     expect(workspace).toContain('surfaces.map((item)');
-    expect(workspace).toContain("{ name: 'You', label: 'You', description: 'Baseline, plan, and control' }");
+    expect(workspace).toContain("{ name: 'You', label: 'You', description: 'Baseline, plan, permissions, and account' }");
     expect(workspace).not.toContain('mobile-bottom-nav');
   });
 
@@ -148,11 +148,11 @@ describe('production mobile and responsive experience', () => {
     for (const marker of [
       'v0-wordmark--mobile',
       'v0-mobile-menu',
-      'See the capacity beneath a pattern, how it may express, what happens between people, and what could change.',
-      'Private. Secure. Yours.',
+      'See the capacity beneath a pattern, how it may be expressing, what happens between people, and what could change.',
+      'Start free · No card required',
       '<MobileCapabilityRail />',
       'Understand yourself',
-      'Understand others',
+      'Understand relationships',
       'Understand systems',
       'Your library'
     ]) expect(landing).toContain(marker);
@@ -167,7 +167,7 @@ describe('production mobile and responsive experience', () => {
     expect(productionReadinessCss).toContain('min-height: max(660px');
     expect(productionReadinessCss).toContain('width: min(660px, 165vw)');
     expect(productionReadinessCss).not.toContain('220vw');
-    expect(landing).toContain('Sovereign begins with the capacity beneath a pattern—showing how it may express, what happens between people, and what could change.');
+    expect(landing).toContain('Sovereign begins with the capacity beneath a pattern. It shows how that capacity may be expressing, what happens between people, and what may be keeping the pattern in place—so you can see what could change.');
     expect(stories).toContain('id="relationship"');
     expect(stories).toContain('id="system"');
   });

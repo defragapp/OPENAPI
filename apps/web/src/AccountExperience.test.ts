@@ -20,9 +20,10 @@ describe('account access experience', () => {
 
   it('uses Baseline-first account language without introducing passwords', () => {
     expect(app).toContain('Create your Sovereign.OS account.');
-    expect(app).toContain('Create your account, verify your email, then build the personal foundation Sovereign uses.');
-    expect(app).toContain('Return to your Baseline and the questions you were exploring.');
-    expect(app).toContain('Enter your email. Sovereign.OS will send a one-time link and six-digit code.');
+    expect(app).toContain('Start free. Verify your email, then build your Baseline.');
+    expect(app).toContain('Your Baseline becomes the private personal foundation Sovereign uses across self, decisions, relationships, and systems.');
+    expect(app).toContain('Sign in to Sovereign.OS.');
+    expect(app).toContain('Use your email and the secure sign-in method available for your account.');
     expect(passkey).toContain('Choose a secure way to sign in.');
     expect(passkey).toContain('Use your device passkey, or enter your email below for a one-time link and six-digit code.');
     expect(passkey).not.toContain('Return to your Baseline and the questions you were exploring.');
