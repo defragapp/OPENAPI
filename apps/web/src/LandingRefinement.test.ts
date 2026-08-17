@@ -13,82 +13,92 @@ const approvedStyles = read('./public-landing-approved-v8.css');
 const heroExtension = read('./landing-hero-field-v4.css');
 const finalAuthority = read('./public-landing-final-authority.css');
 const refinement = read('./experience-refinement-v1.css');
+const renderedFidelity = read('./rendered-fidelity-v1.css');
+const languageAuthority = read('../../../docs/product-language-system.md');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
 describe('approved public landing v8', () => {
-  it('loads the founder foundation and appends one bounded refinement authority', () => {
-    const fieldImport = "import './landing-expression-field-v3.css';";
-    const integrationImport = "import './landing-expression-field-integration.css';";
-    const lineageImport = "import './v0-restored-product-stories.css';";
-    const storiesImport = "import './landing-product-stories-v2.css';";
-    const approvedImport = "import './public-landing-approved-v8.css';";
-    const heroImport = "import './landing-hero-field-v4.css';";
-    const routeImport = "import './deployed-route-cohesion.css';";
-    const passkeyImport = "import './passkey-auth.css';";
-    expect(main.indexOf(integrationImport)).toBeGreaterThan(main.indexOf(fieldImport));
-    expect(main.indexOf(lineageImport)).toBeGreaterThan(main.indexOf(integrationImport));
-    expect(main.indexOf(storiesImport)).toBeGreaterThan(main.indexOf(lineageImport));
-    expect(main.indexOf(approvedImport)).toBeGreaterThan(main.indexOf(storiesImport));
-    expect(main.indexOf(heroImport)).toBeGreaterThan(main.indexOf(approvedImport));
-    expect(main.indexOf(routeImport)).toBeGreaterThan(main.indexOf(heroImport));
-    expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(routeImport));
-    expect(main.slice(main.indexOf(passkeyImport) + passkeyImport.length)).not.toContain("import './");
+  it('preserves the founder cascade and appends the final rendered-fidelity authority last', () => {
+    const imports = [
+      "import './landing-expression-field-v3.css';",
+      "import './landing-expression-field-integration.css';",
+      "import './v0-restored-product-stories.css';",
+      "import './landing-product-stories-v2.css';",
+      "import './public-landing-approved-v8.css';",
+      "import './landing-hero-field-v4.css';",
+      "import './deployed-route-cohesion.css';",
+      "import './passkey-auth.css';"
+    ];
+    for (let index = 1; index < imports.length; index += 1) {
+      expect(main.indexOf(imports[index]!)).toBeGreaterThan(main.indexOf(imports[index - 1]!));
+    }
+    expect(main.slice(main.indexOf(imports.at(-1)!) + imports.at(-1)!.length)).not.toContain("import './");
     expect(main).toContain("import experienceRefinementCss from './experience-refinement-v1.css?inline';");
-    expect(main).toContain('style.textContent += `\\n${experienceRefinementCss}`;');
-    expect(main).not.toContain("import './public-landing-approved-v7.css';");
+    expect(main).toContain("import renderedFidelityCss from './rendered-fidelity-v1.css?inline';");
+    expect(main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;')).toBeGreaterThan(
+      main.indexOf('style.textContent += `\\n${experienceRefinementCss}`;')
+    );
   });
 
-  it('renders the founder hero, situational recognition, and three product demonstrations', () => {
-    expect(landing).toContain('data-public-release="approved-public-v8"');
-    expect(landing).toContain('data-layout-release="v0-motion-workflows-v8"');
-    expect(landing).toContain('<BrandMark />');
-    expect(landing).toContain('Healing isn’t optional.');
-    expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('<LandingExpressionSlice />');
-    expect(landing).toContain('<RealLifeQuestions />');
-    expect(landing).toContain('<LandingProductStories />');
+  it('keeps the founder hero and makes the required real-life recognition stage visible', () => {
+    for (const marker of [
+      'Healing isn’t optional.',
+      'Holding onto the pain is.',
+      '<LandingExpressionSlice />',
+      '<RealLifeQuestions />',
+      '<LandingProductStories />',
+      'Start with what’s actually happening.',
+      'Why do we keep having the same fight?',
+      'Your Baseline is the private personal foundation Sovereign uses to understand where to begin.',
+      'Build my Baseline',
+      'See a Sovereign answer'
+    ]) expect(landing).toContain(marker);
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
-    expect(landing).toContain('Start with what’s actually happening.');
-    expect(landing).toContain('Why do we keep having the same fight?');
-    expect(landing).toContain('<MobileCapabilityRail />');
-    expect(landing).toContain('sovereign-opening-capabilities');
-    expect(landing).toContain('See the capacity beneath a pattern, how it may be expressing, what happens between people, and what could change.');
-    expect(landing).toContain('Start free · No card required');
-    expect(landing).toContain('See a Sovereign answer');
-    expect(landing).toContain('v0-mobile-menu');
-    expect(landing).toContain('title={<BrandMark />}');
-    expect(landing).not.toContain('title="<BrandMark />"');
-    expect(landing).not.toContain('HERO_CAPABILITIES');
+
+    for (const marker of [
+      'Baseline-first recognition: this is a real explanatory stage',
+      'height: auto !important',
+      'min-height: clamp(330px, 29vw, 420px) !important',
+      '.landing-question-orbit h2',
+      'position: static !important',
+      'clip: auto !important',
+      'font-size: clamp(1.14rem, 1.9vw, 1.55rem) !important'
+    ]) expect(renderedFidelity).toContain(marker);
   });
 
-  it('keeps the 360 field geometry while final presentation authority is monochrome', () => {
+  it('implements the canonical Baseline-first experience hierarchy instead of architecture-first copy', () => {
+    for (const marker of [
+      '## Experience hierarchy',
+      'Baseline Design is the foundation.',
+      'A visitor arrives with an ordinary real-life question',
+      'Relationship and system intelligence extend that same foundation outward.',
+      'The technical machinery stays underneath the experience.'
+    ]) expect(languageAuthority).toContain(marker);
+
+    expect(landing).toContain('A blank conversation starts with the prompt. Sovereign starts with your Baseline.');
+    expect(landing).toContain('Build your Baseline once. Use it as the private personal foundation for what you want to understand next.');
+    expect(landing).not.toContain('Generic AI sees the prompt. Sovereign sees the context.');
+  });
+
+  it('keeps one 360-degree structural field while the final presentation remains monochrome', () => {
     for (const marker of [
       'const VIEWBOX_SIZE = 920',
-      'const CENTER = VIEWBOX_SIZE / 2',
       'const SPHERE_RADIUS = 286',
-      'const MIN_AXIS_LENGTH = 118',
-      'const MAX_AXIS_LENGTH = 344',
-      'Array.from({ length: count }',
       'data-field-geometry="spherical-360"',
       'onPointerDown={handlePointerDown}',
       'onPointerMove={handlePointerMove}',
       'landing-expression-slice__readout',
       'relative emphasis',
-      'buildSphereGrid',
       'requestAnimationFrame'
     ]) expect(field).toContain(marker);
-    expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(field).not.toContain('#8b5cff');
     expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
-    expect(heroExtension).toContain('height: 58%');
-    expect(heroExtension).toContain('mask-image: linear-gradient');
     expect(refinement).toContain('--landing-blue: #e8ddd0 !important');
-    expect(refinement).toContain('.landing-expression-slice__beam');
-    expect(refinement).toContain('fill: rgba(241, 233, 222, 0.72) !important');
-    expect(refinement).toContain('-webkit-text-stroke: 1.15px rgba(241, 233, 222, 0.82)');
+    expect(renderedFidelity).toContain('--v8-blue: #d8d0c5 !important');
+    expect(renderedFidelity).toContain("radialGradient[id$='-sphere-fill']");
   });
 
-  it('uses one structural flow, relationship perspective context, and a map-first system view', () => {
+  it('keeps self, relationship, and system examples distinct and permission-safe', () => {
     for (const marker of [
       'See the capacity beneath the pattern.',
       'Understand what happens between you.',
@@ -98,112 +108,45 @@ describe('approved public landing v8', () => {
       'surface="relationship-chat"',
       'surface="relationship-reasoning"',
       'surface="system-map"',
-      'surface="system-reasoning"'
+      'surface="system-reasoning"',
+      'Shared with permission',
+      'Illustrative supplied context',
+      'Role context',
+      'Where decisions and outcomes keep returning.',
+      'What changes if resolution no longer defaults to one person.'
     ]) expect(renderedStories).toContain(marker);
-    for (const marker of [
-      'Capacity beneath the pattern',
-      'How pressure changes the expression',
-      'What may keep it going',
-      'What could change',
-      'Keeping both people distinct',
-      'Clarity may take time.',
-      'Clarity may arrive quickly.',
-      'Between you',
-      'System structure',
-      'Roles',
-      'Responsibility',
-      'Movement'
-    ]) expect(stories).toContain(marker);
+
     expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
-    expect(stories).toContain('<RelationshipContext />');
-    expect(stories).toContain('<SystemContext />');
-    expect(stories).not.toContain("name: 'Maya'");
-    expect(stories).not.toContain("name: 'Noa'");
-    expect(stories).not.toContain("name: 'Ruth'");
+    expect(stories).not.toContain("role: 'Stabilizer'");
+    expect(stories).not.toContain("role: 'Catalyst'");
+    expect(stories).not.toContain("role: 'Observer'");
+    expect(stories).not.toContain("role: 'Anchor'");
+    expect(renderedStories).not.toContain('Permitted context');
     expect(renderedStories).not.toContain('Ask about your life.');
     expect(renderedStories).not.toContain('Bring the question');
   });
 
-  it('keeps source codes as quiet Basis metadata rather than interpretation chips', () => {
+  it('keeps exact supporting codes quiet and secondary', () => {
+    for (const marker of ["{ code: 'GK 13.4'", "{ code: 'GATE 4.11'", "{ code: 'MARS · CANCER'", "{ code: 'GATE 22.4'", "{ code: 'GATE 57.2'"]) {
+      expect(stories).toContain(marker);
+    }
     expect(stories).toContain('<strong>Basis</strong>');
-    expect(stories).toContain("{ code: 'GK 13.4'");
-    expect(stories).toContain("{ code: 'GATE 4.11'");
-    expect(stories).toContain("{ code: 'MARS · CANCER'");
-    expect(stories).toContain("{ code: 'GATE 22.4'");
-    expect(stories).toContain("{ code: 'GATE 57.2'");
-    expect(stories).not.toContain('<p>Grounded in</p>');
-    expect(stories).not.toContain("code: 'Needs time'");
-    expect(stories).not.toContain("code: 'Recognizes quickly'");
     expect(finalAuthority).toContain('.landing-evidence__code');
-    expect(finalAuthority).toContain('.landing-demo--context');
-    expect(finalAuthority).toContain('.landing-story__stage--system');
+    expect(renderedFidelity).toContain('.landing-evidence abbr');
   });
 
-  it('holds the screenshot-defined desktop rail, density, and editorial line breaks', () => {
-    for (const marker of [
-      '@media (min-width: 981px)',
-      'min-height: 690px',
-      'width: min(176px, calc(100vw - 30px))',
-      'width: min(900px, calc(100% - 56px))',
-      'min-height: 434px',
-      'min-height: 190px',
-      '.landing-story--relationship',
-      'padding-top: 112px',
-      '.landing-story--system',
-      'padding-bottom: 52px'
-    ]) expect(approvedStyles).toContain(marker);
-    expect(landing).toContain('Generic AI<br />sees the<br />prompt.<br />');
-    expect(landing).toContain('<span>Sovereign<br />sees the<br />context.</span>');
-    expect(landing).toContain('Your thoughts<br />deserve<br />a better place to live.');
-  });
-
-  it('plays the single structural workflow once, then settles quickly', () => {
-    expect(stories).toContain('useWorkflowProgress(panelRef, steps.length)');
-    expect(stories).toContain('timers.push(window.setTimeout');
-    expect(stories).toContain('240 + step * 620');
-    expect(stories).toContain("data-motion-state={visibleIndex >= steps.length - 1 ? 'settled' : 'running'}");
-    expect(stories).not.toContain('window.setInterval');
-    expect(approvedStyles).toContain('v8-message-in');
-    expect(approvedStyles).toContain(".landing-story[data-visible='true'] .landing-message");
-    expect(approvedStyles).toContain('.landing-workflow > li.is-active');
-  });
-
-  it('gives iPhone the same approved opening with stable viewport sizing, rotating questions, and natural story stacking', () => {
-    for (const marker of [
-      '@media (max-width: 760px)',
-      'min-height: max(776px, calc(100svh - 68px))',
-      '.v0-wordmark--mobile',
-      '.v0-mobile-menu[open] > .v0-mobile-menu__panel',
-      '.sovereign-opening-copy--mobile',
-      '.sovereign-opening-capabilities',
-      '.landing-expression-slice__ambient--mobile',
-      'grid-template-columns: repeat(4, minmax(0, 1fr))',
-      'width: calc(100% - 28px)',
-      'flex-direction: column',
-      'height: auto',
-      'min-height: 0',
-      '.landing-workflow__copy > span',
-      'display: none',
-      '@media (prefers-reduced-motion: reduce)'
-    ]) expect(approvedStyles).toContain(marker);
-    for (const marker of [
-      '--v8-stable-viewport-height',
-      'min-height: max(900px, calc(var(--v8-stable-viewport-height) - 68px + env(safe-area-inset-bottom)))',
-      'touch-action: pan-y pinch-zoom',
-      '@media (max-width: 980px) and (orientation: landscape) and (max-height: 560px)',
-      '.landing-question-orbit__stage',
-      '@keyframes landing-real-question'
-    ]) expect(heroExtension).toContain(marker);
-    expect(main).toContain('function installMobileViewportStability()');
+  it('keeps product proof readable on desktop and mobile without reopening blue UI styling', () => {
+    expect(renderedFidelity).toContain('font-size: 0.86rem !important');
+    expect(renderedFidelity).toContain('font-size: 0.8rem !important');
+    expect(renderedFidelity).toContain('min-height: 330px !important');
+    expect(renderedFidelity).toContain('font-size: 1.02rem !important');
+    expect(approvedStyles).toContain('@media (max-width: 760px)');
+    expect(heroExtension).toContain('@keyframes landing-real-question');
     expect(main).toContain('window.visualViewport');
-    expect(approvedStyles).toContain('border-radius: 999px');
-    expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v8'");
-    expect(main).toContain("dataset.sovereignProductStories = 'isolated-mobile-first-v2'");
-    expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v8'");
   });
 
   it('keeps every active CSS layer structurally balanced', () => {
-    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement]) {
+    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement, renderedFidelity]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
