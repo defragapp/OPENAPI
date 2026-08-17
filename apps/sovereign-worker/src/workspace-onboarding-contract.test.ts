@@ -5,11 +5,13 @@ const onboardingMigration = readFileSync(new URL('../migrations/0010_account_onb
 const recoveryMigration = readFileSync(new URL('../migrations/0011_email_code_recovery.sql', import.meta.url), 'utf8');
 const capacityMigration = readFileSync(new URL('../migrations/0013_workers_ai_free_capacity.sql', import.meta.url), 'utf8');
 const policyReceiptMigration = readFileSync(new URL('../migrations/0016_policy_acceptance_receipts.sql', import.meta.url), 'utf8');
+const privacyAccessMigration = readFileSync(new URL('../migrations/0017_privacy_access_and_eligibility.sql', import.meta.url), 'utf8');
 const auth = readFileSync(new URL('./auth-public.ts', import.meta.url), 'utf8');
 const index = readFileSync(new URL('./index.ts', import.meta.url), 'utf8');
 const entry = readFileSync(new URL('./entry.ts', import.meta.url), 'utf8');
 const baseline = readFileSync(new URL('./baseline.ts', import.meta.url), 'utf8');
 const runtime = readFileSync(new URL('./runtime-entry.ts', import.meta.url), 'utf8');
+const privacyRights = readFileSync(new URL('./privacy-rights.ts', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('../../web/src/PlanOnboarding.tsx', import.meta.url), 'utf8');
 const authenticatedWorkspace = readFileSync(new URL('../../web/src/AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('../../web/src/SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
@@ -20,7 +22,7 @@ const people = readFileSync(new URL('./db/people.ts', import.meta.url), 'utf8');
 const workspaceCss = readFileSync(new URL('../../web/src/deployed-route-cohesion.css', import.meta.url), 'utf8');
 const entryCss = readFileSync(new URL('../../web/src/main.tsx', import.meta.url), 'utf8');
 
- describe('account onboarding, recovery, and conversation persistence', () => {
+describe('account onboarding, recovery, and conversation persistence', () => {
   it('adds an explicit, account-scoped plan confirmation state', () => {
     expect(onboardingMigration).toContain('onboarding_completed_at');
     expect(onboardingMigration).toContain("plan_intent TEXT NOT NULL DEFAULT 'free'");
@@ -37,9 +39,22 @@ const entryCss = readFileSync(new URL('../../web/src/main.tsx', import.meta.url)
     expect(runtime).not.toContain('url.hostname.toLowerCase() !== APP_HOST');
   });
 
+  it('checks current policy and eligibility before Baseline or plan verification opens the workspace', () => {
+    expect(authenticatedWorkspace).toContain("fetch('/api/v1/account/policy-status'");
+    expect(authenticatedWorkspace.indexOf("fetch('/api/v1/account/policy-status'"))
+      .toBeLessThan(authenticatedWorkspace.indexOf("fetch('/api/v1/account/onboarding'"));
+    expect(authenticatedWorkspace).toContain("setState('policy_review')");
+    expect(authenticatedWorkspace).toContain("fetch('/api/v1/account/policy-acceptance'");
+    expect(privacyRights).toContain('export async function getPolicyStatus');
+    expect(privacyRights).toContain('export async function acceptCurrentPolicies');
+    expect(privacyAccessMigration).toContain('eligibility_rule_version TEXT');
+  });
+
   it('requires a structurally valid Baseline before onboarding completion or message persistence', () => {
     expect(index).toContain('await requireCompletedBaseline(context.env, auth.accountId)');
     expect(entry).toContain('await requireCompletedBaseline(env, auth.accountId)');
+    expect(entry.indexOf('await requireCompletedBaseline(env, auth.accountId, threadId'))
+      .not.toBeGreaterThan(entry.length);
     expect(entry.indexOf('await requireCompletedBaseline(env, auth.accountId)'))
       .toBeLessThan(entry.indexOf('await ensureThread(env, auth.accountId, threadId'));
     expect(baseline).toContain("error: 'baseline_required'");
@@ -154,14 +169,17 @@ const entryCss = readFileSync(new URL('../../web/src/main.tsx', import.meta.url)
     expect(entry).not.toContain("'user_message', { redacted: true");
   });
 
-  it('reports the current migration and policy receipt store from the authoritative production health layer', () => {
+  it('reports migration 0017 and privacy-access readiness from the authoritative production health layer', () => {
     expect(runtime).toContain("CAPACITY_MIGRATION_VERSION = '0013_workers_ai_free_capacity'");
     expect(runtime).toContain("PASSKEY_MIGRATION_VERSION = '0014_passkey_authentication'");
-    expect(runtime).toContain("PREVIOUS_MIGRATION_VERSION = '0015_release_evidence'");
-    expect(runtime).toContain("LATEST_MIGRATION_VERSION = '0016_policy_acceptance_receipts'");
-    expect(runtime).toContain('const migrationVersion = policyReceiptSchemaReady');
+    expect(runtime).toContain("RELEASE_EVIDENCE_MIGRATION_VERSION = '0015_release_evidence'");
+    expect(runtime).toContain("POLICY_RECEIPT_MIGRATION_VERSION = '0016_policy_acceptance_receipts'");
+    expect(runtime).toContain("LATEST_MIGRATION_VERSION = '0017_privacy_access_and_eligibility'");
+    expect(runtime).toContain('const migrationVersion = privacyAccessSchemaReady');
     expect(runtime).toContain("policyAcceptanceReceipts: policyReceiptSchemaReady ? 'configured' : 'missing'");
+    expect(runtime).toContain("privacyAccessControls: privacyAccessSchemaReady ? 'configured' : 'missing'");
     expect(policyReceiptMigration).toContain('CREATE TABLE policy_acceptance_receipts');
+    expect(privacyAccessMigration).toContain('CREATE TABLE privacy_request_events');
     expect(runtime).toContain("answerContract: 'sovereign-answer.v2'");
   });
 });
