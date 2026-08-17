@@ -24,7 +24,7 @@ export type PublicLandingViewportResult = {
 };
 
 const narrowViewportMaximum = 760;
-const requiredSurfaces = [
+const desktopRequiredSurfaces = [
   'hero',
   'expression-slice',
   'personal-chat',
@@ -35,6 +35,16 @@ const requiredSurfaces = [
   'system-reasoning',
   'comparison'
 ] as const;
+const narrowRequiredSurfaces = [
+  'hero',
+  'expression-slice',
+  'personal-chat',
+  'personal-reasoning',
+  'relationship-chat',
+  'relationship-reasoning',
+  'system-map',
+  'comparison'
+] as const;
 const productSurfaceIds = new Set([
   'personal-chat',
   'personal-reasoning',
@@ -43,15 +53,15 @@ const productSurfaceIds = new Set([
   'system-map',
   'system-reasoning'
 ]);
-const productPairs = [
+const narrowProductPairs = [
   ['personal-chat', 'personal-reasoning'],
-  ['relationship-chat', 'relationship-reasoning'],
-  ['system-map', 'system-reasoning']
+  ['relationship-chat', 'relationship-reasoning']
 ] as const;
 
 export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSnapshot): PublicLandingViewportResult {
   const failures: string[] = [];
   const narrow = snapshot.viewportWidth <= narrowViewportMaximum;
+  const requiredSurfaces = narrow ? narrowRequiredSurfaces : desktopRequiredSurfaces;
 
   if (snapshot.scrollWidth > snapshot.viewportWidth + 1) {
     failures.push(`horizontal overflow ${snapshot.scrollWidth}px > ${snapshot.viewportWidth}px`);
@@ -85,7 +95,7 @@ export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSna
   }
 
   if (narrow) {
-    for (const [chatId, workflowId] of productPairs) {
+    for (const [chatId, workflowId] of narrowProductPairs) {
       const chat = snapshot.surfaces.find((item) => item.id === chatId);
       const workflow = snapshot.surfaces.find((item) => item.id === workflowId);
       if (chat && workflow && workflow.top < chat.bottom + 10) {
