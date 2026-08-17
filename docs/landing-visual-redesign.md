@@ -1,8 +1,8 @@
-# Sovereign public landing visual contract
+# Sovereign public landing visual companion
 
-The authoritative implementation contract is `docs/v0-visual-port-contract.md`.
+Status: supporting visual summary. The authoritative implementation contract is `docs/v0-visual-port-contract.md`; active user-facing wording is governed by `docs/product-language-system.md`.
 
-The supplied founder v0 archive is the component and visual source for the public root. The root is not a later marketing reconstruction and is not an independent dashboard application.
+The supplied founder v0 archive remains the component/visual source for the public root. Historical archive strings are provenance only and are not automatically active copy requirements.
 
 Archive SHA-256:
 
@@ -10,86 +10,95 @@ Archive SHA-256:
 6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba
 ```
 
-The archive fingerprint preserves design provenance. Active user-facing wording inherits `docs/product-language-system.md`; historical archive strings are not current copy requirements.
-
 ## Required first viewport
 
 - Brand: `Sovereign`
 - Kicker: `PERSONAL AI FOR REAL LIFE`
-- Headline line one: `Healing isn’t optional.`
-- Outlined line two: `Holding onto the pain is.`
+- Founder hero line one: `Healing isn’t optional.`
+- Founder hero line two: `Holding onto the pain is.`
 - Primary action: `Build my Baseline`
 - Secondary action: `See a Sovereign answer`
-- Trust: start free, no card required, interpretations remain reviewable
+- Trust: start free, no card, interpretation remains reviewable/correctable
 
-The hero must preserve the archive’s centered, near-black, atmospheric editorial composition. It must not be replaced by the later `Know yourself. Understand the system. Choose what fits.` reconstruction.
+The adjacent definition must explain Sovereign as a private personal AI for real questions before source-framework machinery.
 
-## Required sequence
+## Required public sequence
 
 1. Founder v0 hero.
-2. Situational recognition: `Start with what’s actually happening.` with one rotating real-life question at a time.
-3. Personal demonstration: `See the capacity beneath the pattern.` with the self chat, quiet Basis metadata, and visible answer structure.
-4. Relationship demonstration: `Understand what happens between you.` with two permitted Baselines and the relationship context.
-5. System demonstration: `See what keeps the pattern going—and what could change it.` with distinct people, roles, responsibility, authority, pressure, and system interaction.
-6. Concise generic-AI / Sovereign comparison focused on current-conversation context versus Baseline + permitted connected context.
+2. Situational recognition: `Start with what’s actually happening.` with one recognizable real-life question at a time.
+3. Personal demonstration: a concrete useful distinction, real answer hierarchy, quiet Basis, and visible text workflow; do not lead with internal `capacity` terminology.
+4. Relationship demonstration: `Understand what happens between you.` with two permission-bound contexts and a distinct interaction field.
+5. System demonstration: distinct participants, responsibility, authority, pressure, supported observations, unknowns, and what could change; no decorative group personality.
+6. Concise comparison focused on blank/current-conversation context versus Baseline + relevant permitted context, without blanket claims about every other AI product.
 7. `Your thoughts deserve a better place to live.` final action.
 
-These are rendered component requirements. Copy-string presence alone is not sufficient. Retired chatbot phrases must not be restored merely because they appeared in the founder archive.
+These are rendered component/interaction requirements, not merely string-presence checks.
 
 ## Selective port boundary
 
 Bring across:
 
-- hero composition;
-- rotating questions;
-- chat windows;
-- Baseline evidence treatment;
-- visible answer-structure flows;
+- founder hero composition;
+- rotating/recognizable questions;
+- demo chat windows;
+- quiet Baseline/Basis evidence treatment;
+- visible text reasoning/progression;
 - relationship example;
-- system map;
+- System map/route presentation;
 - comparison;
 - final action;
-- dark editorial tokens, type, spacing, depth, and motion.
+- near-black/cream editorial tokens, type, spacing, depth, and restrained motion.
 
 Do not bring across:
 
 - mock authentication;
 - localStorage users;
-- canned or random answers;
-- fake dashboard data;
-- mock billing, account, consent, invitation, People, or Systems behavior.
+- canned/random authenticated answers;
+- fake dashboard state;
+- mock billing/account/consent/invitation/People/System behavior;
+- a required video-generation workflow.
 
 ## Real platform continuity
 
-The real OPENAPI platform remains authoritative for:
+The production application remains authoritative for:
 
-- login, signup, invitation, onboarding, and account control;
+- login/signup/invitation/onboarding/account control;
+- policy/18+ review;
+- Plan → Baseline → Workspace gating;
 - Today, Explore, People, Systems, Library, and You;
 - `SovereignIntelligenceWorkspace`;
-- `sovereign-answer.v2`;
-- Baseline, current context, Basis, Alignment, relationship, system, and Covenant behavior;
-- Cloudflare Worker APIs, D1, Durable Objects, Workers AI, AI Gateway, Resend, Turnstile, and Stripe;
-- deterministic permission and consent enforcement.
+- text-first `sovereign-answer.v2` responses;
+- Baseline/current/Basis/Alignment/relationship/system/Covenant behavior;
+- on-demand private export;
+- Cloudflare Worker, D1, Durable Objects, Workers AI/Gateway, Resend, Turnstile, Stripe;
+- deterministic permissions/entitlements.
+
+The landing demo teaches the interaction hierarchy. It never replaces production state or real inference.
 
 ## Sitewide visual application
 
-The v0 visual language applies to the public root, static How it works, Pricing, FAQ, 404, login, signup, invitation, onboarding, policy pages, and the authenticated one-room workspace.
+The founder visual language applies across public root/support pages, login/signup/invitation/onboarding/policy/account surfaces, and the authenticated one-room workspace.
 
-`apps/web/src/v0-visual-port.css` remains the founder visual foundation. `v0-global-experience.css`, route-cohesion authorities, and `passkey-auth.css` preserve the established route implementation. `apps/web/src/experience-refinement-v1.css` is appended through the existing synchronous cohesion installer as the bounded final presentation refinement; it is not another local stylesheet import and must not change product behavior.
+The authenticated text thread should echo the landing demo’s visual logic without becoming a fake chat mock:
 
-Standalone How it works, Pricing, and FAQ retain the founder static foundation and route-cohesion layer, then load `apps/web/public/experience-static-refinement-v1.css` as the final static presentation authority.
+- user turn restrained;
+- direct Sovereign answer visually primary;
+- relevant sections read as one answer;
+- Basis quiet/secondary;
+- correction/continuation after answer;
+- composer remains the next clear action.
 
 ## Verification
 
-Production must reject:
+Production/source contracts must reject:
 
-- the `Know yourself…` reconstructed landing;
-- missing archive fingerprint;
+- the retired reconstructed root hero as the active landing;
+- missing founder provenance fingerprint;
 - wrong component order;
-- retired active chatbot language;
-- missing v0 component selectors;
-- missing workspace/account selectors;
+- retired chatbot language as active public copy;
 - mock runtime markers;
-- a local stylesheet loaded after `passkey-auth.css`, or any change to the certified local Vite import order;
-- a compiled asset missing the founder provenance fingerprint;
-- a compiled experience in which the final monochrome refinement authority is absent.
+- visual delivery-path/import-order regressions;
+- reintroduction of neon/glassmorphism as dominant product chrome;
+- public technical-framework language that displaces the real-life question/answer hierarchy.
+
+Human desktop/iPhone acceptance is required by the current launch task graph. Automated Browser Rendering is optional and must be reported only when actually run.
