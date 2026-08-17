@@ -129,7 +129,24 @@ describe('single-deploy release orchestrator', () => {
     expect(result.deploys).toBe(1);
     expect(deployCalls(test.runWrangler)).toBe(1);
     expect(result.evidence.releaseEvidence.sha).toBe(sha);
+    expect(result.evidence.releaseEvidence.routeCohesionVerified).toBe(false);
+    expect(result.evidence.releaseEvidence.renderedVisualVerified).toBe(false);
     expect(test.fetchImpl).toHaveBeenCalledTimes(4);
+  });
+
+  it('marks browser evidence true only when the matching post-deploy checks complete', async () => {
+    const test = harness();
+    test.options.postDeployChecks = [
+      { label: 'verify-runtime-v3', path: 'runtime.mjs' },
+      { label: 'verify-secondary-public', path: 'secondary.mjs' },
+      { label: 'verify-route-cohesion', path: 'route.mjs', browserRun: true },
+      { label: 'verify-rendered-visuals', path: 'visual.mjs', browserRun: true }
+    ];
+    const result = await orchestrateRelease(test.options);
+    expect(result.status).toBe('success');
+    expect(result.verification).toEqual({ routeCohesionVerified: true, renderedVisualVerified: true });
+    expect(result.evidence.releaseEvidence.routeCohesionVerified).toBe(true);
+    expect(result.evidence.releaseEvidence.renderedVisualVerified).toBe(true);
   });
 
   it('post-deploy failure performs one deploy and persists failure progress', async () => {
