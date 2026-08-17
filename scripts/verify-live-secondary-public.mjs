@@ -187,12 +187,15 @@ for (const marker of [
 }
 for (const marker of [
   '--v8-blue:#d8d0c5!important',
-  'saturate(0.08)',
   'background:#111316!important',
   'padding:54px0!important'
 ]) {
   assert(compactJavaScript.includes(marker), `compiled rendered fidelity is missing ${marker}`);
 }
+assert(
+  /saturate\((?:0?\.)08\)/.test(compactJavaScript),
+  'compiled rendered fidelity is missing saturation 0.08'
+);
 assert(compactJavaScript.includes('-webkit-text-stroke:'), 'compiled injected refinement is missing the founder outline treatment');
 assert(
   compactJavaScript.includes('.sovereign-app-runtime.sovereign-composer') || compactJavaScript.includes('.sovereign-app-runtime .sovereign-composer'),
