@@ -50,18 +50,20 @@ export function normalizeWorkersAiInput(model: string, input: unknown): unknown 
   if (!input || typeof input !== 'object' || Array.isArray(input)) return { prompt: String(input ?? '') };
 
   const source = input as Record<string, unknown>;
-  const prompt = typeof source.input === 'string'
-    ? source.input
-    : typeof source.prompt === 'string'
-      ? source.prompt
+  const prompt = typeof source.prompt === 'string'
+    ? source.prompt
+    : typeof source.input === 'string'
+      ? source.input
       : undefined;
   if (!prompt) return input;
 
-  const output: Record<string, unknown> = { ...source };
+  const output: Record<string, unknown> = { ...source, prompt };
   delete output.input;
+  delete output.messages;
+  if (typeof source.max_output_tokens === 'number' && source.max_completion_tokens === undefined) {
+    output.max_completion_tokens = source.max_output_tokens;
+  }
   delete output.max_output_tokens;
-  output.messages = [{ role: 'user', content: prompt }];
-  if (typeof source.max_output_tokens === 'number') output.max_completion_tokens = source.max_output_tokens;
   if (!output.response_format) output.response_format = { type: 'json_object' };
   if (output.temperature === undefined) output.temperature = 0.2;
   return output;
