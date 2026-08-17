@@ -1,5 +1,8 @@
 /* Sovereign.OS terminal typography authority.
  * The retired display serif must not render anywhere in the active product.
+ * Repeated :root specificity is intentional: this file is appended last and
+ * must beat historical class-specific !important font rules without altering
+ * their layout declarations.
  */
 
 :root {
@@ -16,7 +19,7 @@
   --serif: var(--font-title);
 }
 
-:where(
+html:root:root:root body :is(
   h1,
   h2,
   h3,
@@ -41,8 +44,9 @@
   .v0-final h2,
   .landing-question-orbit h2,
   .landing-demo__bar,
-  .public-secondary-page .policy-title,
-  .account-shell h1,
+  .policy-title,
+  .account-intro h1,
+  .auth-panel h1,
   .plan-onboarding h1,
   .passkey-shell h1
 ) {
@@ -52,9 +56,9 @@
   font-synthesis: none;
 }
 
-.public-approved-v8 .v0-hero h1,
-.public-approved-v8 .v0-hero h1 > span,
-.public-approved-v8 .v0-hero h1 > em {
+html:root:root:root body .public-approved-v8 .v0-hero h1,
+html:root:root:root body .public-approved-v8 .v0-hero h1 > span,
+html:root:root:root body .public-approved-v8 .v0-hero h1 > em {
   font-family: var(--font-title) !important;
   font-style: normal !important;
 }
