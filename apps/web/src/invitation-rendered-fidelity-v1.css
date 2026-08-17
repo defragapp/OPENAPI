@@ -1,0 +1,71 @@
+/*
+ * Invitation rendered fidelity v1.
+ *
+ * Terminal presentation-only authority for the invitation route. This reconciles
+ * the historical premium two-column consent composition with the final deployed
+ * route sizing without changing invitation state, consent, auth, or API behavior.
+ */
+
+@media (min-width: 901px) {
+  .invitation-shell > .auth-panel[data-invitation-state]:has(.invitation-state) {
+    display: grid !important;
+    width: min(960px, calc(100vw - 96px)) !important;
+    max-width: 960px !important;
+    min-height: 560px !important;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 0.92fr) !important;
+    grid-template-rows: auto auto auto 1fr !important;
+    column-gap: clamp(40px, 5vw, 64px) !important;
+    row-gap: 16px !important;
+    align-items: start !important;
+    padding: clamp(40px, 4vw, 56px) !important;
+  }
+
+  .invitation-shell > .auth-panel[data-invitation-state]:has(.invitation-state)::after {
+    left: 50% !important;
+  }
+
+  .invitation-shell > .auth-panel[data-invitation-state]:has(.invitation-state) > .eyebrow,
+  .invitation-shell > .auth-panel[data-invitation-state]:has(.invitation-state) > #invitation-title,
+  .invitation-shell > .auth-panel[data-invitation-state]:has(.invitation-state) > .lede,
+  .invitation-shell > .auth-panel[data-invitation-state]:has(.invitation-state) > .status-note {
+    grid-column: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .invitation-shell > .auth-panel[data-invitation-state]:has(.invitation-state) > .eyebrow {
+    grid-row: 1 !important;
+  }
+
+  .invitation-shell > .auth-panel[data-invitation-state]:has(.invitation-state) > #invitation-title {
+    grid-row: 2 !important;
+    max-width: 9.5ch !important;
+    margin: 0 !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+    font-size: clamp(3.5rem, 5vw, 5rem) !important;
+    line-height: 0.96 !important;
+    text-wrap: balance !important;
+  }
+
+  .invitation-shell > .auth-panel[data-invitation-state]:has(.invitation-state) > .lede {
+    grid-row: 3 !important;
+    max-width: 42ch !important;
+    margin-top: 4px !important;
+  }
+
+  .invitation-shell > .auth-panel[data-invitation-state]:has(.invitation-state) > .status-note {
+    grid-row: 4 !important;
+    align-self: end !important;
+  }
+
+  .invitation-shell > .auth-panel[data-invitation-state]:has(.invitation-state) > .invitation-state {
+    grid-column: 2 !important;
+    grid-row: 1 / span 4 !important;
+    min-width: 0 !important;
+    min-height: 100% !important;
+    align-self: stretch !important;
+    align-content: center !important;
+    padding: clamp(28px, 3vw, 40px) !important;
+  }
+}
