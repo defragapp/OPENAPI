@@ -1,71 +1,69 @@
 # Security Incident Response Runbook
 
+Status: current incident-response engineering runbook. This document does not make legal notification determinations.
+
 This runbook covers suspected credential exposure, unauthorized repository access, customer-data exposure, account takeover, payment abuse, production compromise, and significant service abuse.
 
 ## 1. Contain
 
 - Preserve owner access and verified recovery methods.
-- Revoke unauthorized sessions, collaborators, tokens, deploy keys, apps, and service access.
-- Disable an affected route, integration, or credential only when a safe replacement or containment path is ready, unless active exploitation requires immediate shutdown.
-- Apply temporary Cloudflare rules or Access restrictions when they reduce exposure without blocking required customer or provider traffic.
-- Do not delete evidence before preserving it.
+- Revoke unauthorized sessions, collaborators, tokens, deploy keys, apps, and service access when containment requires it.
+- Disable an affected route, integration, or credential only when a safe replacement/containment path is ready, unless active exploitation requires immediate shutdown.
+- Apply temporary Cloudflare restrictions when they reduce exposure without creating a larger customer/provider failure.
+- Preserve evidence before destructive cleanup.
 
 ## 2. Preserve evidence
 
 Record:
 
-- Detection time and source.
-- Affected service, route, account, repository, or credential category.
-- Relevant commit IDs, event IDs, request IDs, provider audit events, and timestamps.
-- Actions taken and by whom.
-- Current production impact.
+- detection time/source;
+- affected service, route, account, repository, or credential category;
+- relevant commit/event/request/provider audit identifiers and timestamps;
+- actions taken and by whom;
+- current production impact.
 
-Do not copy full secrets, payment data, authentication cookies, private customer content, exact location history, or birth records into the incident log.
+Do not copy full secrets, payment data, authentication cookies, private customer content, exact location history, or birth records into incident logs/issues.
 
 ## 3. Assess scope
 
 Determine:
 
-- What was exposed or changed.
-- The earliest and latest plausible exposure times.
-- Which identities, environments, and providers were affected.
-- Whether production data was accessed, altered, exported, or deleted.
-- Whether billing, authentication, consent, or entitlements were affected.
-- Whether the issue remains exploitable.
+- what was exposed or changed;
+- earliest/latest plausible exposure time;
+- affected identities/environments/providers;
+- whether production data was accessed, altered, exported, or deleted;
+- whether auth, billing, policy, consent, or entitlements were affected;
+- whether the issue remains exploitable.
 
-Distinguish confirmed facts from assumptions and unresolved questions.
+Distinguish confirmed facts from assumptions/unresolved questions.
 
 ## 4. Eradicate and recover
 
-- Rotate compromised credentials using the credential-rotation runbook.
-- Patch the root cause through a reviewed branch and pull request.
+- Replace/revoke compromised credentials using the credential-management runbook when applicable.
+- Patch the root cause in the canonical OPENAPI implementation.
 - Restore safe configuration from repository-owned sources of truth.
-- Verify migrations, release gates, security headers, authentication boundaries, billing flows, webhooks, and health/readiness.
-- Monitor provider audit logs and production telemetry for recurrence.
+- Verify migrations, authentication boundaries, billing/webhooks, consent, privacy controls, release gates, and health/readiness.
+- Monitor relevant provider audit logs/production telemetry for recurrence.
 
-Cloudflare Workers Builds connected to the canonical repository remains the production release authority unless the incident itself makes that path unsafe.
+Current production recovery/release authority is `docs/production-release.md`. For the text-first launch, a repaired exact current `origin/main` SHA must pass `pnpm verify:cloudflare-build` before `pnpm production:release:text` performs the production mutation. GitHub Actions and historical Workers Builds are not recovery release authority.
+
+Do not bypass exact-SHA gates merely because the change is urgent unless active exploitation requires a separate explicit containment action first.
 
 ## 5. Notify appropriately
 
-Escalate to the repository owner immediately for any confirmed or suspected exposure involving:
+Escalate to the repository owner immediately for confirmed/suspected exposure involving customer/account data, authentication/signing material, payment/Stripe data, production infrastructure control, unauthorized repository access, or material service interruption.
 
-- Customer or account data.
-- Authentication or signing secrets.
-- Payment or Stripe data.
-- Production infrastructure control.
-- Unauthorized repository access.
-- Material service interruption.
-
-Legal, regulatory, customer, provider, insurer, or law-enforcement notification decisions require the owner and appropriate qualified counsel. Do not make unsupported claims about breach scope or legal obligations.
+Legal, regulatory, customer, provider, insurer, or law-enforcement notification decisions require the owner and appropriate qualified counsel. Do not make unsupported claims about breach scope or obligations.
 
 ## 6. Close and improve
 
-Before closing the incident:
+Before closure:
 
-- Confirm containment and remediation.
-- Confirm revoked credentials no longer work.
-- Confirm production checks pass.
-- Document the root cause and contributing controls.
-- Add or strengthen automated checks where practical.
-- Track unresolved provider-plan, billing, or permissions blockers separately.
-- Remove temporary emergency controls that are no longer necessary.
+- confirm containment/remediation;
+- confirm unauthorized/revoked access no longer works;
+- confirm current exact-SHA repository and production checks pass;
+- document root cause/contributing controls without secret values;
+- strengthen automated tests/controls where practical;
+- track unresolved provider-account/billing/permission items separately;
+- remove temporary emergency controls that are no longer necessary;
+- record whether any privacy/access/deletion evidence or external governance follow-up remains.
