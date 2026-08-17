@@ -26,10 +26,13 @@ describe('public evidence contract', () => {
 
   it('keeps relationship and system evidence permission-safe and confirmable', () => {
     expect(stories).toContain('With permission, Sovereign keeps each person’s supplied context distinct');
-    expect(stories).toContain('Illustrative permitted Baselines · No compatibility score · No private-thought claims');
-    expect(stories).toContain('Sanitized system demonstration · Each person controls what may be included');
+    expect(stories).toContain('Illustrative shared context · Permission required · No compatibility score · No private-thought claims');
+    expect(stories).toContain('Sanitized supplied system context · Each person controls what may be included');
     expect(stories).toContain('Keeping both people distinct');
-    expect(stories).toContain('Permitted context');
+    expect(stories).toContain('Shared with permission');
+    expect(stories).toContain('Illustrative supplied context');
+    expect(stories).not.toContain('Illustrative permitted Baselines');
+    expect(stories).not.toContain('Permitted context');
     expect(field).toContain('not a diagnosis, score, or claim about anyone’s internal state');
     expect(fixture).toContain('not a score or a verdict about the person');
     expect(fixture).toContain('without determining behavior');
