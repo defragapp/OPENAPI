@@ -118,7 +118,7 @@ describe('secondary public visual parity', () => {
     expect(policyCss).not.toContain('.public-approved-v8 .landing-story');
   });
 
-  it('loads secondary parity after the landing and iOS authorities while the injected refinement remains final', () => {
+  it('loads secondary parity after the landing and iOS authorities while rendered fidelity remains the final injected authority', () => {
     const landingAuthority = main.indexOf("import './public-landing-approved-v8.css'");
     const iosAuthority = main.indexOf("import './landing-ios-parity-density-v1.css'");
     const secondaryAuthority = main.indexOf("import './public-secondary-pages-locked.css'");
@@ -126,7 +126,12 @@ describe('secondary public visual parity', () => {
     expect(iosAuthority).toBeGreaterThan(landingAuthority);
     expect(secondaryAuthority).toBeGreaterThan(iosAuthority);
     expect(main).toContain("import experienceRefinementCss from './experience-refinement-v1.css?inline'");
+    expect(main).toContain("import renderedFidelityCss from './rendered-fidelity-v1.css?inline'");
     expect(main).toContain('style.textContent += `\\n${experienceRefinementCss}`;');
+    expect(main).toContain('style.textContent += `\\n${renderedFidelityCss}`;');
+    expect(main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;')).toBeGreaterThan(
+      main.indexOf('style.textContent += `\\n${experienceRefinementCss}`;')
+    );
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(landing).not.toContain('public-secondary-page');
@@ -145,6 +150,9 @@ describe('secondary public visual parity', () => {
     expect(liveVerifier).toContain('static refinement stylesheet');
     expect(liveVerifier).toContain('const compactJavaScript = javascript.text.replace');
     expect(liveVerifier).toContain('compiled injected refinement');
+    expect(liveVerifier).toContain('compiled rendered fidelity');
+    expect(liveVerifier).toContain('--v8-blue:#d8d0c5!important');
+    expect(liveVerifier).toContain('fidelity=v1');
     expect(liveVerifier).toContain('product-proof-window');
     expect(liveVerifier).toContain('annual-price');
     expect(productionRelease).toContain("['verify-secondary-public', 'scripts/verify-live-secondary-public.mjs']");
