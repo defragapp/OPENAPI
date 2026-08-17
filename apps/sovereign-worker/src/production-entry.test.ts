@@ -20,8 +20,16 @@ describe('production launch preflight', () => {
     expect(productionEntry).toContain('const entitlements = await getEntitlements(env, auth.accountId)');
     expect(productionEntry).toContain('if (selection.personId || selection.systemId)');
     expect(productionEntry).toContain('await authorizeConversationContext(env, auth.accountId, selection, entitlements)');
-    expect(productionEntry.indexOf('await authorizeConversationContext'))
-      .toBeLessThan(productionEntry.indexOf('return runtime.fetch(request, env, executionContext)'));
+
+    const delegatedFetch = 'return runtime.fetch(request, env, executionContext)';
+    expect(productionEntry.indexOf('const preflight = await launchPreflight(request, env)'))
+      .toBeLessThan(productionEntry.indexOf(delegatedFetch));
+
+    const messageStart = productionEntry.indexOf('const messageMatch = url.pathname.match(THREAD_MESSAGE_PATH)');
+    const messageEnd = productionEntry.indexOf('const systemAlignmentMatch = url.pathname.match(LEGACY_SYSTEM_ALIGNMENT_PATH)');
+    const messagePreflight = productionEntry.slice(messageStart, messageEnd);
+    expect(messagePreflight.indexOf('await authorizeConversationContext(env, auth.accountId, selection, entitlements)'))
+      .toBeLessThan(messagePreflight.lastIndexOf('return null;'));
   });
 
   it('keeps urgent/grounded/refusal handling outside paid entitlement preflight', () => {
