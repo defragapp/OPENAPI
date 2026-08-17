@@ -15,13 +15,14 @@ const integrationCss = readFileSync(new URL('./landing-expression-field-integrat
 const heroExtension = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
 const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
 const landingRefinementV5 = readFileSync(new URL('./landing-live-refinement-v5.css', import.meta.url), 'utf8');
+const sansAuthority = readFileSync(new URL('./sans-typography-authority-v1.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
-describe('founder v0 selective visual port', () => {
+describe('founder selective visual port', () => {
   it('ports the integrated interactive 360 field at the opening with click-led inspection', () => {
     expect(landing).toContain('<LandingExpressionSlice />');
-    expect(landing).toContain('<BaselineFoundation />');
     expect(landing).toContain('<RealLifeQuestions />');
+    expect(landing).not.toContain('<BaselineFoundation />');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(field).toContain('expressionAxisRegistryById');
     expect(field).toContain('buildLandingAxes');
@@ -51,18 +52,27 @@ describe('founder v0 selective visual port', () => {
     expect(landingRefinementV5).toContain('width: 104px !important');
   });
 
-  it('introduces the Baseline foundation before real-life question demonstrations', () => {
-    expect(landing).toContain('One private reference beneath every question.');
-    expect(landing).toContain('calculated astronomical positions and selected interpretive frameworks');
-    expect(landing).toContain('One private foundation. More useful answers across the questions that shape your life.');
-    expect(landing).toContain('Should I stay in this job, ask for more, or leave?');
-    expect(landing.indexOf('<BaselineFoundation />')).toBeLessThan(landing.indexOf('<RealLifeQuestions />'));
+  it('starts with self exploration rather than a mechanics-first Baseline explainer', () => {
+    expect(landing).toContain('Start with you');
+    expect(landing).toContain('Explore yourself.');
+    expect(landing).toContain('What does Alignment look like for me?');
+    expect(landing).toContain('How do I create best?');
+    expect(landing).not.toContain('One private reference beneath every question.');
+    expect(landing).not.toContain('One private foundation.');
+    expect(landing).not.toContain('calculated astronomical positions');
+    expect(landing).not.toContain('partial Human Design');
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
   });
 
   it('restores chat and workflow demonstrations without restoring duplicate expression fields', () => {
     expect(landing).toContain('<LandingProductStories />');
     for (const marker of [
+      '01 · You',
+      '02 · You + your people',
+      '03 · From 1:1 to the whole system',
+      'Explore how you think, decide, create, connect, and grow.',
+      'Understand what happens between you.',
+      'See the whole system.',
       'surface="personal-chat"',
       'surface="personal-reasoning"',
       'surface="relationship-chat"',
@@ -73,9 +83,9 @@ describe('founder v0 selective visual port', () => {
       'v0-workflow-panel',
       'v0-family-system-map'
     ]) expect(stories).toContain(marker);
+    expect(stories).not.toContain('Separate helping from carrying the outcome.');
+    expect(stories).not.toContain('See where responsibility keeps landing.');
     expect(stories).not.toContain('LandingExpressionFieldPreview');
-    expect(stories).not.toContain('sphere');
-    expect(stories).not.toContain('globe');
   });
 
   it('preserves the canonical single-room workspace and production data sources', () => {
@@ -94,18 +104,21 @@ describe('founder v0 selective visual port', () => {
     expect(systemField).toContain('<ExpressionFieldRenderer');
   });
 
-  it('applies founder language to authenticated surfaces and the complete public landing', () => {
+  it('applies founder composition with terminal sans typography', () => {
     for (const selector of ['.intelligence-workspace', '.intelligence-sidebar', '.sovereign-composer', '.surface-heading', '.account-shell', '.auth-panel']) expect(v0Visual).toContain(selector);
     for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip']) expect(fieldCss).toContain(selector);
     for (const selector of ['.landing-expression-slice__sphere-shell', '.landing-expression-slice__readout', '.landing-question-orbit__stage']) expect(heroExtension).toContain(selector);
     for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storyCss).toContain(selector);
-    expect(landingRefinementV5).toContain('.landing-baseline-intro__heading');
+    expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
+    expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).toContain('@keyframes sovereign-hero-rise');
+    expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
     expect(expressionCss).toContain('min-height: 44px');
     expect(main).toContain("import './landing-expression-field-integration.css';");
     expect(main).toContain("import './landing-hero-field-v4.css';");
     expect(main).toContain("import './v0-restored-product-stories.css';");
     expect(main).toContain("import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline';");
+    expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';");
   });
 
   it('does not introduce the archive mock runtime, scores, or alternate architecture', () => {
