@@ -20,7 +20,10 @@ CREATE INDEX privacy_request_events_account_created_idx
 
 CREATE TRIGGER policy_signup_eligibility_after_terms_receipt
 AFTER INSERT ON policy_acceptance_receipts
-WHEN NEW.acceptance_surface = 'signup' AND NEW.policy_type = 'terms'
+WHEN NEW.acceptance_surface = 'signup'
+  AND NEW.policy_type = 'terms'
+  AND NEW.policy_version = '2026-08-17.2'
+  AND NEW.policy_content_hash = '10e0e2e9f3a17c6860c91311f3cfcbca426b237e49f2380ac57d11dc23fbf822'
 BEGIN
   UPDATE accounts
   SET eligibility_confirmed_at = NEW.accepted_at,
