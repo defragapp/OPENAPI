@@ -20,6 +20,24 @@ Use the following order when documents overlap:
 
 A subordinate document may quote required language for enforcement. If its wording or sequence conflicts with this file or the founder-locked visual contract, follow the applicable authority and correct the subordinate document rather than creating a third variant.
 
+## Experience hierarchy
+
+Baseline Design is the foundation. A visitor arrives with an ordinary real-life question, decision, relationship, or recurring situation. Sovereign uses the Baseline to make a relevant distinction visible that may have been difficult to see from the situation alone.
+
+Relationship and system intelligence extend that same foundation outward. Each person remains distinct, another person's private state remains unknown unless they supply it, and shared context remains permission-bound.
+
+The technical machinery stays underneath the experience. Source calculations, framework abbreviations, Basis codes, provider details, permission mechanics, and deployment architecture appear only when they are needed for support, verification, control, or deeper inspection. They must not carry the primary explanation of what Sovereign is or why an answer is useful.
+
+The public explanatory order is therefore:
+
+1. recognize a real-life question or situation;
+2. show the useful distinction Sovereign can make visible;
+3. explain that Baseline Design is the private personal foundation beneath that answer;
+4. extend the same intelligence to relationships and systems when relevant and permitted;
+5. keep technical evidence available beneath the explanation rather than in front of it.
+
+This hierarchy is not a new framework or slogan. It clarifies how the existing Baseline-first product should be experienced and explained.
+
 ## The Sovereign lens
 
 Sovereign uses one explanatory movement across self, relationships, decisions, systems, and Worlds:
