@@ -80,6 +80,32 @@ async function configureProductionControls({ accountId, apiToken, databaseId }) 
   });
 }
 
+export function assertRequiredProductionControls(controls) {
+  const failures = [];
+  if (controls?.d1?.readReplication !== 'auto') {
+    failures.push('D1 read replication is not verified in automatic mode');
+  }
+
+  const gatewayVerified = controls?.gateway?.management === 'verified';
+  const gatewayRequestPrivacy = controls?.gateway?.perRequestPrivacy?.skipCache === true
+    && controls?.gateway?.perRequestPrivacy?.collectLog === false;
+  if (!gatewayVerified && !gatewayRequestPrivacy) {
+    failures.push('AI Gateway privacy controls are neither management-verified nor protected per request');
+  }
+
+  if (controls?.rateLimit?.management !== 'verified') {
+    failures.push(controls?.rateLimit?.reason || 'Sovereign zone rate-limit rule is not management-verified');
+  }
+  if (controls?.schema?.management !== 'verified') {
+    failures.push(controls?.schema?.reason || 'Sovereign API Shield schema is not management-verified');
+  }
+
+  if (failures.length) {
+    throw new Error(`Production Cloudflare controls are not release-ready: ${failures.join('; ')}`);
+  }
+  return controls;
+}
+
 export async function main({
   runWrangler = runWranglerCli,
   generatedConfigPath,
@@ -112,7 +138,9 @@ export async function main({
     await ensureSecrets({ runWrangler, fetchImpl });
     const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || process.env.CF_ACCOUNT_ID || '').trim();
     const apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
-    const controls = await configureControls({ accountId, apiToken, databaseId });
+    const controls = assertRequiredProductionControls(
+      await configureControls({ accountId, apiToken, databaseId })
+    );
 
     deployInvoked = true;
     const deployResult = runWrangler(['deploy', '--config', generatedConfigPath]);
