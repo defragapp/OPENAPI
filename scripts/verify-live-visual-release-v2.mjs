@@ -114,7 +114,7 @@ function renderedAuditScript() {
         field: document.documentElement.dataset.sovereignLandingField || '',
         sequence: document.documentElement.dataset.sovereignV0Sequence || ''
       },
-      text: document.body.innerText.replace(/\\s+/g, ' ').trim()
+      text: document.body.innerText.replace(/\s+/g, ' ').trim()
     };
     const node = document.createElement('script');
     node.id = '__sovereign_visual_audit';
@@ -351,7 +351,8 @@ function assertDom(profile, dom) {
     'See the capacity beneath the pattern.',
     'Understand what happens between you.',
     'See what keeps the pattern going—and what could change it.',
-    'Generic AI sees the prompt.',
+    'A blank conversation starts with the prompt.',
+    'Sovereign starts with your Baseline.',
     'Your thoughts deserve a better place to live.'
   ]) {
     assert(dom.text.includes(requiredText), `${profile.name}: rendered page is missing “${requiredText}”`);
