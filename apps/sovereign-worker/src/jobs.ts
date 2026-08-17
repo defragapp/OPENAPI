@@ -5,9 +5,13 @@ import { notifyInvitationLifecycle } from './invitation-notifications';
 
 const ACCOUNT_TABLE_DELETES = [
   'auth_magic_links',
+  'auth_email_codes',
+  'auth_passkey_challenges',
+  'auth_passkeys',
   'auth_sessions',
   'baseline_onboarding',
   'account_privacy_settings',
+  'privacy_request_events',
   'relationships',
   'systems',
   'persons',
@@ -216,6 +220,8 @@ export async function cleanupExpired(env: Env) {
   const turnStates = await env.DB.prepare("DELETE FROM thread_turn_states WHERE updated_at < datetime('now', ?) AND status IN ('completed','failed','interrupted')").bind(auditCutoff).run();
   const auditEvents = await env.DB.prepare("DELETE FROM tool_audit_events WHERE created_at < datetime('now', ?)").bind(auditCutoff).run();
   const magicLinks = await env.DB.prepare("DELETE FROM auth_magic_links WHERE created_at < datetime('now', ?)").bind(threadCutoff).run();
+  const emailCodes = await env.DB.prepare("DELETE FROM auth_email_codes WHERE created_at < datetime('now', ?)").bind(threadCutoff).run();
+  const passkeyChallenges = await env.DB.prepare("DELETE FROM auth_passkey_challenges WHERE created_at < datetime('now', ?)").bind(threadCutoff).run();
   const sessions = await env.DB.prepare("DELETE FROM auth_sessions WHERE revoked_at IS NOT NULL AND created_at < datetime('now', ?)").bind(auditCutoff).run();
   const oldJobs = await env.DB.prepare("DELETE FROM background_jobs WHERE status IN ('completed','failed','cancelled') AND updated_at < datetime('now', ?)").bind(auditCutoff).run();
   await env.DB.prepare("UPDATE auth_sessions SET revoked_at = datetime('now') WHERE expires_at < datetime('now') AND revoked_at IS NULL").run();
@@ -229,6 +235,8 @@ export async function cleanupExpired(env: Env) {
     turnStates: turnStates.meta?.changes ?? 0,
     auditEvents: auditEvents.meta?.changes ?? 0,
     magicLinks: magicLinks.meta?.changes ?? 0,
+    emailCodes: emailCodes.meta?.changes ?? 0,
+    passkeyChallenges: passkeyChallenges.meta?.changes ?? 0,
     sessions: sessions.meta?.changes ?? 0,
     oldJobs: oldJobs.meta?.changes ?? 0
   };
@@ -253,6 +261,7 @@ export function deletionInventory(): string[] {
     'consent_grants:cascade-via-persons',
     'system_memberships:cascade-via-persons-and-systems',
     'thread_events:cascade-via-threads',
+    'policy_acceptance_receipts:retained-with-pseudonymized-account-audit',
     'stripe_subscriptions:cancelled-before-retention',
     'stripe_customers:email-removed',
     'background_jobs:minimized'
