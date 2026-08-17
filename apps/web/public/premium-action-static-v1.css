@@ -15,7 +15,7 @@
     sans-serif;
 }
 
-:where(
+html:root:root:root body :is(
   h1,
   h2,
   h3,
