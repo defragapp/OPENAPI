@@ -32,8 +32,12 @@ describe('shared Sovereign intelligence stage', () => {
     expect(field).toContain('not a diagnosis, score, or claim about anyone’s internal state');
     expect(field).toContain('line length follows relative expression reach');
     expect(stories).toContain('With permission, Sovereign keeps each person’s supplied context distinct');
-    expect(stories).toContain('Each person controls what may be included');
-    expect(stories).toContain('Illustrative permitted Baselines · No compatibility score · No private-thought claims');
+    expect(stories).toContain('Illustrative shared context · Permission required · No compatibility score · No private-thought claims');
+    expect(stories).toContain('Sanitized supplied system context · Each person controls what may be included');
+    expect(stories).toContain('Role context');
+    expect(stories).toContain('Illustrative supplied context');
+    expect(stories).not.toContain('Illustrative permitted Baselines');
+    expect(stories).not.toContain('Permitted context');
     expect(stories).toContain('className="landing-evidence"');
     expect(stories).toContain('<strong>Basis</strong>');
   });
