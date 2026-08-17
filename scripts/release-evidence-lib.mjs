@@ -1,6 +1,6 @@
 export const RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1';
-export const RELEASE_MIGRATION_VERSION = '0016_policy_acceptance_receipts';
-export const RELEASE_MIGRATION_FILENAME = '0016_policy_acceptance_receipts.sql';
+export const RELEASE_MIGRATION_VERSION = '0017_privacy_access_and_eligibility';
+export const RELEASE_MIGRATION_FILENAME = '0017_privacy_access_and_eligibility.sql';
 export const RELEASE_ROUTE_COHESION_CONTRACT = 'sovereign-deployed-route-cohesion-v1';
 export const RELEASE_RENDERED_VISUAL_CONTRACT = 'sovereign-rendered-page-family-audit-v1';
 export const RELEASE_PROGRESS_CONTRACT = 'sovereign-production-release-progress.v1';
