@@ -1,188 +1,124 @@
 # Sovereign.OS product positioning companion
 
-Status: supporting positioning reference. The historical filename contains `canonical`, but this document is not the user-facing language authority. It inherits `docs/product-language-system.md` and does not independently authorize copy, hero sequence, terminology, or product promises. Claims remain subject to the launch product contract, live entitlements, and deterministic privacy and consent enforcement.
+Status: supporting positioning reference only. The historical filename contains `canonical`, but this document is **not** the user-facing language authority and does not define a second hero, product promise, or launch contract.
+
+Current user-facing language is governed exclusively by `docs/product-language-system.md`. Product scope is governed by `docs/launch-product-contract.md`; intelligence behavior by `docs/inner-recognition-intelligence.md`.
 
 ## Product category
 
-**Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the human systems around you.**
+Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the human systems around you.
 
 A new visitor should understand the experience in this order:
 
-1. Recognize an ordinary real-life question, decision, relationship, or recurring situation.
-2. See a useful distinction Sovereign can make visible.
-3. Understand that Baseline Design is the private personal foundation Sovereign uses to know where to begin.
-4. See the same intelligence extend to relationships and systems when relevant and permitted.
-5. Inspect supporting evidence, uncertainty, permissions, or technical detail only when useful.
+1. recognize an ordinary real-life question, decision, relationship, or recurring situation;
+2. see a useful distinction Sovereign can make visible;
+3. understand Baseline Design as the private personal foundation Sovereign uses to know where to begin;
+4. see the same intelligence extend to relationships and systems when relevant and permitted;
+5. inspect supporting evidence, uncertainty, permissions, or technical detail only when useful.
 
-Baseline Design is the foundation. It is not technical garnish after a generic chat interaction, and its framework machinery should not become the first thing a visitor has to decode.
+Baseline Design is the foundation. It is not technical garnish after generic chat, and its framework machinery should not be the first thing a visitor has to decode.
 
-Unlike a blank conversation, Sovereign begins from the user's Baseline. Current context is added only when the user enables it. Another person's or a shared system's context is added only when the applicable identity, entitlement, and permission boundary exists.
+## Current launch interaction
 
-Across those contexts, Sovereign follows one explanatory movement: see the capacity beneath a pattern; see how that capacity may be expressing; see what happens between people; and see what may be keeping the pattern going and what could change it. This is the shared logic beneath existing capabilities, not another named framework or product surface.
+The authenticated launch is text-first. The normal loop is:
+
+`question → direct answer → relevant explanation → quiet Basis/provenance → correction or continuation`
+
+The landing demo chats may demonstrate that hierarchy. The real authenticated workspace uses real account/Baseline/permission state and real inference.
+
+Video/Worlds generation is not part of the current launch product and should not appear as required positioning, pricing, or acceptance behavior.
 
 ## Brand architecture
 
-### Plain product definition
+### Product category
 
-**Private AI for understanding yourself, your relationships, and the systems around you.**
+`Private personal AI for real life.`
 
-This definition explains what the product is in ordinary language. It belongs before unfamiliar framework terminology.
+### Interaction principle
 
-### Primary interaction principle
+`See the pattern. See what could change.`
 
-A person brings a real situation or question. Sovereign uses the Baseline to make the relevant distinction visible. This sentence describes the existing experience; it is not approved public copy or a new slogan.
+Use the exact active wording and placement only as allowed by `product-language-system.md` and the founder visual contract.
 
-### Emotional brand statement
+### Founder root hero
 
-**Healing isn’t optional. Holding the pain is.**
+The root public hero remains founder-locked:
 
-This is a founder-approved campaign statement. Outside the founder-locked root hero, it may appear only after the product category and interaction are understood. It must not be used as a therapy claim, diagnosis, command to reconcile, or guarantee of emotional outcome.
+- `Healing isn’t optional.`
+- `Holding onto the pain is.`
 
-### Enduring brand line
+Immediately adjacent copy must explain the actual product and supported real-life questions. This supporting document does not define alternative root supporting copy.
 
-**Know yourself. Understand the system. Choose what fits.**
+### Enduring secondary brand line
 
-This is an enduring secondary brand line. It is not the root public hero. The founder-locked root sequence begins with **Healing isn’t optional. Holding onto the pain is.** and ends with **Your thoughts deserve a better place to live.**
+`Know yourself. Understand the system. Choose what fits.`
+
+This is a deeper/closing brand line, not the root product explanation.
 
 ## Core position
 
-Sovereign.OS is Baseline-first. The product is useful before the user explains an incident, and it remains useful when the user brings a specific question about self, choice, relationship, family, household, team, workplace, friendship group, or other human system.
+Sovereign.OS is Baseline-first. It should be useful before a user explains an incident and should remain useful for a specific question about self, a decision, relationship, family, household, team, workplace, friendship group, or other permitted system.
 
-Baseline Design is the persistent personal intelligence foundation. It gives Sovereign an explorable reference for identity and purpose; communication; decision-making; learning; creativity; love and connection; leadership; boundaries; responsibility; conflict and repair; responses to pressure and change; underused capacity; Shadow; Gift; Alignment; current relevance; consented relationships; and roles inside a family, household, team, workplace, friendship group, or other system.
+Baseline Design gives Sovereign a persistent personal reference across identity/purpose, communication, decision-making, learning, creativity, love/connection, leadership, boundaries, responsibility, conflict/repair, pressure/change, underused capacity, Shadow, Gift, Alignment, current relevance, permission-bound relationships, and supported roles/context inside Systems.
 
-The public experience should make Sovereign recognizable as useful personal AI and show the real-life question or distinction before asking the visitor to decode framework terminology. Baseline Design should then be understood as the reason the answer does not begin from zero.
+These internal capabilities do not need to be enumerated in the first public explanation. Public copy starts with the real human question/distinction.
 
-## Core capabilities
+## Capability framing
 
-### Understand yourself
+### Self
 
-Users may ask what qualities are central, what they naturally notice or carry, how they communicate and decide, which capacities are underused or overextended, and why one part of themselves is difficult to understand.
+Sovereign may help a user examine stable qualities, possible pressured expressions, communication/decision patterns, boundaries, responsibility, and what appears to fit—without turning interpretation into measured personality fact.
 
-### Understand what is active now
+### Current context
 
-The Baseline stays stable. Current astronomical conditions add an expiring, time-sensitive layer. They may make a theme more relevant; they do not establish behavior, motive, emotion, or outcome.
+Current context is temporary, explicit, expiring, and separate from Baseline. It may make a theme more relevant; it does not prove behavior, emotion, motive, or outcome.
 
-Current context is off until the user enables it. The product uses Earth-geocentric current positions without requesting device location, expires the context after six hours, and lets the user remove it immediately.
+### Shadow and Gift
 
-### Explore Shadow and Gift
+Shadow and Gift are possible expressions of a valid quality, not bad/good identities.
 
-**Shadow** is how a valid quality may narrow, distort, protect, avoid, or overreach under pressure.
+### Alignment
 
-**Gift** is what the same quality makes possible when it is used with awareness and choice.
+Alignment is a qualitative comparison of fit/tradeoff/missing information, never a score or decision made for the user.
 
-Shadow and Gift are not bad and good identities. The product must make each expression specific and behavioral.
+### Relationships
 
-### Examine Alignment
+With active permission, Sovereign may compare distinct structured Baselines and examine what each person may bring, the interaction, ownership, and unknowns. It is not compatibility scoring or mind-reading.
 
-Alignment is not a score or rule. It is a way to examine whether a choice, behavior, relationship, opportunity, or direction fits the person a user is and the person they are becoming.
+### Systems
 
-A useful Alignment answer distinguishes:
+With permission and supplied/confirmed role context, Sovereign may examine responsibility, authority, care/reliance, pressure, constraints, objectives, and missing perspectives while keeping each participant distinct.
 
-- what supports the fit;
-- what pulls against it;
-- the real tradeoff;
-- what information is still needed;
-- a closer version that better preserves the user’s underlying intention.
+### Covenant
 
-Sovereign does not choose for the user.
-
-### Understand a relationship
-
-With permission from both people, Sovereign may compare relevant structured Baseline facets and help explain:
-
-- what each person may be bringing;
-- different communication or processing routes;
-- shared needs;
-- interaction pressure;
-- what each person can own;
-- what remains unconfirmed and must be asked directly.
-
-This is relational perspective, not compatibility scoring, mind-reading, or a verdict about who is right. Understanding, agreement, forgiveness, reconciliation, restored trust, and continued contact remain separate.
-
-### Understand a system
-
-With consented participants and explicit role context, Sovereign may examine stabilizing and change roles, pressure carriers, authority, responsibility, caregiving, dependence, constraints, shared objectives, expectations, and missing perspectives.
-
-The central question is: **How is this functioning, and what is each person contributing?**
-
-Formal roles and factual responsibilities may be shown as facts only when supplied or confirmed. A role inferred from a Baseline must remain a possibility.
-
-### Explore through Covenant
-
-Covenant is a contextual, optional capability. It is not a top-level application or the default identity of the platform.
-
-A grounded answer remains complete without Covenant. When a relevant personal, relationship, or family dynamic is recognized, Sovereign may quietly offer **Explore through Christian Scripture**. It activates only after confirmation for the question.
-
-Covenant separates Biblical parallel, Scripture, teaching, application, and boundary. It uses only retrieved or deliberately curated verified passages. It never claims God’s exact intent, assigns moral status, proves motive, or requires contact, estrangement, forgiveness, reconciliation, submission, or continued exposure to harm.
+Covenant is contextual/optional and activates only after explicit confirmation. It adds verified Scripture/Christian teaching without becoming proof of motive, moral status, destiny, or required reconciliation/contact.
 
 ## Information boundaries
 
-Sovereign preserves four layers:
+Sovereign preserves:
 
-1. Exact source data deterministically calculated or returned by an authorized provider.
-2. Versioned Baseline facets interpreted from authorized exact values.
-3. Expiring current-condition context and deterministic contacts.
-4. Question-specific synthesis using relevant facets, exact Basis references, user-confirmed facts, consented context, and corrections.
+1. exact source data;
+2. versioned Baseline facets;
+3. expiring current context;
+4. question-specific synthesis using permitted context and exact server-approved Basis.
 
-The exact source layer does not measure personality. The facet layer is interpretive. The answer remains a possibility the user may confirm, correct, reject, or save.
+Exact source data does not measure personality. Facets and answers are interpretive/correctable. Another person’s private state remains unknown unless that person supplies it.
 
-These layers belong underneath the primary experience. They explain and constrain the answer; they should not be compressed into the marketing proposition itself.
+## Product-experience principles
 
-## Product experience principles
-
-- Name the AI category before explaining its internal framework.
-- Show a recognizable real-life question and Sovereign answer before requiring framework literacy.
+- Explain the AI/product before framework machinery.
+- Start with a recognizable question or situation.
 - Give the direct answer first.
-- Make the useful distinction visually legible before exact support metadata.
-- Explain Baseline Design as the private personal foundation beneath the answer.
-- Extend that same intelligence to relationships and systems without collapsing people together.
-- Use two to five relevant sections for a normal answer.
-- Put depth behind a clear first viewport instead of collapsing the answer into a platitude.
-- Keep exact Basis data available but secondary.
-- Never let the model write or complete a Basis value.
-- Never display another person’s exact framework data without `framework.display`.
-- Never use a one-sided owner entry as access to another person’s private Baseline.
-- Keep the conversation dominant over workspace chrome.
-- Use one canonical authenticated workspace.
-- Keep users in control of correction, consent, continuity, and deletion.
+- Keep technical support secondary and inspectable.
+- Keep participants distinct.
+- Never let the model write exact Basis display values.
+- Never show another person’s exact framework values without `framework.display`.
+- Keep conversation visually primary over workspace chrome.
+- Preserve one canonical authenticated workspace.
+- Keep users in control of correction, consent, continuity, export, and deletion.
 
-## Supporting public summary
+## Language boundary
 
-Sovereign.OS is a private personal AI for questions about yourself, your relationships, your decisions, and the people or systems around you. Baseline Design gives Sovereign a private personal foundation, so a real-life question does not begin from a blank starting point.
+Do not position Sovereign.OS as a generic chatbot, prediction product, compatibility score, scientific personality test, diagnosis, therapy replacement, spiritual certainty system, incident-only coach, or source of hidden motives.
 
-Sovereign.OS turns Baseline Design into a private AI for personal, relationship, and system intelligence. Plain-language insight comes first. Exact supporting data remains available beneath it. You decide what fits.
-
-These are supporting summaries only. Active root copy remains governed by `docs/product-language-system.md` and the founder visual contract.
-
-## Root public hero contract
-
-Headline:
-
-**Healing isn’t optional.**
-
-**Holding onto the pain is.**
-
-Supporting definition:
-
-**Sovereign begins with the capacity beneath a pattern. It shows how that capacity may be expressing, what happens between people, and what may be keeping the pattern in place—so you can see what could change.**
-
-Primary action:
-
-**Build my Baseline**
-
-Secondary action:
-
-**See a Sovereign answer**
-
-## Language to avoid
-
-Do not position Sovereign.OS as a generic chatbot, prediction product, compatibility score, scientific personality test, diagnosis, therapy replacement, incident-only coach, or source of hidden motives.
-
-Avoid:
-
-- “possible interaction vector”;
-- “calculated solution”;
-- “read” or “reading” as the product;
-- “your chart says”;
-- “the universe is telling you”;
-- “this transit means”;
+Do not revive retired public language from historical archives/audits merely because it remains present as provenance or internal test material.
