@@ -43,11 +43,21 @@ async function main() {
   await executeDeletion(e, 'acct_jobs', 'delete_jobs');
   await cleanupExpired(e);
   const joined = e._writes.join('\n');
-  for (const expected of ['deletion_jobs', 'auth_sessions', 'saved_understandings', 'auth_magic_links', 'retained_billing_record']) {
+  for (const expected of [
+    'deletion_jobs',
+    'auth_sessions',
+    'auth_email_codes',
+    'auth_passkeys',
+    'auth_passkey_challenges',
+    'privacy_request_events',
+    'saved_understandings',
+    'auth_magic_links',
+    'retained_billing_record'
+  ]) {
     if (!joined.includes(expected)) throw new Error(`missing job write ${expected}`);
   }
   if (/ARTIFACTS|R2Bucket|exports\//.test(joined)) throw new Error('R2 dependency remained in jobs smoke');
-  console.log('Jobs smoke passed deletion_executes=true cleanup_executes=true r2=false');
+  console.log('Jobs smoke passed deletion_executes=true cleanup_executes=true credential_cleanup=true privacy_request_cleanup=true r2=false');
 }
 
 main().catch((error) => {
