@@ -14,11 +14,13 @@ const fieldCss = readFileSync(new URL('./landing-expression-field-v3.css', impor
 const integrationCss = readFileSync(new URL('./landing-expression-field-integration.css', import.meta.url), 'utf8');
 const heroExtension = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
 const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
+const landingRefinementV5 = readFileSync(new URL('./landing-live-refinement-v5.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('founder v0 selective visual port', () => {
-  it('ports the integrated interactive 360 field at the opening', () => {
+  it('ports the integrated interactive 360 field at the opening with click-led inspection', () => {
     expect(landing).toContain('<LandingExpressionSlice />');
+    expect(landing).toContain('<BaselineFoundation />');
     expect(landing).toContain('<RealLifeQuestions />');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(field).toContain('expressionAxisRegistryById');
@@ -30,20 +32,32 @@ describe('founder v0 selective visual port', () => {
     expect(field).toContain('onPointerMove');
     expect(field).toContain('onFocus={() => selectAxis(axis.id)}');
     expect(field).toContain('onClick={(event) =>');
+    expect(field).toContain('setHasInspection(true)');
+    expect(field).not.toContain('onPointerEnter={() => selectAxis(axis.id)}');
     expect(field).toContain('data-field-geometry="spherical-360"');
     expect(field).toContain('buildSphereGrid');
     expect(field).toContain('MIN_AXIS_LENGTH');
     expect(field).toContain('MAX_AXIS_LENGTH');
-    expect(field).toContain('TOOLTIP_WIDTH = 132');
-    expect(field).toContain('TOOLTIP_HEIGHT = 34');
+    expect(field).toContain('TOOLTIP_WIDTH = 104');
+    expect(field).toContain('TOOLTIP_HEIGHT = 26');
     expect(field).toContain('landing-expression-slice__tooltip-title');
     expect(field).toContain('landing-expression-slice__tooltip-value');
-    expect(field).toContain('select a line to see its name and relative value');
+    expect(field).toContain('click a line to inspect it');
     expect(field).toContain('placeTooltip(selectedProjected.projected)');
     expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(integrationCss).toContain('background: transparent');
     expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
     expect(heroExtension).toContain('stroke: #2f93ff');
+    expect(landingRefinementV5).toContain('width: 104px !important');
+  });
+
+  it('introduces the Baseline foundation before real-life question demonstrations', () => {
+    expect(landing).toContain('One private reference beneath every question.');
+    expect(landing).toContain('calculated astronomical positions and selected interpretive frameworks');
+    expect(landing).toContain('One private foundation. More useful answers across the questions that shape your life.');
+    expect(landing).toContain('Should I stay in this job, ask for more, or leave?');
+    expect(landing.indexOf('<BaselineFoundation />')).toBeLessThan(landing.indexOf('<RealLifeQuestions />'));
+    expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
   });
 
   it('restores chat and workflow demonstrations without restoring duplicate expression fields', () => {
@@ -85,10 +99,13 @@ describe('founder v0 selective visual port', () => {
     for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip']) expect(fieldCss).toContain(selector);
     for (const selector of ['.landing-expression-slice__sphere-shell', '.landing-expression-slice__readout', '.landing-question-orbit__stage']) expect(heroExtension).toContain(selector);
     for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storyCss).toContain(selector);
+    expect(landingRefinementV5).toContain('.landing-baseline-intro__heading');
+    expect(landingRefinementV5).toContain('@keyframes sovereign-hero-rise');
     expect(expressionCss).toContain('min-height: 44px');
     expect(main).toContain("import './landing-expression-field-integration.css';");
     expect(main).toContain("import './landing-hero-field-v4.css';");
     expect(main).toContain("import './v0-restored-product-stories.css';");
+    expect(main).toContain("import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline';");
   });
 
   it('does not introduce the archive mock runtime, scores, or alternate architecture', () => {
