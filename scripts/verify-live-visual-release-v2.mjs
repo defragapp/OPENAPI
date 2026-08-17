@@ -114,7 +114,7 @@ function renderedAuditScript() {
         field: document.documentElement.dataset.sovereignLandingField || '',
         sequence: document.documentElement.dataset.sovereignV0Sequence || ''
       },
-      text: document.body.innerText.replace(/\s+/g, ' ').trim()
+      text: document.body.innerText.replace(/\\s+/g, ' ').trim()
     };
     const node = document.createElement('script');
     node.id = '__sovereign_visual_audit';
