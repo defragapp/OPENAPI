@@ -19,6 +19,17 @@ const CRITICAL_OPERATIONS = [
   ['POST', '/api/v1/deletion-jobs']
 ];
 
+export function normalizeApiShieldEndpoint(endpoint) {
+  let variableIndex = 0;
+  return String(endpoint || '').replace(/\{[^{}]+\}/g, () => `{var${++variableIndex}}`);
+}
+
+export function apiShieldOperationMatches(operation, method, endpoint) {
+  return String(operation?.host || '').toLowerCase() === 'app.defrag.app'
+    && operation?.method === method
+    && normalizeApiShieldEndpoint(operation?.endpoint) === normalizeApiShieldEndpoint(endpoint);
+}
+
 export async function configureCloudflareFreeTier(options = {}) {
   const accountId = String(options.accountId || process.env.CLOUDFLARE_ACCOUNT_ID || '').trim();
   const apiToken = String(options.apiToken || process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
@@ -249,7 +260,7 @@ async function configureApiShield(client, zoneId) {
   const operationsPayload = await client.request(`/zones/${zoneId}/api_gateway/operations?feature=schema_info&page=1&per_page=5000`);
   const existing = operationsPayload.result || [];
   const missing = CRITICAL_OPERATIONS
-    .filter(([method, endpoint]) => !existing.some((item) => item.host === 'app.defrag.app' && item.method === method && item.endpoint === endpoint))
+    .filter(([method, endpoint]) => !existing.some((item) => apiShieldOperationMatches(item, method, endpoint)))
     .map(([method, endpoint]) => ({ method, host: 'app.defrag.app', endpoint }));
   if (missing.length) {
     await client.request(`/zones/${zoneId}/api_gateway/operations`, { method: 'POST', body: missing });
@@ -268,7 +279,7 @@ async function configureApiShield(client, zoneId) {
   if (schemaVerification.result?.validation_enabled !== true) throw new Error('API Shield schema is not active');
   if (settingVerification.result?.validation_default_mitigation_action !== 'block') throw new Error('API Shield blocking is not active');
   const managed = operationVerification.result || [];
-  const missingAfter = CRITICAL_OPERATIONS.filter(([method, endpoint]) => !managed.some((item) => item.host === 'app.defrag.app' && item.method === method && item.endpoint === endpoint));
+  const missingAfter = CRITICAL_OPERATIONS.filter(([method, endpoint]) => !managed.some((item) => apiShieldOperationMatches(item, method, endpoint)));
   if (missingAfter.length) throw new Error(`API Shield Endpoint Management is missing ${missingAfter.length} critical operations`);
 
   return {
