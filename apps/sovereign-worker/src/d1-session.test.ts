@@ -71,12 +71,24 @@ describe('D1 request sessions', () => {
 });
 
 describe('Workers AI free-tier normalization', () => {
-  it('converts Responses-style input into the Cloudflare-hosted model shape', () => {
+  it('converts legacy Responses-style input into the documented Cloudflare prompt shape', () => {
     expect(normalizeWorkersAiInput('@cf/zai-org/glm-4.7-flash', {
       input: 'Return one JSON object.',
       max_output_tokens: 3_200
     })).toEqual({
-      messages: [{ role: 'user', content: 'Return one JSON object.' }],
+      prompt: 'Return one JSON object.',
+      max_completion_tokens: 3_200,
+      response_format: { type: 'json_object' },
+      temperature: 0.2
+    });
+  });
+
+  it('preserves an already-correct prompt request without duplicating it as messages', () => {
+    expect(normalizeWorkersAiInput('@cf/zai-org/glm-4.7-flash', {
+      prompt: 'Return one JSON object.',
+      max_completion_tokens: 3_200
+    })).toEqual({
+      prompt: 'Return one JSON object.',
       max_completion_tokens: 3_200,
       response_format: { type: 'json_object' },
       temperature: 0.2
