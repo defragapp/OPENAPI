@@ -18,7 +18,7 @@ const captureReplacement = captureMarker
   + "\n  const screenshotPath = resolve(routeScreenshotDirectory, route.name + '-' + profileName + '.png');"
   + "\n  if (snapshot.screenshot.length) writeFileSync(screenshotPath, snapshot.screenshot);";
 const resultMarker = "    screenshotSha256: snapshot.screenshot.length ? createHash('sha256').update(snapshot.screenshot).digest('hex') : '',\n    audit";
-const resultReplacement = "    screenshotSha256: snapshot.screenshot.length ? createHash('sha256').update(snapshot.screenshot).digest('hex') : '',\n    screenshotPath: screenshotPath.replace(root + '/', ''),\n    audit";
+const resultReplacement = "    screenshotSha256: snapshot.screenshot.length ? createHash('sha256').update(snapshot.screenshot).digest('hex') : '',\n    screenshotPath: screenshotPath.replace(process.cwd() + '/', ''),\n    audit";
 const reportMarker = `  console.log(JSON.stringify({
     ok: true,
     release: 'sovereign-deployed-route-cohesion-v1',
@@ -44,7 +44,7 @@ const reportReplacement = `  const report = {
     stylesheet: routeStylesheet,
     auditScript: auditScriptPath,
     browserTransportPreflight: true,
-    screenshotDirectory: routeScreenshotDirectory.replace(root + '/', ''),
+    screenshotDirectory: routeScreenshotDirectory.replace(process.cwd() + '/', ''),
     pages: routes.map((route) => route.name),
     results: results.map((result) => ({
       route: result.route,
