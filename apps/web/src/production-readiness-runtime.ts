@@ -2,12 +2,12 @@ let productionReadinessRuntimeInstalled = false;
 let compactFrame = 0;
 
 const compactGeometry = {
-  panelWidth: '148',
-  panelHeight: '50',
-  panelRadius: '7',
-  titleY: '18',
-  valueY: '34',
-  metaY: '46'
+  panelWidth: '132',
+  panelHeight: '34',
+  panelRadius: '6',
+  titleY: '16',
+  valueY: '16',
+  metaY: '28'
 } as const;
 
 function setAttributeIfChanged(element: Element | null, name: string, value: string): void {
