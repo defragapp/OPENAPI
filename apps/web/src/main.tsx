@@ -26,6 +26,7 @@ import productionReadinessVisualCss from './production-readiness-visual-v1.css?i
 import publicLandingFinalAuthorityCss from './public-landing-final-authority.css?inline';
 import experienceRefinementCss from './experience-refinement-v1.css?inline';
 import renderedFidelityCss from './rendered-fidelity-v1.css?inline';
+import landingRefinementV2Css from './landing-refinement-v2.css?inline';
 import invitationRenderedFidelityCss from './invitation-rendered-fidelity-v1.css?inline';
 
 /* Component foundations */
@@ -90,6 +91,7 @@ function installPlatformVisualCohesion(): void {
   style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}\n${workspaceMobileReleaseCss}\n${productionReadinessVisualCss}\n${publicLandingFinalAuthorityCss}`;
   style.textContent += `\n${experienceRefinementCss}`;
   style.textContent += `\n${renderedFidelityCss}`;
+  style.textContent += `\n${landingRefinementV2Css}`;
   style.textContent += `\n${invitationRenderedFidelityCss}`;
   document.head.append(style);
 }
