@@ -16,9 +16,9 @@ const MIN_AXIS_LENGTH = 118;
 const MAX_AXIS_LENGTH = 344;
 const ROTATION_LIMIT = 72;
 const AUTO_ROTATION_DEGREES_PER_MS = 0.0018;
-const TOOLTIP_WIDTH = 132;
-const TOOLTIP_HEIGHT = 34;
-const TOOLTIP_GAP = 10;
+const TOOLTIP_WIDTH = 104;
+const TOOLTIP_HEIGHT = 26;
+const TOOLTIP_GAP = 7;
 const INTERACTION_PAUSE_MS = 6200;
 const LEGACY_TOOLTIP_COMPATIBILITY = 'landing-expression-slice__tooltip · Baseline value · Live change · Current';
 void LEGACY_TOOLTIP_COMPATIBILITY;
@@ -71,6 +71,7 @@ type TooltipPlacement = {
 
 export function LandingExpressionSlice() {
   const [selectedId, setSelectedId] = useState<ExpressionAxisId>('clarity');
+  const [hasInspection, setHasInspection] = useState(false);
   const [rotation, setRotation] = useState<Rotation>({ yaw: 18, pitch: -7 });
   const dragState = useRef<DragState | null>(null);
   const pauseUntil = useRef(0);
@@ -119,6 +120,7 @@ export function LandingExpressionSlice() {
   function selectAxis(axisId: ExpressionAxisId) {
     pauseRotation();
     setSelectedId(axisId);
+    setHasInspection(true);
   }
 
   function handleKeyDown(event: KeyboardEvent<SVGGElement>, axisId: ExpressionAxisId) {
@@ -184,7 +186,7 @@ export function LandingExpressionSlice() {
       data-visual-contract="landing-expression-field-v3"
       data-field-geometry="spherical-360"
       data-field-axis-count={expressionAxisIds.length}
-      data-inspecting="true"
+      data-inspecting={hasInspection ? 'true' : 'false'}
       data-release-copy="Illustrative Baseline · sixteen interactive themes · one stable center · line length follows relative emphasis · not a diagnosis, score, or claim about anyone’s internal state"
       aria-label="Interactive Baseline expression field"
     >
@@ -252,7 +254,7 @@ export function LandingExpressionSlice() {
             .slice()
             .sort((left, right) => left.projected.depth - right.projected.depth)
             .map(({ axis, description, projected }) => {
-              const selectedLine = axis.id === selectedId;
+              const selectedLine = hasInspection && axis.id === selectedId;
               const path = `M ${CENTER} ${CENTER} L ${projected.x.toFixed(2)} ${projected.y.toFixed(2)}`;
               const depthOpacity = 0.54 + projected.depth * 0.46;
               const normalizedReach = clamp(axis.value / 100, 0, 1);
@@ -270,7 +272,6 @@ export function LandingExpressionSlice() {
                   aria-pressed={selectedLine}
                   aria-label={`${axis.label}. ${salienceLabel(axis.value)} relative emphasis. ${axis.currentDelta !== 0 ? 'Temporarily more active. ' : ''}${description}`}
                   onFocus={() => selectAxis(axis.id)}
-                  onPointerEnter={() => selectAxis(axis.id)}
                   onClick={(event) => {
                     event.stopPropagation();
                     selectAxis(axis.id);
@@ -298,23 +299,22 @@ export function LandingExpressionSlice() {
           <circle cx={CENTER} cy={CENTER} r="2.4" />
         </g>
 
-        <g className="landing-expression-slice__tooltip" aria-hidden="true">
-          <line
-            className="landing-expression-slice__tooltip-connector"
-            x1={selectedProjected.projected.x}
-            y1={selectedProjected.projected.y}
-            x2={tooltip.connectorX}
-            y2={tooltip.connectorY}
-          />
-          <g transform={`translate(${tooltip.x.toFixed(2)} ${tooltip.y.toFixed(2)})`}>
-            <rect className="landing-expression-slice__tooltip-panel" width={TOOLTIP_WIDTH} height={TOOLTIP_HEIGHT} rx="6" />
-            <text className="landing-expression-slice__tooltip-title" x="10" y="16">{selected.axis.label}</text>
-            <text className="landing-expression-slice__tooltip-value" x={TOOLTIP_WIDTH - 10} y="16" textAnchor="end">{selected.axis.value}</text>
-            <text className="landing-expression-slice__tooltip-meta" x="10" y="28">
-              {selected.axis.currentDelta !== 0 ? 'temporarily more active' : 'Baseline example'}
-            </text>
+        {hasInspection ? (
+          <g className="landing-expression-slice__tooltip" aria-hidden="true">
+            <line
+              className="landing-expression-slice__tooltip-connector"
+              x1={selectedProjected.projected.x}
+              y1={selectedProjected.projected.y}
+              x2={tooltip.connectorX}
+              y2={tooltip.connectorY}
+            />
+            <g transform={`translate(${tooltip.x.toFixed(2)} ${tooltip.y.toFixed(2)})`}>
+              <rect className="landing-expression-slice__tooltip-panel" width={TOOLTIP_WIDTH} height={TOOLTIP_HEIGHT} rx="4" />
+              <text className="landing-expression-slice__tooltip-title" x="9" y="16">{selected.axis.label}</text>
+              <text className="landing-expression-slice__tooltip-value" x={TOOLTIP_WIDTH - 9} y="16" textAnchor="end">{selected.axis.value}</text>
+            </g>
           </g>
-        </g>
+        ) : null}
       </svg>
 
       <div className="landing-expression-slice__readout landing-expression-slice__readout--accessible" role="status" aria-live="polite">
@@ -325,7 +325,7 @@ export function LandingExpressionSlice() {
       </div>
 
       <span className="landing-expression-slice__instructions">
-        Drag to rotate · select a line to see its name and relative value
+        Drag to rotate · click a line to inspect it
       </span>
     </section>
   );
@@ -449,22 +449,18 @@ function projectDirection(direction: Vector3, length: number): ProjectedPoint {
 }
 
 function placeTooltip(point: ProjectedPoint): TooltipPlacement {
-  const deltaX = point.x - CENTER;
-  const deltaY = point.y - CENTER;
-  const horizontalExit = Math.abs(deltaX) >= Math.abs(deltaY);
-  const proposedX = horizontalExit
-    ? (deltaX >= 0 ? point.x + TOOLTIP_GAP : point.x - TOOLTIP_WIDTH - TOOLTIP_GAP)
-    : point.x - TOOLTIP_WIDTH / 2;
-  const proposedY = horizontalExit
-    ? point.y - TOOLTIP_HEIGHT / 2
-    : (deltaY >= 0 ? point.y + TOOLTIP_GAP : point.y - TOOLTIP_HEIGHT - TOOLTIP_GAP);
-  const x = clamp(proposedX, 18, VIEWBOX_SIZE - TOOLTIP_WIDTH - 18);
-  const y = clamp(proposedY, 20, VIEWBOX_SIZE - TOOLTIP_HEIGHT - 20);
+  const opensRight = point.x <= CENTER;
+  const proposedX = opensRight
+    ? point.x + TOOLTIP_GAP
+    : point.x - TOOLTIP_WIDTH - TOOLTIP_GAP;
+  const proposedY = point.y - TOOLTIP_HEIGHT / 2;
+  const x = clamp(proposedX, 12, VIEWBOX_SIZE - TOOLTIP_WIDTH - 12);
+  const y = clamp(proposedY, 12, VIEWBOX_SIZE - TOOLTIP_HEIGHT - 12);
   return {
     x,
     y,
-    connectorX: clamp(point.x, x + 8, x + TOOLTIP_WIDTH - 8),
-    connectorY: clamp(point.y, y + 8, y + TOOLTIP_HEIGHT - 8)
+    connectorX: opensRight ? x : x + TOOLTIP_WIDTH,
+    connectorY: clamp(point.y, y + 6, y + TOOLTIP_HEIGHT - 6)
   };
 }
 

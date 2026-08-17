@@ -17,6 +17,7 @@ const integrationCss = readFileSync(new URL('./landing-expression-field-integrat
 const heroExtension = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
 const storiesCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
 const landingRefinement = readFileSync(new URL('./landing-refinement-v2.css', import.meta.url), 'utf8');
+const landingRefinementV5 = readFileSync(new URL('./landing-live-refinement-v5.css', import.meta.url), 'utf8');
 
 const retiredInterfacePhrases = [
   'Ask about your life. Get an answer built around you.',
@@ -42,30 +43,39 @@ describe('founder v0 public production release', () => {
     expect(sitemap).not.toContain('/app');
   });
 
-  it('uses the interactive 360 field as the opening product visual with a compact endpoint label', () => {
+  it('uses the interactive 360 field as the opening product visual with intentional click-led inspection', () => {
     expect(landing).toContain('data-answer-contract="sovereign-answer.v2"');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(landing).toContain('<LandingExpressionSlice />');
+    expect(landing).toContain('<BaselineFoundation />');
     expect(landing).toContain('<RealLifeQuestions />');
     expect(field).toContain('landing-expression-slice__beam');
     expect(field).toContain('landing-expression-slice__tooltip-title');
     expect(field).toContain('landing-expression-slice__tooltip-value');
     expect(field).toContain('onPointerDown={handlePointerDown}');
-    expect(field).toContain('onPointerEnter={() => selectAxis(axis.id)}');
+    expect(field).toContain('onClick={(event) =>');
+    expect(field).toContain('setHasInspection(true)');
+    expect(field).not.toContain('onPointerEnter={() => selectAxis(axis.id)}');
     expect(field).toContain('role="status"');
     expect(field).toContain('data-field-geometry="spherical-360"');
     expect(field).toContain('buildSphereGrid');
     expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(integrationCss).toContain('background: transparent');
     expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
-    expect(landingRefinement).toContain('.landing-expression-slice__tooltip-panel');
+    expect(landingRefinementV5).toContain('width: 104px !important');
+    expect(landingRefinementV5).toContain('height: 26px !important');
   });
 
-  it('keeps recognition situational and the three demonstrations structurally distinct', () => {
-    expect(landing).toContain('Built for real situations');
-    expect(landing).toContain('Start with what’s actually happening.');
-    expect(landing).toContain('Why do we keep having the same fight?');
+  it('introduces Baseline Design before concrete questions and the three demonstrations', () => {
+    expect(landing).toContain('One private reference beneath every question.');
+    expect(landing).toContain('calculated astronomical positions and selected interpretive frameworks');
+    expect(landing).toContain('What this unlocks');
+    expect(landing).toContain('One private foundation. More useful answers across the questions that shape your life.');
+    expect(landing).toContain('Why do we keep having the same argument even when we both want it to stop?');
+    expect(landing).toContain('Should I stay in this job, ask for more, or leave?');
     expect(landing).toContain('<LandingProductStories />');
+    expect(landing.indexOf('<BaselineFoundation />')).toBeLessThan(landing.indexOf('<RealLifeQuestions />'));
+    expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
     for (const marker of [
       'Separate helping from carrying the outcome.',
       'Understand what happens between you.',
@@ -103,9 +113,12 @@ describe('founder v0 public production release', () => {
     for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storiesCss).toContain(selector);
     expect(landingRefinement).toContain('scroll-snap-type: inline mandatory !important');
     expect(landingRefinement).toContain('.landing-demo--system-context');
+    expect(landingRefinementV5).toContain('@keyframes sovereign-hero-rise');
+    expect(landingRefinementV5).toContain('.landing-baseline-intro__heading');
+    expect(landingRefinementV5).toContain('@media (max-width: 760px)');
+    expect(landingRefinementV5).toContain('@media (prefers-reduced-motion: reduce)');
     expect(fieldCss).toContain('@media (max-width: 760px)');
     expect(heroExtension).toContain('@media (max-width: 760px)');
-    expect(heroExtension).toContain('@media (prefers-reduced-motion: reduce)');
     expect(storiesCss).toContain('@media (max-width: 760px)');
     expect(storiesCss).toContain('@media (prefers-reduced-motion: reduce)');
   });

@@ -1,0 +1,522 @@
+/*
+ * Sovereign.OS live landing refinement v5.
+ * Terminal landing-page presentation authority for the final public cohesion pass.
+ *
+ * Goals:
+ * - sharp, restrained first-view impact instead of decorative typography
+ * - intentional type contrast inside the hero statement
+ * - click-led, endpoint-anchored field inspection
+ * - Baseline Design explained before product demonstrations
+ * - concrete questions that reveal product value on scroll
+ *
+ * Presentation only. Product, privacy, consent, entitlement, and answer contracts are unchanged.
+ */
+
+/* HERO -------------------------------------------------------------------- */
+html .public-approved-v8 .v0-hero.sovereign-opening-field {
+  min-height: max(860px, calc(100svh - 74px)) !important;
+  padding-top: clamp(88px, 10vh, 132px) !important;
+  background:
+    radial-gradient(ellipse at 50% 72%, rgba(241, 233, 222, 0.035), transparent 34rem),
+    radial-gradient(ellipse at 50% 18%, rgba(255, 255, 255, 0.018), transparent 26rem),
+    linear-gradient(180deg, #080a0d 0%, #090b0e 70%, #080a0d 100%) !important;
+}
+
+html .public-approved-v8 .v0-hero-content {
+  width: min(1080px, 100%) !important;
+}
+
+html .public-approved-v8 .landing-hero-kicker {
+  margin-bottom: 30px !important;
+  color: rgba(241, 233, 222, 0.48) !important;
+  font-family: var(--font-subheading, sans-serif) !important;
+  font-size: 0.62rem !important;
+  font-weight: 540 !important;
+  letter-spacing: 0.18em !important;
+}
+
+html .public-approved-v8 .landing-hero-kicker > span {
+  width: 4px !important;
+  height: 4px !important;
+  background: rgba(241, 233, 222, 0.82) !important;
+  box-shadow: 0 0 12px rgba(241, 233, 222, 0.16) !important;
+}
+
+/* Deliberate two-face statement: sharp grotesk declaration + editorial consequence. */
+html .public-approved-v8 .v0-hero h1 {
+  width: min(1040px, 100%) !important;
+  margin-inline: auto !important;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+}
+
+html .public-approved-v8 .v0-hero h1 > span {
+  display: block !important;
+  color: #f6efe6 !important;
+  font-family: var(--font-subheading, "Helvetica Neue", Arial, sans-serif) !important;
+  font-size: clamp(4.8rem, 8.4vw, 8.9rem) !important;
+  font-weight: 520 !important;
+  line-height: 0.86 !important;
+  letter-spacing: -0.072em !important;
+  text-shadow: 0 18px 54px rgba(0, 0, 0, 0.38) !important;
+}
+
+html .public-approved-v8 .v0-hero h1 > em {
+  display: block !important;
+  margin-top: 16px !important;
+  color: rgba(241, 233, 222, 0.64) !important;
+  font-family: var(--font-display, Georgia, serif) !important;
+  font-size: clamp(4.6rem, 7.9vw, 8.25rem) !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 0.88 !important;
+  letter-spacing: -0.058em !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: 0 16px 48px rgba(0, 0, 0, 0.34) !important;
+}
+
+html .public-approved-v8 .sovereign-opening-copy {
+  max-width: 670px !important;
+  margin-top: 34px !important;
+  color: rgba(236, 228, 217, 0.68) !important;
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, sans-serif) !important;
+  font-size: clamp(0.95rem, 1.08vw, 1.04rem) !important;
+  line-height: 1.72 !important;
+}
+
+html .public-approved-v8 .sovereign-opening-actions {
+  margin-top: 28px !important;
+}
+
+html .public-approved-v8 .sovereign-opening-trust {
+  margin-top: 18px !important;
+  color: rgba(222, 214, 203, 0.36) !important;
+}
+
+/* Controlled opening motion: one reveal, no bounce, no decorative looping. */
+@media (prefers-reduced-motion: no-preference) {
+  html .public-approved-v8 .landing-hero-kicker {
+    opacity: 0;
+    animation: sovereign-hero-rise 620ms 80ms cubic-bezier(.16, 1, .3, 1) forwards;
+  }
+
+  html .public-approved-v8 .v0-hero h1 > span {
+    opacity: 0;
+    animation: sovereign-hero-rise 760ms 150ms cubic-bezier(.16, 1, .3, 1) forwards;
+  }
+
+  html .public-approved-v8 .v0-hero h1 > em {
+    opacity: 0;
+    animation: sovereign-hero-rise 820ms 260ms cubic-bezier(.16, 1, .3, 1) forwards;
+  }
+
+  html .public-approved-v8 .sovereign-opening-copy {
+    opacity: 0;
+    animation: sovereign-hero-rise 720ms 390ms cubic-bezier(.16, 1, .3, 1) forwards;
+  }
+
+  html .public-approved-v8 .sovereign-opening-actions,
+  html .public-approved-v8 .sovereign-opening-trust {
+    opacity: 0;
+    animation: sovereign-hero-rise 680ms 500ms cubic-bezier(.16, 1, .3, 1) forwards;
+  }
+
+  html .public-approved-v8 .landing-expression-slice__canvas {
+    opacity: 0;
+    animation: sovereign-field-arrive 1250ms 340ms cubic-bezier(.16, 1, .3, 1) forwards;
+  }
+}
+
+@keyframes sovereign-hero-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sovereign-field-arrive {
+  from { opacity: 0; transform: scale(0.985); }
+  to { opacity: 0.9; transform: scale(1); }
+}
+
+/* FIELD INSPECTION -------------------------------------------------------- */
+html .public-approved-v8 .landing-expression-slice[data-inspecting='false'] .landing-expression-slice__vector .landing-expression-slice__beam {
+  filter: none !important;
+}
+
+html .public-approved-v8 .landing-expression-slice__tooltip-panel {
+  width: 104px !important;
+  height: 26px !important;
+  fill: rgba(8, 10, 13, 0.92) !important;
+  stroke: rgba(241, 233, 222, 0.24) !important;
+  stroke-width: 0.7px !important;
+  filter: none !important;
+}
+
+html .public-approved-v8 .landing-expression-slice__tooltip-connector {
+  stroke: rgba(241, 233, 222, 0.34) !important;
+  stroke-width: 0.7px !important;
+  filter: none !important;
+}
+
+html .public-approved-v8 .landing-expression-slice__tooltip-title,
+html .public-approved-v8 .landing-expression-slice__tooltip-value {
+  fill: rgba(255, 250, 243, 0.9) !important;
+  font-family: var(--font-subheading, sans-serif) !important;
+  font-size: 7.8px !important;
+  font-weight: 560 !important;
+  letter-spacing: 0 !important;
+}
+
+html .public-approved-v8 .landing-expression-slice__tooltip-value {
+  fill: rgba(241, 233, 222, 0.56) !important;
+}
+
+html .public-approved-v8 .landing-expression-slice__instructions {
+  color: rgba(222, 214, 203, 0.28) !important;
+  font-size: 0.52rem !important;
+}
+
+html .public-approved-v8 .landing-expression-slice__vector.is-selected .landing-expression-slice__endpoint {
+  filter: drop-shadow(0 0 4px rgba(255, 250, 243, 0.55)) !important;
+}
+
+html .public-approved-v8 .landing-expression-slice__vector.is-selected .landing-expression-slice__beam {
+  filter: drop-shadow(0 0 3px rgba(241, 233, 222, 0.2)) !important;
+}
+
+/* BASELINE INTRO ---------------------------------------------------------- */
+html .public-approved-v8 .landing-baseline-intro {
+  position: relative;
+  width: 100%;
+  padding: clamp(104px, 10vw, 150px) 0 clamp(96px, 9vw, 132px) !important;
+  overflow: clip;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.075);
+  background:
+    radial-gradient(circle at 78% 18%, rgba(241, 233, 222, 0.025), transparent 30rem),
+    #080a0d;
+}
+
+html .public-approved-v8 .landing-baseline-intro__shell {
+  width: min(1180px, calc(100% - 72px)) !important;
+}
+
+html .public-approved-v8 .landing-baseline-intro__heading {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(360px, 0.72fr);
+  grid-template-areas:
+    'label copy'
+    'title copy';
+  column-gap: clamp(64px, 8vw, 118px);
+  row-gap: 16px;
+  align-items: start;
+}
+
+html .public-approved-v8 .landing-baseline-intro__heading > p {
+  grid-area: label;
+  margin: 7px 0 0;
+  color: rgba(241, 233, 222, 0.42);
+  font-family: var(--font-subheading, sans-serif) !important;
+  font-size: 0.64rem;
+  font-weight: 560;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+html .public-approved-v8 .landing-baseline-intro__heading > h2 {
+  grid-area: title;
+  max-width: 10ch;
+  margin: 0;
+  color: #f1e9de;
+  font-family: var(--font-display, Georgia, serif) !important;
+  font-size: clamp(3.75rem, 6vw, 6.6rem) !important;
+  font-weight: 400 !important;
+  line-height: 0.91 !important;
+  letter-spacing: -0.052em !important;
+  text-wrap: balance;
+}
+
+html .public-approved-v8 .landing-baseline-intro__heading > div {
+  grid-area: copy;
+  align-self: end;
+  max-width: 50ch;
+  padding-top: 58px;
+}
+
+html .public-approved-v8 .landing-baseline-intro__heading > div > p {
+  margin: 0;
+  color: rgba(229, 220, 209, 0.58);
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, sans-serif) !important;
+  font-size: 0.96rem;
+  line-height: 1.72;
+}
+
+html .public-approved-v8 .landing-baseline-intro__heading > div > p + p {
+  margin-top: 18px;
+  color: rgba(229, 220, 209, 0.48);
+}
+
+html .public-approved-v8 .landing-baseline-intro__principles {
+  display: grid;
+  margin: clamp(68px, 8vw, 104px) 0 0;
+  border-top: 1px solid rgba(241, 233, 222, 0.13);
+}
+
+html .public-approved-v8 .landing-baseline-intro__principles > div {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: clamp(36px, 7vw, 110px);
+  padding: 27px 0 29px;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.085);
+}
+
+html .public-approved-v8 .landing-baseline-intro__principles dt {
+  color: rgba(241, 233, 222, 0.78);
+  font-family: var(--font-subheading, sans-serif) !important;
+  font-size: 0.72rem;
+  font-weight: 560;
+  letter-spacing: 0.06em;
+}
+
+html .public-approved-v8 .landing-baseline-intro__principles dd {
+  max-width: 760px;
+  margin: 0;
+  color: rgba(229, 220, 209, 0.53);
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, sans-serif) !important;
+  font-size: 0.9rem;
+  line-height: 1.66;
+}
+
+html .public-approved-v8 .landing-baseline-intro__value {
+  max-width: 850px;
+  margin: clamp(52px, 6vw, 76px) 0 0;
+  color: rgba(255, 250, 243, 0.86);
+  font-family: var(--font-subheading, sans-serif) !important;
+  font-size: clamp(1.35rem, 2.25vw, 2.05rem);
+  font-weight: 440;
+  line-height: 1.38;
+  letter-spacing: -0.025em;
+}
+
+/* REAL QUESTIONS --------------------------------------------------------- */
+html .public-approved-v8 .landing-question-orbit {
+  min-height: clamp(520px, 42vw, 650px) !important;
+  padding: clamp(90px, 9vw, 126px) 24px !important;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.075) !important;
+  background:
+    radial-gradient(circle at 50% 52%, rgba(241, 233, 222, 0.028), transparent 28rem),
+    #090b0e !important;
+}
+
+html .public-approved-v8 .landing-question-orbit__inner {
+  width: min(1080px, 100%) !important;
+  max-width: 1080px !important;
+}
+
+html .public-approved-v8 .landing-question-orbit__kicker {
+  color: rgba(241, 233, 222, 0.42) !important;
+  font-family: var(--font-subheading, sans-serif) !important;
+  font-size: 0.62rem !important;
+  font-weight: 560 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+}
+
+html .public-approved-v8 .landing-question-orbit h2 {
+  max-width: 900px !important;
+  margin-top: 16px !important;
+  color: #f1e9de !important;
+  font-family: var(--font-display, Georgia, serif) !important;
+  font-size: clamp(3.35rem, 5.6vw, 5.9rem) !important;
+  font-weight: 400 !important;
+  line-height: 0.96 !important;
+  letter-spacing: -0.045em !important;
+  text-wrap: balance !important;
+}
+
+html .public-approved-v8 .landing-question-orbit__stage {
+  width: min(980px, 100%) !important;
+  height: 146px !important;
+  margin: 42px 0 20px !important;
+}
+
+html .public-approved-v8 .landing-question-orbit__stage > span {
+  justify-items: start !important;
+  place-items: initial !important;
+  align-content: center !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+html .public-approved-v8 .landing-question-orbit__stage > span > small {
+  color: rgba(241, 233, 222, 0.38) !important;
+  font-family: var(--font-subheading, sans-serif) !important;
+  font-size: 0.62rem !important;
+  font-weight: 560 !important;
+  letter-spacing: 0.14em !important;
+}
+
+html .public-approved-v8 .landing-question-orbit__stage > span > strong {
+  max-width: 900px !important;
+  color: rgba(255, 250, 243, 0.92) !important;
+  font-family: var(--font-subheading, sans-serif) !important;
+  font-size: clamp(1.65rem, 2.7vw, 2.65rem) !important;
+  font-weight: 460 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.036em !important;
+  text-align: left !important;
+  text-wrap: balance !important;
+}
+
+html .public-approved-v8 .landing-question-orbit__note {
+  max-width: 68ch !important;
+  color: rgba(229, 220, 209, 0.45) !important;
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, sans-serif) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.66 !important;
+}
+
+/* RESPONSIVE ------------------------------------------------------------- */
+@media (max-width: 900px) {
+  html .public-approved-v8 .landing-baseline-intro__heading {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'label'
+      'title'
+      'copy';
+    gap: 18px;
+  }
+
+  html .public-approved-v8 .landing-baseline-intro__heading > div {
+    max-width: 620px;
+    padding-top: 20px;
+  }
+}
+
+@media (max-width: 760px) {
+  html .public-approved-v8 .v0-hero.sovereign-opening-field {
+    min-height: max(760px, calc(100svh - 64px)) !important;
+    padding: 72px 18px 0 !important;
+  }
+
+  html .public-approved-v8 .landing-hero-kicker {
+    margin-bottom: 22px !important;
+    font-size: 0.56rem !important;
+  }
+
+  html .public-approved-v8 .v0-hero h1 > span {
+    font-size: clamp(3.3rem, 15.2vw, 4.7rem) !important;
+    line-height: 0.89 !important;
+    letter-spacing: -0.066em !important;
+  }
+
+  html .public-approved-v8 .v0-hero h1 > em {
+    margin-top: 11px !important;
+    font-size: clamp(3.25rem, 14.8vw, 4.55rem) !important;
+    line-height: 0.9 !important;
+    letter-spacing: -0.052em !important;
+  }
+
+  html .public-approved-v8 .sovereign-opening-copy {
+    max-width: 34ch !important;
+    margin-top: 24px !important;
+    font-size: 0.92rem !important;
+    line-height: 1.62 !important;
+  }
+
+  html .public-approved-v8 .sovereign-opening-actions {
+    margin-top: 22px !important;
+  }
+
+  html .public-approved-v8 .landing-expression-slice__instructions {
+    right: 16px !important;
+    bottom: 13px !important;
+    max-width: 180px !important;
+    text-align: right !important;
+  }
+
+  html .public-approved-v8 .landing-baseline-intro {
+    padding: 74px 0 72px !important;
+  }
+
+  html .public-approved-v8 .landing-baseline-intro__shell {
+    width: calc(100% - 36px) !important;
+  }
+
+  html .public-approved-v8 .landing-baseline-intro__heading > h2 {
+    max-width: 11ch;
+    font-size: clamp(3rem, 13vw, 4.3rem) !important;
+    line-height: 0.94 !important;
+  }
+
+  html .public-approved-v8 .landing-baseline-intro__heading > div {
+    padding-top: 12px;
+  }
+
+  html .public-approved-v8 .landing-baseline-intro__principles {
+    margin-top: 50px;
+  }
+
+  html .public-approved-v8 .landing-baseline-intro__principles > div {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 21px 0 23px;
+  }
+
+  html .public-approved-v8 .landing-baseline-intro__principles dd {
+    font-size: 0.86rem;
+  }
+
+  html .public-approved-v8 .landing-baseline-intro__value {
+    margin-top: 40px;
+    font-size: 1.22rem;
+    line-height: 1.42;
+  }
+
+  html .public-approved-v8 .landing-question-orbit {
+    min-height: 430px !important;
+    padding: 68px 18px 70px !important;
+  }
+
+  html .public-approved-v8 .landing-question-orbit h2 {
+    font-size: clamp(2.75rem, 12vw, 3.85rem) !important;
+    line-height: 0.98 !important;
+  }
+
+  html .public-approved-v8 .landing-question-orbit__stage {
+    height: 128px !important;
+    margin: 32px 0 14px !important;
+  }
+
+  html .public-approved-v8 .landing-question-orbit__stage > span > strong {
+    font-size: clamp(1.25rem, 5.8vw, 1.55rem) !important;
+    line-height: 1.28 !important;
+  }
+
+  html .public-approved-v8 .landing-question-orbit__note {
+    font-size: 0.82rem !important;
+  }
+}
+
+@media (max-width: 430px) {
+  html .public-approved-v8 .v0-hero h1 > span {
+    font-size: clamp(3.05rem, 14.6vw, 3.85rem) !important;
+  }
+
+  html .public-approved-v8 .v0-hero h1 > em {
+    font-size: clamp(2.95rem, 14vw, 3.7rem) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html .public-approved-v8 .landing-hero-kicker,
+  html .public-approved-v8 .v0-hero h1 > span,
+  html .public-approved-v8 .v0-hero h1 > em,
+  html .public-approved-v8 .sovereign-opening-copy,
+  html .public-approved-v8 .sovereign-opening-actions,
+  html .public-approved-v8 .sovereign-opening-trust,
+  html .public-approved-v8 .landing-expression-slice__canvas {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}

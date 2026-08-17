@@ -15,11 +15,12 @@ const finalAuthority = read('./public-landing-final-authority.css');
 const refinement = read('./experience-refinement-v1.css');
 const renderedFidelity = read('./rendered-fidelity-v1.css');
 const landingRefinementV2 = read('./landing-refinement-v2.css');
+const landingRefinementV5 = read('./landing-live-refinement-v5.css');
 const languageAuthority = read('../../../docs/product-language-system.md');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
 describe('approved public landing v8', () => {
-  it('preserves the founder cascade and loads the refined landing after rendered fidelity', () => {
+  it('preserves the founder cascade and loads the final landing authority after prior live refinements', () => {
     const imports = [
       "import './landing-expression-field-v3.css';",
       "import './landing-expression-field-integration.css';",
@@ -36,29 +37,33 @@ describe('approved public landing v8', () => {
     expect(main.slice(main.indexOf(imports.at(-1)!) + imports.at(-1)!.length)).not.toContain("import './");
     expect(main).toContain("import renderedFidelityCss from './rendered-fidelity-v1.css?inline';");
     expect(main).toContain("import landingRefinementV2Css from './landing-refinement-v2.css?inline';");
-    expect(main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;')).toBeGreaterThan(
-      main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;')
+    expect(main).toContain("import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline';");
+    expect(main.indexOf('style.textContent += `\\n${landingLiveRefinementV5Css}`;')).toBeGreaterThan(
+      main.indexOf('style.textContent += `\\n${landingLiveRefinementV4Css}`;')
     );
     expect(main.indexOf('style.textContent += `\\n${invitationRenderedFidelityCss}`;')).toBeGreaterThan(
-      main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;')
+      main.indexOf('style.textContent += `\\n${landingLiveRefinementV5Css}`;')
     );
   });
 
-  it('keeps the founder hero but explains the actual product in ordinary language', () => {
+  it('keeps the founder hero while making the opening value proposition explicit', () => {
     for (const marker of [
       'Healing isn’t optional.',
       'Holding onto the pain is.',
       '<LandingExpressionSlice />',
+      '<BaselineFoundation />',
       '<RealLifeQuestions />',
       '<LandingProductStories />',
-      'Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics.',
-      'Built for real situations',
-      'Start with what’s actually happening.',
-      'Why do we keep having the same fight?',
-      'Your Baseline gives Sovereign a consistent reference across questions, so each answer does not have to start from zero.',
+      'Build a private Baseline once.',
+      'One private reference beneath every question.',
+      'calculated astronomical positions and selected interpretive frameworks',
+      'What this unlocks',
+      'One private foundation. More useful answers across the questions that shape your life.',
+      'Why do we keep having the same argument even when we both want it to stop?',
       'Build my Baseline',
-      'See a Sovereign answer'
+      'See how it works'
     ]) expect(landing).toContain(marker);
+    expect(landing.indexOf('<BaselineFoundation />')).toBeLessThan(landing.indexOf('<RealLifeQuestions />'));
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
     expect(landing).toContain("data-question-fallback={index === 0 ? 'visible' : undefined}");
     expect(landing).not.toContain('capacity beneath');
@@ -79,28 +84,49 @@ describe('approved public landing v8', () => {
     expect(landing).not.toContain('Generic AI sees the prompt. Sovereign sees the context.');
   });
 
-  it('keeps one interactive line field with a compact name/value endpoint label', () => {
+  it('keeps one interactive line field with click-led minimal endpoint inspection', () => {
     for (const marker of [
       'const VIEWBOX_SIZE = 920',
       'const SPHERE_RADIUS = 286',
+      'const TOOLTIP_WIDTH = 104',
+      'const TOOLTIP_HEIGHT = 26',
       'data-field-geometry="spherical-360"',
-      'data-inspecting="true"',
+      "data-inspecting={hasInspection ? 'true' : 'false'}",
       'onPointerDown={handlePointerDown}',
       'onPointerMove={handlePointerMove}',
-      'onPointerEnter={() => selectAxis(axis.id)}',
+      'onClick={(event) =>',
+      'setHasInspection(true)',
+      'hasInspection ? (',
       'landing-expression-slice__tooltip-title',
       'landing-expression-slice__tooltip-value',
       '{selected.axis.value}',
       'relative emphasis',
       'requestAnimationFrame'
     ]) expect(field).toContain(marker);
-    expect(field).toContain('select a line to see its name and relative value');
+    expect(field).toContain('click a line to inspect it');
+    expect(field).not.toContain('onPointerEnter={() => selectAxis(axis.id)}');
     expect(field).not.toContain('measurement lines');
     expect(field).not.toContain('stable blue sphere');
     expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
     expect(refinement).toContain('--landing-blue: #e8ddd0 !important');
     expect(renderedFidelity).toContain('--v8-blue: #d8d0c5 !important');
-    expect(landingRefinementV2).toContain('.landing-expression-slice__tooltip-panel');
+    expect(landingRefinementV5).toContain('width: 104px !important');
+    expect(landingRefinementV5).toContain('height: 26px !important');
+  });
+
+  it('gives the hero deliberate type contrast, controlled entry motion, and a real Baseline introduction', () => {
+    for (const marker of [
+      '.v0-hero h1 > span',
+      'font-family: var(--font-subheading',
+      '.v0-hero h1 > em',
+      'font-family: var(--font-display',
+      '@keyframes sovereign-hero-rise',
+      '@keyframes sovereign-field-arrive',
+      '.landing-baseline-intro__heading',
+      '.landing-baseline-intro__principles',
+      '.landing-baseline-intro__value',
+      '@media (prefers-reduced-motion: reduce)'
+    ]) expect(landingRefinementV5).toContain(marker);
   });
 
   it('shows self, relationship, and system reasoning as distinct product behavior', () => {
@@ -165,7 +191,7 @@ describe('approved public landing v8', () => {
   });
 
   it('keeps every active CSS layer structurally balanced', () => {
-    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2]) {
+    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });

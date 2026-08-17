@@ -29,6 +29,7 @@ import renderedFidelityCss from './rendered-fidelity-v1.css?inline';
 import landingRefinementV2Css from './landing-refinement-v2.css?inline';
 import landingLiveRefinementV3Css from './landing-live-refinement-v3.css?inline';
 import landingLiveRefinementV4Css from './landing-live-refinement-v4.css?inline';
+import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline';
 import invitationRenderedFidelityCss from './invitation-rendered-fidelity-v1.css?inline';
 import workspaceProductionRefinementCss from './workspace-production-refinement-v1.css?inline';
 
@@ -97,6 +98,7 @@ function installPlatformVisualCohesion(): void {
   style.textContent += `\n${landingRefinementV2Css}`;
   style.textContent += `\n${landingLiveRefinementV3Css}`;
   style.textContent += `\n${landingLiveRefinementV4Css}`;
+  style.textContent += `\n${landingLiveRefinementV5Css}`;
   style.textContent += `\n${invitationRenderedFidelityCss}`;
   style.textContent += `\n${workspaceProductionRefinementCss}`;
   document.head.append(style);

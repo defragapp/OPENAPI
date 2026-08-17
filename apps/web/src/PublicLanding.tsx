@@ -6,14 +6,14 @@ import { LandingProductStories } from './LandingProductStories';
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 
 const REAL_LIFE_QUESTIONS = [
-  { scope: 'Self', text: 'Why do I keep taking responsibility for everyone around me?' },
-  { scope: 'Relationship', text: 'Why do we keep having the same fight?' },
-  { scope: 'Decision', text: 'Should I say something now or wait?' },
-  { scope: 'Relationship', text: 'Why does their silence affect me so strongly?' },
-  { scope: 'Relationship', text: 'What is mine, what is theirs, and what happens between us?' },
-  { scope: 'Decision', text: 'Is this a timing mismatch or a values mismatch?' },
-  { scope: 'Family system', text: 'What changes when I stop playing the role everyone expects?' },
-  { scope: 'Decision', text: 'Does this choice fit me, or does it cost too much of me?' }
+  { scope: 'Self', text: 'Why do I keep saying yes when I already know I’m overwhelmed?' },
+  { scope: 'Relationship', text: 'Why do we keep having the same argument even when we both want it to stop?' },
+  { scope: 'Decision', text: 'Should I stay in this job, ask for more, or leave?' },
+  { scope: 'Relationship', text: 'Why do I shut down when someone gets distant?' },
+  { scope: 'Family system', text: 'How do I stop being the person who holds the whole family together?' },
+  { scope: 'Relationship', text: 'Is this relationship actually working for me?' },
+  { scope: 'Self', text: 'Why do I take responsibility for problems that are not mine?' },
+  { scope: 'Decision', text: 'How do I know when to push and when to let go?' }
 ] as const;
 
 const COMPARISON = {
@@ -44,9 +44,11 @@ export function PublicLanding() {
       data-viewport-contract="v0-public-landing-v3"
       data-layout-release="v0-motion-workflows-v8"
       data-public-release="approved-public-v8"
+      data-public-narrative="baseline-value-first-v1"
     >
       <V0Navigation />
       <V0Hero />
+      <BaselineFoundation />
       <RealLifeQuestions />
       <LandingProductStories />
       <ComparisonStory />
@@ -101,10 +103,10 @@ function V0Hero() {
           </em>
         </h1>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
-          Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics. It keeps what is supported, interpreted, and still unknown distinct.
+          Build a private Baseline once. Sovereign uses the parts that matter to understand patterns, decisions, relationships, and systems—without making you explain yourself from zero every time.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
-          Use your Baseline to understand real questions about yourself, relationships, decisions, and family or group dynamics.
+          Build your private Baseline once. Use it across the questions that matter next.
         </p>
         <div className="sovereign-opening-actions">
           <a className="landing-control landing-control--primary" href="/signup">
@@ -112,8 +114,8 @@ function V0Hero() {
             <span>Build my Baseline</span>
             <ArrowIcon />
           </a>
-          <a className="landing-inline-link" href="#how">
-            <span>See a Sovereign answer</span><ArrowIcon direction="down" />
+          <a className="landing-inline-link" href="#baseline">
+            <span>See how it works</span><ArrowIcon direction="down" />
           </a>
         </div>
         <p className="sovereign-opening-trust">
@@ -124,6 +126,38 @@ function V0Hero() {
       </div>
       <LandingExpressionSlice />
       <MobileCapabilityRail />
+    </section>
+  );
+}
+
+function BaselineFoundation() {
+  return (
+    <section id="baseline" className="landing-baseline-intro" data-viewport-section="baseline-intro" aria-labelledby="baseline-intro-title">
+      <div className="v0-shell landing-baseline-intro__shell">
+        <header className="landing-baseline-intro__heading">
+          <p>Baseline Design</p>
+          <h2 id="baseline-intro-title">One private reference beneath every question.</h2>
+          <div>
+            <p>Baseline Design gives Sovereign a consistent starting point before the conversation begins.</p>
+            <p>It uses calculated astronomical positions and selected interpretive frameworks—including astrology, partial Human Design and Gene Keys activations, and numerology—to surface patterns you can review, correct, or reject.</p>
+          </div>
+        </header>
+        <dl className="landing-baseline-intro__principles">
+          <div>
+            <dt>Foundation</dt>
+            <dd>Your recurring ways of deciding, communicating, relating, responding under pressure, and growing.</dd>
+          </div>
+          <div>
+            <dt>Relevant context</dt>
+            <dd>Sovereign uses only the parts that matter to the question, then keeps temporary conditions and other people’s permitted information separate.</dd>
+          </div>
+          <div>
+            <dt>Your control</dt>
+            <dd>Nothing becomes a verdict. Confirm what fits, correct what does not, and keep raw private details outside the language-model context.</dd>
+          </div>
+        </dl>
+        <p className="landing-baseline-intro__value">The result: you can ask about a decision today, a recurring pattern next week, or a relationship later without rebuilding your context from scratch.</p>
+      </div>
     </section>
   );
 }
@@ -158,13 +192,14 @@ function MobileCapabilityRail() {
 function RealLifeQuestions() {
   return (
     <section
+      id="questions"
       className="landing-question-orbit"
       data-viewport-section="questions"
       aria-labelledby="landing-question-orbit-title"
     >
       <div className="v0-shell landing-question-orbit__inner">
-        <p className="landing-question-orbit__kicker">Built for real situations</p>
-        <h2 id="landing-question-orbit-title">Start with what’s actually happening.</h2>
+        <p className="landing-question-orbit__kicker">What this unlocks</p>
+        <h2 id="landing-question-orbit-title">One private foundation. More useful answers across the questions that shape your life.</h2>
         <div className="landing-question-orbit__stage" aria-hidden="true">
           {REAL_LIFE_QUESTIONS.map((question, index) => (
             <span
@@ -181,7 +216,7 @@ function RealLifeQuestions() {
           {REAL_LIFE_QUESTIONS.map((question) => <li key={question.text}>{question.scope}: {question.text}</li>)}
         </ul>
         <p className="landing-question-orbit__note">
-          Your Baseline gives Sovereign a consistent reference across questions, so each answer does not have to start from zero.
+          The same Baseline can support a decision, a recurring pattern, or a relationship question without flattening them into the same answer.
         </p>
       </div>
     </section>
