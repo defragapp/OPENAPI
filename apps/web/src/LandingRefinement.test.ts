@@ -105,11 +105,14 @@ describe('approved public landing v8', () => {
 
   it('shows self, relationship, and system reasoning as distinct product behavior', () => {
     for (const marker of [
-      'Separate helping from carrying the outcome.',
-      'How Sovereign gets there',
       'What your Baseline supports',
       'Where responsibility shifts',
-      'A cleaner boundary',
+      'A cleaner boundary'
+    ]) expect(stories).toContain(marker);
+
+    for (const marker of [
+      'Separate helping from carrying the outcome.',
+      'How Sovereign gets there',
       'Understand what happens between you.',
       'See where responsibility keeps landing.',
       'surface="personal-chat"',
