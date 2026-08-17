@@ -14,11 +14,12 @@ const heroExtension = read('./landing-hero-field-v4.css');
 const finalAuthority = read('./public-landing-final-authority.css');
 const refinement = read('./experience-refinement-v1.css');
 const renderedFidelity = read('./rendered-fidelity-v1.css');
+const landingRefinementV2 = read('./landing-refinement-v2.css');
 const languageAuthority = read('../../../docs/product-language-system.md');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
 describe('approved public landing v8', () => {
-  it('preserves the founder cascade and appends the final rendered-fidelity authority last', () => {
+  it('preserves the founder cascade and loads the refined landing after rendered fidelity', () => {
     const imports = [
       "import './landing-expression-field-v3.css';",
       "import './landing-expression-field-integration.css';",
@@ -33,78 +34,84 @@ describe('approved public landing v8', () => {
       expect(main.indexOf(imports[index]!)).toBeGreaterThan(main.indexOf(imports[index - 1]!));
     }
     expect(main.slice(main.indexOf(imports.at(-1)!) + imports.at(-1)!.length)).not.toContain("import './");
-    expect(main).toContain("import experienceRefinementCss from './experience-refinement-v1.css?inline';");
     expect(main).toContain("import renderedFidelityCss from './rendered-fidelity-v1.css?inline';");
-    expect(main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;')).toBeGreaterThan(
-      main.indexOf('style.textContent += `\\n${experienceRefinementCss}`;')
+    expect(main).toContain("import landingRefinementV2Css from './landing-refinement-v2.css?inline';");
+    expect(main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;')).toBeGreaterThan(
+      main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;')
+    );
+    expect(main.indexOf('style.textContent += `\\n${invitationRenderedFidelityCss}`;')).toBeGreaterThan(
+      main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;')
     );
   });
 
-  it('keeps the founder hero and makes the required real-life recognition stage visible', () => {
+  it('keeps the founder hero but explains the actual product in ordinary language', () => {
     for (const marker of [
       'Healing isn’t optional.',
       'Holding onto the pain is.',
       '<LandingExpressionSlice />',
       '<RealLifeQuestions />',
       '<LandingProductStories />',
+      'Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics.',
+      'Built for real situations',
       'Start with what’s actually happening.',
       'Why do we keep having the same fight?',
-      'Your Baseline is the private personal foundation Sovereign uses to understand where to begin.',
+      'Your Baseline gives Sovereign a consistent reference across questions, so each answer does not have to start from zero.',
       'Build my Baseline',
       'See a Sovereign answer'
     ]) expect(landing).toContain(marker);
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
     expect(landing).toContain("data-question-fallback={index === 0 ? 'visible' : undefined}");
-    expect(landing).toContain("style={index === 0 ? { opacity: 1, transform: 'translateY(0)' } : undefined}");
-
-    for (const marker of [
-      'Baseline-first recognition: this is a real explanatory stage',
-      'height: auto !important',
-      'min-height: clamp(330px, 29vw, 420px) !important',
-      '.landing-question-orbit h2',
-      'position: static !important',
-      'clip: auto !important',
-      'font-size: clamp(1.14rem, 1.9vw, 1.55rem) !important'
-    ]) expect(renderedFidelity).toContain(marker);
+    expect(landing).not.toContain('capacity beneath');
   });
 
-  it('implements the canonical Baseline-first experience hierarchy instead of architecture-first copy', () => {
+  it('implements the canonical Baseline-first hierarchy without leading with internal capacity language', () => {
     for (const marker of [
       '## Experience hierarchy',
       'Baseline Design is the foundation.',
       'A visitor arrives with an ordinary real-life question',
       'Relationship and system intelligence extend that same foundation outward.',
-      'The technical machinery stays underneath the experience.'
+      'The technical machinery stays underneath the experience.',
+      '### Public translation rule',
+      'must not lead the public landing, demo headings, share metadata, or the first explanation of the product'
     ]) expect(languageAuthority).toContain(marker);
 
     expect(landing).toContain('A blank conversation starts with the prompt. Sovereign starts with your Baseline.');
-    expect(landing).toContain('Build your Baseline once. Use it as the private personal foundation for what you want to understand next.');
     expect(landing).not.toContain('Generic AI sees the prompt. Sovereign sees the context.');
   });
 
-  it('keeps one 360-degree structural field while the final presentation remains monochrome', () => {
+  it('keeps one interactive line field with a compact name/value endpoint label', () => {
     for (const marker of [
       'const VIEWBOX_SIZE = 920',
       'const SPHERE_RADIUS = 286',
       'data-field-geometry="spherical-360"',
+      'data-inspecting="true"',
       'onPointerDown={handlePointerDown}',
       'onPointerMove={handlePointerMove}',
-      'landing-expression-slice__readout',
+      'onPointerEnter={() => selectAxis(axis.id)}',
+      'landing-expression-slice__tooltip-title',
+      'landing-expression-slice__tooltip-value',
+      '{selected.axis.value}',
       'relative emphasis',
       'requestAnimationFrame'
     ]) expect(field).toContain(marker);
-    expect(field).not.toContain('#8b5cff');
+    expect(field).toContain('select a line to see its name and relative value');
+    expect(field).not.toContain('measurement lines');
+    expect(field).not.toContain('stable blue sphere');
     expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
     expect(refinement).toContain('--landing-blue: #e8ddd0 !important');
     expect(renderedFidelity).toContain('--v8-blue: #d8d0c5 !important');
-    expect(renderedFidelity).toContain("radialGradient[id$='-sphere-fill']");
+    expect(landingRefinementV2).toContain('.landing-expression-slice__tooltip-panel');
   });
 
-  it('keeps self, relationship, and system examples distinct and permission-safe', () => {
+  it('shows self, relationship, and system reasoning as distinct product behavior', () => {
     for (const marker of [
-      'See the capacity beneath the pattern.',
+      'Separate helping from carrying the outcome.',
+      'How Sovereign gets there',
+      'What your Baseline supports',
+      'Where responsibility shifts',
+      'A cleaner boundary',
       'Understand what happens between you.',
-      'See what keeps the pattern going—and what could change it.',
+      'See where responsibility keeps landing.',
       'surface="personal-chat"',
       'surface="personal-reasoning"',
       'surface="relationship-chat"',
@@ -113,19 +120,21 @@ describe('approved public landing v8', () => {
       'surface="system-reasoning"',
       'Shared with permission',
       'Illustrative supplied context',
-      'Role context',
-      'Where decisions and outcomes keep returning.',
-      'What changes if resolution no longer defaults to one person.'
+      'Observed route',
+      'Testable change',
+      'What to test',
+      'That is a system pattern—not proof that any one person is the cause.'
     ]) expect(renderedStories).toContain(marker);
 
+    expect(stories).toContain('landing-workflow__progress');
+    expect(stories).toContain("360 + step * 900");
     expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
     expect(stories).not.toContain("role: 'Stabilizer'");
     expect(stories).not.toContain("role: 'Catalyst'");
     expect(stories).not.toContain("role: 'Observer'");
     expect(stories).not.toContain("role: 'Anchor'");
     expect(renderedStories).not.toContain('Permitted context');
-    expect(renderedStories).not.toContain('Ask about your life.');
-    expect(renderedStories).not.toContain('Bring the question');
+    expect(renderedStories).not.toContain('capacity beneath');
   });
 
   it('keeps exact supporting codes quiet and secondary', () => {
@@ -134,21 +143,26 @@ describe('approved public landing v8', () => {
     }
     expect(stories).toContain('<strong>Basis</strong>');
     expect(finalAuthority).toContain('.landing-evidence__code');
-    expect(renderedFidelity).toContain('.landing-evidence abbr');
   });
 
-  it('keeps product proof readable on desktop and mobile without reopening blue UI styling', () => {
-    expect(renderedFidelity).toContain('font-size: 0.86rem !important');
-    expect(renderedFidelity).toContain('font-size: 0.8rem !important');
-    expect(renderedFidelity).toContain('min-height: 330px !important');
-    expect(renderedFidelity).toContain('font-size: 1.02rem !important');
+  it('makes desktop demonstrations larger while making mobile proof shorter and swipeable', () => {
+    for (const marker of [
+      'width: min(1280px, calc(100% - 64px)) !important',
+      'font-size: 0.92rem !important',
+      'grid-template-columns: minmax(0, 1.34fr) minmax(320px, 0.66fr) !important',
+      'landing-workflow__progress',
+      'scroll-snap-type: inline mandatory !important',
+      'grid-auto-columns: minmax(252px, 82vw) !important',
+      '.landing-demo--system-context',
+      'display: none !important'
+    ]) expect(landingRefinementV2).toContain(marker);
     expect(approvedStyles).toContain('@media (max-width: 760px)');
     expect(heroExtension).toContain('@keyframes landing-real-question');
     expect(main).toContain('window.visualViewport');
   });
 
   it('keeps every active CSS layer structurally balanced', () => {
-    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement, renderedFidelity]) {
+    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
