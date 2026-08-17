@@ -38,27 +38,29 @@ The public explanatory order is therefore:
 
 This hierarchy is not a new framework or slogan. It clarifies how the existing Baseline-first product should be experienced and explained.
 
+### Public translation rule
+
+`Capacity` remains a valid internal intelligence concept when the answer contract needs to distinguish a stable quality from its pressured expression. It must not lead the public landing, demo headings, share metadata, or the first explanation of the product. Public surfaces should translate that machinery into the concrete distinction the person can recognize: what is happening, what pressure may be adding, where responsibility sits, what happens between people, what remains unknown, and what could change.
+
 ## The Sovereign lens
 
 Sovereign uses one explanatory movement across self, relationships, decisions, systems, and Worlds:
 
-1. **See the capacity beneath the pattern.** Baseline identifies the valid or useful capacity that may be involved.
-2. **See how that capacity is expressing.** Sovereign distinguishes steady, active-now, protective, Shadow, Gift, repressed, overextended, and integrated possibilities without turning them into fixed identities.
+1. **Start with the real situation.** Use the Baseline to identify the part of the question that is most relevant instead of treating the prompt in isolation.
+2. **Separate the pattern from what pressure is adding.** Distinguish what appears steady from what may be protective, overextended, repressed, Shadow, Gift, or otherwise context-dependent without turning it into a fixed identity.
 3. **See what happens between people.** Permission-bound relationship and system context keeps each person distinct and examines the interaction itself.
-4. **See what keeps the pattern going—and what could change it.** Sovereign examines supported roles, responsibility, authority, pressure, observations, unknowns, Alignment, repair, and a testable change in conditions.
+4. **See what may keep the pattern going—and what could change it.** Examine supported roles, responsibility, authority, pressure, observations, unknowns, Alignment, repair, and a testable change in conditions.
 
-The compact product explanation is:
-
-`Sovereign helps you see the capacity beneath a pattern, how it may be expressing, what happens between people, and what may be keeping the pattern in place—so you can see what could change.`
+The compact product explanation is the product definition above. Do not introduce another slogan to summarize this lens.
 
 This is an explanatory lens, not a new feature, score, diagnosis, causal model, or top-level product. Do not name it the Emotional Field Model in the interface. The established product objects remain Baseline, Expression Field, People, Systems, Library, and Worlds.
 
 ### Certainty register
 
-The memorable sequence may use direct imperative language: `See how it is expressing.` User-facing interpretation must preserve the evidence level:
+User-facing interpretation must preserve the evidence level:
 
-- use `is expressing` only for behavior or context the user has directly supplied or confirmed;
-- use `may be expressing` for Baseline-derived, current-context, relational, or system interpretation;
+- use direct factual language only for behavior or context the user has supplied or confirmed;
+- use `may`, `can`, or equivalent language for Baseline-derived, current-context, relational, or system interpretation;
 - use `what keeps the pattern going` only when continuation conditions are observed or confirmed;
 - otherwise use `what may be keeping the pattern going` and keep unknowns visible.
 
@@ -101,7 +103,7 @@ This is not a chatbot invitation. Do not frame the product with generic open-end
 
 Outside the founder-locked root hero, use the emotional statement only after the product category and interaction are clear. It is not a therapy claim, diagnosis, required reconciliation, or guaranteed outcome.
 
-On the founder-locked root landing, the approved visual sequence places this statement in the hero. The supporting copy immediately below it must make the product and Sovereign lens understandable. Do not create a second competing hero in another language document.
+On the founder-locked root landing, the approved visual sequence places this statement in the hero. The supporting copy immediately below it must make the product category and use cases understandable. Do not create a second competing hero in another language document.
 
 The root hero uses the founder-locked wording `Healing isn’t optional. Holding onto the pain is.` The shorter `Holding the pain is.` form is a secondary campaign or editorial line only. These are intentional scoped variants, not interchangeable root-hero copy.
 
@@ -113,7 +115,7 @@ Use this as a deeper brand statement or closing line. Do not make it carry the f
 
 ## Voice
 
-Write in clear, adult language. Be calm, specific, and direct. State the central insight before explanation. Make the mechanism visible: capacity, pressure expression, Gift, tradeoff, supported context, and unknowns.
+Write in clear, adult language. Be calm, specific, and direct. State the central insight before explanation. Make the mechanism visible in ordinary language: the pattern, pressure, responsibility, tradeoff, supported context, and unknowns.
 
 Use uncertainty words only where uncertainty requires them. Do not weaken every sentence.
 
@@ -188,17 +190,16 @@ Root landing supporting copy:
 
 - Kicker: `PERSONAL AI FOR REAL LIFE`
 - Founder hero: `Healing isn’t optional. Holding onto the pain is.`
-- Body: `Sovereign begins with the capacity beneath a pattern. It shows how that capacity may be expressing, what happens between people, and what may be keeping the pattern in place—so you can see what could change.`
+- Body: `Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics. It keeps what is supported, interpreted, and still unknown distinct.`
 - Primary action: `Build my Baseline`
 - Secondary action: `See a Sovereign answer`
 - Trust line: `Start free · No card required · Review, correct, or reject any interpretation`
 
 Primary section language:
 
-- `WHY SOVEREIGN EXISTS`
+- `BUILT FOR REAL SITUATIONS`
 - `START WITH WHAT’S ACTUALLY HAPPENING`
 - `WHY THIS AI IS DIFFERENT`
-- `ONE QUALITY · MORE THAN ONE EXPRESSION`
 - `TWO PEOPLE · SHARED WITH PERMISSION`
 - `FAMILIES · TEAMS · HUMAN SYSTEMS`
 - `CLEAR ANSWER FIRST`
@@ -292,11 +293,12 @@ Never use these as active product/interface language:
 - `Ask about your life. Get an answer built around you.`;
 - `What do you want to understand?`;
 - `Bring the question you already have.`;
-- generic variants such as `What would you like to explore?`, `Ask anything.`, or `Tell me what's on your mind.`.
+- generic variants such as `What would you like to explore?`, `Ask anything.`, or `Tell me what's on my mind.`.
 
 Also avoid:
 
 - “possible interaction vector”;
+- “emotional vector” or “vector” as user-facing labels for the Expression Field lines;
 - “calculated solution”;
 - “read” or “reading” as the product;
 - “your chart says”;
