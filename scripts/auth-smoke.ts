@@ -1,4 +1,4 @@
-import { POLICY_CONTENT_HASH, POLICY_METADATA } from '../config/policies';
+import { ELIGIBILITY_RULE, POLICY_CONTENT_HASH, POLICY_METADATA } from '../config/policies';
 import { requestMagicLink, redeemMagicLink } from '../apps/sovereign-worker/src/auth-public';
 import { requireAuth } from '../apps/sovereign-worker/src/security/auth';
 import type { Env } from '../apps/sovereign-worker/src/env';
@@ -115,6 +115,19 @@ async function main() {
     throw new Error('nonexistent login created an account or disclosed existence');
   }
 
+  const underageMissing = await requestMagicLink(authRequest('/api/v1/auth/signup', {
+    email: 'blocked@example.com',
+    name: 'Blocked',
+    termsAccepted: true,
+    termsVersion: POLICY_METADATA.terms.version,
+    privacyVersion: POLICY_METADATA.privacy.version,
+    policyContentHash: POLICY_CONTENT_HASH,
+    turnstileToken: 'test-turnstile-pass'
+  }), env, 'signup');
+  if (underageMissing.status !== 400 || (await underageMissing.json() as { field?: string }).field !== 'eligibility') {
+    throw new Error('signup without explicit 18+ eligibility was accepted');
+  }
+
   const signup = await requestMagicLink(authRequest('/api/v1/auth/signup', {
     email: 'USER@Example.COM',
     name: 'User',
@@ -122,6 +135,8 @@ async function main() {
     termsVersion: POLICY_METADATA.terms.version,
     privacyVersion: POLICY_METADATA.privacy.version,
     policyContentHash: POLICY_CONTENT_HASH,
+    ageEligible: true,
+    eligibilityRuleVersion: ELIGIBILITY_RULE.version,
     turnstileToken: 'test-turnstile-pass'
   }), env, 'signup');
   if (signup.status !== 200 || env.emails.length !== 1) throw new Error('signup magic link not sent');
@@ -150,7 +165,7 @@ async function main() {
   if (!auth.accountId) throw new Error('session did not resolve');
   const reused = await redeemMagicLink(new Request(`https://app.test/api/v1/auth/redeem?token=${token}`), env);
   if (reused.status !== 409) throw new Error('used token accepted');
-  console.log('Auth smoke passed private_login=true signup_only_creation=true policy_acceptance=true policy_receipts=2 email=true redemption=true session=true used_rejected=true');
+  console.log('Auth smoke passed private_login=true signup_only_creation=true policy_acceptance=true eligibility_18_plus=true policy_receipts=2 email=true redemption=true session=true used_rejected=true');
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1); });
