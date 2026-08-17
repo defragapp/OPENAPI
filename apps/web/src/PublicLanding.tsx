@@ -71,9 +71,7 @@ function V0Navigation() {
         </nav>
         <div className="v0-nav-actions">
           <a className="v0-sign-in" href="/login">Sign in</a>
-          <a className="landing-control landing-control--nav" href="/signup">
-            <span>Get started</span><ArrowIcon />
-          </a>
+          <a className="v0-get-started" href="/signup">Get started <ArrowIcon /></a>
           <details className="v0-mobile-menu">
             <summary aria-label="Open navigation"><MenuIcon /></summary>
             <nav className="v0-mobile-menu__panel" aria-label="Mobile navigation">
@@ -81,6 +79,7 @@ function V0Navigation() {
               <a href="/pricing">Pricing</a>
               <a href="/faq">FAQ</a>
               <a href="/login">Sign in</a>
+              <a href="/signup">Get started</a>
             </nav>
           </details>
         </div>
@@ -108,16 +107,6 @@ function V0Hero() {
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
           Build your private Baseline once. Use it across the questions that matter next.
         </p>
-        <div className="sovereign-opening-actions">
-          <a className="landing-control landing-control--primary" href="/signup">
-            <SparkIcon />
-            <span>Build my Baseline</span>
-            <ArrowIcon />
-          </a>
-          <a className="landing-inline-link" href="#baseline">
-            <span>See how it works</span><ArrowIcon direction="down" />
-          </a>
-        </div>
         <p className="sovereign-opening-trust">
           <LockIcon />
           <span className="v0-desktop-only">Start free · No card required · Review, correct, or reject any interpretation</span>
@@ -250,9 +239,6 @@ function FinalCallToAction() {
         Your thoughts<br />deserve<br />a better place to live.
       </h2>
       <p>Build your Baseline once. Use it as the private personal foundation for what you want to understand next.</p>
-      <a className="landing-control landing-control--primary" href="/signup">
-        <span>Build my Baseline</span><ArrowIcon />
-      </a>
     </section>
   );
 }
@@ -294,14 +280,6 @@ function MenuIcon() {
   return (
     <svg className="v0-mobile-menu__icon" viewBox="0 0 32 24" aria-hidden="true" focusable="false">
       <path d="M1 2h30M1 12h30M1 22h30" />
-    </svg>
-  );
-}
-
-function SparkIcon() {
-  return (
-    <svg className="v0-mobile-spark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M12 1.75c.86 6.35 3.9 9.39 10.25 10.25C15.9 12.86 12.86 15.9 12 22.25 11.14 15.9 8.1 12.86 1.75 12 8.1 11.14 11.14 8.1 12 1.75Z" />
     </svg>
   );
 }
