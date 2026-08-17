@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 
 const launcher = readFileSync(new URL('./WorldVideoLauncher.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
 const css = readFileSync(new URL('./world-video.css', import.meta.url), 'utf8');
-const wrangler = readFileSync(resolve(process.cwd(), '../../wrangler.jsonc'), 'utf8');
-const videoContract = readFileSync(resolve(process.cwd(), '../../docs/worlds-private-video-contract.md'), 'utf8');
+const wrangler = readFileSync(new URL('../../../wrangler.jsonc', import.meta.url), 'utf8');
+const videoContract = readFileSync(new URL('../../../docs/worlds-private-video-contract.md', import.meta.url), 'utf8');
 
 describe('dormant Worlds video boundary', () => {
   it('keeps video generation out of the current authenticated text-first launch', () => {
