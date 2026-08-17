@@ -64,8 +64,11 @@ describe('desktop and iOS production readiness v1', () => {
       'visibility: hidden !important'
     ]) expect(css).toContain(marker);
     for (const marker of [
-      "panelWidth: '148'",
-      "panelHeight: '50'",
+      "panelWidth: '132'",
+      "panelHeight: '34'",
+      "titleY: '16'",
+      "valueY: '16'",
+      "metaY: '28'",
       "dataset.compactEndpointTooltip = 'true'"
     ]) expect(runtime).toContain(marker);
     expect(field).toContain('const tooltip = placeTooltip(selectedProjected.projected)');
