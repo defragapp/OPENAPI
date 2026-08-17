@@ -8,6 +8,8 @@ Sovereign.OS is a private personal AI for understanding yourself, your relations
 
 This file is the canonical source for user-facing product language. Positioning, intelligence, visual, public-page, and release documents may explain or enforce this language, but must not define a competing hero, product promise, or explanation of how Sovereign works.
 
+The current launch is **text-first**. The authenticated product is one Sovereign conversation: question → direct answer → relevant explanation → quiet Basis/provenance → correction or continuation. The public demo chats may teach that hierarchy. No active video/Worlds capability should be implied by launch copy, pricing, navigation, onboarding, or answer actions.
+
 ## Documentation authority and inheritance
 
 Use the following order when documents overlap:
@@ -44,7 +46,7 @@ This hierarchy is not a new framework or slogan. It clarifies how the existing B
 
 ## The Sovereign lens
 
-Sovereign uses one explanatory movement across self, relationships, decisions, systems, and Worlds:
+Sovereign uses one explanatory movement across self, relationships, decisions, and systems:
 
 1. **Start with the real situation.** Use the Baseline to identify the part of the question that is most relevant instead of treating the prompt in isolation.
 2. **Separate the pattern from what pressure is adding.** Distinguish what appears steady from what may be protective, overextended, repressed, Shadow, Gift, or otherwise context-dependent without turning it into a fixed identity.
@@ -53,7 +55,7 @@ Sovereign uses one explanatory movement across self, relationships, decisions, s
 
 The compact product explanation is the product definition above. Do not introduce another slogan to summarize this lens.
 
-This is an explanatory lens, not a new feature, score, diagnosis, causal model, or top-level product. Do not name it the Emotional Field Model in the interface. The established product objects remain Baseline, Expression Field, People, Systems, Library, and Worlds.
+This is an explanatory lens, not a new feature, score, diagnosis, causal model, or top-level product. Do not name it the Emotional Field Model in the interface. The active launch product objects are Baseline, Expression Field, People, Systems, and Library. Worlds remains future/disabled reference material and is not an active launch object, navigation destination, pricing feature, or required user workflow.
 
 ### Certainty register
 
@@ -213,6 +215,8 @@ The recognition transition should use one real-life situation at a time, such as
 
 Do not open the public page with framework terminology, source abbreviations, a philosophy-only headline, or a generic chatbot invitation.
 
+Do not advertise, price, or invite the user to generate Worlds/video in the current launch. Future/disabled experiments must not leak into active launch copy.
+
 ## Authentication
 
 Signup:
@@ -269,6 +273,8 @@ You:
 
 - `Your Baseline, plan, permissions, and account.`
 
+No active launch navigation item is named Worlds. No core authenticated answer requires video/media generation to be complete.
+
 ## Pricing
 
 Free:
@@ -283,7 +289,7 @@ Sovereign+:
 - $20 monthly or $99 annually.
 - 300 Sovereign AI turns each month.
 
-Do not alter live prices, products, lookup keys, or entitlement descriptions.
+Do not alter live prices, products, lookup keys, or entitlement descriptions. Do not include a video-generation charge or Worlds entitlement in current launch pricing.
 
 ## Retired and prohibited phrasing
 
