@@ -128,7 +128,7 @@ ${JSON.stringify(registry.map(({ id, display, uncertainty }) => ({ id, display, 
 
   const result = await env.AI.run(
     model,
-    { input: prompt, max_output_tokens: 6_000 },
+    { prompt, max_completion_tokens: 6_000 },
     {
       gateway: {
         id: env.AI_GATEWAY_ID,
@@ -177,7 +177,7 @@ function buildDevelopmentFacetProfile(source: BaselineSourceData, model: string)
     modelVersion: model,
     sourceComputationVersion: source.computationVersion,
     generatedAt: new Date().toISOString(),
-    interpretive: true,
+    interpretive: true as const,
     facets: baselineFacetIds.map((id) => ({
       id,
       title: titles[id],
