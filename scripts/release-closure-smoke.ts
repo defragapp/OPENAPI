@@ -34,11 +34,26 @@ async function main() {
   assert(JSON.stringify(baseline.reducedContext).includes('unavailable'), 'unknown birth time did not disable unsupported precision-sensitive frameworks');
   const current = await computeCurrentConditions(envProd, 'acct_release', 'city_or_regional');
   assert(current.providerStatus === 'unavailable' && current.reduced.unknownActualState.includes('do not determine'), 'current conditions without provider did not fail closed');
-  const required = ['auth_magic_links','auth_sessions','baseline_onboarding','current_conditions','relationships','consent_grants','system_memberships','thread_events','user_corrections'];
+  const required = [
+    'auth_magic_links',
+    'auth_email_codes',
+    'auth_sessions',
+    'auth_passkeys',
+    'auth_passkey_challenges',
+    'baseline_onboarding',
+    'privacy_request_events',
+    'current_conditions',
+    'relationships',
+    'consent_grants',
+    'system_memberships',
+    'thread_events',
+    'user_corrections',
+    'policy_acceptance_receipts:retained-with-pseudonymized-account-audit'
+  ];
   const inventory = deletionInventory().join('\n');
   for (const item of required) assert(inventory.includes(item), `deletion inventory missing ${item}`);
   assert(!/R2:exports/.test(inventory), 'disabled R2 private-export storage remained in deletion inventory');
-  console.log('Release closure smoke passed scheduled_cleanup=true optional_message_handler=true covenant_matrix=true turnstile_closed=true email_closed=true baseline_frameworks=true current_fails_closed=true deletion_inventory=true private_exports=on-demand-no-artifact');
+  console.log('Release closure smoke passed scheduled_cleanup=true optional_message_handler=true covenant_matrix=true turnstile_closed=true email_closed=true baseline_frameworks=true current_fails_closed=true deletion_inventory=true credential_cleanup=true privacy_request_cleanup=true private_exports=on-demand-no-artifact');
 }
 main().catch(async (error) => {
   if (error instanceof Response) {
