@@ -110,9 +110,10 @@ describe('Sovereign.OS public experience', () => {
     ]) expect(publicCopy.toLowerCase()).not.toContain(phrase.toLowerCase());
   });
 
-  it('keeps verified plans, correction, and optional Covenant available elsewhere', () => {
+  it('keeps verified plans, correction, optional Covenant, and private data access available elsewhere', () => {
     for (const phrase of ['$0', '$20', '$99', '10 Sovereign AI turns', '300 Sovereign AI turns', 'Covenant']) expect(publicCopy).toContain(phrase);
-    expect(policyAuthority).toContain('Private account export is not yet available in the current release.');
+    expect(policyAuthority).toContain('on-demand JSON copy of account-owned data');
+    expect(policyAuthority).toContain('not retained as an export artifact');
   });
 
   it('renders the public route without runtime copy rewriting', () => {
