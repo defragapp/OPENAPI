@@ -160,7 +160,7 @@ function installFetchObserver(): void {
       if (response.ok && requestUrl.pathname.startsWith('/api/v1/auth/logout')) {
         d1Bookmark = undefined;
         clearStoredD1Bookmark();
-        setTimeout(() => location.assign('/login'), 50);
+        setTimeout(() => location.assign(PUBLIC_SHARE_URL), 50);
       }
 
       if (response.ok && isBillingHandoffPath(requestUrl.pathname)) {
@@ -299,53 +299,24 @@ export async function sharePublicPlatform(): Promise<void> {
     showNotice('Public Sovereign.OS link copied. No private workspace data was included.');
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') return;
-    showNotice('Sharing is unavailable in this browser.', PUBLIC_SHARE_URL, 'Open public site');
-  }
-}
-
-function showNotice(message: string, href?: string, linkLabel?: string): void {
-  let notice = document.querySelector<HTMLElement>('[data-production-notice]');
-  if (!notice) {
-    notice = document.createElement('aside');
-    notice.dataset.productionNotice = 'true';
-    notice.setAttribute('role', 'status');
-    notice.setAttribute('aria-live', 'polite');
-    Object.assign(notice.style, {
-      position: 'fixed',
-      right: '1rem',
-      bottom: '1rem',
-      zIndex: '9999',
-      maxWidth: '22rem',
-      padding: '0.9rem 1rem',
-      border: '1px solid rgba(255,255,255,.2)',
-      borderRadius: '0.8rem',
-      background: 'rgba(10,10,12,.96)',
-      color: '#fff',
-      boxShadow: '0 1rem 3rem rgba(0,0,0,.35)'
-    });
-    document.body.appendChild(notice);
-  }
-
-  notice.replaceChildren(document.createTextNode(message));
-  if (href && linkLabel) {
-    const separator = document.createTextNode(' ');
-    const link = document.createElement('a');
-    link.href = href;
-    link.textContent = linkLabel;
-    link.style.color = 'inherit';
-    link.style.textDecoration = 'underline';
-    notice.append(separator, link);
+    showNotice('Sharing was not completed.');
   }
 }
 
 function resolveRequestUrl(input: RequestInfo | URL): URL {
-  if (input instanceof URL) return input;
-  if (input instanceof Request) return new URL(input.url);
-  return new URL(input, location.href);
+  if (input instanceof Request) return new URL(input.url, location.origin);
+  return new URL(String(input), location.origin);
 }
 
 function isWorkspaceLocation(): boolean {
-  return location.pathname === '/app'
-    || location.pathname.startsWith('/app/')
-    || !['/', '/login', '/signup', '/auth/redeem', '/invitation', '/privacy', '/terms'].includes(location.pathname);
+  return location.pathname === '/app' || location.pathname.startsWith('/app/');
+}
+
+function showNotice(message: string): void {
+  const notice = document.createElement('div');
+  notice.className = 'product-toast';
+  notice.setAttribute('role', 'status');
+  notice.textContent = message;
+  document.body.append(notice);
+  setTimeout(() => notice.remove(), 3600);
 }
