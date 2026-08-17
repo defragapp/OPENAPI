@@ -1,0 +1,4 @@
+/* Launch is text-first. Audio generation remains unavailable until it has a separate privacy/product contract. */
+.tts-listen-button {
+  display: none !important;
+}
