@@ -63,7 +63,7 @@ The current launch is text-first. Video/Worlds generation is not required. Live 
 - Production inference uses Cloudflare Workers AI through AI Gateway with model `@cf/zai-org/glm-4.7-flash`.
 - Personalized inference bypasses Gateway cache and persistent request-content logging.
 - Failed/capacity-blocked inference follows the documented turn-refund behavior.
-- The D1-backed daily reservation ledger stops inference before the account-wide Workers AI allocation is exhausted.
+- The D1-backed daily reservation ledger introduced by `0013_workers_ai_free_capacity` stops inference before the account-wide Workers AI allocation is exhausted. That migration remains lineage for the capacity control; it is not the current schema version.
 - Deterministic grounded/urgent/secure-refusal responses suppress normal Basis/actions as designed.
 
 ## Billing
