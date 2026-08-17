@@ -4,11 +4,13 @@ Use this guide for public pages, authentication, onboarding, the authenticated w
 
 ## Product definition
 
-Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the groups around you. It starts with your Baseline Design, then adds only the current, relational, and system context you choose.
+Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
+
+It begins with your Baseline Design: a private, explorable reference that helps Sovereign understand how you may think, decide, communicate, create, connect, lead, respond under pressure, and grow. From there, Sovereign can add current context, another person's permitted context, or wider system context only when it belongs to the question.
 
 This file is the canonical source for user-facing product language. Positioning, intelligence, visual, public-page, and release documents may explain or enforce this language, but must not define a competing hero, product promise, or explanation of how Sovereign works.
 
-The current launch is **text-first**. The authenticated product is one Sovereign conversation: question → direct answer → relevant explanation → quiet Basis/provenance → correction or continuation. The public demo chats may teach that hierarchy. No active video/Worlds capability should be implied by launch copy, pricing, navigation, onboarding, or answer actions.
+The current launch is **text-first**. The authenticated product is one Sovereign conversation: question → direct answer → relevant explanation → quiet Basis/provenance → correction or continuation. Public demonstrations may teach that hierarchy. No active video/Worlds capability should be implied by launch copy, pricing, navigation, onboarding, or answer actions.
 
 ## Documentation authority and inheritance
 
@@ -20,42 +22,90 @@ Use the following order when documents overlap:
 4. safety, privacy, consent, visual, architecture, tool, and release contracts govern their named implementation boundaries while inheriting the first three;
 5. audits, strategies, implementation plans, deployment markers, and release records provide context or evidence only.
 
-A subordinate document may quote required language for enforcement. If its wording or sequence conflicts with this file or the founder-locked visual contract, follow the applicable authority and correct the subordinate document rather than creating a third variant.
+A subordinate document may quote required language for enforcement. If its wording or sequence conflicts with this file or the founder visual contract, follow the applicable authority and correct the subordinate document rather than creating a third variant.
 
 ## Experience hierarchy
 
-Baseline Design is the foundation. A visitor arrives with an ordinary real-life question, decision, relationship, or recurring situation. Sovereign uses the Baseline to make a relevant distinction visible that may have been difficult to see from the situation alone.
+The public product story moves outward in three clear layers.
 
-Relationship and system intelligence extend that same foundation outward. Each person remains distinct, another person's private state remains unknown unless they supply it, and shared context remains permission-bound.
+### 1. You
 
-The technical machinery stays underneath the experience. Source calculations, framework abbreviations, Basis codes, provider details, permission mechanics, confidence classes, source layers, authorization state, and deployment architecture appear only when they are needed for support, verification, control, or deeper inspection. They must not carry the primary explanation of what Sovereign is or why an answer is useful.
+Sovereign first supports self-exploration. A person should immediately understand that they can explore:
 
-The public explanatory order is therefore:
+- identity and orientation;
+- how they make decisions;
+- how they communicate;
+- how they learn;
+- creativity and expression;
+- love and connection;
+- leadership;
+- boundaries;
+- how they respond to pressure and change;
+- Shadow and Gift expression;
+- Alignment;
+- underused or less familiar parts of themselves;
+- recurring patterns they want to understand more clearly.
 
-1. recognize a real-life question or situation;
-2. show the useful distinction Sovereign can make visible;
-3. explain that Baseline Design is the private personal foundation beneath that answer;
-4. extend the same intelligence to relationships and systems when relevant and permitted;
-5. keep technical evidence available beneath the explanation rather than in front of it.
+Public self-exploration must not be reduced to one incident, one conflict, responsibility, carrying other people, or fixing a problem. Those are valid questions inside the product, not the definition of the product.
 
-This hierarchy is not a new framework or slogan. It clarifies how the existing Baseline-first product should be experienced and explained.
+### 2. You + your people
+
+Relationship intelligence extends self-understanding outward. With permission, Sovereign keeps two people distinct and helps examine what they share, where they differ, how each may be experiencing or approaching the same situation, and what happens in the interaction between them.
+
+Another person's private state remains unknown unless they supply it. Relationship intelligence is not compatibility scoring, mind-reading, motive assignment, or a verdict about whether a relationship should continue.
+
+### 3. From 1:1 to the whole system
+
+System intelligence expands from a single relationship to a family, household, friendship group, workplace, team, or other human system. Sovereign can keep roles, authority, responsibility, expectations, pressure, dependence, observations, and missing perspectives visible together.
+
+A system story must not be reduced to `where responsibility keeps landing`. Responsibility is one dimension among many. The public category is understanding how the whole system functions and how one person's experience changes inside it.
+
+## What Baseline means publicly
+
+Baseline Design is a private, explorable reference for the person using Sovereign. It helps the product begin with more context than the current prompt alone.
+
+Preferred public explanation:
+
+`Your Baseline gives Sovereign a consistent reference for how you may think, decide, communicate, create, connect, respond under pressure, and grow.`
+
+Short form:
+
+`A private reference built around you.`
+
+Do not use `foundation`, `personal foundation`, `private foundation`, or `one private foundation` as the primary public metaphor for Baseline.
+
+Do not lead root marketing with source mechanics. Astronomical calculations, astrology, Human Design, Gene Keys, numerology, source abbreviations, or Basis codes belong in How It Works, FAQ, disclosure, or deeper inspection—not in the root landing explanation of why the product matters.
+
+Baseline remains interpretive and correctable. It is not a measured psychological fact, identity verdict, diagnosis, score, or destiny claim.
+
+## Public explanatory order
+
+A visitor should understand the product before learning its machinery.
+
+1. make clear that Sovereign is personal AI for understanding yourself;
+2. show recognizable areas of self-exploration such as expression, creativity, decisions, connection, pressure, change, Shadow, Gift, and Alignment;
+3. expand from the individual to permission-bound relationship intelligence;
+4. expand from 1:1 relationships to families, teams, and wider systems;
+5. explain Baseline briefly as the private reference Sovereign carries across those questions;
+6. keep source mechanics and exact evidence available deeper in the experience.
+
+The technical machinery stays underneath the experience. Source calculations, framework abbreviations, Basis codes, provider details, permission mechanics, confidence classes, source layers, authorization state, and deployment architecture appear only when they are needed for support, verification, control, or deeper inspection. They must not carry the primary explanation of what Sovereign is.
 
 ### Public translation rule
 
-`Capacity` remains a valid internal intelligence concept when the answer contract needs to distinguish a stable quality from its pressured expression. It must not lead the public landing, demo headings, share metadata, or the first explanation of the product. Public surfaces should translate that machinery into the concrete distinction the person can recognize: what is happening, what pressure may be adding, where responsibility sits, what happens between people, what may need clarification, and what could change.
+`Capacity` remains a valid internal intelligence concept when the answer contract needs to distinguish a stable quality from its pressured expression. It must not lead the public landing, demo headings, share metadata, or the first explanation of the product.
 
 Internal evidence categories must not become the product voice. Do not explain ordinary user-facing output with phrases such as `what is supported, interpreted, and still unknown`, `evidence levels`, `source layers`, `model-safe context`, `server-confirmed state`, or similar implementation language. Keep those distinctions correct underneath the product, then translate them into clear adult language.
 
 ## The Sovereign lens
 
-Sovereign uses one explanatory movement across self, relationships, decisions, and systems:
+Sovereign can move through the same question in several layers without forcing every answer into the same template:
 
-1. **Start with the real situation.** Use the Baseline to identify the part of the question that is most relevant instead of treating the prompt in isolation.
-2. **Separate the pattern from what pressure is adding.** Distinguish what appears steady from what may be protective, overextended, repressed, Shadow, Gift, or otherwise context-dependent without turning it into a fixed identity.
-3. **See what happens between people.** Permission-bound relationship and system context keeps each person distinct and examines the interaction itself.
-4. **See what may keep the pattern going—and what could change it.** Examine roles, responsibility, authority, pressure, observations, Alignment, repair, missing perspective, and a testable change in conditions.
-
-The compact product explanation is the product definition above. Do not introduce another slogan to summarize this lens.
+1. **Understand you.** Identify the relevant part of the user's Baseline: how they may decide, communicate, create, connect, respond, or orient to the question.
+2. **See expression and context.** Distinguish what may be steady from what may change under pressure, through Shadow/Gift expression, current conditions, or the actual situation.
+3. **Understand what happens with other people.** When permission-bound relationship context is relevant, keep each person distinct and examine the interaction itself.
+4. **See the wider system when it matters.** When a family, team, household, or group is involved, include the relevant roles, authority, expectations, pressure, responsibility, constraints, observations, and missing perspectives.
+5. **Help the user examine fit.** Alignment can clarify what supports a choice, what pulls against it, the tradeoff, what information is still needed, and a closer version when relevant.
 
 This is an explanatory lens, not a new feature, score, diagnosis, causal model, or top-level product. Do not name it the Emotional Field Model in the interface. The active launch product objects are Baseline, Expression Field, People, Systems, and Library. Worlds remains future/disabled reference material and is not an active launch object, navigation destination, pricing feature, or required user workflow.
 
@@ -66,9 +116,9 @@ User-facing interpretation must preserve the evidence level without narrating th
 - use direct factual language only for behavior or context the user has supplied or confirmed;
 - use `may`, `can`, or equivalent language for Baseline-derived, current-context, relational, or system interpretation;
 - use `what keeps the pattern going` only when continuation conditions are observed or confirmed;
-- otherwise use `what may be keeping the pattern going` and say plainly what still needs clarification.
+- otherwise state plainly what remains to be clarified.
 
-This distinction changes certainty, not the underlying explanatory movement.
+This distinction changes certainty, not the product category.
 
 ### Responsibility boundary
 
@@ -80,46 +130,41 @@ Use these distinctions wherever interaction or recurrence is discussed:
 - another person's motive, exact emotion, or private state remains unknown unless that person supplies it;
 - safety takes precedence over pattern analysis when abuse, coercion, immediate danger, or a serious power imbalance is present.
 
-A public visitor should understand the interaction before learning framework terminology:
-
-- start with the real situation, decision, relationship, or recurring pattern;
-- receive the direct answer before technical detail;
-- understand what appears steady, what pressure may be changing, and what still needs clarification;
-- explore more deeply only when it is useful.
-
-Baseline Design is the personal intelligence foundation. It gives Sovereign a consistent reference for how a person may decide, communicate, learn, connect, lead, create, respond under pressure, and grow.
-
 ## Brand-language hierarchy
 
 ### Product category
 
 `Private personal AI for real life.`
 
-### Interaction principle
+### Root product promise
 
-`See the pattern. See what could change.`
+`Understand yourself. Understand your people. See the whole system.`
 
-This is not a chatbot invitation. Do not frame the product with generic open-ended prompts. Start from recognizable situations and make the relevant structure visible.
+Use this as a plain description of scope when the page needs one concise line. It is not a replacement for the founder hero.
 
 ### Emotional brand statement
 
 `Healing isn’t optional. Holding the pain is.`
 
-Outside the founder-locked root hero, use the emotional statement only after the product category and interaction are clear. It is not a therapy claim, diagnosis, required reconciliation, or guaranteed outcome.
+Outside the founder root hero, use the emotional statement only after the product category and interaction are clear. It is not a therapy claim, diagnosis, required reconciliation, or guaranteed outcome.
 
-On the founder-locked root landing, the approved visual sequence places this statement in the hero. The supporting copy immediately below it must make the product category and use cases understandable. Do not create a second competing hero in another language document.
+The root hero uses the founder wording:
 
-The root hero uses the founder-locked wording `Healing isn’t optional. Holding onto the pain is.` The shorter `Holding the pain is.` form is a secondary campaign or editorial line only. These are intentional scoped variants, not interchangeable root-hero copy.
+`Healing isn’t optional. Holding onto the pain is.`
+
+The supporting copy immediately below it must make the product category and use cases understandable. Do not create a second competing hero in another language document.
 
 ### Enduring brand line
 
-`Know yourself. Understand the system. Choose what fits.`
+`Know yourself. Understand your people. See the whole system.`
 
 Use this as a deeper brand statement or closing line. Do not make it carry the full burden of explaining the product.
 
 ## Voice
 
-Write in clear, adult language. Be calm, specific, and direct. State the central insight before explanation. Make the mechanism visible in ordinary language: the pattern, pressure, responsibility, tradeoff, context, perspective, and what may need clarification.
+Write in clear, adult language. Be calm, specific, and direct. State what the person can explore or understand before explaining how the product computes it.
+
+Self-exploration language should make room for curiosity, not imply that the user arrives because something is wrong. Relationship and system language should make complexity understandable without turning every interaction into conflict, blame, responsibility, or repair.
 
 Use uncertainty words only where uncertainty requires them. Do not weaken every sentence.
 
@@ -135,7 +180,11 @@ A stable, explorable reference. It is interpretive and correctable, not a measur
 
 Public explanation:
 
-`The private personal foundation Sovereign uses to understand where to begin.`
+`A private reference built around you, so Sovereign can begin with more than the current prompt.`
+
+Expanded public explanation:
+
+`Your Baseline helps Sovereign understand how you may think, decide, communicate, create, connect, respond under pressure, and grow.`
 
 ### Active now
 
@@ -182,44 +231,139 @@ A normal answer contains:
 - only relevant actions;
 - a concise correction prompt.
 
+Self-exploration answers can cover identity/orientation, decision-making, communication, learning, creativity/expression, love/connection, leadership, boundaries, response to pressure/change, Shadow, Gift, Alignment, and underused qualities when the Baseline supports them.
+
 Relationship answers distinguish **You may be bringing**, **They may be bringing**, **What happens between you**, **What each person can own**, and **What still needs to be asked directly**.
 
-System answers distinguish roles, authority, responsibility, pressure, change effects, and perspectives that are not yet represented.
+System answers distinguish roles, authority, responsibility, expectations, pressure, change effects, and perspectives that are not yet represented.
 
 Alignment answers use **Supports the fit**, **Pulls against it**, **The real tradeoff**, **Still needed**, and **A closer version**.
 
 Covenant answers use **Biblical parallel**, **Scripture**, **Teaching**, **Application**, and **Boundary**.
 
-## Public page copy
+## Root landing copy authority
 
-Root landing supporting copy:
+The root landing must explain the platform through the three-layer product scope, not through framework mechanics or one conflict example.
+
+Hero:
 
 - Kicker: `PERSONAL AI FOR REAL LIFE`
 - Founder hero: `Healing isn’t optional. Holding onto the pain is.`
-- Body: `Build a private Baseline once. Sovereign uses the parts that matter to understand patterns, decisions, relationships, and systems—without making you explain yourself from zero every time.`
+- Supporting copy: `Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.`
+- Secondary supporting copy when space allows: `Build your Baseline once, then explore how you think, decide, communicate, create, connect, respond under pressure, and change.`
 - Account navigation: `Sign in` · `Get started`
-- Root hero: no additional acquisition buttons; do not repeat `Build my Baseline`, `See a Sovereign answer`, or equivalent signup actions in the narrative.
 - Trust line: `Start free · No card required · Review, correct, or reject any interpretation`
+- Root hero has no additional acquisition buttons.
 
-Primary section language:
+The root landing must not include a framework/source explainer before the product categories. Do not enumerate astrology, Human Design, Gene Keys, numerology, astronomical positions, or source abbreviations in the main root narrative.
 
-- `BUILT FOR REAL SITUATIONS`
-- `START WITH WHAT’S ACTUALLY HAPPENING`
-- `WHY THIS AI IS DIFFERENT`
-- `TWO PEOPLE · SHARED WITH PERMISSION`
-- `FAMILIES · TEAMS · HUMAN SYSTEMS`
-- `CLEAR ANSWER FIRST`
+Primary product sections:
 
-The recognition transition should use one real-life situation at a time, such as:
+### `01 · YOU`
 
-- `Why do I keep taking responsibility for everyone else?`
-- `Does this decision fit who I am now?`
-- `Why does the same moment land differently for us?`
-- `Why does this responsibility keep landing with me?`
+Heading:
 
-Do not open the public page with framework terminology, source abbreviations, a philosophy-only headline, or a generic chatbot invitation.
+`Explore how you think, decide, communicate, create, connect, and grow.`
 
-Do not advertise, price, or invite the user to generate Worlds/video in the current launch. Future/disabled experiments must not leak into active launch copy.
+Description:
+
+`Use Sovereign to explore your own patterns, expression, creativity, decisions, relationships, pressure, change, Shadow, Gift, and Alignment—without reducing yourself to a type or score.`
+
+Representative public questions may include:
+
+- `What does Alignment look like for me?`
+- `How do I express myself when I’m clear?`
+- `How do I create best?`
+- `What changes in me under pressure?`
+- `How do I make decisions that fit me?`
+- `What part of myself am I underusing?`
+- `Why do I keep repeating this pattern?`
+
+### `02 · YOU + YOUR PEOPLE`
+
+Heading:
+
+`Understand what happens between you.`
+
+Description:
+
+`With permission, compare two people while keeping each person distinct. See where you differ, what you share, and how the interaction changes between you.`
+
+Representative public questions may include:
+
+- `Why does the same situation land differently for us?`
+- `What do we each need to communicate clearly?`
+- `Where do our decision-making styles differ?`
+- `What happens between us when pressure rises?`
+
+### `03 · FROM 1:1 TO THE WHOLE SYSTEM`
+
+Heading:
+
+`See the whole system.`
+
+Description:
+
+`Move from one relationship to a family, household, team, or group. See roles, expectations, authority, responsibility, pressure, and different perspectives together.`
+
+Representative public questions may include:
+
+- `What role am I actually playing in this family?`
+- `What changes when I stop playing the role everyone expects?`
+- `How does pressure move through this team?`
+- `Whose perspective is missing from this decision?`
+
+### Root comparison
+
+Kicker:
+
+`WHY THIS AI IS DIFFERENT`
+
+Heading:
+
+`Most AI starts with the prompt. Sovereign starts with you.`
+
+The comparison may explain continuity, Baseline context, permission-bound relationship/system context, and correction controls. Do not use `foundation` language.
+
+### Root closing
+
+Heading:
+
+`Know yourself. Understand your people. See the whole system.`
+
+Supporting copy:
+
+`Start free. Build your Baseline, then explore what you want to understand next.`
+
+## Public secondary pages
+
+### How It Works
+
+Explain Baseline after the visitor already understands the product scope. Keep the first explanation plain:
+
+`Your Baseline is a private reference Sovereign can return to across self, decisions, relationships, and systems.`
+
+Framework/source disclosure may appear deeper on this page, clearly separated from the primary explanation.
+
+### Pricing
+
+Free should be described as self-exploration and personal intelligence, not merely a Baseline artifact.
+
+Sovereign+ should be described as expanding the same intelligence to People, Systems, Library continuity, optional Covenant exploration, and higher monthly use.
+
+### FAQ
+
+The FAQ may explain which frameworks contribute to Baseline Design, but the answer must begin with what the Baseline is for before listing source systems.
+
+## Typography authority
+
+`Sovereign Display` is retired from rendered UI use.
+
+Do not render `Sovereign Display`, Georgia, Palatino, Iowan Old Style, Book Antiqua, or another serif as a heading/title fallback anywhere in the active product or public site.
+
+Headings, titles, product labels, and body text use the approved sans system. Hierarchy comes from scale, weight, spacing, opacity, and layout—not from switching to a serif display face.
+
+The bundled legacy display font file may remain in the repository only as an unused historical asset until a separate cleanup removes it. It must not be referenced by active CSS.
 
 ## Authentication
 
@@ -238,7 +382,7 @@ Do not use privacy slogans or spiritual promises in account access copy.
 ## Baseline onboarding
 
 - Headline: `Build your Baseline.`
-- Body: `Add your birth details to create the personal foundation Sovereign uses across self, decisions, relationships, and systems.`
+- Body: `Add your birth details to create the private reference Sovereign uses across self, decisions, relationships, and systems.`
 - Birth date: `Required for the Baseline calculation.`
 - Birthplace: `Used to resolve time and astronomical context.`
 - Birth time: `Improves time-sensitive parts of the calculation.`
@@ -255,8 +399,8 @@ Today:
 
 Explore:
 
-- `Look closer at the pattern.`
-- `Examine a pattern, decision, pressure point, or recurring tension against your Baseline.`
+- `Explore yourself more deeply.`
+- `Look at how you decide, communicate, create, connect, respond under pressure, or recognize what feels aligned.`
 
 People:
 
@@ -265,8 +409,8 @@ People:
 
 Systems:
 
-- `See how the whole system functions.`
-- `Keep roles, authority, responsibility, pressure, and perspective in view.`
+- `See the whole system.`
+- `Keep roles, authority, responsibility, expectations, pressure, and perspective in view.`
 
 Library:
 
@@ -283,13 +427,14 @@ No active launch navigation item is named Worlds. No core authenticated answer r
 
 Free:
 
-- `Personal intelligence grounded in your Baseline.`
+- `Explore yourself with Sovereign.`
 - $0, permanent, no card.
+- Complete private Baseline Design.
 - 10 Sovereign AI turns each month.
 
 Sovereign+:
 
-- `Understand the people and systems around you.`
+- `Understand your people and the systems around you.`
 - $20 monthly or $99 annually.
 - 300 Sovereign AI turns each month.
 
@@ -306,6 +451,12 @@ Do not alter the live Sovereign+ prices, products, lookup keys, or entitlement d
 
 Never use these as active product/interface language:
 
+- `One private reference beneath every question.` as a root marketing headline;
+- `One private foundation. More useful answers across the questions that shape your life.`;
+- `The same Baseline can support a decision, a recurring pattern, or a relationship question without flattening them into the same answer.`;
+- `Separate helping from carrying the outcome.` as the category heading for self exploration;
+- `See where responsibility keeps landing.` as the category heading for Systems;
+- `foundation`, `personal foundation`, or `private foundation` as the primary public metaphor for Baseline;
 - `Ask about your life.`;
 - `Ask about your life. Get an answer built around you.`;
 - `What do you want to understand?`;
