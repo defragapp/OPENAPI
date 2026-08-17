@@ -49,6 +49,16 @@ if (source.split(contextMarker).length - 1 !== 1) {
   throw new Error('Intelligence release v2 could not reconcile the retired demo context marker.');
 }
 source = source.replace(contextMarker, "  'Illustrative supplied context',");
+
+// The historical verifier accidentally encoded the main.tsx template-literal newline
+// as a runtime newline. Reconcile only that assertion; main.tsx remains authoritative.
+const staleRefinementAssertion = "  'style.textContent += `\\n${experienceRefinementCss}`',";
+const currentRefinementAssertion = "  'style.textContent += `\\\\n${experienceRefinementCss}`',";
+if (source.split(staleRefinementAssertion).length - 1 !== 1) {
+  throw new Error('Intelligence release v2 could not reconcile the stale refinement append assertion.');
+}
+source = source.replace(staleRefinementAssertion, currentRefinementAssertion);
+
 const activeSource = source.replace(retiredFingerprintOutput, '\n');
 
 if (activeSource.includes('Illustrative permitted Baselines')) {
