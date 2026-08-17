@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 const auth = readFileSync(new URL('./auth-public.ts', import.meta.url), 'utf8');
+const runtime = readFileSync(new URL('./runtime-entry.ts', import.meta.url), 'utf8');
 const accountMigration = readFileSync(new URL('../migrations/0009_production_scale_and_billing_safety.sql', import.meta.url), 'utf8');
 const receiptMigration = readFileSync(new URL('../migrations/0016_policy_acceptance_receipts.sql', import.meta.url), 'utf8');
+const privacyMigration = readFileSync(new URL('../migrations/0017_privacy_access_and_eligibility.sql', import.meta.url), 'utf8');
 const policies = readFileSync(new URL('../../../config/policies.ts', import.meta.url), 'utf8');
 
 describe('production account creation contract', () => {
@@ -21,8 +23,21 @@ describe('production account creation contract', () => {
     expect(auth).toContain('body.privacyVersion !== POLICY_METADATA.privacy.version');
     expect(auth).toContain('body.policyContentHash !== POLICY_CONTENT_HASH');
     expect(auth).toContain("status: 'policy_update_required'");
-    expect(policies).toContain("version: '2026-08-17'");
-    expect(policies).toContain("POLICY_CONTENT_HASH = 'fa4258363c34fa6e6f735dd9045f32b302106d4a8cd583de4519f3d6a135197e'");
+    expect(policies).toContain("version: '2026-08-17.2'");
+    expect(policies).toContain("POLICY_CONTENT_HASH = '10e0e2e9f3a17c6860c91311f3cfcbca426b237e49f2380ac57d11dc23fbf822'");
+  });
+
+  it('requires explicit 18 plus launch eligibility before production signup', () => {
+    expect(policies).toContain("version: '2026-08-17-18-plus'");
+    expect(policies).toContain('minimumAge: 18');
+    expect(runtime).toContain("url.pathname === '/api/v1/auth/signup'");
+    expect(runtime).toContain('signup.ageEligible !== true');
+    expect(runtime).toContain('signup.eligibilityRuleVersion !== ELIGIBILITY_RULE.version');
+    expect(runtime).toContain("field: 'eligibility'");
+    expect(privacyMigration).toContain('eligibility_confirmed_at TEXT');
+    expect(privacyMigration).toContain('eligibility_rule_version TEXT');
+    expect(privacyMigration).toContain('policy_signup_eligibility_after_terms_receipt');
+    expect(privacyMigration).toContain("NEW.acceptance_surface = 'signup'");
   });
 
   it('freezes accepted policy evidence before redemption and appends separate receipts', () => {
