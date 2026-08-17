@@ -105,7 +105,7 @@ The current launch is text-first. Video/Worlds generation is not required. Live 
 ## UX and human device acceptance
 
 - Founder root composition/language remain recognizable and coherent.
-- `Start with what’s actually happening.` remains a visible product-recognition stage.
+- Baseline Design appears before realistic questions and product demonstrations so visitors see the stable foundation before examples.
 - Authenticated conversation is visually primary rather than a dashboard of small cards.
 - User turns, Sovereign answers, direct answer, sections, Basis, corrections, and actions have clear hierarchy.
 - iPhone safe areas are respected.

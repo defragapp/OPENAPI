@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useTTS } from './hooks/useTTS';
 import type { FormEvent, KeyboardEvent, ReactNode } from 'react';
 import { ThreadExpressionField } from './expression-field/ThreadExpressionField';
 import { WorkspaceExpressionField } from './expression-field/WorkspaceExpressionField';
@@ -265,9 +264,9 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     clearResponseProgress();
     const phases = [
       'Connecting your Baseline',
-      workspace.today?.current?.status === 'ready' ? 'Checking current context' : 'Separating what is steady from what is inferred',
-      'Separating what is known from what is inferred',
-      'Preparing the answer'
+      workspace.today?.current?.status === 'ready' ? 'Checking what may be more relevant now' : 'Looking at the pattern',
+      'Connecting the situation',
+      'Preparing your answer'
     ];
     let phase = 0;
     const show = () => {
@@ -339,12 +338,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
   }
 
   function beginBaseline() {
-    setSurface('Today');
-    setMessages([]);
-    setDraft('');
-    setContextOpen(false);
-    setBaselineReveal(null);
-    setBaselineExperience('building');
+    location.assign('/onboarding?baseline=review');
   }
 
   async function completeBaseline(result: Json) {
@@ -403,7 +397,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     if (!clean || apiState === 'loading') return;
     if (!baselineReady) {
       setApiState('error');
-      setStatus('Complete your Baseline source and validated facet profile before asking Sovereign a question.');
+      setStatus('Finish your Baseline before asking Sovereign a question.');
       return;
     }
     const messageContext = {
@@ -536,7 +530,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     setSurface('Explore');
     setDraft(action.type === 'examine_alignment'
       ? 'Help me examine what supports this choice, what pulls against it, and the real tradeoff.'
-      : 'Help me explore the Baseline facet underneath this answer.');
+      : 'Help me explore the part of my Baseline underneath this answer.');
   }
 
   return (
@@ -568,7 +562,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
 
       <main className="intelligence-main">
         <header className="intelligence-topbar">
-          <button className="mobile-menu-trigger" onClick={() => setMenuOpen(true)} aria-label="Open account menu">S</button>
+          <button className="mobile-menu-trigger" onClick={() => setMenuOpen(true)} aria-label="Open workspace menu">S</button>
           <div><strong>Sovereign</strong><span aria-hidden="true" /><em>{surface}</em></div>
           <div className="topbar-actions">
             {(apiState === 'loading' || apiState === 'error') && <span className={`workspace-status ${apiState}`}>{status}</span>}
@@ -620,7 +614,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
         {baselineExperience === 'idle' && baselineReady && surfaceEntitled && (
           <form className="sovereign-composer" onSubmit={submit}>
             <div className="composer-context-line">
-              <span>Considering · {contextItems.join(' · ')}</span>
+              <span>Context · {contextItems.join(' · ')}</span>
               <button type="button" onClick={() => setContextOpen(true)}>Change context</button>
             </div>
             {!composerFocused && !draft && <span className="composer-example" key={`${surface}-${exampleIndex}`} aria-hidden="true">{composerExamples[surface][exampleIndex % composerExamples[surface].length]}</span>}
@@ -647,7 +641,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       </main>
 
       <aside className="intelligence-context" aria-label={`${surface} controls`}>
-        <header><div><p>What Sovereign is considering</p><h2>{surface}</h2></div><button onClick={() => setContextOpen(false)} aria-label="Close context">×</button></header>
+        <header><div><p>In this conversation</p><h2>{surface}</h2></div><button onClick={() => setContextOpen(false)} aria-label="Close context">×</button></header>
         <div className="context-scroll">
           <ContextPanel
             surface={surface}
@@ -667,7 +661,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
 
       {menuOpen && (
         <ModalDialog className="workspace-sheet" labelledBy="account-sheet-title" onClose={() => setMenuOpen(false)}>
-          <button className="sheet-backdrop" aria-label="Close account menu" onClick={() => setMenuOpen(false)} />
+          <button className="sheet-backdrop" aria-label="Close workspace menu" onClick={() => setMenuOpen(false)} />
           <section>
             <header><h2 id="account-sheet-title">Sovereign.OS</h2><button onClick={() => setMenuOpen(false)} aria-label="Close">×</button></header>
             <nav aria-label="Workspace destinations">
@@ -767,7 +761,7 @@ function BaselineBuilder({ api, onCancel, onComplete }: {
       <div className="baseline-builder-layout">
         <div className="baseline-builder-main">
           <h1 id="baseline-builder-title">Build your Baseline.</h1>
-          <p>These details create the private foundation Sovereign uses to see the capacity beneath patterns across self, decisions, relationships, and systems.</p>
+          <p>These details create the private foundation Sovereign uses across self, decisions, relationships, and systems.</p>
 
           {step === 1 && (
             <form onSubmit={continueFromDetails} className="baseline-step-form">
@@ -794,7 +788,7 @@ function BaselineBuilder({ api, onCancel, onComplete }: {
                 {[
                   ['exact', 'Exact', 'Use this when the recorded time is known.'],
                   ['approximate', 'Approximate', 'Use this when the time is close but not exact.'],
-                  ['unknown', 'Unknown', 'A supported path. Sovereign will not guess unavailable values.']
+                  ['unknown', 'Unknown', 'You can continue without a birth time. Sovereign will not guess unavailable values.']
                 ].map(([value, label, description]) => (
                   <label className="certainty-choice" key={value}>
                     <input type="radio" name="birthTimeCertainty" value={value} checked={certainty === value} onChange={() => setCertainty(value as typeof certainty)} />
@@ -821,7 +815,7 @@ function BaselineBuilder({ api, onCancel, onComplete }: {
                 <div><dt>Birthplace</dt><dd>{birthplace}</dd></div>
                 <div><dt>Birth time</dt><dd>{certainty === 'unknown' ? 'Unknown · time-sensitive values will be omitted or carry higher uncertainty' : `${birthTime} · ${certainty}`}</dd></div>
               </dl>
-              <p>Your raw birth details and exact private location are not sent to the model. Your Baseline remains interpretive and correctable.</p>
+              <p>Your raw birth details and exact private location stay private. You can review and correct your Baseline.</p>
               <button className="baseline-primary" disabled={state === 'submitting'}>{state === 'submitting' ? 'Building your Baseline…' : 'Build my Baseline'} <span aria-hidden="true">→</span></button>
               <button type="button" className="baseline-back" onClick={() => setStep(2)} disabled={state === 'submitting'}>Back</button>
             </form>
@@ -832,7 +826,7 @@ function BaselineBuilder({ api, onCancel, onComplete }: {
         <aside>
           <h2>Why this matters</h2>
           <p>Your Baseline gives Sovereign a consistent place to begin before you describe a problem.</p>
-          <p>Your raw birth details and exact private location are not sent to the model.</p>
+          <p>Your raw birth details and exact private location stay private.</p>
           <small>{step === 1 ? 'Next, you’ll confirm your birth-time certainty and review your details.' : step === 2 ? 'Next, you’ll review the details before anything is calculated.' : 'After this, Sovereign will reveal a small number of high-value qualities you can begin exploring.'}</small>
         </aside>
       </div>
@@ -873,7 +867,7 @@ function BaselineReveal({ result, today, onOpenToday, onCurrentContext }: {
         <button onClick={onCurrentContext}>Choose whether to add it</button>
       </div>
       <button className="baseline-reveal-primary" onClick={onOpenToday}>Open Today <span aria-hidden="true">→</span></button>
-      <small>Your Baseline is interpretive and correctable. Keep what fits; correct or reject what does not.</small>
+      <small>Your Baseline is yours to review and correct. Keep what fits; correct or reject what does not.</small>
     </section>
   );
 }
@@ -924,7 +918,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
       <SurfaceHeading kicker="Systems" title="See how the whole system functions." body="Keep roles, authority, responsibility, pressure, observations, and missing perspectives in view." />
       {selectedSystem
         ? <SystemOverview system={selectedSystem} api={api} />
-        : <EmptyState title="Choose a system to examine." body="Choose a permitted group to see supported roles, authority, responsibility, pressure, and the perspectives that remain missing." action="Choose a system" onAction={onOpenContext} />}
+        : <EmptyState title="Choose a system to examine." body="Choose a group to see roles, authority, responsibility, pressure, and which perspectives are not yet represented." action="Choose a system" onAction={onOpenContext} />}
     </div>
   );
   if (surface === 'Library') return (
@@ -935,7 +929,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   );
   return (
     <div className="surface-home">
-      <SurfaceHeading kicker="You" title="Your Baseline, plan, permissions, and account." body="Keep stable Baseline data, temporary context, permissions, privacy, plan, and account controls together." />
+      <SurfaceHeading kicker="You" title="Your Baseline, plan, permissions, and account." body="Review your Baseline, current context, permissions, privacy, plan, and account controls in one place." />
       <AccountSummary workspace={workspace} onOpenContext={onOpenContext} onBuildBaseline={onBuildBaseline} />
     </div>
   );
@@ -968,7 +962,7 @@ function BaselinePreparingState({ baseline, onReview }: { baseline: Json; onRevi
     <section className="baseline-preparing">
       <p>Today</p>
       <h1>{baseline?.readinessState === 'source_unavailable' ? 'Your Baseline source could not be calculated yet.' : 'Sovereign is preparing the parts of your Baseline you can explore.'}</h1>
-      <span>{baseline?.readinessMessage ?? 'Your account and saved data remain unchanged. The validated facet profile required for conversation is not ready yet.'}</span>
+      <span>{baseline?.readinessMessage ?? 'Your account and saved data remain unchanged. Sovereign is still preparing your Baseline. Try again when it is ready.'}</span>
       <button onClick={onReview}>Review my Baseline details</button>
     </section>
   );
@@ -989,8 +983,8 @@ function TodayFacetView({ facets, current, registry }: { facets: Json[]; current
         <h1>What is active for you now?</h1>
         <span>Begin with what remains steady in your Baseline, then see what may be louder today.</span>
       </header>
-      <p className="today-steady"><strong>What remains steady</strong>{core?.description ?? 'Your validated Baseline remains available beneath the conversation.'}</p>
-      <p className="today-current" data-state={current?.status ?? 'not_started'}><strong>Temporary current context</strong>{active ? `${active.title} is supported as temporarily more relevant. It does not determine your behavior.` : current?.status === 'ready' ? `On${current?.reduced?.expiresAt ? ` until ${formatCurrentExpiry(current.reduced.expiresAt)}` : ''}. No temporary factor is being elevated above your stable Baseline here.` : current?.status === 'expired' ? 'Expired. It will not be shown as live or used until you refresh it.' : current?.status === 'unavailable' ? 'Unavailable. Your stable Baseline remains unchanged.' : 'Off. Your stable Baseline remains available.'}</p>
+      <p className="today-steady"><strong>What remains steady</strong>{core?.description ?? 'Your Baseline remains available beneath the conversation.'}</p>
+      <p className="today-current" data-state={current?.status ?? 'not_started'}><strong>Temporary current context</strong>{active ? `${active.title} may be more relevant during this window. It does not determine your behavior.` : current?.status === 'ready' ? `On${current?.reduced?.expiresAt ? ` until ${formatCurrentExpiry(current.reduced.expiresAt)}` : ''}. No temporary factor is being elevated above your stable Baseline here.` : current?.status === 'expired' ? 'Expired. It will not be shown as live or used until you refresh it.' : current?.status === 'unavailable' ? 'Unavailable. Your stable Baseline remains unchanged.' : 'Off. Your stable Baseline remains available.'}</p>
       <BasisStrip values={support.filter(isBasisValue)} />
     </section>
   );
@@ -1002,7 +996,7 @@ function ExploreHome({ workspace }: { workspace: WorkspaceState }) {
     : [];
   return (
     <div className="surface-home explore-home">
-      <SurfaceHeading kicker="Explore" title="Look closer at the pattern." body="Examine a pattern, decision, pressure point, or recurring tension against your Baseline. Sovereign can separate the capacity, its expression, relevant interactions or systems, and what could change without forcing every situation into all four parts." />
+      <SurfaceHeading kicker="Explore" title="Look closer at the pattern." body="Examine a pattern, decision, pressure point, or recurring tension against your Baseline. Sovereign can show what seems steady, how it is showing up here, what may be happening between people or across a system, and what could change." />
       <BasisStrip values={registry} />
     </div>
   );
@@ -1017,13 +1011,13 @@ function RelationshipOverview({ person, api }: { person: Json; api: (path: strin
       .catch((problem) => setError(problem instanceof Error ? problem.message : 'Comparison unavailable.'));
   }, [person.id]);
   if (error) return <EmptyState title="This relationship needs one more permission." body={error} action="Manage permissions" onAction={openConsentControls} />;
-  if (!comparison) return <p className="loading-state">Loading the permitted comparison…</p>;
+  if (!comparison) return <p className="loading-state">Loading the relationship context…</p>;
   const participants = comparison.participants ?? [];
   const fieldSubjects: ExpressionFieldSubject[] = participants.slice(0, 2).map((participant: Json, index: number) => ({
     id: String(participant.key ?? `participant-${index}`),
     label: index === 0 ? 'You' : String(participant.label ?? person.displayName ?? 'They'),
-    meta: String(participant.facets?.[0]?.title ?? 'Permitted Baseline'),
-    detail: String(participant.facets?.[0]?.description ?? 'This permitted perspective is incomplete and remains open to correction.'),
+    meta: String(participant.facets?.[0]?.title ?? 'Shared Baseline'),
+    detail: String(participant.facets?.[0]?.description ?? 'This shared view is incomplete and can be corrected.'),
     axes: expressionAxes(participant.expressionAxes),
     selectedAxisId: 'clarity'
   }));
@@ -1031,7 +1025,7 @@ function RelationshipOverview({ person, api }: { person: Json; api: (path: strin
     <section className="relationship-overview">
       <div className="person-split">
         {participants.slice(0, 2).map((participant: Json, index: number) => (
-          <article key={participant.key ?? index}><span>{index === 0 ? 'YOU MAY BE BRINGING' : 'THEY MAY BE BRINGING'}</span><h2>{participant.facets?.[0]?.title ?? 'Permitted Baseline'}</h2><p>{participant.facets?.[0]?.description ?? 'This permitted facet is incomplete.'}</p></article>
+          <article key={participant.key ?? index}><span>{index === 0 ? 'YOU MAY BE BRINGING' : 'THEY MAY BE BRINGING'}</span><h2>{participant.facets?.[0]?.title ?? 'Shared Baseline'}</h2><p>{participant.facets?.[0]?.description ?? 'This part of the shared Baseline is incomplete.'}</p></article>
         ))}
       </div>
       <WorkspaceExpressionField
@@ -1039,13 +1033,13 @@ function RelationshipOverview({ person, api }: { person: Json; api: (path: strin
         subjects={fieldSubjects}
         context={{
           label: 'What happens between you',
-          meta: 'Two permitted Baselines',
+          meta: 'Two people',
           detail: 'Sovereign keeps each person distinct, then shows the interaction, each person’s responsibility, and what still needs to be asked directly.',
           selectedAxisId: 'clarity'
         }}
         className="workspace-context-field"
       />
-      <article className="relationship-field"><span>WHAT HAPPENS BETWEEN YOU</span><p>The conversation can now use the two permitted facet profiles while keeping each person’s responsibility, private experience, and unknown information distinct.</p></article>
+      <article className="relationship-field"><span>WHAT HAPPENS BETWEEN YOU</span><p>The conversation can now use the Baseline information both people chose to share, while keeping each person’s responsibility and private experience separate.</p></article>
     </section>
   );
 }
@@ -1071,7 +1065,7 @@ function SystemOverview({ system, api }: { system: Json; api: (path: string, ini
     id: String(participant.key ?? `participant-${index}`),
     label: String(participant.label ?? `Person ${index + 1}`),
     meta: String(participant.role ?? 'Role not confirmed'),
-    detail: String(participant.facets?.[0]?.description ?? 'This participant remains distinct. Only their permitted role and Baseline context are included.'),
+    detail: String(participant.facets?.[0]?.description ?? 'This person remains distinct. Only the role and Baseline context they chose to share are included.'),
     axes: expressionAxes(participant.expressionAxes),
     selectedAxisId: axisForConnectionType(String(edge?.type ?? 'responsibility'))
   }));
@@ -1089,7 +1083,7 @@ function SystemOverview({ system, api }: { system: Json; api: (path: string, ini
           subjects={fieldSubjects}
           context={{
             label: 'System interaction',
-            meta: `${fieldSubjects.length} permitted Baselines`,
+            meta: `${fieldSubjects.length} people`,
             detail: 'Roles, authority, responsibility, reliance, and communication remain visible without turning the system into another person. Missing perspectives remain unknown.',
             selectedAxisId: axisForConnectionType(String(edge?.type ?? 'responsibility'))
           }}
@@ -1163,41 +1157,9 @@ function SovereignAnswerView({ answer, basis, expressionFieldContext, interfaceA
   const unknown = answer.sections.find((section) => section.id === 'unknowns');
   const standardSections = answer.sections.filter((section) => section.id !== 'unknowns');
 
-  const { state: ttsState, toggle: toggleTTS } = useTTS();
-  const answerFullText = useMemo(() => {
-    return [
-      answer.headline,
-      answer.direct_answer,
-      ...standardSections.map(s => s.label + '. ' + s.body)
-    ].join('\n\n');
-  }, [answer, standardSections]);
-
-  const onListenClick = () => {
-    toggleTTS(answerFullText);
-  };
-
   return (
     <section className={`sovereign-answer answer-${answer.mode}`} aria-label={`${answer.mode.replace('_', ' ')} answer`}>
-      <header><span>Sovereign · {modeLabel(answer.mode)}</span><h2>{answer.headline}</h2>
-        {latest && (
-          <button
-            className="tts-listen-button"
-            onClick={onListenClick}
-            aria-label={ttsState === 'playing' ? "Pause audio" : "Listen to answer"}
-            style={{
-              background: 'none', border: 'none', color: 'inherit', cursor: 'pointer',
-              opacity: ttsState === 'loading' ? 0.5 : 1, transition: 'opacity 0.2s',
-              display: 'inline-flex', alignItems: 'center', marginLeft: '12px'
-            }}
-          >
-            {ttsState === 'playing' ? (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-            ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            )}
-          </button>
-        )}
-</header>
+      <header><span>Sovereign · {modeLabel(answer.mode)}</span><h2>{answer.headline}</h2></header>
       <p className="direct-answer">{answer.direct_answer}</p>
 
       {answer.mode === 'alignment'
@@ -1215,7 +1177,7 @@ function SovereignAnswerView({ answer, basis, expressionFieldContext, interfaceA
         {covenantAction && <button className="covenant-action" onClick={() => onAction(covenantAction)}><span aria-hidden="true">✝</span>{covenantAction.label}</button>}
         {!covenantAction && covenantPlanAction && <button className="covenant-action plan-action" onClick={() => onShowPlan(covenantPlanAction.feature)}><span aria-hidden="true">✝</span>{covenantPlanAction.label}</button>}
       </div>
-      <p className="answer-limit"><strong>Still unknown</strong>{unknown?.body ?? `This remains an ${answer.confidence} interpretation. Your actual response, another person’s private experience, and the outcome remain yours to confirm.`}</p>
+      <p className="answer-limit"><strong>What still needs clarity</strong>{unknown?.body ?? 'Your actual response, another person’s private experience, and the outcome can only be confirmed through what happens next or what they tell you directly.'}</p>
 
       {latest && (
         <footer className="answer-actions">
@@ -1272,7 +1234,7 @@ function RelationshipAnswer({ sections, expressionFieldContext }: { sections: So
         subjects={fieldSubjects}
         context={{
           label: interaction?.label ?? 'What happens between you',
-          meta: 'Interaction between two Baselines',
+          meta: 'Relationship context',
           detail: interaction?.body ?? 'What happens between you remains separate from either person’s identity.',
           selectedAxisId: 'clarity'
         }}
@@ -1295,8 +1257,8 @@ function SystemAnswer({ sections, expressionFieldContext }: { sections: Sovereig
         subjects={fieldSubjects}
         context={{
           label: 'System interaction',
-          meta: `${fieldSubjects.length} permitted Baselines`,
-          detail: system?.body ?? 'The people remain distinct. The system is the interaction among their roles, responsibilities, and permitted Baseline expressions.',
+          meta: `${fieldSubjects.length} people`,
+          detail: system?.body ?? 'The people remain distinct. This view shows how their roles, responsibilities, and shared Baseline context interact in the system.',
           selectedAxisId: 'responsibility'
         }}
         className="answer-context-field"
@@ -1319,7 +1281,7 @@ function BasisStrip({ values }: { values: BasisValue[] }) {
   if (!available.length) return null;
   return (
     <>
-      <button className="basis-strip" onClick={() => setOpen(true)} aria-label={`Basis. Open ${available.length} exact supporting values.`}>
+      <button className="basis-strip" onClick={() => setOpen(true)} aria-label={`Basis. Open ${available.length} source values.`}>
         <strong>Basis</strong>
         <span className="basis-values">{visible.map((value, index) => <span key={value.id}>{index > 0 && <i aria-hidden="true"> · </i>}<b aria-label={value.accessibleLabel}>{value.display}</b></span>)}</span>
         {available.length > limit && <em>+{available.length - limit}</em>}
@@ -1329,9 +1291,9 @@ function BasisStrip({ values }: { values: BasisValue[] }) {
         <ModalDialog className="source-drawer" labelledBy="basis-title" onClose={() => setOpen(false)}>
           <button className="sheet-backdrop" onClick={() => setOpen(false)} aria-label="Close Basis sources" />
           <section>
-            <header><div><span>Exact support</span><h2 id="basis-title">Basis provenance</h2></div><button onClick={() => setOpen(false)} aria-label="Close">×</button></header>
-            <p>These server-approved values shaped the interpretation. They support reflection; they do not prove a personality or current state.</p>
-            <dl>{available.map((value) => <div key={value.id}><dt>{value.display}</dt><dd><span>{value.accessibleLabel}</span><span>Source · {value.provenance}</span><span>Calculated · {formatDate(value.computedAt)}</span><span>Uncertainty · {value.uncertainty}</span><span>Subject · {value.subject}</span>{value.expiresAt && <span>Expires · {formatDate(value.expiresAt)}</span>}</dd></div>)}</dl>
+            <header><div><span>Source detail</span><h2 id="basis-title">Basis</h2></div><button onClick={() => setOpen(false)} aria-label="Close">×</button></header>
+            <p>These are the source values Sovereign used for this answer. They can inform reflection; they do not prove personality or current state.</p>
+            <dl>{available.map((value) => <div key={value.id}><dt>{value.display}</dt><dd><span>{value.accessibleLabel}</span><span>Source · {value.provenance}</span><span>Calculated · {formatDate(value.computedAt)}</span><span>Uncertainty · {value.uncertainty}</span><span>Applies to · {value.subject === 'self' ? 'You' : value.subject === 'other' ? 'Other person' : 'Relationship'}</span>{value.expiresAt && <span>Expires · {formatDate(value.expiresAt)}</span>}</dd></div>)}</dl>
           </section>
         </ModalDialog>
       )}
@@ -1344,11 +1306,11 @@ function EmptyState({ title, body, action, onAction }: { title: string; body: st
 }
 
 function EntitlementRequired({ surface, feature, onOpenPlan }: { surface: Surface; feature: EntitledFeature; onOpenPlan: (feature: EntitledFeature) => void }) {
-  return <section className="entitlement-required"><p>{surface}</p><h1>{surface} is available with Sovereign+.</h1><span>Your Baseline, current question, and existing private data remain unchanged. Review the plan only if this capability is relevant now.</span><button onClick={() => onOpenPlan(feature)}>Review plan information</button></section>;
+  return <section className="entitlement-required"><p>{surface}</p><h1>{surface} is available with Sovereign+.</h1><span>Your Baseline, current question, and existing private data remain unchanged. Review Sovereign+ only if you want to use this part of the product now.</span><button onClick={() => onOpenPlan(feature)}>Review Sovereign+</button></section>;
 }
 
 function WorkspaceArrival() {
-  return <section className="workspace-arrival" role="status"><span>Sovereign</span><h1>Opening your intelligence.</h1><p>Bringing your Baseline, current choices, conversations, and permissions into one place.</p></section>;
+  return <section className="workspace-arrival" role="status"><span>Sovereign</span><h1>Opening Sovereign.</h1><p>Bringing your Baseline, current choices, conversations, and permissions together.</p></section>;
 }
 
 function WorkspaceUnavailable({ message, onRetry }: { message: string; onRetry: () => void }) {
@@ -1362,12 +1324,12 @@ function AccountSummary({ workspace, onOpenContext, onBuildBaseline }: { workspa
   const plan = workspace.billing?.effective?.plan === 'sovereign_plus' ? 'Sovereign+' : 'Free';
   return (
     <nav className="account-settings-index" aria-label="You settings">
-      <button onClick={onBuildBaseline}><span>Baseline</span><small>{baselineReady ? 'Validated source and facet profile · review or recompute' : 'Required before conversation'}</small></button>
-      <button onClick={onOpenContext}><span>Current context</span><small>{workspace.today?.current?.status === 'ready' ? 'On for a limited window' : workspace.today?.current?.status === 'expired' ? 'Expired · refresh only if you choose' : workspace.today?.current?.status === 'unavailable' ? 'Provider unavailable · stable Baseline unchanged' : 'Off · stable Baseline remains available'}</small></button>
+      <button onClick={onBuildBaseline}><span>Baseline</span><small>{baselineReady ? 'Ready · review or rebuild' : 'Required before conversation'}</small></button>
+      <button onClick={onOpenContext}><span>Current context</span><small>{workspace.today?.current?.status === 'ready' ? 'On for a limited window' : workspace.today?.current?.status === 'expired' ? 'Expired · refresh only if you choose' : workspace.today?.current?.status === 'unavailable' ? 'Current context unavailable · Baseline unchanged' : 'Off · stable Baseline remains available'}</small></button>
       <button onClick={openConsentControls}><span>Permissions</span><small>Review, deny, or revoke each person’s specific use</small></button>
       <button onClick={openConsentControls}><span>People and invitations</span><small>{workspace.people.length ? `${workspace.people.length} private connection${workspace.people.length === 1 ? '' : 's'}` : 'No shared relationship context yet'}</small></button>
-      <button onClick={() => window.dispatchEvent(new CustomEvent('sovereign:open-system-membership'))}><span>System permissions</span><small>Review confirmed members, roles, and active inclusion consent</small></button>
-      <button onClick={openAccountControls}><span>Data and privacy</span><small>Saved understandings, retention, and account deletion</small></button>
+      <button onClick={() => window.dispatchEvent(new CustomEvent('sovereign:open-system-membership'))}><span>System permissions</span><small>Review members, roles, and who is currently included</small></button>
+      <button onClick={openAccountControls}><span>Data and privacy</span><small>Download your data, manage saved information, or delete your account</small></button>
       <button onClick={onOpenContext}><span>Plan and billing</span><small>{plan}</small></button>
       <button onClick={openAccountControls}><span>Account</span><small>Access and account controls</small></button>
       <button onClick={onOpenContext}><span>Accessibility</span><small>Keyboard, text scaling, focus, and reduced motion</small></button>
@@ -1394,7 +1356,7 @@ function ContextPanel(props: {
   if (props.surface === 'Systems') return <SystemControls {...props} />;
   if (props.surface === 'Library') return <LibraryGrid library={props.workspace.library} onPrompt={props.setDraft} compact />;
   if (props.surface === 'You') return <YouControls {...props} />;
-  return <div className="context-stack context-summary"><p className="context-intro">Sovereign selects only the validated Baseline facets and exact Basis values that materially support the situation you are examining.</p><small>Temporary current context remains separate and is used only while it is enabled, unexpired, and relevant.</small></div>;
+  return <div className="context-stack context-summary"><p className="context-intro">Sovereign uses the parts of your Baseline that matter to the situation you are examining.</p><small>Current context is added only while you choose to keep it on and it is still current.</small></div>;
 }
 
 function PeopleControls({ workspace, selectedPerson, setSelectedPerson, api, refresh }: any) {
@@ -1503,12 +1465,12 @@ function YouControls({ workspace, api, refresh, onBuildBaseline }: any) {
   return (
     <div className="context-stack account-controls">
       <section className="control-section">
-        <p>BASELINE</p><h3>{workspace.today?.baseline?.status === 'completed' ? 'Your personal foundation is ready.' : 'Your intelligence begins here.'}</h3><span>Reviewing or recomputing may change exact source values and the facets derived from them. Saved answers retain the Basis provenance attached when they were created.</span>
+        <p>BASELINE</p><h3>{workspace.today?.baseline?.status === 'completed' ? 'Your personal foundation is ready.' : 'Your intelligence begins here.'}</h3><span>If you rebuild your Baseline, future answers use the updated version. Saved answers keep the Basis they were created with.</span>
         <button className="primary-action" onClick={onBuildBaseline}>{workspace.today?.baseline?.status === 'completed' ? 'Review or recompute my Baseline' : 'Build my Baseline'}</button>
       </section>
       <section className="control-section">
-        <p>CURRENT-CONDITION PERMISSION</p><h3>Current context stays separate.</h3>
-        <span>Choose whether Earth-geocentric astronomical context may be added for six hours. Sovereign does not request or store your device location, and current data never determines your behavior.</span>
+        <p>CURRENT CONTEXT</p><h3>Current context stays separate.</h3>
+        <span>Choose whether to add current astronomical context for six hours. It uses a geocentric view, does not request your device location, and never determines your behavior.</span>
         <div className="current-permission-state" data-state={currentReady ? 'ready' : current.status}>
           <strong>{currentReady ? 'Current context on' : current.status === 'expired' ? 'Current context expired' : 'Current context off'}</strong>
           <small>{currentReady && current.reduced?.expiresAt ? `${current.computedAt ? `Enabled ${formatCurrentExpiry(current.computedAt)} · ` : ''}Available until ${formatCurrentExpiry(current.reduced.expiresAt)}` : 'Your stable Baseline remains available.'}</small>
@@ -1521,15 +1483,15 @@ function YouControls({ workspace, api, refresh, onBuildBaseline }: any) {
         {currentMessage && <span className={`current-permission-message ${currentAction === 'error' ? 'error' : ''}`} role={currentAction === 'error' ? 'alert' : 'status'}>{currentMessage}</span>}
       </section>
       <section className="control-section">
-        <p>PERMISSIONS</p><h3>Each person and system use stays separate.</h3><span>Framework display, pair comparison, shared facets, observations, and system inclusion are reviewed as specific permissions. There is no global “share everything” control.</span><div className="control-links"><button onClick={openConsentControls}>People and invitations</button><button onClick={() => window.dispatchEvent(new CustomEvent('sovereign:open-system-membership'))}>System membership</button></div>
+        <p>PERMISSIONS</p><h3>Each person and system use stays separate.</h3><span>Each person chooses separately what Sovereign may use for relationship comparisons, Systems, optional framework detail, and shared context. There is no “share everything” control.</span><div className="control-links"><button onClick={openConsentControls}>People and invitations</button><button onClick={() => window.dispatchEvent(new CustomEvent('sovereign:open-system-membership'))}>System membership</button></div>
       </section>
       <section className="control-section">
         <p>PLAN AND BILLING</p><h3>{workspace.billing?.effective?.plan === 'sovereign_plus' ? 'Sovereign+' : 'Free'}</h3>
         {workspace.billing?.effective?.plan !== 'sovereign_plus' && <><div className="billing-switch"><button type="button" className={interval === 'annual' ? 'active' : ''} onClick={() => setInterval('annual')}>Annual billing</button><button type="button" className={interval === 'monthly' ? 'active' : ''} onClick={() => setInterval('monthly')}>Monthly billing</button></div><button className="primary-action" onClick={() => void handoff('/api/v1/billing/checkout', { interval })}>Choose Sovereign+</button></>}
-        <button className="secondary-action" onClick={() => void handoff('/api/v1/billing/portal')}>Manage billing</button>
+        {workspace.billing?.effective?.plan === 'sovereign_plus' && <button className="secondary-action" onClick={() => void handoff('/api/v1/billing/portal')}>Manage billing</button>}
       </section>
       <section className="control-section"><p>PRIVACY AND SAVED DATA</p><h3>Your controls stay together.</h3><div className="control-links"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><button onClick={openConsentControls}>Permissions</button><button onClick={openAccountControls}>Library and account data</button></div></section>
-      <section className="control-section"><p>ACCOUNT</p><button className="secondary-action" onClick={() => void api('/api/v1/auth/logout', { method: 'POST' }).then(() => location.assign('/'))}>Log out</button></section>
+      <section className="control-section"><p>ACCOUNT</p><button className="secondary-action" onClick={() => void api('/api/v1/auth/logout', { method: 'POST' })}>Log out</button></section>
       <section className="control-section"><p>ACCESSIBILITY</p><h3>The same workspace, without relying on motion.</h3><span>Keyboard navigation, visible focus, text scaling, screen-reader names, and reduced-motion preferences are supported automatically.</span></section>
     </div>
   );
@@ -1573,8 +1535,8 @@ function expressionFieldSubjects(value: unknown): ExpressionFieldSubject[] {
   return value.subjects.map((subject: Json, index: number) => ({
     id: String(subject.id ?? `participant-${index}`),
     label: String(subject.label ?? (index === 0 ? 'You' : `Participant ${index}`)),
-    meta: String(subject.meta ?? 'Permitted Baseline'),
-    detail: 'This field represents permitted Baseline values. Actual present experience remains theirs to confirm.',
+    meta: String(subject.meta ?? 'Shared Baseline'),
+    detail: 'This view uses only Baseline information that person chose to share. What they are feeling right now is theirs to confirm.',
     axes: expressionAxes(subject.axes)
   }));
 }

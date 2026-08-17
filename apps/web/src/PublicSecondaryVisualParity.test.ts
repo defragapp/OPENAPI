@@ -70,14 +70,14 @@ describe('secondary public visual parity', () => {
 
   it('turns How it works into a direct editorial explanation rather than a feature-card grid', () => {
     expect(howItWorks).toContain('Your Baseline first. The situation second.');
-    expect(howItWorks).toContain('ONE ANSWER · FOUR DISTINCTIONS');
+    expect(howItWorks).toContain('ONE BASELINE · DIFFERENT SITUATIONS');
     expect(howItWorks).toContain('Start with your Baseline.');
-    expect(howItWorks).toContain('Add only what is relevant now.');
-    expect(howItWorks).toContain('Keep people and roles distinct.');
-    expect(howItWorks).toContain('Give the useful distinction first.');
+    expect(howItWorks).toContain('Add what is happening now.');
+    expect(howItWorks).toContain('Bring in other people only with permission.');
+    expect(howItWorks).toContain('Answer first. Detail underneath.');
     expect(howItWorks).toContain('class="product-proof-window"');
-    expect(howItWorks).toContain('This is user-visible context—not hidden model reasoning.');
-    expect(howItWorks).toContain('What your Baseline supports');
+    expect(howItWorks).toContain('Sovereign answers in plain language first.');
+    expect(howItWorks).toContain('Where this starts in your Baseline');
     expect(howItWorks).toContain('What pressure may be adding');
     expect(howItWorks).toContain('Where responsibility shifts');
     expect(howItWorks).toContain('What could change');
@@ -96,7 +96,7 @@ describe('secondary public visual parity', () => {
     expect(pricing).toContain('$99 / year');
     expect(pricing).toContain('10 Sovereign AI turns each month');
     expect(pricing).toContain('300 Sovereign AI turns each month');
-    expect(pricing).toContain('Free is complete for you. Plus expands the context.');
+    expect(pricing).toContain('Your Baseline stays the same. Plus gives you more ways to use it.');
     expect(pricing).not.toContain('pricing-dashboard');
     expect(pricing).not.toContain('pricing-toggle');
   });
@@ -107,7 +107,7 @@ describe('secondary public visual parity', () => {
       expect(faq).toContain(category);
     }
     expect(faq).toContain('Tarot is not part of Sovereign.OS.');
-    expect(faq).toContain('Raw birth input, exact private location, authentication material, payment identifiers, invitation tokens');
+    expect(faq).toContain('Raw birth details, exact private location, authentication material, payment identifiers, invitation tokens');
     expect(faq).toContain('Can I support Sovereign.OS without subscribing?');
     expect(faq.toLowerCase()).not.toContain('capacity beneath');
   });

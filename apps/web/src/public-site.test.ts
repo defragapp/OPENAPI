@@ -30,7 +30,7 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
     expect(landing).toContain('Build a private Baseline once.');
-    expect(landing).toContain('See how it works');
+    expect(landing).toContain('Get started');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(field).toContain('Drag to rotate');
     expect(field).toContain('click a line to inspect it');

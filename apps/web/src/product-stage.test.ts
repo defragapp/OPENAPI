@@ -31,7 +31,7 @@ describe('shared Sovereign intelligence stage', () => {
     expect(field).toContain('Illustrative Baseline · relative emphasis');
     expect(field).toContain('line length follows relative emphasis');
     expect(field).toContain('not a diagnosis, score, or claim about anyone’s internal state');
-    expect(field).toContain('select a line to see its name and relative value');
+    expect(field).toContain('click a line to inspect it');
     expect(stories).toContain('With permission, Sovereign keeps each person’s supplied context distinct');
     expect(stories).toContain('Illustrative shared context · Permission required · No compatibility score · No private-thought claims');
     expect(stories).toContain('Sanitized supplied system context · Each person controls what may be included');
@@ -50,7 +50,7 @@ describe('shared Sovereign intelligence stage', () => {
     expect(field).toContain('tabIndex={0}');
     expect(field).toContain('onPointerDown');
     expect(field).toContain('onPointerMove');
-    expect(field).toContain('onPointerEnter={() => selectAxis(axis.id)}');
+    expect(field).not.toContain('onPointerEnter={() => selectAxis(axis.id)}');
     expect(field).toContain('onFocus={() => selectAxis(axis.id)}');
     expect(field).toContain('onClick={(event) =>');
     expect(field).toContain('onKeyDown={(event) => handleKeyDown(event, axis.id)}');

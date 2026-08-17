@@ -169,7 +169,7 @@ describe('deployed route cohesion', () => {
   it.each(staticPages)('%s loads the static refinement after route cohesion', (_label, document) => {
     expect(document).toContain('data-route-cohesion="v1"');
     expect(document).toContain('/deployed-route-cohesion.css?v=20260803-route-v1');
-    expect(document).toContain('/experience-static-refinement-v1.css?v=20260816-refinement-v1');
+    expect(document).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
     expect(document.indexOf('/deployed-route-cohesion.css')).toBeGreaterThan(document.indexOf('/v0-public-static.css'));
     expect(document.indexOf('/experience-static-refinement-v1.css')).toBeGreaterThan(document.indexOf('/deployed-route-cohesion.css'));
   });
@@ -224,7 +224,7 @@ describe('deployed route cohesion', () => {
 
   it('makes both fast and rendered route verification production-authoritative', () => {
     expect(secondaryVerifier).toContain("const routeCssPath = '/deployed-route-cohesion.css?v=20260803-route-v1'");
-    expect(secondaryVerifier).toContain("const refinementCssPath = '/experience-static-refinement-v1.css?v=20260816-refinement-v1'");
+    expect(secondaryVerifier).toContain("const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2'");
     expect(secondaryVerifier).toContain('data-route-cohesion="v1"');
     expect(secondaryVerifier).toContain('body.how-page .journey-steps');
     expect(secondaryVerifier).toContain('body.pricing-page .price-card');

@@ -6,7 +6,9 @@ const main = read('./main.tsx');
 const landing = read('./PublicLanding.tsx');
 const css = read('./production-readiness-visual-v1.css');
 const landingRefinement = read('./landing-refinement-v2.css');
+const landingRefinementV5 = read('./landing-live-refinement-v5.css');
 const runtime = read('./production-readiness-runtime.ts');
+const interactionRuntime = read('./release-interaction-runtime.ts');
 const field = read('./expression-field/LandingExpressionSlice.tsx');
 const mobileUtilities = read('./WorkspaceMobileUtilities.tsx');
 const routeVerifier = read('../../../scripts/verify-live-route-cohesion.mjs');
@@ -53,33 +55,30 @@ describe('desktop and iOS production readiness v1', () => {
     ]) expect(css).toContain(marker);
   });
 
-  it('keeps selected line detail compact and endpoint anchored while the landing makes it visible', () => {
+  it('keeps selected line detail compact, endpoint anchored, and intentionally revealed', () => {
     for (const marker of [
-      'data-inspecting="true"',
+      "data-inspecting={hasInspection ? 'true' : 'false'}",
+      'const TOOLTIP_WIDTH = 104',
+      'const TOOLTIP_HEIGHT = 26',
+      'const tooltip = placeTooltip(selectedProjected.projected)',
+      'x1={selectedProjected.projected.x}',
+      'y1={selectedProjected.projected.y}',
+      'landing-expression-slice__tooltip-value',
+      'click a line to inspect it'
+    ]) expect(field).toContain(marker);
+    for (const marker of [
       '.landing-expression-slice__tooltip-panel',
-      'width: 148px !important',
-      'height: 50px !important',
-      '.landing-expression-slice__tooltip-connector',
-      'opacity: 0 !important',
-      'visibility: hidden !important'
-    ]) expect(css).toContain(marker);
-    for (const marker of [
-      "panelWidth: '132'",
-      "panelHeight: '34'",
-      "titleY: '16'",
-      "valueY: '16'",
-      "metaY: '28'",
-      "dataset.compactEndpointTooltip = 'true'"
-    ]) expect(runtime).toContain(marker);
-    expect(field).toContain('const tooltip = placeTooltip(selectedProjected.projected)');
-    expect(field).toContain('x1={selectedProjected.projected.x}');
-    expect(field).toContain('y1={selectedProjected.projected.y}');
-    expect(field).toContain('landing-expression-slice__tooltip-value');
-    expect(field).toContain('select a line to see its name and relative value');
-    expect(landingRefinement).toContain('.landing-expression-slice__tooltip {');
-    expect(landingRefinement).toContain('display: block !important');
-    expect(landingRefinement).toContain('width: 132px !important');
-    expect(landingRefinement).toContain('height: 34px !important');
+      'width: 104px !important',
+      'height: 26px !important'
+    ]) expect(landingRefinementV5).toContain(marker);
+    expect(field).not.toContain('onPointerEnter={() => selectAxis(axis.id)}');
+    expect(runtime).toContain("document.documentElement.dataset.sovereignProductionReadiness = 'desktop-ios-v1'");
+    expect(runtime).not.toContain('compactGeometry');
+    expect(runtime).not.toContain('compactLandingTooltips');
+    expect(runtime).not.toContain("panelWidth: '132'");
+    expect(interactionRuntime).toContain("field.dataset.inspecting = 'true'");
+    expect(interactionRuntime).toContain("document.addEventListener('focusin'");
+    expect(interactionRuntime).toContain("event.key === 'Escape'");
   });
 
   it('uses a restrained phone scale and keeps the complete field inside the opening', () => {

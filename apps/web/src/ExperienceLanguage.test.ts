@@ -45,9 +45,9 @@ describe('Sovereign.OS active experience language', () => {
   it('uses situational recognition instead of a blank-chat invitation', () => {
     const landing = activeExperience.find(([label]) => label === 'public landing')?.[1] ?? '';
     const workspace = activeExperience.find(([label]) => label === 'workspace')?.[1] ?? '';
-    expect(landing).toContain('Built for real situations');
-    expect(landing).toContain('Start with what’s actually happening.');
-    expect(landing).toContain('Your Baseline gives Sovereign a consistent reference across questions');
+    expect(landing).toContain('What this unlocks');
+    expect(landing).toContain('One private reference beneath every question.');
+    expect(landing).toContain('The result: you can ask about a decision today, a recurring pattern next week, or a relationship later without rebuilding your context from scratch.');
     expect(workspace).toContain('Look closer at the pattern.');
     expect(workspace).toContain('What keeps happening between you?');
     expect(workspace).toContain('Where does responsibility keep landing?');

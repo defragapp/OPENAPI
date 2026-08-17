@@ -59,7 +59,7 @@ describe('identity-bound multi-user contract', () => {
     expect(workspace).toContain('Send private invitation');
     expect(app).toContain('Choose what this connection may use.');
     expect(app).not.toContain('>Grant</button>');
-    expect(consentPage).toContain('Manage requested uses.');
+    expect(consentPage).toContain('Review your shared uses.');
     expect(consentPage).toContain('/consent.js?v=20260726-consent-r1');
     expect(consentRuntime).toContain("fetch('/api/v1/invitations/mine'");
     expect(consentRuntime).toContain("deny.textContent = decision === 'denied' ? 'Not allowed' : 'Do not allow'");

@@ -83,6 +83,10 @@ if (main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("imp
 if (source.split(retiredFingerprintOutput).length - 1 !== 1) throw new Error('Intelligence release v2 could not isolate the historical sequence fingerprint output.');
 
 const languageReplacements = [
+  ["  'See a Sovereign answer',", "  'One private reference beneath every question.',"],
+  ["  'Start with what’s actually happening.',", "  'One private foundation. More useful answers across the questions that shape your life.',"],
+  ["  'Why do we keep having the same fight?',", "  'Why do we keep having the same argument even when we both want it to stop?',"],
+  ["  'What is mine, what is theirs, and what happens between us?',", "  'Adds relationship or system context when relevant and permitted',"],
   ["  'Sovereign begins with the capacity beneath a pattern.',", "  'Build a private Baseline once.',"],
   ["  'See the capacity beneath the pattern.',", "  'Separate helping from carrying the outcome.',"],
   ["  'See what keeps the pattern going—and what could change it.',", "  'See where responsibility keeps landing.',"],
@@ -104,6 +108,14 @@ const staleRefinementAssertion = "  'style.textContent += `\\n${experienceRefine
 const currentRefinementAssertion = "  'style.textContent += `\\\\n${experienceRefinementCss}`',";
 if (source.split(staleRefinementAssertion).length - 1 !== 1) throw new Error('Intelligence release v2 could not reconcile the stale refinement append assertion.');
 source = source.replace(staleRefinementAssertion, currentRefinementAssertion);
+
+const staleStaticRouteAssertion = "  containsAll(label, document, ['Sovereign.OS', 'Build my Baseline', '/premium-public-release.css?v=20260730-final', '/experience-static-refinement-v1.css?v=20260816-refinement-v1']);";
+const currentStaticRouteAssertion = "  containsAll(label, document, ['Sovereign.OS', 'data-visual-contract=\\\"founder-v0-static\\\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260817-action-v1']);";
+
+if (source.split(staleStaticRouteAssertion).length - 1 !== 1) {
+  throw new Error('Intelligence release v2 could not reconcile the retired standalone-route contract.');
+}
+source = source.replace(staleStaticRouteAssertion, currentStaticRouteAssertion);
 
 const activeSource = source.replace(retiredFingerprintOutput, '\n');
 

@@ -21,7 +21,7 @@ const replacements = [
   ],
   [
     "['data-visual-contract=\"founder-v0-static\"', '/v0-public-static.css?v=20260801-v0-global', 'Release compatibility marker only; the retired stylesheet is not loaded']",
-    "['data-visual-contract=\"founder-v0-static\"', 'data-secondary-visual-contract=\"founder-v0-locked-v1\"', 'data-route-cohesion=\"v1\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', 'class=\"launch-nav-inner\"', 'class=\"launch-mobile-menu-panel\"', 'Release compatibility marker only; the retired stylesheet is not loaded']"
+    "['data-visual-contract=\"founder-v0-static\"', 'data-secondary-visual-contract=\"founder-v0-locked-v1\"', 'data-route-cohesion=\"v1\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260817-action-v1', 'class=\"launch-nav-inner\"', 'class=\"launch-mobile-menu-panel\"']"
   ],
   [
     "const passkeyMigration = read('apps/sovereign-worker/migrations/0014_passkey_authentication.sql');",
@@ -77,7 +77,11 @@ const replacements = [
   ],
   [
     "requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe handles payment details', 'Start free. Expand when the question includes more than you.']);",
-    "requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe handles payment details', 'Start with your Baseline. Add more only when you need it.', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);"
+    "requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe securely handles checkout, invoices, payment methods, and subscription changes.', 'If paid access ends, your account stays open and returns to Free.', 'Start with your Baseline. Add more only when you need it.', 'one-time amount from $1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);"
+  ],
+  [
+    "requireAll('FAQ document', faq, ['<details', 'Do I need to open my email every time I sign in?', 'When is my plan verified?', 'Can I correct or remove an interpretation?']);",
+    "requireAll('FAQ document', faq, ['<details', 'What is Sovereign.OS?', 'What is Baseline Design?', 'Do I need to open my email every time I sign in?', 'What happens to my plan if a payment fails or I cancel?', 'Can I correct or remove an interpretation?', 'Can I support Sovereign.OS without subscribing?', 'one-time amount from $1']);"
   ],
   [
     "  ['passkey auth', passkeyCss],\n  ['v0 static public', staticV0]",
