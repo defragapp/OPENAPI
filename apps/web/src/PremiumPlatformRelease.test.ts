@@ -32,6 +32,8 @@ const renderedFidelity = read('./rendered-fidelity-v1.css');
 const landingRefinementV2 = read('./landing-refinement-v2.css');
 const landingRefinementV5 = read('./landing-live-refinement-v5.css');
 const invitationFidelity = read('./invitation-rendered-fidelity-v1.css');
+const sansAuthority = read('./sans-typography-authority-v1.css');
+const typography = read('./typography-system.css');
 const passkeyCss = read('./passkey-auth.css');
 const routeCohesionCss = read('./deployed-route-cohesion.css');
 const staticV0Css = read('../public/v0-public-port.css');
@@ -42,7 +44,7 @@ function expectBalancedCss(source: string) {
   expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
 }
 
-describe('founder v0 selective visual port — approved public v8', () => {
+describe('founder visual port — public positioning reset', () => {
   it('loads the founder stack and appends current rendered authorities in order', () => {
     const imports = [
       "import './v0-platform-port.css';",
@@ -65,16 +67,12 @@ describe('founder v0 selective visual port — approved public v8', () => {
       previous = index;
     }
     expect(main.slice(previous + imports.at(-1)!.length)).not.toContain("import './");
-    expect(main).toContain("import renderedFidelityCss from './rendered-fidelity-v1.css?inline';");
-    expect(main).toContain("import landingRefinementV2Css from './landing-refinement-v2.css?inline';");
-    expect(main).toContain("import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline';");
-    expect(main).toContain("import invitationRenderedFidelityCss from './invitation-rendered-fidelity-v1.css?inline';");
-    expect(main.indexOf('style.textContent += `\\n${landingLiveRefinementV5Css}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${landingLiveRefinementV4Css}`;'));
-    expect(main.indexOf('style.textContent += `\\n${invitationRenderedFidelityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${landingLiveRefinementV5Css}`;'));
-    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, invitationFidelity, passkeyCss, routeCohesionCss, staticRefinement]) expectBalancedCss(source);
+    expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';");
+    expect(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
+    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, invitationFidelity, sansAuthority, typography, passkeyCss, routeCohesionCss, staticRefinement]) expectBalancedCss(source);
   });
 
-  it('preserves the archive compatibility fingerprint as historical provenance', () => {
+  it('preserves the archive compatibility fingerprint as historical provenance only', () => {
     expect(fingerprint).toContain(`V0_ARCHIVE_SHA256 = '${archiveSha}'`);
     expect(fingerprint).toContain(`V0_SEQUENCE_FINGERPRINT = '${sequenceFingerprint}'`);
     expect(fingerprint).toContain("PUBLIC_LANDING_CONTRACT = 'v0-public-landing-v3'");
@@ -82,20 +80,22 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(main).toContain('installV0ReleaseFingerprint();');
   });
 
-  it('keeps the founder statement while translating the product into clear value and use cases', () => {
+  it('keeps the founder statement while making self exploration, People, and Systems explicit', () => {
     expect(landing).toContain(`const V0_ARCHIVE_SHA = '${archiveSha}'`);
     expect(landing).toContain('data-public-release="approved-public-v8"');
+    expect(landing).toContain('data-public-narrative="self-people-systems-v1"');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Build a private Baseline once.');
-    expect(landing).toContain('One private reference beneath every question.');
-    expect(landing).toContain('What this unlocks');
-    expect(landing).toContain('One private foundation. More useful answers across the questions that shape your life.');
+    expect(landing).toContain('Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.');
+    expect(landing).toContain('Start with you');
+    expect(landing).toContain('Explore yourself.');
     expect(landing).toContain('<LandingExpressionSlice />');
-    expect(landing).toContain('<BaselineFoundation />');
     expect(landing).toContain('<RealLifeQuestions />');
-    expect(landing.indexOf('<BaselineFoundation />')).toBeLessThan(landing.indexOf('<RealLifeQuestions />'));
-    expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
+    expect(landing).toContain('<LandingProductStories />');
+    expect(landing).not.toContain('<BaselineFoundation />');
+    expect(landing).not.toContain('One private reference beneath every question.');
+    expect(landing).not.toContain('One private foundation.');
+    expect(landing).not.toContain('calculated astronomical positions');
     expect(landing).not.toContain('capacity beneath');
   });
 
@@ -126,29 +126,33 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(landingRefinementV5).toContain('height: 26px !important');
   });
 
-  it('uses deliberate hero typography and constrained entry motion', () => {
+  it('uses one sans hero system and constrained entry motion', () => {
     for (const marker of [
+      'One typeface. Hierarchy comes from weight, scale, and opacity.',
       '.v0-hero h1 > span',
-      'font-family: var(--font-subheading',
       '.v0-hero h1 > em',
-      'font-family: var(--font-display',
+      'font-family: inherit !important',
       '@keyframes sovereign-hero-rise',
       '@keyframes sovereign-field-arrive',
-      '.landing-baseline-intro__heading',
-      '.landing-baseline-intro__principles',
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(landingRefinementV5).toContain(marker);
+    expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
+    expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
+    expect(typography).not.toContain('font-family: "Sovereign Display"');
+    expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
   });
 
-  it('shows product behavior rather than static demo cards', () => {
+  it('shows broad self exploration, relationship intelligence, and whole-system intelligence', () => {
     for (const marker of [
-      'Separate helping from carrying the outcome.',
-      'How Sovereign gets there',
-      'What your Baseline supports',
-      'Where responsibility shifts',
-      'A cleaner boundary',
+      '01 · You',
+      'Explore how you think, decide, create, connect, and grow.',
+      'How Sovereign explores the question',
+      'How you tend to create',
+      'What feels aligned',
+      '02 · You + your people',
       'Understand what happens between you.',
-      'See where responsibility keeps landing.',
+      '03 · From 1:1 to the whole system',
+      'See the whole system.',
       'surface="personal-chat"',
       'surface="personal-reasoning"',
       'surface="relationship-chat"',
@@ -156,20 +160,17 @@ describe('founder v0 selective visual port — approved public v8', () => {
       'surface="system-map"',
       'surface="system-reasoning"',
       'Keeping both people distinct',
-      'What Sovereign separates',
-      'Observed route',
-      'Testable change',
-      'Selected observation',
-      'What to test',
+      'Seeing the whole system',
+      'Roles',
+      'Authority + expectations',
+      'Missing perspective',
       '360 + step * 900',
       'data-motion-state'
     ]) expect(stories).toContain(marker);
     expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
     expect(stories).toContain('landing-workflow__progress');
-    expect(stories).not.toContain("role: 'Stabilizer'");
-    expect(stories).not.toContain("role: 'Catalyst'");
-    expect(stories).not.toContain("role: 'Observer'");
-    expect(stories).not.toContain("role: 'Anchor'");
+    expect(stories).not.toContain('Separate helping from carrying the outcome.');
+    expect(stories).not.toContain('See where responsibility keeps landing.');
     expect(stories).not.toContain('capacity beneath');
   });
 
@@ -179,7 +180,6 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(stories).toContain('Shared with permission');
     expect(stories).toContain('Illustrative supplied context');
     expect(stories).toContain('Each person controls what may be included');
-    expect(stories).toContain('That is a system pattern—not proof that any one person is the cause.');
     expect(finalAuthority).toContain('.landing-evidence__code');
   });
 
