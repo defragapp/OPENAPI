@@ -34,7 +34,11 @@ describe('founder v0 selective visual port', () => {
     expect(field).toContain('buildSphereGrid');
     expect(field).toContain('MIN_AXIS_LENGTH');
     expect(field).toContain('MAX_AXIS_LENGTH');
-    expect(field).toContain('TOOLTIP_WIDTH = 184');
+    expect(field).toContain('TOOLTIP_WIDTH = 132');
+    expect(field).toContain('TOOLTIP_HEIGHT = 34');
+    expect(field).toContain('landing-expression-slice__tooltip-title');
+    expect(field).toContain('landing-expression-slice__tooltip-value');
+    expect(field).toContain('select a line to see its name and relative value');
     expect(field).toContain('placeTooltip(selectedProjected.projected)');
     expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(integrationCss).toContain('background: transparent');
