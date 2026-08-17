@@ -165,7 +165,11 @@ export async function orchestrateRelease({
 
     let prepared;
     try {
-      prepared = await prepareConfig({ commitSha: normalizedSha, runWrangler: countedWrangler });
+      prepared = await prepareConfig({
+        commitSha: normalizedSha,
+        runWrangler: countedWrangler,
+        preserveExistingRoutes: true
+      });
       generatedConfigPath = prepared.generatedConfigPath;
     } catch (error) {
       return { status: 'prepare-failed', deploys, output: error instanceof Error ? error.message : String(error) };
