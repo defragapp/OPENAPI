@@ -34,6 +34,7 @@ import invitationRenderedFidelityCss from './invitation-rendered-fidelity-v1.css
 import workspaceProductionRefinementCss from './workspace-production-refinement-v1.css?inline';
 import authenticatedLaunchCohesionCss from './authenticated-launch-cohesion-v1.css?inline';
 import premiumActionAuthorityCss from './premium-action-authority-v1.css?inline';
+import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';
 
 /* Component foundations */
 import './styles.css';
@@ -105,6 +106,7 @@ function installPlatformVisualCohesion(): void {
   style.textContent += `\n${workspaceProductionRefinementCss}`;
   style.textContent += `\n${authenticatedLaunchCohesionCss}`;
   style.textContent += `\n${premiumActionAuthorityCss}`;
+  style.textContent += `\n${sansTypographyAuthorityCss}`;
   document.head.append(style);
 }
 
