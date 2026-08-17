@@ -48,6 +48,14 @@ const replacements = [
     "  'System structure',"
   ],
   [
+    "  'Roles',",
+    "  'Role context',"
+  ],
+  [
+    "  'Illustrative permitted Baselines',",
+    "  'Illustrative supplied context',"
+  ],
+  [
     "  'stroke: #2f93ff',\n  'width: 100vw',",
     "  'width: 100vw',"
   ],
@@ -83,7 +91,13 @@ if (source.includes("\"import './passkey-auth.css';\",\n  \"import './deployed-r
 if (!source.includes("read('apps/web/src/rendered-fidelity-v1.css')")) {
   throw new Error('Premium platform release v2 is missing the rendered fidelity authority.');
 }
-for (const retired of ['Bring the question you actually have.', "'Ask about your life.',", "'Get an answer built for you.',"]) {
+for (const retired of [
+  'Bring the question you actually have.',
+  "'Ask about your life.',",
+  "'Get an answer built for you.',",
+  "'Roles',",
+  'Illustrative permitted Baselines'
+]) {
   if (source.includes(retired)) throw new Error(`Premium platform release v2 still enforces retired active language: ${retired}`);
 }
 
