@@ -6,21 +6,23 @@ This document governs what is included in the current launch. User-facing wordin
 
 ## Product boundary
 
-Sovereign.OS is a Baseline-first AI platform for self, relationship, and system intelligence. The launch candidate must provide useful personal exploration before an incident is explained and real permission-bound multi-user behavior.
+Sovereign.OS is a Baseline-first AI platform for **self exploration, relationship intelligence, and system intelligence**.
 
-The platform uses one explanatory movement across applicable surfaces:
+The launch must provide meaningful personal exploration before the user explains an incident, names a conflict, or adds another person. From the user's own Baseline, Sovereign can support exploration of identity/orientation, communication, decision-making, learning, creativity/expression, love/connection, leadership, boundaries, response to pressure/change, Shadow, Gift, Alignment, and underused qualities when the relevant facets exist.
 
-1. the useful capacity beneath a pattern;
-2. how that capacity may be expressing;
-3. what happens between people or across the system;
-4. what may keep the pattern going and what could change it.
+The public product expands outward in three layers:
 
-This movement is implemented through the existing Baseline, answer, People, Systems, Library, Expression Field, and supporting contracts. It is not another top-level product, score, diagnosis, or claim of interpersonal causation.
+1. **You** — understand and explore your own patterns, expression, decisions, creativity, connection, pressure, change, Shadow, Gift, and Alignment;
+2. **You + your people** — with permission, keep two people distinct and examine differences, shared context, and what happens between them;
+3. **From 1:1 to the whole system** — expand to families, households, friendship groups, workplaces, teams, and other human systems while keeping roles, authority, responsibility, expectations, pressure, observations, and missing perspectives distinct.
+
+The internal intelligence contract may reason through capacity, expression, interaction, continuation conditions, responsibility, and possible change. Those internal concepts do not define the public product category and must not force every public example into conflict, responsibility, or carrying-outcomes language.
 
 The current launch includes:
 
 - private Baseline creation with unknown birth time supported;
 - versioned structured Baseline facets;
+- self-exploration across the supported facet universe before another person or incident is required;
 - exact, expiring current-condition context;
 - adaptive `sovereign-answer.v2` text answers;
 - exact server-approved Basis rendering;
@@ -49,6 +51,21 @@ The public landing demo chats may teach the same hierarchy. The authenticated pr
 
 Reasoning progression may be made visible as restrained text workflow state when useful. The product does not require video or media generation to explain how Sovereign reached an answer.
 
+## Public positioning boundary
+
+User-facing positioning inherits `docs/product-language-system.md`.
+
+The root public page must make the product understandable in this order:
+
+- personal AI for understanding yourself;
+- self exploration across the supported personal domains;
+- permission-bound relationship intelligence;
+- system intelligence from 1:1 to family/team/group context;
+- Baseline as the private reference carried across those questions;
+- framework/source mechanics only in deeper How It Works/FAQ/Basis disclosure.
+
+Do not use `foundation` as the primary public Baseline metaphor. Do not lead root marketing with astrology, Human Design, Gene Keys, numerology, astronomical positions, or source abbreviations. Do not make responsibility/carrying outcomes the category story for `You` or `Systems`.
+
 ## Public answer categories
 
 Every answer preserves the difference between:
@@ -71,6 +88,8 @@ The exact source contract may include natal body/sign/longitude/display degree/r
 Unavailable values are omitted, not guessed. The product does not claim uncomputed Human Design type, authority, centers, profile, design-side values, or channels; a complete Gene Keys profile; unsupported Gene Keys expressions/sequences; or unavailable houses.
 
 The Baseline facet profile is versioned, validated, interpretive, tied to exact Basis references, and cached by protected input hash plus calculation/facet/model versions.
+
+These source mechanics support the product; they are not the primary public explanation of what the user can explore.
 
 ## Expression Field
 
