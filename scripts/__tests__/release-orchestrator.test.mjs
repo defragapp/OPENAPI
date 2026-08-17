@@ -46,8 +46,8 @@ function harness({ preFailure = false, dmarcFailure = false, migrationFailure = 
       ok: true,
       ready: true,
       version: sha,
-      migrationVersion: '0015_release_evidence',
-      latestMigrationVersion: '0015_release_evidence',
+      migrationVersion: '0016_policy_acceptance_receipts',
+      latestMigrationVersion: '0016_policy_acceptance_receipts',
       dependencies: { migrationParity: 'current' },
       releaseEvidence: evidence
     });
