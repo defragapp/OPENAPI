@@ -20,6 +20,8 @@ const previewHostname = previewBaseUrl ? new URL(previewBaseUrl).hostname : '';
 const env = { ...process.env };
 const APPROVED_AI_PROVIDER = 'cloudflare-gateway';
 const APPROVED_AI_MODEL = '@cf/zai-org/glm-4.7-flash';
+const CAPACITY_LEDGER_MIGRATION = '0013_workers_ai_free_capacity';
+const CURRENT_MIGRATION_TARGET = '0017_privacy_access_and_eligibility';
 
 if (accountId) env.CLOUDFLARE_ACCOUNT_ID = accountId;
 if (token) env.CLOUDFLARE_API_TOKEN = token;
@@ -31,11 +33,11 @@ if (process.env.AI_MODEL && process.env.AI_MODEL !== APPROVED_AI_MODEL) {
   throw new Error(`Preview AI_MODEL must remain ${APPROVED_AI_MODEL}`);
 }
 if (workersCi && !process.env.PREVIEW_SESSION_SIGNING_SECRET) {
-  throw new Error('PREVIEW_SESSION_SIGNING_SECRET is required in Cloudflare Workers Builds');
+  throw new Error('PREVIEW_SESSION_SIGNING_SECRET is required in the preview CI environment');
 }
 if (workersCi && !previewBaseUrl) {
   throw new Error(
-    'PREVIEW_BASE_URL or CLOUDFLARE_WORKERS_SUBDOMAIN is required in Cloudflare Workers Builds'
+    'PREVIEW_BASE_URL or CLOUDFLARE_WORKERS_SUBDOMAIN is required in the preview CI environment'
   );
 }
 
@@ -100,7 +102,7 @@ function runD1Json(args) {
     return parseJsonOutput(run(args, { capture: true }));
   } catch (error) {
     throw new Error(
-      `Cloudflare build token must include Account D1 Edit permission. ${sanitize(error.message)}`
+      `Cloudflare preview credential must include D1 Edit permission. ${sanitize(error.message)}`
     );
   }
 }
@@ -160,7 +162,7 @@ try {
     run(['d1', 'migrations', 'apply', d1Name, '--remote', '--env', 'preview', '--config', configPath]);
   } catch (error) {
     throw new Error(
-      `Remote D1 migration failed. Confirm the build token has D1 Edit permission. ${sanitize(error.message)}`
+      `Remote D1 migration failed. Confirm the preview credential has D1 Edit permission. ${sanitize(error.message)}`
     );
   }
 
@@ -213,7 +215,8 @@ try {
       model: APPROVED_AI_MODEL,
       gateway: process.env.AI_GATEWAY_ID || config.env.preview.vars.AI_GATEWAY_ID
     },
-    migrationTarget: '0013_workers_ai_free_capacity',
+    migrationTarget: CURRENT_MIGRATION_TARGET,
+    capacityLedgerMigration: CAPACITY_LEDGER_MIGRATION,
     configuredIntegrations: {
       turnstile: Boolean(process.env.VITE_TURNSTILE_SITE_KEY && process.env.TURNSTILE_SECRET_KEY),
       email: Boolean(process.env.EMAIL_API_URL && process.env.EMAIL_API_TOKEN && process.env.EMAIL_FROM),
