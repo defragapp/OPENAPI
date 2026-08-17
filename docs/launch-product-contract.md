@@ -119,11 +119,13 @@ Account deletion retains the existing 14-day grace period and Stripe-first cance
 
 ## Release authority
 
-Cloudflare Workers Builds connected to `defragapp/OPENAPI` is the only production release authority. GitHub Actions, ad-hoc local production deploys, a second Worker, R2, Queue, direct provider SDKs or provider API keys, and alternate deployment paths are not part of this contract.
+This product contract does not define a second deployment system. Current executable production authority is inherited from `docs/production-release.md` and the repository-owned `pnpm production:release:oauth` wrapper.
+
+Production always targets one exact current `origin/main` SHA. `pnpm production:deploy` is an internal stage of the OAuth release wrapper, not a separate release authority. Historical Cloudflare Workers Builds triggers, build tokens, deploy hooks, GitHub Actions, Pages, a second Worker, R2, Queue, direct provider SDKs, and alternate deployment paths are not current production authorities.
 
 Cloudflare-supported third-party models may be called only through the existing Cloudflare `AI` binding and AI Gateway under Cloudflare Unified Billing when a product capability explicitly requires that modality. This does not authorize a second AI integration path or provider credential in Sovereign.OS code.
 
-Production deployment requires one exact commit with:
+Production release requires one exact commit with:
 
 - foundation, type, unit, build, smoke, secret, and removal gates passing;
 - successful idempotent D1 migration replay;
@@ -138,4 +140,5 @@ Production deployment requires one exact commit with:
 - default-deny `/api/v1/*` authentication with an explicit public ingress allowlist;
 - authenticated Worker gating for `/app`, `/app/*`, `/onboarding`, and `/consent.html` before private documents are served;
 - Worlds remaining hidden unless its feature flag is on and its Cloudflare Unified Billing credits and spend-limit checks have been completed;
+- both branded `/ready` endpoints proving the exact release SHA, migration `0015_release_evidence`, migration parity `current`, and matching release evidence;
 - explicit approval.
