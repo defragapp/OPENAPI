@@ -17,19 +17,21 @@ Describe the change and why it is required.
 
 ## Cloudflare and release integrity
 
-- [ ] Cloudflare Workers Builds remains the sole production deployment authority.
+- [ ] Production remains bound to the exact current `origin/main` SHA and the canonical `pnpm production:release:oauth` path.
+- [ ] `pnpm production:deploy` remains an internal release stage rather than an alternate standalone authority.
 - [ ] Production routes and Wrangler configuration remain consistent.
-- [ ] No public source maps, deployment hooks, duplicate Workers, Queues, or R2 dependencies were introduced.
-- [ ] Required release checks and production verification pass.
+- [ ] No GitHub Actions deploy, deploy hook, Pages release, public source maps, duplicate Workers, Queues, R2 dependencies, or historical Workers Builds trigger path was introduced as production authority.
+- [ ] Required release checks and exact-SHA production verification pass.
 
 ## Product integrity
 
-- [ ] The change preserves the canonical Sovereign.OS product and language contracts.
+- [ ] The change preserves `docs/product-language-system.md` as the sole user-facing language authority.
+- [ ] Baseline Design remains the foundation; public explanation begins with recognizable real-life questions and useful distinctions rather than implementation machinery.
 - [ ] Consent, correction, uncertainty, and non-diagnostic behavior remain intact where applicable.
 
 ## Verification
 
-List the exact commands, tests, and live checks performed.
+List the exact commands, tests, rendered screenshots, and live checks performed.
 
 ## Deployment and rollback
 
