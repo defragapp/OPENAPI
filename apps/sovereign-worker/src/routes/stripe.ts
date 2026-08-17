@@ -13,7 +13,9 @@ interface StripeEvent {
 const SUBSCRIPTION_EVENTS = new Set([
   'customer.subscription.created',
   'customer.subscription.updated',
-  'customer.subscription.deleted'
+  'customer.subscription.deleted',
+  'customer.subscription.paused',
+  'customer.subscription.resumed'
 ]);
 
 function stringValue(value: unknown): string | undefined {
@@ -78,8 +80,8 @@ async function normalizeSubscriptionEvent(env: Env, event: StripeEvent): Promise
 function notificationKind(event: NormalizedStripeEvent): BillingNotificationKind | undefined {
   if (['past_due', 'unpaid', 'incomplete'].includes(event.status)) return 'payment_attention';
   if (event.cancelAtPeriodEnd && event.status !== 'canceled') return 'cancellation_scheduled';
-  if (event.type === 'customer.subscription.deleted' || event.status === 'canceled' || event.status === 'incomplete_expired') return 'returned_to_free';
-  if (event.type === 'customer.subscription.created' && ['active', 'trialing'].includes(event.status)) return 'activated';
+  if (event.type === 'customer.subscription.deleted' || event.status === 'canceled' || event.status === 'incomplete_expired' || event.status === 'paused') return 'returned_to_free';
+  if ((event.type === 'customer.subscription.created' || event.type === 'customer.subscription.resumed') && ['active', 'trialing'].includes(event.status)) return 'activated';
   return undefined;
 }
 
