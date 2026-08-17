@@ -1,19 +1,10 @@
 /*
  * Sovereign.OS typography contract.
  *
- * The bundled display and subheading faces are OFL-licensed English UI subsets
- * served from this application's own Cloudflare asset bundle. They are renamed
- * derivatives so reserved upstream font names are not presented to users.
+ * Active product typography is sans-only. The legacy display face is retired
+ * from rendered UI use; hierarchy comes from scale, weight, spacing, opacity,
+ * and composition rather than a serif/sans switch.
  */
-
-@font-face {
-  font-family: "Sovereign Display";
-  src: url("/fonts/sovereign-display.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  unicode-range: U+0020-007E, U+00A0, U+00B0, U+00D7, U+2013-2014, U+2018-201D, U+2022, U+2026, U+2032-2033, U+20AC, U+2190-2193, U+2212;
-}
 
 @font-face {
   font-family: "Sovereign Sans";
@@ -25,15 +16,7 @@
 }
 
 :root {
-  --font-display:
-    "Sovereign Display",
-    "Iowan Old Style",
-    "Palatino Linotype",
-    Palatino,
-    "Book Antiqua",
-    Georgia,
-    serif;
-  --font-subheading:
+  --font-title:
     "Sovereign Sans",
     "Avenir Next",
     Avenir,
@@ -41,6 +24,7 @@
     Helvetica,
     Arial,
     sans-serif;
+  --font-subheading: var(--font-title);
   --font-body:
     -apple-system,
     BlinkMacSystemFont,
@@ -49,19 +33,18 @@
     Arial,
     sans-serif;
 
-  /* Preserve the existing token API while making the approved display face global. */
-  --serif: var(--font-display);
+  /* Compatibility tokens resolve to the active sans title system. */
+  --font-display: var(--font-title);
+  --serif: var(--font-title);
   --sans: var(--font-body);
 }
 
-/* Every semantic title and heading uses the shared editorial display face. */
 :where(h1, h2, h3, h4, h5, h6, [role="heading"]) {
-  font-family: var(--font-display) !important;
+  font-family: var(--font-title) !important;
   font-kerning: normal;
   font-synthesis: none;
 }
 
-/* Brand and non-semantic product titles that function as headings. */
 :where(
   .landing-wordmark,
   .brand-button,
@@ -81,12 +64,11 @@
   .dialog-title,
   .empty-state-title
 ) {
-  font-family: var(--font-display) !important;
+  font-family: var(--font-title) !important;
   font-kerning: normal;
   font-synthesis: none;
 }
 
-/* Premium grotesk for short supporting introductions and subheadings only. */
 :where(
   .lede,
   .subheading,
@@ -94,7 +76,6 @@
   .supporting-heading,
   .context-heading,
   .landing-hero-copy > p:not(.landing-kicker, .fixture-label),
-  .landing-foundation > header > p:last-child,
   .landing-section-header > p:not(.landing-kicker),
   .story-heading > p,
   .story-heading-copy > p,
