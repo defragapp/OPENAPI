@@ -1,11 +1,25 @@
-# Production release procedure
+# Sovereign.OS production release procedure
 
-Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the only supported production deployment path for Sovereign.OS.
+Status: canonical production release authority.
 
-Production is released from one exact commit on `main`. Non-production branch builds remain disabled. Do not run an alternate GitHub Actions deploy, a repository-template deploy, or retired candidate/migrate/promote scripts.
+Production is released from one exact `origin/main` commit through the repository-owned Wrangler OAuth wrapper:
+
+```bash
+pnpm production:release:oauth
+```
+
+That command is the executable production authority. It verifies that the local checkout matches current `origin/main`, establishes a fresh current-member Wrangler OAuth session, provides the same fresh credential to the direct Cloudflare and Browser Rendering checks without printing it, runs the full repository gate, executes the internal production deploy stage, and proves exact-SHA readiness on both branded domains.
+
+`pnpm production:deploy` is an internal deploy-and-live-verification stage used by the OAuth wrapper. Running it by itself is not the complete production release procedure.
+
+Cloudflare Workers Builds records and former trigger/build-token instructions are historical operational evidence. They do not override this procedure and are not required to authorize or prove the current production release.
+
+GitHub Actions, deploy hooks, Cloudflare Pages, a second production Worker, repository-template deploy flows, preview Workers, and retired candidate/migrate/promote scripts are not production release authorities.
 
 ## Production target
 
+- Repository: `defragapp/OPENAPI`
+- Branch authority: current `origin/main`
 - Worker: `sovv-web`
 - Public site: `https://sovereign.defrag.app`
 - Authenticated app and API: `https://app.defrag.app`
@@ -21,11 +35,13 @@ Production is released from one exact commit on `main`. Non-production branch bu
 - Background cleanup: scheduled D1 work every 15 minutes
 - R2 and Queue: disabled
 
-`sovereign.os` is a product name, not an owned or delegated public domain. Do not publish links or email addresses at `sovereign.os`. `sovereign.app` is a separately registrable `.app` domain and must not be used unless it is purchased and added to Cloudflare.
+`sovereign.os` is a product name, not an owned or delegated public domain. Do not publish links or email addresses at `sovereign.os`. `sovereign.app` is not an approved production namespace. Current namespace authority is documented in `docs/release/NAMESPACE_AUTHORITY.md`.
 
 Private account export is disabled for launch. Sharing sends only the public Sovereign.OS link and includes no private workspace data.
 
-## Required encrypted Worker secrets
+## Required production credentials
+
+Encrypted Worker secrets remain in Cloudflare:
 
 - `SESSION_SIGNING_SECRET`
 - `TURNSTILE_SECRET_KEY`
@@ -33,105 +49,88 @@ Private account export is disabled for launch. Sharing sends only the public Sov
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 
-Secret values stay in Cloudflare. Never copy them into repository files, build output, issues, or chat.
+Never copy secret values into repository files, build output, issues, screenshots, or chat.
 
-The Cloudflare build/deploy environment also requires:
+The OAuth release wrapper intentionally clears inherited Cloudflare API-token variables before establishing the current-member Wrangler OAuth session. It then exposes that fresh OAuth credential only to the repository-owned commands that require direct Cloudflare REST or Browser Rendering access.
 
-- `CLOUDFLARE_API_TOKEN`
-- `CLOUDFLARE_ACCOUNT_ID`
-- `VITE_TURNSTILE_SITE_KEY`
-
-These are configured as Cloudflare Workers Builds variables or secrets, not prepended to one command in a shell chain.
-
-Workers Builds REST maintenance uses a separate user-scoped API token with `Workers Builds Configuration: Edit`. Account-scoped tokens are rejected by the Builds API. That management credential does not replace the build token selected by the production trigger's `build_token_uuid`.
+`CLOUDFLARE_ACCOUNT_ID` and `VITE_TURNSTILE_SITE_KEY` remain non-secret release configuration where required by the scripts.
 
 ## Transactional email
 
-Production account and invitation email must use the branded Resend API template in `apps/sovereign-worker/src/email.ts`.
+Production account and invitation email uses the branded Resend template in `apps/sovereign-worker/src/email.ts`.
 
-Recommended values:
+Recommended identities:
 
 - `TRANSACTIONAL_FROM_EMAIL=info@defrag.app`
 - `PUBLIC_CONTACT_EMAIL=info@defrag.app`
 - `EMAIL_SMOKE_TEST_RECIPIENT=info@defrag.app`
 
-The exact sender domain in `TRANSACTIONAL_FROM_EMAIL` must match a verified Resend domain. Resend is the required production provider; the Cloudflare Email binding is only a fallback for non-production recovery.
+The sender domain must match a verified Resend domain. Resend is the production transactional provider.
 
-Before release, verify SPF and DKIM for the selected Resend domain and add DMARC. Run the live delivery test from a secure environment that contains the Resend API key:
+## Release sequence
 
-```bash
-pnpm smoke:email
-```
+The canonical wrapper performs the following sequence against the same exact SHA:
 
-The command sends the same branded template used by the product, reports the Resend message ID, and does not print secrets or the full recipient address.
+1. fetch current `origin/main` and reject a checkout that does not match it;
+2. stamp the exact SHA into the release environment;
+3. clear inherited Cloudflare token variables and establish Wrangler OAuth for the current member;
+4. verify production D1 access before mutation;
+5. run `pnpm verify:cloudflare-build`;
+6. run `pnpm production:deploy`;
+7. run the parent-domain route verification owned by that deploy path;
+8. verify `/ready` on both `app.defrag.app` and `sovereign.defrag.app` for the exact target SHA;
+9. require migration `0015_release_evidence`, migration parity `current`, and `releaseEvidence.sha` equal to the target SHA;
+10. complete the deterministic Browser Rendering audits required by the release scripts.
 
-## Build configuration
-
-- Production branch: `main`
-- Root directory: repository root
-- Build command:
-
-```bash
-corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build
-```
-
-- Deploy command:
-
-```bash
-pnpm production:deploy
-```
-
-The build gate verifies release configuration, migrations through `0015_release_evidence`, secret and fixture scans, intelligence and visual contracts, type checks, Worker and web tests, production build, and compressed Worker size.
-
-The deploy command requires the exact Cloudflare build commit SHA. It resolves the existing D1 database, applies forward-only migrations, preserves encrypted Worker secrets, configures Free-plan Cloudflare controls, deploys that exact commit, and runs live probes. It fails closed when required secrets or runtime dependencies are missing.
+The repository gate includes foundation, migrations, secret and fixture scans, intelligence and visual contracts, type checks, Worker and web tests, production builds, smoke tests, and compressed Worker-size verification.
 
 ## Approval boundary
 
-Do not merge a release branch to `main` until the exact branch commit has:
+A release candidate must have the applicable repository, product, consent, billing, privacy, accessibility, and rendered visual checks complete before production release is treated as approved.
 
-- green repository and protected Cloudflare preview checks;
-- authenticated desktop and iPhone review;
-- reviewed Privacy and Terms;
-- test-mode Checkout, webhook, Portal, cancellation, and Free fallback evidence;
-- explicit founder approval for that commit SHA.
-
-Merging the approved commit to `main` authorizes Cloudflare Workers Builds to execute the configured production deployment. A branch push or draft pull request does not authorize production.
+A branch, pull request, successful build, dashboard configuration, or isolated deploy command does not by itself authorize production. The target is always the exact current `origin/main` SHA selected by the OAuth release wrapper.
 
 ## Live verification
 
-The deploy command must confirm:
+A production release is complete only when the same exact SHA is proven on both branded domains and the live probes succeed.
 
-- public and app hostnames serve the exact commit;
-- `/ready` reports migration `0015_release_evidence`;
-- D1, D1 Sessions, authentication, AI Gateway, Workers AI capacity, Resend, Stripe, and scheduled cleanup are configured;
-- `dependencies.transactionalEmail` is exactly `resend`;
-- pricing shows Free, $20 monthly, and $99 annual without legacy export or unapproved support placement;
-- unauthenticated protected routes fail closed;
-- invalid Stripe signatures are rejected;
-- signup requires Turnstile;
-- security headers and app `noindex` behavior are present;
-- compiled assets are immutable;
-- concurrent health probes pass.
+Required readiness evidence includes:
 
-A deploy command that does not complete these probes is not a completed release.
+- `ready: true`;
+- `version` equal to the exact target SHA;
+- `migrationVersion: 0015_release_evidence`;
+- `latestMigrationVersion: 0015_release_evidence`;
+- `dependencies.migrationParity: current`;
+- `releaseEvidence.sha` equal to the exact target SHA.
+
+The deploy path also verifies the configured D1, D1 Sessions, authentication, AI Gateway, Workers AI capacity, Resend, Stripe, scheduled cleanup, pricing, protected-route boundaries, Stripe signature rejection, Turnstile behavior, security headers, immutable assets, parent-domain routing, and concurrent health behavior represented by the current repository tests and scripts.
+
+A command that does not complete those exact-SHA probes is not a completed release.
+
+## Visual release evidence
+
+Rendered completion additionally follows `docs/browser-visual-release-audit.md`.
+
+Do not freeze or replace a founder visual reference until the intended composition has been rendered at the required desktop and mobile viewports, the actual screenshots have been inspected, and known documentation-to-render contradictions have been repaired.
 
 ## Rollback
 
-Record the previously stable Worker version before merging the approved commit. If rollback is required, use Cloudflare version/deployment controls to restore that exact version after explicit approval.
+Record the previously stable Worker version before release. If rollback is required, use Cloudflare version/deployment controls to restore that exact version after explicit approval.
 
 Worker rollback does not reverse D1 migrations or external Stripe and email events. Use forward-repair migrations and confirm database compatibility before restoring an older Worker.
 
 ## Release evidence
 
-Keep:
+Keep, as applicable:
 
-- exact commit SHA;
-- Cloudflare build UUID;
-- protected preview URL and screenshots;
-- test and smoke results;
-- Resend provider message ID for the delivery smoke test;
-- migration list and D1 backup confirmation;
+- exact `origin/main` SHA;
+- exact deployed SHA;
+- `/ready` evidence from both branded domains;
+- migration and release-evidence parity;
+- repository gate and smoke results;
+- Browser Rendering landing screenshots/report;
+- Browser Rendering route screenshots/report;
+- authenticated desktop/mobile review evidence when required;
 - prior stable Worker version;
-- sanitized `production-deployment.json`;
-- explicit founder approval;
-- post-deploy probe results and any rollback decision.
+- sanitized deployment metadata;
+- any rollback decision.
