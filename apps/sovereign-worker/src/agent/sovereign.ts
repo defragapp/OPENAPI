@@ -82,7 +82,7 @@ async function runCloudflareGateway(prompt: string, context: SovereignContext, m
   if (!context.env.AI_GATEWAY_ID) throw new Error('AI_GATEWAY_ID is not configured.');
   const result = await context.env.AI.run(
     model,
-    { input: prompt, max_output_tokens: 3_200 },
+    { prompt, max_completion_tokens: 3_200 },
     {
       gateway: {
         id: context.env.AI_GATEWAY_ID,
