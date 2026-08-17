@@ -9,14 +9,16 @@ const cohesionStyles = readFileSync(new URL('./account-journey-release-cohesion.
 const entry = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const auth = readFileSync(new URL('../../sovereign-worker/src/auth-public.ts', import.meta.url), 'utf8');
 
-describe('Baseline-first account journey release', () => {
-  it('builds a Baseline before asking a new user to choose a plan', () => {
+describe('Baseline-required account journey release', () => {
+  it('lets a new user choose a plan before building the required Baseline', () => {
     expect(onboarding).toContain("fetch('/api/v1/baseline/status'");
     expect(onboarding).toContain("fetch('/api/v1/baseline/onboarding'");
-    expect(onboarding).toContain("setPhase('baseline')");
     expect(onboarding).toContain("setPhase('plan')");
-    expect(onboarding.indexOf("setPhase('baseline')")).toBeLessThan(onboarding.lastIndexOf("setPhase('plan')"));
-    expect(onboarding).toContain('Create the personal foundation Sovereign uses.');
+    expect(onboarding).toContain("setPhase('baseline')");
+    expect(onboarding).toContain('label="Plan"');
+    expect(onboarding).toContain('label="Baseline"');
+    expect(onboarding.indexOf('label="Plan"')).toBeLessThan(onboarding.indexOf('label="Baseline"'));
+    expect(onboarding).toContain('Choose a plan first. You’ll build your Baseline before the workspace opens.');
   });
 
   it('captures structured birthplace context and explicit timezone confirmation', () => {
@@ -37,7 +39,7 @@ describe('Baseline-first account journey release', () => {
     expect(onboarding).toContain("baseline.uncertainty ?? 'stated in context'");
   });
 
-  it('does not advance while the facet profile is still pending', () => {
+  it('does not advance while the Baseline profile is still pending', () => {
     const pendingCheck = onboarding.indexOf('if (!baselineIsReady(body.baseline))');
     const readyResult = onboarding.indexOf("setPhase('baseline_result')", pendingCheck);
     expect(pendingCheck).toBeGreaterThan(-1);
@@ -68,11 +70,11 @@ describe('Baseline-first account journey release', () => {
     expect(onboarding).toContain('Annual billing');
     expect(onboarding).toContain('Stripe checkout shows the current price before you confirm.');
     expect(onboarding).not.toMatch(/\$99|\$20|\$8\.25|save \$141/);
-    expect(onboarding).toContain('Secure checkout is temporarily unavailable. You can continue with Free and upgrade later.');
+    expect(onboarding).toContain('Secure checkout is temporarily unavailable. You can continue with Free and build your Baseline now.');
     expect(onboarding).toContain("fetch('/api/v1/billing/checkout'");
   });
 
-  it('does not complete Sovereign+ onboarding until the signed Stripe entitlement is effective', () => {
+  it('does not complete Sovereign+ onboarding until the server-confirmed Stripe entitlement is effective', () => {
     const confirmStart = onboarding.indexOf('async function confirm(plan: Plan)');
     const completeStart = onboarding.indexOf('async function completeOnboarding', confirmStart);
     const confirmBody = onboarding.slice(confirmStart, completeStart);
@@ -81,6 +83,17 @@ describe('Baseline-first account journey release', () => {
     expect(confirmBody).not.toContain("completeOnboarding('sovereign_plus')");
     expect(onboarding).toContain("if (effectivePlan === 'sovereign_plus')");
     expect(onboarding).toContain("await completeOnboarding('sovereign_plus', controller.signal)");
+  });
+
+  it('does not mark Free onboarding complete until the required Baseline is ready', () => {
+    const confirmStart = onboarding.indexOf('async function confirm(plan: Plan)');
+    const completeStart = onboarding.indexOf('async function completeOnboarding', confirmStart);
+    const confirmBody = onboarding.slice(confirmStart, completeStart);
+    expect(confirmBody).toContain("if (plan === 'free')");
+    expect(confirmBody).toContain("setPhase('baseline')");
+    expect(confirmBody).not.toContain("completeOnboarding('free')");
+    expect(onboarding).toContain("if (selectedPlan === 'free' || readPlanChoice() === 'free')");
+    expect(onboarding).toContain("await completeOnboarding('free')");
   });
 
   it('waits through a delayed Stripe webhook without opening paid access or starting checkout again', () => {
