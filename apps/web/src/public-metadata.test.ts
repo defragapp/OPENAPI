@@ -5,16 +5,21 @@ const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'utf8');
 const manifest = readFileSync(new URL('../public/manifest.webmanifest', import.meta.url), 'utf8');
 const socialPreview = readFileSync(new URL('../public/og-sovereign.svg', import.meta.url), 'utf8');
+const appIcon = readFileSync(new URL('../public/app-icon.svg', import.meta.url), 'utf8');
+const pinnedIcon = readFileSync(new URL('../public/safari-pinned-tab.svg', import.meta.url), 'utf8');
 const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const productStories = readFileSync(new URL('./landing-product-stories-v2.css', import.meta.url), 'utf8');
 
 describe('public metadata and fallback documents', () => {
-  it('uses the founder v0 promise in document metadata', () => {
-    expect(index).toContain('Healing isn’t optional. Holding onto the pain is.');
-    expect(index).toContain('Personal AI that builds your Baseline');
-    expect(index).toContain('Personal AI for real life');
-    expect(index).not.toContain('Know yourself. Understand the system. Choose what fits.');
+  it('explains the product category in document and shared-link metadata', () => {
+    expect(index).toContain('Sovereign.OS — Private personal AI for real life');
+    expect(index).toContain('private personal AI for understanding yourself, your relationships, your decisions, and the groups around you');
+    expect(index).toContain('Understand yourself, relationships, decisions, and family or group dynamics from a private Baseline');
+    expect(index).toContain('og:site_name" content="Sovereign.OS"');
+    expect(index).toContain('twitter:card" content="summary_large_image"');
+    expect(index).not.toContain('og:title" content="Sovereign — Healing isn’t optional. Holding onto the pain is."');
+    expect(index).not.toContain('with permitted context');
   });
 
   it('delivers product-story layout through the compiled application bundle', () => {
@@ -43,20 +48,25 @@ describe('public metadata and fallback documents', () => {
     expect(notFound.indexOf(assets[2])).toBeGreaterThan(notFound.indexOf(assets[1]));
     expect(notFound).toContain('data-route-cohesion="v1"');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
-    expect(notFound).not.toContain('<link rel="stylesheet" href="/launch.css?v=20260730-cohesion">');
   });
 
-  it('keeps install metadata aligned with the v0 category', () => {
-    expect(manifest).toContain('Personal AI that builds your Baseline');
+  it('keeps install metadata aligned with the product definition', () => {
+    expect(manifest).toContain('Private personal AI for understanding yourself, your relationships, your decisions, and the groups around you.');
     expect(manifest).toContain('Open your private Sovereign workspace.');
-    expect(manifest).toContain('"theme_color": "#0f0f0f"');
+    expect(manifest).toContain('"theme_color": "#080a0d"');
+    expect(manifest).toContain('"src": "/app-icon.svg"');
   });
 
-  it('keeps social previews consistent with the founder hero', () => {
-    expect(socialPreview).toContain('Healing isn’t optional.');
-    expect(socialPreview).toContain('Holding onto the pain is.');
-    expect(socialPreview).toContain('PERSONAL AI FOR REAL LIFE');
-    expect(socialPreview).not.toContain('Know yourself.');
+  it('uses the same line-field identity in social, browser, and install marks', () => {
+    expect(socialPreview).toContain('PRIVATE PERSONAL AI FOR REAL LIFE');
+    expect(socialPreview).toContain('Understand yourself,');
+    expect(socialPreview).toContain('family or group dynamics');
+    expect(socialPreview).not.toContain('Healing isn’t optional.');
+    expect(appIcon).toContain('quiet field of lines showing different relative emphasis');
+    expect(appIcon).toContain('M256 330 256 112');
+    expect(pinnedIcon).toContain('M24 33V8');
+    expect(index).toContain('<link rel="icon" href="/app-icon.svg" type="image/svg+xml" />');
+    expect(index).toContain('<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#080a0d" />');
   });
 
   it('retires the stale public shell instead of caching another visual release', () => {
