@@ -1,0 +1,60 @@
+/* Sovereign.OS terminal typography authority.
+ * The retired display serif must not render anywhere in the active product.
+ */
+
+:root {
+  --font-title:
+    "Sovereign Sans",
+    "Avenir Next",
+    Avenir,
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+  --font-display: var(--font-title);
+  --font-subheading: var(--font-title);
+  --serif: var(--font-title);
+}
+
+:where(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  [role="heading"],
+  .landing-wordmark,
+  .brand-button,
+  .living-question,
+  .response-headline,
+  .workspace-title,
+  .surface-title,
+  .page-title,
+  .section-title,
+  .modal-title,
+  .drawer-title,
+  .dialog-title,
+  .empty-state-title,
+  .landing-story__heading h2,
+  .v0-story-heading h2,
+  .v0-final h2,
+  .landing-question-orbit h2,
+  .landing-demo__bar,
+  .public-secondary-page .policy-title,
+  .account-shell h1,
+  .plan-onboarding h1,
+  .passkey-shell h1
+) {
+  font-family: var(--font-title) !important;
+  font-style: normal !important;
+  font-kerning: normal;
+  font-synthesis: none;
+}
+
+.public-approved-v8 .v0-hero h1,
+.public-approved-v8 .v0-hero h1 > span,
+.public-approved-v8 .v0-hero h1 > em {
+  font-family: var(--font-title) !important;
+  font-style: normal !important;
+}
