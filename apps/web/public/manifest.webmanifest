@@ -2,12 +2,12 @@
   "id": "/",
   "name": "Sovereign.OS",
   "short_name": "Sovereign",
-  "description": "Personal AI that builds your Baseline and answers real questions about you, your relationships, and your family.",
+  "description": "Private personal AI for understanding yourself, your relationships, your decisions, and the groups around you. It starts with your Baseline Design.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0f0f0f",
-  "theme_color": "#0f0f0f",
+  "background_color": "#080a0d",
+  "theme_color": "#080a0d",
   "categories": ["lifestyle", "productivity"],
   "icons": [
     {
