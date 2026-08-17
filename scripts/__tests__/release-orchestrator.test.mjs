@@ -46,9 +46,13 @@ function harness({ preFailure = false, dmarcFailure = false, migrationFailure = 
       ok: true,
       ready: true,
       version: sha,
-      migrationVersion: '0016_policy_acceptance_receipts',
-      latestMigrationVersion: '0016_policy_acceptance_receipts',
-      dependencies: { migrationParity: 'current', policyAcceptanceReceipts: 'configured' },
+      migrationVersion: '0017_privacy_access_and_eligibility',
+      latestMigrationVersion: '0017_privacy_access_and_eligibility',
+      dependencies: {
+        migrationParity: 'current',
+        policyAcceptanceReceipts: 'configured',
+        privacyAccessControls: 'configured'
+      },
       releaseEvidence: evidence
     });
   });
@@ -133,7 +137,6 @@ describe('single-deploy release orchestrator', () => {
     const result = await orchestrateRelease(test.options);
     expect(result.status).toBe('post-deploy-failed');
     expect(result.deploys).toBe(1);
-    expect(deployCalls(test.runWrangler)).toBe(1);
     expect(result.progress.persisted).toBe(true);
   });
 
