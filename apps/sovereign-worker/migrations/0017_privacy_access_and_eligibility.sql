@@ -1,8 +1,5 @@
 PRAGMA foreign_keys = ON;
 
-ALTER TABLE auth_magic_links ADD COLUMN eligibility_confirmed_at TEXT;
-ALTER TABLE auth_magic_links ADD COLUMN eligibility_rule_version TEXT;
-
 ALTER TABLE accounts ADD COLUMN eligibility_confirmed_at TEXT;
 ALTER TABLE accounts ADD COLUMN eligibility_rule_version TEXT;
 
