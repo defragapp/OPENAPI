@@ -1,3 +1,4 @@
+import { POLICY_CONTENT_HASH, POLICY_METADATA } from '../../../config/policies';
 import type { Env } from './env';
 import { runtimeMode } from './runtime';
 import { buildSovereignEmail, sendOperationalEmail } from './email';
@@ -12,8 +13,6 @@ const MAX_TURNSTILE_TOKEN_LENGTH = 2048;
 const MAX_MAGIC_LINKS_PER_IP_WINDOW = 10;
 const EMAIL_CODE_TTL_MINUTES = 10;
 const EMAIL_CODE_MAX_ATTEMPTS = 5;
-const TERMS_VERSION = '2026-08-09';
-const PRIVACY_VERSION = '2026-08-09';
 
 export function normalizeEmail(email: string): string { return email.trim().toLowerCase(); }
 function validEmail(email: string): boolean { return email.length <= MAX_EMAIL_LENGTH && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
@@ -98,12 +97,28 @@ export async function verifyTurnstile(env: Env, token?: string, ip?: string, exp
 }
 
 export async function requestMagicLink(request: Request, env: Env, kind: 'signup' | 'login'): Promise<Response> {
-  const body = await request.json().catch(() => ({})) as { email?: string; name?: string; termsAccepted?: boolean; turnstileToken?: string; returnTo?: string };
+  const body = await request.json().catch(() => ({})) as {
+    email?: string;
+    name?: string;
+    termsAccepted?: boolean;
+    termsVersion?: string;
+    privacyVersion?: string;
+    policyContentHash?: string;
+    turnstileToken?: string;
+    returnTo?: string;
+  };
   const email = normalizeEmail(body.email ?? '');
   const name = body.name?.trim() ?? '';
   const returnTo = safeReturnTo(body.returnTo);
   if (!validEmail(email)) return Response.json({ status: 'invalid', field: 'email' }, { status: 400 });
   if (kind === 'signup' && (!name || name.length > MAX_NAME_LENGTH || body.termsAccepted !== true)) return Response.json({ status: 'invalid', field: !name || name.length > MAX_NAME_LENGTH ? 'name' : 'terms' }, { status: 400 });
+  if (kind === 'signup' && (
+    body.termsVersion !== POLICY_METADATA.terms.version
+    || body.privacyVersion !== POLICY_METADATA.privacy.version
+    || body.policyContentHash !== POLICY_CONTENT_HASH
+  )) {
+    return Response.json({ status: 'policy_update_required', field: 'terms' }, { status: 409, headers: { 'cache-control': 'no-store' } });
+  }
 
   const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
   await verifyTurnstile(env, body.turnstileToken, ip, kind);
@@ -119,8 +134,23 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
   const tokenHash = await sha256(token);
   const id = `magic_${crypto.randomUUID()}`;
   const acceptedAt = kind === 'signup' ? new Date().toISOString() : null;
-  await env.DB.prepare("INSERT INTO auth_magic_links (id, email_normalized, account_id, purpose, token_hash, name, terms_accepted_at, expires_at, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now', '+15 minutes'), ?, ?)")
-    .bind(id, email, existing?.id ?? null, kind, tokenHash, kind === 'signup' ? name : null, acceptedAt, ipHash, userAgentHash).run();
+  const policyReleaseSha = String(env.APP_VERSION || 'unversioned').trim().slice(0, 64) || 'unversioned';
+  await env.DB.prepare("INSERT INTO auth_magic_links (id, email_normalized, account_id, purpose, token_hash, name, terms_accepted_at, terms_version, privacy_version, policy_content_hash, policy_release_sha, expires_at, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+15 minutes'), ?, ?)")
+    .bind(
+      id,
+      email,
+      existing?.id ?? null,
+      kind,
+      tokenHash,
+      kind === 'signup' ? name : null,
+      acceptedAt,
+      kind === 'signup' ? POLICY_METADATA.terms.version : null,
+      kind === 'signup' ? POLICY_METADATA.privacy.version : null,
+      kind === 'signup' ? POLICY_CONTENT_HASH : null,
+      kind === 'signup' ? policyReleaseSha : null,
+      ipHash,
+      userAgentHash
+    ).run();
 
   let emailCode: string | undefined;
   let emailCodeId: string | undefined;
@@ -160,12 +190,19 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   const returnTo = safeReturnTo(url.searchParams.get('returnTo'));
   if (!token || token.length < 32 || token.length > 512) return Response.json({ status: 'invalid' }, { status: 400 });
   const tokenHash = await sha256(token);
-  const row = await env.DB.prepare("SELECT id, email_normalized, account_id, purpose, name, terms_accepted_at, expires_at, used_at FROM auth_magic_links WHERE token_hash = ?").bind(tokenHash).first<Record<string, string | null>>();
+  const row = await env.DB.prepare("SELECT id, email_normalized, account_id, purpose, name, terms_accepted_at, terms_version, privacy_version, policy_content_hash, policy_release_sha, requested_ip_hash, user_agent_hash, expires_at, used_at FROM auth_magic_links WHERE token_hash = ?").bind(tokenHash).first<Record<string, string | null>>();
   if (!row || !row.email_normalized || !validEmail(row.email_normalized) || !['signup', 'login'].includes(row.purpose ?? '')) return Response.json({ status: 'invalid' }, { status: 400 });
   if (row.used_at) return Response.json({ status: 'already used' }, { status: 409 });
   if (!Number.isFinite(parseSqliteTimestamp(row.expires_at)) || parseSqliteTimestamp(row.expires_at) < Date.now()) return Response.json({ status: 'expired' }, { status: 410 });
   if (row.purpose === 'login' && !row.account_id) return Response.json({ status: 'invalid' }, { status: 400 });
-  if (row.purpose === 'signup' && !row.terms_accepted_at) return Response.json({ status: 'invalid' }, { status: 400 });
+  if (row.purpose === 'signup' && (
+    !row.terms_accepted_at
+    || !row.terms_version
+    || !row.privacy_version
+    || !row.policy_content_hash
+    || row.policy_content_hash.length !== 64
+    || !row.policy_release_sha
+  )) return Response.json({ status: 'invalid' }, { status: 400 });
 
   const subject = `email:${row.email_normalized}`;
   let accountId: string;
@@ -182,7 +219,12 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   const redeemed = await env.DB.prepare("UPDATE auth_magic_links SET used_at = datetime('now'), account_id = ? WHERE id = ? AND used_at IS NULL AND expires_at > datetime('now')").bind(accountId, row.id).run();
   if ((redeemed.meta?.changes ?? 0) === 0) return Response.json({ status: 'already used' }, { status: 409 });
   if (row.purpose === 'signup') {
-    await env.DB.prepare("UPDATE accounts SET terms_accepted_at = ?, terms_version = ?, privacy_version = ?, updated_at = datetime('now') WHERE id = ? AND auth_subject = ?").bind(row.terms_accepted_at, TERMS_VERSION, PRIVACY_VERSION, accountId, subject).run();
+    await env.DB.prepare("UPDATE accounts SET terms_accepted_at = ?, terms_version = ?, privacy_version = ?, updated_at = datetime('now') WHERE id = ? AND auth_subject = ?")
+      .bind(row.terms_accepted_at, row.terms_version, row.privacy_version, accountId, subject).run();
+    for (const [policyType, policyVersion] of [['terms', row.terms_version], ['privacy', row.privacy_version]] as const) {
+      await env.DB.prepare("INSERT OR IGNORE INTO policy_acceptance_receipts (id, account_id, policy_type, policy_version, policy_content_hash, release_sha, accepted_at, acceptance_surface, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, ?, 'signup', ?, ?)")
+        .bind(`policy_${row.id}_${policyType}`, accountId, policyType, policyVersion, row.policy_content_hash, row.policy_release_sha, row.terms_accepted_at, row.requested_ip_hash, row.user_agent_hash).run();
+    }
     if (row.name?.trim()) await env.DB.prepare("UPDATE persons SET display_name = ?, updated_at = datetime('now') WHERE account_id = ? AND role = 'self'").bind(row.name.trim().slice(0, MAX_NAME_LENGTH), accountId).run();
   } else {
     await env.DB.prepare("UPDATE auth_email_codes SET used_at = COALESCE(used_at, datetime('now')) WHERE account_id = ? AND used_at IS NULL").bind(accountId).run();
