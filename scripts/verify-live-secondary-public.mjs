@@ -176,16 +176,19 @@ for (const marker of [
 ]) {
   assert(compactCss.includes(marker), `compiled route stylesheet is missing ${marker}`);
 }
-const finalRefinementEncodings = [
+const compactJavaScript = javascript.text.replace(/\s+/g, '');
+for (const marker of [
   '--refine-paper:#e8ddd0',
   '--refine-page:#080a0d',
   '--route-blue:#e8ddd0!important',
   '--landing-blue:#e8ddd0!important'
-];
-for (const marker of finalRefinementEncodings) {
-  assert(compactCss.includes(marker), `compiled final refinement is missing ${marker}`);
+]) {
+  assert(compactJavaScript.includes(marker), `compiled injected refinement is missing ${marker}`);
 }
-assert(compactCss.includes('-webkit-text-stroke:'), 'compiled final refinement is missing the founder outline treatment');
-assert(compactCss.includes('.sovereign-app-runtime.sovereign-composer') || compactCss.includes('.sovereign-app-runtime .sovereign-composer'), 'compiled final refinement is missing the workspace composer authority');
+assert(compactJavaScript.includes('-webkit-text-stroke:'), 'compiled injected refinement is missing the founder outline treatment');
+assert(
+  compactJavaScript.includes('.sovereign-app-runtime.sovereign-composer') || compactJavaScript.includes('.sovereign-app-runtime .sovereign-composer'),
+  'compiled injected refinement is missing the workspace composer authority'
+);
 
 console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} cohesion=v1 refinement=v1 worlds=illustrative`);
