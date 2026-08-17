@@ -6,14 +6,29 @@ const sourcePath = resolve('scripts/verify-visual-intelligence-release.mjs');
 const temporaryPath = resolve(`scripts/.verify-visual-intelligence-release-v2-${process.pid}.mjs`);
 const source = readFileSync(sourcePath, 'utf8');
 const main = readFileSync(resolve('apps/web/src/main.tsx'), 'utf8');
+const renderedFidelity = readFileSync(resolve('apps/web/src/rendered-fidelity-v1.css'), 'utf8');
 
 for (const marker of [
   "import './deployed-route-cohesion.css';",
   "import './passkey-auth.css';",
   "import experienceRefinementCss from './experience-refinement-v1.css?inline';",
-  'style.textContent += `\\n${experienceRefinementCss}`;'
+  "import renderedFidelityCss from './rendered-fidelity-v1.css?inline';",
+  'style.textContent += `\\n${experienceRefinementCss}`;',
+  'style.textContent += `\\n${renderedFidelityCss}`;'
 ]) {
   if (!main.includes(marker)) throw new Error(`Visual intelligence release v2 is missing ${marker}`);
+}
+if (main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;') <= main.indexOf('style.textContent += `\\n${experienceRefinementCss}`;')) {
+  throw new Error('Visual intelligence release v2 does not place rendered fidelity after experience refinement.');
+}
+for (const marker of [
+  '--v8-blue: #d8d0c5 !important',
+  "radialGradient[id$='-sphere-fill']",
+  'filter: saturate(0.08) contrast(1.05) brightness(0.96) !important',
+  '.public-approved-v8 .landing-demo {',
+  'padding: 54px 0 !important'
+]) {
+  if (!renderedFidelity.includes(marker)) throw new Error(`Visual intelligence release v2 is missing rendered fidelity marker ${marker}`);
 }
 
 const routeCohesionImport = "import './deployed-route-cohesion.css';";

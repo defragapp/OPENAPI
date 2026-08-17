@@ -64,7 +64,7 @@ describe('production release parity contract', () => {
       'cloudflare-production-deploy-v3.mjs',
       'verify-parent-domain-routes-v3.mjs',
       'verify-live-secondary-public.mjs',
-      'verify-live-route-cohesion.mjs',
+      'verify-live-route-cohesion-v2.mjs',
       'verify-live-visual-release-v3.mjs',
       'configure-cloudflare-dmarc.mjs',
       'write-cloudflare-release-evidence.mjs'

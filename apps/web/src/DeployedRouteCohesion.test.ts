@@ -230,7 +230,7 @@ describe('deployed route cohesion', () => {
     expect(secondaryVerifier).toContain('body.pricing-page .price-card');
     expect(secondaryVerifier).toContain('body.questions-page .faq-section');
     expect(secondaryVerifier).toContain('--refine-paper:#e8ddd0');
-    expect(productionRelease).toContain("['verify-route-cohesion', 'scripts/verify-live-route-cohesion.mjs']");
-    expect(packageJson.scripts?.['verify:live-route-cohesion']).toBe('node scripts/verify-live-route-cohesion.mjs');
+    expect(productionRelease).toContain("['verify-route-cohesion', 'scripts/verify-live-route-cohesion-v2.mjs']");
+    expect(packageJson.scripts?.['verify:live-route-cohesion']).toBe('node scripts/verify-live-route-cohesion-v2.mjs');
   });
 });

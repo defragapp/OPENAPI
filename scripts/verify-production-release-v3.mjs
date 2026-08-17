@@ -29,7 +29,7 @@ const replacements = [
   ],
   [
     "const heroCss = read('apps/web/src/landing-hero-field-v4.css');\nconst storyCss = read('apps/web/src/v0-restored-product-stories.css');",
-    "const heroCss = read('apps/web/src/landing-hero-field-v4.css');\nconst refinementCss = read('apps/web/src/experience-refinement-v1.css');\nconst storyCss = read('apps/web/src/v0-restored-product-stories.css');"
+    "const heroCss = read('apps/web/src/landing-hero-field-v4.css');\nconst refinementCss = read('apps/web/src/experience-refinement-v1.css');\nconst renderedFidelityCss = read('apps/web/src/rendered-fidelity-v1.css');\nconst storyCss = read('apps/web/src/v0-restored-product-stories.css');"
   ],
   [
     "const staticV0 = read('apps/web/public/v0-public-static.css');\nconst how = read('apps/web/public/how-it-works.html');",
@@ -61,7 +61,7 @@ const replacements = [
   ],
   [
     "assert(!field.includes('<div className=\"landing-expression-slice__tooltip\"'), 'The retired floating tooltip returned.');",
-    "assert(!field.includes('<div className=\"landing-expression-slice__tooltip\"'), 'The retired floating tooltip returned.');\nrequireAll('final experience refinement', refinementCss, ['--landing-blue: #e8ddd0 !important', '--route-blue: #e8ddd0 !important', '-webkit-text-stroke: 1.15px rgba(241, 233, 222, 0.82)', '.sovereign-app-runtime .sovereign-composer']);\nrequireAll('final static refinement', staticRefinement, ['--v0-blue: #e8ddd0', '--v0-blue-bright: #fffaf3', '@media (prefers-reduced-motion: reduce)']);"
+    "assert(!field.includes('<div className=\"landing-expression-slice__tooltip\"'), 'The retired floating tooltip returned.');\nrequireAll('final experience refinement', refinementCss, ['--landing-blue: #e8ddd0 !important', '--route-blue: #e8ddd0 !important', '-webkit-text-stroke: 1.15px rgba(241, 233, 222, 0.82)', '.sovereign-app-runtime .sovereign-composer']);\nrequireAll('rendered fidelity authority', renderedFidelityCss, ['--v8-blue: #d8d0c5 !important', \"radialGradient[id$='-sphere-fill']\", 'filter: saturate(0.08) contrast(1.05) brightness(0.96) !important', '.public-approved-v8 .landing-demo {', 'padding: 54px 0 !important']);\nrequireAll('final static refinement', staticRefinement, ['--v0-blue: #e8ddd0', '--v0-blue-bright: #fffaf3', '@media (prefers-reduced-motion: reduce)']);"
   ],
   [
     "requireAll('How it works document', how, ['Ask about your life. Get an answer built around you.', 'journey-steps', 'baseline-explainer']);",
@@ -73,7 +73,7 @@ const replacements = [
   ],
   [
     "  ['passkey auth', passkeyCss],\n  ['v0 static public', staticV0]",
-    "  ['experience refinement', refinementCss],\n  ['passkey auth', passkeyCss],\n  ['v0 static public', staticV0],\n  ['static experience refinement', staticRefinement]"
+    "  ['experience refinement', refinementCss],\n  ['rendered fidelity', renderedFidelityCss],\n  ['passkey auth', passkeyCss],\n  ['v0 static public', staticV0],\n  ['static experience refinement', staticRefinement]"
   ]
 ];
 
@@ -117,6 +117,9 @@ if (!source.includes("import './deployed-route-cohesion.css'")) {
 }
 if (!source.includes('/experience-static-refinement-v1.css?v=20260816-refinement-v1')) {
   throw new Error('Production release v3 is missing the final static refinement contract.');
+}
+if (!source.includes("read('apps/web/src/rendered-fidelity-v1.css')")) {
+  throw new Error('Production release v3 is missing the rendered fidelity authority.');
 }
 if (source.includes('Bring the question you actually have.') || source.includes('Ask about your life. Get an answer built around you.')) {
   throw new Error('Production release v3 still enforces retired active product language.');
