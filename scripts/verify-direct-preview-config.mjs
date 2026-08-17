@@ -5,6 +5,9 @@ const productionConfig = JSON.parse(readFileSync('wrangler.production-direct.jso
 const workerConfig = JSON.parse(readFileSync('apps/sovereign-worker/wrangler.jsonc', 'utf8'));
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 const readme = readFileSync('README.md', 'utf8');
+const productionReleaseDoc = readFileSync('docs/production-release.md', 'utf8');
+const workersBuildsHistory = readFileSync('docs/cloudflare-workers-builds-production.md', 'utf8');
+const productionOauthRelease = readFileSync('scripts/production-release-oauth.sh', 'utf8');
 const bootstrap = readFileSync('scripts/cloudflare-preview-bootstrap.mjs', 'utf8');
 const buildDiagnostics = readFileSync('scripts/cloudflare-build-diagnostics.mjs', 'utf8');
 const mainReleaseGuard = readFileSync('scripts/assert-main-release.mjs', 'utf8');
@@ -92,6 +95,7 @@ requireValue(packageJson.scripts?.['verify:cloudflare-build'] === 'node scripts/
 requireValue(packageJson.scripts?.['verify:release-config'] === 'node scripts/verify-direct-preview-config.mjs', 'Release verifier must use the direct Cloudflare contract');
 requireValue(packageJson.scripts?.['preview:bootstrap'] === 'node scripts/cloudflare-preview-bootstrap.mjs', 'Preview bootstrap command drifted');
 requireValue(packageJson.scripts?.['production:deploy'] === 'node scripts/assert-main-release.mjs && node scripts/cloudflare-production-release.mjs && node scripts/verify-parent-domain-routes.mjs', 'Production deploy command drifted');
+requireValue(packageJson.scripts?.['production:release:oauth'] === 'bash scripts/production-release-oauth.sh', 'Canonical production release must use the Wrangler OAuth wrapper');
 for (const required of [
   'scripts/assert-main-release.mjs',
   'verify:foundation',
@@ -140,17 +144,44 @@ for (const required of [
 ]) {
   requireValue(productionRelease.includes(required), `Production release wrapper is missing ${required}`);
 }
+for (const required of [
+  'git fetch --quiet origin refs/heads/main',
+  'TARGET_SHA="$(git rev-parse FETCH_HEAD)"',
+  'if [[ "$CHECKOUT_SHA" != "$TARGET_SHA" ]]',
+  'unset CLOUDFLARE_API_TOKEN',
+  'unset CF_API_TOKEN',
+  'unset CLOUDFLARE_BROWSER_API_TOKEN',
+  'auth token --json',
+  'auth_type',
+  'export CLOUDFLARE_BROWSER_API_TOKEN="$oauth_token"',
+  'pnpm verify:cloudflare-build',
+  'pnpm production:deploy',
+  'https://app.defrag.app/ready?release=$TARGET_SHA',
+  'https://sovereign.defrag.app/ready?release=$TARGET_SHA',
+  '0015_release_evidence',
+  'SHA_PARITY: PASS',
+  'SOVEREIGN.OS PRODUCTION RELEASE: VERIFIED'
+]) {
+  requireValue(productionOauthRelease.includes(required), `OAuth production release wrapper is missing ${required}`);
+}
 
 requireValue(!existsSync('.dev.vars.example'), 'Deploy-template secret form must not exist');
 requireValue(!existsSync('scripts/verify-one-click-deploy.mjs'), 'One-click fork verifier must not exist');
 requireValue(!readme.includes('deploy.workers.cloudflare.com'), 'README must not use Deploy to Cloudflare');
 requireValue(readme.includes('defragapp/OPENAPI'), 'README must name the canonical repository');
 requireValue(readme.includes('Cloudflare Queue and R2 are intentionally disabled'), 'README must document the no-Queue, no-R2 launch architecture');
-requireValue(readme.includes('Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the sole production release authority'), 'README must keep Cloudflare Workers Builds as production authority');
-requireValue(readme.includes('Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`'), 'README Cloudflare build command drifted');
-requireValue(readme.includes('Deploy command: `pnpm production:deploy`'), 'README Cloudflare deploy command drifted');
+requireValue(readme.includes('The current production release authority is the exact current `origin/main` SHA executed through:'), 'README must identify exact current origin/main as production release authority');
+requireValue(readme.includes('pnpm production:release:oauth'), 'README must name the canonical OAuth production release command');
+requireValue(readme.includes('Historical Cloudflare Workers Builds trigger and build-token records are not current release authority.'), 'README must keep Workers Builds records historical rather than authoritative');
 requireValue(readme.includes('`defrag.app/*` and `www.defrag.app/*` remain explicit Worker routes'), 'README parent-route contract drifted');
 requireValue(readme.includes('Production `workers.dev` access is disabled'), 'README must document production workers.dev retirement');
+
+requireValue(productionReleaseDoc.includes('Status: canonical production release authority.'), 'Production release document must declare canonical authority');
+requireValue(productionReleaseDoc.includes('pnpm production:release:oauth'), 'Production release document must name the canonical OAuth release command');
+requireValue(productionReleaseDoc.includes('That command is the executable production authority.'), 'Production release document must identify the OAuth wrapper as executable authority');
+requireValue(productionReleaseDoc.includes('Cloudflare Workers Builds records and former trigger/build-token instructions are historical operational evidence.'), 'Production release document must keep Workers Builds records historical');
+requireValue(workersBuildsHistory.includes('Status: historical operational reference. This file no longer defines production release authority.'), 'Workers Builds document must remain explicitly historical');
+requireValue(workersBuildsHistory.includes('pnpm production:release:oauth'), 'Workers Builds history must point to the canonical OAuth release command');
 
 for (const required of ['WORKERS_CI_COMMIT_SHA', 'APP_VERSION', "'d1', 'migrations', 'apply'", "'deploy', '--config'", 'verifyLiveProduction', 'configureCloudflareFreeTier']) {
   requireValue(productionDeploy.includes(required), `Production deploy is missing ${required}`);
@@ -195,4 +226,4 @@ for (const required of [
 requireValue(!bootstrap.includes('AI_MODEL: process.env.AI_MODEL ||'), 'Preview bootstrap must not allow arbitrary model override');
 requireValue(!bootstrap.includes('AI_PROVIDER: process.env.AI_PROVIDER ||'), 'Preview bootstrap must not allow arbitrary provider override');
 
-console.log('Direct Cloudflare release config verified production_root=true production_workers_dev=false cloudflare_builds_only=true current_main_only=true github_workflows_non_authoritative=true free_workers_ai=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false telemetry_non_authoritative=true');
+console.log('Direct Cloudflare release config verified production_root=true production_workers_dev=false oauth_release_only=true cloudflare_builds_only=false workers_builds_historical=true current_main_only=true github_workflows_non_authoritative=true free_workers_ai=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false telemetry_non_authoritative=true');
