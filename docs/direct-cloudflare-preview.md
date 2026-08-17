@@ -14,11 +14,14 @@ Production configuration remains repository-owned. Isolated review preview uses 
 - Durable Object: `ThreadCoordinator`
 - AI: Workers AI through Gateway `sovereign-ai-gateway`
 - model: `@cf/zai-org/glm-4.7-flash`
+- capacity-ledger foundation: migration `0013_workers_ai_free_capacity`
+- current schema target: `0017_privacy_access_and_eligibility`
 - assets: compiled Sovereign.OS web application
 - R2/Queue: disabled
-- current schema target: `0017_privacy_access_and_eligibility`
 - private export behavior: on-demand/no-artifact
 - video/Worlds: not required for current preview acceptance
+
+`0013_workers_ai_free_capacity` is retained here as schema lineage for the daily capacity ledger. It is not the current migration; current preview parity must advance through `0017_privacy_access_and_eligibility`.
 
 Preview must never attach a production custom domain, production D1 database, live Stripe credential/customer state, or production route.
 
