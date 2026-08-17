@@ -84,7 +84,7 @@ requireValue(preview?.name === 'sovereign-openapi-preview', 'Preview Worker name
 requireValue(preview?.workers_dev === true, 'Preview must remain isolated on workers.dev');
 requireValue(preview?.preview_urls === false, 'Versioned preview URLs must remain disabled');
 requireValue(preview?.vars?.APP_ENV === 'preview', 'Preview APP_ENV drifted');
-requireValue(preview?.vars?.AI_MODEL === expectedModel, 'Preview AI model drifted');
+requireValue(preview?.vars?.AI_MODEL === expectedModel, 'Preview Worker AI model drifted');
 requireValue(preview?.vars?.AI_GATEWAY_ID === expectedGatewayId, 'Preview AI Gateway drifted');
 requireValue(preview?.d1_databases?.some((item) => item.binding === 'DB'), 'Preview D1 binding missing');
 requireValue(preview?.durable_objects?.bindings?.some((item) => item.name === 'THREADS'), 'Preview Durable Object binding missing');
@@ -101,7 +101,7 @@ requireValue(existsSync('apps/web/public/404.html'), 'The static 404 document is
 requireValue(packageJson.scripts?.['verify:cloudflare-build'] === 'node scripts/cloudflare-build-diagnostics.mjs', 'Canonical build gate command drifted');
 requireValue(packageJson.scripts?.['verify:release-config'] === 'node scripts/verify-direct-preview-config.mjs', 'Release config verifier command drifted');
 requireValue(packageJson.scripts?.['preview:bootstrap'] === 'node scripts/cloudflare-preview-bootstrap.mjs', 'Preview bootstrap command drifted');
-requireValue(packageJson.scripts?.['production:release:text'] === 'node scripts/assert-main-release.mjs && node scripts/cloudflare-production-text-release.mjs', 'Text-first production release command drifted');
+requireValue(packageJson.scripts?.['production:release:text'] === 'node scripts/assert-main-release.mjs --require-current-origin-main && node scripts/cloudflare-production-text-release.mjs', 'Text-first production release command drifted');
 requireValue(packageJson.scripts?.['production:release:oauth'] === 'bash scripts/production-release-oauth.sh', 'Optional OAuth Browser-audited release command drifted');
 
 for (const required of [
@@ -121,7 +121,15 @@ for (const required of [
 ]) {
   requireValue(buildDiagnostics.includes(required), `Cloudflare build diagnostics are missing ${required}`);
 }
-for (const required of ['WORKERS_CI_BRANCH', 'WORKERS_CI_COMMIT_SHA', "'refs/heads/main'", "'FETCH_HEAD'", 'has been superseded by current main']) {
+for (const required of [
+  'WORKERS_CI_BRANCH',
+  'WORKERS_CI_COMMIT_SHA',
+  "'refs/heads/main'",
+  "'FETCH_HEAD'",
+  'has been superseded by current main',
+  '--require-current-origin-main',
+  'requireCurrentOriginMain'
+]) {
   requireValue(mainReleaseGuard.includes(required), `Main release guard is missing ${required}`);
 }
 
