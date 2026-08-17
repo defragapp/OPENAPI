@@ -18,7 +18,7 @@ describe('production account creation contract', () => {
   });
 
   it('requires the exact current policy versions and content hash at signup', () => {
-    expect(auth).toContain("import { POLICY_CONTENT_HASH, POLICY_METADATA } from '../../../config/policies'");
+    expect(auth).toContain("import { ELIGIBILITY_RULE, POLICY_CONTENT_HASH, POLICY_METADATA } from '../../../config/policies'");
     expect(auth).toContain('body.termsVersion !== POLICY_METADATA.terms.version');
     expect(auth).toContain('body.privacyVersion !== POLICY_METADATA.privacy.version');
     expect(auth).toContain('body.policyContentHash !== POLICY_CONTENT_HASH');
@@ -27,9 +27,11 @@ describe('production account creation contract', () => {
     expect(policies).toContain("POLICY_CONTENT_HASH = '10e0e2e9f3a17c6860c91311f3cfcbca426b237e49f2380ac57d11dc23fbf822'");
   });
 
-  it('requires explicit 18 plus launch eligibility before production signup', () => {
+  it('requires explicit 18 plus launch eligibility in both the auth core and production wrapper', () => {
     expect(policies).toContain("version: '2026-08-17-18-plus'");
     expect(policies).toContain('minimumAge: 18');
+    expect(auth).toContain('body.ageEligible !== true');
+    expect(auth).toContain('body.eligibilityRuleVersion !== ELIGIBILITY_RULE.version');
     expect(runtime).toContain("url.pathname === '/api/v1/auth/signup'");
     expect(runtime).toContain('signup.ageEligible !== true');
     expect(runtime).toContain('signup.eligibilityRuleVersion !== ELIGIBILITY_RULE.version');
@@ -51,6 +53,8 @@ describe('production account creation contract', () => {
     expect(auth).toContain('INSERT OR IGNORE INTO policy_acceptance_receipts');
     expect(auth).toContain("[['terms', row.terms_version], ['privacy', row.privacy_version]]");
     expect(auth).toContain("'signup', ?, ?");
+    expect(auth).toContain("if (!/^[0-9a-f]{40}$/.test(value)) throw new Response('Release identity unavailable'");
+    expect(auth).toContain("!/^[0-9a-f]{40}$/.test(row.policy_release_sha)");
   });
 
   it('stores only hashed request evidence in policy receipts', () => {
