@@ -27,7 +27,7 @@ const COMPARISON = {
     'Starts with your Baseline',
     'Adds current context only when you choose it',
     'Adds relationship or system context when relevant and permitted',
-    'Keeps support, interpretation, and unknowns distinguishable'
+    'Lets you review and correct what does not fit'
   ]
 } as const;
 const RELEASE_COPY_MARKERS = ['everyone the same.'] as const;
@@ -138,11 +138,11 @@ function BaselineFoundation() {
           </div>
           <div>
             <dt>Relevant context</dt>
-            <dd>Sovereign uses only the parts that matter to the question, then keeps temporary conditions and other people’s permitted information separate.</dd>
+            <dd>Sovereign uses only what matters to the question. Current conditions and another person’s shared information are added only when they belong.</dd>
           </div>
           <div>
             <dt>Your control</dt>
-            <dd>Nothing becomes a verdict. Confirm what fits, correct what does not, and keep raw private details outside the language-model context.</dd>
+            <dd>Nothing becomes a verdict. Confirm what fits, correct what does not, and keep raw birth details and exact private location private.</dd>
           </div>
         </dl>
         <p className="landing-baseline-intro__value">The result: you can ask about a decision today, a recurring pattern next week, or a relationship later without rebuilding your context from scratch.</p>
@@ -251,6 +251,7 @@ function V0Footer() {
         <nav aria-label="Footer navigation">
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
+          <a href="/pricing#support">Support</a>
           <a href="mailto:info@defrag.app">Contact</a>
         </nav>
         <p>© 2026 Sovereign.OS</p>
