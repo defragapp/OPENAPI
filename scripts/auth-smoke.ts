@@ -1,15 +1,18 @@
+import { POLICY_CONTENT_HASH, POLICY_METADATA } from '../config/policies';
 import { requestMagicLink, redeemMagicLink } from '../apps/sovereign-worker/src/auth-public';
 import { requireAuth } from '../apps/sovereign-worker/src/security/auth';
 import type { Env } from '../apps/sovereign-worker/src/env';
 
 type Account = { id: string; auth_subject: string; terms_accepted_at?: string; terms_version?: string; privacy_version?: string };
+type PolicyReceipt = { policyType: string; policyVersion: string; contentHash: string; releaseSha: string; acceptedAt: string };
 
-function fakeEnv(): Env & { emails: string[]; accountsBySubject: Map<string, Account> } {
+function fakeEnv(): Env & { emails: string[]; accountsBySubject: Map<string, Account>; policyReceipts: PolicyReceipt[] } {
   const accountsBySubject = new Map<string, Account>();
   const accountsById = new Map<string, Account>();
   const links = new Map<string, Record<string, unknown>>();
   const sessions = new Map<string, { revoked_at: string | null; expires_at: string }>();
   const emails: string[] = [];
+  const policyReceipts: PolicyReceipt[] = [];
 
   const db = {
     prepare(sql: string) {
@@ -39,7 +42,9 @@ function fakeEnv(): Env & { emails: string[]; accountsBySubject: Map<string, Acc
               if (sql.startsWith('INSERT INTO auth_magic_links')) {
                 links.set(String(args[0]), {
                   id: args[0], email_normalized: args[1], account_id: args[2], purpose: args[3],
-                  token_hash: args[4], name: args[5], terms_accepted_at: args[6],
+                  token_hash: args[4], name: args[5], terms_accepted_at: args[6], terms_version: args[7],
+                  privacy_version: args[8], policy_content_hash: args[9], policy_release_sha: args[10],
+                  requested_ip_hash: args[11], user_agent_hash: args[12],
                   expires_at: new Date(Date.now() + 900_000).toISOString(), used_at: null
                 });
               }
@@ -60,6 +65,18 @@ function fakeEnv(): Env & { emails: string[]; accountsBySubject: Map<string, Acc
                   account.privacy_version = String(args[2]);
                 }
               }
+              if (sql.startsWith('INSERT OR IGNORE INTO policy_acceptance_receipts')) {
+                const key = `${String(args[2])}:${String(args[6])}`;
+                if (!policyReceipts.some((receipt) => `${receipt.policyType}:${receipt.acceptedAt}` === key)) {
+                  policyReceipts.push({
+                    policyType: String(args[2]),
+                    policyVersion: String(args[3]),
+                    contentHash: String(args[4]),
+                    releaseSha: String(args[5]),
+                    acceptedAt: String(args[6])
+                  });
+                }
+              }
               if (sql.startsWith('INSERT INTO auth_sessions')) {
                 sessions.set(String(args[0]), { revoked_at: null, expires_at: new Date(Date.now() + 86_400_000).toISOString() });
               }
@@ -74,11 +91,11 @@ function fakeEnv(): Env & { emails: string[]; accountsBySubject: Map<string, Acc
   } as unknown as D1Database;
   const kv = { put: async (_key: string, value: string) => { emails.push(value); } } as unknown as KVNamespace;
   return {
-    APP_ENV: 'test', APP_VERSION: 'auth-smoke', DB: db, KV: kv,
+    APP_ENV: 'test', APP_VERSION: 'a'.repeat(40), DB: db, KV: kv,
     THREADS: {} as DurableObjectNamespace, STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '',
     SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret',
-    emails, accountsBySubject
-  } as Env & { emails: string[]; accountsBySubject: Map<string, Account> };
+    emails, accountsBySubject, policyReceipts
+  } as Env & { emails: string[]; accountsBySubject: Map<string, Account>; policyReceipts: PolicyReceipt[] };
 }
 
 function authRequest(path: string, body: Record<string, unknown>) {
@@ -99,7 +116,13 @@ async function main() {
   }
 
   const signup = await requestMagicLink(authRequest('/api/v1/auth/signup', {
-    email: 'USER@Example.COM', name: 'User', termsAccepted: true, turnstileToken: 'test-turnstile-pass'
+    email: 'USER@Example.COM',
+    name: 'User',
+    termsAccepted: true,
+    termsVersion: POLICY_METADATA.terms.version,
+    privacyVersion: POLICY_METADATA.privacy.version,
+    policyContentHash: POLICY_CONTENT_HASH,
+    turnstileToken: 'test-turnstile-pass'
   }), env, 'signup');
   if (signup.status !== 200 || env.emails.length !== 1) throw new Error('signup magic link not sent');
   const emailText = JSON.parse(env.emails[0]!).text as string;
@@ -112,8 +135,14 @@ async function main() {
     throw new Error(`redeem did not create hardened cookie status=${redeemed.status}`);
   }
   const account = env.accountsBySubject.get('email:user@example.com');
-  if (!account?.terms_accepted_at || account.terms_version !== '2026-08-09' || account.privacy_version !== '2026-08-09') {
+  if (!account?.terms_accepted_at || account.terms_version !== POLICY_METADATA.terms.version || account.privacy_version !== POLICY_METADATA.privacy.version) {
     throw new Error('signup policy acceptance was not persisted');
+  }
+  if (env.policyReceipts.length !== 2
+    || !env.policyReceipts.some((receipt) => receipt.policyType === 'terms' && receipt.policyVersion === POLICY_METADATA.terms.version)
+    || !env.policyReceipts.some((receipt) => receipt.policyType === 'privacy' && receipt.policyVersion === POLICY_METADATA.privacy.version)
+    || env.policyReceipts.some((receipt) => receipt.contentHash !== POLICY_CONTENT_HASH || receipt.releaseSha !== 'a'.repeat(40))) {
+    throw new Error('versioned policy acceptance receipts were not persisted');
   }
 
   const cookie = setCookie.split(';')[0]!;
@@ -121,7 +150,7 @@ async function main() {
   if (!auth.accountId) throw new Error('session did not resolve');
   const reused = await redeemMagicLink(new Request(`https://app.test/api/v1/auth/redeem?token=${token}`), env);
   if (reused.status !== 409) throw new Error('used token accepted');
-  console.log('Auth smoke passed private_login=true signup_only_creation=true policy_acceptance=true email=true redemption=true session=true used_rejected=true');
+  console.log('Auth smoke passed private_login=true signup_only_creation=true policy_acceptance=true policy_receipts=2 email=true redemption=true session=true used_rejected=true');
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1); });
