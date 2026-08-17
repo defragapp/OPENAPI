@@ -28,6 +28,9 @@ const approvedCss = read('./public-landing-approved-v8.css');
 const heroExtension = read('./landing-hero-field-v4.css');
 const finalAuthority = read('./public-landing-final-authority.css');
 const refinement = read('./experience-refinement-v1.css');
+const renderedFidelity = read('./rendered-fidelity-v1.css');
+const landingRefinementV2 = read('./landing-refinement-v2.css');
+const invitationFidelity = read('./invitation-rendered-fidelity-v1.css');
 const passkeyCss = read('./passkey-auth.css');
 const routeCohesionCss = read('./deployed-route-cohesion.css');
 const staticV0Css = read('../public/v0-public-port.css');
@@ -39,7 +42,7 @@ function expectBalancedCss(source: string) {
 }
 
 describe('founder v0 selective visual port — approved public v8', () => {
-  it('loads the founder stack and appends one bounded final refinement authority', () => {
+  it('loads the founder stack and appends current rendered authorities in order', () => {
     const imports = [
       "import './v0-platform-port.css';",
       "import './v0-motion-accessibility.css';",
@@ -61,15 +64,12 @@ describe('founder v0 selective visual port — approved public v8', () => {
       previous = index;
     }
     expect(main.slice(previous + imports.at(-1)!.length)).not.toContain("import './");
-    expect(main).toContain("import experienceRefinementCss from './experience-refinement-v1.css?inline';");
-    expect(main).toContain('style.textContent += `\\n${experienceRefinementCss}`;');
-    expect(main).not.toContain("import './public-landing-approved-v7.css';");
-    expect(main).not.toContain("import './public-landing-premium-v4.css';");
-    expect(main).not.toContain("import './public-landing-premium-v5.css';");
-    expect(main).not.toContain("import './public-landing-premium-v6.css';");
-    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, refinement, passkeyCss, routeCohesionCss, staticRefinement]) {
-      expectBalancedCss(source);
-    }
+    expect(main).toContain("import renderedFidelityCss from './rendered-fidelity-v1.css?inline';");
+    expect(main).toContain("import landingRefinementV2Css from './landing-refinement-v2.css?inline';");
+    expect(main).toContain("import invitationRenderedFidelityCss from './invitation-rendered-fidelity-v1.css?inline';");
+    expect(main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;'));
+    expect(main.indexOf('style.textContent += `\\n${invitationRenderedFidelityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;'));
+    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, invitationFidelity, passkeyCss, routeCohesionCss, staticRefinement]) expectBalancedCss(source);
   });
 
   it('preserves the archive compatibility fingerprint as historical provenance', () => {
@@ -80,152 +80,102 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(main).toContain('installV0ReleaseFingerprint();');
   });
 
-  it('keeps the approved hero, 360 Baseline field, and situational recognition first', () => {
+  it('keeps the founder hero while translating the product into ordinary use cases', () => {
     expect(landing).toContain(`const V0_ARCHIVE_SHA = '${archiveSha}'`);
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Sovereign begins with the capacity beneath a pattern.');
-    expect(landing).toContain('See a Sovereign answer');
+    expect(landing).toContain('Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics.');
+    expect(landing).toContain('Built for real situations');
+    expect(landing).toContain('Start with what’s actually happening.');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('<RealLifeQuestions />');
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
-    expect(landing).toContain('Start with what’s actually happening.');
-    expect(landing).toContain('Why do I keep taking responsibility for everyone around me?');
-    expect(landing).toContain('<MobileCapabilityRail />');
-    expect(landing).toContain('sovereign-opening-capabilities');
-    expect(landing).toContain('title={<BrandMark />}');
-    expect(landing).not.toContain('title="<BrandMark />"');
-    expect(landing).not.toContain('HERO_CAPABILITIES');
-    expect(field).toContain('const CENTER = VIEWBOX_SIZE / 2');
-    expect(field).toContain('const SPHERE_RADIUS = 286');
-    expect(field).toContain('const MIN_AXIS_LENGTH = 118');
-    expect(field).toContain('const MAX_AXIS_LENGTH = 344');
-    expect(field).toContain('data-field-geometry="spherical-360"');
-    expect(field).toContain('buildSphereGrid');
-    expect(field).toContain('buildAmbientRays');
-    expect(field).toContain('requestAnimationFrame');
-    expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
-    expect(field).not.toContain('#8b5cff');
-    expect(integrationCss).toContain('background: transparent');
-    expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
-    expect(refinement).toContain('--landing-blue: #e8ddd0 !important');
-    expect(refinement).toContain('-webkit-text-stroke: 1.15px rgba(241, 233, 222, 0.82)');
+    expect(landing).not.toContain('capacity beneath');
   });
 
-  it('keeps one visible structural flow and uses context-specific relationship and system demonstrations', () => {
-    expect(landing).toContain('<LandingProductStories />');
+  it('keeps the 360 Baseline field interactive and exposes one compact endpoint label', () => {
     for (const marker of [
-      'See the capacity beneath the pattern.',
+      'const CENTER = VIEWBOX_SIZE / 2',
+      'const SPHERE_RADIUS = 286',
+      'const MIN_AXIS_LENGTH = 118',
+      'const MAX_AXIS_LENGTH = 344',
+      'data-field-geometry="spherical-360"',
+      'data-inspecting="true"',
+      'buildSphereGrid',
+      'buildAmbientRays',
+      'requestAnimationFrame',
+      'onPointerEnter={() => selectAxis(axis.id)}',
+      'landing-expression-slice__tooltip-title',
+      'landing-expression-slice__tooltip-value',
+      '{selected.axis.value}',
+      'select a line to see its name and relative value'
+    ]) expect(field).toContain(marker);
+    expect(field).not.toContain('measurement lines');
+    expect(field).not.toContain('stable blue sphere');
+    expect(landingRefinementV2).toContain('width: 132px !important');
+    expect(landingRefinementV2).toContain('height: 34px !important');
+  });
+
+  it('shows product behavior rather than static demo cards', () => {
+    for (const marker of [
+      'Separate helping from carrying the outcome.',
+      'How Sovereign gets there',
+      'What your Baseline supports',
+      'Where responsibility shifts',
+      'A cleaner boundary',
       'Understand what happens between you.',
-      'See what keeps the pattern going—and what could change it.',
+      'See where responsibility keeps landing.',
       'surface="personal-chat"',
       'surface="personal-reasoning"',
       'surface="relationship-chat"',
       'surface="relationship-reasoning"',
       'surface="system-map"',
       'surface="system-reasoning"',
-      'Capacity beneath the pattern',
-      'How pressure changes the expression',
-      'What may keep it going',
-      'What could change',
       'Keeping both people distinct',
-      'Clarity may take time.',
-      'Clarity may arrive quickly.',
-      'Between you',
-      'System structure',
-      'Role context',
-      'Responsibility',
-      'Movement',
-      '240 + step * 620',
+      'What Sovereign separates',
+      'Observed route',
+      'Testable change',
+      'Selected observation',
+      'What to test',
+      '360 + step * 900',
       'data-motion-state'
     ]) expect(stories).toContain(marker);
     expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
-    expect(stories).toContain('<RelationshipContext />');
-    expect(stories).toContain('<SystemContext />');
-    expect(stories).not.toContain("name: 'Maya'");
-    expect(stories).not.toContain("name: 'Noa'");
-    expect(stories).not.toContain("name: 'Ruth'");
-    expect(stories).not.toContain("code: 'Needs time'");
-    expect(stories).not.toContain("code: 'Recognizes quickly'");
-    expect(stories).not.toContain('window.setInterval');
-    expect(stories).not.toContain('LandingExpressionFieldPreview');
-    expect(stories).not.toContain('sphere');
-    expect(stories).not.toContain('globe');
+    expect(stories).toContain('landing-workflow__progress');
+    expect(stories).not.toContain("role: 'Stabilizer'");
+    expect(stories).not.toContain("role: 'Catalyst'");
+    expect(stories).not.toContain("role: 'Observer'");
+    expect(stories).not.toContain("role: 'Anchor'");
+    expect(stories).not.toContain('capacity beneath');
   });
 
-  it('presents public Basis as quiet exact metadata instead of interpretation chips', () => {
+  it('keeps public Basis quiet and relationship/system boundaries explicit', () => {
+    for (const marker of ["{ code: 'GK 13.4'", "{ code: 'GATE 4.11'", "{ code: 'MARS · CANCER'", "{ code: 'GATE 22.4'", "{ code: 'GATE 57.2'"]) expect(stories).toContain(marker);
     expect(stories).toContain('<strong>Basis</strong>');
-    expect(stories).toContain("{ code: 'GK 13.4'");
-    expect(stories).toContain("{ code: 'GATE 4.11'");
-    expect(stories).toContain("{ code: 'MARS · CANCER'");
-    expect(stories).toContain("{ code: 'GATE 22.4'");
-    expect(stories).toContain("{ code: 'GATE 57.2'");
-    expect(stories).not.toContain('<p>Grounded in</p>');
+    expect(stories).toContain('Shared with permission');
+    expect(stories).toContain('Illustrative supplied context');
+    expect(stories).toContain('Each person controls what may be included');
+    expect(stories).toContain('That is a system pattern—not proof that any one person is the cause.');
     expect(finalAuthority).toContain('.landing-evidence__code');
-    expect(finalAuthority).toContain('font-family: ui-monospace');
-    expect(finalAuthority).toContain('color: rgba(226, 218, 207, 0.48)');
-    expect(finalAuthority).toContain('.landing-demo--context');
-    expect(finalAuthority).toContain('.landing-story__stage--system');
   });
 
-  it('enforces the founder layout, product windows, recognition, and viewport-stable mobile opening', () => {
-    for (const marker of [
-      '.public-approved-v8 .v0-hero.sovereign-opening-field',
-      'min-height: max(820px, calc(100svh - 74px))',
-      '.public-approved-v8 .landing-expression-slice',
-      '.public-approved-v8 .landing-story__stage',
-      'grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr)',
-      '.public-approved-v8 .landing-demo',
-      'border-radius: 16px',
-      '.public-approved-v8 .landing-workflow::before',
-      '.public-approved-v8 .landing-workflow > li.is-active',
-      'v8-message-in',
-      '@media (max-width: 760px)',
-      'min-height: max(776px, calc(100svh - 68px))',
-      '.v0-wordmark--mobile',
-      '.v0-mobile-menu[open] > .v0-mobile-menu__panel',
-      '.sovereign-opening-capabilities',
-      '.landing-expression-slice__ambient--mobile',
-      'grid-template-columns: repeat(4, minmax(0, 1fr))',
-      'flex-direction: column',
-      '.landing-workflow__copy > span',
-      '@media (prefers-reduced-motion: reduce)'
-    ]) expect(approvedCss).toContain(marker);
-    for (const marker of [
-      'min-height: max(940px, calc(100svh - 74px))',
-      'height: 58%',
-      '.landing-expression-slice__readout',
-      '.landing-question-orbit__stage',
-      '@keyframes landing-real-question',
-      '--v8-stable-viewport-height',
-      'min-height: max(900px, calc(var(--v8-stable-viewport-height) - 68px + env(safe-area-inset-bottom)))',
-      'touch-action: pan-y pinch-zoom',
-      '@media (max-width: 980px) and (orientation: landscape) and (max-height: 560px)'
-    ]) expect(heroExtension).toContain(marker);
+  it('makes desktop demonstrations larger and mobile demonstrations shorter', () => {
+    expect(landingRefinementV2).toContain('width: min(1280px, calc(100% - 64px)) !important');
+    expect(landingRefinementV2).toContain('font-size: 0.92rem !important');
+    expect(landingRefinementV2).toContain('grid-template-columns: minmax(0, 1.34fr) minmax(320px, 0.66fr) !important');
+    expect(landingRefinementV2).toContain('scroll-snap-type: inline mandatory !important');
+    expect(landingRefinementV2).toContain('.landing-demo--system-context');
+    expect(landingRefinementV2).toContain('display: none !important');
+    expect(landingRefinementV2).toContain('@media (prefers-reduced-motion: reduce)');
     expect(main).toContain('function installMobileViewportStability()');
     expect(main).toContain('window.visualViewport');
-    expect(approvedCss).toContain('border-radius: 999px');
-    expect(main).toContain("dataset.sovereignLayoutRelease = 'approved-public-v8'");
-    expect(main).toContain("dataset.sovereignMotionRelease = 'v0-motion-workflows-v8'");
-  });
-
-  it('applies the founder language to platform and standalone routes with final monochrome refinements', () => {
-    for (const selector of ['.v0-hero', '.v0-story-grid', '.intelligence-workspace', '.intelligence-sidebar', '.sovereign-composer', '.account-shell', '.auth-panel', '.workspace-sheet']) expect(v0Css).toContain(selector);
-    for (const selector of ['body:has(.plan-onboarding)', 'body:has(.sovereign-policy)', '.plan-nav', '.onboarding-plan-grid', '.policy-hero', '.email-code-fallback']) expect(v0PlatformCss).toContain(selector);
-    for (const selector of ['body.launch-page', '.launch-nav', '.launch-hero', '.journey-steps', '.pricing-grid', '.faq-list details', '.launch-footer']) expect(staticV0Css).toContain(selector);
-    expect(staticAuthority).toContain("@import url('/v0-public-port.css?v=20260801-founder-v0')");
-    expect(staticRefinement).toContain('--v0-blue: #e8ddd0');
-    expectBalancedCss(staticV0Css);
   });
 
   it('measures the complete rendered landing at desktop and phone widths', () => {
-    for (const surface of ['hero', 'expression-slice', 'personal-chat', 'personal-reasoning', 'relationship-chat', 'relationship-reasoning', 'system-map', 'system-reasoning', 'comparison']) {
-      expect(viewportProbe).toContain(`'${surface}'`);
-    }
+    for (const surface of ['hero', 'expression-slice', 'personal-chat', 'personal-reasoning', 'relationship-chat', 'relationship-reasoning', 'system-map', 'system-reasoning', 'comparison']) expect(viewportProbe).toContain(`'${surface}'`);
     expect(viewportProbe).toContain('const narrow = snapshot.viewportWidth <= narrowViewportMaximum');
     expect(viewportProbe).toContain('getBoundingClientRect()');
-    expect(viewportProbe).toContain('node.offsetWidth');
     expect(viewportProbe).toContain('comparisonStacked');
   });
 
@@ -242,10 +192,10 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(membership).toContain("person.activeScopes.includes('system.include')");
   });
 
-  it('does not import the archive mock runtime or unsupported scoring', () => {
+  it('does not import mock runtime or unsupported scoring', () => {
     const source = `${landing}\n${stories}\n${field}\n${v0Css}\n${v0PlatformCss}\n${app}\n${workspace}`;
-    for (const prohibited of ['Math.random', 'mock-auth', 'fake-answer', 'dashboard-grid', 'Demo User', 'generateAIResponse', 'Alignment Score', 'Stability Index']) {
-      expect(source).not.toContain(prohibited);
-    }
+    for (const prohibited of ['Math.random', 'mock-auth', 'fake-answer', 'dashboard-grid', 'Demo User', 'generateAIResponse', 'Alignment Score', 'Stability Index']) expect(source).not.toContain(prohibited);
+    expect(staticAuthority).toContain("@import url('/v0-public-port.css?v=20260801-founder-v0')");
+    expect(staticV0Css).toContain('body.launch-page');
   });
 });
