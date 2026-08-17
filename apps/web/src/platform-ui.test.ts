@@ -20,7 +20,7 @@ describe('authenticated product flow', () => {
     expect(main).toContain('<AuthenticatedWorkspace />');
     expect(authenticatedWorkspace).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
     expect(onboarding).toContain('Choose a plan');
-    expect(onboarding).toContain("location.assign('/app')");
+    expect(onboarding).toContain("location.replace('/app')");
   });
 
   it('makes Stripe-backed tier choice explicit', () => {
@@ -31,6 +31,7 @@ describe('authenticated product flow', () => {
     expect(onboarding).toContain('Stripe checkout shows the current price before you confirm.');
     expect(onboarding).not.toMatch(/\$99|\$20|\$8\.25|save \$141/);
     expect(onboarding).toContain("fetch('/api/v1/billing/checkout'");
+    expect(onboarding).toContain('location.assign(data.checkout.url)');
   });
 
   it('persists and restores account-scoped conversation history', () => {
