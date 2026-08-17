@@ -185,10 +185,18 @@ for (const marker of [
 ]) {
   assert(compactJavaScript.includes(marker), `compiled injected refinement is missing ${marker}`);
 }
+for (const marker of [
+  '--v8-blue:#d8d0c5!important',
+  'saturate(0.08)',
+  'background:#111316!important',
+  'padding:54px0!important'
+]) {
+  assert(compactJavaScript.includes(marker), `compiled rendered fidelity is missing ${marker}`);
+}
 assert(compactJavaScript.includes('-webkit-text-stroke:'), 'compiled injected refinement is missing the founder outline treatment');
 assert(
   compactJavaScript.includes('.sovereign-app-runtime.sovereign-composer') || compactJavaScript.includes('.sovereign-app-runtime .sovereign-composer'),
   'compiled injected refinement is missing the workspace composer authority'
 );
 
-console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} cohesion=v1 refinement=v1 worlds=illustrative`);
+console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} cohesion=v1 refinement=v1 fidelity=v1 worlds=illustrative`);
