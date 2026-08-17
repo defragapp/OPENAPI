@@ -1,99 +1,108 @@
 # Sovereign.OS launch surface
 
-Status: route, access, plan, and launch-acceptance boundary. This document inherits user-facing language from `docs/product-language-system.md`, product scope from `docs/launch-product-contract.md`, and production release authority from `docs/production-release.md`; it does not define alternate page copy, positioning, or deployment authority.
+Status: current route, access, plan, and launch-acceptance boundary. User-facing language inherits `product-language-system.md`; product scope inherits `launch-product-contract.md`; release execution inherits `production-release.md`.
 
-## One product, three boundaries
+## One product, three access boundaries
 
 ### Public
 
-The canonical public hostname is `https://sovereign.defrag.app`.
+Canonical public hostname: `https://sovereign.defrag.app`.
 
-The public site stays open and contains:
+Public routes include:
 
-- `/` — main entry and product explanation;
-- `/how-it-works` — short operating model;
-- `/pricing` — Free and Sovereign+ comparison;
-- `/faq` — privacy, consent, visual, and billing answers;
+- `/` — main product entry;
+- `/how-it-works` — operating model;
+- `/pricing` — Free/Sovereign+ comparison;
+- `/faq` — privacy, consent, product, and billing answers;
 - `/privacy` and `/terms`;
 - `/login` and `/signup`.
 
-`https://defrag.app` and `https://www.defrag.app` are owned parent-domain routes that resolve public traffic to the canonical Sovereign.OS public experience. They are not alternate product identities.
+`https://defrag.app` and `https://www.defrag.app` remain owned parent-domain routes into the same Sovereign.OS product. They are not alternate identities.
 
-The public site never needs private Baseline data and never receives Stripe secret keys.
-
-Each public route has a distinct explanatory job while inheriting the same language authority: the root introduces the product and interaction; How It Works explains the operating sequence; Pricing states plans and entitlements; FAQ explains limits, consent, privacy, and billing. These pages may adapt depth, but they must not introduce a competing hero, product promise, named framework, or causal claim.
-
-The root must preserve the Baseline-first experience hierarchy: recognizable real-life situation first, useful distinction, Baseline Design as the private personal foundation, then relationship/system extensions where relevant. Technical machinery remains secondary.
+Public pages do not need private Baseline data or payment secrets.
 
 ### Protected preview
 
-A founder-review preview hostname must be protected by Cloudflare Access before it is accepted as private review evidence. Access is the preview perimeter, not the customer subscription system.
+An isolated preview may be used for founder/reviewer work only when protected by Cloudflare Access and isolated from production D1, Durable Object state, live Stripe credentials, production routes, and customer records.
 
-Recommended layout:
-
-- public production entry: `https://sovereign.defrag.app`;
-- protected preview: a dedicated preview hostname or Worker Preview URL;
-- Cloudflare Access application: the entire preview hostname;
-- policy: founder/reviewer identities or a dedicated verification service token only;
-- no public bypass policy on the preview hostname;
-- preview D1, Durable Object, secrets, Stripe test mode, and AI Gateway settings remain isolated from production.
-
-Run `pnpm verify:preview-access` with `PREVIEW_BASE_URL` when protected-preview evidence is required. A service token may be provided through the documented environment variables without logging its values.
+Preview is not production authority and is not required for every production release.
 
 ### Customer app
 
-The canonical production customer application and API hostname is `https://app.defrag.app`.
+Canonical authenticated application/API hostname: `https://app.defrag.app`.
 
-Production customer access remains application-owned:
+Customer access remains application-owned:
 
-- passwordless account session;
-- Cloudflare Turnstile on login and signup requests;
-- server-side session validation;
-- server-side entitlement checks on protected routes;
-- Stripe Checkout for upgrades;
-- Stripe Customer Portal for payment method, cancellation, and subscription management;
-- Stripe webhooks projected into D1;
-- cancellation or payment failure resolves safely to Free without deleting the workspace.
+- Turnstile-protected signup/login;
+- one-time email link/code plus passkey/recovery flows;
+- signed revocable account session;
+- current policy/18+ eligibility review;
+- server-side plan/entitlement enforcement;
+- Stripe-hosted Checkout and Customer Portal;
+- signed Stripe webhook projection into D1;
+- Baseline readiness before AI thread use;
+- consent/permission checks before shared context;
+- authenticated on-demand private export.
 
-Cloudflare Access must not be used as the Sovereign+ paywall. Access policies do not replace Stripe subscription state or application consent rules.
+Cloudflare Access is never the Sovereign+ paywall.
+
+## Current onboarding path
+
+The product journey is:
+
+`Account → policy/eligibility → Plan → Baseline → Workspace`
+
+Existing account state may allow the UI to skip already-completed steps, but the server boundaries remain authoritative.
+
+- Free can be chosen without a card.
+- Sovereign+ does not become effective from a browser choice; it becomes effective only from server-confirmed Stripe subscription state.
+- A structurally ready Baseline is required before ordinary Sovereign messages are processed.
+- Unknown birth time remains a supported Baseline path; unavailable outputs stay unavailable rather than guessed.
 
 ## Launch plans
 
 ### Free
 
 - permanent first-party plan;
-- no card required;
+- $0, no card;
 - private Baseline;
-- Today and Explore;
-- 10 Sovereign AI turns per UTC calendar month.
+- Today and Explore personal intelligence;
+- 10 Sovereign AI turns per UTC month.
 
 ### Sovereign+
 
-- $20 per month or $99 per year;
-- everything in Free;
-- consented People comparisons;
-- family, household, friendship group, workplace, and team Systems;
-- Library continuity;
-- optional Covenant lens;
-- consent-aware invitations and public-link sharing that never includes private workspace data.
+- $20/month or $99/year;
+- 300 Sovereign AI turns per UTC month;
+- server-enforced paid capabilities defined by `launch-product-contract.md`, including permission-bound People/Systems, Library continuity, and contextual Covenant.
 
-Private account export is not part of the launch product.
+Private account export is an account right/control, not a Sovereign+ entitlement. It is generated on demand and not retained as an export artifact.
 
-The application must use configured price IDs and never infer entitlement from a price amount or public page copy.
+Voluntary support payments remain entitlement-neutral.
+
+## Text-first launch experience
+
+The authenticated launch is one text-first Sovereign workspace. The normal answer loop is:
+
+`question → direct answer → relevant explanation → quiet Basis → correction/continue`
+
+The public landing demo chats may teach that hierarchy. They are not fake authenticated state.
+
+Worlds/video generation is not part of the current launch. No video CTA, provider, generated media, or video spend is required for production acceptance.
 
 ## Release acceptance
 
-A launch candidate is not complete until one exact current `origin/main` commit has the applicable evidence for:
+A launch candidate is not technically live until one exact current `origin/main` SHA has:
 
-1. green repository verification, typecheck, tests, build, smoke, and compressed-size gates;
-2. successful D1 migration replay through `0015_release_evidence`;
-3. protected preview verification when preview is part of the approval flow;
-4. authenticated desktop and iPhone review;
-5. test-mode Checkout, webhook, Portal, cancellation, and Free fallback verification;
-6. reviewed Privacy and Terms;
-7. rendered production landing and route evidence where visual changes are in scope;
-8. founder approval;
-9. successful `pnpm production:release:oauth` exact-SHA production verification;
-10. both branded `/ready` endpoints proving the exact target SHA, migration parity `current`, and matching release evidence.
+1. green `pnpm verify:cloudflare-build` evidence;
+2. successful release through `pnpm production:release:text` for that same SHA;
+3. D1 migration parity through `0017_privacy_access_and_eligibility`;
+4. exact-SHA `/health` and `/ready` convergence on both branded domains;
+5. configured policy acceptance receipts and privacy access controls;
+6. matching exact-SHA release evidence;
+7. truthful automated Browser verification booleans.
 
-No public page, successful Stripe object lookup, historical Cloudflare build, dashboard state, branch push, or standalone deploy command by itself satisfies these gates.
+The text-first release intentionally does not run live Browser Rendering, so its automated route/rendered evidence fields remain `false`. That is not a readiness failure.
+
+Final public launch acceptance additionally requires the real production journeys and human desktop/iPhone review tracked under #207/#210–#216.
+
+No successful public page, historical deployment, dashboard state, isolated Stripe object lookup, branch push, or standalone upload by itself satisfies these gates.
