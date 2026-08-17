@@ -46,6 +46,8 @@ type BaselineForm = {
 
 type BaselineErrors = Record<BaselineField, string>;
 
+const PLAN_CHOICE_KEY = 'sovereign:onboarding-plan-choice';
+
 const emptyErrors = (): BaselineErrors => ({
   birthDate: '',
   birthplaceCity: '',
@@ -65,6 +67,7 @@ const baselineStages = [
 export function PlanOnboarding() {
   const [interval, setInterval] = useState<BillingInterval>('monthly');
   const [currentPlan, setCurrentPlan] = useState<Plan>('free');
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(() => readPlanChoice());
   const [accountAlreadyOnboarded, setAccountAlreadyOnboarded] = useState(false);
   const [phase, setPhase] = useState<JourneyPhase>('loading');
   const [status, setStatus] = useState('Loading your account…');
@@ -121,31 +124,57 @@ export function PlanOnboarding() {
         const nextBaseline = baselineBody.baseline ?? { status: 'not_started' };
         const effectivePlan: Plan = onboardingBody.effectivePlan === 'sovereign_plus' ? 'sovereign_plus' : 'free';
         const completed = onboardingBody.completed === true;
+        const billing = new URLSearchParams(location.search).get('billing');
+        const rememberedPlan = readPlanChoice();
 
         setCurrentPlan(effectivePlan);
+        setSelectedPlan(rememberedPlan);
         setAccountAlreadyOnboarded(completed);
         setBaseline(nextBaseline);
 
         if (baselineIsReady(nextBaseline)) {
           if (completed) {
+            clearPlanChoice();
             location.replace('/app');
             return;
           }
           if (effectivePlan === 'sovereign_plus') {
             setStatus('Opening your Sovereign+ workspace…');
             await completeOnboarding('sovereign_plus', controller.signal);
+            clearPlanChoice();
+            location.replace('/app');
+            return;
+          }
+          if (rememberedPlan === 'free') {
+            setStatus('Opening your Free workspace…');
+            await completeOnboarding('free', controller.signal);
+            clearPlanChoice();
             location.replace('/app');
             return;
           }
           setPhase('plan');
-          setStatus(new URLSearchParams(location.search).get('billing') === 'cancelled'
-            ? 'Stripe checkout was cancelled. Nothing changed. Continue with Free or try again.'
-            : 'Choose how you want to continue.');
+          setStatus(billing === 'cancelled'
+            ? 'Stripe checkout was cancelled. Nothing changed. Choose Free or try Sovereign+ again.'
+            : 'Choose how you want to start.');
           return;
         }
 
-        setPhase('baseline');
-        setStatus(nextBaseline.readinessMessage || 'Add the birth details you know.');
+        if (billing === 'cancelled') {
+          clearPlanChoice();
+          setSelectedPlan(null);
+          setPhase('plan');
+          setStatus('Stripe checkout was cancelled. Nothing changed. Choose Free or try Sovereign+ again.');
+          return;
+        }
+
+        if (completed || effectivePlan === 'sovereign_plus' || rememberedPlan === 'free') {
+          setPhase('baseline');
+          setStatus(nextBaseline.readinessMessage || 'Add the birth details you know. Your Baseline must be ready before the workspace opens.');
+          return;
+        }
+
+        setPhase('plan');
+        setStatus('Choose a plan first. You’ll build your Baseline before the workspace opens.');
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') return;
         setPhase('error');
@@ -212,13 +241,14 @@ export function PlanOnboarding() {
       if (!baselineIsReady(body.baseline)) {
         setPhase('baseline');
         setBaselineStage('idle');
-        setStatus(body.baseline.readinessMessage || body.message || 'Your source data is saved, but the facet profile is not ready yet. Try Baseline again.');
+        setStatus(body.baseline.readinessMessage || body.message || 'Your source data is saved, but the Baseline interpretation is not ready yet. Try Baseline again.');
         return;
       }
 
       setBaselineStage('complete');
 
       if (accountAlreadyOnboarded) {
+        clearPlanChoice();
         setStatus('Your Baseline is ready. Opening your workspace…');
         location.replace('/app');
         return;
@@ -226,6 +256,14 @@ export function PlanOnboarding() {
       if (currentPlan === 'sovereign_plus') {
         setStatus('Your Baseline is ready. Opening your Sovereign+ workspace…');
         await completeOnboarding('sovereign_plus');
+        clearPlanChoice();
+        location.replace('/app');
+        return;
+      }
+      if (selectedPlan === 'free' || readPlanChoice() === 'free') {
+        setStatus('Your Baseline is ready. Opening your Free workspace…');
+        await completeOnboarding('free');
+        clearPlanChoice();
         location.replace('/app');
         return;
       }
@@ -245,15 +283,19 @@ export function PlanOnboarding() {
     if (submitting) return;
     setSubmitting(true);
     setCheckoutUnavailable(false);
-    setStatus(plan === 'free' ? 'Opening your Free workspace…' : 'Preparing secure Stripe checkout…');
+    rememberPlanChoice(plan);
+    setSelectedPlan(plan);
+
+    if (plan === 'free') {
+      setStatus('Free selected. Build your Baseline before the workspace opens.');
+      setPhase('baseline');
+      setSubmitting(false);
+      return;
+    }
+
+    setStatus('Preparing secure Stripe checkout…');
 
     try {
-      if (plan === 'free') {
-        await completeOnboarding('free');
-        location.assign('/app');
-        return;
-      }
-
       const checkout = await fetch('/api/v1/billing/checkout', {
         method: 'POST',
         credentials: 'same-origin',
@@ -266,7 +308,7 @@ export function PlanOnboarding() {
       const data = await checkout.json().catch(() => ({})) as { checkout?: { url?: string }; error?: string };
       if (!checkout.ok || !data.checkout?.url) {
         setCheckoutUnavailable(true);
-        setStatus(data.error || 'Secure checkout is temporarily unavailable. You can continue with Free and upgrade later.');
+        setStatus(data.error || 'Secure checkout is temporarily unavailable. You can continue with Free and build your Baseline now.');
         return;
       }
 
@@ -313,8 +355,8 @@ export function PlanOnboarding() {
         <section className="plan-choice">
           <ol className="onboarding-progress" aria-label="Account setup progress">
             <ProgressItem number="1" label="Account" state="complete" />
-            <ProgressItem number="2" label="Baseline" state={progress.baseline} />
-            <ProgressItem number="3" label="Plan" state={progress.plan} />
+            <ProgressItem number="2" label="Plan" state={progress.plan} />
+            <ProgressItem number="3" label="Baseline" state={progress.baseline} />
             <ProgressItem number="4" label="Workspace" state={progress.workspace} />
           </ol>
 
@@ -361,7 +403,7 @@ export function PlanOnboarding() {
               onToggleReview={() => setShowBaselineReview((value) => !value)}
               onContinue={() => {
                 setPhase('plan');
-                setStatus('Choose how you want to continue.');
+                setStatus('Choose how you want to start.');
               }}
             />
           )}
@@ -378,14 +420,14 @@ export function PlanOnboarding() {
           )}
         </section>
 
-        <aside className="plan-visual" aria-label="Why your Baseline comes first">
+        <aside className="plan-visual" aria-label="Why your Baseline is required before the workspace">
           <div className="onboarding-baseline-preview">
             <span>YOUR BASELINE</span>
-            <h2>A living reference for the questions that matter.</h2>
-            <p>Begin with what remains steady. Add current, relationship, or system context only when it belongs.</p>
+            <h2>The personal foundation behind every Sovereign answer.</h2>
+            <p>Choose your level of access, then build the Baseline Sovereign needs before your private workspace opens.</p>
             <div><strong>Plain-language understanding</strong><small>Exact approved Basis remains available beneath it.</small></div>
           </div>
-          <p>Your Baseline stays beneath every exploration. Plan selection changes access, not who you are.</p>
+          <p>Your plan changes access. Your Baseline remains the private foundation for the questions you choose to explore.</p>
         </aside>
       </div>
     </main>
@@ -416,8 +458,8 @@ function BaselineFormView({
   return (
     <>
       <p className="eyebrow">BUILD YOUR BASELINE</p>
-      <h1>Create the personal foundation Sovereign uses.</h1>
-      <p className="plan-intro">Add the birth details you know. Sovereign.OS uses them to calculate your Baseline—the private foundation for seeing the capacity beneath patterns in plain language you can explore and correct.</p>
+      <h1>Build your Baseline.</h1>
+      <p className="plan-intro">Add your birth details to create the personal foundation Sovereign uses across self, decisions, relationships, and systems.</p>
       {notice && <p className="plan-status baseline-retry-status" role="status" aria-live="polite">{notice}</p>}
 
       <form className="baseline-onboarding-form" onSubmit={onSubmit} noValidate>
@@ -575,9 +617,9 @@ function BaselineResultView({ baseline, certainty, reviewOpen, onToggleReview, o
     <section className="baseline-result-state">
       <p className="eyebrow">YOUR BASELINE IS READY</p>
       <h1>Your Baseline is ready.</h1>
-      <p className="plan-intro">Your exact source and validated plain-language facet profile are ready beneath every question, relationship, and system you choose to explore.</p>
+      <p className="plan-intro">Your exact source and validated plain-language Baseline profile are ready beneath every question, relationship, and system you choose to explore.</p>
       <div className="baseline-result-summary">
-        <div><span>Result</span><strong>Source and facets validated</strong></div>
+        <div><span>Result</span><strong>Source and Baseline profile validated</strong></div>
         <div><span>Birth-time certainty</span><strong>{certainty}</strong></div>
         <div><span>Interpretive uncertainty</span><strong>{baseline.uncertainty ?? 'stated in context'}</strong></div>
       </div>
@@ -606,20 +648,20 @@ function PlanChoiceView({ interval, currentPlan, status, submitting, checkoutUna
 }) {
   return (
     <>
-      <p className="eyebrow">CHOOSE HOW TO CONTINUE</p>
-      <h1>Keep your personal Baseline free. Add the wider system when you need it.</h1>
-      <p className="plan-intro">Free is an ongoing plan, not a trial. Sovereign+ adds permission-based relationships, systems, and longer continuity.</p>
+      <p className="eyebrow">CHOOSE YOUR PLAN</p>
+      <h1>Choose how you want to start.</h1>
+      <p className="plan-intro">Free covers your personal Baseline and personal AI use. Sovereign+ adds permission-based relationships, systems, Library continuity, and more AI turns. Your Baseline is required before either workspace opens.</p>
 
       <div className="onboarding-plan-grid">
         <article className={currentPlan === 'free' ? 'current' : ''}>
           <header><span>FREE</span><strong>$0</strong></header>
           <h2>Your personal foundation.</h2>
-          <p>Use your private Baseline across Today, Explore, Shadow and Gift, Alignment, decisions, and behavior.</p>
+          <p>Use your private Baseline across Today, Explore, decisions, recurring patterns, Shadow and Gift, and Alignment.</p>
           <ul>
             <li>Complete private Baseline Design</li>
             <li>Today and Explore</li>
-            <li>10 Sovereign responses each UTC month</li>
-            <li>Correction controls and active-retention history</li>
+            <li>10 Sovereign AI turns each month</li>
+            <li>Review and correct what does not fit</li>
           </ul>
           <button className="primary-button" type="button" disabled={submitting} onClick={() => onConfirm('free')}>Continue with Free</button>
         </article>
@@ -627,11 +669,11 @@ function PlanChoiceView({ interval, currentPlan, status, submitting, checkoutUna
         <article className="plus-plan">
           <header><span>SOVEREIGN+</span><strong>{interval === 'annual' ? 'Annual billing' : 'Monthly billing'}</strong></header>
           <h2>Relationships, systems, and continuity.</h2>
-          <p>Bring permitted Baselines together and keep the wider human system in view.</p>
+          <p>Use permission-based relationship and system context while keeping each person distinct.</p>
           <ul>
             <li>Everything in Free</li>
             <li>People, Systems, Library, and optional Covenant</li>
-            <li>300 Sovereign responses each UTC month</li>
+            <li>300 Sovereign AI turns each month</li>
             <li>Permission-aware invitations and controls</li>
           </ul>
           <div className="billing-toggle" role="group" aria-label="Billing interval">
@@ -716,11 +758,28 @@ function baselineIsReady(baseline: BaselineStatus): boolean {
     && baseline.facetProfileStatus === 'ready';
 }
 
+function readPlanChoice(): Plan | null {
+  try {
+    const value = sessionStorage.getItem(PLAN_CHOICE_KEY);
+    return value === 'free' || value === 'sovereign_plus' ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function rememberPlanChoice(plan: Plan): void {
+  try { sessionStorage.setItem(PLAN_CHOICE_KEY, plan); } catch { /* no-op */ }
+}
+
+function clearPlanChoice(): void {
+  try { sessionStorage.removeItem(PLAN_CHOICE_KEY); } catch { /* no-op */ }
+}
+
 function progressState(phase: JourneyPhase) {
-  if (phase === 'plan') return { baseline: 'complete', plan: 'active', workspace: 'upcoming' } as const;
-  if (phase === 'baseline_result') return { baseline: 'complete', plan: 'upcoming', workspace: 'upcoming' } as const;
-  if (phase === 'baseline' || phase === 'baseline_building') return { baseline: 'active', plan: 'upcoming', workspace: 'upcoming' } as const;
-  return { baseline: 'upcoming', plan: 'upcoming', workspace: 'upcoming' } as const;
+  if (phase === 'plan') return { plan: 'active', baseline: 'upcoming', workspace: 'upcoming' } as const;
+  if (phase === 'baseline' || phase === 'baseline_building') return { plan: 'complete', baseline: 'active', workspace: 'upcoming' } as const;
+  if (phase === 'baseline_result') return { plan: 'complete', baseline: 'complete', workspace: 'upcoming' } as const;
+  return { plan: 'upcoming', baseline: 'upcoming', workspace: 'upcoming' } as const;
 }
 
 function stageState(current: BaselineStage, index: number): 'complete' | 'active' | 'upcoming' {
