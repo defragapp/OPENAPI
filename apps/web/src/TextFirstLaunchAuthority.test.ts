@@ -12,8 +12,10 @@ describe('text-first authenticated launch', () => {
       .toBeLessThan(indexHtml.indexOf('/src/main.tsx'));
   });
 
-  it('keeps the dormant listen control invisible even while legacy source is being retired', () => {
-    expect(workspace).toContain('tts-listen-button');
+  it('removes the legacy Listen/TTS control from the authenticated workspace', () => {
+    expect(workspace).not.toContain("import { useTTS } from './hooks/useTTS'");
+    expect(workspace).not.toContain('tts-listen-button');
+    expect(workspace).not.toContain('toggleTTS');
     expect(css).toContain('.tts-listen-button');
     expect(css).toContain('display: none !important;');
   });
