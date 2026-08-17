@@ -20,3 +20,14 @@ CREATE TABLE privacy_request_events (
 
 CREATE INDEX privacy_request_events_account_created_idx
   ON privacy_request_events(account_id, created_at DESC);
+
+CREATE TRIGGER policy_signup_eligibility_after_terms_receipt
+AFTER INSERT ON policy_acceptance_receipts
+WHEN NEW.acceptance_surface = 'signup' AND NEW.policy_type = 'terms'
+BEGIN
+  UPDATE accounts
+  SET eligibility_confirmed_at = NEW.accepted_at,
+      eligibility_rule_version = '2026-08-17-18-plus',
+      updated_at = datetime('now')
+  WHERE id = NEW.account_id;
+END;
