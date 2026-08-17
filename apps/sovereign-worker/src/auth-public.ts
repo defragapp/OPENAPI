@@ -1,4 +1,4 @@
-import { POLICY_CONTENT_HASH, POLICY_METADATA } from '../../../config/policies';
+import { ELIGIBILITY_RULE, POLICY_CONTENT_HASH, POLICY_METADATA } from '../../../config/policies';
 import type { Env } from './env';
 import { runtimeMode } from './runtime';
 import { buildSovereignEmail, sendOperationalEmail } from './email';
@@ -43,6 +43,11 @@ function parseSqliteTimestamp(value?: string | null): number {
   if (!value) return Number.NaN;
   const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value) ? `${value.replace(' ', 'T')}Z` : value;
   return Date.parse(normalized);
+}
+function exactReleaseSha(env: Env): string {
+  const value = String(env.APP_VERSION || '').trim().toLowerCase();
+  if (!/^[0-9a-f]{40}$/.test(value)) throw new Response('Release identity unavailable', { status: 503 });
+  return value;
 }
 
 export function safeReturnTo(value: unknown, fallback = '/app'): string {
@@ -104,6 +109,8 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
     termsVersion?: string;
     privacyVersion?: string;
     policyContentHash?: string;
+    ageEligible?: boolean;
+    eligibilityRuleVersion?: string;
     turnstileToken?: string;
     returnTo?: string;
   };
@@ -112,6 +119,9 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
   const returnTo = safeReturnTo(body.returnTo);
   if (!validEmail(email)) return Response.json({ status: 'invalid', field: 'email' }, { status: 400 });
   if (kind === 'signup' && (!name || name.length > MAX_NAME_LENGTH || body.termsAccepted !== true)) return Response.json({ status: 'invalid', field: !name || name.length > MAX_NAME_LENGTH ? 'name' : 'terms' }, { status: 400 });
+  if (kind === 'signup' && (body.ageEligible !== true || body.eligibilityRuleVersion !== ELIGIBILITY_RULE.version)) {
+    return Response.json({ status: 'invalid', field: 'eligibility' }, { status: 400, headers: { 'cache-control': 'no-store' } });
+  }
   if (kind === 'signup' && (
     body.termsVersion !== POLICY_METADATA.terms.version
     || body.privacyVersion !== POLICY_METADATA.privacy.version
@@ -134,7 +144,7 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
   const tokenHash = await sha256(token);
   const id = `magic_${crypto.randomUUID()}`;
   const acceptedAt = kind === 'signup' ? new Date().toISOString() : null;
-  const policyReleaseSha = String(env.APP_VERSION || 'unversioned').trim().slice(0, 64) || 'unversioned';
+  const policyReleaseSha = kind === 'signup' ? exactReleaseSha(env) : null;
   await env.DB.prepare("INSERT INTO auth_magic_links (id, email_normalized, account_id, purpose, token_hash, name, terms_accepted_at, terms_version, privacy_version, policy_content_hash, policy_release_sha, expires_at, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+15 minutes'), ?, ?)")
     .bind(
       id,
@@ -147,7 +157,7 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
       kind === 'signup' ? POLICY_METADATA.terms.version : null,
       kind === 'signup' ? POLICY_METADATA.privacy.version : null,
       kind === 'signup' ? POLICY_CONTENT_HASH : null,
-      kind === 'signup' ? policyReleaseSha : null,
+      policyReleaseSha,
       ipHash,
       userAgentHash
     ).run();
@@ -202,6 +212,7 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
     || !row.policy_content_hash
     || row.policy_content_hash.length !== 64
     || !row.policy_release_sha
+    || !/^[0-9a-f]{40}$/.test(row.policy_release_sha)
   )) return Response.json({ status: 'invalid' }, { status: 400 });
 
   const subject = `email:${row.email_normalized}`;
