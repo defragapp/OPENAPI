@@ -10,13 +10,13 @@ Sovereign.OS is a private personal AI for understanding yourself, your relations
 
 A new visitor should understand the experience in this order:
 
-1. recognize an ordinary real-life question, decision, relationship, or recurring situation;
-2. see a useful distinction Sovereign can make visible;
-3. understand Baseline Design as the private personal foundation Sovereign uses to know where to begin;
-4. see the same intelligence extend to relationships and systems when relevant and permitted;
-5. inspect supporting evidence, uncertainty, permissions, or technical detail only when useful.
+1. **You** — explore how you think, decide, communicate, learn, create, connect, lead, respond under pressure, change, and recognize what feels aligned;
+2. **You + your people** — with permission, keep each person distinct and examine what happens between them;
+3. **From 1:1 to the whole system** — expand to families, households, teams, workplaces, friendship groups, and other human systems;
+4. understand Baseline Design as the private reference Sovereign can carry across those questions;
+5. inspect source detail, permissions, uncertainty, or Basis only when useful.
 
-Baseline Design is the foundation. It is not technical garnish after generic chat, and its framework machinery should not be the first thing a visitor has to decode.
+Baseline Design is not the public product category and should not be described as a `foundation` in primary marketing. It is the private reference that makes the personal AI more continuous and specific than a blank conversation.
 
 ## Current launch interaction
 
@@ -34,11 +34,9 @@ Video/Worlds generation is not part of the current launch product and should not
 
 `Private personal AI for real life.`
 
-### Interaction principle
+### Public scope
 
-`See the pattern. See what could change.`
-
-Use the exact active wording and placement only as allowed by `product-language-system.md` and the founder visual contract.
+`Understand yourself. Understand your people. See the whole system.`
 
 ### Founder root hero
 
@@ -47,27 +45,29 @@ The root public hero remains founder-locked:
 - `Healing isn’t optional.`
 - `Holding onto the pain is.`
 
-Immediately adjacent copy must explain the actual product and supported real-life questions. This supporting document does not define alternative root supporting copy.
+Immediately adjacent copy must explain the actual product and supported use cases. This supporting document does not define alternative root supporting copy.
 
 ### Enduring secondary brand line
 
-`Know yourself. Understand the system. Choose what fits.`
+`Know yourself. Understand your people. See the whole system.`
 
 This is a deeper/closing brand line, not the root product explanation.
 
 ## Core position
 
-Sovereign.OS is Baseline-first. It should be useful before a user explains an incident and should remain useful for a specific question about self, a decision, relationship, family, household, team, workplace, friendship group, or other permitted system.
+Sovereign.OS is Baseline-first internally, but public understanding begins with what the person can explore.
 
-Baseline Design gives Sovereign a persistent personal reference across identity/purpose, communication, decision-making, learning, creativity, love/connection, leadership, boundaries, responsibility, conflict/repair, pressure/change, underused capacity, Shadow, Gift, Alignment, current relevance, permission-bound relationships, and supported roles/context inside Systems.
+The product should be useful before the user explains an incident, names a conflict, or adds another person. A person can explore identity/orientation, communication, decision-making, learning, creativity/expression, love/connection, leadership, boundaries, response to pressure/change, Shadow, Gift, Alignment, and underused qualities from their own Baseline.
 
-These internal capabilities do not need to be enumerated in the first public explanation. Public copy starts with the real human question/distinction.
+Relationship intelligence extends that understanding outward with permission. System intelligence expands again from one relationship to the wider family, household, team, workplace, friendship group, or other human system.
+
+These capabilities do not need to be enumerated in the first public sentence, but the public page must unmistakably communicate that the product is broader than conflict, responsibility, or recurring-problem analysis.
 
 ## Capability framing
 
-### Self
+### You
 
-Sovereign may help a user examine stable qualities, possible pressured expressions, communication/decision patterns, boundaries, responsibility, and what appears to fit—without turning interpretation into measured personality fact.
+Sovereign may help a user explore identity/orientation, communication, decisions, learning, creativity/expression, love/connection, leadership, boundaries, pressure/change, Shadow, Gift, Alignment, and less familiar or underused qualities—without turning interpretation into measured personality fact.
 
 ### Current context
 
@@ -79,19 +79,29 @@ Shadow and Gift are possible expressions of a valid quality, not bad/good identi
 
 ### Alignment
 
-Alignment is a qualitative comparison of fit/tradeoff/missing information, never a score or decision made for the user.
+Alignment is a qualitative comparison of fit, tradeoff, and missing information, never a score or decision made for the user.
 
-### Relationships
+### You + your people
 
-With active permission, Sovereign may compare distinct structured Baselines and examine what each person may bring, the interaction, ownership, and unknowns. It is not compatibility scoring or mind-reading.
+With active permission, Sovereign may compare distinct structured Baselines and examine where two people differ, what they share, what each may bring, what happens between them, what each person can own, and what still needs to be asked directly. It is not compatibility scoring or mind-reading.
 
-### Systems
+### From 1:1 to the whole system
 
-With permission and supplied/confirmed role context, Sovereign may examine responsibility, authority, care/reliance, pressure, constraints, objectives, and missing perspectives while keeping each participant distinct.
+With permission and supplied/confirmed role context, Sovereign may examine roles, authority, responsibility, care/reliance, expectations, pressure, constraints, objectives, observations, and missing perspectives across a family, household, team, workplace, friendship group, or other system.
 
 ### Covenant
 
 Covenant is contextual/optional and activates only after explicit confirmation. It adds verified Scripture/Christian teaching without becoming proof of motive, moral status, destiny, or required reconciliation/contact.
+
+## Baseline framing
+
+Baseline Design gives Sovereign a persistent private reference across self, decisions, relationships, and systems.
+
+Preferred public description:
+
+`A private reference built around you, so Sovereign can begin with more than the current prompt.`
+
+The root landing should not enumerate astronomical positions, astrology, Human Design, Gene Keys, numerology, or source abbreviations. Those belong in deeper How It Works/FAQ disclosure and Basis inspection.
 
 ## Information boundaries
 
@@ -106,8 +116,9 @@ Exact source data does not measure personality. Facets and answers are interpret
 
 ## Product-experience principles
 
-- Explain the AI/product before framework machinery.
-- Start with a recognizable question or situation.
+- Explain what the person can explore before framework machinery.
+- Make self-exploration useful before requiring an incident, conflict, or another person.
+- Expand clearly from You → You + your people → whole system.
 - Give the direct answer first.
 - Keep technical support secondary and inspectable.
 - Keep participants distinct.
@@ -116,9 +127,18 @@ Exact source data does not measure personality. Facets and answers are interpret
 - Keep conversation visually primary over workspace chrome.
 - Preserve one canonical authenticated workspace.
 - Keep users in control of correction, consent, continuity, export, and deletion.
+- Do not reduce the public story to responsibility, carrying outcomes, conflict, or repair.
+
+## Typography boundary
+
+The active product is sans-only. `Sovereign Display` is retired from rendered UI use.
+
+Headings and titles must use the approved sans system. Visual hierarchy comes from scale, weight, spacing, opacity, and composition rather than a serif/sans contrast.
 
 ## Language boundary
 
 Do not position Sovereign.OS as a generic chatbot, prediction product, compatibility score, scientific personality test, diagnosis, therapy replacement, spiritual certainty system, incident-only coach, or source of hidden motives.
+
+Do not describe Baseline as a `foundation` in primary public marketing.
 
 Do not revive retired public language from historical archives/audits merely because it remains present as provenance or internal test material.
