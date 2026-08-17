@@ -1,24 +1,46 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
-  <title id="title">Sovereign</title>
-  <desc id="desc">Healing isn’t optional. Holding onto the pain is. Personal AI for real life.</desc>
+  <title id="title">Sovereign.OS — Private personal AI for real life</title>
+  <desc id="desc">Understand yourself, relationships, decisions, and family or group dynamics from a private Baseline.</desc>
   <defs>
-    <radialGradient id="glow" cx="50%" cy="42%" r="66%">
-      <stop offset="0" stop-color="#e8ddd0" stop-opacity=".10"/>
-      <stop offset=".55" stop-color="#c89370" stop-opacity=".035"/>
-      <stop offset="1" stop-color="#0f0f0f" stop-opacity="0"/>
+    <radialGradient id="glow" cx="78%" cy="62%" r="48%">
+      <stop offset="0" stop-color="#f1e9de" stop-opacity=".10"/>
+      <stop offset=".54" stop-color="#bdb4a9" stop-opacity=".035"/>
+      <stop offset="1" stop-color="#080a0d" stop-opacity="0"/>
     </radialGradient>
-    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
-      <path d="M64 0H0V64" fill="none" stroke="#e8ddd0" stroke-opacity=".025"/>
-    </pattern>
   </defs>
-  <rect width="1200" height="630" fill="#0f0f0f"/>
-  <rect width="1200" height="630" fill="url(#grid)"/>
-  <ellipse cx="600" cy="310" rx="520" ry="300" fill="url(#glow)"/>
-  <text x="90" y="92" fill="#f5f1e8" font-family="Georgia, serif" font-size="30" font-weight="700">Sovereign</text>
-  <g text-anchor="middle" font-family="Georgia, serif" font-weight="700" letter-spacing="-3">
-    <text x="600" y="282" fill="#f5f1e8" font-size="76">Healing isn’t optional.</text>
-    <text x="600" y="376" fill="none" stroke="#e8ddd0" stroke-opacity=".55" stroke-width="1.4" font-size="76">Holding onto the pain is.</text>
+  <rect width="1200" height="630" fill="#080a0d"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <text x="78" y="82" fill="#f1e9de" font-family="Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="5">SOVEREIGN.OS</text>
+  <text x="78" y="158" fill="#9d978f" font-family="Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="4">PRIVATE PERSONAL AI FOR REAL LIFE</text>
+
+  <g font-family="Georgia, serif" fill="#f5f1e8">
+    <text x="78" y="238" font-size="52">Understand yourself,</text>
+    <text x="78" y="298" font-size="52">relationships, decisions,</text>
+    <text x="78" y="358" font-size="52">and the groups around you.</text>
   </g>
-  <text x="600" y="475" text-anchor="middle" fill="#a39c8f" font-family="Arial, sans-serif" font-size="22" letter-spacing="4">PERSONAL AI FOR REAL LIFE</text>
-  <text x="600" y="532" text-anchor="middle" fill="#746f67" font-family="Arial, sans-serif" font-size="19">Build your Baseline. Ask your real questions. Start free.</text>
+  <text x="80" y="420" fill="#918b83" font-family="Arial, sans-serif" font-size="21">Starts with your private Baseline Design, then adds the context you choose.</text>
+
+  <g transform="translate(810 170)" fill="none" stroke="#f1e9de" stroke-linecap="round">
+    <path d="M-150 255A255 255 0 0 1 360 255" stroke-opacity=".12" stroke-width="2"/>
+    <path d="M105 255 105 0" stroke-opacity=".9" stroke-width="3"/>
+    <path d="M105 255 7 42" stroke-opacity=".58" stroke-width="2.3"/>
+    <path d="M105 255 212 55" stroke-opacity=".72" stroke-width="2.6"/>
+    <path d="M105 255 -55 132" stroke-opacity=".38" stroke-width="1.9"/>
+    <path d="M105 255 290 142" stroke-opacity=".46" stroke-width="2"/>
+    <path d="M105 255 -22 213" stroke-opacity=".28" stroke-width="1.6"/>
+    <path d="M105 255 256 214" stroke-opacity=".32" stroke-width="1.6"/>
+    <g fill="#fffaf3" stroke="none">
+      <circle cx="105" cy="0" r="5" fill-opacity=".9"/>
+      <circle cx="7" cy="42" r="4" fill-opacity=".62"/>
+      <circle cx="212" cy="55" r="4.5" fill-opacity=".76"/>
+      <circle cx="-55" cy="132" r="3" fill-opacity=".44"/>
+      <circle cx="290" cy="142" r="3.5" fill-opacity=".5"/>
+      <circle cx="-22" cy="213" r="2.8" fill-opacity=".34"/>
+      <circle cx="256" cy="214" r="2.8" fill-opacity=".38"/>
+      <circle cx="105" cy="255" r="8"/>
+    </g>
+  </g>
+
+  <text x="80" y="552" fill="#69655f" font-family="Arial, sans-serif" font-size="17">Self · Relationships · Decisions · Family and group dynamics</text>
 </svg>
