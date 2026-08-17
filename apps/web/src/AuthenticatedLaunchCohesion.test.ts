@@ -53,10 +53,11 @@ describe('authenticated launch cohesion', () => {
     expect(onboarding).toContain("locationPrecision: 'city_or_regional' as const");
   });
 
-  it('retains one-room thread behavior while the duplicate in-workspace Baseline path is tracked for canonical routing', () => {
+  it('routes every reachable Baseline edit back through canonical onboarding', () => {
     expect(workspace).toContain('className={`intelligence-workspace');
     expect(workspace).toContain('className="sovereign-composer"');
-    expect(workspace).toContain("api('/api/v1/account/onboarding')");
     expect(workspace).toContain('function beginBaseline()');
+    expect(workspace).toContain("location.assign('/onboarding?baseline=review')");
+    expect(workspace).not.toContain('capacity beneath patterns');
   });
 });
