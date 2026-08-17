@@ -38,10 +38,8 @@ describe('standalone public action authority', () => {
       expect(source).toContain(SUPPORT_URL);
       expect(source).not.toContain('7sY6oG1LDcls8s90x267S03');
       expect(source).not.toContain('Development support');
+      expect(source).toContain('one-time amount from $1');
     }
-    expect(pricing).toContain('one-time amount from $1');
-    expect(faq).toContain('one-time amount from $1');
-    expect(how).toContain('one-time amount from $1');
   });
 
   it('keeps developer taxonomy out of public copy and metadata', () => {
