@@ -25,7 +25,7 @@ const replacements = [
   ],
   [
     "const passkeyMigration = read('apps/sovereign-worker/migrations/0014_passkey_authentication.sql');",
-    "const passkeyMigration = read('apps/sovereign-worker/migrations/0014_passkey_authentication.sql');\nconst releaseMigration = read('apps/sovereign-worker/migrations/0015_release_evidence.sql');\nconst releaseEvidenceRuntime = read('apps/sovereign-worker/src/release-evidence.ts');\nconst releaseEvidenceLibrary = read('scripts/release-evidence-lib.mjs');\nconst releaseOrchestrator = read('scripts/release-orchestrator.mjs');"
+    "const passkeyMigration = read('apps/sovereign-worker/migrations/0014_passkey_authentication.sql');\nconst releaseMigration = read('apps/sovereign-worker/migrations/0015_release_evidence.sql');\nconst policyReceiptMigration = read('apps/sovereign-worker/migrations/0016_policy_acceptance_receipts.sql');\nconst releaseEvidenceRuntime = read('apps/sovereign-worker/src/release-evidence.ts');\nconst releaseEvidenceLibrary = read('scripts/release-evidence-lib.mjs');\nconst releaseOrchestrator = read('scripts/release-orchestrator.mjs');"
   ],
   [
     "const heroCss = read('apps/web/src/landing-hero-field-v4.css');\nconst storyCss = read('apps/web/src/v0-restored-product-stories.css');",
@@ -41,11 +41,11 @@ const replacements = [
   ],
   [
     "  \"migrationVersion: '0013_workers_ai_free_capacity'\",\n  \"latestMigrationVersion: '0014_passkey_authentication'\"",
-    "  \"const LATEST_MIGRATION_VERSION = '0015_release_evidence'\",\n  \"releaseEvidenceStore: releaseSchemaReady ? 'configured' : 'missing'\",\n  \"dependencies.releaseEvidenceStore === 'configured'\""
+    "  \"const LATEST_MIGRATION_VERSION = '0016_policy_acceptance_receipts'\",\n  \"policyAcceptanceReceipts: policyReceiptSchemaReady ? 'configured' : 'missing'\",\n  \"dependencies.policyAcceptanceReceipts === 'configured'\",\n  \"releaseEvidenceStore: releaseSchemaReady ? 'configured' : 'missing'\",\n  \"dependencies.releaseEvidenceStore === 'configured'\""
   ],
   [
     "requireAll('passkey credential verification', passkeyVerifier, [",
-    "requireAll('release evidence migration', releaseMigration, ['CREATE TABLE release_evidence', 'CREATE TABLE release_progress', \"status TEXT NOT NULL CHECK(status = 'success')\", \"status TEXT NOT NULL CHECK(status = 'failure')\"]);\nrequireAll('D1 release evidence runtime', releaseEvidenceRuntime, ['env.DB.prepare', \"status = 'success'\", \"RELEASE_MIGRATION_VERSION = '0015_release_evidence'\"]);\nrequireAll('release evidence orchestration', `${releaseEvidenceLibrary}\\n${releaseOrchestrator}`, ['upsertReleaseEvidenceSql', 'upsertReleaseProgressSql', 'applyD1Migrations', 'writeReleaseEvidence', 'writeReleaseProgress']);\n\nrequireAll('passkey credential verification', passkeyVerifier, ["
+    "requireAll('release evidence migration', releaseMigration, ['CREATE TABLE release_evidence', 'CREATE TABLE release_progress', \"status TEXT NOT NULL CHECK(status = 'success')\", \"status TEXT NOT NULL CHECK(status = 'failure')\"]);\nrequireAll('policy acceptance receipt migration', policyReceiptMigration, ['ALTER TABLE auth_magic_links ADD COLUMN terms_version', 'ALTER TABLE auth_magic_links ADD COLUMN privacy_version', 'ALTER TABLE auth_magic_links ADD COLUMN policy_content_hash', 'ALTER TABLE auth_magic_links ADD COLUMN policy_release_sha', 'CREATE TABLE policy_acceptance_receipts']);\nrequireAll('D1 release evidence runtime', releaseEvidenceRuntime, ['env.DB.prepare', \"status = 'success'\", \"RELEASE_MIGRATION_VERSION = '0016_policy_acceptance_receipts'\"]);\nrequireAll('release evidence orchestration', `${releaseEvidenceLibrary}\\n${releaseOrchestrator}`, ['upsertReleaseEvidenceSql', 'upsertReleaseProgressSql', 'applyD1Migrations', 'writeReleaseEvidence', 'writeReleaseProgress', \"RELEASE_MIGRATION_VERSION = '0016_policy_acceptance_receipts'\"]);\n\nrequireAll('passkey credential verification', passkeyVerifier, ["
   ],
   [
     "requireAll('application document', index, ['id=\"root\"', 'Healing isn’t optional. Holding onto the pain is.', 'release-fingerprint']);",
@@ -113,6 +113,7 @@ if (source.includes("'--v0-page:#0f0f0f'")) throw new Error('Production release 
 if (!source.includes("import './deployed-route-cohesion.css'")) throw new Error('Production release v3 is missing the deployed route cohesion visual layer.');
 if (!source.includes('/experience-static-refinement-v1.css?v=20260816-refinement-v1')) throw new Error('Production release v3 is missing the final static refinement contract.');
 if (!source.includes("read('apps/web/src/rendered-fidelity-v1.css')") || !source.includes("read('apps/web/src/landing-refinement-v2.css')")) throw new Error('Production release v3 is missing current rendered landing authorities.');
+if (!source.includes("read('apps/sovereign-worker/migrations/0016_policy_acceptance_receipts.sql')")) throw new Error('Production release v3 is missing the policy acceptance receipt migration authority.');
 for (const retired of ['Bring the question you actually have.', 'Ask about your life. Get an answer built around you.', 'Seeing the capacity beneath it', 'Mapping the people']) {
   if (source.includes(retired)) throw new Error(`Production release v3 still enforces retired active product language: ${retired}`);
 }
