@@ -36,7 +36,7 @@
     "preview:session": "node --import tsx scripts/create-preview-session.ts",
     "production:deploy": "node scripts/assert-main-release.mjs && node scripts/cloudflare-production-release.mjs && node scripts/verify-parent-domain-routes.mjs",
     "production:release:oauth": "bash scripts/production-release-oauth.sh",
-    "production:release:text": "node scripts/assert-main-release.mjs && node scripts/cloudflare-production-text-release.mjs",
+    "production:release:text": "node scripts/assert-main-release.mjs --require-current-origin-main && node scripts/cloudflare-production-text-release.mjs",
     "production:deploy:v2": "node scripts/cloudflare-production-deploy-v2.mjs",
     "production:deploy:v3": "node scripts/cloudflare-production-deploy-v3.mjs",
     "scan:production-fixtures": "node scripts/scan-production-fixtures.mjs",
