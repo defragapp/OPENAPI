@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
+import { POLICY_CONTENT_HASH, POLICY_METADATA } from '../../../config/policies';
 import { PlanOnboarding } from './PlanOnboarding';
 
 type ConsentDecision = 'granted' | 'denied';
@@ -135,7 +136,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
     const nextErrors: FieldErrors = {};
     if (!email.includes('@')) nextErrors.email = 'Enter a complete email address.';
     if (mode === 'signup' && !name.trim()) nextErrors.name = 'Enter the name you want Sovereign.OS to use.';
-    if (mode === 'signup' && !accepted) nextErrors.terms = 'Review and accept the Terms and Privacy Policy.';
+    if (mode === 'signup' && !accepted) nextErrors.terms = 'Review the Terms and Privacy Policy before creating your account.';
     if (turnstileState !== 'verified') nextErrors.turnstile = turnstileState === 'error' || turnstileState === 'unsupported'
       ? 'The security check is unavailable. Refresh the page or try another browser.'
       : 'Complete the private security check before continuing.';
@@ -156,12 +157,24 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
       const response = await fetch(`/api/v1/auth/${mode}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email, name, termsAccepted: accepted, turnstileToken, returnTo: requestedReturnTo })
+        body: JSON.stringify({
+          email,
+          name,
+          termsAccepted: accepted,
+          termsVersion: POLICY_METADATA.terms.version,
+          privacyVersion: POLICY_METADATA.privacy.version,
+          policyContentHash: POLICY_CONTENT_HASH,
+          turnstileToken,
+          returnTo: requestedReturnTo
+        })
       });
-      const problem = await response.clone().json().catch(() => ({})) as { reason?: string; field?: keyof FieldErrors };
+      const problem = await response.clone().json().catch(() => ({})) as { reason?: string; field?: keyof FieldErrors; status?: string };
       if (!response.ok) {
-        if (problem.field) setFieldErrors((current) => ({ ...current, [problem.field!]: problem.field === 'email' ? 'Enter a complete email address.' : problem.field === 'name' ? 'Enter the name you want Sovereign.OS to use.' : 'Review and accept the Terms and Privacy Policy.' }));
-        if (response.status === 429) {
+        if (problem.field) setFieldErrors((current) => ({ ...current, [problem.field!]: problem.field === 'email' ? 'Enter a complete email address.' : problem.field === 'name' ? 'Enter the name you want Sovereign.OS to use.' : 'Review the current Terms and Privacy Policy.' }));
+        if (problem.status === 'policy_update_required') {
+          setState('The policies changed before signup completed');
+          setMessage('Refresh this page, review the current Terms and Privacy Policy, then choose again.');
+        } else if (response.status === 429) {
           setState('A link was requested recently');
           setMessage('Wait two minutes, then complete a fresh security check and try again.');
         } else if (response.status === 503) {
@@ -246,10 +259,13 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
                 <input type="email" value={email} onChange={(event) => { setEmail(event.target.value); setFieldErrors((current) => ({ ...current, email: undefined })); }} autoComplete="email" inputMode="email" aria-invalid={Boolean(fieldErrors.email)} />
               </Field>
               {mode === 'signup' && (
-                <label className={`check-line ${fieldErrors.terms ? 'has-error' : ''}`}>
-                  <input type="checkbox" checked={accepted} onChange={(event) => { setAccepted(event.target.checked); setFieldErrors((current) => ({ ...current, terms: undefined })); }} aria-invalid={Boolean(fieldErrors.terms)} />
-                  <span>I accept the Terms and Privacy Policy.</span>
-                </label>
+                <>
+                  <label className={`check-line ${fieldErrors.terms ? 'has-error' : ''}`}>
+                    <input type="checkbox" checked={accepted} onChange={(event) => { setAccepted(event.target.checked); setFieldErrors((current) => ({ ...current, terms: undefined })); }} aria-invalid={Boolean(fieldErrors.terms)} />
+                    <span>I agree to the <a href={POLICY_METADATA.terms.path}>Terms</a> and acknowledge the <a href={POLICY_METADATA.privacy.path}>Privacy Policy</a>.</span>
+                  </label>
+                  <p className="account-policy-notice">Your name and email operate your private account. Sovereign also hashes limited request metadata for account security and abuse prevention. <a href={POLICY_METADATA.privacy.path}>See how information is handled.</a></p>
+                </>
               )}
               {fieldErrors.terms && <p className="field-error">{fieldErrors.terms}</p>}
               <div className="turnstile-frame" data-state={turnstileState}>
