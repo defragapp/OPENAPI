@@ -5,6 +5,7 @@ const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf
 const main = read('./main.tsx');
 const landing = read('./PublicLanding.tsx');
 const css = read('./production-readiness-visual-v1.css');
+const landingRefinement = read('./landing-refinement-v2.css');
 const runtime = read('./production-readiness-runtime.ts');
 const field = read('./expression-field/LandingExpressionSlice.tsx');
 const mobileUtilities = read('./WorkspaceMobileUtilities.tsx');
@@ -15,10 +16,12 @@ const buildDiagnostics = read('../../../scripts/cloudflare-build-diagnostics.mjs
 const workerGatewaySmoke = read('../../../scripts/worker-gateway-smoke.ts');
 
 describe('desktop and iOS production readiness v1', () => {
-  it('installs the final authority after every prior platform layer', () => {
+  it('installs production readiness before the current landing-only refinement authority', () => {
     expect(main).toContain("import { installProductionReadinessRuntime } from './production-readiness-runtime'");
     expect(main).toContain("import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline'");
+    expect(main).toContain("import landingRefinementV2Css from './landing-refinement-v2.css?inline'");
     expect(main).toContain('${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}');
+    expect(main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;')).toBeGreaterThan(main.indexOf('${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}'));
     expect(main.indexOf('installProductionReadinessRuntime();')).toBeLessThan(main.indexOf('installReleaseInteractionRuntime();'));
     expect(main).toContain("dataset.sovereignProductionReadiness = 'desktop-ios-v1'");
   });
@@ -50,7 +53,7 @@ describe('desktop and iOS production readiness v1', () => {
     ]) expect(css).toContain(marker);
   });
 
-  it('keeps vector detail compact, endpoint anchored, and click revealed', () => {
+  it('keeps selected line detail compact and endpoint anchored while the landing makes it visible', () => {
     for (const marker of [
       'data-inspecting="true"',
       '.landing-expression-slice__tooltip-panel',
@@ -63,14 +66,17 @@ describe('desktop and iOS production readiness v1', () => {
     for (const marker of [
       "panelWidth: '148'",
       "panelHeight: '50'",
-      "titleY: '18'",
-      "valueY: '34'",
-      "metaY: '46'",
       "dataset.compactEndpointTooltip = 'true'"
     ]) expect(runtime).toContain(marker);
     expect(field).toContain('const tooltip = placeTooltip(selectedProjected.projected)');
     expect(field).toContain('x1={selectedProjected.projected.x}');
     expect(field).toContain('y1={selectedProjected.projected.y}');
+    expect(field).toContain('landing-expression-slice__tooltip-value');
+    expect(landingRefinement).toContain('.landing-expression-slice__tooltip {');
+    expect(landingRefinement).toContain('display: block !important');
+    expect(landingRefinement).toContain('width: 132px !important');
+    expect(landingRefinement).toContain('height: 34px !important');
+    expect(landingRefinement).toContain('select a line');
   });
 
   it('uses a restrained phone scale and keeps the complete field inside the opening', () => {
@@ -88,6 +94,7 @@ describe('desktop and iOS production readiness v1', () => {
     ]) expect(css).toContain(marker);
     expect(css).not.toContain('15.2vw');
     expect(css).not.toContain('220vw');
+    expect(landingRefinement).toContain('.landing-expression-slice__tooltip {\n    display: none !important;');
   });
 
   it('organizes policy, account, onboarding, and workspace pages with one mobile hierarchy', () => {
@@ -127,6 +134,7 @@ describe('desktop and iOS production readiness v1', () => {
     expect(routeVerifier).toContain('audit.document.overflowX <= 1');
     expect(visualVerifier).toContain("name: 'mobile-390x844'");
     expect(visualVerifier).toContain("name: 'mobile-430x932'");
+    expect(visualVerifier).toContain('const desktopMinimumScore = 0.70;');
   });
 
   it('requires runtime, visual, product, billing, auth, and AI gates before release', () => {
@@ -151,6 +159,7 @@ describe('desktop and iOS production readiness v1', () => {
 
   it('keeps every release stylesheet structurally balanced', () => {
     expect((css.match(/{/g) ?? []).length).toBe((css.match(/}/g) ?? []).length);
+    expect((landingRefinement.match(/{/g) ?? []).length).toBe((landingRefinement.match(/}/g) ?? []).length);
     expect((runtime.match(/{/g) ?? []).length).toBe((runtime.match(/}/g) ?? []).length);
   });
 });
