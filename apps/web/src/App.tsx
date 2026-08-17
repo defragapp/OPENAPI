@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
-import { POLICY_CONTENT_HASH, POLICY_METADATA } from '../../../config/policies';
+import { ELIGIBILITY_RULE, POLICY_CONTENT_HASH, POLICY_METADATA } from '../../../config/policies';
 import { PlanOnboarding } from './PlanOnboarding';
 
 type ConsentDecision = 'granted' | 'denied';
 type TurnstileState = 'loading' | 'ready' | 'verified' | 'expired' | 'error' | 'unsupported';
-type FieldErrors = Partial<Record<'email' | 'name' | 'terms' | 'turnstile', string | undefined>>;
+type FieldErrors = Partial<Record<'email' | 'name' | 'terms' | 'eligibility' | 'turnstile', string | undefined>>;
 type InvitationPhase = 'loading' | 'ready' | 'error';
 type InvitationRecord = {
   id?: string;
@@ -67,6 +67,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [accepted, setAccepted] = useState(false);
+  const [ageEligible, setAgeEligible] = useState(false);
   const [state, setState] = useState('Ready');
   const [message, setMessage] = useState('');
   const [statusTone, setStatusTone] = useState<'neutral' | 'success' | 'error'>('neutral');
@@ -137,6 +138,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
     if (!email.includes('@')) nextErrors.email = 'Enter a complete email address.';
     if (mode === 'signup' && !name.trim()) nextErrors.name = 'Enter the name you want Sovereign.OS to use.';
     if (mode === 'signup' && !accepted) nextErrors.terms = 'Review the Terms and Privacy Policy before creating your account.';
+    if (mode === 'signup' && !ageEligible) nextErrors.eligibility = 'Confirm that you are 18 or older to create a Sovereign.OS account.';
     if (turnstileState !== 'verified') nextErrors.turnstile = turnstileState === 'error' || turnstileState === 'unsupported'
       ? 'The security check is unavailable. Refresh the page or try another browser.'
       : 'Complete the private security check before continuing.';
@@ -164,13 +166,24 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
           termsVersion: POLICY_METADATA.terms.version,
           privacyVersion: POLICY_METADATA.privacy.version,
           policyContentHash: POLICY_CONTENT_HASH,
+          ageEligible,
+          eligibilityRuleVersion: ELIGIBILITY_RULE.version,
           turnstileToken,
           returnTo: requestedReturnTo
         })
       });
       const problem = await response.clone().json().catch(() => ({})) as { reason?: string; field?: keyof FieldErrors; status?: string };
       if (!response.ok) {
-        if (problem.field) setFieldErrors((current) => ({ ...current, [problem.field!]: problem.field === 'email' ? 'Enter a complete email address.' : problem.field === 'name' ? 'Enter the name you want Sovereign.OS to use.' : 'Review the current Terms and Privacy Policy.' }));
+        if (problem.field) setFieldErrors((current) => ({
+          ...current,
+          [problem.field!]: problem.field === 'email'
+            ? 'Enter a complete email address.'
+            : problem.field === 'name'
+              ? 'Enter the name you want Sovereign.OS to use.'
+              : problem.field === 'eligibility'
+                ? 'Confirm that you are 18 or older to create a Sovereign.OS account.'
+                : 'Review the current Terms and Privacy Policy.'
+        }));
         if (problem.status === 'policy_update_required') {
           setState('The policies changed before signup completed');
           setMessage('Refresh this page, review the current Terms and Privacy Policy, then choose again.');
@@ -264,10 +277,15 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
                     <input type="checkbox" checked={accepted} onChange={(event) => { setAccepted(event.target.checked); setFieldErrors((current) => ({ ...current, terms: undefined })); }} aria-invalid={Boolean(fieldErrors.terms)} />
                     <span>I agree to the <a href={POLICY_METADATA.terms.path}>Terms</a> and acknowledge the <a href={POLICY_METADATA.privacy.path}>Privacy Policy</a>.</span>
                   </label>
+                  <label className={`check-line ${fieldErrors.eligibility ? 'has-error' : ''}`}>
+                    <input type="checkbox" checked={ageEligible} onChange={(event) => { setAgeEligible(event.target.checked); setFieldErrors((current) => ({ ...current, eligibility: undefined })); }} aria-invalid={Boolean(fieldErrors.eligibility)} />
+                    <span>I confirm I am 18 or older.</span>
+                  </label>
                   <p className="account-policy-notice">Your name and email operate your private account. Sovereign also hashes limited request metadata for account security and abuse prevention. <a href={POLICY_METADATA.privacy.path}>See how information is handled.</a></p>
                 </>
               )}
               {fieldErrors.terms && <p className="field-error">{fieldErrors.terms}</p>}
+              {fieldErrors.eligibility && <p className="field-error">{fieldErrors.eligibility}</p>}
               <div className="turnstile-frame" data-state={turnstileState}>
                 <div
                   className="turnstile-slot"
