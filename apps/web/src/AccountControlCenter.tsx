@@ -31,6 +31,7 @@ export function AccountControlCenter() {
   async function api(path: string, init: RequestInit = {}) {
     const response = await fetch(path, {
       ...init,
+      credentials: 'same-origin',
       headers: {
         'content-type': 'application/json',
         ...(init.method && init.method !== 'GET' ? { 'x-idempotency-key': crypto.randomUUID() } : {}),
@@ -144,6 +145,41 @@ export function AccountControlCenter() {
     }
   }
 
+  async function downloadPrivateExport() {
+    if (loading) return;
+    setLoading(true);
+    setStatus('Preparing your private account export…');
+    try {
+      const response = await fetch('/api/v1/account/export', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'x-idempotency-key': crypto.randomUUID() }
+      });
+      if (response.status === 401) {
+        location.assign(`/login?returnTo=${encodeURIComponent(location.pathname + location.search)}`);
+        return;
+      }
+      if (!response.ok) {
+        const problem = await response.json().catch(() => ({})) as Json;
+        throw new Error(problem.message || problem.error || 'Your export could not be generated.');
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'sovereign-account-export.json';
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 0);
+      setStatus('Private account export downloaded. Sovereign did not retain an export copy.');
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Your export could not be generated.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function requestDeletion() {
     if (!deleteApproval || deletePhrase !== 'DELETE' || loading) return;
     setLoading(true);
@@ -202,17 +238,27 @@ export function AccountControlCenter() {
         }}>
           <section className="account-control-dialog" role="dialog" aria-modal="true" aria-labelledby="account-control-title">
             <header><div><p>YOUR CONTROL</p><h2 id="account-control-title">Account & Library</h2></div><button onClick={() => setOpen(false)} aria-label="Close account controls">×</button></header>
-            <p className="account-control-intro">Manage invitations, saved understandings, billing, permissions, and deletion without searching through separate product areas.</p>
+            <p className="account-control-intro">Manage privacy, invitations, saved understandings, billing, permissions, and deletion without searching through separate product areas.</p>
             <p className="account-control-status" role="status" aria-live="polite">{status}</p>
 
             <nav className="account-control-links" aria-label="Account links">
               <button onClick={openPermissions}>People & permissions</button>
+              <button onClick={() => void downloadPrivateExport()} disabled={loading}>Download my data</button>
               <button onClick={() => void openBilling()} disabled={loading}>Manage billing</button>
               <a href={SUPPORT_PAYMENT_URL} target="_blank" rel="noreferrer">Support development</a>
               <a href="https://sovereign.defrag.app/privacy">Privacy</a>
               <a href="https://sovereign.defrag.app/terms">Terms</a>
               <a href="mailto:info@defrag.app">Contact support</a>
             </nav>
+
+            <section className="account-control-section privacy-data-section">
+              <div className="account-section-heading">
+                <p>PRIVACY & DATA</p>
+                <h3>Download a private copy of your account data</h3>
+                <span>Sovereign generates a JSON export only for this authenticated request. The export includes account-owned product data and policy history, excludes authentication secrets and provider identifiers, and is not retained as an export artifact.</span>
+              </div>
+              <button disabled={loading} onClick={() => void downloadPrivateExport()}>Download private JSON export</button>
+            </section>
 
             <section className="account-control-section support-development-section">
               <div className="account-section-heading">
