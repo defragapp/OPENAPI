@@ -28,9 +28,11 @@ export GITHUB_SHA="$TARGET_SHA"
 export APP_VERSION="$TARGET_SHA"
 
 # Wrangler gives CLOUDFLARE_API_TOKEN precedence over stored OAuth. Remove any
-# under-scoped CI/Builds token before establishing the current-member OAuth session.
+# under-scoped or stale inherited credentials before establishing the current-member
+# OAuth session. Browser Rendering has its own preferred env var, so clear that too.
 unset CLOUDFLARE_API_TOKEN || true
 unset CF_API_TOKEN || true
+unset CLOUDFLARE_BROWSER_API_TOKEN || true
 
 WRANGLER=(pnpm --filter @sovereign/worker exec wrangler)
 
@@ -57,11 +59,12 @@ ensure_oauth() {
     exit 3
   fi
 
-  # The canonical release path has a small number of direct Cloudflare REST
-  # calls in addition to Wrangler. Feed those calls the same current-member
-  # OAuth credential without printing or persisting it.
+  # The canonical release path has direct Cloudflare REST calls in addition to
+  # Wrangler, including Browser Rendering. Feed every direct call the same fresh
+  # current-member OAuth credential without printing or persisting it.
   export CLOUDFLARE_API_TOKEN="$oauth_token"
   export CF_API_TOKEN="$oauth_token"
+  export CLOUDFLARE_BROWSER_API_TOKEN="$oauth_token"
   echo "WRANGLER_OAUTH: PASS"
 }
 

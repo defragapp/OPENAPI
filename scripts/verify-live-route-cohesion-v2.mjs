@@ -19,6 +19,10 @@ const captureReplacement = captureMarker
   + "\n  if (snapshot.screenshot.length) writeFileSync(screenshotPath, snapshot.screenshot);";
 const resultMarker = "    screenshotSha256: snapshot.screenshot.length ? createHash('sha256').update(snapshot.screenshot).digest('hex') : '',\n    audit";
 const resultReplacement = "    screenshotSha256: snapshot.screenshot.length ? createHash('sha256').update(snapshot.screenshot).digest('hex') : '',\n    screenshotPath: screenshotPath.replace(process.cwd() + '/', ''),\n    audit";
+const desktopProgressMarker = "      verify(desktop);\n      results.push(desktop);";
+const desktopProgressReplacement = "      verify(desktop);\n      console.log('[route-cohesion] label=' + desktop.route + '/' + desktop.profile + ' status=pass');\n      results.push(desktop);";
+const mobileProgressMarker = "      verify(mobile);\n      results.push(mobile);";
+const mobileProgressReplacement = "      verify(mobile);\n      console.log('[route-cohesion] label=' + mobile.route + '/' + mobile.profile + ' status=pass');\n      results.push(mobile);";
 const reportMarker = `  console.log(JSON.stringify({
     ok: true,
     release: 'sovereign-deployed-route-cohesion-v1',
@@ -66,6 +70,8 @@ const replacements = [
   [selectorMarker, selectorReplacement],
   [captureMarker, captureReplacement],
   [resultMarker, resultReplacement],
+  [desktopProgressMarker, desktopProgressReplacement],
+  [mobileProgressMarker, mobileProgressReplacement],
   [reportMarker, reportReplacement]
 ];
 
