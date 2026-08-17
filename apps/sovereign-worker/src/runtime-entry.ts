@@ -38,6 +38,16 @@ const PUBLIC_API_ROUTES = new Set([
   'GET /api/v1/invitations/preview',
   'POST /api/v1/invitations/redeem'
 ]);
+const POLICY_REVIEW_EXEMPT_ROUTES = new Set([
+  'GET /api/v1/account/policy-status',
+  'POST /api/v1/account/policy-acceptance',
+  'POST /api/v1/account/export',
+  'POST /api/v1/auth/logout',
+  'POST /api/v1/auth/logout-all',
+  'GET /api/v1/auth/session',
+  'GET /api/v1/billing/entitlements',
+  'POST /api/v1/billing/portal'
+]);
 const DISABLED_PATH_PREFIXES = ['/api/v1/export-jobs'];
 const PARENT_HOSTS = new Set(['defrag.app', 'www.defrag.app']);
 const PUBLIC_HOST = 'sovereign.defrag.app';
@@ -215,12 +225,29 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
 async function enforcePrivateApiBoundary(request: Request, url: URL, env: Env): Promise<Response | undefined> {
   if (!url.pathname.startsWith('/api/v1/') || PUBLIC_API_ROUTES.has(`${request.method.toUpperCase()} ${url.pathname}`)) return undefined;
   try {
-    await requireAuth(request, env);
+    const auth = await requireAuth(request, env);
+    if (env.APP_ENV === 'production' && !isPolicyReviewExempt(request, url)) {
+      const policyStatus = await getPolicyStatus(env, auth.accountId);
+      if (!policyStatus.current) {
+        return withSecurityHeaders(privateBoundaryResponse(Response.json({
+          error: 'policy_review_required',
+          message: 'Review the current Terms, Privacy Policy, and launch eligibility before continuing.',
+          nextAction: 'review_policy'
+        }, { status: 428, headers: { 'cache-control': 'private, no-store' } })));
+      }
+    }
     return undefined;
   } catch (error) {
     if (error instanceof Response) return withSecurityHeaders(privateBoundaryResponse(error));
     throw error;
   }
+}
+
+function isPolicyReviewExempt(request: Request, url: URL): boolean {
+  const route = `${request.method.toUpperCase()} ${url.pathname}`;
+  if (POLICY_REVIEW_EXEMPT_ROUTES.has(route)) return true;
+  return url.pathname === '/api/v1/deletion-jobs'
+    || url.pathname.startsWith('/api/v1/deletion-jobs/');
 }
 
 async function enforcePrivatePageBoundary(request: Request, url: URL, env: Env): Promise<Response | undefined> {
