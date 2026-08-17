@@ -26,7 +26,7 @@ void RELEASE_WRAPPER_COMPATIBILITY;
 const RELEASE_WRAPPER_LIVE_GATES = [
   ['verify-runtime-v3', 'scripts/verify-parent-domain-routes-v3.mjs'],
   ['verify-secondary-public', 'scripts/verify-live-secondary-public.mjs'],
-  ['verify-route-cohesion', 'scripts/verify-live-route-cohesion.mjs'],
+  ['verify-route-cohesion', 'scripts/verify-live-route-cohesion-v2.mjs'],
   ['verify-rendered-visuals', 'scripts/verify-live-visual-release-v3.mjs']
 ];
 for (const [label, path] of RELEASE_WRAPPER_LIVE_GATES) {
