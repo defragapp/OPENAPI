@@ -50,7 +50,8 @@ These instructions apply to the entire OPENAPI repository.
 - The canonical authenticated implementation is `SovereignIntelligenceWorkspace`.
 - Visual explanation must come from Baseline facets, Shadow and Gift, Alignment, relationships, systems, current context, and exact Basis data.
 - `docs/product-language-system.md` is the single source of truth for user-facing product language. Other documents may explain or enforce it but must not define a competing hero or product promise.
-- Across applicable self, relationship, system, Library, Expression Field, and Worlds surfaces, preserve one explanatory movement: capacity beneath the pattern → how the capacity may be expressing → what happens between people → what may keep the pattern going and what could change.
+- Public surfaces must begin with the real situation and useful distinction. Internal `capacity` terminology may remain where the intelligence contract requires it, but it must not lead the public landing, public demonstration headings, share metadata, or the first explanation of the product.
+- Across applicable self, relationship, system, Library, Expression Field, and Worlds surfaces, preserve the underlying reasoning separation: stable Baseline reference → what pressure or current context may be adding → what happens between people → what may keep the pattern going and what could change. Translate that separation into ordinary user language on public surfaces.
 - This movement is not another named framework or top-level product. Contribution is not causation, feedback is not blame, and pattern analysis must never mutualize harm.
 
 ## Typography contract
