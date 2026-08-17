@@ -13,6 +13,13 @@ const activeExperience = [
   ['faq', read('../public/faq.html')]
 ] as const;
 
+const publicFirstExplanation = activeExperience.filter(([label]) => [
+  'public landing',
+  'landing demonstrations',
+  'how it works',
+  'faq'
+].includes(label));
+
 const retired = [
   'Ask about your life.',
   'Ask about your life. Get an answer built around you.',
@@ -31,10 +38,16 @@ describe('Sovereign.OS active experience language', () => {
     for (const phrase of retired) expect(source).not.toContain(phrase);
   });
 
+  it.each(publicFirstExplanation)('%s translates internal capacity language into concrete public distinctions', (_label, source) => {
+    expect(source.toLowerCase()).not.toContain('capacity beneath');
+  });
+
   it('uses situational recognition instead of a blank-chat invitation', () => {
     const landing = activeExperience.find(([label]) => label === 'public landing')?.[1] ?? '';
     const workspace = activeExperience.find(([label]) => label === 'workspace')?.[1] ?? '';
+    expect(landing).toContain('Built for real situations');
     expect(landing).toContain('Start with what’s actually happening.');
+    expect(landing).toContain('Your Baseline gives Sovereign a consistent reference across questions');
     expect(workspace).toContain('Look closer at the pattern.');
     expect(workspace).toContain('What keeps happening between you?');
     expect(workspace).toContain('Where does responsibility keep landing?');
