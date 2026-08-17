@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { normalizeStripeFixtureEvent, projectSubscriptionEvent } from './stripe';
 import type { Env } from '../env';
+
+const webhookRoute = readFileSync(new URL('../routes/stripe.ts', import.meta.url), 'utf8');
 
 function lifecycleEnv() {
   const entitlementWrites: Array<{ plan: string; source: string }> = [];
@@ -84,5 +87,12 @@ describe('Stripe subscription lifecycle is the entitlement source of truth', () 
     expect(await projectSubscriptionEvent(env, event(env, 'unpaid', 70))).toMatchObject({ plan: 'free' });
     expect(await projectSubscriptionEvent(env, event(env, 'active', 60))).toEqual({ applied: false, stale: true });
     expect(entitlementWrites.map((item) => item.plan)).toEqual(['free']);
+  });
+
+  it('projects the explicit paused and resumed webhook events instead of ignoring them', () => {
+    expect(webhookRoute).toContain("'customer.subscription.paused'");
+    expect(webhookRoute).toContain("'customer.subscription.resumed'");
+    expect(webhookRoute).toContain("event.status === 'paused'");
+    expect(webhookRoute).toContain("event.type === 'customer.subscription.resumed'");
   });
 });
