@@ -203,6 +203,7 @@ export async function buildPrivateAccountExport(env: Env, accountId: string) {
     corrections,
     privacySettings,
     policyReceipts,
+    privacyRequests,
     passkeys,
     entitlements,
     subscriptions,
@@ -242,6 +243,8 @@ export async function buildPrivateAccountExport(env: Env, accountId: string) {
       FROM account_privacy_settings WHERE account_id = ?`, accountId),
     allRows(env, `SELECT policy_type, policy_version, policy_content_hash, release_sha, accepted_at, acceptance_surface, created_at
       FROM policy_acceptance_receipts WHERE account_id = ? ORDER BY accepted_at`, accountId),
+    allRows(env, `SELECT request_type, status, policy_version, release_sha, requested_at, completed_at, created_at
+      FROM privacy_request_events WHERE account_id = ? ORDER BY requested_at`, accountId),
     allRows(env, `SELECT id, label, transports_json, created_at, last_used_at FROM auth_passkeys WHERE account_id = ? ORDER BY created_at`, accountId),
     allRows(env, `SELECT plan, features_json, as_of, updated_at FROM entitlement_cache WHERE account_id = ?`, accountId),
     allRows(env, `SELECT plan_key, status, current_period_end, cancel_at_period_end, created_at, updated_at
@@ -301,6 +304,7 @@ export async function buildPrivateAccountExport(env: Env, accountId: string) {
     privacy: {
       settings: parseRows(privacySettings, ['accessibility_json']),
       policyAcceptanceHistory: policyReceipts,
+      requestHistory: privacyRequests,
       deletionRequests: deletionJobs
     },
     authentication: {
