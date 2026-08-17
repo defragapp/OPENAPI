@@ -1,34 +1,15 @@
-# Sovereign public landing — single-example production release
+# Historical single-example landing production release — 2026-08-02
 
-Release date: 2026-08-02
-Release branch: `main`
+Status: dated visual/release manifest only. The single-example landing described here was a temporary release state and is not the current founder visual contract or deployment authority.
 
-## Public experience
+Historical release details:
 
-- Preserve the approved Sovereign hero and closing statement.
-- Remove the former stacked personal, relationship, and system demonstrations from the rendered landing page.
-- Present one immediately interactive Expression Field inside the opening experience.
-- Render eight deterministic Cloudflare-blue expression lines from one stable point of light.
-- Do not render an outer sphere, network globe, particles, endpoint nodes, compatibility values, or emotion-detection framing.
-- Provide line-level hover, keyboard-focus, and tap interaction with a plain-language tooltip.
-- Retain one concise capability summary, the product comparison, final call to action, and footer.
+- branch: `main`;
+- preserved the then-approved Sovereign hero/closing statement;
+- temporarily replaced the stacked personal/relationship/system demonstrations with one interactive Expression Field opening experience;
+- used the then-current mobile/iOS and release verification contract;
+- treated `v0-public-landing-v2` as the deployed public-root contract.
 
-## Mobile and iOS contract
+The file existed to describe and certify that historical production state. It is retained for design/release provenance only.
 
-- Full-width interactive slice with safe-area handling.
-- Minimum 320 px viewport support.
-- Minimum 44 px navigation and call-to-action targets.
-- Wide invisible line hit paths without visually thickening the instrument.
-- No horizontal overflow.
-- Tooltip remains contained within the mobile field.
-- Reduced-motion behavior remains available.
-
-## Test-contract reconciliation
-
-The public-site, selective-visual-port, viewport, public-release, product-stage, evidence, and landing-refinement tests now validate the approved single-example experience rather than requiring the retired three-demonstration wall. The production implementation was not reverted to satisfy stale assertions.
-
-## Release verification
-
-Production must pass the repository Cloudflare build gate, including foundation checks, migration validation, release-source checks, typechecking, web and Worker tests, production builds, bundle-size verification, and deployment smoke checks.
-
-The release is considered complete only when the deployed Worker reports healthy `/health` and ready `/ready` responses and the public root serves the `v0-public-landing-v2` single-example experience.
+Current public composition is governed by `docs/v0-visual-port-contract.md` and `docs/product-language-system.md`. Current production authority is `docs/production-release.md`. Do not restore this temporary single-example architecture merely because it appears in this historical manifest.
