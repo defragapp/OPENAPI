@@ -35,47 +35,67 @@ const SELF_BASELINE: readonly EvidenceGroup[] = [
 const DUO_BASELINE: readonly EvidenceGroup[] = [
   {
     name: 'You',
-    points: [
-      { code: 'GATE 22.4', label: 'Illustrative personality gate and line' }
-    ]
+    points: [{ code: 'GATE 22.4', label: 'Illustrative personality gate and line' }]
   },
   {
     name: 'Partner',
-    points: [
-      { code: 'GATE 57.2', label: 'Illustrative personality gate and line' }
-    ]
+    points: [{ code: 'GATE 57.2', label: 'Illustrative personality gate and line' }]
   }
 ] as const;
 
 const SELF_FLOW: readonly WorkflowStep[] = [
   {
     kind: 'input',
-    title: 'Capacity beneath the pattern',
-    body: 'Sovereign brings forward the useful capacity connected to responsibility, steadiness, and pressure.'
+    title: 'What your Baseline supports',
+    body: 'Steadiness and responsibility are relevant to this question, so Sovereign starts there instead of treating the prompt in isolation.'
   },
   {
     kind: 'read',
-    title: 'How pressure changes the expression',
-    body: 'When uncertainty rises, the capacity for steadiness may express as becoming responsible for everyone.',
+    title: 'What changes under pressure',
+    body: 'When uncertainty rises, steadiness can become taking responsibility for whether everyone else is okay.',
     chips: ['GK 13.4', 'MARS · CANCER']
   },
   {
     kind: 'connect',
-    title: 'What may keep it going',
-    body: 'Helping uses your capacity. Carrying the outcome can teach the group to return responsibility to you.'
+    title: 'Where responsibility shifts',
+    body: 'Helping is different from owning another person’s outcome. Repeatedly resolving uncertainty can teach the group to return it to you.'
   },
   {
     kind: 'direction',
-    title: 'What could change',
-    body: 'Care can remain. Ownership can return to the person it belongs to.'
+    title: 'A cleaner boundary',
+    body: 'Care can remain while the outcome stays with the person who actually owns it.'
   }
 ] as const;
 
 const FAMILY = [
-  { id: 'you', name: 'You', context: 'Often resolves', route: 'Decisions return here' },
-  { id: 'partner', name: 'Partner', context: 'Moves toward action', route: 'Moves decisions forward' },
-  { id: 'child', name: 'Child', context: 'Waits for direction', route: 'Defers when uncertainty rises' },
-  { id: 'elder', name: 'Elder', context: 'Holds expectation', route: 'Reinforces the familiar route' }
+  {
+    id: 'you',
+    name: 'You',
+    context: 'Often resolves',
+    route: 'Unresolved decisions return here',
+    effect: 'Responsibility concentrates around the person who usually closes the loop.'
+  },
+  {
+    id: 'partner',
+    name: 'Partner',
+    context: 'Moves toward action',
+    route: 'Pushes the decision forward',
+    effect: 'Speed can increase pressure before everyone has reached clarity.'
+  },
+  {
+    id: 'child',
+    name: 'Child',
+    context: 'Waits for direction',
+    route: 'Defers when uncertainty rises',
+    effect: 'Waiting leaves more of the unresolved decision in the shared system.'
+  },
+  {
+    id: 'elder',
+    name: 'Elder',
+    context: 'Holds expectation',
+    route: 'Reinforces the familiar route',
+    effect: 'Existing expectations make the usual resolver feel like the obvious destination.'
+  }
 ] as const;
 
 export function LandingProductStories() {
@@ -93,8 +113,8 @@ function PersonalStory() {
   return (
     <section ref={sectionRef} id="how" className="landing-story landing-story--personal" data-viewport-section="personal">
       <div className="landing-story__shell">
-        <StoryHeading step="01 · You" title="See the capacity beneath the pattern.">
-          Sovereign begins with the useful capacity underneath the situation, then separates the capacity itself from how pressure may be changing its expression.
+        <StoryHeading step="01 · You" title="Separate helping from carrying the outcome.">
+          Sovereign uses your Baseline to distinguish what is genuinely yours to bring from what pressure may be pulling you to take over.
         </StoryHeading>
         <div className="landing-story__stage" data-viewport-stage="personal">
           <ChatWindow title="Sovereign — Personal" surface="personal-chat">
@@ -106,7 +126,7 @@ function PersonalStory() {
             <Message side="user">How do I stop without feeling selfish?</Message>
             <ComposerPreview>What changes if I stop carrying the outcome?</ComposerPreview>
           </ChatWindow>
-          <WorkflowPanel title="How the distinction is built" steps={SELF_FLOW} surface="personal-reasoning" />
+          <WorkflowPanel title="How Sovereign gets there" steps={SELF_FLOW} surface="personal-reasoning" />
         </div>
       </div>
     </section>
@@ -143,17 +163,17 @@ function SystemStory() {
   return (
     <section ref={sectionRef} id="system" className="landing-story landing-story--system" data-viewport-section="system">
       <div className="landing-story__shell">
-        <StoryHeading step="03 · Your people" title="See what keeps the pattern going—and what could change it.">
-          Keep roles, responsibility, authority, pressure, and perspective in view across a family, team, or group.
+        <StoryHeading step="03 · Your people" title="See where responsibility keeps landing.">
+          Sovereign keeps roles, responsibility, authority, pressure, and unknown perspectives separate so the recurring route becomes easier to see.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--system" data-viewport-stage="system">
           <ChatWindow title="Sovereign — Family System" surface="system-map">
             <Message side="user">Why does every family decision eventually become my job to resolve?</Message>
             <Message side="assistant">
-              In this example, decisions keep returning to you when uncertainty rises. That repeated distribution of responsibility can make you the default resolver, even when the decision does not require you.
+              In this supplied example, uncertainty changes the route of the decision: one person pushes toward action, one waits, one reinforces the familiar expectation, and unresolved decisions keep returning to you. That is a system pattern—not proof that any one person is the cause.
             </Message>
             <FamilySystemMap />
-            <ComposerPreview>Where does responsibility keep returning?</ComposerPreview>
+            <ComposerPreview>What changes if the next decision stays with its actual owner?</ComposerPreview>
           </ChatWindow>
           <SystemContext />
         </div>
@@ -163,11 +183,7 @@ function SystemStory() {
   );
 }
 
-function StoryHeading({ step, title, children }: {
-  step: string;
-  title: string;
-  children: ReactNode;
-}) {
+function StoryHeading({ step, title, children }: { step: string; title: string; children: ReactNode }) {
   return (
     <header className="landing-story__heading">
       <p>{step}</p>
@@ -248,21 +264,21 @@ function SystemContext() {
   return (
     <article className="landing-demo landing-demo--context landing-demo--system-context" data-viewport-surface="system-reasoning">
       <header className="landing-demo__bar landing-demo__bar--context">
-        <span>System structure</span>
+        <span>What Sovereign separates</span>
         <small>Illustrative supplied context</small>
       </header>
       <div className="landing-context-view landing-context-view--system">
         <section>
-          <small>Role context</small>
-          <strong>What each person is carrying or expected to carry.</strong>
+          <small>Observed route</small>
+          <strong>Where the unresolved decision moves when pressure rises.</strong>
         </section>
         <section>
           <small>Responsibility</small>
-          <strong>Where decisions and outcomes keep returning.</strong>
+          <strong>Who is expected to close the loop versus who actually owns the outcome.</strong>
         </section>
         <section>
-          <small>Movement</small>
-          <strong>What changes if resolution no longer defaults to one person.</strong>
+          <small>Testable change</small>
+          <strong>What happens if resolution no longer defaults to one person.</strong>
         </section>
       </div>
     </article>
@@ -273,7 +289,8 @@ function WorkflowPanel({ title, steps, surface }: { title: string; steps: readon
   const panelRef = useRef<HTMLElement | null>(null);
   const activeIndex = useWorkflowProgress(panelRef, steps.length);
   const [manualIndex, setManualIndex] = useState<number | null>(null);
-  const visibleIndex = manualIndex ?? activeIndex;
+  const visibleIndex = Math.max(0, manualIndex ?? activeIndex);
+  const activeStep = steps[visibleIndex] ?? steps[0]!;
 
   return (
     <article
@@ -285,8 +302,13 @@ function WorkflowPanel({ title, steps, surface }: { title: string; steps: readon
       <header className="landing-demo__bar landing-demo__bar--workflow">
         <span className="landing-demo__status" aria-hidden="true" />
         <span>{title}</span>
-        <small>Baseline context</small>
+        <small aria-live="polite">{visibleIndex + 1}/{steps.length} · {activeStep.title}</small>
       </header>
+      <div className="landing-workflow__progress" aria-hidden="true">
+        {steps.map((step, index) => (
+          <i key={step.title} className={index < visibleIndex ? 'is-complete' : index === visibleIndex ? 'is-active' : ''} />
+        ))}
+      </div>
       <ol className="landing-workflow">
         {steps.map((step, index) => {
           const state = index < visibleIndex ? 'is-complete' : index === visibleIndex ? 'is-active' : 'is-upcoming';
@@ -317,11 +339,7 @@ function StepGlyph({ kind }: { kind: WorkflowStep['kind'] }) {
       : kind === 'connect'
         ? 'M5 4v3m6-3v3M5 12V9m6 3V9M5 8h6'
         : 'M3.5 8h8m-3-3 3 3-3 3';
-  return (
-    <svg viewBox="0 0 16 16" focusable="false">
-      <path d={path} />
-    </svg>
-  );
+  return <svg viewBox="0 0 16 16" focusable="false"><path d={path} /></svg>;
 }
 
 function FamilySystemMap() {
@@ -329,18 +347,21 @@ function FamilySystemMap() {
   const active = FAMILY.find((member) => member.id === activeId) ?? FAMILY[0];
 
   return (
-    <div className="landing-system-map" aria-label="Illustrative family system map">
+    <div className="landing-system-map" aria-label="Illustrative family system map showing how unresolved decisions move under pressure">
+      <div className="landing-system-map__condition">
+        <small>When uncertainty rises</small>
+        <strong>The route of the decision changes.</strong>
+      </div>
       <svg viewBox="0 0 720 360" aria-hidden="true" focusable="false">
-        <path d="M 360 180 L 118 78" />
-        <path d="M 360 180 L 602 78" />
-        <path d="M 360 180 L 118 282" />
-        <path d="M 360 180 L 602 282" />
-        <path className="is-secondary" d="M 118 78 C 260 24 460 24 602 78" />
-        <path className="is-secondary" d="M 118 282 C 260 336 460 336 602 282" />
+        <path className={activeId === 'partner' ? 'is-active' : ''} d="M 585 82 C 510 115 452 146 378 180" />
+        <path className={activeId === 'child' ? 'is-active' : ''} d="M 585 278 C 500 252 450 220 378 180" />
+        <path className={activeId === 'elder' ? 'is-active' : ''} d="M 135 82 C 220 110 275 144 342 180" />
+        <path className="is-primary" d="M 360 180 C 300 220 228 250 135 278" />
+        <path className="is-secondary" d="M 135 82 C 260 28 470 30 585 82" />
       </svg>
       <div className="landing-system-map__core" aria-hidden="true">
-        <span>Recurring pressure</span>
-        <strong>Resolution returns to you</strong>
+        <span>Decision pressure</span>
+        <strong>Unresolved choices converge</strong>
       </div>
       <div className="landing-system-map__nodes">
         {FAMILY.map((member, index) => (
@@ -354,13 +375,17 @@ function FamilySystemMap() {
           >
             <span>{member.name}</span>
             <small>{member.context}</small>
-            <em>{member.route}</em>
           </button>
         ))}
       </div>
       <div className="landing-system-map__evidence" aria-live="polite">
-        <span>{active.name} · {active.context}</span>
-        <strong>{active.route}</strong>
+        <small>Selected observation</small>
+        <strong>{active.name} · {active.route}</strong>
+        <span>{active.effect}</span>
+      </div>
+      <div className="landing-system-map__test">
+        <small>What to test</small>
+        <strong>Leave the next unresolved decision with its actual owner.</strong>
       </div>
     </div>
   );
@@ -384,7 +409,7 @@ function useWorkflowProgress(ref: RefObject<HTMLElement | null>, length: number)
         return;
       }
       for (let step = 0; step < length; step += 1) {
-        timers.push(window.setTimeout(() => setIndex(step), 240 + step * 620));
+        timers.push(window.setTimeout(() => setIndex(step), 360 + step * 900));
       }
     };
 
@@ -394,7 +419,7 @@ function useWorkflowProgress(ref: RefObject<HTMLElement | null>, length: number)
         if (!entry?.isIntersecting) return;
         reveal();
         observer?.disconnect();
-      }, { threshold: 0.34 });
+      }, { threshold: 0.28 });
       observer.observe(node);
     } else {
       reveal();
