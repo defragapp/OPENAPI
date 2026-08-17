@@ -72,11 +72,11 @@ describe('desktop and iOS production readiness v1', () => {
     expect(field).toContain('x1={selectedProjected.projected.x}');
     expect(field).toContain('y1={selectedProjected.projected.y}');
     expect(field).toContain('landing-expression-slice__tooltip-value');
+    expect(field).toContain('select a line to see its name and relative value');
     expect(landingRefinement).toContain('.landing-expression-slice__tooltip {');
     expect(landingRefinement).toContain('display: block !important');
     expect(landingRefinement).toContain('width: 132px !important');
     expect(landingRefinement).toContain('height: 34px !important');
-    expect(landingRefinement).toContain('select a line');
   });
 
   it('uses a restrained phone scale and keeps the complete field inside the opening', () => {
