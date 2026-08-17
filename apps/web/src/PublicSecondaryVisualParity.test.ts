@@ -143,7 +143,8 @@ describe('secondary public visual parity', () => {
     expect(liveVerifier).toContain(`const refinementCssPath = '${refinementCssPath}'`);
     expect(liveVerifier).toContain('assertSecurityHeaders');
     expect(liveVerifier).toContain('static refinement stylesheet');
-    expect(liveVerifier).toContain('compiled final refinement');
+    expect(liveVerifier).toContain('const compactJavaScript = javascript.text.replace');
+    expect(liveVerifier).toContain('compiled injected refinement');
     expect(liveVerifier).toContain('product-proof-window');
     expect(liveVerifier).toContain('annual-price');
     expect(productionRelease).toContain("['verify-secondary-public', 'scripts/verify-live-secondary-public.mjs']");
