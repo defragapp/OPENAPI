@@ -30,6 +30,7 @@ const finalAuthority = read('./public-landing-final-authority.css');
 const refinement = read('./experience-refinement-v1.css');
 const renderedFidelity = read('./rendered-fidelity-v1.css');
 const landingRefinementV2 = read('./landing-refinement-v2.css');
+const landingRefinementV5 = read('./landing-live-refinement-v5.css');
 const invitationFidelity = read('./invitation-rendered-fidelity-v1.css');
 const passkeyCss = read('./passkey-auth.css');
 const routeCohesionCss = read('./deployed-route-cohesion.css');
@@ -66,10 +67,11 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(main.slice(previous + imports.at(-1)!.length)).not.toContain("import './");
     expect(main).toContain("import renderedFidelityCss from './rendered-fidelity-v1.css?inline';");
     expect(main).toContain("import landingRefinementV2Css from './landing-refinement-v2.css?inline';");
+    expect(main).toContain("import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline';");
     expect(main).toContain("import invitationRenderedFidelityCss from './invitation-rendered-fidelity-v1.css?inline';");
-    expect(main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;'));
-    expect(main.indexOf('style.textContent += `\\n${invitationRenderedFidelityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;'));
-    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, invitationFidelity, passkeyCss, routeCohesionCss, staticRefinement]) expectBalancedCss(source);
+    expect(main.indexOf('style.textContent += `\\n${landingLiveRefinementV5Css}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${landingLiveRefinementV4Css}`;'));
+    expect(main.indexOf('style.textContent += `\\n${invitationRenderedFidelityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${landingLiveRefinementV5Css}`;'));
+    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, invitationFidelity, passkeyCss, routeCohesionCss, staticRefinement]) expectBalancedCss(source);
   });
 
   it('preserves the archive compatibility fingerprint as historical provenance', () => {
@@ -80,41 +82,62 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(main).toContain('installV0ReleaseFingerprint();');
   });
 
-  it('keeps the founder hero while translating the product into ordinary use cases', () => {
+  it('keeps the founder statement while translating the product into clear value and use cases', () => {
     expect(landing).toContain(`const V0_ARCHIVE_SHA = '${archiveSha}'`);
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics.');
-    expect(landing).toContain('Built for real situations');
-    expect(landing).toContain('Start with what’s actually happening.');
+    expect(landing).toContain('Build a private Baseline once.');
+    expect(landing).toContain('One private reference beneath every question.');
+    expect(landing).toContain('What this unlocks');
+    expect(landing).toContain('One private foundation. More useful answers across the questions that shape your life.');
     expect(landing).toContain('<LandingExpressionSlice />');
+    expect(landing).toContain('<BaselineFoundation />');
     expect(landing).toContain('<RealLifeQuestions />');
+    expect(landing.indexOf('<BaselineFoundation />')).toBeLessThan(landing.indexOf('<RealLifeQuestions />'));
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
     expect(landing).not.toContain('capacity beneath');
   });
 
-  it('keeps the 360 Baseline field interactive and exposes one compact endpoint label', () => {
+  it('keeps the 360 Baseline field interactive and exposes one compact endpoint label only after selection', () => {
     for (const marker of [
       'const CENTER = VIEWBOX_SIZE / 2',
       'const SPHERE_RADIUS = 286',
       'const MIN_AXIS_LENGTH = 118',
       'const MAX_AXIS_LENGTH = 344',
+      'const TOOLTIP_WIDTH = 104',
+      'const TOOLTIP_HEIGHT = 26',
       'data-field-geometry="spherical-360"',
-      'data-inspecting="true"',
+      "data-inspecting={hasInspection ? 'true' : 'false'}",
       'buildSphereGrid',
       'buildAmbientRays',
       'requestAnimationFrame',
-      'onPointerEnter={() => selectAxis(axis.id)}',
+      'onClick={(event) =>',
+      'setHasInspection(true)',
       'landing-expression-slice__tooltip-title',
       'landing-expression-slice__tooltip-value',
       '{selected.axis.value}',
-      'select a line to see its name and relative value'
+      'click a line to inspect it'
     ]) expect(field).toContain(marker);
+    expect(field).not.toContain('onPointerEnter={() => selectAxis(axis.id)}');
     expect(field).not.toContain('measurement lines');
     expect(field).not.toContain('stable blue sphere');
-    expect(landingRefinementV2).toContain('width: 132px !important');
-    expect(landingRefinementV2).toContain('height: 34px !important');
+    expect(landingRefinementV5).toContain('width: 104px !important');
+    expect(landingRefinementV5).toContain('height: 26px !important');
+  });
+
+  it('uses deliberate hero typography and constrained entry motion', () => {
+    for (const marker of [
+      '.v0-hero h1 > span',
+      'font-family: var(--font-subheading',
+      '.v0-hero h1 > em',
+      'font-family: var(--font-display',
+      '@keyframes sovereign-hero-rise',
+      '@keyframes sovereign-field-arrive',
+      '.landing-baseline-intro__heading',
+      '.landing-baseline-intro__principles',
+      '@media (prefers-reduced-motion: reduce)'
+    ]) expect(landingRefinementV5).toContain(marker);
   });
 
   it('shows product behavior rather than static demo cards', () => {
@@ -168,6 +191,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
     expect(landingRefinementV2).toContain('.landing-demo--system-context');
     expect(landingRefinementV2).toContain('display: none !important');
     expect(landingRefinementV2).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(landingRefinementV5).toContain('@media (max-width: 760px)');
     expect(main).toContain('function installMobileViewportStability()');
     expect(main).toContain('window.visualViewport');
   });
