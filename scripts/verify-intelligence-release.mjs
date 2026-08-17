@@ -134,7 +134,7 @@ containsAll('founder v0 public product contract', landing, [
   '<LandingProductStories />',
   '<ComparisonStory />',
   '<FinalCallToAction />',
-  'Generic AI',
+  'A blank conversation starts with the prompt. Sovereign starts with your Baseline.',
   'Sovereign',
   'Your thoughts deserve',
   'a better place to live.'
@@ -277,7 +277,7 @@ containsAll('final v0 visual import and refinement append', main, [
   "import './landing-hero-field-v4.css'",
   "import './passkey-auth.css'",
   "import experienceRefinementCss from './experience-refinement-v1.css?inline'",
-  'style.textContent += `\\n${experienceRefinementCss}`',
+  'style.textContent += `\n${experienceRefinementCss}`',
   'installV0ReleaseFingerprint();'
 ]);
 const platformImport = "import './v0-platform-port.css';";
