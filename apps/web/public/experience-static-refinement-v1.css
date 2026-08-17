@@ -1,35 +1,86 @@
 /*
  * Sovereign.OS static public experience refinement v1.
- * Shared by How it works, Pricing, and FAQ after deployed-route-cohesion.css.
- * Presentation only: no route, entitlement, billing, or product behavior changes.
+ *
+ * Terminal presentation authority for public static surfaces. The older static
+ * and route-cohesion layers remain as structural compatibility foundations; this
+ * file owns the rendered visual hierarchy for How it works, Pricing, FAQ, 404,
+ * and the account-bound consent document.
+ *
+ * Presentation only: no route, entitlement, billing, consent, or product logic.
  */
 
-body.launch-page {
+body.launch-page,
+body.consent-page {
   --v0-blue: #e8ddd0;
   --v0-blue-bright: #fffaf3;
-  --v0-page: #090b0e;
-  --v0-panel: #121417;
+  --v0-page: #080a0d;
+  --v0-panel: #111316;
   --v0-cream: #f1e9de;
   --v0-muted: rgba(229, 220, 209, 0.68);
   --v0-faint: rgba(229, 220, 209, 0.44);
-  --v0-line: rgba(241, 233, 222, 0.08);
-  --v0-line-strong: rgba(241, 233, 222, 0.14);
-  background: #090b0e;
+  --v0-line: rgba(241, 233, 222, 0.085);
+  --v0-line-strong: rgba(241, 233, 222, 0.16);
+  --static-shell: min(1180px, calc(100vw - 96px));
+  --static-reading: 720px;
+  --static-display: "Sovereign Display", Georgia, serif;
+  --static-sans: "Sovereign Sans", Inter, system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 72% -8%, rgba(241, 233, 222, 0.045), transparent 34rem),
+    radial-gradient(circle at 12% 32%, rgba(241, 233, 222, 0.018), transparent 28rem),
+    #080a0d;
   color: #f1e9de;
 }
 
-body.launch-page .launch-nav {
-  border-bottom-color: rgba(241, 233, 222, 0.08);
-  background: rgba(9, 11, 14, 0.88);
-  backdrop-filter: blur(18px) saturate(108%);
+body.launch-page {
+  overflow-x: clip;
 }
 
-body.launch-page :is(.launch-kicker, .price-tag, .plan-audience) {
-  color: rgba(241, 233, 222, 0.58);
+body.launch-page .launch-shell,
+body.consent-page .launch-shell {
+  min-height: 100svh;
+  background: transparent;
+}
+
+/* Navigation: same quiet line, scale, and restraint as the landing experience. */
+body.launch-page .launch-nav,
+body.consent-page .launch-nav {
+  border-bottom: 1px solid rgba(241, 233, 222, 0.075);
+  background: rgba(8, 10, 13, 0.82);
+  backdrop-filter: blur(18px) saturate(106%);
+  -webkit-backdrop-filter: blur(18px) saturate(106%);
+}
+
+body.launch-page .launch-nav-inner {
+  width: var(--static-shell);
+  min-height: 72px;
+}
+
+body.launch-page .launch-wordmark,
+body.launch-page .launch-footer-wordmark,
+body.consent-page .launch-wordmark {
+  letter-spacing: 0.16em;
+}
+
+body.launch-page .launch-links a,
+body.launch-page .launch-sign-in,
+body.consent-page .launch-links a {
+  color: rgba(229, 220, 209, 0.58);
+}
+
+body.launch-page .launch-links a:is(:hover, :focus-visible),
+body.launch-page .launch-links a[aria-current="page"],
+body.launch-page .launch-sign-in:is(:hover, :focus-visible),
+body.consent-page .launch-links a:is(:hover, :focus-visible) {
+  color: #f1e9de;
+}
+
+body.launch-page .launch-links a[aria-current="page"]::after {
+  background: rgba(241, 233, 222, 0.76);
 }
 
 body.launch-page :is(.launch-cta, .launch-button.primary) {
   border-color: #e8ddd0;
+  border-radius: 9px;
   background: #e8ddd0;
   color: #101214;
   box-shadow: none;
@@ -42,19 +93,238 @@ body.launch-page :is(.launch-cta, .launch-button.primary):is(:hover, :focus-visi
 }
 
 body.launch-page .launch-button:not(.primary) {
-  border-color: rgba(241, 233, 222, 0.16);
+  border-color: rgba(241, 233, 222, 0.15);
+  border-radius: 9px;
   background: transparent;
   color: rgba(241, 233, 222, 0.82);
   box-shadow: none;
 }
 
-body.launch-page :is(.price-card, .billing-note, .launch-card, .product-proof-window) {
+body.launch-page :is(.launch-kicker, .price-tag, .plan-audience),
+body.consent-page :is(.launch-kicker, .consent-card-label) {
+  color: rgba(241, 233, 222, 0.52);
+  font-family: var(--static-sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.17em;
+}
+
+/* Shared editorial hero. One idea first; supporting copy remains clearly secondary. */
+body.launch-page .launch-hero.launch-hero-compact {
+  box-sizing: border-box;
+  display: grid;
+  width: var(--static-shell);
+  min-height: 600px;
+  margin: 0 auto;
+  padding: clamp(118px, 13vh, 168px) 0 clamp(92px, 11vh, 132px);
+  grid-template-columns: minmax(0, 1.34fr) minmax(290px, 0.66fr);
+  grid-template-areas:
+    "kicker kicker"
+    "title body";
+  column-gap: clamp(56px, 8vw, 112px);
+  row-gap: 24px;
+  align-content: center;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.075);
+  background: transparent;
+}
+
+body.launch-page .launch-hero.launch-hero-compact::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 72px;
+  left: 50%;
+  width: min(1180px, 96vw);
+  height: 520px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 72% 30%, rgba(241, 233, 222, 0.042), transparent 43%),
+    radial-gradient(ellipse at 18% 70%, rgba(241, 233, 222, 0.02), transparent 36%);
+}
+
+body.launch-page .launch-hero.launch-hero-compact > .launch-kicker {
+  grid-area: kicker;
+  margin: 0;
+}
+
+body.launch-page .launch-hero.launch-hero-compact > h1 {
+  grid-area: title;
+  max-width: 11.5ch;
+  margin: 0;
+  color: #f1e9de;
+  font-family: var(--static-display);
+  font-size: clamp(4.35rem, 6.75vw, 7.3rem);
+  font-weight: 400;
+  line-height: 0.91;
+  letter-spacing: -0.048em;
+  text-wrap: balance;
+}
+
+body.launch-page .launch-hero.launch-hero-compact > p:last-child {
+  grid-area: body;
+  align-self: end;
+  max-width: 38ch;
+  margin: 0 0 7px;
+  color: rgba(229, 220, 209, 0.61);
+  font-family: var(--static-sans);
+  font-size: clamp(1rem, 1.18vw, 1.14rem);
+  line-height: 1.72;
+}
+
+/* Shared section rhythm: open space and rules rather than stacked cards. */
+body.launch-page :is(.launch-band, .launch-section) {
+  width: var(--static-shell);
+  margin-inline: auto;
+  padding: clamp(88px, 9vw, 132px) 0;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.07);
+  background: transparent;
+}
+
+body.launch-page .launch-heading,
+body.launch-page .pricing-details-heading {
+  display: grid;
+  margin: 0 0 clamp(50px, 6vw, 78px);
+  grid-template-columns: minmax(0, 1.18fr) minmax(300px, 0.62fr);
+  gap: clamp(48px, 7vw, 100px);
+  align-items: end;
+}
+
+body.launch-page :is(.launch-heading, .pricing-details-heading) h2,
+body.launch-page .baseline-explainer > div > h2,
+body.launch-page .support-note h2,
+body.launch-page .launch-callout h2 {
+  max-width: 12.5ch;
+  margin: 12px 0 0;
+  color: #f1e9de;
+  font-family: var(--static-display);
+  font-size: clamp(3rem, 5vw, 5.35rem);
+  font-weight: 400;
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+body.launch-page :is(.launch-heading, .pricing-details-heading) > p,
+body.launch-page .baseline-explainer > div > p,
+body.launch-page .support-note > div > p,
+body.launch-page .launch-callout > div > p {
+  color: rgba(229, 220, 209, 0.58);
+  line-height: 1.7;
+}
+
+/* How it works: an editorial sequence, not a grid of feature cards. */
+body.how-page .journey-steps {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border-top: 1px solid rgba(241, 233, 222, 0.11);
+  background: transparent;
+}
+
+body.how-page .journey-steps::before,
+body.how-page .journey-steps::after {
+  display: none;
+}
+
+body.how-page .journey-steps > article {
+  display: grid;
+  min-height: 168px;
+  margin: 0;
+  padding: clamp(30px, 4vw, 46px) 0;
+  grid-template-columns: 92px minmax(240px, 0.78fr) minmax(280px, 0.9fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: start;
+  border: 0;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.09);
+  border-radius: 0;
+  background: transparent;
   box-shadow: none;
 }
 
-body.launch-page .price-card.featured {
-  border-color: rgba(241, 233, 222, 0.22);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 28%), #121417;
+body.how-page .journey-steps > article > span {
+  margin: 4px 0 0;
+  color: rgba(241, 233, 222, 0.38);
+  font-family: var(--static-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+}
+
+body.how-page .journey-steps > article > h3 {
+  margin: 0;
+  color: #f1e9de;
+  font-family: var(--static-display);
+  font-size: clamp(1.85rem, 2.7vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.03;
+  letter-spacing: -0.028em;
+}
+
+body.how-page .journey-steps > article > p {
+  max-width: 48ch;
+  margin: 2px 0 0;
+  color: rgba(229, 220, 209, 0.57);
+  font-size: 0.96rem;
+  line-height: 1.68;
+}
+
+body.how-page .baseline-explainer {
+  display: grid;
+  gap: clamp(60px, 8vw, 112px);
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 0.78fr);
+  align-items: start;
+}
+
+body.how-page .baseline-explainer > div > p {
+  max-width: 50ch;
+}
+
+body.how-page .definition-list {
+  margin: 4px 0 0;
+  border-top: 1px solid rgba(241, 233, 222, 0.11);
+}
+
+body.how-page .definition-list > div {
+  display: grid;
+  padding: 21px 0;
+  grid-template-columns: minmax(118px, 0.34fr) minmax(0, 1fr);
+  gap: 24px;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.08);
+  background: transparent;
+}
+
+body.how-page .definition-list dt {
+  color: rgba(241, 233, 222, 0.78);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+body.how-page .definition-list dd {
+  margin: 0;
+  color: rgba(229, 220, 209, 0.52);
+  font-size: 0.88rem;
+  line-height: 1.58;
+}
+
+body.how-page .product-proof-section {
+  position: relative;
+}
+
+body.how-page .product-proof-window {
+  overflow: hidden;
+  border: 1px solid rgba(241, 233, 222, 0.095);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 80% 0, rgba(241, 233, 222, 0.035), transparent 28rem),
+    #101215;
+  box-shadow: none;
+}
+
+body.how-page .product-proof-topbar {
+  min-height: 54px;
+  padding-inline: 20px;
+  border-bottom-color: rgba(241, 233, 222, 0.075);
+  background: rgba(255, 255, 255, 0.006);
 }
 
 body.launch-page .product-proof-topbar > span,
@@ -63,6 +333,532 @@ body.how-page .worlds-proof-topbar > span {
   box-shadow: 0 0 14px rgba(241, 233, 222, 0.16);
 }
 
+body.how-page .product-proof-grid {
+  gap: 0;
+}
+
+body.how-page .product-proof-conversation,
+body.how-page .product-proof-flow {
+  padding: clamp(32px, 5vw, 58px);
+}
+
+body.how-page .product-proof-conversation {
+  border-right: 1px solid rgba(241, 233, 222, 0.07);
+}
+
+body.how-page .product-proof-question {
+  max-width: 15ch;
+  font-family: var(--static-display);
+  font-size: clamp(2rem, 3.6vw, 3.7rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+body.how-page .product-proof-answer {
+  max-width: 46ch;
+  color: rgba(229, 220, 209, 0.63);
+  font-size: 0.96rem;
+  line-height: 1.68;
+}
+
+body.how-page .product-proof-flow li {
+  padding-block: 18px;
+  border-bottom-color: rgba(241, 233, 222, 0.07);
+}
+
+body.how-page .framework-disclosure,
+body.how-page .billing-note {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.how-page .framework-disclosure {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 640px);
+  gap: clamp(36px, 6vw, 88px);
+}
+
+body.how-page .framework-disclosure > strong {
+  color: rgba(241, 233, 222, 0.72);
+  font-family: var(--static-sans);
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+body.how-page .framework-disclosure > p {
+  margin: 0;
+  color: rgba(229, 220, 209, 0.48);
+  line-height: 1.65;
+}
+
+body.how-page .support-note-section {
+  padding-top: clamp(70px, 8vw, 108px);
+  padding-bottom: clamp(70px, 8vw, 108px);
+}
+
+body.how-page .support-note {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(50px, 7vw, 96px);
+  align-items: end;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+body.how-page .support-note h2 {
+  max-width: 11ch;
+  font-size: clamp(2.7rem, 4.5vw, 4.7rem);
+}
+
+body.how-page .support-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+body.how-page .support-note-section > .billing-note {
+  max-width: 680px;
+  margin-top: 42px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(241, 233, 222, 0.08);
+}
+
+/* Pricing: an editorial plan ledger rather than generic SaaS cards. */
+body.pricing-page .pricing-section {
+  padding-top: clamp(82px, 9vw, 128px);
+}
+
+body.pricing-page .pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  border-top: 1px solid rgba(241, 233, 222, 0.12);
+  border-bottom: 1px solid rgba(241, 233, 222, 0.12);
+}
+
+body.pricing-page .price-card,
+body.pricing-page .price-card.featured {
+  display: flex;
+  min-height: 590px;
+  padding: clamp(40px, 5vw, 62px);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.pricing-page .price-card + .price-card {
+  border-left: 1px solid rgba(241, 233, 222, 0.11);
+}
+
+body.pricing-page .price-card.featured {
+  background: linear-gradient(145deg, rgba(241, 233, 222, 0.028), transparent 52%);
+}
+
+body.pricing-page .price-card > header {
+  padding: 0 0 34px;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.085);
+}
+
+body.pricing-page .price-card h2 {
+  max-width: 12ch;
+  margin-top: 16px;
+  color: #f1e9de;
+  font-family: var(--static-display);
+  font-size: clamp(2.25rem, 3.5vw, 3.7rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+body.pricing-page .price-card-body {
+  gap: 32px;
+  padding-block: 34px;
+}
+
+body.pricing-page .price {
+  color: #f1e9de;
+  font-family: var(--static-display);
+  font-size: clamp(4.2rem, 6vw, 6.4rem);
+  font-weight: 400;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+}
+
+body.pricing-page .price-note,
+body.pricing-page .price-options small {
+  color: rgba(229, 220, 209, 0.45);
+}
+
+body.pricing-page .price-options {
+  align-items: end;
+}
+
+body.pricing-page .annual-price {
+  padding-left: 24px;
+  border-left: 1px solid rgba(241, 233, 222, 0.1);
+}
+
+body.pricing-page .annual-price strong {
+  color: rgba(241, 233, 222, 0.82);
+  font-size: 1.15rem;
+}
+
+body.pricing-page .feature-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+body.pricing-page .feature-list li {
+  position: relative;
+  padding: 13px 0 13px 22px;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.055);
+  color: rgba(229, 220, 209, 0.62);
+  line-height: 1.48;
+}
+
+body.pricing-page .feature-list li::before {
+  content: "";
+  position: absolute;
+  top: 21px;
+  left: 1px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(241, 233, 222, 0.5);
+}
+
+body.pricing-page .price-card > .launch-button {
+  width: fit-content;
+  min-width: 180px;
+  margin-top: auto;
+}
+
+body.pricing-page .pricing-details-section {
+  padding-top: clamp(96px, 10vw, 142px);
+}
+
+body.pricing-page .plan-comparison-list {
+  border-top: 1px solid rgba(241, 233, 222, 0.11);
+}
+
+body.pricing-page .plan-comparison-list > div {
+  display: grid;
+  padding: 24px 0;
+  grid-template-columns: minmax(150px, 0.7fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 54px);
+  border-bottom: 1px solid rgba(241, 233, 222, 0.075);
+  background: transparent;
+}
+
+body.pricing-page .plan-comparison-list dt {
+  color: rgba(241, 233, 222, 0.76);
+  font-weight: 600;
+}
+
+body.pricing-page .plan-comparison-list dd {
+  color: rgba(229, 220, 209, 0.5);
+  line-height: 1.55;
+}
+
+body.pricing-page .plan-comparison-list dd > span {
+  display: block;
+  margin-bottom: 7px;
+  color: rgba(241, 233, 222, 0.38);
+  font-size: 0.66rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+body.pricing-page .billing-section {
+  padding-block: clamp(62px, 7vw, 88px);
+}
+
+body.pricing-page .billing-note {
+  display: grid;
+  max-width: 880px;
+  padding: 0;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: clamp(34px, 5vw, 70px);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.pricing-page .billing-note > strong {
+  color: rgba(241, 233, 222, 0.72);
+  font-size: 0.78rem;
+}
+
+body.pricing-page .billing-note > p {
+  margin: 0;
+  color: rgba(229, 220, 209, 0.5);
+  line-height: 1.62;
+}
+
+/* FAQ: a calm single reading column with category landmarks. */
+body.questions-page .faq-section {
+  display: block;
+  max-width: 980px;
+  margin-inline: auto;
+  padding-top: clamp(88px, 9vw, 126px);
+}
+
+body.questions-page .faq-category {
+  display: grid;
+  padding: 0 0 clamp(72px, 8vw, 104px);
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: clamp(42px, 7vw, 92px);
+}
+
+body.questions-page .faq-category + .faq-category {
+  padding-top: clamp(68px, 7vw, 96px);
+  border-top: 1px solid rgba(241, 233, 222, 0.08);
+}
+
+body.questions-page .faq-category > .launch-kicker {
+  margin: 7px 0 0;
+}
+
+body.questions-page .faq-list {
+  border-top: 1px solid rgba(241, 233, 222, 0.11);
+}
+
+body.questions-page .faq-list details {
+  border-bottom: 1px solid rgba(241, 233, 222, 0.08);
+  background: transparent;
+}
+
+body.questions-page .faq-list summary {
+  position: relative;
+  min-height: 72px;
+  padding: 22px 50px 22px 0;
+  color: rgba(241, 233, 222, 0.86);
+  font-family: var(--static-sans);
+  font-size: clamp(1rem, 1.35vw, 1.12rem);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+body.questions-page .faq-list summary::after {
+  content: "+";
+  position: absolute;
+  top: 20px;
+  right: 1px;
+  color: rgba(241, 233, 222, 0.38);
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+body.questions-page .faq-list details[open] summary::after {
+  content: "−";
+}
+
+body.questions-page .faq-list details > p {
+  max-width: 66ch;
+  margin: -2px 0 26px;
+  color: rgba(229, 220, 209, 0.55);
+  font-size: 0.94rem;
+  line-height: 1.7;
+}
+
+body.questions-page .faq-list a {
+  color: rgba(241, 233, 222, 0.84);
+  text-decoration-color: rgba(241, 233, 222, 0.32);
+  text-underline-offset: 3px;
+}
+
+/* Final CTA: conclusion, not another card. */
+body.launch-page .launch-callout {
+  display: grid;
+  padding: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(54px, 8vw, 120px);
+  align-items: end;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.launch-page .launch-callout h2 {
+  max-width: 10.5ch;
+}
+
+body.launch-page .launch-callout .launch-button {
+  margin-bottom: 6px;
+}
+
+/* 404: quiet and intentional rather than a disconnected utility page. */
+body.not-found-page .not-found-main {
+  background:
+    radial-gradient(circle at 72% 30%, rgba(241, 233, 222, 0.035), transparent 30rem),
+    transparent;
+}
+
+body.not-found-page .not-found-stage {
+  width: var(--static-shell);
+  min-height: calc(100svh - 150px);
+  padding-block: clamp(90px, 12vh, 150px);
+  border-bottom: 1px solid rgba(241, 233, 222, 0.07);
+}
+
+body.not-found-page .not-found-code {
+  color: rgba(241, 233, 222, 0.12);
+  font-family: var(--static-display);
+  font-weight: 400;
+}
+
+body.not-found-page .not-found-copy h1 {
+  max-width: 10ch;
+  color: #f1e9de;
+  font-family: var(--static-display);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+}
+
+body.not-found-page .not-found-copy > p:not(.launch-kicker) {
+  max-width: 42ch;
+  color: rgba(229, 220, 209, 0.56);
+  line-height: 1.68;
+}
+
+/* Consent is static but account-bound. Match the public visual language without
+   changing any permission controls or IDs consumed by consent.js. */
+body.consent-page {
+  min-height: 100svh;
+  font-family: var(--static-sans);
+}
+
+body.consent-page .launch-nav {
+  box-sizing: border-box;
+  display: flex;
+  width: var(--static-shell);
+  min-height: 72px;
+  margin: 0 auto;
+  padding: 0;
+  align-items: center;
+  justify-content: space-between;
+}
+
+body.consent-page .launch-links {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+body.consent-page .launch-cta {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(241, 233, 222, 0.16);
+  border-radius: 9px;
+  background: transparent;
+  color: rgba(241, 233, 222, 0.84);
+}
+
+body.consent-page .consent-main {
+  width: var(--static-shell);
+  margin: 0 auto;
+  padding: clamp(92px, 10vw, 142px) 0;
+}
+
+body.consent-page .consent-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(390px, 0.7fr);
+  gap: clamp(64px, 9vw, 128px);
+  align-items: start;
+}
+
+body.consent-page .consent-intro h1 {
+  max-width: 10ch;
+  margin: 18px 0 26px;
+  color: #f1e9de;
+  font-family: var(--static-display);
+  font-size: clamp(4rem, 6vw, 6.6rem);
+  font-weight: 400;
+  line-height: 0.93;
+  letter-spacing: -0.048em;
+}
+
+body.consent-page .consent-lede {
+  max-width: 46ch;
+  color: rgba(229, 220, 209, 0.58);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+body.consent-page .consent-boundary {
+  display: block;
+  margin-top: 54px;
+  border-top: 1px solid rgba(241, 233, 222, 0.1);
+}
+
+body.consent-page .consent-boundary article {
+  display: grid;
+  padding: 18px 0;
+  grid-template-columns: 98px minmax(0, 1fr);
+  gap: 24px;
+  border: 0;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.07);
+  border-radius: 0;
+  background: transparent;
+}
+
+body.consent-page .consent-boundary article > span {
+  color: rgba(241, 233, 222, 0.74);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+body.consent-page .consent-boundary article > p {
+  margin: 0;
+  color: rgba(229, 220, 209, 0.5);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+body.consent-page .consent-panel {
+  padding: clamp(34px, 4vw, 48px);
+  border: 1px solid rgba(241, 233, 222, 0.1);
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.018), transparent 46%),
+    #111316;
+  box-shadow: none;
+}
+
+body.consent-page .consent-panel h2 {
+  margin: 10px 0 12px;
+  color: #f1e9de;
+  font-family: var(--static-display);
+  font-size: clamp(2rem, 3.2vw, 3.1rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.032em;
+}
+
+body.consent-page .consent-panel header > p,
+body.consent-page .consent-status,
+body.consent-page .consent-support {
+  color: rgba(229, 220, 209, 0.5);
+}
+
+body.consent-page .launch-footer {
+  width: var(--static-shell);
+  margin: 0 auto;
+  border-top: 1px solid rgba(241, 233, 222, 0.075);
+  background: transparent;
+}
+
+/* Retain dormant Worlds refinements for compatibility while the feature remains
+   absent from the current static How-it-works document. */
 body.how-page .worlds-proof-section::before {
   background: radial-gradient(circle at 62% 48%, rgba(241, 233, 222, 0.035), transparent 42rem);
 }
@@ -111,27 +907,321 @@ body.how-page .worlds-field-instrument b {
   box-shadow: 0 0 18px rgba(241, 233, 222, 0.26);
 }
 
-body.launch-page :is(a, button, summary) {
+body.launch-page :is(a, button, summary),
+body.consent-page :is(a, button, summary) {
   transition-duration: 160ms;
   transition-timing-function: ease-out;
 }
 
-@media (max-width: 650px) {
-  body.launch-page .launch-hero {
-    padding-top: 82px;
+/* Tablet. */
+@media (max-width: 900px) {
+  body.launch-page,
+  body.consent-page {
+    --static-shell: min(100% - 48px, 760px);
   }
 
-  body.launch-page .launch-hero h1 {
-    text-wrap: balance;
+  body.launch-page .launch-hero.launch-hero-compact {
+    min-height: auto;
+    padding: 108px 0 92px;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "kicker"
+      "title"
+      "body";
+    gap: 24px;
+  }
+
+  body.launch-page .launch-hero.launch-hero-compact > h1 {
+    max-width: 11ch;
+    font-size: clamp(4rem, 10vw, 6.3rem);
+  }
+
+  body.launch-page .launch-hero.launch-hero-compact > p:last-child {
+    max-width: 52ch;
+  }
+
+  body.launch-page .launch-heading,
+  body.launch-page .pricing-details-heading,
+  body.how-page .baseline-explainer,
+  body.launch-page .launch-callout,
+  body.how-page .support-note,
+  body.consent-page .consent-hero {
+    grid-template-columns: 1fr;
+  }
+
+  body.how-page .journey-steps > article {
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+
+  body.how-page .journey-steps > article > p {
+    grid-column: 2;
+  }
+
+  body.how-page .product-proof-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.how-page .product-proof-conversation {
+    border-right: 0;
+    border-bottom: 1px solid rgba(241, 233, 222, 0.07);
+  }
+
+  body.questions-page .faq-category {
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 44px;
+  }
+
+  body.consent-page .consent-panel {
+    max-width: 680px;
+  }
+}
+
+/* Phone. */
+@media (max-width: 650px) {
+  body.launch-page,
+  body.consent-page {
+    --static-shell: calc(100% - 32px);
+  }
+
+  body.launch-page .launch-nav-inner {
+    min-height: 64px;
+  }
+
+  body.launch-page .launch-hero.launch-hero-compact {
+    padding: 84px 0 70px;
+  }
+
+  body.launch-page .launch-hero.launch-hero-compact::before {
+    top: 64px;
+    height: 390px;
+  }
+
+  body.launch-page .launch-hero.launch-hero-compact > h1 {
+    max-width: 12ch;
+    font-size: clamp(3.25rem, 15.6vw, 5.1rem);
+    line-height: 0.94;
+  }
+
+  body.launch-page .launch-hero.launch-hero-compact > p:last-child {
+    font-size: 0.96rem;
+    line-height: 1.62;
+  }
+
+  body.launch-page :is(.launch-band, .launch-section) {
+    padding: 70px 0;
+  }
+
+  body.launch-page .launch-heading,
+  body.launch-page .pricing-details-heading {
+    margin-bottom: 38px;
+    gap: 24px;
+  }
+
+  body.launch-page :is(.launch-heading, .pricing-details-heading) h2,
+  body.launch-page .baseline-explainer > div > h2,
+  body.launch-page .support-note h2,
+  body.launch-page .launch-callout h2 {
+    max-width: 12ch;
+    font-size: clamp(2.55rem, 11.8vw, 4rem);
+  }
+
+  body.how-page .journey-steps > article {
+    min-height: 0;
+    padding: 27px 0 30px;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  body.how-page .journey-steps > article > span {
+    font-size: 0.62rem;
+  }
+
+  body.how-page .journey-steps > article > h3 {
+    font-size: clamp(1.6rem, 7.4vw, 2rem);
+  }
+
+  body.how-page .journey-steps > article > p {
+    grid-column: 1 / -1;
+    padding-left: 56px;
+    font-size: 0.9rem;
+  }
+
+  body.how-page .definition-list > div,
+  body.how-page .framework-disclosure,
+  body.pricing-page .billing-note {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  body.how-page .product-proof-window {
+    border-radius: 14px;
+  }
+
+  body.how-page .product-proof-conversation,
+  body.how-page .product-proof-flow {
+    padding: 24px 20px;
+  }
+
+  body.how-page .product-proof-question {
+    font-size: clamp(1.75rem, 9vw, 2.55rem);
+  }
+
+  body.how-page .support-note {
+    gap: 34px;
+  }
+
+  body.how-page .support-links {
+    width: 100%;
+  }
+
+  body.how-page .support-links .launch-button {
+    width: 100%;
+    min-height: 48px;
+    justify-content: space-between;
+  }
+
+  body.pricing-page .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.pricing-page .price-card,
+  body.pricing-page .price-card.featured {
+    min-height: 0;
+    padding: 42px 0;
+  }
+
+  body.pricing-page .price-card + .price-card {
+    border-top: 1px solid rgba(241, 233, 222, 0.11);
+    border-left: 0;
+  }
+
+  body.pricing-page .price-card.featured {
+    background: transparent;
+  }
+
+  body.pricing-page .price-card h2 {
+    max-width: 14ch;
+    font-size: clamp(2rem, 10vw, 2.85rem);
+  }
+
+  body.pricing-page .price {
+    font-size: clamp(4rem, 20vw, 5.8rem);
+  }
+
+  body.pricing-page .plan-comparison-list > div {
+    padding: 24px 0;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  body.pricing-page .plan-comparison-list dt {
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(241, 233, 222, 0.06);
+  }
+
+  body.questions-page .faq-section {
+    max-width: none;
+  }
+
+  body.questions-page .faq-category {
+    padding-bottom: 62px;
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  body.questions-page .faq-category + .faq-category {
+    padding-top: 56px;
+  }
+
+  body.questions-page .faq-list summary {
+    min-height: 64px;
+    padding: 19px 42px 19px 0;
+    font-size: 0.98rem;
+  }
+
+  body.questions-page .faq-list summary::after {
+    top: 17px;
+  }
+
+  body.questions-page .faq-list details > p {
+    margin-bottom: 23px;
+    font-size: 0.9rem;
+  }
+
+  body.launch-page .launch-callout {
+    gap: 34px;
+  }
+
+  body.launch-page .launch-callout .launch-button {
+    width: 100%;
+    min-height: 50px;
+    justify-content: space-between;
+  }
+
+  body.not-found-page .not-found-stage {
+    min-height: calc(100svh - 128px);
+    padding-bottom: max(84px, calc(64px + env(safe-area-inset-bottom)));
+  }
+
+  body.consent-page .launch-nav {
+    width: var(--static-shell);
+    min-height: 64px;
+  }
+
+  body.consent-page .launch-links > a:not(.launch-cta) {
+    display: none;
+  }
+
+  body.consent-page .consent-main {
+    padding: 78px 0 92px;
+  }
+
+  body.consent-page .consent-hero {
+    gap: 54px;
+  }
+
+  body.consent-page .consent-intro h1 {
+    max-width: 11ch;
+    font-size: clamp(3.25rem, 15vw, 4.9rem);
+  }
+
+  body.consent-page .consent-boundary article {
+    grid-template-columns: 82px minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  body.consent-page .consent-panel {
+    padding: 28px 20px;
+    border-radius: 14px;
+  }
+
+  body.consent-page .launch-footer {
+    padding-bottom: max(28px, env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 360px) {
+  body.launch-page,
+  body.consent-page {
+    --static-shell: calc(100% - 24px);
+  }
+
+  body.launch-page .launch-hero.launch-hero-compact > h1,
+  body.consent-page .consent-intro h1 {
+    font-size: 3rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   body.launch-page *,
   body.launch-page *::before,
-  body.launch-page *::after {
+  body.launch-page *::after,
+  body.consent-page *,
+  body.consent-page *::before,
+  body.consent-page *::after {
     animation: none !important;
     scroll-behavior: auto !important;
     transition: none !important;
+    transform: none !important;
   }
 }
