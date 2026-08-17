@@ -54,6 +54,8 @@ describe('approved public landing v8', () => {
       'See a Sovereign answer'
     ]) expect(landing).toContain(marker);
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
+    expect(landing).toContain("data-question-fallback={index === 0 ? 'visible' : undefined}");
+    expect(landing).toContain("style={index === 0 ? { opacity: 1, transform: 'translateY(0)' } : undefined}");
 
     for (const marker of [
       'Baseline-first recognition: this is a real explanatory stage',
