@@ -135,20 +135,27 @@ describe('Sovereign.OS public experience', () => {
     expect(landingRefinementV2Css).toContain('@keyframes sovereign-system-route');
     expect(landingRefinementV2Css).toContain('scroll-snap-type: inline mandatory !important');
     expect(staticRefinementCss).toContain('--v0-blue: #e8ddd0');
+    expect(staticRefinementCss).toContain('body.how-page .journey-steps > article');
+    expect(staticRefinementCss).toContain('body.pricing-page .pricing-grid');
+    expect(staticRefinementCss).toContain('body.questions-page .faq-category');
   });
 
-  it('keeps support pages, consent, and fallback routes intact', () => {
-    expect(how).toContain('See the pattern clearly enough to understand what could change.');
-    expect(how).toContain('/experience-static-refinement-v1.css');
+  it('keeps support pages, consent, and fallback routes intact while using current public language', () => {
+    expect(how).toContain('Your Baseline first. The situation second.');
+    expect(how).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
+    expect(pricing).toContain('Start with your Baseline. Add more only when you need it.');
     expect(pricing).toContain('$20');
     expect(pricing).toContain('$99 / year');
-    expect(pricing).toContain('/experience-static-refinement-v1.css');
-    expect(faq).toContain('Clear answers about what Sovereign does—and what remains yours.');
-    expect(faq).toContain('/experience-static-refinement-v1.css');
+    expect(pricing).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
+    expect(faq).toContain('What you should know before you begin.');
+    expect(faq).toContain('Tarot is not part of Sovereign.OS.');
+    expect(faq).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
     expect(platformPublicCss).toContain('opacity: 1 !important');
     expect(staticExperienceCss).toContain('@media (max-width: 620px)');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
-    expect(consent).toContain('You decide what another account may use.');
+    expect(notFound).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
+    expect(consent).toContain('You control what another person can use with you.');
+    expect(consent).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
     expect(consentCss).toContain('@media (max-width: 680px)');
   });
 });
