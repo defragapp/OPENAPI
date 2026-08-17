@@ -1,13 +1,26 @@
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import sharp from 'sharp';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const webRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const repoRoot = resolve(webRoot, '../..');
 const publicDir = resolve(webRoot, 'public');
 const distDir = resolve(webRoot, 'dist');
 
+async function loadSharp() {
+  try {
+    return (await import('sharp')).default;
+  } catch {
+    const pnpmDirectory = resolve(repoRoot, 'node_modules/.pnpm');
+    const entry = readdirSync(pnpmDirectory).find((name) => name.startsWith('sharp@'));
+    if (!entry) throw new Error('sharp is required to materialize Sovereign brand PNGs');
+    const modulePath = resolve(pnpmDirectory, entry, 'node_modules/sharp/lib/index.js');
+    return (await import(pathToFileURL(modulePath).href)).default;
+  }
+}
+
 mkdirSync(distDir, { recursive: true });
+const sharp = await loadSharp();
 
 const jobs = [
   {
