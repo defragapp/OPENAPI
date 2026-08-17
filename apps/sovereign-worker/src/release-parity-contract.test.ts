@@ -11,6 +11,7 @@ const privacyAccessMigration = readFileSync(resolve(workerRoot, 'migrations/0017
 const packageJson = readFileSync(resolve(repositoryRoot, 'package.json'), 'utf8');
 const wranglerConfig = readFileSync(resolve(repositoryRoot, 'wrangler.jsonc'), 'utf8');
 const releaseWrapper = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-release.mjs'), 'utf8');
+const textRelease = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-text-release.mjs'), 'utf8');
 const deployV3 = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-deploy-v3.mjs'), 'utf8');
 const releaseOrchestrator = readFileSync(resolve(repositoryRoot, 'scripts/release-orchestrator.mjs'), 'utf8');
 const releaseEvidenceLibrary = readFileSync(resolve(repositoryRoot, 'scripts/release-evidence-lib.mjs'), 'utf8');
@@ -67,7 +68,7 @@ describe('production release parity contract', () => {
     expect(parentVerifier).toContain("assert(result.json?.visualRelease?.sequenceFingerprint === expectedSequence");
   });
 
-  it('verifies DMARC before migrations, one deploy, route checks, rendered checks, and D1 evidence', () => {
+  it('keeps the optional Browser-audited release path fail-closed', () => {
     expect(deployV3).toContain("runWrangler(['deploy', '--config', generatedConfigPath])");
     expect(deployV3).not.toContain('cloudflare-production-deploy-v2.mjs');
     expect(releaseOrchestrator).toContain('applyD1Migrations');
@@ -101,6 +102,22 @@ describe('production release parity contract', () => {
     expect(visualVerifier).toContain("method: 'Cloudflare Browser Run snapshot with full-page PNG plus deterministic normalized pixel, edge, color, and section-rhythm comparison'");
   });
 
+  it('provides a text-first production release path without Browser Rendering and records truthful evidence', () => {
+    expect(packageJson).toContain('"production:release:text"');
+    expect(packageJson).toContain('cloudflare-production-text-release.mjs');
+    expect(textRelease).toContain('DEFAULT_POST_DEPLOY_CHECKS.filter((check) => check.browserRun !== true)');
+    expect(textRelease).toContain("const requiredChecks = ['verify-runtime-v3', 'verify-secondary-public']");
+    expect(textRelease).toContain('postDeployChecks: TEXT_FIRST_POST_DEPLOY_CHECKS');
+    expect(textRelease).not.toContain('verify-live-route-cohesion');
+    expect(textRelease).not.toContain('verify-live-visual-release');
+    expect(releaseOrchestrator).toContain("routeCohesionVerified: passedPostDeployChecks.has('verify-route-cohesion')");
+    expect(releaseOrchestrator).toContain("renderedVisualVerified: passedPostDeployChecks.has('verify-rendered-visuals')");
+    expect(releaseEvidenceLibrary).toContain("typeof value.routeCohesionVerified === 'boolean'");
+    expect(releaseEvidenceLibrary).toContain("typeof value.renderedVisualVerified === 'boolean'");
+    expect(releaseEvidenceRuntime).toContain("typeof evidence.routeCohesionVerified !== 'boolean'");
+    expect(releaseEvidenceRuntime).toContain("typeof evidence.renderedVisualVerified !== 'boolean'");
+  });
+
   it('verifies the publicly served DMARC value before deployment without mutating DNS', () => {
     expect(dmarcReconciler).toContain("const RECORD_NAME = '_dmarc.defrag.app'");
     expect(dmarcReconciler).toContain("v=DMARC1; p=none; sp=none; adkim=s; aspf=s; pct=100");
@@ -115,7 +132,7 @@ describe('production release parity contract', () => {
     expect(releaseEvidenceLibrary).not.toContain('external_blocker');
   });
 
-  it('publishes exact-SHA application release evidence only after every application gate', () => {
+  it('publishes exact-SHA application release evidence with explicit verification provenance', () => {
     expect(releaseEvidenceLibrary).toContain("RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
     expect(releaseEvidenceLibrary).toContain("RELEASE_MIGRATION_VERSION = '0017_privacy_access_and_eligibility'");
     expect(releaseEvidenceLibrary).toContain("RELEASE_MIGRATION_FILENAME = '0017_privacy_access_and_eligibility.sql'");
@@ -123,6 +140,8 @@ describe('production release parity contract', () => {
     expect(evidenceWriter).toContain("status='success'");
     expect(evidenceWriter).toContain('releaseEvidenceEquals');
     expect(evidenceWriter).toContain("payload?.dependencies?.privacyAccessControls === 'configured'");
+    expect(evidenceWriter).toContain('routeCohesionVerified');
+    expect(evidenceWriter).toContain('renderedVisualVerified');
     expect(evidenceWriter).not.toContain("runWrangler(['deploy'");
     expect(progressWriter).toContain('upsertReleaseProgressSql');
     expect(wranglerConfig).toMatch(/"account_id"\s*:\s*"[0-9a-f]{32}"/i);
