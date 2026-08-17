@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 const onboardingMigration = readFileSync(new URL('../migrations/0010_account_onboarding_and_chat_history.sql', import.meta.url), 'utf8');
 const recoveryMigration = readFileSync(new URL('../migrations/0011_email_code_recovery.sql', import.meta.url), 'utf8');
 const capacityMigration = readFileSync(new URL('../migrations/0013_workers_ai_free_capacity.sql', import.meta.url), 'utf8');
+const policyReceiptMigration = readFileSync(new URL('../migrations/0016_policy_acceptance_receipts.sql', import.meta.url), 'utf8');
 const auth = readFileSync(new URL('./auth-public.ts', import.meta.url), 'utf8');
 const index = readFileSync(new URL('./index.ts', import.meta.url), 'utf8');
 const entry = readFileSync(new URL('./entry.ts', import.meta.url), 'utf8');
@@ -153,11 +154,14 @@ const entryCss = readFileSync(new URL('../../web/src/main.tsx', import.meta.url)
     expect(entry).not.toContain("'user_message', { redacted: true");
   });
 
-  it('reports the current migration from the authoritative production health layer', () => {
+  it('reports the current migration and policy receipt store from the authoritative production health layer', () => {
     expect(runtime).toContain("CAPACITY_MIGRATION_VERSION = '0013_workers_ai_free_capacity'");
-    expect(runtime).toContain("PREVIOUS_MIGRATION_VERSION = '0014_passkey_authentication'");
-    expect(runtime).toContain("LATEST_MIGRATION_VERSION = '0015_release_evidence'");
-    expect(runtime).toContain('const migrationVersion = releaseSchemaReady');
+    expect(runtime).toContain("PASSKEY_MIGRATION_VERSION = '0014_passkey_authentication'");
+    expect(runtime).toContain("PREVIOUS_MIGRATION_VERSION = '0015_release_evidence'");
+    expect(runtime).toContain("LATEST_MIGRATION_VERSION = '0016_policy_acceptance_receipts'");
+    expect(runtime).toContain('const migrationVersion = policyReceiptSchemaReady');
+    expect(runtime).toContain("policyAcceptanceReceipts: policyReceiptSchemaReady ? 'configured' : 'missing'");
+    expect(policyReceiptMigration).toContain('CREATE TABLE policy_acceptance_receipts');
     expect(runtime).toContain("answerContract: 'sovereign-answer.v2'");
   });
 });
