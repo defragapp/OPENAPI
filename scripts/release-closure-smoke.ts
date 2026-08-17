@@ -8,12 +8,23 @@ function assert(condition: unknown, message: string): asserts condition { if (!c
 function fakeDb(): D1Database { return { prepare(sql: string) { return { bind(...args: unknown[]) { return { async first() { if (sql.includes('auth_magic_links WHERE email_normalized')) return null; if (sql.startsWith('SELECT id FROM accounts')) return null; if (sql.startsWith('SELECT id FROM persons')) return null; return null; }, async run() { return { success: true, meta: { changes: 1 } }; }, async all() { return { results: [] }; } }; }, async run() { return { success: true, meta: { changes: 1 } }; }, async all() { return { results: [] }; } }; } } as unknown as D1Database; }
 async function main() {
   const worker = readFileSync('apps/sovereign-worker/src/index.ts', 'utf8');
+  const runtime = readFileSync('apps/sovereign-worker/src/runtime-entry.ts', 'utf8');
+  const privacyRights = readFileSync('apps/sovereign-worker/src/privacy-rights.ts', 'utf8');
   assert(worker.includes("app.post('/api/v1/threads/:threadId/covenant'"), 'missing Covenant thread route');
   assert(worker.includes("requireFeature(await getEntitlements") && worker.includes("'covenant.lens'"), 'missing Covenant entitlement gate');
   assert(worker.includes("requireConsent(context.env, auth.accountId, body.personId, 'covenant.include')"), 'missing Covenant person consent gate');
   assert(worker.includes("app.get('/api/v1/covenant/scripture/:reference', async () => Response.json({ error: 'not_found' }, { status: 404 }))"), 'direct scripture retrieval must be unavailable');
   assert(worker.includes('export async function queue'), 'missing optional background-message handler');
   assert(worker.includes('export async function scheduled'), 'missing scheduled cleanup export');
+  assert(runtime.includes("url.pathname === '/api/v1/account/export'"), 'missing authenticated private export route');
+  assert(runtime.includes("'content-disposition': 'attachment; filename=\"sovereign-account-export.json\"'"), 'private export is not returned as a download');
+  assert(runtime.includes("privateExports: 'on-demand-no-artifact'"), 'runtime does not advertise on-demand no-artifact export');
+  assert(privacyRights.includes("exportArtifactStored: false"), 'private export retention contract is missing');
+  assert(privacyRights.includes("generatedOnDemand: true"), 'private export on-demand contract is missing');
+  for (const prohibited of ['credential_id TEXT', 'public_key_jwk TEXT', 'stripe_customer_id TEXT', 'stripe_subscription_id TEXT', 'token_hash TEXT']) {
+    assert(!privacyRights.includes(prohibited), `private export source includes prohibited credential/provider field marker ${prohibited}`);
+  }
+  assert(!privacyRights.includes('env.R2') && !privacyRights.includes('r2_key'), 'private export must not use R2 or retained export artifacts');
   const envProd = { APP_ENV: 'production', APP_VERSION: 'closure', DB: fakeDb(), THREADS: {} as DurableObjectNamespace, STRIPE_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '', SESSION_SIGNING_SECRET: 'secret' } as Env;
   let turnstileClosed = false; try { await verifyTurnstile(envProd, 'test-turnstile-pass'); } catch (error) { turnstileClosed = error instanceof Response && error.status === 503; }
   assert(turnstileClosed, 'production Turnstile test bypass was accepted');
@@ -27,7 +38,7 @@ async function main() {
   const inventory = deletionInventory().join('\n');
   for (const item of required) assert(inventory.includes(item), `deletion inventory missing ${item}`);
   assert(!/R2:exports/.test(inventory), 'disabled R2 private-export storage remained in deletion inventory');
-  console.log('Release closure smoke passed scheduled_cleanup=true optional_message_handler=true covenant_matrix=true turnstile_closed=true email_closed=true baseline_frameworks=true current_fails_closed=true deletion_inventory=true private_exports=false');
+  console.log('Release closure smoke passed scheduled_cleanup=true optional_message_handler=true covenant_matrix=true turnstile_closed=true email_closed=true baseline_frameworks=true current_fails_closed=true deletion_inventory=true private_exports=on-demand-no-artifact');
 }
 main().catch(async (error) => {
   if (error instanceof Response) {
