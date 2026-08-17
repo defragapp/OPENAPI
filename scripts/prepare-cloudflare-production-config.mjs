@@ -16,7 +16,8 @@ export function prepareProductionConfig({
   runWrangler = runWranglerCli,
   generatedConfigPath = DEFAULT_PRODUCTION_CONFIG_PATH,
   sourceConfigPath = SOURCE_CONFIG_PATH,
-  canonicalConfigPath = CANONICAL_CONFIG_PATH
+  canonicalConfigPath = CANONICAL_CONFIG_PATH,
+  preserveExistingRoutes = false
 } = {}) {
   const sha = assertReleaseSha(commitSha);
   const source = JSON.parse(readFileSync(sourceConfigPath, 'utf8'));
@@ -41,8 +42,19 @@ export function prepareProductionConfig({
     database_id: databaseId,
     migrations_dir: 'apps/sovereign-worker/migrations'
   }];
+  if (preserveExistingRoutes) {
+    delete source.routes;
+    delete source.route;
+  }
   writeFileSync(generatedConfigPath, `${JSON.stringify(source, null, 2)}\n`);
-  return { generatedConfigPath, databaseId, databaseName: DATABASE_NAME, workerName: WORKER_NAME, commitSha: sha };
+  return {
+    generatedConfigPath,
+    databaseId,
+    databaseName: DATABASE_NAME,
+    workerName: WORKER_NAME,
+    commitSha: sha,
+    routesManagedByDeploy: !preserveExistingRoutes
+  };
 }
 
 export function cleanupProductionConfig(path = DEFAULT_PRODUCTION_CONFIG_PATH) {
