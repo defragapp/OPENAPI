@@ -72,16 +72,25 @@ for (let attempt = 1; attempt <= 30; attempt += 1) {
   }
 }
 
-const [home, parentRoot, wwwRoot, parentApp, wwwLogin] = await Promise.all([
+const [home, parentRoot, wwwRoot, parentApp, wwwLogin, socialPreview, appIcon, touchIcon] = await Promise.all([
   readText(`${publicBase}/?release=${commitSha}`),
   readText('https://defrag.app/', { redirect: 'manual' }),
   readText('https://www.defrag.app/', { redirect: 'manual' }),
   readText('https://defrag.app/app', { redirect: 'manual' }),
-  readText('https://www.defrag.app/login', { redirect: 'manual' })
+  readText('https://www.defrag.app/login', { redirect: 'manual' }),
+  request(`${publicBase}/og-sovereign.png`),
+  request(`${publicBase}/app-icon.png`),
+  request(`${publicBase}/apple-touch-icon.png`)
 ]);
 
 assert(home.response.ok, `public landing returned ${home.response.status}`);
 assert(home.text.includes('id="root"'), 'public landing root is missing');
+assert(home.text.includes('Sovereign.OS — Private personal AI for real life'), 'public landing product-category metadata is missing');
+assert(home.text.includes('/og-sovereign.png'), 'public landing raster social preview is missing');
+assert(home.text.includes('/apple-touch-icon.png'), 'public landing iOS touch icon is missing');
+assert(socialPreview.ok && (socialPreview.headers.get('content-type') || '').includes('image/png'), 'social preview PNG is not publicly served');
+assert(appIcon.ok && (appIcon.headers.get('content-type') || '').includes('image/png'), 'app icon PNG is not publicly served');
+assert(touchIcon.ok && (touchIcon.headers.get('content-type') || '').includes('image/png'), 'iOS touch icon PNG is not publicly served');
 assert(parentRoot.response.status === 308 && parentRoot.response.headers.get('location') === `${publicBase}/`, 'defrag.app root redirect is incorrect');
 assert(wwwRoot.response.status === 308 && wwwRoot.response.headers.get('location') === `${publicBase}/`, 'www.defrag.app root redirect is incorrect');
 assert(parentApp.response.status === 308 && parentApp.response.headers.get('location') === `${appBase}/app`, 'defrag.app app redirect is incorrect');
@@ -103,12 +112,17 @@ for (const marker of [
   'landing-expression-field-v3',
   'Healing isn’t optional.',
   'Holding onto the pain is.',
-  'See the capacity beneath the pattern.',
+  'Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics.',
+  'Built for real situations',
+  'Separate helping from carrying the outcome.',
   'Understand what happens between you.',
-  'See what keeps the pattern going—and what could change it.',
+  'See where responsibility keeps landing.',
   'Your thoughts deserve'
 ]) {
   assert(javascript.text.includes(marker), `compiled production JavaScript is missing ${marker}`);
+}
+for (const retired of ['See the capacity beneath the pattern.', 'See what keeps the pattern going—and what could change it.']) {
+  assert(!javascript.text.includes(retired), `compiled production JavaScript still contains retired public language ${retired}`);
 }
 
 const normalizedStylesheet = stylesheet.text.replace(/\s+/g, '');
@@ -139,7 +153,10 @@ console.log(JSON.stringify({
     sequenceFingerprint: expectedSequence,
     renderedComparisonRequired: true,
     javascriptAsset: jsPath,
-    cssAsset: cssPath
+    cssAsset: cssPath,
+    socialPreview: `${publicBase}/og-sovereign.png`,
+    appIcon: `${publicBase}/app-icon.png`,
+    touchIcon: `${publicBase}/apple-touch-icon.png`
   },
   redirects: [
     { source: 'https://defrag.app/', destination: `${publicBase}/` },
