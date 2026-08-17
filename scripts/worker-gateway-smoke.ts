@@ -105,6 +105,10 @@ function fakeEnv(): Env {
     THREADS: { idFromName: (name: string) => ({ name }) as DurableObjectId, get: () => ({ fetch: async () => Response.json({ sequence: ++seq, duplicate: false }) }) as unknown as DurableObjectStub } as unknown as DurableObjectNamespace,
     AI: { async run(model: string, input: unknown, options?: unknown) {
       if (model !== config.model) throw new Error(`invalid model ${redact(model)}`);
+      const request = input as Record<string, unknown>;
+      if (typeof request?.prompt !== 'string' || request.prompt.length < 20) throw new Error('invalid workers ai prompt');
+      if (request.max_completion_tokens !== 3_200) throw new Error('invalid workers ai completion limit');
+      if ('input' in request || 'max_output_tokens' in request) throw new Error('legacy workers ai request fields detected');
       const gateway = (options as any)?.gateway;
       if (gateway?.id !== 'sovereign-ai-gateway' || gateway?.skipCache !== true || gateway?.collectLog !== false || gateway?.metadata?.plan !== 'free' || gateway?.metadata?.response_contract !== 'sovereign-answer.v2' || !gateway?.metadata?.account_ref) throw new Error('invalid gateway metadata');
       if (JSON.stringify(options).includes('acct_')) throw new Error('raw account id leaked');
@@ -114,7 +118,7 @@ function fakeEnv(): Env {
         mode: 'baseline',
         depth: 'standard',
         headline: 'Direction can become responsibility quickly.',
-        direct_answer: 'You may be quick to create direction when a situation has no clear owner. That capacity becomes costly when consequences become yours without matching authority.',
+        direct_answer: 'You may be quick to create direction when a situation has no clear owner. That quality becomes costly when consequences become yours without matching authority.',
         sections: [
           { id: 'shadow', label: 'Shadow', body: 'You may end uncertainty by taking over before responsibility is shared.' },
           { id: 'gift', label: 'Gift', body: 'You can create structure while leaving ownership visible and shared.' }
@@ -148,7 +152,7 @@ async function main(): Promise<void> {
   const text = await res.text();
   if (res.status !== 202) throw new Error(`worker gateway smoke failed status=${res.status} body=${redact(text)}`);
   for (const phrase of ['Direction can become responsibility quickly.', 'SHADOW', 'GIFT']) if (!text.includes(phrase)) throw new Error(`missing ${phrase}`);
-  console.log(`Worker Gateway smoke passed status=${res.status} response_chars=${text.length} contract=sovereign-answer.v2 provider=${config.provider} model=${config.model}`);
+  console.log(`Worker Gateway smoke passed status=${res.status} response_chars=${text.length} contract=sovereign-answer.v2 provider=${config.provider} model=${config.model} request_shape=prompt+max_completion_tokens`);
 }
 
 main().catch((error) => { console.error(redact(error instanceof Error ? error.message : String(error))); process.exit(1); });
