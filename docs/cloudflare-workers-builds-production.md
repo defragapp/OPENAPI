@@ -1,41 +1,32 @@
-# Cloudflare Workers Builds production wiring
+# Historical Cloudflare Workers Builds production wiring
 
-Production source: `defragapp/OPENAPI`
+Status: historical operational reference. This file no longer defines production release authority.
 
-Worker: `sovv-web`
+The production repository and Worker remain:
 
-Branch: `main`
+- repository: `defragapp/OPENAPI`;
+- branch authority: `main`;
+- Worker: `sovv-web`;
+- public domain: `https://sovereign.defrag.app`;
+- app/API domain: `https://app.defrag.app`;
+- current migration: `0015_release_evidence`.
 
-Repository root: `/`
+Earlier releases used Cloudflare Workers Builds triggers and build-token wiring. Those records are retained only to explain historical deployments and incidents.
 
-Build command:
+## Current authority
 
-```sh
-corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build
+The current production release procedure is `docs/production-release.md` and the executable entry point is:
+
+```bash
+pnpm production:release:oauth
 ```
 
-Deploy command:
+The wrapper selects the exact current `origin/main` SHA, establishes a fresh Wrangler current-member OAuth session, runs `pnpm verify:cloudflare-build`, executes the internal `pnpm production:deploy` stage, and verifies exact-SHA readiness and release evidence on both branded domains.
 
-```sh
-pnpm production:deploy
-```
+Do not use a historical Workers Builds trigger, `build_token_uuid`, manual Builds API POST, deploy hook, or old build UUID as current release authority or as proof that production is complete.
 
-Required production release contract:
+GitHub Actions, Cloudflare Pages, preview Workers, duplicate Workers, and alternate repositories remain outside production authority.
 
-- Cloudflare Workers Builds is the only automatic production authority.
-- A push to `main` triggers the connected production build. Non-production branch builds remain disabled.
-- Cloudflare must supply the full source commit through `WORKERS_CI_COMMIT_SHA` or `GITHUB_SHA`.
-- The deploy process applies D1 migrations, deploys `wrangler.production-direct.jsonc`, and verifies the exact live release.
-- `/health` must report the exact deployed commit.
-- `/ready` must report `ready=true`, the exact deployed commit, and migration `0015_release_evidence`.
-- Closed, draft, experimental, and `ops/*` branches are never production sources and must not retain an alternative deployment workflow.
-- Do not use `chatthread-app`, `defragapp/SOVV`, a Pages deployment, a preview Worker, or an external design preview as a production signal for Sovereign.OS.
-- Do not retain a deploy hook that points to an unknown or retired repository or branch. Delete it and recreate it only after the Git connection is verified.
-- A release is incomplete until `sovereign.defrag.app` and `app.defrag.app` report the same exact commit and `ready=true`.
-- The retired `sovv-web.sovereign-os-api.workers.dev` hostname must remain unavailable because production sets both `workers_dev` and preview URLs to `false`.
+## Historical evidence
 
-## Builds API maintenance
-
-Workers Builds trigger inspection, repair, and manual build creation require a user-scoped Cloudflare API token with `Workers Builds Configuration: Edit`; account-scoped tokens are rejected by the Builds API. This management credential is separate from the build token selected by the trigger. The production trigger's `build_token_uuid` must reference an active build token before an exact-SHA build is started.
-
-The Worker configuration is defined in `wrangler.production-direct.jsonc`. The repository release gate is `pnpm verify:cloudflare-build`; the deploy-and-live-verification entry point is `pnpm production:deploy`.
+Old Workers Builds UUIDs, trigger configuration, and build-token investigations may still be useful when reconstructing a past deployment. They must be interpreted as dated evidence only and must not override the live release scripts, `docs/production-release.md`, or exact `/ready` evidence from the current production domains.
