@@ -32,6 +32,7 @@ import landingLiveRefinementV4Css from './landing-live-refinement-v4.css?inline'
 import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline';
 import invitationRenderedFidelityCss from './invitation-rendered-fidelity-v1.css?inline';
 import workspaceProductionRefinementCss from './workspace-production-refinement-v1.css?inline';
+import authenticatedLaunchCohesionCss from './authenticated-launch-cohesion-v1.css?inline';
 
 /* Component foundations */
 import './styles.css';
@@ -101,6 +102,7 @@ function installPlatformVisualCohesion(): void {
   style.textContent += `\n${landingLiveRefinementV5Css}`;
   style.textContent += `\n${invitationRenderedFidelityCss}`;
   style.textContent += `\n${workspaceProductionRefinementCss}`;
+  style.textContent += `\n${authenticatedLaunchCohesionCss}`;
   document.head.append(style);
 }
 
