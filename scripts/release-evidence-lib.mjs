@@ -40,17 +40,25 @@ export function decodeBase64Json(value) {
   return JSON.parse(Buffer.from(String(value || ''), 'base64').toString('utf8'));
 }
 
-export function createReleaseEvidence({ sha, dmarcVerified = false, completedAt = new Date().toISOString() }) {
+export function createReleaseEvidence({
+  sha,
+  routeCohesionVerified = false,
+  renderedVisualVerified = false,
+  dmarcVerified = false,
+  completedAt = new Date().toISOString()
+}) {
   const normalizedSha = assertReleaseSha(sha);
+  if (typeof routeCohesionVerified !== 'boolean') throw new Error('Route-cohesion verification state must be boolean');
+  if (typeof renderedVisualVerified !== 'boolean') throw new Error('Rendered-visual verification state must be boolean');
   if (dmarcVerified !== true) throw new Error('Verified DMARC is required for successful release evidence');
   return {
     contract: RELEASE_EVIDENCE_CONTRACT,
     sha: normalizedSha,
     migrationVersion: RELEASE_MIGRATION_VERSION,
     routeCohesionContract: RELEASE_ROUTE_COHESION_CONTRACT,
-    routeCohesionVerified: true,
+    routeCohesionVerified,
     renderedVisualContract: RELEASE_RENDERED_VISUAL_CONTRACT,
-    renderedVisualVerified: true,
+    renderedVisualVerified,
     dmarcRecord: RELEASE_DMARC_RECORD,
     dmarcVerified: true,
     dmarcStatus: 'verified',
@@ -69,9 +77,9 @@ export function validateReleaseEvidence(value, expectedSha) {
     && value.sha === sha
     && value.migrationVersion === RELEASE_MIGRATION_VERSION
     && value.routeCohesionContract === RELEASE_ROUTE_COHESION_CONTRACT
-    && value.routeCohesionVerified === true
+    && typeof value.routeCohesionVerified === 'boolean'
     && value.renderedVisualContract === RELEASE_RENDERED_VISUAL_CONTRACT
-    && value.renderedVisualVerified === true
+    && typeof value.renderedVisualVerified === 'boolean'
     && value.dmarcRecord === RELEASE_DMARC_RECORD
     && value.dmarcVerified === true
     && value.dmarcStatus === 'verified'
