@@ -12,13 +12,15 @@ Canonical repository: `defragapp/OPENAPI`.
 
 ## Product direction
 
-Sovereign.OS is a Baseline-first AI platform for understanding yourself, your relationships, and the human systems around you. One Sovereign agent helps a person explore a structured Baseline, distinguish stable qualities from temporary current context, compare consented Baselines, examine Alignment, and understand families, households, teams, friendships, and workplaces.
+Sovereign.OS is a Baseline-first AI platform for understanding yourself, your relationships, and the human systems around you.
+
+Baseline Design is the foundation. A person brings an ordinary real-life question, decision, relationship, or recurring situation; Sovereign uses the Baseline to make a relevant distinction visible before exposing technical machinery. Relationship and system intelligence extend that same foundation outward while keeping each person distinct and permission-bound.
 
 The platform uses one explanatory movement across those capabilities: see the capacity beneath a pattern, see how that capacity may be expressing, see what happens between people, and see what may keep the pattern going and what could change it. This is implemented through the existing Baseline, Expression Field, answer, People, Systems, Library, and Worlds contracts; it is not a separate product or claim of interpersonal causation.
 
 Defrag, Alignment, and Covenant are internal capabilities of one agent. They are not separate top-level applications.
 
-User-facing language is governed by [`docs/product-language-system.md`](docs/product-language-system.md). The founder-approved product boundary is defined in [`docs/launch-product-contract.md`](docs/launch-product-contract.md). The Layer A–D intelligence model, `sovereign-answer.v2`, and exact Basis contract are defined in [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md). Safety, privacy, visual, architecture, and release documents inherit those authorities within their own scope; audits, strategies, and release records are supporting or historical documents and do not redefine them.
+User-facing language is governed by [`docs/product-language-system.md`](docs/product-language-system.md). The founder-approved product boundary is defined in [`docs/launch-product-contract.md`](docs/launch-product-contract.md). The Layer A–D intelligence model, `sovereign-answer.v2`, and exact Basis contract are defined in [`docs/inner-recognition-intelligence.md`](docs/inner-recognition-intelligence.md). Safety, privacy, visual, architecture, and release documents inherit those authorities within their own scope; audits, strategies, implementation plans, deployment markers, and release records are supporting or historical documents and do not redefine them.
 
 ## Production architecture
 
@@ -61,21 +63,21 @@ Cloudflare Queue and R2 are intentionally disabled. Private export is not part o
 - Covenant is contextual, explicitly confirmed, and limited to retrieved or curated verified Scripture.
 - Safety presentation is driven by the validated answer contract rather than matching user-visible headlines.
 
-## Cloudflare production release
+## Production release
 
-Cloudflare Workers Builds connected directly to `defragapp/OPENAPI` is the sole production release authority. Merging an approved, fully gated commit to `main` authorizes Cloudflare to run the repository-owned deployment command. GitHub Actions, deploy hooks, and ad-hoc local production deploys are not release authorities.
+The current production release authority is the exact current `origin/main` SHA executed through:
 
-Use an exact, clean `main` checkout:
+```bash
+pnpm production:release:oauth
+```
 
-- Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
-- Deploy command: `pnpm production:deploy`
-- Commit stamp: set `WORKERS_CI_COMMIT_SHA` to the full 40-character `main` commit SHA
+The wrapper establishes a fresh current-member Wrangler OAuth session, runs the full repository gate, executes the internal `pnpm production:deploy` stage, and verifies exact-SHA readiness and release evidence on both branded production domains. Historical Cloudflare Workers Builds trigger and build-token records are not current release authority.
 
-The deployment command applies D1 migrations, preserves existing encrypted Worker secrets, configures and verifies Free-plan Cloudflare controls, stamps `APP_VERSION`, deploys `sovv-web`, and tests the public site, app, health/readiness, pricing, unauthenticated boundaries, Stripe signature rejection, disabled export route, security headers, concurrent health requests, and all four approved production domains. A deploy command that fails any check is not a completed release.
+GitHub Actions, deploy hooks, Cloudflare Pages, preview Workers, duplicate production Workers, and alternate repositories are not release authorities.
 
-Wrangler configuration is the source of truth for routes. Both production Custom Domains and both Defrag parent routes must remain declared in `wrangler.jsonc` and `wrangler.production-direct.jsonc`; dashboard-only routes can be overwritten by the next Wrangler deployment. Preview may use its separately named `workers.dev` environment, but production may not.
+Wrangler configuration remains the source of truth for routes. Both production Custom Domains and both Defrag parent routes must remain declared in the production Wrangler authorities; dashboard-only route changes can be overwritten by a later deployment.
 
-Required encrypted Worker secrets:
+Required encrypted Worker secrets remain in Cloudflare:
 
 - `SESSION_SIGNING_SECRET`
 - `TURNSTILE_SECRET_KEY`
@@ -83,7 +85,11 @@ Required encrypted Worker secrets:
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 
-The production deploy environment also requires a scoped `CLOUDFLARE_API_TOKEN` so the repository-owned deploy script can configure and verify D1 replication, AI Gateway controls, the Free-plan rate-limit rule, and API Shield. Secret values belong only in Cloudflare and must never be copied into repository files, logs, issues, deploy hooks, or chat.
+Secret values belong only in protected provider configuration and must never be copied into repository files, logs, issues, screenshots, deploy hooks, or chat.
+
+A release is complete only when both `https://sovereign.defrag.app/ready` and `https://app.defrag.app/ready` prove the exact target SHA with `ready: true`, migration `0015_release_evidence`, migration parity `current`, and matching release evidence after all repository and live probes pass.
+
+See [`docs/production-release.md`](docs/production-release.md) for the canonical procedure and [`docs/browser-visual-release-audit.md`](docs/browser-visual-release-audit.md) for rendered acceptance.
 
 ## Launch billing
 
@@ -104,8 +110,9 @@ Account deletion uses a 14-day grace period. When execution becomes due, every n
 - [`docs/worlds-experience-contract.md`](docs/worlds-experience-contract.md)
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/tool-contracts.md`](docs/tool-contracts.md)
+- [`docs/production-release.md`](docs/production-release.md)
 - [`docs/release-gates.md`](docs/release-gates.md)
 
 ## Release status
 
-The repository is production-hardened code, but a release is verified only when `pnpm production:deploy` completes for the exact `main` commit and every live probe passes against `sovereign.defrag.app`, `app.defrag.app`, `defrag.app`, and `www.defrag.app`.
+Repository state and production state are separate. Current production is verified only for an exact `origin/main` SHA that completes `pnpm production:release:oauth` and passes the required live exact-SHA, migration, release-evidence, domain, security, billing, and rendered-browser probes.
