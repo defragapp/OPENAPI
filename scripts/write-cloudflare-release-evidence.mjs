@@ -74,6 +74,8 @@ export async function convergeReleaseEvidence({
 
 export async function writeReleaseEvidence({
   sha,
+  routeCohesionVerified = false,
+  renderedVisualVerified = false,
   dmarcVerified = false,
   configPath = DEFAULT_PRODUCTION_CONFIG_PATH,
   runWrangler = runWranglerCli,
@@ -85,7 +87,13 @@ export async function writeReleaseEvidence({
   completedAt
 } = {}) {
   const normalizedSha = assertReleaseSha(sha);
-  const evidence = createReleaseEvidence({ sha: normalizedSha, dmarcVerified, completedAt });
+  const evidence = createReleaseEvidence({
+    sha: normalizedSha,
+    routeCohesionVerified,
+    renderedVisualVerified,
+    dmarcVerified,
+    completedAt
+  });
   const writeResult = d1Execute({
     configPath,
     runWrangler,
@@ -121,6 +129,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const sha = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
   const result = await writeReleaseEvidence({
     sha,
+    routeCohesionVerified: String(process.env.RELEASE_ROUTE_COHESION_VERIFIED || '').trim() === 'true',
+    renderedVisualVerified: String(process.env.RELEASE_RENDERED_VISUAL_VERIFIED || '').trim() === 'true',
     dmarcVerified: String(process.env.RELEASE_DMARC_VERIFIED || '').trim() === 'true',
     configPath: String(process.env.WRANGLER_RELEASE_CONFIG_PATH || DEFAULT_PRODUCTION_CONFIG_PATH)
   });
