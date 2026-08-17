@@ -1,86 +1,21 @@
-# Sovereign.OS — Owner Actions Required
+# Sovereign.OS owner actions
 
-## Release State
+Status: no standing manual release action is defined by this document.
 
-Repository gates: PASS
-Namespace authority: VERIFIED
-DNS/custom domains: PASS
-Turnstile: PASS
-Resend: PASS
-Production release: BLOCKED
+The former instruction in this file asked the owner to trigger a Cloudflare Workers Build for a stale repository/deployment SHA. That instruction is superseded and must not be followed.
 
-Reason:
-Cloudflare production deployment SHA is behind repository release authority.
+## Current release authority
 
-## Verified Systems — No Owner Action Required
+Production release follows `docs/production-release.md` from the exact current `origin/main` SHA:
 
-### Namespace
-- Public: https://sovereign.defrag.app
-- App/API: https://app.defrag.app
-- Email: Sovereign.OS <info@defrag.app>
+```bash
+pnpm production:release:oauth
+```
 
-### Cloudflare DNS / Custom Domains
-PASS
+The release is complete only when the repository gates pass and both branded readiness endpoints prove the exact target SHA, migration `0015_release_evidence`, migration parity `current`, and matching release evidence.
 
-### Turnstile
-PASS
+## When owner action is actually required
 
-### Resend
-PASS — defrag.app verified and sending enabled
+Add an owner action here only when a current external account control cannot be completed by the repository-owned release path and the exact action, target resource, reason, and pass condition have been freshly verified.
 
-## Owner Action Required — Cloudflare Builds
-
-Production Worker:
-sovv-web
-
-Repository:
-defragapp/OPENAPI
-
-Branch:
-main
-
-Current deployed SHA:
-79df7bb3b1defa51b6256043add02abdcef320ef
-
-Target release SHA:
-TO BE ESTABLISHED AFTER THIS DOCUMENTATION CORRECTION IS COMMITTED
-
-Blocker:
-Current available API credentials cannot perform the required Workers Builds owner-level mutation / build trigger.
-
-Owner action:
-Trigger the Cloudflare production build for the FINAL origin/main SHA produced by this cleanup task.
-
-Dashboard:
-Cloudflare Dashboard
-→ Compute (Workers & Pages)
-→ sovv-web
-→ Deployments / Builds
-→ Trigger build
-
-Do not trigger the historical d42fef09 SHA if this cleanup creates a newer main commit.
-
-Build command:
-corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build
-
-Deploy command:
-pnpm production:deploy
-
-Pass condition:
-Cloudflare build SHA
-=
-final origin/main SHA
-=
-deployed SHA
-=
-/ready version
-
-Migration:
-0015_release_evidence
-unless current repository authority proves a newer migration.
-
-## After Owner Action
-
-Tell Junie:
-
-CLOUDFLARE BUILD TRIGGERED. Verify the build and deployment against current origin/main, then execute final production release closure.
+Do not carry forward old build UUIDs, build-token UUIDs, deployed SHAs, dashboard paths, agent names, or manual trigger instructions as standing tasks.
