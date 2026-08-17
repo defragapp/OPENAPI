@@ -273,3 +273,182 @@
     transform: none !important;
   }
 }
+
+/* Baseline-first recognition: this is a real explanatory stage, not a zero-height transition. */
+.public-approved-v8 .landing-question-orbit {
+  position: relative !important;
+  z-index: 8 !important;
+  display: grid !important;
+  place-items: center !important;
+  height: auto !important;
+  min-height: clamp(330px, 29vw, 420px) !important;
+  padding: 78px 24px 84px !important;
+  overflow: hidden !important;
+  border-top: 1px solid rgba(241, 233, 222, 0.065) !important;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.065) !important;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(241, 233, 222, 0.035), transparent 28rem),
+    #080a0d !important;
+  pointer-events: auto !important;
+}
+
+.public-approved-v8 .landing-question-orbit__inner {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  display: grid !important;
+  justify-items: center !important;
+  width: min(880px, 100%) !important;
+  max-width: 880px !important;
+  padding: 0 !important;
+  transform: none !important;
+  text-align: center !important;
+}
+
+.public-approved-v8 .landing-question-orbit__kicker,
+.public-approved-v8 .landing-question-orbit h2,
+.public-approved-v8 .landing-question-orbit__note {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+  white-space: normal !important;
+}
+
+.public-approved-v8 .landing-question-orbit__kicker {
+  margin: 0 0 16px !important;
+  color: rgba(241, 233, 222, 0.52) !important;
+  font-family: var(--font-sans, sans-serif) !important;
+  font-size: 0.66rem !important;
+  font-weight: 650 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+}
+
+.public-approved-v8 .landing-question-orbit h2 {
+  max-width: 760px !important;
+  margin: 0 !important;
+  color: #f1e9de !important;
+  font-family: var(--font-display, serif) !important;
+  font-size: clamp(2.6rem, 5vw, 5rem) !important;
+  font-weight: 470 !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.045em !important;
+  text-wrap: balance !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage {
+  position: relative !important;
+  display: grid !important;
+  place-items: center !important;
+  width: min(760px, 100%) !important;
+  height: 92px !important;
+  margin: 28px 0 12px !important;
+  border: 0 !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage span {
+  padding: 0 18px !important;
+  color: rgba(255, 250, 243, 0.9) !important;
+  font-family: var(--font-subheading, var(--font-sans, sans-serif)) !important;
+  font-size: clamp(1.14rem, 1.9vw, 1.55rem) !important;
+  font-weight: 520 !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.02em !important;
+  text-wrap: balance !important;
+}
+
+.public-approved-v8 .landing-question-orbit__note {
+  max-width: 58ch !important;
+  margin: 0 !important;
+  color: rgba(229, 220, 209, 0.56) !important;
+  font-family: var(--font-body, var(--font-sans, sans-serif)) !important;
+  font-size: 0.86rem !important;
+  line-height: 1.62 !important;
+  text-wrap: balance !important;
+}
+
+/* The product proof must be readable at normal viewing distance. */
+.public-approved-v8 .landing-message > div {
+  font-size: 0.86rem !important;
+  line-height: 1.58 !important;
+}
+
+.public-approved-v8 .landing-workflow__copy > strong,
+.public-approved-v8 .landing-context-view strong,
+.public-approved-v8 .landing-system-map__evidence > strong {
+  font-size: 0.84rem !important;
+  line-height: 1.4 !important;
+}
+
+.public-approved-v8 .landing-workflow__copy > span,
+.public-approved-v8 .landing-context-view section > span,
+.public-approved-v8 .landing-context-distinction > span {
+  font-size: 0.74rem !important;
+  line-height: 1.5 !important;
+}
+
+@media (max-width: 760px) {
+  .public-approved-v8 .landing-question-orbit {
+    min-height: 330px !important;
+    padding: 58px 20px 62px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__inner {
+    top: auto !important;
+    width: min(100%, 560px) !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__kicker {
+    margin-bottom: 13px !important;
+    font-size: 0.6rem !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit h2 {
+    max-width: 10ch !important;
+    font-size: clamp(2.45rem, 12vw, 3.6rem) !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__stage {
+    height: 86px !important;
+    margin: 23px 0 10px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__stage span {
+    padding-inline: 4px !important;
+    font-size: 1.02rem !important;
+    line-height: 1.38 !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__note {
+    max-width: 34ch !important;
+    font-size: 0.78rem !important;
+    line-height: 1.55 !important;
+  }
+
+  .public-approved-v8 .landing-message > div {
+    font-size: 0.8rem !important;
+    line-height: 1.55 !important;
+  }
+
+  .public-approved-v8 .landing-workflow__copy > strong,
+  .public-approved-v8 .landing-context-view strong,
+  .public-approved-v8 .landing-system-map__evidence > strong {
+    font-size: 0.8rem !important;
+  }
+
+  .public-approved-v8 .landing-workflow__copy > span,
+  .public-approved-v8 .landing-context-view section > span,
+  .public-approved-v8 .landing-context-distinction > span {
+    font-size: 0.72rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-approved-v8 .landing-question-orbit__stage span {
+    animation: none !important;
+  }
+}
