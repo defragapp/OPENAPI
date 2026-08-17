@@ -6,7 +6,6 @@ import { SystemMembershipManager } from './SystemMembershipManager';
 import { VerifiedPlanStatus } from './VerifiedPlanStatus';
 import { WorkspaceMobileUtilities } from './WorkspaceMobileUtilities';
 import { AccountExpressionField } from './expression-field/ExpressionField';
-import { WorldVideoLauncher } from './WorldVideoLauncher';
 import { ELIGIBILITY_RULE, POLICY_CONTENT_HASH, POLICY_METADATA } from '../../../config/policies';
 
 // Source-level release compatibility marker retained for the certified production verifier:
@@ -247,7 +246,6 @@ export function AuthenticatedWorkspace() {
       <SovereignIntelligenceWorkspace onboardingVerified />
       <WorkspaceMobileUtilities />
       <AccountExpressionField />
-      <WorldVideoLauncher />
       <PasskeyManager />
       <div className="sovereign-workspace-overlays" aria-label="Workspace controls">
         <AccountControlCenter />
