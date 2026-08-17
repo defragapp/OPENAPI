@@ -132,7 +132,7 @@ describe('desktop and iOS production readiness v1', () => {
   it('requires runtime, visual, product, billing, auth, and AI gates before release', () => {
     for (const marker of [
       "['verify-runtime-v3', 'scripts/verify-parent-domain-routes-v3.mjs']",
-      "['verify-route-cohesion', 'scripts/verify-live-route-cohesion.mjs']",
+      "['verify-route-cohesion', 'scripts/verify-live-route-cohesion-v2.mjs']",
       "['verify-rendered-visuals', 'scripts/verify-live-visual-release-v3.mjs']"
     ]) expect(release).toContain(marker);
     for (const stage of [
