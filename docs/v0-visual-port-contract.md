@@ -10,7 +10,7 @@ Archive SHA-256:
 6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba
 ```
 
-The archive is a design and component source. It is not the production application architecture, and its historical strings are not automatically current product-language requirements. Active user-facing language inherits `docs/product-language-system.md`.
+The archive is a design and component source. It is not the production application architecture, and its historical strings or typeface choices are not automatically current product-language requirements. Active user-facing language inherits `docs/product-language-system.md`.
 
 ## Required public composition
 
@@ -20,43 +20,50 @@ The root landing must preserve the archive’s recognizable sequence while using
 2. Badge: `Personal AI for real life`.
 3. Hero:
    - `Healing isn’t optional.`
-   - outlined `Holding onto the pain is.`
-   - supporting copy immediately explains that Sovereign uses the user’s Baseline across real questions about self, relationships, decisions, and family or group dynamics.
-4. Situational recognition:
-   - `Start with what’s actually happening.`
-   - one rotating real-life question at a time;
-   - the question is a major product-recognition surface, not an empty transition.
+   - `Holding onto the pain is.`
+   - both lines use the active sans typography authority;
+   - hierarchy may use scale, weight, opacity, or a restrained outline treatment, but must not switch to the retired display serif;
+   - supporting copy immediately explains that Sovereign is private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
+4. Self exploration:
+   - `Start with you` / `Explore yourself.` or current language inherited from `product-language-system.md`;
+   - one recognizable exploration question at a time;
+   - questions can cover Alignment, expression, creativity, decisions, communication, pressure/change, connection, or other supported self domains;
+   - do not reduce this section to one incident, conflict, responsibility, or carrying-outcomes example.
 5. Personal demonstration:
-   - show a concrete distinction, such as separating helping from carrying an outcome;
-   - chat example, quiet Basis metadata, and a visible step-by-step reasoning structure;
-   - do not lead with internal `capacity` terminology.
+   - section identity is `01 · You`;
+   - demonstrate genuine self exploration from the supported Baseline facet universe;
+   - chat example, quiet Basis metadata, and a visible step-by-step exploration structure;
+   - do not lead with internal `capacity` terminology or framework mechanics.
 6. Relationship demonstration:
-   - `Understand what happens between you.`
+   - section identity is `02 · You + your people`;
+   - `Understand what happens between you.`;
    - two permission-bound contexts, shared interaction, and no motive claims.
 7. System demonstration:
-   - make the route of responsibility, pressure, authority, and unresolved decisions visible across a family, team, or group;
-   - show what changes when responsibility no longer defaults to one person;
+   - section identity is `03 · From 1:1 to the whole system`;
+   - `See the whole system.`;
+   - make roles, expectations, authority, responsibility, pressure, observations, and missing perspectives understandable across a family, team, household, or group;
+   - do not make responsibility concentration the category headline for all Systems;
    - do not reduce the system to decorative role cards or imply that one person causes the whole pattern.
 8. Comparison:
+   - `Most AI starts with the prompt. Sovereign starts with you.`;
    - concise current-conversation context versus Baseline + relevant connected context;
    - no claim that every other AI literally answers every user identically.
 9. Final action:
-   - `Your thoughts deserve`
-   - `a better place to live.`
+   - `Know yourself. Understand your people. See the whole system.`
 
-These are component and sequence requirements, not merely copy strings. Retired chatbot phrases from the archive remain historical fingerprint provenance only and must not be restored as active UI copy.
+These are component and sequence requirements, not merely copy strings. Retired chatbot phrases and historical archive copy remain fingerprint provenance only and must not be restored as active UI copy.
 
 ## Included from the archive
 
 Port and maintain:
 
-- the full-screen dark editorial hero;
-- outlined display typography;
+- the full-screen dark hero composition;
+- large restrained sans typography with hierarchy created by scale, weight, spacing, opacity, and layout;
 - rotating question treatment;
 - self, relationship, and system storytelling sequence;
 - chat-window demonstrations;
-- visible Baseline evidence metadata;
-- answer-structure treatment;
+- visible but quiet Baseline/Basis evidence metadata;
+- answer/exploration structure treatment;
 - family/system map;
 - comparison composition;
 - final call to action;
@@ -64,6 +71,8 @@ Port and maintain:
 - the real Expression Field renderer: one value-driven field for self, two distinct fields for a relationship, and multiple distinct fields for a system;
 - near-black, cream, white/gray line, spacing, radius, and depth language;
 - responsive behavior and reduced-motion treatment.
+
+`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. The legacy font asset may remain unused until separate cleanup, but no heading/title may resolve to it.
 
 The refined product should not depend on electric blue, cyan glow, neon, generic AI gradients, or glassmorphism as primary UI language. Spectral color, where intentionally used, should behave like physical light rather than a generic interface accent.
 
@@ -115,9 +124,9 @@ The styling layer may change presentation. It must not replace route ownership, 
 
 The public Expression Fields use deterministic sanitized `expression-field.v1` examples only. Matching fields inside People, Systems, and relationship/system answers use axes derived from the same permitted Baseline facets already authorized for those surfaces; they do not load additional private data, infer motive, or calculate compatibility. There is one canvas renderer at every depth. Relationship engagement may be shown by lines temporarily orienting toward one another, never by a literal connector. A system never receives a synthetic center person: the system is the interaction among the distinct fields.
 
-The explanatory hierarchy is Baseline data → Expression Field → Sovereign interpretation. The field is a product object representing the data, not artwork generated by the AI answer.
+The explanatory hierarchy is user need → relevant Baseline reference → optional current/relationship/system context → Sovereign interpretation. Framework/source mechanics stay underneath the product explanation and appear only when useful for disclosure or inspection.
 
-Across the landing and authenticated product, preserve the underlying reasoning separation: stable Baseline reference → what pressure or current context may be adding → what happens between people → what may keep the pattern going and what could change. On public surfaces, translate that structure into ordinary human language rather than exposing internal `capacity` terminology as the headline explanation.
+Across the landing and authenticated product, preserve the underlying intelligence separation without forcing it into the public headings. Public surfaces translate internal reasoning into ordinary human language and keep self exploration broader than conflict/problem analysis.
 
 ## Visual delivery paths
 
@@ -133,20 +142,24 @@ The complete Vite foundation and final refinement are required:
    - extends the founder language across non-landing product surfaces without replacing the landing composition.
 5. Route-specific and account authorities, ending with `apps/web/src/passkey-auth.css`
    - preserve the certified local import order;
-   - no local stylesheet import may appear after `passkey-auth.css`.
+   - terminal inline release authorities follow the component stylesheet imports.
 6. `apps/web/src/experience-refinement-v1.css`
    - is appended through the existing synchronous cohesion installer for bounded cross-platform presentation refinement.
 7. `apps/web/src/rendered-fidelity-v1.css`
-   - is appended after experience refinement and preserves Browser-verified monochrome fidelity and readable public proof.
-8. `apps/web/src/landing-refinement-v2.css`
-   - is appended after rendered fidelity;
-   - owns the current landing-only recognition, larger demonstrations, visible workflow behavior, compact Expression Field endpoint label, system-route presentation, and intentionally shorter mobile proof;
+   - is appended after experience refinement and preserves monochrome fidelity and readable public proof.
+8. `apps/web/src/landing-refinement-v2.css` plus current landing live refinements
+   - own landing-only recognition, larger demonstrations, visible workflow behavior, Expression Field detail, system presentation, and mobile proof;
    - must not alter product logic, consent, Baseline contracts, or answer contracts.
-9. `apps/web/src/invitation-rendered-fidelity-v1.css`
-   - remains the terminal invitation-specific rendered correction after the landing refinement.
-10. Standalone public documents
-   - retain `v0-public-port.css` and deployed route-cohesion foundations;
-   - load `apps/web/public/experience-static-refinement-v1.css` last for the final static presentation treatment.
+9. `apps/web/src/premium-action-authority-v1.css`
+   - preserves the terminal no-pill editorial action language.
+10. `apps/web/src/sans-typography-authority-v1.css`
+   - is appended after other inline authorities;
+   - is the terminal rendered typography authority;
+   - prevents legacy import order or selector specificity from restoring the retired display serif.
+11. Standalone public documents
+   - retain the deployed static foundations;
+   - load `apps/web/public/premium-action-static-v1.css` last;
+   - that terminal static authority also enforces sans headings/titles.
 
 Removing or bypassing any one of these means the visual port is not sitewide.
 
@@ -166,15 +179,16 @@ The runtime fingerprint proves which founder visual source was compiled. It does
 A production release must fail unless all of the following are true:
 
 - `PublicLanding.tsx` contains the exact archive fingerprint;
-- the runtime bundle contains the exact historical sequence fingerprint;
+- the runtime bundle contains the exact historical sequence fingerprint as provenance only;
 - the required founder component structure is compiled;
-- active UI copy follows `docs/product-language-system.md`, translates internal `capacity` terminology on public surfaces, and excludes retired chatbot language;
-- the certified local Vite import order ends at `passkey-auth.css`;
-- the inline presentation authorities are appended in the established order: experience refinement → rendered fidelity → landing refinement v2 → invitation fidelity;
+- active UI copy follows `docs/product-language-system.md` and excludes retired product-positioning language;
+- root marketing communicates You → You + your people → whole system before source mechanics;
+- the root landing does not use `foundation` as its Baseline metaphor or enumerate framework sources in its main narrative;
+- the terminal rendered typography authority is mounted after legacy visual layers;
+- active headings/titles resolve to the sans title system, never `Sovereign Display` or serif fallbacks;
 - compiled CSS contains founder landing, real workspace/account, onboarding, policy, and access selectors;
 - the final compiled presentation contains the near-black/cream refinement authority;
-- standalone public routes load the static refinement after route cohesion;
-- the reconstructed `Know yourself. Understand the system. Choose what fits.` hero is absent from the compiled landing bundle;
+- standalone public routes load the static terminal action/typography authority after route cohesion/refinement;
 - archive mock-runtime markers are absent;
 - `/health` and `/ready` report the exact release SHA;
 - the public entry document is non-storable;
