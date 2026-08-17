@@ -27,6 +27,7 @@ import publicLandingFinalAuthorityCss from './public-landing-final-authority.css
 import experienceRefinementCss from './experience-refinement-v1.css?inline';
 import renderedFidelityCss from './rendered-fidelity-v1.css?inline';
 import landingRefinementV2Css from './landing-refinement-v2.css?inline';
+import landingLiveRefinementV3Css from './landing-live-refinement-v3.css?inline';
 import invitationRenderedFidelityCss from './invitation-rendered-fidelity-v1.css?inline';
 
 /* Component foundations */
@@ -92,6 +93,7 @@ function installPlatformVisualCohesion(): void {
   style.textContent += `\n${experienceRefinementCss}`;
   style.textContent += `\n${renderedFidelityCss}`;
   style.textContent += `\n${landingRefinementV2Css}`;
+  style.textContent += `\n${landingLiveRefinementV3Css}`;
   style.textContent += `\n${invitationRenderedFidelityCss}`;
   document.head.append(style);
 }
