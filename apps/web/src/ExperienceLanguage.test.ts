@@ -33,23 +33,49 @@ const retired = [
   "Tell me what's on your mind."
 ] as const;
 
+const rejectedPublicCategoryPhrases = [
+  'One private reference beneath every question.',
+  'One private foundation. More useful answers across the questions that shape your life.',
+  'Separate helping from carrying the outcome.',
+  'See where responsibility keeps landing.'
+] as const;
+
 describe('Sovereign.OS active experience language', () => {
   it.each(activeExperience)('%s excludes retired generic-chatbot language', (_label, source) => {
     for (const phrase of retired) expect(source).not.toContain(phrase);
   });
 
-  it.each(publicFirstExplanation)('%s translates internal capacity language into concrete public distinctions', (_label, source) => {
+  it.each(publicFirstExplanation)('%s translates internal capacity language into concrete public language', (_label, source) => {
     expect(source.toLowerCase()).not.toContain('capacity beneath');
   });
 
-  it('uses situational recognition instead of a blank-chat invitation', () => {
+  it('uses self exploration before expanding to People and Systems', () => {
     const landing = activeExperience.find(([label]) => label === 'public landing')?.[1] ?? '';
+    const stories = activeExperience.find(([label]) => label === 'landing demonstrations')?.[1] ?? '';
+
+    expect(landing).toContain('Start with you');
+    expect(landing).toContain('Explore yourself.');
+    expect(landing).toContain('What does Alignment look like for me?');
+    expect(stories).toContain('01 · You');
+    expect(stories).toContain('Explore how you think, decide, create, connect, and grow.');
+    expect(stories).toContain('02 · You + your people');
+    expect(stories).toContain('Understand what happens between you.');
+    expect(stories).toContain('03 · From 1:1 to the whole system');
+    expect(stories).toContain('See the whole system.');
+
+    for (const phrase of rejectedPublicCategoryPhrases) {
+      expect(landing).not.toContain(phrase);
+      expect(stories).not.toContain(phrase);
+    }
+  });
+
+  it('keeps authenticated Explore and Systems aligned with the same product model', () => {
     const workspace = activeExperience.find(([label]) => label === 'workspace')?.[1] ?? '';
-    expect(landing).toContain('What this unlocks');
-    expect(landing).toContain('One private reference beneath every question.');
-    expect(landing).toContain('The result: you can ask about a decision today, a recurring pattern next week, or a relationship later without rebuilding your context from scratch.');
-    expect(workspace).toContain('Look closer at the pattern.');
-    expect(workspace).toContain('What keeps happening between you?');
-    expect(workspace).toContain('Where does responsibility keep landing?');
+    expect(workspace).toContain("{ name: 'Explore', label: 'Explore', description: 'Explore yourself more deeply' }");
+    expect(workspace).toContain("{ name: 'Systems', label: 'Systems', description: 'See the whole system' }");
+    expect(workspace).toContain("Explore: ['What part of myself do I want to understand more clearly?', 'What changes in me under pressure?']");
+    expect(workspace).toContain("Systems: ['What role am I playing in this system?', 'What changes when the usual roles shift?']");
+    expect(workspace).not.toContain("Explore: ['Describe the pattern you want to look at.', 'Where does this change under pressure?']");
+    expect(workspace).not.toContain("Systems: ['Where does responsibility keep landing?']");
   });
 });
