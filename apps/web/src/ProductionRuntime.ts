@@ -263,6 +263,8 @@ function installAccountNavigation(): void {
 
   document.querySelectorAll<HTMLElement>('.account-shell .check-line span').forEach((label) => {
     if (label.dataset.policyLinks === 'true') return;
+    const originalLabel = label.textContent ?? '';
+    if (!/\bTerms\b|\bPrivacy(?: Policy)?\b/i.test(originalLabel)) return;
     label.dataset.policyLinks = 'true';
     const terms = policyLink('Terms', TERMS_URL);
     const privacy = policyLink('Privacy Policy', PRIVACY_URL);
