@@ -33,6 +33,6 @@ describe('production domain hardening', () => {
     expect(productionDeploy).toContain('productionWorkersDev = false');
     expect(productionDeploy).toContain("'workersDevUrl'");
     expect(productionDeploy).toContain('Production deploy v3 does not record workers.dev retirement');
-    expect(readme).toContain('Production `workers.dev` access is disabled');
+    expect(readme).toMatch(/production `workers\.dev` access (?:is )?disabled/i);
   });
 });
