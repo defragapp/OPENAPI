@@ -13,7 +13,9 @@ These instructions apply to the entire OPENAPI repository.
 - Work directly on `main` for normal AI-assisted implementation turns. Do not create a new branch for each request, correction, release attempt, visual pass, or verification pass.
 - Create a temporary branch only when the user explicitly asks for isolated review work or when repository protection makes direct `main` work impossible.
 - Never create parallel `final`, `release`, `reconciliation`, `visual`, `hotfix`, or agent-named branches as substitutes for strengthening the existing platform on `main`.
-- Cloudflare production builds must originate from `main`, and the injected Workers Builds commit SHA must match the checked-out repository HEAD.
+- Production release authority is the exact current `origin/main` SHA executed through `pnpm production:release:oauth`. `pnpm production:deploy` is an internal stage of that wrapper, not an alternate standalone authority.
+- GitHub Actions, deploy hooks, Cloudflare Pages, duplicate production Workers, preview Workers, and historical Workers Builds trigger instructions are not production release authorities.
+- A production release is complete only when both branded `/ready` endpoints report the exact target SHA, migration `0015_release_evidence`, migration parity `current`, and matching release evidence after the repository gates and live browser checks pass.
 - Extend the canonical components and contracts in place. Do not create duplicate workspaces, alternative landing implementations, second agents, or disconnected product shells.
 
 ## Founder v0 visual-port contract
@@ -30,9 +32,13 @@ These instructions apply to the entire OPENAPI repository.
 - `apps/web/src/v0-release-fingerprint.ts` must expose the exact archive and founder-sequence fingerprints on the running document.
 - Do not call a visual implementation `canonical`, `approved`, `v0`, `editorial`, or `cinematic` unless the archive fingerprint, runtime sequence fingerprint, rendered component sequence, compiled asset markers, all three visual delivery paths, and sitewide selectors match the documented contract.
 - The reconstructed `Know yourself. Understand the system. Choose what fits.` landing is not the founder v0 port and must not return as the root public experience.
+- Do not freeze or replace a founder visual reference while a known documentation-to-render contradiction remains unresolved. Inspect the actual desktop and mobile production renders first.
 
 ## Product definition
 - Sovereign.OS is Baseline-first. The product must be useful before the user explains an incident.
+- Baseline Design is the foundation. The visitor brings an ordinary real-life question or situation; Sovereign should make a relevant distinction visible before exposing technical machinery.
+- Relationship and system intelligence extend the same Baseline-first foundation outward while keeping each person distinct and permission-bound.
+- Source calculations, Basis codes, provider details, permission mechanics, and deployment architecture stay beneath the primary experience until needed for support, verification, control, or deeper inspection.
 - The single user-facing agent is named Sovereign.
 - Defrag, Alignment, and Covenant are internal reasoning lenses, not separate top-level products.
 - Authenticated navigation is Today, Explore, People, Systems, Library, and You.
