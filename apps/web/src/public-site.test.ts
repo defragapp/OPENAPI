@@ -5,6 +5,7 @@ const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'u
 const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
 const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
 const policy = readFileSync(new URL('./PublicPolicy.tsx', import.meta.url), 'utf8');
+const policyAuthority = readFileSync(new URL('../../../config/policies.ts', import.meta.url), 'utf8');
 const how = readFileSync(new URL('../public/how-it-works.html', import.meta.url), 'utf8');
 const pricing = readFileSync(new URL('../public/pricing.html', import.meta.url), 'utf8');
 const faq = readFileSync(new URL('../public/faq.html', import.meta.url), 'utf8');
@@ -20,7 +21,7 @@ const refinementCss = readFileSync(new URL('./experience-refinement-v1.css', imp
 const renderedFidelityCss = readFileSync(new URL('./rendered-fidelity-v1.css', import.meta.url), 'utf8');
 const landingRefinementV2Css = readFileSync(new URL('./landing-refinement-v2.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
-const publicCopy = `${landing}\n${stories}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
+const publicCopy = `${landing}\n${stories}\n${policy}\n${policyAuthority}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
 describe('Sovereign.OS public experience', () => {
   it('keeps the approved hero and explains the product beside the interactive field', () => {
@@ -111,7 +112,7 @@ describe('Sovereign.OS public experience', () => {
 
   it('keeps verified plans, correction, and optional Covenant available elsewhere', () => {
     for (const phrase of ['$0', '$20', '$99', '10 Sovereign AI turns', '300 Sovereign AI turns', 'Covenant']) expect(publicCopy).toContain(phrase);
-    expect(policy).toContain('Private account export is not available at launch.');
+    expect(policyAuthority).toContain('Private account export is not yet available in the current release.');
   });
 
   it('renders the public route without runtime copy rewriting', () => {
