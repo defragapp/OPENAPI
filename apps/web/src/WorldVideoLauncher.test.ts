@@ -1,28 +1,35 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const launcher = readFileSync(new URL('./WorldVideoLauncher.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
 const css = readFileSync(new URL('./world-video.css', import.meta.url), 'utf8');
+const wrangler = readFileSync(resolve(process.cwd(), '../../wrangler.jsonc'), 'utf8');
+const videoContract = readFileSync(resolve(process.cwd(), '../../docs/worlds-private-video-contract.md'), 'utf8');
 
-describe('authenticated Worlds experience', () => {
-  it('keeps Worlds inside the authenticated one-room workspace rather than navigation', () => {
-    expect(workspace).toContain("import { WorldVideoLauncher } from './WorldVideoLauncher'");
-    expect(workspace).toContain('<WorldVideoLauncher />');
+describe('dormant Worlds video boundary', () => {
+  it('keeps video generation out of the current authenticated text-first launch', () => {
+    expect(workspace).not.toContain("import { WorldVideoLauncher } from './WorldVideoLauncher'");
+    expect(workspace).not.toContain('<WorldVideoLauncher />');
+    expect(workspace).not.toContain('/api/v1/worlds/video/status');
+    expect(workspace).not.toContain('/api/v1/worlds/video');
     expect(workspace).toContain('data-workspace-contract="one-room"');
-    expect(launcher).toContain("fetch('/api/v1/worlds/video/status'");
-    expect(launcher).toContain("if (!status?.enabled || !status.eligible) return null");
+    expect(wrangler).toContain('"WORLDS_VIDEO_ENABLED": "false"');
+    expect(videoContract).toContain('future/disabled reference only');
+    expect(videoContract).toContain('Issue #198 was closed `not planned`');
   });
 
-  it('requires explicit generation and never accepts an arbitrary renderer prompt', () => {
+  it('keeps the future launcher fail-closed if the dormant component is ever revisited', () => {
+    expect(launcher).toContain("fetch('/api/v1/worlds/video/status'");
+    expect(launcher).toContain("if (!status?.enabled || !status.eligible) return null");
     expect(launcher).toContain("fetch('/api/v1/worlds/video', {");
     expect(launcher).toContain("method: 'POST'");
     expect(launcher).not.toContain('prompt:');
     expect(launcher).not.toContain('<textarea');
-    expect(launcher).toContain('Generate World ·');
   });
 
-  it('plays provider media only from a local blob URL and revokes it', () => {
+  it('keeps future provider media private to a local blob URL and revokes it', () => {
     expect(launcher).toContain('URL.createObjectURL(blob)');
     expect(launcher).toContain('URL.revokeObjectURL');
     expect(launcher).toContain('autoPlay={!reduceMotion}');
@@ -31,14 +38,13 @@ describe('authenticated Worlds experience', () => {
     expect(launcher).toContain('playsInline');
   });
 
-  it('respects reduced-motion preferences for generated video playback', () => {
+  it('preserves reduced-motion safeguards in the dormant future component', () => {
     expect(launcher).toContain("window.matchMedia('(prefers-reduced-motion: reduce)')");
     expect(launcher).toContain("query.addEventListener('change', update)");
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
-  it('uses the restrained monochrome world-first visual language', () => {
-    expect(launcher).toContain('See the world you’re living in.');
+  it('preserves the restrained visual guard if video is ever explicitly reopened', () => {
     expect(css).toContain('background: #050505');
     expect(css).toContain('filter: grayscale(1)');
     expect(css).toContain('.worlds-stage__viewport');
