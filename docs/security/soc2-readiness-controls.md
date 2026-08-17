@@ -6,7 +6,7 @@ Reviewed: 2026-08-17
 
 **This document is not a SOC 2 report, certification, attestation, audit opinion, or claim of SOC 2 compliance.** A SOC 2 examination is performed by an independent CPA firm against an in-scope system description and controls. This repository records engineering controls and evidence that may support future readiness work.
 
-The control families below are organized around the AICPA Trust Services Criteria categories: Security, Availability, Processing Integrity, Confidentiality, and Privacy. Reference: AICPA & CIMA, *2017 Trust Services Criteria (With Revised Points of Focus — 2022)*, https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022 .
+The control families below are organized around the AICPA Trust Services Criteria categories: Security, Availability, Processing Integrity, Confidentiality, and Privacy. Reference: AICPA & CIMA, *2017 Trust Services Criteria (With Revised Points of Focus — 2022)*.
 
 ## Control status vocabulary
 
@@ -44,7 +44,7 @@ The control families below are organized around the AICPA Trust Services Criteri
 | PI-01 | Prevent duplicate state-changing AI turns | Thread Durable Object coordination plus idempotency keys and D1 turn state | Implemented | worker integration tests |
 | PI-02 | Project paid access only from authoritative payment state | Stripe event ordering, signed webhook handling and entitlement cache projection | Implemented | Stripe tests/smoke |
 | PI-03 | Produce Baseline output from deterministic provider-backed computation without silent guessing | Provenance, uncertainty state, recorded test fixtures only in test mode, provider-unavailable fail-close | Implemented | baseline engine tests and smoke |
-| PI-04 | Keep release evidence tied to exact code and schema | Full 40-character commit SHA, exact migration version, route/visual/DMARC evidence, D1 readback and production convergence | Implemented | release evidence library/writer and release gate |
+| PI-04 | Keep release evidence tied to exact code/schema and actual verification performed | Full 40-character commit SHA, current migration version, explicit route/rendered automated-verification booleans, DMARC evidence, D1 readback and production convergence | Implemented | release evidence library/writer/orchestrator tests; human visual evidence remains separate |
 | PI-05 | Bind policy acceptance to the exact content presented | Canonical policy hash, explicit version tuple, stale-client rejection, exact release SHA, append-only receipts | Implemented | `config/policies.ts`, migrations `0016`/`0017`, auth/privacy tests |
 | PI-06 | Make privacy access non-persistent by design | Account export is assembled on demand, returned directly, `private, no-store`, and not written to R2/export artifacts | Implemented | `privacy-rights.ts`, runtime route, release-closure smoke |
 
@@ -52,10 +52,10 @@ The control families below are organized around the AICPA Trust Services Criteri
 
 | ID | Objective | Implementation / evidence | Status | Evidence cadence / gap |
 | --- | --- | --- | --- | --- |
-| CONF-01 | Keep raw sensitive Baseline inputs outside model context | Model-safe Baseline reduction; raw birth details, exact private location, auth material, billing IDs and invitation secrets excluded | Implemented | `docs/privacy-model.md`, Baseline smoke, advertised AI-context tests |
+| CONF-01 | Keep raw sensitive Baseline inputs outside model context | Model-safe Baseline reduction; raw birth details, exact private location, auth material, billing IDs and invitation secrets excluded | Implemented | `docs/privacy-model.md`, Baseline smoke, AI-context tests |
 | CONF-02 | Prevent one account from authorizing another person’s private data | Account-bound invitation redemption and use-specific consent; owner-granted consent blocked | Implemented | People/consent tests and product smoke |
 | CONF-03 | Avoid unnecessary export copies | No R2 binding; account export uses direct authenticated response and does not retain an artifact | Implemented | configs, privacy-rights source, release closure smoke |
-| CONF-04 | Avoid public source disclosure | Production build verifies no `.map` files are served publicly | Implemented | `verify:public-source-maps` each release |
+| CONF-04 | Avoid public source disclosure | Production build verifies no `.map` files are served publicly | Implemented | source-map gate each release |
 | CONF-05 | Bound operational logging | AI calls use bounded logging configuration; privacy policy prohibits raw prompt logging by default | Implemented / operating evidence required | code/config evidence exists; future audit requires provider/account log settings and samples over period |
 | CONF-06 | Maintain vendor/confidentiality agreements | Vendor contracts, DPAs, confidentiality terms and access authorizations are not stored/proven by this repository | External evidence required | Maintain vendor register/contracts and periodic review evidence outside source control |
 
@@ -72,13 +72,11 @@ The control families below are organized around the AICPA Trust Services Criteri
 | PRIV-07 | Respect relationship consent | Per-use permission, denial/revocation, identity binding and recheck before relationship/system use | Implemented | People/System flows and tests |
 | PRIV-08 | Apply retention controls | 30-day unsaved thread/content cleanup, 90-day operational/audit metadata window, explicit Library retention and cleanup jobs | Implemented / operating evidence required | cleanup job/tests; audit would require scheduled-execution evidence over period |
 | PRIV-09 | Avoid undeclared behavioral tracking | Active entry surfaces are guarded against common analytics/ad tracker markers; first-party necessary storage is disclosed | Implemented | `PrivacyComplianceContract.test.ts` |
-| PRIV-10 | Maintain data-flow/provider inventory | Operational register maps Cloudflare, D1, DO, Turnstile, Workers AI/Gateway, JPL, Stripe, Resend and optional Worlds renderer | Implemented / operating evidence required | `docs/privacy-data-flow-register.md`; review when provider/data path changes |
+| PRIV-10 | Maintain data-flow/provider inventory | Operational register maps current Cloudflare, D1, DO, Turnstile, Workers AI/Gateway, JPL, Stripe, Resend flows; dormant/future Worlds video remains non-launch | Implemented / operating evidence required | `docs/privacy-data-flow-register.md`; review when provider/data path changes |
 
 ## Age eligibility and child-data boundary
 
-Sovereign.OS uses an **18+ launch eligibility rule as a product choice**, not as a statement that all applicable law universally requires 18+. The FTC describes COPPA as applying to child-directed services collecting personal information from children under 13 and to general-audience services with actual knowledge of collection from a child under 13. See FTC, *Complying with COPPA: Frequently Asked Questions*, https://www.ftc.gov/business-guidance/resources/complying-coppa-frequently-asked-questions .
-
-The 18+ rule deliberately keeps the initial public launch outside intended child/teen use while the product handles sensitive birth-related inputs and private AI context. A later change to age eligibility requires separate legal/product review; it must not be changed only as UI copy.
+Sovereign.OS uses an **18+ launch eligibility rule as a product choice**, not as a statement that all applicable law universally requires 18+. The initial launch is not intended for child/teen use while the product handles sensitive birth-related inputs and private AI context. A later change to age eligibility requires separate legal/product review; it must not be changed only as UI copy.
 
 ## Evidence that must exist outside GitHub before an audit
 
@@ -99,4 +97,4 @@ The application repository is only part of a SOC 2 readiness program. At minimum
 
 ## Release evidence relationship
 
-A green `pnpm verify:cloudflare-build` proves the repository’s deterministic release gates at a specific commit. A successful production release then proves exact-SHA `/health` and `/ready` convergence plus release evidence. Neither event by itself constitutes a SOC 2 examination or a claim that controls operated effectively for an audit period.
+A green `pnpm verify:cloudflare-build` proves the repository’s deterministic release gates at a specific commit. A successful production release then proves exact-SHA `/health`/`/ready` convergence plus D1 release evidence for what that release path actually verified. The current text-first release may legitimately record automated Browser route/rendered flags as `false`; human desktop/iPhone review is maintained as separate product evidence. None of these events constitutes a SOC 2 examination or a claim that controls operated effectively for an audit period.
