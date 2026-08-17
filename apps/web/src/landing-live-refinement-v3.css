@@ -1,0 +1,337 @@
+/*
+ * Sovereign.OS live landing refinement v3.
+ * Derived from inspection of the deployed fc548a8 desktop render.
+ * This layer is intentionally presentation-only: it increases product-demo authority,
+ * repairs comparison wrapping, improves the field endpoint attachment, and turns the
+ * system explanation into one coherent reasoning surface without changing product truth.
+ */
+
+@media (min-width: 901px) {
+  html .public-approved-v8 .sovereign-opening-copy {
+    max-width: 720px !important;
+    font-size: 1.06rem !important;
+    line-height: 1.68 !important;
+  }
+
+  html .public-approved-v8 .landing-control--primary {
+    min-height: 48px !important;
+    padding-inline: 18px !important;
+    font-size: 0.82rem !important;
+  }
+
+  html .public-approved-v8 .landing-question-orbit {
+    min-height: 430px !important;
+    padding: 76px 24px 82px !important;
+  }
+
+  html .public-approved-v8 .landing-question-orbit__stage {
+    width: min(980px, 100%) !important;
+    height: 142px !important;
+    margin: 30px auto 18px !important;
+  }
+
+  html .public-approved-v8 .landing-question-orbit__stage > span > small {
+    font-size: 0.66rem !important;
+  }
+
+  html .public-approved-v8 .landing-question-orbit__stage > span > strong {
+    max-width: 900px !important;
+    font-size: clamp(1.75rem, 2.4vw, 2.35rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  html .public-approved-v8 .landing-question-orbit__note {
+    max-width: 68ch !important;
+    font-size: 0.96rem !important;
+  }
+
+  html .public-approved-v8 .landing-story {
+    padding: 104px 0 122px !important;
+  }
+
+  html .public-approved-v8 .landing-story__shell {
+    width: min(1360px, calc(100% - 52px)) !important;
+    max-width: 1360px !important;
+  }
+
+  html .public-approved-v8 .landing-story__heading {
+    width: min(900px, 100%) !important;
+    max-width: 900px !important;
+    margin-bottom: 56px !important;
+  }
+
+  html .public-approved-v8 .landing-story__heading h2 {
+    max-width: 880px !important;
+    font-size: clamp(3.2rem, 4.85vw, 5rem) !important;
+  }
+
+  html .public-approved-v8 .landing-story__heading > div {
+    max-width: 760px !important;
+    font-size: 1.08rem !important;
+    line-height: 1.68 !important;
+  }
+
+  html .public-approved-v8 .landing-story__stage {
+    grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr) !important;
+    gap: 34px !important;
+  }
+
+  html .public-approved-v8 .landing-story__stage--relationship {
+    grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr) !important;
+  }
+
+  html .public-approved-v8 .landing-demo {
+    min-height: 660px !important;
+    border-radius: 12px !important;
+  }
+
+  html .public-approved-v8 .landing-demo--context {
+    min-height: 0 !important;
+  }
+
+  html .public-approved-v8 .landing-demo__bar {
+    min-height: 58px !important;
+    padding-inline: 20px !important;
+    font-size: 0.82rem !important;
+  }
+
+  html .public-approved-v8 .landing-demo__body {
+    gap: 20px !important;
+    padding: 30px !important;
+  }
+
+  html .public-approved-v8 .landing-message > div {
+    max-width: 94% !important;
+    padding: 17px 19px !important;
+    font-size: 1rem !important;
+    line-height: 1.64 !important;
+  }
+
+  html .public-approved-v8 .landing-composer {
+    min-height: 56px !important;
+    font-size: 0.84rem !important;
+  }
+
+  html .public-approved-v8 .landing-workflow {
+    gap: 13px !important;
+    padding: 18px 20px 24px !important;
+  }
+
+  html .public-approved-v8 .landing-workflow > li {
+    min-height: 126px !important;
+  }
+
+  html .public-approved-v8 .landing-workflow__copy > strong {
+    font-size: 0.98rem !important;
+  }
+
+  html .public-approved-v8 .landing-workflow__copy > span {
+    font-size: 0.83rem !important;
+    line-height: 1.62 !important;
+  }
+
+  /* The system demo is one intelligence surface: conversation + map + reasoning strip. */
+  html .public-approved-v8 .landing-story__stage--system {
+    grid-template-columns: 1fr !important;
+    width: min(1180px, 100%) !important;
+    margin-inline: auto !important;
+    gap: 18px !important;
+  }
+
+  html .public-approved-v8 .landing-story__stage--system .landing-demo--chat {
+    min-height: 820px !important;
+  }
+
+  html .public-approved-v8 .landing-system-map {
+    min-height: 510px !important;
+    margin-top: 22px !important;
+  }
+
+  html .public-approved-v8 .landing-system-map__condition {
+    min-width: 244px !important;
+    padding: 11px 14px !important;
+  }
+
+  html .public-approved-v8 .landing-system-map__condition strong {
+    font-size: 0.78rem !important;
+  }
+
+  html .public-approved-v8 .landing-system-map__nodes button {
+    width: 150px !important;
+    min-height: 66px !important;
+  }
+
+  html .public-approved-v8 .landing-system-map__nodes button span {
+    font-size: 0.82rem !important;
+  }
+
+  html .public-approved-v8 .landing-system-map__nodes button small {
+    font-size: 0.61rem !important;
+  }
+
+  html .public-approved-v8 .landing-system-map__evidence {
+    min-height: 68px !important;
+    padding: 12px 15px !important;
+  }
+
+  html .public-approved-v8 .landing-system-map__evidence > strong {
+    font-size: 0.8rem !important;
+  }
+
+  html .public-approved-v8 .landing-system-map__evidence > span {
+    font-size: 0.7rem !important;
+  }
+
+  html .public-approved-v8 .landing-demo--system-context {
+    min-height: 0 !important;
+    overflow: visible !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html .public-approved-v8 .landing-demo--system-context .landing-demo__bar {
+    min-height: 44px !important;
+    padding-inline: 0 !important;
+    border-bottom-color: rgba(241, 233, 222, 0.11) !important;
+    background: transparent !important;
+  }
+
+  html .public-approved-v8 .landing-context-view--system {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+
+  html .public-approved-v8 .landing-context-view--system > section {
+    min-height: 132px !important;
+    padding: 22px 24px !important;
+    border: 0 !important;
+    border-right: 1px solid rgba(241, 233, 222, 0.09) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
+  html .public-approved-v8 .landing-context-view--system > section:last-child {
+    border-right: 0 !important;
+  }
+
+  html .public-approved-v8 .landing-context-view--system strong {
+    max-width: 29ch !important;
+    font-size: 0.98rem !important;
+    line-height: 1.42 !important;
+  }
+
+  /* Prevent any old anywhere-wrap rule from splitting words in the comparison statement. */
+  html .public-approved-v8 .v0-comparison > .v0-shell {
+    grid-template-columns: minmax(470px, 0.96fr) minmax(0, 1.18fr) !important;
+    gap: 58px !important;
+    width: min(1320px, calc(100vw - 64px)) !important;
+    max-width: 1320px !important;
+  }
+
+  html .public-approved-v8 .v0-comparison .v0-story-heading-left {
+    max-width: 520px !important;
+  }
+
+  html .public-approved-v8 .v0-comparison .v0-story-heading h2,
+  html .public-approved-v8 .v0-comparison .v0-story-heading h2 * {
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+  }
+
+  html .public-approved-v8 .v0-comparison .v0-story-heading h2 {
+    max-width: 520px !important;
+    font-size: clamp(3.25rem, 4.55vw, 4.9rem) !important;
+    line-height: 0.92 !important;
+  }
+
+  html .public-approved-v8 .v0-comparison-panel {
+    min-height: 390px !important;
+    padding: 32px 28px !important;
+  }
+
+  html .public-approved-v8 .v0-comparison-panel li {
+    font-size: 0.88rem !important;
+    line-height: 1.52 !important;
+  }
+
+  html .public-approved-v8 .v0-final p {
+    max-width: 680px !important;
+    font-size: 1.06rem !important;
+  }
+}
+
+/* Make the selected endpoint read as attached to the line, not as a loose HUD card. */
+html .public-approved-v8 .landing-expression-slice__tooltip-connector {
+  stroke: rgba(241, 233, 222, 0.72) !important;
+  stroke-width: 1px !important;
+}
+
+html .public-approved-v8 .landing-expression-slice__tooltip-panel {
+  fill: rgba(7, 9, 12, 0.9) !important;
+  stroke: rgba(241, 233, 222, 0.38) !important;
+}
+
+html .public-approved-v8 .landing-expression-slice__endpoint {
+  transition: opacity 180ms ease, r 180ms ease !important;
+}
+
+@media (max-width: 760px) {
+  html .public-approved-v8 .landing-question-orbit {
+    min-height: 320px !important;
+    padding: 48px 18px 50px !important;
+  }
+
+  html .public-approved-v8 .landing-question-orbit__stage {
+    height: 104px !important;
+  }
+
+  html .public-approved-v8 .landing-question-orbit__stage > span > strong {
+    font-size: 1.08rem !important;
+  }
+
+  html .public-approved-v8 .landing-story {
+    padding: 48px 0 54px !important;
+  }
+
+  html .public-approved-v8 .landing-story__heading {
+    margin-bottom: 26px !important;
+  }
+
+  html .public-approved-v8 .landing-story__heading h2 {
+    font-size: clamp(2.35rem, 10.5vw, 3.15rem) !important;
+  }
+
+  html .public-approved-v8 .landing-story__heading > div {
+    font-size: 0.88rem !important;
+  }
+
+  html .public-approved-v8 .landing-demo--chat {
+    min-height: 0 !important;
+  }
+
+  html .public-approved-v8 .landing-demo__body {
+    padding: 14px !important;
+  }
+
+  html .public-approved-v8 .landing-story__stage--system .landing-demo--chat {
+    min-height: 0 !important;
+  }
+
+  html .public-approved-v8 .landing-demo--system-context {
+    display: none !important;
+  }
+
+  html .public-approved-v8 .v0-comparison .v0-story-heading h2,
+  html .public-approved-v8 .v0-comparison .v0-story-heading h2 * {
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+  }
+
+  html .public-approved-v8 .v0-final {
+    padding-block: 82px 88px !important;
+  }
+}
