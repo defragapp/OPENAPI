@@ -7,6 +7,7 @@ const repositoryRoot = resolve(workerRoot, '../..');
 const runtime = readFileSync(resolve(workerRoot, 'src/runtime-entry.ts'), 'utf8');
 const releaseEvidenceRuntime = readFileSync(resolve(workerRoot, 'src/release-evidence.ts'), 'utf8');
 const policyReceiptMigration = readFileSync(resolve(workerRoot, 'migrations/0016_policy_acceptance_receipts.sql'), 'utf8');
+const privacyAccessMigration = readFileSync(resolve(workerRoot, 'migrations/0017_privacy_access_and_eligibility.sql'), 'utf8');
 const packageJson = readFileSync(resolve(repositoryRoot, 'package.json'), 'utf8');
 const wranglerConfig = readFileSync(resolve(repositoryRoot, 'wrangler.jsonc'), 'utf8');
 const releaseWrapper = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-release.mjs'), 'utf8');
@@ -30,23 +31,30 @@ const expectedRuntimeSequence = expectedSequence.replace(archiveSha256, '${VISUA
 const expectedParentVerifierSequence = expectedSequence.replace(archiveSha256, '${expectedArchive}');
 
 describe('production release parity contract', () => {
-  it('derives migration 0016 from D1 history and the policy receipt table with accurate fallbacks', () => {
+  it('derives migration 0017 from D1 history, policy receipts, privacy requests, and eligibility schema', () => {
     expect(runtime).toContain("const PASSKEY_MIGRATION_VERSION = '0014_passkey_authentication'");
-    expect(runtime).toContain("const PREVIOUS_MIGRATION_VERSION = '0015_release_evidence'");
-    expect(runtime).toContain("const LATEST_MIGRATION_VERSION = '0016_policy_acceptance_receipts'");
-    expect(runtime).toContain("const LATEST_MIGRATION_FILENAME = '0016_policy_acceptance_receipts.sql'");
+    expect(runtime).toContain("const RELEASE_EVIDENCE_MIGRATION_VERSION = '0015_release_evidence'");
+    expect(runtime).toContain("const POLICY_RECEIPT_MIGRATION_VERSION = '0016_policy_acceptance_receipts'");
+    expect(runtime).toContain("const LATEST_MIGRATION_VERSION = '0017_privacy_access_and_eligibility'");
+    expect(runtime).toContain("const LATEST_MIGRATION_FILENAME = '0017_privacy_access_and_eligibility.sql'");
     expect(runtime).toContain("name = 'release_evidence'");
     expect(runtime).toContain("name = 'release_progress'");
     expect(runtime).toContain("name = 'policy_acceptance_receipts'");
+    expect(runtime).toContain("name = 'privacy_request_events'");
+    expect(runtime).toContain("pragma_table_info('accounts')");
     expect(runtime).toContain('FROM d1_migrations WHERE name = ?1');
     expect(runtime).toContain("policyAcceptanceReceipts: policyReceiptSchemaReady ? 'configured' : 'missing'");
+    expect(runtime).toContain("privacyAccessControls: privacyAccessSchemaReady ? 'configured' : 'missing'");
     expect(runtime).toContain("migrationParity: migrationParity ? 'current' : 'behind'");
-    expect(runtime).toContain('&& dependencies.policyAcceptanceReceipts === \'configured\'');
+    expect(runtime).toContain("&& dependencies.policyAcceptanceReceipts === 'configured'");
+    expect(runtime).toContain("&& dependencies.privacyAccessControls === 'configured'");
     expect(runtime).toContain("status: pathname === '/ready' && !ready ? 503 : 200");
     expect(runtime).toContain("...(pathname === '/ready' ? { sha: env.APP_VERSION } : {})");
     expect(runtime).toContain('migrationVersion,');
     expect(runtime).toContain('latestMigrationVersion: LATEST_MIGRATION_VERSION');
     expect(policyReceiptMigration).toContain('CREATE TABLE policy_acceptance_receipts');
+    expect(privacyAccessMigration).toContain('CREATE TABLE privacy_request_events');
+    expect(privacyAccessMigration).toContain('eligibility_rule_version TEXT');
   });
 
   it('publishes the v3 runtime visual release contract', () => {
@@ -109,18 +117,19 @@ describe('production release parity contract', () => {
 
   it('publishes exact-SHA application release evidence only after every application gate', () => {
     expect(releaseEvidenceLibrary).toContain("RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
-    expect(releaseEvidenceLibrary).toContain("RELEASE_MIGRATION_VERSION = '0016_policy_acceptance_receipts'");
-    expect(releaseEvidenceLibrary).toContain("RELEASE_MIGRATION_FILENAME = '0016_policy_acceptance_receipts.sql'");
+    expect(releaseEvidenceLibrary).toContain("RELEASE_MIGRATION_VERSION = '0017_privacy_access_and_eligibility'");
+    expect(releaseEvidenceLibrary).toContain("RELEASE_MIGRATION_FILENAME = '0017_privacy_access_and_eligibility.sql'");
     expect(evidenceWriter).toContain('upsertReleaseEvidenceSql');
     expect(evidenceWriter).toContain("status='success'");
     expect(evidenceWriter).toContain('releaseEvidenceEquals');
+    expect(evidenceWriter).toContain("payload?.dependencies?.privacyAccessControls === 'configured'");
     expect(evidenceWriter).not.toContain("runWrangler(['deploy'");
     expect(progressWriter).toContain('upsertReleaseProgressSql');
     expect(wranglerConfig).toMatch(/"account_id"\s*:\s*"[0-9a-f]{32}"/i);
     expect(releaseEvidenceRuntime).toContain('env.DB.prepare');
     expect(releaseEvidenceRuntime).toContain("status = 'success'");
     expect(releaseEvidenceRuntime).toContain("RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
-    expect(releaseEvidenceRuntime).toContain("RELEASE_MIGRATION_VERSION = '0016_policy_acceptance_receipts'");
+    expect(releaseEvidenceRuntime).toContain("RELEASE_MIGRATION_VERSION = '0017_privacy_access_and_eligibility'");
     expect(releaseEvidenceRuntime).toContain('evidence.sha !== sha');
     expect(releaseEvidenceRuntime).toContain('evidence.dmarcVerified !== true');
     expect(runtime).toContain("import { readProductionReleaseEvidence } from './release-evidence'");
