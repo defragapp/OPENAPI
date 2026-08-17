@@ -160,7 +160,7 @@ function installFetchObserver(): void {
       if (response.ok && requestUrl.pathname.startsWith('/api/v1/auth/logout')) {
         d1Bookmark = undefined;
         clearStoredD1Bookmark();
-        setTimeout(() => location.assign('/login'), 50);
+        setTimeout(() => location.assign(PUBLIC_SHARE_URL), 50);
       }
 
       if (response.ok && isBillingHandoffPath(requestUrl.pathname)) {
@@ -263,6 +263,8 @@ function installAccountNavigation(): void {
 
   document.querySelectorAll<HTMLElement>('.account-shell .check-line span').forEach((label) => {
     if (label.dataset.policyLinks === 'true') return;
+    const originalLabel = label.textContent ?? '';
+    if (!/\bTerms\b|\bPrivacy(?: Policy)?\b/i.test(originalLabel)) return;
     label.dataset.policyLinks = 'true';
     const terms = policyLink('Terms', TERMS_URL);
     const privacy = policyLink('Privacy Policy', PRIVACY_URL);

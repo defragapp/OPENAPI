@@ -85,7 +85,7 @@ describe('account journey AI, Baseline, and Stripe tiering release chain', () =>
   });
 
   it('keeps support contributions entirely outside subscription entitlement projection', () => {
-    expect(publicSupport).toContain('Donation payments remain entitlement-neutral.');
+    expect(publicSupport).toContain('keeps voluntary support separate from subscriptions and entitlement projection');
     expect(publicSupport).toContain('entitlement-neutral');
     expect(index).not.toContain('donate.stripe.com');
     expect(entry).not.toContain('donate.stripe.com');

@@ -14,6 +14,7 @@ const mobileRelease = read('./workspace-mobile-release-v3.css');
 const productionReadiness = read('./production-readiness-visual-v1.css');
 const finalAuthority = read('./public-landing-final-authority.css');
 const landingRefinementV2 = read('./landing-refinement-v2.css');
+const landingRefinementV5 = read('./landing-live-refinement-v5.css');
 const interactionRuntime = read('./release-interaction-runtime.ts');
 const controls = read('./emergency-public-removal.css');
 
@@ -47,14 +48,14 @@ describe('premium rotating public Expression Field v3', () => {
     expect(hero).toContain('<LandingExpressionSlice />');
     expect(landing.indexOf('<RealLifeQuestions />')).toBeGreaterThan(landing.indexOf('<V0Hero />'));
     expect(landing.indexOf('<LandingProductStories />')).toBeGreaterThan(landing.indexOf('<RealLifeQuestions />'));
-    expect(landing).toContain("{ scope: 'Self', text: 'Why do I keep taking responsibility for everyone around me?' }");
-    expect(landing).toContain("{ scope: 'Family system', text: 'What changes when I stop playing the role everyone expects?' }");
+    expect(landing).toContain("{ scope: 'Self', text: 'Why do I keep saying yes when I already know I’m overwhelmed?' }");
+    expect(landing).toContain("{ scope: 'Family system', text: 'How do I stop being the person who holds the whole family together?' }");
     expect(landing).toContain('<small>{question.scope}</small>');
     expect(landing).toContain('<strong>{question.text}</strong>');
     expect(landingRefinementV2).toContain('font-size: clamp(1.3rem, 2vw, 1.7rem) !important');
   });
 
-  it('supports stable automatic rotation plus pointer, hover, and keyboard control', () => {
+  it('supports stable automatic rotation plus pointer, click/focus, and keyboard control', () => {
     for (const marker of [
       'AUTO_ROTATION_DEGREES_PER_MS',
       'INTERACTION_PAUSE_MS',
@@ -70,7 +71,8 @@ describe('premium rotating public Expression Field v3', () => {
       'onPointerMove={handlePointerMove}',
       'onPointerUp={handlePointerEnd}',
       'onPointerCancel={handlePointerEnd}',
-      'onPointerEnter={() => selectAxis(axis.id)}',
+      'onFocus={() => selectAxis(axis.id)}',
+      'onClick={(event) =>',
       'role="button"',
       'tabIndex={0}',
       "event.key === 'ArrowLeft'",
@@ -80,6 +82,7 @@ describe('premium rotating public Expression Field v3', () => {
       'yaw: wrapAngle',
       'pitch: clamp'
     ]) expect(field).toContain(marker);
+    expect(field).not.toContain('onPointerEnter={() => selectAxis(axis.id)}');
   });
 
   it('renders all sixteen value-driven themes with a compact name/value endpoint label', () => {
@@ -92,13 +95,13 @@ describe('premium rotating public Expression Field v3', () => {
       'MAX_AXIS_LENGTH',
       'Math.pow(normalized, 1.32)',
       'relative emphasis',
-      'data-inspecting="true"',
+      "data-inspecting={hasInspection ? 'true' : 'false'}",
       'data-field-geometry="spherical-360"',
       'buildSphereGrid',
       'buildAmbientRays',
       'SPHERE_RADIUS',
-      'TOOLTIP_WIDTH = 132',
-      'TOOLTIP_HEIGHT = 34',
+      'TOOLTIP_WIDTH = 104',
+      'TOOLTIP_HEIGHT = 26',
       'placeTooltip',
       '<g className="landing-expression-slice__tooltip"',
       'landing-expression-slice__tooltip-title',
@@ -115,12 +118,10 @@ describe('premium rotating public Expression Field v3', () => {
     expect(field).not.toContain('shadowExpression');
     expect(heroExtension).toContain('.landing-expression-slice__tooltip');
     expect(heroExtension).toContain('display: none !important');
-    expect(landingRefinementV2).toContain('.landing-expression-slice__tooltip');
-    expect(landingRefinementV2).toContain('display: block !important');
-    expect(landingRefinementV2).toContain('width: 132px !important');
-    expect(landingRefinementV2).toContain('height: 34px !important');
-    expect(landingRefinementV2).toContain('@media (max-width: 760px)');
-    expect(landingRefinementV2).toContain('display: none !important');
+    expect(landingRefinementV5).toContain('.landing-expression-slice__tooltip-panel');
+    expect(landingRefinementV5).toContain('width: 104px !important');
+    expect(landingRefinementV5).toContain('height: 26px !important');
+    expect(landingRefinementV5).toContain('@media (prefers-reduced-motion: reduce)');
     expect(interactionRuntime).toContain("field.dataset.inspecting = 'true'");
     expect(interactionRuntime).toContain("event.key === 'Escape'");
   });

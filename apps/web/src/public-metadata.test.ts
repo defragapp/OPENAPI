@@ -17,7 +17,7 @@ describe('public metadata and fallback documents', () => {
   it('explains the product category in document and shared-link metadata', () => {
     expect(index).toContain('Sovereign.OS — Private personal AI for real life');
     expect(index).toContain('private personal AI for understanding yourself, your relationships, your decisions, and the groups around you');
-    expect(index).toContain('Understand yourself, relationships, decisions, and family or group dynamics from a private Baseline');
+    expect(index).toContain('Use one private Baseline to understand recurring patterns, decisions, relationships, and family or group dynamics without starting from zero every time.');
     expect(index).toContain('og:site_name" content="Sovereign.OS"');
     expect(index).toContain('twitter:card" content="summary_large_image"');
     expect(index).toContain('https://sovereign.defrag.app/og-sovereign.png');

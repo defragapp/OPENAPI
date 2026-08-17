@@ -10,7 +10,7 @@ describe('one authoritative intelligence response', () => {
     expect(workspace).toContain('<SovereignAnswerView');
     expect(workspace).toContain('<p className="direct-answer">');
     expect(workspace).toContain('<BasisStrip values={basis} />');
-    expect(workspace).toContain('Still unknown');
+    expect(workspace).toContain('What still needs clarity');
     expect(workspace).toContain('answer.correction_prompt');
     expect(workspace).toContain('onCorrection');
   });

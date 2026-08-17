@@ -60,8 +60,8 @@ describe('approved public landing v8', () => {
       'What this unlocks',
       'One private foundation. More useful answers across the questions that shape your life.',
       'Why do we keep having the same argument even when we both want it to stop?',
-      'Build my Baseline',
-      'See how it works'
+      'Start free · No card required',
+      'Get started'
     ]) expect(landing).toContain(marker);
     expect(landing.indexOf('<BaselineFoundation />')).toBeLessThan(landing.indexOf('<RealLifeQuestions />'));
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));

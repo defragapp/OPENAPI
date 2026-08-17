@@ -62,7 +62,7 @@ describe('authenticated product flow', () => {
 
   it('supports unknown birth time without guessed outputs', () => {
     expect(workspace).toContain("['unknown', 'Unknown'");
-    expect(workspace).toContain('A supported path.');
+    expect(workspace).toContain('You can continue without a birth time.');
     expect(workspace).toContain('Sovereign will not guess unavailable values.');
   });
 
@@ -71,7 +71,7 @@ describe('authenticated product flow', () => {
     expect(workspace).toContain("api('/api/v1/current-conditions', { method: 'DELETE' })");
     expect(workspace).toContain('Enable for six hours');
     expect(workspace).toContain('Remove current context');
-    expect(workspace).toContain('does not request or store your device location');
+    expect(workspace).toContain('does not request your device location');
     expect(workspace).not.toContain('navigator.geolocation');
   });
 });

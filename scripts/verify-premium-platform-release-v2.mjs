@@ -11,6 +11,14 @@ const landingRefinementV5 = readFileSync(resolve('apps/web/src/landing-live-refi
 
 const replacements = [
   [
+    "  'Why do I keep taking responsibility for everyone around me?',",
+    "  'Why do I take responsibility for problems that are not mine?',"
+  ],
+  [
+    "  'What is mine, what is theirs, and what happens between us?',",
+    "  'Adds relationship or system context when relevant and permitted',"
+  ],
+  [
     "const passkeyVisual = read('apps/web/src/passkey-auth.css');\nconst staticV0Visual = read('apps/web/public/v0-public-port.css');",
     "const passkeyVisual = read('apps/web/src/passkey-auth.css');\nconst routeCohesionVisual = read('apps/web/src/deployed-route-cohesion.css');\nconst refinementVisual = read('apps/web/src/experience-refinement-v1.css');\nconst renderedFidelityVisual = read('apps/web/src/rendered-fidelity-v1.css');\nconst landingRefinementVisual = read('apps/web/src/landing-refinement-v2.css');\nconst landingRefinementV5Visual = read('apps/web/src/landing-live-refinement-v5.css');\nconst invitationFidelityVisual = read('apps/web/src/invitation-rendered-fidelity-v1.css');\nconst staticV0Visual = read('apps/web/public/v0-public-port.css');\nconst staticRefinementVisual = read('apps/web/public/experience-static-refinement-v1.css');"
   ],
@@ -72,7 +80,7 @@ const replacements = [
   ],
   [
     "supportPages.forEach((page) => requireAll('support page', page, ['/premium-public-release.css?v=20260730-final', 'Sovereign.OS']));",
-    "supportPages.forEach((page) => requireAll('support page', page, ['/premium-public-release.css?v=20260730-final', 'Sovereign.OS']));\nfor (const page of supportPages.slice(0, 3)) requireAll('refined static page', page, ['/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);"
+    "supportPages.forEach((page) => requireAll('support page', page, ['/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260817-action-v1', 'Sovereign.OS']));"
   ],
   [
     "  ['passkey authority', passkeyVisual],\n  ['standalone authority', staticV0Visual],",

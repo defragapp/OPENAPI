@@ -95,6 +95,9 @@ if (main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("imp
 if (source.split(retiredFingerprintOutput).length - 1 !== 1) throw new Error('Visual intelligence release v2 could not isolate the historical sequence fingerprint output.');
 
 const replacements = [
+  ["  'See a Sovereign answer',", "  'One private reference beneath every question.',"],
+  ["  'Start with what’s actually happening.',", "  'One private foundation. More useful answers across the questions that shape your life.',"],
+  ["  'Why do we keep having the same fight?',", "  'Why do we keep having the same argument even when we both want it to stop?',"],
   ["  'Sovereign begins with the capacity beneath a pattern.',", "  'Build a private Baseline once.',"],
   ["  'Generic AI',", "  'A blank conversation starts with the prompt. Sovereign starts with your Baseline.',"],
   ["  'Capacity beneath the pattern',", "  'What your Baseline supports',"],
@@ -102,7 +105,9 @@ const replacements = [
   ["  'What may keep it going',", "  'Where responsibility shifts',"],
   ["  'What could change',", "  'A cleaner boundary',"],
   ["  'System structure',", "  'What Sovereign separates',"],
-  ["  'Illustrative permitted Baselines',", "  'Illustrative supplied context',"]
+  ["  'Illustrative permitted Baselines',", "  'Illustrative supplied context',"],
+  ["  '/experience-static-refinement-v1.css?v=20260816-refinement-v1',", "  '/experience-static-refinement-v1.css?v=20260817-cohesion-v2',\n  '/premium-action-static-v1.css?v=20260817-action-v1',"],
+  ["  'Build my Baseline',", "  'Get started',"]
 ];
 for (const [retiredMarker, currentMarker] of replacements) {
   const occurrences = source.split(retiredMarker).length - 1;

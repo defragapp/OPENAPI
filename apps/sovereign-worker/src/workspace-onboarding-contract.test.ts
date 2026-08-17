@@ -105,7 +105,7 @@ describe('account onboarding, recovery, and conversation persistence', () => {
     for (const label of ['Current context', 'Permissions', 'People and invitations', 'System permissions', 'Data and privacy', 'Accessibility']) {
       expect(workspace).toContain(label);
     }
-    expect(workspace).toContain('There is no global “share everything” control.');
+    expect(workspace).toContain('There is no “share everything” control.');
     expect(permissions).toContain("granted: false");
     expect(permissions).toContain("status: 'revoked'");
     expect(permissions).toContain("method: 'DELETE'");

@@ -1,0 +1,174 @@
+/* Standalone public-route action authority. */
+:root {
+  --static-action-ink: #f2ede5;
+  --static-action-muted: rgba(242, 237, 229, 0.62);
+  --static-action-line: rgba(242, 237, 229, 0.26);
+  --static-action-line-strong: rgba(242, 237, 229, 0.54);
+  --static-action-bg: #080a0d;
+}
+
+.launch-cta,
+.launch-button,
+.support-links .launch-button,
+.launch-mobile-menu summary,
+.consent-actions button {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.launch-sign-in,
+.launch-cta,
+.launch-button {
+  color: var(--static-action-ink) !important;
+  text-decoration: none !important;
+}
+
+.launch-cta,
+.launch-button,
+.consent-actions button {
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 44px !important;
+  padding-inline: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  border-bottom: 1px solid var(--static-action-line) !important;
+}
+
+.launch-cta:hover,
+.launch-cta:focus-visible,
+.launch-button:hover,
+.launch-button:focus-visible,
+.consent-actions button:hover,
+.consent-actions button:focus-visible {
+  border-bottom-color: var(--static-action-line-strong) !important;
+}
+
+.launch-sign-in,
+.launch-cta {
+  position: relative;
+}
+
+.launch-sign-in:focus-visible,
+.launch-cta:focus-visible,
+.launch-button:focus-visible,
+.launch-mobile-menu summary:focus-visible,
+.consent-actions button:focus-visible {
+  outline: 1px solid var(--static-action-line-strong) !important;
+  outline-offset: 5px !important;
+}
+
+.launch-mobile-menu-panel {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.launch-mobile-menu-panel a {
+  min-height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding-inline: 0 !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid var(--static-action-line) !important;
+}
+
+.support-links {
+  gap: 18px !important;
+}
+
+.support-links .launch-button {
+  display: inline-flex !important;
+}
+
+/* Consent is part of the same product, not a light-theme utility page. */
+.consent-page {
+  background: var(--static-action-bg) !important;
+  color: var(--static-action-ink) !important;
+}
+
+.consent-page .launch-wordmark,
+.consent-page .launch-links a,
+.consent-page .launch-footer a,
+.consent-page .consent-support a {
+  color: var(--static-action-ink) !important;
+}
+
+.consent-page .consent-lede,
+.consent-page .consent-boundary p,
+.consent-page .consent-panel > header p,
+.consent-page .consent-status,
+.consent-page .consent-empty,
+.consent-page .consent-invitation > p,
+.consent-page .consent-scope small,
+.consent-page .consent-support,
+.consent-page .launch-footer {
+  color: var(--static-action-muted) !important;
+}
+
+.consent-page .consent-card-label,
+.consent-page .consent-boundary span {
+  color: var(--static-action-muted) !important;
+}
+
+.consent-page .consent-panel,
+.consent-page .consent-status,
+.consent-page .consent-empty,
+.consent-page .consent-invitation {
+  background: transparent !important;
+  border-color: var(--static-action-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.consent-page .consent-panel {
+  border-inline: 0 !important;
+  border-bottom: 0 !important;
+  padding-inline: 0 !important;
+}
+
+.consent-page .consent-status {
+  min-height: 0 !important;
+  padding-inline: 0 !important;
+  border-inline: 0 !important;
+  border-bottom: 0 !important;
+}
+
+.consent-page .consent-invitation,
+.consent-page .consent-empty {
+  padding-inline: 0 !important;
+  border-inline: 0 !important;
+  border-bottom: 0 !important;
+}
+
+.consent-actions {
+  gap: 18px !important;
+}
+
+.consent-actions button {
+  color: var(--static-action-ink) !important;
+  font-weight: 620 !important;
+}
+
+.consent-actions button.secondary {
+  color: var(--static-action-muted) !important;
+}
+
+.consent-actions button:disabled {
+  opacity: 0.38 !important;
+}
+
+@media (max-width: 760px) {
+  .launch-nav-actions > .launch-sign-in,
+  .launch-nav-actions > .launch-cta {
+    display: none !important;
+  }
+
+  .consent-actions button {
+    min-height: 44px !important;
+  }
+}

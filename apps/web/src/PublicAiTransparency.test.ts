@@ -7,11 +7,11 @@ const safetyRuntime = readFileSync(new URL('./SafetyResponseRuntime.ts', import.
 describe('public AI transparency', () => {
   it('states plan-independent safety, evidence boundaries, and correction paths', () => {
     for (const marker of [
-      'SAFETY, EVIDENCE, AND LIMITS',
-      'Safety responses do not become an upgrade prompt',
-      'does not consume a monthly Sovereign AI turn',
-      'does not turn an interpretive framework, coincidence, current astronomical condition, or strong feeling into proof',
-      'Exact server-approved Basis values remain available beneath the answer',
+      'SAFETY',
+      'does not turn that moment into an upgrade prompt',
+      'do not use one of your monthly Sovereign AI turns',
+      'A framework, coincidence, current astronomical condition, or strong feeling is not treated as proof',
+      'Basis shows the exact source values that informed it',
       'info@defrag.app'
     ]) {
       expect(faq).toContain(marker);

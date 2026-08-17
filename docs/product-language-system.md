@@ -28,7 +28,7 @@ Baseline Design is the foundation. A visitor arrives with an ordinary real-life 
 
 Relationship and system intelligence extend that same foundation outward. Each person remains distinct, another person's private state remains unknown unless they supply it, and shared context remains permission-bound.
 
-The technical machinery stays underneath the experience. Source calculations, framework abbreviations, Basis codes, provider details, permission mechanics, and deployment architecture appear only when they are needed for support, verification, control, or deeper inspection. They must not carry the primary explanation of what Sovereign is or why an answer is useful.
+The technical machinery stays underneath the experience. Source calculations, framework abbreviations, Basis codes, provider details, permission mechanics, confidence classes, source layers, authorization state, and deployment architecture appear only when they are needed for support, verification, control, or deeper inspection. They must not carry the primary explanation of what Sovereign is or why an answer is useful.
 
 The public explanatory order is therefore:
 
@@ -42,7 +42,9 @@ This hierarchy is not a new framework or slogan. It clarifies how the existing B
 
 ### Public translation rule
 
-`Capacity` remains a valid internal intelligence concept when the answer contract needs to distinguish a stable quality from its pressured expression. It must not lead the public landing, demo headings, share metadata, or the first explanation of the product. Public surfaces should translate that machinery into the concrete distinction the person can recognize: what is happening, what pressure may be adding, where responsibility sits, what happens between people, what remains unknown, and what could change.
+`Capacity` remains a valid internal intelligence concept when the answer contract needs to distinguish a stable quality from its pressured expression. It must not lead the public landing, demo headings, share metadata, or the first explanation of the product. Public surfaces should translate that machinery into the concrete distinction the person can recognize: what is happening, what pressure may be adding, where responsibility sits, what happens between people, what may need clarification, and what could change.
+
+Internal evidence categories must not become the product voice. Do not explain ordinary user-facing output with phrases such as `what is supported, interpreted, and still unknown`, `evidence levels`, `source layers`, `model-safe context`, `server-confirmed state`, or similar implementation language. Keep those distinctions correct underneath the product, then translate them into clear adult language.
 
 ## The Sovereign lens
 
@@ -51,7 +53,7 @@ Sovereign uses one explanatory movement across self, relationships, decisions, a
 1. **Start with the real situation.** Use the Baseline to identify the part of the question that is most relevant instead of treating the prompt in isolation.
 2. **Separate the pattern from what pressure is adding.** Distinguish what appears steady from what may be protective, overextended, repressed, Shadow, Gift, or otherwise context-dependent without turning it into a fixed identity.
 3. **See what happens between people.** Permission-bound relationship and system context keeps each person distinct and examines the interaction itself.
-4. **See what may keep the pattern going—and what could change it.** Examine supported roles, responsibility, authority, pressure, observations, unknowns, Alignment, repair, and a testable change in conditions.
+4. **See what may keep the pattern going—and what could change it.** Examine roles, responsibility, authority, pressure, observations, Alignment, repair, missing perspective, and a testable change in conditions.
 
 The compact product explanation is the product definition above. Do not introduce another slogan to summarize this lens.
 
@@ -59,12 +61,12 @@ This is an explanatory lens, not a new feature, score, diagnosis, causal model, 
 
 ### Certainty register
 
-User-facing interpretation must preserve the evidence level:
+User-facing interpretation must preserve the evidence level without narrating the evidence system:
 
 - use direct factual language only for behavior or context the user has supplied or confirmed;
 - use `may`, `can`, or equivalent language for Baseline-derived, current-context, relational, or system interpretation;
 - use `what keeps the pattern going` only when continuation conditions are observed or confirmed;
-- otherwise use `what may be keeping the pattern going` and keep unknowns visible.
+- otherwise use `what may be keeping the pattern going` and say plainly what still needs clarification.
 
 This distinction changes certainty, not the underlying explanatory movement.
 
@@ -82,7 +84,7 @@ A public visitor should understand the interaction before learning framework ter
 
 - start with the real situation, decision, relationship, or recurring pattern;
 - receive the direct answer before technical detail;
-- see what is supported, interpretive, confirmed, or still unknown;
+- understand what appears steady, what pressure may be changing, and what still needs clarification;
 - explore more deeply only when it is useful.
 
 Baseline Design is the personal intelligence foundation. It gives Sovereign a consistent reference for how a person may decide, communicate, learn, connect, lead, create, respond under pressure, and grow.
@@ -117,11 +119,13 @@ Use this as a deeper brand statement or closing line. Do not make it carry the f
 
 ## Voice
 
-Write in clear, adult language. Be calm, specific, and direct. State the central insight before explanation. Make the mechanism visible in ordinary language: the pattern, pressure, responsibility, tradeoff, supported context, and unknowns.
+Write in clear, adult language. Be calm, specific, and direct. State the central insight before explanation. Make the mechanism visible in ordinary language: the pattern, pressure, responsibility, tradeoff, context, perspective, and what may need clarification.
 
 Use uncertainty words only where uncertainty requires them. Do not weaken every sentence.
 
-Do not use generic coaching, inspirational filler, therapy voice, diagnosis, spiritual certainty, specialist-first language, generic chatbot invitations, or verdicts about another person.
+Do not use generic coaching, inspirational filler, therapy voice, diagnosis, spiritual certainty, specialist-first language, generic chatbot invitations, verdicts about another person, or implementation taxonomy as product copy.
+
+User-facing text should say what the person can understand, choose, review, or do. Schema names, provider state, entitlement projection, model context, evidence classifications, and release vocabulary belong underneath the interface unless the user explicitly asks how the system works.
 
 ## Core terms
 
@@ -157,7 +161,7 @@ Public demonstration label may be `What fits` while the authenticated contract r
 
 ### Basis
 
-Exact server-approved values that shaped an interpretation. Basis supports reflection; it does not scientifically prove personality or state.
+The source values behind an answer, available when the user wants to inspect them. Basis supports reflection; it does not scientifically prove personality or state.
 
 ### Covenant
 
@@ -180,7 +184,7 @@ A normal answer contains:
 
 Relationship answers distinguish **You may be bringing**, **They may be bringing**, **What happens between you**, **What each person can own**, and **What still needs to be asked directly**.
 
-System answers distinguish supported roles, authority, responsibility, pressure, change effects, and unknown perspectives.
+System answers distinguish roles, authority, responsibility, pressure, change effects, and perspectives that are not yet represented.
 
 Alignment answers use **Supports the fit**, **Pulls against it**, **The real tradeoff**, **Still needed**, and **A closer version**.
 
@@ -192,9 +196,9 @@ Root landing supporting copy:
 
 - Kicker: `PERSONAL AI FOR REAL LIFE`
 - Founder hero: `Healing isn’t optional. Holding onto the pain is.`
-- Body: `Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics. It keeps what is supported, interpreted, and still unknown distinct.`
-- Primary action: `Build my Baseline`
-- Secondary action: `See a Sovereign answer`
+- Body: `Build a private Baseline once. Sovereign uses the parts that matter to understand patterns, decisions, relationships, and systems—without making you explain yourself from zero every time.`
+- Account navigation: `Sign in` · `Get started`
+- Root hero: no additional acquisition buttons; do not repeat `Build my Baseline`, `See a Sovereign answer`, or equivalent signup actions in the narrative.
 - Trust line: `Start free · No card required · Review, correct, or reject any interpretation`
 
 Primary section language:
@@ -289,7 +293,14 @@ Sovereign+:
 - $20 monthly or $99 annually.
 - 300 Sovereign AI turns each month.
 
-Do not alter live prices, products, lookup keys, or entitlement descriptions. Do not include a video-generation charge or Worlds entitlement in current launch pricing.
+Support:
+
+- `Support Sovereign.OS`
+- voluntary one-time payment separate from Free and Sovereign+;
+- user chooses any amount beginning at $1;
+- support never changes entitlement, plan status, ownership, influence, or promised access.
+
+Do not alter the live Sovereign+ prices, products, lookup keys, or entitlement descriptions without an explicit product-pricing decision. Do not include a video-generation charge or Worlds entitlement in current launch pricing.
 
 ## Retired and prohibited phrasing
 
@@ -299,7 +310,10 @@ Never use these as active product/interface language:
 - `Ask about your life. Get an answer built around you.`;
 - `What do you want to understand?`;
 - `Bring the question you already have.`;
-- generic variants such as `What would you like to explore?`, `Ask anything.`, or `Tell me what's on my mind.`.
+- generic variants such as `What would you like to explore?`, `Ask anything.`, or `Tell me what's on my mind.`;
+- `what is supported, interpreted, and still unknown` as a product explanation;
+- `support, interpretation, and unknowns distinguishable` as user-facing value language;
+- `server-confirmed Stripe subscription state` in customer-facing billing copy.
 
 Also avoid:
 

@@ -74,7 +74,7 @@ describe('Sovereign account and workspace shell', () => {
     expect(workspace).toContain('Send private invitation');
     expect(workspace).toContain('Adding a name is not permission.');
     expect(app).toContain('Choose what this connection may use.');
-    expect(consent).toContain('Manage requested uses.');
+    expect(consent).toContain('Review your shared uses.');
     expect(consentRuntime).toContain("fetch('/api/v1/invitations/mine'");
     expect(consentRuntime).toContain('Permission revoked for future use.');
   });

@@ -23,6 +23,7 @@ const releaseEvidence = read('scripts/release-evidence-lib.mjs');
 const freeTierControls = read('scripts/configure-cloudflare-free-tier.mjs');
 const parentDomainVerifier = read('scripts/verify-parent-domain-routes-v3.mjs');
 const authenticatedWorkspace = read('apps/web/src/AuthenticatedWorkspace.tsx');
+const productionEntry = read('apps/sovereign-worker/src/production-entry.ts');
 
 const expectedObservability = {
   enabled: true,
@@ -52,7 +53,7 @@ for (const [label, observability] of [
 }
 
 requireValue(rootConfig.name === 'sovv-web', 'Production Worker name drifted');
-requireValue(rootConfig.main === 'apps/sovereign-worker/src/runtime-entry.ts', 'Production runtime entry drifted');
+requireValue(rootConfig.main === 'apps/sovereign-worker/src/production-entry.ts', 'Production preflight entry drifted');
 requireValue(rootConfig.workers_dev === false, 'Production workers.dev must remain disabled');
 requireValue(rootConfig.preview_urls === false, 'Production preview URLs must remain disabled');
 requireValue(rootConfig.vars?.APP_ENV === 'production', 'Production APP_ENV drifted');
@@ -68,6 +69,15 @@ requireValue(rootConfig.assets?.binding === 'ASSETS', 'Production assets binding
 requireValue(rootConfig.assets?.not_found_handling === '404-page', 'Production 404 asset contract drifted');
 requireValue(!rootConfig.r2_buckets?.length, 'Production must not enable R2');
 requireValue(!rootConfig.queues?.producers?.length && !rootConfig.queues?.consumers?.length, 'Production must not enable Queue');
+
+requireAll('production preflight', productionEntry, [
+  "DISABLED_TEXT_FIRST_PATHS = new Set(['/api/tts'])",
+  "safety.disposition !== 'standard'",
+  'authorizeConversationContext(env, auth.accountId, selection, entitlements)',
+  "requireFeature(entitlements, 'covenant.lens')",
+  'LEGACY_SYSTEM_ALIGNMENT_PATH',
+  "'systems.family' : 'systems.team'"
+]);
 
 for (const hostname of ['sovereign.defrag.app', 'app.defrag.app']) {
   requireValue(rootConfig.routes?.some((route) => route.pattern === hostname && route.custom_domain === true), `Production is missing Custom Domain ${hostname}`);
