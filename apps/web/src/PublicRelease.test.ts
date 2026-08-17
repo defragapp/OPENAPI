@@ -16,6 +16,7 @@ const fieldCss = readFileSync(new URL('./landing-expression-field-v3.css', impor
 const integrationCss = readFileSync(new URL('./landing-expression-field-integration.css', import.meta.url), 'utf8');
 const heroExtension = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
 const storiesCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
+const landingRefinement = readFileSync(new URL('./landing-refinement-v2.css', import.meta.url), 'utf8');
 
 const retiredInterfacePhrases = [
   'Ask about your life. Get an answer built around you.',
@@ -24,12 +25,14 @@ const retiredInterfacePhrases = [
 ] as const;
 
 describe('founder v0 public production release', () => {
-  it('publishes canonical and controlled social metadata', () => {
+  it('publishes category-first canonical and social metadata', () => {
     expect(index).toContain('rel="canonical" href="https://sovereign.defrag.app/"');
-    expect(index).toContain('Healing isn’t optional. Holding onto the pain is.');
+    expect(index).toContain('Sovereign.OS — Private personal AI for real life');
+    expect(index).toContain('https://sovereign.defrag.app/og-sovereign.png');
+    expect(index).not.toContain('og:title" content="Sovereign — Healing isn’t optional. Holding onto the pain is."');
     for (const [page, canonical] of [[pricing, '/pricing'], [questions, '/faq'], [how, '/how-it-works']] as const) {
       expect(page).toContain(`rel="canonical" href="https://sovereign.defrag.app${canonical}"`);
-      expect(page).toContain('og-sovereign.svg');
+      expect(page).toContain('og-sovereign.png');
     }
   });
 
@@ -39,42 +42,48 @@ describe('founder v0 public production release', () => {
     expect(sitemap).not.toContain('/app');
   });
 
-  it('uses the interactive 360 field as the opening product visual', () => {
+  it('uses the interactive 360 field as the opening product visual with a compact endpoint label', () => {
     expect(landing).toContain('data-answer-contract="sovereign-answer.v2"');
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('<RealLifeQuestions />');
     expect(field).toContain('landing-expression-slice__beam');
+    expect(field).toContain('landing-expression-slice__tooltip-title');
+    expect(field).toContain('landing-expression-slice__tooltip-value');
     expect(field).toContain('onPointerDown={handlePointerDown}');
+    expect(field).toContain('onPointerEnter={() => selectAxis(axis.id)}');
     expect(field).toContain('role="status"');
     expect(field).toContain('data-field-geometry="spherical-360"');
     expect(field).toContain('buildSphereGrid');
     expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(integrationCss).toContain('background: transparent');
     expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
+    expect(landingRefinement).toContain('.landing-expression-slice__tooltip-panel');
   });
 
   it('keeps recognition situational and the three demonstrations structurally distinct', () => {
+    expect(landing).toContain('Built for real situations');
     expect(landing).toContain('Start with what’s actually happening.');
     expect(landing).toContain('Why do we keep having the same fight?');
     expect(landing).toContain('<LandingProductStories />');
     for (const marker of [
-      'See the capacity beneath the pattern.',
+      'Separate helping from carrying the outcome.',
       'Understand what happens between you.',
-      'See what keeps the pattern going—and what could change it.',
-      'Capacity beneath the pattern',
+      'See where responsibility keeps landing.',
+      'What your Baseline supports',
       'Keeping both people distinct',
-      'System structure',
+      'What Sovereign separates',
       'surface="personal-chat"',
       'surface="relationship-chat"',
       'surface="system-map"'
     ]) expect(stories).toContain(marker);
+    expect(stories).not.toContain('capacity beneath');
     expect(stories).not.toContain('LandingExpressionFieldPreview');
     expect(stories).not.toContain('sphere');
     expect(stories).not.toContain('globe');
   });
 
-  it('keeps retired chatbot phrasing out of active public language', () => {
+  it('keeps retired chatbot and capacity-first phrasing out of active public language', () => {
     for (const phrase of retiredInterfacePhrases) {
       expect(landing).not.toContain(phrase);
       expect(stories).not.toContain(phrase);
@@ -82,14 +91,18 @@ describe('founder v0 public production release', () => {
       expect(pricing).not.toContain(phrase);
       expect(questions).not.toContain(phrase);
     }
+    expect(`${landing}\n${stories}\n${how}\n${questions}`).not.toContain('capacity beneath');
+    expect(language).toContain('### Public translation rule');
     expect(language).toContain('## Retired and prohibited phrasing');
   });
 
-  it('retains the founder hierarchy and responsive behavior', () => {
+  it('retains the founder hierarchy and responsive behavior while mobile proof is intentionally shorter', () => {
     for (const selector of ['.v0-hero', '.v0-comparison-grid', '.v0-final']) expect(v0Css).toContain(selector);
     for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip']) expect(fieldCss).toContain(selector);
     for (const selector of ['.landing-expression-slice__sphere-shell', '.landing-question-orbit__stage', '.landing-expression-slice__readout']) expect(heroExtension).toContain(selector);
     for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storiesCss).toContain(selector);
+    expect(landingRefinement).toContain('scroll-snap-type: inline mandatory !important');
+    expect(landingRefinement).toContain('.landing-demo--system-context');
     expect(fieldCss).toContain('@media (max-width: 760px)');
     expect(heroExtension).toContain('@media (max-width: 760px)');
     expect(heroExtension).toContain('@media (prefers-reduced-motion: reduce)');
