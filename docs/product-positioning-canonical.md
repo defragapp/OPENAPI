@@ -30,9 +30,7 @@ This definition explains what the product is in ordinary language. It belongs be
 
 ### Primary interaction principle
 
-**Bring the real situation. Sovereign uses your Baseline to make the useful distinction visible.**
-
-This is explanatory positioning for this companion document, not a new root-hero string. Active public wording continues to inherit `docs/product-language-system.md` and the founder visual contract.
+A person brings a real situation or question. Sovereign uses the Baseline to make the relevant distinction visible. This sentence describes the existing experience; it is not approved public copy or a new slogan.
 
 ### Emotional brand statement
 
