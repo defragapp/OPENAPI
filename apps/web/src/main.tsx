@@ -33,6 +33,7 @@ import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline'
 import invitationRenderedFidelityCss from './invitation-rendered-fidelity-v1.css?inline';
 import workspaceProductionRefinementCss from './workspace-production-refinement-v1.css?inline';
 import authenticatedLaunchCohesionCss from './authenticated-launch-cohesion-v1.css?inline';
+import premiumActionAuthorityCss from './premium-action-authority-v1.css?inline';
 
 /* Component foundations */
 import './styles.css';
@@ -86,7 +87,7 @@ import './account-journey.css';
 import './account-journey-structured.css';
 import './account-journey-release-cohesion.css';
 import './deployed-route-cohesion.css';
-/* Passkey authentication remains the final CSS authority required by AGENTS.md. */
+/* Passkey authentication remains the final component stylesheet; terminal inline release authorities follow below. */
 import './passkey-auth.css';
 
 function installPlatformVisualCohesion(): void {
@@ -103,6 +104,7 @@ function installPlatformVisualCohesion(): void {
   style.textContent += `\n${invitationRenderedFidelityCss}`;
   style.textContent += `\n${workspaceProductionRefinementCss}`;
   style.textContent += `\n${authenticatedLaunchCohesionCss}`;
+  style.textContent += `\n${premiumActionAuthorityCss}`;
   document.head.append(style);
 }
 
