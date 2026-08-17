@@ -35,7 +35,7 @@ const privacySections = [
 const termsSections = [
   {
     title: 'What Sovereign.OS provides',
-    copy: 'Sovereign.OS is a private intelligence platform for understanding yourself, your relationships, and the groups around you. It uses an interpretive Baseline, permitted current context, user-confirmed information, and consented relationship or system context to form responses.'
+    copy: 'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the groups around you. It uses an interpretive Baseline, permitted current context, user-confirmed information, and consented relationship or system context to form responses.'
   },
   {
     title: 'Interpretive limits',
@@ -55,7 +55,7 @@ const termsSections = [
   },
   {
     title: 'Billing and cancellation',
-    copy: 'Stripe manages checkout, payment methods, subscriptions, and the customer billing portal. Ending Sovereign+ returns paid features to Free without deleting your workspace. Account deletion has a 14-day grace period and cancels active subscriptions before private workspace data is removed.'
+    copy: 'Stripe manages checkout, payment methods, subscriptions, and the customer billing portal. Sovereign+ access is enabled only from the server-confirmed Stripe subscription state. Ending Sovereign+ returns paid features to Free without deleting your workspace. Account deletion has a 14-day grace period and cancels active subscriptions before private workspace data is removed.'
   },
   {
     title: 'Another person’s information',
