@@ -108,6 +108,7 @@ export async function orchestrateRelease({
   let deploys = 0;
   let migrationsApplied = false;
   let dmarc;
+  const passedPostDeployChecks = new Set();
   const environment = {
     ...process.env,
     WORKERS_CI_COMMIT_SHA: normalizedSha,
@@ -205,11 +206,14 @@ export async function orchestrateRelease({
         const progress = await persistFailure(check.label, result.combined);
         return { status: 'post-deploy-failed', stage: check.label, deploys, output: result.combined, progress };
       }
+      passedPostDeployChecks.add(check.label);
     }
 
     try {
       const evidence = await evidenceWriter({
         sha: normalizedSha,
+        routeCohesionVerified: passedPostDeployChecks.has('verify-route-cohesion'),
+        renderedVisualVerified: passedPostDeployChecks.has('verify-rendered-visuals'),
         dmarcVerified: dmarc.verified === true,
         configPath: generatedConfigPath,
         runWrangler: countedWrangler,
@@ -218,7 +222,16 @@ export async function orchestrateRelease({
         attempts: evidenceAttempts,
         delayMs: evidenceDelayMs
       });
-      return { status: 'success', deploys, dmarc, evidence };
+      return {
+        status: 'success',
+        deploys,
+        dmarc,
+        verification: {
+          routeCohesionVerified: passedPostDeployChecks.has('verify-route-cohesion'),
+          renderedVisualVerified: passedPostDeployChecks.has('verify-rendered-visuals')
+        },
+        evidence
+      };
     } catch (error) {
       const output = error instanceof Error ? error.message : String(error);
       const progress = await persistFailure('write-release-evidence', output);
