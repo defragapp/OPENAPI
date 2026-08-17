@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const packageJson = readFileSync(new URL('../package.json', import.meta.url), 'utf8');
+const rasterizer = readFileSync(new URL('../scripts/materialize-brand-assets.mjs', import.meta.url), 'utf8');
 const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'utf8');
 const manifest = readFileSync(new URL('../public/manifest.webmanifest', import.meta.url), 'utf8');
 const socialPreview = readFileSync(new URL('../public/og-sovereign.svg', import.meta.url), 'utf8');
@@ -18,6 +20,8 @@ describe('public metadata and fallback documents', () => {
     expect(index).toContain('Understand yourself, relationships, decisions, and family or group dynamics from a private Baseline');
     expect(index).toContain('og:site_name" content="Sovereign.OS"');
     expect(index).toContain('twitter:card" content="summary_large_image"');
+    expect(index).toContain('https://sovereign.defrag.app/og-sovereign.png');
+    expect(index).toContain('og:image:type" content="image/png"');
     expect(index).not.toContain('og:title" content="Sovereign — Healing isn’t optional. Holding onto the pain is."');
     expect(index).not.toContain('with permitted context');
   });
@@ -54,7 +58,23 @@ describe('public metadata and fallback documents', () => {
     expect(manifest).toContain('Private personal AI for understanding yourself, your relationships, your decisions, and the groups around you.');
     expect(manifest).toContain('Open your private Sovereign workspace.');
     expect(manifest).toContain('"theme_color": "#080a0d"');
+    expect(manifest).toContain('"src": "/app-icon.png"');
+    expect(manifest).toContain('"sizes": "512x512"');
     expect(manifest).toContain('"src": "/app-icon.svg"');
+  });
+
+  it('materializes raster social and iOS assets from the canonical SVG marks during build', () => {
+    expect(packageJson).toContain('vite build && node scripts/materialize-brand-assets.mjs');
+    expect(rasterizer).toContain("source: resolve(publicDir, 'og-sovereign.svg')");
+    expect(rasterizer).toContain("target: resolve(distDir, 'og-sovereign.png')");
+    expect(rasterizer).toContain('width: 1200');
+    expect(rasterizer).toContain('height: 630');
+    expect(rasterizer).toContain("source: resolve(publicDir, 'app-icon.svg')");
+    expect(rasterizer).toContain("target: resolve(distDir, 'app-icon.png')");
+    expect(rasterizer).toContain("target: resolve(distDir, 'apple-touch-icon.png')");
+    expect(rasterizer).toContain('width: 180');
+    expect(rasterizer).toContain("name.startsWith('sharp@')");
+    expect(index).toContain('<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />');
   });
 
   it('uses the same line-field identity in social, browser, and install marks', () => {
@@ -66,6 +86,7 @@ describe('public metadata and fallback documents', () => {
     expect(appIcon).toContain('M256 330 256 112');
     expect(pinnedIcon).toContain('M24 33V8');
     expect(index).toContain('<link rel="icon" href="/app-icon.svg" type="image/svg+xml" />');
+    expect(index).toContain('<link rel="icon" href="/app-icon.png" type="image/png" sizes="512x512" />');
     expect(index).toContain('<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#080a0d" />');
   });
 
