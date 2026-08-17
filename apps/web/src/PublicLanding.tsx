@@ -17,17 +17,17 @@ const REAL_LIFE_QUESTIONS = [
 ] as const;
 
 const COMPARISON = {
-  others: [
-    'Begins with the current conversation',
-    'Context can fragment across separate chats',
-    'Often treats each problem independently',
-    'May not retain the relationship or system around the question'
+  blank: [
+    'Starts with what is in the current conversation',
+    'Needs important context brought into the thread',
+    'Can lose continuity across separate questions',
+    'Does not begin from your Baseline'
   ],
   sovereign: [
     'Starts with your Baseline',
-    'Keeps permitted context connected',
-    'Distinguishes you, the relationship, and the system',
-    'Keeps evidence, interpretation, and unknowns visible'
+    'Adds current context only when you choose it',
+    'Adds relationship or system context when relevant and permitted',
+    'Keeps support, interpretation, and unknowns distinguishable'
   ]
 } as const;
 const RELEASE_COPY_MARKERS = ['everyone the same.'] as const;
@@ -172,7 +172,7 @@ function RealLifeQuestions() {
           {REAL_LIFE_QUESTIONS.map((question) => <li key={question}>{question}</li>)}
         </ul>
         <p className="landing-question-orbit__note">
-          Sovereign keeps what is steady, what may be active now, what you have observed, and what is still unknown separate.
+          Your Baseline is the private personal foundation Sovereign uses to understand where to begin.
         </p>
       </div>
     </section>
@@ -185,13 +185,13 @@ function ComparisonStory() {
       <div className="v0-shell">
         <header className="v0-story-heading v0-story-heading-left">
           <p>Why this AI is different</p>
-          <h2 aria-label="Generic AI sees the prompt. Sovereign sees the context.">
-            Generic AI<br />sees the<br />prompt.<br />
-            <span>Sovereign<br />sees the<br />context.</span>
+          <h2 aria-label="A blank conversation starts with the prompt. Sovereign starts with your Baseline.">
+            A blank conversation<br />starts with<br />the prompt.<br />
+            <span>Sovereign<br />starts with<br />your Baseline.</span>
           </h2>
         </header>
         <div className="v0-comparison-grid" data-viewport-surface="comparison">
-          <ComparisonPanel title="Generic AI" items={COMPARISON.others} positive={false} />
+          <ComparisonPanel title="A blank conversation" items={COMPARISON.blank} positive={false} />
           <ComparisonPanel title={<BrandMark />} items={COMPARISON.sovereign} positive />
         </div>
       </div>
@@ -205,7 +205,7 @@ function FinalCallToAction() {
       <h2 aria-label="Your thoughts deserve a better place to live.">
         Your thoughts<br />deserve<br />a better place to live.
       </h2>
-      <p>Use your Baseline as the starting point. Keep the answer, the context, and what is still unknown connected.</p>
+      <p>Build your Baseline once. Use it as the private personal foundation for what you want to understand next.</p>
       <a className="landing-control landing-control--primary" href="/signup">
         <span>Build my Baseline</span><ArrowIcon />
       </a>
