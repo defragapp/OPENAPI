@@ -23,6 +23,8 @@ const desktopProgressMarker = "      verify(desktop);\n      results.push(deskto
 const desktopProgressReplacement = "      verify(desktop);\n      console.log('[route-cohesion] label=' + desktop.route + '/' + desktop.profile + ' status=pass');\n      results.push(desktop);";
 const mobileProgressMarker = "      verify(mobile);\n      results.push(mobile);";
 const mobileProgressReplacement = "      verify(mobile);\n      console.log('[route-cohesion] label=' + mobile.route + '/' + mobile.profile + ' status=pass');\n      results.push(mobile);";
+const serifTypographyMarker = "  assert(String(audit.typography.headingFamily).includes('Sovereign Display'), `${label}: heading is not using Sovereign Display (${audit.typography.headingFamily})`);";
+const sansTypographyReplacement = "  assert(String(audit.typography.headingFamily).includes('Sovereign Sans'), `${label}: heading is not using Sovereign Sans (${audit.typography.headingFamily})`);";
 const reportMarker = `  console.log(JSON.stringify({
     ok: true,
     release: 'sovereign-deployed-route-cohesion-v1',
@@ -72,6 +74,7 @@ const replacements = [
   [resultMarker, resultReplacement],
   [desktopProgressMarker, desktopProgressReplacement],
   [mobileProgressMarker, mobileProgressReplacement],
+  [serifTypographyMarker, sansTypographyReplacement],
   [reportMarker, reportReplacement]
 ];
 
@@ -85,6 +88,9 @@ for (const [, marker] of replacements) {
   if (!generated.includes(marker)) {
     throw new Error(`Route cohesion v2 did not apply required persistence hardening: ${marker.slice(0, 120)}`);
   }
+}
+if (generated.includes("headingFamily).includes('Sovereign Display')")) {
+  throw new Error('Route cohesion v2 still certifies the retired display serif.');
 }
 
 writeFileSync(generatedPath, generated);
