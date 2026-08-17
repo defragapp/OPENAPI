@@ -11,11 +11,14 @@ let generated = readFileSync(sourcePath, 'utf8');
 const importMarker = "import { readFileSync } from 'node:fs';";
 const importReplacement = "import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';";
 const selectorMarker = "const auditMarkerSelector = `html[${auditAttribute}]`;";
-const selectorReplacement = `${selectorMarker}\nconst routeScreenshotDirectory = resolve('.visual-release-audit/routes');`;
+const selectorReplacement = selectorMarker + "\nconst routeScreenshotDirectory = resolve('.visual-release-audit/routes');";
 const captureMarker = "  const snapshot = await browserSnapshot(request, `${route.name}/${profileName}`);";
-const captureReplacement = `${captureMarker}\n  mkdirSync(routeScreenshotDirectory, { recursive: true });\n  const screenshotPath = resolve(routeScreenshotDirectory, `${'${route.name}'}-${'${profileName}'}.png`);\n  if (snapshot.screenshot.length) writeFileSync(screenshotPath, snapshot.screenshot);`;
+const captureReplacement = captureMarker
+  + "\n  mkdirSync(routeScreenshotDirectory, { recursive: true });"
+  + "\n  const screenshotPath = resolve(routeScreenshotDirectory, route.name + '-' + profileName + '.png');"
+  + "\n  if (snapshot.screenshot.length) writeFileSync(screenshotPath, snapshot.screenshot);";
 const resultMarker = "    screenshotSha256: snapshot.screenshot.length ? createHash('sha256').update(snapshot.screenshot).digest('hex') : '',\n    audit";
-const resultReplacement = "    screenshotSha256: snapshot.screenshot.length ? createHash('sha256').update(snapshot.screenshot).digest('hex') : '',\n    screenshotPath: screenshotPath.replace(`${root}/`, ''),\n    audit";
+const resultReplacement = "    screenshotSha256: snapshot.screenshot.length ? createHash('sha256').update(snapshot.screenshot).digest('hex') : '',\n    screenshotPath: screenshotPath.replace(root + '/', ''),\n    audit";
 const reportMarker = `  console.log(JSON.stringify({
     ok: true,
     release: 'sovereign-deployed-route-cohesion-v1',
@@ -41,7 +44,7 @@ const reportReplacement = `  const report = {
     stylesheet: routeStylesheet,
     auditScript: auditScriptPath,
     browserTransportPreflight: true,
-    screenshotDirectory: routeScreenshotDirectory.replace(\`${root}/\`, ''),
+    screenshotDirectory: routeScreenshotDirectory.replace(root + '/', ''),
     pages: routes.map((route) => route.name),
     results: results.map((result) => ({
       route: result.route,
@@ -55,7 +58,7 @@ const reportReplacement = `  const report = {
     }))
   };
   mkdirSync(routeScreenshotDirectory, { recursive: true });
-  writeFileSync(resolve(routeScreenshotDirectory, 'report.json'), \`${'${JSON.stringify(report, null, 2)}'}\\n\`);
+  writeFileSync(resolve(routeScreenshotDirectory, 'report.json'), JSON.stringify(report, null, 2) + '\\n');
   console.log(JSON.stringify(report, null, 2));`;
 
 const replacements = [
