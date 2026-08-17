@@ -47,6 +47,8 @@ The approved visual language is quiet, editorial, monochrome, spatial, and preci
 
 The final injected presentation authority is loaded synchronously from `apps/web/src/main.tsx`. New rendered-fidelity corrections must remain presentation-only and must not change routing, permissions, Baseline logic, billing, consent, answer contracts, or Worker architecture.
 
+The public experience inherits `docs/product-language-system.md`: Baseline Design is the foundation; the visitor brings an ordinary real-life question or situation; Sovereign makes a useful distinction visible; relationship and system intelligence extend the same foundation outward; technical machinery remains secondary.
+
 ## Primary audit: Cloudflare Browser Rendering
 
 Cloudflare Browser Rendering is the primary deterministic production browser.
@@ -70,6 +72,8 @@ This must:
 - treat mobile as structural evidence unless an approved viewport-specific mobile reference exists.
 
 A similarity score is a regression alarm, not a substitute for human visual judgment.
+
+Do not freeze, replace, or re-certify a founder visual reference while a known documentation-to-render contradiction remains. The intended composition must be rendered and inspected first.
 
 ### Route cohesion
 
@@ -113,9 +117,15 @@ Verify:
 - the outlined second line remains legible without looking like a neon effect;
 - Expression Field reads as one centered structural instrument and not as blue UI decoration;
 - the CTA remains subordinate to the concept rather than becoming a bright app-store button;
+- `Start with what’s actually happening.` is visibly rendered as a real recognition stage rather than existing only in source or accessibility-only clipped text;
+- one ordinary real-life question is legible in that stage at normal viewing distance;
+- the recognition stage makes Baseline Design understandable as the private personal foundation without exposing framework codes or implementation machinery as the primary explanation;
+- the Personal demonstration makes the useful distinction and answer legible before Basis metadata;
+- the Relationship demonstration keeps both people distinct and makes the interaction itself visually legible;
+- the System demonstration shows responsibility, role context, authority, pressure, or movement without presenting inferred personality roles as fixed facts;
 - Personal, Relationship, and System stories remain visually distinct without feeling like repeated dashboard cards;
 - mobile pacing preserves major conceptual pauses while avoiding repetitive empty vertical distance;
-- the comparison section reads immediately at a glance;
+- the comparison states the factual Baseline-first distinction without making a blanket claim about every other AI product;
 - the final CTA feels like a conclusion rather than another product panel.
 
 ### Secondary routes
@@ -157,7 +167,7 @@ Review:
 - invitation scope decisions;
 - hover, focus, menu, scrolling, and reduced-motion behavior.
 
-The browser agent is an interaction reviewer, not a deployment authority. Repository changes still go through the canonical branch/verification/release path.
+The browser agent is an interaction reviewer, not a deployment authority. Repository changes still go through the canonical `main` verification and release path.
 
 ## Acceptance and fixes
 
@@ -171,7 +181,7 @@ Exact fix
 Verification after fix
 ```
 
-Do not leave a fixable production visual defect as a recommendation. Repair it on a focused branch, run the relevant web tests and repository gates, merge only when green, release the resulting exact `main` SHA through `pnpm production:release:oauth`, then rerun both Browser Rendering audits against that deployed SHA.
+Do not leave a fixable production visual defect as a recommendation. Repair it in the canonical implementation on `main` unless repository protection or explicit user instruction requires isolated review, run the relevant web tests and repository gates, release the resulting exact current `main` SHA through `pnpm production:release:oauth`, then rerun both Browser Rendering audits against that deployed SHA.
 
 The final report must include:
 
