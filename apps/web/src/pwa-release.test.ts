@@ -6,6 +6,7 @@ const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const headers = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const consent = readFileSync(new URL('../public/consent.html', import.meta.url), 'utf8');
 const icon = readFileSync(new URL('../public/app-icon.svg', import.meta.url), 'utf8');
 const brandMark = readFileSync(new URL('../public/brand-mark.svg', import.meta.url), 'utf8');
 
@@ -14,14 +15,19 @@ describe('release PWA surface', () => {
     expect(manifest.name).toBe('Sovereign.OS');
     expect(manifest.scope).toBe('/');
     expect(manifest.icons).toEqual(expect.arrayContaining([
+      expect.objectContaining({ src: '/app-icon.png', sizes: '512x512', type: 'image/png' }),
       expect.objectContaining({ src: '/app-icon.svg', type: 'image/svg+xml' })
     ]));
     expect(index).toContain('rel="icon" href="/app-icon.svg"');
-    expect(index).toContain('rel="apple-touch-icon" href="/app-icon.svg"');
+    expect(index).toContain('rel="icon" href="/app-icon.png" type="image/png" sizes="512x512"');
+    expect(index).toContain('rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"');
     expect(index).toContain('rel="mask-icon" href="/safari-pinned-tab.svg"');
+    expect(consent).toContain('rel="icon" href="/app-icon.png" type="image/png" sizes="512x512"');
+    expect(consent).toContain('rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"');
+    expect(consent).toContain('rel="mask-icon" href="/safari-pinned-tab.svg"');
     expect(icon).toContain('<svg');
     expect(icon).toContain('viewBox="0 0 512 512"');
-    expect(icon).toContain('A central point held by three open layers');
+    expect(icon).toContain('A central point with a quiet field of lines showing different relative emphasis.');
     expect(brandMark).toContain('viewBox="0 0 48 48"');
   });
 
