@@ -16,9 +16,9 @@ const MIN_AXIS_LENGTH = 118;
 const MAX_AXIS_LENGTH = 344;
 const ROTATION_LIMIT = 72;
 const AUTO_ROTATION_DEGREES_PER_MS = 0.0018;
-const TOOLTIP_WIDTH = 184;
-const TOOLTIP_HEIGHT = 64;
-const TOOLTIP_GAP = 14;
+const TOOLTIP_WIDTH = 132;
+const TOOLTIP_HEIGHT = 34;
+const TOOLTIP_GAP = 10;
 const INTERACTION_PAUSE_MS = 6200;
 const LEGACY_TOOLTIP_COMPATIBILITY = 'landing-expression-slice__tooltip · Baseline value · Live change · Current';
 void LEGACY_TOOLTIP_COMPATIBILITY;
@@ -28,7 +28,7 @@ const AXIS_DESCRIPTIONS: Record<ExpressionAxisId, string> = {
   focus: 'Where attention can stay long enough to become useful.',
   steadiness: 'What helps you remain organized while conditions change.',
   urgency: 'How strongly the moment pulls for an immediate response.',
-  courage: 'The capacity to move while uncertainty is still present.',
+  courage: 'How available action feels while uncertainty is still present.',
   fear: 'How threat, uncertainty, or consequence becomes noticeable.',
   anger: 'The force that appears when a limit, need, or value is crossed.',
   tenderness: 'How care remains available without taking over responsibility.',
@@ -36,7 +36,7 @@ const AXIS_DESCRIPTIONS: Record<ExpressionAxisId, string> = {
   joy: 'How aliveness, pleasure, and connection become available.',
   desire: 'The pull toward what feels meaningful, wanted, or unfinished.',
   trust: 'How safety and reliance become possible without certainty.',
-  patience: 'The capacity to let timing reveal what pressure cannot.',
+  patience: 'How much room there is to let timing reveal what pressure cannot.',
   boundaries: 'The distinction between what belongs to you and what belongs to someone else.',
   responsibility: 'The pull to carry what needs doing, especially when uncertainty rises.',
   repair: 'How tension can be addressed after something lands badly.'
@@ -184,14 +184,15 @@ export function LandingExpressionSlice() {
       data-visual-contract="landing-expression-field-v3"
       data-field-geometry="spherical-360"
       data-field-axis-count={expressionAxisIds.length}
-      data-release-copy="Illustrative Baseline · Sixteen interactive measurements · one stable center · line length follows relative expression reach · not a diagnosis, score, or claim about anyone’s internal state"
+      data-inspecting="true"
+      data-release-copy="Illustrative Baseline · sixteen interactive themes · one stable center · line length follows relative emphasis · not a diagnosis, score, or claim about anyone’s internal state"
       aria-label="Interactive Baseline expression field"
     >
       <svg
         className="landing-expression-slice__canvas"
         viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
         role="group"
-        aria-label="A stable blue sphere with sixteen interactive measurement lines radiating in every direction from one center. Longer lines show more available expression in this sanitized example. Shorter lines remain closer to the center. Drag to rotate."
+        aria-label="A monochrome field with sixteen interactive lines radiating from one center. Longer lines show greater relative emphasis in this sanitized example. Drag to rotate or select a line to inspect it."
         preserveAspectRatio="xMidYMid meet"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -220,13 +221,7 @@ export function LandingExpressionSlice() {
           </radialGradient>
         </defs>
 
-        <circle
-          className="landing-expression-slice__sphere-shell"
-          cx={CENTER}
-          cy={CENTER}
-          r={SPHERE_RADIUS}
-          fill={`url(#${id}-sphere-fill)`}
-        />
+        <circle className="landing-expression-slice__sphere-shell" cx={CENTER} cy={CENTER} r={SPHERE_RADIUS} fill={`url(#${id}-sphere-fill)`} />
 
         <g className="landing-expression-slice__sphere-grid" aria-hidden="true">
           {gridPaths.map((path, index) => <path key={index} d={path} />)}
@@ -275,23 +270,15 @@ export function LandingExpressionSlice() {
                   aria-pressed={selectedLine}
                   aria-label={`${axis.label}. ${salienceLabel(axis.value)} relative emphasis. ${axis.currentDelta !== 0 ? 'Temporarily more active. ' : ''}${description}`}
                   onFocus={() => selectAxis(axis.id)}
+                  onPointerEnter={() => selectAxis(axis.id)}
                   onClick={(event) => {
                     event.stopPropagation();
                     selectAxis(axis.id);
                   }}
                   onKeyDown={(event) => handleKeyDown(event, axis.id)}
                 >
-                  <path
-                    className="landing-expression-slice__aura"
-                    d={path}
-                    filter={`url(#${glowId})`}
-                    style={{ opacity: auraOpacity }}
-                  />
-                  <path
-                    className="landing-expression-slice__beam"
-                    d={path}
-                    style={{ opacity: beamOpacity, strokeWidth: beamWidth }}
-                  />
+                  <path className="landing-expression-slice__aura" d={path} filter={`url(#${glowId})`} style={{ opacity: auraOpacity }} />
+                  <path className="landing-expression-slice__beam" d={path} style={{ opacity: beamOpacity, strokeWidth: beamWidth }} />
                   <circle
                     className="landing-expression-slice__endpoint"
                     cx={projected.x}
@@ -320,34 +307,25 @@ export function LandingExpressionSlice() {
             y2={tooltip.connectorY}
           />
           <g transform={`translate(${tooltip.x.toFixed(2)} ${tooltip.y.toFixed(2)})`}>
-            <rect
-              className="landing-expression-slice__tooltip-panel"
-              width={TOOLTIP_WIDTH}
-              height={TOOLTIP_HEIGHT}
-              rx="8"
-            />
-            <text className="landing-expression-slice__tooltip-title" x="13" y="21">{selected.axis.label}</text>
-            <text className="landing-expression-slice__tooltip-value" x="13" y="40">
-              {salienceLabel(selected.axis.value)} · relative emphasis
-            </text>
-            <text className="landing-expression-slice__tooltip-meta" x="13" y="55">
-              Baseline expression{selected.axis.currentDelta !== 0 ? ' · active now' : ''}
+            <rect className="landing-expression-slice__tooltip-panel" width={TOOLTIP_WIDTH} height={TOOLTIP_HEIGHT} rx="6" />
+            <text className="landing-expression-slice__tooltip-title" x="10" y="16">{selected.axis.label}</text>
+            <text className="landing-expression-slice__tooltip-value" x={TOOLTIP_WIDTH - 10} y="16" textAnchor="end">{selected.axis.value}</text>
+            <text className="landing-expression-slice__tooltip-meta" x="10" y="28">
+              {selected.axis.currentDelta !== 0 ? 'temporarily more active' : 'Baseline example'}
             </text>
           </g>
         </g>
       </svg>
 
       <div className="landing-expression-slice__readout landing-expression-slice__readout--accessible" role="status" aria-live="polite">
-        <span>Qualitative expression emphasis · sanitized example</span>
+        <span>Illustrative Baseline · relative emphasis</span>
         <strong>{selected.axis.label}</strong>
         <p>{selected.description}</p>
-        <small>
-          Baseline expression{selected.axis.currentDelta !== 0 ? ' · temporarily more active' : ''}
-        </small>
+        <small>{selected.axis.currentDelta !== 0 ? 'Temporarily more active in this example' : 'Baseline example'}</small>
       </div>
 
       <span className="landing-expression-slice__instructions">
-        Drag to rotate · select a line to inspect how it may be expressing
+        Drag to rotate · select a line to see its name and relative value
       </span>
     </section>
   );
@@ -485,8 +463,8 @@ function placeTooltip(point: ProjectedPoint): TooltipPlacement {
   return {
     x,
     y,
-    connectorX: clamp(point.x, x + 10, x + TOOLTIP_WIDTH - 10),
-    connectorY: clamp(point.y, y + 10, y + TOOLTIP_HEIGHT - 10)
+    connectorX: clamp(point.x, x + 8, x + TOOLTIP_WIDTH - 8),
+    connectorY: clamp(point.y, y + 8, y + TOOLTIP_HEIGHT - 8)
   };
 }
 
