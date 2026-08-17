@@ -13,10 +13,10 @@ describe('Sovereign runtime behavior contract', () => {
     expect(sovereignRuntimePromptV2).toContain('Do not turn every answer into an action plan');
     expect(sovereignRuntimePromptV2).toContain('Shadow and Gift');
     expect(sovereignRuntimePromptV2).toContain('Alignment is not a score');
-    expect(sovereignRuntimePromptV2).toContain('See the capacity beneath the pattern.');
-    expect(sovereignRuntimePromptV2).toContain('See how that capacity may be expressing.');
-    expect(sovereignRuntimePromptV2).toContain('See what happens between people or across the system.');
-    expect(sovereignRuntimePromptV2).toContain('See what may keep the pattern going—and what could change it.');
+    expect(sovereignRuntimePromptV2).toContain('Identify the relevant stable Baseline quality, tendency, or pattern.');
+    expect(sovereignRuntimePromptV2).toContain('Show how pressure or current context may be changing its expression.');
+    expect(sovereignRuntimePromptV2).toContain('Show what happens between people or across the system when permitted context exists.');
+    expect(sovereignRuntimePromptV2).toContain('Show what may be keeping the pattern in place and what could change.');
   });
 
   it('keeps exact data, interpretation, current context, and synthesis separate', () => {
@@ -88,7 +88,7 @@ describe('Cloudflare Gateway answer adapter', () => {
               mode: 'baseline',
               depth: 'standard',
               headline: 'Direction can become responsibility quickly.',
-              direct_answer: 'You may be quick to create direction when a situation has no clear owner. That capacity becomes costly when consequences become yours without matching authority.',
+              direct_answer: 'You may be quick to create direction when a situation has no clear owner. That quality becomes costly when consequences become yours without matching authority.',
               sections: [
                 { id: 'shadow', label: 'Shadow', body: 'You may end uncertainty by taking over before responsibility is shared.' },
                 { id: 'gift', label: 'Gift', body: 'You can create structure while leaving ownership visible and shared.' }
@@ -124,7 +124,10 @@ describe('Cloudflare Gateway answer adapter', () => {
     expect(result.text).toContain('Direction can become responsibility quickly.');
     expect(calls).toHaveLength(1);
     expect(calls[0]?.model).toBe('@cf/zai-org/glm-4.7-flash');
-    expect(calls[0]?.input).toMatchObject({ max_output_tokens: 3_200 });
+    expect(calls[0]?.input).toMatchObject({ max_completion_tokens: 3_200 });
+    expect(calls[0]?.input).toHaveProperty('prompt');
+    expect(calls[0]?.input).not.toHaveProperty('max_output_tokens');
+    expect(calls[0]?.input).not.toHaveProperty('input');
     expect(calls[0]?.options).toMatchObject({
       gateway: {
         id: 'sovereign-ai-gateway',
