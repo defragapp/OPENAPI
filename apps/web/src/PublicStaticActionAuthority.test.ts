@@ -28,7 +28,7 @@ describe('standalone public action authority', () => {
 
   it('keeps pricing informational rather than placing acquisition CTAs inside plan cards', () => {
     expect(pricing).toContain('class="pricing-grid"');
-    expect(pricing).not.toContain('class="launch-button primary"');
+    expect(pricing).not.toContain('class="price-card featured" data-checkout');
     expect(pricing).toContain('Your Baseline stays the same. Plus gives you more ways to use it.');
   });
 
