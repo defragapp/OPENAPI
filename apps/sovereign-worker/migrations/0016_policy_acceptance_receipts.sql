@@ -11,7 +11,7 @@ CREATE TABLE policy_acceptance_receipts (
   policy_type TEXT NOT NULL CHECK(policy_type IN ('terms','privacy')),
   policy_version TEXT NOT NULL CHECK(length(policy_version) BETWEEN 8 AND 40),
   policy_content_hash TEXT NOT NULL CHECK(length(policy_content_hash) = 64),
-  release_sha TEXT NOT NULL CHECK(length(release_sha) BETWEEN 1 AND 64),
+  release_sha TEXT NOT NULL CHECK(length(release_sha) = 40 AND release_sha NOT GLOB '*[^0-9a-f]*'),
   accepted_at TEXT NOT NULL,
   acceptance_surface TEXT NOT NULL CHECK(acceptance_surface IN ('signup','policy-update')),
   requested_ip_hash TEXT CHECK(requested_ip_hash IS NULL OR length(requested_ip_hash) = 64),
