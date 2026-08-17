@@ -48,12 +48,15 @@ Do not allow a historical file to redefine current product or release authority.
 - production model `@cf/zai-org/glm-4.7-flash`
 - personalized inference bypasses Gateway cache and persistent prompt logging
 - D1-backed daily Workers AI capacity reservation
+- capacity-ledger foundation: migration `0013_workers_ai_free_capacity`
 - Stripe Checkout/Portal + signed subscription webhooks
 - Resend transactional email
 - passkey-first returning access with email fallback/recovery
 - Turnstile-protected signup/login
 - iOS-aware web/PWA behavior
 - Queue and R2 intentionally disabled
+
+`0013_workers_ai_free_capacity` is retained as schema lineage for the daily capacity control; it is not the current schema version.
 
 Current schema: **`0017_privacy_access_and_eligibility`**.
 
