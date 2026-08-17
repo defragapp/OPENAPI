@@ -63,11 +63,16 @@ const howItWorks = staticDocuments[0].text;
 assert(howItWorks.includes('class="product-proof-window"'), '/how-it-works is missing the restrained product proof');
 assert(howItWorks.includes('This is user-visible context—not hidden model reasoning.'), '/how-it-works does not distinguish visible context from hidden model reasoning');
 assert(howItWorks.includes('without exposing chain-of-thought'), '/how-it-works does not keep hidden reasoning out of the product proof');
-assert(howItWorks.includes('class="launch-section worlds-proof-section"'), '/how-it-works is missing the Worlds product proof');
-assert(howItWorks.includes('See the pattern. Then step into it.'), '/how-it-works is missing the Worlds positioning');
-assert(howItWorks.includes('src="/worlds-how-it-works.svg"'), '/how-it-works is missing the Worlds illustration');
-assert(howItWorks.includes('qualitative expression emphasis'), '/how-it-works is missing the Expression Field measurement boundary');
-assert(howItWorks.includes('A peek into the structure—not a literal place, prediction, or spiritual portal.'), '/how-it-works does not keep the World illustration boundary explicit');
+assert(howItWorks.includes('class="launch-section text-thread-proof-section"'), '/how-it-works is missing the text-thread product proof');
+assert(howItWorks.includes('ONE CONTINUOUS THREAD'), '/how-it-works is missing the text-first launch boundary');
+assert(howItWorks.includes('Ask. Understand. Continue.'), '/how-it-works is missing the text-thread interaction sequence');
+for (const marker of ['Direct answer', 'Relevant structure', 'Basis', 'Correction', 'Continue']) {
+  assert(howItWorks.includes(marker), `/how-it-works text-thread proof is missing ${marker}`);
+}
+assert(howItWorks.includes('without exposing hidden chain-of-thought or requiring generated media'), '/how-it-works does not keep the text workflow independent from generated media');
+assert(!howItWorks.includes('OPTIONAL WORLD PREVIEW'), '/how-it-works still advertises the retired World preview');
+assert(!howItWorks.includes('World as experience'), '/how-it-works still presents Worlds as an active launch experience');
+assert(!howItWorks.includes('/worlds-how-it-works.svg'), '/how-it-works still loads the retired Worlds launch illustration');
 assert(howItWorks.includes('class="launch-section support-note-section"'), '/how-it-works is missing the reduced-prominence support note');
 assert(!howItWorks.includes('Help fund continued public development.'), '/how-it-works still gives development support primary-page prominence');
 
@@ -76,17 +81,14 @@ assert(pricing.includes('aria-label="Sovereign.OS plans"'), '/pricing is missing
 assert(pricing.includes('class="annual-price"'), '/pricing is missing the clarified annual option');
 assert(pricing.includes('$99 / year'), '/pricing is missing the annual price hierarchy');
 
-const [staticCss, routeCss, refinementCss, worldsIllustration] = await Promise.all([
+const [staticCss, routeCss, refinementCss] = await Promise.all([
   read(expectedCssPath),
   read(routeCssPath),
-  read(refinementCssPath),
-  read('/worlds-how-it-works.svg')
+  read(refinementCssPath)
 ]);
 assert(staticCss.response.ok, `secondary stylesheet returned ${staticCss.response.status}`);
 assert(routeCss.response.ok, `route cohesion stylesheet returned ${routeCss.response.status}`);
 assert(refinementCss.response.ok, `static refinement stylesheet returned ${refinementCss.response.status}`);
-assert(worldsIllustration.response.ok, `Worlds illustration returned ${worldsIllustration.response.status}`);
-assert(worldsIllustration.text.includes('Sovereign Worlds illustrative scene'), 'Worlds illustration is missing its accessible title');
 for (const marker of [
   '--v0-page: #090b0e',
   '--v0-cream: #f1e9de',
@@ -116,8 +118,6 @@ for (const marker of [
   '--v0-blue: #e8ddd0',
   '--v0-blue-bright: #fffaf3',
   'background: #090b0e',
-  'body.how-page .worlds-aperture img',
-  'filter: saturate(0.18)',
   '@media (prefers-reduced-motion: reduce)'
 ]) {
   assert(refinementCss.text.includes(marker), `static refinement stylesheet is missing ${marker}`);
@@ -125,10 +125,6 @@ for (const marker of [
 for (const marker of [
   'body.how-page .journey-steps',
   'grid-template-columns: repeat(2, minmax(0, 1fr))',
-  'body.how-page .worlds-proof-window',
-  'body.how-page .worlds-aperture',
-  'body.how-page .worlds-field-instrument',
-  'body.how-page .worlds-proof-flow',
   'body.pricing-page .price-card',
   'body.pricing-page .plan-comparison-list > div',
   'body.questions-page .faq-section',
@@ -202,4 +198,4 @@ assert(
   'compiled injected refinement is missing the workspace composer authority'
 );
 
-console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} cohesion=v1 refinement=v1 fidelity=v1 worlds=illustrative`);
+console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} cohesion=v1 refinement=v1 fidelity=v1 thread=text-first`);
