@@ -41,10 +41,11 @@ const PARENT_HOSTS = new Set(['defrag.app', 'www.defrag.app']);
 const PUBLIC_HOST = 'sovereign.defrag.app';
 const APP_HOST = 'app.defrag.app';
 const CAPACITY_MIGRATION_VERSION = '0013_workers_ai_free_capacity';
-const PREVIOUS_MIGRATION_VERSION = '0014_passkey_authentication';
-const LATEST_MIGRATION_VERSION = '0015_release_evidence';
-const LATEST_MIGRATION_FILENAME = '0015_release_evidence.sql';
-const LEGACY_HEALTH_METADATA_COMPATIBILITY = "migrationVersion: '0014_passkey_authentication' · latestMigrationVersion: '0015_release_evidence'";
+const PASSKEY_MIGRATION_VERSION = '0014_passkey_authentication';
+const PREVIOUS_MIGRATION_VERSION = '0015_release_evidence';
+const LATEST_MIGRATION_VERSION = '0016_policy_acceptance_receipts';
+const LATEST_MIGRATION_FILENAME = '0016_policy_acceptance_receipts.sql';
+const LEGACY_HEALTH_METADATA_COMPATIBILITY = "migrationVersion: '0015_release_evidence' · latestMigrationVersion: '0016_policy_acceptance_receipts'";
 const VISUAL_ARCHIVE_SHA256 = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 const VISUAL_SEQUENCE_FINGERPRINT = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${VISUAL_ARCHIVE_SHA256}`;
 const PUBLIC_PATHS = new Set([
@@ -263,6 +264,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'auth_passkeys') AS passkeys_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'release_evidence') AS release_evidence_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'release_progress') AS release_progress_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'policy_acceptance_receipts') AS policy_receipts_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'd1_migrations') AS migration_history_ready`)
       .first<{
         ok: number;
@@ -270,6 +272,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
         passkeys_ready: number;
         release_evidence_ready: number;
         release_progress_ready: number;
+        policy_receipts_ready: number;
         migration_history_ready: number;
       }>();
     const migrationHistory = db?.migration_history_ready === 1
@@ -297,15 +300,18 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && env.STRIPE_PORTAL_RETURN_URL
     );
     const releaseSchemaReady = db?.release_evidence_ready === 1
-      && db?.release_progress_ready === 1
+      && db?.release_progress_ready === 1;
+    const policyReceiptSchemaReady = db?.policy_receipts_ready === 1
       && migrationHistory?.release_migration_applied === 1;
-    const migrationVersion = releaseSchemaReady
+    const migrationVersion = policyReceiptSchemaReady
       ? LATEST_MIGRATION_VERSION
-      : db?.passkeys_ready === 1
+      : releaseSchemaReady
         ? PREVIOUS_MIGRATION_VERSION
-        : db?.capacity_ready === 1
-          ? CAPACITY_MIGRATION_VERSION
-          : 'unknown';
+        : db?.passkeys_ready === 1
+          ? PASSKEY_MIGRATION_VERSION
+          : db?.capacity_ready === 1
+            ? CAPACITY_MIGRATION_VERSION
+            : 'unknown';
     const migrationParity = migrationVersion === LATEST_MIGRATION_VERSION;
     const dependencies = {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
@@ -313,6 +319,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing',
       passkeys: db?.passkeys_ready === 1 ? 'configured' : 'missing',
       releaseEvidenceStore: releaseSchemaReady ? 'configured' : 'missing',
+      policyAcceptanceReceipts: policyReceiptSchemaReady ? 'configured' : 'missing',
       durableObjects: env.THREADS ? 'configured' : 'missing',
       assets: env.ASSETS ? 'configured' : 'missing',
       ai: aiConfig.provider === 'cloudflare-gateway' && env.AI && env.AI_GATEWAY_ID ? 'configured' : 'missing',
@@ -340,6 +347,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && dependencies.aiFreeCapacity === 'configured'
       && dependencies.passkeys === 'configured'
       && dependencies.releaseEvidenceStore === 'configured'
+      && dependencies.policyAcceptanceReceipts === 'configured'
       && dependencies.durableObjects === 'configured'
       && dependencies.assets === 'configured'
       && dependencies.ai === 'configured'
