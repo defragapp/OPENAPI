@@ -48,6 +48,10 @@ const replacements = [
     "requireAll('release evidence migration', releaseMigration, ['CREATE TABLE release_evidence', 'CREATE TABLE release_progress', \"status TEXT NOT NULL CHECK(status = 'success')\", \"status TEXT NOT NULL CHECK(status = 'failure')\"]);\nrequireAll('D1 release evidence runtime', releaseEvidenceRuntime, ['env.DB.prepare', \"status = 'success'\", \"RELEASE_MIGRATION_VERSION = '0015_release_evidence'\"]);\nrequireAll('release evidence orchestration', `${releaseEvidenceLibrary}\\n${releaseOrchestrator}`, ['upsertReleaseEvidenceSql', 'upsertReleaseProgressSql', 'applyD1Migrations', 'writeReleaseEvidence', 'writeReleaseProgress']);\n\nrequireAll('passkey credential verification', passkeyVerifier, ["
   ],
   [
+    "requireAll('application document', index, ['id=\"root\"', 'Healing isn’t optional. Holding onto the pain is.', 'release-fingerprint']);",
+    "requireAll('application document', index, ['id=\"root\"', 'Sovereign.OS — Private personal AI for real life', 'og:title', 'og:description', '/og-sovereign.png', '/app-icon.png', '/apple-touch-icon.png', 'release-fingerprint']);"
+  ],
+  [
     "  'Bring the question you actually have.',",
     "  'Start with what’s actually happening.',"
   ],
