@@ -51,12 +51,13 @@ export async function convergeReleaseEvidence({
           && payload?.latestMigrationVersion === RELEASE_MIGRATION_VERSION
           && payload?.dependencies?.migrationParity === 'current'
           && payload?.dependencies?.policyAcceptanceReceipts === 'configured'
+          && payload?.dependencies?.privacyAccessControls === 'configured'
           && (!isReadyEndpoint || payload?.ready === true)
           && validateReleaseEvidence(payload?.releaseEvidence, sha)
           && releaseEvidenceEquals(payload.releaseEvidence, evidence);
         if (!matches) {
           allMatch = false;
-          lastError = `${endpoint} status=${response.status} version=${payload?.version || 'missing'} migration=${payload?.migrationVersion || 'missing'} policyReceipts=${payload?.dependencies?.policyAcceptanceReceipts || 'missing'} evidence=${payload?.releaseEvidence?.sha || 'missing'}`;
+          lastError = `${endpoint} status=${response.status} version=${payload?.version || 'missing'} migration=${payload?.migrationVersion || 'missing'} policyReceipts=${payload?.dependencies?.policyAcceptanceReceipts || 'missing'} privacyAccess=${payload?.dependencies?.privacyAccessControls || 'missing'} evidence=${payload?.releaseEvidence?.sha || 'missing'}`;
           break;
         }
       } catch (error) {
