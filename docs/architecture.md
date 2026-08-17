@@ -13,36 +13,45 @@ The production system consists of:
 - Cloudflare Workers AI through the `sovereign-ai-gateway` AI Gateway;
 - Turnstile, Resend, and Stripe;
 - static assets served by the same Worker;
-- Cloudflare Workers Builds as the only supported build and deployment authority.
+- one exact-`origin/main` production release path owned by the repository and executed through Wrangler OAuth.
 
-`defragapp/SOVV` remains read-only reference material. All production implementation belongs to OPENAPI.
+`defragapp/SOVV` remains read-only reference material. It is not a production service dependency or deployment source. All production implementation belongs to OPENAPI.
 
 ## Deployment authority
 
-Production is connected directly to `defragapp/OPENAPI` on `main`.
+Production targets the exact current `origin/main` SHA through:
+
+```bash
+pnpm production:release:oauth
+```
 
 - Worker: `sovv-web`
 - Repository root: `/`
-- Build command: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
-- Deploy command: `pnpm production:deploy`
-- Production deploy implementation: `scripts/cloudflare-production-deploy-v3.mjs`, coordinated by `scripts/release-orchestrator.mjs`
+- Verification gate: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
+- Internal deploy stage: `pnpm production:deploy`
+- OAuth wrapper: `scripts/production-release-oauth.sh`
+- Production deploy implementation: `scripts/cloudflare-production-release.mjs`, coordinated by `scripts/release-orchestrator.mjs`
 - Cloudflare control implementation: `scripts/configure-cloudflare-free-tier.mjs`
 
-GitHub Actions, Cloudflare Pages, duplicate production Workers, Queue, and R2 are not supported release paths.
+The OAuth wrapper verifies the checkout against current `origin/main`, establishes a fresh Wrangler current-member OAuth session, hands that same fresh credential to direct Cloudflare REST and Browser Rendering checks without printing it, runs the full gate, executes the internal deploy stage, and proves the exact SHA on both branded readiness endpoints.
 
-A release is complete only when the exact Workers Builds commit:
+GitHub Actions, deploy hooks, Cloudflare Pages, historical Workers Builds triggers, duplicate production Workers, Queue, R2, preview Workers, and alternate repositories are not supported production release paths.
 
-1. passes foundation, migration, secret, fixture, release, intelligence, visual, type, test, build, and compressed-bundle checks;
+A release is complete only when the exact target commit:
+
+1. passes foundation, migration, secret, fixture, release, intelligence, visual, type, test, build, smoke, and compressed-bundle checks;
 2. applies D1 migrations;
-3. configures and verifies Cloudflare Free-plan controls;
+3. configures and verifies the required Cloudflare controls;
 4. deploys the exact commit SHA;
-5. reports that SHA from `/health` and `/ready`;
-6. reports migration `0015_release_evidence`;
-7. passes live public, application, authentication, billing, security-header, and 404 probes.
+5. reports that SHA from `/health` and `/ready` on both branded domains;
+6. reports migration `0015_release_evidence`, migration parity `current`, and matching release evidence;
+7. passes live public, application, authentication, billing, security-header, parent-domain, 404, and Browser Rendering probes.
 
 ## Product contract
 
-Sovereign.OS is Baseline-first. It must provide value before the user describes an incident.
+Sovereign.OS is Baseline-first. Baseline Design is the foundation beneath ordinary real-life questions, decisions, relationships, and recurring situations. The primary experience should make a useful distinction visible before exposing source calculations, Basis codes, provider details, permission mechanics, or deployment architecture.
+
+Relationship and system intelligence extend that same foundation outward while keeping each person distinct and permission-bound.
 
 The single user-facing agent is Sovereign. Defrag, Alignment, and Covenant are internal reasoning lenses.
 
@@ -225,8 +234,8 @@ The platform is release-ready only when:
 6. D1 migrations and readiness dependencies are current.
 7. the Worker compressed upload remains below the 2,500 KiB internal budget and 3 MiB Free-plan limit.
 8. Workers AI, D1, Durable Objects, assets, authentication, Resend, and Stripe report configured.
-9. Cloudflare Free-plan gateway, rate-limit, replication, and API Shield controls verify through the API.
-10. the exact commit SHA is live on `sovereign.defrag.app` and `app.defrag.app`.
+9. Cloudflare gateway, rate-limit, replication, and API Shield controls verify through the API.
+10. the exact target commit is live and ready on `sovereign.defrag.app` and `app.defrag.app` with matching release evidence.
 
 ## Non-negotiable repository rule
 
