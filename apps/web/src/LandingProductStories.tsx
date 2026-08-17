@@ -287,10 +287,24 @@ function SystemContext() {
 
 function WorkflowPanel({ title, steps, surface }: { title: string; steps: readonly WorkflowStep[]; surface: string }) {
   const panelRef = useRef<HTMLElement | null>(null);
+  const listRef = useRef<HTMLOListElement | null>(null);
   const activeIndex = useWorkflowProgress(panelRef, steps.length);
   const [manualIndex, setManualIndex] = useState<number | null>(null);
   const visibleIndex = Math.max(0, manualIndex ?? activeIndex);
   const activeStep = steps[visibleIndex] ?? steps[0]!;
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia('(max-width: 760px)').matches) return;
+    const list = listRef.current;
+    const activeCard = list?.children.item(visibleIndex);
+    if (!(activeCard instanceof HTMLElement)) return;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    activeCard.scrollIntoView({
+      behavior: reducedMotion ? 'auto' : 'smooth',
+      block: 'nearest',
+      inline: 'start'
+    });
+  }, [visibleIndex]);
 
   return (
     <article
@@ -309,7 +323,7 @@ function WorkflowPanel({ title, steps, surface }: { title: string; steps: readon
           <i key={step.title} className={index < visibleIndex ? 'is-complete' : index === visibleIndex ? 'is-active' : ''} />
         ))}
       </div>
-      <ol className="landing-workflow">
+      <ol ref={listRef} className="landing-workflow">
         {steps.map((step, index) => {
           const state = index < visibleIndex ? 'is-complete' : index === visibleIndex ? 'is-active' : 'is-upcoming';
           return (
