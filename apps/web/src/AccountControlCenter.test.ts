@@ -16,6 +16,15 @@ describe('mounted Account and Library controls', () => {
     expect(controls).toContain('Delete this saved understanding from your Library?');
   });
 
+  it('downloads an authenticated no-retention private account export', () => {
+    expect(controls).toContain("fetch('/api/v1/account/export'");
+    expect(controls).toContain("credentials: 'same-origin'");
+    expect(controls).toContain("'x-idempotency-key': crypto.randomUUID()");
+    expect(controls).toContain("anchor.download = 'sovereign-account-export.json'");
+    expect(controls).toContain('Download private JSON export');
+    expect(controls).toContain('Sovereign did not retain an export copy.');
+  });
+
   it('reviews, resends, and cancels pending invitations without revealing the recipient address', () => {
     expect(controls).toContain("api('/api/v1/people')");
     expect(controls).toContain("person.invitationStatus === 'pending'");
