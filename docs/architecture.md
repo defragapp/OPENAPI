@@ -1,242 +1,184 @@
 # Sovereign.OS production architecture
 
+Status: current runtime architecture. Product/language behavior inherits `product-language-system.md`, `launch-product-contract.md`, and `inner-recognition-intelligence.md`. Release execution inherits `production-release.md`.
+
 ## Executive summary
 
 Sovereign.OS is a TypeScript-first pnpm monorepo in `defragapp/OPENAPI`.
 
-The production system consists of:
+Production consists of:
 
-- a React 19 and Vite PWA;
-- one Cloudflare Worker named `sovv-web`;
-- D1 as canonical storage;
-- one Durable Object per thread for sequencing and idempotency;
-- Cloudflare Workers AI through the `sovereign-ai-gateway` AI Gateway;
+- React 19 + Vite web/PWA application;
+- one Cloudflare Worker, `sovv-web`;
+- D1 as canonical account/product storage;
+- request-scoped D1 Sessions with automatic read replication;
+- one SQLite Durable Object per thread for sequencing/idempotency;
+- Cloudflare Workers AI through AI Gateway `sovereign-ai-gateway`;
 - Turnstile, Resend, and Stripe;
 - static assets served by the same Worker;
-- one exact-`origin/main` production release path owned by the repository and executed through Wrangler OAuth.
+- D1-scheduled retention/background work;
+- one exact-`origin/main` production release authority.
 
-`defragapp/SOVV` remains read-only reference material. It is not a production service dependency or deployment source. All production implementation belongs to OPENAPI.
+`defragapp/SOVV` is read-only legacy reference material. It is not a production dependency, fallback service, or release source.
 
-## Deployment authority
+## Current production authority
 
-Production targets the exact current `origin/main` SHA through:
+For the current text-first launch:
 
 ```bash
-pnpm production:release:oauth
+pnpm verify:cloudflare-build
+pnpm production:release:text
 ```
 
+The full gate and release command must target the same exact current `origin/main` SHA. The release path performs one Worker deployment and excludes live Browser Rendering. Human desktop/iPhone visual acceptance is tracked separately from infrastructure readiness.
+
+`pnpm production:release:oauth` remains an optional Browser-audited path when explicitly requested. GitHub Actions, deploy hooks, Cloudflare Pages, Workers Builds triggers, preview Workers, duplicate production Workers, Queue, R2, and alternate repositories are not production authorities.
+
+See `docs/production-release.md` for the executable sequence and exact evidence semantics.
+
+## Production resources
+
 - Worker: `sovv-web`
-- Repository root: `/`
-- Verification gate: `corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build`
-- Internal deploy stage: `pnpm production:deploy`
-- OAuth wrapper: `scripts/production-release-oauth.sh`
-- Production deploy implementation: `scripts/cloudflare-production-release.mjs`, coordinated by `scripts/release-orchestrator.mjs`
-- Cloudflare control implementation: `scripts/configure-cloudflare-free-tier.mjs`
-
-The OAuth wrapper verifies the checkout against current `origin/main`, establishes a fresh Wrangler current-member OAuth session, hands that same fresh credential to direct Cloudflare REST and Browser Rendering checks without printing it, runs the full gate, executes the internal deploy stage, and proves the exact SHA on both branded readiness endpoints.
-
-GitHub Actions, deploy hooks, Cloudflare Pages, historical Workers Builds triggers, duplicate production Workers, Queue, R2, preview Workers, and alternate repositories are not supported production release paths.
-
-A release is complete only when the exact target commit:
-
-1. passes foundation, migration, secret, fixture, release, intelligence, visual, type, test, build, smoke, and compressed-bundle checks;
-2. applies D1 migrations;
-3. configures and verifies the required Cloudflare controls;
-4. deploys the exact commit SHA;
-5. reports that SHA from `/health` and `/ready` on both branded domains;
-6. reports migration `0015_release_evidence`, migration parity `current`, and matching release evidence;
-7. passes live public, application, authentication, billing, security-header, parent-domain, 404, and Browser Rendering probes.
+- public host: `https://sovereign.defrag.app`
+- authenticated app/API: `https://app.defrag.app`
+- parent routes: `https://defrag.app` and `https://www.defrag.app`
+- D1: `sovereign-openapi-db`
+- Durable Object: `ThreadCoordinator`
+- AI Gateway: `sovereign-ai-gateway`
+- Workers AI model: `@cf/zai-org/glm-4.7-flash`
+- current schema: `0017_privacy_access_and_eligibility`
+- daily Workers AI capacity ledger foundation: `0013_workers_ai_free_capacity`
+- release-evidence table foundation: `0015_release_evidence`
+- policy receipt foundation: `0016_policy_acceptance_receipts`
+- R2: disabled
+- Queue: disabled
+- Worlds/video generation: not part of the current launch runtime
 
 ## Product contract
 
-Sovereign.OS is Baseline-first. Baseline Design is the foundation beneath ordinary real-life questions, decisions, relationships, and recurring situations. The primary experience should make a useful distinction visible before exposing source calculations, Basis codes, provider details, permission mechanics, or deployment architecture.
+Sovereign.OS is Baseline-first. Baseline Design is the private personal foundation beneath ordinary real-life questions, decisions, relationships, and recurring situations. The primary experience makes the useful distinction visible before source calculations, framework abbreviations, Basis codes, provider details, permission mechanics, or deployment architecture.
 
-Relationship and system intelligence extend that same foundation outward while keeping each person distinct and permission-bound.
+The authenticated launch is text-first. The canonical thread progression is:
 
-The single user-facing agent is Sovereign. Defrag, Alignment, and Covenant are internal reasoning lenses.
+`user question → direct Sovereign answer → relevant structured sections → quiet Basis/provenance → correction or continuation`
 
-Authenticated navigation is:
+The landing demo-chat may teach that hierarchy, but production uses the real Worker, D1 state, permissions, entitlements, and `sovereign-answer.v2`; it never substitutes canned or random demo answers for authenticated inference.
 
-- Today
-- Explore
-- People
-- Systems
-- Library
-- You
+Relationship and system intelligence extend the same Baseline-first foundation while keeping each participant distinct and permission-bound.
 
-The only supported answer contract is `sovereign-answer.v2`. Exact source data, interpretive Baseline facets, temporary current context, and question-specific synthesis remain separate. The model selects server-authorized Basis IDs and never invents displayed Basis values.
+Authenticated navigation remains Today, Explore, People, Systems, Library, and You.
 
-Alignment is a structured comparison, never a score, gauge, percentage, or sentiment calculation.
-
-## Runtime responsibilities
-
-### Web application
+## Web responsibilities
 
 The web application provides:
 
-- the public Sovereign.OS experience;
-- authentication and onboarding;
-- the single-room intelligence workspace;
+- public product pages;
+- signup/login/recovery and passkey controls;
+- policy/18+ review;
+- Plan → Baseline → Workspace onboarding;
+- the canonical `SovereignIntelligenceWorkspace` text thread;
 - Today, Explore, People, Systems, Library, and You;
-- consent and invitation controls;
-- responsive mobile and iOS safe-area behavior;
-- D1 bookmark continuity for same-origin API requests;
+- invitation/consent/account controls;
+- mobile/iPhone safe-area and keyboard behavior;
+- D1 bookmark continuity for sequential same-origin API requests;
 - no shared caching of private API responses.
 
-### Sovereign Worker
+## Worker responsibilities
 
 The Worker provides:
 
-- authentication and same-origin enforcement;
+- default-deny private API/page boundaries;
+- session and same-origin enforcement;
 - entitlement checks;
-- thread sequencing and idempotency;
+- policy/eligibility gates;
+- thread sequencing/idempotency;
 - Baseline and current-condition computation;
-- consent-filtered relationship and system context;
-- structured Sovereign answer generation;
-- exact Basis validation;
-- Covenant opt-in and Scripture grounding;
-- safety review;
-- Stripe webhooks and hosted billing handoffs;
-- privacy-safe operational health and readiness.
+- consent-filtered relationship/system context;
+- `sovereign-answer.v2` generation and validation;
+- exact Basis authorization;
+- contextual Covenant grounding;
+- deterministic safety routing;
+- Stripe webhooks and billing handoffs;
+- authenticated private data export;
+- privacy-safe health/readiness.
 
-### D1
+## D1 authority
 
 D1 is canonical for:
 
-- accounts and revocable sessions;
-- Baseline source data and facet profiles;
+- accounts, sessions, passkeys/recovery state;
+- policy acceptance and privacy-request events;
+- Baseline source/reduced profiles;
 - current-condition snapshots;
-- people, invitations, consent, and systems;
-- threads, turns, events, and corrections;
-- saved Library understanding;
-- Stripe projections and webhook idempotency;
-- monthly account AI usage;
-- the global Workers AI daily reservation ledger.
+- People, invitations, consent, and Systems;
+- threads, turns, events, corrections, and Library understanding;
+- Stripe entitlement projection/webhook idempotency;
+- monthly AI usage;
+- daily Workers AI capacity reservations;
+- release progress/evidence.
 
-Read replication is enabled on `sovereign-openapi-db`. API requests use request-scoped D1 Sessions. Requests without a bookmark begin with `first-primary`; later same-origin requests reuse an opaque validated bookmark.
+Current migration parity is `0017_privacy_access_and_eligibility`.
 
-### Durable Objects
+Private account export is assembled on demand from account-owned D1 data and returned directly with private/no-store behavior. It is not written to R2 or retained as an export artifact.
 
-`ThreadCoordinator` serializes concurrent sends, allocates sequence numbers, and rejects duplicate turns. D1 remains the canonical source of truth.
+## Durable Object authority
 
-## Free Workers AI path
+`ThreadCoordinator` serializes concurrent sends, allocates sequence numbers, and rejects duplicate turns. D1 remains the durable source of truth.
 
-Production and preview use the Cloudflare-hosted model:
+## Workers AI path
+
+Production uses the Cloudflare-hosted model:
 
 ```text
 @cf/zai-org/glm-4.7-flash
 ```
 
-The Worker normalizes existing prompt input into Workers AI chat messages and normalizes hosted chat-completion output back into the stable `output_text` form expected by Sovereign and Baseline-facet parsers.
+Every personalized model request enforces cache bypass and disabled persistent request-content logging. The model receives reduced authorized context rather than raw birth records, exact private location, auth material, Stripe identifiers, invitation secrets, or unrelated account history.
 
-Every personalized model request enforces:
+A D1-backed global daily capacity reservation prevents Sovereign from consuming the full account-level Workers AI allocation. A failed model call releases the corresponding reservation and monthly turn where the product contract promises a refund.
 
-- `skipCache: true`;
-- `collectLog: false`;
-- JSON response mode;
-- low-temperature structured generation;
-- `sovereign-answer.v2` parsing;
-- authorized answer mode and Basis references;
-- output safety review.
+## Cloudflare controls
 
-### Global daily capacity
+The release path reconciles the repository-owned Free-plan controls before deployment:
 
-Cloudflare Workers AI Free provides a finite daily neuron allocation. Sovereign reserves conservatively against a 7,500-neuron daily internal budget, leaving capacity below the account-level 10,000-neuron hard limit.
+- D1 read replication in automatic mode;
+- AI Gateway cache/log/rate-limit settings;
+- the single Free-plan zone rate-limit rule for `/api/v1/threads/*/messages`;
+- API Shield schema/Endpoint Management for critical mutations.
 
-The estimate uses:
+Cloudflare Endpoint Management may normalize named OpenAPI parameters such as `{personId}`/`{scope}` to positional forms such as `{var1}`/`{var2}`. The release script normalizes both expected and returned templates before comparison; that normalization is provider compatibility, not a weakening of the schema contract.
 
-- 5,500 neurons per million input tokens;
-- 36,400 neurons per million output tokens;
-- two characters per estimated token;
-- the requested maximum output size.
+The release path owns only its identified Sovereign.OS controls. If an unrelated Free-plan rate-limit rule occupies the one available slot, release preparation fails rather than deleting the unrelated rule.
 
-Reservations are atomic in D1. A source-level model failure releases its reservation. If the internal daily budget is exhausted, Sovereign returns a controlled `429` response until the next UTC day without guessing an answer.
+## Security/privacy boundary
 
-A failed generation also refunds the user’s monthly turn.
+Treat birth inputs, exact location, Baseline data, relationship data, system membership, spiritual prompts, Stripe references, policy state, and thread content as sensitive.
 
-## Cloudflare Free-plan controls
+Required behavior includes:
 
-The production deploy configures and verifies:
-
-### D1
-
-- read replication mode: `auto`;
-- request-scoped D1 Sessions;
-- capacity ledger introduced by migration `0013_workers_ai_free_capacity`;
-- current schema parity through migration `0015_release_evidence`;
-- readiness failure when the capacity ledger or release-evidence store is missing.
-
-### AI Gateway
-
-- gateway ID: `sovereign-ai-gateway`;
-- cache TTL: zero;
-- persistent request-content logging: disabled;
-- global rate limit: 50 requests per 60 seconds;
-- sliding technique.
-
-### Zone rate limiting
-
-The single Free-plan rule protects matching thread-message paths:
-
-```text
-/api/v1/threads/*/messages
-```
-
-It uses only Free-plan-supported path fields, counts by source IP and Cloudflare data center, permits 10 matching requests per 10 seconds, and blocks for 10 seconds.
-
-### API Shield
-
-`docs/api-shield/sovereign-critical-api.openapi.yaml` validates short, security-sensitive mutations for:
-
-- account onboarding;
-- current-condition settings;
-- consent decisions;
-- Stripe Checkout and portal handoffs;
-- account deletion approval.
-
-Turnstile-bearing authentication payloads are intentionally excluded from blocking schema validation because Free-plan request-body inspection is limited to the first 1 KB. Authentication remains protected by Turnstile, origin checks, rate limits, input limits, one-time credentials, signed cookies, and D1 revocation.
-
-## Security and privacy
-
-Treat birth inputs, exact location, Baseline data, relationship data, system membership, spiritual prompts, Stripe references, and thread content as sensitive.
-
-The model never receives raw birth inputs, exact private location, credentials, or unrelated account history.
-
-Required controls include:
-
-- HTTP-only secure session cookies;
-- server-side Turnstile verification;
-- strict same-origin mutation checks;
-- D1-backed revocation and logout-all;
-- consent enforcement before relationship or system context is loaded;
+- secure HTTP-only host session cookie;
+- Turnstile verification at public auth boundaries;
+- same-origin mutation enforcement;
+- server-side entitlements;
+- scope-specific consent and immediate future-use revocation;
 - prepared D1 statements;
 - idempotent Stripe webhooks and AI turns;
-- no personalized AI cache;
-- no persistent prompt logging;
-- no private export at launch;
-- explicit deletion lifecycle.
+- no personalized AI cache or persistent prompt logging;
+- on-demand/no-artifact private export;
+- 14-day account-deletion grace and Stripe-first cancellation;
+- no raw birth input, exact private location, secrets, or unconsented other-person context in model input/logging.
 
-## Billing and entitlements
+## Technical release acceptance
 
-Stripe is authoritative for paid billing. Sovereign.OS uses hosted Checkout and Customer Portal sessions, signed webhooks, D1 entitlement projections, and deterministic server-side feature gates.
+The exact target commit must:
 
-Free includes 10 Sovereign AI turns per month. Sovereign+ includes 300 turns per month and the paid relationship, system, Library continuity, and Covenant entitlements represented in the product contract. Monthly account quotas operate beneath the global daily Free-plan capacity gate.
+1. pass `pnpm verify:cloudflare-build`;
+2. apply migrations through `0017_privacy_access_and_eligibility`;
+3. reconcile required Cloudflare controls;
+4. deploy `sovv-web` exactly once;
+5. report the exact SHA from both branded hosts;
+6. report migration parity `current`, configured policy receipts/privacy controls, and on-demand private export;
+7. expose exact matching D1-backed release evidence;
+8. preserve the explicit route/rendered Browser-evidence booleans without inventing verification.
 
-## Release gates
-
-The platform is release-ready only when:
-
-1. Today provides useful Baseline-first value without incident entry.
-2. Baseline and current conditions remain distinct.
-3. `sovereign-answer.v2` validates every generated answer.
-4. invented Basis references and score-based Alignment output are rejected.
-5. consent is enforced and revocable.
-6. D1 migrations and readiness dependencies are current.
-7. the Worker compressed upload remains below the 2,500 KiB internal budget and 3 MiB Free-plan limit.
-8. Workers AI, D1, Durable Objects, assets, authentication, Resend, and Stripe report configured.
-9. Cloudflare gateway, rate-limit, replication, and API Shield controls verify through the API.
-10. the exact target commit is live and ready on `sovereign.defrag.app` and `app.defrag.app` with matching release evidence.
-
-## Non-negotiable repository rule
-
-No implementation changes are made in `defragapp/SOVV`. Any future requirement to change SOVV must be separately authorized, narrowly scoped, reversible, and independently reviewed.
+Final product acceptance additionally requires the real account/Baseline/text-AI journey, billing/auth lifecycle, permission-bound People/Systems behavior, privacy controls, and human desktop/iPhone QA tracked under #207 and #210–#216.
