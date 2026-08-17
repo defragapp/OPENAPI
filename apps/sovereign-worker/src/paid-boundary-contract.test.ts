@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const auth = readFileSync(new URL('./security/auth.ts', import.meta.url), 'utf8');
 const entitlements = readFileSync(new URL('./db/entitlements.ts', import.meta.url), 'utf8');
+const stripe = readFileSync(new URL('./billing/stripe.ts', import.meta.url), 'utf8');
 const people = readFileSync(new URL('./db/people.ts', import.meta.url), 'utf8');
 const product = readFileSync(new URL('./db/product.ts', import.meta.url), 'utf8');
 const relational = readFileSync(new URL('./relational-context.ts', import.meta.url), 'utf8');
@@ -10,10 +11,14 @@ const insightModules = readFileSync(new URL('./db/insight-modules.ts', import.me
 
 describe('server-side Free and Sovereign+ boundary', () => {
   it('never trusts the client to decide the effective paid plan', () => {
-    expect(entitlements).toContain("plan: 'sovereign_plus'");
-    expect(entitlements).toContain("plan: 'free'");
+    expect(entitlements).toContain('SELECT plan, features_json, as_of FROM entitlement_cache WHERE account_id = ?1');
+    expect(entitlements).toContain("if (!row) return { plan: 'free'");
+    expect(entitlements).toContain('return { plan: row.plan');
     expect(entitlements).toContain("error: 'entitlement_required'");
     expect(entitlements).toContain("nextAction: 'review_plan'");
+    expect(stripe).toContain("event.plan === 'sovereign_plus'");
+    expect(stripe).toContain('ACTIVE_SUBSCRIPTION_STATUSES.has(event.status)');
+    expect(stripe).toContain('INSERT INTO entitlement_cache');
     expect(auth).toContain('const entitlements = await getEntitlements(env, accountId)');
   });
 
