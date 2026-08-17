@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { evaluatePublicLandingViewport } from './PublicLandingViewportContract';
 import type { PublicLandingViewportSnapshot, ViewportSurfaceMeasurement } from './PublicLandingViewportContract';
 
-const requiredSurfaceIds = [
+const desktopRequiredSurfaceIds = [
   'hero',
   'expression-slice',
   'personal-chat',
@@ -46,8 +46,8 @@ function passingPhoneSnapshot(): PublicLandingViewportSnapshot {
       surface('relationship-chat', 16, 359, 2380, 450),
       surface('relationship-reasoning', 16, 359, 2848, 610),
       surface('system-map', 16, 359, 3650, 760),
-      surface('system-reasoning', 16, 359, 4428, 520),
-      surface('comparison', 16, 359, 5140, 430)
+      surface('system-reasoning', 0, 0, 0, 0, 0),
+      surface('comparison', 16, 359, 4430, 430)
     ],
     stageGaps: [42, 36, 36],
     comparisonStacked: true
@@ -65,8 +65,8 @@ function passingDesktopSnapshot(): PublicLandingViewportSnapshot {
       surface('personal-reasoning', 713, 1340, 1480, 610),
       surface('relationship-chat', 100, 665, 2320, 500),
       surface('relationship-reasoning', 713, 1340, 2320, 650),
-      surface('system-map', 100, 665, 3220, 820),
-      surface('system-reasoning', 713, 1340, 3220, 570),
+      surface('system-map', 100, 820, 3220, 820),
+      surface('system-reasoning', 860, 1340, 3220, 570),
       surface('comparison', 160, 1280, 4300, 520)
     ],
     stageGaps: [58, 54, 54],
@@ -81,6 +81,16 @@ describe('restored landing rendered viewport contract', () => {
 
   it('accepts the intended desktop composition', () => {
     expect(evaluatePublicLandingViewport(passingDesktopSnapshot())).toMatchObject({ ok: true, failures: [] });
+  });
+
+  it('allows the secondary system reasoning panel to collapse on narrow screens only', () => {
+    const narrow = passingPhoneSnapshot();
+    narrow.surfaces = narrow.surfaces.filter((item) => item.id !== 'system-reasoning');
+    expect(evaluatePublicLandingViewport(narrow)).toMatchObject({ ok: true, failures: [] });
+
+    const desktop = passingDesktopSnapshot();
+    desktop.surfaces = desktop.surfaces.filter((item) => item.id !== 'system-reasoning');
+    expect(evaluatePublicLandingViewport(desktop).failures).toContain('missing surface system-reasoning');
   });
 
   it('rejects a desktop-scaled expression field on a phone', () => {
@@ -102,7 +112,7 @@ describe('restored landing rendered viewport contract', () => {
     expect(result.failures).toContain('comparison section is not stacked');
   });
 
-  it('rejects missing, stretched, or side-by-side workflow surfaces', () => {
+  it('rejects missing, stretched, or side-by-side required workflow surfaces', () => {
     const missing = passingPhoneSnapshot();
     missing.surfaces = missing.surfaces.filter((item) => item.id !== 'relationship-reasoning');
     expect(evaluatePublicLandingViewport(missing).failures).toContain('missing surface relationship-reasoning');
@@ -131,8 +141,8 @@ describe('restored landing rendered viewport contract', () => {
     expect(evaluatePublicLandingViewport(excessive).failures).toContain('stage gap 2 is 140px');
   });
 
-  it('covers every required public surface', () => {
-    expect(requiredSurfaceIds).toEqual([
+  it('covers every desktop-required public surface', () => {
+    expect(desktopRequiredSurfaceIds).toEqual([
       'hero',
       'expression-slice',
       'personal-chat',
