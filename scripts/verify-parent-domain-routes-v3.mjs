@@ -115,16 +115,28 @@ for (const marker of [
   'landing-expression-field-v3',
   'Healing isn’t optional.',
   'Holding onto the pain is.',
-  'Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics.',
-  'Built for real situations',
-  'Separate helping from carrying the outcome.',
+  'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
+  'Start with you',
+  'Explore yourself.',
+  'Explore how you think, decide, create, connect, and grow.',
   'Understand what happens between you.',
-  'See where responsibility keeps landing.',
-  'Your thoughts deserve'
+  'From 1:1 to the whole system',
+  'See the whole system.',
+  'Most AI starts with the prompt. Sovereign starts with you.',
+  'Know yourself. Understand your people. See the whole system.'
 ]) {
   assert(javascript.text.includes(marker), `compiled production JavaScript is missing ${marker}`);
 }
-for (const retired of ['See the capacity beneath the pattern.', 'See what keeps the pattern going—and what could change it.']) {
+for (const retired of [
+  'One private reference beneath every question.',
+  'One private foundation. More useful answers across the questions that shape your life.',
+  'Separate helping from carrying the outcome.',
+  'See where responsibility keeps landing.',
+  'Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics.',
+  'Built for real situations',
+  'See the capacity beneath the pattern.',
+  'See what keeps the pattern going—and what could change it.'
+]) {
   assert(!javascript.text.includes(retired), `compiled production JavaScript still contains retired public language ${retired}`);
 }
 
