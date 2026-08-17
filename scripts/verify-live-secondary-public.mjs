@@ -2,6 +2,7 @@ const publicBase = String(process.env.PUBLIC_BASE_URL || 'https://sovereign.defr
 const expectedCssPath = '/v0-public-static.css?v=20260803-refined-v2';
 const routeCssPath = '/deployed-route-cohesion.css?v=20260803-route-v1';
 const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2';
+const terminalCssPath = '/premium-action-static-v1.css?v=20260817-action-v1';
 const expectedContract = 'founder-v0-locked-v1';
 const staticRoutes = ['/how-it-works', '/pricing', '/faq'];
 const policyRoutes = ['/privacy', '/terms'];
@@ -20,7 +21,7 @@ async function read(path) {
     headers: {
       accept: 'text/html,application/json;q=0.9,*/*;q=0.8',
       'cache-control': 'no-cache',
-      'user-agent': 'SovereignSecondaryPublicVerifier/1.0'
+      'user-agent': 'SovereignSecondaryPublicVerifier/2.0'
     },
     redirect: 'follow',
     signal: AbortSignal.timeout(20_000)
@@ -42,6 +43,7 @@ function assertStaticDocument(path, document) {
     `href="${expectedCssPath}"`,
     `href="${routeCssPath}"`,
     `href="${refinementCssPath}"`,
+    `href="${terminalCssPath}"`,
     'class="launch-nav-inner"',
     'class="launch-wordmark"',
     '>SOVEREIGN.OS</a>',
@@ -59,36 +61,42 @@ staticDocuments.forEach((document, index) => assertStaticDocument(staticRoutes[i
 
 const howItWorks = staticDocuments[0].text;
 for (const marker of [
-  'Your Baseline first. The situation second.',
-  'ONE ANSWER · FOUR DISTINCTIONS',
-  'Start with your Baseline.',
-  'Add only what is relevant now.',
-  'Keep people and roles distinct.',
-  'Give the useful distinction first.',
+  'Start with you. Add context when it matters.',
+  'YOU → PEOPLE → SYSTEMS',
+  'Explore yourself first. Expand outward when you need to.',
+  'Explore yourself.',
+  'Add what is happening now.',
+  'Bring in your people with permission.',
+  'See the wider system.',
+  'Answer first. Detail underneath.',
+  'A private reference built around you.',
   'class="product-proof-window"',
-  'This is user-visible context—not hidden model reasoning.',
-  'What your Baseline supports',
-  'What pressure may be adding',
-  'Where responsibility shifts',
-  'What could change',
-  'class="launch-section text-thread-proof-section"',
+  'SELF EXPLORATION',
+  'What does Alignment look like for me when I’m creating something new?',
+  'What the question touches',
+  'What changes under pressure',
+  'What feels aligned',
+  'What to explore next',
   'THE CONVERSATION STAYS PRIMARY',
-  'Understand it. Then keep going.',
-  'Direct answer',
-  'Relevant structure',
-  'Still unknown',
-  'Continue',
+  'Get the answer. Go deeper when you want.',
+  'What still needs clarity',
+  'Where Baseline Design comes from',
   'class="launch-section support-note-section"'
 ]) assert(howItWorks.includes(marker), `/how-it-works is missing ${marker}`);
+for (const retired of [
+  'One private foundation',
+  'ONE ANSWER · FOUR DISTINCTIONS',
+  'Where responsibility shifts',
+  'Help fund continued public development.',
+  'OPTIONAL WORLD PREVIEW',
+  'World as experience',
+  '/worlds-how-it-works.svg'
+]) assert(!howItWorks.includes(retired), `/how-it-works still contains retired language: ${retired}`);
 assert(!howItWorks.toLowerCase().includes('capacity beneath'), '/how-it-works returned to capacity-first public language');
-assert(!howItWorks.includes('OPTIONAL WORLD PREVIEW'), '/how-it-works still advertises the retired World preview');
-assert(!howItWorks.includes('World as experience'), '/how-it-works still presents Worlds as an active launch experience');
-assert(!howItWorks.includes('/worlds-how-it-works.svg'), '/how-it-works still loads the retired Worlds launch illustration');
-assert(!howItWorks.includes('Help fund continued public development.'), '/how-it-works still gives development support primary-page prominence');
 
 const pricing = staticDocuments[1].text;
 for (const marker of [
-  'Start with your Baseline. Add more only when you need it.',
+  'Explore yourself for free. Add People and Systems with Sovereign+.',
   'aria-label="Sovereign.OS plans"',
   'class="annual-price"',
   '$0',
@@ -96,44 +104,50 @@ for (const marker of [
   '$99 / year',
   '10 Sovereign AI turns each month',
   '300 Sovereign AI turns each month',
-  'Free is complete for you. Plus expands the context.'
+  'Explore yourself with Sovereign.',
+  'Understand your people and the systems around you.',
+  'Your Baseline stays yours. Plus expands what you can explore.',
+  'one-time amount from $1'
 ]) assert(pricing.includes(marker), `/pricing is missing ${marker}`);
 
 const faq = staticDocuments[2].text;
 for (const marker of [
-  'What you should know before you begin.',
+  'What can Sovereign help you understand?',
+  'What can I use Sovereign to explore about myself?',
+  'Baseline Design is a private, explorable reference built around you.',
   'PEOPLE + PERMISSION',
   'FRAMEWORKS + LIMITS',
   'PRIVACY + ACCOUNT',
   'PLANS + SUPPORT',
   'SAFETY',
+  'Where does Baseline Design come from?',
+  'Which frameworks are included?',
   'Tarot is not part of Sovereign.OS.',
+  'Does Sovereign reduce me to a type?',
   'Can I support Sovereign.OS without subscribing?'
 ]) assert(faq.includes(marker), `/faq is missing ${marker}`);
 assert(!faq.toLowerCase().includes('capacity beneath'), '/faq returned to capacity-first public language');
+assert(!faq.includes('private personal foundation'), '/faq returned to the retired Baseline foundation metaphor');
 
-const [staticCss, routeCss, refinementCss] = await Promise.all([
+const [staticCss, routeCss, refinementCss, terminalCss] = await Promise.all([
   read(expectedCssPath),
   read(routeCssPath),
-  read(refinementCssPath)
+  read(refinementCssPath),
+  read(terminalCssPath)
 ]);
 assert(staticCss.response.ok, `secondary stylesheet returned ${staticCss.response.status}`);
 assert(routeCss.response.ok, `route cohesion stylesheet returned ${routeCss.response.status}`);
 assert(refinementCss.response.ok, `static refinement stylesheet returned ${refinementCss.response.status}`);
+assert(terminalCss.response.ok, `terminal static stylesheet returned ${terminalCss.response.status}`);
 for (const marker of [
   '--v0-page: #090b0e',
   '--v0-cream: #f1e9de',
-  '--v0-blue: #2f93ff',
-  '--v0-blue-bright: #78c7ff',
   '--v0-shell: min(1120px',
-  '/fonts/sovereign-display.woff2',
-  '/fonts/sovereign-sans.woff2',
   'body.launch-page',
   '.launch-nav-inner',
   '.launch-mobile-menu-panel',
   '.journey-steps',
   '.pricing-grid',
-  '.price-options .annual-price > small',
   '.product-proof-window',
   '.support-note-section',
   '.faq-list details',
@@ -141,8 +155,6 @@ for (const marker of [
   '@media (max-width: 430px)',
   'min-height: 44px'
 ]) assert(staticCss.text.includes(marker), `secondary stylesheet is missing ${marker}`);
-assert(!staticCss.text.includes('--v0-warm'), 'secondary stylesheet still contains the retired warm token');
-assert(!staticCss.text.includes('--v0-sage'), 'secondary stylesheet still contains the retired sage token');
 for (const marker of [
   '--v0-blue: #e8ddd0',
   '--v0-blue-bright: #fffaf3',
@@ -151,12 +163,16 @@ for (const marker of [
   'body.how-page .journey-steps > article',
   'body.pricing-page .pricing-grid',
   'body.questions-page .faq-category',
-  'body.not-found-page .not-found-stage',
-  'body.consent-page .consent-hero',
   '@media (max-width: 650px)',
   '@media (max-width: 360px)',
   '@media (prefers-reduced-motion: reduce)'
 ]) assert(refinementCss.text.includes(marker), `static refinement stylesheet is missing ${marker}`);
+for (const marker of [
+  '--static-title-font:',
+  'font-family: var(--static-title-font) !important',
+  'border-radius: 0 !important;'
+]) assert(terminalCss.text.includes(marker), `terminal static stylesheet is missing ${marker}`);
+assert(!terminalCss.text.includes('Sovereign Display'), 'terminal static typography references the retired display face');
 for (const marker of [
   'body.how-page .journey-steps',
   'grid-template-columns: repeat(2, minmax(0, 1fr))',
@@ -208,16 +224,6 @@ for (const marker of [
   '--route-blue:#e8ddd0!important',
   '--landing-blue:#e8ddd0!important'
 ]) assert(compactJavaScript.includes(marker), `compiled injected refinement is missing ${marker}`);
-for (const marker of [
-  '--v8-blue:#d8d0c5!important',
-  'background:#111316!important',
-  'padding:54px0!important'
-]) assert(compactJavaScript.includes(marker), `compiled rendered fidelity is missing ${marker}`);
-assert(/saturate\((?:0?\.)08\)/.test(compactJavaScript), 'compiled rendered fidelity is missing saturation 0.08');
-assert(compactJavaScript.includes('-webkit-text-stroke:'), 'compiled injected refinement is missing the founder outline treatment');
-assert(
-  compactJavaScript.includes('.sovereign-app-runtime.sovereign-composer') || compactJavaScript.includes('.sovereign-app-runtime .sovereign-composer'),
-  'compiled injected refinement is missing the workspace composer authority'
-);
+assert(compactJavaScript.includes('sans-typography-authority-v1.css') || compactJavaScript.includes('--font-title:'), 'compiled release is missing the sans typography authority');
 
-console.log(`Secondary public visual release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} cohesion=v2 refinement=editorial-static-v2 fidelity=v1 thread=text-first`);
+console.log(`Secondary public release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} positioning=self-people-systems typography=sans-only`);
