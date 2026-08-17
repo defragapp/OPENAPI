@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 
 const sourcePath = resolve('scripts/verify-intelligence-release.mjs');
 const temporaryPath = resolve(`scripts/.verify-intelligence-release-v2-${process.pid}.mjs`);
-const source = readFileSync(sourcePath, 'utf8');
+let source = readFileSync(sourcePath, 'utf8');
 const main = readFileSync(resolve('apps/web/src/main.tsx'), 'utf8');
 const renderedFidelity = readFileSync(resolve('apps/web/src/rendered-fidelity-v1.css'), 'utf8');
 
@@ -43,7 +43,17 @@ if (main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("imp
 if (source.split(retiredFingerprintOutput).length - 1 !== 1) {
   throw new Error('Intelligence release v2 could not isolate the historical sequence fingerprint output.');
 }
+
+const contextMarker = "  'Illustrative permitted Baselines',";
+if (source.split(contextMarker).length - 1 !== 1) {
+  throw new Error('Intelligence release v2 could not reconcile the retired demo context marker.');
+}
+source = source.replace(contextMarker, "  'Illustrative supplied context',");
 const activeSource = source.replace(retiredFingerprintOutput, '\n');
+
+if (activeSource.includes('Illustrative permitted Baselines')) {
+  throw new Error('Intelligence release v2 still enforces retired permission-heavy demo language.');
+}
 
 try {
   writeFileSync(temporaryPath, activeSource, 'utf8');
