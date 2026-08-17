@@ -6,28 +6,28 @@ import { LandingProductStories } from './LandingProductStories';
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 
 const REAL_LIFE_QUESTIONS = [
-  { scope: 'Self', text: 'Why do I keep saying yes when I already know I’m overwhelmed?' },
-  { scope: 'Relationship', text: 'Why do we keep having the same argument even when we both want it to stop?' },
-  { scope: 'Decision', text: 'Should I stay in this job, ask for more, or leave?' },
-  { scope: 'Relationship', text: 'Why do I shut down when someone gets distant?' },
-  { scope: 'Family system', text: 'How do I stop being the person who holds the whole family together?' },
-  { scope: 'Relationship', text: 'Is this relationship actually working for me?' },
-  { scope: 'Self', text: 'Why do I take responsibility for problems that are not mine?' },
-  { scope: 'Decision', text: 'How do I know when to push and when to let go?' }
+  { scope: 'Self', text: 'What does Alignment look like for me?' },
+  { scope: 'Self', text: 'How do I express myself when I’m clear?' },
+  { scope: 'Creativity', text: 'How do I create best?' },
+  { scope: 'Self', text: 'What changes in me under pressure?' },
+  { scope: 'Decision', text: 'How do I make decisions that actually fit me?' },
+  { scope: 'Self', text: 'What part of myself am I underusing?' },
+  { scope: 'Relationship', text: 'Why does the same situation land differently for us?' },
+  { scope: 'System', text: 'What role am I actually playing in this family?' }
 ] as const;
 
 const COMPARISON = {
   blank: [
-    'Starts with what is in the current conversation',
-    'Needs important context brought into the thread',
-    'Can lose continuity across separate questions',
-    'Does not begin from your Baseline'
+    'Starts from the current prompt',
+    'Knows only the context you bring into that conversation',
+    'Treats separate questions as separate conversations',
+    'Has no private personal reference to return to'
   ],
   sovereign: [
-    'Starts with your Baseline',
-    'Adds current context only when you choose it',
-    'Adds relationship or system context when relevant and permitted',
-    'Lets you review and correct what does not fit'
+    'Carries your Baseline across conversations',
+    'Connects self, relationship, and system context when you choose',
+    'Keeps other people distinct and permission-bound',
+    'Lets you review, correct, or reject interpretations'
   ]
 } as const;
 const RELEASE_COPY_MARKERS = ['everyone the same.'] as const;
