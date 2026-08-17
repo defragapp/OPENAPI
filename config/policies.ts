@@ -1,16 +1,21 @@
-export const POLICY_CONTRACT = 'sovereign-policy.v1' as const;
+export const POLICY_CONTRACT = 'sovereign-policy.v2' as const;
 
 export const POLICY_METADATA = {
   terms: {
-    version: '2026-08-17',
+    version: '2026-08-17.2',
     path: '/terms',
     effectiveDate: 'August 17, 2026'
   },
   privacy: {
-    version: '2026-08-17',
+    version: '2026-08-17.2',
     path: '/privacy',
     effectiveDate: 'August 17, 2026'
   }
+} as const;
+
+export const ELIGIBILITY_RULE = {
+  version: '2026-08-17-18-plus',
+  minimumAge: 18
 } as const;
 
 export const PRIVACY_SECTIONS = [
@@ -48,7 +53,11 @@ export const PRIVACY_SECTIONS = [
   },
   {
     title: 'Your controls',
-    copy: 'You can correct a response, decide what enters Library, revoke shared-context permission, manage billing, and request account deletion with a 14-day grace period. Private account export is not yet available in the current release. Public sharing sends only the public Sovereign.OS link.'
+    copy: 'You can correct a response, decide what enters Library, revoke shared-context permission, manage billing, download an on-demand JSON copy of account-owned data, and request account deletion with a 14-day grace period. The private export is generated for your authenticated request and is not retained as an export artifact. Public sharing sends only the public Sovereign.OS link.'
+  },
+  {
+    title: 'Policy history and eligibility',
+    copy: 'Sovereign records the policy versions and content hash accepted for an account. Material policy updates can require renewed review before private workspace use resumes. At launch, Sovereign.OS is offered only to people who confirm they are 18 or older; that confirmation is stored as an account eligibility record.'
   },
   {
     title: 'Optional Worlds video',
@@ -60,6 +69,10 @@ export const TERMS_SECTIONS = [
   {
     title: 'What Sovereign.OS provides',
     copy: 'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the groups around you. It uses an interpretive Baseline, permitted current context, user-confirmed information, and consented relationship or system context to form responses.'
+  },
+  {
+    title: 'Launch eligibility',
+    copy: 'Sovereign.OS is offered only to people who are 18 or older at launch. You must confirm that you meet this eligibility rule when creating an account and again if Sovereign requires an eligibility or policy review before private workspace use resumes.'
   },
   {
     title: 'Interpretive limits',
@@ -86,6 +99,10 @@ export const TERMS_SECTIONS = [
     copy: 'You may not grant permission on behalf of someone else. Using another person’s Baseline requires account-bound, use-specific permission that they can deny or revoke. One person’s description is never treated as verified truth about another person’s inner state.'
   },
   {
+    title: 'Policy updates',
+    copy: 'If Sovereign materially changes the Terms or Privacy Policy, private workspace access may pause until you review the current versions and affirm the required acceptance and eligibility confirmation. Sovereign keeps versioned acceptance receipts tied to the policy content hash and release that recorded the decision.'
+  },
+  {
     title: 'Covenant is optional',
     copy: 'Covenant is a separate biblical lens that activates only when you choose it. It does not establish God’s exact intent or automatically require contact, estrangement, reconciliation, forgiveness, submission, or continued exposure to harm.'
   }
@@ -94,6 +111,7 @@ export const TERMS_SECTIONS = [
 export function policyHashPayload(): string {
   return JSON.stringify({
     contract: POLICY_CONTRACT,
+    eligibility: ELIGIBILITY_RULE,
     terms: POLICY_METADATA.terms,
     privacy: POLICY_METADATA.privacy,
     privacySections: PRIVACY_SECTIONS,
@@ -101,4 +119,4 @@ export function policyHashPayload(): string {
   });
 }
 
-export const POLICY_CONTENT_HASH = 'fa4258363c34fa6e6f735dd9045f32b302106d4a8cd583de4519f3d6a135197e' as const;
+export const POLICY_CONTENT_HASH = '10e0e2e9f3a17c6860c91311f3cfcbca426b237e49f2380ac57d11dc23fbf822' as const;
