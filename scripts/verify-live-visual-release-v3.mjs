@@ -260,6 +260,27 @@ const domParserCallV2 = 'const dom = parseRenderedAudit(captured.content);';
 const domParserCallV3 = `const dom = await scrapeRenderedAudit(profile, captured.url, captured.content);
   const screenshotMetadata = await sharp(captured.screenshot).metadata();
   dom.document.height = Math.max(dom.document.height, Number(screenshotMetadata.height || 0));`;
+const requiredTextV2 = `  for (const requiredText of [
+    'Healing isn’t optional.',
+    'Holding onto the pain is.',
+    'See the capacity beneath the pattern.',
+    'Understand what happens between you.',
+    'See what keeps the pattern going—and what could change it.',
+    'A blank conversation starts with the prompt.',
+    'Sovereign starts with your Baseline.',
+    'Your thoughts deserve a better place to live.'
+  ]) {`;
+const requiredTextV3 = `  for (const requiredText of [
+    'Healing isn’t optional.',
+    'Holding onto the pain is.',
+    'Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics.',
+    'Separate helping from carrying the outcome.',
+    'Understand what happens between you.',
+    'See where responsibility keeps landing.',
+    'A blank conversation starts with the prompt.',
+    'Sovereign starts with your Baseline.',
+    'Your thoughts deserve a better place to live.'
+  ]) {`;
 const comparisonAssertionV2 = '  assertComparison(profile, comparison);';
 const comparisonAssertionV3 = `  const referenceAuthority = profile.name.startsWith('desktop-') ? 'founder-reference' : 'structural-only';
   const desktopMinimumScore = 0.70;
@@ -349,6 +370,7 @@ const replacements = [
   [auditParserV2, auditParserV3],
   [scriptTagV2, scriptTagV3],
   [domParserCallV2, domParserCallV3],
+  [requiredTextV2, requiredTextV3],
   [comparisonAssertionV2, comparisonAssertionV3],
   [resultViewportV2, resultViewportV3],
   [reportReferenceV2, reportReferenceV3],
