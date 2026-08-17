@@ -17,6 +17,7 @@ const platformPublicCss = readFileSync(new URL('../public/platform-public.css', 
 const v0Css = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
 const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
 const refinementCss = readFileSync(new URL('./experience-refinement-v1.css', import.meta.url), 'utf8');
+const renderedFidelityCss = readFileSync(new URL('./rendered-fidelity-v1.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${stories}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
@@ -33,7 +34,7 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).not.toContain('Know yourself.');
   });
 
-  it('presents the intended product sequence in order', () => {
+  it('presents the intended Baseline-first product sequence in order', () => {
     const rendered = landing.slice(landing.indexOf('export function PublicLanding()'), landing.indexOf('function V0Navigation()'));
     const values = ['<V0Navigation />', '<V0Hero />', '<RealLifeQuestions />', '<LandingProductStories />', '<ComparisonStory />', '<FinalCallToAction />', '<V0Footer />'];
     let previous = -1;
@@ -43,9 +44,11 @@ describe('Sovereign.OS public experience', () => {
       previous = index;
     }
     expect(landing).toContain('Start with what’s actually happening.');
+    expect(landing).toContain('Your Baseline is the private personal foundation Sovereign uses to understand where to begin.');
     expect(stories).toContain('Understand what happens');
     expect(stories).toContain('From one person');
-    expect(landing).toContain('Generic AI');
+    expect(landing).toContain('A blank conversation starts with the prompt. Sovereign starts with your Baseline.');
+    expect(landing).not.toContain('Generic AI sees the prompt. Sovereign sees the context.');
     expect(landing).toContain('Your thoughts deserve');
   });
 
@@ -65,6 +68,7 @@ describe('Sovereign.OS public experience', () => {
       'Clarity may take time.',
       'Between you',
       'System structure',
+      'Role context',
       'Movement'
     ]) expect(stories).toContain(marker);
     expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
@@ -75,12 +79,18 @@ describe('Sovereign.OS public experience', () => {
 
   it('keeps relationship and system examples permission-safe, anonymous, and source-aware', () => {
     expect(stories).toContain('With permission, Sovereign keeps each person’s supplied context distinct');
+    expect(stories).toContain('Shared with permission');
+    expect(stories).toContain('Illustrative supplied context');
     expect(stories).toContain('Each person controls what may be included');
     expect(stories).toContain('No compatibility score');
     expect(stories).toContain('<strong>Basis</strong>');
     expect(stories).not.toContain("name: 'Maya'");
     expect(stories).not.toContain("name: 'Noa'");
     expect(stories).not.toContain("name: 'Ruth'");
+    expect(stories).not.toContain("role: 'Stabilizer'");
+    expect(stories).not.toContain("role: 'Catalyst'");
+    expect(stories).not.toContain("role: 'Observer'");
+    expect(stories).not.toContain("role: 'Anchor'");
     expect(stories).not.toContain("code: 'Needs time'");
     expect(stories).not.toContain("code: 'Recognizes quickly'");
     expect(stories).not.toContain('LandingExpressionFieldPreview');
@@ -107,6 +117,7 @@ describe('Sovereign.OS public experience', () => {
     expect(main).toContain("import './landing-expression-field-integration.css';");
     expect(main).toContain("import './v0-restored-product-stories.css';");
     expect(main).toContain("import experienceRefinementCss from './experience-refinement-v1.css?inline';");
+    expect(main).toContain("import renderedFidelityCss from './rendered-fidelity-v1.css?inline';");
     expect(main).not.toContain('ProductLanguageRuntime');
   });
 
@@ -116,6 +127,8 @@ describe('Sovereign.OS public experience', () => {
     expect(storyCss).toContain('@media (max-width: 760px)');
     expect(storyCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(refinementCss).toContain('--landing-blue: #e8ddd0 !important');
+    expect(renderedFidelityCss).toContain('--v8-blue: #d8d0c5 !important');
+    expect(renderedFidelityCss).toContain('Baseline-first recognition: this is a real explanatory stage');
     expect(staticRefinementCss).toContain('--v0-blue: #e8ddd0');
     expect(staticRefinementCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
