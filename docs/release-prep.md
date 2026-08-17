@@ -1,30 +1,31 @@
 # Preview and production preparation
 
-Status: current preparation guidance. Production release authority is defined by `docs/production-release.md`.
+Status: current preparation guidance. Production authority is `docs/production-release.md`.
 
 ## Resource inventory
 
-Configure preview and production separately. Do not reuse production IDs in local files.
+Preview and production remain isolated.
 
-- Cloudflare Worker: `sovv-web` in production or an environment-specific preview equivalent.
-- Web application: same-origin route in front of the Worker/PWA shell.
-- D1: canonical database with migrations applied in order.
-- D1 Sessions: request-scoped sessions with opaque browser bookmarks for sequential API consistency.
-- D1 read replication: automatic mode in production.
-- Durable Object: `ThreadCoordinator` for turn ordering.
-- AI binding: `AI` with `AI_PROVIDER=cloudflare-gateway`.
-- AI Gateway: `AI_GATEWAY_ID=sovereign-ai-gateway`.
-- Workers AI model: `AI_MODEL=@cf/zai-org/glm-4.7-flash`.
-- Global free-capacity ledger: migration `0013_workers_ai_free_capacity`.
-- Current release evidence: migration `0015_release_evidence`.
-- Auth: signed, revocable D1-backed sessions.
-- Stripe: test-mode secrets and price IDs only until explicit live approval.
+Production:
 
-`defragapp/SOVV` is read-only legacy reference material. It is not a production service binding, fallback API, deployment source, or runtime dependency.
+- Worker: `sovv-web`.
+- D1: `sovereign-openapi-db`.
+- D1 Sessions + automatic read replication.
+- Durable Object: `ThreadCoordinator`.
+- AI binding: `AI` through Gateway `sovereign-ai-gateway`.
+- model: `@cf/zai-org/glm-4.7-flash`.
+- capacity ledger foundation: `0013_workers_ai_free_capacity`.
+- release-evidence table foundation: `0015_release_evidence`.
+- current schema: `0017_privacy_access_and_eligibility`.
+- current private export: authenticated on-demand/no-artifact.
+- Queue/R2: disabled.
+- Worlds/video: not part of current launch.
+
+`defragapp/SOVV` is read-only legacy reference and is not a production binding, fallback API, deployment source, or runtime dependency.
 
 ## Secret inventory
 
-Required encrypted Worker secrets remain configured in Cloudflare, not committed:
+Required encrypted Worker secrets:
 
 - `SESSION_SIGNING_SECRET`
 - `TURNSTILE_SECRET_KEY`
@@ -32,83 +33,98 @@ Required encrypted Worker secrets remain configured in Cloudflare, not committed
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 
-No OpenAI provider key is accepted by the Worker. Production and preview use the Cloudflare AI binding and do not fall back to direct OpenAI.
+No direct OpenAI provider key is accepted by the production answer Worker.
 
-The canonical production release wrapper establishes a fresh current-member Wrangler OAuth session and intentionally clears inherited Cloudflare API-token variables before it performs direct Cloudflare REST and Browser Rendering checks. Do not convert those fresh OAuth credentials into repository configuration or standing secrets.
+Never commit or print production secret values.
 
-## Canonical production runbook
+## Current production runbook
 
-From an exact clean checkout of current `origin/main`, run:
+From an exact clean checkout matching current `origin/main`:
 
 ```bash
-pnpm production:release:oauth
+pnpm verify:cloudflare-build
+pnpm production:release:text
 ```
 
-The wrapper owns the sequence:
+The second command is run only after the first is green for that exact same SHA.
 
-1. fetch current `origin/main` and reject a checkout that does not match it;
-2. stamp the exact release SHA;
-3. establish a fresh Wrangler current-member OAuth session;
-4. prove production D1 access;
-5. run `pnpm verify:cloudflare-build`;
-6. run the internal `pnpm production:deploy` stage;
-7. verify parent-domain routing and all required live probes;
-8. verify both branded `/ready` endpoints for the exact SHA, migration `0015_release_evidence`, migration parity `current`, and matching release evidence;
-9. complete the required deterministic Browser Rendering checks.
+The text-first release:
 
-`pnpm production:deploy` is not a separate production authority. Historical Cloudflare Workers Builds triggers and build-token instructions are not part of the current runbook.
+1. asserts exact current `origin/main`;
+2. verifies production release config/migrations;
+3. verifies public DMARC;
+4. prepares the production config;
+5. applies migrations through `0017_privacy_access_and_eligibility`;
+6. verifies Worker secrets and repository-owned Cloudflare controls;
+7. deploys exactly one Worker version;
+8. verifies runtime/parent-domain/secondary public behavior without Browser Rendering;
+9. writes/converges exact-SHA release evidence.
 
-GitHub Actions, deploy hooks, Pages, preview Workers, duplicate production Workers, and alternate repositories are not production release authorities.
+`pnpm production:release:oauth` is optional Browser-audited release machinery and is not required for the current text-first launch.
+
+## Cloudflare control preparation
+
+The release credential must have sufficient access for Worker/D1 operations and the exact control mutations/reads owned by the release script. In particular, release preparation may reconcile API Shield Endpoint Management and the owned Free-plan rate-limit rule before deploy.
+
+Cloudflare may normalize named API path parameters to positional `{varN}` templates. The repository normalizes both expected and returned endpoint templates before deciding an operation is missing.
+
+If an unrelated Free-plan rate-limit rule occupies the only available slot, the release fails rather than deleting it.
+
+## Release evidence preparation
+
+Release evidence is exact-SHA D1 data. It does not create a second Worker deployment.
+
+For the text-first release:
+
+- `routeCohesionVerified` is `false` because the automated Browser route audit is not run;
+- `renderedVisualVerified` is `false` because the automated rendered Browser audit is not run;
+- DMARC, SHA, migration, and runtime convergence still must be verified.
+
+A human desktop/iPhone review is separate product evidence and never flips those automated fields.
 
 ## Preview verification
 
-Before production release when preview evidence is required, verify preview behavior for Today, Explore, People, Systems, Library, You, Gateway inference, the disabled private-export boundary, deletion grace, and Stripe test entitlements. Confirm:
+When an isolated preview is needed, use the protected preview procedure in `docs/preview-deployment.md`. Preview must use its own database/config/secrets and must not attach production routes/customer state.
 
-- `sovereign-answer.v2` validation remains strict;
-- exact Basis references are server-authorized;
-- relationship and system context remains consent-bound;
-- monthly allowance and daily free-capacity failures do not charge users for missing answers;
-- personalized Gateway cache and persistent logs remain disabled;
-- no direct OpenAI fallback exists;
-- the preview does not attach production D1, routes, Stripe live credentials, or customer data.
+Preview acceptance should cover the same current product boundaries relevant to the change, including policy/18+ handling, Baseline readiness, text AI responses, consent/entitlements, on-demand private export, deletion grace, and Stripe test behavior.
 
-## Rollback procedure
+## Rollback preparation
 
-- Keep the previous Worker version available for rollback.
-- Do not roll back D1 by destructive migration. Use forward-repair migrations.
-- Change the active Worker version or route binding rather than deleting secrets.
-- Keep Stripe webhooks pointed at the last known good Worker until the repaired Worker has passed replay and idempotency tests.
-- A rollback may restore code, but it must not report readiness against a migration dependency it cannot satisfy.
+- Record the previous stable Worker version before a production mutation where rollback may be needed.
+- Do not roll back D1 with destructive migration; use forward repair.
+- A Worker rollback must remain compatible with the already-applied D1 schema and external Stripe/email events.
+- Do not delete or rotate unrelated secrets merely to perform rollback.
 
-## Health verification
+## Health/readiness preparation
 
-Health and readiness may report application version, runtime mode, D1 readiness, Durable Object readiness, AI provider/Gateway configuration, Stripe configuration, migration version, and degraded state. They must not reveal tokens, account IDs, provider payloads, exact locations, or private topology.
+Expected production readiness includes:
 
-Production readiness depends on migration `0015_release_evidence`, the applied D1 migration ledger, the release evidence/progress tables, passkeys, and the daily AI capacity ledger.
+- exact target version/SHA;
+- migration `0017_privacy_access_and_eligibility` current;
+- D1, Durable Object, AI Gateway/Workers AI, email, Stripe, scheduled cleanup, and adapter readiness as exposed by the endpoint contract;
+- policy acceptance receipts configured;
+- privacy access controls configured;
+- private export state on-demand/no-artifact where exposed;
+- exact matching release evidence.
+
+Health/readiness must never reveal tokens, private IDs, exact locations, provider payloads, or secret topology.
 
 ## Privacy verification
 
-Before release, inspect logs and traces for raw birth inputs, exact private location, hidden reasoning, provider authorization headers, Stripe secrets, and unconsented relationship/system context. The expected result is zero findings.
+Before release acceptance, inspect the relevant logs/traces for prohibited values: raw birth input, exact private location, hidden reasoning, provider authorization headers, Stripe secrets/IDs not intended for the log, invitation secrets, and unconsented person context. Expected result: zero findings.
 
 ## Deterministic smoke tests
 
-- `pnpm smoke:worker-gateway` verifies Worker-to-Gateway behavior through a fake Cloudflare AI binding without credentials.
-- `pnpm smoke:stripe` verifies Checkout, Portal, fixture webhooks, subscription projection, and entitlement resolution through the deterministic Stripe adapter.
-- `pnpm smoke:product` verifies authenticated People, consent, Systems, Library, disabled private export, deletion grace, billing fixtures, and Covenant Scripture retrieval with fake external providers.
-- Production release verification is owned by `pnpm verify:cloudflare-build`, the internal `pnpm production:deploy` stage, and the canonical `pnpm production:release:oauth` wrapper.
+The full release gate owns the current smoke matrix, including auth, Baseline, jobs, Worker Gateway, Stripe, product, privacy/export, and release closure. Do not treat fixture-only success as final live-product acceptance.
 
-## Stripe test-mode setup
+## Stripe test configuration
 
-Use `STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY`, `STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`, and `STRIPE_PORTAL_RETURN_URL` for Stripe test-mode Checkout and Portal configuration. Domain entitlement logic depends only on stable feature keys, never hard-coded Stripe product IDs.
-
-## Scripture provider configuration
-
-Covenant is opt-in per turn. The local fixture provider supports the configured `WEB` translation for deterministic tests and keeps retrieved passage text, citation metadata, and Sovereign interpretation separate. Production Scripture retrieval must use an approved configured provider and must not allow fabricated citations.
+Use configured Stripe test-mode price/return settings for preview or safe billing verification. Domain entitlement behavior depends on server-confirmed feature state, never a hard-coded price amount in the browser.
 
 ## Sharing and deletion
 
-Private account export is disabled for launch. Public sharing includes only the Sovereign.OS public link and no private workspace data. Deletion enters a grace state and executes only through tested jobs with auditable completion records.
+Public sharing contains only public Sovereign.OS content and no private workspace data unless a future separately reviewed product contract says otherwise.
 
-## Incident response notes
+Private account export is available on demand to the authenticated account and is not retained as an export artifact.
 
-If Gateway, Workers AI, Stripe, Scripture, D1, or another current dependency degrades, fail closed, preserve safe public state, avoid invented interpretations, and use forward-repair migrations or provider reconfiguration rather than destructive rollback.
+Account deletion remains a scheduled 14-day grace workflow with subscription cancellation before destructive deletion.
