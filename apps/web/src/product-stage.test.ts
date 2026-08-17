@@ -7,6 +7,7 @@ const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.ts
 const fieldStyles = readFileSync(new URL('./landing-expression-field-v3.css', import.meta.url), 'utf8');
 const heroStyles = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
 const storyStyles = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
+const refinementStyles = readFileSync(new URL('./landing-refinement-v2.css', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 
 describe('shared Sovereign intelligence stage', () => {
@@ -15,7 +16,7 @@ describe('shared Sovereign intelligence stage', () => {
     expect(landing).toContain('<RealLifeQuestions />');
     expect(landing).toContain('<LandingProductStories />');
     expect(field).toContain('landing-expression-slice__beam');
-    expect(field).toContain('landing-expression-slice__readout');
+    expect(field).toContain('landing-expression-slice__tooltip-value');
     expect(field).toContain('data-field-geometry="spherical-360"');
     expect(stories).toContain('Sovereign — Personal');
     expect(stories).toContain('Sovereign — Relationship');
@@ -27,14 +28,16 @@ describe('shared Sovereign intelligence stage', () => {
   });
 
   it('keeps expression, evidence, permission, and actual experience distinct', () => {
-    expect(field).toContain('Illustrative Baseline');
-    expect(field).toContain('Qualitative expression emphasis · sanitized example');
+    expect(field).toContain('Illustrative Baseline · relative emphasis');
+    expect(field).toContain('line length follows relative emphasis');
     expect(field).toContain('not a diagnosis, score, or claim about anyone’s internal state');
-    expect(field).toContain('line length follows relative expression reach');
+    expect(field).toContain('select a line to see its name and relative value');
     expect(stories).toContain('With permission, Sovereign keeps each person’s supplied context distinct');
     expect(stories).toContain('Illustrative shared context · Permission required · No compatibility score · No private-thought claims');
     expect(stories).toContain('Sanitized supplied system context · Each person controls what may be included');
-    expect(stories).toContain('Role context');
+    expect(stories).toContain('Observed route');
+    expect(stories).toContain('Responsibility');
+    expect(stories).toContain('Testable change');
     expect(stories).toContain('Illustrative supplied context');
     expect(stories).not.toContain('Illustrative permitted Baselines');
     expect(stories).not.toContain('Permitted context');
@@ -47,11 +50,13 @@ describe('shared Sovereign intelligence stage', () => {
     expect(field).toContain('tabIndex={0}');
     expect(field).toContain('onPointerDown');
     expect(field).toContain('onPointerMove');
+    expect(field).toContain('onPointerEnter={() => selectAxis(axis.id)}');
     expect(field).toContain('onFocus={() => selectAxis(axis.id)}');
     expect(field).toContain('onClick={(event) =>');
     expect(field).toContain('onKeyDown={(event) => handleKeyDown(event, axis.id)}');
     expect(field).toContain('prefers-reduced-motion: reduce');
     expect(stories).toContain('aria-current');
+    expect(stories).toContain('landing-workflow__progress');
     expect(workspace).toContain('const limit = mobile ? 3 : 5');
     expect(fieldStyles).toContain('@media (max-width: 760px)');
     expect(fieldStyles).toContain('@media (prefers-reduced-motion: reduce)');
@@ -59,5 +64,7 @@ describe('shared Sovereign intelligence stage', () => {
     expect(heroStyles).toContain('@media (prefers-reduced-motion: reduce)');
     expect(storyStyles).toContain('@media (max-width: 760px)');
     expect(storyStyles).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(refinementStyles).toContain('scroll-snap-type: inline mandatory !important');
+    expect(refinementStyles).toContain('@media (prefers-reduced-motion: reduce)');
   });
 });
