@@ -72,10 +72,10 @@ const SELF_FLOW: readonly WorkflowStep[] = [
 ] as const;
 
 const FAMILY = [
-  { id: 'you', name: 'You', role: 'Stabilizer', route: 'Carries resolution' },
-  { id: 'partner', name: 'Partner', role: 'Catalyst', route: 'Moves decisions forward' },
-  { id: 'child', name: 'Child', role: 'Observer', route: 'Waits for direction' },
-  { id: 'elder', name: 'Elder', role: 'Anchor', route: 'Holds expectation' }
+  { id: 'you', name: 'You', context: 'Often resolves', route: 'Decisions return here' },
+  { id: 'partner', name: 'Partner', context: 'Moves toward action', route: 'Moves decisions forward' },
+  { id: 'child', name: 'Child', context: 'Waits for direction', route: 'Defers when uncertainty rises' },
+  { id: 'elder', name: 'Elder', context: 'Holds expectation', route: 'Reinforces the familiar route' }
 ] as const;
 
 export function LandingProductStories() {
@@ -132,7 +132,7 @@ function RelationshipStory() {
           </ChatWindow>
           <RelationshipContext />
         </div>
-        <p className="landing-story__consent">Illustrative permitted Baselines · No compatibility score · No private-thought claims</p>
+        <p className="landing-story__consent">Illustrative shared context · Permission required · No compatibility score · No private-thought claims</p>
       </div>
     </section>
   );
@@ -150,14 +150,14 @@ function SystemStory() {
           <ChatWindow title="Sovereign — Family System" surface="system-map">
             <Message side="user">Why does every family decision eventually become my job to resolve?</Message>
             <Message side="assistant">
-              The family may rely on you to stabilize uncertainty. Once that role becomes expected, everyone organizes around it—so even small decisions return to you.
+              In this example, decisions keep returning to you when uncertainty rises. That repeated distribution of responsibility can make you the default resolver, even when the decision does not require you.
             </Message>
             <FamilySystemMap />
             <ComposerPreview>Where does responsibility keep returning?</ComposerPreview>
           </ChatWindow>
           <SystemContext />
         </div>
-        <p className="landing-story__consent">Sanitized system demonstration · Each person controls what may be included</p>
+        <p className="landing-story__consent">Sanitized supplied system context · Each person controls what may be included</p>
       </div>
     </section>
   );
@@ -221,7 +221,7 @@ function RelationshipContext() {
     <article className="landing-demo landing-demo--context landing-demo--relationship-context" data-viewport-surface="relationship-reasoning">
       <header className="landing-demo__bar landing-demo__bar--context">
         <span>Keeping both people distinct</span>
-        <small>Permitted context</small>
+        <small>Shared with permission</small>
       </header>
       <div className="landing-context-view landing-context-view--relationship">
         <section>
@@ -249,12 +249,12 @@ function SystemContext() {
     <article className="landing-demo landing-demo--context landing-demo--system-context" data-viewport-surface="system-reasoning">
       <header className="landing-demo__bar landing-demo__bar--context">
         <span>System structure</span>
-        <small>Permitted context</small>
+        <small>Illustrative supplied context</small>
       </header>
       <div className="landing-context-view landing-context-view--system">
         <section>
-          <small>Roles</small>
-          <strong>Who stabilizes, moves, observes, or anchors.</strong>
+          <small>Role context</small>
+          <strong>What each person is carrying or expected to carry.</strong>
         </section>
         <section>
           <small>Responsibility</small>
@@ -262,7 +262,7 @@ function SystemContext() {
         </section>
         <section>
           <small>Movement</small>
-          <strong>What changes when one person stops carrying the familiar role.</strong>
+          <strong>What changes if resolution no longer defaults to one person.</strong>
         </section>
       </div>
     </article>
@@ -353,13 +353,13 @@ function FamilySystemMap() {
             aria-pressed={member.id === activeId}
           >
             <span>{member.name}</span>
-            <small>{member.role}</small>
+            <small>{member.context}</small>
             <em>{member.route}</em>
           </button>
         ))}
       </div>
       <div className="landing-system-map__evidence" aria-live="polite">
-        <span>{active.name} · {active.role}</span>
+        <span>{active.name} · {active.context}</span>
         <strong>{active.route}</strong>
       </div>
     </div>
