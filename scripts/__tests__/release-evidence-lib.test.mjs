@@ -11,9 +11,11 @@ import {
 } from '../release-evidence-lib.mjs';
 
 describe('release evidence library', () => {
-  it('round-trips and validates complete production evidence', () => {
+  it('round-trips and validates complete production evidence without inventing browser verification', () => {
     const sha = 'a'.repeat(40);
     const evidence = createReleaseEvidence({ sha, dmarcVerified: true, completedAt: '2026-08-09T00:00:00.000Z' });
+    expect(evidence.routeCohesionVerified).toBe(false);
+    expect(evidence.renderedVisualVerified).toBe(false);
     const decoded = decodeBase64Json(encodeBase64Json(evidence));
     expect(validateReleaseEvidence(decoded, sha)).toBe(true);
     expect(releaseEvidenceEquals(decoded, evidence)).toBe(true);
@@ -21,6 +23,22 @@ describe('release evidence library', () => {
     expect(releaseEvidenceEquals({ ...decoded, unexpected: true }, evidence)).toBe(false);
     expect(validateReleaseEvidence({ ...decoded, dmarcVerified: false, dmarcStatus: 'external_blocker' }, sha)).toBe(false);
     expect(() => createReleaseEvidence({ sha, dmarcVerified: false })).toThrow(/Verified DMARC/);
+  });
+
+  it('records browser verification only when explicitly supplied', () => {
+    const sha = 'f'.repeat(40);
+    const evidence = createReleaseEvidence({
+      sha,
+      routeCohesionVerified: true,
+      renderedVisualVerified: true,
+      dmarcVerified: true,
+      completedAt: '2026-08-17T00:00:00.000Z'
+    });
+    expect(validateReleaseEvidence(evidence, sha)).toBe(true);
+    expect(evidence.routeCohesionVerified).toBe(true);
+    expect(evidence.renderedVisualVerified).toBe(true);
+    expect(validateReleaseEvidence({ ...evidence, routeCohesionVerified: 'true' }, sha)).toBe(false);
+    expect(validateReleaseEvidence({ ...evidence, renderedVisualVerified: null }, sha)).toBe(false);
   });
 
   it('generates constrained upserts only after validating identifiers', () => {
