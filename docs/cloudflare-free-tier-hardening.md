@@ -17,24 +17,27 @@ Prepared for the `defragapp/OPENAPI` production architecture.
 
 Do not replace production names with placeholders or create alternate data paths.
 
-## Automated production authority
+## Production authority
 
-Cloudflare Workers Builds is the sole release path.
+The current production release path is:
 
-```text
-Build: corepack enable && pnpm install --frozen-lockfile && pnpm verify:cloudflare-build
-Deploy: pnpm production:deploy
+```bash
+pnpm production:release:oauth
 ```
 
-`pnpm production:deploy`:
+The wrapper selects the exact current `origin/main` SHA, establishes a fresh current-member Wrangler OAuth session, runs `pnpm verify:cloudflare-build`, executes the internal `pnpm production:deploy` stage, and proves exact-SHA readiness and release evidence on both branded domains.
 
-1. Resolves the exact Workers Builds commit SHA.
-2. Resolves the existing D1 database ID.
-3. Applies all D1 migrations.
-4. Verifies required Worker secrets.
-5. Configures and verifies the Free-plan Cloudflare controls below.
-6. Deploys the exact SHA.
-7. Verifies both live domains, current product copy, immutable assets, security headers, authentication boundaries, Stripe signature rejection, migration identity, and readiness version.
+Historical Cloudflare Workers Builds trigger and build-token wiring is not current production authority. GitHub Actions, deploy hooks, Pages, preview Workers, duplicate production Workers, and alternate repositories are also outside production authority.
+
+The internal `pnpm production:deploy` stage:
+
+1. receives the exact release SHA selected by the OAuth wrapper;
+2. resolves the existing D1 database ID;
+3. applies all D1 migrations;
+4. verifies required Worker secrets;
+5. configures and verifies the Free-plan Cloudflare controls below;
+6. deploys the exact SHA;
+7. verifies both live domains, current product copy, immutable assets, security headers, authentication boundaries, Stripe signature rejection, migration identity, and readiness version.
 
 The release fails closed when an infrastructure control or live verification does not match the repository contract.
 
