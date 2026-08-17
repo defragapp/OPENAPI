@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import app from '../apps/sovereign-worker/src/index';
 import { createSignedSessionToken } from '../apps/sovereign-worker/src/security/auth';
 import type { Env } from '../apps/sovereign-worker/src/env';
@@ -172,6 +173,15 @@ async function json(env: Env, token: string, path: string, init: RequestInit = {
 }
 
 async function main() {
+  const runtime = readFileSync('apps/sovereign-worker/src/runtime-entry.ts', 'utf8');
+  const privacyRights = readFileSync('apps/sovereign-worker/src/privacy-rights.ts', 'utf8');
+  if (!runtime.includes("url.pathname === '/api/v1/account/export'") || !privacyRights.includes('generatedOnDemand: true')) {
+    throw new Error('on-demand private export contract is not wired into production runtime');
+  }
+  if (privacyRights.includes('env.R2') || privacyRights.includes('r2_key')) {
+    throw new Error('private export unexpectedly depends on retained R2 artifact storage');
+  }
+
   const env = fakeEnv();
   const token = await createSignedSessionToken({ sub: 'user:product-smoke', exp: Math.floor(Date.now() / 1000) + 60 }, 'secret');
 
@@ -228,7 +238,7 @@ async function main() {
   });
   if (!covenant.scriptureSeparateFromInterpretation || !covenant.lens?.scripture?.citation || !covenant.lens?.boundary) throw new Error('Covenant smoke failed');
 
-  console.log('Product smoke passed billing=stripe-projected paid_surfaces=people,systems,library,covenant private_export=disabled owner_granted_consent=blocked');
+  console.log('Product smoke passed billing=stripe-projected paid_surfaces=people,systems,library,covenant private_export=on-demand-no-artifact legacy_export_jobs=disabled owner_granted_consent=blocked');
 }
 
 main().catch(async (error) => {
