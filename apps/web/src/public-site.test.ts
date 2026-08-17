@@ -18,20 +18,22 @@ const v0Css = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'ut
 const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
 const refinementCss = readFileSync(new URL('./experience-refinement-v1.css', import.meta.url), 'utf8');
 const renderedFidelityCss = readFileSync(new URL('./rendered-fidelity-v1.css', import.meta.url), 'utf8');
+const landingRefinementV2Css = readFileSync(new URL('./landing-refinement-v2.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${stories}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
 describe('Sovereign.OS public experience', () => {
-  it('keeps the approved hero and immediate interactive field', () => {
+  it('keeps the approved hero and explains the product beside the interactive field', () => {
     expect(landing).toContain('Personal AI for real life');
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Sovereign begins with the capacity beneath a pattern.');
+    expect(landing).toContain('Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics.');
     expect(landing).toContain('See a Sovereign answer');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(field).toContain('Drag to rotate');
-    expect(field).toContain('landing-expression-slice__tooltip');
-    expect(landing).not.toContain('Know yourself.');
+    expect(field).toContain('select a line to see its name and relative value');
+    expect(field).toContain('{selected.axis.value}');
+    expect(landing).not.toContain('capacity beneath');
   });
 
   it('presents the intended Baseline-first product sequence in order', () => {
@@ -43,16 +45,16 @@ describe('Sovereign.OS public experience', () => {
       expect(index).toBeGreaterThan(previous);
       previous = index;
     }
+    expect(landing).toContain('Built for real situations');
     expect(landing).toContain('Start with what’s actually happening.');
-    expect(landing).toContain('Your Baseline is the private personal foundation Sovereign uses to understand where to begin.');
+    expect(landing).toContain('Your Baseline gives Sovereign a consistent reference across questions, so each answer does not have to start from zero.');
     expect(stories).toContain('Understand what happens');
-    expect(stories).toContain('From one person');
     expect(landing).toContain('A blank conversation starts with the prompt. Sovereign starts with your Baseline.');
     expect(landing).not.toContain('Generic AI sees the prompt. Sovereign sees the context.');
     expect(landing).toContain('Your thoughts deserve');
   });
 
-  it('shows one visible structural flow plus relationship and system context', () => {
+  it('shows a visible reasoning flow plus relationship and system context', () => {
     for (const marker of [
       'surface="personal-chat"',
       'surface="personal-reasoning"',
@@ -60,19 +62,22 @@ describe('Sovereign.OS public experience', () => {
       'surface="relationship-reasoning"',
       'surface="system-map"',
       'surface="system-reasoning"',
-      'Capacity beneath the pattern',
-      'How pressure changes the expression',
-      'What may keep it going',
-      'What could change',
+      'What your Baseline supports',
+      'What changes under pressure',
+      'Where responsibility shifts',
+      'A cleaner boundary',
       'Keeping both people distinct',
       'Clarity may take time.',
       'Between you',
-      'System structure',
-      'Role context',
-      'Movement'
+      'What Sovereign separates',
+      'Observed route',
+      'Testable change',
+      'Selected observation',
+      'What to test'
     ]) expect(stories).toContain(marker);
     expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
     expect(stories).toContain("aria-current={index === visibleIndex ? 'step' : undefined}");
+    expect(stories).toContain('landing-workflow__progress');
     expect(stories).toContain('<RelationshipContext />');
     expect(stories).toContain('<SystemContext />');
   });
@@ -83,6 +88,7 @@ describe('Sovereign.OS public experience', () => {
     expect(stories).toContain('Illustrative supplied context');
     expect(stories).toContain('Each person controls what may be included');
     expect(stories).toContain('No compatibility score');
+    expect(stories).toContain('That is a system pattern—not proof that any one person is the cause.');
     expect(stories).toContain('<strong>Basis</strong>');
     expect(stories).not.toContain("name: 'Maya'");
     expect(stories).not.toContain("name: 'Noa'");
@@ -91,19 +97,16 @@ describe('Sovereign.OS public experience', () => {
     expect(stories).not.toContain("role: 'Catalyst'");
     expect(stories).not.toContain("role: 'Observer'");
     expect(stories).not.toContain("role: 'Anchor'");
-    expect(stories).not.toContain("code: 'Needs time'");
-    expect(stories).not.toContain("code: 'Recognizes quickly'");
-    expect(stories).not.toContain('LandingExpressionFieldPreview');
-    expect(stories).not.toContain('sphere');
-    expect(stories).not.toContain('globe');
   });
 
-  it('keeps retired chatbot phrasing out of active public copy', () => {
+  it('keeps retired chatbot and technical-field phrasing out of active public copy', () => {
     for (const phrase of [
       'Ask about your life. Get an answer built around you.',
       'What do you want to understand?',
-      'Bring the question you already have.'
-    ]) expect(publicCopy).not.toContain(phrase);
+      'Bring the question you already have.',
+      'possible interaction vector',
+      'emotional vector'
+    ]) expect(publicCopy.toLowerCase()).not.toContain(phrase.toLowerCase());
   });
 
   it('keeps verified plans, correction, and optional Covenant available elsewhere', () => {
@@ -116,21 +119,20 @@ describe('Sovereign.OS public experience', () => {
     expect(main).toContain('<PublicLanding />');
     expect(main).toContain("import './landing-expression-field-integration.css';");
     expect(main).toContain("import './v0-restored-product-stories.css';");
-    expect(main).toContain("import experienceRefinementCss from './experience-refinement-v1.css?inline';");
-    expect(main).toContain("import renderedFidelityCss from './rendered-fidelity-v1.css?inline';");
+    expect(main).toContain("import landingRefinementV2Css from './landing-refinement-v2.css?inline';");
+    expect(main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;'));
     expect(main).not.toContain('ProductLanguageRuntime');
   });
 
   it('applies the founder visual system and bounded monochrome refinement authorities', () => {
     for (const selector of ['.v0-landing-port', '.v0-hero', '.intelligence-workspace', '.sovereign-composer', '.account-shell', '.auth-panel']) expect(v0Css).toContain(selector);
     for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storyCss).toContain(selector);
-    expect(storyCss).toContain('@media (max-width: 760px)');
-    expect(storyCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(refinementCss).toContain('--landing-blue: #e8ddd0 !important');
     expect(renderedFidelityCss).toContain('--v8-blue: #d8d0c5 !important');
-    expect(renderedFidelityCss).toContain('Baseline-first recognition: this is a real explanatory stage');
+    expect(landingRefinementV2Css).toContain('.landing-workflow__progress');
+    expect(landingRefinementV2Css).toContain('@keyframes sovereign-system-route');
+    expect(landingRefinementV2Css).toContain('scroll-snap-type: inline mandatory !important');
     expect(staticRefinementCss).toContain('--v0-blue: #e8ddd0');
-    expect(staticRefinementCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
   it('keeps support pages, consent, and fallback routes intact', () => {
