@@ -83,7 +83,7 @@ requireValue(workerConfig.vars?.AI_GATEWAY_ID === expectedGatewayId, 'Local Work
 requireValue(preview?.name === 'sovereign-openapi-preview', 'Preview Worker name drifted');
 requireValue(preview?.workers_dev === true, 'Preview must remain isolated on workers.dev');
 requireValue(preview?.preview_urls === false, 'Versioned preview URLs must remain disabled');
-requireValue(preview?.vars?.APP_ENV === 'preview', 'Preview APP_ENV drifted');
+requireValue(preview?.vars?.APP_ENV === 'preview', 'Preview Worker APP_ENV drifted');
 requireValue(preview?.vars?.AI_MODEL === expectedModel, 'Preview Worker AI model drifted');
 requireValue(preview?.vars?.AI_GATEWAY_ID === expectedGatewayId, 'Preview AI Gateway drifted');
 requireValue(preview?.d1_databases?.some((item) => item.binding === 'DB'), 'Preview D1 binding missing');
@@ -145,7 +145,9 @@ requireAll('single-deploy implementation', deployV3, [
   'WORKERS_CI_COMMIT_SHA',
   "runWrangler(['deploy', '--config', generatedConfigPath])",
   'configureCloudflareFreeTier',
-  'applyMigrations: true'
+  'applyMigrations = true',
+  'if (applyMigrations)',
+  'applyD1Migrations'
 ]);
 requireAll('release orchestrator', releaseOrchestrator, [
   'applyD1Migrations',
