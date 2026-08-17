@@ -166,7 +166,15 @@ function RealLifeQuestions() {
         <p className="landing-question-orbit__kicker">Real life, not a blank prompt</p>
         <h2 id="landing-question-orbit-title">Start with what’s actually happening.</h2>
         <div className="landing-question-orbit__stage" aria-hidden="true">
-          {REAL_LIFE_QUESTIONS.map((question) => <span key={question}>{question}</span>)}
+          {REAL_LIFE_QUESTIONS.map((question, index) => (
+            <span
+              key={question}
+              data-question-fallback={index === 0 ? 'visible' : undefined}
+              style={index === 0 ? { opacity: 1, transform: 'translateY(0)' } : undefined}
+            >
+              {question}
+            </span>
+          ))}
         </div>
         <ul className="landing-question-orbit__accessible">
           {REAL_LIFE_QUESTIONS.map((question) => <li key={question}>{question}</li>)}
