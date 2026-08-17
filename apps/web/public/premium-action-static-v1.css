@@ -1,10 +1,37 @@
-/* Standalone public-route action authority. */
+/* Standalone public-route action and typography authority. */
 :root {
   --static-action-ink: #f2ede5;
   --static-action-muted: rgba(242, 237, 229, 0.62);
   --static-action-line: rgba(242, 237, 229, 0.26);
   --static-action-line-strong: rgba(242, 237, 229, 0.54);
   --static-action-bg: #080a0d;
+  --static-title-font:
+    "Sovereign Sans",
+    "Avenir Next",
+    Avenir,
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+:where(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  [role="heading"],
+  .launch-wordmark,
+  .launch-footer-wordmark,
+  .price,
+  .faq-category .launch-kicker
+) {
+  font-family: var(--static-title-font) !important;
+  font-style: normal !important;
+  font-kerning: normal;
+  font-synthesis: none;
 }
 
 .launch-cta,
