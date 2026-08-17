@@ -31,10 +31,20 @@ describe('production account creation contract', () => {
     }
     expect(receiptMigration).toContain('CREATE TABLE policy_acceptance_receipts');
     expect(receiptMigration).toContain("policy_type TEXT NOT NULL CHECK(policy_type IN ('terms','privacy'))");
+    expect(receiptMigration).toContain("release_sha TEXT NOT NULL CHECK(length(release_sha) = 40 AND release_sha NOT GLOB '*[^0-9a-f]*')");
     expect(auth).toContain('terms_accepted_at, terms_version, privacy_version, policy_content_hash, policy_release_sha');
     expect(auth).toContain('INSERT OR IGNORE INTO policy_acceptance_receipts');
     expect(auth).toContain("[['terms', row.terms_version], ['privacy', row.privacy_version]]");
     expect(auth).toContain("'signup', ?, ?");
+  });
+
+  it('stores only hashed request evidence in policy receipts', () => {
+    expect(receiptMigration).toContain('requested_ip_hash TEXT');
+    expect(receiptMigration).toContain('user_agent_hash TEXT');
+    expect(receiptMigration).not.toMatch(/\brequested_ip\s+TEXT\b/);
+    expect(receiptMigration).not.toMatch(/\buser_agent\s+TEXT\b/);
+    expect(auth).toContain("sha256(request.headers.get('user-agent') ?? 'unknown')");
+    expect(auth).toContain("const [ipHash, userAgentHash] = await Promise.all([sha256(ip)");
   });
 
   it('preserves account-level current policy fields and hardens the host-only session cookie', () => {
