@@ -1,1 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc"><title id="title">Sovereign.OS</title><desc id="desc">A central point held by three open layers representing self, relationship, and system.</desc><rect width="512" height="512" rx="120" fill="#101011"/><rect x="42" y="42" width="428" height="428" rx="104" fill="#171718" stroke="#f1ece5" stroke-opacity=".12" stroke-width="8"/><circle cx="256" cy="256" r="34" fill="#f1ece5"/><path d="M151 205A118 118 0 0 1 341 160" fill="none" stroke="#dda273" stroke-width="26" stroke-linecap="round"/><path d="M374 194A151 151 0 0 1 342 363" fill="none" stroke="#98a18c" stroke-width="26" stroke-linecap="round"/><path d="M308 398A183 183 0 0 1 114 268" fill="none" stroke="#f1ece5" stroke-opacity=".62" stroke-width="26" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Sovereign.OS</title>
+  <desc id="desc">A central point with a quiet field of lines showing different relative emphasis.</desc>
+  <rect width="512" height="512" rx="112" fill="#080a0d"/>
+  <g fill="none" stroke="#f1e9de" stroke-linecap="round">
+    <path d="M92 330A164 164 0 0 1 420 330" stroke-opacity=".16" stroke-width="2"/>
+    <path d="M126 330A130 130 0 0 1 386 330" stroke-opacity=".09" stroke-width="1.5"/>
+    <path d="M256 330 256 112" stroke-opacity=".9" stroke-width="3"/>
+    <path d="M256 330 176 151" stroke-opacity=".62" stroke-width="2.4"/>
+    <path d="M256 330 343 166" stroke-opacity=".76" stroke-width="2.6"/>
+    <path d="M256 330 118 230" stroke-opacity=".46" stroke-width="2"/>
+    <path d="M256 330 400 240" stroke-opacity=".54" stroke-width="2.1"/>
+    <path d="M256 330 151 298" stroke-opacity=".34" stroke-width="1.8"/>
+    <path d="M256 330 371 293" stroke-opacity=".38" stroke-width="1.8"/>
+  </g>
+  <g fill="#fffaf3">
+    <circle cx="256" cy="112" r="5" fill-opacity=".9"/>
+    <circle cx="176" cy="151" r="4" fill-opacity=".66"/>
+    <circle cx="343" cy="166" r="4.5" fill-opacity=".78"/>
+    <circle cx="118" cy="230" r="3.5" fill-opacity=".52"/>
+    <circle cx="400" cy="240" r="3.5" fill-opacity=".58"/>
+    <circle cx="151" cy="298" r="3" fill-opacity=".4"/>
+    <circle cx="371" cy="293" r="3" fill-opacity=".44"/>
+    <circle cx="256" cy="330" r="9"/>
+  </g>
+  <circle cx="256" cy="330" r="30" fill="#f1e9de" fill-opacity=".035"/>
+</svg>
