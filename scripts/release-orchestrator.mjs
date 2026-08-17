@@ -20,7 +20,7 @@ const DEFAULT_PRE_DEPLOY_CHECKS = [
 export const DEFAULT_POST_DEPLOY_CHECKS = [
   { label: 'verify-runtime-v3', path: 'scripts/verify-parent-domain-routes-v3.mjs' },
   { label: 'verify-secondary-public', path: 'scripts/verify-live-secondary-public.mjs' },
-  { label: 'verify-route-cohesion', path: 'scripts/verify-live-route-cohesion.mjs', browserRun: true },
+  { label: 'verify-route-cohesion', path: 'scripts/verify-live-route-cohesion-v2.mjs', browserRun: true },
   { label: 'verify-rendered-visuals', path: 'scripts/verify-live-visual-release-v3.mjs', browserRun: true }
 ];
 
