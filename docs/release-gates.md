@@ -1,6 +1,6 @@
 # Release gates
 
-The founder-approved launch boundary is defined in [`launch-product-contract.md`](launch-product-contract.md). Production deployment is prohibited until every applicable gate below passes for one exact commit SHA.
+The founder-approved launch boundary is defined in [`launch-product-contract.md`](launch-product-contract.md). Production deployment is prohibited until every applicable gate below passes for one exact current `origin/main` SHA. The executable release procedure is defined in [`production-release.md`](production-release.md).
 
 ## Product
 
@@ -21,7 +21,11 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 ## Language and comprehension
 
 - `product-language-system.md` remains the only user-facing language authority; no product, visual, strategy, or release document defines a competing hero, product promise, named model, or explanation of how Sovereign works.
+- Baseline Design remains the foundation. The public experience begins from an ordinary real-life question, decision, relationship, or recurring situation and makes a useful distinction visible before exposing technical machinery.
+- Relationship and system explanations extend the same Baseline-first intelligence outward while keeping every person distinct and permission-bound.
+- Source calculations, Basis codes, provider details, permission mechanics, and deployment architecture remain beneath the primary explanation until needed for support, verification, control, or deeper inspection.
 - The founder-locked root hero and visual sequence remain exact, while immediately adjacent copy makes the product category, interaction, and first action understandable.
+- The required `Start with what’s actually happening.` recognition stage is visibly rendered; string presence in source or clipped accessibility-only text is not sufficient.
 - Applicable self, relationship, system, Library, Expression Field, and Worlds surfaces inherit the same movement: capacity beneath the pattern, possible expression, what happens between people, and supported continuation or change conditions.
 - Interpretive language preserves uncertainty: confirmed observations may use direct language; derived interpretations use possibility language and expose unknowns.
 - Contribution is not presented as causation, feedback as blame, or multi-person context as evidence that harm is mutual.
@@ -38,7 +42,7 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Stripe signatures and timestamps are verified.
 - Webhooks and thread turns are idempotent.
 - All D1 queries use bound parameters.
-- Secrets exist only in Cloudflare Worker bindings or the Cloudflare build/deploy environment.
+- Secrets exist only in Cloudflare Worker bindings or protected release credentials.
 - The disabled private-export boundary, public-link sharing, and deletion are tested.
 - Unsaved thread content expires after 30 days.
 - Minimal security and operational audit metadata without conversation content expires after 90 days unless a documented incident or legal hold applies.
@@ -72,7 +76,10 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 
 ## Reliability
 
-- Cloudflare Workers Builds is green for the exact approved `main` commit.
+- The exact current `origin/main` SHA is selected by `pnpm production:release:oauth` and the checkout is rejected if it does not match that authority.
+- The OAuth release wrapper establishes a fresh current-member Wrangler credential and uses it for direct Cloudflare and Browser Rendering checks without printing or persisting it.
+- `pnpm verify:cloudflare-build` is green for the exact target SHA before the internal deploy stage runs.
+- `pnpm production:deploy` remains an internal stage of the canonical OAuth release rather than a separate authority.
 - D1 migrations apply locally and remotely through `0015_release_evidence`; `0013_workers_ai_free_capacity` remains the historical capacity-ledger foundation.
 - D1 Sessions preserve sequential API consistency and reject invalid bookmarks.
 - Thread ordering survives concurrent requests.
@@ -82,11 +89,11 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 - Traces correlate by thread and request ID.
 - Request rate limits, bounded pagination, provider timeouts, Gateway privacy controls, API Shield, and the daily free-capacity budget are verified.
 - Scheduled retention cleanup is tested at the 30-day and 90-day boundaries.
-- Cloudflare Workers Builds verifies and deploys only the exact approved `main` commit.
-- Migration compatibility and D1 backup evidence are recorded before the build deploys.
+- Both branded `/ready` endpoints report `ready: true`, the exact target SHA, migration `0015_release_evidence`, migration parity `current`, and `releaseEvidence.sha` equal to the target SHA.
+- Migration compatibility and D1 backup evidence are recorded when applicable before production mutation.
 - Rollback instructions and the previous stable Worker version are documented.
-- The production build is bound to the exact approved commit SHA and fails closed if live probes do not converge.
-- GitHub Actions and ad-hoc local commands are not accepted as production release evidence.
+- The production release fails closed if live probes do not converge.
+- GitHub Actions, deploy hooks, Cloudflare Pages, preview Workers, duplicate Workers, historical Workers Builds trigger instructions, and alternate repositories are not accepted as production release evidence.
 
 ## UX
 
@@ -105,15 +112,17 @@ The founder-approved launch boundary is defined in [`launch-product-contract.md`
 
 ## Approval evidence
 
-- Protected preview URL tied to the exact green commit SHA.
-- Desktop and iPhone screenshots of public, authentication, Today, Explore, People, Systems, Library, You, and Covenant states.
-- Browser smoke for invite, redeem, grant, compare, system overlay, revoke, and blocked-after-revocation.
+- Exact target `origin/main` SHA and repository gate evidence.
+- Desktop and iPhone screenshots of public, authentication, Today, Explore, People, Systems, Library, You, and Covenant states where applicable.
+- Browser Rendering landing screenshots and report for the required desktop/mobile viewports.
+- Browser Rendering route-cohesion screenshots and report.
+- Browser smoke for invite, redeem, grant, compare, system overlay, revoke, and blocked-after-revocation when those flows are in scope.
 - A three-person family or team overlay using consented reduced Baseline fixtures.
 - Free allowance, paid upgrade, cancellation, and Free fallback smoke evidence.
 - Both founder-approved donation links resolve to active Stripe-hosted donation pages and preserve entitlement-neutral metadata.
 - Disabled private-export, public-link sharing, deletion grace, immediate thread deletion, and scheduled retention evidence.
 - Reviewed Terms and Privacy documents matching actual behavior.
-- Cloudflare build UUID and post-deploy metadata for the exact commit.
+- Both branded `/ready` responses proving the exact deployed SHA and release evidence.
 - Previous stable Worker version.
-- Migration list and D1 backup confirmation for the exact commit.
+- Migration list and D1 backup confirmation when applicable.
 - Explicit founder approval before production deployment.
