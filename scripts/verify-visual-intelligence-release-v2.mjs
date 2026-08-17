@@ -81,7 +81,7 @@ for (const marker of [
 for (const retired of ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'calculated astronomical positions and selected interpretive frameworks']) {
   if (landing.includes(retired)) throw new Error(`Visual intelligence release v2 found retired landing language ${retired}`);
 }
-for (const marker of ['01 · You', 'Explore how you think, decide, create, connect, and grow.', '02 · You + your people', '03 · From 1:1 to the whole system', 'See the whole system.']) {
+for (const marker of ['01 · You', 'Explore how you think, decide, create, connect, and grow.', '02 · You + your people', 'Understand both sides and what happens between you.', '03 · From 1:1 to the whole system', 'See the whole system.']) {
   if (!stories.includes(marker)) throw new Error(`Visual intelligence release v2 is missing story marker ${marker}`);
 }
 for (const retired of ['Separate helping from carrying the outcome.', 'See where responsibility keeps landing.']) {
@@ -117,13 +117,39 @@ const replacements = [
   ["  'System structure',", "  'Seeing the whole system',"],
   ["  'Illustrative permitted Baselines',", "  'Illustrative supplied context',"],
   ["  '/experience-static-refinement-v1.css?v=20260816-refinement-v1',", "  '/experience-static-refinement-v1.css?v=20260817-cohesion-v2',\n  '/premium-action-static-v1.css?v=20260817-action-v1',"],
-  ["  'Build my Baseline',", "  'Get started',"]
+  ["  'Build my Baseline',", "  'Get started',"],
+  ["  'Your thoughts deserve'", "  'Know yourself. Understand your people. See the whole system.'"],
+  ["  'Look closer at the pattern.',", "  'Explore yourself more deeply.',"],
+  ["  'See how the whole system functions.',", "  'See the whole system.',"]
 ];
 for (const [retiredMarker, currentMarker] of replacements) {
   const occurrences = source.split(retiredMarker).length - 1;
   if (occurrences !== 1) throw new Error(`Visual intelligence release v2 expected one retired marker but found ${occurrences}: ${retiredMarker}`);
   source = source.replace(retiredMarker, currentMarker);
 }
+const currentWorkspaceReplacements = [
+  [
+    "  'Look closer at the pattern.',",
+    "  'Explore yourself more deeply.',"
+  ],
+  [
+    "  'Understand what happens between you.',",
+    "  'Understand both sides and what happens between you.',"
+  ],
+  [
+    "  'See how the whole system functions.',",
+    "  'See the whole system.',"
+  ]
+];
+
+for (const [from, to] of currentWorkspaceReplacements) {
+  if (source.includes(from)) {
+    source = source.replaceAll(from, to);
+  } else if (!source.includes(to)) {
+    throw new Error(`Visual intelligence release v2 could not reconcile workspace marker: ${from}`);
+  }
+}
+
 const activeSource = source.replace(retiredFingerprintOutput, '\n');
 
 for (const retired of [

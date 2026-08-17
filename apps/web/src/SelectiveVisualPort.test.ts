@@ -71,7 +71,7 @@ describe('founder selective visual port', () => {
       '02 · You + your people',
       '03 · From 1:1 to the whole system',
       'Explore how you think, decide, create, connect, and grow.',
-      'Understand what happens between you.',
+      'Understand both sides and what happens between you.',
       'See the whole system.',
       'surface="personal-chat"',
       'surface="personal-reasoning"',

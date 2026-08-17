@@ -72,7 +72,7 @@ describe('Sovereign account and workspace shell', () => {
 
   it('keeps consent under the invited person’s control', () => {
     expect(workspace).toContain('Send private invitation');
-    expect(workspace).toContain('Adding a name is not permission.');
+    expect(workspace).toContain('Shared relationship intelligence begins with an invitation.');
     expect(app).toContain('Choose what this connection may use.');
     expect(consent).toContain('Review your shared uses.');
     expect(consentRuntime).toContain("fetch('/api/v1/invitations/mine'");

@@ -48,8 +48,8 @@ describe('premium rotating public Expression Field v3', () => {
     expect(hero).toContain('<LandingExpressionSlice />');
     expect(landing.indexOf('<RealLifeQuestions />')).toBeGreaterThan(landing.indexOf('<V0Hero />'));
     expect(landing.indexOf('<LandingProductStories />')).toBeGreaterThan(landing.indexOf('<RealLifeQuestions />'));
-    expect(landing).toContain("{ scope: 'Self', text: 'Why do I keep saying yes when I already know I’m overwhelmed?' }");
-    expect(landing).toContain("{ scope: 'Family system', text: 'How do I stop being the person who holds the whole family together?' }");
+    expect(landing).toContain("{ scope: 'Self', text: 'What changes in me under pressure?' }");
+    expect(landing).toContain("{ scope: 'System', text: 'What role am I actually playing in this family?' }");
     expect(landing).toContain('<small>{question.scope}</small>');
     expect(landing).toContain('<strong>{question.text}</strong>');
     expect(landingRefinementV2).toContain('font-size: clamp(1.3rem, 2vw, 1.7rem) !important');

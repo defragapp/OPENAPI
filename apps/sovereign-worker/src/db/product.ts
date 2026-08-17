@@ -94,8 +94,8 @@ export function analyzeSystem(type: string) {
   const team = type === 'team' || type === 'workplace';
   return {
     individualAlignment: 'Reduced member context only; no diagnosis or exact inner state is inferred.',
-    interactionAlignment: family ? 'Account for history, caregiving, dependence, authority, and contact expectations without defaulting to estrangement.' : 'Map communication friction without assigning hidden intent.',
-    roleAlignment: team ? 'Account for formal authority, deadlines, responsibility, handoffs, pace, and decision rights.' : 'Separate informal roles and expectations from actual state.',
+    interactionAlignment: family ? 'Account for history, caregiving, dependence, responsibilities, and contact expectations without defaulting to estrangement.' : 'Map communication friction without assigning hidden intent.',
+    roleAlignment: team ? 'Account for formal roles, deadlines, responsibility, handoffs, pace, and decision process.' : 'Separate informal roles and expectations from actual state.',
     systemAlignment: 'Assess shared objective, constraints, consent, and missing information before recommendations.',
     prohibitedDefaults: ['diagnosis', 'hidden intent', 'automatic estrangement', 'villain assignment']
   };

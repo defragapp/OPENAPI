@@ -50,7 +50,7 @@ describe('Baseline-first Sovereign answer UI', () => {
     expect(prompt).toContain('Shadow and Gift');
     expect(prompt).toContain('Alignment is not a score or rule');
     expect(prompt).toContain('Keep the people and the interaction distinct');
-    expect(prompt).toContain('System: Consider consented facets');
+    expect(prompt).toContain('System: Consider each consented participant’s Baseline plus supplied roles');
   });
 
   it('has physically removed the obsolete workspace and static enhancement files', () => {

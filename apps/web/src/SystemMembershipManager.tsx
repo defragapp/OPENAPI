@@ -9,6 +9,7 @@ export function SystemMembershipManager() {
   const [systemId, setSystemId] = useState('');
   const [personId, setPersonId] = useState('');
   const [role, setRole] = useState('member');
+  const [responsibility, setResponsibility] = useState('');
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -73,13 +74,13 @@ export function SystemMembershipManager() {
           personId,
           metadata: {
             formalRole: role,
-            authority: 'none assumed',
-            responsibility: 'shared objective',
+            ...(responsibility.trim() ? { responsibility: responsibility.trim() } : {}),
             constraints: []
           }
         })
       });
       setPersonId('');
+      setResponsibility('');
       setStatus('Member added with active consent.');
       await refresh();
     } catch (error) {
@@ -113,6 +114,7 @@ export function SystemMembershipManager() {
             )}
             <label>Permitted person<select value={personId} onChange={(event) => setPersonId(event.target.value)} disabled={!systemId}><option value="">Choose a person</option>{available.map((person) => <option key={person.id} value={person.id}>{person.displayName}</option>)}</select></label>
             <label>Role in this system<select value={role} onChange={(event) => setRole(event.target.value)}><option value="member">Member</option><option value="parent">Parent</option><option value="partner">Partner</option><option value="child">Child</option><option value="caregiver">Caregiver</option><option value="leader">Leader</option><option value="teammate">Teammate</option></select></label>
+            <label>Responsibility in this system · optional<input value={responsibility} onChange={(event) => setResponsibility(event.target.value)} placeholder="Only add what is actually known" /></label>
             <button className="system-membership-primary" disabled={!systemId || !personId || loading} onClick={() => void addMember()}>Add permitted member</button>
             <p className="system-membership-status" role="status" aria-live="polite">{status || (available.length === 0 && systemId ? 'No additional connected people currently allow system inclusion.' : '')}</p>
           </section>

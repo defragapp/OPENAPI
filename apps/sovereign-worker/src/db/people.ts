@@ -18,7 +18,6 @@ export interface RelationshipMetadataInput {
   closeness?: string;
   duration?: string;
   sharedHousehold?: boolean;
-  authorityDifference?: string;
   dependence?: string;
   contactExpectations?: string;
   userNotes?: string;

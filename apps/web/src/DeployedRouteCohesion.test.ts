@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const main = read('./main.tsx');
 const routeCss = read('./deployed-route-cohesion.css');
+const staticRouteCss = read('../public/deployed-route-cohesion.css');
 const experienceRefinement = read('./experience-refinement-v1.css');
 const renderedFidelity = read('./rendered-fidelity-v1.css');
 const landingRefinement = read('./landing-refinement-v2.css');
@@ -40,17 +41,20 @@ describe('deployed route cohesion contract', () => {
   });
 
   it('keeps route, refinement, and typography CSS structurally balanced', () => {
-    for (const source of [routeCss, experienceRefinement, renderedFidelity, landingRefinement, landingRefinementV5, sansAuthority, invitationFidelity, staticRefinement, staticTerminal]) {
+    for (const source of [routeCss, staticRouteCss, experienceRefinement, renderedFidelity, landingRefinement, landingRefinementV5, sansAuthority, invitationFidelity, staticRefinement, staticTerminal]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
 
   it('keeps shared static pages on current route and terminal typography authorities', () => {
-    for (const document of [how, pricing, faq, consent, notFound]) {
+    for (const document of [how, pricing, faq, notFound]) {
       expect(document).toContain('/deployed-route-cohesion.css?v=20260803-route-v1');
+    }
+    for (const document of [how, pricing, faq, consent, notFound]) {
       expect(document).toContain(refinementCssPath);
       expect(document).toContain(terminalCssPath);
     }
+    expect(consent).not.toContain('/deployed-route-cohesion.css?v=20260803-route-v1');
     expect(staticTerminal).toContain('--static-title-font:');
     expect(staticTerminal).toContain('font-family: var(--static-title-font) !important');
     expect(staticTerminal).not.toContain('Sovereign Display');
@@ -79,7 +83,7 @@ describe('deployed route cohesion contract', () => {
       'body.questions-page .faq-section',
       'body.questions-page .faq-list summary',
       '@media (max-width: 650px)'
-    ]) expect(routeCss).toContain(marker);
+    ]) expect(staticRouteCss).toContain(marker);
   });
 
   it('keeps the Browser audit transport external, deterministic, and rate-limit aware', () => {
@@ -97,8 +101,12 @@ describe('deployed route cohesion contract', () => {
     expect(verifier).toContain("url: `${appBase}/invitation?token=route-cohesion-audit`");
     expect(verifierV2).toContain('mkdirSync(routeScreenshotDirectory');
     expect(verifierV2).toContain('screenshotPath');
+    expect(verifierV2).toContain('const serifTypographyMarker =');
+    expect(verifierV2).toContain("headingFamily).includes('Sovereign Display')");
+    expect(verifierV2).toContain('const sansTypographyReplacement =');
     expect(verifierV2).toContain("headingFamily).includes('Sovereign Sans')");
-    expect(verifierV2).not.toContain("headingFamily).includes('Sovereign Display')");
+    expect(verifierV2).toContain('for (const [from, to] of replacements) generated = generated.replace(from, to);');
+    expect(verifierV2).toContain('Route cohesion v2 still certifies the retired display serif.');
     expect(productionRelease).toContain("['verify-route-cohesion', 'scripts/verify-live-route-cohesion-v2.mjs']");
   });
 

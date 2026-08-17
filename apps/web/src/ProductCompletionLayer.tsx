@@ -134,7 +134,7 @@ function planCopy(feature: PlanNotice['feature'], message: string): Pick<PlanNot
     },
     systems: {
       title: 'Family and team systems are part of Sovereign+.',
-      description: 'Map roles, authority, responsibility, reliance, communication, pressure, and missing perspectives.'
+      description: 'See the people, roles, perspectives, responsibilities, communication, and pressure shaping the system.'
     },
     library: {
       title: 'Library continuity is part of Sovereign+.',

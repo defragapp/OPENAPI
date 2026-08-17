@@ -4,7 +4,7 @@ import { requireAuth, requireSameOrigin } from './security/auth';
 import { withSecurityHeaders } from './security/headers';
 import { decideInviteeConsent, listInviteeInvitations, previewInvitation, redeemInvitation, sendInvitation } from './invitation-service';
 import { addConsentedSystemMember, buildPairComparison, buildSystemAnalysis } from './relational-context';
-import { removePerson } from './db/people';
+import { createPerson, removePerson } from './db/people';
 import { ensureThread, appendThreadEvent, getOwnedThread, touchThread } from './db/threads';
 import { getTurn, startTurn, updateTurnStatus } from './db/turns';
 import { getEntitlements } from './db/entitlements';
@@ -19,6 +19,55 @@ import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import { authorizeConversationContext, parseConversationContext, projectExpressionFieldContext } from './conversation-context';
 import { buildInterfaceActions } from './interface-actions';
 import type { SovereignAnswerAction } from './agent/recognition';
+
+app.post('/api/v1/invitations/send', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{
+    displayName?: string;
+    role?: string;
+    email?: string;
+    requestedScopes?: string[];
+  }>();
+
+  const displayName = body.displayName?.trim() ?? '';
+  const role = body.role?.trim() ?? '';
+  const email = body.email?.trim().toLowerCase() ?? '';
+
+  if (!displayName) return context.json({ error: 'Name required' }, 400);
+  if (!role) return context.json({ error: 'Role required' }, 400);
+  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+    return context.json({ error: 'Valid invitation email required' }, 400);
+  }
+
+  const person = await createPerson(context.env, auth.accountId, {
+    displayName,
+    role,
+    metadata: {
+      relationshipType: role,
+      source: 'invitation'
+    }
+  });
+
+  try {
+    const invitation = await sendInvitation(
+      context.req.raw,
+      context.env,
+      auth.accountId,
+      person.id,
+      auth.subject,
+      {
+        email,
+        ...(body.requestedScopes ? { requestedScopes: body.requestedScopes } : {})
+      }
+    );
+
+    return context.json({ person, invitation }, 201);
+  } catch (error) {
+    await removePerson(context.env, auth.accountId, person.id).catch(() => undefined);
+    throw error;
+  }
+});
 
 app.post('/api/v1/people/:personId/invitations/send', async (context) => {
   requireSameOrigin(context.req.raw);

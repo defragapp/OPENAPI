@@ -50,13 +50,19 @@ Public self-exploration must not be reduced to one incident, one conflict, respo
 
 ### 2. You + your people
 
-Relationship intelligence extends self-understanding outward. With permission, Sovereign keeps two people distinct and helps examine what they share, where they differ, how each may be experiencing or approaching the same situation, and what happens in the interaction between them.
+Relationship intelligence extends self-understanding outward.
 
-Another person's private state remains unknown unless they supply it. Relationship intelligence is not compatibility scoring, mind-reading, motive assignment, or a verdict about whether a relationship should continue.
+**Understand both sides and what happens between you.**
+
+Shared relationship intelligence begins through a private invitation. The invited person signs in or creates their own Sovereign.OS account, completes their own Baseline, and explicitly chooses which requested uses to allow. Only then may Sovereign use both permitted Baselines together.
+
+Sovereign keeps both people distinct and can examine how each person's Baseline may shape how the same situation is experienced or approached, where the two people differ or align, and what happens when those patterns meet.
+
+A Baseline does not reveal an exact private thought, motive, or emotion. Relationship intelligence is not compatibility scoring, mind-reading, motive assignment, or a verdict about whether a relationship should continue.
 
 ### 3. From 1:1 to the whole system
 
-System intelligence expands from a single relationship to a family, household, friendship group, workplace, team, or other human system. Sovereign can keep roles, authority, responsibility, expectations, pressure, dependence, observations, and missing perspectives visible together.
+System intelligence expands from a single relationship to a family, household, friendship group, workplace, team, or other human system. Sovereign keeps each consented person distinct while bringing their supplied role, permitted Baseline-informed perspective, confirmed responsibilities, pressure, dependence, observations, and interactions into the same system view.
 
 A system story must not be reduced to `where responsibility keeps landing`. Responsibility is one dimension among many. The public category is understanding how the whole system functions and how one person's experience changes inside it.
 
@@ -104,7 +110,7 @@ Sovereign can move through the same question in several layers without forcing e
 1. **Understand you.** Identify the relevant part of the user's Baseline: how they may decide, communicate, create, connect, respond, or orient to the question.
 2. **See expression and context.** Distinguish what may be steady from what may change under pressure, through Shadow/Gift expression, current conditions, or the actual situation.
 3. **Understand what happens with other people.** When permission-bound relationship context is relevant, keep each person distinct and examine the interaction itself.
-4. **See the wider system when it matters.** When a family, team, household, or group is involved, include the relevant roles, authority, expectations, pressure, responsibility, constraints, observations, and missing perspectives.
+4. **See the wider system when it matters.** When a family, team, household, or group is involved, keep each consented person distinct and include the relevant roles, perspectives, confirmed responsibilities, pressure, constraints, observations, and interactions.
 5. **Help the user examine fit.** Alignment can clarify what supports a choice, what pulls against it, the tradeoff, what information is still needed, and a closer version when relevant.
 
 This is an explanatory lens, not a new feature, score, diagnosis, causal model, or top-level product. Do not name it the Emotional Field Model in the interface. The active launch product objects are Baseline, Expression Field, People, Systems, and Library. Worlds remains future/disabled reference material and is not an active launch object, navigation destination, pricing feature, or required user workflow.
@@ -233,9 +239,9 @@ A normal answer contains:
 
 Self-exploration answers can cover identity/orientation, decision-making, communication, learning, creativity/expression, love/connection, leadership, boundaries, response to pressure/change, Shadow, Gift, Alignment, and underused qualities when the Baseline supports them.
 
-Relationship answers distinguish **You may be bringing**, **They may be bringing**, **What happens between you**, **What each person can own**, and **What still needs to be asked directly**.
+Relationship answers distinguish **You may be bringing**, **They may be bringing**, **What happens between you**, **What each person can own**, and any factual detail that still needs to be asked directly.
 
-System answers distinguish roles, authority, responsibility, expectations, pressure, change effects, and perspectives that are not yet represented.
+System answers keep participants distinct and distinguish supplied roles, permitted perspectives, confirmed responsibilities, pressure, relevant interactions, and change effects.
 
 Alignment answers use **Supports the fit**, **Pulls against it**, **The real tradeoff**, **Still needed**, and **A closer version**.
 
@@ -304,7 +310,7 @@ Heading:
 
 Description:
 
-`Move from one relationship to a family, household, team, or group. See roles, expectations, authority, responsibility, pressure, and different perspectives together.`
+`Move from one relationship to a family, household, team, or group. See the people, roles, perspectives, responsibilities, pressure, and patterns between them together.`
 
 Representative public questions may include:
 
@@ -410,7 +416,7 @@ People:
 Systems:
 
 - `See the whole system.`
-- `Keep roles, authority, responsibility, expectations, pressure, and perspective in view.`
+- `Keep each consented person distinct while roles, perspectives, confirmed responsibilities, pressure, and interactions stay in view.`
 
 Library:
 

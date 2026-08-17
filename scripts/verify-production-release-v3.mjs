@@ -99,6 +99,64 @@ function replaceOnce(retiredContract, currentContract) {
 
 for (const [retiredContract, currentContract] of replacements) replaceOnce(retiredContract, currentContract);
 
+/*
+ * Public-positioning-reset compatibility.
+ *
+ * The underlying v2 verifier still contains earlier founder-v0 copy markers.
+ * The main v3 compatibility pass upgrades that historical verifier first;
+ * this second pass aligns only those generated public-language assertions
+ * with the self → People → Systems release contract.
+ */
+const positioningContracts = [
+  [
+    `requireAll('landing value sequence', landing, ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'Should I stay in this job, ask for more, or leave?']);`,
+    `requireAll('landing value sequence', landing, ['data-public-narrative="self-people-systems-v1"', 'Start with you', 'Explore yourself.', 'What does Alignment look like for me?', 'Most AI starts with the prompt. Sovereign starts with you.', 'Know yourself. Understand your people. See the whole system.']);
+rejectAll('retired landing positioning', landing, ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'calculated astronomical positions and selected interpretive frameworks']);`
+  ],
+  [
+    `  'One private reference beneath every question.',`,
+    `  'Explore yourself.',`
+  ],
+  [
+    `  'Why do we keep having the same argument even when we both want it to stop?',`,
+    `  'What does Alignment look like for me?',`
+  ],
+  [
+    `  'What your Baseline supports',
+  'Keeping both people distinct',
+  'What Sovereign separates',`,
+    `  'How you tend to create',
+  'Keeping both people distinct',
+  'Seeing the whole system',`
+  ],
+  [
+    `requireAll('landing refinement v5', landingRefinementV5Css, ['.v0-hero h1 > span', '.v0-hero h1 > em', '@keyframes sovereign-hero-rise', '@keyframes sovereign-field-arrive', '.landing-baseline-intro__heading', '.landing-baseline-intro__principles', '.landing-expression-slice__tooltip-panel', 'width: 104px !important', 'height: 26px !important', '@media (prefers-reduced-motion: reduce)']);`,
+    `requireAll('landing refinement v5', landingRefinementV5Css, ['One typeface. Hierarchy comes from weight, scale, and opacity.', '.v0-hero h1 > span', '.v0-hero h1 > em', 'font-family: inherit !important', '@keyframes sovereign-hero-rise', '@keyframes sovereign-field-arrive', '.landing-expression-slice__tooltip-panel', 'width: 104px !important', 'height: 26px !important', '@media (prefers-reduced-motion: reduce)']);`
+  ],
+  [
+    `requireAll('How it works document', how, ['Your Baseline first. The situation second.', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`,
+    `requireAll('How it works document', how, ['Start with you. Add context when it matters.', 'YOU → PEOPLE → SYSTEMS', 'Explore yourself.', 'A private reference built around you.', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`
+  ],
+  [
+    `requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe securely handles checkout, invoices, payment methods, and subscription changes.', 'If paid access ends, your account stays open and returns to Free.', 'Start with your Baseline. Add more only when you need it.', 'one-time amount from $1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`,
+    `requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Explore yourself for free. Add People and Systems with Sovereign+.', 'Explore yourself with Sovereign.', 'Understand your people and the systems around you.', 'Your Baseline stays yours. Plus expands what you can explore.', 'Stripe securely handles checkout, invoices, payment methods, and subscription changes.', 'If paid access ends, your account stays open and returns to Free.', 'one-time amount from $1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`
+  ]
+];
+
+function replacePositioningContract(retiredContract, currentContract) {
+  const occurrences = source.split(retiredContract).length - 1;
+  if (occurrences !== 1) {
+    throw new Error(
+      `Production release v3 positioning compatibility expected one occurrence but found ${occurrences}: ${retiredContract.slice(0, 120)}`
+    );
+  }
+  source = source.replace(retiredContract, currentContract);
+}
+
+for (const [retiredContract, currentContract] of positioningContracts) {
+  replacePositioningContract(retiredContract, currentContract);
+}
+
 const deployBlock = /requireAll\('production deploy compatibility', deploy, \[[\s\S]*?assert\(!deploy\.includes\("'Math\.random'"\), 'Production deploy still rejects a dependency bundle by a generic string'\);/;
 const deployMatches = source.match(deployBlock);
 if (!deployMatches || deployMatches.length !== 1) {

@@ -102,9 +102,9 @@ type WorkspaceState = {
 
 const surfaces: Array<{ name: Surface; label: string; description: string }> = [
   { name: 'Today', label: 'Today', description: 'What is active for you now' },
-  { name: 'Explore', label: 'Explore', description: 'Look closer at the pattern' },
-  { name: 'People', label: 'People', description: 'Understand what happens between you' },
-  { name: 'Systems', label: 'Systems', description: 'See how the whole system functions' },
+  { name: 'Explore', label: 'Explore', description: 'Explore yourself more deeply' },
+  { name: 'People', label: 'People', description: 'Understand both sides and what happens between you' },
+  { name: 'Systems', label: 'Systems', description: 'See the whole system' },
   { name: 'Library', label: 'Library', description: 'Keep what changes your understanding' },
   { name: 'You', label: 'You', description: 'Baseline, plan, permissions, and account' }
 ];
@@ -113,9 +113,9 @@ const expressionAxisIdSet = new Set<string>(expressionAxisIds);
 
 const composerExamples: Record<Surface, string[]> = {
   Today: ['What feels different today?', 'What still feels steady underneath it?'],
-  Explore: ['Describe the pattern you want to look at.', 'Where does this change under pressure?'],
+  Explore: ['What part of myself do I want to understand more clearly?', 'What changes in me under pressure?'],
   People: ['What keeps happening between you?'],
-  Systems: ['Where does responsibility keep landing?'],
+  Systems: ['What role am I playing in this system?', 'What changes when the usual roles shift?'],
   Library: ['Continue from a distinction you chose to keep.'],
   You: ['What does my Baseline support here?']
 };
@@ -907,7 +907,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   if (surface === 'Explore') return <ExploreHome workspace={workspace} />;
   if (surface === 'People') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="People" title="Understand what happens between you." body="Keep each person distinct, then examine the interaction itself, what each person can own, and what still needs to be asked directly." />
+      <SurfaceHeading kicker="People" title="Understand both sides and what happens between you." body="Keep each person distinct, then examine your side, their side, and what happens between you using only the Baseline context both people approved." />
       {selectedPerson
         ? <RelationshipOverview person={selectedPerson} api={api} />
         : <EmptyState title="Choose one relationship to examine." body="A name alone does not create access. The other person connects their account and chooses what Sovereign may use." action="Invite or choose someone" onAction={onOpenContext} />}
@@ -915,10 +915,10 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   );
   if (surface === 'Systems') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="Systems" title="See how the whole system functions." body="Keep roles, authority, responsibility, pressure, observations, and missing perspectives in view." />
+      <SurfaceHeading kicker="Systems" title="See the whole system." body="See the people, roles, perspectives, responsibilities, and pressure shaping how the system functions." />
       {selectedSystem
         ? <SystemOverview system={selectedSystem} api={api} />
-        : <EmptyState title="Choose a system to examine." body="Choose a group to see roles, authority, responsibility, pressure, and which perspectives are not yet represented." action="Choose a system" onAction={onOpenContext} />}
+        : <EmptyState title="Choose a system to examine." body="Choose a group to see each consented person, their role, their perspective, their responsibilities, and how the group interacts." action="Choose a system" onAction={onOpenContext} />}
     </div>
   );
   if (surface === 'Library') return (
@@ -996,7 +996,7 @@ function ExploreHome({ workspace }: { workspace: WorkspaceState }) {
     : [];
   return (
     <div className="surface-home explore-home">
-      <SurfaceHeading kicker="Explore" title="Look closer at the pattern." body="Examine a pattern, decision, pressure point, or recurring tension against your Baseline. Sovereign can show what seems steady, how it is showing up here, what may be happening between people or across a system, and what could change." />
+      <SurfaceHeading kicker="Explore" title="Explore yourself more deeply." body="Explore how you think, decide, create, connect, and grow. Bring in a decision, relationship, pressure point, or recurring pattern when you want to see how it connects to your Baseline." />
       <BasisStrip values={registry} />
     </div>
   );
@@ -1084,7 +1084,7 @@ function SystemOverview({ system, api }: { system: Json; api: (path: string, ini
           context={{
             label: 'System interaction',
             meta: `${fieldSubjects.length} people`,
-            detail: 'Roles, authority, responsibility, reliance, and communication remain visible without turning the system into another person. Missing perspectives remain unknown.',
+            detail: 'Each consented person stays distinct while roles, perspectives, responsibilities, reliance, and communication remain visible across the system.',
             selectedAxisId: axisForConnectionType(String(edge?.type ?? 'responsibility'))
           }}
           {...(activeFieldConnection ? { activeConnection: activeFieldConnection } : {})}
@@ -1094,10 +1094,10 @@ function SystemOverview({ system, api }: { system: Json; api: (path: string, ini
       </div>
       <div className="connection-focus">
         <span>ACTIVE CONNECTION</span>
-        {edge ? <p>{edge.from} → {edge.to} · {edge.type}{edge.detail ? ` · ${edge.detail}` : ''}</p> : <p>No relationship edge is shown until authority, responsibility, reliance, or communication is supplied.</p>}
+        {edge ? <p>{edge.from} → {edge.to} · {edge.type}{edge.detail ? ` · ${edge.detail}` : ''}</p> : <p>No relationship edge is shown until responsibility, reliance, or communication is supplied.</p>}
         {edges.length > 1 && <div>{edges.map((_: Json, index: number) => <button key={index} aria-pressed={activeConnection === index} onClick={() => setActiveConnection(index)}>Connection {index + 1}</button>)}</div>}
       </div>
-      <aside><strong>Pressure field</strong><p>{analysis.pressureField?.responsibilityAuthorityMismatch?.[0]?.status ?? 'No responsibility and authority mismatch is confirmed yet.'}</p></aside>
+      <aside><strong>Pressure field</strong><p>{analysis.pressureField?.observations?.[0] ?? 'Pressure stays tied to supplied observations and approved participant context.'}</p></aside>
     </section>
   );
 }
@@ -1361,33 +1361,120 @@ function ContextPanel(props: {
 
 function PeopleControls({ workspace, selectedPerson, setSelectedPerson, api, refresh }: any) {
   const [name, setName] = useState('');
+  const [role, setRole] = useState('');
   const [email, setEmail] = useState('');
-  const selected = workspace.people.find((person: Json) => person.id === selectedPerson);
-  async function addPerson() {
-    if (!name.trim()) return;
-    const data = await api('/api/v1/people', { method: 'POST', body: JSON.stringify({ displayName: name.trim(), role: 'relationship', metadata: { source: 'private-owner-entry' } }) });
-    setName('');
-    await refresh();
-    if (data.person?.id) setSelectedPerson(data.person.id);
-  }
+
+  const permitted = workspace.people.filter((person: Json) =>
+    person.identityBound === true
+    && person.baselineStatus === 'ready'
+    && Array.isArray(person.activeScopes)
+    && person.activeScopes.includes('pair.compare')
+    && person.activeScopes.includes('trait.display')
+  );
+
+  const selected = permitted.find((person: Json) => person.id === selectedPerson);
+
   async function invite() {
-    if (!selectedPerson || !email.includes('@') || !window.confirm(`Send a private invitation to ${email.trim()}?`)) return;
-    await api(`/api/v1/people/${selectedPerson}/invitations/send`, {
+    const displayName = name.trim();
+    const relationshipRole = role.trim();
+    const invitationEmail = email.trim().toLowerCase();
+
+    if (
+      !displayName
+      || !relationshipRole
+      || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(invitationEmail)
+    ) return;
+
+    if (!window.confirm(`Send a private Sovereign.OS invitation to ${invitationEmail}?`)) return;
+
+    await api('/api/v1/invitations/send', {
       method: 'POST',
-      body: JSON.stringify({ email: email.trim(), requestedScopes: ['pair.compare', 'trait.display', 'system.include'] })
+      body: JSON.stringify({
+        displayName,
+        role: relationshipRole,
+        email: invitationEmail,
+        requestedScopes: ['pair.compare', 'trait.display', 'system.include']
+      })
     });
+
+    setName('');
+    setRole('');
     setEmail('');
+    setSelectedPerson('');
     await refresh();
   }
+
   return (
     <div className="context-stack">
-      <p className="context-intro">Adding a name is not permission. Shared comparison begins only after the other person connects and chooses what to allow.</p>
-      <button className="secondary-action" onClick={openConsentControls}>Manage permissions</button>
-      <label>Add a person<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Name" /></label>
-      <button className="secondary-action" onClick={() => void addPerson()}>Add person</button>
-      <label>Choose a permitted person<select value={selectedPerson} onChange={(event) => setSelectedPerson(event.target.value)}><option value="">Only me</option>{workspace.people.map((person: Json) => <option key={person.id} value={person.id}>{person.displayName}</option>)}</select></label>
-      {selected && <div className="permission-card"><span>Account</span><strong>{selected.identityBound ? 'Connected' : 'Not connected'}</strong><span>Baseline</span><strong>{selected.baselineStatus ?? 'Unavailable'}</strong></div>}
-      {selected && !selected.identityBound && <><label>Invitation email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label><button className="primary-action" onClick={() => void invite()}>Send private invitation</button></>}
+      <p className="context-intro">
+        Shared relationship intelligence begins with an invitation. The other person signs in or creates their account, completes their own Baseline, and decides what Sovereign may use.
+      </p>
+
+      <button className="secondary-action" onClick={openConsentControls}>
+        Manage invitations and permissions
+      </button>
+
+      <label>
+        Invite a person
+        <input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="Name"
+        />
+      </label>
+
+      <label>
+        Their role in your relationship
+        <input
+          value={role}
+          onChange={(event) => setRole(event.target.value)}
+          placeholder="Partner, sibling, parent, friend, teammate…"
+        />
+      </label>
+
+      <label>
+        Invitation email
+        <input
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="name@example.com"
+        />
+      </label>
+
+      <button
+        className="primary-action"
+        disabled={!name.trim() || !role.trim() || !email.includes('@')}
+        onClick={() => void invite()}
+      >
+        Send private invitation
+      </button>
+
+      <label>
+        Choose a permitted person
+        <select
+          value={selectedPerson}
+          onChange={(event) => setSelectedPerson(event.target.value)}
+        >
+          <option value="">Only me</option>
+          {permitted.map((person: Json) => (
+            <option key={person.id} value={person.id}>
+              {person.displayName} · {person.role}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      {selected && (
+        <div className="permission-card">
+          <span>Account</span>
+          <strong>Connected</strong>
+          <span>Baseline</span>
+          <strong>Ready</strong>
+          <span>Role</span>
+          <strong>{selected.role}</strong>
+        </div>
+      )}
     </div>
   );
 }
@@ -1407,7 +1494,7 @@ function SystemControls({ workspace, selectedSystem, setSelectedSystem, api, ref
   }
   return (
     <div className="context-stack">
-      <p className="context-intro">A System keeps roles, authority, pressure, and responsibility visible across a family, household, team, or group.</p>
+      <p className="context-intro">A System keeps each consented person, their role, perspective, responsibilities, and pressure visible across a family, household, team, or group.</p>
       <label>New system<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Family, household, team…" /></label>
       <label>Type<select value={type} onChange={(event) => setType(event.target.value)}>{['family', 'household', 'friendship_group', 'team', 'workplace', 'custom'].map((item) => <option key={item} value={item}>{systemTypeLabel(item)}</option>)}</select></label>
       <button className="secondary-action" onClick={() => void createSystem()}>Create system</button>
@@ -1703,8 +1790,8 @@ function modeLabel(mode: SovereignAnswer['mode']) {
 
 function composerPlaceholder(surface: Surface) {
   return surface === 'People' ? 'What keeps happening between you?'
-    : surface === 'Systems' ? 'Where does the pressure keep landing?'
-      : surface === 'Explore' ? 'Describe the pattern you want to look at…'
+    : surface === 'Systems' ? 'What role am I playing in this system?'
+      : surface === 'Explore' ? 'What part of myself do I want to understand more clearly?'
         : surface === 'Library' ? 'Continue from something you saved…'
           : surface === 'You' ? 'What does my Baseline support here?'
             : 'What feels different today?';

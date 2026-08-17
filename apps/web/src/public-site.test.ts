@@ -81,8 +81,8 @@ describe('Sovereign.OS public experience', () => {
       'Between you',
       'Seeing the whole system',
       'Roles',
-      'Authority + expectations',
-      'Missing perspective'
+      'Perspectives',
+      'Responsibilities'
     ]) expect(stories).toContain(marker);
     expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
     expect(stories).toContain("aria-current={index === visibleIndex ? 'step' : undefined}");

@@ -59,7 +59,7 @@ describe('Sovereign.OS active experience language', () => {
     expect(stories).toContain('01 · You');
     expect(stories).toContain('Explore how you think, decide, create, connect, and grow.');
     expect(stories).toContain('02 · You + your people');
-    expect(stories).toContain('Understand what happens between you.');
+    expect(stories).toContain('Understand both sides and what happens between you.');
     expect(stories).toContain('03 · From 1:1 to the whole system');
     expect(stories).toContain('See the whole system.');
 

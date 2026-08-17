@@ -150,7 +150,7 @@ describe('founder visual port — public positioning reset', () => {
       'How you tend to create',
       'What feels aligned',
       '02 · You + your people',
-      'Understand what happens between you.',
+      'Understand both sides and what happens between you.',
       '03 · From 1:1 to the whole system',
       'See the whole system.',
       'surface="personal-chat"',
@@ -162,8 +162,8 @@ describe('founder visual port — public positioning reset', () => {
       'Keeping both people distinct',
       'Seeing the whole system',
       'Roles',
-      'Authority + expectations',
-      'Missing perspective',
+      'Perspectives',
+      'Responsibilities',
       '360 + step * 900',
       'data-motion-state'
     ]) expect(stories).toContain(marker);

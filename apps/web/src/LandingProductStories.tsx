@@ -80,7 +80,7 @@ const FAMILY = [
     name: 'Parent',
     context: 'Pushes for resolution',
     route: 'Sets the pace when pressure rises',
-    effect: 'Formal or informal authority can make one person’s urgency shape the whole group.'
+    effect: 'The pace one person sets can shape how the whole group responds.'
   },
   {
     id: 'sibling',
@@ -138,7 +138,7 @@ function RelationshipStory() {
   return (
     <section ref={sectionRef} id="relationship" className="landing-story landing-story--relationship" data-viewport-section="relationship">
       <div className="landing-story__shell">
-        <StoryHeading step="02 · You + your people" title="Understand what happens between you.">
+        <StoryHeading step="02 · You + your people" title="Understand both sides and what happens between you.">
           With permission, Sovereign keeps each person distinct so you can see where you differ, what you share, and how the interaction changes between you.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--relationship" data-viewport-stage="relationship">
@@ -164,7 +164,7 @@ function SystemStory() {
     <section ref={sectionRef} id="system" className="landing-story landing-story--system" data-viewport-section="system">
       <div className="landing-story__shell">
         <StoryHeading step="03 · From 1:1 to the whole system" title="See the whole system.">
-          Move from one relationship to a family, household, team, or group. See roles, expectations, authority, responsibility, pressure, and different perspectives together.
+          Move from one relationship to a family, household, team, or group. See the people, roles, perspectives, responsibilities, and patterns between them together.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--system" data-viewport-stage="system">
           <ChatWindow title="Sovereign — Family System" surface="system-map">
@@ -273,12 +273,12 @@ function SystemContext() {
           <strong>Who moves toward, away from, or around the pressure.</strong>
         </section>
         <section>
-          <small>Authority + expectations</small>
-          <strong>Who sets the pace, who gets listened to, and what the group expects each person to do.</strong>
+          <small>Perspectives</small>
+          <strong>How the same situation may land differently for each consented person.</strong>
         </section>
         <section>
-          <small>Missing perspective</small>
-          <strong>Whose experience or information is not represented yet.</strong>
+          <small>Responsibilities</small>
+          <strong>What each person is actually responsible for when that context has been supplied or confirmed.</strong>
         </section>
       </div>
     </article>

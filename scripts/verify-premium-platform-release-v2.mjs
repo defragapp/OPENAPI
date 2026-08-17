@@ -20,7 +20,7 @@ const replacements = [
   ],
   [
     "  'What is mine, what is theirs, and what happens between us?',",
-    "  'Understand what happens between you.',"
+    "  'Why does the same situation land differently for us?',"
   ],
   [
     "const passkeyVisual = read('apps/web/src/passkey-auth.css');\nconst staticV0Visual = read('apps/web/public/v0-public-port.css');",
@@ -48,7 +48,7 @@ const replacements = [
   ],
   [
     "  'Understand what happens',\n  'between you.',",
-    "  'Understand what happens between you.',"
+    "  'Understand both sides and what happens between you.',"
   ],
   [
     "  'From one person',\n  'to the whole system.',",
@@ -67,8 +67,12 @@ const replacements = [
     "  'Roles',"
   ],
   [
+    "  'Responsibility',",
+    "  'Responsibilities',"
+  ],
+  [
     "  'Movement',",
-    "  'Authority + expectations',"
+    "  'Perspectives',"
   ],
   [
     "  'Illustrative permitted Baselines',",
@@ -118,7 +122,19 @@ for (const marker of [
 for (const retired of ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'calculated astronomical positions and selected interpretive frameworks']) {
   if (landing.includes(retired)) throw new Error(`Premium platform release v2 found retired root language: ${retired}`);
 }
-for (const marker of ['01 · You', 'Explore how you think, decide, create, connect, and grow.', '02 · You + your people', '03 · From 1:1 to the whole system', 'See the whole system.']) {
+for (const marker of [
+  '01 · You',
+  'Explore how you think, decide, create, connect, and grow.',
+  '02 · You + your people',
+  'Understand both sides and what happens between you.',
+  'Keeping both people distinct',
+  '03 · From 1:1 to the whole system',
+  'See the whole system.',
+  'Seeing the whole system',
+  'Roles',
+  'Perspectives',
+  'Responsibilities'
+]) {
   if (!stories.includes(marker)) throw new Error(`Premium platform release v2 is missing product story marker: ${marker}`);
 }
 for (const retired of ['Separate helping from carrying the outcome.', 'See where responsibility keeps landing.']) {

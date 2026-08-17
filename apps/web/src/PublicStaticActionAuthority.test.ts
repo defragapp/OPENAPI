@@ -28,7 +28,7 @@ describe('standalone public action authority', () => {
 
   it('keeps pricing informational instead of turning plan cards into checkout buttons', () => {
     expect(pricing).toContain('class="pricing-grid"');
-    expect(pricing).toContain('Your Baseline stays the same. Plus gives you more ways to use it.');
+    expect(pricing).toContain('Your Baseline stays yours. Plus expands what you can explore.');
     expect(pricing).not.toContain('Choose Sovereign+');
     expect(pricing).not.toContain('Choose Free');
   });

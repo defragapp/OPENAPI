@@ -170,11 +170,13 @@ The renderer keeps the two people in distinct columns and the relationship itsel
 
 ## System context
 
-System analysis uses consented facets and supplied role, authority, responsibility, care, dependence, constraints, objective, observation, and missing perspective data.
+System analysis uses only consented participants and their permitted Baseline context together with supplied roles, confirmed responsibilities, care, dependence, constraints, shared objectives, and observations.
 
-It returns stabilizing and change roles, pressure carriers, formal and informal authority, responsibility concentration, mediation and withdrawal, expectations, change effects, unknown roles, supported relationship edges, and a separate pressure field.
+Every participant remains a separate subject. Sovereign may examine how the same situation can land differently across the permitted Baselines and how those perspectives, roles, responsibilities, communication patterns, reliance, and pressure interact across the group.
 
-A Baseline-derived role is labeled as a possibility. A formal role or practical responsibility is factual only when supplied or confirmed. Unsupported decorative edges are prohibited.
+Roles come from invitation or system-membership context; they are not invented from Baseline facets. Responsibilities are factual only when supplied or confirmed. Sovereign may interpret how a person's Baseline could affect their experience or expression inside that role, but the Baseline does not assign the role itself.
+
+The system context may return participant roles, permitted perspectives, confirmed responsibility context, communication or reliance relationships, observations, change effects, and a separate pressure field. Unsupported decorative edges are prohibited.
 
 ## Covenant
 

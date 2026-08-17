@@ -26,7 +26,7 @@ describe('systems, library, privacy, and entitlement helpers', () => {
     const env = fakeEnv();
     const system = await createSystem(env, 'acct_1', { name: 'Ops team', systemType: 'team', metadata: { sharedObjective: 'ship safely' } });
     expect(system.systemType).toBe('team');
-    expect(analyzeSystem('team').roleAlignment).toContain('formal authority');
+    expect(analyzeSystem('team').roleAlignment).toContain('formal roles');
     expect(analyzeSystem('family').interactionAlignment).toContain('caregiving');
     expect(analyzeSystem('family').prohibitedDefaults).toContain('automatic estrangement');
   });

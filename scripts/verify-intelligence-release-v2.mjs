@@ -96,12 +96,12 @@ for (const marker of [
   '01 · You',
   'Explore how you think, decide, create, connect, and grow.',
   '02 · You + your people',
-  'Understand what happens between you.',
+  'Understand both sides and what happens between you.',
   '03 · From 1:1 to the whole system',
   'See the whole system.',
   'Roles',
-  'Authority + expectations',
-  'Missing perspective'
+  'Perspectives',
+  'Responsibilities'
 ]) {
   if (!stories.includes(marker)) throw new Error(`Intelligence release v2 is missing product story marker ${marker}`);
 }
@@ -122,10 +122,12 @@ if (main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("imp
 if (source.split(retiredFingerprintOutput).length - 1 !== 1) throw new Error('Intelligence release v2 could not isolate the historical sequence fingerprint output.');
 
 const languageReplacements = [
+  ["  'Look closer at the pattern.',", "  'Explore yourself more deeply.',"],
+  ["  'See how the whole system functions.',", "  'See the whole system.',"],
   ["  'See a Sovereign answer',", "  'Explore yourself.',"],
   ["  'Start with what’s actually happening.',", "  'Start with you',"],
   ["  'Why do we keep having the same fight?',", "  'What does Alignment look like for me?',"],
-  ["  'What is mine, what is theirs, and what happens between us?',", "  'Understand what happens between you.',"],
+  ["  'What is mine, what is theirs, and what happens between us?',", "  'Why does the same situation land differently for us?',"],
   ["  'Sovereign begins with the capacity beneath a pattern.',", "  'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',"],
   ["  'See the capacity beneath the pattern.',", "  'Explore how you think, decide, create, connect, and grow.',"],
   ["  'See what keeps the pattern going—and what could change it.',", "  'See the whole system.',"],
@@ -134,11 +136,42 @@ const languageReplacements = [
   ["  'What may keep it going',", "  'What feels aligned',"],
   ["  'What could change',", "  'What to explore next',"],
   ["  'System structure',", "  'Seeing the whole system',"],
-  ["  'Illustrative permitted Baselines',", "  'Illustrative supplied context',"]
+  ["  'Illustrative permitted Baselines',", "  'Illustrative supplied context',"],
+  ["  'A blank conversation starts with the prompt. Sovereign starts with your Baseline.',", "  'Most AI starts with the prompt. Sovereign starts with you.',"],
+  ["  'Your thoughts deserve',", "  'Know yourself. Understand your people. See the whole system.',"],
+  ["  'a better place to live.'", "  'Start free. Build your Baseline, then explore what you want to understand next.'"],
 ];
 for (const [from, to] of languageReplacements) {
   if (source.split(from).length - 1 !== 1) throw new Error(`Intelligence release v2 could not reconcile historical marker: ${from}`);
   source = source.replace(from, to);
+}
+
+const staleProhibitedLanding = "for (const prohibited of ['Know yourself.', 'Understand the system.', 'Choose what fits.', 'Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'generateAIResponse', 'Demo User']) {";
+const currentProhibitedLanding = "for (const prohibited of ['Understand the system.', 'Choose what fits.', 'Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'generateAIResponse', 'Demo User']) {";
+
+if (source.split(staleProhibitedLanding).length - 1 !== 1) {
+  throw new Error('Intelligence release v2 could not reconcile the retired Know yourself rejection.');
+}
+source = source.replace(staleProhibitedLanding, currentProhibitedLanding);
+
+const currentSemanticReplacements = [
+  [
+    "  'Understand what happens between you.',",
+    "  'Understand both sides and what happens between you.',"
+  ],
+  [
+    "  'responsibilityAuthorityMismatch',",
+    "  'roles: participants.map',"
+  ]
+];
+for (const [from, to] of currentSemanticReplacements) {
+  if (!source.includes(from)) {
+    if (!source.includes(to)) {
+      throw new Error(`Intelligence release v2 could not reconcile current semantic marker: ${from}`);
+    }
+    continue;
+  }
+  source = source.replaceAll(from, to);
 }
 
 const staleRefinementAssertion = "  'style.textContent += `\\n${experienceRefinementCss}`',";

@@ -14,7 +14,7 @@ The public product expands outward in three layers:
 
 1. **You** — understand and explore your own patterns, expression, decisions, creativity, connection, pressure, change, Shadow, Gift, and Alignment;
 2. **You + your people** — with permission, keep two people distinct and examine differences, shared context, and what happens between them;
-3. **From 1:1 to the whole system** — expand to families, households, friendship groups, workplaces, teams, and other human systems while keeping roles, authority, responsibility, expectations, pressure, observations, and missing perspectives distinct.
+3. **From 1:1 to the whole system** — expand to families, households, friendship groups, workplaces, teams, and other human systems while keeping each consented person distinct and preserving their supplied role, permitted perspective, confirmed responsibilities, pressure, observations, and interactions.
 
 The internal intelligence contract may reason through capacity, expression, interaction, continuation conditions, responsibility, and possible change. Those internal concepts do not define the public product category and must not force every public example into conflict, responsibility, or carrying-outcomes language.
 
@@ -73,7 +73,7 @@ Every answer preserves the difference between:
 1. a stable Baseline facet;
 2. a temporary current condition;
 3. a user-confirmed observation;
-4. supplied role, authority, responsibility, dependence, caregiving, or material context;
+4. supplied role, responsibility, dependence, caregiving, or material context;
 5. an unconfirmed interpretation;
 6. the unknown actual state.
 
@@ -101,13 +101,15 @@ The current launch does not require a World/video renderer downstream of the Exp
 
 ## Relationship and system consent
 
-A workspace owner may request access, cancel an invitation, remove a person from their workspace, or stop using shared context. A workspace owner may never grant consent on behalf of another person.
+Shared People intelligence begins through a private invitation. The invited person signs in or creates their own account, completes their own Baseline, and explicitly decides each requested consent scope.
 
-The server rechecks identity, entitlement, and required scope on every shared use. Revocation blocks future use immediately.
+A workspace owner may send or cancel an invitation, remove a connected person from their workspace, or stop using previously shared context. A workspace owner may never grant consent on behalf of another person.
 
-Another person’s exact framework values remain absent without `framework.display`. A one-sided owner entry never exposes that person’s private Baseline.
+The server rechecks identity, entitlement, Baseline availability, and required scope on every shared use. Revocation blocks future use immediately.
 
-System analysis uses supported roles, authority, responsibility, care, reliance, constraints, objectives, observations, and missing perspectives. Graph edges appear only when a relationship is supplied or confirmed.
+Another person’s exact framework values remain absent without `framework.display`.
+
+System analysis uses only consented participants plus supplied roles, confirmed responsibilities, care, reliance, constraints, objectives, observations, and permitted Baseline context. Every participant remains distinct. Graph edges appear only when a relationship is supplied or confirmed.
 
 ## Covenant
 

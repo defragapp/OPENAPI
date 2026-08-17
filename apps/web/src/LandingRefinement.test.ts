@@ -154,16 +154,17 @@ describe('public positioning reset', () => {
       'What feels aligned',
       'What to explore next',
       '02 · You + your people',
-      'Understand what happens between you.',
+      'Understand both sides and what happens between you.',
       'Why does the same situation land differently for us?',
       '03 · From 1:1 to the whole system',
       'See the whole system.',
       'Why does everyone fall back into the same roles when my family is under pressure?',
       'Roles',
-      'Authority + expectations',
-      'Missing perspective',
+      'Perspectives',
+      'Responsibilities',
       'Seeing the whole system'
-    ]) expect(renderedStories).toContain(marker);
+    ]) expect(stories).toContain(marker);
+    expect(renderedStories).toContain('<WorkflowPanel title="How Sovereign explores the question" steps={SELF_FLOW} surface="personal-reasoning" />');
 
     expect(renderedStories).not.toContain('Separate helping from carrying the outcome.');
     expect(renderedStories).not.toContain('See where responsibility keeps landing.');

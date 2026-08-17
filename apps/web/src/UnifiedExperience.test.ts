@@ -12,7 +12,7 @@ const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('unified Sovereign intelligence experience', () => {
   it('offers useful Baseline questions before an incident is supplied', () => {
-    for (const phrase of ['What feels different today?', 'What still feels steady underneath it?', 'Describe the pattern you want to look at.', 'Where does this change under pressure?']) {
+    for (const phrase of ['What feels different today?', 'What still feels steady underneath it?', 'What part of myself do I want to understand more clearly?', 'What changes in me under pressure?']) {
       expect(workspace).toContain(phrase);
     }
     expect(workspace).toContain('composerExamples');

@@ -18,7 +18,7 @@ describe('shared Sovereign intelligence stage', () => {
     expect(field).toContain('landing-expression-slice__beam');
     expect(field).toContain('landing-expression-slice__tooltip-value');
     expect(field).toContain('data-field-geometry="spherical-360"');
-    expect(stories).toContain('Sovereign — Personal');
+    expect(stories).toContain('Sovereign — You');
     expect(stories).toContain('Sovereign — Relationship');
     expect(stories).toContain('Sovereign — Family System');
     expect(workspace).toContain('<SovereignAnswerView');
@@ -32,12 +32,12 @@ describe('shared Sovereign intelligence stage', () => {
     expect(field).toContain('line length follows relative emphasis');
     expect(field).toContain('not a diagnosis, score, or claim about anyone’s internal state');
     expect(field).toContain('click a line to inspect it');
-    expect(stories).toContain('With permission, Sovereign keeps each person’s supplied context distinct');
+    expect(stories).toContain('With permission, Sovereign keeps each person distinct');
     expect(stories).toContain('Illustrative shared context · Permission required · No compatibility score · No private-thought claims');
     expect(stories).toContain('Sanitized supplied system context · Each person controls what may be included');
-    expect(stories).toContain('Observed route');
-    expect(stories).toContain('Responsibility');
-    expect(stories).toContain('Testable change');
+    expect(stories).toContain('Seeing the whole system');
+    expect(stories).toContain('Responsibilities');
+    expect(stories).toContain('Perspectives');
     expect(stories).toContain('Illustrative supplied context');
     expect(stories).not.toContain('Illustrative permitted Baselines');
     expect(stories).not.toContain('Permitted context');

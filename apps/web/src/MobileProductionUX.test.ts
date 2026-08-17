@@ -69,19 +69,19 @@ describe('production mobile and responsive experience', () => {
     for (const marker of [
       'v0-wordmark--mobile',
       'v0-mobile-menu',
-      'Build a private Baseline once. Sovereign uses the parts that matter to understand patterns, decisions, relationships, and systems—without making you explain yourself from zero every time.',
-      'Build your private Baseline once. Use it across the questions that matter next.',
+      'Private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
       'Start free · No card required',
       '<MobileCapabilityRail />',
-      'Understand yourself',
-      'Understand relationships',
-      'Understand systems',
-      'Your library',
+      'Explore yourself',
+      'Understand your people',
+      'See the whole system',
+      'Keep what matters',
       'Get started'
     ]) expect(landing).toContain(marker);
     expect(landing).not.toContain('capacity beneath');
     expect(landing).not.toContain('Build my Baseline');
-    expect(landing).toContain('One private foundation. More useful answers across the questions that shape your life.');
+    expect(landing).not.toContain('One private foundation. More useful answers across the questions that shape your life.');
+    expect(landing).not.toContain('Build a private Baseline once.');
     expect(landing).toContain('<small>{question.scope}</small>');
     expect(landing).toContain('<strong>{question.text}</strong>');
     expect(stories).toContain('id="relationship"');

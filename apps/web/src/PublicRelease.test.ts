@@ -90,12 +90,12 @@ describe('public production positioning release', () => {
       'Explore how you think, decide, create, connect, and grow.',
       'What does Alignment look like for me when I’m creating something new?',
       '02 · You + your people',
-      'Understand what happens between you.',
+      'Understand both sides and what happens between you.',
       '03 · From 1:1 to the whole system',
       'See the whole system.',
       'Roles',
-      'Authority + expectations',
-      'Missing perspective'
+      'Perspectives',
+      'Responsibilities'
     ]) expect(stories).toContain(marker);
 
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));

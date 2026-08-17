@@ -69,7 +69,7 @@ export async function buildPairComparison(env: Env, accountId: string, personId:
   ]);
 
   const owner = participant('you', 'You', 'self', ownerBaseline, {});
-  const other = participant('other', person.display_name, person.role, invitedBaseline, safeJson(person.source_of_truth));
+  const other = participant('other', person.display_name, person.role, invitedBaseline, sanitizeRoleContext(safeJson(person.source_of_truth)));
   const pairContacts = frameworkAllowed ? buildPairContacts(ownerBaseline.source, invitedBaseline.source) : [];
   const invitedBasis = frameworkAllowed
     ? prefixBasis(invitedBaseline.basisRegistry, 'other', 'other')
@@ -117,7 +117,7 @@ export async function buildPairComparison(env: Env, accountId: string, personId:
       missingInformation: [
         'What each person is experiencing now',
         'What each person has directly observed',
-        'What has been agreed about timing, authority, responsibility, and boundaries'
+        'What has been agreed about timing, responsibilities, boundaries, and expectations'
       ],
       exactPairContacts: pairContacts
     },
@@ -175,10 +175,10 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
     throw new Response('A reviewable system requires the owner and at least two consented invited members.', { status: 409 });
   }
 
-  const systemContext = safeJson(system.metadata_json);
+  const systemContext = sanitizeRoleContext(safeJson(system.metadata_json));
   const ownerBaseline = await loadStructuredBaseline(env, accountId);
   const participants: ParticipantContext[] = [
-    participant('you', 'You', 'self', ownerBaseline, extractRoleContext(systemContext.owner))
+    participant('you', 'You', 'self', ownerBaseline, sanitizeRoleContext(systemContext.owner))
   ];
   const basisRegistry: BasisRegistryItem[] = [...ownerBaseline.basisRegistry];
 
@@ -193,8 +193,8 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
     const baseline = await loadStructuredBaseline(env, member.bound_account_id);
     const key = `member_${ordinal}`;
     const roleContext = {
-      ...safeJson(member.source_of_truth),
-      ...safeJson(member.metadata_json),
+      ...sanitizeRoleContext(safeJson(member.source_of_truth)),
+      ...sanitizeRoleContext(safeJson(member.metadata_json)),
       formalRole: member.role_label ?? safeJson(member.metadata_json).formalRole ?? member.role ?? 'member'
     };
     const item = participant(key, member.display_name ?? `Member ${ordinal}`, member.role ?? 'member', baseline, roleContext);
@@ -221,11 +221,7 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
     },
     participants,
     systemView: {
-      stabilizingRoles: roleCandidates(participants, ['responsibility', 'boundaries']),
-      changeChallengeRoles: roleCandidates(participants, ['response_change', 'leadership']),
-      pressureCarriers: roleCandidates(participants, ['response_pressure', 'responsibility']),
-      formalAuthority: participants.flatMap((item) => roleValue(item, 'authority')),
-      informalAuthority: participants.flatMap((item) => roleValue(item, 'informalAuthority')),
+      roles: participants.map((item) => ({ participant: item.label, role: item.role })),
       responsibilityConcentration: participants.flatMap((item) => roleValue(item, 'responsibility')),
       mediationAndWithdrawal: participants.flatMap((item) => roleValue(item, 'communicationPattern')),
       roleExpectations: participants.flatMap((item) => roleValue(item, 'expectations')),
@@ -235,18 +231,16 @@ export async function buildSystemAnalysis(env: Env, accountId: string, systemId:
     relationshipGraph: buildSupportedEdges(participants),
     pressureField: {
       observations: extractArray(systemContext.pressure),
-      responsibilityAuthorityMismatch: findResponsibilityAuthorityMismatch(participants),
       rule: 'Pressure is shown only from supplied observations or explicit role context, never from decorative links.'
     },
     basisRegistry,
     missingInformation: [
-      'Unconfirmed perspectives from any participant who has not described the arrangement',
-      'Authority, dependence, caregiving, and material constraints not yet supplied',
-      'Responsibilities that have not been explicitly assigned or confirmed'
+      'Responsibilities, caregiving, dependence, or material constraints that have not been supplied or confirmed',
+      'Role expectations or agreements that have not been supplied or confirmed'
     ],
     responsibilityBoundaries: [
       'No participant is responsible for another participant’s internal state.',
-      'A Baseline-derived role is a possibility, not a factual assignment.',
+      'Roles come only from supplied invitation or system-membership context.',
       'A formal role or practical responsibility is factual only when supplied or confirmed.'
     ],
     provenance: {
@@ -370,14 +364,6 @@ function buildPairContacts(first: BaselineSourceData, second: BaselineSourceData
   return contacts.sort((left, right) => Number(left.display.match(/(\d+\.\d+)°/)?.[1] ?? 99) - Number(right.display.match(/(\d+\.\d+)°/)?.[1] ?? 99)).slice(0, 12);
 }
 
-function roleCandidates(participants: ParticipantContext[], facetIds: string[]) {
-  return participants.map((item) => ({
-    participant: item.label,
-    possibility: item.facets.some((facet) => facetIds.includes(facet.id))
-      ? `Possible role based on ${facetIds.join(' and ')} facets; confirmation is required.`
-      : 'No Baseline role is asserted.'
-  }));
-}
 
 function roleValue(participant: ParticipantContext, key: string) {
   const value = participant.roleContext[key];
@@ -386,7 +372,7 @@ function roleValue(participant: ParticipantContext, key: string) {
 }
 
 function buildSupportedEdges(participants: ParticipantContext[]) {
-  const allowedTypes = ['authority', 'responsibility', 'reliance', 'communication'] as const;
+  const allowedTypes = ['responsibility', 'reliance', 'communication'] as const;
   const keys = new Set(participants.map((item) => item.key));
   return participants.flatMap((participant) => {
     const raw = Array.isArray(participant.roleContext.connections) ? participant.roleContext.connections : [];
@@ -406,18 +392,21 @@ function buildSupportedEdges(participants: ParticipantContext[]) {
   });
 }
 
-function findResponsibilityAuthorityMismatch(participants: ParticipantContext[]) {
-  return participants.flatMap((participant) => {
-    const responsibility = participant.roleContext.responsibility;
-    const authority = participant.roleContext.authority;
-    if (!responsibility || authority) return [];
-    return [{
-      participant: participant.label,
-      responsibility,
-      authority: 'not supplied',
-      status: 'possible mismatch; confirmation required'
-    }];
-  });
+
+function sanitizeRoleContext(value: unknown): Record<string, unknown> {
+  const source = value && typeof value === 'object' && !Array.isArray(value)
+    ? { ...(value as Record<string, unknown>) }
+    : {};
+  for (const key of Object.keys(source)) {
+    if (/authority/i.test(key)) delete source[key];
+  }
+  if (Array.isArray(source.connections)) {
+    source.connections = source.connections.filter((entry) => {
+      if (!entry || typeof entry !== 'object') return false;
+      return String((entry as Record<string, unknown>).type ?? '') !== 'authority';
+    });
+  }
+  return source;
 }
 
 function extractRoleContext(value: unknown): Record<string, unknown> {

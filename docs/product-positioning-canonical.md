@@ -87,7 +87,7 @@ With active permission, Sovereign may compare distinct structured Baselines and 
 
 ### From 1:1 to the whole system
 
-With permission and supplied/confirmed role context, Sovereign may examine roles, authority, responsibility, care/reliance, expectations, pressure, constraints, objectives, observations, and missing perspectives across a family, household, team, workplace, friendship group, or other system.
+With permission and supplied/confirmed role context, Sovereign may examine each consented person's distinct perspective together with roles, confirmed responsibilities, care/reliance, pressure, constraints, objectives, observations, and the interactions between participants across a family, household, team, workplace, friendship group, or other system.
 
 ### Covenant
 
