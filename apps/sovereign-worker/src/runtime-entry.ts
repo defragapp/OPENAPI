@@ -8,6 +8,8 @@ import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/hea
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 import { attachD1Bookmark, createD1RequestSession, withD1SessionEnv } from './d1-session';
 import { handleWorldVideoRequest, handleWorldVideoStatusRequest, WORLD_VIDEO_CONTRACT } from './world-video';
+import { ELIGIBILITY_RULE } from '../../../config/policies';
+import { acceptCurrentPolicies, buildPrivateAccountExport, getPolicyStatus } from './privacy-rights';
 import {
   createPasskeyLoginOptions,
   createPasskeyRegistrationOptions,
@@ -42,9 +44,10 @@ const PUBLIC_HOST = 'sovereign.defrag.app';
 const APP_HOST = 'app.defrag.app';
 const CAPACITY_MIGRATION_VERSION = '0013_workers_ai_free_capacity';
 const PASSKEY_MIGRATION_VERSION = '0014_passkey_authentication';
-const PREVIOUS_MIGRATION_VERSION = '0015_release_evidence';
-const LATEST_MIGRATION_VERSION = '0016_policy_acceptance_receipts';
-const LATEST_MIGRATION_FILENAME = '0016_policy_acceptance_receipts.sql';
+const RELEASE_EVIDENCE_MIGRATION_VERSION = '0015_release_evidence';
+const POLICY_RECEIPT_MIGRATION_VERSION = '0016_policy_acceptance_receipts';
+const LATEST_MIGRATION_VERSION = '0017_privacy_access_and_eligibility';
+const LATEST_MIGRATION_FILENAME = '0017_privacy_access_and_eligibility.sql';
 const LEGACY_HEALTH_METADATA_COMPATIBILITY = "migrationVersion: '0015_release_evidence' · latestMigrationVersion: '0016_policy_acceptance_receipts'";
 const VISUAL_ARCHIVE_SHA256 = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 const VISUAL_SEQUENCE_FINGERPRINT = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${VISUAL_ARCHIVE_SHA256}`;
@@ -106,6 +109,14 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
   const routed = routeHostname(request, url);
   if (routed) return routed;
 
+  if (request.method === 'POST' && url.pathname === '/api/v1/auth/signup') {
+    requireSameOrigin(request);
+    const signup = await request.clone().json().catch(() => ({})) as { ageEligible?: boolean; eligibilityRuleVersion?: string };
+    if (signup.ageEligible !== true || signup.eligibilityRuleVersion !== ELIGIBILITY_RULE.version) {
+      return withSecurityHeaders(Response.json({ status: 'invalid', field: 'eligibility' }, { status: 400, headers: { 'cache-control': 'no-store' } }));
+    }
+  }
+
   const apiBoundary = await enforcePrivateApiBoundary(request, url, env);
   if (apiBoundary) return apiBoundary;
 
@@ -135,6 +146,35 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
   if (request.method === 'DELETE' && passkeyDelete) {
     requireSameOrigin(request);
     return withSecurityHeaders(await deletePasskey(request, env, decodeURIComponent(passkeyDelete[1]!)));
+  }
+
+  if (request.method === 'GET' && url.pathname === '/api/v1/account/policy-status') {
+    const auth = await requireAuth(request, env);
+    return withSecurityHeaders(privateBoundaryResponse(Response.json(await getPolicyStatus(env, auth.accountId), {
+      headers: { 'cache-control': 'private, no-store' }
+    })));
+  }
+
+  if (request.method === 'POST' && url.pathname === '/api/v1/account/policy-acceptance') {
+    requireSameOrigin(request);
+    const auth = await requireAuth(request, env);
+    return withSecurityHeaders(privateBoundaryResponse(Response.json(await acceptCurrentPolicies(request, env, auth.accountId), {
+      headers: { 'cache-control': 'private, no-store' }
+    })));
+  }
+
+  if (request.method === 'POST' && url.pathname === '/api/v1/account/export') {
+    requireSameOrigin(request);
+    const auth = await requireAuth(request, env);
+    const payload = await buildPrivateAccountExport(env, auth.accountId);
+    return withSecurityHeaders(privateBoundaryResponse(new Response(JSON.stringify(payload, null, 2), {
+      status: 200,
+      headers: {
+        'content-type': 'application/json; charset=utf-8',
+        'content-disposition': 'attachment; filename="sovereign-account-export.json"',
+        'cache-control': 'private, no-store'
+      }
+    })));
   }
 
   if (DISABLED_PATH_PREFIXES.some((prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`))) {
@@ -247,7 +287,9 @@ async function shareFirstAccountResponse(request: Request, env: Env, executionCo
     ...payload,
     privacy: {
       deletion: '/api/v1/deletion-jobs',
-      privateExport: 'disabled',
+      privateExport: '/api/v1/account/export',
+      exportRetention: 'generated-on-demand-not-retained',
+      policyStatus: '/api/v1/account/policy-status',
       sharing: {
         mode: 'public-link-only',
         url: `https://${PUBLIC_HOST}`,
@@ -265,6 +307,8 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'release_evidence') AS release_evidence_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'release_progress') AS release_progress_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'policy_acceptance_receipts') AS policy_receipts_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'privacy_request_events') AS privacy_requests_ready,
+      EXISTS(SELECT 1 FROM pragma_table_info('accounts') WHERE name = 'eligibility_rule_version') AS eligibility_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'd1_migrations') AS migration_history_ready`)
       .first<{
         ok: number;
@@ -273,6 +317,8 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
         release_evidence_ready: number;
         release_progress_ready: number;
         policy_receipts_ready: number;
+        privacy_requests_ready: number;
+        eligibility_ready: number;
         migration_history_ready: number;
       }>();
     const migrationHistory = db?.migration_history_ready === 1
@@ -301,17 +347,21 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
     );
     const releaseSchemaReady = db?.release_evidence_ready === 1
       && db?.release_progress_ready === 1;
-    const policyReceiptSchemaReady = db?.policy_receipts_ready === 1
+    const policyReceiptSchemaReady = db?.policy_receipts_ready === 1;
+    const privacyAccessSchemaReady = db?.privacy_requests_ready === 1
+      && db?.eligibility_ready === 1
       && migrationHistory?.release_migration_applied === 1;
-    const migrationVersion = policyReceiptSchemaReady
+    const migrationVersion = privacyAccessSchemaReady
       ? LATEST_MIGRATION_VERSION
-      : releaseSchemaReady
-        ? PREVIOUS_MIGRATION_VERSION
-        : db?.passkeys_ready === 1
-          ? PASSKEY_MIGRATION_VERSION
-          : db?.capacity_ready === 1
-            ? CAPACITY_MIGRATION_VERSION
-            : 'unknown';
+      : policyReceiptSchemaReady
+        ? POLICY_RECEIPT_MIGRATION_VERSION
+        : releaseSchemaReady
+          ? RELEASE_EVIDENCE_MIGRATION_VERSION
+          : db?.passkeys_ready === 1
+            ? PASSKEY_MIGRATION_VERSION
+            : db?.capacity_ready === 1
+              ? CAPACITY_MIGRATION_VERSION
+              : 'unknown';
     const migrationParity = migrationVersion === LATEST_MIGRATION_VERSION;
     const dependencies = {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
@@ -320,6 +370,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       passkeys: db?.passkeys_ready === 1 ? 'configured' : 'missing',
       releaseEvidenceStore: releaseSchemaReady ? 'configured' : 'missing',
       policyAcceptanceReceipts: policyReceiptSchemaReady ? 'configured' : 'missing',
+      privacyAccessControls: privacyAccessSchemaReady ? 'configured' : 'missing',
       durableObjects: env.THREADS ? 'configured' : 'missing',
       assets: env.ASSETS ? 'configured' : 'missing',
       ai: aiConfig.provider === 'cloudflare-gateway' && env.AI && env.AI_GATEWAY_ID ? 'configured' : 'missing',
@@ -338,7 +389,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       stripe: stripeConfigured ? 'configured' : 'missing',
       stripeWebhookPaths: [...STRIPE_WEBHOOK_PATHS],
       scripture: env.SCRIPTURE_TRANSLATION || 'WEB',
-      privateExports: 'disabled',
+      privateExports: 'on-demand-no-artifact',
       sharing: 'public-link-only'
     };
     const ok = db?.ok === 1;
@@ -348,6 +399,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       && dependencies.passkeys === 'configured'
       && dependencies.releaseEvidenceStore === 'configured'
       && dependencies.policyAcceptanceReceipts === 'configured'
+      && dependencies.privacyAccessControls === 'configured'
       && dependencies.durableObjects === 'configured'
       && dependencies.assets === 'configured'
       && dependencies.ai === 'configured'
