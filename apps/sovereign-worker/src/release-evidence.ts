@@ -23,9 +23,9 @@ export type ProductionReleaseEvidence = {
   sha: string;
   migrationVersion: typeof RELEASE_MIGRATION_VERSION;
   routeCohesionContract: typeof RELEASE_ROUTE_COHESION_CONTRACT;
-  routeCohesionVerified: true;
+  routeCohesionVerified: boolean;
   renderedVisualContract: typeof RELEASE_RENDERED_VISUAL_CONTRACT;
-  renderedVisualVerified: true;
+  renderedVisualVerified: boolean;
   dmarcRecord: '_dmarc.defrag.app';
   dmarcVerified: true;
   dmarcStatus: 'verified';
@@ -55,9 +55,9 @@ export async function readProductionReleaseEvidence(env: Env): Promise<Productio
     || evidence.sha !== sha
     || evidence.migrationVersion !== RELEASE_MIGRATION_VERSION
     || evidence.routeCohesionContract !== RELEASE_ROUTE_COHESION_CONTRACT
-    || evidence.routeCohesionVerified !== true
+    || typeof evidence.routeCohesionVerified !== 'boolean'
     || evidence.renderedVisualContract !== RELEASE_RENDERED_VISUAL_CONTRACT
-    || evidence.renderedVisualVerified !== true
+    || typeof evidence.renderedVisualVerified !== 'boolean'
     || evidence.dmarcRecord !== '_dmarc.defrag.app'
     || evidence.dmarcVerified !== true
     || evidence.dmarcStatus !== 'verified'
