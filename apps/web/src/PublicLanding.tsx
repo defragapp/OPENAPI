@@ -6,14 +6,14 @@ import { LandingProductStories } from './LandingProductStories';
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 
 const REAL_LIFE_QUESTIONS = [
-  'Why do I keep taking responsibility for everyone around me?',
-  'Why do we keep having the same fight?',
-  'Should I say something now or wait?',
-  'Why does their silence affect me so strongly?',
-  'What is mine, what is theirs, and what happens between us?',
-  'Is this a timing mismatch or a values mismatch?',
-  'What changes when I stop playing the role everyone expects?',
-  'Does this choice fit me, or does it cost too much of me?'
+  { scope: 'Self', text: 'Why do I keep taking responsibility for everyone around me?' },
+  { scope: 'Relationship', text: 'Why do we keep having the same fight?' },
+  { scope: 'Decision', text: 'Should I say something now or wait?' },
+  { scope: 'Relationship', text: 'Why does their silence affect me so strongly?' },
+  { scope: 'Relationship', text: 'What is mine, what is theirs, and what happens between us?' },
+  { scope: 'Decision', text: 'Is this a timing mismatch or a values mismatch?' },
+  { scope: 'Family system', text: 'What changes when I stop playing the role everyone expects?' },
+  { scope: 'Decision', text: 'Does this choice fit me, or does it cost too much of me?' }
 ] as const;
 
 const COMPARISON = {
@@ -101,10 +101,10 @@ function V0Hero() {
           </em>
         </h1>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
-          Sovereign begins with the capacity beneath a pattern. It shows how that capacity may be expressing, what happens between people, and what may be keeping the pattern in place—so you can see what could change.
+          Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics. It keeps what is supported, interpreted, and still unknown distinct.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
-          See the capacity beneath a pattern, how it may be expressing, what happens between people, and what could change.
+          Use your Baseline to understand real questions about yourself, relationships, decisions, and family or group dynamics.
         </p>
         <div className="sovereign-opening-actions">
           <a className="landing-control landing-control--primary" href="/signup">
@@ -163,24 +163,25 @@ function RealLifeQuestions() {
       aria-labelledby="landing-question-orbit-title"
     >
       <div className="v0-shell landing-question-orbit__inner">
-        <p className="landing-question-orbit__kicker">Real life, not a blank prompt</p>
+        <p className="landing-question-orbit__kicker">Built for real situations</p>
         <h2 id="landing-question-orbit-title">Start with what’s actually happening.</h2>
         <div className="landing-question-orbit__stage" aria-hidden="true">
           {REAL_LIFE_QUESTIONS.map((question, index) => (
             <span
-              key={question}
+              key={question.text}
               data-question-fallback={index === 0 ? 'visible' : undefined}
               style={index === 0 ? { opacity: 1, transform: 'translateY(0)' } : undefined}
             >
-              {question}
+              <small>{question.scope}</small>
+              <strong>{question.text}</strong>
             </span>
           ))}
         </div>
         <ul className="landing-question-orbit__accessible">
-          {REAL_LIFE_QUESTIONS.map((question) => <li key={question}>{question}</li>)}
+          {REAL_LIFE_QUESTIONS.map((question) => <li key={question.text}>{question.scope}: {question.text}</li>)}
         </ul>
         <p className="landing-question-orbit__note">
-          Your Baseline is the private personal foundation Sovereign uses to understand where to begin.
+          Your Baseline gives Sovereign a consistent reference across questions, so each answer does not have to start from zero.
         </p>
       </div>
     </section>
