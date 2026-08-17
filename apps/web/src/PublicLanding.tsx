@@ -44,11 +44,10 @@ export function PublicLanding() {
       data-viewport-contract="v0-public-landing-v3"
       data-layout-release="v0-motion-workflows-v8"
       data-public-release="approved-public-v8"
-      data-public-narrative="baseline-value-first-v1"
+      data-public-narrative="self-people-systems-v1"
     >
       <V0Navigation />
       <V0Hero />
-      <BaselineFoundation />
       <RealLifeQuestions />
       <LandingProductStories />
       <ComparisonStory />
@@ -102,10 +101,10 @@ function V0Hero() {
           </em>
         </h1>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
-          Build a private Baseline once. Sovereign uses the parts that matter to understand patterns, decisions, relationships, and systems—without making you explain yourself from zero every time.
+          Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you. Build your Baseline once, then explore how you think, decide, communicate, create, connect, respond under pressure, and change.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
-          Build your private Baseline once. Use it across the questions that matter next.
+          Private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
         <p className="sovereign-opening-trust">
           <LockIcon />
@@ -119,60 +118,28 @@ function V0Hero() {
   );
 }
 
-function BaselineFoundation() {
-  return (
-    <section id="baseline" className="landing-baseline-intro" data-viewport-section="baseline-intro" aria-labelledby="baseline-intro-title">
-      <div className="v0-shell landing-baseline-intro__shell">
-        <header className="landing-baseline-intro__heading">
-          <p>Baseline Design</p>
-          <h2 id="baseline-intro-title">One private reference beneath every question.</h2>
-          <div>
-            <p>Baseline Design gives Sovereign a consistent starting point before the conversation begins.</p>
-            <p>It uses calculated astronomical positions and selected interpretive frameworks—including astrology, partial Human Design and Gene Keys activations, and numerology—to surface patterns you can review, correct, or reject.</p>
-          </div>
-        </header>
-        <dl className="landing-baseline-intro__principles">
-          <div>
-            <dt>Foundation</dt>
-            <dd>Your recurring ways of deciding, communicating, relating, responding under pressure, and growing.</dd>
-          </div>
-          <div>
-            <dt>Relevant context</dt>
-            <dd>Sovereign uses only what matters to the question. Current conditions and another person’s shared information are added only when they belong.</dd>
-          </div>
-          <div>
-            <dt>Your control</dt>
-            <dd>Nothing becomes a verdict. Confirm what fits, correct what does not, and keep raw birth details and exact private location private.</dd>
-          </div>
-        </dl>
-        <p className="landing-baseline-intro__value">The result: you can ask about a decision today, a recurring pattern next week, or a relationship later without rebuilding your context from scratch.</p>
-      </div>
-    </section>
-  );
-}
-
 function MobileCapabilityRail() {
   return (
     <nav className="sovereign-opening-capabilities" aria-label="Explore Sovereign">
       <a href="#how">
         <CapabilityIcon kind="self" />
-        <strong>Understand yourself</strong>
-        <small>See your patterns<br />with clarity.</small>
+        <strong>Explore yourself</strong>
+        <small>Decisions, expression,<br />connection, Alignment.</small>
       </a>
       <a href="#relationship">
         <CapabilityIcon kind="people" />
-        <strong>Understand relationships</strong>
+        <strong>Understand your people</strong>
         <small>See what happens<br />between you.</small>
       </a>
       <a href="#system">
         <CapabilityIcon kind="system" />
-        <strong>Understand systems</strong>
-        <small>See the whole<br />dynamic.</small>
+        <strong>See the whole system</strong>
+        <small>From 1:1 to family,<br />team, or group.</small>
       </a>
       <a href="/login">
         <CapabilityIcon kind="library" />
-        <strong>Your library</strong>
-        <small>Keep what changes<br />your understanding.</small>
+        <strong>Keep what matters</strong>
+        <small>Return to what changed<br />your understanding.</small>
       </a>
     </nav>
   );
@@ -187,8 +154,11 @@ function RealLifeQuestions() {
       aria-labelledby="landing-question-orbit-title"
     >
       <div className="v0-shell landing-question-orbit__inner">
-        <p className="landing-question-orbit__kicker">What this unlocks</p>
-        <h2 id="landing-question-orbit-title">One private foundation. More useful answers across the questions that shape your life.</h2>
+        <p className="landing-question-orbit__kicker">Start with you</p>
+        <h2 id="landing-question-orbit-title">Explore yourself.</h2>
+        <p className="landing-question-orbit__note">
+          Look at how you decide, communicate, create, connect, respond to pressure, and recognize what feels aligned.
+        </p>
         <div className="landing-question-orbit__stage" aria-hidden="true">
           {REAL_LIFE_QUESTIONS.map((question, index) => (
             <span
@@ -204,9 +174,6 @@ function RealLifeQuestions() {
         <ul className="landing-question-orbit__accessible">
           {REAL_LIFE_QUESTIONS.map((question) => <li key={question.text}>{question.scope}: {question.text}</li>)}
         </ul>
-        <p className="landing-question-orbit__note">
-          The same Baseline can support a decision, a recurring pattern, or a relationship question without flattening them into the same answer.
-        </p>
       </div>
     </section>
   );
@@ -218,9 +185,9 @@ function ComparisonStory() {
       <div className="v0-shell">
         <header className="v0-story-heading v0-story-heading-left">
           <p>Why this AI is different</p>
-          <h2 aria-label="A blank conversation starts with the prompt. Sovereign starts with your Baseline.">
-            A blank conversation<br />starts with<br />the prompt.<br />
-            <span>Sovereign<br />starts with<br />your Baseline.</span>
+          <h2 aria-label="Most AI starts with the prompt. Sovereign starts with you.">
+            Most AI starts<br />with the prompt.<br />
+            <span>Sovereign<br />starts with you.</span>
           </h2>
         </header>
         <div className="v0-comparison-grid" data-viewport-surface="comparison">
@@ -235,10 +202,10 @@ function ComparisonStory() {
 function FinalCallToAction() {
   return (
     <section className="v0-final">
-      <h2 aria-label="Your thoughts deserve a better place to live.">
-        Your thoughts<br />deserve<br />a better place to live.
+      <h2 aria-label="Know yourself. Understand your people. See the whole system.">
+        Know yourself.<br />Understand your people.<br />See the whole system.
       </h2>
-      <p>Build your Baseline once. Use it as the private personal foundation for what you want to understand next.</p>
+      <p>Start free. Build your Baseline, then explore what you want to understand next.</p>
     </section>
   );
 }
