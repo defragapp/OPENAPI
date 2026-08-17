@@ -134,7 +134,7 @@ describe('founder v0 selective visual port — approved public v8', () => {
       'Clarity may arrive quickly.',
       'Between you',
       'System structure',
-      'Roles',
+      'Role context',
       'Responsibility',
       'Movement',
       '240 + step * 620',
