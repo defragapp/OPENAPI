@@ -26,10 +26,11 @@ describe('standalone public action authority', () => {
     }
   });
 
-  it('keeps pricing informational rather than placing acquisition CTAs inside plan cards', () => {
+  it('keeps pricing informational instead of turning plan cards into checkout buttons', () => {
     expect(pricing).toContain('class="pricing-grid"');
-    expect(pricing).not.toContain('class="price-card featured" data-checkout');
     expect(pricing).toContain('Your Baseline stays the same. Plus gives you more ways to use it.');
+    expect(pricing).not.toContain('Choose Sovereign+');
+    expect(pricing).not.toContain('Choose Free');
   });
 
   it('uses one entitlement-neutral support path beginning at one dollar', () => {
