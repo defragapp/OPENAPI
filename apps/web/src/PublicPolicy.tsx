@@ -44,7 +44,7 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
         <h1>{privacy ? 'How Sovereign.OS handles your information.' : 'Terms for using Sovereign.OS.'}</h1>
         <p>
           {privacy
-            ? 'This page explains what the product collects, what reaches the language model or optional renderer, how long information is kept, which service providers are involved, and the choices you control.'
+            ? 'This page explains what the product collects, what reaches the language model, how long information is kept, which service providers are involved, and the choices you control.'
             : 'These terms explain the product’s interpretive limits, account and billing rules, consent requirements, and where your own judgment remains essential.'}
         </p>
         <p className="policy-effective">Effective {metadata.effectiveDate} · Version {metadata.version}</p>
