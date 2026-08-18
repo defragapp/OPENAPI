@@ -14,6 +14,15 @@ describe('production launch preflight', () => {
     expect(verifier).toContain("rootConfig.main === 'apps/sovereign-worker/src/production-entry.ts'");
   });
 
+  it('fails readiness if any legacy SOVV authentication configuration is present in production', () => {
+    expect(productionEntry).toContain("env.APP_ENV === 'production'");
+    expect(productionEntry).toContain('env.SOVV_INTERNAL_BASE_URL || env.SOVV_INTERNAL_AUTH_TOKEN');
+    expect(productionEntry).toContain("url.pathname === '/ready'");
+    expect(productionEntry).toContain("error: 'legacy_auth_adapter_enabled'");
+    expect(productionEntry).toContain("dependency: 'legacySovvAdapter'");
+    expect(productionEntry).toContain('status: 503');
+  });
+
   it('preflights paid relationship and system context before the delegated runtime can persist a turn', () => {
     expect(productionEntry).toContain("const safety = decideSovereignInputSafety(message)");
     expect(productionEntry).toContain("if (safety.disposition !== 'standard') return null");
