@@ -7,8 +7,19 @@ const activeExperience = [
   ['public landing', read('./PublicLanding.tsx')],
   ['landing demonstrations', read('./LandingProductStories.tsx')],
   ['account access', read('./App.tsx')],
+  ['authenticated gate', read('./AuthenticatedWorkspace.tsx')],
   ['workspace', read('./SovereignIntelligenceWorkspace.tsx')],
   ['onboarding', read('./PlanOnboarding.tsx')],
+  ['account controls', read('./AccountControlCenter.tsx')],
+  ['policy-gate account rights', read('./PolicyGateAccountRights.tsx')],
+  ['system membership', read('./SystemMembershipManager.tsx')],
+  ['plan status', read('./VerifiedPlanStatus.tsx')],
+  ['mobile workspace tools', read('./WorkspaceMobileUtilities.tsx')],
+  ['application error boundary', read('./AppErrorBoundary.tsx')],
+  ['passkey manager', read('./PasskeyManager.tsx')],
+  ['passkey client', read('./passkey-client.ts')],
+  ['consent page', read('../public/consent.html')],
+  ['consent runtime', read('../public/consent.js')],
   ['how it works', read('../public/how-it-works.html')],
   ['pricing', read('../public/pricing.html')],
   ['faq', read('../public/faq.html')]
@@ -54,6 +65,37 @@ const rejectedPublicImplementationLanguage = [
   'confirmed responsibilities'
 ] as const;
 
+const rejectedLaunchUiPhrases = [
+  'SERVER-VERIFIED PLAN',
+  'authoritative account record',
+  'signed webhook',
+  'signed Stripe event',
+  'signed Stripe entitlement',
+  'Confirming your Stripe entitlement',
+  'Adding permitted member',
+  'Add only permitted people',
+  'No permitted members have been added yet',
+  'consent active',
+  'Add permitted member',
+  'Manage permitted inclusion',
+  'center-emitted view',
+  'PRIVATE CONSENT',
+  'Review your shared uses.',
+  'Permission revoked for future use.',
+  'permitted context',
+  'shared context',
+  'provider identifiers',
+  'export artifact',
+  'server-side rate limits',
+  'Status: {deletionJob.status}',
+  'required billing and legal retention',
+  'Raw birth details and exact private location are not sent to the language model.',
+  'Choose a valid IANA timezone.',
+  'Calculating source positions',
+  'Preparing your Baseline profile',
+  'Interpretive uncertainty'
+] as const;
+
 describe('Sovereign.OS active experience language', () => {
   it.each(activeExperience)('%s excludes retired generic-chatbot language', (_label, source) => {
     for (const phrase of retired) expect(source).not.toContain(phrase);
@@ -62,6 +104,11 @@ describe('Sovereign.OS active experience language', () => {
   it.each(publicFirstExplanation)('%s translates internal concepts into concrete public language', (_label, source) => {
     expect(source.toLowerCase()).not.toContain('capacity beneath');
     for (const phrase of rejectedPublicImplementationLanguage) expect(source).not.toContain(phrase);
+  });
+
+  it('keeps internal operations vocabulary out of active launch UI copy', () => {
+    const combined = activeExperience.map(([, source]) => source).join('\n');
+    for (const phrase of rejectedLaunchUiPhrases) expect(combined).not.toContain(phrase);
   });
 
   it('uses self exploration before expanding to People and Systems', () => {
@@ -138,6 +185,7 @@ describe('Sovereign.OS active experience language', () => {
     expect(workspace).toContain("Explore: ['What part of myself do I want to understand more clearly?', 'What changes in me under pressure?']");
     expect(workspace).toContain("Systems: ['What role am I playing in this system?', 'What changes when the usual roles shift?']");
     expect(workspace).toContain('<strong>Sources</strong>');
+    expect(workspace).toContain('<span>See source details</span>');
     expect(workspace).toContain('<h2 id="basis-title">Source details</h2>');
     expect(workspace).toContain('These are the source values Sovereign used for this answer.');
     expect(workspace).not.toContain('aria-label={`Basis. Open ${available.length} source values.`}');
@@ -147,6 +195,9 @@ describe('Sovereign.OS active experience language', () => {
     expect(workspace).not.toContain('private foundation');
     expect(workspace).not.toContain('personal foundation');
     expect(workspace).not.toContain('same foundation');
+    expect(workspace).not.toContain('Each consented person');
+    expect(workspace).not.toContain('permitted member');
+    expect(workspace).not.toContain('problem.message || problem.error');
   });
 
   it('keeps onboarding progress user-facing while internal readiness fields remain implementation-only', () => {
@@ -157,5 +208,28 @@ describe('Sovereign.OS active experience language', () => {
     for (const phrase of ['Calculating source positions', 'Calculating your exact source positions', 'Preparing your Baseline profile', 'exact source and validated plain-language Baseline profile', 'Source and Baseline profile validated', 'Interpretive uncertainty', 'exact approved Basis values']) {
       expect(onboarding).not.toContain(phrase);
     }
+  });
+
+  it('keeps plan, system, account, consent, and recovery surfaces in ordinary language', () => {
+    const plan = activeExperience.find(([label]) => label === 'plan status')?.[1] ?? '';
+    const membership = activeExperience.find(([label]) => label === 'system membership')?.[1] ?? '';
+    const account = activeExperience.find(([label]) => label === 'account controls')?.[1] ?? '';
+    const rights = activeExperience.find(([label]) => label === 'policy-gate account rights')?.[1] ?? '';
+    const mobile = activeExperience.find(([label]) => label === 'mobile workspace tools')?.[1] ?? '';
+    const crash = activeExperience.find(([label]) => label === 'application error boundary')?.[1] ?? '';
+    const consentPage = activeExperience.find(([label]) => label === 'consent page')?.[1] ?? '';
+    const consentRuntime = activeExperience.find(([label]) => label === 'consent runtime')?.[1] ?? '';
+
+    expect(plan).toContain('Sovereign+ is active.');
+    expect(plan).toContain('Plan active');
+    expect(membership).toContain('Choose who belongs in this system.');
+    expect(membership).toContain('They can be included only while their sharing choice allows it.');
+    expect(account).toContain('Download my data');
+    expect(account).toContain('Sovereign did not keep a separate copy.');
+    expect(rights).toContain('Your account stays in your control.');
+    expect(mobile).toContain('Open the visual view of your Baseline');
+    expect(crash).toContain('Something went wrong while opening Sovereign.OS.');
+    expect(consentPage).toContain('Review what you share.');
+    expect(consentRuntime).toContain("status.textContent = granted ? 'This use is now allowed.' : 'This use is now off.'");
   });
 });
