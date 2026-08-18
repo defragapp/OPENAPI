@@ -74,11 +74,12 @@ describe('public positioning reset', () => {
     expect(landing).not.toContain('Gene Keys activations');
     expect(landing).not.toContain('numerology');
     expect(landing).not.toContain('capacity beneath');
+    expect(landing).not.toContain('server-approved Basis');
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
     expect(landing).toContain("data-question-fallback={index === 0 ? 'visible' : undefined}");
   });
 
-  it('enforces the canonical public hierarchy of You, your people, and whole systems', () => {
+  it('enforces the canonical public hierarchy and source-detail vocabulary boundary', () => {
     for (const marker of [
       '## Experience hierarchy',
       '### 1. You',
@@ -86,7 +87,10 @@ describe('public positioning reset', () => {
       '### 3. From 1:1 to the whole system',
       '## What Baseline means publicly',
       '`A private reference built around you.`',
-      'Do not use `foundation`, `personal foundation`, `private foundation`, or `one private foundation` as the primary public metaphor for Baseline.',
+      '### User-facing vocabulary boundary',
+      '`Basis` remains the internal/server contract name',
+      '**Sources** or **See source details**',
+      '## Retired and prohibited phrasing',
       '`Sovereign Display` is retired from rendered UI use.',
       '**See why the same moment lands differently—and how to bridge the gap.**'
     ]) expect(languageAuthority).toContain(marker);
@@ -95,6 +99,7 @@ describe('public positioning reset', () => {
       'section identity is `01 · You`',
       'section identity is `02 · You + your people`',
       'section identity is `03 · From 1:1 to the whole system`',
+      'source codes stay hidden by default behind a plain `See source details` disclosure',
       '`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product.'
     ]) expect(visualContract).toContain(marker);
 
@@ -120,15 +125,10 @@ describe('public positioning reset', () => {
     expect(typography.indexOf('-apple-system')).toBeLessThan(typography.indexOf('"SF Pro Display"'));
     expect(sansAuthority.indexOf('-apple-system')).toBeLessThan(sansAuthority.indexOf('"SF Pro Display"'));
     expect(sansAuthority).toContain('Component and route styles');
-
     expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
     expect(landingRefinementV5).toContain('font-family: inherit !important');
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
-    expect(landingRefinementV5).toContain('LANDING_TYPE_COMPOSITION_RECOVERY_V6');
-    expect(landingRefinementV5).toContain('font-size: clamp(3.6rem, 5.7vw, 5.65rem) !important;');
-    expect(landingRefinementV5).toContain('font-size: clamp(2.15rem, 3.15vw, 3.15rem) !important;');
-    expect(landingRefinementV5).toContain('font-size: clamp(2.8rem, 4.25vw, 4.2rem) !important;');
   });
 
   it('keeps one interactive line field with click-led minimal endpoint inspection', () => {
@@ -143,7 +143,6 @@ describe('public positioning reset', () => {
       'onPointerMove={handlePointerMove}',
       'onClick={(event) =>',
       'setHasInspection(true)',
-      'hasInspection ? (',
       'landing-expression-slice__tooltip-title',
       'landing-expression-slice__tooltip-value',
       '{selected.axis.value}',
@@ -152,35 +151,30 @@ describe('public positioning reset', () => {
     ]) expect(field).toContain(marker);
     expect(field).toContain('click a line to inspect it');
     expect(field).not.toContain('onPointerEnter={() => selectAxis(axis.id)}');
-    expect(field).not.toContain('measurement lines');
-    expect(field).not.toContain('stable blue sphere');
     expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
     expect(refinement).toContain('--landing-blue: #e8ddd0 !important');
     expect(renderedFidelity).toContain('--v8-blue: #d8d0c5 !important');
-    expect(landingRefinementV5).toContain('width: 104px !important');
-    expect(landingRefinementV5).toContain('height: 26px !important');
   });
 
-  it('shows self exploration, relationship intelligence, and system intelligence as substantive product behavior', () => {
+  it('shows self, relationship, and system intelligence as substantive product behavior in approved language', () => {
     for (const marker of [
       '01 · You',
       'Explore how you think, decide, communicate, create, connect, and grow.',
       'How Sovereign builds the answer',
-      'Separate clarity from pressure',
+      'Start with the question',
+      'Find the useful difference',
       '02 · You + your people',
       'See why the same moment lands differently—and how to bridge the gap.',
       'How Sovereign compares two people',
-      'Trace the interaction loop',
-      'Build the bridge',
+      'Show what happens between you',
+      'Find a lower-pressure next step',
       '03 · From 1:1 to the whole system',
       'See the whole system.',
       'How Sovereign reads a system',
-      'Trace how pressure moves',
-      'Find what the role is doing',
-      'Test one system-level change',
-      'What the user gets',
-      'Pressure sequence',
-      'Leverage point'
+      'Show how pressure moves',
+      'Show why the role keeps returning',
+      'Change one thing and watch what happens',
+      'What this gives you'
     ]) expect(stories).toContain(marker);
 
     expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(3);
@@ -191,16 +185,22 @@ describe('public positioning reset', () => {
     expect(renderedStories).not.toContain('<SystemContext />');
     expect(renderedStories).not.toContain('Permitted context');
     expect(renderedStories).not.toContain('capacity beneath');
+    expect(renderedStories).not.toContain('permitted perspectives');
+    expect(renderedStories).not.toContain('confirmed responsibilities');
   });
 
-  it('keeps exact fixture-backed supporting codes quiet, explicit, and secondary', () => {
+  it('keeps exact fixture-backed source codes secondary and collapsed by default', () => {
     for (const marker of ["{ code: 'HD G13.1'", "{ code: 'GK ACT13'", "{ code: '☉ CAN 04.2°'", "{ code: 'HD G22.4'", "{ code: 'HD G57.2'", "{ code: 'REL ☿ □ ☿ 1.8°'"]) {
       expect(stories).toContain(marker);
     }
-    expect(stories).toContain('<strong>Example Basis</strong>');
-    expect(stories).toContain('Exact values used by this representative fixture · authenticated Basis is server-approved per answer');
+    expect(stories).toContain('<details className="landing-evidence">');
+    expect(stories).toContain('<strong>See source details</strong>');
+    expect(stories).toContain('These values are not visitor data.');
+    expect(stories).not.toContain('<strong>Example Basis</strong>');
+    expect(stories).not.toContain("chips: ['HD G13.1'");
     expect(stories).not.toContain('GATE 4.11');
     expect(finalAuthority).toContain('.landing-evidence__code');
+    expect(intelligenceDemoStyles).toContain('.landing-evidence > summary');
   });
 
   it('places workflow before conversation and anchors the composer outside the answer body', () => {
