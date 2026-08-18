@@ -16,13 +16,13 @@ The archive is a design and component source. It is not the production applicati
 
 The root landing must preserve the archive’s recognizable sequence while using current approved language:
 
-1. Navigation branded `Sovereign` with How it works, Pricing, FAQ, Sign in, and Get started.
+1. Navigation branded `SOVEREIGN.OS` with How it works, Pricing, FAQ, Sign in, and Get started. The wordmark, header height, shell geometry, link scale, and account actions must remain visually consistent across root, standalone public pages, Privacy, Terms, and account-entry surfaces.
 2. Badge: `Personal AI for real life`.
 3. Hero:
    - `Healing isn’t optional.`
    - `Holding onto the pain is.`
-   - both lines use the active sans typography authority;
-   - hierarchy may use scale, weight, opacity, or a restrained outline treatment, but must not switch to the retired display serif;
+   - both lines use the active native sans typography authority;
+   - hierarchy may use scale, weight, opacity, or a restrained outline treatment, but must not switch to the retired display serif or rejected Optima treatment;
    - supporting copy immediately explains that Sovereign is private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
 4. Self exploration:
    - `Start with you` / `Explore yourself.` or current language inherited from `product-language-system.md`;
@@ -33,6 +33,7 @@ The root landing must preserve the archive’s recognizable sequence while using
    - section identity is `01 · You`;
    - demonstrate genuine self exploration from the supported Baseline facet universe;
    - chat example, quiet Basis metadata, and a visible step-by-step exploration structure;
+   - the demonstration must remain visible without IntersectionObserver/reveal-state success; motion is enhancement, never a content gate;
    - do not lead with internal `capacity` terminology or framework mechanics.
 6. Relationship demonstration:
    - section identity is `02 · You + your people`;
@@ -41,8 +42,9 @@ The root landing must preserve the archive’s recognizable sequence while using
 7. System demonstration:
    - section identity is `03 · From 1:1 to the whole system`;
    - `See the whole system.`;
-   - make consented people, supplied roles, permitted perspectives, confirmed responsibilities, pressure, observations, and interactions understandable across a family, team, household, or group;
+   - make consented people, supplied roles, permitted perspectives, confirmed responsibilities, pressure, constraints, observations, and interactions understandable across a family, team, household, or group;
    - do not make responsibility concentration the category headline for all Systems;
+   - do not treat `authority` or `missing perspective` as product intelligence dimensions;
    - do not reduce the system to decorative role cards or imply that one person causes the whole pattern.
 8. Comparison:
    - `Most AI starts with the prompt. Sovereign starts with you.`;
@@ -72,7 +74,7 @@ Port and maintain:
 - near-black, cream, white/gray line, spacing, radius, and depth language;
 - responsive behavior and reduced-motion treatment.
 
-`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. `Avenir Next` and the retired bundled `Sovereign Sans` are also excluded as title/heading authorities. Titles use the approved humanist Optima-first sans stack with native platform fallbacks. Legacy font assets may remain unused until separate cleanup, but no heading/title may resolve to them.
+`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. `Optima`, `Avenir Next`, and the retired bundled `Sovereign Sans` are also excluded as title/heading authorities. Titles use the approved native enterprise sans stack: Apple system/SF Pro Display on Apple platforms, Segoe Variable/Segoe on Windows, followed by system-ui and native sans fallbacks. Legacy font assets may remain unused until separate cleanup, but no heading/title may resolve to them.
 
 The refined product should not depend on electric blue, cyan glow, neon, generic AI gradients, or glassmorphism as primary UI language. Spectral color, where intentionally used, should behave like physical light rather than a generic interface accent.
 
@@ -153,13 +155,19 @@ The complete Vite foundation and final refinement are required:
 9. `apps/web/src/premium-action-authority-v1.css`
    - preserves editorial action language for navigation and low-emphasis actions while transactional authentication, onboarding, consent, billing, and account controls retain clear visible affordance.
 10. `apps/web/src/sans-typography-authority-v1.css`
-   - is appended after other inline authorities;
-   - is the terminal rendered typography authority;
-   - prevents legacy import order or selector specificity from restoring the retired display serif.
-11. Standalone public documents
+   - enforces the active native title family after legacy visual layers;
+   - prevents legacy import order or selector specificity from restoring retired/rejected title faces;
+   - does not own global heading dimensions.
+11. `apps/web/src/production-product-cohesion-v1.css`
+   - preserves private-product structure and launch-surface cohesion after typography family authority.
+12. `apps/web/src/production-visual-authority-v1.css`
+   - is the terminal inline presentation authority;
+   - owns final public/private proportions, shared navigation and wordmark geometry, product-demo visibility, policy-document hierarchy, restrained motion, and final interface presence;
+   - no later visual override may follow it.
+13. Standalone public documents
    - retain the deployed static foundations;
    - load `apps/web/public/premium-action-static-v1.css` last;
-   - that terminal static authority also enforces sans headings/titles.
+   - that terminal static authority enforces the same native title system, public header/wordmark geometry, and final static hierarchy.
 
 Removing or bypassing any one of these means the visual port is not sitewide.
 
@@ -184,9 +192,12 @@ A production release must fail unless all of the following are true:
 - active UI copy follows `docs/product-language-system.md` and excludes retired product-positioning language;
 - root marketing communicates You → You + your people → whole system before source mechanics;
 - the root landing does not use `foundation` as its Baseline metaphor or enumerate framework sources in its main narrative;
-- the terminal rendered typography authority is mounted after legacy visual layers;
-- active headings/titles resolve to the sans title system, never `Sovereign Display` or serif fallbacks;
+- the terminal rendered typography authority is mounted after legacy visual layers and the terminal production visual authority follows all other inline presentation authorities;
+- active headings/titles resolve to the native sans title system, never `Optima`, `Sovereign Display`, retired bundled faces, or serif fallbacks;
+- root/static/policy public navigation exposes the expected page-in/page-out destinations with one consistent `SOVEREIGN.OS` wordmark geometry;
+- product demonstrations remain visible without reveal-state success;
 - compiled CSS contains founder landing, real workspace/account, onboarding, policy, and access selectors;
+- Privacy and Terms render as disciplined documents rather than a generic card grid;
 - the final compiled presentation contains the near-black/cream refinement authority;
 - standalone public routes load the static terminal action/typography authority after route cohesion/refinement;
 - archive mock-runtime markers are absent;
