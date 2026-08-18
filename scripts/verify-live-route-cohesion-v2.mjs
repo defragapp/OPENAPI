@@ -24,7 +24,7 @@ const desktopProgressReplacement = "      verify(desktop);\n      console.log('[
 const mobileProgressMarker = "      verify(mobile);\n      results.push(mobile);";
 const mobileProgressReplacement = "      verify(mobile);\n      console.log('[route-cohesion] label=' + mobile.route + '/' + mobile.profile + ' status=pass');\n      results.push(mobile);";
 const serifTypographyMarker = "  assert(String(audit.typography.headingFamily).includes('Sovereign Display'), `${label}: heading is not using Sovereign Display (${audit.typography.headingFamily})`);";
-const sansTypographyReplacement = "  assert(['-apple-system', 'SF Pro Display', 'Segoe UI', 'system-ui', 'Helvetica Neue'].concat(['Optima', 'Candara']).some((family) => String(audit.typography.headingFamily).includes(family)), `${label}: heading is not using the approved humanist sans title stack (${audit.typography.headingFamily})`);";
+const sansTypographyReplacement = "  assert(['-apple-system', 'SF Pro Display', 'Segoe UI', 'system-ui', 'Helvetica Neue'].concat(['Optima', 'Candara']).some((family) => String(audit.typography.headingFamily).includes(family)), `${label}: heading is not using the approved humanist sans title stack with native sans title stack fallbacks (${audit.typography.headingFamily})`);";
 const reportMarker = `  console.log(JSON.stringify({
     ok: true,
     release: 'sovereign-deployed-route-cohesion-v1',
