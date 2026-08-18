@@ -24,6 +24,7 @@
     "verify:live-visual-release": "node scripts/verify-live-visual-release-v3.mjs",
     "verify:live-route-cohesion": "node scripts/verify-live-route-cohesion-v2.mjs",
     "scan:secrets": "node scripts/scan-secrets.mjs",
+    "scan:dependencies": "pnpm audit --audit-level=high",
     "smoke:sovereign": "node --import tsx scripts/worker-gateway-smoke.ts",
     "smoke:gateway": "node --import tsx scripts/cloudflare-gateway-smoke.ts",
     "smoke:worker-gateway": "node --import tsx scripts/worker-gateway-smoke.ts",
