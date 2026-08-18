@@ -62,9 +62,11 @@ A Baseline does not reveal an exact private thought, motive, or emotion. Relatio
 
 ### 3. From 1:1 to the whole system
 
-System intelligence expands from a single relationship to a family, household, friendship group, workplace, team, or other human system. Sovereign keeps each consented person distinct while bringing their supplied role, permitted Baseline-informed perspective, confirmed responsibilities, pressure, dependence, observations, and interactions into the same system view.
+System intelligence expands from a single relationship to a family, household, friendship group, workplace, team, or other human system. Sovereign keeps each consented person distinct while bringing their supplied role, permitted Baseline-informed perspective, confirmed responsibilities, pressure, constraints, observations, and interactions into the same system view.
 
 A system story must not be reduced to `where responsibility keeps landing`. Responsibility is one dimension among many. The public category is understanding how the whole system functions and how one person's experience changes inside it.
+
+`Authority` and `missing perspective` are not canonical product intelligence dimensions. Do not infer an absent person's perspective or turn non-participation into a hidden-state claim.
 
 ## What Baseline means publicly
 
@@ -289,7 +291,7 @@ Representative public questions may include:
 
 Heading:
 
-`Understand what happens between you.`
+`Understand both sides and what happens between you.`
 
 Description:
 
@@ -310,14 +312,14 @@ Heading:
 
 Description:
 
-`Move from one relationship to a family, household, team, or group. See the people, roles, perspectives, responsibilities, pressure, and patterns between them together.`
+`Move from one relationship to a family, household, team, or group. See the people, supplied roles, permitted perspectives, confirmed responsibilities, pressure, constraints, observations, interactions, and patterns between them together.`
 
 Representative public questions may include:
 
 - `What role am I actually playing in this family?`
 - `What changes when I stop playing the role everyone expects?`
 - `How does pressure move through this team?`
-- `Whose perspective is missing from this decision?`
+- `What changes when one person responds differently?`
 
 ### Root comparison
 
@@ -367,11 +369,15 @@ The FAQ may explain which frameworks contribute to Baseline Design, but the answ
 
 Do not render `Sovereign Display`, Georgia, Palatino, Iowan Old Style, Book Antiqua, or another serif as a heading/title fallback anywhere in the active product or public site.
 
-The approved rendered title stack is humanist sans with `Optima` first where available, followed by Helvetica Neue/SF, Candara/Noto Sans/Segoe, system-ui, and native fallbacks. `Avenir Next`, the retired bundled `Sovereign Sans`, and `Sovereign Display` are not title or heading authorities.
+The approved rendered title stack is native enterprise sans: Apple system/SF Pro Display first on Apple platforms, Segoe Variable/Segoe on Windows, followed by system-ui and native sans fallbacks. `Optima`, `Avenir Next`, the retired bundled `Sovereign Sans`, and `Sovereign Display` are not title or heading authorities.
 
-Typography authority sets the family, not a universal heading size. Page and component composition own title scale, line height, wrapping, spacing, and responsive behavior.
+Typography authority sets the family, not a universal heading size. Page and component composition own title scale, line height, wrapping, spacing, and responsive behavior. `production-visual-authority-v1.css` owns final presentation after the family authority.
 
-Headings, titles, product labels, and body text use the approved sans system. Hierarchy comes from scale, weight, spacing, opacity, and layout—not from switching to a serif display face.
+Headings, titles, product labels, and body text use the approved sans system. Hierarchy comes from scale, weight, spacing, opacity, and layout—not from switching to a decorative display face.
+
+Public `SOVEREIGN.OS` wordmark geometry is sitewide: root, standalone public pages, Privacy/Terms, and account-entry surfaces must use the same header height, wordmark font size, weight, tracking, and shell alignment.
+
+Product demonstrations must remain understandable when motion or reveal observers do not run. Motion may enhance progression but must never hide the primary product proof.
 
 The bundled legacy display font file may remain in the repository only as an unused historical asset until a separate cleanup removes it. It must not be referenced by active CSS.
 
@@ -414,13 +420,13 @@ Explore:
 
 People:
 
-- `Understand what happens between you.`
+- `Understand both sides and what happens between you.`
 - `Keep each person distinct, then examine the interaction itself.`
 
 Systems:
 
 - `See the whole system.`
-- `Keep each consented person distinct while roles, perspectives, confirmed responsibilities, pressure, and interactions stay in view.`
+- `Keep each consented person distinct while supplied roles, permitted perspectives, confirmed responsibilities, pressure, constraints, observations, and interactions stay in view.`
 
 Library:
 
@@ -474,7 +480,9 @@ Never use these as active product/interface language:
 - generic variants such as `What would you like to explore?`, `Ask anything.`, or `Tell me what's on my mind.`;
 - `what is supported, interpreted, and still unknown` as a product explanation;
 - `support, interpretation, and unknowns distinguishable` as user-facing value language;
-- `server-confirmed Stripe subscription state` in customer-facing billing copy.
+- `server-confirmed Stripe subscription state` in customer-facing billing copy;
+- `authority` or `missing perspective` as canonical Systems intelligence dimensions;
+- questions that infer an absent person's perspective merely because that person is not participating.
 
 Also avoid:
 
