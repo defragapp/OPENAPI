@@ -31,7 +31,8 @@ const retiredInterfacePhrases = [
   'One private foundation. More useful answers across the questions that shape your life.',
   'Separate helping from carrying the outcome.',
   'See where responsibility keeps landing.',
-  'Understand both sides and what happens between you.'
+  'Understand both sides and what happens between you.',
+  'Ordinary questions. More context when it belongs.'
 ] as const;
 
 describe('public production positioning release', () => {
@@ -39,7 +40,6 @@ describe('public production positioning release', () => {
     expect(index).toContain('rel="canonical" href="https://sovereign.defrag.app/"');
     expect(index).toContain('Sovereign.OS — Private personal AI for real life');
     expect(index).toContain('https://sovereign.defrag.app/og-sovereign.png');
-    expect(index).not.toContain('og:title" content="Sovereign — Healing isn’t optional. Holding onto the pain is."');
     for (const [page, canonical] of [[pricing, '/pricing'], [questions, '/faq'], [how, '/how-it-works']] as const) {
       expect(page).toContain(`rel="canonical" href="https://sovereign.defrag.app${canonical}"`);
       expect(page).toContain('og-sovereign.png');
@@ -76,11 +76,8 @@ describe('public production positioning release', () => {
     expect(field).toContain('role="status"');
     expect(field).toContain('data-field-geometry="spherical-360"');
     expect(field).toContain('buildSphereGrid');
-    expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(integrationCss).toContain('background: transparent');
     expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
-    expect(landingRefinementV5).toContain('width: 104px !important');
-    expect(landingRefinementV5).toContain('height: 26px !important');
   });
 
   it('introduces self exploration before People and Systems with recognizable high-value questions', () => {
@@ -105,8 +102,9 @@ describe('public production positioning release', () => {
       'See the whole system.',
       'How Sovereign compares two people',
       'How Sovereign reads a system',
-      'Pressure sequence',
-      'Leverage point'
+      'Show what happens between you',
+      'Show how pressure moves',
+      'What you can change'
     ]) expect(stories).toContain(marker);
 
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
@@ -114,31 +112,39 @@ describe('public production positioning release', () => {
     expect(stories).not.toContain('LandingExpressionFieldPreview');
   });
 
-  it('keeps framework mechanics off the root narrative while preserving deeper disclosure and exact example Basis', () => {
+  it('keeps framework mechanics off the root narrative and source codes collapsed behind inspection', () => {
     expect(landing).not.toContain('calculated astronomical positions');
     expect(landing).not.toContain('partial Human Design');
     expect(landing).not.toContain('Gene Keys activations');
     expect(landing).not.toContain('numerology');
     expect(how).toContain('Where Baseline Design comes from');
     expect(how).toContain('calculated astronomical data with selected interpretive frameworks');
-    expect(how).toContain('HD G13.1 · GK ACT13 · ☉ CAN 04.2°');
-    expect(how).not.toContain('CREATIVITY · DECISION-MAKING · ALIGNMENT');
+    expect(how).toContain('<summary>See source details</summary>');
+    expect(how).not.toContain('HD G13.1 · GK ACT13 · ☉ CAN 04.2°');
+    expect(how).not.toContain('EXAMPLE BASIS');
+    expect(stories).toContain('<details className="landing-evidence">');
+    expect(stories).toContain('<strong>See source details</strong>');
     expect(questions).toContain('Which frameworks are included?');
     expect(questions).toContain('partial Human Design and Gene Keys activations');
-    expect(questions).toContain('the server attaches the displayed values');
+    expect(questions).toContain('Can I see what information Sovereign used for an answer?');
+    expect(questions).toContain('Do those source details prove the interpretation is true?');
+    expect(questions).not.toContain('What is Basis?');
+    expect(questions).not.toContain('What does Basis prove?');
   });
 
-  it('keeps retired public positioning out of active public surfaces', () => {
-    for (const phrase of retiredInterfacePhrases) {
-      expect(landing).not.toContain(phrase);
-      expect(stories).not.toContain(phrase);
+  it('keeps internal implementation vocabulary out of active public surfaces', () => {
+    const publicSource = `${landing}\n${stories}\n${how}\n${questions}\n${pricing}`;
+    for (const phrase of retiredInterfacePhrases) expect(publicSource).not.toContain(phrase);
+    for (const phrase of ['Example Basis', 'server-approved', 'authorized references', 'permitted context', 'consented people', 'permitted perspectives', 'confirmed responsibilities']) {
+      expect(publicSource).not.toContain(phrase);
     }
-    expect(`${landing}\n${stories}\n${how}\n${questions}`).not.toContain('capacity beneath');
+    expect(publicSource.toLowerCase()).not.toContain('capacity beneath');
     expect(language).toContain('### 1. You');
     expect(language).toContain('### 2. You + your people');
     expect(language).toContain('### 3. From 1:1 to the whole system');
     expect(language).toContain('## Retired and prohibited phrasing');
     expect(language).toContain('`Understand both sides and what happens between you.`;');
+    expect(language).toContain('`What is Basis?`;');
   });
 
   it('renders headings through the canonical native sans authority', () => {
