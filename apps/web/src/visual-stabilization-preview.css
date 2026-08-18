@@ -1,0 +1,314 @@
+/*
+ * PREVIEW ONLY — visual stabilization pass.
+ * Off-production branch. This file must be consolidated into the existing
+ * terminal authority before any approved merge.
+ */
+
+.public-approved-v8 {
+  --stabilized-line: rgba(240, 234, 226, 0.115);
+  --stabilized-line-strong: rgba(240, 234, 226, 0.19);
+  --stabilized-glow: rgba(124, 154, 196, 0.09);
+}
+
+/* Keep the existing product structure. Tighten the public shell only. */
+.public-approved-v8 .v0-hero.sovereign-opening-field {
+  min-height: 620px !important;
+  padding-top: 58px !important;
+  padding-bottom: 58px !important;
+  gap: clamp(48px, 6vw, 78px) !important;
+}
+
+.public-approved-v8 .v0-hero-content {
+  max-width: 530px !important;
+}
+
+.public-approved-v8 .v0-hero h1 > span {
+  font-size: clamp(3.15rem, 4.5vw, 4.55rem) !important;
+  font-weight: 690 !important;
+  line-height: 0.97 !important;
+  letter-spacing: -0.045em !important;
+}
+
+.public-approved-v8 .v0-hero h1 > em {
+  margin-top: 5px !important;
+  font-size: clamp(2.6rem, 3.65vw, 3.6rem) !important;
+  font-weight: 390 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.038em !important;
+}
+
+.public-approved-v8 .sovereign-opening-copy {
+  max-width: 50ch !important;
+  font-size: 0.96rem !important;
+  line-height: 1.58 !important;
+}
+
+.public-approved-v8 .landing-expression-slice {
+  width: min(520px, 42vw) !important;
+  height: 520px !important;
+  min-height: 520px !important;
+  max-height: 520px !important;
+}
+
+/* No decorative icon language on the public landing. */
+.public-approved-v8 :is(
+  .sovereign-capability-icon,
+  .v0-mobile-lock,
+  .landing-workflow__copy + svg,
+  .landing-workflow button > i,
+  .v0-comparison-panel li > span,
+  .landing-demo__traffic
+) {
+  display: none !important;
+}
+
+.public-approved-v8 .sovereign-opening-trust {
+  padding-left: 0 !important;
+  gap: 0 !important;
+}
+
+/* Questions teach the product without looking like a prompt widget. */
+.public-approved-v8 .landing-question-orbit {
+  padding-top: 54px !important;
+  padding-bottom: 58px !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage {
+  min-height: 92px !important;
+  padding: 18px 0 16px !important;
+  border: 0 !important;
+  border-top: 1px solid var(--stabilized-line) !important;
+  border-bottom: 1px solid var(--stabilized-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage > span > strong {
+  font-size: clamp(1.15rem, 1.45vw, 1.36rem) !important;
+  font-weight: 530 !important;
+}
+
+/* Product demonstrations: continuous enterprise thread, not rounded cards. */
+.public-approved-v8 .landing-story {
+  padding-top: 72px !important;
+  padding-bottom: 78px !important;
+}
+
+.public-approved-v8 .landing-story__shell {
+  position: relative !important;
+}
+
+.public-approved-v8 .landing-story__stage {
+  position: relative !important;
+  isolation: isolate !important;
+  gap: 16px !important;
+}
+
+.public-approved-v8 .landing-story__stage::before {
+  position: absolute !important;
+  z-index: -1 !important;
+  inset: 8% 5% !important;
+  content: '' !important;
+  pointer-events: none !important;
+  background: radial-gradient(ellipse at center, var(--stabilized-glow), transparent 68%) !important;
+  filter: blur(28px) !important;
+  opacity: 0.8 !important;
+}
+
+.public-approved-v8 .landing-demo,
+.public-approved-v8 .landing-story .landing-demo,
+.public-approved-v8 .landing-story[data-visible="true"] .landing-demo {
+  border: 1px solid var(--stabilized-line) !important;
+  border-radius: 2px !important;
+  background: rgba(13, 16, 20, 0.82) !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.26) !important;
+}
+
+.public-approved-v8 .landing-demo__bar {
+  min-height: 40px !important;
+  padding-inline: 14px !important;
+  border-bottom-color: var(--stabilized-line) !important;
+  font-size: 0.66rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.035em !important;
+}
+
+.public-approved-v8 .landing-demo__body {
+  gap: 0 !important;
+  padding: 8px 22px 18px !important;
+}
+
+.public-approved-v8 .landing-message {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 15px 0 !important;
+  border-bottom: 1px solid rgba(240, 234, 226, 0.075) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.58 !important;
+}
+
+.public-approved-v8 .landing-message--user {
+  max-width: 100% !important;
+}
+
+.public-approved-v8 .landing-message--user > div {
+  position: relative !important;
+  max-width: 82% !important;
+  margin-left: auto !important;
+  padding: 0 0 0 22px !important;
+  border: 0 !important;
+  border-left: 1px solid rgba(222, 200, 174, 0.5) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: rgba(244, 240, 233, 0.94) !important;
+  box-shadow: none !important;
+}
+
+.public-approved-v8 .landing-message--assistant > div {
+  max-width: 94% !important;
+  padding: 0 !important;
+  color: rgba(239, 233, 225, 0.78) !important;
+}
+
+.public-approved-v8 .landing-evidence {
+  padding-top: 9px !important;
+  border-top-color: rgba(240, 234, 226, 0.07) !important;
+  font-size: 0.64rem !important;
+  letter-spacing: 0.045em !important;
+}
+
+.public-approved-v8 .landing-composer {
+  min-height: 42px !important;
+  border-top: 0 !important;
+  border-bottom: 1px solid var(--stabilized-line) !important;
+  border-radius: 0 !important;
+}
+
+/* Motion is tied to the thread sequence, not decorative UI chrome. */
+.public-approved-v8 .landing-story[data-visible="true"] .landing-message,
+.public-approved-v8 .landing-story[data-visible="true"] .landing-composer,
+.public-approved-v8 .landing-story[data-visible="true"] .landing-evidence {
+  animation: stabilized-thread-reveal 520ms cubic-bezier(.22,.72,.18,1) both !important;
+}
+
+.public-approved-v8 .landing-story[data-visible="true"] .landing-message:nth-child(2) { animation-delay: 90ms !important; }
+.public-approved-v8 .landing-story[data-visible="true"] .landing-message:nth-child(3) { animation-delay: 180ms !important; }
+.public-approved-v8 .landing-story[data-visible="true"] .landing-message:nth-child(4) { animation-delay: 270ms !important; }
+.public-approved-v8 .landing-story[data-visible="true"] .landing-composer { animation-delay: 330ms !important; }
+
+/* Reasoning/context stays linear and readable. */
+.public-approved-v8 .landing-workflow {
+  padding: 0 18px 14px !important;
+}
+
+.public-approved-v8 .landing-workflow > li,
+.public-approved-v8 .landing-context-view section,
+.public-approved-v8 .landing-context-distinction {
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.public-approved-v8 .landing-workflow > li {
+  min-height: 76px !important;
+}
+
+.public-approved-v8 .landing-workflow > li.is-active {
+  background: linear-gradient(90deg, rgba(185, 151, 114, 0.055), transparent 68%) !important;
+}
+
+.public-approved-v8 .landing-context-view section,
+.public-approved-v8 .landing-context-distinction {
+  border-width: 0 0 1px !important;
+  border-color: var(--stabilized-line) !important;
+}
+
+/* Comparison: typography and rules, not feature cards. */
+.public-approved-v8 .v0-comparison {
+  padding-top: 74px !important;
+  padding-bottom: 78px !important;
+}
+
+.public-approved-v8 .v0-comparison-panel {
+  padding: 22px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid var(--stabilized-line-strong) !important;
+  border-bottom: 1px solid var(--stabilized-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.public-approved-v8 .v0-comparison-panel li {
+  padding-left: 0 !important;
+}
+
+.public-approved-v8 .v0-final {
+  padding-top: 78px !important;
+  padding-bottom: 88px !important;
+}
+
+/* Keep navigation actions typographic, never pill/box treatment. */
+.public-approved-v8 :is(.v0-sign-in, .v0-get-started) {
+  padding-inline: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.public-approved-v8 .v0-get-started {
+  color: rgba(244, 240, 233, 0.9) !important;
+  border-bottom: 1px solid rgba(222, 200, 174, 0.36) !important;
+}
+
+@keyframes stabilized-thread-reveal {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@media (max-width: 760px) {
+  .public-approved-v8 .v0-hero.sovereign-opening-field {
+    min-height: 0 !important;
+    padding-top: 42px !important;
+    padding-bottom: 44px !important;
+  }
+
+  .public-approved-v8 .v0-hero h1 > span {
+    font-size: clamp(2.55rem, 11.8vw, 3.55rem) !important;
+  }
+
+  .public-approved-v8 .v0-hero h1 > em {
+    font-size: clamp(2.15rem, 9.7vw, 3rem) !important;
+  }
+
+  .public-approved-v8 .sovereign-opening-capabilities a {
+    padding-left: 0 !important;
+  }
+
+  .public-approved-v8 .landing-story {
+    padding-top: 56px !important;
+    padding-bottom: 60px !important;
+  }
+
+  .public-approved-v8 .landing-demo__body {
+    padding-inline: 16px !important;
+  }
+
+  .public-approved-v8 .landing-message--user > div,
+  .public-approved-v8 .landing-message--assistant > div {
+    max-width: 100% !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-approved-v8 .landing-story[data-visible="true"] :is(
+    .landing-message,
+    .landing-composer,
+    .landing-evidence
+  ) {
+    animation: none !important;
+  }
+}
