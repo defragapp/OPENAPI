@@ -86,6 +86,25 @@ describe('same-origin mutation policy', () => {
     }))).not.toThrow();
   });
 
+  it('allows an explicit non-browser bearer mutation without ambient cookies', () => {
+    expect(() => requireSameOrigin(new Request('https://app.defrag.app/api/v1/library', {
+      method: 'POST',
+      headers: { authorization: 'Bearer signed-session-token' }
+    }))).not.toThrow();
+  });
+
+  it('does not let a bearer header bypass browser cookie origin requirements', () => {
+    const error = capturedThrow(() => requireSameOrigin(new Request('https://app.defrag.app/api/v1/library', {
+      method: 'POST',
+      headers: {
+        authorization: 'Bearer signed-session-token',
+        cookie: '__Host-sovereign_session=ambient-cookie'
+      }
+    })));
+    expect(error).toBeInstanceOf(Response);
+    expect((error as Response).status).toBe(403);
+  });
+
   it('rejects a cross-origin mutation even when the request is otherwise valid', () => {
     const error = capturedThrow(() => requireSameOrigin(new Request('https://app.defrag.app/api/v1/account/export', {
       method: 'POST',
