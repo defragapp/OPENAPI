@@ -24,18 +24,30 @@ describe('public evidence contract', () => {
     }
   });
 
-  it('keeps relationship and system evidence permission-safe and confirmable', () => {
-    expect(stories).toContain('With permission, Sovereign keeps each person distinct');
-    expect(stories).toContain('Illustrative shared context · Permission required · No compatibility score · No private-thought claims');
-    expect(stories).toContain('Sanitized supplied system context · Each person controls what may be included');
-    expect(stories).toContain('Keeping both people distinct');
-    expect(stories).toContain('Shared with permission');
-    expect(stories).toContain('Illustrative supplied context');
+  it('keeps relationship and system examples permission-safe while translating implementation language for users', () => {
+    expect(stories).toContain('With permission, Sovereign can use both people’s Baselines while keeping each person distinct.');
+    expect(stories).toContain('Both people must agree before their Baselines can be used together');
+    expect(stories).toContain('Each person controls whether their Baseline can be included');
+    expect(stories).toContain('Keep each person separate');
+    expect(stories).toContain('Do not guess private feelings');
+    expect(stories).toContain('What you told Sovereign');
     expect(stories).not.toContain('Illustrative permitted Baselines');
     expect(stories).not.toContain('Permitted context');
+    expect(stories).not.toContain('permitted perspectives');
+    expect(stories).not.toContain('confirmed responsibilities');
     expect(field).toContain('not a diagnosis, score, or claim about anyone’s internal state');
     expect(fixture).toContain('not a score or a verdict about the person');
     expect(fixture).toContain('without determining behavior');
+  });
+
+  it('keeps exact example source values available but collapsed behind plain user language', () => {
+    expect(stories).toContain('<details className="landing-evidence">');
+    expect(stories).toContain('<strong>See source details</strong>');
+    expect(stories).toContain('Example data used in this demonstration. These values are not visitor data.');
+    expect(stories).toContain("{ code: 'HD G13.1'");
+    expect(stories).toContain("{ code: 'REL ☿ □ ☿ 1.8°'");
+    expect(stories).not.toContain('<strong>Example Basis</strong>');
+    expect(stories).not.toContain("chips: ['HD G13.1'");
   });
 
   it('keeps the outlined hero line visible at normal viewport scale', () => {
