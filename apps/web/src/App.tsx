@@ -17,19 +17,19 @@ const consentScopes = [
   ['pair.compare', 'Compare together'],
   ['system.include', 'Include in a system'],
   ['trait.display', 'Use shared Baseline traits'],
-  ['framework.display', 'Show optional source detail'],
+  ['framework.display', 'Show optional source details'],
   ['current_conditions.use', 'Use current conditions'],
   ['library.link', 'Link a saved understanding'],
   ['covenant.include', 'Include in a Scripture lens']
 ] as const;
 
 const consentScopeDescriptions: Record<string, string> = {
-  'pair.compare': 'Compare the two permitted Baselines while keeping each person distinct.',
+  'pair.compare': 'Compare the two Baselines only after both people agree, while keeping each person distinct.',
   'system.include': 'Include this person in a family, household, friendship, or team view.',
   'trait.display': 'Use the plain-language themes this person chose to share.',
-  'framework.display': 'Show optional supporting framework detail.',
-  'current_conditions.use': 'Include temporary current context for this person.',
-  'library.link': 'Use a saved understanding as shared context.',
+  'framework.display': 'Show optional source details this person chose to share.',
+  'current_conditions.use': 'Include temporary current conditions for this person.',
+  'library.link': 'Use a saved understanding this person chose to share.',
   'covenant.include': 'Include this person only when the optional Covenant lens is on.'
 };
 
@@ -285,7 +285,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
                     <input type="checkbox" checked={ageEligible} onChange={(event) => { setAgeEligible(event.target.checked); setFieldErrors((current) => ({ ...current, eligibility: undefined })); }} aria-invalid={Boolean(fieldErrors.eligibility)} />
                     <span>I confirm I am 18 or older.</span>
                   </label>
-                  <p className="account-policy-notice">Your name and email operate your private account. Sovereign also hashes limited request metadata for account security and abuse prevention. <a href={POLICY_METADATA.privacy.path}>See how information is handled.</a></p>
+                  <p className="account-policy-notice">Your name and email operate your private account. Sovereign uses limited request information to protect your account and prevent abuse. <a href={POLICY_METADATA.privacy.path}>See how information is handled.</a></p>
                 </>
               )}
               {fieldErrors.terms && <p className="field-error">{fieldErrors.terms}</p>}
@@ -402,7 +402,7 @@ function InvitationPage() {
         body: JSON.stringify({ granted })
       });
       if (!response.ok) {
-        setState('That decision could not be saved safely. Nothing changed.');
+        setState('That decision could not be saved. Nothing changed.');
         return;
       }
       setDecisions((current) => ({ ...current, [scope]: granted ? 'granted' : 'denied' }));
@@ -423,16 +423,16 @@ function InvitationPage() {
     <main className="account-shell invitation-shell">
       <a className="wordmark" href="/">SOVEREIGN.OS</a>
       <section className="auth-panel" data-invitation-state={invitationState} aria-labelledby="invitation-title">
-        <p className="eyebrow">PRIVATE CONSENT</p>
+        <p className="eyebrow">SHARING CHOICES</p>
         <h1 id="invitation-title">Choose what this connection may use.</h1>
-        <p className="lede">An invitation does not grant blanket access. Review each requested use separately; you can change your choices later.</p>
+        <p className="lede">Accepting an invitation does not automatically share everything. Review each requested use separately; you can change your choices later.</p>
         <div className={`status-note ${statusTone}`} role={phase === 'error' ? 'alert' : 'status'} aria-live="polite"><span>{state}</span></div>
 
         {!invitation && (
           <section className="invitation-state" aria-busy={phase === 'loading'}>
             <span>{phase === 'loading' ? 'Checking invitation' : 'Invitation unavailable'}</span>
             <h2>{phase === 'loading' ? 'Opening the private request.' : 'This request cannot be opened.'}</h2>
-            <p>{phase === 'loading' ? 'Sovereign.OS is confirming the invitation before showing any requested use.' : 'No permission was granted and no account information was changed.'}</p>
+            <p>{phase === 'loading' ? 'Sovereign.OS is checking the invitation before showing what was requested.' : 'No permission was granted and no account information was changed.'}</p>
             {phase === 'error' && <a href="/login">Sign in to Sovereign.OS</a>}
           </section>
         )}
@@ -440,8 +440,8 @@ function InvitationPage() {
         {invitation && !accepted && (
           <div className="form-stack">
             <div className="usage-card">
-              <div><span>Shared relationship record</span><strong>{invitation.displayName || 'Private connection'}</strong></div>
-              <p>No raw birth input or exact private location is shared with the other account.</p>
+              <div><span>Private connection</span><strong>{invitation.displayName || 'Private connection'}</strong></div>
+              <p>Your birth details and exact private location are not shown to the other person.</p>
             </div>
             <section className="scope-panel">
               <div><p className="eyebrow">REQUESTED USES</p><h3>Review before accepting.</h3></div>
@@ -471,7 +471,7 @@ function InvitationPage() {
                 );
               })}
             </div>
-            <p className="consent-completion-note">Every requested use needs its own decision before the shared workspace opens.</p>
+            <p className="consent-completion-note">Every requested use needs its own decision before you continue.</p>
             <button className="primary-button" disabled={!completed || Boolean(savingScope)} onClick={() => location.assign('/app')}>Open Sovereign.OS</button>
           </section>
         )}
@@ -499,7 +499,7 @@ function scopeLabel(scope: string): string {
 }
 
 function scopeDescription(scope: string): string {
-  return consentScopeDescriptions[scope] ?? 'Use only the context covered by this permission.';
+  return consentScopeDescriptions[scope] ?? 'Use only what this choice allows.';
 }
 
 function Field({ label, children, error }: { label: string; children: ReactNode; error?: string | undefined }) {
