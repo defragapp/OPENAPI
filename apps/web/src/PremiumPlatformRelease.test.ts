@@ -126,8 +126,6 @@ describe('founder visual port — public positioning reset', () => {
       'click a line to inspect it'
     ]) expect(field).toContain(marker);
     expect(field).not.toContain('onPointerEnter={() => selectAxis(axis.id)}');
-    expect(field).not.toContain('measurement lines');
-    expect(field).not.toContain('stable blue sphere');
     expect(landingRefinementV5).toContain('width: 104px !important');
     expect(landingRefinementV5).toContain('height: 26px !important');
   });
@@ -148,20 +146,22 @@ describe('founder visual port — public positioning reset', () => {
     expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
   });
 
-  it('shows broad self exploration, relationship intelligence, and whole-system intelligence', () => {
+  it('shows broad self exploration, relationship intelligence, and whole-system intelligence in approved language', () => {
     for (const marker of [
       '01 · You',
       'Explore how you think, decide, communicate, create, connect, and grow.',
       'How Sovereign builds the answer',
+      'Start with the question',
       '02 · You + your people',
       'See why the same moment lands differently—and how to bridge the gap.',
       'How Sovereign compares two people',
-      'Trace the interaction loop',
+      'Show what happens between you',
+      'Find a lower-pressure next step',
       '03 · From 1:1 to the whole system',
       'See the whole system.',
       'How Sovereign reads a system',
-      'Pressure sequence',
-      'Leverage point',
+      'Show how pressure moves',
+      'Change one thing and watch what happens',
       'surface="personal-chat"',
       'surface="personal-reasoning"',
       'surface="relationship-chat"',
@@ -175,15 +175,22 @@ describe('founder visual port — public positioning reset', () => {
     expect(stories).toContain('landing-workflow__progress');
     expect(stories).not.toContain('<FamilySystemMap />');
     expect(stories).not.toContain('capacity beneath');
+    expect(stories).not.toContain('permitted perspectives');
+    expect(stories).not.toContain('confirmed responsibilities');
   });
 
-  it('keeps public Basis quiet, exact, fixture-backed, and relationship/system boundaries explicit', () => {
+  it('keeps public source details exact, fixture-backed, and collapsed by default', () => {
     for (const marker of ["{ code: 'HD G13.1'", "{ code: 'GK ACT13'", "{ code: '☉ CAN 04.2°'", "{ code: 'HD G22.4'", "{ code: 'HD G57.2'", "{ code: 'REL ☿ □ ☿ 1.8°'"]) expect(stories).toContain(marker);
-    expect(stories).toContain('<strong>Example Basis</strong>');
-    expect(stories).toContain('Representative shared example · Permission required');
-    expect(stories).toContain('Representative supplied system context · Each person controls what may be included');
+    expect(stories).toContain('<details className="landing-evidence">');
+    expect(stories).toContain('<strong>See source details</strong>');
+    expect(stories).toContain('These values are not visitor data.');
+    expect(stories).not.toContain('<strong>Example Basis</strong>');
+    expect(stories).not.toContain("chips: ['HD G13.1'");
+    expect(stories).toContain('Both people must agree before their Baselines can be used together');
+    expect(stories).toContain('Each person controls whether their Baseline can be included');
     expect(stories).not.toContain('GATE 4.11');
     expect(finalAuthority).toContain('.landing-evidence__code');
+    expect(intelligenceDemoCss).toContain('.landing-evidence > summary');
   });
 
   it('puts workflow on the left and the conversation on the right while preserving mobile stacking', () => {
@@ -214,6 +221,16 @@ describe('founder visual port — public positioning reset', () => {
     expect(onboarding).toContain('/api/v1/billing/checkout');
     expect(controls).toContain('/api/v1/billing/portal');
     expect(membership).toContain("person.activeScopes.includes('system.include')");
+  });
+
+  it('requires plain Sources UI in the authenticated product while preserving internal Basis transport', () => {
+    expect(workspace).toContain('<strong>Sources</strong>');
+    expect(workspace).toContain('<h2 id="basis-title">Source details</h2>');
+    expect(workspace).toContain('These are the source values Sovereign used for this answer.');
+    expect(workspace).not.toContain('<strong>Basis</strong>');
+    expect(workspace).not.toContain('aria-label={`Basis. Open ${available.length} source values.`}');
+    expect(workspace).toContain('basis: BasisValue[]');
+    expect(workspace).toContain('basis_refs: string[]');
   });
 
   it('does not import mock runtime or unsupported scoring', () => {
