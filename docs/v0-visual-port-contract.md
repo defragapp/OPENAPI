@@ -72,7 +72,7 @@ Port and maintain:
 - near-black, cream, white/gray line, spacing, radius, and depth language;
 - responsive behavior and reduced-motion treatment.
 
-`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. `Avenir Next` and the retired bundled `Sovereign Sans` are also excluded as title/heading authorities. Titles use the native platform sans stack. Legacy font assets may remain unused until separate cleanup, but no heading/title may resolve to them.
+`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. `Avenir Next` and the retired bundled `Sovereign Sans` are also excluded as title/heading authorities. Titles use the approved Helvetica Neue-first sans stack with native platform fallbacks. Legacy font assets may remain unused until separate cleanup, but no heading/title may resolve to them.
 
 The refined product should not depend on electric blue, cyan glow, neon, generic AI gradients, or glassmorphism as primary UI language. Spectral color, where intentionally used, should behave like physical light rather than a generic interface accent.
 

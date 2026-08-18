@@ -104,11 +104,13 @@ describe('public positioning reset', () => {
     expect(typography).toContain('--font-display: var(--font-title);');
     expect(typography).toContain('--serif: var(--font-title);');
     expect(typography).not.toContain('"Sovereign Sans"');
-    expect(typography).toContain('"SF Pro Display"');
+    expect(typography).toContain('"Helvetica Neue"');
+    expect(typography.indexOf('"Helvetica Neue"')).toBeLessThan(typography.indexOf('"SF Pro Display"'));
     expect(typography).not.toContain('Avenir Next');
     expect(sansAuthority).not.toContain('"Sovereign Sans"');
     expect(sansAuthority).not.toContain('Avenir Next');
-    expect(sansAuthority).toContain('"SF Pro Display"');
+    expect(sansAuthority).toContain('"Helvetica Neue"');
+    expect(sansAuthority.indexOf('"Helvetica Neue"')).toBeLessThan(sansAuthority.indexOf('"SF Pro Display"'));
     expect(sansAuthority).not.toContain('PREMIUM_TITLE_SCALE_V2');
 
     expect(sansAuthority).toContain('The retired display serif must not render anywhere in the active product.');
@@ -119,6 +121,10 @@ describe('public positioning reset', () => {
     expect(landingRefinementV5).toContain('font-family: inherit !important');
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
+    expect(landingRefinementV5).toContain('LANDING_TYPE_COMPOSITION_RECOVERY_V6');
+    expect(landingRefinementV5).toContain('font-size: clamp(3.6rem, 5.7vw, 5.65rem) !important;');
+    expect(landingRefinementV5).toContain('font-size: clamp(2.15rem, 3.15vw, 3.15rem) !important;');
+    expect(landingRefinementV5).toContain('font-size: clamp(2.8rem, 4.25vw, 4.2rem) !important;');
   });
 
   it('keeps one interactive line field with click-led minimal endpoint inspection', () => {
