@@ -47,7 +47,11 @@ export function AccountControlCenter() {
       : {};
     if (!response.ok) {
       const retry = Number(response.headers.get('retry-after') ?? body.retryAfterSeconds ?? 0);
-      throw new Error(response.status === 429 && retry > 0 ? `Try again in ${retry} seconds.` : body.message || body.error || 'That request could not be completed.');
+      if (response.status === 429 && retry > 0) throw new Error(`Try again in ${retry} seconds.`);
+      if (response.status === 403) throw new Error('That action is not available for this account.');
+      if (response.status === 404) throw new Error('That item is no longer available.');
+      if (response.status >= 500) throw new Error('Sovereign.OS could not complete that request. Try again in a moment.');
+      throw new Error('That request could not be completed.');
     }
     return body;
   }
@@ -148,7 +152,7 @@ export function AccountControlCenter() {
   async function downloadPrivateExport() {
     if (loading) return;
     setLoading(true);
-    setStatus('Preparing your private account export…');
+    setStatus('Preparing your data download…');
     try {
       const response = await fetch('/api/v1/account/export', {
         method: 'POST',
@@ -159,10 +163,7 @@ export function AccountControlCenter() {
         location.assign(`/login?returnTo=${encodeURIComponent(location.pathname + location.search)}`);
         return;
       }
-      if (!response.ok) {
-        const problem = await response.json().catch(() => ({})) as Json;
-        throw new Error(problem.message || problem.error || 'Your export could not be generated.');
-      }
+      if (!response.ok) throw new Error('Your data could not be prepared. Try again.');
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
@@ -172,9 +173,9 @@ export function AccountControlCenter() {
       anchor.click();
       anchor.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 0);
-      setStatus('Private account export downloaded. Sovereign did not retain an export copy.');
+      setStatus('Your data download is ready. Sovereign did not keep a separate copy.');
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Your export could not be generated.');
+      setStatus(error instanceof Error ? error.message : 'Your data could not be prepared. Try again.');
     } finally {
       setLoading(false);
     }
@@ -238,7 +239,7 @@ export function AccountControlCenter() {
         }}>
           <section className="account-control-dialog" role="dialog" aria-modal="true" aria-labelledby="account-control-title">
             <header><div><p>YOUR CONTROL</p><h2 id="account-control-title">Account & Library</h2></div><button onClick={() => setOpen(false)} aria-label="Close account controls">×</button></header>
-            <p className="account-control-intro">Manage privacy, invitations, saved understandings, billing, permissions, and deletion without searching through separate product areas.</p>
+            <p className="account-control-intro">Manage privacy, invitations, saved understandings, billing, sharing, and account deletion in one place.</p>
             <p className="account-control-status" role="status" aria-live="polite">{status}</p>
 
             <nav className="account-control-links" aria-label="Account links">
@@ -254,10 +255,10 @@ export function AccountControlCenter() {
             <section className="account-control-section privacy-data-section">
               <div className="account-section-heading">
                 <p>PRIVACY & DATA</p>
-                <h3>Download a private copy of your account data</h3>
-                <span>Sovereign generates a JSON export only for this authenticated request. The export includes account-owned product data and policy history, excludes authentication secrets and provider identifiers, and is not retained as an export artifact.</span>
+                <h3>Download a copy of your data</h3>
+                <span>Sovereign creates the file when you ask for it. It includes the information attached to your account, but not sign-in secrets. Sovereign does not keep a separate copy of the download.</span>
               </div>
-              <button disabled={loading} onClick={() => void downloadPrivateExport()}>Download private JSON export</button>
+              <button disabled={loading} onClick={() => void downloadPrivateExport()}>Download my data</button>
             </section>
 
             <section className="account-control-section support-development-section">
@@ -270,7 +271,7 @@ export function AccountControlCenter() {
             </section>
 
             <section className="account-control-section">
-              <div className="account-section-heading"><p>PENDING INVITATIONS</p><h3>Private links awaiting review</h3><span>Resending creates a new one-time link and invalidates the previous link. Server-side rate limits prevent repeated delivery.</span></div>
+              <div className="account-section-heading"><p>PENDING INVITATIONS</p><h3>Private links awaiting review</h3><span>Resending creates a new one-time link and makes the previous link stop working. You may need to wait before sending another invitation.</span></div>
               {pendingInvitations.length === 0 ? <p className="account-empty">No invitations are waiting.</p> : <div className="pending-invitation-list">{pendingInvitations.map((person) => <article key={person.id}><div><strong>{person.displayName}</strong><small>{person.invitationExpiresAt ? `Expires ${new Date(person.invitationExpiresAt).toLocaleDateString()}` : 'Pending review'}</small></div><div><button disabled={loading} onClick={() => void changeInvitation(person, 'resend')}>Resend invitation</button><button className="danger" disabled={loading} onClick={() => void changeInvitation(person, 'cancel')}>Cancel</button></div></article>)}</div>}
             </section>
 
@@ -281,7 +282,7 @@ export function AccountControlCenter() {
 
             <section className="account-control-section deletion-section">
               <div className="account-section-heading"><p>ACCOUNT DELETION</p><h3>14-day grace period</h3><span>Scheduling deletion does not happen immediately. You can cancel while the request remains in the grace period.</span></div>
-              {deletionJob ? <div className="active-deletion"><strong>Deletion scheduled</strong><p>Status: {deletionJob.status}. Scheduled for {deletionJob.scheduledFor ? new Date(deletionJob.scheduledFor).toLocaleString() : 'the end of the grace period'}.</p><button disabled={loading || deletionJob.status !== 'grace'} onClick={() => void cancelDeletion()}>Cancel account deletion</button></div> : <div className="deletion-approval"><label className="approval-check"><input type="checkbox" checked={deleteApproval} onChange={(event) => setDeleteApproval(event.target.checked)} /><span>I understand that deletion removes the account and its private data after the grace period, subject to required billing and legal retention.</span></label><label>Type DELETE to continue<input value={deletePhrase} onChange={(event) => setDeletePhrase(event.target.value)} autoComplete="off" /></label><button className="danger" disabled={loading || !deleteApproval || deletePhrase !== 'DELETE'} onClick={() => void requestDeletion()}>Schedule account deletion</button></div>}
+              {deletionJob ? <div className="active-deletion"><strong>Deletion scheduled</strong><p>Scheduled for {deletionJob.scheduledFor ? new Date(deletionJob.scheduledFor).toLocaleString() : 'the end of the grace period'}.</p><button disabled={loading || deletionJob.status !== 'grace'} onClick={() => void cancelDeletion()}>Cancel account deletion</button></div> : <div className="deletion-approval"><label className="approval-check"><input type="checkbox" checked={deleteApproval} onChange={(event) => setDeleteApproval(event.target.checked)} /><span>I understand that deleting my account removes its private product data after the grace period, subject to the Privacy Policy.</span></label><label>Type DELETE to continue<input value={deletePhrase} onChange={(event) => setDeletePhrase(event.target.value)} autoComplete="off" /></label><button className="danger" disabled={loading || !deleteApproval || deletePhrase !== 'DELETE'} onClick={() => void requestDeletion()}>Schedule account deletion</button></div>}
             </section>
           </section>
         </div>
