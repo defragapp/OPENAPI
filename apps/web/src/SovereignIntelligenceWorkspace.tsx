@@ -732,7 +732,7 @@ function BaselineBuilder({ api, onCancel, onComplete }: {
   async function build(event: FormEvent) {
     event.preventDefault();
     setState('submitting');
-    setMessage('Sovereign is constructing your private personal foundation…');
+    setMessage('Sovereign is building your private Baseline…');
     try {
       const data = await api('/api/v1/baseline/onboarding', {
         method: 'POST',

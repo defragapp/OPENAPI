@@ -27,6 +27,7 @@ describe('premium action authority', () => {
 
   it('removes visible pill and rectangular action chrome without removing semantics', () => {
     expect(css).toContain('button:not(.sheet-backdrop):not(.context-backdrop)');
+    expect(css).toContain(':not(.primary-button):not(.passkey-button):not(.consent-choice)');
     expect(css).toContain('background: transparent !important;');
     expect(css).toContain('border-radius: 0 !important;');
     expect(css).toContain('box-shadow: none !important;');

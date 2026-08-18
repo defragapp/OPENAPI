@@ -45,7 +45,7 @@ describe('Sovereign account and workspace shell', () => {
 
   it('routes signup through explicit plan confirmation without duplicating live prices', () => {
     expect(app).toContain('Start free. Verify your email, then build your Baseline.');
-    expect(app).toContain('Your Baseline becomes the private personal foundation Sovereign uses across self, decisions, relationships, and systems.');
+    expect(app).toContain('Your Baseline becomes the private reference Sovereign uses across self, decisions, relationships, and systems.');
     expect(app).toContain('safeClientReturnTo');
     expect(app).toContain("if (path === '/onboarding') return <PlanOnboarding />;");
     expect(onboarding).toContain('/api/v1/account/onboarding');

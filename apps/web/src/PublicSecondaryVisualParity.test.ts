@@ -52,7 +52,8 @@ describe('secondary public visual parity', () => {
   it('keeps the historical static foundation but lets terminal sans authority own rendered headings', () => {
     expect(staticCss).toContain('--v0-page: #090b0e');
     expect(staticCss).toContain('--v0-cream: #f1e9de');
-    expect(staticCss).toContain('"Avenir Next"');
+    expect(staticCss).toContain('"SF Pro Display"');
+    expect(staticTerminalCss).not.toContain('Avenir Next');
     expect(staticTerminalCss).toContain('--static-title-font:');
     expect(staticTerminalCss).toContain('font-family: var(--static-title-font) !important');
     expect(staticTerminalCss).not.toContain('Sovereign Display');

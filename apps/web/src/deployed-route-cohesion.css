@@ -70,7 +70,7 @@
 
   min-width: 320px;
   color: var(--route-ink);
-  font-family: var(--font-subheading, "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif);
+  font-family: var(--font-subheading, system-ui,  "Helvetica Neue", Arial, sans-serif);
   font-size: 17px;
   line-height: 1.62;
   text-rendering: optimizeLegibility;
@@ -106,7 +106,7 @@ body:has(.sovereign-app-runtime) {
 ) :where(h1, h2, h3, h4, h5, h6) {
   margin-block-start: 0;
   color: var(--route-ink);
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
   font-weight: 400 !important;
   letter-spacing: -0.04em;
   text-wrap: balance;
@@ -121,7 +121,7 @@ body:has(.sovereign-app-runtime) {
   .public-secondary-page,
   .sovereign-app-runtime
 ) :where(p, li, dd, label, input, textarea, select, button, a, summary) {
-  font-family: var(--font-subheading, "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif);
+  font-family: var(--font-subheading, system-ui,  "Helvetica Neue", Arial, sans-serif);
 }
 
 :where(
@@ -147,7 +147,7 @@ body:has(.sovereign-app-runtime) {
   .sovereign-app-runtime
 ) :where(.eyebrow, .policy-kicker, [class*="kicker"]) {
   color: rgba(120, 199, 255, 0.78) !important;
-  font-family: var(--font-subheading, "Avenir Next", sans-serif) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
   font-size: 0.66rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.16em !important;
@@ -201,7 +201,7 @@ body:has(.sovereign-app-runtime) {
 
 .public-secondary-page .v0-wordmark {
   color: var(--route-ink);
-  font-family: var(--font-subheading, "Avenir Next", sans-serif) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
   font-size: 0.82rem;
   font-weight: 650;
   letter-spacing: 0.22em;
@@ -346,7 +346,7 @@ body:has(.sovereign-app-runtime) {
 .invitation-shell > .wordmark,
 .private-route-brand {
   color: var(--route-ink) !important;
-  font-family: var(--font-subheading, "Avenir Next", sans-serif) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
   font-size: 0.78rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.2em !important;
@@ -703,7 +703,7 @@ body:has(.sovereign-app-runtime) {
 
 .sovereign-app-runtime :where(.intelligence-topbar h1, .intelligence-context h2, .workspace-sheet h2, .account-control-dialog h2) {
   color: var(--route-ink);
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
   font-weight: 400 !important;
 }
 
@@ -733,7 +733,7 @@ body:has(.sovereign-app-runtime) {
 
 .sovereign-app-runtime :where(.response-headline, .baseline-builder h1, .baseline-reveal h1) {
   color: var(--route-ink);
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
   font-weight: 400 !important;
   letter-spacing: -0.04em;
 }

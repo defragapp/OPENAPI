@@ -41,7 +41,7 @@ The root landing must preserve the archive’s recognizable sequence while using
 7. System demonstration:
    - section identity is `03 · From 1:1 to the whole system`;
    - `See the whole system.`;
-   - make roles, expectations, authority, responsibility, pressure, observations, and missing perspectives understandable across a family, team, household, or group;
+   - make consented people, supplied roles, permitted perspectives, confirmed responsibilities, pressure, observations, and interactions understandable across a family, team, household, or group;
    - do not make responsibility concentration the category headline for all Systems;
    - do not reduce the system to decorative role cards or imply that one person causes the whole pattern.
 8. Comparison:
@@ -72,7 +72,7 @@ Port and maintain:
 - near-black, cream, white/gray line, spacing, radius, and depth language;
 - responsive behavior and reduced-motion treatment.
 
-`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. The legacy font asset may remain unused until separate cleanup, but no heading/title may resolve to it.
+`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. `Avenir Next` and the retired bundled `Sovereign Sans` are also excluded as title/heading authorities. Titles use the native platform sans stack. Legacy font assets may remain unused until separate cleanup, but no heading/title may resolve to them.
 
 The refined product should not depend on electric blue, cyan glow, neon, generic AI gradients, or glassmorphism as primary UI language. Spectral color, where intentionally used, should behave like physical light rather than a generic interface accent.
 
@@ -151,7 +151,7 @@ The complete Vite foundation and final refinement are required:
    - own landing-only recognition, larger demonstrations, visible workflow behavior, Expression Field detail, system presentation, and mobile proof;
    - must not alter product logic, consent, Baseline contracts, or answer contracts.
 9. `apps/web/src/premium-action-authority-v1.css`
-   - preserves the terminal no-pill editorial action language.
+   - preserves editorial action language for navigation and low-emphasis actions while transactional authentication, onboarding, consent, billing, and account controls retain clear visible affordance.
 10. `apps/web/src/sans-typography-authority-v1.css`
    - is appended after other inline authorities;
    - is the terminal rendered typography authority;

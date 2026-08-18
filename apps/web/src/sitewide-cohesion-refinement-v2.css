@@ -8,7 +8,7 @@
  */
 
 :root {
-  --sovereign-wordmark-family: var(--font-subheading, "Avenir Next", "Helvetica Neue", Arial, sans-serif);
+  --sovereign-wordmark-family: var(--font-subheading, system-ui, "Helvetica Neue", Arial, sans-serif);
   --sovereign-wordmark-size: 0.69rem;
   --sovereign-wordmark-tracking: 0.22em;
 }
@@ -92,7 +92,7 @@
 
 .public-approved-v8 .landing-expression-slice__tooltip-title {
   fill: #f1e9de;
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif);
+  font-family: var(--font-display, system-ui, Georgia, serif);
   font-size: 20px;
   font-weight: 500;
   letter-spacing: -0.02em;
@@ -100,7 +100,7 @@
 
 .public-approved-v8 .landing-expression-slice__tooltip-value {
   fill: rgba(120, 199, 255, 0.9);
-  font-family: var(--font-subheading, "Avenir Next", sans-serif);
+  font-family: var(--font-subheading, system-ui, sans-serif);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -165,7 +165,7 @@
   overflow: visible !important;
   clip: auto !important;
   color: rgba(120, 199, 255, 0.72) !important;
-  font-family: var(--font-subheading, "Avenir Next", sans-serif) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
   font-size: 0.58rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.17em !important;
@@ -181,7 +181,7 @@
 .public-approved-v8 .landing-question-orbit__stage span {
   padding-inline: 28px !important;
   color: rgba(241, 233, 222, 0.86) !important;
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
   font-size: clamp(1.28rem, 2.35vw, 1.82rem) !important;
   font-weight: 400 !important;
   line-height: 1.16 !important;
@@ -209,7 +209,7 @@
 
 .account-nav > a:last-child {
   color: rgba(229, 220, 209, 0.72) !important;
-  font-family: var(--font-subheading, "Avenir Next", sans-serif) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
   font-size: 0.72rem !important;
   text-decoration: none;
 }
@@ -228,7 +228,7 @@
 .account-intro .eyebrow,
 .auth-panel .eyebrow {
   color: rgba(120, 199, 255, 0.76) !important;
-  font-family: var(--font-subheading, "Avenir Next", sans-serif) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
   font-size: 0.61rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.17em !important;
@@ -236,14 +236,14 @@
 
 .account-intro h1 {
   color: #f1e9de !important;
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
   font-weight: 400 !important;
   letter-spacing: -0.055em !important;
 }
 
 .account-intro .lede {
   color: rgba(229, 220, 209, 0.7) !important;
-  font-family: var(--font-subheading, "Avenir Next", sans-serif) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
 }
 
 .account-points li {
@@ -265,7 +265,7 @@
 .auth-panel h2 {
   max-width: 12ch;
   color: #f1e9de !important;
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
   font-weight: 400 !important;
   letter-spacing: -0.045em !important;
 }
@@ -286,7 +286,7 @@
   border-radius: 7px !important;
   background: #e8ddd0 !important;
   color: #111316 !important;
-  font-family: var(--font-subheading, "Avenir Next", sans-serif) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
   font-weight: 700 !important;
 }
 
@@ -310,14 +310,14 @@
 .sovereign-app-runtime .relationship-overview h1,
 .sovereign-app-runtime .system-overview h1 {
   color: #f1e9de !important;
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
   font-weight: 400 !important;
   letter-spacing: -0.055em !important;
 }
 
 .sovereign-app-runtime :where(.surface-heading > span, .workspace-intro, .section-introduction) {
   color: rgba(229, 220, 209, 0.7) !important;
-  font-family: var(--font-subheading, "Avenir Next", sans-serif) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
 }
 
 /* Keep authenticated surfaces calm and document-like on desktop. */
@@ -529,7 +529,7 @@
 
   .sovereign-app-runtime .intelligence-topbar > div:first-of-type > em {
     color: rgba(229, 220, 209, 0.62) !important;
-    font-family: var(--font-subheading, "Avenir Next", sans-serif) !important;
+    font-family: var(--font-subheading, system-ui, sans-serif) !important;
     font-size: 0.64rem !important;
     font-style: normal !important;
     letter-spacing: 0.08em !important;

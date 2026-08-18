@@ -60,7 +60,7 @@
   width: 100% !important;
   max-width: 1040px !important;
   margin: 0 auto !important;
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
   font-size: clamp(4rem, 6.25vw, 6.75rem) !important;
   font-weight: 470 !important;
   line-height: 0.91 !important;
@@ -202,7 +202,7 @@
 .public-approved-v8 .landing-story__heading h2 {
   max-width: 760px !important;
   margin: 14px auto 0 !important;
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
   font-size: clamp(2.8rem, 4.8vw, 4.65rem) !important;
   font-weight: 470 !important;
   line-height: 0.98 !important;

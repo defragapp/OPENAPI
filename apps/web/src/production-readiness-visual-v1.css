@@ -39,7 +39,7 @@ html[data-sovereign-production-readiness="desktop-ios-v1"] {
 .plan-onboarding .wordmark,
 .launch-page .launch-wordmark,
 .sovereign-app-runtime .intelligence-brand strong {
-  font-family: var(--sovereign-wordmark-family, var(--font-body, "Avenir Next", sans-serif)) !important;
+  font-family: var(--sovereign-wordmark-family, var(--font-body, system-ui, sans-serif)) !important;
   font-size: 0.82rem !important;
   font-weight: 760 !important;
   letter-spacing: 0.2em !important;

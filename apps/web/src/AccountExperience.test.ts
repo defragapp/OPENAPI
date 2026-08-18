@@ -21,7 +21,7 @@ describe('account access experience', () => {
   it('uses Baseline-first account language without introducing passwords', () => {
     expect(app).toContain('Create your Sovereign.OS account.');
     expect(app).toContain('Start free. Verify your email, then build your Baseline.');
-    expect(app).toContain('Your Baseline becomes the private personal foundation Sovereign uses across self, decisions, relationships, and systems.');
+    expect(app).toContain('Your Baseline becomes the private reference Sovereign uses across self, decisions, relationships, and systems.');
     expect(app).toContain('Sign in to Sovereign.OS.');
     expect(app).toContain('Use your email and the secure sign-in method available for your account.');
     expect(passkey).toContain('Choose a secure way to sign in.');

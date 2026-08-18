@@ -12,7 +12,7 @@
 
 /* Remove visible pill / rectangular button chrome without disabling semantics. */
 :where(
-  button:not(.sheet-backdrop):not(.context-backdrop),
+  button:not(.sheet-backdrop):not(.context-backdrop):not(.primary-button):not(.passkey-button):not(.consent-choice),
   a.landing-control,
   a[class*="-action"],
   a[class*="__action"],
@@ -29,7 +29,7 @@
 }
 
 :where(
-  button:not(.sheet-backdrop):not(.context-backdrop),
+  button:not(.sheet-backdrop):not(.context-backdrop):not(.primary-button):not(.passkey-button):not(.consent-choice),
   a.landing-control,
   a[class*="-action"],
   a[class*="__action"],
@@ -134,7 +134,7 @@
   .public-secondary-page,
   .pricing-page,
   .faq-page
-) button:not(.sheet-backdrop):not(.context-backdrop) {
+) button:not(.sheet-backdrop):not(.context-backdrop):not(.primary-button):not(.passkey-button):not(.consent-choice) {
   color: inherit !important;
   background: transparent !important;
   border: 0 !important;
@@ -313,7 +313,7 @@ body :where(a.button, a.btn, a.cta, a[class*="button"], a[class*="cta"]) {
 
 @media (max-width: 820px) {
   :where(
-    button:not(.sheet-backdrop):not(.context-backdrop),
+    button:not(.sheet-backdrop):not(.context-backdrop):not(.primary-button):not(.passkey-button):not(.consent-choice),
     a.v0-sign-in,
     a.v0-get-started,
     a[class*="action"],

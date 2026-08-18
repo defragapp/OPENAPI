@@ -33,6 +33,9 @@ describe('authenticated launch cohesion', () => {
     expect(launchCss).not.toMatch(/#(?:2f93ff|5aa9ff|78c7ff)/i);
     expect(launchCss).not.toMatch(/rgba\(120,\s*199,\s*255/i);
     expect(launchCss).not.toMatch(/rgba\(47,\s*147,\s*255/i);
+    expect(launchCss).not.toContain('Avenir Next');
+    expect(launchCss).toContain('.account-shell .passkey-button');
+    expect(launchCss).toContain('.account-shell .primary-button');
   });
 
   it('keeps mobile account and onboarding surfaces compact and safe-area aware', () => {

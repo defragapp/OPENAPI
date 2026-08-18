@@ -1,19 +1,18 @@
 /*
  * Sovereign.OS typography contract.
  *
- * Active product typography is sans-only. The legacy display face is retired
- * from rendered UI use; hierarchy comes from scale, weight, spacing, opacity,
- * and composition rather than a serif/sans switch.
+ * Active rendered typography is native sans-only. Historical bundled display
+ * faces are not part of the active title or heading system.
  */
 
 :root {
   --font-title:
-    "Avenir Next",
-    Avenir,
-    "Segoe UI Variable Display",
-    "SF Pro Display",
     -apple-system,
     BlinkMacSystemFont,
+    "SF Pro Display",
+    "Segoe UI Variable Display",
+    "Segoe UI",
+    system-ui,
     "Helvetica Neue",
     Helvetica,
     Arial,
@@ -23,11 +22,12 @@
     -apple-system,
     BlinkMacSystemFont,
     "SF Pro Text",
+    "Segoe UI",
+    system-ui,
     "Helvetica Neue",
+    Helvetica,
     Arial,
     sans-serif;
-
-  /* Compatibility tokens resolve to the active sans title system. */
   --font-display: var(--font-title);
   --serif: var(--font-title);
   --sans: var(--font-body);

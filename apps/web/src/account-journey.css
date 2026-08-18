@@ -8,7 +8,7 @@
 
 .plan-onboarding .plan-nav > a {
   color: var(--v0-route-ink, #f5f1e8) !important;
-  font-family: var(--font-body, "Avenir Next", Inter, system-ui, sans-serif) !important;
+  font-family: var(--font-body, system-ui, Inter, system-ui, sans-serif) !important;
   font-size: 0.72rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.22em !important;

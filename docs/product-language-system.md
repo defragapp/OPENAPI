@@ -367,6 +367,10 @@ The FAQ may explain which frameworks contribute to Baseline Design, but the answ
 
 Do not render `Sovereign Display`, Georgia, Palatino, Iowan Old Style, Book Antiqua, or another serif as a heading/title fallback anywhere in the active product or public site.
 
+The approved rendered title stack is the native platform sans system: Apple system/SF on Apple platforms, Segoe on Windows, then system/Helvetica fallbacks. `Avenir Next`, the retired bundled `Sovereign Sans`, and `Sovereign Display` are not title or heading authorities.
+
+Typography authority sets the family, not a universal heading size. Page and component composition own title scale, line height, wrapping, spacing, and responsive behavior.
+
 Headings, titles, product labels, and body text use the approved sans system. Hierarchy comes from scale, weight, spacing, opacity, and layout—not from switching to a serif display face.
 
 The bundled legacy display font file may remain in the repository only as an unused historical asset until a separate cleanup removes it. It must not be referenced by active CSS.

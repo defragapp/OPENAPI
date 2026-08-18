@@ -5,14 +5,6 @@
  * to How it works, Pricing, and Questions without changing the landing itself.
  */
 
-@font-face {
-  font-family: "Sovereign Display";
-  src: url("/fonts/sovereign-display.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
 :root {
   --v0-page: #090b0e;
   --v0-page-soft: #0c0f14;
@@ -29,10 +21,10 @@
   --v0-blue-bright: #78c7ff;
   --v0-blue-soft: rgba(47, 147, 255, 0.13);
   --v0-shell: min(1120px, calc(100vw - 72px));
-  --v0-display: "Sovereign Display", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --v0-display: system-ui, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --v0-sans:
-    "Avenir Next",
-    Avenir,
+    system-ui,
+
     "Segoe UI Variable Display",
     "SF Pro Display",
     -apple-system,

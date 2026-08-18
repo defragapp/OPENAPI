@@ -14,7 +14,7 @@
   min-width: 320px;
   overflow-x: clip;
   color: var(--surface-ink, #f5f1e8);
-  font-family: var(--font-body, "Avenir Next", Inter, system-ui, sans-serif);
+  font-family: var(--font-body, system-ui, Inter, system-ui, sans-serif);
 }
 
 body:has(.account-shell),
@@ -76,7 +76,7 @@ body:has(.sovereign-app-runtime) {
   .private-route-gate,
   .sovereign-app-runtime
 ) :where(h1, h2, h3, h4) {
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif);
+  font-family: var(--font-display, system-ui, Georgia, serif);
   text-wrap: balance;
 }
 
@@ -85,7 +85,7 @@ body:has(.sovereign-app-runtime) {
 .public-not-found .private-route-brand,
 .private-route-gate .private-route-brand {
   color: var(--surface-ink, #f5f1e8);
-  font-family: var(--font-body, "Avenir Next", Inter, system-ui, sans-serif);
+  font-family: var(--font-body, system-ui, Inter, system-ui, sans-serif);
   font-size: 0.72rem;
   font-weight: 750;
   letter-spacing: 0.2em;

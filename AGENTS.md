@@ -62,6 +62,8 @@ These instructions apply to the entire OPENAPI repository.
 
 ## Typography contract
 - Treat `apps/web/src/typography-system.css` as the platform-wide typography source of truth.
+- The rendered title/heading stack is native platform sans: Apple system/SF, Segoe, system-ui/Helvetica fallbacks. Do not make `Avenir Next`, `Sovereign Sans`, `Sovereign Display`, or a serif the active title authority.
+- The terminal typography authority may enforce font family only; it must not impose a universal `h1`/`h2`/`h3` size or spacing system over route-owned composition.
 - Use `--font-display` for every meaningful heading and title across public, authenticated, onboarding, policy, modal, drawer, answer, relationship, system, Alignment, and Covenant surfaces.
 - Use `--font-subheading` only for short supporting introductions and secondary headings.
 - Preserve `--font-body` for paragraphs, controls, evidence, metadata, inputs, and long-form answers.

@@ -254,7 +254,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
                 : 'Use your email and the secure sign-in method available for your account.'}
           </p>
           {mode === 'signup' && (
-            <p className="account-intro-note">Your Baseline becomes the private personal foundation Sovereign uses across self, decisions, relationships, and systems.</p>
+            <p className="account-intro-note">Your Baseline becomes the private reference Sovereign uses across self, decisions, relationships, and systems.</p>
           )}
         </section>
 

@@ -29,7 +29,7 @@ html .public-approved-v8 .v0-hero-content {
 html .public-approved-v8 .landing-hero-kicker {
   margin-bottom: 30px !important;
   color: rgba(241, 233, 222, 0.48) !important;
-  font-family: var(--font-title, "Avenir Next", "Helvetica Neue", Arial, sans-serif) !important;
+  font-family: var(--font-title, system-ui, "Helvetica Neue", Arial, sans-serif) !important;
   font-size: 0.62rem !important;
   font-weight: 540 !important;
   letter-spacing: 0.18em !important;
@@ -46,7 +46,7 @@ html .public-approved-v8 .landing-hero-kicker > span {
 html .public-approved-v8 .v0-hero h1 {
   width: min(1040px, 100%) !important;
   margin-inline: auto !important;
-  font-family: var(--font-title, "Avenir Next", "Helvetica Neue", Arial, sans-serif) !important;
+  font-family: var(--font-title, system-ui, "Helvetica Neue", Arial, sans-serif) !important;
   font-size: 1rem !important;
   line-height: 1 !important;
   letter-spacing: 0 !important;
@@ -162,7 +162,7 @@ html .public-approved-v8 .landing-expression-slice__tooltip-connector {
 html .public-approved-v8 .landing-expression-slice__tooltip-title,
 html .public-approved-v8 .landing-expression-slice__tooltip-value {
   fill: rgba(255, 250, 243, 0.9) !important;
-  font-family: var(--font-title, "Avenir Next", "Helvetica Neue", Arial, sans-serif) !important;
+  font-family: var(--font-title, system-ui, "Helvetica Neue", Arial, sans-serif) !important;
   font-size: 7.8px !important;
   font-weight: 560 !important;
   letter-spacing: 0 !important;
@@ -202,7 +202,7 @@ html .public-approved-v8 .landing-question-orbit__inner {
 
 html .public-approved-v8 .landing-question-orbit__kicker {
   color: rgba(241, 233, 222, 0.42) !important;
-  font-family: var(--font-title, "Avenir Next", "Helvetica Neue", Arial, sans-serif) !important;
+  font-family: var(--font-title, system-ui, "Helvetica Neue", Arial, sans-serif) !important;
   font-size: 0.62rem !important;
   font-weight: 560 !important;
   letter-spacing: 0.16em !important;
@@ -213,7 +213,7 @@ html .public-approved-v8 .landing-question-orbit h2 {
   max-width: 900px !important;
   margin-top: 16px !important;
   color: #f1e9de !important;
-  font-family: var(--font-title, "Avenir Next", "Helvetica Neue", Arial, sans-serif) !important;
+  font-family: var(--font-title, system-ui, "Helvetica Neue", Arial, sans-serif) !important;
   font-size: clamp(3.1rem, 5.2vw, 5.4rem) !important;
   font-weight: 520 !important;
   line-height: 0.98 !important;
@@ -246,7 +246,7 @@ html .public-approved-v8 .landing-question-orbit__stage > span {
 
 html .public-approved-v8 .landing-question-orbit__stage > span > small {
   color: rgba(241, 233, 222, 0.38) !important;
-  font-family: var(--font-title, "Avenir Next", "Helvetica Neue", Arial, sans-serif) !important;
+  font-family: var(--font-title, system-ui, "Helvetica Neue", Arial, sans-serif) !important;
   font-size: 0.62rem !important;
   font-weight: 560 !important;
   letter-spacing: 0.14em !important;
@@ -255,7 +255,7 @@ html .public-approved-v8 .landing-question-orbit__stage > span > small {
 html .public-approved-v8 .landing-question-orbit__stage > span > strong {
   max-width: 900px !important;
   color: rgba(255, 250, 243, 0.92) !important;
-  font-family: var(--font-title, "Avenir Next", "Helvetica Neue", Arial, sans-serif) !important;
+  font-family: var(--font-title, system-ui, "Helvetica Neue", Arial, sans-serif) !important;
   font-size: clamp(1.65rem, 2.7vw, 2.65rem) !important;
   font-weight: 460 !important;
   line-height: 1.2 !important;

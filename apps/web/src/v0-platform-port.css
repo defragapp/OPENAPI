@@ -27,7 +27,7 @@ body:has(.email-code-fallback) {
   min-height: 100svh;
   background: transparent !important;
   color: var(--v0-route-ink) !important;
-  font-family: var(--font-body, "Avenir Next", Inter, system-ui, sans-serif) !important;
+  font-family: var(--font-body, system-ui, Inter, system-ui, sans-serif) !important;
 }
 
 .plan-onboarding *,
@@ -55,7 +55,7 @@ body:has(.email-code-fallback) {
 .plan-nav > a,
 .sovereign-policy .landing-wordmark {
   color: var(--v0-route-ink) !important;
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
   font-weight: 700 !important;
   letter-spacing: -0.025em !important;
   text-decoration: none !important;
@@ -64,7 +64,7 @@ body:has(.email-code-fallback) {
 .plan-nav > span,
 .sovereign-policy .landing-nav nav a {
   color: var(--v0-route-muted) !important;
-  font-family: var(--font-body, "Avenir Next", Inter, system-ui, sans-serif) !important;
+  font-family: var(--font-body, system-ui, Inter, system-ui, sans-serif) !important;
 }
 
 .sovereign-policy .landing-nav-cta {
@@ -105,7 +105,7 @@ body:has(.email-code-fallback) {
 .policy-hero .landing-kicker,
 .policy-contact .landing-kicker {
   color: var(--v0-route-warm) !important;
-  font-family: var(--font-subheading, "Avenir Next", Inter, system-ui, sans-serif) !important;
+  font-family: var(--font-subheading, system-ui, Inter, system-ui, sans-serif) !important;
   letter-spacing: 0.18em !important;
   text-transform: uppercase;
 }
@@ -117,7 +117,7 @@ body:has(.email-code-fallback) {
 .policy-grid h2,
 .policy-contact h2 {
   color: var(--v0-route-ink) !important;
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
   font-weight: 650 !important;
   letter-spacing: -0.04em !important;
 }
@@ -170,14 +170,14 @@ body:has(.email-code-fallback) {
 .onboarding-baseline-preview > span,
 .policy-grid > article > span {
   color: var(--v0-route-warm) !important;
-  font-family: var(--font-subheading, "Avenir Next", Inter, system-ui, sans-serif) !important;
+  font-family: var(--font-subheading, system-ui, Inter, system-ui, sans-serif) !important;
   letter-spacing: 0.15em !important;
   text-transform: uppercase;
 }
 
 .onboarding-plan-grid article > header strong {
   color: var(--v0-route-ink) !important;
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
 }
 
 .billing-toggle {
@@ -335,7 +335,7 @@ body:has(.email-code-fallback) {
 
 .email-code-fallback h2 {
   color: #f5f1e8 !important;
-  font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
   letter-spacing: -0.035em !important;
 }
 

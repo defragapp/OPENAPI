@@ -97,7 +97,7 @@
   .workspace-mobile-utilities-heading h3 {
     margin: 0;
     color: #f1e9de;
-    font-family: var(--font-display, "Sovereign Display", Georgia, serif);
+    font-family: var(--font-display, system-ui, Georgia, serif);
     font-size: 1.7rem;
     font-weight: 400;
     letter-spacing: -0.04em;
@@ -373,7 +373,7 @@
 
   .public-approved-v8 .landing-expression-slice[data-inspecting="true"] .landing-expression-slice__readout--accessible > strong {
     margin-top: 4px !important;
-    font-family: var(--font-display, "Sovereign Display", Georgia, serif) !important;
+    font-family: var(--font-display, system-ui, Georgia, serif) !important;
     font-size: 1.28rem !important;
     font-weight: 400 !important;
   }

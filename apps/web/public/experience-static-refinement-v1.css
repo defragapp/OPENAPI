@@ -22,8 +22,8 @@ body.consent-page {
   --v0-line-strong: rgba(241, 233, 222, 0.16);
   --static-shell: min(1180px, calc(100vw - 96px));
   --static-reading: 720px;
-  --static-display: "Sovereign Display", Georgia, serif;
-  --static-sans: "Avenir Next", Inter, system-ui, sans-serif;
+  --static-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --static-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
   background:
     radial-gradient(circle at 72% -8%, rgba(241, 233, 222, 0.045), transparent 34rem),
     radial-gradient(circle at 12% 32%, rgba(241, 233, 222, 0.018), transparent 28rem),
@@ -1223,5 +1223,88 @@ body.consent-page :is(a, button, summary) {
     scroll-behavior: auto !important;
     transition: none !important;
     transform: none !important;
+  }
+}
+
+
+/* STATIC_ROUTE_HIERARCHY_RECOVERY_V1 */
+body.launch-page .launch-hero.launch-hero-compact > h1 {
+  max-width: 14ch;
+  font-size: clamp(3rem, 4.5vw, 4.65rem);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.038em;
+}
+
+body.launch-page :is(.launch-heading, .pricing-details-heading) h2,
+body.launch-page .baseline-explainer > div > h2,
+body.launch-page .support-note h2,
+body.launch-page .launch-callout h2 {
+  max-width: 16ch;
+  font-size: clamp(2.05rem, 3.2vw, 3.25rem);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.028em;
+}
+
+body.pricing-page .pricing-section {
+  padding-top: clamp(68px, 7vw, 96px);
+}
+
+body.pricing-page .price-card,
+body.pricing-page .price-card.featured {
+  min-height: 0;
+  padding: clamp(34px, 4vw, 48px);
+}
+
+body.pricing-page .price-card h2 {
+  max-width: 18ch;
+  font-size: clamp(1.55rem, 2.05vw, 2.05rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.024em;
+}
+
+body.pricing-page .price {
+  font-size: clamp(3.2rem, 4.5vw, 4.65rem);
+  font-weight: 450;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+body.pricing-page .price-card-body {
+  gap: 25px;
+  padding-block: 27px;
+}
+
+body.pricing-page .pricing-details-section {
+  padding-top: clamp(76px, 8vw, 108px);
+}
+
+body.pricing-page .feature-list li {
+  padding-block: 11px;
+}
+
+@media (max-width: 650px) {
+  body.launch-page .launch-hero.launch-hero-compact > h1 {
+    max-width: 13ch;
+    font-size: clamp(2.35rem, 10vw, 3rem);
+    line-height: 1.01;
+  }
+
+  body.launch-page :is(.launch-heading, .pricing-details-heading) h2,
+  body.launch-page .baseline-explainer > div > h2,
+  body.launch-page .support-note h2,
+  body.launch-page .launch-callout h2 {
+    max-width: 16ch;
+    font-size: clamp(1.8rem, 7.5vw, 2.35rem);
+  }
+
+  body.pricing-page .price-card h2 {
+    font-size: clamp(1.45rem, 6vw, 1.85rem);
+  }
+
+  body.pricing-page .price {
+    font-size: clamp(3rem, 14vw, 4rem);
   }
 }
