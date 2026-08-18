@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AccountControlCenter } from './AccountControlCenter';
+import { PolicyGateAccountRights } from './PolicyGateAccountRights';
 import { PasskeyManager } from './PasskeyManager';
 import { SovereignIntelligenceWorkspace } from './SovereignIntelligenceWorkspace';
 import { SystemMembershipManager } from './SystemMembershipManager';
@@ -184,7 +185,7 @@ export function AuthenticatedWorkspace() {
           <section role="status" aria-live="polite">
             <span>PRIVACY REVIEW</span>
             <h1>Review the current account terms before continuing.</h1>
-            <p>Your private workspace remains closed until the current Terms, Privacy Policy, and launch eligibility rule are confirmed. Your data-export and deletion rights remain available through the account APIs.</p>
+            <p>Your private workspace remains closed until the current Terms, Privacy Policy, and launch eligibility rule are confirmed. You can still download your data, manage any existing billing, sign out, and manage account deletion below.</p>
             <div className="policy-review-links">
               <a href="https://sovereign.defrag.app/terms" target="_blank" rel="noreferrer">Read Terms</a>
               <a href="https://sovereign.defrag.app/privacy" target="_blank" rel="noreferrer">Read Privacy Policy</a>
@@ -205,6 +206,7 @@ export function AuthenticatedWorkspace() {
             <button disabled={!termsAccepted || !privacyAcknowledged || !ageEligible || policySubmitting} onClick={() => void acceptPolicyUpdate()}>
               {policySubmitting ? 'Recording review…' : 'Continue to Sovereign.OS'} <span aria-hidden="true">→</span>
             </button>
+            <PolicyGateAccountRights />
           </section>
         </main>
       );

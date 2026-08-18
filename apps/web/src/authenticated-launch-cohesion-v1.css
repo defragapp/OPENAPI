@@ -906,3 +906,152 @@ html:root:root:root body .account-shell .passkey-button:hover:not(:disabled) {
     font-size: clamp(2.35rem, 9vw, 3rem) !important;
   }
 }
+
+/* POLICY-GATE ACCOUNT RIGHTS --------------------------------------------- */
+.policy-gate-account-rights {
+  display: grid;
+  gap: 18px;
+  margin-top: 30px;
+  padding-top: 28px;
+  border-top: 1px solid var(--launch-line);
+}
+
+.policy-gate-rights-heading {
+  display: grid;
+  gap: 8px;
+}
+
+.policy-gate-rights-heading > span {
+  color: var(--launch-faint);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+.policy-gate-rights-heading > h2 {
+  margin: 0;
+  max-width: 24ch;
+  color: var(--launch-ink);
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+}
+
+.policy-gate-rights-heading > p,
+.policy-gate-rights-status,
+.policy-gate-deletion-body > p {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--launch-muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.policy-gate-rights-status {
+  min-height: 1.4em;
+  color: var(--launch-faint);
+}
+
+.policy-gate-rights-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.policy-gate-rights-actions > button,
+.policy-gate-rights-actions > a,
+.policy-gate-deletion button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 14px;
+  border: 1px solid var(--launch-line-strong);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--launch-ink);
+  font: inherit;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.policy-gate-rights-actions > button:hover,
+.policy-gate-rights-actions > a:hover,
+.policy-gate-deletion button:hover {
+  background: rgba(242, 237, 229, 0.055);
+}
+
+.policy-gate-rights-actions > button:focus-visible,
+.policy-gate-rights-actions > a:focus-visible,
+.policy-gate-deletion :where(summary, button, input):focus-visible {
+  outline: 2px solid var(--launch-focus);
+  outline-offset: 3px;
+}
+
+.policy-gate-rights-actions > button:disabled,
+.policy-gate-deletion button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.policy-gate-deletion {
+  padding-top: 2px;
+  border-top: 1px solid var(--launch-line);
+}
+
+.policy-gate-deletion > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: var(--launch-ink);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.policy-gate-deletion-body {
+  display: grid;
+  gap: 14px;
+  padding: 5px 0 2px;
+}
+
+.policy-gate-delete-confirmation {
+  display: grid;
+  gap: 7px;
+  color: var(--launch-muted);
+  font-size: 0.78rem;
+}
+
+.policy-gate-delete-confirmation input {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--launch-line-strong);
+  border-radius: 8px;
+  background: #0b0c0d;
+  color: var(--launch-ink);
+  font-size: 16px;
+}
+
+.policy-gate-deletion .policy-gate-danger {
+  border-color: rgba(242, 237, 229, 0.34);
+}
+
+@media (max-width: 640px) {
+  .policy-gate-account-rights {
+    margin-top: 24px;
+    padding-top: 22px;
+  }
+
+  .policy-gate-rights-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .policy-gate-rights-actions > button,
+  .policy-gate-rights-actions > a,
+  .policy-gate-deletion button {
+    width: 100%;
+  }
+}

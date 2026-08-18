@@ -7,6 +7,7 @@ const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
 const policy = readFileSync(new URL('./PublicPolicy.tsx', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
 const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
+const policyGateRights = readFileSync(new URL('./PolicyGateAccountRights.tsx', import.meta.url), 'utf8');
 const accountControls = readFileSync(new URL('./AccountControlCenter.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
@@ -55,6 +56,12 @@ describe('privacy, policy acceptance, and tracking contract', () => {
     expect(authenticatedWorkspace).toContain('I accept the current Terms.');
     expect(authenticatedWorkspace).toContain('I acknowledge the current Privacy Policy.');
     expect(authenticatedWorkspace).toContain('I confirm I am 18 or older.');
+    expect(authenticatedWorkspace).toContain('<PolicyGateAccountRights />');
+    expect(authenticatedWorkspace).not.toContain('through the account APIs');
+    expect(policyGateRights).toContain('Download my data');
+    expect(policyGateRights).toContain('Manage billing');
+    expect(policyGateRights).toContain('Sign out all sessions');
+    expect(policyGateRights).toContain('Schedule account deletion');
   });
 
   it('exposes on-demand private account access without promising a retained export artifact', () => {
@@ -96,7 +103,7 @@ describe('privacy, policy acceptance, and tracking contract', () => {
   });
 
   it('ships no non-essential analytics or advertising tracker in active web entry surfaces', () => {
-    const activeWeb = [html, main, app, onboarding, authenticatedWorkspace, accountControls, workspace].join('\n');
+    const activeWeb = [html, main, app, onboarding, authenticatedWorkspace, policyGateRights, accountControls, workspace].join('\n');
     for (const forbidden of [
       'googletagmanager.com',
       'google-analytics.com',
