@@ -126,11 +126,17 @@ describe('public production positioning release', () => {
     expect(language).toContain('## Retired and prohibited phrasing');
   });
 
-  it('renders headings through the sans authority, never the retired display face', () => {
+  it('renders headings through the native sans authority and excludes rejected display faces', () => {
     expect(typography).not.toContain('font-family: "Sovereign Display"');
     expect(typography).not.toContain('/fonts/sovereign-display.woff2');
     expect(typography).toContain('--font-display: var(--font-title);');
-    expect(sansAuthority).toContain('The retired display serif must not render anywhere in the active product.');
+    expect(sansAuthority).toContain('Rejected legacy display faces must not render in active titles.');
+    expect(sansAuthority).not.toContain('Optima,');
+    expect(sansAuthority).not.toContain('Avenir Next');
+    expect(sansAuthority).not.toContain('"Sovereign Sans"');
+    expect(sansAuthority).toContain('-apple-system');
+    expect(sansAuthority).toContain('"SF Pro Display"');
+    expect(sansAuthority).toContain('"Segoe UI Variable Display"');
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
   });
