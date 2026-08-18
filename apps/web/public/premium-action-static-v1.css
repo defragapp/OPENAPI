@@ -1,42 +1,153 @@
-/* Standalone public-route action and typography authority. */
+/* Standalone public-route terminal identity, typography, and action authority. */
 :root {
-  --static-action-ink: #f2ede5;
-  --static-action-muted: rgba(242, 237, 229, 0.62);
-  --static-action-line: rgba(242, 237, 229, 0.26);
-  --static-action-line-strong: rgba(242, 237, 229, 0.54);
+  --static-action-ink: #f3eee7;
+  --static-action-muted: rgba(235, 228, 219, 0.64);
+  --static-action-line: rgba(241, 235, 227, 0.18);
+  --static-action-line-strong: rgba(241, 235, 227, 0.42);
   --static-action-bg: #080a0d;
   --static-title-font:
-    Optima,
-    "Helvetica Neue",
+    -apple-system,
+    BlinkMacSystemFont,
     "SF Pro Display",
-    Candara,
-    "Noto Sans",
+    "Helvetica Neue",
     "Segoe UI Variable Display",
     "Segoe UI",
     system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
     Arial,
     sans-serif;
+  --static-body-font:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "Segoe UI Variable Text",
+    "Segoe UI",
+    system-ui,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  --static-shell-final: min(1180px, calc(100vw - 64px));
 }
 
 html:root:root:root body :is(
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  [role="heading"],
-  .launch-wordmark,
-  .launch-footer-wordmark,
-  .price,
-  .faq-category .launch-kicker
+  h1, h2, h3, h4, h5, h6, [role="heading"], .price
 ) {
   font-family: var(--static-title-font) !important;
   font-style: normal !important;
   font-kerning: normal;
   font-synthesis: none;
+}
+
+body.launch-page,
+body.consent-page {
+  font-family: var(--static-body-font) !important;
+}
+
+/* Same brand and navigation geometry on every standalone public route. */
+body.launch-page .launch-nav,
+body.consent-page .launch-nav {
+  min-height: 64px !important;
+  border-bottom: 1px solid rgba(241, 235, 227, 0.09) !important;
+  background: rgba(8, 10, 13, 0.94) !important;
+}
+
+body.launch-page .launch-nav-inner,
+body.consent-page .launch-nav-inner {
+  width: var(--static-shell-final) !important;
+  max-width: 1180px !important;
+  min-height: 64px !important;
+  margin-inline: auto !important;
+}
+
+body.launch-page :is(.launch-wordmark, .launch-footer-wordmark),
+body.consent-page :is(.launch-wordmark, .launch-footer-wordmark) {
+  display: inline-flex !important;
+  align-items: center !important;
+  color: var(--static-action-ink) !important;
+  font-family: var(--static-body-font) !important;
+  font-size: 0.75rem !important;
+  font-weight: 720 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.17em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+}
+
+body.launch-page :is(.launch-links a, .launch-sign-in, .launch-cta),
+body.consent-page :is(.launch-links a, .launch-sign-in, .launch-cta) {
+  font-family: var(--static-body-font) !important;
+  font-size: 0.73rem !important;
+  font-weight: 560 !important;
+  letter-spacing: 0.01em !important;
+}
+
+/* Tight, consistent static-page hierarchy. */
+body.launch-page .launch-hero.launch-hero-compact {
+  width: var(--static-shell-final) !important;
+  max-width: 1180px !important;
+  min-height: 460px !important;
+  padding: 84px 0 68px !important;
+  column-gap: clamp(48px, 7vw, 96px) !important;
+  row-gap: 18px !important;
+}
+
+body.launch-page .launch-hero.launch-hero-compact > h1 {
+  max-width: 13ch !important;
+  font-size: clamp(3rem, 4.8vw, 4.7rem) !important;
+  font-weight: 700 !important;
+  line-height: 0.96 !important;
+  letter-spacing: -0.045em !important;
+}
+
+body.launch-page .launch-hero.launch-hero-compact > p:last-child {
+  max-width: 46ch !important;
+  font-size: 0.94rem !important;
+  line-height: 1.62 !important;
+}
+
+body.launch-page :is(.launch-band, .launch-section) {
+  width: var(--static-shell-final) !important;
+  max-width: 1180px !important;
+  padding: clamp(64px, 7vw, 92px) 0 !important;
+}
+
+body.launch-page :is(.launch-heading, .pricing-details-heading) h2,
+body.launch-page .baseline-explainer > div > h2,
+body.launch-page .support-note h2,
+body.launch-page .launch-callout h2 {
+  max-width: 14ch !important;
+  font-size: clamp(2.2rem, 3.5vw, 3.45rem) !important;
+  font-weight: 680 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.036em !important;
+}
+
+body.how-page .journey-steps > article > h3 {
+  font-size: clamp(1.55rem, 2.2vw, 2.2rem) !important;
+  font-weight: 650 !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.028em !important;
+}
+
+body.pricing-page .price-card h2 {
+  font-size: clamp(1.45rem, 2vw, 1.9rem) !important;
+  font-weight: 660 !important;
+  line-height: 1.06 !important;
+  letter-spacing: -0.026em !important;
+}
+
+body.pricing-page .price {
+  font-weight: 620 !important;
+  letter-spacing: -0.04em !important;
+}
+
+body.questions-page .faq-category h2,
+body.questions-page .faq-list summary {
+  font-family: var(--static-title-font) !important;
+}
+
+body.questions-page .faq-list summary {
+  font-weight: 600 !important;
+  letter-spacing: -0.012em !important;
 }
 
 .launch-cta,
@@ -81,11 +192,6 @@ html:root:root:root body :is(
   border-bottom-color: var(--static-action-line-strong) !important;
 }
 
-.launch-sign-in,
-.launch-cta {
-  position: relative;
-}
-
 .launch-sign-in:focus-visible,
 .launch-cta:focus-visible,
 .launch-button:focus-visible,
@@ -113,11 +219,7 @@ html:root:root:root body :is(
   gap: 18px !important;
 }
 
-.support-links .launch-button {
-  display: inline-flex !important;
-}
-
-/* Consent is part of the same product, not a light-theme utility page. */
+/* Consent remains visually part of the same product. */
 .consent-page {
   background: var(--static-action-bg) !important;
   color: var(--static-action-ink) !important;
@@ -142,11 +244,6 @@ html:root:root:root body :is(
   color: var(--static-action-muted) !important;
 }
 
-.consent-page .consent-card-label,
-.consent-page .consent-boundary span {
-  color: var(--static-action-muted) !important;
-}
-
 .consent-page .consent-panel,
 .consent-page .consent-status,
 .consent-page .consent-empty,
@@ -157,19 +254,8 @@ html:root:root:root body :is(
   box-shadow: none !important;
 }
 
-.consent-page .consent-panel {
-  border-inline: 0 !important;
-  border-bottom: 0 !important;
-  padding-inline: 0 !important;
-}
-
-.consent-page .consent-status {
-  min-height: 0 !important;
-  padding-inline: 0 !important;
-  border-inline: 0 !important;
-  border-bottom: 0 !important;
-}
-
+.consent-page .consent-panel,
+.consent-page .consent-status,
 .consent-page .consent-invitation,
 .consent-page .consent-empty {
   padding-inline: 0 !important;
@@ -195,12 +281,43 @@ html:root:root:root body :is(
 }
 
 @media (max-width: 760px) {
+  :root {
+    --static-shell-final: calc(100vw - 32px);
+  }
+
+  body.launch-page :is(.launch-wordmark, .launch-footer-wordmark),
+  body.consent-page :is(.launch-wordmark, .launch-footer-wordmark) {
+    font-size: 0.71rem !important;
+  }
+
   .launch-nav-actions > .launch-sign-in,
   .launch-nav-actions > .launch-cta {
     display: none !important;
   }
 
-  .consent-actions button {
-    min-height: 44px !important;
+  body.launch-page .launch-hero.launch-hero-compact {
+    display: block !important;
+    min-height: 0 !important;
+    padding: 72px 0 54px !important;
+  }
+
+  body.launch-page .launch-hero.launch-hero-compact > h1 {
+    margin-top: 14px !important;
+    font-size: clamp(2.55rem, 11vw, 3.5rem) !important;
+  }
+
+  body.launch-page .launch-hero.launch-hero-compact > p:last-child {
+    margin-top: 20px !important;
+  }
+
+  body.launch-page :is(.launch-band, .launch-section) {
+    padding: 52px 0 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.launch-page *,
+  body.consent-page * {
+    scroll-behavior: auto !important;
   }
 }
