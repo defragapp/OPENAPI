@@ -105,9 +105,9 @@ export function serializeRegistration(credential: PublicKeyCredential) {
 export function passkeyErrorMessage(error: unknown): string {
   if (error instanceof DOMException) {
     if (error.name === 'NotAllowedError') return 'The passkey request was cancelled or timed out.';
-    if (error.name === 'InvalidStateError') return 'This passkey is already connected to the account.';
-    if (error.name === 'NotSupportedError') return 'This browser or device cannot use the required passkey.';
-    if (error.name === 'SecurityError') return 'Passkeys are unavailable on this domain or browser context.';
+    if (error.name === 'InvalidStateError') return 'This passkey is already added to your account.';
+    if (error.name === 'NotSupportedError') return 'This browser or device cannot use passkeys here.';
+    if (error.name === 'SecurityError') return 'Passkeys are unavailable on this page. Try email sign-in instead.';
   }
-  return 'The passkey could not be verified. Use email recovery or try again.';
+  return 'The passkey could not be completed. Try again or use email sign-in.';
 }
