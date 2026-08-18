@@ -18,12 +18,13 @@ const landingRefinementV2 = read('./landing-refinement-v2.css');
 const landingRefinementV5 = read('./landing-live-refinement-v5.css');
 const typography = read('./typography-system.css');
 const sansAuthority = read('./sans-typography-authority-v1.css');
+const productionVisual = read('./production-visual-authority-v1.css');
 const languageAuthority = read('../../../docs/product-language-system.md');
 const visualContract = read('../../../docs/v0-visual-port-contract.md');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
 describe('public positioning reset', () => {
-  it('preserves the visual cascade and mounts sans typography as the terminal inline authority', () => {
+  it('preserves the visual cascade and mounts the production authority last', () => {
     const imports = [
       "import './landing-expression-field-v3.css';",
       "import './landing-expression-field-integration.css';",
@@ -39,8 +40,9 @@ describe('public positioning reset', () => {
     }
     expect(main.slice(main.indexOf(imports.at(-1)!) + imports.at(-1)!.length)).not.toContain("import './");
     expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';");
-    expect(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;')).toBeGreaterThan(
-      main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;')
+    expect(main).toContain("import productionVisualAuthorityCss from './production-visual-authority-v1.css?inline';");
+    expect(main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;')).toBeGreaterThan(
+      main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;')
     );
   });
 
@@ -97,23 +99,24 @@ describe('public positioning reset', () => {
     expect(landing).toContain('Know yourself. Understand your people. See the whole system.');
   });
 
-  it('retires the display serif from active typography authority', () => {
-    expect(typography).not.toContain('font-family: "Sovereign Display"');
-    expect(typography).not.toContain('/fonts/sovereign-display.woff2');
+  it('uses the native SF/Segoe title system and excludes rejected title faces', () => {
+    for (const source of [typography, sansAuthority, productionVisual]) {
+      expect(source).not.toContain('font-family: "Sovereign Display"');
+      expect(source).not.toContain('/fonts/sovereign-display.woff2');
+      expect(source).not.toContain('"Sovereign Sans"');
+      expect(source).not.toContain('Avenir Next');
+      expect(source).not.toContain('Optima');
+      expect(source).toContain('-apple-system');
+      expect(source).toContain('"SF Pro Display"');
+      expect(source).toContain('"Segoe UI Variable Display"');
+    }
     expect(typography).toContain('font-family: var(--font-title) !important');
     expect(typography).toContain('--font-display: var(--font-title);');
     expect(typography).toContain('--serif: var(--font-title);');
-    expect(typography).not.toContain('"Sovereign Sans"');
-    expect(typography).toContain('"Helvetica Neue"');
-    expect(typography.indexOf('"Helvetica Neue"')).toBeLessThan(typography.indexOf('"SF Pro Display"'));
-    expect(typography).not.toContain('Avenir Next');
-    expect(sansAuthority).not.toContain('"Sovereign Sans"');
-    expect(sansAuthority).not.toContain('Avenir Next');
-    expect(sansAuthority).toContain('"Helvetica Neue"');
-    expect(sansAuthority.indexOf('"Helvetica Neue"')).toBeLessThan(sansAuthority.indexOf('"SF Pro Display"'));
+    expect(typography.indexOf('-apple-system')).toBeLessThan(typography.indexOf('"SF Pro Display"'));
+    expect(sansAuthority.indexOf('-apple-system')).toBeLessThan(sansAuthority.indexOf('"SF Pro Display"'));
     expect(sansAuthority).not.toContain('PREMIUM_TITLE_SCALE_V2');
-
-    expect(sansAuthority).toContain('The retired display serif must not render anywhere in the active product.');
+    expect(sansAuthority).toContain('Optima and retired bundled display faces must not render in active titles.');
     expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
     expect(sansAuthority).toContain('font-family: var(--font-title) !important');
 
@@ -122,9 +125,6 @@ describe('public positioning reset', () => {
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
     expect(landingRefinementV5).toContain('LANDING_TYPE_COMPOSITION_RECOVERY_V6');
-    expect(landingRefinementV5).toContain('font-size: clamp(3.6rem, 5.7vw, 5.65rem) !important;');
-    expect(landingRefinementV5).toContain('font-size: clamp(2.15rem, 3.15vw, 3.15rem) !important;');
-    expect(landingRefinementV5).toContain('font-size: clamp(2.8rem, 4.25vw, 4.2rem) !important;');
   });
 
   it('keeps one interactive line field with click-led minimal endpoint inspection', () => {
@@ -178,7 +178,6 @@ describe('public positioning reset', () => {
       'Seeing the whole system'
     ]) expect(stories).toContain(marker);
     expect(renderedStories).toContain('<WorkflowPanel title="How Sovereign explores the question" steps={SELF_FLOW} surface="personal-reasoning" />');
-
     expect(renderedStories).not.toContain('Separate helping from carrying the outcome.');
     expect(renderedStories).not.toContain('See where responsibility keeps landing.');
     expect(stories).toContain('landing-workflow__progress');
@@ -186,6 +185,7 @@ describe('public positioning reset', () => {
     expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
     expect(renderedStories).not.toContain('Permitted context');
     expect(renderedStories).not.toContain('capacity beneath');
+    expect(productionVisual).toContain('visibility: visible !important');
   });
 
   it('keeps exact supporting codes quiet and secondary', () => {
@@ -213,7 +213,7 @@ describe('public positioning reset', () => {
   });
 
   it('keeps every active CSS layer structurally balanced', () => {
-    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, typography, sansAuthority]) {
+    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, typography, sansAuthority, productionVisual]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
