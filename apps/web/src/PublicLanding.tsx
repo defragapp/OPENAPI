@@ -64,7 +64,7 @@ function V0Navigation() {
         <a className="v0-wordmark v0-wordmark--desktop" href="/" aria-label="Sovereign.OS home"><BrandMark /></a>
         <a className="v0-wordmark v0-wordmark--mobile" href="/" aria-label="Sovereign.OS home"><BrandMark /></a>
         <nav aria-label="Public navigation">
-          <a href="#how">How it works</a>
+          <a href="/how-it-works">How it works</a>
           <a href="/pricing">Pricing</a>
           <a href="/faq">FAQ</a>
         </nav>
@@ -74,7 +74,7 @@ function V0Navigation() {
           <details className="v0-mobile-menu">
             <summary aria-label="Open navigation"><MenuIcon /></summary>
             <nav className="v0-mobile-menu__panel" aria-label="Mobile navigation">
-              <a href="#how">How it works</a>
+              <a href="/how-it-works">How it works</a>
               <a href="/pricing">Pricing</a>
               <a href="/faq">FAQ</a>
               <a href="/login">Sign in</a>
@@ -216,6 +216,9 @@ function V0Footer() {
       <div className="v0-shell">
         <a href="/" className="v0-wordmark" aria-label="Sovereign.OS home"><BrandMark /></a>
         <nav aria-label="Footer navigation">
+          <a href="/how-it-works">How it works</a>
+          <a href="/pricing">Pricing</a>
+          <a href="/faq">FAQ</a>
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
           <a href="/pricing#support">Support</a>
