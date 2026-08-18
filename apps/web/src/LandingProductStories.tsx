@@ -29,15 +29,15 @@ void RELEASE_LINEAGE_MARKERS;
 
 /*
  * Public examples use sanitized representative fixture values, not visitor data.
- * Each answer below is authored against the exact fixture shown in its Example Basis
- * so the visible source values and the demonstration cannot drift apart.
+ * Each answer below is authored against the same exact example sources available
+ * inside its collapsed source-details disclosure.
  */
 const SELF_BASELINE: readonly EvidenceGroup[] = [
   {
     points: [
-      { code: 'HD G13.1', label: 'Illustrative Human Design personality activation: Gate 13 line 1' },
-      { code: 'GK ACT13', label: 'Illustrative Gene Keys activation number 13' },
-      { code: '☉ CAN 04.2°', label: 'Illustrative natal Sun at 4.2 degrees Cancer' }
+      { code: 'HD G13.1', label: 'Example Human Design personality activation: Gate 13 line 1' },
+      { code: 'GK ACT13', label: 'Example Gene Keys activation number 13' },
+      { code: '☉ CAN 04.2°', label: 'Example natal Sun at 4.2 degrees Cancer' }
     ]
   }
 ] as const;
@@ -46,34 +46,34 @@ const DUO_BASELINE: readonly EvidenceGroup[] = [
   {
     name: 'You',
     points: [
-      { code: 'HD G22.4', label: 'Illustrative permitted personality activation: Gate 22 line 4' },
-      { code: '☿ CAN 18.4°', label: 'Illustrative permitted Mercury placement: 18.4 degrees Cancer' }
+      { code: 'HD G22.4', label: 'Example Human Design personality activation for you: Gate 22 line 4' },
+      { code: '☿ CAN 18.4°', label: 'Example Mercury placement for you: 18.4 degrees Cancer' }
     ]
   },
   {
     name: 'Partner',
     points: [
-      { code: 'HD G57.2', label: 'Illustrative permitted personality activation: Gate 57 line 2' },
-      { code: '☿ LIB 16.6°', label: 'Illustrative permitted Mercury placement: 16.6 degrees Libra' }
+      { code: 'HD G57.2', label: 'Example Human Design personality activation for your partner: Gate 57 line 2' },
+      { code: '☿ LIB 16.6°', label: 'Example Mercury placement for your partner: 16.6 degrees Libra' }
     ]
   },
   {
-    name: 'Between',
-    points: [{ code: 'REL ☿ □ ☿ 1.8°', label: 'Illustrative deterministic pair Mercury square with 1.8 degree orb' }]
+    name: 'Between you',
+    points: [{ code: 'REL ☿ □ ☿ 1.8°', label: 'Example pair Mercury square with a 1.8 degree orb' }]
   }
 ] as const;
 
 const SYSTEM_BASIS: readonly EvidenceGroup[] = [
   {
     name: 'You',
-    points: [{ code: 'HD G13.1', label: 'Illustrative permitted personality activation: Gate 13 line 1' }]
+    points: [{ code: 'HD G13.1', label: 'Example Human Design personality activation: Gate 13 line 1' }]
   },
   {
-    name: 'Confirmed',
+    name: 'What you told Sovereign',
     points: [
-      { code: 'U✓', label: 'Illustrative user-confirmed observation: parent pushes for immediate resolution' },
-      { code: 'U✓', label: 'Illustrative user-confirmed observation: you move into mediation' },
-      { code: 'U✓', label: 'Illustrative user-confirmed observation: sibling withdraws as pressure rises' }
+      { code: 'U✓', label: 'Example observation: a parent pushes for immediate resolution' },
+      { code: 'U✓', label: 'Example observation: you move into mediation' },
+      { code: 'U✓', label: 'Example observation: a sibling withdraws as pressure rises' }
     ]
   }
 ] as const;
@@ -81,96 +81,92 @@ const SYSTEM_BASIS: readonly EvidenceGroup[] = [
 const SELF_FLOW: readonly WorkflowStep[] = [
   {
     kind: 'input',
-    title: 'Read the actual question',
-    body: 'The question is not “what is my type?” It is whether refinement is making the idea clearer or making it easier to defend.'
+    title: 'Start with the question',
+    body: 'The question is whether the idea is becoming clearer or being changed mainly to make other people’s reactions easier to manage.'
   },
   {
     kind: 'read',
-    title: 'Pull only the relevant Baseline',
-    body: 'Sovereign uses the parts of the Baseline connected to expression, meaning-making, pressure, and Alignment instead of loading every possible interpretation.',
-    chips: ['HD G13.1', 'GK ACT13', '☉ CAN 04.2°']
+    title: 'Use what matters from your Baseline',
+    body: 'Sovereign uses only the parts of your Baseline that help with this question instead of loading every possible interpretation.'
   },
   {
     kind: 'connect',
-    title: 'Separate clarity from pressure',
-    body: 'The useful distinction is whether the next change strengthens the idea for you or mainly anticipates how other people might react.'
+    title: 'Find the useful difference',
+    body: 'The key distinction is whether the next change makes the idea clearer to you or mainly makes it easier to defend to someone else.'
   },
   {
     kind: 'read',
-    title: 'Keep the unknowns open',
-    body: 'Actual project constraints and feedback still matter. Baseline context cannot decide whether a specific edit is objectively better.'
+    title: 'Leave what is not known unanswered',
+    body: 'Real project constraints and the quality of the feedback still matter. Your Baseline cannot decide whether a specific edit is objectively better.'
   },
   {
     kind: 'direction',
-    title: 'Return something testable',
-    body: 'The answer gives the user a concrete way to compare their own version before feedback with the version created under outside pressure.'
+    title: 'Give you something you can try',
+    body: 'Compare the version you made before feedback with the version you made after it and notice what became clearer versus what changed mainly for someone else.'
   }
 ] as const;
 
 const RELATIONSHIP_FLOW: readonly WorkflowStep[] = [
   {
     kind: 'input',
-    title: 'Start with what actually happened',
-    body: 'One person asks for resolution, the other becomes quieter, and the same conversation is being experienced as urgency on one side and pressure on the other.'
+    title: 'Start with what happened',
+    body: 'One person asks to resolve the issue now, the other becomes quieter, and the same conversation starts to feel urgent to one person and pressuring to the other.'
   },
   {
     kind: 'read',
-    title: 'Keep both Baselines separate',
-    body: 'Sovereign reads only the permitted communication, processing, pressure, and repair context that belongs to each person.',
-    chips: ['You · HD G22.4', 'Partner · HD G57.2']
+    title: 'Keep each person separate',
+    body: 'Sovereign uses only what each person chose to share and does not blend two people into one relationship profile.'
   },
   {
     kind: 'connect',
-    title: 'Trace the interaction loop',
-    body: 'A move toward more definition can increase pressure; less response can then increase uncertainty; more urgency can follow. The sequence matters more than choosing a winner.',
-    chips: ['REL ☿ □ ☿ 1.8°']
+    title: 'Show what happens between you',
+    body: 'More urgency can create more pressure; less response can create more uncertainty; the cycle can then intensify even when both people want the conversation to go better.'
   },
   {
     kind: 'read',
-    title: 'Separate ownership from mind-reading',
+    title: 'Do not guess private feelings',
     body: 'Each person can own pacing, clarity, tone, and follow-through. The other person’s exact feeling or motive stays unknown unless they say it.'
   },
   {
     kind: 'direction',
-    title: 'Build the bridge',
-    body: 'The answer turns the timing difference into a usable sequence: reassurance, less immediate demand, a defined return time, and one decision at a time.'
+    title: 'Find a lower-pressure next step',
+    body: 'Separate reassurance from resolution: care can be made clear now, while the full answer can wait for a defined return time.'
   }
 ] as const;
 
 const SYSTEM_FLOW: readonly WorkflowStep[] = [
   {
     kind: 'input',
-    title: 'Read the supplied system context',
-    body: 'The example begins with confirmed roles and observations rather than assigning family identities from Baseline data.',
-    chips: ['U✓', 'U✓', 'U✓']
+    title: 'Start with what you told Sovereign',
+    body: 'The example begins with the people, roles, and events that were actually described rather than assigning identities from Baseline data.'
   },
   {
     kind: 'read',
-    title: 'Keep every person distinct',
-    body: 'Parent, you, sibling, and partner remain separate subjects. No synthetic “family personality” is created.'
+    title: 'Keep each person separate',
+    body: 'Parent, you, sibling, and partner remain separate people. Sovereign does not create a single “family personality.”'
   },
   {
     kind: 'connect',
-    title: 'Trace how pressure moves',
-    body: 'Immediate resolution pressure is followed by withdrawal, then mediation. The sequence reveals why the same roles can reappear even when nobody consciously chooses them.'
+    title: 'Show how pressure moves',
+    body: 'One person pushes for resolution, another withdraws, and you step in to mediate. Seeing the sequence makes the repeating role easier to understand.'
   },
   {
     kind: 'read',
-    title: 'Find what the role is doing',
-    body: 'Mediation lowers short-term tension, but it also lets direct communication stay unfinished. That makes the mediator role useful to the arrangement.'
+    title: 'Show why the role keeps returning',
+    body: 'Mediation lowers tension in the moment, but it also lets direct communication stay unfinished. Because it works short term, the same role can become easy to repeat.'
   },
   {
     kind: 'direction',
-    title: 'Test one system-level change',
-    body: 'The leverage point is not “fix the family.” It is changing one repeatable behavior and watching what the rest of the system must do differently.'
+    title: 'Change one thing and watch what happens',
+    body: 'Stop carrying messages for one cycle and watch what the other people have to say or do directly instead.'
   }
 ] as const;
 
 const SYSTEM_SEQUENCE = [
-  { person: 'Parent', action: 'Pushes for resolution', detail: 'The pace of the conversation accelerates.' },
+  { person: 'Parent', action: 'Pushes for resolution', detail: 'The pace of the conversation speeds up.' },
   { person: 'Sibling', action: 'Creates distance', detail: 'Less participation leaves more uncertainty in the room.' },
   { person: 'You', action: 'Move into mediation', detail: 'You translate, soften, or carry the next step between people.' },
-  { person: 'System effect', action: 'Tension drops temporarily', detail: 'Because mediation works in the moment, the same route becomes easy to repeat.' }
+  { person: 'What happens next', action: 'Tension drops temporarily', detail: 'Because mediation works in the moment, the same route becomes easy to repeat.' }
 ] as const;
 
 export function LandingProductStories() {
@@ -195,20 +191,20 @@ function PersonalStory() {
           <WorkflowPanel
             title="How Sovereign builds the answer"
             steps={SELF_FLOW}
-            result="The output is a distinction you can test: does the change make the idea clearer to you, or only easier to defend to someone else?"
+            result="You get a distinction you can use: is the change making the idea clearer to you, or mainly easier to defend to someone else?"
             surface="personal-reasoning"
           />
           <ChatWindow title="Sovereign — You" surface="personal-chat" composer="What changes when I get feedback too early?">
             <Message side="user">How do I know whether I’m refining an idea because it’s getting clearer—or changing it because I’m anticipating everyone else’s reaction?</Message>
             <Message side="assistant" wide>
               <DemoAnswer
-                direct="A useful distinction for you may be whether the next change makes the idea more coherent to you or merely more defensible to an imagined audience. Your example Baseline points toward strong sensitivity to meaning and response; under pressure, that sensitivity can become editing before you have decided what you actually want to preserve."
+                direct="A useful distinction may be whether the next change makes the idea more coherent to you or merely more defensible to an imagined audience. In this example, the Baseline suggests strong sensitivity to meaning and response; under pressure, that sensitivity can become editing before you have decided what you actually want to preserve."
                 sections={[
                   { label: 'What may be steady', body: 'You may naturally notice subtext, patterns, and how something will be received. That can make refinement one of your real strengths.' },
                   { label: 'Under pressure', body: 'When outside expectations arrive too early, refinement can shift into pre-emptive explanation: solving objections before the idea has had enough room to become your own.' },
-                  { label: 'The distinction', body: 'Clarity simplifies the idea without making you disappear from it. Anticipation often adds explanation, qualification, or compromise before anyone has actually asked for it.', tone: 'distinction' },
+                  { label: 'The difference', body: 'Clarity simplifies the idea without making you disappear from it. Anticipation often adds explanation, qualification, or compromise before anyone has actually asked for it.', tone: 'distinction' },
                   { label: 'Try this', body: 'Save one version before feedback. After revising, compare the two and ask: what became more precise, and what changed mainly to make the work easier for someone else to accept?', tone: 'bridge' },
-                  { label: 'Still open', body: 'Real constraints, expertise, deadlines, and good feedback can absolutely improve the work. The Baseline cannot decide that part for you.', tone: 'unknown' }
+                  { label: 'What is still unknown', body: 'Real constraints, expertise, deadlines, and good feedback can absolutely improve the work. Your Baseline cannot decide that part for you.', tone: 'unknown' }
                 ]}
                 basis={SELF_BASELINE}
               />
@@ -226,13 +222,13 @@ function RelationshipStory() {
     <section ref={sectionRef} id="relationship" className="landing-story landing-story--relationship" data-viewport-section="relationship">
       <div className="landing-story__shell">
         <StoryHeading step="02 · You + your people" title="See why the same moment lands differently—and how to bridge the gap.">
-          With permission, Sovereign can compare two Baselines without blending the people together. See where timing, communication, pressure, or decision styles diverge, what happens when they meet, and what each person can do differently.
+          With permission, Sovereign can use both people’s Baselines while keeping each person distinct. See where timing, communication, pressure, or decision styles differ, what happens when they meet, and what each person can do differently.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--relationship" data-viewport-stage="relationship">
           <WorkflowPanel
             title="How Sovereign compares two people"
             steps={RELATIONSHIP_FLOW}
-            result="The useful answer is not who is right. It is the interaction sequence: one person seeks clarity by moving closer to resolution while the other may need less pressure before clarity is possible."
+            result="The useful answer is not who is right. It is what happens between you and what may make the next conversation easier for both people to enter clearly."
             surface="relationship-reasoning"
           />
           <ChatWindow title="Sovereign — Relationship" surface="relationship-chat" composer="What would repair look like for each of us?">
@@ -242,7 +238,7 @@ function RelationshipStory() {
                 direct="You may be colliding at the point where each of you tries to regain clarity. In this example, you appear to settle by defining the issue and the next step; your partner may need the pressure to come down before they can tell what they actually think. That means your move toward resolution can arrive to them as more demand, while their pause can arrive to you as less care. The conflict can become a timing loop before it becomes a disagreement about the relationship itself."
                 sections={[
                   { label: 'You may be bringing', body: 'Ambiguity may stay active for you until there is a clear next step. Asking another question can be an attempt to restore connection and orientation—not necessarily an attempt to control the outcome.' },
-                  { label: 'They may be bringing', body: 'Their permitted example Baseline suggests clarity may improve when input and pressure reduce. A quieter response can therefore be part of processing, although only they can say what they actually feel or intend.' },
+                  { label: 'They may be bringing', body: 'In this example, their Baseline suggests clarity may improve when input and pressure reduce. A quieter response can therefore be part of processing, although only they can say what they actually feel or intend.' },
                   { label: 'Between you', body: 'You ask for more definition → they reduce their response → the reduction raises your uncertainty → you ask with more urgency → the added urgency increases pressure. Each move makes sense from inside one person and becomes harder from inside the other.', tone: 'distinction' },
                   { label: 'A bridge that protects both', body: 'Separate reassurance from resolution. For example: “I care about this, and I don’t need the full answer right now. Can we come back at 7 and decide only what happens next?” You get a defined return point; they get room that is not indefinite.', tone: 'bridge' },
                   { label: 'What still must be asked', body: 'Silence does not tell us whether your partner feels hurt, overwhelmed, uncertain, angry, or simply unfinished. That remains theirs to name directly.', tone: 'unknown' }
@@ -252,7 +248,7 @@ function RelationshipStory() {
             </Message>
           </ChatWindow>
         </div>
-        <p className="landing-story__consent">Representative shared example · Permission required · No compatibility score · No private-thought claims</p>
+        <p className="landing-story__consent">Representative example · Both people must agree before their Baselines can be used together · No compatibility score · No private-thought claims</p>
       </div>
     </section>
   );
@@ -264,26 +260,26 @@ function SystemStory() {
     <section ref={sectionRef} id="system" className="landing-story landing-story--system" data-viewport-section="system">
       <div className="landing-story__shell">
         <StoryHeading step="03 · From 1:1 to the whole system" title="See the whole system.">
-          Move from one relationship to a family, household, team, or group. See how supplied roles, permitted perspectives, confirmed responsibilities, pressure, constraints, observations, and interactions work together—and what changes when one person responds differently.
+          Move from one relationship to a family, household, team, or group. See who is involved, what each person is responsible for, where pressure builds, how people respond to one another, and what may change when one person responds differently.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--system" data-viewport-stage="system">
           <WorkflowPanel
             title="How Sovereign reads a system"
             steps={SYSTEM_FLOW}
-            result="The system-level insight is the role sequence: mediation reduces tension now, which can unintentionally preserve the conditions that keep requiring mediation later."
+            result="The useful insight is why the mediator role keeps returning: it lowers tension now, which can make the same route easier to repeat later."
             surface="system-reasoning"
           />
           <ChatWindow title="Sovereign — Family System" surface="system-map" composer="What changes if I stop carrying messages between them?">
             <Message side="user">Why does my family pull me back into mediator mode even when I’ve decided not to fix the conflict?</Message>
             <Message side="assistant" wide>
               <DemoAnswer
-                direct="Because the role is reinforced by a sequence, not just by your intention. In this supplied example, one person pushes for immediate resolution, another reduces participation, and you become the shortest path between them. When you translate, soften, or carry the next step, the room gets temporary relief. That makes mediation useful to the system even when it is costly to you."
+                direct="Because the role is reinforced by a sequence, not just by your intention. In this example, one person pushes for immediate resolution, another reduces participation, and you become the shortest path between them. When you translate, soften, or carry the next step, the room gets temporary relief. That makes mediation useful to the group even when it is costly to you."
                 sections={[
-                  { label: 'What the system is doing', body: 'Pressure moves through a repeatable route: resolution accelerates, participation drops, you step between positions, and the immediate conflict becomes easier to manage.' },
-                  { label: 'Why the role returns', body: 'Your mediation works well enough in the short term that other people can remain in their familiar positions. The system does not need anyone to consciously assign you the role for the pattern to keep re-forming.', tone: 'distinction' },
-                  { label: 'What changes if you stop', body: 'Short-term tension may rise because the usual pressure-release route is gone. That is also the point where direct communication, ownership, or a new boundary has to appear somewhere else in the system.' },
-                  { label: 'A leverage point', body: 'Do not carry messages between people for one cycle. Ask each person to state their own position and next step directly. You can still care about the relationship without becoming the communication channel for it.', tone: 'bridge' },
-                  { label: 'What remains unknown', body: 'The example does not tell us why the sibling withdraws or what any absent person privately feels. Their perspective stays unknown until they participate or their observation is supplied.', tone: 'unknown' }
+                  { label: 'What is happening', body: 'Pressure moves through a repeatable route: resolution speeds up, participation drops, you step between positions, and the immediate conflict becomes easier to manage.' },
+                  { label: 'Why the role returns', body: 'Your mediation works well enough in the short term that other people can remain in their familiar positions. Nobody has to consciously assign you the role for the pattern to keep re-forming.', tone: 'distinction' },
+                  { label: 'What changes if you stop', body: 'Short-term tension may rise because the usual pressure-release route is gone. That is also the point where direct communication, ownership, or a new boundary has to appear somewhere else.' },
+                  { label: 'What you can change', body: 'Do not carry messages between people for one cycle. Ask each person to state their own position and next step directly. You can still care about the relationship without becoming the communication channel for it.', tone: 'bridge' },
+                  { label: 'What remains unknown', body: 'This example does not tell us why the sibling withdraws or what any absent person privately feels. We do not know their private perspective unless they tell you or choose to participate.', tone: 'unknown' }
                 ]}
                 basis={SYSTEM_BASIS}
               />
@@ -291,7 +287,7 @@ function SystemStory() {
             <SystemAnalysis />
           </ChatWindow>
         </div>
-        <p className="landing-story__consent">Representative supplied system context · Each person controls what may be included</p>
+        <p className="landing-story__consent">Representative example · Each person controls whether their Baseline can be included</p>
       </div>
     </section>
   );
@@ -350,42 +346,45 @@ function DemoAnswer({ direct, sections, basis }: { direct: string; sections: rea
           </section>
         ))}
       </div>
-      <BaselineTrace groups={basis} />
+      <SourceDetails groups={basis} />
     </div>
   );
 }
 
-function BaselineTrace({ groups }: { groups: readonly EvidenceGroup[] }) {
+function SourceDetails({ groups }: { groups: readonly EvidenceGroup[] }) {
   const entries = groups.flatMap((group) => [
-    ...(group.name ? [{ text: group.name, label: `${group.name} example context`, subject: true }] : []),
+    ...(group.name ? [{ text: group.name, label: `${group.name} example sources`, subject: true }] : []),
     ...group.points.map((point) => ({ text: point.code, label: point.label, subject: false }))
   ]);
   return (
-    <div className="landing-evidence" aria-label={`Example Basis. ${entries.map((entry) => entry.text).join('. ')}`}>
-      <div className="landing-evidence__heading">
-        <strong>Example Basis</strong>
-        <small>Exact values used by this representative fixture · authenticated Basis is server-approved per answer</small>
+    <details className="landing-evidence">
+      <summary aria-label="See source details for this representative example">
+        <strong>See source details</strong>
+        <small>Representative example</small>
+      </summary>
+      <div className="landing-evidence__detail">
+        <p>Example data used in this demonstration. These values are not visitor data.</p>
+        <span className="landing-evidence__values">
+          {entries.map((entry, index) => (
+            <span key={`${entry.text}-${index}`} className={entry.subject ? 'landing-evidence__subject' : 'landing-evidence__code'} title={entry.label}>
+              <i aria-hidden="true"> · </i>{entry.text}
+            </span>
+          ))}
+        </span>
       </div>
-      <span className="landing-evidence__values">
-        {entries.map((entry, index) => (
-          <span key={`${entry.text}-${index}`} className={entry.subject ? 'landing-evidence__subject' : 'landing-evidence__code'} title={entry.label}>
-            <i aria-hidden="true"> · </i>{entry.text}
-          </span>
-        ))}
-      </span>
-    </div>
+    </details>
   );
 }
 
 function SystemAnalysis() {
   return (
-    <div className="landing-system-analysis" aria-label="Representative family system pressure sequence">
+    <div className="landing-system-analysis" aria-label="Representative family pressure sequence">
       <div className="landing-system-analysis__context">
-        <small>Supplied example context</small>
+        <small>What you told Sovereign</small>
         <strong>Recurring family conflict · you report becoming the mediator when pressure rises</strong>
       </div>
       <div className="landing-system-analysis__sequence">
-        <small>Pressure sequence</small>
+        <small>What happens</small>
         <ol>
           {SYSTEM_SEQUENCE.map((entry, index) => (
             <li key={entry.person}>
@@ -396,8 +395,8 @@ function SystemAnalysis() {
         </ol>
       </div>
       <div className="landing-system-analysis__leverage">
-        <small>Leverage point</small>
-        <strong>Remove one automatic mediation behavior and watch what the other participants must do directly instead.</strong>
+        <small>What you can change</small>
+        <strong>Stop carrying one message between people and watch what the other participants have to say or do directly instead.</strong>
       </div>
     </div>
   );
@@ -459,7 +458,7 @@ function WorkflowPanel({
               <button type="button" onClick={() => setManualIndex(index)} aria-current={index === visibleIndex ? 'step' : undefined}>
                 <i aria-hidden="true"><StepGlyph kind={step.kind} /></i>
                 <span className="landing-workflow__copy">
-                  <small>{step.kind === 'direction' ? 'Final synthesis' : `Step ${index + 1}`}</small>
+                  <small>Step {index + 1}</small>
                   <strong>{step.title}</strong>
                   <span>{step.body}</span>
                 </span>
@@ -469,7 +468,7 @@ function WorkflowPanel({
           );
         })}
       </ol>
-      <div className="landing-workflow__result"><small>What the user gets</small><strong>{result}</strong></div>
+      <div className="landing-workflow__result"><small>What this gives you</small><strong>{result}</strong></div>
     </article>
   );
 }
