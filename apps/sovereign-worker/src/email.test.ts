@@ -21,13 +21,30 @@ describe('Sovereign.OS transactional email', () => {
     expect(message.text).toContain('Open Sovereign.OS:');
     expect(message.text).toContain('Questions or account support: info@defrag.app');
     expect(message.text).toContain('Do not forward it.');
-    expect(message.html).toContain('Sovereign.OS');
+    expect(message.html).toContain('SOVEREIGN.OS');
     expect(message.html).toContain('background:#0f0f0f');
     expect(message.html).toContain('https://sovereign.defrag.app/brand-mark.svg');
-    expect(message.html).toContain('border-radius:10px');
+    expect(message.html).toContain("Optima,'Helvetica Neue',Arial,sans-serif");
+    expect(message.html).not.toContain('Georgia');
+    expect(message.html).not.toContain("'Times New Roman'");
+    expect(message.html).toContain('border-radius:2px');
     expect(message.html).not.toContain('border-radius:999px');
     expect(message.html).toContain('mailto:info@defrag.app');
     expect(message.html).not.toContain('<script');
+  });
+
+  it('preserves the exact safe action URL in both HTML and plain text', () => {
+    const actionUrl = 'https://app.defrag.app/auth/redeem?token=private-token&returnTo=%2Fapp';
+    const message = buildSovereignEmail({
+      eyebrow: 'Private sign-in',
+      title: 'Return to your Sovereign.OS.',
+      intro: 'Continue securely.',
+      actionLabel: 'Open Sovereign.OS',
+      actionUrl
+    });
+
+    expect(message.text).toContain(actionUrl);
+    expect(message.html).toContain('https://app.defrag.app/auth/redeem?token=private-token&amp;returnTo=%2Fapp');
   });
 
   it('escapes user-facing content before placing it in HTML', () => {
