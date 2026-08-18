@@ -35,7 +35,7 @@ These instructions apply to the entire OPENAPI repository.
 - Do not call a visual implementation `canonical`, `approved`, `v0`, `editorial`, or `cinematic` unless its actual implementation and evidence support that claim.
 - Do not freeze or replace a founder visual reference while a known documentation-to-render contradiction remains unresolved. Inspect actual desktop and mobile production renders first.
 - Release, deployment, copy, verifier, navigation, and infrastructure work must not redefine the visual system as a side effect. A non-visual task may repair a visual defect only when the defect is directly evidenced and the smallest coherent visual change is made.
-- Do not replace the near-black/cream founder system with a white/light shell, generic enterprise SaaS styling, dashboard/card-grid composition, native-SF-only typography, neon/glassmorphism chrome, or a new design language during release hardening.
+- Do not replace the near-black/cream founder system with a white/light shell, generic enterprise SaaS styling, dashboard/card-grid composition, neon/glassmorphism chrome, or a new design language during release hardening.
 - Changes to `typography-system.css`, `sans-typography-authority-v1.css`, `production-visual-authority-v1.css`, or `premium-action-static-v1.css` must preserve the founder visual language, receive focused regression coverage, and remain subject to #214 desktop+iPhone human visual acceptance.
 
 ## Product definition
@@ -47,14 +47,17 @@ These instructions apply to the entire OPENAPI repository.
 - Defrag, Alignment, and Covenant are internal reasoning lenses, not separate top-level products.
 - Authenticated navigation is Today, Explore, People, Systems, Library, and You.
 - The canonical authenticated implementation is `SovereignIntelligenceWorkspace`.
-- The core AI experience is one text thread: user question → direct answer → relevant sections → quiet Basis/provenance → correction or continuation.
+- The core AI experience is one text thread: user question → direct answer → relevant sections → quiet source details → correction or continuation.
 - Public product pages must demonstrate the real Baseline-first answer hierarchy and stay accurate to live plans and entitlements.
 - The only supported answer contract is `sovereign-answer.v2`.
 - Exact source data, interpretive Baseline facets, temporary current context, and question-specific synthesis must remain separate.
-- Basis contains server-approved exact values only. The model selects Basis IDs and never writes display values.
+- Basis remains the internal/server name for exact source values. User-facing UI labels this layer `Sources`, `Source details`, or `See source details`; do not require users to learn the internal term.
+- Exact source values remain server-approved only. The model selects Basis IDs and never writes display values.
 - Alignment is a structured comparison, never a score, gauge, or model-text sentiment calculation.
 - `docs/product-language-system.md` is the single source of truth for user-facing product language. Other documents may explain or enforce it but must not define a competing hero or product promise.
+- Release tests and verifiers may enforce approved user-facing language only after it is defined in `docs/product-language-system.md`; they must never invent or restore UI wording.
 - Public surfaces must begin with the real situation and useful distinction. Internal `capacity` terminology may remain where the intelligence contract requires it, but it must not lead the public landing, public demonstration headings, share metadata, or the first explanation of the product.
+- Internal taxonomy such as evidence levels, model context, provider state, authorization state, or release vocabulary must not become interface copy.
 - Contribution is not causation, feedback is not blame, and pattern analysis must never mutualize harm.
 
 ## Current data/privacy boundary
@@ -66,15 +69,15 @@ These instructions apply to the entire OPENAPI repository.
 
 ## Typography contract
 - Treat `apps/web/src/typography-system.css` as the platform-wide typography source of truth.
-- The rendered title/heading stack is the founder-approved humanist sans system: Optima first, then resilient native fallbacks including Helvetica Neue, SF Pro Display, Candara, Noto Sans, Segoe UI Variable Display/Segoe UI, system-ui, and platform system fonts. Do not replace it with a native-SF/Segoe-only or generic enterprise stack.
-- `Sovereign Display`, the retired bundled `Sovereign Sans`, `Avenir Next`, and serif fallbacks must not become active title authorities.
+- The rendered title/heading stack is the approved native enterprise sans system: Apple system/SF Pro Display on Apple platforms, Segoe Variable/Segoe on Windows, followed by system-ui and resilient native sans fallbacks.
+- `Sovereign Display`, the retired bundled `Sovereign Sans`, `Optima`, `Avenir Next`, and serif fallbacks must not become active title authorities.
 - The terminal typography authority may enforce font family only; it must not impose a universal `h1`/`h2`/`h3` size or spacing system over route-owned composition.
 - `apps/web/src/production-visual-authority-v1.css` owns final live visual proportions, warm-metal interface accent, demo organization, navigation/brand geometry, and motion after route/component foundations have loaded.
 - `SOVEREIGN.OS` public wordmark sizing is a shared sitewide contract. React and standalone public routes must use the same visual hierarchy while allowing breakpoint-specific placement; navigation tests must not freeze a temporary redesign geometry as product authority.
 - Product demonstrations must remain visible without JavaScript reveal state. Motion may enhance entry/progression but must never gate comprehension or create blank product sections.
 - Use `--font-display` for every meaningful heading and title across public, authenticated, onboarding, policy, modal, drawer, answer, relationship, system, Alignment, and Covenant surfaces.
 - Use `--font-subheading` only for short supporting introductions and secondary headings.
-- Preserve `--font-body` for paragraphs, controls, evidence, metadata, inputs, and long-form answers.
+- Preserve `--font-body` for paragraphs, controls, source details, metadata, inputs, and long-form answers.
 - New headings must use semantic heading elements whenever possible so the typography contract applies automatically.
 - Do not add component-local font families or bypass shared typography tokens without a documented product exception.
 - Typography-only work must not alter copy, line breaks, layout, spacing, dimensions, colors, backgrounds, borders, imagery, motion, responsive behavior, or product logic.
