@@ -22,9 +22,9 @@ describe('owned-domain contact and transactional delivery', () => {
     expect(runtime).toContain("dependencies.transactionalEmail === 'resend'");
   });
 
-  it('uses the current brand mark and non-pill email action styling', () => {
+  it('uses the current brand mark and restrained non-pill email action styling', () => {
     expect(email).toContain('https://sovereign.defrag.app/brand-mark.svg');
-    expect(email).toContain('border-radius:10px');
+    expect(email).toContain('border-radius:2px');
     expect(email).not.toContain('border-radius:999px');
   });
 
