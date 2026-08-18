@@ -17,9 +17,9 @@
     "@sovereign/agent-contracts": "workspace:*"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "5.20260721.1",
     "typescript": "5.8.3",
-    "wrangler": "4.112.0",
-    "vitest": "4.1.10"
+    "wrangler": "4.118.0",
+    "vitest": "4.1.10",
+    "@cloudflare/workers-types": "5.20260730.1"
   }
 }
