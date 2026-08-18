@@ -61,10 +61,10 @@ const emptyErrors = (): BaselineErrors => ({
 });
 
 const baselineStages = [
-  'Checking time and place',
-  'Calculating source positions',
-  'Preparing your Baseline profile',
-  'Opening your workspace'
+  'Checking your details',
+  'Building your Baseline',
+  'Preparing your Baseline',
+  'Opening Sovereign.OS'
 ] as const;
 
 export function PlanOnboarding() {
@@ -157,7 +157,7 @@ export function PlanOnboarding() {
           }
           setPhase('plan');
           setStatus(billing === 'cancelled'
-            ? 'Stripe checkout was cancelled. Nothing changed. Choose Free or try Sovereign+ again.'
+            ? 'Checkout was cancelled. Nothing changed. Choose Free or try Sovereign+ again.'
             : 'Choose how you want to start.');
           return;
         }
@@ -165,23 +165,19 @@ export function PlanOnboarding() {
         if (nextBaseline.readinessState === 'facet_profile_preparing') {
           setPhase('baseline_building');
           setBaselineStage('preparing');
-          setStatus(nextBaseline.readinessMessage || 'Preparing your Baseline profile…');
+          setStatus('Preparing your Baseline…');
 
           try {
             const prepared = await prepareSavedBaselineProfile(controller.signal);
             setBaseline(prepared);
             setBaselineStage('opening');
-            setStatus('Your Baseline is ready. Opening your workspace…');
+            setStatus('Your Baseline is ready. Opening Sovereign.OS…');
             location.reload();
           } catch (error) {
             if (error instanceof DOMException && error.name === 'AbortError') return;
             setPhase('error');
             setBaselineStage('idle');
-            setStatus(
-              error instanceof Error
-                ? error.message
-                : 'Your saved Baseline source is intact, but its profile could not finish. Try again.'
-            );
+            setStatus(error instanceof Error ? error.message : 'Your Baseline could not finish preparing. Try again.');
           }
           return;
         }
@@ -190,13 +186,13 @@ export function PlanOnboarding() {
           clearPlanChoice();
           setSelectedPlan(null);
           setPhase('plan');
-          setStatus('Stripe checkout was cancelled. Nothing changed. Choose Free or try Sovereign+ again.');
+          setStatus('Checkout was cancelled. Nothing changed. Choose Free or try Sovereign+ again.');
           return;
         }
 
         if (completed || effectivePlan === 'sovereign_plus' || rememberedPlan === 'free') {
           setPhase('baseline');
-          setStatus(nextBaseline.readinessMessage || 'Add the birth details you know. Your Baseline must be ready before the workspace opens.');
+          setStatus('Add the birth details you know. Your Baseline must be ready before the workspace opens.');
           return;
         }
 
@@ -227,7 +223,7 @@ export function PlanOnboarding() {
     setSubmitting(true);
     setPhase('baseline_building');
     setBaselineStage('validating');
-    setStatus('Checking time and place…');
+    setStatus('Checking your details…');
 
     try {
       const birthplace = [form.birthplaceCity, form.birthplaceRegion, form.birthplaceCountry]
@@ -244,7 +240,7 @@ export function PlanOnboarding() {
       };
 
       setBaselineStage('calculating');
-      setStatus('Calculating your exact source positions…');
+      setStatus('Building your Baseline…');
 
       const response = await fetch('/api/v1/baseline/onboarding', {
         method: 'POST',
@@ -268,14 +264,14 @@ export function PlanOnboarding() {
       };
 
       if (!response.ok || !body.baseline) {
-        throw new Error(body.message || body.error || 'Your Baseline could not be completed yet.');
+        throw new Error('Your Baseline could not be completed yet. Try again.');
       }
 
       setBaseline(body.baseline);
 
       if (response.status === 202) {
         setBaselineStage('preparing');
-        setStatus(body.message || 'Your exact source is saved. Preparing your Baseline profile…');
+        setStatus('Preparing your Baseline…');
         const prepared = await pollBaselineReadiness();
         await openReadyBaseline(prepared);
         return;
@@ -284,7 +280,7 @@ export function PlanOnboarding() {
       if (!baselineIsReady(body.baseline)) {
         setPhase('baseline');
         setBaselineStage('idle');
-        setStatus(body.baseline.readinessMessage || body.message || 'Your source data is saved, but the Baseline profile is not ready yet. Try Baseline again.');
+        setStatus('Your Baseline is saved, but it needs another attempt before the workspace can open.');
         return;
       }
 
@@ -292,7 +288,7 @@ export function PlanOnboarding() {
     } catch (error) {
       setPhase('baseline');
       setBaselineStage('idle');
-      setStatus(error instanceof Error ? error.message : 'Your Baseline could not be completed yet.');
+      setStatus(error instanceof Error ? error.message : 'Your Baseline could not be completed yet. Try again.');
     } finally {
       setSubmitting(false);
     }
@@ -316,12 +312,12 @@ export function PlanOnboarding() {
       }
 
       if (!response.ok) {
-        throw new Error('Baseline readiness could not be checked.');
+        throw new Error('Sovereign could not finish building your Baseline. Try again.');
       }
 
       const body = await response.json().catch(() => ({})) as { baseline?: BaselineStatus };
       const nextBaseline = body.baseline;
-      if (!nextBaseline) throw new Error('Baseline readiness returned no state.');
+      if (!nextBaseline) throw new Error('Sovereign could not finish building your Baseline. Try again.');
 
       setBaseline(nextBaseline);
 
@@ -329,7 +325,7 @@ export function PlanOnboarding() {
 
       if (nextBaseline.readinessState === 'source_computing') {
         setBaselineStage('calculating');
-        setStatus(nextBaseline.readinessMessage || 'Calculating your exact source positions…');
+        setStatus('Building your Baseline…');
         continue;
       }
 
@@ -338,7 +334,7 @@ export function PlanOnboarding() {
         || nextBaseline.status === 'preparing'
       ) {
         setBaselineStage('preparing');
-        setStatus(nextBaseline.readinessMessage || 'Preparing your Baseline profile…');
+        setStatus('Preparing your Baseline…');
 
         if (
           !profileRecoveryAttempted
@@ -356,15 +352,10 @@ export function PlanOnboarding() {
         continue;
       }
 
-      throw new Error(
-        nextBaseline.readinessMessage
-        || 'Your Baseline needs another attempt before the workspace can open.'
-      );
+      throw new Error('Your Baseline needs another attempt before the workspace can open.');
     }
 
-    throw new Error(
-      'Your exact Baseline source is saved, but the Baseline profile is taking longer than expected. Try again to continue from the saved source.'
-    );
+    throw new Error('Your Baseline is taking longer than expected. Try again to continue from what was already saved.');
   }
 
   async function prepareSavedBaselineProfile(signal?: AbortSignal): Promise<BaselineStatus> {
@@ -392,11 +383,7 @@ export function PlanOnboarding() {
     };
 
     if (!response.ok || !body.baseline || !baselineIsReady(body.baseline)) {
-      throw new Error(
-        body.message
-        || body.error
-        || 'Your saved Baseline source is intact, but its profile could not finish. Try again.'
-      );
+      throw new Error('Your Baseline could not finish preparing. Try again.');
     }
 
     return body.baseline;
@@ -408,13 +395,13 @@ export function PlanOnboarding() {
 
     if (accountAlreadyOnboarded) {
       clearPlanChoice();
-      setStatus('Your Baseline is ready. Opening your workspace…');
+      setStatus('Your Baseline is ready. Opening Sovereign.OS…');
       location.replace('/app');
       return;
     }
 
     if (currentPlan === 'sovereign_plus') {
-      setStatus('Your Baseline is ready. Opening your Sovereign+ workspace…');
+      setStatus('Your Baseline is ready. Opening Sovereign+…');
       await completeOnboarding('sovereign_plus');
       clearPlanChoice();
       location.replace('/app');
@@ -422,7 +409,7 @@ export function PlanOnboarding() {
     }
 
     if (selectedPlan === 'free' || readPlanChoice() === 'free') {
-      setStatus('Your Baseline is ready. Opening your Free workspace…');
+      setStatus('Your Baseline is ready. Opening Sovereign.OS…');
       await completeOnboarding('free');
       clearPlanChoice();
       location.replace('/app');
@@ -448,7 +435,7 @@ export function PlanOnboarding() {
       return;
     }
 
-    setStatus('Preparing secure Stripe checkout…');
+    setStatus('Preparing secure checkout…');
 
     try {
       const checkout = await fetch('/api/v1/billing/checkout', {
@@ -463,14 +450,14 @@ export function PlanOnboarding() {
       const data = await checkout.json().catch(() => ({})) as { checkout?: { url?: string }; error?: string };
       if (!checkout.ok || !data.checkout?.url) {
         setCheckoutUnavailable(true);
-        setStatus(data.error || 'Secure checkout is temporarily unavailable. You can continue with Free and build your Baseline now.');
+        setStatus('Secure checkout is temporarily unavailable. You can continue with Free and build your Baseline now.');
         return;
       }
 
-      setStatus('Opening secure Stripe checkout…');
+      setStatus('Opening secure checkout…');
       location.assign(data.checkout.url);
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'That plan could not be confirmed. Please try again.');
+    } catch {
+      setStatus('That plan could not be confirmed. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -491,10 +478,7 @@ export function PlanOnboarding() {
       location.replace('/login?returnTo=%2Fonboarding');
       throw new Error('Sign-in required.');
     }
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({})) as { error?: string; message?: string };
-      throw new Error(body.message || body.error || 'That plan could not be confirmed. Please try again.');
-    }
+    if (!response.ok) throw new Error('That plan could not be confirmed. Please try again.');
   }
 
   const progress = progressState(phase);
@@ -550,9 +534,8 @@ export function PlanOnboarding() {
             />
           )}
           {phase === 'baseline_building' && <BaselineBuildingView stage={baselineStage} status={status} />}
-          {phase === 'baseline_result' && baseline && (
+          {phase === 'baseline_result' && (
             <BaselineResultView
-              baseline={baseline}
               certainty={form.birthTimeCertainty}
               reviewOpen={showBaselineReview}
               onToggleReview={() => setShowBaselineReview((value) => !value)}
@@ -653,7 +636,7 @@ function BaselineFormView({
               required
             />
           </Field>
-          <Field label="Birthplace timezone" error={errors.birthTimezone} errorId="baseline-birth-timezone-error">
+          <Field label="Timezone at birth" error={errors.birthTimezone} errorId="baseline-birth-timezone-error">
             <input
               name="birthTimezone"
               type="search"
@@ -673,7 +656,7 @@ function BaselineFormView({
             <datalist id="baseline-timezone-options">
               {timeZones.map((timeZone) => <option value={timeZone} key={timeZone}>{timeZone.replaceAll('_', ' ')}</option>)}
             </datalist>
-            <small id="baseline-timezone-help">Use the historical timezone that applied at the birthplace on the birth date.</small>
+            <small id="baseline-timezone-help">Choose the timezone that applied where you were born on your birth date.</small>
           </Field>
         </div>
 
@@ -687,7 +670,7 @@ function BaselineFormView({
           />
           <span>
             <strong>I confirm this timezone for the birthplace and date.</strong>
-            <small>Sovereign does not silently replace an unconfirmed timezone.</small>
+            <small>Sovereign will use the timezone you confirm here.</small>
             {errors.timezoneConfirmed && <small id="baseline-timezone-confirmation-error" className="field-error">{errors.timezoneConfirmed}</small>}
           </span>
         </label>
@@ -704,7 +687,7 @@ function BaselineFormView({
                   checked={form.birthTimeCertainty === certainty}
                   onChange={() => onCertainty(certainty)}
                 />
-                <span>{certainty === 'exact' ? 'Exact' : certainty === 'approximate' ? 'Approximate' : 'Unknown'}</span>
+                <span>{birthTimeCertaintyLabel(certainty)}</span>
               </label>
             ))}
           </div>
@@ -728,8 +711,8 @@ function BaselineFormView({
           <p className="baseline-limited-note">You can continue without a birth time. Time-dependent details will remain visibly limited rather than being guessed.</p>
         )}
 
-        <p className="baseline-current-location-note">Current conditions stay separate from your birth data. City-level current location can be enabled later from You and is never required to build a Baseline.</p>
-        <p className="baseline-privacy-boundary">Raw birth details and exact private location are not sent to the language model. Sovereign receives only the reduced themes needed for an exploration.</p>
+        <p className="baseline-current-location-note">What may be more relevant now stays separate from your birth data. You can choose to add city-level current location later from You, and it is never required to build a Baseline.</p>
+        <p className="baseline-privacy-boundary">Your birth details are used to build your Baseline. They are not included in the AI conversation.</p>
         <button className="primary-button" type="submit" disabled={submitting}>Build my Baseline</button>
       </form>
     </>
@@ -752,8 +735,7 @@ function BaselineBuildingView({ stage, status }: { stage: BaselineStage; status:
   );
 }
 
-function BaselineResultView({ baseline, certainty, reviewOpen, onToggleReview, onContinue }: {
-  baseline: BaselineStatus;
+function BaselineResultView({ certainty, reviewOpen, onToggleReview, onContinue }: {
   certainty: BirthTimeCertainty;
   reviewOpen: boolean;
   onToggleReview: () => void;
@@ -763,16 +745,15 @@ function BaselineResultView({ baseline, certainty, reviewOpen, onToggleReview, o
     <section className="baseline-result-state">
       <p className="eyebrow">YOUR BASELINE IS READY</p>
       <h1>Your Baseline is ready.</h1>
-      <p className="plan-intro">Your exact source and validated plain-language Baseline profile are ready beneath every question, relationship, and system you choose to explore.</p>
+      <p className="plan-intro">Your Baseline is ready to use across the questions, relationships, and systems you choose to explore.</p>
       <div className="baseline-result-summary">
-        <div><span>Result</span><strong>Source and Baseline profile validated</strong></div>
-        <div><span>Birth-time certainty</span><strong>{certainty}</strong></div>
-        <div><span>Interpretive uncertainty</span><strong>{baseline.uncertainty ?? 'stated in context'}</strong></div>
+        <div><span>Baseline</span><strong>Ready</strong></div>
+        <div><span>Birth time</span><strong>{birthTimeCertaintyLabel(certainty)}</strong></div>
       </div>
       {reviewOpen && (
         <div className="baseline-review" role="region" aria-label="Baseline availability">
           <h2>What is available now</h2>
-          <p>Stable Baseline themes, exact approved Basis values, and visible uncertainty can now be used in the workspace. Current conditions remain separate and permission-based.</p>
+          <p>Your Baseline and its source details are ready. What may be more relevant now stays separate and optional.</p>
         </div>
       )}
       <div className="baseline-result-actions">
@@ -796,12 +777,12 @@ function PlanChoiceView({ interval, currentPlan, status, submitting, checkoutUna
     <>
       <p className="eyebrow">CHOOSE YOUR PLAN</p>
       <h1>Choose how you want to start.</h1>
-      <p className="plan-intro">Free covers your personal Baseline and personal AI use. Sovereign+ adds permission-based relationships, systems, Library continuity, and more AI turns. Your Baseline is required before either workspace opens.</p>
+      <p className="plan-intro">Free lets you explore yourself with your Baseline. Sovereign+ adds People, Systems, Library, optional Covenant, and more monthly use. Your Baseline is required before either workspace opens.</p>
 
       <div className="onboarding-plan-grid">
         <article className={currentPlan === 'free' ? 'current' : ''}>
           <header><span>FREE</span><strong>$0</strong></header>
-          <h2>Your personal Baseline.</h2>
+          <h2>Explore yourself with Sovereign.</h2>
           <p>Use your private Baseline across Today, Explore, decisions, recurring patterns, Shadow and Gift, and Alignment.</p>
           <ul>
             <li>Complete private Baseline Design</li>
@@ -814,19 +795,19 @@ function PlanChoiceView({ interval, currentPlan, status, submitting, checkoutUna
 
         <article className="plus-plan">
           <header><span>SOVEREIGN+</span><strong>{interval === 'annual' ? 'Annual billing' : 'Monthly billing'}</strong></header>
-          <h2>Relationships, systems, and continuity.</h2>
-          <p>Use permission-based relationship and system context while keeping each person distinct.</p>
+          <h2>Understand your people and the systems around you.</h2>
+          <p>Use another person’s Baseline only when they agree, and explore families, households, friendships, workplaces, and teams while keeping each person distinct.</p>
           <ul>
             <li>Everything in Free</li>
             <li>People, Systems, Library, and optional Covenant</li>
             <li>300 Sovereign AI turns each month</li>
-            <li>Permission-aware invitations and controls</li>
+            <li>Private invitations and sharing controls</li>
           </ul>
           <div className="billing-toggle" role="group" aria-label="Billing interval">
             <button type="button" aria-pressed={interval === 'monthly'} className={interval === 'monthly' ? 'active' : ''} onClick={() => onInterval('monthly')}>Monthly billing</button>
             <button type="button" aria-pressed={interval === 'annual'} className={interval === 'annual' ? 'active' : ''} onClick={() => onInterval('annual')}>Annual billing</button>
           </div>
-          <p className="annual-value">Stripe checkout shows the current price before you confirm.</p>
+          <p className="annual-value">Secure checkout shows the current price before you confirm.</p>
           <button className="primary-button" type="button" disabled={submitting} onClick={() => onConfirm('sovereign_plus')}>Choose Sovereign+</button>
         </article>
       </div>
@@ -868,7 +849,7 @@ function validateBaseline(form: BaselineForm): BaselineErrors {
   }
   if (form.birthplaceCity.trim().length < 2) errors.birthplaceCity = 'Enter the city of birth.';
   if (form.birthplaceCountry.trim().length < 2) errors.birthplaceCountry = 'Enter the country of birth.';
-  if (!isValidTimeZone(form.birthTimezone.trim())) errors.birthTimezone = 'Choose a valid IANA timezone.';
+  if (!isValidTimeZone(form.birthTimezone.trim())) errors.birthTimezone = 'Choose a valid timezone.';
   if (!form.timezoneConfirmed) errors.timezoneConfirmed = 'Confirm the birthplace timezone before continuing.';
   if (form.birthTimeCertainty !== 'unknown' && !/^([01]\d|2[0-3]):[0-5]\d$/.test(form.birthTime)) {
     errors.birthTime = 'Enter the birth time or choose Unknown.';
@@ -900,6 +881,10 @@ function supportedTimeZones(): string[] {
   const values = supportedValuesOf?.('timeZone');
   if (Array.isArray(values) && values.length > 0) return values;
   return ['UTC', 'America/Los_Angeles', 'America/Denver', 'America/Chicago', 'America/New_York', 'Europe/London', 'Europe/Paris', 'Asia/Tokyo', 'Australia/Sydney'];
+}
+
+function birthTimeCertaintyLabel(certainty: BirthTimeCertainty): string {
+  return certainty === 'exact' ? 'Exact' : certainty === 'approximate' ? 'Approximate' : 'Unknown';
 }
 
 function baselineIsReady(baseline: BaselineStatus): boolean {
