@@ -153,7 +153,16 @@ describe('secondary public visual parity', () => {
     expect(productionVisual).toContain('.public-secondary-page .policy-grid article:nth-child(n)');
     expect(productionVisual).toContain('background: transparent !important');
     expect(productionVisual).toContain('border-radius: 0 !important');
-    expect(productionVisual).toContain('font-size: clamp(3rem, 4.8vw, 4.7rem) !important');
+    expect(productionVisual).toContain('font-size: clamp(2.9rem, 4.3vw, 4.25rem) !important');
+  });
+
+  it('keeps the standalone public pages dense enough to read as product surfaces rather than sparse posters', () => {
+    expect(staticTerminalCss).toContain('body.how-page .journey-steps > article');
+    expect(staticTerminalCss).toContain('grid-template-columns: 64px minmax(220px, 0.7fr) minmax(0, 1.3fr) !important');
+    expect(staticTerminalCss).toContain('body.pricing-page .price-card');
+    expect(staticTerminalCss).toContain('body.questions-page .faq-category');
+    expect(staticTerminalCss).toContain('grid-template-columns: 190px minmax(0, 1fr) !important');
+    expect(staticTerminalCss).toContain('font-size: 0.96rem !important');
   });
 
   it('keeps landing refinement order and terminal production authority explicit', () => {
