@@ -100,4 +100,6 @@ Required baseline checks are:
 - `pnpm test`
 - `pnpm build`
 
+Before a production release mutation, run `pnpm scan:dependencies` against the exact candidate lockfile in an environment with registry access. High/critical findings must be resolved or explicitly reviewed and accepted with evidence; a registry/network failure is an environment failure, not a passing scan.
+
 Production candidates additionally require the exact-SHA `pnpm verify:cloudflare-build` gate before any release mutation. Do not substitute source inspection, issue comments, old deployment evidence, or healthy endpoints from a different SHA for that gate.
