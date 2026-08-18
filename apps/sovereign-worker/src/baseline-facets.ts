@@ -12,7 +12,9 @@ import {
   type BaselineFacet,
   type BaselineFacetId,
   type BaselineFacetProfile,
-  type BaselineSourceData
+  type BaselineSourceData,
+  type BasisCategory,
+  type BasisRegistryItem
 } from './baseline-contracts';
 
 interface FacetCacheInput {
@@ -33,16 +35,39 @@ interface FacetCacheRow {
 export const FACET_BATCH_SIZE = 6;
 export const FACET_BATCH_TIMEOUT_MS = 12_000;
 export const FACET_BATCH_ATTEMPTS = 2;
+export const DETERMINISTIC_FACET_MODEL_VERSION = 'deterministic-baseline-facets-v1';
+
+const FACET_PRESENTATION: Record<BaselineFacetId, { title: string; focus: string; categories: BasisCategory[] }> = {
+  core_orientation: { title: 'Core orientation', focus: 'how you tend to orient before a specific situation takes over', categories: ['natal', 'numerology', 'human_design', 'gene_keys'] },
+  identity_purpose: { title: 'Identity and purpose', focus: 'the themes you may return to when deciding what feels meaningful or worth carrying forward', categories: ['natal', 'numerology', 'gene_keys'] },
+  communication: { title: 'Communication', focus: 'how expression, timing, and clarity may become noticeable in communication', categories: ['natal', 'human_design'] },
+  decision_making: { title: 'Decision-making', focus: 'what may help you distinguish a considered choice from a pressured response', categories: ['human_design', 'natal', 'numerology'] },
+  learning: { title: 'Learning', focus: 'how attention, repetition, experimentation, and integration may work together for you', categories: ['human_design', 'natal'] },
+  creativity_expression: { title: 'Creativity and expression', focus: 'how ideas and expression may move from private impulse into visible form', categories: ['natal', 'gene_keys'] },
+  love_connection: { title: 'Love and connection', focus: 'how closeness, difference, reciprocity, and connection may be experienced', categories: ['natal', 'aspect', 'human_design'] },
+  leadership: { title: 'Leadership', focus: 'how direction, initiative, influence, and responsibility may be expressed without turning them into a fixed role', categories: ['human_design', 'natal', 'gene_keys'] },
+  boundaries: { title: 'Boundaries', focus: 'how limits and distinctions may stay visible while connection remains possible', categories: ['human_design', 'aspect', 'natal'] },
+  responsibility: { title: 'Responsibility', focus: 'how responsibility may be taken, shared, limited, or clarified in real situations', categories: ['numerology', 'human_design', 'natal'] },
+  conflict_repair: { title: 'Conflict and repair', focus: 'how tension may be recognized and what can support clearer repair after impact', categories: ['aspect', 'human_design', 'natal'] },
+  response_pressure: { title: 'Response to pressure', focus: 'how a useful capacity may narrow, speed up, or overreach when pressure rises', categories: ['aspect', 'natal', 'human_design'] },
+  response_change: { title: 'Response to change', focus: 'how flexibility, continuity, and uncertainty may interact when conditions change', categories: ['aspect', 'natal', 'gene_keys'] },
+  underused_capacity: { title: 'Underused capacity', focus: 'which useful qualities may deserve more deliberate room rather than being treated as absent', categories: ['human_design', 'gene_keys', 'natal'] },
+  shadow_expression: { title: 'Shadow expression', focus: 'how a valid quality may become narrower, defensive, avoidant, or overused under pressure', categories: ['gene_keys', 'human_design', 'aspect', 'natal'] },
+  gift_expression: { title: 'Gift expression', focus: 'how the same valid quality may become more flexible, proportionate, and usable with awareness', categories: ['gene_keys', 'human_design', 'aspect', 'natal'] },
+  alignment_markers: { title: 'Alignment markers', focus: 'what observable signs may help you test whether an interpretation fits your actual experience', categories: ['human_design', 'gene_keys', 'numerology', 'natal'] }
+};
 
 export async function ensureBaselineFacetProfile(env: Env, input: FacetCacheInput): Promise<BaselineFacetProfile | null> {
   const config = resolveAiModelConfig(env);
   const cached = input.refresh ? null : await readCachedProfile(env, input.accountId);
+  const cachedModelCompatible = cached?.model_version === config.model
+    || cached?.model_version === DETERMINISTIC_FACET_MODEL_VERSION;
   if (
     cached
+    && cachedModelCompatible
     && cached.input_hash === input.inputHash
     && cached.calculation_version === input.source.computationVersion
     && cached.facet_contract_version === BASELINE_FACET_CONTRACT_VERSION
-    && cached.model_version === config.model
   ) {
     const parsed = baselineFacetProfileSchema.parse(JSON.parse(cached.profile_json));
     return validateFacetProfileBasis(parsed, buildBaselineBasisRegistry(input.source));
@@ -51,9 +76,14 @@ export async function ensureBaselineFacetProfile(env: Env, input: FacetCacheInpu
   let profile: BaselineFacetProfile;
   if (canUseDevelopmentFixtures(env)) {
     profile = buildDevelopmentFacetProfile(input.source, config.model);
+  } else if (config.provider === 'cloudflare-gateway' && env.AI && env.AI_GATEWAY_ID) {
+    try {
+      profile = await generateFacetProfile(env, input.source, config.model);
+    } catch {
+      profile = buildDeterministicFacetProfile(input.source);
+    }
   } else {
-    if (config.provider !== 'cloudflare-gateway' || !env.AI || !env.AI_GATEWAY_ID) return null;
-    profile = await generateFacetProfile(env, input.source, config.model);
+    profile = buildDeterministicFacetProfile(input.source);
   }
 
   await env.DB.prepare(`INSERT OR REPLACE INTO baseline_facet_profiles
@@ -64,7 +94,7 @@ export async function ensureBaselineFacetProfile(env: Env, input: FacetCacheInpu
       input.inputHash,
       input.source.computationVersion,
       BASELINE_FACET_CONTRACT_VERSION,
-      config.model,
+      profile.modelVersion,
       JSON.stringify(profile),
       profile.generatedAt
     )
@@ -231,6 +261,66 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: s
   });
 }
 
+export function buildDeterministicFacetProfile(source: BaselineSourceData): BaselineFacetProfile {
+  const registry = buildBaselineBasisRegistry(source);
+  if (registry.length === 0) throw new Error('Deterministic Baseline facets require exact Basis data');
+
+  const facets = baselineFacetIds.map((id) => {
+    const presentation = FACET_PRESENTATION[id];
+    const basis = selectFacetBasis(registry, presentation.categories);
+    const basisSummary = basis
+      .slice(0, 2)
+      .map((item) => item.accessibleLabel)
+      .join(' and ');
+    const lowerTitle = presentation.title.toLowerCase();
+
+    return {
+      id,
+      title: presentation.title,
+      description: `Use this facet to explore ${presentation.focus}. It is anchored to ${basisSummary} and remains an interpretation to test against lived experience.`,
+      shadowExpression: `Under pressure, the ${lowerTitle} theme may become narrower, faster, avoidant, or overused; the exact expression remains something to verify in context.`,
+      giftExpression: `With awareness, the ${lowerTitle} theme may become more flexible, proportionate, and useful while leaving room for correction and choice.`,
+      alignmentMarkers: [
+        `The ${lowerTitle} description matches repeated experience rather than one isolated moment.`,
+        `You can name where the ${lowerTitle} description does not fit and keep the underlying Basis unchanged.`
+      ],
+      uncertainty: source.uncertainty,
+      basisRefs: basis.map((item) => item.id)
+    } satisfies BaselineFacet;
+  });
+
+  const profile = baselineFacetProfileSchema.parse({
+    version: BASELINE_FACET_CONTRACT_VERSION,
+    modelVersion: DETERMINISTIC_FACET_MODEL_VERSION,
+    sourceComputationVersion: source.computationVersion,
+    generatedAt: new Date().toISOString(),
+    interpretive: true,
+    facets
+  });
+
+  return validateFacetProfileBasis(profile, registry);
+}
+
+function selectFacetBasis(registry: BasisRegistryItem[], categories: BasisCategory[]): BasisRegistryItem[] {
+  const selected: BasisRegistryItem[] = [];
+  const seen = new Set<string>();
+  for (const category of categories) {
+    for (const item of registry) {
+      if (item.category !== category || seen.has(item.id)) continue;
+      selected.push(item);
+      seen.add(item.id);
+      if (selected.length >= 3) return selected;
+    }
+  }
+  for (const item of registry) {
+    if (seen.has(item.id)) continue;
+    selected.push(item);
+    seen.add(item.id);
+    if (selected.length >= 3) break;
+  }
+  return selected;
+}
+
 function buildDevelopmentFacetProfile(source: BaselineSourceData, model: string): BaselineFacetProfile {
   const registry = buildBaselineBasisRegistry(source);
   const primary = registry[0]?.id;
@@ -266,7 +356,7 @@ function buildDevelopmentFacetProfile(source: BaselineSourceData, model: string)
       description: `Development-only interpretation for ${titles[id].toLowerCase()}, derived from the recorded authorized fixture.`,
       shadowExpression: 'Under pressure, a valid capacity may narrow into overuse, avoidance, or responsibility taken without agreement.',
       giftExpression: 'With awareness, the same capacity can create direction while leaving room for consent, limits, and shared responsibility.',
-      alignmentMarkers: ['Authority and responsibility are named clearly.', 'The person can use the capacity without erasing their limits.'],
+      alignmentMarkers: ['Roles and responsibility are named clearly.', 'The person can use the capacity without erasing their limits.'],
       uncertainty: source.uncertainty,
       basisRefs: [primary]
     }))
