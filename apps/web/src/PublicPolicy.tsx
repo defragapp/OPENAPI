@@ -16,8 +16,8 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
     >
       <header className="v0-nav">
         <div className="v0-shell v0-nav-inner">
-          <a className="v0-wordmark v0-wordmark--desktop" href="/"><BrandMark /></a>
-          <a className="v0-wordmark v0-wordmark--mobile" href="/" aria-label="Sovereign.OS home">Sovereign</a>
+          <a className="v0-wordmark v0-wordmark--desktop" href="/" aria-label="Sovereign.OS home"><BrandMark /></a>
+          <a className="v0-wordmark v0-wordmark--mobile" href="/" aria-label="Sovereign.OS home"><BrandMark /></a>
           <nav aria-label="Public navigation">
             <a href="/how-it-works">How it works</a>
             <a href="/pricing">Pricing</a>
@@ -33,6 +33,7 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
                 <a href="/pricing">Pricing</a>
                 <a href="/faq">FAQ</a>
                 <a href="/login">Sign in</a>
+                <a href="/signup">Get started</a>
               </nav>
             </details>
           </div>
@@ -70,11 +71,12 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
 
       <footer className="v0-footer">
         <div className="v0-shell">
-          <a href="/" className="v0-wordmark"><BrandMark /></a>
+          <a href="/" className="v0-wordmark" aria-label="Sovereign.OS home"><BrandMark /></a>
           <nav aria-label="Footer navigation">
             <a aria-current={privacy ? 'page' : undefined} href="/privacy">Privacy</a>
             <a aria-current={!privacy ? 'page' : undefined} href="/terms">Terms</a>
             <a href="/pricing">Pricing</a>
+            <a href="/faq">FAQ</a>
             <a href="mailto:info@defrag.app">Contact</a>
           </nav>
           <p>© 2026 Sovereign.OS</p>
