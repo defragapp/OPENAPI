@@ -16,6 +16,16 @@ describe('mounted Account and Library controls', () => {
     expect(controls).toContain('Delete this saved understanding from your Library?');
   });
 
+  it('keeps raw uncertainty provenance out of primary Library rows', () => {
+    expect(controls).toContain('uncertainty?: string');
+    expect(controls).toContain(
+      "item.updatedAt ? `Updated ${new Date(item.updatedAt).toLocaleDateString()}` : 'Saved privately'"
+    );
+    expect(controls).not.toContain(
+      ' · uncertainty ${item.body.uncertainty}'
+    );
+  });
+
   it('downloads an authenticated no-retention private account export', () => {
     expect(controls).toContain("fetch('/api/v1/account/export'");
     expect(controls).toContain("credentials: 'same-origin'");
