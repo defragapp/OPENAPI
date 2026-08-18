@@ -70,14 +70,14 @@ export function PolicyGateAccountRights() {
       const body = await requestJson(
         '/api/v1/deletion-jobs',
         {},
-        'Account deletion status is temporarily unavailable.'
+        'Account deletion information is temporarily unavailable.'
       );
       setDeletionJob(body.deletionJob ?? null);
     } catch (error) {
       setStatus(
         error instanceof Error
           ? error.message
-          : 'Account deletion status is temporarily unavailable.'
+          : 'Account deletion information is temporarily unavailable.'
       );
     }
   }
@@ -90,7 +90,7 @@ export function PolicyGateAccountRights() {
     if (loading) return;
 
     setLoading(true);
-    setStatus('Preparing your private account download…');
+    setStatus('Preparing your data download…');
 
     try {
       const response = await fetch('/api/v1/account/export', {
@@ -110,7 +110,7 @@ export function PolicyGateAccountRights() {
       }
 
       if (!response.ok) {
-        throw new Error('Your account download could not be generated.');
+        throw new Error('Your data could not be prepared. Try again.');
       }
 
       const blob = await response.blob();
@@ -127,13 +127,13 @@ export function PolicyGateAccountRights() {
       window.setTimeout(() => URL.revokeObjectURL(url), 0);
 
       setStatus(
-        'Private account download complete. Sovereign did not retain an export copy.'
+        'Your data download is ready. Sovereign did not keep a separate copy.'
       );
     } catch (error) {
       setStatus(
         error instanceof Error
           ? error.message
-          : 'Your account download could not be generated.'
+          : 'Your data could not be prepared. Try again.'
       );
     } finally {
       setLoading(false);
@@ -175,7 +175,7 @@ export function PolicyGateAccountRights() {
     if (loading) return;
 
     setLoading(true);
-    setStatus(allSessions ? 'Signing out all sessions…' : 'Signing out…');
+    setStatus(allSessions ? 'Signing out everywhere…' : 'Signing out…');
 
     try {
       await requestJson(
@@ -184,7 +184,7 @@ export function PolicyGateAccountRights() {
         'Sign out could not be completed.'
       );
 
-      setStatus(allSessions ? 'All sessions signed out.' : 'Signed out.');
+      setStatus(allSessions ? 'Signed out everywhere.' : 'Signed out.');
     } catch (error) {
       setStatus(
         error instanceof Error
@@ -274,9 +274,9 @@ export function PolicyGateAccountRights() {
           Your account stays in your control.
         </h2>
         <p>
-          Updated policies pause private intelligence, not your ability to
-          download your data, manage billing, sign out, or manage account
-          deletion.
+          Updated policies pause normal use of Sovereign.OS until you review
+          them. You can still download your data, manage billing, sign out, or
+          manage account deletion.
         </p>
       </div>
 
@@ -321,7 +321,7 @@ export function PolicyGateAccountRights() {
           disabled={loading}
           onClick={() => void signOut(true)}
         >
-          Sign out all sessions
+          Sign out everywhere
         </button>
 
         <a href="https://sovereign.defrag.app/privacy">
@@ -341,7 +341,7 @@ export function PolicyGateAccountRights() {
             <strong>Deletion scheduled</strong>
 
             <p>
-              Status: {deletionJob.status}. Scheduled for{' '}
+              Scheduled for{' '}
               {deletionJob.scheduledFor
                 ? new Date(deletionJob.scheduledFor).toLocaleString()
                 : 'the end of the 14-day grace period'}.
@@ -370,9 +370,9 @@ export function PolicyGateAccountRights() {
               />
 
               <span>
-                I understand that deletion removes my account and private data
-                after the grace period, subject to required billing and legal
-                retention.
+                I understand that deleting my account removes its private
+                product data after the grace period, subject to the Privacy
+                Policy.
               </span>
             </label>
 
