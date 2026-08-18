@@ -10,6 +10,7 @@ const renderedFidelity = read('./rendered-fidelity-v1.css');
 const landingRefinement = read('./landing-refinement-v2.css');
 const landingRefinementV5 = read('./landing-live-refinement-v5.css');
 const sansAuthority = read('./sans-typography-authority-v1.css');
+const productionVisual = read('./production-visual-authority-v1.css');
 const invitationFidelity = read('./invitation-rendered-fidelity-v1.css');
 const staticRefinement = read('../public/experience-static-refinement-v1.css');
 const staticTerminal = read('../public/premium-action-static-v1.css');
@@ -29,7 +30,7 @@ const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohes
 const terminalCssPath = '/premium-action-static-v1.css?v=20260817-action-v1';
 
 describe('deployed route cohesion contract', () => {
-  it('keeps component stylesheet order and appends terminal sans typography after inline authorities', () => {
+  it('keeps component stylesheet order and appends terminal production authority last', () => {
     const cohesion = "import './deployed-route-cohesion.css';";
     const passkey = "import './passkey-auth.css';";
     expect(main).toContain(cohesion);
@@ -37,11 +38,12 @@ describe('deployed route cohesion contract', () => {
     expect(main.indexOf(cohesion)).toBeLessThan(main.indexOf(passkey));
     expect(main.slice(main.indexOf(passkey) + passkey.length)).not.toContain("import './");
     expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';");
-    expect(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
+    expect(main).toContain("import productionVisualAuthorityCss from './production-visual-authority-v1.css?inline';");
+    expect(main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;'));
   });
 
   it('keeps route, refinement, and typography CSS structurally balanced', () => {
-    for (const source of [routeCss, staticRouteCss, experienceRefinement, renderedFidelity, landingRefinement, landingRefinementV5, sansAuthority, invitationFidelity, staticRefinement, staticTerminal]) {
+    for (const source of [routeCss, staticRouteCss, experienceRefinement, renderedFidelity, landingRefinement, landingRefinementV5, sansAuthority, productionVisual, invitationFidelity, staticRefinement, staticTerminal]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
@@ -56,7 +58,9 @@ describe('deployed route cohesion contract', () => {
     }
     expect(consent).not.toContain('/deployed-route-cohesion.css?v=20260803-route-v1');
     expect(staticTerminal).toContain('--static-title-font:');
-    expect(staticTerminal).toContain('font-family: var(--static-title-font) !important');
+    expect(staticTerminal).toContain('-apple-system');
+    expect(staticTerminal).toContain('"SF Pro Display"');
+    expect(staticTerminal).not.toContain('Optima');
     expect(staticTerminal).not.toContain('Sovereign Display');
   });
 
@@ -86,7 +90,7 @@ describe('deployed route cohesion contract', () => {
     ]) expect(staticRouteCss).toContain(marker);
   });
 
-  it('keeps the Browser audit transport external, deterministic, and rate-limit aware', () => {
+  it('keeps the Browser audit transport external, deterministic, rate-limit aware, and native-font aware', () => {
     expect(routeAuditAsset).toContain('document.currentScript');
     expect(routeAuditAsset).toContain('setTimeout(inspect, pollInterval)');
     expect(routeAuditAsset).toContain("document.addEventListener('DOMContentLoaded', start");
@@ -104,10 +108,10 @@ describe('deployed route cohesion contract', () => {
     expect(verifierV2).toContain('const serifTypographyMarker =');
     expect(verifierV2).toContain("headingFamily).includes('Sovereign Display')");
     expect(verifierV2).toContain('const sansTypographyReplacement =');
-    expect(verifierV2).toContain("['-apple-system', 'SF Pro Display', 'Segoe UI', 'system-ui', 'Helvetica Neue']");
-    expect(verifierV2).toContain('native sans title stack');
-    expect(verifierV2).toContain('for (const [from, to] of replacements) generated = generated.replace(from, to);');
-    expect(verifierV2).toContain('Route cohesion v2 still certifies the retired display serif.');
+    expect(verifierV2).toContain("['-apple-system', 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', 'system-ui', 'Helvetica Neue']");
+    expect(verifierV2).toContain('approved native SF/Segoe title stack');
+    expect(verifierV2).not.toContain("concat(['Optima', 'Candara'])");
+    expect(verifierV2).toContain('Route cohesion v2 still certifies the rejected legacy humanist title stack.');
     expect(productionRelease).toContain("['verify-route-cohesion', 'scripts/verify-live-route-cohesion-v2.mjs']");
   });
 
@@ -119,14 +123,15 @@ describe('deployed route cohesion contract', () => {
     expect(packageJson.scripts?.['verify:live-route-cohesion']).toBe('node scripts/verify-live-route-cohesion-v2.mjs');
   });
 
-  it('keeps rendered visual refinements coherent with the sans-only public release', () => {
+  it('keeps rendered visual refinements coherent with the current public release', () => {
     expect(experienceRefinement).toContain('--landing-blue: #e8ddd0 !important');
     expect(renderedFidelity).toContain('--v8-blue: #d8d0c5 !important');
     expect(landingRefinement).toContain('.landing-workflow__progress');
     expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
-    expect(sansAuthority).toContain('The retired display serif must not render anywhere in the active product.');
+    expect(sansAuthority).toContain('Optima and retired bundled display faces must not render in active titles.');
+    expect(productionVisual).toContain('visibility: visible !important');
     expect(invitationFidelity).toContain('@media (min-width: 901px)');
     expect(staticRefinement).toContain('--v0-blue: #e8ddd0');
     expect(staticRefinement).toContain('--v0-blue-bright: #fffaf3');
