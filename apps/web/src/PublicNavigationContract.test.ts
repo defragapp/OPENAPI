@@ -51,6 +51,16 @@ describe('public navigation and brand contract', () => {
     expect(visualAuthority).toContain('min-height: 64px !important');
   });
 
+  it('allows exactly one visible React wordmark per breakpoint', () => {
+    expect(visualAuthority).toContain('.public-approved-v8 .v0-wordmark--desktop,');
+    expect(visualAuthority).toContain('.public-secondary-page .v0-wordmark--desktop {\n  display: inline-flex !important;');
+    expect(visualAuthority).toContain('.public-approved-v8 .v0-wordmark--mobile,');
+    expect(visualAuthority).toContain('.public-secondary-page .v0-wordmark--mobile {\n  display: none !important;');
+    expect(visualAuthority).toContain('@media (max-width: 760px)');
+    expect(visualAuthority).toContain('.public-secondary-page .v0-wordmark--desktop { display: none !important; }');
+    expect(visualAuthority).toContain('.public-secondary-page .v0-wordmark--mobile { display: inline-flex !important; }');
+  });
+
   it('uses the same wordmark geometry on standalone public routes', () => {
     expect(staticAuthority).toContain('font-size: 0.75rem !important');
     expect(staticAuthority).toContain('font-weight: 720 !important');
