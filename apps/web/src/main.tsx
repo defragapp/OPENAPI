@@ -36,6 +36,7 @@ import authenticatedLaunchCohesionCss from './authenticated-launch-cohesion-v1.c
 import premiumActionAuthorityCss from './premium-action-authority-v1.css?inline';
 import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';
 import productionProductCohesionCss from './production-product-cohesion-v1.css?inline';
+import publicIntelligenceDemonstrationCss from './public-intelligence-demonstration-v1.css?inline';
 import productionVisualAuthorityCss from './production-visual-authority-v1.css?inline';
 
 /* Component foundations */
@@ -110,6 +111,7 @@ function installPlatformVisualCohesion(): void {
   style.textContent += `\n${authenticatedLaunchCohesionCss}`;
   style.textContent += `\n${sansTypographyAuthorityCss}`;
   style.textContent += `\n${productionProductCohesionCss}`;
+  style.textContent += `\n${publicIntelligenceDemonstrationCss}`;
   style.textContent += `\n${productionVisualAuthorityCss}`;
   document.head.append(style);
 }

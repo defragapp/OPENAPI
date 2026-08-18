@@ -52,11 +52,11 @@ Public self-exploration must not be reduced to one incident, one conflict, respo
 
 Relationship intelligence extends self-understanding outward.
 
-**Understand both sides and what happens between you.**
+**See why the same moment lands differently—and how to bridge the gap.**
 
 Shared relationship intelligence begins through a private invitation. The invited person signs in or creates their own Sovereign.OS account, completes their own Baseline, and explicitly chooses which requested uses to allow. Only then may Sovereign use both permitted Baselines together.
 
-Sovereign keeps both people distinct and can examine how each person's Baseline may shape how the same situation is experienced or approached, where the two people differ or align, and what happens when those patterns meet.
+Sovereign keeps both people distinct and can examine how each person's Baseline may shape how the same situation is experienced or approached, where the two people differ or align, what happens when those patterns meet, and what may reduce avoidable pressure without requiring either person to disappear into the other person's style.
 
 A Baseline does not reveal an exact private thought, motive, or emotion. Relationship intelligence is not compatibility scoring, mind-reading, motive assignment, or a verdict about whether a relationship should continue.
 
@@ -239,11 +239,13 @@ A normal answer contains:
 - only relevant actions;
 - a concise correction prompt.
 
+The schema is structural, not a writing template. Sections should be selected because they materially improve the answer, not because a mode has a fixed checklist. Deep relationship and system answers should explain the interaction mechanism, consequence, and useful distinction in natural prose rather than returning a stack of short categorical summaries.
+
 Self-exploration answers can cover identity/orientation, decision-making, communication, learning, creativity/expression, love/connection, leadership, boundaries, response to pressure/change, Shadow, Gift, Alignment, and underused qualities when the Baseline supports them.
 
-Relationship answers distinguish **You may be bringing**, **They may be bringing**, **What happens between you**, **What each person can own**, and any factual detail that still needs to be asked directly.
+Relationship answers may draw from **You may be bringing**, **They may be bringing**, **What happens between you**, **What each person can own**, and factual detail that still needs to be asked directly. Use only the pieces that make the specific question clearer; do not force every relationship answer through every label.
 
-System answers keep participants distinct and distinguish supplied roles, permitted perspectives, confirmed responsibilities, pressure, relevant interactions, and change effects.
+System answers keep participants distinct and may distinguish supplied roles, permitted perspectives, confirmed responsibilities, pressure, relevant interactions, and change effects. The answer should make the system-level consequence visible, not merely list participants or roles.
 
 Alignment answers use **Supports the fit**, **Pulls against it**, **The real tradeoff**, **Still needed**, and **A closer version**.
 
@@ -279,11 +281,10 @@ Description:
 
 Representative public questions may include:
 
-- `What does Alignment look like for me?`
-- `How do I express myself when I’m clear?`
-- `How do I create best?`
+- `How do I make decisions that actually fit me?`
+- `Why did their tone affect me more than their words?`
+- `How do I know when I’m adapting too early?`
 - `What changes in me under pressure?`
-- `How do I make decisions that fit me?`
 - `What part of myself am I underusing?`
 - `Why do I keep repeating this pattern?`
 
@@ -291,18 +292,19 @@ Representative public questions may include:
 
 Heading:
 
-`Understand both sides and what happens between you.`
+`See why the same moment lands differently—and how to bridge the gap.`
 
 Description:
 
-`With permission, compare two people while keeping each person distinct. See where you differ, what you share, and how the interaction changes between you.`
+`With permission, compare two people while keeping each person distinct. See where timing, communication, pressure, or decision styles diverge, what happens when they meet, and what each person can do differently.`
 
 Representative public questions may include:
 
-- `Why does the same situation land differently for us?`
+- `Why does the same conversation feel urgent to me and pressuring to them?`
 - `What do we each need to communicate clearly?`
 - `Where do our decision-making styles differ?`
 - `What happens between us when pressure rises?`
+- `What would repair require from each of us?`
 
 ### `03 · FROM 1:1 TO THE WHOLE SYSTEM`
 
@@ -312,13 +314,14 @@ Heading:
 
 Description:
 
-`Move from one relationship to a family, household, team, or group. See the people, supplied roles, permitted perspectives, confirmed responsibilities, pressure, constraints, observations, interactions, and patterns between them together.`
+`Move from one relationship to a family, household, team, or group. See how supplied roles, permitted perspectives, confirmed responsibilities, pressure, constraints, observations, and interactions work together—and what changes when one person responds differently.`
 
 Representative public questions may include:
 
 - `What role am I actually playing in this family?`
 - `What changes when I stop playing the role everyone expects?`
 - `How does pressure move through this team?`
+- `Why does my family pull me back into mediator mode even when I stop fixing the conflict?`
 - `What changes when one person responds differently?`
 
 ### Root comparison
@@ -420,8 +423,8 @@ Explore:
 
 People:
 
-- `Understand both sides and what happens between you.`
-- `Keep each person distinct, then examine the interaction itself.`
+- `See how the same moment can land differently.`
+- `Keep each person distinct, then examine the interaction and what may help close the gap.`
 
 Systems:
 
@@ -467,6 +470,7 @@ Do not alter the live Sovereign+ prices, products, lookup keys, or entitlement d
 
 Never use these as active product/interface language:
 
+- `Understand both sides and what happens between you.`;
 - `One private reference beneath every question.` as a root marketing headline;
 - `One private foundation. More useful answers across the questions that shape your life.`;
 - `The same Baseline can support a decision, a recurring pattern, or a relationship question without flattening them into the same answer.`;

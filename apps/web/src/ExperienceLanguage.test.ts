@@ -34,6 +34,7 @@ const retired = [
 ] as const;
 
 const rejectedPublicCategoryPhrases = [
+  'Understand both sides and what happens between you.',
   'One private reference beneath every question.',
   'One private foundation. More useful answers across the questions that shape your life.',
   'Separate helping from carrying the outcome.',
@@ -53,13 +54,13 @@ describe('Sovereign.OS active experience language', () => {
     const landing = activeExperience.find(([label]) => label === 'public landing')?.[1] ?? '';
     const stories = activeExperience.find(([label]) => label === 'landing demonstrations')?.[1] ?? '';
 
-    expect(landing).toContain('Start with you');
-    expect(landing).toContain('Explore yourself.');
-    expect(landing).toContain('What does Alignment look like for me?');
+    expect(landing).toContain('You → your people → the whole system');
+    expect(landing).toContain('Start with yourself. Expand outward when it matters.');
+    expect(landing).toContain('How do I make decisions that actually fit me?');
     expect(stories).toContain('01 · You');
-    expect(stories).toContain('Explore how you think, decide, create, connect, and grow.');
+    expect(stories).toContain('Explore how you think, decide, communicate, create, connect, and grow.');
     expect(stories).toContain('02 · You + your people');
-    expect(stories).toContain('Understand both sides and what happens between you.');
+    expect(stories).toContain('See why the same moment lands differently—and how to bridge the gap.');
     expect(stories).toContain('03 · From 1:1 to the whole system');
     expect(stories).toContain('See the whole system.');
 
@@ -69,12 +70,19 @@ describe('Sovereign.OS active experience language', () => {
     }
   });
 
-  it('keeps authenticated Explore and Systems aligned with the same product model', () => {
+  it('keeps authenticated Explore, People, Systems, and Baseline language aligned with the same product model', () => {
     const workspace = activeExperience.find(([label]) => label === 'workspace')?.[1] ?? '';
     expect(workspace).toContain("{ name: 'Explore', label: 'Explore', description: 'Explore yourself more deeply' }");
+    expect(workspace).toContain("{ name: 'People', label: 'People', description: 'See how the same moment can land differently' }");
     expect(workspace).toContain("{ name: 'Systems', label: 'Systems', description: 'See the whole system' }");
+    expect(workspace).toContain('title="See how the same moment can land differently."');
+    expect(workspace).toContain('body="Keep each person distinct, then examine the interaction and what may help close the gap."');
     expect(workspace).toContain("Explore: ['What part of myself do I want to understand more clearly?', 'What changes in me under pressure?']");
     expect(workspace).toContain("Systems: ['What role am I playing in this system?', 'What changes when the usual roles shift?']");
+    expect(workspace).not.toContain('Understand both sides and what happens between you');
+    expect(workspace).not.toContain('private foundation');
+    expect(workspace).not.toContain('personal foundation');
+    expect(workspace).not.toContain('same foundation');
     expect(workspace).not.toContain("Explore: ['Describe the pattern you want to look at.', 'Where does this change under pressure?']");
     expect(workspace).not.toContain("Systems: ['Where does responsibility keep landing?']");
   });

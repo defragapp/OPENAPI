@@ -16,6 +16,7 @@ const refinement = read('./experience-refinement-v1.css');
 const renderedFidelity = read('./rendered-fidelity-v1.css');
 const landingRefinementV2 = read('./landing-refinement-v2.css');
 const landingRefinementV5 = read('./landing-live-refinement-v5.css');
+const intelligenceDemoStyles = read('./public-intelligence-demonstration-v1.css');
 const typography = read('./typography-system.css');
 const sansAuthority = read('./sans-typography-authority-v1.css');
 const languageAuthority = read('../../../docs/product-language-system.md');
@@ -23,7 +24,7 @@ const visualContract = read('../../../docs/v0-visual-port-contract.md');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
 describe('public positioning reset', () => {
-  it('preserves the visual cascade and mounts sans typography as the terminal inline authority', () => {
+  it('preserves the visual cascade and keeps production visual authority terminal', () => {
     const imports = [
       "import './landing-expression-field-v3.css';",
       "import './landing-expression-field-integration.css';",
@@ -38,10 +39,13 @@ describe('public positioning reset', () => {
       expect(main.indexOf(imports[index]!)).toBeGreaterThan(main.indexOf(imports[index - 1]!));
     }
     expect(main.slice(main.indexOf(imports.at(-1)!) + imports.at(-1)!.length)).not.toContain("import './");
-    expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';");
-    expect(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;')).toBeGreaterThan(
-      main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;')
-    );
+    expect(main).toContain("import publicIntelligenceDemonstrationCss from './public-intelligence-demonstration-v1.css?inline';");
+    const productCohesion = main.indexOf('style.textContent += `\\n${productionProductCohesionCss}`;');
+    const intelligenceDemo = main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationCss}`;');
+    const productionVisual = main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;');
+    expect(intelligenceDemo).toBeGreaterThan(productCohesion);
+    expect(productionVisual).toBeGreaterThan(intelligenceDemo);
+    expect(main.slice(productionVisual + 'style.textContent += `\\n${productionVisualAuthorityCss}`;'.length)).not.toContain('style.textContent +=');
   });
 
   it('keeps the founder hero but explains the actual product immediately', () => {
@@ -52,11 +56,11 @@ describe('public positioning reset', () => {
       '<RealLifeQuestions />',
       '<LandingProductStories />',
       'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
-      'Start with you',
-      'Explore yourself.',
-      'What does Alignment look like for me?',
-      'How do I express myself when I’m clear?',
-      'How do I create best?',
+      'You → your people → the whole system',
+      'Start with yourself. Expand outward when it matters.',
+      'How do I make decisions that actually fit me?',
+      'Why does the same conversation feel urgent to me and pressuring to them?',
+      'How does pressure move through this team?',
       'Start free · No card required',
       'Get started',
       'data-public-narrative="self-people-systems-v1"'
@@ -83,7 +87,8 @@ describe('public positioning reset', () => {
       '## What Baseline means publicly',
       '`A private reference built around you.`',
       'Do not use `foundation`, `personal foundation`, `private foundation`, or `one private foundation` as the primary public metaphor for Baseline.',
-      '`Sovereign Display` is retired from rendered UI use.'
+      '`Sovereign Display` is retired from rendered UI use.',
+      '**See why the same moment lands differently—and how to bridge the gap.**'
     ]) expect(languageAuthority).toContain(marker);
 
     for (const marker of [
@@ -97,25 +102,24 @@ describe('public positioning reset', () => {
     expect(landing).toContain('Know yourself. Understand your people. See the whole system.');
   });
 
-  it('retires the display serif from active typography authority', () => {
-    expect(typography).not.toContain('font-family: "Sovereign Display"');
+  it('uses the canonical native enterprise sans title authority', () => {
+    for (const source of [typography, sansAuthority]) {
+      expect(source).toContain('-apple-system');
+      expect(source).toContain('"SF Pro Display"');
+      expect(source).toContain('"Segoe UI Variable Display"');
+      expect(source).toContain('"Segoe UI"');
+      expect(source).toContain('font-family: var(--font-title) !important');
+      expect(source).not.toContain('\n    Optima,');
+      expect(source).not.toContain('\n    "Avenir Next",');
+      expect(source).not.toContain('font-family: "Sovereign Display"');
+      expect(source).not.toContain('font-family: "Sovereign Sans"');
+    }
     expect(typography).not.toContain('/fonts/sovereign-display.woff2');
-    expect(typography).toContain('font-family: var(--font-title) !important');
     expect(typography).toContain('--font-display: var(--font-title);');
     expect(typography).toContain('--serif: var(--font-title);');
-    expect(typography).not.toContain('"Sovereign Sans"');
-    expect(typography).toContain('"Helvetica Neue"');
-    expect(typography.indexOf('"Helvetica Neue"')).toBeLessThan(typography.indexOf('"SF Pro Display"'));
-    expect(typography).not.toContain('Avenir Next');
-    expect(sansAuthority).not.toContain('"Sovereign Sans"');
-    expect(sansAuthority).not.toContain('Avenir Next');
-    expect(sansAuthority).toContain('"Helvetica Neue"');
-    expect(sansAuthority.indexOf('"Helvetica Neue"')).toBeLessThan(sansAuthority.indexOf('"SF Pro Display"'));
-    expect(sansAuthority).not.toContain('PREMIUM_TITLE_SCALE_V2');
-
-    expect(sansAuthority).toContain('The retired display serif must not render anywhere in the active product.');
-    expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
-    expect(sansAuthority).toContain('font-family: var(--font-title) !important');
+    expect(typography.indexOf('-apple-system')).toBeLessThan(typography.indexOf('"SF Pro Display"'));
+    expect(sansAuthority.indexOf('-apple-system')).toBeLessThan(sansAuthority.indexOf('"SF Pro Display"'));
+    expect(sansAuthority).toContain('Component and route styles');
 
     expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
     expect(landingRefinementV5).toContain('font-family: inherit !important');
@@ -157,63 +161,75 @@ describe('public positioning reset', () => {
     expect(landingRefinementV5).toContain('height: 26px !important');
   });
 
-  it('shows self exploration, relationship intelligence, and system intelligence as distinct product behavior', () => {
+  it('shows self exploration, relationship intelligence, and system intelligence as substantive product behavior', () => {
     for (const marker of [
       '01 · You',
-      'Explore how you think, decide, create, connect, and grow.',
-      'What does Alignment look like for me when I’m creating something new?',
-      'How you tend to create',
-      'What changes under pressure',
-      'What feels aligned',
-      'What to explore next',
+      'Explore how you think, decide, communicate, create, connect, and grow.',
+      'How Sovereign builds the answer',
+      'Separate clarity from pressure',
       '02 · You + your people',
-      'Understand both sides and what happens between you.',
-      'Why does the same situation land differently for us?',
+      'See why the same moment lands differently—and how to bridge the gap.',
+      'How Sovereign compares two people',
+      'Trace the interaction loop',
+      'Build the bridge',
       '03 · From 1:1 to the whole system',
       'See the whole system.',
-      'Why does everyone fall back into the same roles when my family is under pressure?',
-      'Roles',
-      'Perspectives',
-      'Responsibilities',
-      'Seeing the whole system'
+      'How Sovereign reads a system',
+      'Trace how pressure moves',
+      'Find what the role is doing',
+      'Test one system-level change',
+      'What the user gets',
+      'Pressure sequence',
+      'Leverage point'
     ]) expect(stories).toContain(marker);
-    expect(renderedStories).toContain('<WorkflowPanel title="How Sovereign explores the question" steps={SELF_FLOW} surface="personal-reasoning" />');
 
-    expect(renderedStories).not.toContain('Separate helping from carrying the outcome.');
-    expect(renderedStories).not.toContain('See where responsibility keeps landing.');
+    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(3);
     expect(stories).toContain('landing-workflow__progress');
-    expect(stories).toContain("360 + step * 900");
-    expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
+    expect(stories).toContain('280 + step * 760');
+    expect(renderedStories).not.toContain('<FamilySystemMap />');
+    expect(renderedStories).not.toContain('<RelationshipContext />');
+    expect(renderedStories).not.toContain('<SystemContext />');
     expect(renderedStories).not.toContain('Permitted context');
     expect(renderedStories).not.toContain('capacity beneath');
   });
 
-  it('keeps exact supporting codes quiet and secondary', () => {
-    for (const marker of ["{ code: 'GK 13.4'", "{ code: 'GATE 4.11'", "{ code: 'MARS · CANCER'", "{ code: 'GATE 22.4'", "{ code: 'GATE 57.2'"]) {
+  it('keeps exact fixture-backed supporting codes quiet, explicit, and secondary', () => {
+    for (const marker of ["{ code: 'HD G13.1'", "{ code: 'GK ACT13'", "{ code: '☉ CAN 04.2°'", "{ code: 'HD G22.4'", "{ code: 'HD G57.2'", "{ code: 'REL ☿ □ ☿ 1.8°'"]) {
       expect(stories).toContain(marker);
     }
-    expect(stories).toContain('<strong>Basis</strong>');
+    expect(stories).toContain('<strong>Example Basis</strong>');
+    expect(stories).toContain('Exact values used by this representative fixture · authenticated Basis is server-approved per answer');
+    expect(stories).not.toContain('GATE 4.11');
     expect(finalAuthority).toContain('.landing-evidence__code');
+  });
+
+  it('places workflow before conversation and anchors the composer outside the answer body', () => {
+    expect(renderedStories.indexOf('surface="personal-reasoning"')).toBeLessThan(renderedStories.indexOf('surface="personal-chat"'));
+    expect(renderedStories.indexOf('surface="relationship-reasoning"')).toBeLessThan(renderedStories.indexOf('surface="relationship-chat"'));
+    expect(renderedStories.indexOf('surface="system-reasoning"')).toBeLessThan(renderedStories.indexOf('surface="system-map"'));
+    expect(stories).toContain('landing-demo__composer-shell');
+    expect(intelligenceDemoStyles).toContain('.landing-demo__composer-shell');
+    expect(intelligenceDemoStyles).toContain('flex: 1 1 auto !important;');
+    expect(intelligenceDemoStyles).toContain('grid-template-columns: repeat(5, minmax(0, 1fr)) !important;');
   });
 
   it('makes desktop demonstrations larger while making mobile proof shorter and swipeable', () => {
     for (const marker of [
       'width: min(1280px, calc(100% - 64px)) !important',
       'font-size: 0.92rem !important',
-      'grid-template-columns: minmax(0, 1.34fr) minmax(320px, 0.66fr) !important',
-      'landing-workflow__progress',
       'scroll-snap-type: inline mandatory !important',
-      'grid-auto-columns: minmax(252px, 82vw) !important',
-      '.landing-demo--system-context',
-      'display: none !important'
+      'grid-auto-columns: minmax(252px, 82vw) !important'
     ]) expect(landingRefinementV2).toContain(marker);
+    expect(intelligenceDemoStyles).toContain('grid-template-columns: minmax(320px, .88fr) minmax(0, 1.12fr) !important;');
+    expect(intelligenceDemoStyles).toContain('@media (max-width: 900px)');
+    expect(intelligenceDemoStyles).toContain('@media (max-width: 760px)');
     expect(approvedStyles).toContain('@media (max-width: 760px)');
     expect(heroExtension).toContain('@keyframes landing-real-question');
     expect(main).toContain('window.visualViewport');
   });
 
   it('keeps every active CSS layer structurally balanced', () => {
-    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, typography, sansAuthority]) {
+    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, intelligenceDemoStyles, typography, sansAuthority]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });

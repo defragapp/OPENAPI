@@ -126,7 +126,11 @@ describe('deployed route cohesion contract', () => {
     expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
-    expect(sansAuthority).toContain('The retired display serif must not render anywhere in the active product.');
+    expect(sansAuthority).toContain('--font-title:');
+    expect(sansAuthority).toContain('-apple-system');
+    expect(sansAuthority).toContain('"SF Pro Display"');
+    expect(sansAuthority).toContain('"Segoe UI"');
+    expect(sansAuthority).not.toMatch(/^[ \t]*(?:Optima,|"Avenir Next",)/m);
     expect(invitationFidelity).toContain('@media (min-width: 901px)');
     expect(staticRefinement).toContain('--v0-blue: #e8ddd0');
     expect(staticRefinement).toContain('--v0-blue-bright: #fffaf3');

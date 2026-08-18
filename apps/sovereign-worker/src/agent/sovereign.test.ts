@@ -7,9 +7,14 @@ import { retrieveScripture } from '../covenant/scripture';
 const fakeEnv = { APP_ENV: 'test', SOVV_INTERNAL_BASE_URL: '', SOVV_INTERNAL_AUTH_TOKEN: '' } as never;
 
 describe('Sovereign runtime behavior contract', () => {
-  it('is Baseline-first and does not force an incident or action plan', () => {
+  it('is Baseline-first and does not force an incident, rigid template, or action plan', () => {
     expect(sovereignRuntimePromptV2).toContain('A user does not need to report a problem');
     expect(sovereignRuntimePromptV2).toContain('Give the direct answer first');
+    expect(sovereignRuntimePromptV2).toContain('Treat the section schema as structure, not a writing template.');
+    expect(sovereignRuntimePromptV2).toContain('Deep relationship and system answers must explain the mechanism, sequence, consequence, or tradeoff');
+    expect(sovereignRuntimePromptV2).toContain('Write cohesive adult prose inside each selected section.');
+    expect(sovereignRuntimePromptV2).toContain('Draw selectively from what the user may be bringing');
+    expect(sovereignRuntimePromptV2).toContain('make the pressure sequence, concentration point, change effect, or leverage point explicit');
     expect(sovereignRuntimePromptV2).toContain('Do not turn every answer into an action plan');
     expect(sovereignRuntimePromptV2).toContain('Shadow and Gift');
     expect(sovereignRuntimePromptV2).toContain('Alignment is not a score');

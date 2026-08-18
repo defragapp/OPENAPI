@@ -21,31 +21,36 @@ The root landing must preserve the archive’s recognizable sequence while using
 3. Hero:
    - `Healing isn’t optional.`
    - `Holding onto the pain is.`
-   - both lines use the active founder-approved humanist sans typography authority;
-   - hierarchy may use scale, weight, opacity, or a restrained outline treatment, but must not switch to the retired display serif or a native-SF/Segoe-only enterprise replacement;
+   - both lines use the active sans typography authority;
+   - hierarchy may use scale, weight, opacity, or a restrained outline treatment, but must not switch to the retired display serif or a decorative replacement;
    - supporting copy immediately explains that Sovereign is private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
 4. Self exploration:
-   - `Start with you` / `Explore yourself.` or current language inherited from `product-language-system.md`;
+   - current language inherited from `product-language-system.md`;
    - one recognizable exploration question at a time;
    - questions can cover Alignment, expression, creativity, decisions, communication, pressure/change, connection, or other supported self domains;
    - do not reduce this section to one incident, conflict, responsibility, or carrying-outcomes example.
 5. Personal demonstration:
    - section identity is `01 · You`;
    - demonstrate genuine self exploration from the supported Baseline facet universe;
-   - chat example, quiet Basis metadata, and a visible step-by-step exploration structure;
+   - visible product-level workflow/explanation on the left and the conversation/output on the right at desktop widths;
+   - quiet fixture-backed Example Basis metadata beneath the demonstration answer;
    - the demonstration must remain visible without IntersectionObserver/reveal-state success; motion is enhancement, never a content gate;
    - do not lead with internal `capacity` terminology or framework mechanics.
 6. Relationship demonstration:
    - section identity is `02 · You + your people`;
-   - `Understand what happens between you.`;
-   - two permission-bound contexts, shared interaction, and no motive claims.
+   - `See why the same moment lands differently—and how to bridge the gap.`;
+   - keep two permission-bound contexts distinct;
+   - demonstrate a materially useful interaction explanation rather than paired labels alone: relevant differences, the interaction sequence when supported, a practical bridge or repair sequence when useful, and what remains unknown;
+   - no motive, exact-emotion, private-thought, compatibility-score, or future-outcome claims.
 7. System demonstration:
    - section identity is `03 · From 1:1 to the whole system`;
    - `See the whole system.`;
    - make consented people, supplied roles, permitted perspectives, confirmed responsibilities, pressure, constraints, observations, and interactions understandable across a family, team, household, or group;
+   - use a stable system analysis, pressure sequence, relationship structure, or change-effect view only when it supports the explanation;
+   - do not require or preserve a decorative node graph merely because one existed in the archive;
    - do not make responsibility concentration the category headline for all Systems;
    - do not treat `authority` or `missing perspective` as product intelligence dimensions;
-   - do not reduce the system to decorative role cards or imply that one person causes the whole pattern.
+   - do not imply that one person causes the whole pattern.
 8. Comparison:
    - `Most AI starts with the prompt. Sovereign starts with you.`;
    - concise current-conversation context versus Baseline + relevant connected context;
@@ -60,13 +65,13 @@ These are component and sequence requirements, not merely copy strings. Retired 
 Port and maintain:
 
 - the full-screen dark hero composition;
-- large restrained humanist sans typography with hierarchy created by scale, weight, spacing, opacity, and layout;
+- large restrained sans typography with hierarchy created by scale, weight, spacing, opacity, and layout;
 - rotating question treatment;
 - self, relationship, and system storytelling sequence;
 - chat-window demonstrations;
 - visible but quiet Baseline/Basis evidence metadata;
 - answer/exploration structure treatment;
-- family/system map;
+- a system structure/sequence treatment that supports the explanation rather than requiring a decorative graph;
 - comparison composition;
 - final call to action;
 - restrained atmospheric motion;
@@ -74,7 +79,7 @@ Port and maintain:
 - near-black, cream, white/gray line, spacing, radius, and depth language;
 - responsive behavior and reduced-motion treatment.
 
-`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. The retired bundled `Sovereign Sans` and `Avenir Next` are also excluded as title/heading authorities. Titles use the approved humanist stack defined by `apps/web/src/typography-system.css`: Optima first, then resilient native fallbacks including Helvetica Neue, SF Pro Display, Candara, Noto Sans, Segoe UI Variable Display/Segoe UI, system-ui, and platform system fonts. Do not replace this with a native-SF/Segoe-only or generic enterprise title system during release hardening. Legacy font assets may remain unused until separate cleanup, but no heading/title may resolve to a retired bundled display face or serif fallback.
+`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. The retired bundled `Sovereign Sans`, `Optima`, and `Avenir Next` are also excluded as title/heading authorities. Titles inherit the approved native enterprise sans stack defined by `docs/product-language-system.md` and `apps/web/src/typography-system.css`: Apple system/SF Pro Display on Apple platforms, Segoe Variable/Segoe on Windows, followed by system-ui and resilient native sans fallbacks. Visual hierarchy comes from scale, weight, spacing, opacity, and layout rather than a decorative face.
 
 The refined product should not depend on electric blue, cyan glow, neon, generic AI gradients, or glassmorphism as primary UI language. Spectral color, where intentionally used, should behave like physical light rather than a generic interface accent.
 
@@ -91,6 +96,8 @@ Never import or recreate the archive’s mock product runtime:
 - any component that bypasses the real OPENAPI APIs and contracts.
 
 The selective-port source must reject mock auth, canned answer generators, fake users, dashboard-grid behavior, and nondeterministic demonstration generation. Broad dependency-bundle string guesses are not a substitute for source-level and runtime-contract verification.
+
+Public marketing examples may use deterministic, sanitized representative fixtures. Those fixtures must be explicitly bounded as examples, must not imply visitor data or a live private inference call, and must keep their displayed Example Basis values tied to the same fixture used to author the demonstration answer.
 
 ## Real production architecture that remains authoritative
 
@@ -150,24 +157,27 @@ The complete Vite foundation and final refinement are required:
 7. `apps/web/src/rendered-fidelity-v1.css`
    - is appended after experience refinement and preserves monochrome fidelity and readable public proof.
 8. `apps/web/src/landing-refinement-v2.css` plus current landing live refinements
-   - own landing-only recognition, larger demonstrations, visible workflow behavior, Expression Field detail, system presentation, and mobile proof;
+   - own landing-only recognition, larger demonstrations, visible workflow behavior, Expression Field detail, and mobile proof;
    - must not alter product logic, consent, Baseline contracts, or answer contracts.
 9. `apps/web/src/premium-action-authority-v1.css`
    - preserves editorial action language for navigation and low-emphasis actions while transactional authentication, onboarding, consent, billing, and account controls retain clear visible affordance.
 10. `apps/web/src/sans-typography-authority-v1.css`
-   - enforces the active founder-approved humanist title family after legacy visual layers;
-   - prevents legacy import order or selector specificity from restoring retired title faces or replacing the family with a generic enterprise stack;
+   - enforces the active native sans title family after legacy visual layers;
+   - prevents legacy selector specificity from restoring retired display faces;
    - does not own global heading dimensions.
 11. `apps/web/src/production-product-cohesion-v1.css`
    - preserves private-product structure and launch-surface cohesion after typography family authority.
-12. `apps/web/src/production-visual-authority-v1.css`
-   - is the terminal inline presentation authority;
+12. `apps/web/src/public-intelligence-demonstration-v1.css`
+   - owns the public demo composition, rich fixture-backed answer presentation, bottom-anchored demo composer, system pressure sequence, and the product-language title-variable correction;
+   - loads before the terminal production visual authority and uses bounded specificity only where a later legacy selector would otherwise restore the superseded demo layout.
+13. `apps/web/src/production-visual-authority-v1.css`
+   - remains the terminal inline presentation authority;
    - owns final public/private proportions, shared navigation and wordmark geometry, product-demo visibility, policy-document hierarchy, restrained motion, and final interface presence;
    - no later visual override may follow it.
-13. Standalone public documents
+14. Standalone public documents
    - retain the deployed static foundations;
    - load `apps/web/public/premium-action-static-v1.css` last;
-   - that terminal static authority enforces the same humanist title system, public header/wordmark hierarchy, and final static presentation.
+   - that terminal static authority must inherit the same native sans title system, public header/wordmark hierarchy, and final static presentation.
 
 Removing or bypassing any one of these means the visual port is not sitewide.
 
@@ -192,10 +202,13 @@ A production release must fail unless all of the following are true:
 - active UI copy follows `docs/product-language-system.md` and excludes retired product-positioning language;
 - root marketing communicates You → You + your people → whole system before source mechanics;
 - the root landing does not use `foundation` as its Baseline metaphor or enumerate framework sources in its main narrative;
-- the terminal rendered typography authority is mounted after legacy visual layers and the terminal production visual authority follows all other inline presentation authorities;
-- active headings/titles resolve to the founder-approved humanist title system and never to `Sovereign Display`, the retired bundled `Sovereign Sans`, `Avenir Next`, or serif fallbacks; a native-SF/Segoe-only replacement is not an accepted equivalent;
+- the terminal production visual authority remains the final inline presentation layer;
+- active headings/titles resolve to the approved native sans title system and never to `Sovereign Display`, the retired bundled `Sovereign Sans`, `Optima`, `Avenir Next`, or serif fallbacks;
 - root/static/policy public navigation exposes the expected page-in/page-out destinations with one consistent `SOVEREIGN.OS` wordmark identity without freezing temporary breakpoint geometry as the design authority;
 - product demonstrations remain visible without reveal-state success;
+- public demo workflow precedes the conversation at desktop widths and the composer reads as the bottom of the thread rather than floating in the middle of the answer field;
+- public Example Basis values are exact fixture values, are explicitly representative, and never imply visitor/private runtime data;
+- the system demonstration supports the explanation with a stable sequence/structure rather than requiring a decorative node graph;
 - compiled CSS contains founder landing, real workspace/account, onboarding, policy, and access selectors;
 - Privacy and Terms render as disciplined documents rather than a generic card grid;
 - the final compiled presentation contains the near-black/cream refinement authority;
