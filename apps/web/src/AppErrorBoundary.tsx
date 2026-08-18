@@ -27,11 +27,11 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
       <main className="account-shell">
         <a className="wordmark" href="/">SOVEREIGN.OS</a>
         <section className="auth-panel" role="alert">
-          <p className="eyebrow">VIEW INTERRUPTED</p>
-          <h1>Sovereign could not open this view safely.</h1>
-          <p className="lede">Nothing new was submitted or saved from the interrupted view. Reload it, or return to the public entry page.</p>
+          <p className="eyebrow">THIS VIEW DID NOT OPEN</p>
+          <h1>Something went wrong while opening Sovereign.OS.</h1>
+          <p className="lede">Reload the page. If the problem continues, return home and sign in again.</p>
           <div className="action-row">
-            <button className="primary-button" onClick={() => window.location.reload()}>Reload this view</button>
+            <button className="primary-button" onClick={() => window.location.reload()}>Reload</button>
             <a className="secondary-button" href="/">Return home</a>
           </div>
         </section>
