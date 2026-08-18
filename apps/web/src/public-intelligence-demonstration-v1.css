@@ -3,7 +3,7 @@
  * Refines only the public self -> relationship -> system demonstrations.
  * This layer loads before production-visual-authority-v1; selectors that must
  * survive the terminal layer deliberately carry higher specificity.
- * Private inference, consent, and authenticated Basis authority remain server-owned.
+ * Private inference, consent, and authenticated source authorization remain server-owned.
  */
 
 html:root:root:root {
@@ -119,33 +119,52 @@ html body .public-approved-v8 .landing-answer__section[data-tone='unknown'] > p 
 }
 
 html body .public-approved-v8 .landing-evidence {
-  display: grid !important;
-  gap: 10px !important;
+  display: block !important;
   margin-top: 2px !important;
   padding-top: 15px !important;
   border-top: 1px solid rgba(241, 233, 222, .1) !important;
 }
 
-html body .public-approved-v8 .landing-evidence__heading {
+html body .public-approved-v8 .landing-evidence > summary {
   display: flex !important;
   align-items: baseline !important;
   justify-content: space-between !important;
   gap: 16px !important;
+  min-height: 44px !important;
+  padding: 10px 0 !important;
+  cursor: pointer !important;
+  list-style: none !important;
 }
 
-html body .public-approved-v8 .landing-evidence__heading > strong {
+html body .public-approved-v8 .landing-evidence > summary::-webkit-details-marker {
+  display: none !important;
+}
+
+html body .public-approved-v8 .landing-evidence > summary > strong {
   color: rgba(241, 233, 222, .75) !important;
-  font-size: .6rem !important;
-  font-weight: 740 !important;
-  letter-spacing: .13em !important;
-  text-transform: uppercase !important;
+  font-size: .66rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .04em !important;
 }
 
-html body .public-approved-v8 .landing-evidence__heading > small {
+html body .public-approved-v8 .landing-evidence > summary > small {
   color: rgba(241, 233, 222, .4) !important;
   font-size: .56rem !important;
   line-height: 1.45 !important;
   text-align: right !important;
+}
+
+html body .public-approved-v8 .landing-evidence__detail {
+  display: grid !important;
+  gap: 10px !important;
+  padding: 2px 0 6px !important;
+}
+
+html body .public-approved-v8 .landing-evidence__detail > p {
+  margin: 0 !important;
+  color: rgba(196, 188, 177, .6) !important;
+  font-size: .62rem !important;
+  line-height: 1.5 !important;
 }
 
 html body .public-approved-v8 .landing-evidence__values {
@@ -176,8 +195,7 @@ html body .public-approved-v8 .landing-evidence__subject {
   color: rgba(241, 233, 222, .48) !important;
   font-family: inherit !important;
   font-weight: 700 !important;
-  letter-spacing: .08em !important;
-  text-transform: uppercase !important;
+  letter-spacing: .04em !important;
 }
 
 html body .public-approved-v8 .landing-evidence__values i {
@@ -207,8 +225,7 @@ html body .public-approved-v8 .landing-workflow__result > small {
   color: rgba(241, 233, 222, .42) !important;
   font-size: .56rem !important;
   font-weight: 700 !important;
-  letter-spacing: .1em !important;
-  text-transform: uppercase !important;
+  letter-spacing: .06em !important;
 }
 
 html body .public-approved-v8 .landing-workflow__result > strong {
@@ -245,8 +262,7 @@ html body .public-approved-v8 .landing-system-analysis__sequence > small {
   color: rgba(241, 233, 222, .42) !important;
   font-size: .56rem !important;
   font-weight: 700 !important;
-  letter-spacing: .1em !important;
-  text-transform: uppercase !important;
+  letter-spacing: .06em !important;
 }
 
 html body .public-approved-v8 .landing-system-analysis__context strong,
@@ -345,12 +361,12 @@ html body .public-approved-v8 .landing-system-analysis__sequence li small {
     padding-left: 11px !important;
   }
 
-  html body .public-approved-v8 .landing-evidence__heading {
+  html body .public-approved-v8 .landing-evidence > summary {
     display: grid !important;
     gap: 4px !important;
   }
 
-  html body .public-approved-v8 .landing-evidence__heading > small {
+  html body .public-approved-v8 .landing-evidence > summary > small {
     text-align: left !important;
   }
 
