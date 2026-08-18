@@ -10,9 +10,13 @@ describe('Workers AI production request contract', () => {
     expect(sovereign).not.toContain('{ input: prompt, max_output_tokens: 3_200 }');
   });
 
-  it('uses the supported GLM prompt and completion-token fields for Baseline facet generation', () => {
-    expect(facets).toContain('{ prompt, max_completion_tokens: 4_200 }');
-    expect(facets).not.toContain('{ input: prompt, max_output_tokens: 4_200 }');
+  it('uses bounded supported GLM prompt and completion-token fields for Baseline facet batches', () => {
+    expect(facets).toContain('export const FACET_BATCH_SIZE = 6');
+    expect(facets).toContain('export const FACET_BATCH_TIMEOUT_MS = 12_000');
+    expect(facets).toContain('export const FACET_BATCH_ATTEMPTS = 2');
+    expect(facets).toContain('{ prompt, max_completion_tokens: 1_600 }');
+    expect(facets).not.toContain('{ input: prompt, max_output_tokens: 1_600 }');
+    expect(facets).not.toContain('{ prompt, max_completion_tokens: 4_200 }');
   });
 
   it('decodes current chat-completion result shapes for Baseline facet generation', () => {
