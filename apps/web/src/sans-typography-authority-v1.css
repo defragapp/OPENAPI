@@ -1,6 +1,6 @@
 /* Sovereign.OS terminal typography authority.
  * Font family only. Route/component styles own hierarchy and dimensions.
- * Optima and retired bundled display faces must not render in active titles.
+ * Rejected legacy display faces must not render in active titles.
  */
 
 :root {
