@@ -40,15 +40,15 @@ const replacements = [
   ],
   [
     "  'Bring the question you actually have.',",
-    "  'Explore yourself.',"
+    "  'Start with yourself. Expand outward when it matters.',"
   ],
   [
     "  'Ask about your life.',\n  'Get an answer built for you.',",
-    "  'Explore how you think, decide, create, connect, and grow.',\n  'How Sovereign explores the question',"
+    "  'Explore how you think, decide, communicate, create, connect, and grow.',\n  'How Sovereign builds the answer',"
   ],
   [
     "  'Understand what happens',\n  'between you.',",
-    "  'Understand both sides and what happens between you.',"
+    "  'See why the same moment lands differently—and how to bridge the gap.',"
   ],
   [
     "  'From one person',\n  'to the whole system.',",
@@ -56,27 +56,67 @@ const replacements = [
   ],
   [
     "  'Seeing the capacity beneath it',\n  'Seeing how it is expressing',\n  'Seeing what keeps it going',\n  'Seeing what could change',",
-    "  'How you tend to create',\n  'What changes under pressure',\n  'What feels aligned',\n  'What to explore next',"
+    "  'Start with the question',\n  'Use what matters from your Baseline',\n  'Find the useful difference',\n  'Give you something you can try',"
+  ],
+  [
+    "  'Keeping both people distinct',",
+    "  'Keep each person separate',"
+  ],
+  [
+    "  'Clarity may take time.',",
+    "  'Show what happens between you',"
+  ],
+  [
+    "  'Clarity may arrive quickly.',",
+    "  'Find a lower-pressure next step',"
   ],
   [
     "  'Mapping the people',",
-    "  'Seeing the whole system',"
+    "  'How Sovereign reads a system',"
   ],
   [
     "  'Roles',",
-    "  'Roles',"
+    "  'What you told Sovereign',"
   ],
   [
     "  'Responsibility',",
-    "  'Responsibilities',"
+    "  'What happens',"
   ],
   [
     "  'Movement',",
-    "  'Perspectives',"
+    "  'What you can change',"
+  ],
+  [
+    "  '<RelationshipContext />',",
+    "  'Show what happens between you',"
+  ],
+  [
+    "  '<SystemContext />',",
+    "  'Show how pressure moves',"
+  ],
+  [
+    "  '<strong>Basis</strong>',",
+    "  '<strong>See source details</strong>',"
+  ],
+  [
+    "  'className=\"v0-baseline-trace\"',",
+    "  '<details className=\"landing-evidence\">',"
+  ],
+  [
+    "  'v0-workflow-panel',",
+    "  'landing-workflow',"
+  ],
+  [
+    "  'v0-family-system-map',",
+    "  'landing-system-analysis',"
   ],
   [
     "  'Illustrative permitted Baselines',",
-    "  'Illustrative supplied context',"
+    "  'Representative example',"
+  ],
+  [
+    "assert((stories.match(/<WorkflowPanel /g) ?? []).length === 1, 'Public stories must render one detailed reasoning flow, not repeat it for relationship and system examples.');",
+    "assert((stories.match(/<WorkflowPanel/g) ?? []).length === 3, 'Public stories must render one workflow for self, relationship, and system examples.');"
   ],
   [
     "  'stroke: #2f93ff',\n  'width: 100vw',",
@@ -113,9 +153,9 @@ if (!source.includes("read('apps/web/src/rendered-fidelity-v1.css')") || !source
 
 for (const marker of [
   'data-public-narrative="self-people-systems-v1"',
-  'Start with you',
-  'Explore yourself.',
-  'What does Alignment look like for me?',
+  'Start with yourself. Expand outward when it matters.',
+  'Explore how you think, decide, communicate, create, connect, and grow.',
+  'See why the same moment lands differently—and how to bridge the gap.',
   'Most AI starts with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
 ]) if (!landing.includes(marker)) throw new Error(`Premium platform release v2 is missing landing marker: ${marker}`);
@@ -124,21 +164,32 @@ for (const retired of ['<BaselineFoundation />', 'One private reference beneath 
 }
 for (const marker of [
   '01 · You',
-  'Explore how you think, decide, create, connect, and grow.',
+  'Explore how you think, decide, communicate, create, connect, and grow.',
+  'How Sovereign builds the answer',
   '02 · You + your people',
-  'Understand both sides and what happens between you.',
-  'Keeping both people distinct',
+  'See why the same moment lands differently—and how to bridge the gap.',
+  'Keep each person separate',
+  'Show what happens between you',
+  'Find a lower-pressure next step',
   '03 · From 1:1 to the whole system',
   'See the whole system.',
-  'Seeing the whole system',
-  'Roles',
-  'Perspectives',
-  'Responsibilities'
+  'How Sovereign reads a system',
+  'Show how pressure moves',
+  'What you can change',
+  '<details className="landing-evidence">',
+  '<strong>See source details</strong>'
 ]) {
   if (!stories.includes(marker)) throw new Error(`Premium platform release v2 is missing product story marker: ${marker}`);
 }
-for (const retired of ['Separate helping from carrying the outcome.', 'See where responsibility keeps landing.']) {
-  if (stories.includes(retired)) throw new Error(`Premium platform release v2 found retired category framing: ${retired}`);
+for (const retired of [
+  'Understand both sides and what happens between you.',
+  'Illustrative permitted Baselines',
+  'permitted perspectives',
+  'confirmed responsibilities',
+  'Separate helping from carrying the outcome.',
+  'See where responsibility keeps landing.'
+]) {
+  if (stories.includes(retired)) throw new Error(`Premium platform release v2 found retired or internal product language: ${retired}`);
 }
 for (const marker of [
   "data-inspecting={hasInspection ? 'true' : 'false'}",
@@ -163,6 +214,7 @@ for (const retired of [
   'Bring the question you actually have.',
   "'Ask about your life.',",
   "'Get an answer built for you.',",
+  'Understand both sides and what happens between you.',
   'Illustrative permitted Baselines',
   'capacity beneath a pattern',
   'Seeing the capacity beneath it',
