@@ -23,7 +23,14 @@ export function SystemMembershipManager() {
       }
     });
     const body = await response.json().catch(() => ({})) as Json;
-    if (!response.ok) throw new Error(body.message || body.error || 'That request could not be completed.');
+    if (!response.ok) {
+      if (response.status === 403) throw new Error('That person cannot be added to this system right now.');
+      if (response.status === 404) throw new Error('That person or system is no longer available.');
+      if (response.status === 409) throw new Error('That membership changed before this request finished. Refresh and try again.');
+      if (response.status === 429) throw new Error('Too many requests. Wait a moment and try again.');
+      if (response.status >= 500) throw new Error('Sovereign.OS could not update this system. Try again in a moment.');
+      throw new Error('That request could not be completed.');
+    }
     return body;
   }
 
@@ -38,7 +45,7 @@ export function SystemMembershipManager() {
       setSystemId((current) => current || nextSystems[0]?.id || '');
       setStatus('');
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'System membership is unavailable.');
+      setStatus(error instanceof Error ? error.message : 'System members are temporarily unavailable.');
     } finally {
       setLoading(false);
     }
@@ -64,9 +71,9 @@ export function SystemMembershipManager() {
   async function addMember() {
     if (!systemId || !personId || loading) return;
     const person = people.find((item) => item.id === personId);
-    if (!window.confirm(`Add ${person?.displayName ?? 'this person'} to ${selectedSystem?.name ?? 'this system'} using their active permission?`)) return;
+    if (!window.confirm(`Add ${person?.displayName ?? 'this person'} to ${selectedSystem?.name ?? 'this system'}? They can be included only while their sharing choice allows it.`)) return;
     setLoading(true);
-    setStatus('Adding permitted member…');
+    setStatus('Adding this person…');
     try {
       await api(`/api/v1/systems/${encodeURIComponent(systemId)}/members`, {
         method: 'POST',
@@ -81,7 +88,7 @@ export function SystemMembershipManager() {
       });
       setPersonId('');
       setResponsibility('');
-      setStatus('Member added with active consent.');
+      setStatus('Person added to this system.');
       await refresh();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'That person could not be added.');
@@ -99,23 +106,23 @@ export function SystemMembershipManager() {
         }}>
           <section className="system-membership-dialog" role="dialog" aria-modal="true" aria-labelledby="system-membership-title">
             <header>
-              <div><p>SYSTEM MEMBERSHIP</p><h2 id="system-membership-title">Add only permitted people.</h2></div>
-              <button onClick={() => setOpen(false)} aria-label="Close system membership">×</button>
+              <div><p>SYSTEM MEMBERS</p><h2 id="system-membership-title">Choose who belongs in this system.</h2></div>
+              <button onClick={() => setOpen(false)} aria-label="Close system members">×</button>
             </header>
-            <p className="system-membership-intro">A person appears in a system only while their identity is connected and their <strong>Include in a system</strong> permission remains active.</p>
+            <p className="system-membership-intro">A person can appear here only after they connect their own account and choose to allow <strong>Include in a system</strong>. If they change that choice later, future use follows the new choice.</p>
             <label>System<select value={systemId} onChange={(event) => { setSystemId(event.target.value); setPersonId(''); }}><option value="">Choose a system</option>{systems.map((system) => <option key={system.id} value={system.id}>{system.name}</option>)}</select></label>
             {selectedSystem && (
               <section className="current-system-members">
-                <span>CURRENT MEMBERS</span>
+                <span>PEOPLE IN THIS SYSTEM</span>
                 {(Array.isArray(selectedSystem.members) ? selectedSystem.members : []).length === 0
-                  ? <p>No permitted members have been added yet.</p>
-                  : (selectedSystem.members as Json[]).map((member) => <article key={member.personId}><strong>{member.displayName}</strong><small>{member.roleLabel ?? 'member'} · consent active</small></article>)}
+                  ? <p>No one has been added yet.</p>
+                  : (selectedSystem.members as Json[]).map((member) => <article key={member.personId}><strong>{member.displayName}</strong><small>{member.roleLabel ?? 'Member'}</small></article>)}
               </section>
             )}
-            <label>Permitted person<select value={personId} onChange={(event) => setPersonId(event.target.value)} disabled={!systemId}><option value="">Choose a person</option>{available.map((person) => <option key={person.id} value={person.id}>{person.displayName}</option>)}</select></label>
+            <label>Person<select value={personId} onChange={(event) => setPersonId(event.target.value)} disabled={!systemId}><option value="">Choose a person</option>{available.map((person) => <option key={person.id} value={person.id}>{person.displayName}</option>)}</select></label>
             <label>Role in this system<select value={role} onChange={(event) => setRole(event.target.value)}><option value="member">Member</option><option value="parent">Parent</option><option value="partner">Partner</option><option value="child">Child</option><option value="caregiver">Caregiver</option><option value="leader">Leader</option><option value="teammate">Teammate</option></select></label>
             <label>Responsibility in this system · optional<input value={responsibility} onChange={(event) => setResponsibility(event.target.value)} placeholder="Only add what is actually known" /></label>
-            <button className="system-membership-primary" disabled={!systemId || !personId || loading} onClick={() => void addMember()}>Add permitted member</button>
+            <button className="system-membership-primary" disabled={!systemId || !personId || loading} onClick={() => void addMember()}>Add person</button>
             <p className="system-membership-status" role="status" aria-live="polite">{status || (available.length === 0 && systemId ? 'No additional connected people currently allow system inclusion.' : '')}</p>
           </section>
         </div>
