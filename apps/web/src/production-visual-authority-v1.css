@@ -1,0 +1,737 @@
+/*
+ * Sovereign.OS production visual authority v1.
+ *
+ * This is the single terminal visual layer for the live React product. Earlier
+ * files remain component foundations; this file owns final presentation only.
+ * It must load after all route refinements and before no later visual override.
+ *
+ * Principles:
+ * - humanist display typography with restrained scale
+ * - near-black / cream / warm-metal interface chrome
+ * - hard alignment and deliberate whitespace
+ * - demos read as real product workflows, not decorative cards
+ * - motion explains entry/progression and disappears under reduced motion
+ */
+
+:root {
+  --sovereign-title:
+    Optima,
+    Candara,
+    "Noto Sans",
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  --sovereign-ink: #f3ece2;
+  --sovereign-muted: rgba(226, 218, 207, 0.68);
+  --sovereign-faint: rgba(226, 218, 207, 0.42);
+  --sovereign-line: rgba(241, 233, 222, 0.105);
+  --sovereign-line-strong: rgba(241, 233, 222, 0.18);
+  --sovereign-accent: #b99772;
+  --sovereign-accent-bright: #e1cdb5;
+  --sovereign-panel: #101215;
+  --sovereign-panel-raised: #15181c;
+}
+
+html:root:root:root body :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  [role="heading"],
+  .response-headline,
+  .workspace-title,
+  .surface-title,
+  .page-title,
+  .section-title,
+  .modal-title,
+  .drawer-title,
+  .dialog-title,
+  .empty-state-title,
+  .policy-title,
+  .account-intro h1,
+  .auth-panel h1,
+  .auth-panel h2,
+  .passkey-primary h2,
+  .plan-onboarding h1,
+  .passkey-shell h1
+) {
+  font-family: var(--sovereign-title) !important;
+  font-style: normal !important;
+  font-kerning: normal;
+  font-synthesis: none;
+}
+
+html:root:root:root body :is(
+  .account-intro h1,
+  .auth-panel h1,
+  .auth-panel h2,
+  .passkey-primary h2,
+  .plan-onboarding h1,
+  .policy-title,
+  .workspace-title,
+  .response-headline
+) {
+  letter-spacing: -0.022em !important;
+}
+
+/* PUBLIC HOME ------------------------------------------------------------ */
+
+.public-approved-v8 {
+  --landing-shell: min(1120px, calc(100vw - 72px)) !important;
+  --landing-panel: var(--sovereign-panel) !important;
+  --landing-panel-raised: var(--sovereign-panel-raised) !important;
+  --landing-ink: var(--sovereign-ink) !important;
+  --landing-muted: var(--sovereign-muted) !important;
+  --landing-faint: var(--sovereign-faint) !important;
+  --landing-line: var(--sovereign-line) !important;
+}
+
+.public-approved-v8 .v0-nav-inner,
+.public-approved-v8 .v0-footer > .v0-shell {
+  width: var(--landing-shell) !important;
+  max-width: 1120px !important;
+}
+
+.public-approved-v8 .v0-nav {
+  border-bottom: 1px solid rgba(241, 233, 222, 0.075) !important;
+  background: rgba(9, 11, 14, 0.92) !important;
+  backdrop-filter: blur(18px) saturate(105%) !important;
+}
+
+.public-approved-v8 .v0-nav nav a,
+.public-approved-v8 .v0-sign-in,
+.public-approved-v8 .v0-get-started {
+  font-size: 0.72rem !important;
+  letter-spacing: 0.025em !important;
+}
+
+.public-approved-v8 .v0-get-started {
+  color: var(--sovereign-ink) !important;
+}
+
+.public-approved-v8 .v0-get-started .landing-arrow {
+  color: var(--sovereign-accent-bright) !important;
+}
+
+.public-approved-v8 .v0-hero.sovereign-opening-field {
+  min-height: max(800px, calc(var(--sovereign-viewport-height, 100svh) - 74px)) !important;
+  max-height: 900px !important;
+  padding: clamp(72px, 8vh, 96px) 24px 372px !important;
+  border-bottom-color: rgba(241, 233, 222, 0.08) !important;
+  background:
+    radial-gradient(circle at 50% 84%, rgba(96, 118, 145, 0.09), transparent 30rem),
+    radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.014), transparent 24rem),
+    linear-gradient(180deg, #090b0e 0%, #080a0d 100%) !important;
+}
+
+.public-approved-v8 .v0-hero-content {
+  width: min(940px, 100%) !important;
+  max-width: 940px !important;
+}
+
+.public-approved-v8 .landing-hero-kicker,
+.public-approved-v8 .landing-question-orbit__kicker,
+.public-approved-v8 .landing-story__heading > p,
+.public-approved-v8 .v0-story-heading > p {
+  color: rgba(185, 151, 114, 0.78) !important;
+  font-family: var(--font-body, system-ui, sans-serif) !important;
+  font-size: 0.58rem !important;
+  font-weight: 720 !important;
+  letter-spacing: 0.19em !important;
+  text-transform: uppercase !important;
+}
+
+.public-approved-v8 .v0-hero h1 {
+  width: 100% !important;
+  max-width: 920px !important;
+  font-family: var(--sovereign-title) !important;
+}
+
+.public-approved-v8 .v0-hero h1 > span {
+  font-family: var(--sovereign-title) !important;
+  font-size: clamp(3.7rem, 5.35vw, 5.7rem) !important;
+  font-weight: 600 !important;
+  line-height: 0.975 !important;
+  letter-spacing: -0.026em !important;
+  text-shadow: none !important;
+}
+
+.public-approved-v8 .v0-hero h1 > em {
+  margin-top: 7px !important;
+  color: rgba(231, 222, 211, 0.55) !important;
+  font-family: var(--sovereign-title) !important;
+  font-size: clamp(3.3rem, 4.85vw, 5.05rem) !important;
+  font-weight: 460 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.018em !important;
+  text-shadow: none !important;
+}
+
+.public-approved-v8 .sovereign-opening-copy {
+  max-width: 630px !important;
+  margin-top: 27px !important;
+  color: rgba(226, 218, 207, 0.64) !important;
+  font-size: 0.91rem !important;
+  line-height: 1.68 !important;
+}
+
+.public-approved-v8 .sovereign-opening-trust {
+  margin-top: 14px !important;
+  color: rgba(226, 218, 207, 0.34) !important;
+  font-size: 0.66rem !important;
+}
+
+.public-approved-v8 .landing-expression-slice {
+  height: 392px !important;
+  min-height: 392px !important;
+  max-height: 392px !important;
+}
+
+.public-approved-v8 .landing-expression-slice__canvas {
+  width: min(1120px, 90vw) !important;
+  opacity: 0.84 !important;
+}
+
+.public-approved-v8 .landing-expression-slice__instructions {
+  color: rgba(226, 218, 207, 0.26) !important;
+}
+
+/* Question bridge: compact and purposeful. */
+.public-approved-v8 .landing-question-orbit {
+  padding: 70px 24px 74px !important;
+  background: #090b0e !important;
+}
+
+.public-approved-v8 .landing-question-orbit__inner {
+  width: min(780px, 100%) !important;
+}
+
+.public-approved-v8 .landing-question-orbit h2 {
+  max-width: 680px !important;
+  margin-top: 10px !important;
+  font-family: var(--sovereign-title) !important;
+  font-size: clamp(2.05rem, 3vw, 2.95rem) !important;
+  font-weight: 600 !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.018em !important;
+}
+
+.public-approved-v8 .landing-question-orbit__note {
+  max-width: 590px !important;
+  margin-top: 17px !important;
+  font-size: 0.8rem !important;
+  line-height: 1.58 !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage {
+  min-height: 68px !important;
+  margin-top: 22px !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage > span > strong {
+  max-width: 660px !important;
+  font-family: var(--sovereign-title) !important;
+  font-size: clamp(1.18rem, 1.7vw, 1.55rem) !important;
+  font-weight: 500 !important;
+  line-height: 1.28 !important;
+  letter-spacing: -0.012em !important;
+}
+
+/* Product stories: one clear heading, one product demonstration. */
+.public-approved-v8 .landing-story {
+  padding: 88px 0 96px !important;
+}
+
+.public-approved-v8 .landing-story__shell {
+  width: var(--landing-shell) !important;
+  max-width: 1120px !important;
+}
+
+.public-approved-v8 .landing-story__heading {
+  width: min(690px, 100%) !important;
+  max-width: 690px !important;
+  margin-bottom: 38px !important;
+}
+
+.public-approved-v8 .landing-story__heading h2 {
+  max-width: 690px !important;
+  margin-top: 11px !important;
+  font-family: var(--sovereign-title) !important;
+  font-size: clamp(2.2rem, 3.2vw, 3.2rem) !important;
+  font-weight: 600 !important;
+  line-height: 1.035 !important;
+  letter-spacing: -0.019em !important;
+}
+
+.public-approved-v8 .landing-story__heading > div {
+  max-width: 610px !important;
+  margin-top: 16px !important;
+  color: rgba(226, 218, 207, 0.58) !important;
+  font-size: 0.86rem !important;
+  line-height: 1.62 !important;
+}
+
+.public-approved-v8 .landing-story__stage {
+  gap: 14px !important;
+}
+
+.public-approved-v8 .landing-story__stage--relationship {
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr) !important;
+}
+
+.public-approved-v8 .landing-story__stage--system {
+  width: min(980px, 100%) !important;
+}
+
+.public-approved-v8 .landing-demo {
+  min-height: 500px !important;
+  border: 1px solid var(--sovereign-line-strong) !important;
+  border-radius: 10px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.012), transparent 20%), var(--sovereign-panel) !important;
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.30) !important;
+}
+
+.public-approved-v8 .landing-demo--context {
+  min-height: 0 !important;
+}
+
+.public-approved-v8 .landing-demo__bar {
+  min-height: 48px !important;
+  padding-inline: 17px !important;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.08) !important;
+  color: rgba(226, 218, 207, 0.56) !important;
+  font-family: var(--font-body, system-ui, sans-serif) !important;
+  font-size: 0.66rem !important;
+  font-weight: 620 !important;
+  letter-spacing: 0.04em !important;
+}
+
+.public-approved-v8 .landing-demo__bar::before {
+  color: rgba(185, 151, 114, 0.72) !important;
+}
+
+.public-approved-v8 .landing-demo__status {
+  width: 6px !important;
+  height: 6px !important;
+  background: var(--sovereign-accent) !important;
+  box-shadow: 0 0 10px rgba(185, 151, 114, 0.34) !important;
+}
+
+.public-approved-v8 .landing-demo__body {
+  gap: 17px !important;
+  padding: 24px !important;
+}
+
+.public-approved-v8 .landing-message {
+  max-width: 100% !important;
+  font-size: 0.84rem !important;
+  line-height: 1.58 !important;
+}
+
+.public-approved-v8 .landing-message--user {
+  max-width: 78% !important;
+}
+
+.public-approved-v8 .landing-message--user > div {
+  padding: 13px 15px !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: #eee3d5 !important;
+  color: #161616 !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18) !important;
+}
+
+.public-approved-v8 .landing-message--assistant > div {
+  max-width: 100% !important;
+  padding: 2px 0 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: rgba(235, 228, 218, 0.82) !important;
+}
+
+.public-approved-v8 .landing-evidence {
+  margin-top: 14px !important;
+  padding-top: 11px !important;
+  border-top-color: rgba(241, 233, 222, 0.075) !important;
+  color: rgba(226, 218, 207, 0.42) !important;
+}
+
+.public-approved-v8 .landing-evidence > strong {
+  color: rgba(185, 151, 114, 0.74) !important;
+}
+
+.public-approved-v8 .landing-composer {
+  min-height: 46px !important;
+  border-top-color: rgba(241, 233, 222, 0.09) !important;
+  color: rgba(226, 218, 207, 0.38) !important;
+}
+
+.public-approved-v8 .landing-composer i {
+  color: var(--sovereign-accent-bright) !important;
+}
+
+/* Workflow becomes a readable progression, not a stack of mini cards. */
+.public-approved-v8 .landing-workflow {
+  gap: 0 !important;
+  padding: 10px 20px 18px !important;
+}
+
+.public-approved-v8 .landing-workflow > li {
+  min-height: 96px !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(241, 233, 222, 0.08) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  opacity: 0.42 !important;
+  transition: opacity 260ms ease, background 260ms ease !important;
+}
+
+.public-approved-v8 .landing-workflow > li:last-child {
+  border-bottom: 1px solid rgba(241, 233, 222, 0.08) !important;
+}
+
+.public-approved-v8 .landing-workflow > li.is-complete {
+  opacity: 0.68 !important;
+}
+
+.public-approved-v8 .landing-workflow > li.is-active {
+  margin-inline: -20px !important;
+  padding-inline: 20px !important;
+  opacity: 1 !important;
+  background: linear-gradient(90deg, rgba(185, 151, 114, 0.10), transparent 76%) !important;
+  box-shadow: inset 2px 0 0 var(--sovereign-accent) !important;
+}
+
+.public-approved-v8 .landing-workflow button {
+  min-height: 96px !important;
+  padding: 16px 0 !important;
+}
+
+.public-approved-v8 .landing-workflow button > i {
+  border-color: rgba(185, 151, 114, 0.26) !important;
+  color: rgba(225, 201, 175, 0.82) !important;
+}
+
+.public-approved-v8 .landing-workflow__copy > small {
+  color: rgba(185, 151, 114, 0.70) !important;
+}
+
+.public-approved-v8 .landing-workflow__copy > strong {
+  color: rgba(243, 236, 226, 0.92) !important;
+  font-size: 0.86rem !important;
+}
+
+.public-approved-v8 .landing-workflow__copy > span {
+  max-width: 42ch !important;
+  color: rgba(211, 203, 193, 0.62) !important;
+  font-size: 0.73rem !important;
+  line-height: 1.5 !important;
+}
+
+.public-approved-v8 .landing-workflow__progress i.is-active,
+.public-approved-v8 .landing-workflow__progress i.is-complete {
+  background: var(--sovereign-accent) !important;
+}
+
+.public-approved-v8 .landing-workflow code {
+  border-color: rgba(185, 151, 114, 0.18) !important;
+  background: rgba(185, 151, 114, 0.04) !important;
+  color: rgba(225, 201, 175, 0.72) !important;
+}
+
+/* Relationship and system context use structural rules, not floating cards. */
+.public-approved-v8 .landing-context-view {
+  gap: 0 !important;
+  padding: 18px 20px 22px !important;
+}
+
+.public-approved-v8 .landing-context-view section,
+.public-approved-v8 .landing-context-distinction {
+  padding: 17px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(241, 233, 222, 0.08) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.public-approved-v8 .landing-context-view strong,
+.public-approved-v8 .landing-context-distinction strong {
+  font-family: var(--sovereign-title) !important;
+  font-size: 0.91rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.public-approved-v8 .landing-context-view small,
+.public-approved-v8 .landing-context-distinction small {
+  color: rgba(185, 151, 114, 0.68) !important;
+}
+
+.public-approved-v8 .landing-system-map {
+  border-color: rgba(241, 233, 222, 0.09) !important;
+  border-radius: 7px !important;
+  background: radial-gradient(circle at 50% 46%, rgba(185, 151, 114, 0.055), transparent 54%), #0d1013 !important;
+}
+
+.public-approved-v8 .landing-system-map path {
+  stroke: rgba(225, 201, 175, 0.28) !important;
+}
+
+.public-approved-v8 .landing-system-map path.is-secondary {
+  stroke: rgba(241, 233, 222, 0.10) !important;
+}
+
+.public-approved-v8 .landing-system-map__core,
+.public-approved-v8 .landing-system-map__nodes button {
+  border-color: rgba(241, 233, 222, 0.12) !important;
+  background: rgba(16, 18, 21, 0.94) !important;
+}
+
+/* Comparison and close: quieter, more established. */
+.public-approved-v8 .v0-comparison {
+  padding: 96px 24px 104px !important;
+}
+
+.public-approved-v8 .v0-comparison > .v0-shell {
+  gap: 56px !important;
+  width: var(--landing-shell) !important;
+  max-width: 1120px !important;
+}
+
+.public-approved-v8 .v0-comparison .v0-story-heading h2 {
+  font-family: var(--sovereign-title) !important;
+  font-size: clamp(2.35rem, 3.4vw, 3.4rem) !important;
+  font-weight: 600 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.public-approved-v8 .v0-comparison-panel {
+  min-height: 320px !important;
+  padding: 26px 24px !important;
+  border: 1px solid var(--sovereign-line) !important;
+  border-radius: 9px !important;
+  background: rgba(255,255,255,0.012) !important;
+  box-shadow: none !important;
+}
+
+.public-approved-v8 .v0-comparison-positive {
+  border-color: rgba(185, 151, 114, 0.26) !important;
+  background: linear-gradient(180deg, rgba(185,151,114,0.055), rgba(255,255,255,0.012)) !important;
+}
+
+.public-approved-v8 .v0-final {
+  padding: 110px 24px 118px !important;
+}
+
+.public-approved-v8 .v0-final h2 {
+  max-width: 820px !important;
+  font-family: var(--sovereign-title) !important;
+  font-size: clamp(2.65rem, 4vw, 4.05rem) !important;
+  font-weight: 600 !important;
+  line-height: 1.01 !important;
+  letter-spacing: -0.022em !important;
+}
+
+.public-approved-v8 .v0-final p {
+  margin-top: 20px !important;
+  font-size: 0.87rem !important;
+}
+
+/* MOTION ---------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .public-approved-v8 .landing-expression-slice__canvas {
+    animation: sovereign-field-breathe-v1 9s ease-in-out 1.2s infinite alternate !important;
+  }
+
+  .public-approved-v8 .landing-story .landing-demo {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-demo {
+    animation: sovereign-demo-arrive-v1 620ms cubic-bezier(.16,1,.3,1) forwards;
+  }
+
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-story__stage > .landing-demo:nth-child(2) {
+    animation-delay: 110ms;
+  }
+
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-message,
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-context-view > *,
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-system-map__evidence,
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-system-map__test {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: sovereign-content-arrive-v1 460ms cubic-bezier(.16,1,.3,1) forwards;
+  }
+
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-demo__body > :nth-child(1),
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-context-view > :nth-child(1) { animation-delay: 120ms; }
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-demo__body > :nth-child(2),
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-context-view > :nth-child(2) { animation-delay: 230ms; }
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-demo__body > :nth-child(3),
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-context-view > :nth-child(3) { animation-delay: 340ms; }
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-demo__body > :nth-child(4) { animation-delay: 450ms; }
+
+  .public-approved-v8 .landing-story[data-visible="true"] .landing-system-map path {
+    stroke-dasharray: 8 9;
+    animation: sovereign-system-flow-v1 12s linear infinite;
+  }
+}
+
+@keyframes sovereign-field-breathe-v1 {
+  from { opacity: 0.76; filter: brightness(0.94) contrast(1); }
+  to { opacity: 0.92; filter: brightness(1.08) contrast(1.03); }
+}
+
+@keyframes sovereign-demo-arrive-v1 {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sovereign-content-arrive-v1 {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sovereign-system-flow-v1 {
+  to { stroke-dashoffset: -136; }
+}
+
+@media (max-width: 900px) {
+  .public-approved-v8 {
+    --landing-shell: min(100% - 34px, 680px) !important;
+  }
+
+  .public-approved-v8 .v0-hero.sovereign-opening-field {
+    min-height: max(760px, calc(var(--sovereign-viewport-height, 100svh) - 68px)) !important;
+    max-height: 850px !important;
+    padding: 52px 17px 330px !important;
+  }
+
+  .public-approved-v8 .v0-hero h1 > span {
+    font-size: clamp(2.75rem, 10vw, 3.85rem) !important;
+  }
+
+  .public-approved-v8 .v0-hero h1 > em {
+    font-size: clamp(2.55rem, 9.2vw, 3.55rem) !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice {
+    height: 340px !important;
+    min-height: 340px !important;
+    max-height: 340px !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice__canvas {
+    width: min(760px, 178vw) !important;
+  }
+
+  .public-approved-v8 .landing-story {
+    padding: 72px 0 78px !important;
+  }
+
+  .public-approved-v8 .landing-story__heading {
+    margin-bottom: 30px !important;
+  }
+
+  .public-approved-v8 .landing-story__heading h2 {
+    font-size: clamp(2rem, 7vw, 2.8rem) !important;
+  }
+
+  .public-approved-v8 .landing-story__stage,
+  .public-approved-v8 .landing-story__stage--relationship,
+  .public-approved-v8 .landing-story__stage--system {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .public-approved-v8 .landing-demo {
+    min-height: 0 !important;
+  }
+
+  .public-approved-v8 .landing-context-view--relationship,
+  .public-approved-v8 .landing-context-view--system {
+    grid-template-columns: 1fr !important;
+  }
+
+  .public-approved-v8 .v0-comparison {
+    padding: 80px 17px 86px !important;
+  }
+
+  .public-approved-v8 .v0-comparison > .v0-shell {
+    gap: 34px !important;
+  }
+
+  .public-approved-v8 .v0-comparison .v0-story-heading h2 {
+    font-size: clamp(2.2rem, 7.6vw, 3rem) !important;
+  }
+
+  .public-approved-v8 .v0-final {
+    padding: 88px 18px 94px !important;
+  }
+
+  .public-approved-v8 .v0-final h2 {
+    font-size: clamp(2.35rem, 8vw, 3.2rem) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .public-approved-v8 .v0-hero.sovereign-opening-field {
+    min-height: 740px !important;
+    padding-bottom: 310px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit {
+    padding: 58px 17px 62px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit h2 {
+    font-size: clamp(1.9rem, 8vw, 2.4rem) !important;
+  }
+
+  .public-approved-v8 .landing-message--user {
+    max-width: 90% !important;
+  }
+
+  .public-approved-v8 .landing-demo__body {
+    padding: 19px !important;
+  }
+
+  .public-approved-v8 .landing-workflow {
+    padding-inline: 14px !important;
+  }
+
+  .public-approved-v8 .landing-workflow > li.is-active {
+    margin-inline: -14px !important;
+    padding-inline: 14px !important;
+  }
+
+  .public-approved-v8 .v0-comparison-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-approved-v8 .landing-expression-slice__canvas,
+  .public-approved-v8 .landing-demo,
+  .public-approved-v8 .landing-message,
+  .public-approved-v8 .landing-context-view > *,
+  .public-approved-v8 .landing-system-map path,
+  .public-approved-v8 .landing-system-map__evidence,
+  .public-approved-v8 .landing-system-map__test {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
