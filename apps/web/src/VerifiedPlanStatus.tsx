@@ -27,22 +27,22 @@ function planLabel(plan?: string): string {
 }
 
 function usageLabel(usage?: AiUsage | null): string {
-  if (!usage || !Number.isFinite(usage.remaining) || !Number.isFinite(usage.allowance)) return 'Monthly allowance unavailable';
-  return `${usage.remaining} of ${usage.allowance} Sovereign turns remaining this UTC month`;
+  if (!usage || !Number.isFinite(usage.remaining) || !Number.isFinite(usage.allowance)) return 'Monthly turns unavailable';
+  return `${usage.remaining} of ${usage.allowance} Sovereign turns remaining this month`;
 }
 
 function resetLabel(value?: string): string {
-  if (!value) return 'Resets at the start of the next UTC month.';
+  if (!value) return 'Resets at the start of the next month.';
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'Resets at the start of the next UTC month.';
-  return `Resets ${date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })} UTC.`;
+  if (Number.isNaN(date.getTime())) return 'Resets at the start of the next month.';
+  return `Resets ${date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}.`;
 }
 
 export function VerifiedPlanStatus({ expanded = false }: Props) {
   const [entitlement, setEntitlement] = useState<Entitlement | null>(null);
   const [usage, setUsage] = useState<AiUsage | null>(null);
   const [state, setState] = useState<VerificationState>('loading');
-  const [message, setMessage] = useState('Verifying your plan from the authoritative account record.');
+  const [message, setMessage] = useState('Checking your plan.');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -67,23 +67,23 @@ export function VerifiedPlanStatus({ expanded = false }: Props) {
         if (billingReturn === 'success' && effective.plan !== 'sovereign_plus' && attempt < 8) {
           attempt += 1;
           setState('confirming');
-          setMessage('Stripe returned successfully. Waiting for the signed webhook to confirm Sovereign+ access. Free access remains available while confirmation completes.');
+          setMessage('Checkout returned successfully. Sovereign+ is still being activated. Free remains available while this finishes.');
           retryTimer = window.setTimeout(() => void verifyEntitlement(), 1_500);
           return;
         }
 
         if (billingReturn === 'success' && effective.plan !== 'sovereign_plus') {
           setState('confirming');
-          setMessage('Payment returned successfully, but Sovereign+ access is still being confirmed from the signed Stripe event. Refresh this page in a moment or continue using Free.');
+          setMessage('Sovereign+ is still being activated. Refresh in a moment or continue using Free.');
           return;
         }
 
         setState('ready');
         setMessage(effective.plan === 'sovereign_plus'
-          ? `Sovereign+ access is verified from the latest signed Stripe event. ${usageLabel(body.aiUsage)}`
+          ? `Sovereign+ is active. ${usageLabel(body.aiUsage)}`
           : billingReturn === 'cancelled'
-            ? `Stripe checkout was cancelled. Your Free access is unchanged. ${usageLabel(body.aiUsage)}`
-            : `Free access is verified. ${usageLabel(body.aiUsage)} Upgrade remains available through secure Stripe checkout.`);
+            ? `Checkout was cancelled. Free is unchanged. ${usageLabel(body.aiUsage)}`
+            : `Free is active. ${usageLabel(body.aiUsage)} You can upgrade from Plan and billing whenever you want.`);
 
         if (billingReturn && effective.plan === 'sovereign_plus') {
           const url = new URL(location.href);
@@ -93,7 +93,7 @@ export function VerifiedPlanStatus({ expanded = false }: Props) {
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') return;
         setState('error');
-        setMessage('Plan verification is temporarily unavailable. Paid capabilities remain locked until the authoritative entitlement can be read.');
+        setMessage('Plan information is temporarily unavailable. Paid features will stay closed until your plan can be checked.');
       }
     }
 
@@ -108,17 +108,17 @@ export function VerifiedPlanStatus({ expanded = false }: Props) {
 
   if (expanded) {
     return (
-      <section className="account-plan-verification" aria-label="Verified plan and AI allowance">
+      <section className="account-plan-verification" aria-label="Plan and monthly Sovereign turns">
         <div>
-          <small>SERVER-VERIFIED PLAN</small>
+          <small>PLAN</small>
           <strong>
             {state === 'loading'
-              ? 'Verifying your plan…'
+              ? 'Checking your plan…'
               : state === 'confirming'
-                ? 'Confirming your Stripe entitlement…'
+                ? 'Finishing Sovereign+ activation…'
                 : state === 'error'
-                  ? 'Plan verification unavailable'
-                  : `${planLabel(entitlement?.plan)} verified`}
+                  ? 'Plan information unavailable'
+                  : `${planLabel(entitlement?.plan)} active`}
           </strong>
           <small>{message}</small>
           {(state === 'ready' || state === 'confirming') && usage && (
@@ -135,12 +135,12 @@ export function VerifiedPlanStatus({ expanded = false }: Props) {
       <i aria-hidden="true" />
       <span>
         {state === 'loading'
-          ? 'Verifying plan'
+          ? 'Checking plan'
           : state === 'confirming'
-            ? 'Confirming Stripe'
+            ? 'Activating Sovereign+'
             : state === 'error'
               ? 'Plan unavailable'
-              : 'Server verified'}
+              : 'Plan active'}
       </span>
       {(state === 'ready' || state === 'confirming') && (
         <strong>
