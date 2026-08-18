@@ -122,9 +122,14 @@ export function requireSameOrigin(request: Request): void {
   const url = new URL(request.url);
   const origin = request.headers.get('origin');
   const fetchSite = request.headers.get('sec-fetch-site')?.trim().toLowerCase();
+  const bearer = request.headers.get('authorization')?.startsWith('Bearer ') === true;
+  const hasSessionCookie = Boolean(readCookie(request, '__Host-sovereign_session') || readCookie(request, '__sov_session'));
 
   if (fetchSite && !['same-origin', 'same-site', 'none'].includes(fetchSite)) forbiddenOrigin();
-  if (!origin) forbiddenOrigin();
+  if (!origin) {
+    if (bearer && !hasSessionCookie && !fetchSite) return;
+    forbiddenOrigin();
+  }
 
   let normalizedOrigin: string;
   try {
