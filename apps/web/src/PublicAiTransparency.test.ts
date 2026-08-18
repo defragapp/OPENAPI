@@ -11,7 +11,7 @@ describe('public AI transparency', () => {
       'does not turn that moment into an upgrade prompt',
       'do not use one of your monthly Sovereign AI turns',
       'A framework, coincidence, current astronomical condition, or strong feeling is not treated as proof',
-      'Basis shows the exact source values that informed it',
+      'Open source details beneath an answer when you want to inspect the exact source information that materially shaped the interpretation',
       'info@defrag.app'
     ]) {
       expect(faq).toContain(marker);

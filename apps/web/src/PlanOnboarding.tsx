@@ -61,10 +61,10 @@ const emptyErrors = (): BaselineErrors => ({
 });
 
 const baselineStages = [
-  'Checking time and place',
-  'Calculating source positions',
-  'Preparing your Baseline profile',
-  'Opening your workspace'
+  'Checking your details',
+  'Building your Baseline',
+  'Preparing your Baseline',
+  'Opening Sovereign.OS'
 ] as const;
 
 export function PlanOnboarding() {
@@ -165,7 +165,7 @@ export function PlanOnboarding() {
         if (nextBaseline.readinessState === 'facet_profile_preparing') {
           setPhase('baseline_building');
           setBaselineStage('preparing');
-          setStatus(nextBaseline.readinessMessage || 'Preparing your Baseline profile…');
+          setStatus(nextBaseline.readinessMessage || 'Preparing your Baseline…');
 
           try {
             const prepared = await prepareSavedBaselineProfile(controller.signal);
@@ -180,7 +180,7 @@ export function PlanOnboarding() {
             setStatus(
               error instanceof Error
                 ? error.message
-                : 'Your saved Baseline source is intact, but its profile could not finish. Try again.'
+                : 'Your saved Baseline details are still here, but your Baseline could not finish. Try again.'
             );
           }
           return;
@@ -244,7 +244,7 @@ export function PlanOnboarding() {
       };
 
       setBaselineStage('calculating');
-      setStatus('Calculating your exact source positions…');
+      setStatus('Building your Baseline…');
 
       const response = await fetch('/api/v1/baseline/onboarding', {
         method: 'POST',
@@ -275,7 +275,7 @@ export function PlanOnboarding() {
 
       if (response.status === 202) {
         setBaselineStage('preparing');
-        setStatus(body.message || 'Your exact source is saved. Preparing your Baseline profile…');
+        setStatus(body.message || 'Your details are saved. Preparing your Baseline…');
         const prepared = await pollBaselineReadiness();
         await openReadyBaseline(prepared);
         return;
@@ -284,7 +284,7 @@ export function PlanOnboarding() {
       if (!baselineIsReady(body.baseline)) {
         setPhase('baseline');
         setBaselineStage('idle');
-        setStatus(body.baseline.readinessMessage || body.message || 'Your source data is saved, but the Baseline profile is not ready yet. Try Baseline again.');
+        setStatus(body.baseline.readinessMessage || body.message || 'Your details are saved, but your Baseline is not ready yet. Try again.');
         return;
       }
 
@@ -329,7 +329,7 @@ export function PlanOnboarding() {
 
       if (nextBaseline.readinessState === 'source_computing') {
         setBaselineStage('calculating');
-        setStatus(nextBaseline.readinessMessage || 'Calculating your exact source positions…');
+        setStatus(nextBaseline.readinessMessage || 'Building your Baseline…');
         continue;
       }
 
@@ -338,7 +338,7 @@ export function PlanOnboarding() {
         || nextBaseline.status === 'preparing'
       ) {
         setBaselineStage('preparing');
-        setStatus(nextBaseline.readinessMessage || 'Preparing your Baseline profile…');
+        setStatus(nextBaseline.readinessMessage || 'Preparing your Baseline…');
 
         if (
           !profileRecoveryAttempted
@@ -363,7 +363,7 @@ export function PlanOnboarding() {
     }
 
     throw new Error(
-      'Your exact Baseline source is saved, but the Baseline profile is taking longer than expected. Try again to continue from the saved source.'
+      'Your details are saved, but your Baseline is taking longer than expected. Try again to continue from what you already entered.'
     );
   }
 
@@ -395,7 +395,7 @@ export function PlanOnboarding() {
       throw new Error(
         body.message
         || body.error
-        || 'Your saved Baseline source is intact, but its profile could not finish. Try again.'
+        || 'Your saved Baseline details are still here, but your Baseline could not finish. Try again.'
       );
     }
 
@@ -763,16 +763,16 @@ function BaselineResultView({ baseline, certainty, reviewOpen, onToggleReview, o
     <section className="baseline-result-state">
       <p className="eyebrow">YOUR BASELINE IS READY</p>
       <h1>Your Baseline is ready.</h1>
-      <p className="plan-intro">Your exact source and validated plain-language Baseline profile are ready beneath every question, relationship, and system you choose to explore.</p>
+      <p className="plan-intro">Your Baseline is ready to use across the questions, relationships, and systems you choose to explore.</p>
       <div className="baseline-result-summary">
-        <div><span>Result</span><strong>Source and Baseline profile validated</strong></div>
+        <div><span>Result</span><strong>Baseline ready</strong></div>
         <div><span>Birth-time certainty</span><strong>{certainty}</strong></div>
-        <div><span>Interpretive uncertainty</span><strong>{baseline.uncertainty ?? 'stated in context'}</strong></div>
+        <div><span>What may need more context</span><strong>{baseline.uncertainty ?? 'stated in context'}</strong></div>
       </div>
       {reviewOpen && (
         <div className="baseline-review" role="region" aria-label="Baseline availability">
           <h2>What is available now</h2>
-          <p>Stable Baseline themes, exact approved Basis values, and visible uncertainty can now be used in the workspace. Current conditions remain separate and permission-based.</p>
+          <p>Your Baseline is ready to use in the workspace. Current conditions stay separate and are included only when you choose them.</p>
         </div>
       )}
       <div className="baseline-result-actions">
@@ -796,7 +796,7 @@ function PlanChoiceView({ interval, currentPlan, status, submitting, checkoutUna
     <>
       <p className="eyebrow">CHOOSE YOUR PLAN</p>
       <h1>Choose how you want to start.</h1>
-      <p className="plan-intro">Free covers your personal Baseline and personal AI use. Sovereign+ adds permission-based relationships, systems, Library continuity, and more AI turns. Your Baseline is required before either workspace opens.</p>
+      <p className="plan-intro">Free gives you your personal Baseline and personal AI use. Sovereign+ adds relationships, systems, Library continuity, and more AI turns. Your Baseline is ready before the workspace opens.</p>
 
       <div className="onboarding-plan-grid">
         <article className={currentPlan === 'free' ? 'current' : ''}>
@@ -815,12 +815,12 @@ function PlanChoiceView({ interval, currentPlan, status, submitting, checkoutUna
         <article className="plus-plan">
           <header><span>SOVEREIGN+</span><strong>{interval === 'annual' ? 'Annual billing' : 'Monthly billing'}</strong></header>
           <h2>Relationships, systems, and continuity.</h2>
-          <p>Use permission-based relationship and system context while keeping each person distinct.</p>
+          <p>Explore relationships and systems while keeping each person distinct.</p>
           <ul>
             <li>Everything in Free</li>
             <li>People, Systems, Library, and optional Covenant</li>
             <li>300 Sovereign AI turns each month</li>
-            <li>Permission-aware invitations and controls</li>
+            <li>Invitations and sharing controls</li>
           </ul>
           <div className="billing-toggle" role="group" aria-label="Billing interval">
             <button type="button" aria-pressed={interval === 'monthly'} className={interval === 'monthly' ? 'active' : ''} onClick={() => onInterval('monthly')}>Monthly billing</button>

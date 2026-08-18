@@ -16,11 +16,11 @@ const sansTypography = readFileSync(resolve('apps/web/src/sans-typography-author
 const replacements = [
   [
     "  'Why do I keep taking responsibility for everyone around me?',",
-    "  'What does Alignment look like for me?',"
+    "  'How do I make decisions that actually fit me?',"
   ],
   [
     "  'What is mine, what is theirs, and what happens between us?',",
-    "  'Why does the same situation land differently for us?',"
+    "  'Why does the same conversation feel urgent to me and pressuring to them?',"
   ],
   [
     "const passkeyVisual = read('apps/web/src/passkey-auth.css');\nconst staticV0Visual = read('apps/web/public/v0-public-port.css');",
@@ -40,15 +40,15 @@ const replacements = [
   ],
   [
     "  'Bring the question you actually have.',",
-    "  'Explore yourself.',"
+    "  'Start with yourself. Expand outward when it matters.',"
   ],
   [
     "  'Ask about your life.',\n  'Get an answer built for you.',",
-    "  'Explore how you think, decide, create, connect, and grow.',\n  'How Sovereign explores the question',"
+    "  'Explore how you think, decide, communicate, create, connect, and grow.',\n  'How Sovereign explores the question',"
   ],
   [
     "  'Understand what happens',\n  'between you.',",
-    "  'Understand both sides and what happens between you.',"
+    "  'See why the same moment lands differently—and how to bridge the gap.',"
   ],
   [
     "  'From one person',\n  'to the whole system.',",
@@ -56,11 +56,11 @@ const replacements = [
   ],
   [
     "  'Seeing the capacity beneath it',\n  'Seeing how it is expressing',\n  'Seeing what keeps it going',\n  'Seeing what could change',",
-    "  'How you tend to create',\n  'What changes under pressure',\n  'What feels aligned',\n  'What to explore next',"
+    "  'Start with the question',\n  'Use what matters from your Baseline',\n  'Find the useful difference',\n  'Give you something you can try',"
   ],
   [
     "  'Mapping the people',",
-    "  'Seeing the whole system',"
+    "  'How Sovereign reads a system',"
   ],
   [
     "  'Roles',",
@@ -76,7 +76,7 @@ const replacements = [
   ],
   [
     "  'Illustrative permitted Baselines',",
-    "  'Illustrative supplied context',"
+    "  'Start with what you told Sovereign',"
   ],
   [
     "  'stroke: #2f93ff',\n  'width: 100vw',",
@@ -113,9 +113,9 @@ if (!source.includes("read('apps/web/src/rendered-fidelity-v1.css')") || !source
 
 for (const marker of [
   'data-public-narrative="self-people-systems-v1"',
-  'Start with you',
-  'Explore yourself.',
-  'What does Alignment look like for me?',
+  'You → your people → the whole system',
+  'Start with yourself. Expand outward when it matters.',
+  'How do I make decisions that actually fit me?',
   'Most AI starts with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
 ]) if (!landing.includes(marker)) throw new Error(`Premium platform release v2 is missing landing marker: ${marker}`);
@@ -124,16 +124,16 @@ for (const retired of ['<BaselineFoundation />', 'One private reference beneath 
 }
 for (const marker of [
   '01 · You',
-  'Explore how you think, decide, create, connect, and grow.',
+  'Explore how you think, decide, communicate, create, connect, and grow.',
   '02 · You + your people',
-  'Understand both sides and what happens between you.',
-  'Keeping both people distinct',
+  'See why the same moment lands differently—and how to bridge the gap.',
+  'Keep each person separate',
   '03 · From 1:1 to the whole system',
   'See the whole system.',
-  'Seeing the whole system',
-  'Roles',
-  'Perspectives',
-  'Responsibilities'
+  'How Sovereign reads a system',
+  'How Sovereign reads a system',
+  'Show how pressure moves',
+  'Change one thing and watch what happens'
 ]) {
   if (!stories.includes(marker)) throw new Error(`Premium platform release v2 is missing product story marker: ${marker}`);
 }
@@ -171,6 +171,28 @@ for (const retired of [
   'See where responsibility keeps landing.',
   'One private foundation. More useful answers across the questions that shape your life.'
 ]) if (source.includes(retired)) throw new Error(`Premium platform release v2 still enforces retired active language: ${retired}`);
+
+
+/* CURRENT_STORY_CONTRACT_restored product stories */
+const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","No compatibility score"];
+const currentStoryQuote = String.fromCharCode(39);
+const currentStoryStart = "requireAll(" + currentStoryQuote + "restored product stories" + currentStoryQuote + ", stories, [";
+const currentStoryIndex = source.indexOf(currentStoryStart);
+if (currentStoryIndex < 0) throw new Error("Current story verifier block is missing: restored product stories");
+const currentStoryEnd = source.indexOf("\n]);", currentStoryIndex);
+if (currentStoryEnd < 0) throw new Error("Current story verifier block has no end: restored product stories");
+const currentStoryContract = currentStoryStart + "\n" + currentStoryMarkers.map((marker) => "  " + JSON.stringify(marker)).join(",\n") + "\n]);";
+source = source.slice(0, currentStoryIndex) + currentStoryContract + source.slice(currentStoryEnd + 4);
+
+
+/* CURRENT_THREE_WORKFLOW_CONTRACT */
+const staleWorkflowMultiplicity = "assert((stories.match(/<WorkflowPanel /g) ?? []).length === 1, 'Public stories must render one detailed reasoning flow, not repeat it for relationship and system examples.');";
+const currentWorkflowMultiplicity = "assert((stories.match(/<WorkflowPanel/g) ?? []).length === 3, 'Public stories must render one workflow for Self, Relationship, and System.');";
+if (source.includes(staleWorkflowMultiplicity)) {
+  source = source.replace(staleWorkflowMultiplicity, currentWorkflowMultiplicity);
+} else if (source.includes(currentWorkflowMultiplicity) === false) {
+  throw new Error("Premium platform release v2 could not reconcile workflow multiplicity.");
+}
 
 try {
   writeFileSync(temporaryPath, source, 'utf8');

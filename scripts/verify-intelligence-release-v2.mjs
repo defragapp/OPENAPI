@@ -75,15 +75,15 @@ if (typography.includes('font-family: "Sovereign Display"') || typography.includ
 for (const marker of ['--font-display: var(--font-title);', '--serif: var(--font-title);', 'font-family: var(--font-title) !important']) {
   if (!typography.includes(marker)) throw new Error(`Intelligence release v2 is missing typography marker ${marker}`);
 }
-for (const marker of ['The retired display serif must not render anywhere in the active product.', '.public-approved-v8 .v0-hero h1 > em', 'font-family: var(--font-title) !important']) {
+for (const marker of ['--font-title:', '.public-approved-v8 .v0-hero h1 > em', 'font-family: var(--font-title) !important']) {
   if (!sansTypography.includes(marker)) throw new Error(`Intelligence release v2 is missing terminal sans marker ${marker}`);
 }
 for (const marker of [
   'data-public-narrative="self-people-systems-v1"',
   'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
-  'Start with you',
-  'Explore yourself.',
-  'What does Alignment look like for me?',
+  'You → your people → the whole system',
+  'Start with yourself. Expand outward when it matters.',
+  'How do I make decisions that actually fit me?',
   'Most AI starts with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
 ]) {
@@ -94,14 +94,14 @@ for (const retired of ['<BaselineFoundation />', 'One private reference beneath 
 }
 for (const marker of [
   '01 · You',
-  'Explore how you think, decide, create, connect, and grow.',
+  'Explore how you think, decide, communicate, create, connect, and grow.',
   '02 · You + your people',
-  'Understand both sides and what happens between you.',
+  'See why the same moment lands differently—and how to bridge the gap.',
   '03 · From 1:1 to the whole system',
   'See the whole system.',
-  'Roles',
-  'Perspectives',
-  'Responsibilities'
+  'How Sovereign reads a system',
+  'Show how pressure moves',
+  'Change one thing and watch what happens'
 ]) {
   if (!stories.includes(marker)) throw new Error(`Intelligence release v2 is missing product story marker ${marker}`);
 }
@@ -124,19 +124,19 @@ if (source.split(retiredFingerprintOutput).length - 1 !== 1) throw new Error('In
 const languageReplacements = [
   ["  'Look closer at the pattern.',", "  'Explore yourself more deeply.',"],
   ["  'See how the whole system functions.',", "  'See the whole system.',"],
-  ["  'See a Sovereign answer',", "  'Explore yourself.',"],
-  ["  'Start with what’s actually happening.',", "  'Start with you',"],
-  ["  'Why do we keep having the same fight?',", "  'What does Alignment look like for me?',"],
-  ["  'What is mine, what is theirs, and what happens between us?',", "  'Why does the same situation land differently for us?',"],
+  ["  'See a Sovereign answer',", "  'Start with yourself. Expand outward when it matters.',"],
+  ["  'Start with what’s actually happening.',", "  'You → your people → the whole system',"],
+  ["  'Why do we keep having the same fight?',", "  'How do I make decisions that actually fit me?',"],
+  ["  'What is mine, what is theirs, and what happens between us?',", "  'Why does the same conversation feel urgent to me and pressuring to them?',"],
   ["  'Sovereign begins with the capacity beneath a pattern.',", "  'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',"],
-  ["  'See the capacity beneath the pattern.',", "  'Explore how you think, decide, create, connect, and grow.',"],
+  ["  'See the capacity beneath the pattern.',", "  'Explore how you think, decide, communicate, create, connect, and grow.',"],
   ["  'See what keeps the pattern going—and what could change it.',", "  'See the whole system.',"],
-  ["  'Capacity beneath the pattern',", "  'How you tend to create',"],
-  ["  'How pressure changes the expression',", "  'What changes under pressure',"],
-  ["  'What may keep it going',", "  'What feels aligned',"],
-  ["  'What could change',", "  'What to explore next',"],
-  ["  'System structure',", "  'Seeing the whole system',"],
-  ["  'Illustrative permitted Baselines',", "  'Illustrative supplied context',"],
+  ["  'Capacity beneath the pattern',", "  'Start with the question',"],
+  ["  'How pressure changes the expression',", "  'Use what matters from your Baseline',"],
+  ["  'What may keep it going',", "  'Find the useful difference',"],
+  ["  'What could change',", "  'Give you something you can try',"],
+  ["  'System structure',", "  'How Sovereign reads a system',"],
+  ["  'Illustrative permitted Baselines',", "  'Start with what you told Sovereign',"],
   ["  'A blank conversation starts with the prompt. Sovereign starts with your Baseline.',", "  'Most AI starts with the prompt. Sovereign starts with you.',"],
   ["  'Your thoughts deserve',", "  'Know yourself. Understand your people. See the whole system.',"],
   ["  'a better place to live.'", "  'Start free. Build your Baseline, then explore what you want to understand next.'"],
@@ -156,23 +156,68 @@ source = source.replace(staleProhibitedLanding, currentProhibitedLanding);
 
 const currentSemanticReplacements = [
   [
-    "  'Understand what happens between you.',",
-    "  'Understand both sides and what happens between you.',"
-  ],
-  [
     "  'responsibilityAuthorityMismatch',",
     "  'roles: participants.map',"
   ]
 ];
+
 for (const [from, to] of currentSemanticReplacements) {
-  if (!source.includes(from)) {
-    if (!source.includes(to)) {
-      throw new Error(`Intelligence release v2 could not reconcile current semantic marker: ${from}`);
+  if (source.includes(from) === false) {
+    if (source.includes(to) === false) {
+      throw new Error("Intelligence release v2 could not reconcile semantic marker: " + from);
     }
     continue;
   }
   source = source.replaceAll(from, to);
 }
+
+const replaceIntelligenceSectionMarker = (label, startMarker, endMarker, from, to) => {
+  const start = source.indexOf(startMarker);
+  const end = source.indexOf(endMarker, start);
+
+  if (start < 0 || end <= start) {
+    throw new Error("Intelligence release v2 could not isolate " + label + ".");
+  }
+
+  const section = source.slice(start, end);
+  const count = section.split(from).length - 1;
+
+  if (count === 0 && section.includes(to)) {
+    return;
+  }
+
+  if (count !== 1) {
+    throw new Error(
+      "Intelligence release v2 expected one " +
+      label +
+      " marker but found " +
+      count +
+      ": " +
+      from
+    );
+  }
+
+  source =
+    source.slice(0, start) +
+    section.replace(from, to) +
+    source.slice(end);
+};
+
+replaceIntelligenceSectionMarker(
+  "authenticated workspace relationship",
+  "containsAll('canonical workspace', workspace, [",
+  "containsAll('relationship and system intelligence', relational, [",
+  "  'Understand what happens between you.',",
+  "  'See how the same moment can land differently.',"
+);
+
+replaceIntelligenceSectionMarker(
+  "public relationship story",
+  "containsAll('restored product stories', stories, [",
+  "for (const retired of",
+  "  'Understand what happens between you.',",
+  "  'See why the same moment lands differently—and how to bridge the gap.',"
+);
 
 const staleRefinementAssertion = "  'style.textContent += `\\n${experienceRefinementCss}`',";
 const currentRefinementAssertion = "  'style.textContent += `\\\\n${experienceRefinementCss}`',";
@@ -183,6 +228,18 @@ const staleStaticRouteAssertion = "  containsAll(label, document, ['Sovereign.OS
 const currentStaticRouteAssertion = "  containsAll(label, document, ['Sovereign.OS', 'data-visual-contract=\\\"founder-v0-static\\\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260817-action-v1']);";
 if (source.split(staleStaticRouteAssertion).length - 1 !== 1) throw new Error('Intelligence release v2 could not reconcile the retired standalone-route contract.');
 source = source.replace(staleStaticRouteAssertion, currentStaticRouteAssertion);
+
+
+/* CURRENT_STORY_CONTRACT_restored product stories */
+const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","No compatibility score"];
+const currentStoryQuote = String.fromCharCode(39);
+const currentStoryStart = "containsAll(" + currentStoryQuote + "restored product stories" + currentStoryQuote + ", stories, [";
+const currentStoryIndex = source.indexOf(currentStoryStart);
+if (currentStoryIndex < 0) throw new Error("Current story verifier block is missing: restored product stories");
+const currentStoryEnd = source.indexOf("\n]);", currentStoryIndex);
+if (currentStoryEnd < 0) throw new Error("Current story verifier block has no end: restored product stories");
+const currentStoryContract = currentStoryStart + "\n" + currentStoryMarkers.map((marker) => "  " + JSON.stringify(marker)).join(",\n") + "\n]);";
+source = source.slice(0, currentStoryIndex) + currentStoryContract + source.slice(currentStoryEnd + 4);
 
 const activeSource = source.replace(retiredFingerprintOutput, '\n');
 

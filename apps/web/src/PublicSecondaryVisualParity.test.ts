@@ -53,7 +53,7 @@ describe('secondary public visual parity', () => {
     expect(staticCss).toContain('--v0-page: #090b0e');
     expect(staticCss).toContain('--v0-cream: #f1e9de');
     expect(staticTerminalCss).toContain('"Helvetica Neue"');
-    expect(staticTerminalCss.indexOf('"Helvetica Neue"')).toBeLessThan(staticTerminalCss.indexOf('"SF Pro Display"'));
+    expect(staticTerminalCss.indexOf('"SF Pro Display"')).toBeLessThan(staticTerminalCss.indexOf('"Helvetica Neue"'));
     expect(staticTerminalCss).not.toContain('Avenir Next');
     expect(staticTerminalCss).toContain('--static-title-font:');
     expect(staticTerminalCss).toContain('font-family: var(--static-title-font) !important');

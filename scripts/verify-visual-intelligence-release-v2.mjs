@@ -72,16 +72,16 @@ for (const marker of ['--font-display: var(--font-title);', '.public-approved-v8
 
 for (const marker of [
   'data-public-narrative="self-people-systems-v1"',
-  'Start with you',
-  'Explore yourself.',
-  'What does Alignment look like for me?',
+  'You → your people → the whole system',
+  'Start with yourself. Expand outward when it matters.',
+  'How do I make decisions that actually fit me?',
   'Most AI starts with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
 ]) if (!landing.includes(marker)) throw new Error(`Visual intelligence release v2 is missing current landing marker ${marker}`);
 for (const retired of ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'calculated astronomical positions and selected interpretive frameworks']) {
   if (landing.includes(retired)) throw new Error(`Visual intelligence release v2 found retired landing language ${retired}`);
 }
-for (const marker of ['01 · You', 'Explore how you think, decide, create, connect, and grow.', '02 · You + your people', 'Understand both sides and what happens between you.', '03 · From 1:1 to the whole system', 'See the whole system.']) {
+for (const marker of ['01 · You', 'Explore how you think, decide, communicate, create, connect, and grow.', '02 · You + your people', 'See why the same moment lands differently—and how to bridge the gap.', '03 · From 1:1 to the whole system', 'See the whole system.']) {
   if (!stories.includes(marker)) throw new Error(`Visual intelligence release v2 is missing story marker ${marker}`);
 }
 for (const retired of ['Separate helping from carrying the outcome.', 'See where responsibility keeps landing.']) {
@@ -105,17 +105,17 @@ if (main.slice(main.indexOf(passkeyImport) + passkeyImport.length).includes("imp
 if (source.split(retiredFingerprintOutput).length - 1 !== 1) throw new Error('Visual intelligence release v2 could not isolate the historical sequence fingerprint output.');
 
 const replacements = [
-  ["  'See a Sovereign answer',", "  'Explore yourself.',"],
-  ["  'Start with what’s actually happening.',", "  'Start with you',"],
-  ["  'Why do we keep having the same fight?',", "  'What does Alignment look like for me?',"],
+  ["  'See a Sovereign answer',", "  'Start with yourself. Expand outward when it matters.',"],
+  ["  'Start with what’s actually happening.',", "  'You → your people → the whole system',"],
+  ["  'Why do we keep having the same fight?',", "  'How do I make decisions that actually fit me?',"],
   ["  'Sovereign begins with the capacity beneath a pattern.',", "  'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',"],
   ["  'Generic AI',", "  'Most AI starts with the prompt. Sovereign starts with you.',"],
-  ["  'Capacity beneath the pattern',", "  'How you tend to create',"],
-  ["  'How pressure changes the expression',", "  'What changes under pressure',"],
-  ["  'What may keep it going',", "  'What feels aligned',"],
-  ["  'What could change',", "  'What to explore next',"],
-  ["  'System structure',", "  'Seeing the whole system',"],
-  ["  'Illustrative permitted Baselines',", "  'Illustrative supplied context',"],
+  ["  'Capacity beneath the pattern',", "  'Start with the question',"],
+  ["  'How pressure changes the expression',", "  'Use what matters from your Baseline',"],
+  ["  'What may keep it going',", "  'Find the useful difference',"],
+  ["  'What could change',", "  'Give you something you can try',"],
+  ["  'System structure',", "  'How Sovereign reads a system',"],
+  ["  'Illustrative permitted Baselines',", "  'Start with what you told Sovereign',"],
   ["  '/experience-static-refinement-v1.css?v=20260816-refinement-v1',", "  '/experience-static-refinement-v1.css?v=20260817-cohesion-v2',\n  '/premium-action-static-v1.css?v=20260817-action-v1',"],
   ["  'Build my Baseline',", "  'Get started',"],
   ["  'Your thoughts deserve'", "  'Know yourself. Understand your people. See the whole system.'"],
@@ -133,10 +133,6 @@ const currentWorkspaceReplacements = [
     "  'Explore yourself more deeply.',"
   ],
   [
-    "  'Understand what happens between you.',",
-    "  'Understand both sides and what happens between you.',"
-  ],
-  [
     "  'See how the whole system functions.',",
     "  'See the whole system.',"
   ]
@@ -145,10 +141,62 @@ const currentWorkspaceReplacements = [
 for (const [from, to] of currentWorkspaceReplacements) {
   if (source.includes(from)) {
     source = source.replaceAll(from, to);
-  } else if (!source.includes(to)) {
-    throw new Error(`Visual intelligence release v2 could not reconcile workspace marker: ${from}`);
+  } else if (source.includes(to) === false) {
+    throw new Error("Visual intelligence release v2 could not reconcile workspace marker: " + from);
   }
 }
+
+const replaceVisualSectionMarker = (label, startMarker, endMarker, from, to) => {
+  const start = source.indexOf(startMarker);
+  const end = source.indexOf(endMarker, start);
+
+  if (start < 0 || end <= start) {
+    throw new Error("Visual intelligence release v2 could not isolate " + label + ".");
+  }
+
+  const section = source.slice(start, end);
+  const count = section.split(from).length - 1;
+
+  if (count === 0 && section.includes(to)) {
+    return;
+  }
+
+  if (count !== 1) {
+    throw new Error(
+      "Visual intelligence release v2 expected one " +
+      label +
+      " marker but found " +
+      count +
+      ": " +
+      from
+    );
+  }
+
+  source =
+    source.slice(0, start) +
+    section.replace(from, to) +
+    source.slice(end);
+};
+
+replaceVisualSectionMarker(
+  "authenticated workspace relationship",
+  "requireAll('authenticated workspace',",
+  "requireAll('final workspace presentation',",
+  "  'Understand what happens between you.',",
+  "  'See how the same moment can land differently.',"
+);
+
+
+/* CURRENT_STORY_CONTRACT_isolated landing demonstrations */
+const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","No compatibility score"];
+const currentStoryQuote = String.fromCharCode(39);
+const currentStoryStart = "requireAll(" + currentStoryQuote + "isolated landing demonstrations" + currentStoryQuote + ", stories, [";
+const currentStoryIndex = source.indexOf(currentStoryStart);
+if (currentStoryIndex < 0) throw new Error("Current story verifier block is missing: isolated landing demonstrations");
+const currentStoryEnd = source.indexOf("\n]);", currentStoryIndex);
+if (currentStoryEnd < 0) throw new Error("Current story verifier block has no end: isolated landing demonstrations");
+const currentStoryContract = currentStoryStart + "\n" + currentStoryMarkers.map((marker) => "  " + JSON.stringify(marker)).join(",\n") + "\n]);";
+source = source.slice(0, currentStoryIndex) + currentStoryContract + source.slice(currentStoryEnd + 4);
 
 const activeSource = source.replace(retiredFingerprintOutput, '\n');
 

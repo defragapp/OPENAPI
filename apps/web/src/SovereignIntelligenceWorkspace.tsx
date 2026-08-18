@@ -915,10 +915,10 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   );
   if (surface === 'Systems') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="Systems" title="See the whole system." body="See the people, roles, perspectives, responsibilities, and pressure shaping how the system functions." />
+      <SurfaceHeading kicker="Systems" title="See the whole system." body="See who is involved, where responsibility sits, how pressure moves, and what changes when one person responds differently." />
       {selectedSystem
         ? <SystemOverview system={selectedSystem} api={api} />
-        : <EmptyState title="Choose a system to examine." body="Choose a group to see each consented person, their role, their perspective, their responsibilities, and how the group interacts." action="Choose a system" onAction={onOpenContext} />}
+        : <EmptyState title="Choose a system to examine." body="Choose a group to see who is involved, what each person is carrying, where pressure gathers, and how the group responds." action="Choose a system" onAction={onOpenContext} />}
     </div>
   );
   if (surface === 'Library') return (
@@ -1084,7 +1084,7 @@ function SystemOverview({ system, api }: { system: Json; api: (path: string, ini
           context={{
             label: 'System interaction',
             meta: `${fieldSubjects.length} people`,
-            detail: 'Each consented person stays distinct while roles, perspectives, responsibilities, reliance, and communication remain visible across the system.',
+            detail: 'Each person stays distinct while roles, responsibility, reliance, communication, and pressure remain visible across the system.',
             selectedAxisId: axisForConnectionType(String(edge?.type ?? 'responsibility'))
           }}
           {...(activeFieldConnection ? { activeConnection: activeFieldConnection } : {})}
@@ -1281,17 +1281,17 @@ function BasisStrip({ values }: { values: BasisValue[] }) {
   if (!available.length) return null;
   return (
     <>
-      <button className="basis-strip" onClick={() => setOpen(true)} aria-label={`Basis. Open ${available.length} source values.`}>
-        <strong>Basis</strong>
+      <button className="basis-strip" onClick={() => setOpen(true)} aria-label={`Sources. Open ${available.length} source details.`}>
+        <strong>Sources</strong>
         <span className="basis-values">{visible.map((value, index) => <span key={value.id}>{index > 0 && <i aria-hidden="true"> · </i>}<b aria-label={value.accessibleLabel}>{value.display}</b></span>)}</span>
         {available.length > limit && <em>+{available.length - limit}</em>}
         <i aria-hidden="true">⌄</i>
       </button>
       {open && (
         <ModalDialog className="source-drawer" labelledBy="basis-title" onClose={() => setOpen(false)}>
-          <button className="sheet-backdrop" onClick={() => setOpen(false)} aria-label="Close Basis sources" />
+          <button className="sheet-backdrop" onClick={() => setOpen(false)} aria-label="Close source details" />
           <section>
-            <header><div><span>Source detail</span><h2 id="basis-title">Basis</h2></div><button onClick={() => setOpen(false)} aria-label="Close">×</button></header>
+            <header><div><span>Sources</span><h2 id="basis-title">Source details</h2></div><button onClick={() => setOpen(false)} aria-label="Close">×</button></header>
             <p>These are the source values Sovereign used for this answer. They can inform reflection; they do not prove personality or current state.</p>
             <dl>{available.map((value) => <div key={value.id}><dt>{value.display}</dt><dd><span>{value.accessibleLabel}</span><span>Source · {value.provenance}</span><span>Calculated · {formatDate(value.computedAt)}</span><span>Uncertainty · {value.uncertainty}</span><span>Applies to · {value.subject === 'self' ? 'You' : value.subject === 'other' ? 'Other person' : 'Relationship'}</span>{value.expiresAt && <span>Expires · {formatDate(value.expiresAt)}</span>}</dd></div>)}</dl>
           </section>
@@ -1494,7 +1494,7 @@ function SystemControls({ workspace, selectedSystem, setSelectedSystem, api, ref
   }
   return (
     <div className="context-stack">
-      <p className="context-intro">A System keeps each consented person, their role, perspective, responsibilities, and pressure visible across a family, household, team, or group.</p>
+      <p className="context-intro">A System helps you see who is involved, the roles people take, where responsibility sits, and how pressure moves across a family, household, team, or group.</p>
       <label>New system<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Family, household, team…" /></label>
       <label>Type<select value={type} onChange={(event) => setType(event.target.value)}>{['family', 'household', 'friendship_group', 'team', 'workplace', 'custom'].map((item) => <option key={item} value={item}>{systemTypeLabel(item)}</option>)}</select></label>
       <button className="secondary-action" onClick={() => void createSystem()}>Create system</button>
@@ -1552,7 +1552,7 @@ function YouControls({ workspace, api, refresh, onBuildBaseline }: any) {
   return (
     <div className="context-stack account-controls">
       <section className="control-section">
-        <p>BASELINE</p><h3>{workspace.today?.baseline?.status === 'completed' ? 'Your Baseline is ready.' : 'Your intelligence begins here.'}</h3><span>If you rebuild your Baseline, future answers use the updated version. Saved answers keep the Basis they were created with.</span>
+        <p>BASELINE</p><h3>{workspace.today?.baseline?.status === 'completed' ? 'Your Baseline is ready.' : 'Your intelligence begins here.'}</h3><span>If you rebuild your Baseline, future answers use the updated version. Saved answers keep the sources that shaped them.</span>
         <button className="primary-action" onClick={onBuildBaseline}>{workspace.today?.baseline?.status === 'completed' ? 'Review or recompute my Baseline' : 'Build my Baseline'}</button>
       </section>
       <section className="control-section">

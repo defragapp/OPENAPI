@@ -24,7 +24,7 @@ const landingRefinementV2Css = readFileSync(new URL('./landing-refinement-v2.css
 const landingRefinementV5Css = readFileSync(new URL('./landing-live-refinement-v5.css', import.meta.url), 'utf8');
 const sansAuthority = readFileSync(new URL('./sans-typography-authority-v1.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
-const publicCopy = `${landing}\n${stories}\n${policy}\n${policyAuthority}\n${how}\n${pricing}\n${faq}\n${consent}`;
+const publicCopy = `${landing}\n${stories}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
 describe('Sovereign.OS public experience', () => {
   it('keeps the founder statement but makes the opening product value explicit', () => {

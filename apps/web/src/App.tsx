@@ -24,12 +24,12 @@ const consentScopes = [
 ] as const;
 
 const consentScopeDescriptions: Record<string, string> = {
-  'pair.compare': 'Compare the two permitted Baselines while keeping each person distinct.',
+  'pair.compare': 'Use both Baselines together while keeping each person distinct.',
   'system.include': 'Include this person in a family, household, friendship, or team view.',
   'trait.display': 'Use the plain-language themes this person chose to share.',
-  'framework.display': 'Show optional supporting framework detail.',
-  'current_conditions.use': 'Include temporary current context for this person.',
-  'library.link': 'Use a saved understanding as shared context.',
+  'framework.display': 'Show optional source details.',
+  'current_conditions.use': 'Include temporary current conditions for this person.',
+  'library.link': 'Include a saved understanding you both approved.',
   'covenant.include': 'Include this person only when the optional Covenant lens is on.'
 };
 

@@ -110,24 +110,24 @@ for (const [retiredContract, currentContract] of replacements) replaceOnce(retir
 const positioningContracts = [
   [
     `requireAll('landing value sequence', landing, ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'Should I stay in this job, ask for more, or leave?']);`,
-    `requireAll('landing value sequence', landing, ['data-public-narrative="self-people-systems-v1"', 'Start with you', 'Explore yourself.', 'What does Alignment look like for me?', 'Most AI starts with the prompt. Sovereign starts with you.', 'Know yourself. Understand your people. See the whole system.']);
+    `requireAll('landing value sequence', landing, ['data-public-narrative="self-people-systems-v1"', 'You → your people → the whole system', 'Start with yourself. Expand outward when it matters.', 'How do I make decisions that actually fit me?', 'Most AI starts with the prompt. Sovereign starts with you.', 'Know yourself. Understand your people. See the whole system.']);
 rejectAll('retired landing positioning', landing, ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'calculated astronomical positions and selected interpretive frameworks']);`
   ],
   [
     `  'One private reference beneath every question.',`,
-    `  'Explore yourself.',`
+    `  'Start with yourself. Expand outward when it matters.',`
   ],
   [
     `  'Why do we keep having the same argument even when we both want it to stop?',`,
-    `  'What does Alignment look like for me?',`
+    `  'How do I make decisions that actually fit me?',`
   ],
   [
     `  'What your Baseline supports',
   'Keeping both people distinct',
   'What Sovereign separates',`,
-    `  'How you tend to create',
-  'Keeping both people distinct',
-  'Seeing the whole system',`
+    `  'Start with the question',
+  'Keep each person separate',
+  'How Sovereign reads a system',`
   ],
   [
     `requireAll('landing refinement v5', landingRefinementV5Css, ['.v0-hero h1 > span', '.v0-hero h1 > em', '@keyframes sovereign-hero-rise', '@keyframes sovereign-field-arrive', '.landing-baseline-intro__heading', '.landing-baseline-intro__principles', '.landing-expression-slice__tooltip-panel', 'width: 104px !important', 'height: 26px !important', '@media (prefers-reduced-motion: reduce)']);`,
@@ -135,7 +135,7 @@ rejectAll('retired landing positioning', landing, ['<BaselineFoundation />', 'On
   ],
   [
     `requireAll('How it works document', how, ['Your Baseline first. The situation second.', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`,
-    `requireAll('How it works document', how, ['Start with you. Add context when it matters.', 'YOU → PEOPLE → SYSTEMS', 'Explore yourself.', 'A private reference built around you.', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`
+    `requireAll('How it works document', how, ['Start with yourself. Add another person or the wider situation only when it helps.', 'Ask about what you actually want to understand.', '<summary>See source details</summary>', '<dt>Sources</dt>', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`
   ],
   [
     `requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe securely handles checkout, invoices, payment methods, and subscription changes.', 'If paid access ends, your account stays open and returns to Free.', 'Start with your Baseline. Add more only when you need it.', 'one-time amount from $1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`,
