@@ -191,7 +191,9 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
           setState('A link was requested recently');
           setMessage('Wait two minutes, then complete a fresh security check and try again.');
         } else if (response.status === 503) {
-          setState('Sign-in is temporarily unavailable');
+          setState(mode === 'signup'
+            ? 'Account creation is temporarily unavailable'
+            : 'Sign-in is temporarily unavailable');
           setMessage('No account change was made. Try again in a moment.');
         } else if (problem.reason === 'expired_or_used') {
           setState('The security check expired');
@@ -211,7 +213,9 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
         return;
       }
       setState('One-time access email sent');
-      setMessage('Check your inbox. The one-time link and six-digit code expire in 15 minutes.');
+      setMessage(mode === 'signup'
+        ? 'Check your inbox. The one-time link expires in 15 minutes.'
+        : 'Check your inbox. The one-time link expires in 15 minutes. The six-digit code expires in 10 minutes.');
       setStatusTone('success');
       setLinkSent(true);
     } catch {

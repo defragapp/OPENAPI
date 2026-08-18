@@ -14,7 +14,7 @@ type LibraryItem = {
 type PersonItem = { id: string; displayName: string; invitationId?: string; invitationStatus?: string; invitationExpiresAt?: string };
 type DeletionJob = { id: string; status: string; requestedAt?: string; scheduledFor?: string };
 
-const SUPPORT_PAYMENT_URL = 'https://donate.stripe.com/7sY6oG1LDcls8s90x267S03';
+const SUPPORT_PAYMENT_URL = 'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02';
 
 export function AccountControlCenter() {
   const [open, setOpen] = useState(false);
@@ -264,7 +264,7 @@ export function AccountControlCenter() {
               <div className="account-section-heading">
                 <p>VOLUNTARY SUPPORT</p>
                 <h3>Support continued Sovereign.OS development</h3>
-                <span>The secure Stripe link accepts a one-time amount from $5 to $500. Support does not grant Sovereign+ access, ownership, influence, tax-deductible status, or a promise of future features.</span>
+                <span>The secure Stripe link accepts a one-time amount from $1. Support does not grant Sovereign+ access, ownership, influence, tax-deductible status, or a promise of future features.</span>
               </div>
               <a className="support-development-link" href={SUPPORT_PAYMENT_URL} target="_blank" rel="noreferrer">Open secure Stripe support link</a>
             </section>

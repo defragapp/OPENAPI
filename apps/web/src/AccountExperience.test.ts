@@ -15,7 +15,11 @@ describe('account access experience', () => {
     expect(app).toContain('returnTo: requestedReturnTo');
     expect(app).toContain("problem.reason === 'expired_or_used'");
     expect(app).toContain('No account change was made.');
-    expect(app).toContain('The one-time link and six-digit code expire in 15 minutes.');
+    expect(app).toContain('The one-time link expires in 15 minutes.');
+    expect(app).toContain('The six-digit code expires in 10 minutes.');
+    expect(app).not.toContain('The one-time link and six-digit code expire in 15 minutes.');
+    expect(app).toContain("'Account creation is temporarily unavailable'");
+    expect(app).toContain("'Sign-in is temporarily unavailable'");
   });
 
   it('uses Baseline-first account language without introducing passwords', () => {
@@ -54,8 +58,11 @@ describe('account access experience', () => {
   });
 
   it('connects the canonical live Stripe support link without granting entitlements', () => {
-    expect(accountControls).toContain("const SUPPORT_PAYMENT_URL = 'https://donate.stripe.com/7sY6oG1LDcls8s90x267S03'");
+    expect(accountControls).toContain("const SUPPORT_PAYMENT_URL = 'https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02'");
+    expect(accountControls).not.toContain('https://donate.stripe.com/7sY6oG1LDcls8s90x267S03');
     expect(accountControls).toContain('Support continued Sovereign.OS development');
+    expect(accountControls).toContain('one-time amount from $1');
+    expect(accountControls).not.toContain('$5 to $500');
     expect(accountControls).toContain('Support does not grant Sovereign+ access, ownership, influence, tax-deductible status, or a promise of future features.');
     expect(accountControls).toContain('target="_blank" rel="noreferrer"');
     expect(accountControlCss).toContain('.support-development-section');

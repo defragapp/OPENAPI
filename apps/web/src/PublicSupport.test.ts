@@ -5,6 +5,7 @@ const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf
 const how = read('../public/how-it-works.html');
 const pricing = read('../public/pricing.html');
 const faq = read('../public/faq.html');
+const accountControls = read('./AccountControlCenter.tsx');
 const launchContract = read('../../../docs/launch-product-contract.md');
 const releaseGates = read('../../../docs/release-gates.md');
 
@@ -14,7 +15,7 @@ const retiredDevelopmentSupportUrl = 'https://donate.stripe.com/7sY6oG1LDcls8s90
 describe('founder-approved public support contributions', () => {
   it('keeps one Stripe-hosted support path visible across the public information surfaces', () => {
     expect(how).toContain('id="support"');
-    for (const source of [how, pricing, faq]) {
+    for (const source of [how, pricing, faq, accountControls]) {
       expect(source).toContain(generalSupportUrl);
       expect(source).not.toContain(retiredDevelopmentSupportUrl);
     }
@@ -34,9 +35,10 @@ describe('founder-approved public support contributions', () => {
 
   it('preserves the current custom contribution minimum and disclosure', () => {
     expect(how).toContain('Support Sovereign.OS from $1.');
-    for (const source of [how, pricing, faq]) {
+    for (const source of [how, pricing, faq, accountControls]) {
       expect(source).toContain('one-time amount from $1');
     }
+    expect(accountControls).not.toContain('$5 to $500');
     expect(faq).toContain('is not presented as tax-deductible');
     expect(how).not.toContain('$10 suggested');
     expect(how).not.toContain('$25 suggested');
