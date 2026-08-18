@@ -5,9 +5,11 @@ import {
   BASELINE_FACET_CONTRACT_VERSION,
   baselineFacetIds,
   baselineFacetProfileSchema,
+  baselineFacetSchema,
   buildBaselineBasisRegistry,
   parseJsonObject,
   validateFacetProfileBasis,
+  type BaselineFacet,
   type BaselineFacetId,
   type BaselineFacetProfile,
   type BaselineSourceData
@@ -27,6 +29,10 @@ interface FacetCacheRow {
   model_version: string;
   profile_json: string;
 }
+
+export const FACET_BATCH_SIZE = 6;
+export const FACET_BATCH_TIMEOUT_MS = 12_000;
+export const FACET_BATCH_ATTEMPTS = 2;
 
 export async function ensureBaselineFacetProfile(env: Env, input: FacetCacheInput): Promise<BaselineFacetProfile | null> {
   const config = resolveAiModelConfig(env);
@@ -83,39 +89,86 @@ async function readCachedProfile(env: Env, accountId: string): Promise<FacetCach
       .bind(accountId)
       .first<FacetCacheRow>();
   } catch {
-    // A pre-migration preview may briefly run old data. It must show an incomplete state, never guessed facets.
     return null;
   }
+}
+
+export function baselineFacetBatches(
+  ids: readonly BaselineFacetId[] = baselineFacetIds,
+  size = FACET_BATCH_SIZE
+): BaselineFacetId[][] {
+  if (!Number.isInteger(size) || size < 1) throw new Error('Facet batch size must be a positive integer');
+  const batches: BaselineFacetId[][] = [];
+  for (let index = 0; index < ids.length; index += size) {
+    batches.push(ids.slice(index, index + size));
+  }
+  return batches;
+}
+
+export function parseFacetBatch(raw: string, expectedIds: readonly BaselineFacetId[]): BaselineFacet[] {
+  const parsed = parseJsonObject(raw);
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('Facet batch response must be a JSON object');
+  }
+  const facetsValue = (parsed as Record<string, unknown>).facets;
+  if (!Array.isArray(facetsValue) || facetsValue.length !== expectedIds.length) {
+    throw new Error('Facet batch response did not contain the expected facet count');
+  }
+  const facets = facetsValue.map((facet) => baselineFacetSchema.parse(facet));
+  for (let index = 0; index < expectedIds.length; index += 1) {
+    if (facets[index]?.id !== expectedIds[index]) {
+      throw new Error(`Facet batch response expected ${expectedIds[index]} at position ${index + 1}`);
+    }
+  }
+  return facets;
 }
 
 async function generateFacetProfile(env: Env, source: BaselineSourceData, model: string): Promise<BaselineFacetProfile> {
   if (!env.AI || !env.AI_GATEWAY_ID) throw new Error('Facet generation requires Cloudflare AI Gateway');
   const registry = buildBaselineBasisRegistry(source);
-  const prompt = `Create a complete Sovereign.OS Baseline facet profile from the exact authorized source data below.
+  const batches = baselineFacetBatches();
+  const batchResults = await Promise.all(
+    batches.map((ids) => generateFacetBatch(env, source, model, ids, registry))
+  );
+  const profile = baselineFacetProfileSchema.parse({
+    version: BASELINE_FACET_CONTRACT_VERSION,
+    modelVersion: model,
+    sourceComputationVersion: source.computationVersion,
+    generatedAt: new Date().toISOString(),
+    interpretive: true,
+    facets: batchResults.flat()
+  });
+  return validateFacetProfileBasis(profile, registry);
+}
+
+async function generateFacetBatch(
+  env: Env,
+  source: BaselineSourceData,
+  model: string,
+  ids: readonly BaselineFacetId[],
+  registry: ReturnType<typeof buildBaselineBasisRegistry>
+): Promise<BaselineFacet[]> {
+  if (!env.AI || !env.AI_GATEWAY_ID) throw new Error('Facet generation requires Cloudflare AI Gateway');
+  const prompt = `Create only the requested Sovereign.OS Baseline facets from the exact authorized source data below.
 
 This is interpretive reflection, not psychological measurement. Do not diagnose, predict, infer hidden motives, or fill missing values.
 Use ordinary adult language. Make every shadow and gift behaviorally specific. Shadow and Gift are two expressions of the same valid quality, not bad and good identities.
 Every facet must cite one or more exact basisRefs from the allowed registry. Use IDs only. Never write a new ID.
 Keep each description, shadowExpression, and giftExpression to one concise sentence. Use exactly two alignmentMarkers per facet.
-Return JSON only.
+Return JSON only. Do not return profile metadata.
 
 Required facet IDs, exactly once and in this order:
-${baselineFacetIds.join(', ')}
+${ids.join(', ')}
 
 Required shape:
 {
-  "version": "${BASELINE_FACET_CONTRACT_VERSION}",
-  "modelVersion": "${model}",
-  "sourceComputationVersion": "${source.computationVersion}",
-  "generatedAt": "${new Date().toISOString()}",
-  "interpretive": true,
   "facets": [{
-    "id": "one required facet ID",
+    "id": "one requested facet ID",
     "title": "plain-language title",
     "description": "specific concise interpretation",
     "shadowExpression": "specific observable pressure expression",
     "giftExpression": "specific observable conscious expression",
-    "alignmentMarkers": ["two to six observable markers"],
+    "alignmentMarkers": ["observable marker", "observable marker"],
     "uncertainty": "low | medium | high",
     "basisRefs": ["allowed ID"]
   }]
@@ -127,27 +180,55 @@ ${JSON.stringify(source)}
 Allowed Basis registry:
 ${JSON.stringify(registry.map(({ id, display, uncertainty }) => ({ id, display, uncertainty })))}`;
 
-  const result = await env.AI.run(
-    model,
-    { prompt, max_completion_tokens: 4_200 },
-    {
-      gateway: {
-        id: env.AI_GATEWAY_ID,
-        skipCache: true,
-        collectLog: false,
-        metadata: {
-          response_contract: BASELINE_FACET_CONTRACT_VERSION,
-          source_version: source.version
-        }
-      }
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= FACET_BATCH_ATTEMPTS; attempt += 1) {
+    try {
+      const result = await withTimeout(
+        env.AI.run(
+          model,
+          { prompt, max_completion_tokens: 1_600 },
+          {
+            gateway: {
+              id: env.AI_GATEWAY_ID,
+              skipCache: true,
+              collectLog: false,
+              metadata: {
+                response_contract: `${BASELINE_FACET_CONTRACT_VERSION}.batch`,
+                source_version: source.version,
+                batch_size: ids.length,
+                batch_attempt: attempt
+              }
+            }
+          }
+        ),
+        FACET_BATCH_TIMEOUT_MS,
+        `Baseline facet batch ${ids[0]} timed out`
+      );
+      const raw = await extractAiText(result);
+      return parseFacetBatch(raw, ids);
+    } catch (error) {
+      lastError = error;
     }
-  );
-  const raw = await extractAiText(result);
-  const parsed = baselineFacetProfileSchema.parse(parseJsonObject(raw));
-  if (parsed.modelVersion !== model || parsed.sourceComputationVersion !== source.computationVersion) {
-    throw new Error('Facet profile version metadata did not match the server contract');
   }
-  return validateFacetProfileBasis(parsed, registry);
+  throw lastError instanceof Error
+    ? lastError
+    : new Error(`Baseline facet batch ${ids[0]} could not be generated`);
+}
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(message)), timeoutMs);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      }
+    );
+  });
 }
 
 function buildDevelopmentFacetProfile(source: BaselineSourceData, model: string): BaselineFacetProfile {
