@@ -1,20 +1,17 @@
 /* Sovereign.OS terminal typography authority.
- * The retired display serif must not render anywhere in the active product.
- * Font family only. Component and route styles own hierarchy and dimensions.
+ * Font family only. Route/component styles own hierarchy and dimensions.
+ * Optima and retired bundled display faces must not render in active titles.
  */
 
 :root {
   --font-title:
-    Optima,
-    "Helvetica Neue",
+    -apple-system,
+    BlinkMacSystemFont,
     "SF Pro Display",
-    Candara,
-    "Noto Sans",
+    "Helvetica Neue",
     "Segoe UI Variable Display",
     "Segoe UI",
     system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
     Arial,
     sans-serif;
   --font-display: var(--font-title);
@@ -31,6 +28,7 @@ html:root:root:root body :is(
   h6,
   [role="heading"],
   .landing-wordmark,
+  .brand-mark,
   .brand-button,
   .living-question,
   .response-headline,
