@@ -119,7 +119,7 @@ for (const marker of [
   'Start with you',
   'Explore yourself.',
   'Explore how you think, decide, create, connect, and grow.',
-  'Understand what happens between you.',
+  'Understand both sides and what happens between you.',
   'From 1:1 to the whole system',
   'See the whole system.',
   'Most AI starts with the prompt. Sovereign starts with you.',
