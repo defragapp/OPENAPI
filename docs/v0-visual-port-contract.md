@@ -33,19 +33,19 @@ The root landing must preserve the archive’s recognizable sequence while using
    - section identity is `01 · You`;
    - demonstrate genuine self exploration from the supported Baseline facet universe;
    - visible product-level workflow/explanation on the left and the conversation/output on the right at desktop widths;
-   - quiet fixture-backed Example Basis metadata beneath the demonstration answer;
+   - source codes stay hidden by default behind a plain `See source details` disclosure;
    - the demonstration must remain visible without IntersectionObserver/reveal-state success; motion is enhancement, never a content gate;
    - do not lead with internal `capacity` terminology or framework mechanics.
 6. Relationship demonstration:
    - section identity is `02 · You + your people`;
    - `See why the same moment lands differently—and how to bridge the gap.`;
-   - keep two permission-bound contexts distinct;
+   - keep two permission-bound contexts distinct in implementation while describing the experience in ordinary language;
    - demonstrate a materially useful interaction explanation rather than paired labels alone: relevant differences, the interaction sequence when supported, a practical bridge or repair sequence when useful, and what remains unknown;
    - no motive, exact-emotion, private-thought, compatibility-score, or future-outcome claims.
 7. System demonstration:
    - section identity is `03 · From 1:1 to the whole system`;
    - `See the whole system.`;
-   - make consented people, supplied roles, permitted perspectives, confirmed responsibilities, pressure, constraints, observations, and interactions understandable across a family, team, household, or group;
+   - describe people, roles, responsibilities, pressure, interactions, and change in ordinary language rather than exposing authorization/evidence taxonomy;
    - use a stable system analysis, pressure sequence, relationship structure, or change-effect view only when it supports the explanation;
    - do not require or preserve a decorative node graph merely because one existed in the archive;
    - do not make responsibility concentration the category headline for all Systems;
@@ -53,7 +53,7 @@ The root landing must preserve the archive’s recognizable sequence while using
    - do not imply that one person causes the whole pattern.
 8. Comparison:
    - `Most AI starts with the prompt. Sovereign starts with you.`;
-   - concise current-conversation context versus Baseline + relevant connected context;
+   - concise current-conversation behavior versus Baseline continuity, shared relationship information, and wider family/team information when relevant;
    - no claim that every other AI literally answers every user identically.
 9. Final action:
    - `Know yourself. Understand your people. See the whole system.`
@@ -69,7 +69,7 @@ Port and maintain:
 - rotating question treatment;
 - self, relationship, and system storytelling sequence;
 - chat-window demonstrations;
-- visible but quiet Baseline/Basis evidence metadata;
+- a quiet source-details disclosure whose exact example values stay collapsed until opened;
 - answer/exploration structure treatment;
 - a system structure/sequence treatment that supports the explanation rather than requiring a decorative graph;
 - comparison composition;
@@ -97,7 +97,7 @@ Never import or recreate the archive’s mock product runtime:
 
 The selective-port source must reject mock auth, canned answer generators, fake users, dashboard-grid behavior, and nondeterministic demonstration generation. Broad dependency-bundle string guesses are not a substitute for source-level and runtime-contract verification.
 
-Public marketing examples may use deterministic, sanitized representative fixtures. Those fixtures must be explicitly bounded as examples, must not imply visitor data or a live private inference call, and must keep their displayed Example Basis values tied to the same fixture used to author the demonstration answer.
+Public marketing examples may use deterministic, sanitized representative fixtures. Those fixtures must be explicitly bounded as examples, must not imply visitor data or a live private inference call, and must keep their exact source values tied to the same fixture used to author the demonstration answer. Exact codes remain collapsed until the visitor chooses `See source details`.
 
 ## Real production architecture that remains authoritative
 
@@ -126,14 +126,14 @@ The archive visual language must extend beyond the landing to the real product s
 - composer and contextual controls;
 - Baseline onboarding and reveal;
 - relationship and system views;
-- answer, Basis, Alignment, Covenant, and Library surfaces;
+- answer, source-details, Alignment, Covenant, and Library surfaces;
 - login, signup, email access, invitation, onboarding, plan, account, privacy, terms, and not-found surfaces.
 
 The styling layer may change presentation. It must not replace route ownership, state management, API requests, authorization, consent, billing, or AI output behavior.
 
 The public Expression Fields use deterministic sanitized `expression-field.v1` examples only. Matching fields inside People, Systems, and relationship/system answers use axes derived from the same permitted Baseline facets already authorized for those surfaces; they do not load additional private data, infer motive, or calculate compatibility. There is one canvas renderer at every depth. Relationship engagement may be shown by lines temporarily orienting toward one another, never by a literal connector. A system never receives a synthetic center person: the system is the interaction among the distinct fields.
 
-The explanatory hierarchy is user need → relevant Baseline reference → optional current/relationship/system context → Sovereign interpretation. Framework/source mechanics stay underneath the product explanation and appear only when useful for disclosure or inspection.
+The explanatory hierarchy is user need → relevant Baseline reference → optional current/relationship/system information → Sovereign interpretation. Framework/source mechanics stay underneath the product explanation and appear only when useful for disclosure or inspection.
 
 Across the landing and authenticated product, preserve the underlying intelligence separation without forcing it into the public headings. Public surfaces translate internal reasoning into ordinary human language and keep self exploration broader than conflict/problem analysis.
 
@@ -168,7 +168,7 @@ The complete Vite foundation and final refinement are required:
 11. `apps/web/src/production-product-cohesion-v1.css`
    - preserves private-product structure and launch-surface cohesion after typography family authority.
 12. `apps/web/src/public-intelligence-demonstration-v1.css`
-   - owns the public demo composition, rich fixture-backed answer presentation, bottom-anchored demo composer, system pressure sequence, and the product-language title-variable correction;
+   - owns the public demo composition, rich fixture-backed answer presentation, bottom-anchored demo composer, system pressure sequence, collapsed source-details disclosure, and the product-language title-variable correction;
    - loads before the terminal production visual authority and uses bounded specificity only where a later legacy selector would otherwise restore the superseded demo layout.
 13. `apps/web/src/production-visual-authority-v1.css`
    - remains the terminal inline presentation authority;
@@ -207,7 +207,7 @@ A production release must fail unless all of the following are true:
 - root/static/policy public navigation exposes the expected page-in/page-out destinations with one consistent `SOVEREIGN.OS` wordmark identity without freezing temporary breakpoint geometry as the design authority;
 - product demonstrations remain visible without reveal-state success;
 - public demo workflow precedes the conversation at desktop widths and the composer reads as the bottom of the thread rather than floating in the middle of the answer field;
-- public Example Basis values are exact fixture values, are explicitly representative, and never imply visitor/private runtime data;
+- public source codes remain collapsed by default behind `See source details`, stay tied to the exact representative fixture, and never imply visitor/private runtime data;
 - the system demonstration supports the explanation with a stable sequence/structure rather than requiring a decorative node graph;
 - compiled CSS contains founder landing, real workspace/account, onboarding, policy, and access selectors;
 - Privacy and Terms render as disciplined documents rather than a generic card grid;
