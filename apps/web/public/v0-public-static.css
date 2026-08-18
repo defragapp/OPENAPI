@@ -13,14 +13,6 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: "Sovereign Sans";
-  src: url("/fonts/sovereign-sans.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
 :root {
   --v0-page: #090b0e;
   --v0-page-soft: #0c0f14;
@@ -38,7 +30,17 @@
   --v0-blue-soft: rgba(47, 147, 255, 0.13);
   --v0-shell: min(1120px, calc(100vw - 72px));
   --v0-display: "Sovereign Display", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --v0-sans: "Sovereign Sans", "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --v0-sans:
+    "Avenir Next",
+    Avenir,
+    "Segoe UI Variable Display",
+    "SF Pro Display",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
   color-scheme: dark;
 }
 

@@ -103,6 +103,11 @@ describe('public positioning reset', () => {
     expect(typography).toContain('font-family: var(--font-title) !important');
     expect(typography).toContain('--font-display: var(--font-title);');
     expect(typography).toContain('--serif: var(--font-title);');
+    expect(typography).not.toContain('"Sovereign Sans"');
+    expect(typography).toContain('"Avenir Next"');
+    expect(sansAuthority).not.toContain('"Sovereign Sans"');
+    expect(sansAuthority).toContain('"Avenir Next"');
+    expect(sansAuthority).toContain('PREMIUM_TITLE_SCALE_V2');
 
     expect(sansAuthority).toContain('The retired display serif must not render anywhere in the active product.');
     expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');

@@ -15,6 +15,12 @@ describe('Workers AI production request contract', () => {
     expect(facets).not.toContain('{ input: prompt, max_output_tokens: 4_200 }');
   });
 
+  it('decodes current chat-completion result shapes for Baseline facet generation', () => {
+    expect(facets).toContain('Array.isArray(record.choices)');
+    expect(facets).toContain('if (record.message)');
+    expect(facets).toContain('if (record.content)');
+  });
+
   it('keeps the privacy-preserving AI Gateway options on both production model calls', () => {
     for (const source of [sovereign, facets]) {
       expect(source).toContain('gateway: {');

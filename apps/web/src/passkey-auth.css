@@ -34,7 +34,7 @@ body:has(.account-shell) {
 
 .account-nav .wordmark {
   color: var(--account-ink) !important;
-  font-family: var(--font-body, "Sovereign Sans", Inter, system-ui, sans-serif) !important;
+  font-family: var(--font-body, "Avenir Next", Inter, system-ui, sans-serif) !important;
   font-size: 0.72rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.22em !important;
@@ -68,7 +68,7 @@ body:has(.account-shell) {
 .passkey-manager .eyebrow {
   margin: 0 0 14px;
   color: #c89370 !important;
-  font-family: var(--font-subheading, "Sovereign Sans", Inter, system-ui, sans-serif) !important;
+  font-family: var(--font-subheading, "Avenir Next", Inter, system-ui, sans-serif) !important;
   font-size: 0.65rem;
   font-weight: 750;
   letter-spacing: 0.17em;

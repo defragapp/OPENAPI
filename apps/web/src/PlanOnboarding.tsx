@@ -49,6 +49,7 @@ type BaselineErrors = Record<BaselineField, string>;
 const PLAN_CHOICE_KEY = 'sovereign:onboarding-plan-choice';
 const BASELINE_POLL_ATTEMPTS = 48;
 const BASELINE_POLL_INTERVAL_MS = 1_250;
+const BASELINE_PROFILE_RECOVERY_AFTER_ATTEMPT = 4;
 
 const emptyErrors = (): BaselineErrors => ({
   birthDate: '',
@@ -158,6 +159,30 @@ export function PlanOnboarding() {
           setStatus(billing === 'cancelled'
             ? 'Stripe checkout was cancelled. Nothing changed. Choose Free or try Sovereign+ again.'
             : 'Choose how you want to start.');
+          return;
+        }
+
+        if (nextBaseline.readinessState === 'facet_profile_preparing') {
+          setPhase('baseline_building');
+          setBaselineStage('preparing');
+          setStatus(nextBaseline.readinessMessage || 'Preparing your Baseline profile…');
+
+          try {
+            const prepared = await prepareSavedBaselineProfile(controller.signal);
+            setBaseline(prepared);
+            setBaselineStage('opening');
+            setStatus('Your Baseline is ready. Opening your workspace…');
+            location.reload();
+          } catch (error) {
+            if (error instanceof DOMException && error.name === 'AbortError') return;
+            setPhase('error');
+            setBaselineStage('idle');
+            setStatus(
+              error instanceof Error
+                ? error.message
+                : 'Your saved Baseline source is intact, but its profile could not finish. Try again.'
+            );
+          }
           return;
         }
 
@@ -274,6 +299,8 @@ export function PlanOnboarding() {
   }
 
   async function pollBaselineReadiness(): Promise<BaselineStatus> {
+    let profileRecoveryAttempted = false;
+
     for (let attempt = 0; attempt < BASELINE_POLL_ATTEMPTS; attempt += 1) {
       if (attempt > 0) await baselinePollDelay(BASELINE_POLL_INTERVAL_MS);
 
@@ -312,6 +339,20 @@ export function PlanOnboarding() {
       ) {
         setBaselineStage('preparing');
         setStatus(nextBaseline.readinessMessage || 'Preparing your Baseline profile…');
+
+        if (
+          !profileRecoveryAttempted
+          && (
+            nextBaseline.nextAction === 'retry_baseline'
+            || attempt >= BASELINE_PROFILE_RECOVERY_AFTER_ATTEMPT
+          )
+        ) {
+          profileRecoveryAttempted = true;
+          const recovered = await prepareSavedBaselineProfile();
+          setBaseline(recovered);
+          if (baselineIsReady(recovered)) return recovered;
+        }
+
         continue;
       }
 
@@ -324,6 +365,41 @@ export function PlanOnboarding() {
     throw new Error(
       'Your exact Baseline source is saved, but the Baseline profile is taking longer than expected. Try again to continue from the saved source.'
     );
+  }
+
+  async function prepareSavedBaselineProfile(signal?: AbortSignal): Promise<BaselineStatus> {
+    const response = await fetch('/api/v1/baseline/profile/prepare', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'x-idempotency-key': crypto.randomUUID()
+      },
+      body: '{}',
+      ...(signal ? { signal } : {})
+    });
+
+    if (response.status === 401) {
+      location.replace('/login?returnTo=%2Fonboarding');
+      throw new Error('Sign-in required.');
+    }
+
+    const body = await response.json().catch(() => ({})) as {
+      baseline?: BaselineStatus;
+      error?: string;
+      message?: string;
+    };
+
+    if (!response.ok || !body.baseline || !baselineIsReady(body.baseline)) {
+      throw new Error(
+        body.message
+        || body.error
+        || 'Your saved Baseline source is intact, but its profile could not finish. Try again.'
+      );
+    }
+
+    return body.baseline;
   }
 
   async function openReadyBaseline(nextBaseline: BaselineStatus) {
@@ -664,7 +740,7 @@ function BaselineBuildingView({ stage, status }: { stage: BaselineStage; status:
   return (
     <section className="baseline-building-state" role="status" aria-live="polite">
       <p className="eyebrow">BUILDING YOUR BASELINE</p>
-      <h1>Turning source data into something you can use.</h1>
+      <h1>Preparing your Baseline.</h1>
       <div className="baseline-progress-light" aria-hidden="true"><i /></div>
       <ol>
         {baselineStages.map((label, index) => (

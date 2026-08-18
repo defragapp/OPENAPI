@@ -27,7 +27,7 @@
   --v0-danger: #a45c55;
   --v0-shell: min(1180px, calc(100vw - 48px));
   --v0-display: var(--font-display, "Sovereign Display", Georgia, serif);
-  --v0-sans: var(--font-subheading, var(--font-sans, "Sovereign Sans", Inter, system-ui, sans-serif));
+  --v0-sans: var(--font-subheading, var(--font-sans, "Avenir Next", Inter, system-ui, sans-serif));
 }
 
 body:has(.v0-landing-port),

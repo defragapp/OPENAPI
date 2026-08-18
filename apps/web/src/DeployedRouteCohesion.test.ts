@@ -104,7 +104,7 @@ describe('deployed route cohesion contract', () => {
     expect(verifierV2).toContain('const serifTypographyMarker =');
     expect(verifierV2).toContain("headingFamily).includes('Sovereign Display')");
     expect(verifierV2).toContain('const sansTypographyReplacement =');
-    expect(verifierV2).toContain("headingFamily).includes('Sovereign Sans')");
+    expect(verifierV2).toContain("headingFamily).includes('Avenir Next')");
     expect(verifierV2).toContain('for (const [from, to] of replacements) generated = generated.replace(from, to);');
     expect(verifierV2).toContain('Route cohesion v2 still certifies the retired display serif.');
     expect(productionRelease).toContain("['verify-route-cohesion', 'scripts/verify-live-route-cohesion-v2.mjs']");

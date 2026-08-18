@@ -281,7 +281,7 @@ export async function persistBaseline(
       if (facetProfile) {
         latest.facetProfile = facetProfile;
         latest.facetProfileStatus = 'ready';
-      } else {
+      } else if (latest.facetProfileStatus !== 'ready' && !latest.facetProfile) {
         latest.facetProfileStatus = 'retryable';
       }
 
@@ -337,6 +337,68 @@ export async function getBaselineStatus(env: Env, accountId: string) {
   };
 }
 
+export async function prepareStoredBaselineFacetProfile(env: Env, accountId: string) {
+  const readiness = await getBaselineReadiness(env, accountId);
+  if (readiness.ready) return getBaselineStatus(env, accountId);
+
+  const row = await env.DB.prepare(
+    'SELECT input_hash, status, provider_status, reduced_context_json FROM baseline_onboarding WHERE account_id = ?'
+  )
+    .bind(accountId)
+    .first<{
+      input_hash: string;
+      status: string;
+      provider_status: string;
+      reduced_context_json: string;
+    }>();
+
+  if (!row || row.status !== 'completed' || row.provider_status !== 'computed') {
+    return getBaselineStatus(env, accountId);
+  }
+
+  const reduced = safeStoredRecord(row.reduced_context_json);
+  const source = baselineSourceDataSchema.safeParse(reduced.sourceData);
+  if (!source.success) return getBaselineStatus(env, accountId);
+
+  reduced.facetProfileStatus = 'pending';
+
+  await env.DB.prepare(`UPDATE baseline_onboarding
+    SET reduced_context_json = ?, updated_at = datetime('now')
+    WHERE account_id = ?`)
+    .bind(JSON.stringify(reduced), accountId)
+    .run();
+
+  let facetProfile = await ensureBaselineFacetProfile(env, {
+    accountId,
+    inputHash: row.input_hash,
+    source: source.data
+  }).catch(() => null);
+
+  if (!facetProfile) {
+    facetProfile = await ensureBaselineFacetProfile(env, {
+      accountId,
+      inputHash: row.input_hash,
+      source: source.data,
+      refresh: true
+    }).catch(() => null);
+  }
+
+  if (facetProfile) {
+    reduced.facetProfile = facetProfile;
+    reduced.facetProfileStatus = 'ready';
+  } else {
+    reduced.facetProfileStatus = 'retryable';
+  }
+
+  await env.DB.prepare(`UPDATE baseline_onboarding
+    SET reduced_context_json = ?, updated_at = datetime('now')
+    WHERE account_id = ?`)
+    .bind(JSON.stringify(reduced), accountId)
+    .run();
+
+  return getBaselineStatus(env, accountId);
+}
+
 export async function getBaselineReadiness(env: Env, accountId: string): Promise<BaselineReadiness> {
   const row = await env.DB.prepare('SELECT status, reduced_context_json, provider_status FROM baseline_onboarding WHERE account_id = ?')
     .bind(accountId)
@@ -349,6 +411,14 @@ export async function getBaselineReadiness(env: Env, accountId: string): Promise
     return baselineReadiness('source_computing', 'The Baseline source is still being calculated. Sovereign has not generated an answer.', 'continue_onboarding', true);
   }
   const reduced = safeStoredRecord(row.reduced_context_json);
+  if (reduced.facetProfileStatus === 'pending') {
+    return baselineReadiness(
+      'facet_profile_preparing',
+      'Your exact Baseline source is saved. The plain-language profile is being prepared.',
+      'continue_onboarding',
+      true
+    );
+  }
   if (reduced.facetProfileStatus === 'retryable') {
     return baselineReadiness(
       'facet_profile_preparing',

@@ -73,6 +73,9 @@ describe('account onboarding, recovery, and conversation persistence', () => {
     expect(baseline).toContain("latest.facetProfileStatus = 'ready'");
     expect(baseline).toContain("latest.facetProfileStatus = 'retryable'");
     expect(onboarding).toContain('pollBaselineReadiness');
+    expect(index).toContain("app.post('/api/v1/baseline/profile/prepare'");
+    expect(baseline).toContain('prepareStoredBaselineFacetProfile');
+    expect(onboarding).toContain("fetch('/api/v1/baseline/profile/prepare'");
   });
 
   it('resumes onboarding until both source and facet profile are ready', () => {

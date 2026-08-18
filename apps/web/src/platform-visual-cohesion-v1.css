@@ -261,7 +261,7 @@ body:has(.public-secondary-page) {
 }
 
 .sovereign-app-runtime .intelligence-topbar > div:first-of-type strong {
-  font-family: var(--font-subheading, "Sovereign Sans", sans-serif);
+  font-family: var(--font-subheading, "Avenir Next", sans-serif);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.14em;

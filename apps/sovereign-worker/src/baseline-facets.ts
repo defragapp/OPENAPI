@@ -193,8 +193,15 @@ function buildDevelopmentFacetProfile(source: BaselineSourceData, model: string)
   return validateFacetProfileBasis(profile, registry);
 }
 
-async function extractAiText(result: unknown): Promise<string> {
-  if (result instanceof Response) return result.text();
+export async function extractAiText(result: unknown): Promise<string> {
+  if (result instanceof Response) {
+    const text = await result.text();
+    try {
+      return await extractAiText(JSON.parse(text));
+    } catch {
+      return text;
+    }
+  }
   if (typeof result === 'string') return result;
   if (Array.isArray(result)) return (await Promise.all(result.map(extractAiText))).join('');
   if (result && typeof result === 'object') {
@@ -204,6 +211,10 @@ async function extractAiText(result: unknown): Promise<string> {
     if (record.response) return extractAiText(record.response);
     if (record.result) return extractAiText(record.result);
     if (Array.isArray(record.output)) return extractAiText(record.output);
+    if (Array.isArray(record.choices)) return (await Promise.all(record.choices.map(extractAiText))).join('');
+    if (record.message) return extractAiText(record.message);
+    if (record.delta) return extractAiText(record.delta);
+    if (record.content) return extractAiText(record.content);
   }
   throw new Error('Facet generator returned no text');
 }

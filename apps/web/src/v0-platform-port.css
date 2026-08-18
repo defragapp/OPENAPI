@@ -27,7 +27,7 @@ body:has(.email-code-fallback) {
   min-height: 100svh;
   background: transparent !important;
   color: var(--v0-route-ink) !important;
-  font-family: var(--font-body, "Sovereign Sans", Inter, system-ui, sans-serif) !important;
+  font-family: var(--font-body, "Avenir Next", Inter, system-ui, sans-serif) !important;
 }
 
 .plan-onboarding *,
@@ -64,7 +64,7 @@ body:has(.email-code-fallback) {
 .plan-nav > span,
 .sovereign-policy .landing-nav nav a {
   color: var(--v0-route-muted) !important;
-  font-family: var(--font-body, "Sovereign Sans", Inter, system-ui, sans-serif) !important;
+  font-family: var(--font-body, "Avenir Next", Inter, system-ui, sans-serif) !important;
 }
 
 .sovereign-policy .landing-nav-cta {
@@ -105,7 +105,7 @@ body:has(.email-code-fallback) {
 .policy-hero .landing-kicker,
 .policy-contact .landing-kicker {
   color: var(--v0-route-warm) !important;
-  font-family: var(--font-subheading, "Sovereign Sans", Inter, system-ui, sans-serif) !important;
+  font-family: var(--font-subheading, "Avenir Next", Inter, system-ui, sans-serif) !important;
   letter-spacing: 0.18em !important;
   text-transform: uppercase;
 }
@@ -170,7 +170,7 @@ body:has(.email-code-fallback) {
 .onboarding-baseline-preview > span,
 .policy-grid > article > span {
   color: var(--v0-route-warm) !important;
-  font-family: var(--font-subheading, "Sovereign Sans", Inter, system-ui, sans-serif) !important;
+  font-family: var(--font-subheading, "Avenir Next", Inter, system-ui, sans-serif) !important;
   letter-spacing: 0.15em !important;
   text-transform: uppercase;
 }

@@ -15,7 +15,7 @@ import { addSystemMember, analyzeSystem, cancelDeletionJob, createDeletionJob, c
 import { createCheckoutSession, createPortalSession, normalizeStripeFixtureEvent, projectSubscriptionEvent, type BillingInterval } from './billing/stripe';
 import { getAiUsage, releaseAiTurn, reserveAiTurn } from './billing/usage';
 import { requestMagicLink, redeemMagicLink, logout } from './auth-public';
-import { clearCurrentConditions, computeCurrentConditions, getBaselineStatus, getModelSafeBaselineContext, parseLocationPrecision, persistBaseline, requireCompletedBaseline, type LocationPrecision } from './baseline';
+import { clearCurrentConditions, computeCurrentConditions, getBaselineStatus, getModelSafeBaselineContext, parseLocationPrecision, persistBaseline, prepareStoredBaselineFacetProfile, requireCompletedBaseline, type LocationPrecision } from './baseline';
 import { runDueJobs, runOneJob } from './jobs';
 import { applyBiblicalLens, assertCovenantSafe, retrieveScripture } from './covenant/scripture';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
@@ -291,6 +291,24 @@ app.post('/api/v1/baseline/onboarding', async (context) => {
 app.get('/api/v1/baseline/status', async (context) => {
   const auth = await requireAuth(context.req.raw, context.env);
   return context.json({ baseline: await getBaselineStatus(context.env, auth.accountId) });
+});
+
+app.post('/api/v1/baseline/profile/prepare', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const baseline = await prepareStoredBaselineFacetProfile(context.env, auth.accountId);
+
+  if (!baseline.ready) {
+    return context.json({
+      type: 'https://sovereign.defrag.app/problems/baseline-profile-not-ready',
+      error: baseline.readinessState ?? 'facet_profile_preparing',
+      message: baseline.readinessMessage ?? 'Your saved Baseline source is intact, but its profile is not ready yet.',
+      nextAction: baseline.nextAction ?? 'retry_baseline',
+      baseline
+    }, 503);
+  }
+
+  return context.json({ baseline });
 });
 
 app.post('/api/v1/current-conditions', async (context) => {
