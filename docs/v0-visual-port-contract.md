@@ -21,8 +21,8 @@ The root landing must preserve the archive’s recognizable sequence while using
 3. Hero:
    - `Healing isn’t optional.`
    - `Holding onto the pain is.`
-   - both lines use the active native sans typography authority;
-   - hierarchy may use scale, weight, opacity, or a restrained outline treatment, but must not switch to the retired display serif or rejected Optima treatment;
+   - both lines use the active founder-approved humanist sans typography authority;
+   - hierarchy may use scale, weight, opacity, or a restrained outline treatment, but must not switch to the retired display serif or a native-SF/Segoe-only enterprise replacement;
    - supporting copy immediately explains that Sovereign is private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
 4. Self exploration:
    - `Start with you` / `Explore yourself.` or current language inherited from `product-language-system.md`;
@@ -60,7 +60,7 @@ These are component and sequence requirements, not merely copy strings. Retired 
 Port and maintain:
 
 - the full-screen dark hero composition;
-- large restrained sans typography with hierarchy created by scale, weight, spacing, opacity, and layout;
+- large restrained humanist sans typography with hierarchy created by scale, weight, spacing, opacity, and layout;
 - rotating question treatment;
 - self, relationship, and system storytelling sequence;
 - chat-window demonstrations;
@@ -74,7 +74,7 @@ Port and maintain:
 - near-black, cream, white/gray line, spacing, radius, and depth language;
 - responsive behavior and reduced-motion treatment.
 
-`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. `Optima`, `Avenir Next`, and the retired bundled `Sovereign Sans` are also excluded as title/heading authorities. Titles use the approved native enterprise sans stack: Apple system/SF Pro Display on Apple platforms, Segoe Variable/Segoe on Windows, followed by system-ui and native sans fallbacks. Legacy font assets may remain unused until separate cleanup, but no heading/title may resolve to them.
+`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. The retired bundled `Sovereign Sans` and `Avenir Next` are also excluded as title/heading authorities. Titles use the approved humanist stack defined by `apps/web/src/typography-system.css`: Optima first, then resilient native fallbacks including Helvetica Neue, SF Pro Display, Candara, Noto Sans, Segoe UI Variable Display/Segoe UI, system-ui, and platform system fonts. Do not replace this with a native-SF/Segoe-only or generic enterprise title system during release hardening. Legacy font assets may remain unused until separate cleanup, but no heading/title may resolve to a retired bundled display face or serif fallback.
 
 The refined product should not depend on electric blue, cyan glow, neon, generic AI gradients, or glassmorphism as primary UI language. Spectral color, where intentionally used, should behave like physical light rather than a generic interface accent.
 
@@ -155,8 +155,8 @@ The complete Vite foundation and final refinement are required:
 9. `apps/web/src/premium-action-authority-v1.css`
    - preserves editorial action language for navigation and low-emphasis actions while transactional authentication, onboarding, consent, billing, and account controls retain clear visible affordance.
 10. `apps/web/src/sans-typography-authority-v1.css`
-   - enforces the active native title family after legacy visual layers;
-   - prevents legacy import order or selector specificity from restoring retired/rejected title faces;
+   - enforces the active founder-approved humanist title family after legacy visual layers;
+   - prevents legacy import order or selector specificity from restoring retired title faces or replacing the family with a generic enterprise stack;
    - does not own global heading dimensions.
 11. `apps/web/src/production-product-cohesion-v1.css`
    - preserves private-product structure and launch-surface cohesion after typography family authority.
@@ -167,7 +167,7 @@ The complete Vite foundation and final refinement are required:
 13. Standalone public documents
    - retain the deployed static foundations;
    - load `apps/web/public/premium-action-static-v1.css` last;
-   - that terminal static authority enforces the same native title system, public header/wordmark geometry, and final static hierarchy.
+   - that terminal static authority enforces the same humanist title system, public header/wordmark hierarchy, and final static presentation.
 
 Removing or bypassing any one of these means the visual port is not sitewide.
 
@@ -193,8 +193,8 @@ A production release must fail unless all of the following are true:
 - root marketing communicates You → You + your people → whole system before source mechanics;
 - the root landing does not use `foundation` as its Baseline metaphor or enumerate framework sources in its main narrative;
 - the terminal rendered typography authority is mounted after legacy visual layers and the terminal production visual authority follows all other inline presentation authorities;
-- active headings/titles resolve to the native sans title system, never `Optima`, `Sovereign Display`, retired bundled faces, or serif fallbacks;
-- root/static/policy public navigation exposes the expected page-in/page-out destinations with one consistent `SOVEREIGN.OS` wordmark geometry;
+- active headings/titles resolve to the founder-approved humanist title system and never to `Sovereign Display`, the retired bundled `Sovereign Sans`, `Avenir Next`, or serif fallbacks; a native-SF/Segoe-only replacement is not an accepted equivalent;
+- root/static/policy public navigation exposes the expected page-in/page-out destinations with one consistent `SOVEREIGN.OS` wordmark identity without freezing temporary breakpoint geometry as the design authority;
 - product demonstrations remain visible without reveal-state success;
 - compiled CSS contains founder landing, real workspace/account, onboarding, policy, and access selectors;
 - Privacy and Terms render as disciplined documents rather than a generic card grid;
@@ -209,5 +209,7 @@ A production release must fail unless all of the following are true:
 ## Change control
 
 Do not use the words `canonical`, `approved`, `v0`, `editorial`, or `cinematic` as evidence by themselves.
+
+Release, deployment, copy, verifier, and infrastructure work must not redefine the founder visual system as a side effect. Any intentional visual-system change requires a focused visual task, a narrow diff, and desktop+iPhone human review against the current founder contract.
 
 A future change is valid only when the rendered component structure, current language authority, archive fingerprint provenance, visual delivery paths, and real platform contracts agree. Static string checks must never certify a visually different implementation as the founder visual port.
