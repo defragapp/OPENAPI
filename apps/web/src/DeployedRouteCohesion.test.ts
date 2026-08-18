@@ -130,7 +130,7 @@ describe('deployed route cohesion contract', () => {
     expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
-    expect(sansAuthority).toContain('Optima and retired bundled display faces must not render in active titles.');
+    expect(sansAuthority).toContain('Rejected legacy display faces must not render in active titles.');
     expect(productionVisual).toContain('visibility: visible !important');
     expect(invitationFidelity).toContain('@media (min-width: 901px)');
     expect(staticRefinement).toContain('--v0-blue: #e8ddd0');
