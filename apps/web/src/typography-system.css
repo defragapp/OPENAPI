@@ -8,13 +8,15 @@
 :root {
   --font-title:
     Optima,
+    "Helvetica Neue",
+    "SF Pro Display",
     Candara,
     "Noto Sans",
+    "Segoe UI Variable Display",
     "Segoe UI",
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
-    "Helvetica Neue",
     Arial,
     sans-serif;
   --font-subheading: var(--font-title);
