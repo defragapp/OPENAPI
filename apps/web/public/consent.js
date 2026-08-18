@@ -2,20 +2,20 @@ const labels = {
   'pair.compare': 'Compare your two Baselines',
   'system.include': 'Include you in a family, household, friendship, or team view',
   'trait.display': 'Use the plain-language themes you chose to share',
-  'framework.display': 'Show optional supporting framework detail',
-  'current_conditions.use': 'Use your temporary current context',
-  'library.link': 'Link a saved understanding',
-  'covenant.include': 'Include your context in an explicit Scripture lens'
+  'framework.display': 'Show optional source details',
+  'current_conditions.use': 'Use your temporary current conditions',
+  'library.link': 'Use a saved understanding',
+  'covenant.include': 'Include you in a Scripture lens'
 };
 
 const descriptions = {
-  'pair.compare': 'Compare permitted context from both accounts while keeping each person distinct.',
-  'system.include': 'Use your permitted context inside one named group view.',
-  'trait.display': 'Show only the reduced themes you chose to share.',
-  'framework.display': 'Show optional supporting framework details for this connection.',
-  'current_conditions.use': 'Include temporary current context without treating it as confirmed fact.',
-  'library.link': 'Use a saved understanding as shared context for this connection.',
-  'covenant.include': 'Include your context only when the optional Covenant lens is explicitly enabled.'
+  'pair.compare': 'Use the two Baselines together for this connection while keeping each person distinct.',
+  'system.include': 'Allow what you chose to share to be included in one named group view.',
+  'trait.display': 'Show only the plain-language themes you chose to share.',
+  'framework.display': 'Show optional source details you chose to share with this connection.',
+  'current_conditions.use': 'Include temporary current conditions without treating them as proof of how you feel or what you will do.',
+  'library.link': 'Use a saved understanding you chose to share with this connection.',
+  'covenant.include': 'Include what you shared only when the optional Covenant lens is on.'
 };
 
 const status = document.querySelector('#status');
@@ -24,12 +24,12 @@ const container = document.querySelector('#invitations');
 async function load() {
   const response = await fetch('/api/v1/invitations/mine', { headers: { accept: 'application/json' } });
   if (response.status === 401) {
-    status.textContent = 'Sign in to review your permissions.';
-    container.innerHTML = '<p class="consent-empty">Your permission choices are connected to your account. <a class="launch-button primary" href="/login">Sign in</a></p>';
+    status.textContent = 'Sign in to review your sharing choices.';
+    container.innerHTML = '<p class="consent-empty">Your sharing choices are connected to your account. <a class="launch-button primary" href="/login">Sign in</a></p>';
     return;
   }
   if (!response.ok) {
-    status.textContent = 'Your permissions could not be loaded safely.';
+    status.textContent = 'Your sharing choices could not be loaded. Try again.';
     return;
   }
   const data = await response.json();
@@ -40,17 +40,17 @@ function render(invitations) {
   container.replaceChildren();
   if (!invitations.length) {
     status.textContent = 'No accepted invitations are connected to this account.';
-    container.innerHTML = '<p class="consent-empty">When you accept a Sovereign.OS invitation, its requested uses and your decisions will appear here.</p>';
+    container.innerHTML = '<p class="consent-empty">When you accept a Sovereign.OS invitation, the requested uses and your choices will appear here.</p>';
     return;
   }
 
-  status.textContent = 'Choose each permission independently.';
+  status.textContent = 'Choose each use independently.';
   for (const invitation of invitations) {
     const article = document.createElement('article');
     article.className = 'consent-invitation';
 
     const heading = document.createElement('h3');
-    heading.textContent = invitation.displayName || 'Shared relationship';
+    heading.textContent = invitation.displayName || 'Private connection';
     article.append(heading);
 
     const note = document.createElement('p');
@@ -68,11 +68,11 @@ function scopeRow(invitation, scope) {
 
   const copy = document.createElement('span');
   const title = document.createElement('strong');
-  title.textContent = labels[scope] || scope;
+  title.textContent = labels[scope] || 'Requested use';
   const detail = document.createElement('small');
   const decision = invitation.decisions?.[scope];
   const decisionLabel = decision === 'granted' ? 'Currently allowed.' : decision === 'denied' ? 'Not allowed.' : 'No decision yet.';
-  detail.textContent = `${decisionLabel} ${descriptions[scope] || 'Use only the context covered by this permission.'}`;
+  detail.textContent = `${decisionLabel} ${descriptions[scope] || 'Use only what this choice allows.'}`;
   copy.append(title, detail);
 
   const actions = document.createElement('div');
@@ -96,19 +96,19 @@ function scopeRow(invitation, scope) {
 
 async function decide(invitationId, scope, granted, row) {
   for (const button of row.querySelectorAll('button')) button.disabled = true;
-  status.textContent = granted ? 'Saving permission…' : 'Revoking permission…';
+  status.textContent = 'Saving your choice…';
   const response = await fetch(`/api/v1/invitations/${encodeURIComponent(invitationId)}/consent/${encodeURIComponent(scope)}`, {
     method: 'PUT',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ granted })
   });
   if (!response.ok) {
-    status.textContent = 'That decision could not be saved safely.';
+    status.textContent = 'That choice could not be saved. Nothing changed.';
     for (const button of row.querySelectorAll('button')) button.disabled = false;
     return;
   }
-  status.textContent = granted ? 'Permission allowed for future use.' : 'Permission revoked for future use.';
+  status.textContent = granted ? 'This use is now allowed.' : 'This use is now off.';
   await load();
 }
 
-load().catch(() => { status.textContent = 'Your permissions could not be loaded safely.'; });
+load().catch(() => { status.textContent = 'Your sharing choices could not be loaded. Try again.'; });
