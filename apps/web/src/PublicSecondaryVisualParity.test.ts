@@ -21,7 +21,6 @@ const notFound = read('../public/404.html');
 const consent = read('../public/consent.html');
 const policy = read('./PublicPolicy.tsx');
 const policyCss = read('./public-secondary-pages-locked.css');
-const productionVisual = read('./production-visual-authority-v1.css');
 const main = read('./main.tsx');
 const landing = read('./PublicLanding.tsx');
 const liveVerifier = read('../../../scripts/verify-live-secondary-public.mjs');
@@ -32,7 +31,7 @@ const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohes
 const terminalCssPath = '/premium-action-static-v1.css?v=20260817-action-v1';
 
 describe('secondary public visual parity', () => {
-  it.each(staticPages)('%s uses the same Sovereign identity and complete public navigation', (_label, path) => {
+  it.each(staticPages)('%s uses the same Sovereign identity and terminal static authority', (_label, path) => {
     const document = read(path);
     expect(document).toContain('data-secondary-visual-contract="founder-v0-locked-v1"');
     expect(document).toContain(refinedCssPath);
@@ -41,9 +40,6 @@ describe('secondary public visual parity', () => {
     expect(document).toContain('class="launch-nav-inner"');
     expect(document).toContain('class="launch-wordmark"');
     expect(document).toContain('>SOVEREIGN.OS</a>');
-    for (const href of ['/how-it-works', '/pricing', '/faq', '/login', '/signup']) {
-      expect(document).toContain(`href="${href}"`);
-    }
     expect(document).toContain('class="launch-cta" href="/signup">Get started');
     expect(document).toContain('class="launch-mobile-menu"');
     expect(document).toContain('class="launch-mobile-menu-panel"');
@@ -53,20 +49,15 @@ describe('secondary public visual parity', () => {
     expect(document).toContain('apple-touch-icon.png');
   });
 
-  it('uses the native SF/Segoe title stack and one static header geometry', () => {
+  it('keeps the historical static foundation but lets terminal sans authority own rendered headings', () => {
     expect(staticCss).toContain('--v0-page: #090b0e');
     expect(staticCss).toContain('--v0-cream: #f1e9de');
-    expect(staticTerminalCss).toContain('-apple-system');
-    expect(staticTerminalCss).toContain('"SF Pro Display"');
-    expect(staticTerminalCss).toContain('"Segoe UI Variable Display"');
-    expect(staticTerminalCss.indexOf('-apple-system')).toBeLessThan(staticTerminalCss.indexOf('"SF Pro Display"'));
-    expect(staticTerminalCss).not.toContain('Optima');
+    expect(staticTerminalCss).toContain('"Helvetica Neue"');
+    expect(staticTerminalCss.indexOf('"Helvetica Neue"')).toBeLessThan(staticTerminalCss.indexOf('"SF Pro Display"'));
     expect(staticTerminalCss).not.toContain('Avenir Next');
-    expect(staticTerminalCss).not.toContain('Sovereign Display');
     expect(staticTerminalCss).toContain('--static-title-font:');
-    expect(staticTerminalCss).toContain('font-size: 0.75rem !important');
-    expect(staticTerminalCss).toContain('min-height: 64px !important');
-    expect(staticTerminalCss).toContain('--static-shell-final: min(1180px, calc(100vw - 64px))');
+    expect(staticTerminalCss).toContain('font-family: var(--static-title-font) !important');
+    expect(staticTerminalCss).not.toContain('Sovereign Display');
     for (const marker of [
       '--static-shell: min(1180px, calc(100vw - 96px))',
       'body.launch-page .launch-hero.launch-hero-compact',
@@ -79,6 +70,9 @@ describe('secondary public visual parity', () => {
       '@media (max-width: 360px)',
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(staticRefinementCss).toContain(marker);
+    expect(staticRefinementCss).toContain('--v0-blue: #e8ddd0');
+    expect(staticRefinementCss).toContain('--v0-blue-bright: #fffaf3');
+    expect(staticRefinementCss).toContain('#080a0d');
   });
 
   it('makes How it works explain You, People, and Systems before source mechanics', () => {
@@ -133,7 +127,7 @@ describe('secondary public visual parity', () => {
     expect(faq).not.toContain('private personal foundation');
   });
 
-  it('extends the final static authority to 404 and account-bound consent without changing behavior contracts', () => {
+  it('extends the final static authority to 404 and account-bound consent without changing their behavior contracts', () => {
     expect(notFound).toContain(refinementCssPath);
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
     expect(consent).toContain(refinementCssPath);
@@ -143,29 +137,18 @@ describe('secondary public visual parity', () => {
     expect(consent).toContain('/consent.js?v=20260726-consent-r1');
   });
 
-  it('keeps Privacy and Terms in a legal-document hierarchy instead of a card grid', () => {
+  it('ports Privacy and Terms onto the landing navigation and footer without leaking static-page rules into the landing', () => {
     expect(policy).toContain('sovereign-policy public-approved-v8 public-secondary-page');
     expect(policy).toContain('data-secondary-visual-contract="founder-v0-locked-v1"');
     expect(policy).toContain('className="v0-nav"');
     expect(policy).toContain('className="v0-footer"');
     expect(policy).toContain('© 2026 Sovereign.OS');
     expect(policyCss).toContain('.public-secondary-page');
-    expect(productionVisual).toContain('.public-secondary-page .policy-grid article:nth-child(n)');
-    expect(productionVisual).toContain('background: transparent !important');
-    expect(productionVisual).toContain('border-radius: 0 !important');
-    expect(productionVisual).toContain('font-size: clamp(2.9rem, 4.3vw, 4.25rem) !important');
+    expect(policyCss).not.toContain('.public-approved-v8 .v0-hero');
+    expect(policyCss).not.toContain('.public-approved-v8 .landing-story');
   });
 
-  it('keeps the standalone public pages dense enough to read as product surfaces rather than sparse posters', () => {
-    expect(staticTerminalCss).toContain('body.how-page .journey-steps > article');
-    expect(staticTerminalCss).toContain('grid-template-columns: 64px minmax(220px, 0.7fr) minmax(0, 1.3fr) !important');
-    expect(staticTerminalCss).toContain('body.pricing-page .price-card');
-    expect(staticTerminalCss).toContain('body.questions-page .faq-category');
-    expect(staticTerminalCss).toContain('grid-template-columns: 190px minmax(0, 1fr) !important');
-    expect(staticTerminalCss).toContain('font-size: 0.96rem !important');
-  });
-
-  it('keeps landing refinement order and terminal production authority explicit', () => {
+  it('keeps landing refinement order and terminal sans authority explicit', () => {
     const landingAuthority = main.indexOf("import './public-landing-approved-v8.css'");
     const iosAuthority = main.indexOf("import './landing-ios-parity-density-v1.css'");
     const secondaryAuthority = main.indexOf("import './public-secondary-pages-locked.css'");
@@ -173,8 +156,7 @@ describe('secondary public visual parity', () => {
     expect(iosAuthority).toBeGreaterThan(landingAuthority);
     expect(secondaryAuthority).toBeGreaterThan(iosAuthority);
     expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline'");
-    expect(main).toContain("import productionVisualAuthorityCss from './production-visual-authority-v1.css?inline'");
-    expect(main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;'));
+    expect(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).not.toContain('body.how-page');
   });

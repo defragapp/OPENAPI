@@ -75,7 +75,7 @@ if (typography.includes('font-family: "Sovereign Display"') || typography.includ
 for (const marker of ['--font-display: var(--font-title);', '--serif: var(--font-title);', 'font-family: var(--font-title) !important']) {
   if (!typography.includes(marker)) throw new Error(`Intelligence release v2 is missing typography marker ${marker}`);
 }
-for (const marker of ['Rejected legacy display faces must not render in active titles.', '.public-approved-v8 .v0-hero h1 > em', 'font-family: var(--font-title) !important']) {
+for (const marker of ['The retired display serif must not render anywhere in the active product.', '.public-approved-v8 .v0-hero h1 > em', 'font-family: var(--font-title) !important']) {
   if (!sansTypography.includes(marker)) throw new Error(`Intelligence release v2 is missing terminal sans marker ${marker}`);
 }
 for (const marker of [
