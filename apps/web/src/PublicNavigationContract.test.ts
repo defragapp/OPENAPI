@@ -10,8 +10,6 @@ const staticPages = [
   read('../public/pricing.html'),
   read('../public/faq.html')
 ];
-const visualAuthority = read('./production-visual-authority-v1.css');
-const staticAuthority = read('../public/premium-action-static-v1.css');
 const brand = read('./BrandMark.tsx');
 
 const publicDestinations = ['/how-it-works', '/pricing', '/faq', '/login', '/signup'] as const;
@@ -43,28 +41,9 @@ describe('public navigation and brand contract', () => {
     expect(policy).not.toContain('aria-label="Sovereign.OS home">Sovereign</a>');
   });
 
-  it('centralizes React brand geometry instead of hard-coding it in the component', () => {
+  it('keeps one semantic React wordmark without coupling navigation to a specific visual treatment', () => {
     expect(brand).toBe('import React from \'react\';\n\nexport function BrandMark() {\n  return <span className="brand-mark">SOVEREIGN.OS</span>;\n}\n');
-    expect(visualAuthority).toContain('font-size: 0.75rem !important');
-    expect(visualAuthority).toContain('font-weight: 720 !important');
-    expect(visualAuthority).toContain('letter-spacing: 0.17em !important');
-    expect(visualAuthority).toContain('min-height: 64px !important');
-  });
-
-  it('allows exactly one visible React wordmark per breakpoint', () => {
-    expect(visualAuthority).toContain('.public-approved-v8 .v0-wordmark--desktop,');
-    expect(visualAuthority).toContain('.public-secondary-page .v0-wordmark--desktop {\n  display: inline-flex !important;');
-    expect(visualAuthority).toContain('.public-approved-v8 .v0-wordmark--mobile,');
-    expect(visualAuthority).toContain('.public-secondary-page .v0-wordmark--mobile {\n  display: none !important;');
-    expect(visualAuthority).toContain('@media (max-width: 760px)');
-    expect(visualAuthority).toContain('.public-secondary-page .v0-wordmark--desktop { display: none !important; }');
-    expect(visualAuthority).toContain('.public-secondary-page .v0-wordmark--mobile { display: inline-flex !important; }');
-  });
-
-  it('uses the same wordmark geometry on standalone public routes', () => {
-    expect(staticAuthority).toContain('font-size: 0.75rem !important');
-    expect(staticAuthority).toContain('font-weight: 720 !important');
-    expect(staticAuthority).toContain('letter-spacing: 0.17em !important');
-    expect(staticAuthority).toContain('min-height: 64px !important');
+    expect(landing).toContain('className="public-logo v0-wordmark v0-wordmark--desktop"');
+    expect(landing).toContain('className="public-logo-mobile v0-wordmark v0-wordmark--mobile"');
   });
 });
