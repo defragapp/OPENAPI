@@ -35,6 +35,7 @@ import workspaceProductionRefinementCss from './workspace-production-refinement-
 import authenticatedLaunchCohesionCss from './authenticated-launch-cohesion-v1.css?inline';
 import premiumActionAuthorityCss from './premium-action-authority-v1.css?inline';
 import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';
+import productionProductCohesionCss from './production-product-cohesion-v1.css?inline';
 import productionVisualAuthorityCss from './production-visual-authority-v1.css?inline';
 
 /* Component foundations */
@@ -108,6 +109,7 @@ function installPlatformVisualCohesion(): void {
   style.textContent += `\n${premiumActionAuthorityCss}`;
   style.textContent += `\n${authenticatedLaunchCohesionCss}`;
   style.textContent += `\n${sansTypographyAuthorityCss}`;
+  style.textContent += `\n${productionProductCohesionCss}`;
   style.textContent += `\n${productionVisualAuthorityCss}`;
   document.head.append(style);
 }
@@ -192,6 +194,7 @@ document.documentElement.dataset.sovereignMotionRelease = 'v0-motion-workflows-v
 document.documentElement.dataset.sovereignPlatformCohesion = 'v1';
 document.documentElement.dataset.sovereignProductionReadiness = 'desktop-ios-v1';
 document.documentElement.dataset.sovereignHeroComposition = 'v3-bounded';
+document.documentElement.dataset.sovereignVisualAuthority = 'production-v1';
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'
