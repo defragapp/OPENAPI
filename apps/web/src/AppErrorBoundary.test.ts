@@ -11,11 +11,14 @@ describe('application error recovery', () => {
     expect(main).toContain('</AppErrorBoundary>');
   });
 
-  it('provides a safe user-facing recovery state', () => {
+  it('provides a factual user-facing recovery state', () => {
     expect(boundary).toContain('getDerivedStateFromError');
-    expect(boundary).toContain('Nothing new was submitted or saved');
+    expect(boundary).toContain('Something went wrong while opening Sovereign.OS.');
+    expect(boundary).toContain('Reload the page. If the problem continues, return home and sign in again.');
     expect(boundary).toContain('window.location.reload()');
     expect(boundary).toContain('Return home');
+    expect(boundary).not.toContain('Nothing new was submitted or saved');
+    expect(boundary).not.toContain('could not open this view safely');
     expect(boundary).not.toContain('error.message');
     expect(boundary).not.toContain('componentStack}</');
   });
