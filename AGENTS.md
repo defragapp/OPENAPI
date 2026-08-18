@@ -26,18 +26,19 @@ These instructions apply to the entire OPENAPI repository.
 ## Founder v0 visual-port contract
 - Read `docs/v0-visual-port-contract.md` before changing any public, workspace, account, onboarding, policy, or visual release surface.
 - The supplied founder v0 archive is the component and visual authority for the public landing and the visual language applied sitewide.
-- Preserve the exact v0 public sequence beginning with `Healing isn’t optional. Holding onto the pain is.` and ending with `Your thoughts deserve a better place to live.`
+- Preserve the exact founder hero `Healing isn’t optional. Holding onto the pain is.` and the approved self → people → systems narrative; do not introduce a competing product story.
 - Port visual components and styling only. Never import the archive’s mock auth, localStorage users, canned or random answers, dashboard state, fake billing, fake consent, or fake account behavior.
 - Preserve the real OPENAPI routes, APIs, authentication, billing, consent, Baseline contracts, one-room workspace, and `sovereign-answer.v2`.
 - The authenticated launch is text-first. The landing demo-chat visual logic may inform the real thread hierarchy, but do not introduce a required video/media-generation workflow.
-- Preserve the certified local CSS import order and the terminal presentation authorities in `apps/web/src/main.tsx`; no local stylesheet may load after `passkey-auth.css`.
+- Preserve the certified local CSS import order in `apps/web/src/main.tsx`; no local component stylesheet may load after `passkey-auth.css`.
+- `apps/web/src/production-visual-authority-v1.css` is the terminal inline presentation authority and must be appended after all other inline visual/typography authorities. Do not add a later visual override.
 - Do not call a visual implementation `canonical`, `approved`, `v0`, `editorial`, or `cinematic` unless its actual implementation and evidence support that claim.
 - Do not freeze or replace a founder visual reference while a known documentation-to-render contradiction remains unresolved. Inspect actual desktop and mobile production renders first.
 
 ## Product definition
 - Sovereign.OS is Baseline-first. The product must be useful before the user explains an incident.
-- Baseline Design is the foundation. The visitor brings an ordinary real-life question or situation; Sovereign should make a relevant distinction visible before exposing technical machinery.
-- Relationship and system intelligence extend the same Baseline-first foundation outward while keeping each person distinct and permission-bound.
+- Baseline Design is a private, explorable reference built around the person. It gives Sovereign continuity across self, decisions, relationships, and systems without turning interpretation into fact.
+- Relationship and system intelligence extend the same Baseline-first reference outward while keeping each person distinct and permission-bound.
 - Source calculations, Basis codes, provider details, permission mechanics, and deployment architecture stay beneath the primary experience until needed for support, verification, control, or deeper inspection.
 - The single user-facing agent is Sovereign.
 - Defrag, Alignment, and Covenant are internal reasoning lenses, not separate top-level products.
@@ -62,8 +63,9 @@ These instructions apply to the entire OPENAPI repository.
 
 ## Typography contract
 - Treat `apps/web/src/typography-system.css` as the platform-wide typography source of truth.
-- The rendered title/heading stack is Helvetica Neue first where available, then SF/system on Apple, Segoe on Windows, and system/Helvetica fallbacks. Do not make `Avenir Next`, `Sovereign Sans`, `Sovereign Display`, or a serif the active title authority.
+- The rendered title/heading stack is humanist sans with `Optima` first where available, followed by Helvetica Neue/SF, Candara/Noto Sans/Segoe, system-ui, and native fallbacks. Do not make `Avenir Next`, `Sovereign Sans`, `Sovereign Display`, or a serif the active title authority.
 - The terminal typography authority may enforce font family only; it must not impose a universal `h1`/`h2`/`h3` size or spacing system over route-owned composition.
+- `apps/web/src/production-visual-authority-v1.css` owns final live visual proportions, warm-metal interface accent, demo organization, and motion after route/component foundations have loaded.
 - Use `--font-display` for every meaningful heading and title across public, authenticated, onboarding, policy, modal, drawer, answer, relationship, system, Alignment, and Covenant surfaces.
 - Use `--font-subheading` only for short supporting introductions and secondary headings.
 - Preserve `--font-body` for paragraphs, controls, evidence, metadata, inputs, and long-form answers.
