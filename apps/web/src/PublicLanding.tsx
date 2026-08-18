@@ -18,16 +18,16 @@ const REAL_LIFE_QUESTIONS = [
 
 const COMPARISON = {
   blank: [
-    'Starts from the prompt and the context you provide in that conversation',
-    'Personal history or patterns must be explained, inferred, or reconstructed in the thread',
-    'Another person’s context is not permission-bound by a relationship model by default',
-    'Does not provide Sovereign’s server-approved Basis for the exact values behind an interpretation'
+    'Starts from the prompt and what you explain in that conversation',
+    'Your history and recurring patterns must be explained again or inferred from the thread',
+    'Another person’s information is not automatically protected by Sovereign’s sharing permissions',
+    'Does not show Sovereign’s exact source details for an interpretation'
   ],
   sovereign: [
     'Carries your private Baseline across conversations',
-    'Adds current, relationship, and system context only when it belongs to the question',
-    'Keeps other people distinct and permission-bound',
-    'Lets you inspect Basis and review, correct, or reject interpretations'
+    'Uses what is happening now, another person’s shared Baseline, or the wider family or team situation only when it helps answer the question',
+    'Keeps each person separate and uses only what they chose to share',
+    'Lets you inspect source details and review, correct, or reject interpretations'
   ]
 } as const;
 const RELEASE_COPY_MARKERS = ['everyone the same.'] as const;
@@ -157,7 +157,7 @@ function RealLifeQuestions() {
         <p className="landing-question-orbit__kicker">You → your people → the whole system</p>
         <h2 id="landing-question-orbit-title">Start with yourself. Expand outward when it matters.</h2>
         <p className="landing-question-orbit__note">
-          Explore how you think, decide, communicate, create, and respond. Add another person with permission, or step back to see the family, team, or group when the wider context changes the answer.
+          Explore how you think, decide, communicate, create, and respond. Add another person with permission, or step back to see the family, team, or group when the wider situation changes what is happening.
         </p>
         <div className="landing-question-orbit__stage" aria-hidden="true">
           {REAL_LIFE_QUESTIONS.map((question, index) => (
