@@ -41,8 +41,10 @@ describe('public navigation and brand contract', () => {
     expect(policy).not.toContain('aria-label="Sovereign.OS home">Sovereign</a>');
   });
 
-  it('keeps one semantic React wordmark without coupling navigation to a specific visual treatment', () => {
-    expect(brand).toBe('import React from \'react\';\n\nexport function BrandMark() {\n  return <span className="brand-mark">SOVEREIGN.OS</span>;\n}\n');
+  it('keeps one semantic Sovereign wordmark without coupling navigation to temporary redesign geometry', () => {
+    expect(brand).toContain('className="brand-mark"');
+    expect(brand).toContain('SOVEREIGN.OS');
+    expect(brand).not.toContain('<img');
     expect(landing).toContain('className="public-logo v0-wordmark v0-wordmark--desktop"');
     expect(landing).toContain('className="public-logo-mobile v0-wordmark v0-wordmark--mobile"');
   });
