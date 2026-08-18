@@ -6,14 +6,14 @@
   --static-action-line-strong: rgba(242, 237, 229, 0.54);
   --static-action-bg: #080a0d;
   --static-title-font:
-    "Helvetica Neue",
-    "SF Pro Display",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI Variable Display",
+    Optima,
+    Candara,
+    "Noto Sans",
     "Segoe UI",
     system-ui,
-    Helvetica,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
     Arial,
     sans-serif;
 }
