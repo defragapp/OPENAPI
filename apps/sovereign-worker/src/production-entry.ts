@@ -30,6 +30,19 @@ const productionRuntime = {
 async function launchPreflight(request: Request, env: Env): Promise<Response | null> {
   const url = new URL(request.url);
 
+  if (env.APP_ENV === 'production'
+    && (env.SOVV_INTERNAL_BASE_URL || env.SOVV_INTERNAL_AUTH_TOKEN)
+    && url.pathname === '/ready') {
+    return Response.json({
+      ready: false,
+      error: 'legacy_auth_adapter_enabled',
+      dependency: 'legacySovvAdapter'
+    }, {
+      status: 503,
+      headers: { 'cache-control': 'no-store' }
+    });
+  }
+
   if (DISABLED_TEXT_FIRST_PATHS.has(url.pathname)) {
     return Response.json({ error: 'not_found' }, {
       status: 404,
