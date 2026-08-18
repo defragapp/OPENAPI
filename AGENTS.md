@@ -63,9 +63,11 @@ These instructions apply to the entire OPENAPI repository.
 
 ## Typography contract
 - Treat `apps/web/src/typography-system.css` as the platform-wide typography source of truth.
-- The rendered title/heading stack is humanist sans with `Optima` first where available, followed by Helvetica Neue/SF, Candara/Noto Sans/Segoe, system-ui, and native fallbacks. Do not make `Avenir Next`, `Sovereign Sans`, `Sovereign Display`, or a serif the active title authority.
+- The rendered title/heading stack is native enterprise sans: Apple system/SF Pro Display first on Apple platforms, Segoe Variable/Segoe on Windows, then system-ui and native sans fallbacks. Do not make `Optima`, `Avenir Next`, `Sovereign Sans`, `Sovereign Display`, or a serif the active title authority.
 - The terminal typography authority may enforce font family only; it must not impose a universal `h1`/`h2`/`h3` size or spacing system over route-owned composition.
-- `apps/web/src/production-visual-authority-v1.css` owns final live visual proportions, warm-metal interface accent, demo organization, and motion after route/component foundations have loaded.
+- `apps/web/src/production-visual-authority-v1.css` owns final live visual proportions, warm-metal interface accent, demo organization, navigation/brand geometry, and motion after route/component foundations have loaded.
+- `SOVEREIGN.OS` public wordmark sizing is a shared sitewide contract. React and standalone public routes must use the same header height, wordmark font size, weight, tracking, and shell geometry.
+- Product demonstrations must remain visible without JavaScript reveal state. Motion may enhance entry/progression but must never gate comprehension or create blank product sections.
 - Use `--font-display` for every meaningful heading and title across public, authenticated, onboarding, policy, modal, drawer, answer, relationship, system, Alignment, and Covenant surfaces.
 - Use `--font-subheading` only for short supporting introductions and secondary headings.
 - Preserve `--font-body` for paragraphs, controls, evidence, metadata, inputs, and long-form answers.
