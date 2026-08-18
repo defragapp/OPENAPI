@@ -76,26 +76,29 @@ describe('secondary public visual parity', () => {
   });
 
   it('makes How it works explain You, People, and Systems before source mechanics', () => {
-    expect(howItWorks).toContain('Start with you. Add context when it matters.');
+    expect(howItWorks).toContain('Start with yourself. Add another person or the wider situation only when it helps.');
     expect(howItWorks).toContain('YOU → PEOPLE → SYSTEMS');
     expect(howItWorks).toContain('Explore yourself.');
-    expect(howItWorks).toContain('Add what is happening now.');
-    expect(howItWorks).toContain('Bring in your people with permission.');
+    expect(howItWorks).toContain('See what may be more relevant now.');
+    expect(howItWorks).toContain('Understand what happens between two people.');
     expect(howItWorks).toContain('See the wider system.');
-    expect(howItWorks).toContain('consented people, supplied roles, permitted perspectives, confirmed responsibilities');
-    expect(howItWorks).toContain('Answer first. Detail underneath.');
+    expect(howItWorks).toContain('Get the answer first.');
+    expect(howItWorks).toContain('Ask about what you actually want to understand.');
     expect(howItWorks).toContain('A private reference built around you.');
     expect(howItWorks).toContain('class="product-proof-window"');
-    expect(howItWorks).toContain('What does Alignment look like for me when I’m creating something new?');
+    expect(howItWorks).toContain('How do I know whether I’m refining an idea because it is getting clearer—or changing it because I’m anticipating everyone else’s reaction?');
+    expect(howItWorks).toContain('<summary>See source details</summary>');
     expect(howItWorks).toContain('Where Baseline Design comes from');
     expect(howItWorks.toLowerCase()).not.toContain('capacity beneath');
-    expect(howItWorks.toLowerCase()).not.toContain('missing perspective');
-    expect(howItWorks.toLowerCase()).not.toContain('roles, authority');
+    expect(howItWorks).not.toContain('consented people');
+    expect(howItWorks).not.toContain('permitted perspectives');
+    expect(howItWorks).not.toContain('confirmed responsibilities');
+    expect(howItWorks).not.toContain('EXAMPLE BASIS');
     expect(howItWorks).not.toContain('One private foundation');
     expect(howItWorks).not.toContain('Where responsibility shifts');
   });
 
-  it('makes pricing explicit without changing products, prices, or the entitlement path', () => {
+  it('makes pricing explicit without changing products or prices', () => {
     expect(pricing).toContain('Explore yourself for free. Add People and Systems with Sovereign+.');
     expect(pricing).toContain('Explore yourself with Sovereign.');
     expect(pricing).toContain('Understand your people and the systems around you.');
@@ -107,6 +110,9 @@ describe('secondary public visual parity', () => {
     expect(pricing).toContain('10 Sovereign AI turns each month');
     expect(pricing).toContain('300 Sovereign AI turns each month');
     expect(pricing).toContain('Your Baseline stays yours. Plus expands what you can explore.');
+    expect(pricing).toContain('Two-person Baseline comparison when both people agree');
+    expect(pricing).toContain('Private invitations and sharing controls');
+    expect(pricing).not.toContain('permission-based relationship and system context');
     expect(pricing).not.toContain('pricing-dashboard');
     expect(pricing).not.toContain('pricing-toggle');
   });
@@ -115,15 +121,17 @@ describe('secondary public visual parity', () => {
     expect(faq).toContain('What can Sovereign help you understand?');
     expect(faq).toContain('What can I use Sovereign to explore about myself?');
     expect(faq).toContain('Baseline Design is a private, explorable reference built around you.');
-    for (const category of ['THE PRODUCT', 'PEOPLE + PERMISSION', 'FRAMEWORKS + LIMITS', 'PRIVACY + ACCOUNT', 'PLANS + SUPPORT', 'SAFETY']) {
-      expect(faq).toContain(category);
-    }
-    expect(faq).toContain('consented people, supplied roles, permitted perspectives, confirmed responsibilities');
+    for (const category of ['THE PRODUCT', 'PEOPLE + PERMISSION', 'FRAMEWORKS + LIMITS', 'PRIVACY + ACCOUNT', 'PLANS + SUPPORT', 'SAFETY']) expect(faq).toContain(category);
+    expect(faq).toContain('Can I see what information Sovereign used for an answer?');
+    expect(faq).toContain('Do those source details prove the interpretation is true?');
     expect(faq).toContain('Tarot is not part of Sovereign.OS.');
     expect(faq).toContain('Can I support Sovereign.OS without subscribing?');
     expect(faq.toLowerCase()).not.toContain('capacity beneath');
-    expect(faq.toLowerCase()).not.toContain('missing perspective');
-    expect(faq.toLowerCase()).not.toContain('roles, authority');
+    expect(faq).not.toContain('What is Basis?');
+    expect(faq).not.toContain('What does Basis prove?');
+    expect(faq).not.toContain('consented people');
+    expect(faq).not.toContain('permitted perspectives');
+    expect(faq).not.toContain('confirmed responsibilities');
     expect(faq).not.toContain('private personal foundation');
   });
 

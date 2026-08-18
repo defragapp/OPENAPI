@@ -61,22 +61,26 @@ staticDocuments.forEach((document, index) => assertStaticDocument(staticRoutes[i
 
 const howItWorks = staticDocuments[0].text;
 for (const marker of [
-  'Start with you. Add context when it matters.',
+  'Start with yourself. Add another person or the wider situation only when it helps.',
   'YOU → PEOPLE → SYSTEMS',
-  'Explore yourself first. Expand outward when you need to.',
+  'Understand yourself first. Expand outward when the question does.',
   'Explore yourself.',
-  'Add what is happening now.',
-  'Bring in your people with permission.',
+  'See what may be more relevant now.',
+  'Understand what happens between two people.',
   'See the wider system.',
-  'Answer first. Detail underneath.',
+  'Get the answer first.',
+  'Ask about what you actually want to understand.',
   'A private reference built around you.',
+  'Source details',
   'class="product-proof-window"',
   'SELF EXPLORATION',
-  'What does Alignment look like for me when I’m creating something new?',
-  'What the question touches',
-  'What changes under pressure',
-  'What feels aligned',
-  'What to explore next',
+  'How do I know whether I’m refining an idea because it is getting clearer—or changing it because I’m anticipating everyone else’s reaction?',
+  '<summary>See source details</summary>',
+  'Start with the question',
+  'Use what matters from your Baseline',
+  'Find the useful difference',
+  'Leave what is not known unanswered',
+  'Give you something you can try',
   'THE CONVERSATION STAYS PRIMARY',
   'Get the answer. Go deeper when you want.',
   'What still needs clarity',
@@ -84,14 +88,20 @@ for (const marker of [
   'class="launch-section support-note-section"'
 ]) assert(howItWorks.includes(marker), `/how-it-works is missing ${marker}`);
 for (const retired of [
+  'Ordinary questions. More context when it belongs.',
+  'EXAMPLE BASIS',
+  'HD G13.1 · GK ACT13 · ☉ CAN 04.2°',
   'One private foundation',
+  'consented people',
+  'permitted perspectives',
+  'confirmed responsibilities',
   'ONE ANSWER · FOUR DISTINCTIONS',
   'Where responsibility shifts',
   'Help fund continued public development.',
   'OPTIONAL WORLD PREVIEW',
   'World as experience',
   '/worlds-how-it-works.svg'
-]) assert(!howItWorks.includes(retired), `/how-it-works still contains retired language: ${retired}`);
+]) assert(!howItWorks.includes(retired), `/how-it-works still contains retired or internal language: ${retired}`);
 assert(!howItWorks.toLowerCase().includes('capacity beneath'), '/how-it-works returned to capacity-first public language');
 
 const pricing = staticDocuments[1].text;
@@ -106,9 +116,14 @@ for (const marker of [
   '300 Sovereign AI turns each month',
   'Explore yourself with Sovereign.',
   'Understand your people and the systems around you.',
+  'Two-person Baseline comparison when both people agree',
+  'Private invitations and sharing controls',
   'Your Baseline stays yours. Plus expands what you can explore.',
   'one-time amount from $1'
 ]) assert(pricing.includes(marker), `/pricing is missing ${marker}`);
+for (const retired of ['permission-based relationship and system context', 'Permission-aware invitations and controls']) {
+  assert(!pricing.includes(retired), `/pricing still contains implementation-first language: ${retired}`);
+}
 
 const faq = staticDocuments[2].text;
 for (const marker of [
@@ -122,10 +137,15 @@ for (const marker of [
   'SAFETY',
   'Where does Baseline Design come from?',
   'Which frameworks are included?',
+  'Can I see what information Sovereign used for an answer?',
+  'Do those source details prove the interpretation is true?',
   'Tarot is not part of Sovereign.OS.',
   'Does Sovereign reduce me to a type?',
   'Can I support Sovereign.OS without subscribing?'
 ]) assert(faq.includes(marker), `/faq is missing ${marker}`);
+for (const retired of ['What is Basis?', 'What does Basis prove?', 'server-approved Basis values', 'consented people', 'permitted perspectives', 'confirmed responsibilities']) {
+  assert(!faq.includes(retired), `/faq still contains retired or internal language: ${retired}`);
+}
 assert(!faq.toLowerCase().includes('capacity beneath'), '/faq returned to capacity-first public language');
 assert(!faq.includes('private personal foundation'), '/faq returned to the retired Baseline foundation metaphor');
 

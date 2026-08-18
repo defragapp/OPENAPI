@@ -1,20 +1,19 @@
-/* Sovereign.OS terminal typography authority.
- * The retired display serif must not render anywhere in the active product.
- * Font family only. Component and route styles own hierarchy and dimensions.
+/* Sovereign.OS title-family authority.
+ * Retired display serif, bundled display/sans substitutions, Optima, and Avenir
+ * Next must not render as active product headings. Component and route styles
+ * own hierarchy and dimensions; this file owns title family only.
  */
 
 :root {
   --font-title:
-    Optima,
-    "Helvetica Neue",
+    -apple-system,
+    BlinkMacSystemFont,
     "SF Pro Display",
-    Candara,
-    "Noto Sans",
     "Segoe UI Variable Display",
     "Segoe UI",
     system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
+    "Helvetica Neue",
+    Helvetica,
     Arial,
     sans-serif;
   --font-display: var(--font-title);

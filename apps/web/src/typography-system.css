@@ -1,22 +1,21 @@
 /*
  * Sovereign.OS typography contract.
  *
- * Titles use a humanist sans stack with stronger editorial presence. Body text
- * stays native and highly legible. Retired bundled display faces are excluded.
+ * Titles use the native enterprise sans stack defined by the product-language
+ * authority. Body text stays native and highly legible. Retired bundled
+ * display faces and decorative title substitutions are excluded.
  */
 
 :root {
   --font-title:
-    Optima,
-    "Helvetica Neue",
+    -apple-system,
+    BlinkMacSystemFont,
     "SF Pro Display",
-    Candara,
-    "Noto Sans",
     "Segoe UI Variable Display",
     "Segoe UI",
     system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
+    "Helvetica Neue",
+    Helvetica,
     Arial,
     sans-serif;
   --font-subheading: var(--font-title);

@@ -6,32 +6,39 @@ const main = read('./main.tsx');
 const typography = read('./typography-system.css');
 const sansAuthority = read('./sans-typography-authority-v1.css');
 const productCohesion = read('./production-product-cohesion-v1.css');
+const intelligenceDemo = read('./public-intelligence-demonstration-v1.css');
 const visualAuthority = read('./production-visual-authority-v1.css');
 const staticAuthority = read('../public/premium-action-static-v1.css');
 
 describe('production visual authority v1', () => {
-  it('keeps one deterministic terminal visual authority after product and typography layers', () => {
+  it('keeps one deterministic terminal visual authority after product, typography, and demo layers', () => {
     expect(main).toContain("import productionProductCohesionCss from './production-product-cohesion-v1.css?inline';");
+    expect(main).toContain("import publicIntelligenceDemonstrationCss from './public-intelligence-demonstration-v1.css?inline';");
     expect(main).toContain("import productionVisualAuthorityCss from './production-visual-authority-v1.css?inline';");
-    expect(main.indexOf('style.textContent += `\\n${productionProductCohesionCss}`;')).toBeGreaterThan(
-      main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;')
-    );
-    expect(main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;')).toBeGreaterThan(
-      main.indexOf('style.textContent += `\\n${productionProductCohesionCss}`;')
-    );
+    const sansIndex = main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;');
+    const productIndex = main.indexOf('style.textContent += `\\n${productionProductCohesionCss}`;');
+    const demoIndex = main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationCss}`;');
+    const visualIndex = main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;');
+    expect(productIndex).toBeGreaterThan(sansIndex);
+    expect(demoIndex).toBeGreaterThan(productIndex);
+    expect(visualIndex).toBeGreaterThan(demoIndex);
+    expect(main.slice(visualIndex + 'style.textContent += `\\n${productionVisualAuthorityCss}`;'.length)).not.toContain('style.textContent +=');
     expect(main).toContain("document.documentElement.dataset.sovereignVisualAuthority = 'production-v1';");
   });
 
-  it('uses a humanist title face first while preserving resilient native fallbacks', () => {
-    for (const source of [typography, sansAuthority, staticAuthority, visualAuthority]) {
-      expect(source).toContain('Optima');
-      expect(source).not.toContain('Avenir Next');
+  it('uses the canonical native enterprise sans title stack without decorative substitutions', () => {
+    for (const source of [typography, sansAuthority, staticAuthority, intelligenceDemo, visualAuthority]) {
+      expect(source).toContain('-apple-system');
+      expect(source).toContain('"SF Pro Display"');
+      expect(source).toContain('"Segoe UI"');
+      expect(source).not.toContain('\n    Optima,');
+      expect(source).not.toContain('\n    "Avenir Next",');
       expect(source).not.toContain('font-family: "Sovereign Display"');
       expect(source).not.toContain('font-family: "Sovereign Sans"');
     }
-    expect(typography.indexOf('Optima')).toBeLessThan(typography.indexOf('"Helvetica Neue"'));
-    expect(sansAuthority.indexOf('Optima')).toBeLessThan(sansAuthority.indexOf('"Helvetica Neue"'));
-    expect(staticAuthority.indexOf('Optima')).toBeLessThan(staticAuthority.indexOf('"Helvetica Neue"'));
+    expect(typography.indexOf('-apple-system')).toBeLessThan(typography.indexOf('"SF Pro Display"'));
+    expect(sansAuthority.indexOf('-apple-system')).toBeLessThan(sansAuthority.indexOf('"SF Pro Display"'));
+    expect(staticAuthority.indexOf('-apple-system')).toBeLessThan(staticAuthority.indexOf('"SF Pro Display"'));
   });
 
   it('gives the landing established proportions and warm interface chrome without rebuilding its story', () => {
@@ -43,11 +50,12 @@ describe('production visual authority v1', () => {
       'font-size: clamp(2.2rem, 3.2vw, 3.2rem)',
       '.public-approved-v8 .landing-workflow > li.is-active',
       '.public-approved-v8 .landing-message--assistant > div',
-      '.public-approved-v8 .landing-system-map path',
       '.public-approved-v8 .v0-final h2'
     ]) expect(visualAuthority).toContain(marker);
     expect(visualAuthority).not.toContain('#62b5ff');
     expect(visualAuthority).not.toContain('rgba(126, 201, 255');
+    expect(intelligenceDemo).toContain('.landing-system-analysis__sequence');
+    expect(intelligenceDemo).toContain('.landing-demo__composer-shell');
   });
 
   it('uses motion to reveal product state and honors reduced motion', () => {
@@ -79,7 +87,7 @@ describe('production visual authority v1', () => {
   });
 
   it('keeps all new authority styles structurally balanced', () => {
-    for (const source of [productCohesion, visualAuthority]) {
+    for (const source of [productCohesion, intelligenceDemo, visualAuthority]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });

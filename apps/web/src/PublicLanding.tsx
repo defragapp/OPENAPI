@@ -6,28 +6,28 @@ import { LandingProductStories } from './LandingProductStories';
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 
 const REAL_LIFE_QUESTIONS = [
-  { scope: 'Self', text: 'What does Alignment look like for me?' },
-  { scope: 'Self', text: 'How do I express myself when I’m clear?' },
-  { scope: 'Creativity', text: 'How do I create best?' },
-  { scope: 'Self', text: 'What changes in me under pressure?' },
-  { scope: 'Decision', text: 'How do I make decisions that actually fit me?' },
-  { scope: 'Self', text: 'What part of myself am I underusing?' },
-  { scope: 'Relationship', text: 'Why does the same situation land differently for us?' },
-  { scope: 'System', text: 'What role am I actually playing in this family?' }
+  { scope: 'Self', text: 'How do I make decisions that actually fit me?' },
+  { scope: 'Reaction', text: 'Why did their tone affect me more than their words?' },
+  { scope: 'Creativity', text: 'How do I know when I’m adapting too early?' },
+  { scope: 'Decision', text: 'Should I say something now or wait?' },
+  { scope: 'Relationship', text: 'Why does the same conversation feel urgent to me and pressuring to them?' },
+  { scope: 'Family', text: 'Why does everything fall to me when something goes wrong?' },
+  { scope: 'Team', text: 'How does pressure move through this team?' },
+  { scope: 'System', text: 'What changes when I stop playing the role everyone expects?' }
 ] as const;
 
 const COMPARISON = {
   blank: [
-    'Starts from the current prompt',
-    'Knows only the context you bring into that conversation',
-    'Treats separate questions as separate conversations',
-    'Has no private personal reference to return to'
+    'Starts from the prompt and what you explain in that conversation',
+    'Your history and recurring patterns must be explained again or inferred from the thread',
+    'Another person’s information is not automatically protected by Sovereign’s sharing permissions',
+    'Does not show Sovereign’s exact source details for an interpretation'
   ],
   sovereign: [
-    'Carries your Baseline across conversations',
-    'Connects self, relationship, and system context when you choose',
-    'Keeps other people distinct and permission-bound',
-    'Lets you review, correct, or reject interpretations'
+    'Carries your private Baseline across conversations',
+    'Uses what is happening now, another person’s shared Baseline, or the wider family or team situation only when it helps answer the question',
+    'Keeps each person separate and uses only what they chose to share',
+    'Lets you inspect source details and review, correct, or reject interpretations'
   ]
 } as const;
 const RELEASE_COPY_MARKERS = ['everyone the same.'] as const;
@@ -42,7 +42,7 @@ export function PublicLanding() {
       data-visual-contract="v0-landing-selective-port"
       data-v0-archive-sha={V0_ARCHIVE_SHA}
       data-viewport-contract="v0-public-landing-v3"
-      data-layout-release="v0-motion-workflows-v8"
+      data-layout-release="high-value-intelligence-v1"
       data-public-release="approved-public-v8"
       data-public-narrative="self-people-systems-v1"
     >
@@ -129,7 +129,7 @@ function MobileCapabilityRail() {
       <a href="#relationship">
         <CapabilityIcon kind="people" />
         <strong>Understand your people</strong>
-        <small>See what happens<br />between you.</small>
+        <small>See why the same moment<br />can land differently.</small>
       </a>
       <a href="#system">
         <CapabilityIcon kind="system" />
@@ -154,10 +154,10 @@ function RealLifeQuestions() {
       aria-labelledby="landing-question-orbit-title"
     >
       <div className="v0-shell landing-question-orbit__inner">
-        <p className="landing-question-orbit__kicker">Start with you</p>
-        <h2 id="landing-question-orbit-title">Explore yourself.</h2>
+        <p className="landing-question-orbit__kicker">You → your people → the whole system</p>
+        <h2 id="landing-question-orbit-title">Start with yourself. Expand outward when it matters.</h2>
         <p className="landing-question-orbit__note">
-          Look at how you decide, communicate, create, connect, respond to pressure, and recognize what feels aligned.
+          Explore how you think, decide, communicate, create, and respond. Add another person with permission, or step back to see the family, team, or group when the wider situation changes what is happening.
         </p>
         <div className="landing-question-orbit__stage" aria-hidden="true">
           {REAL_LIFE_QUESTIONS.map((question, index) => (

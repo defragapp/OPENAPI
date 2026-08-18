@@ -15,6 +15,8 @@ When it applies to the user's question, Sovereign makes one movement visible:
 
 The fourth part is conditional and non-blaming. Contribution is not causation. Feedback is not blame. Understanding a pattern does not make harm mutual. Safety handling overrides completion of the lens when abuse, coercion, immediate danger, or a serious power imbalance is present.
 
+These are intelligence concepts, not required interface labels. User-facing wording inherits `docs/product-language-system.md` and translates this structure into ordinary language.
+
 ## Four-layer information model
 
 ### Layer A — exact source data
@@ -112,9 +114,11 @@ Recurring-pattern answers use the existing section contract to show the useful c
 
 ## Basis
 
-Basis is a data-only interface owned by the server registry.
+Basis is the internal/server name for a data-only interface owned by the server registry.
 
-Examples of formatting:
+The UI does not require users to learn this term. User-facing labels are defined by `docs/product-language-system.md` and use **Sources**, **Source details**, or **See source details**. Exact codes remain hidden until the user chooses to inspect them.
+
+Examples of internal/display formatting:
 
 - user confirmation: `U✓`;
 - Human Design personality activation: `HD G13.1`;
@@ -136,7 +140,9 @@ Rules:
 - at most five values on desktop;
 - at most three values on mobile followed by `+N`;
 - accessible labels for glyphs and abbreviations;
-- a compact source drawer containing exact value, calculation time, uncertainty, and provenance only.
+- a source drawer containing exact value, calculation time, uncertainty, and provenance only.
+
+The default UI surface shows only the plain source-details affordance, not the codes themselves. Opening the source drawer is an explicit inspection action.
 
 Basis supports an interpretation. It does not prove personality or current state.
 
@@ -166,7 +172,7 @@ The server compares two separate permitted facet profiles and returns:
 - missing information;
 - authorized exact Basis references.
 
-The renderer keeps the two people in distinct columns and the relationship itself in a full-width field. It never claims motive, exact emotion, private experience, or future behavior.
+The renderer keeps the two people distinct and the relationship itself separate. User-facing language says what each person may be bringing, what happens between them, what each person can own, and what still has to be asked directly. It never claims motive, exact emotion, private experience, or future behavior.
 
 ## System context
 
@@ -177,6 +183,8 @@ Every participant remains a separate subject. Sovereign may examine how the same
 Roles come from invitation or system-membership context; they are not invented from Baseline facets. Responsibilities are factual only when supplied or confirmed. Sovereign may interpret how a person's Baseline could affect their experience or expression inside that role, but the Baseline does not assign the role itself.
 
 The system context may return participant roles, permitted perspectives, confirmed responsibility context, communication or reliance relationships, observations, change effects, and a separate pressure field. Unsupported decorative edges are prohibited.
+
+The UI translates that structure into ordinary language: who is involved, what each person is responsible for, where pressure builds, how people respond to one another, and what may change when one person responds differently.
 
 ## Covenant
 
@@ -204,10 +212,11 @@ Tests must prove:
 - expiry enforcement;
 - meaningful Baseline value without an incident;
 - relationship and system structure;
-- exact Basis filtering and accessible truncation;
+- exact Basis filtering and accessible truncation inside source details;
+- source codes remain hidden by default until inspection;
 - structured Alignment without calculated precision;
 - contextual, confirmed, retrieved-passage Covenant behavior;
 - consent and entitlement enforcement;
-- complete answers even when the Basis drawer is never opened.
+- complete answers even when the source drawer is never opened;
 - recurring-pattern answers connect capacity, expression, applicable interaction, and possible continuation or change without adding causal certainty or blame;
 - abuse, coercion, danger, and serious power imbalance cases do not receive mutualizing feedback-loop language.

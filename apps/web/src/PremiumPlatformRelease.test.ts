@@ -31,6 +31,7 @@ const refinement = read('./experience-refinement-v1.css');
 const renderedFidelity = read('./rendered-fidelity-v1.css');
 const landingRefinementV2 = read('./landing-refinement-v2.css');
 const landingRefinementV5 = read('./landing-live-refinement-v5.css');
+const intelligenceDemoCss = read('./public-intelligence-demonstration-v1.css');
 const invitationFidelity = read('./invitation-rendered-fidelity-v1.css');
 const sansAuthority = read('./sans-typography-authority-v1.css');
 const typography = read('./typography-system.css');
@@ -45,7 +46,7 @@ function expectBalancedCss(source: string) {
 }
 
 describe('founder visual port — public positioning reset', () => {
-  it('loads the founder stack and appends current rendered authorities in order', () => {
+  it('loads the founder stack and keeps production visual authority terminal', () => {
     const imports = [
       "import './v0-platform-port.css';",
       "import './v0-motion-accessibility.css';",
@@ -67,9 +68,14 @@ describe('founder visual port — public positioning reset', () => {
       previous = index;
     }
     expect(main.slice(previous + imports.at(-1)!.length)).not.toContain("import './");
-    expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';");
-    expect(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
-    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, invitationFidelity, sansAuthority, typography, passkeyCss, routeCohesionCss, staticRefinement]) expectBalancedCss(source);
+    expect(main).toContain("import publicIntelligenceDemonstrationCss from './public-intelligence-demonstration-v1.css?inline';");
+    const productCohesion = main.indexOf('style.textContent += `\\n${productionProductCohesionCss}`;');
+    const intelligenceDemo = main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationCss}`;');
+    const productionVisual = main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;');
+    expect(intelligenceDemo).toBeGreaterThan(productCohesion);
+    expect(productionVisual).toBeGreaterThan(intelligenceDemo);
+    expect(main.slice(productionVisual + 'style.textContent += `\\n${productionVisualAuthorityCss}`;'.length)).not.toContain('style.textContent +=');
+    for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, intelligenceDemoCss, invitationFidelity, sansAuthority, typography, passkeyCss, routeCohesionCss, staticRefinement]) expectBalancedCss(source);
   });
 
   it('preserves the archive compatibility fingerprint as historical provenance only', () => {
@@ -87,8 +93,8 @@ describe('founder visual port — public positioning reset', () => {
     expect(landing).toContain('Healing isn’t optional.');
     expect(landing).toContain('Holding onto the pain is.');
     expect(landing).toContain('Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.');
-    expect(landing).toContain('Start with you');
-    expect(landing).toContain('Explore yourself.');
+    expect(landing).toContain('You → your people → the whole system');
+    expect(landing).toContain('Start with yourself. Expand outward when it matters.');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('<RealLifeQuestions />');
     expect(landing).toContain('<LandingProductStories />');
@@ -120,8 +126,6 @@ describe('founder visual port — public positioning reset', () => {
       'click a line to inspect it'
     ]) expect(field).toContain(marker);
     expect(field).not.toContain('onPointerEnter={() => selectAxis(axis.id)}');
-    expect(field).not.toContain('measurement lines');
-    expect(field).not.toContain('stable blue sphere');
     expect(landingRefinementV5).toContain('width: 104px !important');
     expect(landingRefinementV5).toContain('height: 26px !important');
   });
@@ -142,58 +146,61 @@ describe('founder visual port — public positioning reset', () => {
     expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
   });
 
-  it('shows broad self exploration, relationship intelligence, and whole-system intelligence', () => {
+  it('shows broad self exploration, relationship intelligence, and whole-system intelligence in approved language', () => {
     for (const marker of [
       '01 · You',
-      'Explore how you think, decide, create, connect, and grow.',
-      'How Sovereign explores the question',
-      'How you tend to create',
-      'What feels aligned',
+      'Explore how you think, decide, communicate, create, connect, and grow.',
+      'How Sovereign builds the answer',
+      'Start with the question',
       '02 · You + your people',
-      'Understand both sides and what happens between you.',
+      'See why the same moment lands differently—and how to bridge the gap.',
+      'How Sovereign compares two people',
+      'Show what happens between you',
+      'Find a lower-pressure next step',
       '03 · From 1:1 to the whole system',
       'See the whole system.',
+      'How Sovereign reads a system',
+      'Show how pressure moves',
+      'Change one thing and watch what happens',
       'surface="personal-chat"',
       'surface="personal-reasoning"',
       'surface="relationship-chat"',
       'surface="relationship-reasoning"',
       'surface="system-map"',
       'surface="system-reasoning"',
-      'Keeping both people distinct',
-      'Seeing the whole system',
-      'Roles',
-      'Perspectives',
-      'Responsibilities',
-      '360 + step * 900',
+      '280 + step * 760',
       'data-motion-state'
     ]) expect(stories).toContain(marker);
-    expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
+    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(3);
     expect(stories).toContain('landing-workflow__progress');
-    expect(stories).not.toContain('Separate helping from carrying the outcome.');
-    expect(stories).not.toContain('See where responsibility keeps landing.');
+    expect(stories).not.toContain('<FamilySystemMap />');
     expect(stories).not.toContain('capacity beneath');
+    expect(stories).not.toContain('permitted perspectives');
+    expect(stories).not.toContain('confirmed responsibilities');
   });
 
-  it('keeps public Basis quiet and relationship/system boundaries explicit', () => {
-    for (const marker of ["{ code: 'GK 13.4'", "{ code: 'GATE 4.11'", "{ code: 'MARS · CANCER'", "{ code: 'GATE 22.4'", "{ code: 'GATE 57.2'"]) expect(stories).toContain(marker);
-    expect(stories).toContain('<strong>Basis</strong>');
-    expect(stories).toContain('Shared with permission');
-    expect(stories).toContain('Illustrative supplied context');
-    expect(stories).toContain('Each person controls what may be included');
+  it('keeps public source details exact, fixture-backed, and collapsed by default', () => {
+    for (const marker of ["{ code: 'HD G13.1'", "{ code: 'GK ACT13'", "{ code: '☉ CAN 04.2°'", "{ code: 'HD G22.4'", "{ code: 'HD G57.2'", "{ code: 'REL ☿ □ ☿ 1.8°'"]) expect(stories).toContain(marker);
+    expect(stories).toContain('<details className="landing-evidence">');
+    expect(stories).toContain('<strong>See source details</strong>');
+    expect(stories).toContain('These values are not visitor data.');
+    expect(stories).not.toContain('<strong>Example Basis</strong>');
+    expect(stories).not.toContain("chips: ['HD G13.1'");
+    expect(stories).toContain('Both people must agree before their Baselines can be used together');
+    expect(stories).toContain('Each person controls whether their Baseline can be included');
+    expect(stories).not.toContain('GATE 4.11');
     expect(finalAuthority).toContain('.landing-evidence__code');
+    expect(intelligenceDemoCss).toContain('.landing-evidence > summary');
   });
 
-  it('makes desktop demonstrations larger and mobile demonstrations shorter', () => {
-    expect(landingRefinementV2).toContain('width: min(1280px, calc(100% - 64px)) !important');
-    expect(landingRefinementV2).toContain('font-size: 0.92rem !important');
-    expect(landingRefinementV2).toContain('grid-template-columns: minmax(0, 1.34fr) minmax(320px, 0.66fr) !important');
-    expect(landingRefinementV2).toContain('scroll-snap-type: inline mandatory !important');
-    expect(landingRefinementV2).toContain('.landing-demo--system-context');
-    expect(landingRefinementV2).toContain('display: none !important');
-    expect(landingRefinementV2).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(landingRefinementV5).toContain('@media (max-width: 760px)');
-    expect(main).toContain('function installMobileViewportStability()');
-    expect(main).toContain('window.visualViewport');
+  it('puts workflow on the left and the conversation on the right while preserving mobile stacking', () => {
+    expect(stories.indexOf('surface="personal-reasoning"')).toBeLessThan(stories.indexOf('surface="personal-chat"'));
+    expect(stories.indexOf('surface="relationship-reasoning"')).toBeLessThan(stories.indexOf('surface="relationship-chat"'));
+    expect(stories.indexOf('surface="system-reasoning"')).toBeLessThan(stories.indexOf('surface="system-map"'));
+    expect(stories).toContain('landing-demo__composer-shell');
+    expect(intelligenceDemoCss).toContain('grid-template-columns: minmax(320px, .88fr) minmax(0, 1.12fr) !important;');
+    expect(intelligenceDemoCss).toContain('.landing-demo__composer-shell');
+    expect(intelligenceDemoCss).toContain('@media (max-width: 900px)');
   });
 
   it('measures the complete rendered landing at desktop and phone widths', () => {
@@ -214,6 +221,16 @@ describe('founder visual port — public positioning reset', () => {
     expect(onboarding).toContain('/api/v1/billing/checkout');
     expect(controls).toContain('/api/v1/billing/portal');
     expect(membership).toContain("person.activeScopes.includes('system.include')");
+  });
+
+  it('requires plain Sources UI in the authenticated product while preserving internal Basis transport', () => {
+    expect(workspace).toContain('<strong>Sources</strong>');
+    expect(workspace).toContain('<h2 id="basis-title">Source details</h2>');
+    expect(workspace).toContain('These are the source values Sovereign used for this answer.');
+    expect(workspace).not.toContain('<strong>Basis</strong>');
+    expect(workspace).not.toContain('aria-label={`Basis. Open ${available.length} source values.`}');
+    expect(workspace).toContain('basis: BasisValue[]');
+    expect(workspace).toContain('basis_refs: string[]');
   });
 
   it('does not import mock runtime or unsupported scoring', () => {

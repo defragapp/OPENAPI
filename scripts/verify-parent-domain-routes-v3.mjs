@@ -116,18 +116,27 @@ for (const marker of [
   'Healing isn’t optional.',
   'Holding onto the pain is.',
   'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
-  'Start with you',
-  'Explore yourself.',
-  'Explore how you think, decide, create, connect, and grow.',
-  'Understand both sides and what happens between you.',
+  'Start with yourself. Expand outward when it matters.',
+  'Explore how you think, decide, communicate, create, connect, and grow.',
+  'See why the same moment lands differently—and how to bridge the gap.',
+  'How Sovereign compares two people',
+  'See source details',
   'From 1:1 to the whole system',
   'See the whole system.',
+  'How Sovereign reads a system',
   'Most AI starts with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
 ]) {
   assert(javascript.text.includes(marker), `compiled production JavaScript is missing ${marker}`);
 }
 for (const retired of [
+  'Understand both sides and what happens between you.',
+  'Example Basis',
+  'server-approved Basis',
+  'permitted context',
+  'consented people',
+  'permitted perspectives',
+  'confirmed responsibilities',
   'One private reference beneath every question.',
   'One private foundation. More useful answers across the questions that shape your life.',
   'Separate helping from carrying the outcome.',
@@ -137,7 +146,7 @@ for (const retired of [
   'See the capacity beneath the pattern.',
   'See what keeps the pattern going—and what could change it.'
 ]) {
-  assert(!javascript.text.includes(retired), `compiled production JavaScript still contains retired public language ${retired}`);
+  assert(!javascript.text.includes(retired), `compiled production JavaScript still contains retired or internal public language ${retired}`);
 }
 
 const normalizedStylesheet = stylesheet.text.replace(/\s+/g, '');

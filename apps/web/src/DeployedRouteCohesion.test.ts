@@ -47,9 +47,7 @@ describe('deployed route cohesion contract', () => {
   });
 
   it('keeps shared static pages on current route and terminal typography authorities', () => {
-    for (const document of [how, pricing, faq, notFound]) {
-      expect(document).toContain('/deployed-route-cohesion.css?v=20260803-route-v1');
-    }
+    for (const document of [how, pricing, faq, notFound]) expect(document).toContain('/deployed-route-cohesion.css?v=20260803-route-v1');
     for (const document of [how, pricing, faq, consent, notFound]) {
       expect(document).toContain(refinementCssPath);
       expect(document).toContain(terminalCssPath);
@@ -60,18 +58,24 @@ describe('deployed route cohesion contract', () => {
     expect(staticTerminal).not.toContain('Sovereign Display');
   });
 
-  it('keeps current public-page language aligned with self exploration, People, and Systems', () => {
-    expect(how).toContain('Start with you. Add context when it matters.');
+  it('keeps public-page language aligned with the canonical product-language authority', () => {
+    expect(how).toContain('Start with yourself. Add another person or the wider situation only when it helps.');
     expect(how).toContain('YOU → PEOPLE → SYSTEMS');
-    expect(how).toContain('Explore yourself.');
+    expect(how).toContain('Ask about what you actually want to understand.');
     expect(how).toContain('A private reference built around you.');
+    expect(how).toContain('<summary>See source details</summary>');
     expect(pricing).toContain('Explore yourself for free. Add People and Systems with Sovereign+.');
     expect(pricing).toContain('Your Baseline stays yours. Plus expands what you can explore.');
     expect(faq).toContain('What can Sovereign help you understand?');
     expect(faq).toContain('What can I use Sovereign to explore about myself?');
-    expect(faq).toContain('Baseline Design is a private, explorable reference built around you.');
+    expect(faq).toContain('Can I see what information Sovereign used for an answer?');
+    expect(faq).toContain('Do those source details prove the interpretation is true?');
     expect(`${how}\n${pricing}\n${faq}`).not.toContain('One private foundation.');
     expect(`${how}\n${pricing}\n${faq}`).not.toContain('See where responsibility keeps landing.');
+    expect(`${how}\n${pricing}\n${faq}`).not.toContain('Ordinary questions. More context when it belongs.');
+    expect(`${how}\n${pricing}\n${faq}`).not.toContain('Example Basis');
+    expect(`${how}\n${pricing}\n${faq}`).not.toContain('permitted perspectives');
+    expect(`${how}\n${pricing}\n${faq}`).not.toContain('confirmed responsibilities');
   });
 
   it('keeps route cohesion focused on structure rather than redesigning product state', () => {
@@ -126,7 +130,11 @@ describe('deployed route cohesion contract', () => {
     expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
-    expect(sansAuthority).toContain('The retired display serif must not render anywhere in the active product.');
+    expect(sansAuthority).toContain('--font-title:');
+    expect(sansAuthority).toContain('-apple-system');
+    expect(sansAuthority).toContain('"SF Pro Display"');
+    expect(sansAuthority).toContain('"Segoe UI"');
+    expect(sansAuthority).not.toMatch(/^[ \t]*(?:Optima,|"Avenir Next",)/m);
     expect(invitationFidelity).toContain('@media (min-width: 901px)');
     expect(staticRefinement).toContain('--v0-blue: #e8ddd0');
     expect(staticRefinement).toContain('--v0-blue-bright: #fffaf3');

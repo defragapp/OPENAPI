@@ -13,8 +13,8 @@ The launch must provide meaningful personal exploration before the user explains
 The public product expands outward in three layers:
 
 1. **You** — understand and explore your own patterns, expression, decisions, creativity, connection, pressure, change, Shadow, Gift, and Alignment;
-2. **You + your people** — with permission, keep two people distinct and examine differences, shared context, and what happens between them;
-3. **From 1:1 to the whole system** — expand to families, households, friendship groups, workplaces, teams, and other human systems while keeping each consented person distinct and preserving their supplied role, permitted perspective, confirmed responsibilities, pressure, observations, and interactions.
+2. **You + your people** — with permission, keep two people distinct and examine differences, shared information, and what happens between them;
+3. **From 1:1 to the whole system** — expand to families, households, friendship groups, workplaces, teams, and other human systems while keeping each person distinct and using only the roles, responsibilities, observations, relationships, and Baseline information people chose to provide.
 
 The internal intelligence contract may reason through capacity, expression, interaction, continuation conditions, responsibility, and possible change. Those internal concepts do not define the public product category and must not force every public example into conflict, responsibility, or carrying-outcomes language.
 
@@ -25,7 +25,7 @@ The current launch includes:
 - self-exploration across the supported facet universe before another person or incident is required;
 - exact, expiring current-condition context;
 - adaptive `sovereign-answer.v2` text answers;
-- exact server-approved Basis rendering;
+- exact server-approved Basis rendering behind user-facing source details;
 - invited-person identity and scope-specific consent;
 - two-person comparison from separate permitted structured Baselines;
 - family, household, friendship, workplace, team, and custom Systems;
@@ -45,11 +45,11 @@ The canonical authenticated experience is `SovereignIntelligenceWorkspace`.
 
 The normal loop is:
 
-`user question → direct answer → relevant structured sections → quiet Basis/provenance → correction or continuation`
+`user question → direct answer → relevant structured sections → quiet source details → correction or continuation`
 
 The public landing demo chats may teach the same hierarchy. The authenticated product must use real account state, real Baseline context, real entitlements/permissions, and the real Worker inference path; it must never substitute canned/random demo behavior.
 
-Reasoning progression may be made visible as restrained text workflow state when useful. The product does not require video or media generation to explain how Sovereign reached an answer.
+Reasoning progression may be made visible as restrained text workflow state when useful. Public workflow labels inherit `product-language-system.md` and must describe what the user can follow in ordinary language rather than exposing internal reasoning taxonomy. The product does not require video or media generation to explain how Sovereign reached an answer.
 
 ## Public positioning boundary
 
@@ -59,12 +59,12 @@ The root public page must make the product understandable in this order:
 
 - personal AI for understanding yourself;
 - self exploration across the supported personal domains;
-- permission-bound relationship intelligence;
+- relationship intelligence that uses only what each person chose to share;
 - system intelligence from 1:1 to family/team/group context;
 - Baseline as the private reference carried across those questions;
-- framework/source mechanics only in deeper How It Works/FAQ/Basis disclosure.
+- framework/source mechanics only inside deeper disclosure or inspection.
 
-Do not use `foundation` as the primary public Baseline metaphor. Do not lead root marketing with astrology, Human Design, Gene Keys, numerology, astronomical positions, or source abbreviations. Do not make responsibility/carrying outcomes the category story for `You` or `Systems`.
+Do not use `foundation` as the primary public Baseline metaphor. Do not lead root marketing with astrology, Human Design, Gene Keys, numerology, astronomical positions, source abbreviations, or Basis codes. Do not make responsibility/carrying outcomes the category story for `You` or `Systems`. Do not use internal authorization/evidence vocabulary as public explanation.
 
 ## Public answer categories
 
@@ -77,7 +77,7 @@ Every answer preserves the difference between:
 5. an unconfirmed interpretation;
 6. the unknown actual state.
 
-The main answer uses plain language. Exact source values appear only in Basis.
+The main answer uses plain language. Exact source values appear only when the user opens source details. `Basis` remains the server/schema name for that source layer.
 
 Recurring-pattern answers may connect the relevant stable quality, possible expression, permitted interaction/system context, and supported continuation/change conditions. Contribution is not causation, feedback is not blame, and harm must never be reframed as mutual merely because more than one person is present.
 
@@ -110,6 +110,8 @@ The server rechecks identity, entitlement, Baseline availability, and required s
 Another person’s exact framework values remain absent without `framework.display`.
 
 System analysis uses only consented participants plus supplied roles, confirmed responsibilities, care, reliance, constraints, objectives, observations, and permitted Baseline context. Every participant remains distinct. Graph edges appear only when a relationship is supplied or confirmed.
+
+User-facing system copy translates those implementation rules into ordinary language: who is involved, what each person is responsible for, where pressure builds, how people respond to one another, and what may change when one person responds differently.
 
 ## Covenant
 

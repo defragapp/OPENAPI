@@ -6,7 +6,7 @@
  * It must load after all route refinements and before no later visual override.
  *
  * Principles:
- * - humanist display typography with restrained scale
+ * - native enterprise sans typography with restrained scale
  * - near-black / cream / warm-metal interface chrome
  * - hard alignment and deliberate whitespace
  * - demos read as real product workflows, not decorative cards
@@ -15,14 +15,14 @@
 
 :root {
   --sovereign-title:
-    Optima,
-    Candara,
-    "Noto Sans",
-    "Segoe UI",
-    system-ui,
     -apple-system,
     BlinkMacSystemFont,
+    "SF Pro Display",
+    "Segoe UI Variable Display",
+    "Segoe UI",
+    system-ui,
     "Helvetica Neue",
+    Helvetica,
     Arial,
     sans-serif;
   --sovereign-ink: #f3ece2;

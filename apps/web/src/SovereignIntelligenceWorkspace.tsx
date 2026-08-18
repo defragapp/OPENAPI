@@ -103,7 +103,7 @@ type WorkspaceState = {
 const surfaces: Array<{ name: Surface; label: string; description: string }> = [
   { name: 'Today', label: 'Today', description: 'What is active for you now' },
   { name: 'Explore', label: 'Explore', description: 'Explore yourself more deeply' },
-  { name: 'People', label: 'People', description: 'Understand both sides and what happens between you' },
+  { name: 'People', label: 'People', description: 'See how the same moment can land differently' },
   { name: 'Systems', label: 'Systems', description: 'See the whole system' },
   { name: 'Library', label: 'Library', description: 'Keep what changes your understanding' },
   { name: 'You', label: 'You', description: 'Baseline, plan, permissions, and account' }
@@ -761,7 +761,7 @@ function BaselineBuilder({ api, onCancel, onComplete }: {
       <div className="baseline-builder-layout">
         <div className="baseline-builder-main">
           <h1 id="baseline-builder-title">Build your Baseline.</h1>
-          <p>These details create the private foundation Sovereign uses across self, decisions, relationships, and systems.</p>
+          <p>These details create the private reference Sovereign uses across self, decisions, relationships, and systems.</p>
 
           {step === 1 && (
             <form onSubmit={continueFromDetails} className="baseline-step-form">
@@ -858,8 +858,8 @@ function BaselineReveal({ result, today, onOpenToday, onCurrentContext }: {
   return (
     <section className="baseline-reveal">
       <p>Your Baseline is ready.</p>
-      <h1>{core?.title ?? 'Your personal foundation is ready to explore.'}</h1>
-      <span>{core?.description ?? 'Sovereign can now keep a stable, correctable personal foundation beneath decisions, relationships, pressure, and change.'}</span>
+      <h1>{core?.title ?? 'Your Baseline is ready to explore.'}</h1>
+      <span>{core?.description ?? 'Sovereign can now return to your stable, correctable Baseline across decisions, relationships, pressure, and change.'}</span>
       <BasisStrip values={support.filter(isBasisValue)} />
       <p className="baseline-reveal-distinction">{communication?.description ?? decisions?.description ?? pressure?.description ?? 'Your Baseline is ready beneath the situations you examine.'}</p>
       <div className="baseline-current-choice">
@@ -907,7 +907,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   if (surface === 'Explore') return <ExploreHome workspace={workspace} />;
   if (surface === 'People') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="People" title="Understand both sides and what happens between you." body="Keep each person distinct, then examine your side, their side, and what happens between you using only the Baseline context both people approved." />
+      <SurfaceHeading kicker="People" title="See how the same moment can land differently." body="Keep each person distinct, then examine the interaction and what may help close the gap." />
       {selectedPerson
         ? <RelationshipOverview person={selectedPerson} api={api} />
         : <EmptyState title="Choose one relationship to examine." body="A name alone does not create access. The other person connects their account and chooses what Sovereign may use." action="Invite or choose someone" onAction={onOpenContext} />}
@@ -946,12 +946,12 @@ function BaselineInvitation({ onBuild }: { onBuild: () => void }) {
         <h1>Your intelligence begins with your Baseline.</h1>
         <p>Sovereign.OS uses your Baseline to understand how you communicate, decide, connect, respond to pressure, and move through change.</p>
         <button onClick={onBuild}>Build my Baseline <span aria-hidden="true">→</span></button>
-        <small>Complete it once to open Today, personal exploration, choices, relationships, and systems from the same foundation.</small>
+        <small>Complete it once to open Today, personal exploration, choices, relationships, and systems from the same Baseline.</small>
       </div>
       <div className="baseline-foundation-visual" aria-hidden="true"><span /><span /><span /><i /></div>
       <div className="baseline-composer-preview">
         <strong>Your Baseline stays beneath every exploration.</strong>
-        <span>Future questions and saved distinctions draw from the same personal foundation.</span>
+        <span>Future questions and saved distinctions can return to the same Baseline.</span>
       </div>
     </section>
   );
@@ -1552,7 +1552,7 @@ function YouControls({ workspace, api, refresh, onBuildBaseline }: any) {
   return (
     <div className="context-stack account-controls">
       <section className="control-section">
-        <p>BASELINE</p><h3>{workspace.today?.baseline?.status === 'completed' ? 'Your personal foundation is ready.' : 'Your intelligence begins here.'}</h3><span>If you rebuild your Baseline, future answers use the updated version. Saved answers keep the Basis they were created with.</span>
+        <p>BASELINE</p><h3>{workspace.today?.baseline?.status === 'completed' ? 'Your Baseline is ready.' : 'Your intelligence begins here.'}</h3><span>If you rebuild your Baseline, future answers use the updated version. Saved answers keep the Basis they were created with.</span>
         <button className="primary-action" onClick={onBuildBaseline}>{workspace.today?.baseline?.status === 'completed' ? 'Review or recompute my Baseline' : 'Build my Baseline'}</button>
       </section>
       <section className="control-section">

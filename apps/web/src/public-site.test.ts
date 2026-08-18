@@ -53,10 +53,9 @@ describe('Sovereign.OS public experience', () => {
     }
     expect(landing).not.toContain('<BaselineFoundation />');
     expect(landing).not.toContain('calculated astronomical positions');
-    expect(landing).toContain('Start with you');
-    expect(landing).toContain('Explore yourself.');
-    expect(landing).toContain('What does Alignment look like for me?');
-    expect(landing).toContain('How do I create best?');
+    expect(landing).toContain('Start with yourself. Expand outward when it matters.');
+    expect(landing).toContain('How do I make decisions that actually fit me?');
+    expect(landing).toContain('Why does the same conversation feel urgent to me and pressuring to them?');
     expect(stories).toContain('01 · You');
     expect(stories).toContain('02 · You + your people');
     expect(stories).toContain('03 · From 1:1 to the whole system');
@@ -64,7 +63,7 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).toContain('Know yourself. Understand your people. See the whole system.');
   });
 
-  it('shows a visible exploration flow plus relationship and system context', () => {
+  it('shows visible self, relationship, and system workflows in user language', () => {
     for (const marker of [
       'surface="personal-chat"',
       'surface="personal-reasoning"',
@@ -72,36 +71,38 @@ describe('Sovereign.OS public experience', () => {
       'surface="relationship-reasoning"',
       'surface="system-map"',
       'surface="system-reasoning"',
-      'How you tend to create',
-      'What changes under pressure',
-      'What feels aligned',
-      'What to explore next',
-      'Keeping both people distinct',
-      'Clarity may take time.',
-      'Between you',
-      'Seeing the whole system',
-      'Roles',
-      'Perspectives',
-      'Responsibilities'
+      'Start with the question',
+      'Use what matters from your Baseline',
+      'Find the useful difference',
+      'Leave what is not known unanswered',
+      'Give you something you can try',
+      'Start with what happened',
+      'Keep each person separate',
+      'Show what happens between you',
+      'Do not guess private feelings',
+      'Find a lower-pressure next step',
+      'Start with what you told Sovereign',
+      'Show how pressure moves',
+      'Show why the role keeps returning',
+      'Change one thing and watch what happens'
     ]) expect(stories).toContain(marker);
-    expect((stories.match(/<WorkflowPanel /g) ?? []).length).toBe(1);
+    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(3);
     expect(stories).toContain("aria-current={index === visibleIndex ? 'step' : undefined}");
     expect(stories).toContain('landing-workflow__progress');
-    expect(stories).toContain('<RelationshipContext />');
-    expect(stories).toContain('<SystemContext />');
+    expect(stories).not.toContain('<RelationshipContext />');
+    expect(stories).not.toContain('<SystemContext />');
   });
 
-  it('keeps relationship and system examples permission-safe, anonymous, and source-aware', () => {
-    expect(stories).toContain('With permission, Sovereign keeps each person distinct');
-    expect(stories).toContain('Shared with permission');
-    expect(stories).toContain('Illustrative supplied context');
-    expect(stories).toContain('Each person controls what may be included');
+  it('keeps relationship/system examples permission-safe and source codes optional', () => {
+    expect(stories).toContain('Both people must agree before their Baselines can be used together');
+    expect(stories).toContain('Each person controls whether their Baseline can be included');
     expect(stories).toContain('No compatibility score');
-    expect(stories).toContain('The useful view is the whole arrangement—not one person as the cause.');
-    expect(stories).toContain('<strong>Basis</strong>');
-    expect(stories).not.toContain("name: 'Maya'");
-    expect(stories).not.toContain("name: 'Noa'");
-    expect(stories).not.toContain("name: 'Ruth'");
+    expect(stories).toContain('<details className="landing-evidence">');
+    expect(stories).toContain('<strong>See source details</strong>');
+    expect(stories).not.toContain('<strong>Basis</strong>');
+    expect(stories).not.toContain('<strong>Example Basis</strong>');
+    expect(stories).not.toContain('permitted perspectives');
+    expect(stories).not.toContain('confirmed responsibilities');
   });
 
   it('keeps retired chatbot, technical-field, and rejected category phrasing out of active public copy', () => {
@@ -114,7 +115,14 @@ describe('Sovereign.OS public experience', () => {
       'One private reference beneath every question.',
       'One private foundation. More useful answers across the questions that shape your life.',
       'Separate helping from carrying the outcome.',
-      'See where responsibility keeps landing.'
+      'See where responsibility keeps landing.',
+      'Ordinary questions. More context when it belongs.',
+      'Example Basis',
+      'server-approved',
+      'permitted context',
+      'consented people',
+      'permitted perspectives',
+      'confirmed responsibilities'
     ]) expect(publicCopy.toLowerCase()).not.toContain(phrase.toLowerCase());
   });
 
@@ -154,16 +162,19 @@ describe('Sovereign.OS public experience', () => {
   });
 
   it('keeps support pages, consent, and fallback routes intact with current public language', () => {
-    expect(how).toContain('Start with you. Add context when it matters.');
+    expect(how).toContain('Start with yourself. Add another person or the wider situation only when it helps.');
     expect(how).toContain('YOU → PEOPLE → SYSTEMS');
+    expect(how).toContain('Ask about what you actually want to understand.');
     expect(how).toContain('A private reference built around you.');
+    expect(how).toContain('<summary>See source details</summary>');
     expect(how).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
     expect(pricing).toContain('Explore yourself for free. Add People and Systems with Sovereign+.');
     expect(pricing).toContain('$20');
     expect(pricing).toContain('$99 / year');
     expect(pricing).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
     expect(faq).toContain('What can Sovereign help you understand?');
-    expect(faq).toContain('What can I use Sovereign to explore about myself?');
+    expect(faq).toContain('Can I see what information Sovereign used for an answer?');
+    expect(faq).toContain('Do those source details prove the interpretation is true?');
     expect(faq).toContain('Tarot is not part of Sovereign.OS.');
     expect(faq).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
     expect(platformPublicCss).toContain('opacity: 1 !important');
