@@ -82,12 +82,15 @@ describe('secondary public visual parity', () => {
     expect(howItWorks).toContain('Add what is happening now.');
     expect(howItWorks).toContain('Bring in your people with permission.');
     expect(howItWorks).toContain('See the wider system.');
+    expect(howItWorks).toContain('consented people, supplied roles, permitted perspectives, confirmed responsibilities');
     expect(howItWorks).toContain('Answer first. Detail underneath.');
     expect(howItWorks).toContain('A private reference built around you.');
     expect(howItWorks).toContain('class="product-proof-window"');
     expect(howItWorks).toContain('What does Alignment look like for me when I’m creating something new?');
     expect(howItWorks).toContain('Where Baseline Design comes from');
     expect(howItWorks.toLowerCase()).not.toContain('capacity beneath');
+    expect(howItWorks.toLowerCase()).not.toContain('missing perspective');
+    expect(howItWorks.toLowerCase()).not.toContain('roles, authority');
     expect(howItWorks).not.toContain('One private foundation');
     expect(howItWorks).not.toContain('Where responsibility shifts');
   });
@@ -115,9 +118,12 @@ describe('secondary public visual parity', () => {
     for (const category of ['THE PRODUCT', 'PEOPLE + PERMISSION', 'FRAMEWORKS + LIMITS', 'PRIVACY + ACCOUNT', 'PLANS + SUPPORT', 'SAFETY']) {
       expect(faq).toContain(category);
     }
+    expect(faq).toContain('consented people, supplied roles, permitted perspectives, confirmed responsibilities');
     expect(faq).toContain('Tarot is not part of Sovereign.OS.');
     expect(faq).toContain('Can I support Sovereign.OS without subscribing?');
     expect(faq.toLowerCase()).not.toContain('capacity beneath');
+    expect(faq.toLowerCase()).not.toContain('missing perspective');
+    expect(faq.toLowerCase()).not.toContain('roles, authority');
     expect(faq).not.toContain('private personal foundation');
   });
 
