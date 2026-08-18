@@ -14,17 +14,19 @@ A new visitor should understand the experience in this order:
 2. **You + your people** — with permission, keep each person distinct and examine what happens between them;
 3. **From 1:1 to the whole system** — expand to families, households, teams, workplaces, friendship groups, and other human systems;
 4. understand Baseline Design as the private reference Sovereign can carry across those questions;
-5. inspect source detail, permissions, uncertainty, or Basis only when useful.
+5. inspect source details or change sharing choices only when useful.
 
 Baseline Design is not the public product category and should not be described as a `foundation` in primary marketing. It is the private reference that makes the personal AI more continuous and specific than a blank conversation.
 
 ## Current launch interaction
 
-The authenticated launch is text-first. The normal loop is:
+The authenticated launch is text-first. The normal user experience is:
 
-`question → direct answer → relevant explanation → quiet Basis/provenance → correction or continuation`
+`question → direct answer → relevant explanation → quiet source details → correction or continuation`
 
-The landing demo chats may demonstrate that hierarchy. The real authenticated workspace uses real account/Baseline/permission state and real inference.
+Internally, the source-detail layer is backed by the Basis contract and server-approved source registry. `Basis`, `provenance`, authorization state, and evidence classifications are implementation terms, not required interface vocabulary.
+
+The landing demo chats may demonstrate the same answer hierarchy. The real authenticated workspace uses real account state, Baseline state, sharing choices, entitlements, and inference.
 
 Video/Worlds generation is not part of the current launch product and should not appear as required positioning, pricing, or acceptance behavior.
 
@@ -69,9 +71,9 @@ These capabilities do not need to be enumerated in the first public sentence, bu
 
 Sovereign may help a user explore identity/orientation, communication, decisions, learning, creativity/expression, love/connection, leadership, boundaries, pressure/change, Shadow, Gift, Alignment, and less familiar or underused qualities—without turning interpretation into measured personality fact.
 
-### Current context
+### Active now
 
-Current context is temporary, explicit, expiring, and separate from Baseline. It may make a theme more relevant; it does not prove behavior, emotion, motive, or outcome.
+The underlying current-condition layer is temporary, explicit, expiring, and separate from Baseline. In the interface, describe this as what may be more relevant or louder now. It does not prove behavior, emotion, motive, or outcome.
 
 ### Shadow and Gift
 
@@ -83,11 +85,11 @@ Alignment is a qualitative comparison of fit, tradeoff, and missing information,
 
 ### You + your people
 
-With active permission, Sovereign may compare distinct structured Baselines and examine where two people differ, what they share, what each may bring, what happens between them, what each person can own, and what still needs to be asked directly. It is not compatibility scoring or mind-reading.
+When another person chooses to share, Sovereign may compare the two distinct structured Baselines and examine where the people differ, what they share, what each may bring, what happens between them, what each person can own, and what still needs to be asked directly. It is not compatibility scoring or mind-reading.
 
 ### From 1:1 to the whole system
 
-With permission and supplied/confirmed role context, Sovereign may examine each consented person's distinct perspective together with roles, confirmed responsibilities, care/reliance, pressure, constraints, objectives, observations, and the interactions between participants across a family, household, team, workplace, friendship group, or other system.
+When people choose to participate and the relevant role or relationship information has been supplied, Sovereign may examine the distinct people together with roles, responsibilities, care/reliance, pressure, constraints, objectives, observations, and interactions across a family, household, team, workplace, friendship group, or other system. It does not infer an absent person's private perspective.
 
 ### Covenant
 
@@ -101,18 +103,20 @@ Preferred public description:
 
 `A private reference built around you, so Sovereign can begin with more than the current prompt.`
 
-The root landing should not enumerate astronomical positions, astrology, Human Design, Gene Keys, numerology, or source abbreviations. Those belong in deeper How It Works/FAQ disclosure and Basis inspection.
+The root landing should not enumerate astronomical positions, astrology, Human Design, Gene Keys, numerology, or source abbreviations. Those belong in deeper How It Works/FAQ disclosure and optional source-detail inspection.
 
 ## Information boundaries
 
-Sovereign preserves:
+Internally, Sovereign preserves:
 
 1. exact source data;
 2. versioned Baseline facets;
-3. expiring current context;
-4. question-specific synthesis using permitted context and exact server-approved Basis.
+3. expiring current-condition data;
+4. question-specific synthesis using only authorized information and exact server-owned Basis references.
 
-Exact source data does not measure personality. Facets and answers are interpretive/correctable. Another person’s private state remains unknown unless that person supplies it.
+Those implementation layers must be translated before they reach the interface. Users should see the answer, what may be active now, what another person chose to share, the relevant family/team situation, and optional source details—not schema names or authorization vocabulary.
+
+Exact source data does not measure personality. Facets and answers are interpretive/correctable. Another person's private state remains unknown unless that person supplies it.
 
 ## Product-experience principles
 
@@ -123,11 +127,12 @@ Exact source data does not measure personality. Facets and answers are interpret
 - Keep technical support secondary and inspectable.
 - Keep participants distinct.
 - Never let the model write exact Basis display values.
-- Never show another person’s exact framework values without `framework.display`.
+- Never show another person's exact framework values without the required server permission.
 - Keep conversation visually primary over workspace chrome.
 - Preserve one canonical authenticated workspace.
-- Keep users in control of correction, consent, continuity, export, and deletion.
+- Keep users in control of correction, sharing, continuity, export, and deletion.
 - Do not reduce the public story to responsibility, carrying outcomes, conflict, or repair.
+- Do not let implementation nouns become visible product nouns merely because they are accurate in code.
 
 ## Typography boundary
 
@@ -140,5 +145,7 @@ Headings and titles must use the approved sans system. Visual hierarchy comes fr
 Do not position Sovereign.OS as a generic chatbot, prediction product, compatibility score, scientific personality test, diagnosis, therapy replacement, spiritual certainty system, incident-only coach, or source of hidden motives.
 
 Do not describe Baseline as a `foundation` in primary public marketing.
+
+Do not use `Basis`, `provenance`, `entitlement`, `authorized`, `permitted context`, `consented person`, provider state, or release state as ordinary interface language. Translate the underlying rule into the person's action or experience.
 
 Do not revive retired public language from historical archives/audits merely because it remains present as provenance or internal test material.
