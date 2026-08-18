@@ -18,6 +18,7 @@ function harness({
   dmarcFailure = false,
   migrationFailure = false,
   controlFailure = false,
+  externallyManagedControls = false,
   deployFailure = false,
   postFailure = false,
   evidenceFailure = false
@@ -95,16 +96,34 @@ function harness({
       cleanupConfig: vi.fn(),
       deployOptions: {
         ensureSecrets: async () => ({ configured: [] }),
-        configureControls: async () => controlFailure
-          ? {
+        configureControls: async () => {
+          if (controlFailure) {
+            return {
+              ...releaseReadyControls(),
+              rateLimit: {
+                management: 'unavailable',
+                status: 500,
+                reason: 'unexpected zone control failure'
+              }
+            };
+          }
+          if (externallyManagedControls) {
+            return {
               ...releaseReadyControls(),
               rateLimit: {
                 management: 'unavailable',
                 status: 403,
                 reason: 'WAF rate limiting reconciliation requires zone-level management permission'
+              },
+              schema: {
+                management: 'unavailable',
+                status: 403,
+                reason: 'API Shield reconciliation requires zone-level management permission'
               }
-            }
-          : releaseReadyControls()
+            };
+          }
+          return releaseReadyControls();
+        }
       },
       reconcileDmarc: async () => dmarcFailure
         ? ({ verified: false, output: 'DNS verification failed' })
@@ -148,13 +167,21 @@ describe('single-deploy release orchestrator', () => {
     expect(test.d1Execute).not.toHaveBeenCalled();
   });
 
-  it('unmanaged required Cloudflare controls block before any deploy', async () => {
+  it('non-permission Cloudflare control failures block before any deploy', async () => {
     const test = harness({ controlFailure: true });
     const result = await orchestrateRelease(test.options);
     expect(result.status).toBe('deploy-failed');
     expect(result.deploys).toBe(0);
     expect(deployCalls(test.runWrangler)).toBe(0);
-    expect(result.output).toContain('zone-level management permission');
+    expect(result.output).toContain('unexpected zone control failure');
+  });
+
+  it('OAuth 403 zone controls remain externally managed and do not block deploy', async () => {
+    const test = harness({ externallyManagedControls: true });
+    const result = await orchestrateRelease(test.options);
+    expect(result.status).toBe('success');
+    expect(result.deploys).toBe(1);
+    expect(deployCalls(test.runWrangler)).toBe(1);
   });
 
   it('successful release performs exactly one deploy and converges full evidence', async () => {

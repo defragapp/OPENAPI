@@ -51,7 +51,7 @@ Encrypted Worker secrets remain in Cloudflare:
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 
-The release environment also needs the Cloudflare account identifier and an authenticated Cloudflare credential capable of the repository-owned production operations. The credential must be able to deploy the Worker, access the production D1 database, inspect required Worker secrets, and reconcile the exact Cloudflare controls owned by the release script, including API Shield/Endpoint Management and the single Free-plan rate-limit rule. A credential that can upload a Worker but cannot reconcile those controls is insufficient for a complete release.
+The release environment also needs the Cloudflare account identifier and an authenticated Cloudflare credential capable of the repository-owned production operations. Wrangler OAuth is the canonical interactive credential for Worker deployment, production D1 access, required Worker-secret inspection, and the Cloudflare surfaces exposed by Wrangler OAuth. Cloudflare zone WAF/ruleset and API Gateway management APIs may require zone-management permissions that Wrangler OAuth does not expose. When those two zone-control APIs return HTTP 403, the release treats the existing controls as externally managed and leaves them untouched; any non-403 reconciliation failure still blocks the release before deployment. Changing those externally managed zone controls requires separate zone-management authority and separate evidence.
 
 Do not copy secret values into repository files, build output, issues, screenshots, or product logs.
 
@@ -85,8 +85,8 @@ The text-first release path:
 4. prepares the exact production Wrangler configuration;
 5. applies D1 migrations through `0017_privacy_access_and_eligibility`;
 6. verifies required Worker secrets;
-7. reconciles the repository-owned Free-plan Cloudflare controls;
-8. normalizes API Shield Endpoint Management templates because Cloudflare may return named OpenAPI parameters as positional `{var1}`, `{var2}`, and equivalent forms;
+7. reconciles the repository-owned Free-plan Cloudflare controls when the authenticated credential exposes the required management APIs; HTTP 403 from the WAF/ruleset or API Gateway management APIs records those zone controls as externally managed and leaves them untouched;
+8. when API Shield management is available, normalizes Endpoint Management templates because Cloudflare may return named OpenAPI parameters as positional `{var1}`, `{var2}`, and equivalent forms;
 9. performs exactly one `wrangler deploy` for `sovv-web`;
 10. verifies parent-domain/runtime and secondary public-route behavior without Browser Rendering;
 11. writes exact-SHA D1 release evidence;

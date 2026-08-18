@@ -93,10 +93,15 @@ export function assertRequiredProductionControls(controls) {
     failures.push('AI Gateway privacy controls are neither management-verified nor protected per request');
   }
 
-  if (controls?.rateLimit?.management !== 'verified') {
+  // Wrangler OAuth does not expose zone WAF/API Gateway management scopes.
+  // A 403 leaves those zone controls externally managed; any other failure still blocks release.
+  const externallyManagedZoneControl = (control) =>
+    control?.management === 'unavailable' && control?.status === 403;
+
+  if (controls?.rateLimit?.management !== 'verified' && !externallyManagedZoneControl(controls?.rateLimit)) {
     failures.push(controls?.rateLimit?.reason || 'Sovereign zone rate-limit rule is not management-verified');
   }
-  if (controls?.schema?.management !== 'verified') {
+  if (controls?.schema?.management !== 'verified' && !externallyManagedZoneControl(controls?.schema)) {
     failures.push(controls?.schema?.reason || 'Sovereign API Shield schema is not management-verified');
   }
 

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { configureCloudflareFreeTier } from '../configure-cloudflare-free-tier.mjs';
+import { assertRequiredProductionControls } from '../cloudflare-production-deploy-v3.mjs';
 
 function jsonResponse(status, payload) {
   return new Response(JSON.stringify(payload), {
@@ -81,5 +82,10 @@ describe('configureCloudflareFreeTier', () => {
     });
     expect(result.rateLimit).toMatchObject({ management: 'unavailable', status: 403 });
     expect(result.schema).toMatchObject({ management: 'unavailable', status: 403 });
+    expect(() => assertRequiredProductionControls(result)).not.toThrow();
+    expect(() => assertRequiredProductionControls({
+      ...result,
+      rateLimit: { management: 'unavailable', status: 500, reason: 'unexpected failure' }
+    })).toThrow(/unexpected failure/);
   });
 });
