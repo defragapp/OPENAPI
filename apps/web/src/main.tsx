@@ -37,6 +37,7 @@ import premiumActionAuthorityCss from './premium-action-authority-v1.css?inline'
 import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';
 import productionProductCohesionCss from './production-product-cohesion-v1.css?inline';
 import productionVisualAuthorityCss from './production-visual-authority-v1.css?inline';
+import visualStabilizationPreviewCss from './visual-stabilization-preview.css?inline';
 
 /* Component foundations */
 import './styles.css';
@@ -111,6 +112,7 @@ function installPlatformVisualCohesion(): void {
   style.textContent += `\n${sansTypographyAuthorityCss}`;
   style.textContent += `\n${productionProductCohesionCss}`;
   style.textContent += `\n${productionVisualAuthorityCss}`;
+  style.textContent += `\n${visualStabilizationPreviewCss}`;
   document.head.append(style);
 }
 
@@ -195,6 +197,7 @@ document.documentElement.dataset.sovereignPlatformCohesion = 'v1';
 document.documentElement.dataset.sovereignProductionReadiness = 'desktop-ios-v1';
 document.documentElement.dataset.sovereignHeroComposition = 'v3-bounded';
 document.documentElement.dataset.sovereignVisualAuthority = 'production-v1';
+document.documentElement.dataset.sovereignVisualPreview = 'stabilization-v1';
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'
