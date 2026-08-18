@@ -36,9 +36,7 @@ describe('Sovereign account and workspace shell', () => {
   });
 
   it('keeps Today Baseline-first, qualified, and correction-ready', () => {
-    for (const phrase of ['Your Baseline is ready.', 'What remains steady', 'Temporary current context', 'Not today']) {
-      expect(workspace).toContain(phrase);
-    }
+    for (const phrase of ['Your Baseline is ready.', 'What remains steady', 'Not today']) expect(workspace).toContain(phrase);
     expect(workspace).toContain('It does not determine your behavior.');
     expect(workspace).toContain('Your actual response');
   });
@@ -52,7 +50,7 @@ describe('Sovereign account and workspace shell', () => {
     expect(onboarding).toContain('/api/v1/billing/checkout');
     expect(onboarding).toContain('Monthly billing');
     expect(onboarding).toContain('Annual billing');
-    expect(onboarding).toContain('Stripe checkout shows the current price before you confirm.');
+    expect(onboarding).toContain('Secure checkout shows the current price before you confirm.');
     expect(onboarding).not.toMatch(/\$99|\$20|\$8\.25|save \$141/);
   });
 
@@ -65,15 +63,21 @@ describe('Sovereign account and workspace shell', () => {
   });
 
   it('uses visible labels across private forms', () => {
-    for (const label of ['Email address', 'Invitation email', 'New system', 'Birth date', 'Birthplace', 'Birth-time certainty']) {
-      expect(`${app}\n${workspace}`).toContain(label);
+    for (const label of ['Email address', 'Invitation email', 'New system', 'Birth date', 'Birthplace', 'How certain is the birth time?']) {
+      expect(`${app}\n${workspace}\n${onboarding}`).toContain(label);
     }
   });
 
-  it('keeps consent under the invited person’s control', () => {
+  it('keeps consent under the invited person’s control in plain language', () => {
     expect(workspace).toContain('Send private invitation');
     expect(workspace).toContain('Shared relationship intelligence begins with an invitation.');
     expect(app).toContain('Choose what this connection may use.');
+    expect(app).toContain('Accepting an invitation does not automatically share everything.');
+    expect(app).toContain('Compare the two Baselines only after both people agree');
+    expect(app).toContain('Use a saved understanding this person chose to share.');
+    expect(app).not.toContain('permitted Baselines');
+    expect(app).not.toContain('shared context');
+    expect(app).not.toContain('raw birth input');
     expect(consent).toContain('Review your shared uses.');
     expect(consentRuntime).toContain("fetch('/api/v1/invitations/mine'");
     expect(consentRuntime).toContain('Permission revoked for future use.');
