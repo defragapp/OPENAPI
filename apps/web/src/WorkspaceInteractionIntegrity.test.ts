@@ -52,4 +52,12 @@ describe('Sovereign workspace interaction integrity', () => {
     expect(workspace).toContain('That request could not be completed.');
     expect(workspace).toContain('Sovereign.OS could not complete that request. Try again in a moment.');
   });
+
+  it('keeps Baseline birth-input ownership in canonical onboarding', () => {
+    const beginBaseline = functionBody('beginBaseline');
+    expect(beginBaseline).toContain("location.assign('/onboarding?baseline=review')");
+    expect(workspace).not.toContain('function BaselineBuilder(');
+    expect(workspace).not.toContain('Intl.DateTimeFormat().resolvedOptions().timeZone');
+    expect(workspace).not.toContain('birthTimezone: timezone');
+  });
 });
