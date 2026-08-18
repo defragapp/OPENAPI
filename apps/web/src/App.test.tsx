@@ -68,7 +68,7 @@ describe('Sovereign account and workspace shell', () => {
     }
   });
 
-  it('keeps consent under the invited person’s control in plain language', () => {
+  it('keeps sharing under the invited person’s control in plain language', () => {
     expect(workspace).toContain('Send private invitation');
     expect(workspace).toContain('Shared relationship intelligence begins with an invitation.');
     expect(app).toContain('Choose what this connection may use.');
@@ -78,9 +78,12 @@ describe('Sovereign account and workspace shell', () => {
     expect(app).not.toContain('permitted Baselines');
     expect(app).not.toContain('shared context');
     expect(app).not.toContain('raw birth input');
-    expect(consent).toContain('Review your shared uses.');
+    expect(consent).toContain('Review what you share.');
+    expect(consent).toContain('Your sharing choices stay in your control');
     expect(consentRuntime).toContain("fetch('/api/v1/invitations/mine'");
-    expect(consentRuntime).toContain('Permission revoked for future use.');
+    expect(consentRuntime).toContain("status.textContent = granted ? 'This use is now allowed.' : 'This use is now off.'");
+    expect(consentRuntime).not.toContain('permitted context');
+    expect(consentRuntime).not.toContain('shared context');
   });
 
   it('keeps Library explicit and user-controlled', () => {
