@@ -7,6 +7,7 @@ const questions = readFileSync(new URL('../public/faq.html', import.meta.url), '
 const how = readFileSync(new URL('../public/how-it-works.html', import.meta.url), 'utf8');
 const robots = readFileSync(new URL('../public/robots.txt', import.meta.url), 'utf8');
 const sitemap = readFileSync(new URL('../public/sitemap.xml', import.meta.url), 'utf8');
+const securityTxt = readFileSync(new URL('../public/.well-known/security.txt', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
 const language = readFileSync(new URL('../../../docs/product-language-system.md', import.meta.url), 'utf8');
@@ -47,6 +48,14 @@ describe('public production positioning release', () => {
     for (const route of ['/app', '/login', '/signup', '/onboarding', '/auth/', '/invitation', '/consent.html', '/api/']) expect(robots).toContain(`Disallow: ${route}`);
     expect(sitemap).toContain('https://sovereign.defrag.app/how-it-works');
     expect(sitemap).not.toContain('/app');
+  });
+
+  it('publishes one deterministic vulnerability-reporting contact', () => {
+    expect(securityTxt).toContain('Contact: mailto:info@defrag.app');
+    expect(securityTxt).toContain('Canonical: https://sovereign.defrag.app/.well-known/security.txt');
+    expect(securityTxt).toContain('Preferred-Languages: en');
+    expect(securityTxt).toMatch(/Expires: 20\d{2}-\d{2}-\d{2}T00:00:00Z/);
+    expect(securityTxt).not.toMatch(/token|secret|password/i);
   });
 
   it('uses the interactive 360 field as the opening product visual with intentional click-led inspection', () => {
