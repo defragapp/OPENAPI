@@ -45,7 +45,9 @@ describe('public navigation and brand contract', () => {
     expect(brand).toContain('className="brand-mark"');
     expect(brand).toContain('SOVEREIGN.OS');
     expect(brand).not.toContain('<img');
-    expect(landing).toContain('className="public-logo v0-wordmark v0-wordmark--desktop"');
-    expect(landing).toContain('className="public-logo-mobile v0-wordmark v0-wordmark--mobile"');
+    expect(landing).toContain('className="v0-wordmark v0-wordmark--desktop"');
+    expect(landing).toContain('className="v0-wordmark v0-wordmark--mobile"');
+    expect(landing).not.toContain('className="public-logo ');
+    expect(landing).not.toContain('className="public-logo-mobile ');
   });
 });
