@@ -73,7 +73,11 @@ describe('public metadata and fallback documents', () => {
     expect(rasterizer).toContain("target: resolve(distDir, 'app-icon.png')");
     expect(rasterizer).toContain("target: resolve(distDir, 'apple-touch-icon.png')");
     expect(rasterizer).toContain('width: 180');
-    expect(rasterizer).toContain("name.startsWith('sharp@')");
+    expect(packageJson).toContain('"sharp": "0.35.2"');
+    expect(rasterizer).toContain("import sharp from 'sharp';");
+    expect(rasterizer).not.toContain("node_modules/.pnpm");
+    expect(rasterizer).not.toContain("name.startsWith('sharp@')");
+    expect(rasterizer).not.toContain("node_modules/sharp/lib/index.js");
     expect(index).toContain('<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />');
   });
 
