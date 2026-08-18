@@ -55,15 +55,17 @@ describe('identity-bound multi-user contract', () => {
     expect(relational).toContain('other.facets.map((facet) => ({ ...facet, basisRefs: [] }))');
   });
 
-  it('removes owner-side granting and exposes invitee revocation controls', () => {
+  it('removes owner-side granting and exposes invitee sharing controls', () => {
     expect(workspace).toContain('Send private invitation');
     expect(app).toContain('Choose what this connection may use.');
     expect(app).not.toContain('>Grant</button>');
-    expect(consentPage).toContain('Review your shared uses.');
+    expect(consentPage).toContain('Review what you share.');
     expect(consentPage).toContain('/consent.js?v=20260726-consent-r1');
     expect(consentRuntime).toContain("fetch('/api/v1/invitations/mine'");
     expect(consentRuntime).toContain("deny.textContent = decision === 'denied' ? 'Not allowed' : 'Do not allow'");
-    expect(consentRuntime).toContain("status.textContent = granted ? 'Permission allowed for future use.' : 'Permission revoked for future use.'");
+    expect(consentRuntime).toContain("status.textContent = granted ? 'This use is now allowed.' : 'This use is now off.'");
+    expect(consentRuntime).not.toContain('permitted context');
+    expect(consentRuntime).not.toContain('shared context');
     expect(consentRuntime).toContain("method: 'PUT'");
   });
 
