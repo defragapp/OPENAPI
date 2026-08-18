@@ -36,10 +36,13 @@ describe('stale-policy account rights', () => {
     expect(rights).toContain('Download my data');
     expect(rights).toContain('Manage billing');
     expect(rights).toContain('Sign out');
-    expect(rights).toContain('Sign out all sessions');
+    expect(rights).toContain('Sign out everywhere');
     expect(rights).toContain('Account deletion');
     expect(rights).toContain('https://sovereign.defrag.app/privacy');
     expect(rights).toContain('mailto:info@defrag.app');
+    expect(rights).not.toContain('private intelligence');
+    expect(rights).not.toContain('Status: {deletionJob.status}');
+    expect(rights).not.toContain('required billing and legal retention');
   });
 
   it('uses only server-authorized stale-policy account-rights routes', () => {
