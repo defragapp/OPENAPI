@@ -185,7 +185,7 @@ export function AuthenticatedWorkspace() {
           <section role="status" aria-live="polite">
             <span>PRIVACY REVIEW</span>
             <h1>Review the current account terms before continuing.</h1>
-            <p>Your private workspace remains closed until the current Terms, Privacy Policy, and launch eligibility rule are confirmed. You can still download your data, manage any existing billing, sign out, and manage account deletion below.</p>
+            <p>Your private workspace remains closed until you review the current Terms and Privacy Policy and confirm you are 18 or older. You can still download your data, manage any existing billing, sign out, and manage account deletion below.</p>
             <div className="policy-review-links">
               <a href="https://sovereign.defrag.app/terms" target="_blank" rel="noreferrer">Read Terms</a>
               <a href="https://sovereign.defrag.app/privacy" target="_blank" rel="noreferrer">Read Privacy Policy</a>
@@ -221,16 +221,16 @@ export function AuthenticatedWorkspace() {
           <strong>SOVEREIGN.OS</strong>
         </a>
         <section role={failed ? 'alert' : 'status'} aria-live="polite">
-          <span>{pendingPayment ? 'STRIPE CONFIRMATION' : 'SOVEREIGN'}</span>
+          <span>{pendingPayment ? 'PAYMENT CONFIRMATION' : 'SOVEREIGN'}</span>
           <h1>{failed ? 'Sovereign.OS could not open yet.' : pendingPayment ? 'Your payment is still being confirmed.' : 'Opening Sovereign.OS.'}</h1>
           <p>
             {failed
               ? 'Your workspace was not shown. Check your connection and try again.'
               : pendingPayment
-                ? 'Stripe returned successfully, but the signed subscription event has not reached your account yet. Sovereign+ remains locked until that authoritative event arrives; checking again will not create another charge.'
+                ? 'Your checkout returned successfully, but Sovereign+ is not active on your account yet. Wait a moment and check again. Checking again will not create another charge.'
                 : state === 'confirming_plan'
-                  ? 'Confirming the signed Stripe entitlement and connecting it to your private workspace.'
-                  : 'Confirming your account, current policy acceptance, Baseline, and plan before the private workspace is shown.'}
+                  ? 'Confirming your Sovereign+ plan before opening your workspace.'
+                  : 'Checking your account, Baseline, and plan before opening your workspace.'}
           </p>
           {(failed || pendingPayment) && (
             <button onClick={() => setAttempt((value) => value + 1)}>
