@@ -437,7 +437,7 @@ Framework/source disclosure may appear deeper on this page, clearly separated fr
 
 Free should be described as self-exploration and personal intelligence, not merely a Baseline artifact.
 
-Sovereign+ should be described as expanding the same intelligence to People, Systems, Library continuity, optional Covenant exploration, and higher monthly use.
+Sovereign+ should be described as expanding the same intelligence to People, Systems, Library, optional Covenant exploration, and higher monthly use.
 
 ### FAQ
 
@@ -461,3 +461,163 @@ The approved rendered title stack is native enterprise sans: Apple system/SF Pro
 Typography authority sets the family, not a universal heading size. Page and component composition own title scale, line height, wrapping, spacing, and responsive behavior. `production-visual-authority-v1.css` owns final presentation after the family authority.
 
 Headings, titles, product labels, and body text use the approved sans system. Hierarchy comes from scale, weight, spacing, opacity, and layout—not from switching to a decorative display face.
+
+Product demonstrations must remain understandable when motion or reveal observers do not run. Motion may enhance progression but must never hide the primary product proof.
+
+The bundled legacy display font file may remain in the repository only as an unused historical asset until a separate cleanup removes it. It must not be referenced by active CSS.
+
+## Authentication
+
+Signup:
+
+- Headline: `Create your Sovereign.OS account.`
+- Body: `Start free. Verify your email, then build your Baseline.`
+
+Login:
+
+- Headline: `Sign in to Sovereign.OS.`
+- Body: `Use your email and the secure sign-in method available for your account.`
+
+Do not use privacy slogans or spiritual promises in account access copy.
+
+## Baseline onboarding
+
+- Headline: `Build your Baseline.`
+- Body: `Add the birth details you know to build the private Baseline Sovereign uses across self, decisions, relationships, and systems.`
+- Birth date: `Required to build your Baseline.`
+- Birthplace: `Used to calculate the parts of your Baseline that depend on place.`
+- Birth time: `Improves the parts of your Baseline that depend on time.`
+- Birth-time certainty: `Tell us whether the time is exact, approximate, or unknown.`
+
+Approved progress language:
+
+- `Checking your details`
+- `Building your Baseline`
+- `Preparing your Baseline`
+- `Opening Sovereign.OS`
+
+Approved completion language:
+
+- `Your Baseline is ready.`
+- `Your Baseline is ready to use across the questions, relationships, and systems you choose to explore.`
+- `Your Baseline and its source details are ready. What may be more relevant now stays separate and optional.`
+
+Unknown birth time is a supported path. Explain which outputs remain unavailable or less precise. Never imply that the Baseline is invalid or fill missing values.
+
+Do not expose `source_computing`, `facet_profile_preparing`, provider status, provenance, `exact source positions`, `Baseline profile`, `facet profile`, or `interpretive uncertainty` as onboarding UI language.
+
+## Authenticated surfaces
+
+Today:
+
+- `What is active for you now?`
+- `Begin with what remains steady in your Baseline, then see what may be louder today.`
+
+Explore:
+
+- `Explore yourself more deeply.`
+- `Explore how you think, decide, create, connect, and grow. Bring in a decision, relationship, pressure point, or recurring pattern when you want to see how it connects to your Baseline.`
+
+People:
+
+- `See how the same moment can land differently.`
+- `Keep each person distinct, then examine the interaction and what may help close the gap.`
+
+Systems:
+
+- `See the whole system.`
+- `See who is involved, what each person is responsible for, where pressure builds, how people respond to one another, and what may change when one person responds differently.`
+
+Library:
+
+- `Keep what changes your understanding.`
+- `Return to distinctions worth carrying forward. Library is not a journal or transcript archive.`
+
+You:
+
+- `Your Baseline, plan, permissions, and account.`
+
+Sources beneath an answer:
+
+- collapsed control: `Sources`
+- optional action: `See source details`
+- drawer title: `Source details`
+- explanation: `These are the source values Sovereign used for this answer. They can inform reflection; they do not prove personality or current state.`
+
+The collapsed control must not show raw source codes. Exact source values appear only after the user explicitly opens source details.
+
+No active launch navigation item is named Worlds. No core authenticated answer requires video/media generation to be complete.
+
+## Pricing
+
+Free:
+
+- `Explore yourself with Sovereign.`
+- $0, permanent, no card.
+- Complete private Baseline Design.
+- 10 Sovereign AI turns each month.
+
+Sovereign+:
+
+- `Understand your people and the systems around you.`
+- $20 monthly or $99 annually.
+- 300 Sovereign AI turns each month.
+- Another person's Baseline may be used only when that person agrees.
+- Systems, Library, and optional Covenant are included.
+
+Support:
+
+- `Support Sovereign.OS`
+- voluntary one-time payment separate from Free and Sovereign+;
+- user chooses any amount beginning at $1;
+- support never changes plan status, ownership, influence, or promised access.
+
+Do not alter the live Sovereign+ prices, products, lookup keys, or server-enforced access without an explicit product-pricing decision. Do not include a video-generation charge or Worlds access in current launch pricing.
+
+## Retired and prohibited phrasing
+
+Never use these as active product/interface language:
+
+- `Ordinary questions. More context when it belongs.`;
+- `What is Basis?`;
+- `What does Basis prove?`;
+- `Basis` or `Example Basis` as an unexplained user-facing source label;
+- `server-approved`, `authorized references`, `provenance`, `evidence levels`, or `model context` as ordinary UI language;
+- `permitted context`, `consented people`, `permitted perspectives`, or `confirmed responsibilities` as the public explanation of People or Systems;
+- `exact source positions`, `Baseline profile`, `facet profile`, or `interpretive uncertainty` as onboarding UI language;
+- `One private reference beneath every question.` as a root marketing headline;
+- `One private foundation. More useful answers across the questions that shape your life.`;
+- `The same Baseline can support a decision, a recurring pattern, or a relationship question without flattening them into the same answer.`;
+- `Separate helping from carrying the outcome.` as the category heading for self exploration;
+- `See where responsibility keeps landing.` as the category heading for Systems;
+- `Understand both sides and what happens between you.`;
+- `foundation`, `personal foundation`, or `private foundation` as the primary public metaphor for Baseline;
+- `Ask about your life.`;
+- `Ask about your life. Get an answer built around you.`;
+- `What do you want to understand?`;
+- `Bring the question you already have.`;
+- generic variants such as `What would you like to explore?`, `Ask anything.`, or `Tell me what's on my mind.`;
+- `what is supported, interpreted, and still unknown` as a product explanation;
+- `support, interpretation, and unknowns distinguishable` as user-facing value language;
+- `server-confirmed Stripe subscription state` in customer-facing billing copy;
+- `authority` or `missing perspective` as canonical Systems intelligence dimensions;
+- questions that infer an absent person's perspective merely because that person is not participating.
+
+Also avoid:
+
+- `possible interaction vector`;
+- `emotional vector` or `vector` as user-facing labels for the Expression Field lines;
+- `calculated solution`;
+- `read` or `reading` as the product;
+- `your chart says`;
+- `the universe is telling you`;
+- `this transit means`;
+- `choose yourself`;
+- `return to yourself`;
+- `do the work`;
+- `one clean next move` as the whole value;
+- `healing journey`;
+- `unlock your potential`;
+- `become your highest self`;
+- generic `break the cycle` promises;
+- claims of motive, exact emotion, diagnosis, destiny, or guaranteed outcome.
