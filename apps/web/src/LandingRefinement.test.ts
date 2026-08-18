@@ -116,7 +116,7 @@ describe('public positioning reset', () => {
     expect(typography.indexOf('-apple-system')).toBeLessThan(typography.indexOf('"SF Pro Display"'));
     expect(sansAuthority.indexOf('-apple-system')).toBeLessThan(sansAuthority.indexOf('"SF Pro Display"'));
     expect(sansAuthority).not.toContain('PREMIUM_TITLE_SCALE_V2');
-    expect(sansAuthority).toContain('Optima and retired bundled display faces must not render in active titles.');
+    expect(sansAuthority).toContain('Rejected legacy display faces must not render in active titles.');
     expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
     expect(sansAuthority).toContain('font-family: var(--font-title) !important');
 
