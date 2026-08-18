@@ -21,25 +21,30 @@ describe('Baseline-required account journey release', () => {
     expect(onboarding).toContain('Choose a plan first. You’ll build your Baseline before the workspace opens.');
   });
 
-  it('captures structured birthplace context and explicit timezone confirmation', () => {
+  it('captures birthplace and timezone information without exposing implementation vocabulary', () => {
     expect(onboarding).toContain('birthplaceCity');
     expect(onboarding).toContain('birthplaceRegion');
     expect(onboarding).toContain('birthplaceCountry');
     expect(onboarding).toContain('timezoneConfirmed');
     expect(onboarding).toContain('I confirm this timezone for the birthplace and date.');
+    expect(onboarding).toContain('Sovereign will use the timezone you confirm here.');
     expect(onboarding).toContain("[form.birthplaceCity, form.birthplaceRegion, form.birthplaceCountry]");
     expect(onboarding).toContain("locationPrecision: 'city_or_regional'");
+    expect(onboarding).not.toContain('Choose a valid IANA timezone.');
+    expect(onboarding).not.toContain('Sovereign does not silently replace an unconfirmed timezone.');
   });
 
-  it('keeps raw birth data outside the language-model boundary and preserves uncertainty', () => {
-    expect(onboarding).toContain('Raw birth details and exact private location are not sent to the language model.');
+  it('keeps raw birth details out of the AI conversation and keeps uncertainty internal during onboarding', () => {
+    expect(onboarding).toContain('Your birth details are used to build your Baseline. They are not included in the AI conversation.');
     expect(onboarding).toContain("birthTimeCertainty: 'unknown'");
     expect(onboarding).toContain("form.birthTimeCertainty === 'unknown'");
     expect(onboarding).toContain('Time-dependent details will remain visibly limited rather than being guessed.');
-    expect(onboarding).toContain("baseline.uncertainty ?? 'stated in context'");
+    expect(onboarding).toContain('uncertainty?: string;');
+    expect(onboarding).not.toContain('Interpretive uncertainty');
+    expect(onboarding).not.toContain('Raw birth details and exact private location are not sent to the language model.');
   });
 
-  it('keeps a pending Baseline profile in real preparation until server readiness reports complete', () => {
+  it('keeps a pending Baseline interpretation in real preparation until server readiness reports complete', () => {
     expect(onboarding).toContain("if (response.status === 202)");
     expect(onboarding).toContain('await pollBaselineReadiness()');
     expect(onboarding).toContain("fetch('/api/v1/baseline/status'");
@@ -48,7 +53,7 @@ describe('Baseline-required account journey release', () => {
     expect(onboarding).toContain('BASELINE_POLL_ATTEMPTS');
   });
 
-  it('uses real request/readiness state instead of timer-driven fake calculation progress', () => {
+  it('uses real request/readiness state while presenting only approved progress language', () => {
     expect(onboarding).toContain("setBaselineStage('validating')");
     expect(onboarding).toContain("setBaselineStage('calculating')");
     expect(onboarding).toContain("setBaselineStage('preparing')");
@@ -56,6 +61,21 @@ describe('Baseline-required account journey release', () => {
     expect(onboarding).toContain("setBaselineStage('complete')");
     expect(onboarding).toContain('baselinePollDelay(BASELINE_POLL_INTERVAL_MS)');
     expect(onboarding).not.toContain('window.setInterval(');
+    for (const marker of ['Checking your details', 'Building your Baseline', 'Preparing your Baseline', 'Opening Sovereign.OS']) {
+      expect(onboarding).toContain(marker);
+    }
+    for (const retired of ['Calculating source positions', 'Calculating your exact source positions', 'Preparing your Baseline profile', 'Baseline readiness returned no state']) {
+      expect(onboarding).not.toContain(retired);
+    }
+  });
+
+  it('does not render backend readiness or checkout messages as product copy', () => {
+    expect(onboarding).not.toContain('setStatus(nextBaseline.readinessMessage');
+    expect(onboarding).not.toContain('setStatus(body.message');
+    expect(onboarding).not.toContain('setStatus(data.error');
+    expect(onboarding).not.toContain('throw new Error(body.message || body.error');
+    expect(onboarding).toContain('Sovereign could not finish building your Baseline. Try again.');
+    expect(onboarding).toContain('Secure checkout is temporarily unavailable. You can continue with Free and build your Baseline now.');
   });
 
   it('does not ask an already-onboarded Free user to choose a plan again after Baseline completion', () => {
@@ -65,18 +85,28 @@ describe('Baseline-required account journey release', () => {
     expect(onboarding).toContain("location.replace('/app')");
   });
 
-  it('keeps Free legitimate and makes paid cadence and the live-price handoff explicit', () => {
+  it('keeps Free legitimate and makes paid cadence and the checkout handoff explicit', () => {
     expect(onboarding).toContain("useState<BillingInterval>('monthly')");
     expect(onboarding).toContain('Continue with Free');
     expect(onboarding).toContain('Monthly billing');
     expect(onboarding).toContain('Annual billing');
-    expect(onboarding).toContain('Stripe checkout shows the current price before you confirm.');
+    expect(onboarding).toContain('Secure checkout shows the current price before you confirm.');
     expect(onboarding).not.toMatch(/\$99|\$20|\$8\.25|save \$141/);
     expect(onboarding).toContain('Secure checkout is temporarily unavailable. You can continue with Free and build your Baseline now.');
     expect(onboarding).toContain("fetch('/api/v1/billing/checkout'");
   });
 
-  it('does not complete Sovereign+ onboarding until the server-confirmed Stripe entitlement is effective', () => {
+  it('describes Free and Sovereign+ in product language rather than entitlement language', () => {
+    expect(onboarding).toContain('Free lets you explore yourself with your Baseline.');
+    expect(onboarding).toContain('Explore yourself with Sovereign.');
+    expect(onboarding).toContain('Understand your people and the systems around you.');
+    expect(onboarding).toContain('Use another person’s Baseline only when they agree');
+    expect(onboarding).toContain('Private invitations and sharing controls');
+    expect(onboarding).not.toContain('permission-based relationship and system context');
+    expect(onboarding).not.toContain('Permission-aware invitations and controls');
+  });
+
+  it('does not complete Sovereign+ onboarding until the server-confirmed paid plan is effective', () => {
     const confirmStart = onboarding.indexOf('async function confirm(plan: Plan)');
     const completeStart = onboarding.indexOf('async function completeOnboarding', confirmStart);
     const confirmBody = onboarding.slice(confirmStart, completeStart);
@@ -98,13 +128,16 @@ describe('Baseline-required account journey release', () => {
     expect(onboarding).toContain("await completeOnboarding('free')");
   });
 
-  it('waits through a delayed Stripe webhook without opening paid access or starting checkout again', () => {
+  it('waits through delayed payment confirmation without opening paid access or starting checkout again', () => {
     expect(workspaceGate).toContain("billingReturn === 'success'");
     expect(workspaceGate).toContain('STRIPE_CONFIRMATION_ATTEMPTS = 12');
     expect(workspaceGate).toContain('await waitForStripeConfirmation(controller.signal)');
     expect(workspaceGate).toContain("setState('payment_pending')");
-    expect(workspaceGate).toContain('the signed subscription event has not reached your account yet');
-    expect(workspaceGate).toContain('checking again will not create another charge');
+    expect(workspaceGate).toContain('Your checkout returned successfully, but Sovereign+ is not active on your account yet.');
+    expect(workspaceGate).toContain('Checking again will not create another charge.');
+    expect(workspaceGate).not.toContain('signed subscription event');
+    expect(workspaceGate).not.toContain('authoritative event');
+    expect(workspaceGate).not.toContain('signed Stripe entitlement');
     expect(workspaceGate).not.toContain("fetch('/api/v1/billing/checkout'");
   });
 
@@ -125,7 +158,7 @@ describe('Baseline-required account journey release', () => {
     expect(auth).toContain("parsed.pathname === '/onboarding'");
   });
 
-  it('inherits the frozen landing language across desktop, iOS, account, and workspace surfaces', () => {
+  it('inherits the landing visual language across desktop, iOS, account, and workspace surfaces', () => {
     expect(styles).toContain('letter-spacing: 0.22em');
     expect(styles).toContain('env(safe-area-inset-top)');
     expect(styles).toContain('env(safe-area-inset-bottom)');
