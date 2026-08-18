@@ -4,7 +4,7 @@ import type { FormEvent, ReactNode } from 'react';
 type Plan = 'free' | 'sovereign_plus';
 type BillingInterval = 'monthly' | 'annual';
 type JourneyPhase = 'loading' | 'baseline' | 'baseline_building' | 'baseline_result' | 'plan' | 'error';
-type BaselineStage = 'idle' | 'validating' | 'calculating' | 'complete';
+type BaselineStage = 'idle' | 'validating' | 'calculating' | 'preparing' | 'opening' | 'complete';
 type BirthTimeCertainty = 'exact' | 'approximate' | 'unknown';
 type BaselineField =
   | 'birthDate'
@@ -47,6 +47,8 @@ type BaselineForm = {
 type BaselineErrors = Record<BaselineField, string>;
 
 const PLAN_CHOICE_KEY = 'sovereign:onboarding-plan-choice';
+const BASELINE_POLL_ATTEMPTS = 48;
+const BASELINE_POLL_INTERVAL_MS = 1_250;
 
 const emptyErrors = (): BaselineErrors => ({
   birthDate: '',
@@ -60,8 +62,8 @@ const emptyErrors = (): BaselineErrors => ({
 const baselineStages = [
   'Checking time and place',
   'Calculating source positions',
-  'Translating the result',
-  'Preparing your first overview'
+  'Preparing your Baseline profile',
+  'Opening your workspace'
 ] as const;
 
 export function PlanOnboarding() {
@@ -217,7 +219,8 @@ export function PlanOnboarding() {
       };
 
       setBaselineStage('calculating');
-      setStatus('Calculating source positions and translating the result…');
+      setStatus('Calculating your exact source positions…');
+
       const response = await fetch('/api/v1/baseline/onboarding', {
         method: 'POST',
         credentials: 'same-origin',
@@ -232,44 +235,35 @@ export function PlanOnboarding() {
         location.replace('/login?returnTo=%2Fonboarding');
         return;
       }
-      const body = await response.json().catch(() => ({})) as { baseline?: BaselineStatus; error?: string; message?: string };
+
+      const body = await response.json().catch(() => ({})) as {
+        baseline?: BaselineStatus;
+        error?: string;
+        message?: string;
+      };
+
       if (!response.ok || !body.baseline) {
         throw new Error(body.message || body.error || 'Your Baseline could not be completed yet.');
       }
 
       setBaseline(body.baseline);
+
+      if (response.status === 202) {
+        setBaselineStage('preparing');
+        setStatus(body.message || 'Your exact source is saved. Preparing your Baseline profile…');
+        const prepared = await pollBaselineReadiness();
+        await openReadyBaseline(prepared);
+        return;
+      }
+
       if (!baselineIsReady(body.baseline)) {
         setPhase('baseline');
         setBaselineStage('idle');
-        setStatus(body.baseline.readinessMessage || body.message || 'Your source data is saved, but the Baseline interpretation is not ready yet. Try Baseline again.');
+        setStatus(body.baseline.readinessMessage || body.message || 'Your source data is saved, but the Baseline profile is not ready yet. Try Baseline again.');
         return;
       }
 
-      setBaselineStage('complete');
-
-      if (accountAlreadyOnboarded) {
-        clearPlanChoice();
-        setStatus('Your Baseline is ready. Opening your workspace…');
-        location.replace('/app');
-        return;
-      }
-      if (currentPlan === 'sovereign_plus') {
-        setStatus('Your Baseline is ready. Opening your Sovereign+ workspace…');
-        await completeOnboarding('sovereign_plus');
-        clearPlanChoice();
-        location.replace('/app');
-        return;
-      }
-      if (selectedPlan === 'free' || readPlanChoice() === 'free') {
-        setStatus('Your Baseline is ready. Opening your Free workspace…');
-        await completeOnboarding('free');
-        clearPlanChoice();
-        location.replace('/app');
-        return;
-      }
-
-      setPhase('baseline_result');
-      setStatus('Your Baseline is ready.');
+      await openReadyBaseline(body.baseline);
     } catch (error) {
       setPhase('baseline');
       setBaselineStage('idle');
@@ -277,6 +271,91 @@ export function PlanOnboarding() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  async function pollBaselineReadiness(): Promise<BaselineStatus> {
+    for (let attempt = 0; attempt < BASELINE_POLL_ATTEMPTS; attempt += 1) {
+      if (attempt > 0) await baselinePollDelay(BASELINE_POLL_INTERVAL_MS);
+
+      const response = await fetch('/api/v1/baseline/status', {
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: { accept: 'application/json' }
+      });
+
+      if (response.status === 401) {
+        location.replace('/login?returnTo=%2Fonboarding');
+        throw new Error('Sign-in required.');
+      }
+
+      if (!response.ok) {
+        throw new Error('Baseline readiness could not be checked.');
+      }
+
+      const body = await response.json().catch(() => ({})) as { baseline?: BaselineStatus };
+      const nextBaseline = body.baseline;
+      if (!nextBaseline) throw new Error('Baseline readiness returned no state.');
+
+      setBaseline(nextBaseline);
+
+      if (baselineIsReady(nextBaseline)) return nextBaseline;
+
+      if (nextBaseline.readinessState === 'source_computing') {
+        setBaselineStage('calculating');
+        setStatus(nextBaseline.readinessMessage || 'Calculating your exact source positions…');
+        continue;
+      }
+
+      if (
+        nextBaseline.readinessState === 'facet_profile_preparing'
+        || nextBaseline.status === 'preparing'
+      ) {
+        setBaselineStage('preparing');
+        setStatus(nextBaseline.readinessMessage || 'Preparing your Baseline profile…');
+        continue;
+      }
+
+      throw new Error(
+        nextBaseline.readinessMessage
+        || 'Your Baseline needs another attempt before the workspace can open.'
+      );
+    }
+
+    throw new Error(
+      'Your exact Baseline source is saved, but the Baseline profile is taking longer than expected. Try again to continue from the saved source.'
+    );
+  }
+
+  async function openReadyBaseline(nextBaseline: BaselineStatus) {
+    setBaseline(nextBaseline);
+    setBaselineStage('opening');
+
+    if (accountAlreadyOnboarded) {
+      clearPlanChoice();
+      setStatus('Your Baseline is ready. Opening your workspace…');
+      location.replace('/app');
+      return;
+    }
+
+    if (currentPlan === 'sovereign_plus') {
+      setStatus('Your Baseline is ready. Opening your Sovereign+ workspace…');
+      await completeOnboarding('sovereign_plus');
+      clearPlanChoice();
+      location.replace('/app');
+      return;
+    }
+
+    if (selectedPlan === 'free' || readPlanChoice() === 'free') {
+      setStatus('Your Baseline is ready. Opening your Free workspace…');
+      await completeOnboarding('free');
+      clearPlanChoice();
+      location.replace('/app');
+      return;
+    }
+
+    setBaselineStage('complete');
+    setPhase('baseline_result');
+    setStatus('Your Baseline is ready.');
   }
 
   async function confirm(plan: Plan) {
@@ -420,15 +499,6 @@ export function PlanOnboarding() {
           )}
         </section>
 
-        <aside className="plan-visual" aria-label="Why your Baseline is required before the workspace">
-          <div className="onboarding-baseline-preview">
-            <span>YOUR BASELINE</span>
-            <h2>The personal foundation behind every Sovereign answer.</h2>
-            <p>Choose your level of access, then build the Baseline Sovereign needs before your private workspace opens.</p>
-            <div><strong>Plain-language understanding</strong><small>Exact approved Basis remains available beneath it.</small></div>
-          </div>
-          <p>Your plan changes access. Your Baseline remains the private foundation for the questions you choose to explore.</p>
-        </aside>
       </div>
     </main>
   );
@@ -459,7 +529,7 @@ function BaselineFormView({
     <>
       <p className="eyebrow">BUILD YOUR BASELINE</p>
       <h1>Build your Baseline.</h1>
-      <p className="plan-intro">Add your birth details to create the personal foundation Sovereign uses across self, decisions, relationships, and systems.</p>
+      <p className="plan-intro">Add the birth details you know to build the private Baseline Sovereign uses across self, decisions, relationships, and systems.</p>
       {notice && <p className="plan-status baseline-retry-status" role="status" aria-live="polite">{notice}</p>}
 
       <form className="baseline-onboarding-form" onSubmit={onSubmit} noValidate>
@@ -655,7 +725,7 @@ function PlanChoiceView({ interval, currentPlan, status, submitting, checkoutUna
       <div className="onboarding-plan-grid">
         <article className={currentPlan === 'free' ? 'current' : ''}>
           <header><span>FREE</span><strong>$0</strong></header>
-          <h2>Your personal foundation.</h2>
+          <h2>Your personal Baseline.</h2>
           <p>Use your private Baseline across Today, Explore, decisions, recurring patterns, Shadow and Gift, and Alignment.</p>
           <ul>
             <li>Complete private Baseline Design</li>
@@ -730,6 +800,10 @@ function validateBaseline(form: BaselineForm): BaselineErrors {
   return errors;
 }
 
+function baselinePollDelay(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
 function localDateToday(): string {
   const now = new Date();
   const offset = now.getTimezoneOffset() * 60_000;
@@ -784,11 +858,17 @@ function progressState(phase: JourneyPhase) {
 
 function stageState(current: BaselineStage, index: number): 'complete' | 'active' | 'upcoming' {
   if (current === 'complete') return 'complete';
-  if (current === 'calculating') {
-    if (index === 0) return 'complete';
-    if (index === 1) return 'active';
-    return 'upcoming';
-  }
-  if (current === 'validating' && index === 0) return 'active';
+  const activeIndex = current === 'validating'
+    ? 0
+    : current === 'calculating'
+      ? 1
+      : current === 'preparing'
+        ? 2
+        : current === 'opening'
+          ? 3
+          : -1;
+  if (activeIndex < 0) return 'upcoming';
+  if (index < activeIndex) return 'complete';
+  if (index === activeIndex) return 'active';
   return 'upcoming';
 }

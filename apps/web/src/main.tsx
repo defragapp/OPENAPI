@@ -104,8 +104,8 @@ function installPlatformVisualCohesion(): void {
   style.textContent += `\n${landingLiveRefinementV5Css}`;
   style.textContent += `\n${invitationRenderedFidelityCss}`;
   style.textContent += `\n${workspaceProductionRefinementCss}`;
-  style.textContent += `\n${authenticatedLaunchCohesionCss}`;
   style.textContent += `\n${premiumActionAuthorityCss}`;
+  style.textContent += `\n${authenticatedLaunchCohesionCss}`;
   style.textContent += `\n${sansTypographyAuthorityCss}`;
   document.head.append(style);
 }

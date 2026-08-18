@@ -263,15 +263,27 @@ app.get('/api/v1/you', async (context) => {
 app.post('/api/v1/baseline/onboarding', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
-  const result = await persistBaseline(context.env, auth.accountId, await context.req.json());
+  const result = await persistBaseline(
+    context.env,
+    auth.accountId,
+    await context.req.json(),
+    {
+      deferFacetProfile: (task) => context.executionCtx.waitUntil(task)
+    }
+  );
   if (!result.ready) {
+    const responseStatus: 202 | 409 | 503 = result.readinessState === 'facet_profile_preparing'
+      ? 202
+      : result.status === 'partial'
+        ? 503
+        : 409;
     return context.json({
       type: 'https://sovereign.defrag.app/problems/baseline-not-ready',
       error: result.readinessState,
       message: result.message,
       nextAction: result.nextAction,
       baseline: result
-    }, result.status === 'partial' ? 503 : 409);
+    }, responseStatus);
   }
   return context.json({ baseline: result }, 201);
 });

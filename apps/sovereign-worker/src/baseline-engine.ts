@@ -158,21 +158,33 @@ export function createOpenApiBaselineProvider(env: Env, fetchImpl: FetchLike = f
 
 async function computeNatalPositions(env: Env, instant: Date, fetchImpl: FetchLike): Promise<Record<string, BodyPosition>> {
   const positions: Record<string, BodyPosition> = {};
-  for (const [body, targetId] of Object.entries(PLANET_IDS)) {
-    if (Object.keys(positions).length > 0) await delay(125);
-    const rows = await fetchHorizonsRows(env, targetId, instant, fetchImpl);
-    if (!rows.length) continue;
-    const first = rows[0]!;
-    const second = rows[1];
-    const sign = longitudeToSign(first.longitude);
-    positions[body] = {
-      longitude: first.longitude,
-      latitude: first.latitude,
-      retrograde: Boolean(second && signedLongitudeDelta(first.longitude, second.longitude) < 0),
-      sign: sign.sign,
-      degree: sign.degree
-    };
+  const entries = Object.entries(PLANET_IDS);
+  const batchSize = 3;
+
+  for (let offset = 0; offset < entries.length; offset += batchSize) {
+    const batch = entries.slice(offset, offset + batchSize);
+    const resolved = await Promise.all(batch.map(async ([body, targetId]) => {
+      const rows = await fetchHorizonsRows(env, targetId, instant, fetchImpl);
+      if (!rows.length) return null;
+      const first = rows[0]!;
+      const second = rows[1];
+      const sign = longitudeToSign(first.longitude);
+      return [body, {
+        longitude: first.longitude,
+        latitude: first.latitude,
+        retrograde: Boolean(second && signedLongitudeDelta(first.longitude, second.longitude) < 0),
+        sign: sign.sign,
+        degree: sign.degree
+      }] as const;
+    }));
+
+    for (const result of resolved) {
+      if (result) positions[result[0]] = result[1];
+    }
+
+    if (offset + batchSize < entries.length) await delay(125);
   }
+
   return positions;
 }
 

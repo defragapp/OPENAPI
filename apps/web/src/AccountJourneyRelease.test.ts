@@ -39,21 +39,23 @@ describe('Baseline-required account journey release', () => {
     expect(onboarding).toContain("baseline.uncertainty ?? 'stated in context'");
   });
 
-  it('does not advance while the Baseline profile is still pending', () => {
-    const pendingCheck = onboarding.indexOf('if (!baselineIsReady(body.baseline))');
-    const readyResult = onboarding.indexOf("setPhase('baseline_result')", pendingCheck);
-    expect(pendingCheck).toBeGreaterThan(-1);
-    expect(onboarding.slice(pendingCheck, readyResult)).toContain("setPhase('baseline')");
-    expect(onboarding.slice(pendingCheck, readyResult)).toContain("setBaselineStage('idle')");
-    expect(onboarding.slice(pendingCheck, readyResult)).toContain('body.baseline.readinessMessage');
+  it('keeps a pending Baseline profile in real preparation until server readiness reports complete', () => {
+    expect(onboarding).toContain("if (response.status === 202)");
+    expect(onboarding).toContain('await pollBaselineReadiness()');
+    expect(onboarding).toContain("fetch('/api/v1/baseline/status'");
+    expect(onboarding).toContain("nextBaseline.readinessState === 'facet_profile_preparing'");
+    expect(onboarding).toContain("setBaselineStage('preparing')");
+    expect(onboarding).toContain('BASELINE_POLL_ATTEMPTS');
   });
 
-  it('uses request state rather than timer-driven fake calculation progress', () => {
+  it('uses real request/readiness state instead of timer-driven fake calculation progress', () => {
     expect(onboarding).toContain("setBaselineStage('validating')");
     expect(onboarding).toContain("setBaselineStage('calculating')");
+    expect(onboarding).toContain("setBaselineStage('preparing')");
+    expect(onboarding).toContain("setBaselineStage('opening')");
     expect(onboarding).toContain("setBaselineStage('complete')");
+    expect(onboarding).toContain('baselinePollDelay(BASELINE_POLL_INTERVAL_MS)');
     expect(onboarding).not.toContain('window.setInterval(');
-    expect(onboarding).not.toContain('window.setTimeout(');
   });
 
   it('does not ask an already-onboarded Free user to choose a plan again after Baseline completion', () => {

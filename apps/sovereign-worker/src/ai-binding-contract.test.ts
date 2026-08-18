@@ -11,8 +11,8 @@ describe('Workers AI production request contract', () => {
   });
 
   it('uses the supported GLM prompt and completion-token fields for Baseline facet generation', () => {
-    expect(facets).toContain('{ prompt, max_completion_tokens: 6_000 }');
-    expect(facets).not.toContain('{ input: prompt, max_output_tokens: 6_000 }');
+    expect(facets).toContain('{ prompt, max_completion_tokens: 4_200 }');
+    expect(facets).not.toContain('{ input: prompt, max_output_tokens: 4_200 }');
   });
 
   it('keeps the privacy-preserving AI Gateway options on both production model calls', () => {

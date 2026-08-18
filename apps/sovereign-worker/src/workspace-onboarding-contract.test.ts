@@ -64,6 +64,17 @@ describe('account onboarding, recovery, and conversation persistence', () => {
     expect(baseline).toContain('validateFacetProfileBasis(profile.data, registry)');
   });
 
+  it('persists exact Baseline source before deferred facet preparation and exposes real readiness polling', () => {
+    expect(index).toContain('deferFacetProfile: (task) => context.executionCtx.waitUntil(task)');
+    expect(index).toContain("result.readinessState === 'facet_profile_preparing'");
+    expect(index).toContain('? 202');
+    expect(baseline).toContain('options.deferFacetProfile');
+    expect(baseline).toContain("reducedContext.facetProfileStatus = 'pending'");
+    expect(baseline).toContain("latest.facetProfileStatus = 'ready'");
+    expect(baseline).toContain("latest.facetProfileStatus = 'retryable'");
+    expect(onboarding).toContain('pollBaselineReadiness');
+  });
+
   it('resumes onboarding until both source and facet profile are ready', () => {
     for (const source of [onboarding, authenticatedWorkspace, workspace]) {
       expect(source).toContain("status === 'completed'");

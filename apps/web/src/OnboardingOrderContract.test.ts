@@ -35,7 +35,7 @@ describe('production onboarding order', () => {
   });
 
   it('uses the canonical plain-language Baseline explanation', () => {
-    expect(onboarding).toContain('Add your birth details to create the personal foundation Sovereign uses across self, decisions, relationships, and systems.');
+    expect(onboarding).toContain('Add the birth details you know to build the private Baseline Sovereign uses across self, decisions, relationships, and systems.');
     expect(onboarding).not.toContain('seeing the capacity beneath patterns');
   });
 });

@@ -96,6 +96,7 @@ async function generateFacetProfile(env: Env, source: BaselineSourceData, model:
 This is interpretive reflection, not psychological measurement. Do not diagnose, predict, infer hidden motives, or fill missing values.
 Use ordinary adult language. Make every shadow and gift behaviorally specific. Shadow and Gift are two expressions of the same valid quality, not bad and good identities.
 Every facet must cite one or more exact basisRefs from the allowed registry. Use IDs only. Never write a new ID.
+Keep each description, shadowExpression, and giftExpression to one concise sentence. Use exactly two alignmentMarkers per facet.
 Return JSON only.
 
 Required facet IDs, exactly once and in this order:
@@ -128,7 +129,7 @@ ${JSON.stringify(registry.map(({ id, display, uncertainty }) => ({ id, display, 
 
   const result = await env.AI.run(
     model,
-    { prompt, max_completion_tokens: 6_000 },
+    { prompt, max_completion_tokens: 4_200 },
     {
       gateway: {
         id: env.AI_GATEWAY_ID,

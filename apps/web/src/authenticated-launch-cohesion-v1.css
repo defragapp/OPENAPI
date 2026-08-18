@@ -258,6 +258,326 @@
   box-shadow: 0 0 0 4px rgba(242, 237, 229, 0.05) !important;
 }
 
+
+/* ONBOARDING + POLICY ACCEPTANCE ----------------------------------------- */
+.plan-onboarding[data-onboarding-phase="baseline"] .plan-layout,
+.plan-onboarding[data-onboarding-phase="baseline_building"] .plan-layout,
+.plan-onboarding[data-onboarding-phase="baseline_result"] .plan-layout,
+.plan-onboarding[data-onboarding-phase="loading"] .plan-layout,
+.plan-onboarding[data-onboarding-phase="error"] .plan-layout {
+  grid-template-columns: minmax(0, 1fr) !important;
+  width: min(960px, calc(100% - 64px)) !important;
+  padding-top: clamp(46px, 6vw, 76px) !important;
+}
+
+.plan-onboarding[data-onboarding-phase="baseline"] .plan-choice,
+.plan-onboarding[data-onboarding-phase="baseline_building"] .plan-choice,
+.plan-onboarding[data-onboarding-phase="baseline_result"] .plan-choice,
+.plan-onboarding[data-onboarding-phase="loading"] .plan-choice,
+.plan-onboarding[data-onboarding-phase="error"] .plan-choice {
+  display: grid !important;
+  width: 100% !important;
+  max-width: 900px !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0 !important;
+  margin-inline: auto !important;
+}
+
+.plan-onboarding[data-onboarding-phase="baseline"] .plan-choice > *,
+.plan-onboarding[data-onboarding-phase="baseline_building"] .plan-choice > *,
+.plan-onboarding[data-onboarding-phase="baseline_result"] .plan-choice > *,
+.plan-onboarding[data-onboarding-phase="loading"] .plan-choice > *,
+.plan-onboarding[data-onboarding-phase="error"] .plan-choice > * {
+  grid-column: 1 !important;
+}
+
+.plan-onboarding .onboarding-progress {
+  display: grid !important;
+  width: 100% !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+  margin-bottom: clamp(42px, 5vw, 62px) !important;
+  padding-bottom: 18px !important;
+  border-bottom: 1px solid var(--launch-line) !important;
+}
+
+.plan-onboarding .onboarding-progress li {
+  min-width: 0 !important;
+  font-size: 0.7rem !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0.08em !important;
+}
+
+.plan-onboarding .plan-choice > h1,
+.plan-onboarding .baseline-building-state > h1,
+.plan-onboarding .baseline-result-state > h1,
+.plan-onboarding .onboarding-message > h1 {
+  max-width: 11ch !important;
+  margin: 15px 0 20px !important;
+  font-size: clamp(3.2rem, 5.2vw, 5rem) !important;
+  line-height: 0.94 !important;
+  letter-spacing: -0.052em !important;
+}
+
+.plan-onboarding .plan-intro {
+  max-width: 62ch !important;
+  margin: 0 !important;
+  color: var(--launch-muted) !important;
+  font-size: 1rem !important;
+  line-height: 1.68 !important;
+}
+
+.plan-onboarding .baseline-onboarding-form {
+  width: 100% !important;
+  max-width: 900px !important;
+  gap: 24px !important;
+  margin-top: 36px !important;
+  padding: clamp(28px, 4vw, 40px) !important;
+  border-radius: 18px !important;
+}
+
+.plan-onboarding .baseline-form-grid {
+  gap: 18px !important;
+}
+
+.plan-onboarding .baseline-field > span,
+.plan-onboarding .baseline-certainty-fieldset legend {
+  color: var(--launch-muted) !important;
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+}
+
+.plan-onboarding .baseline-field small,
+.plan-onboarding .baseline-timezone-confirmation small,
+.plan-onboarding .baseline-limited-note,
+.plan-onboarding .baseline-current-location-note,
+.plan-onboarding .baseline-privacy-boundary {
+  font-size: 0.82rem !important;
+  line-height: 1.55 !important;
+}
+
+.plan-onboarding .primary-button,
+.policy-review-gate > section > button {
+  display: inline-flex !important;
+  min-width: 190px !important;
+  min-height: 52px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 22px !important;
+  border: 1px solid rgba(232, 221, 208, 0.82) !important;
+  border-radius: 9px !important;
+  background: #e8ddd0 !important;
+  color: #111213 !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3) !important;
+  font-weight: 720 !important;
+  text-align: center !important;
+}
+
+.plan-onboarding .primary-button:hover,
+.policy-review-gate > section > button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.38) !important;
+}
+
+.plan-onboarding .baseline-building-state {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr) !important;
+  gap: clamp(38px, 6vw, 72px) !important;
+  align-items: center !important;
+}
+
+.plan-onboarding .baseline-building-state > .eyebrow,
+.plan-onboarding .baseline-building-state > h1 {
+  grid-column: 1 !important;
+}
+
+.plan-onboarding .baseline-building-state > .baseline-progress-light,
+.plan-onboarding .baseline-building-state > ol,
+.plan-onboarding .baseline-building-state > p:last-child {
+  grid-column: 2 !important;
+}
+
+.plan-onboarding .baseline-building-state > .baseline-progress-light {
+  width: 100% !important;
+  min-height: 170px !important;
+}
+
+.plan-onboarding .baseline-building-state > ol {
+  display: grid !important;
+  gap: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.plan-onboarding .baseline-building-state > ol li {
+  min-height: 58px !important;
+  padding: 10px 0 !important;
+  border-top: 1px solid var(--launch-line) !important;
+}
+
+.plan-onboarding .baseline-building-state > ol li:last-child {
+  border-bottom: 1px solid var(--launch-line) !important;
+}
+
+.policy-review-gate {
+  display: grid !important;
+  min-height: 100svh !important;
+  place-items: center !important;
+  padding: 104px 48px 64px !important;
+}
+
+.policy-review-gate > section {
+  display: grid !important;
+  width: min(1080px, calc(100vw - 96px)) !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr) !important;
+  gap: 14px clamp(56px, 7vw, 92px) !important;
+  align-items: start !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.policy-review-gate > section > span,
+.policy-review-gate > section > h1,
+.policy-review-gate > section > p:not([role="alert"]) {
+  grid-column: 1 !important;
+}
+
+.policy-review-gate > section > .policy-review-links,
+.policy-review-gate > section > .approval-check,
+.policy-review-gate > section > p[role="alert"],
+.policy-review-gate > section > button {
+  grid-column: 2 !important;
+}
+
+.policy-review-gate > section > span {
+  color: var(--launch-faint) !important;
+  font-size: 0.66rem !important;
+  font-weight: 720 !important;
+  letter-spacing: 0.16em !important;
+}
+
+.policy-review-gate > section > h1 {
+  max-width: 11ch !important;
+  margin: 18px 0 22px !important;
+  font-size: clamp(3.5rem, 5.3vw, 5.65rem) !important;
+  line-height: 0.93 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.policy-review-gate > section > p:not([role="alert"]) {
+  max-width: 52ch !important;
+  margin: 0 !important;
+  color: var(--launch-muted) !important;
+  font-size: 0.98rem !important;
+  line-height: 1.68 !important;
+}
+
+.policy-review-gate .policy-review-links {
+  display: flex !important;
+  gap: 22px !important;
+  margin-bottom: 18px !important;
+  padding-bottom: 18px !important;
+  border-bottom: 1px solid var(--launch-line) !important;
+}
+
+.policy-review-gate .policy-review-links a {
+  color: var(--launch-ink) !important;
+  text-underline-offset: 4px !important;
+}
+
+.policy-review-gate .approval-check {
+  display: grid !important;
+  min-height: 58px !important;
+  grid-template-columns: 22px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 13px !important;
+  padding: 12px 0 !important;
+  border-bottom: 1px solid var(--launch-line) !important;
+  color: var(--launch-muted) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.45 !important;
+}
+
+.policy-review-gate .approval-check input {
+  width: 20px !important;
+  height: 20px !important;
+  accent-color: #e8ddd0 !important;
+}
+
+.policy-review-gate > section > button {
+  justify-self: start !important;
+  margin-top: 18px !important;
+}
+
+@media (max-width: 820px) {
+  .plan-onboarding[data-onboarding-phase="baseline"] .plan-layout,
+  .plan-onboarding[data-onboarding-phase="baseline_building"] .plan-layout,
+  .plan-onboarding[data-onboarding-phase="baseline_result"] .plan-layout,
+  .plan-onboarding[data-onboarding-phase="loading"] .plan-layout,
+  .plan-onboarding[data-onboarding-phase="error"] .plan-layout {
+    width: calc(100% - 32px) !important;
+    padding-top: 32px !important;
+  }
+
+  .plan-onboarding .onboarding-progress {
+    gap: 8px !important;
+    margin-bottom: 32px !important;
+  }
+
+  .plan-onboarding .onboarding-progress li {
+    display: grid !important;
+    justify-items: center !important;
+    gap: 7px !important;
+    text-align: center !important;
+  }
+
+  .plan-onboarding .baseline-building-state {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  .plan-onboarding .baseline-building-state > * {
+    grid-column: 1 !important;
+  }
+
+  .plan-onboarding .baseline-building-state > .baseline-progress-light {
+    min-height: 120px !important;
+  }
+
+  .policy-review-gate {
+    align-items: start !important;
+    padding: calc(84px + env(safe-area-inset-top)) 16px calc(44px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .policy-review-gate > section {
+    width: min(100%, 620px) !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .policy-review-gate > section > * {
+    grid-column: 1 !important;
+  }
+
+  .policy-review-gate > section > h1 {
+    max-width: 10ch !important;
+    font-size: clamp(2.7rem, 11vw, 4rem) !important;
+  }
+
+  .policy-review-gate .policy-review-links {
+    margin-top: 24px !important;
+  }
+
+  .policy-review-gate > section > button,
+  .plan-onboarding .baseline-onboarding-form > .primary-button {
+    width: 100% !important;
+  }
+}
+
 /* AUTHENTICATED MOBILE UTILITIES ---------------------------------------- */
 @media (max-width: 820px) {
   .workspace-mobile-utilities-heading > span {

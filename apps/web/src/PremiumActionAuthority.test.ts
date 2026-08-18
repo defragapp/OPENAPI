@@ -6,10 +6,12 @@ const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'u
 const css = readFileSync(new URL('./premium-action-authority-v1.css', import.meta.url), 'utf8');
 
 describe('premium action authority', () => {
-  it('loads the de-buttoning authority after authenticated launch cohesion', () => {
+  it('loads editorial action authority before authenticated launch cohesion restores critical private actions', () => {
     expect(main).toContain("import premiumActionAuthorityCss from './premium-action-authority-v1.css?inline'");
     expect(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'))
-      .toBeGreaterThan(main.indexOf('style.textContent += `\\n${authenticatedLaunchCohesionCss}`;'));
+      .toBeGreaterThan(main.indexOf('style.textContent += `\\n${workspaceProductionRefinementCss}`;'));
+    expect(main.indexOf('style.textContent += `\\n${authenticatedLaunchCohesionCss}`;'))
+      .toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
   });
 
   it('uses one acquisition vocabulary without duplicate hero/final CTAs', () => {

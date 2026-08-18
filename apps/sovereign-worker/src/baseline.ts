@@ -191,7 +191,12 @@ function reduceComputedBaseline(certainty: BirthTimeCertainty, computed: Baselin
 }
 function modelSafeContext(certainty: BirthTimeCertainty, providerStatus: string, availability: Record<string, string>) { return { baselineTendency: 'Enduring tendency is represented as reduced interpretive language, not a diagnosis.', currentAmplification: 'Current conditions are computed separately and never determine behavior.', userObservation: 'No observed behavior is assumed until supplied by the user.', interpretiveSignals: Object.entries(availability).filter(([, state]) => state === 'available' || state === 'partial').map(([name]) => name), systemInference: providerStatus === 'computed' ? 'Structured deterministic reduction is available.' : 'Structured deterministic reduction is unavailable.', uncertainty: certainty === 'unknown' ? 'high' : 'stated', unknownActualState: 'Actual state remains unknown unless the user confirms it.' }; }
 
-export async function persistBaseline(env: Env, accountId: string, input: BaselineInput) {
+export async function persistBaseline(
+  env: Env,
+  accountId: string,
+  input: BaselineInput,
+  options: { deferFacetProfile?: (task: Promise<void>) => void } = {}
+) {
   const computed = await computeConfiguredBaseline(env, input);
   const protectedInput = {
     birthDateHash: await sha256(input.birthDate ?? ''),
@@ -202,35 +207,106 @@ export async function persistBaseline(env: Env, accountId: string, input: Baseli
     locationPrecision: input.locationPrecision ?? 'city_or_regional'
   };
   const inputHash = await sha256(JSON.stringify(protectedInput));
-  const parsedSource = baselineSourceDataSchema.safeParse(asRecord(computed.reducedContext).sourceData);
-  let facetProfile = null;
-  if (parsedSource.success) {
-    facetProfile = await ensureBaselineFacetProfile(env, {
-      accountId,
-      inputHash,
-      source: parsedSource.data
-    }).catch(() => null);
-    (computed.reducedContext as Record<string, unknown>).facetProfile = facetProfile;
-    (computed.reducedContext as Record<string, unknown>).facetProfileStatus = facetProfile ? 'ready' : 'pending';
-  }
-  await env.DB.prepare(`INSERT OR REPLACE INTO baseline_onboarding (account_id, input_hash, protected_input_json, reduced_context_json, computation_version, provenance_json, status, uncertainty, last_computed_at, provider_status, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, datetime('now'))`).bind(accountId, inputHash, JSON.stringify(protectedInput), JSON.stringify(computed.reducedContext), computed.computationVersion, JSON.stringify(computed.provenance), computed.status, computed.uncertainty, computed.providerStatus).run();
-  const ready = computed.status === 'completed' && facetProfile !== null;
-  return {
-    status: ready ? 'completed' : computed.status === 'completed' ? 'preparing' : computed.status,
-    ready,
-    uncertainty: computed.uncertainty,
-    reducedContext: computed.reducedContext,
-    facetProfileStatus: facetProfile ? 'ready' : 'pending',
-    readinessState: ready ? 'ready' : computed.status === 'completed' ? 'facet_profile_preparing' : 'source_unavailable',
-    message: ready
-      ? 'Your Baseline is ready.'
-      : computed.status === 'completed'
-        ? 'The exact Baseline source was saved, but its plain-language facet profile did not finish validating.'
-        : 'The Baseline source could not be calculated, so Sovereign will not substitute a generic answer.',
-    nextAction: 'retry_baseline' as const,
-    provenance: computed.provenance,
-    computationVersion: computed.computationVersion
+  const reducedContext = asRecord(computed.reducedContext);
+  const parsedSource = baselineSourceDataSchema.safeParse(reducedContext.sourceData);
+
+  const writeBaselineRow = async () => {
+    await env.DB.prepare(`INSERT OR REPLACE INTO baseline_onboarding
+      (account_id, input_hash, protected_input_json, reduced_context_json, computation_version, provenance_json, status, uncertainty, last_computed_at, provider_status, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, datetime('now'))`)
+      .bind(
+        accountId,
+        inputHash,
+        JSON.stringify(protectedInput),
+        JSON.stringify(reducedContext),
+        computed.computationVersion,
+        JSON.stringify(computed.provenance),
+        computed.status,
+        computed.uncertainty,
+        computed.providerStatus
+      )
+      .run();
   };
+
+  const resultFor = (facetProfile: Awaited<ReturnType<typeof ensureBaselineFacetProfile>> | null) => {
+    const ready = computed.status === 'completed' && facetProfile !== null;
+    return {
+      status: ready ? 'completed' : computed.status === 'completed' ? 'preparing' : computed.status,
+      ready,
+      uncertainty: computed.uncertainty,
+      reducedContext,
+      facetProfileStatus: facetProfile ? 'ready' : 'pending',
+      readinessState: ready ? 'ready' : computed.status === 'completed' ? 'facet_profile_preparing' : 'source_unavailable',
+      message: ready
+        ? 'Your Baseline is ready.'
+        : computed.status === 'completed'
+          ? 'Your exact Baseline source is saved. The plain-language profile is being prepared.'
+          : 'The Baseline source could not be calculated, so Sovereign will not substitute a generic answer.',
+      nextAction: ready
+        ? 'open_workspace' as const
+        : computed.status === 'completed'
+          ? 'continue_onboarding' as const
+          : 'retry_baseline' as const,
+      provenance: computed.provenance,
+      computationVersion: computed.computationVersion
+    };
+  };
+
+  if (!parsedSource.success || computed.status !== 'completed') {
+    reducedContext.facetProfileStatus = 'unavailable';
+    await writeBaselineRow();
+    return resultFor(null);
+  }
+
+  if (options.deferFacetProfile) {
+    reducedContext.facetProfileStatus = 'pending';
+    await writeBaselineRow();
+
+    const task = (async (): Promise<void> => {
+      const facetProfile = await ensureBaselineFacetProfile(env, {
+        accountId,
+        inputHash,
+        source: parsedSource.data
+      }).catch(() => null);
+
+      const current = await env.DB.prepare(
+        'SELECT reduced_context_json FROM baseline_onboarding WHERE account_id = ? AND input_hash = ?'
+      )
+        .bind(accountId, inputHash)
+        .first<{ reduced_context_json: string }>();
+
+      if (!current) return;
+
+      const latest = safeStoredRecord(current.reduced_context_json);
+      if (facetProfile) {
+        latest.facetProfile = facetProfile;
+        latest.facetProfileStatus = 'ready';
+      } else {
+        latest.facetProfileStatus = 'retryable';
+      }
+
+      await env.DB.prepare(`UPDATE baseline_onboarding
+        SET reduced_context_json = ?, updated_at = datetime('now')
+        WHERE account_id = ? AND input_hash = ?`)
+        .bind(JSON.stringify(latest), accountId, inputHash)
+        .run();
+    })();
+
+    options.deferFacetProfile(task);
+    return resultFor(null);
+  }
+
+  const facetProfile = await ensureBaselineFacetProfile(env, {
+    accountId,
+    inputHash,
+    source: parsedSource.data
+  }).catch(() => null);
+
+  reducedContext.facetProfile = facetProfile;
+  reducedContext.facetProfileStatus = facetProfile ? 'ready' : 'pending';
+  await writeBaselineRow();
+
+  return resultFor(facetProfile);
 }
 
 export async function computeConfiguredBaseline(env: Env, input: BaselineInput) {
@@ -273,6 +349,14 @@ export async function getBaselineReadiness(env: Env, accountId: string): Promise
     return baselineReadiness('source_computing', 'The Baseline source is still being calculated. Sovereign has not generated an answer.', 'continue_onboarding', true);
   }
   const reduced = safeStoredRecord(row.reduced_context_json);
+  if (reduced.facetProfileStatus === 'retryable') {
+    return baselineReadiness(
+      'facet_profile_preparing',
+      'Your exact Baseline source is saved. Preparing the plain-language profile needs another attempt.',
+      'retry_baseline',
+      true
+    );
+  }
   const source = baselineSourceDataSchema.safeParse(reduced.sourceData);
   if (!source.success) {
     return baselineReadiness('source_invalid', 'The saved Baseline source is incomplete or invalid. No generic substitute will be used.', 'review_baseline', false);

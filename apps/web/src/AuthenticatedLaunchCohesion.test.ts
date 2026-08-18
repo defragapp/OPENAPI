@@ -22,6 +22,8 @@ describe('authenticated launch cohesion', () => {
     expect(main).toContain('style.textContent += `\\n${authenticatedLaunchCohesionCss}`;');
     expect(main.indexOf('style.textContent += `\\n${authenticatedLaunchCohesionCss}`;'))
       .toBeGreaterThan(main.indexOf('style.textContent += `\\n${workspaceProductionRefinementCss}`;'));
+    expect(main.indexOf('style.textContent += `\\n${authenticatedLaunchCohesionCss}`;'))
+      .toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
   });
 
   it('uses a restrained neutral launch authority instead of blue authenticated chrome', () => {
@@ -42,6 +44,17 @@ describe('authenticated launch cohesion', () => {
     expect(launchCss).toContain('.plan-onboarding .plan-visual');
     expect(launchCss).toContain('.plan-onboarding .baseline-choice-row');
     expect(launchCss).toContain('grid-template-columns: 1fr !important;');
+  });
+
+  it('restores production-scale onboarding and policy actions after editorial action styling', () => {
+    expect(launchCss).toContain('[data-onboarding-phase="baseline_building"]');
+    expect(launchCss).toContain('.baseline-onboarding-form > .primary-button');
+    expect(launchCss).toContain('.policy-review-gate > section > button');
+    expect(launchCss).toContain('grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr)');
+    expect(onboarding).toContain('pollBaselineReadiness');
+    expect(onboarding).toContain("setBaselineStage('preparing')");
+    expect(onboarding).toContain("setBaselineStage('opening')");
+    expect(onboarding).not.toContain('personal foundation');
   });
 
   it('retains the canonical structured Baseline inputs and explicit timezone confirmation', () => {
