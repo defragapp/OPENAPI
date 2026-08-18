@@ -46,7 +46,7 @@ export function requireAuth(request: Request, env: Env): Promise<AuthContext> {
 
 async function resolveAuth(request: Request, env: Env): Promise<AuthContext> {
   const sovvCookie = readCookie(request, '__sov_session');
-  if (sovvCookie && env.SOVV_INTERNAL_BASE_URL) {
+  if (sovvCookie && env.SOVV_INTERNAL_BASE_URL && env.APP_ENV !== 'production') {
     const identity = await resolveExistingIdentity(env, `__sov_session=${sovvCookie}`);
     const context = { ...(await resolveAccount(env, identity.data.subject)), sovvCookieHeader: `__sov_session=${sovvCookie}` };
     await requireRouteEntitlement(request, env, context.accountId);
@@ -114,8 +114,23 @@ function readCookie(request: Request, name: string): string | undefined {
   return undefined;
 }
 
+function forbiddenOrigin(): never {
+  throw new Response('Forbidden origin', { status: 403 });
+}
+
 export function requireSameOrigin(request: Request): void {
-  const origin = request.headers.get('origin');
   const url = new URL(request.url);
-  if (origin && origin !== url.origin) throw new Response('Forbidden origin', { status: 403 });
+  const origin = request.headers.get('origin');
+  const fetchSite = request.headers.get('sec-fetch-site')?.trim().toLowerCase();
+
+  if (fetchSite && !['same-origin', 'same-site', 'none'].includes(fetchSite)) forbiddenOrigin();
+  if (!origin) forbiddenOrigin();
+
+  let normalizedOrigin: string;
+  try {
+    normalizedOrigin = new URL(origin).origin;
+  } catch {
+    forbiddenOrigin();
+  }
+  if (normalizedOrigin !== url.origin) forbiddenOrigin();
 }
