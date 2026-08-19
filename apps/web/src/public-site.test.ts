@@ -25,6 +25,7 @@ const landingRefinementV5Css = read('./landing-live-refinement-v5.css');
 const sansAuthority = read('./sans-typography-authority-v1.css');
 const seniorSystem = read('./senior-design-system-v1.css');
 const demoV2 = read('./public-intelligence-demonstration-v2.css');
+const launchPolish = read('./launch-polish-final-v1.css');
 const main = read('./main.tsx');
 const publicCopy = `${landing}\n${stories}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
@@ -94,25 +95,28 @@ describe('Sovereign.OS public experience', () => {
       'When you stop mediating',
       'You remain in the system; the communication path is what changes.'
     ]) expect(stories).toContain(marker);
-    for (const prohibited of ['83%', 'Alignment meter', 'compatibilityPercent', 'compatibilityScore', 'alignmentScore']) expect(stories).not.toContain(prohibited);
+    for (const prohibited of ['83%', 'Alignment meter', 'compatibility', 'compatibilityPercent', 'compatibilityScore', 'alignmentScore']) expect(stories.toLowerCase()).not.toContain(prohibited.toLowerCase());
   });
 
   it('keeps relationship and system examples permission-safe and source codes optional', () => {
     expect(stories).toContain('Both people choose what they share');
-    expect(stories).toContain('No compatibility score');
+    expect(stories).toContain('keeping both people distinct');
     expect(stories).toContain('Only they can say what they actually felt or intended');
     expect(stories).toContain('Each person controls whether their Baseline can be included');
+    expect(stories).toContain('information each participant chose to share');
     expect(stories).toContain('<details className="landing-evidence">');
     expect(stories).toContain('<strong>See source details</strong>');
     expect(stories).not.toContain('<strong>Basis</strong>');
     expect(stories).not.toContain('permitted perspectives');
     expect(stories).not.toContain('confirmed responsibilities');
+    expect(stories).not.toContain('consented participant context');
   });
 
   it('keeps retired technical and rejected public phrasing out of active public copy', () => {
     for (const phrase of [
       'possible interaction vector',
       'emotional vector',
+      'compatibility',
       'One private reference beneath every question.',
       'One private foundation. More useful answers across the questions that shape your life.',
       'server-approved',
@@ -131,17 +135,22 @@ describe('Sovereign.OS public experience', () => {
     expect(policyAuthority).toContain('not retained as an export artifact');
   });
 
-  it('loads the senior system first and the demo-specific text-first authority last', () => {
+  it('loads senior and demo authorities before one terminal cross-route launch polish layer', () => {
     expect(main).toContain("import seniorDesignSystemCss from './senior-design-system-v1.css?inline';");
     expect(main).toContain("import publicIntelligenceDemonstrationV2Css from './public-intelligence-demonstration-v2.css?inline';");
+    expect(main).toContain("import launchPolishFinalCss from './launch-polish-final-v1.css?inline';");
     const senior = main.indexOf('style.textContent += `\\n${seniorDesignSystemCss}`;');
     const demos = main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationV2Css}`;');
+    const final = main.indexOf('style.textContent += `\\n${launchPolishFinalCss}`;');
     expect(demos).toBeGreaterThan(senior);
+    expect(final).toBeGreaterThan(demos);
     expect(main).toContain("dataset.sovereignProductStories = 'text-first-intelligence-v2'");
     expect(main).toContain("dataset.sovereignPublicDemoAuthority = 'text-first-v2'");
+    expect(main).toContain("dataset.sovereignLaunchPolish = 'final-v1'");
     expect(main).not.toContain('ProductLanguageRuntime');
     expect(demoV2).toContain('@media (prefers-reduced-motion: reduce)');
     expect(demoV2).not.toContain('infinite');
+    expect(launchPolish).toContain('visibility: visible !important');
   });
 
   it('keeps the unified visual and support-page foundations intact', () => {
@@ -153,6 +162,7 @@ describe('Sovereign.OS public experience', () => {
     expect(sansAuthority).toContain('font-family: var(--font-title) !important');
     expect(seniorSystem).toContain('--sds-radius: 4px');
     expect(staticTerminalCss).toContain('--static-title-font:');
+    expect(staticTerminalCss).toContain('--static-header-h:64px');
     expect(staticRefinementCss).toContain('--v0-blue: #e8ddd0');
     expect(how).toContain('A private reference built around you.');
     expect(pricing).toContain('$20');
@@ -162,6 +172,7 @@ describe('Sovereign.OS public experience', () => {
     expect(staticExperienceCss).toContain('@media (max-width: 620px)');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
     expect(consent).toContain('You control what another person can use with you.');
+    expect(consent).toContain('class="launch-nav-inner"');
     expect(consentCss).toContain('@media (max-width: 680px)');
   });
 });
