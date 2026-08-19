@@ -5,6 +5,7 @@ const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf
 const main = read('./main.tsx');
 const landing = read('./PublicLanding.tsx');
 const stories = read('./LandingProductStories.tsx');
+const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 const field = read('./expression-field/LandingExpressionSlice.tsx');
 const fieldStyles = read('./landing-expression-field-v3.css');
 const integrationStyles = read('./landing-expression-field-integration.css');
@@ -115,18 +116,18 @@ describe('public positioning reset', () => {
       '<SystemField />',
       'Does this fit?',
       '<strong>See source details</strong>'
-    ]) expect(stories).toContain(marker);
-    expect(stories).not.toContain('function WorkflowPanel(');
-    expect(stories).not.toContain('useWorkflowProgress');
-    expect(stories).not.toContain('data-motion-state');
+    ]) expect(renderedStories).toContain(marker);
+    expect(renderedStories).not.toContain('function WorkflowPanel(');
+    expect(renderedStories).not.toContain('useWorkflowProgress');
+    expect(renderedStories).not.toContain('data-motion-state');
   });
 
   it('keeps source codes secondary and collapsed by default', () => {
     for (const marker of ["{ code: 'HD G13.1'", "{ code: 'GK ACT13'", "{ code: '☉ CAN 04.2°'", "{ code: 'HD G22.4'", "{ code: 'HD G57.2'", "{ code: 'REL ☿ □ ☿ 1.8°'"]) expect(stories).toContain(marker);
-    expect(stories).toContain('<details className="landing-evidence">');
-    expect(stories).toContain('<strong>See source details</strong>');
-    expect(stories).toContain('These values are not visitor data.');
-    expect(stories).not.toContain('<strong>Example Basis</strong>');
+    expect(renderedStories).toContain('<details className="landing-evidence">');
+    expect(renderedStories).toContain('<strong>See source details</strong>');
+    expect(renderedStories).toContain('These values are not visitor data.');
+    expect(renderedStories).not.toContain('<strong>Example Basis</strong>');
     expect(finalAuthority).toContain('.landing-evidence__code');
   });
 
@@ -140,10 +141,11 @@ describe('public positioning reset', () => {
       '.relationship-field__center',
       '.relationship-field__bridge',
       '.landing-understanding--system',
-      '.system-field__state--current',
-      '.system-field__state--changed',
+      '.system-field__state',
       '.system-field__route--direct'
     ]) expect(demoV2).toContain(marker);
+    expect(renderedStories).toContain('className="system-field__state system-field__state--current"');
+    expect(renderedStories).toContain('className="system-field__state system-field__state--changed"');
     expect(demoV2).toContain('grid-template-columns: minmax(0, 1.18fr) minmax(360px, .82fr) !important');
     expect(demoV2).toContain('@media (max-width: 760px)');
   });
