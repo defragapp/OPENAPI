@@ -72,7 +72,7 @@ describe("Sovereign split typography authority", () => {
       expect(start).toBeGreaterThanOrEqual(0);
       const end = visualAuthority.indexOf("}", start);
       expect(end).toBeGreaterThan(start);
-      expect(visualAuthority.slice(start, end)).toContain("font-family: var(--sovereign-title) !important;");
+      expect(visualAuthority.slice(start, end)).toContain("font-family: var(--font-public-display, var(--sovereign-title)) !important;");
     }
 
     const contextStart = visualAuthority.indexOf(".public-approved-v8 .landing-context-view strong,");
