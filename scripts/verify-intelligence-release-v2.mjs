@@ -11,6 +11,7 @@ const landingRefinement = readFileSync(resolve('apps/web/src/landing-refinement-
 const landingRefinementV5 = readFileSync(resolve('apps/web/src/landing-live-refinement-v5.css'), 'utf8');
 const sansTypography = readFileSync(resolve('apps/web/src/sans-typography-authority-v1.css'), 'utf8');
 const typography = readFileSync(resolve('apps/web/src/typography-system.css'), 'utf8');
+const launchPolish = readFileSync(resolve('apps/web/src/launch-polish-final-v1.css'), 'utf8');
 const landing = readFileSync(resolve('apps/web/src/PublicLanding.tsx'), 'utf8');
 const stories = readFileSync(resolve('apps/web/src/LandingProductStories.tsx'), 'utf8');
 const field = readFileSync(resolve('apps/web/src/expression-field/LandingExpressionSlice.tsx'), 'utf8');
@@ -29,6 +30,8 @@ const premiumActionAppend = 'style.textContent += `\\n${premiumActionAuthorityCs
 const sansTypographyImport = "import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';";
 const sansTypographyAppend = 'style.textContent += `\\n${sansTypographyAuthorityCss}`;';
 const invitationAppend = 'style.textContent += `\\n${invitationRenderedFidelityCss}`;';
+const launchPolishImport = "import launchPolishFinalCss from './launch-polish-final-v1.css?inline';";
+const launchPolishAppend = 'style.textContent += `\\n${launchPolishFinalCss}`;';
 const retiredFingerprintOutput = '\n  sequenceFingerprint,\n';
 
 if (!main.includes(routeCohesionImport)) throw new Error('Intelligence release v2 is missing deployed route cohesion.');
@@ -39,11 +42,14 @@ if (!main.includes(fidelityImport) || !main.includes(fidelityAppend)) throw new 
 if (!main.includes(landingRefinementImport) || !main.includes(landingRefinementAppend)) throw new Error('Intelligence release v2 is missing landing refinement v2.');
 if (!main.includes(landingRefinementV5Import) || !main.includes(landingRefinementV5Append)) throw new Error('Intelligence release v2 is missing landing refinement v5.');
 if (!main.includes(sansTypographyImport) || !main.includes(sansTypographyAppend)) throw new Error('Intelligence release v2 is missing terminal sans typography authority.');
+if (!main.includes(launchPolishImport) || !main.includes(launchPolishAppend)) throw new Error('Intelligence release v2 is missing final launch polish authority.');
 if (main.indexOf(fidelityAppend) <= main.indexOf(refinementAppend)) throw new Error('Intelligence release v2 does not place rendered fidelity after experience refinement.');
 if (main.indexOf(landingRefinementAppend) <= main.indexOf(fidelityAppend)) throw new Error('Intelligence release v2 does not place landing refinement v2 after rendered fidelity.');
 if (main.indexOf(landingRefinementV5Append) <= main.indexOf('style.textContent += `\\n${landingLiveRefinementV4Css}`;')) throw new Error('Intelligence release v2 does not place landing refinement v5 after v4.');
 if (main.includes(invitationAppend) && main.indexOf(invitationAppend) <= main.indexOf(landingRefinementV5Append)) throw new Error('Intelligence release v2 places Invitation fidelity before landing refinement v5.');
 if (main.indexOf(sansTypographyAppend) <= main.indexOf(premiumActionAppend)) throw new Error('Intelligence release v2 does not place sans typography after the terminal action authority.');
+if (main.indexOf(launchPolishAppend) <= main.indexOf(sansTypographyAppend)) throw new Error('Intelligence release v2 does not place final launch polish after the earlier typography authority.');
+if (main.slice(main.indexOf(launchPolishAppend) + launchPolishAppend.length).includes('style.textContent +=')) throw new Error('Intelligence release v2 found an inline visual authority after final launch polish.');
 
 for (const marker of ['--v8-blue: #d8d0c5 !important', "radialGradient[id$='-sphere-fill']", 'padding: 54px 0 !important']) {
   if (!renderedFidelity.includes(marker)) throw new Error(`Intelligence release v2 is missing rendered fidelity marker ${marker}`);
@@ -78,6 +84,9 @@ for (const marker of ['--font-display: var(--font-title);', '--serif: var(--font
 for (const marker of ['--font-title:', '.public-approved-v8 .v0-hero h1 > em', 'font-family: var(--font-title) !important']) {
   if (!sansTypography.includes(marker)) throw new Error(`Intelligence release v2 is missing terminal sans marker ${marker}`);
 }
+for (const marker of ['--launch-header-h: 64px', '--launch-brand-size: 13px', "[data-product-stories='text-first-intelligence-v2']", 'visibility: visible !important']) {
+  if (!launchPolish.includes(marker)) throw new Error(`Intelligence release v2 is missing final launch marker ${marker}`);
+}
 for (const marker of [
   'data-public-narrative="self-people-systems-v1"',
   'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
@@ -105,8 +114,8 @@ for (const marker of [
 ]) {
   if (!stories.includes(marker)) throw new Error(`Intelligence release v2 is missing product story marker ${marker}`);
 }
-for (const retired of ['Separate helping from carrying the outcome.', 'See where responsibility keeps landing.']) {
-  if (stories.includes(retired)) throw new Error(`Intelligence release v2 found retired category framing: ${retired}`);
+for (const retired of ['Separate helping from carrying the outcome.', 'See where responsibility keeps landing.', 'compatibility', 'consented participant context']) {
+  if (stories.toLowerCase().includes(retired.toLowerCase())) throw new Error(`Intelligence release v2 found retired public story language: ${retired}`);
 }
 for (const marker of [
   "data-inspecting={hasInspection ? 'true' : 'false'}",
@@ -229,9 +238,8 @@ const currentStaticRouteAssertion = "  containsAll(label, document, ['Sovereign.
 if (source.split(staleStaticRouteAssertion).length - 1 !== 1) throw new Error('Intelligence release v2 could not reconcile the retired standalone-route contract.');
 source = source.replace(staleStaticRouteAssertion, currentStaticRouteAssertion);
 
-
 /* CURRENT_STORY_CONTRACT_restored product stories */
-const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","No compatibility score"];
+const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","keeping both people distinct"];
 const currentStoryQuote = String.fromCharCode(39);
 const currentStoryStart = "containsAll(" + currentStoryQuote + "restored product stories" + currentStoryQuote + ", stories, [";
 const currentStoryIndex = source.indexOf(currentStoryStart);
