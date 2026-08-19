@@ -35,7 +35,7 @@ describe('senior design system v1', () => {
       expect(source).toContain('1180px');
       expect(source).toContain('64px');
       expect(source).toContain('13px');
-      expect(source).toContain('grid-template-columns:minmax(180px,1fr) auto minmax(180px,1fr)');
+      expect(source).toMatch(/grid-template-columns:\s*minmax\(180px,1fr\) auto minmax\(180px,1fr\)/);
     }
     expect(finalPolish).toContain('.public-approved-v8 .v0-nav-inner');
     expect(finalPolish).toContain('.public-secondary-page .v0-nav-inner');
