@@ -25,11 +25,11 @@ describe('public evidence contract', () => {
   });
 
   it('keeps relationship and system examples permission-safe while translating implementation language for users', () => {
-    expect(stories).toContain('With permission, Sovereign can use both people’s Baselines while keeping each person distinct.');
-    expect(stories).toContain('Both people must agree before their Baselines can be used together');
+    expect(stories).toContain('With permission, Sovereign can use two separate Baselines to explain what each person may be bringing and what happens when those patterns meet—without flattening either person into a compatibility result.');
+    expect(stories).toContain('Both people choose what they share');
+    expect(stories).toContain('Only they can say what they actually felt or intended');
     expect(stories).toContain('Each person controls whether their Baseline can be included');
-    expect(stories).toContain('Keep each person separate');
-    expect(stories).toContain('Do not guess private feelings');
+    expect(stories).toContain('Roles and events are supplied in the example');
     expect(stories).toContain('What you told Sovereign');
     expect(stories).not.toContain('Illustrative permitted Baselines');
     expect(stories).not.toContain('Permitted context');
