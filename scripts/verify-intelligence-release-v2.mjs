@@ -38,12 +38,12 @@ if (!main.includes(refinementImport) || !main.includes(refinementAppend)) throw 
 if (!main.includes(fidelityImport) || !main.includes(fidelityAppend)) throw new Error('Intelligence release v2 is missing the rendered fidelity authority.');
 if (!main.includes(landingRefinementImport) || !main.includes(landingRefinementAppend)) throw new Error('Intelligence release v2 is missing landing refinement v2.');
 if (!main.includes(landingRefinementV5Import) || !main.includes(landingRefinementV5Append)) throw new Error('Intelligence release v2 is missing landing refinement v5.');
-if (!main.includes(sansTypographyImport) || !main.includes(sansTypographyAppend)) throw new Error('Intelligence release v2 is missing terminal sans typography authority.');
+if (!main.includes(sansTypographyImport) || !main.includes(sansTypographyAppend)) throw new Error('Intelligence release v2 is missing the split typography authority.');
 if (main.indexOf(fidelityAppend) <= main.indexOf(refinementAppend)) throw new Error('Intelligence release v2 does not place rendered fidelity after experience refinement.');
 if (main.indexOf(landingRefinementAppend) <= main.indexOf(fidelityAppend)) throw new Error('Intelligence release v2 does not place landing refinement v2 after rendered fidelity.');
 if (main.indexOf(landingRefinementV5Append) <= main.indexOf('style.textContent += `\\n${landingLiveRefinementV4Css}`;')) throw new Error('Intelligence release v2 does not place landing refinement v5 after v4.');
 if (main.includes(invitationAppend) && main.indexOf(invitationAppend) <= main.indexOf(landingRefinementV5Append)) throw new Error('Intelligence release v2 places Invitation fidelity before landing refinement v5.');
-if (main.indexOf(sansTypographyAppend) <= main.indexOf(premiumActionAppend)) throw new Error('Intelligence release v2 does not place sans typography after the terminal action authority.');
+if (main.indexOf(sansTypographyAppend) <= main.indexOf(premiumActionAppend)) throw new Error('Intelligence release v2 does not place split typography after the terminal action authority.');
 
 for (const marker of ['--v8-blue: #d8d0c5 !important', "radialGradient[id$='-sphere-fill']", 'padding: 54px 0 !important']) {
   if (!renderedFidelity.includes(marker)) throw new Error(`Intelligence release v2 is missing rendered fidelity marker ${marker}`);
@@ -56,7 +56,6 @@ for (const marker of [
   if (!landingRefinement.includes(marker)) throw new Error(`Intelligence release v2 is missing landing refinement marker ${marker}`);
 }
 for (const marker of [
-  'One typeface. Hierarchy comes from weight, scale, and opacity.',
   '.v0-hero h1 > span',
   '.v0-hero h1 > em',
   'font-family: inherit !important',
@@ -69,14 +68,21 @@ for (const marker of [
 ]) {
   if (!landingRefinementV5.includes(marker)) throw new Error(`Intelligence release v2 is missing landing refinement v5 marker ${marker}`);
 }
-if (landingRefinementV5.includes('var(--font-display, Georgia, serif)')) throw new Error('Intelligence release v2 found the retired display-serif landing treatment.');
+if (landingRefinementV5.includes('var(--font-display, Georgia, serif)')) throw new Error('Intelligence release v2 found a component-local display-serif override instead of shared typography authority.');
 if (landingRefinementV5.includes('.landing-baseline-intro')) throw new Error('Intelligence release v2 found the retired root Baseline intro styling.');
-if (typography.includes('font-family: "Sovereign Display"') || typography.includes('/fonts/sovereign-display.woff2')) throw new Error('Intelligence release v2 found active Sovereign Display typography.');
-for (const marker of ['--font-display: var(--font-title);', '--serif: var(--font-title);', 'font-family: var(--font-title) !important']) {
-  if (!typography.includes(marker)) throw new Error(`Intelligence release v2 is missing typography marker ${marker}`);
+for (const marker of [
+  'font-family: "Geist Sans";',
+  'font-family: "Sovereign Display";',
+  '/fonts/sovereign-display.woff2',
+  '--font-public-display:',
+  '--font-display: var(--font-title);',
+  '--serif: var(--font-title);',
+  'font-family: var(--font-title) !important'
+]) {
+  if (!typography.includes(marker)) throw new Error(`Intelligence release v2 is missing split typography marker ${marker}`);
 }
-for (const marker of ['--font-title:', '.public-approved-v8 .v0-hero h1 > em', 'font-family: var(--font-title) !important']) {
-  if (!sansTypography.includes(marker)) throw new Error(`Intelligence release v2 is missing terminal sans marker ${marker}`);
+for (const marker of ['--font-title:', '.public-approved-v8 .v0-hero h1 > em', 'font-family: var(--font-title) !important', 'font-family: var(--font-public-display) !important']) {
+  if (!sansTypography.includes(marker)) throw new Error(`Intelligence release v2 is missing split typography authority marker ${marker}`);
 }
 for (const marker of [
   'data-public-narrative="self-people-systems-v1"',
@@ -225,10 +231,9 @@ if (source.split(staleRefinementAssertion).length - 1 !== 1) throw new Error('In
 source = source.replace(staleRefinementAssertion, currentRefinementAssertion);
 
 const staleStaticRouteAssertion = "  containsAll(label, document, ['Sovereign.OS', 'Build my Baseline', '/premium-public-release.css?v=20260730-final', '/experience-static-refinement-v1.css?v=20260816-refinement-v1']);";
-const currentStaticRouteAssertion = "  containsAll(label, document, ['Sovereign.OS', 'data-visual-contract=\\\"founder-v0-static\\\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260818-geist-v1']);";
+const currentStaticRouteAssertion = "  containsAll(label, document, ['Sovereign.OS', 'data-visual-contract=\\\"founder-v0-static\\\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260819-founder-display-v1']);";
 if (source.split(staleStaticRouteAssertion).length - 1 !== 1) throw new Error('Intelligence release v2 could not reconcile the retired standalone-route contract.');
 source = source.replace(staleStaticRouteAssertion, currentStaticRouteAssertion);
-
 
 /* CURRENT_STORY_CONTRACT_restored product stories */
 const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","No compatibility score"];
