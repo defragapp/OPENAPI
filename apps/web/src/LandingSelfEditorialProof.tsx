@@ -2,8 +2,7 @@ import { useMemo, useState } from 'react';
 import {
   SELF_EVIDENCE_GROUPS,
   SELF_PRODUCT_PROOF,
-  SELF_REPRESENTATIVE_PROFILE,
-  SELF_REPRESENTATIVE_SOURCES
+  SELF_REPRESENTATIVE_PROFILE
 } from './landing-demo-fixtures';
 import { ExpressionFieldRenderer } from './expression-field/ExpressionField';
 import {
@@ -14,133 +13,73 @@ import {
 } from './expression-field/expression-field-contract';
 import './landing-self-editorial-proof.css';
 
-type AxisConfig = {
-  value: number;
-  state: ExpressionAxisValue['state'];
-  facets: readonly string[];
-  summary: string;
-  practicalDistinction?: string;
+/*
+ * Keep the public representative field aligned with the production Worker derivation.
+ * The Worker remains authoritative. This map and salience formula intentionally mirror
+ * apps/sovereign-worker/src/expression-field.ts for a sanitized Baseline-only fixture.
+ */
+const AXIS_FACET_MAP: Record<ExpressionAxisId, readonly string[]> = {
+  clarity: ['decision_making', 'alignment_markers'],
+  focus: ['learning', 'underused_capacity'],
+  steadiness: ['core_orientation', 'response_change'],
+  urgency: ['response_pressure', 'responsibility'],
+  courage: ['leadership', 'gift_expression'],
+  fear: ['shadow_expression', 'response_pressure'],
+  anger: ['boundaries', 'conflict_repair'],
+  tenderness: ['love_connection', 'gift_expression'],
+  grief: ['love_connection', 'response_change'],
+  joy: ['creativity_expression', 'gift_expression'],
+  desire: ['identity_purpose', 'creativity_expression'],
+  trust: ['love_connection', 'core_orientation'],
+  patience: ['decision_making', 'response_change'],
+  boundaries: ['boundaries'],
+  responsibility: ['responsibility'],
+  repair: ['conflict_repair']
 };
 
-const AXIS_CONFIG: Record<ExpressionAxisId, AxisConfig> = {
-  clarity: {
-    value: 54,
-    state: 'mixed',
-    facets: ['decision_making', 'alignment_markers'],
-    summary: 'Clarity improves after the representative person separates a first preference from the needs they can already see around them.'
-  },
-  focus: {
-    value: 49,
-    state: 'gift',
-    facets: ['learning', 'creativity_expression'],
-    summary: 'Focus is available, but can shift quickly toward whichever person or situation appears to need attention first.'
-  },
-  steadiness: {
-    value: 52,
-    state: 'gift',
-    facets: ['core_orientation', 'response_change'],
-    summary: 'The representative pattern can stay adaptable without losing continuity when an internal position has been named first.'
-  },
-  urgency: {
-    value: 67,
-    state: 'under_pressure',
-    facets: ['response_pressure', 'decision_making'],
-    summary: 'Pressure can accelerate attention toward external signals before slower internal preferences have equal time to form.'
-  },
-  courage: {
-    value: 46,
-    state: 'gift',
-    facets: ['identity_purpose', 'boundaries'],
-    summary: 'Courage here is less about confrontation and more about allowing an unoptimized first position to exist long enough to be heard.'
-  },
-  fear: {
-    value: 39,
-    state: 'protective',
-    facets: ['response_pressure', 'shadow_expression'],
-    summary: 'Protective attention can increase when belonging, usefulness, or another person’s reaction feels consequential.'
-  },
-  anger: {
-    value: 24,
-    state: 'unconfirmed',
-    facets: ['conflict_repair'],
-    summary: 'Anger is not assumed by the representative fixture; actual expression remains the person’s to confirm.'
-  },
-  tenderness: {
-    value: 74,
-    state: 'gift',
-    facets: ['love_connection', 'gift_expression'],
-    summary: 'Relational attunement is a strong resource: the person can notice what another person or relationship needs with unusual speed.'
-  },
-  grief: {
-    value: 31,
-    state: 'unconfirmed',
-    facets: ['love_connection'],
-    summary: 'Grief is not inferred from the Baseline fixture and remains contextual rather than treated as a stable trait.'
-  },
-  joy: {
-    value: 47,
-    state: 'gift',
-    facets: ['creativity_expression'],
-    summary: 'Joy can become easier to recognize when expression is not being edited for reception before it has taken shape.'
-  },
-  desire: {
-    value: 34,
-    state: 'repressed',
-    facets: ['decision_making', 'underused_capacity', 'alignment_markers'],
-    summary: 'A personal preference may be quieter not because it is absent, but because comparison, accommodation, and optimization begin before it gets first access to the question.',
-    practicalDistinction: 'Notice the room. Do not let noticing the room answer the question before you do.'
-  },
-  trust: {
-    value: 58,
-    state: 'gift',
-    facets: ['love_connection', 'gift_expression'],
-    summary: 'Trust grows when responsiveness remains chosen rather than becoming an automatic obligation to stabilize everyone else.'
-  },
-  patience: {
-    value: 43,
-    state: 'mixed',
-    facets: ['response_pressure', 'underused_capacity'],
-    summary: 'The underused move is often a brief pause long enough for the first internal preference to become available.'
-  },
-  boundaries: {
-    value: 63,
-    state: 'protective',
-    facets: ['boundaries', 'shadow_expression'],
-    summary: 'The key boundary is sequential: noticing another person’s need does not have to become an immediate decision to meet it.'
-  },
-  responsibility: {
-    value: 83,
-    state: 'overextended',
-    facets: ['responsibility', 'leadership'],
-    summary: 'Reliability and situational awareness can make the person the fastest route to completion, which can quietly turn competence into excess ownership.'
-  },
-  repair: {
-    value: 77,
-    state: 'overextended',
-    facets: ['conflict_repair', 'love_connection'],
-    summary: 'Repair skill is strong, but can become premature accommodation when reducing tension outruns an honest personal position.'
-  }
-};
-
-const SOURCE_IDS = SELF_REPRESENTATIVE_SOURCES.map((source) => source.id);
-const FACET_IDS = new Set<string>(SELF_REPRESENTATIVE_PROFILE.facets.map((facet) => facet.id));
+const clamp = (value: number, minimum: number, maximum: number) => (
+  Math.max(minimum, Math.min(maximum, Math.round(value)))
+);
 
 function buildSelfExpressionAxes(): readonly ExpressionAxisValue[] {
   return expressionAxisRegistry.map((axis) => {
-    const config = AXIS_CONFIG[axis.id];
-    const facetIds = config.facets.filter((id) => FACET_IDS.has(id));
+    const allowedFacetIds = AXIS_FACET_MAP[axis.id];
+    const mappedFacets = SELF_REPRESENTATIVE_PROFILE.facets.filter((facet) => allowedFacetIds.includes(facet.id));
+    const basisRefs = [...new Set(mappedFacets.flatMap((facet) => facet.basisRefs))];
+    const supportWeight = mappedFacets.reduce((total, facet) => {
+      if (facet.uncertainty === 'low') return total + 8;
+      if (facet.uncertainty === 'medium') return total + 5;
+      return total + 2;
+    }, 0);
+    const baselineValue = clamp(
+      30 + Math.min(28, mappedFacets.length * 8) + Math.min(12, basisRefs.length * 3) + Math.min(8, supportWeight),
+      28,
+      76
+    );
+    const primary = mappedFacets[0];
+    const practicalDistinction = primary?.alignmentMarkers[0];
+
     return {
       id: axis.id,
       label: axis.label,
-      baselineValue: config.value,
+      baselineValue,
       currentDelta: 0,
-      value: config.value,
-      state: config.state,
-      confidence: 'supported',
-      facetIds,
-      basisRefs: [...SOURCE_IDS],
-      summary: config.summary,
-      ...(config.practicalDistinction ? { practicalDistinction: config.practicalDistinction } : {}),
+      value: baselineValue,
+      state: 'unconfirmed',
+      confidence: mappedFacets.length > 0 && basisRefs.length > 0 ? 'supported' : 'exploratory',
+      facetIds: mappedFacets.map((facet) => facet.id),
+      basisRefs,
+      summary: primary?.description
+        ?? `${axis.label} is one expression within this representative Baseline that Sovereign can help examine in ordinary language.`,
+      ...(primary?.giftExpression ? { giftExpression: primary.giftExpression } : {}),
+      ...(primary?.shadowExpression
+        ? {
+            shadowExpression: primary.shadowExpression,
+            repressedExpression: `When held back, ${primary.shadowExpression.charAt(0).toLowerCase()}${primary.shadowExpression.slice(1)}`,
+            overextendedExpression: `When overused, ${primary.shadowExpression.charAt(0).toLowerCase()}${primary.shadowExpression.slice(1)}`
+          }
+        : {}),
+      ...(practicalDistinction ? { practicalDistinction } : {}),
       contextDomain: axis.domain
     } satisfies ExpressionAxisValue;
   });
@@ -184,7 +123,7 @@ export function LandingSelfEditorialProof() {
             onSelectAxis={setSelectedAxisId}
             draggable
             variant="preview"
-            ariaLabel="Representative Self Expression Field. Sixteen lines begin at one stable center. Line length shows relative expression emphasis in this example, not a diagnosis or score. Select a line to inspect it."
+            ariaLabel="Representative Self Expression Field. Sixteen lines begin at one stable center. Line length shows relative expression salience in this example, not a psychological score or diagnosis. Select a line to inspect it."
           />
         </div>
         <figcaption>
@@ -192,7 +131,7 @@ export function LandingSelfEditorialProof() {
           <div className="landing-self-vector__readout">
             <small>Inspected axis</small>
             <strong id="landing-self-vector-title">{selectedAxis.label}</strong>
-            <em>{salienceLabel(selectedAxis.value)} · relative emphasis</em>
+            <em>{salienceLabel(selectedAxis.value)} · relative salience</em>
             <p>{selectedAxis.summary}</p>
           </div>
         </figcaption>
