@@ -338,7 +338,7 @@ function RelationshipField() {
         <span><strong>Alex</strong><small>less pressure → more room to respond</small></span>
       </div>
       <div className="relationship-field__center">
-        <small>Between you</small>
+        <small>What happens between you</small>
         <ol>
           <li><span>1</span><strong>You ask for clarity</strong></li>
           <li><span>2</span><strong>Alex reduces response</strong></li>
