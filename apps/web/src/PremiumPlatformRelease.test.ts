@@ -22,6 +22,7 @@ const typography = read('./typography-system.css');
 const sansAuthority = read('./sans-typography-authority-v1.css');
 const seniorSystem = read('./senior-design-system-v1.css');
 const demoV2 = read('./public-intelligence-demonstration-v2.css');
+const launchPolish = read('./launch-polish-final-v1.css');
 const staticAuthority = read('../public/premium-public-release.css');
 const staticV0Css = read('../public/v0-public-port.css');
 
@@ -30,16 +31,21 @@ function balanced(source: string) {
 }
 
 describe('premium platform release — current public product contract', () => {
-  it('preserves founder lineage while current rendered authorities remain explicit', () => {
+  it('preserves founder lineage while current rendered authorities remain explicit and terminal launch polish is last', () => {
     expect(fingerprint).toContain(`V0_ARCHIVE_SHA256 = '${archiveSha}'`);
     expect(fingerprint).toContain("PUBLIC_LANDING_CONTRACT = 'v0-public-landing-v3'");
     expect(main).toContain("import seniorDesignSystemCss from './senior-design-system-v1.css?inline';");
     expect(main).toContain("import publicIntelligenceDemonstrationV2Css from './public-intelligence-demonstration-v2.css?inline';");
+    expect(main).toContain("import launchPolishFinalCss from './launch-polish-final-v1.css?inline';");
     const senior = main.indexOf('style.textContent += `\\n${seniorDesignSystemCss}`;');
     const demos = main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationV2Css}`;');
+    const final = main.indexOf('style.textContent += `\\n${launchPolishFinalCss}`;');
     expect(demos).toBeGreaterThan(senior);
+    expect(final).toBeGreaterThan(demos);
+    expect(main.slice(final + 'style.textContent += `\\n${launchPolishFinalCss}`;'.length)).not.toContain('style.textContent +=');
     expect(main).toContain("document.documentElement.dataset.sovereignVisualAuthority = 'senior-design-system-v1';");
     expect(main).toContain("document.documentElement.dataset.sovereignPublicDemoAuthority = 'text-first-v2';");
+    expect(main).toContain("document.documentElement.dataset.sovereignLaunchPolish = 'final-v1';");
   });
 
   it('keeps the founder statement and public capability progression', () => {
@@ -72,12 +78,13 @@ describe('premium platform release — current public product contract', () => {
   });
 
   it('uses native sans typography across the mature product system', () => {
-    for (const source of [typography, sansAuthority, seniorSystem]) {
+    for (const source of [typography, sansAuthority, seniorSystem, launchPolish]) {
       expect(source).toContain('-apple-system');
       expect(source).toContain('"SF Pro Display"');
       expect(source).not.toContain('\n    Optima,');
       expect(source).not.toContain('\n    "Avenir Next",');
       expect(source).not.toContain('font-family: "Sovereign Display"');
+      expect(source).not.toContain('font-family: "Sovereign Sans"');
     }
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(demoV2).toContain('var(--sds-title, system-ui, sans-serif)');
@@ -111,13 +118,14 @@ describe('premium platform release — current public product contract', () => {
   it('keeps People and Systems permission-safe and does not invent private states or inferred system roles', () => {
     for (const marker of [
       'Both people choose what they share',
-      'No compatibility score',
+      'keeping both people distinct',
       'Only they can say what they actually felt or intended',
       'Roles and events are supplied in the example',
       'Each person controls whether their Baseline can be included',
-      'What you told Sovereign'
+      'What you told Sovereign',
+      'information each participant chose to share'
     ]) expect(stories).toContain(marker);
-    for (const prohibited of ['compatibilityPercent', 'compatibilityScore', 'alignmentScore', 'missing perspective', 'authority as']) expect(stories.toLowerCase()).not.toContain(prohibited.toLowerCase());
+    for (const prohibited of ['compatibility', 'compatibilityPercent', 'compatibilityScore', 'alignmentScore', 'missing perspective', 'authority as', 'consented participant context']) expect(stories.toLowerCase()).not.toContain(prohibited.toLowerCase());
   });
 
   it('preserves fixture-backed sources as collapsed supporting detail', () => {
@@ -128,7 +136,7 @@ describe('premium platform release — current public product contract', () => {
     expect(stories).not.toContain('<strong>Basis</strong>');
   });
 
-  it('renders one progressively richer visual grammar with finite motion and mobile intelligence intact', () => {
+  it('renders one progressively richer visual grammar with finite motion, fail-open visibility, and mobile intelligence intact', () => {
     for (const marker of [
       '.landing-understanding--decision',
       '.decision-field__choice',
@@ -148,8 +156,12 @@ describe('premium platform release — current public product contract', () => {
     expect(stories).toContain('className="system-field__state system-field__state--current"');
     expect(stories).toContain('className="system-field__state system-field__state--changed"');
     expect(demoV2).not.toContain('infinite');
+    expect(launchPolish).toContain("[data-product-stories='text-first-intelligence-v2']");
+    expect(launchPolish).toContain('visibility: visible !important');
+    expect(launchPolish).toContain('opacity: 1 !important');
     balanced(demoV2);
     balanced(seniorSystem);
+    balanced(launchPolish);
   });
 
   it('keeps viewport release measurement attached to self, relationship, and system proof', () => {
