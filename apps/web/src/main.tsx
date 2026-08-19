@@ -94,6 +94,7 @@ import './account-journey.css';
 import './account-journey-structured.css';
 import './account-journey-release-cohesion.css';
 import './deployed-route-cohesion.css';
+import './launch-detail-controls-v1.css';
 /* Passkey authentication remains the final component stylesheet; terminal inline release authorities follow below. */
 import './passkey-auth.css';
 
