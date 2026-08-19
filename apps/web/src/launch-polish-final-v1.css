@@ -26,6 +26,12 @@ html:root:root:root body {
   font-family: var(--launch-body) !important;
 }
 
+html:root:root:root body :is(h1,h2,h3,h4,h5,h6,[role='heading']) {
+  font-family: var(--launch-title) !important;
+  font-style: normal !important;
+  font-synthesis: none !important;
+}
+
 /* ---------------------------------------------------------------------
    ONE BRAND / HEADER GEOMETRY
    ------------------------------------------------------------------ */
@@ -124,6 +130,31 @@ html:root:root:root body :is(.public-approved-v8,.public-secondary-page) .v0-nav
 html:root:root:root body :is(.public-approved-v8,.public-secondary-page) .v0-nav :is(.v0-get-started,.landing-control--nav) {
   border-bottom: 1px solid rgba(242,235,225,.30) !important;
   color: var(--launch-ink) !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-mobile-menu summary,
+html:root:root:root body .public-secondary-page .v0-mobile-menu summary {
+  min-width: 44px !important;
+  min-height: 44px !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--launch-ink) !important;
+  font-family: var(--launch-body) !important;
+  font-size: 12px !important;
+  font-weight: 560 !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-mobile-menu__icon,
+html:root:root:root body .public-secondary-page .v0-mobile-menu__icon {
+  display: none !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-mobile-menu summary::after,
+html:root:root:root body .public-secondary-page .v0-mobile-menu summary::after {
+  content: "Menu" !important;
 }
 
 html:root:root:root body .account-shell .account-nav,
@@ -263,6 +294,87 @@ html:root:root:root body .public-approved-v8 .landing-demo-close {
   padding: 18px 36px 22px !important;
 }
 
+html:root:root:root body .public-approved-v8 .sovereign-opening-capabilities a {
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-comparison-grid {
+  gap: 0 !important;
+  border-top: 1px solid var(--launch-line-strong) !important;
+  border-bottom: 1px solid var(--launch-line) !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-comparison-panel,
+html:root:root:root body .public-approved-v8 .v0-comparison-panel.v0-comparison-positive {
+  padding: 30px 34px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-comparison-panel + .v0-comparison-panel {
+  border-left: 1px solid var(--launch-line-strong) !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-comparison-panel li {
+  position: relative !important;
+  padding: 12px 0 12px 18px !important;
+  border-top: 1px solid var(--launch-line) !important;
+  color: var(--launch-muted) !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-comparison-panel li::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 1.18rem !important;
+  width: 7px !important;
+  height: 1px !important;
+  background: rgba(242,235,225,.34) !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-footer {
+  border-top: 1px solid var(--launch-line) !important;
+  background: var(--launch-page) !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-footer > .v0-shell {
+  display: grid !important;
+  grid-template-columns: minmax(180px,1fr) auto minmax(180px,1fr) !important;
+  align-items: center !important;
+  gap: 24px !important;
+  width: var(--launch-shell) !important;
+  max-width: 1180px !important;
+  min-height: 76px !important;
+  margin-inline: auto !important;
+  padding: 16px 0 !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-footer nav {
+  justify-self: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  gap: 16px !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-footer nav a,
+html:root:root:root body .public-approved-v8 .v0-footer p {
+  color: var(--launch-faint) !important;
+  font-family: var(--launch-body) !important;
+  font-size: .72rem !important;
+  line-height: 1.4 !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-footer p {
+  justify-self: end !important;
+  margin: 0 !important;
+}
+
 /* ---------------------------------------------------------------------
    PUBLIC / POLICY / ACCOUNT PAGE RHYTHM
    ------------------------------------------------------------------ */
@@ -274,6 +386,10 @@ html:root:root:root body .public-secondary-page .policy-hero {
 
 html:root:root:root body .public-secondary-page .policy-grid article {
   padding-block: 20px !important;
+}
+
+html:root:root:root body .public-secondary-page .landing-control > span {
+  display: none !important;
 }
 
 html:root:root:root body .account-shell .account-layout {
@@ -316,10 +432,44 @@ html:root:root:root body :is(.account-shell,.plan-onboarding,.invitation-shell) 
   font-family: var(--launch-body) !important;
 }
 
-html:root:root:root body :is(.account-shell,.plan-onboarding,.invitation-shell) :is(.primary-button,.secondary-button,.consent-choice) {
+html:root:root:root body :is(.account-shell,.plan-onboarding,.invitation-shell) :is(.primary-button,.secondary-button,.consent-choice,.passkey-button,.checkout-free-fallback) {
   min-height: 48px !important;
   border-radius: 0 !important;
+  background: transparent !important;
   box-shadow: none !important;
+}
+
+html:root:root:root body .account-shell .passkey-button,
+html:root:root:root body .account-shell .form-stack button[type='submit'] {
+  border: 0 !important;
+  border-top: 1px solid var(--launch-line) !important;
+  border-bottom: 1px solid var(--launch-line-strong) !important;
+  color: var(--launch-ink) !important;
+}
+
+html:root:root:root body .account-shell .passkey-button > span {
+  display: none !important;
+}
+
+html:root:root:root body .account-shell .passkey-manager-heading > button,
+html:root:root:root body .account-shell .passkey-list .passkey-remove {
+  min-height: 44px !important;
+  padding-inline: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--launch-line-strong) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--launch-ink) !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .account-shell .passkey-list article,
+html:root:root:root body .account-shell .passkey-empty {
+  padding: 14px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid var(--launch-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
 }
 
 html:root:root:root body .plan-onboarding .plan-layout {
@@ -330,10 +480,171 @@ html:root:root:root body .plan-onboarding .plan-layout {
 html:root:root:root body .plan-onboarding .baseline-onboarding-form,
 html:root:root:root body .plan-onboarding .onboarding-message {
   border-radius: 2px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .plan-onboarding .onboarding-progress {
+  margin-bottom: 42px !important;
+}
+
+html:root:root:root body .plan-onboarding .onboarding-progress li span {
+  width: auto !important;
+  height: auto !important;
+  flex-basis: auto !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--launch-faint) !important;
+  font-size: .66rem !important;
+}
+
+html:root:root:root body .plan-onboarding .baseline-choice-row {
+  gap: 18px !important;
+}
+
+html:root:root:root body .plan-onboarding .baseline-choice-row span {
+  min-height: 48px !important;
+  justify-items: start !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--launch-line-strong) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--launch-muted) !important;
+}
+
+html:root:root:root body .plan-onboarding .baseline-choice-row input:checked + span {
+  border-bottom-color: rgba(242,235,225,.72) !important;
+  background: transparent !important;
+  color: var(--launch-ink) !important;
+}
+
+html:root:root:root body .plan-onboarding .baseline-progress-light {
+  height: 120px !important;
+  background: radial-gradient(circle at 50% 100%,rgba(92,123,158,.055),transparent 58%) !important;
+}
+
+html:root:root:root body .plan-onboarding .baseline-progress-light::before,
+html:root:root:root body .plan-onboarding .baseline-progress-light::after,
+html:root:root:root body .plan-onboarding .baseline-progress-light i::before,
+html:root:root:root body .plan-onboarding .baseline-progress-light i::after {
+  background: linear-gradient(90deg,transparent,rgba(242,235,225,.30)) !important;
+}
+
+html:root:root:root body .plan-onboarding .baseline-progress-light i {
+  width: 5px !important;
+  height: 5px !important;
+  background: rgba(242,235,225,.72) !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .plan-onboarding .baseline-building-state > ol li span {
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .plan-onboarding :is(.baseline-result-summary > div,.baseline-review) {
+  padding: 16px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid var(--launch-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .plan-onboarding .baseline-result-actions > button,
+html:root:root:root body .plan-onboarding .checkout-free-fallback {
+  min-height: 44px !important;
+  padding-inline: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--launch-line-strong) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--launch-ink) !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .plan-onboarding .onboarding-plan-grid {
+  gap: 0 !important;
+  border-top: 1px solid var(--launch-line-strong) !important;
+  border-bottom: 1px solid var(--launch-line) !important;
+}
+
+html:root:root:root body .plan-onboarding .onboarding-plan-grid > article,
+html:root:root:root body .plan-onboarding .onboarding-plan-grid > article.plus-plan,
+html:root:root:root body .plan-onboarding .onboarding-plan-grid > article.current {
+  padding: 30px 28px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .plan-onboarding .onboarding-plan-grid > article + article {
+  border-left: 1px solid var(--launch-line-strong) !important;
+}
+
+html:root:root:root body .plan-onboarding .billing-toggle {
+  gap: 18px !important;
+}
+
+html:root:root:root body .plan-onboarding .billing-toggle button {
+  min-height: 44px !important;
+  padding-inline: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--launch-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--launch-faint) !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .plan-onboarding .billing-toggle button[aria-pressed='true'] {
+  border-bottom-color: rgba(242,235,225,.68) !important;
+  color: var(--launch-ink) !important;
 }
 
 html:root:root:root body .invitation-shell {
   padding-top: 104px !important;
+}
+
+html:root:root:root body .invitation-shell :is(.auth-panel,.consent-panel,.invitation-panel) {
+  border-radius: 2px !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .public-not-found {
+  position: relative !important;
+  min-height: 100svh !important;
+  padding: calc(var(--launch-header-h) + 64px) max(32px,calc((100vw - 1180px)/2)) 72px !important;
+  background: var(--launch-page) !important;
+}
+
+html:root:root:root body .public-not-found::before {
+  content: "" !important;
+  position: absolute !important;
+  top: var(--launch-header-h) !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 1px !important;
+  background: var(--launch-line) !important;
+}
+
+html:root:root:root body .public-not-found .private-route-brand {
+  position: absolute !important;
+  top: 0 !important;
+  left: max(32px,calc((100vw - 1180px)/2)) !important;
+  height: var(--launch-header-h) !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+html:root:root:root body .public-not-found > section {
+  width: min(760px,100%) !important;
+  margin: 0 !important;
 }
 
 /* ---------------------------------------------------------------------
@@ -385,14 +696,58 @@ html:root:root:root body .user-question {
 
 html:root:root:root body .composer-shell,
 html:root:root:root body .workspace-composer,
-html:root:root:root body .thread-composer {
+html:root:root:root body .thread-composer,
+html:root:root:root body .sovereign-composer {
   border-radius: 2px !important;
 }
 
-html:root:root:root body :is(.topbar-actions button,.answer-actions button,.fit-controls button,.new-conversation,.covenant-action) {
+html:root:root:root body :is(.topbar-actions button,.answer-actions button,.fit-controls button,.new-conversation,.covenant-action,.baseline-primary,.baseline-back,.primary-action,.secondary-action) {
   min-height: 44px !important;
   border-radius: 0 !important;
   box-shadow: none !important;
+}
+
+html:root:root:root body .new-conversation > span,
+html:root:root:root body .baseline-primary > span,
+html:root:root:root body .covenant-confirmation > header > span {
+  display: none !important;
+}
+
+html:root:root:root body :is(.mobile-menu-trigger,.composer-send,.intelligence-context > header > button,.workspace-sheet > section > header > button) {
+  min-width: 44px !important;
+  min-height: 44px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 0 !important;
+}
+
+html:root:root:root body .mobile-menu-trigger::after {
+  content: "Menu" !important;
+  font-size: 12px !important;
+}
+
+html:root:root:root body .composer-send::after {
+  content: "Send" !important;
+  font-size: 12px !important;
+}
+
+html:root:root:root body .intelligence-context > header > button::after,
+html:root:root:root body .workspace-sheet > section > header > button::after {
+  content: "Close" !important;
+  font-size: 12px !important;
+}
+
+html:root:root:root body .baseline-step-form .certainty-choice > span {
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .baseline-builder :is(input,select,textarea) {
+  min-height: 48px !important;
+  border-radius: 2px !important;
+  font-size: 16px !important;
 }
 
 /* ---------------------------------------------------------------------
@@ -478,6 +833,32 @@ html:root:root:root body [aria-disabled='true'] {
     gap: 24px !important;
   }
 
+  html:root:root:root body .public-approved-v8 .v0-comparison-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  html:root:root:root body .public-approved-v8 .v0-comparison-panel,
+  html:root:root:root body .public-approved-v8 .v0-comparison-panel.v0-comparison-positive {
+    padding: 26px 0 !important;
+  }
+
+  html:root:root:root body .public-approved-v8 .v0-comparison-panel + .v0-comparison-panel {
+    border-left: 0 !important;
+    border-top: 1px solid var(--launch-line-strong) !important;
+  }
+
+  html:root:root:root body .public-approved-v8 .v0-footer > .v0-shell {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    padding: 22px 0 !important;
+  }
+
+  html:root:root:root body .public-approved-v8 .v0-footer nav,
+  html:root:root:root body .public-approved-v8 .v0-footer p {
+    justify-self: start !important;
+    justify-content: flex-start !important;
+  }
+
   html:root:root:root body .account-shell .account-layout {
     width: var(--launch-shell) !important;
     padding: 34px 0 54px !important;
@@ -500,11 +881,39 @@ html:root:root:root body [aria-disabled='true'] {
     padding: 26px 0 54px !important;
   }
 
+  html:root:root:root body .plan-onboarding .onboarding-plan-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  html:root:root:root body .plan-onboarding .onboarding-plan-grid > article,
+  html:root:root:root body .plan-onboarding .onboarding-plan-grid > article.plus-plan,
+  html:root:root:root body .plan-onboarding .onboarding-plan-grid > article.current {
+    padding: 28px 0 !important;
+  }
+
+  html:root:root:root body .plan-onboarding .onboarding-plan-grid > article + article {
+    border-left: 0 !important;
+    border-top: 1px solid var(--launch-line-strong) !important;
+  }
+
+  html:root:root:root body .plan-onboarding .baseline-choice-row,
+  html:root:root:root body .plan-onboarding .baseline-result-summary {
+    grid-template-columns: 1fr !important;
+  }
+
   html:root:root:root body .invitation-shell {
     padding: 92px 18px 54px !important;
   }
 
   html:root:root:root body .invitation-shell > .wordmark {
+    left: 18px !important;
+  }
+
+  html:root:root:root body .public-not-found {
+    padding: calc(var(--launch-header-h) + 44px) 18px 54px !important;
+  }
+
+  html:root:root:root body .public-not-found .private-route-brand {
     left: 18px !important;
   }
 
