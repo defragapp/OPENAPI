@@ -295,7 +295,7 @@ export const SELF_EVIDENCE_GROUPS: readonly RepresentativeEvidenceGroup[] = [
 ] as const;
 
 export function validateRepresentativeSelfFixture(): void {
-  const sourceIds = new Set(SELF_REPRESENTATIVE_SOURCES.map((source) => source.id));
+  const sourceIds = new Set<string>(SELF_REPRESENTATIVE_SOURCES.map((source) => source.id));
   const facets = new Map(SELF_REPRESENTATIVE_PROFILE.facets.map((item) => [item.id, item]));
 
   if (facets.size !== representativeBaselineFacetIds.length) {
