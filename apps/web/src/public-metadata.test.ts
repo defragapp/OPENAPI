@@ -14,14 +14,17 @@ const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const productStories = readFileSync(new URL('./landing-product-stories-v2.css', import.meta.url), 'utf8');
 
 describe('public metadata and fallback documents', () => {
-  it('explains the product category in document and shared-link metadata', () => {
+  it('explains the canonical product category in document and shared-link metadata', () => {
     expect(index).toContain('Sovereign.OS — Private personal AI for real life');
-    expect(index).toContain('private personal AI for understanding yourself, your relationships, your decisions, and the groups around you');
-    expect(index).toContain('Use one private Baseline to understand recurring patterns, decisions, relationships, and family or group dynamics without starting from zero every time.');
+    expect(index).toContain('private personal AI for understanding yourself, your relationships, your decisions, and the systems around you');
+    expect(index).toContain('It begins with your Baseline Design: a private, explorable reference built around you.');
+    expect(index).toContain('Use one private Baseline to understand recurring patterns, decisions, relationships, and the systems around you without starting from zero every time.');
     expect(index).toContain('og:site_name" content="Sovereign.OS"');
     expect(index).toContain('twitter:card" content="summary_large_image"');
     expect(index).toContain('https://sovereign.defrag.app/og-sovereign.png');
     expect(index).toContain('og:image:type" content="image/png"');
+    expect(index).not.toContain('the groups around you');
+    expect(index).not.toContain('family or group dynamics without starting from zero');
     expect(index).not.toContain('og:title" content="Sovereign — Healing isn’t optional. Holding onto the pain is."');
     expect(index).not.toContain('with permitted context');
   });
@@ -55,7 +58,9 @@ describe('public metadata and fallback documents', () => {
   });
 
   it('keeps install metadata aligned with the product definition', () => {
-    expect(manifest).toContain('Private personal AI for understanding yourself, your relationships, your decisions, and the groups around you.');
+    expect(manifest).toContain('Private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.');
+    expect(manifest).toContain('It starts with your Baseline Design.');
+    expect(manifest).not.toContain('the groups around you');
     expect(manifest).toContain('Open your private Sovereign workspace.');
     expect(manifest).toContain('"theme_color": "#080a0d"');
     expect(manifest).toContain('"src": "/app-icon.png"');
@@ -81,10 +86,15 @@ describe('public metadata and fallback documents', () => {
     expect(index).toContain('<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />');
   });
 
-  it('uses the same line-field identity in social, browser, and install marks', () => {
+  it('uses the same line-field identity and sans product hierarchy in social, browser, and install marks', () => {
     expect(socialPreview).toContain('PRIVATE PERSONAL AI FOR REAL LIFE');
-    expect(socialPreview).toContain('Understand yourself,');
-    expect(socialPreview).toContain('family or group dynamics');
+    expect(socialPreview).toContain('Understand yourself.');
+    expect(socialPreview).toContain('Understand your people.');
+    expect(socialPreview).toContain('See the whole system.');
+    expect(socialPreview).toContain('Self · People · Systems');
+    expect(socialPreview).not.toContain('Georgia');
+    expect(socialPreview).not.toContain('the groups around you');
+    expect(socialPreview).not.toContain('family or group dynamics');
     expect(socialPreview).not.toContain('Healing isn’t optional.');
     expect(appIcon).toContain('quiet field of lines showing different relative emphasis');
     expect(appIcon).toContain('M256 330 256 112');
