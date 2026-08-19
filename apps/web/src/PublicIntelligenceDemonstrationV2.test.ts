@@ -64,7 +64,7 @@ describe('public intelligence demonstrations v2', () => {
       'decision-field__adapt',
       'function RelationshipField()',
       'relationship-field__center',
-      'Between you',
+      'What happens between you',
       'function SystemField()',
       'system-field__state--current',
       'system-field__state--changed'
