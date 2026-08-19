@@ -23,6 +23,7 @@ const renderedFidelityCss = readFileSync(new URL('./rendered-fidelity-v1.css', i
 const landingRefinementV2Css = readFileSync(new URL('./landing-refinement-v2.css', import.meta.url), 'utf8');
 const landingRefinementV5Css = readFileSync(new URL('./landing-live-refinement-v5.css', import.meta.url), 'utf8');
 const sansAuthority = readFileSync(new URL('./sans-typography-authority-v1.css', import.meta.url), 'utf8');
+const typography = readFileSync(new URL('./typography-system.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${stories}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
@@ -132,7 +133,7 @@ describe('Sovereign.OS public experience', () => {
     expect(policyAuthority).toContain('not retained as an export artifact');
   });
 
-  it('renders the public route without runtime copy rewriting and appends terminal sans typography', () => {
+  it('renders the public route without runtime copy rewriting and appends split typography authority', () => {
     expect(main).toContain("location.pathname === '/'");
     expect(main).toContain('<PublicLanding />');
     expect(main).toContain("import './landing-expression-field-integration.css';");
@@ -144,7 +145,7 @@ describe('Sovereign.OS public experience', () => {
     expect(main).not.toContain('ProductLanguageRuntime');
   });
 
-  it('applies the founder visual system with sans-only terminal typography', () => {
+  it('applies founder display typography to public identity and Geist to product UI', () => {
     for (const selector of ['.v0-landing-port', '.v0-hero', '.intelligence-workspace', '.sovereign-composer', '.account-shell', '.auth-panel']) expect(v0Css).toContain(selector);
     for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storyCss).toContain(selector);
     expect(refinementCss).toContain('--landing-blue: #e8ddd0 !important');
@@ -155,9 +156,16 @@ describe('Sovereign.OS public experience', () => {
     expect(landingRefinementV5Css).not.toContain('.landing-baseline-intro');
     expect(landingRefinementV5Css).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5Css).toContain('@keyframes sovereign-hero-rise');
+    expect(typography).toContain('font-family: "Sovereign Display";');
+    expect(typography).toContain('font-family: "Geist Sans";');
     expect(sansAuthority).toContain('font-family: var(--font-title) !important');
-    expect(staticTerminalCss).toContain('--static-title-font:');
-    expect(staticTerminalCss).toContain('font-family: var(--static-title-font) !important');
+    expect(sansAuthority).toContain('font-family: var(--font-public-display) !important');
+    expect(staticTerminalCss).toContain('--static-display-font:');
+    expect(staticTerminalCss).toContain('--static-ui-title-font:');
+    expect(staticTerminalCss).toContain('body.launch-page :is(');
+    expect(staticTerminalCss).toContain('body.consent-page :is(');
+    expect(staticTerminalCss).toContain('font-family: var(--static-display-font) !important');
+    expect(staticTerminalCss).toContain('font-family: var(--static-ui-title-font) !important');
     expect(staticRefinementCss).toContain('--v0-blue: #e8ddd0');
   });
 
@@ -168,21 +176,26 @@ describe('Sovereign.OS public experience', () => {
     expect(how).toContain('A private reference built around you.');
     expect(how).toContain('<summary>See source details</summary>');
     expect(how).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
+    expect(how).toContain('/premium-action-static-v1.css?v=20260819-founder-display-v1');
     expect(pricing).toContain('Explore yourself for free. Add People and Systems with Sovereign+.');
     expect(pricing).toContain('$20');
     expect(pricing).toContain('$99 / year');
     expect(pricing).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
+    expect(pricing).toContain('/premium-action-static-v1.css?v=20260819-founder-display-v1');
     expect(faq).toContain('What can Sovereign help you understand?');
     expect(faq).toContain('Can I see what information Sovereign used for an answer?');
     expect(faq).toContain('Do those source details prove the interpretation is true?');
     expect(faq).toContain('Tarot is not part of Sovereign.OS.');
     expect(faq).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
+    expect(faq).toContain('/premium-action-static-v1.css?v=20260819-founder-display-v1');
     expect(platformPublicCss).toContain('opacity: 1 !important');
     expect(staticExperienceCss).toContain('@media (max-width: 620px)');
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
     expect(notFound).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
+    expect(notFound).toContain('/premium-action-static-v1.css?v=20260819-founder-display-v1');
     expect(consent).toContain('You control what another person can use with you.');
     expect(consent).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
+    expect(consent).toContain('/premium-action-static-v1.css?v=20260819-founder-display-v1');
     expect(consentCss).toContain('@media (max-width: 680px)');
   });
 });
