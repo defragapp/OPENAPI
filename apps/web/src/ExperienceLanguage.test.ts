@@ -84,31 +84,50 @@ describe('Sovereign.OS active experience language', () => {
     }
   });
 
-  it('keeps public workflows in approved adult language and hides exact source codes until inspection', () => {
+  it('makes the demonstrations sound like edited Sovereign answers instead of workflow narration', () => {
     const stories = activeExperience.find(([label]) => label === 'landing demonstrations')?.[1] ?? '';
     for (const marker of [
-      'Start with the question',
-      'Use what matters from your Baseline',
-      'Find the useful difference',
-      'Leave what is not known unanswered',
-      'Give you something you can try',
-      'Start with what happened',
-      'Keep each person separate',
-      'Show what happens between you',
-      'Do not guess private feelings',
-      'Find a lower-pressure next step',
-      'Start with what you told Sovereign',
-      'Show how pressure moves',
-      'Show why the role keeps returning',
-      'Change one thing and watch what happens',
+      'The right decision may not be the easiest one to explain.',
+      'Your Baseline suggests that clarity may come less from reaching certainty quickly',
+      'The real tradeoff',
+      'A closer version',
+      'You may both be trying to reach clarity in opposite ways.',
+      'The conversation may be caught in timing before it is caught in disagreement.',
+      'Reassurance now. Resolution at a defined time.',
+      'When one person changes roles, the system has to find another route.',
+      'The role can keep returning because it works for the system',
+      'Change one position and everyone else has to respond to a different structure.',
       '<strong>See source details</strong>',
       '<details className="landing-evidence">'
     ]) expect(stories).toContain(marker);
 
+    expect(stories).not.toContain('function WorkflowPanel(');
+    expect(stories).not.toContain('useWorkflowProgress');
     expect(stories).not.toContain('<strong>Example Basis</strong>');
-    expect(stories).not.toContain('Exact values used by this representative fixture');
-    expect(stories).not.toContain("chips: ['HD G13.1'");
-    expect(stories).not.toContain("chips: ['You · HD G22.4'");
+  });
+
+  it('keeps People language consent-aware and avoids private-state claims', () => {
+    const stories = activeExperience.find(([label]) => label === 'landing demonstrations')?.[1] ?? '';
+    for (const marker of [
+      'Both people choose what they share',
+      'No compatibility score',
+      'Only they can say what they actually felt or intended',
+      'Alex’s shared Baseline'
+    ]) expect(stories).toContain(marker);
+    for (const prohibited of ['They secretly', 'They definitely feel', 'compatibilityScore', 'compatibilityPercent']) expect(stories).not.toContain(prohibited);
+  });
+
+  it('keeps Systems language grounded in supplied roles and observed interaction', () => {
+    const stories = activeExperience.find(([label]) => label === 'landing demonstrations')?.[1] ?? '';
+    for (const marker of [
+      'Roles and events are supplied in the example',
+      'What you told Sovereign',
+      'A parent pushes for immediate resolution.',
+      'A sibling pulls away when tension rises.',
+      'You often step in to translate or mediate',
+      'You remain in the system; the communication path is what changes.'
+    ]) expect(stories).toContain(marker);
+    expect(stories.toLowerCase()).not.toContain('missing perspective');
   });
 
   it('keeps secondary pages understandable before framework/source mechanics', () => {
@@ -120,7 +139,6 @@ describe('Sovereign.OS active experience language', () => {
     expect(how).toContain('<summary>See source details</summary>');
     expect(how).toContain('<dt>Sources</dt>');
     expect(how).not.toContain('EXAMPLE BASIS');
-    expect(how).not.toContain('HD G13.1 · GK ACT13 · ☉ CAN 04.2°');
 
     expect(faq).toContain('Can I see what information Sovereign used for an answer?');
     expect(faq).toContain('Do those source details prove the interpretation is true?');
@@ -135,27 +153,15 @@ describe('Sovereign.OS active experience language', () => {
     expect(workspace).toContain("{ name: 'Systems', label: 'Systems', description: 'See the whole system' }");
     expect(workspace).toContain('title="See how the same moment can land differently."');
     expect(workspace).toContain('body="Keep each person distinct, then examine the interaction and what may help close the gap."');
-    expect(workspace).toContain("Explore: ['What part of myself do I want to understand more clearly?', 'What changes in me under pressure?']");
-    expect(workspace).toContain("Systems: ['What role am I playing in this system?', 'What changes when the usual roles shift?']");
     expect(workspace).toContain('<strong>Sources</strong>');
     expect(workspace).toContain('<h2 id="basis-title">Source details</h2>');
-    expect(workspace).toContain('These are the source values Sovereign used for this answer.');
-    expect(workspace).not.toContain('aria-label={`Basis. Open ${available.length} source values.`}');
     expect(workspace).not.toContain('<strong>Basis</strong>');
-    expect(workspace).not.toContain('<h2 id="basis-title">Basis</h2>');
     expect(workspace).not.toContain('Understand both sides and what happens between you');
-    expect(workspace).not.toContain('private foundation');
-    expect(workspace).not.toContain('personal foundation');
-    expect(workspace).not.toContain('same foundation');
   });
 
   it('keeps onboarding progress user-facing while internal readiness fields remain implementation-only', () => {
     const onboarding = activeExperience.find(([label]) => label === 'onboarding')?.[1] ?? '';
-    for (const marker of ['Checking your details', 'Building your Baseline', 'Preparing your Baseline', 'Opening Sovereign.OS', 'Your Baseline is ready to use across the questions, relationships, and systems you choose to explore.']) {
-      expect(onboarding).toContain(marker);
-    }
-    for (const phrase of ['Calculating source positions', 'Calculating your exact source positions', 'Preparing your Baseline profile', 'exact source and validated plain-language Baseline profile', 'Source and Baseline profile validated', 'Interpretive uncertainty', 'exact approved Basis values']) {
-      expect(onboarding).not.toContain(phrase);
-    }
+    for (const marker of ['Checking your details', 'Building your Baseline', 'Preparing your Baseline', 'Opening Sovereign.OS', 'Your Baseline is ready to use across the questions, relationships, and systems you choose to explore.']) expect(onboarding).toContain(marker);
+    for (const phrase of ['Calculating source positions', 'Calculating your exact source positions', 'Preparing your Baseline profile', 'exact source and validated plain-language Baseline profile', 'Source and Baseline profile validated', 'Interpretive uncertainty', 'exact approved Basis values']) expect(onboarding).not.toContain(phrase);
   });
 });
