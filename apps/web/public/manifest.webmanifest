@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Sovereign.OS",
   "short_name": "Sovereign",
-  "description": "Private personal AI for understanding yourself, your relationships, your decisions, and the groups around you. It starts with your Baseline Design.",
+  "description": "Private personal AI for understanding yourself, your relationships, your decisions, and the systems around you. It starts with your Baseline Design.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
