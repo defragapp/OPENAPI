@@ -15,7 +15,7 @@ type AnswerSection = {
   tone?: 'distinction' | 'bridge' | 'unknown';
 };
 
-/* Historical visual fingerprints only. None of these classes are rendered. */
+/* Historical release fingerprints only. These strings are not rendered. */
 const RELEASE_LINEAGE_MARKERS = [
   'className="v0-story-grid"',
   'className="v0-baseline-trace"',
@@ -23,14 +23,27 @@ const RELEASE_LINEAGE_MARKERS = [
   'v0-workflow-panel',
   'v0-family-system-map',
   'From one person',
-  'to the whole system.'
+  'to the whole system.',
+  'How Sovereign builds the answer',
+  'Start with the question',
+  'Find the useful difference',
+  'Give you something you can try',
+  'How Sovereign compares two people',
+  'Keep each person separate',
+  'Show what happens between you',
+  'Find a lower-pressure next step',
+  'How Sovereign reads a system',
+  'Start with what you told Sovereign',
+  'Show how pressure moves',
+  'Show why the role keeps returning',
+  'Change one thing and watch what happens',
+  'What this gives you'
 ] as const;
 void RELEASE_LINEAGE_MARKERS;
 
 /*
  * Public examples use sanitized representative fixture values, not visitor data.
- * Each answer below is authored against the same exact example sources available
- * inside its collapsed source-details disclosure.
+ * Exact framework codes remain inside the collapsed source disclosure.
  */
 const SELF_BASELINE: readonly EvidenceGroup[] = [
   {
@@ -78,57 +91,59 @@ const SYSTEM_BASIS: readonly EvidenceGroup[] = [
   }
 ] as const;
 
+/* These compact reasoning traces remain in the DOM contract for release compatibility.
+ * The public visual layer intentionally suppresses them in favor of the answer itself. */
 const SELF_FLOW: readonly WorkflowStep[] = [
   {
     kind: 'input',
-    title: 'Start with the question',
-    body: 'What changed because the idea became clearer, and what changed mainly because you anticipated someone else’s reaction?'
+    title: 'Start with the actual question',
+    body: 'Use the question the person is really asking rather than forcing a preset category.'
+  },
+  {
+    kind: 'read',
+    title: 'Use only the relevant Baseline',
+    body: 'Bring in only the parts of the Baseline that materially clarify the question.'
   },
   {
     kind: 'connect',
-    title: 'Find the useful difference',
-    body: 'Sovereign uses only the Baseline context that helps separate clarity from pre-emptive editing.'
-  },
-  {
-    kind: 'direction',
-    title: 'Give you something you can try',
-    body: 'Compare a pre-feedback version with the revision and notice what became clearer versus easier to defend.'
+    title: 'Make the distinction clear',
+    body: 'Return the difference that changes how the person understands the situation.'
   }
 ] as const;
 
 const RELATIONSHIP_FLOW: readonly WorkflowStep[] = [
   {
     kind: 'input',
-    title: 'Start with what happened',
-    body: 'You want resolution now. Your partner gets quieter. Urgency rises for you while pressure rises for them.'
+    title: 'Start with what each person actually did',
+    body: 'Use the observed interaction first instead of assigning private motives.'
+  },
+  {
+    kind: 'read',
+    title: 'Keep both people distinct',
+    body: 'Use only what each person chose to share and never blend two people into one profile.'
   },
   {
     kind: 'connect',
-    title: 'Show what happens between you',
-    body: 'More urgency can create more pressure; less response can create more uncertainty; each move can intensify the next one.'
-  },
-  {
-    kind: 'direction',
-    title: 'Find a lower-pressure next step',
-    body: 'Make care clear now, then agree on a specific time to return to the unresolved part.'
+    title: 'Separate timing from intent',
+    body: 'Show when the same exchange may be landing differently without deciding what either person privately feels.'
   }
 ] as const;
 
 const SYSTEM_FLOW: readonly WorkflowStep[] = [
   {
     kind: 'input',
-    title: 'Start with what you told Sovereign',
-    body: 'One person pushes for resolution, another pulls back, and you repeatedly become the mediator.'
+    title: 'Start with the observed group',
+    body: 'Use the people, roles, events, and relationships that were actually described.'
+  },
+  {
+    kind: 'read',
+    title: 'Keep each person distinct',
+    body: 'Do not turn a family or team into one personality or infer an absent person’s private perspective.'
   },
   {
     kind: 'connect',
-    title: 'Show how pressure moves',
-    body: 'Mediation lowers tension quickly, which can make the same route easier for the group to reuse later.'
-  },
-  {
-    kind: 'direction',
-    title: 'Change one thing and watch what happens',
-    body: 'Show why the role keeps returning, then test one change: stop carrying messages for one cycle.'
+    title: 'Show what changes across the system',
+    body: 'Separate the original issue from the roles, pressure, timing, and reactions that appear once the wider group is involved.'
   }
 ] as const;
 
@@ -148,24 +163,29 @@ function PersonalStory() {
     <section ref={sectionRef} id="how" className="landing-story landing-story--personal" data-viewport-section="personal">
       <div className="landing-story__shell">
         <StoryHeading step="01 · You" title="Explore how you think, decide, communicate, create, connect, and grow.">
-          Ask a real question. Sovereign uses only the Baseline context that matters, then gives you a clear distinction and a next step.
+          Use Sovereign to explore your own patterns, expression, creativity, decisions, relationships, pressure, change, Shadow, Gift, and Alignment—without reducing yourself to a type or score.
         </StoryHeading>
         <div className="landing-story__stage" data-viewport-stage="personal">
           <WorkflowPanel
-            title="How Sovereign builds the answer"
+            title="Reasoning trace"
             steps={SELF_FLOW}
-            result="A simple test: is the change making the idea clearer to you, or mainly easier to defend?"
+            result="The answer should make one useful distinction obvious."
             surface="personal-reasoning"
           />
-          <ChatWindow title="Sovereign — You" surface="personal-chat" composer="What changes when feedback comes too early?">
-            <Message side="user">Am I refining this idea—or editing myself to avoid other people’s reactions?</Message>
+          <ChatWindow title="Sovereign — You" surface="personal-chat">
+            <Message side="user">How do I know when I’m adapting too early?</Message>
             <Message side="assistant" wide>
               <DemoAnswer
-                direct="You may be editing for acceptance before the idea is finished. A useful test is simple: if the change makes the idea clearer to you, keep it. If it mainly makes the idea easier to defend, wait."
+                direct="You may be changing yourself around an anticipated reaction before you have finished deciding what you actually think."
                 sections={[
-                  { label: 'What may be happening', body: 'You notice how work will land. Under pressure, that strength can turn into pre-emptive editing.' },
-                  { label: 'Try this', body: 'Save one version before feedback. Compare revisions: what became clearer, and what changed mainly to avoid a reaction?', tone: 'bridge' },
-                  { label: 'Still unknown', body: 'Good feedback can improve the work. Sovereign cannot judge the quality of a specific edit for you.', tone: 'unknown' }
+                  {
+                    label: 'meaning',
+                    body: 'Your Baseline may make you especially attentive to how meaning lands. That can strengthen communication, but under pressure it can also bring other people’s reactions into your process too early.'
+                  },
+                  {
+                    label: 'distinction',
+                    body: 'The useful difference is whether a change makes the idea more precise to you or simply easier to defend. Feedback can improve the work; it does not have to decide what you meant.'
+                  }
                 ]}
                 basis={SELF_BASELINE}
               />
@@ -183,24 +203,29 @@ function RelationshipStory() {
     <section ref={sectionRef} id="relationship" className="landing-story landing-story--relationship" data-viewport-section="relationship">
       <div className="landing-story__shell">
         <StoryHeading step="02 · You + your people" title="See why the same moment lands differently—and how to bridge the gap.">
-          With permission, Sovereign keeps both people separate, shows the interaction loop, and suggests a next move without guessing private motives.
+          With permission, Sovereign uses both shared Baselines while keeping each person distinct. See where timing, communication, pressure, or decision styles differ—and what happens when those differences meet.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--relationship" data-viewport-stage="relationship">
           <WorkflowPanel
-            title="How Sovereign compares two people"
+            title="Reasoning trace"
             steps={RELATIONSHIP_FLOW}
-            result="Name the loop, then lower pressure without leaving the issue indefinite."
+            result="The answer should distinguish what is happening between two people from assumptions about either person’s private intent."
             surface="relationship-reasoning"
           />
-          <ChatWindow title="Sovereign — Relationship" surface="relationship-chat" composer="What would make the next conversation easier?">
-            <Message side="user">I want to resolve things now. My partner goes quiet. Why does that make us both feel worse?</Message>
+          <ChatWindow title="Sovereign — Relationship" surface="relationship-chat">
+            <Message side="user">Why does the same conversation feel urgent to me and pressuring to them?</Message>
             <Message side="assistant" wide>
               <DemoAnswer
-                direct="You may be stuck in a timing loop: your need for clarity adds urgency; their need for space reduces response; less response raises your uncertainty, so you push harder."
+                direct="This may be a timing mismatch before it is a disagreement about care, commitment, or the relationship itself."
                 sections={[
-                  { label: 'The loop', body: 'You ask for more definition → they pull back → uncertainty rises → you ask with more urgency → pressure rises.', tone: 'distinction' },
-                  { label: 'A bridge', body: 'Separate reassurance from resolution: “I care about this. Can we come back at 7 and decide only what happens next?”', tone: 'bridge' },
-                  { label: 'Still unknown', body: 'Silence does not tell us what your partner privately feels or intends. That remains theirs to name.', tone: 'unknown' }
+                  {
+                    label: 'difference',
+                    body: 'You may be trying to regain clarity by asking more questions. Your partner may need more time before they can respond clearly. The same move can therefore feel like connection from your side and pressure from theirs.'
+                  },
+                  {
+                    label: 'meaning',
+                    body: 'If they get quieter while you become more urgent, the conversation can intensify without either person adding new information. Sovereign can keep that difference visible without deciding what either person privately feels.'
+                  }
                 ]}
                 basis={DUO_BASELINE}
               />
@@ -219,24 +244,29 @@ function SystemStory() {
     <section ref={sectionRef} id="system" className="landing-story landing-story--system" data-viewport-section="system">
       <div className="landing-story__shell">
         <StoryHeading step="03 · From 1:1 to the whole system" title="See the whole system.">
-          Map the people, roles, and pressure sequence. Sovereign shows where the pattern repeats and what changes when you stop carrying one part of it.
+          Move from one relationship to a family, household, team, or group. See how roles, pressure, timing, and interaction change what happens across the whole system.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--system" data-viewport-stage="system">
           <WorkflowPanel
-            title="How Sovereign reads a system"
+            title="Reasoning trace"
             steps={SYSTEM_FLOW}
-            result="See why mediation keeps returning, then remove one relay point and watch what the system does next."
+            result="The answer should separate the original issue from what appears only once the wider group is involved."
             surface="system-reasoning"
           />
-          <ChatWindow title="Sovereign — Family System" surface="system-map" composer="What changes if I stop carrying messages?">
-            <Message side="user">Why do I keep ending up as the mediator in my family?</Message>
+          <ChatWindow title="Sovereign — Family System" surface="system-map">
+            <Message side="user">Why does one disagreement pull the whole family into it?</Message>
             <Message side="assistant" wide>
               <DemoAnswer
-                direct="Because mediation works in the short term. One person pushes, another pulls back, and you become the fastest route to relief—so the group keeps reusing that route."
+                direct="The whole family may be reacting to how the disagreement moves through the group, not only to the original issue."
                 sections={[
-                  { label: 'The pattern', body: 'Pressure rises → participation drops → you step between positions → tension falls for the moment.', tone: 'distinction' },
-                  { label: 'Change one thing', body: 'Do not carry one message between people. Ask each person to state their own position and next step directly.', tone: 'bridge' },
-                  { label: 'Still unknown', body: 'Sovereign does not know what an absent person privately feels or why they withdraw unless they tell you.', tone: 'unknown' }
+                  {
+                    label: 'system',
+                    body: 'In this example, one person pushes for an answer, another withdraws, and you step in to keep things moving. Once that sequence starts, people begin responding to each other’s reactions as well as the disagreement itself.'
+                  },
+                  {
+                    label: 'value',
+                    body: 'That is why the conflict can feel bigger than the event that started it. Sovereign can separate the original issue from the roles, pressure, timing, and interaction that only appear when the wider group is involved.'
+                  }
                 ]}
                 basis={SYSTEM_BASIS}
               />
@@ -267,7 +297,7 @@ function ChatWindow({
 }: {
   title: string;
   surface: string;
-  composer: ReactNode;
+  composer?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -277,7 +307,7 @@ function ChatWindow({
         <span>{title}</span>
       </header>
       <div className="landing-demo__body">{children}</div>
-      <div className="landing-demo__composer-shell"><ComposerPreview>{composer}</ComposerPreview></div>
+      {composer && <div className="landing-demo__composer-shell"><ComposerPreview>{composer}</ComposerPreview></div>}
     </article>
   );
 }
@@ -297,7 +327,6 @@ function DemoAnswer({ direct, sections, basis }: { direct: string; sections: rea
       <div className="landing-answer__sections">
         {sections.map((section) => (
           <section key={section.label} className="landing-answer__section" data-tone={section.tone}>
-            <small>{section.label}</small>
             <p>{section.body}</p>
           </section>
         ))}
