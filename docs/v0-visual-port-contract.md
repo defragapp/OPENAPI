@@ -32,8 +32,11 @@ The root landing must preserve the archive’s recognizable sequence while using
 5. Personal demonstration:
    - section identity is `01 · You`;
    - demonstrate genuine self exploration from the supported Baseline facet universe;
-   - visible product-level workflow/explanation on the left and the conversation/output on the right at desktop widths;
+   - use an insight-first product proof: one ordinary human question, one strong direct answer, two or three concise mechanism paragraphs, one visually dominant distinction, quiet context proof, and collapsed source details;
+   - do not require a parallel five-step workflow tutorial before the visitor reaches the insight;
+   - the product proof may occupy the full available demonstration stage at desktop widths rather than preserving a historical 50/50 workflow/chat split;
    - source codes stay hidden by default behind a plain `See source details` disclosure;
+   - when a composer is shown, it must read as the bottom of the conversation/product surface rather than floating inside the answer;
    - the demonstration must remain visible without IntersectionObserver/reveal-state success; motion is enhancement, never a content gate;
    - do not lead with internal `capacity` terminology or framework mechanics.
 6. Relationship demonstration:
@@ -68,7 +71,7 @@ Port and maintain:
 - large restrained sans typography with hierarchy created by scale, weight, spacing, opacity, and layout;
 - rotating question treatment;
 - self, relationship, and system storytelling sequence;
-- chat-window demonstrations;
+- recognizable conversation/product-proof demonstrations without requiring faux-browser chrome or a parallel reasoning tutorial;
 - a quiet source-details disclosure whose exact example values stay collapsed until opened;
 - answer/exploration structure treatment;
 - a system structure/sequence treatment that supports the explanation rather than requiring a decorative graph;
@@ -97,7 +100,7 @@ Never import or recreate the archive’s mock product runtime:
 
 The selective-port source must reject mock auth, canned answer generators, fake users, dashboard-grid behavior, and nondeterministic demonstration generation. Broad dependency-bundle string guesses are not a substitute for source-level and runtime-contract verification.
 
-Public marketing examples may use deterministic, sanitized representative fixtures. Those fixtures must be explicitly bounded as examples, must not imply visitor data or a live private inference call, and must keep their exact source values tied to the same fixture used to author the demonstration answer. Exact codes remain collapsed until the visitor chooses `See source details`.
+Public marketing examples may use deterministic, sanitized representative fixtures. Those fixtures must be explicitly bounded as examples, must not imply visitor data or a live private inference call, and must keep their exact source values tied to the same fixture used to author the demonstration answer. Exact codes remain collapsed until the visitor chooses `See source details`. Representative fixtures must validate semantic support as well as source-reference integrity: the Baseline facets and supplied observations used by the example must actually support the visible claim rather than serving as decorative provenance.
 
 ## Real production architecture that remains authoritative
 
@@ -157,7 +160,8 @@ The complete Vite foundation and final refinement are required:
 7. `apps/web/src/rendered-fidelity-v1.css`
    - is appended after experience refinement and preserves monochrome fidelity and readable public proof.
 8. `apps/web/src/landing-refinement-v2.css` plus current landing live refinements
-   - own landing-only recognition, larger demonstrations, visible workflow behavior, Expression Field detail, and mobile proof;
+   - own landing-only recognition, larger demonstrations, Expression Field detail, and mobile proof;
+   - legacy workflow styling may remain only for not-yet-refactored stories during a controlled product-proof migration and must not dictate the new insight-first composition;
    - must not alter product logic, consent, Baseline contracts, or answer contracts.
 9. `apps/web/src/premium-action-authority-v1.css`
    - preserves editorial action language for navigation and low-emphasis actions while transactional authentication, onboarding, consent, billing, and account controls retain clear visible affordance.
@@ -168,7 +172,8 @@ The complete Vite foundation and final refinement are required:
 11. `apps/web/src/production-product-cohesion-v1.css`
    - preserves private-product structure and launch-surface cohesion after typography family authority.
 12. `apps/web/src/public-intelligence-demonstration-v1.css`
-   - owns the public demo composition, rich fixture-backed answer presentation, bottom-anchored demo composer, system pressure sequence, collapsed source-details disclosure, and the product-language title-variable correction;
+   - owns the public demo composition, insight-first product-proof presentation, fixture-backed answer presentation, bottom-anchored demo composer, system pressure sequence, collapsed source-details disclosure, and the product-language title-variable correction;
+   - may retain transitional Relationship/System workflow styles only while those stories are being deliberately migrated to the accepted product-proof grammar;
    - loads before the terminal production visual authority and uses bounded specificity only where a later legacy selector would otherwise restore the superseded demo layout.
 13. `apps/web/src/production-visual-authority-v1.css`
    - remains the terminal inline presentation authority;
@@ -206,8 +211,9 @@ A production release must fail unless all of the following are true:
 - active headings/titles resolve to the approved native sans title system and never to `Sovereign Display`, the retired bundled `Sovereign Sans`, `Optima`, `Avenir Next`, or serif fallbacks;
 - root/static/policy public navigation exposes the expected page-in/page-out destinations with one consistent `SOVEREIGN.OS` wordmark identity without freezing temporary breakpoint geometry as the design authority;
 - product demonstrations remain visible without reveal-state success;
-- public demo workflow precedes the conversation at desktop widths and the composer reads as the bottom of the thread rather than floating in the middle of the answer field;
+- public product proof presents the ordinary user question before the answer, keeps the direct answer and dominant distinction visually primary, and keeps any composer at the bottom of the product surface; a parallel workflow panel is not required;
 - public source codes remain collapsed by default behind `See source details`, stay tied to the exact representative fixture, and never imply visitor/private runtime data;
+- representative marketing claims remain backed by the same explicit Baseline facets, permitted profiles, supplied roles/observations, and source registries used to author the example;
 - the system demonstration supports the explanation with a stable sequence/structure rather than requiring a decorative node graph;
 - compiled CSS contains founder landing, real workspace/account, onboarding, policy, and access selectors;
 - Privacy and Terms render as disciplined documents rather than a generic card grid;
