@@ -4,23 +4,28 @@ import { readFileSync } from 'node:fs';
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const css = readFileSync(new URL('./premium-action-authority-v1.css', import.meta.url), 'utf8');
+const finalPolish = readFileSync(new URL('./launch-polish-final-v1.css', import.meta.url), 'utf8');
 
 describe('premium action authority', () => {
-  it('loads editorial action authority before authenticated launch cohesion restores critical private actions', () => {
+  it('loads editorial action authority before authenticated launch cohesion and final launch polish', () => {
     expect(main).toContain("import premiumActionAuthorityCss from './premium-action-authority-v1.css?inline'");
     expect(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'))
       .toBeGreaterThan(main.indexOf('style.textContent += `\\n${workspaceProductionRefinementCss}`;'));
     expect(main.indexOf('style.textContent += `\\n${authenticatedLaunchCohesionCss}`;'))
       .toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
+    expect(main.indexOf('style.textContent += `\\n${launchPolishFinalCss}`;'))
+      .toBeGreaterThan(main.indexOf('style.textContent += `\\n${authenticatedLaunchCohesionCss}`;'));
   });
 
-  it('uses one acquisition vocabulary without duplicate hero/final CTAs', () => {
+  it('uses one acquisition vocabulary with text-only public actions', () => {
     expect(landing).toContain('>Sign in</a>');
-    expect(landing).toContain('>Get started <ArrowIcon /></a>');
+    expect(landing).toContain('>Get started</a>');
     expect(landing).toContain('<a href="/signup">Get started</a>');
+    expect(landing).not.toContain('ArrowIcon');
+    expect(landing).not.toContain('LockIcon');
+    expect(landing).not.toContain('CapabilityIcon');
     expect(landing).not.toContain('Build my Baseline');
     expect(landing).not.toContain('See a Sovereign answer');
-    expect(landing).not.toContain('See how it works</span><ArrowIcon');
     expect(landing).not.toContain('sovereign-opening-actions');
     expect(landing).not.toContain('landing-control landing-control--primary');
   });
@@ -35,6 +40,9 @@ describe('premium action authority', () => {
     expect(css).toContain(':focus-visible');
     expect(css).toContain('.billing-switch button.active');
     expect(css).toContain('.intelligence-sidebar nav button');
+    expect(finalPolish).toContain('.passkey-button');
+    expect(finalPolish).toContain('.billing-toggle button');
+    expect(finalPolish).toContain('.baseline-choice-row span');
   });
 
   it('keeps mobile capability navigation as editorial rows rather than cards', () => {
@@ -42,5 +50,6 @@ describe('premium action authority', () => {
     expect(css).toContain('border-top: 1px solid var(--sovereign-action-line) !important;');
     expect(css).toContain('.v0-mobile-menu__panel a');
     expect(css).toContain('border-bottom: 1px solid var(--sovereign-action-line) !important;');
+    expect(finalPolish).toContain('.sovereign-opening-capabilities a');
   });
 });
