@@ -54,13 +54,15 @@ describe("Sovereign split typography authority", () => {
     expect(sansAuthority).toContain("font-family: var(--font-title) !important;");
   });
 
-  it("uses founder display titles and Geist UI controls on standalone public pages", () => {
+  it("uses founder display titles on public launch pages and Geist on account-bound consent", () => {
     expect(staticAuthority).toContain("--static-display-font:");
     expect(staticAuthority).toContain('"Sovereign Display",');
     expect(staticAuthority).toContain('"Iowan Old Style",');
     expect(staticAuthority).toContain("--static-ui-title-font:");
     expect(staticAuthority).toContain('"Geist Sans",');
+    expect(staticAuthority).toContain("body.launch-page :is(");
     expect(staticAuthority).toContain("font-family: var(--static-display-font) !important;");
+    expect(staticAuthority).toContain("body.consent-page :is(");
     expect(staticAuthority).toContain("font-family: var(--static-ui-title-font) !important;");
   });
 });
