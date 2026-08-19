@@ -1,8 +1,9 @@
 /* Sovereign.OS title-family authority.
- * Geist Sans is the active self-hosted title face; native families are fallback only.
- * Retired display serif, bundled display/sans substitutions, Optima, and Avenir
- * Next must not render as active product headings. Component and route styles
- * own hierarchy and dimensions; this file owns title family only.
+ * Geist Sans owns product UI, account, onboarding, and workspace headings.
+ * The founder public identity intentionally retains the self-hosted Sovereign
+ * Display face with Iowan Old Style/classic editorial fallbacks.
+ * Component and route styles own hierarchy and dimensions; this file owns
+ * family assignment only.
  */
 
 :root {
@@ -62,9 +63,23 @@ html:root:root:root body :is(
   font-synthesis: none;
 }
 
-html:root:root:root body .public-approved-v8 .v0-hero h1,
+/* Public identity: restore the founder editorial voice without carrying it
+ * into product UI, demo chrome, forms, account surfaces, or the workspace. */
+html:root:root:root body .public-approved-v8 :is(
+  h1,
+  h2,
+  .v0-wordmark
+),
 html:root:root:root body .public-approved-v8 .v0-hero h1 > span,
-html:root:root:root body .public-approved-v8 .v0-hero h1 > em {
-  font-family: var(--font-title) !important;
-  font-style: normal !important;
+html:root:root:root body .public-approved-v8 .v0-hero h1 > em,
+html:root:root:root body .public-approved-v8 .landing-question-orbit__stage > span > strong,
+html:root:root:root body .public-secondary-page :is(
+  .policy-hero h1,
+  .policy-grid h2,
+  .policy-contact h2,
+  .v0-wordmark
+) {
+  font-family: var(--font-public-display) !important;
+  font-kerning: normal;
+  font-synthesis: none;
 }
