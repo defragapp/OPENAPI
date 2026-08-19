@@ -18,32 +18,43 @@ describe('public visual refinement v2', () => {
 
   it('keeps the existing story architecture while making the AI answer the visual proof point', () => {
     for (const marker of [
-      'grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr)',
+      'grid-template-columns: minmax(260px, 0.68fr) minmax(0, 1.32fr)',
       '.landing-demo--workflow',
       '.landing-demo--chat',
-      '.landing-workflow > li:not(.is-active) .landing-workflow__copy > span',
+      '.landing-workflow__copy > span',
+      'display: none !important',
       '.landing-answer__direct',
-      'font-size: 1.06rem !important',
+      'font-size: 1.08rem !important',
       '.landing-answer__section',
-      'grid-template-columns: minmax(92px, 0.24fr) minmax(0, 0.76fr)',
+      'grid-template-columns: minmax(88px, 0.22fr) minmax(0, 0.78fr)',
+      '.landing-answer__section:nth-child(3)',
       '.landing-message--user',
-      'max-width: 72% !important'
+      'max-width: 68% !important'
     ]) expect(refinement).toContain(marker);
   });
 
-  it('uses a deliberate native display treatment without restoring retired product fonts', () => {
+  it('uses the native system display stack without restoring retired product fonts', () => {
     expect(refinement).toContain('--sovereign-display-v2:');
-    expect(refinement).toContain('"Helvetica Neue"');
     expect(refinement).toContain('-apple-system');
+    expect(refinement).toContain('BlinkMacSystemFont');
     expect(refinement).toContain('"SF Pro Display"');
     expect(refinement).toContain('"Segoe UI Variable Display"');
+    expect(refinement).not.toContain('"Helvetica Neue"');
     expect(refinement).not.toContain('"Avenir Next"');
     expect(refinement).not.toContain('Optima');
     expect(refinement).not.toContain('Sovereign Display');
     expect(refinement).not.toContain('Sovereign Sans');
   });
 
-  it('reduces the public demonstrations to three understandable reasoning steps and three compact answer rows', () => {
+  it('removes redundant workflow chrome while keeping status accessible', () => {
+    expect(refinement).toContain('.landing-demo__bar--workflow > small');
+    expect(refinement).toContain('clip-path: inset(50%) !important');
+    expect(refinement).toContain('white-space: nowrap !important');
+    expect(refinement).toContain('.landing-workflow__copy > span');
+    expect(refinement).toContain('display: none !important');
+  });
+
+  it('reduces the public demonstrations to three understandable reasoning steps and compact answer rows', () => {
     for (const marker of [
       'Start with the question',
       'Find the useful difference',
