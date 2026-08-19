@@ -72,7 +72,7 @@ function V0Navigation() {
           <a className="v0-sign-in" href="/login">Sign in</a>
           <a className="v0-get-started" href="/signup">Get started</a>
           <details className="v0-mobile-menu">
-            <summary aria-label="Open navigation"><MenuIcon /></summary>
+            <summary aria-label="Open navigation">Menu</summary>
             <nav className="v0-mobile-menu__panel" aria-label="Mobile navigation">
               <a href="/how-it-works">How it works</a>
               <a href="/pricing">Pricing</a>
@@ -231,13 +231,5 @@ function ComparisonPanel({ title, items, positive }: { title: ReactNode; items: 
       <h3>{title}</h3>
       <ul>{items.map((item) => <li key={item}>{item}</li>)}</ul>
     </article>
-  );
-}
-
-function MenuIcon() {
-  return (
-    <svg className="v0-mobile-menu__icon" viewBox="0 0 32 24" aria-hidden="true" focusable="false">
-      <path d="M1 2h30M1 12h30M1 22h30" />
-    </svg>
   );
 }
