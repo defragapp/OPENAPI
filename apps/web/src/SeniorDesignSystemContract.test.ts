@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const main = read('./main.tsx');
 const system = read('./senior-design-system-v1.css');
+const detailControls = read('./launch-detail-controls-v1.css');
 const demoSystem = read('./public-intelligence-demonstration-v2.css');
 const finalPolish = read('./launch-polish-final-v1.css');
 const staticSystem = read('../public/senior-design-system-static-v1.css');
@@ -17,6 +18,8 @@ const compact = (source: string) => source.replace(/\s+/g, ' ');
 
 describe('senior design system v1', () => {
   it('loads one terminal launch-polish authority after the senior and demo authorities', () => {
+    expect(main).toContain("import './launch-detail-controls-v1.css';");
+    expect(main.indexOf("import './launch-detail-controls-v1.css';")).toBeLessThan(main.indexOf("import './passkey-auth.css';"));
     expect(main).toContain("import launchPolishFinalCss from './launch-polish-final-v1.css?inline';");
     const production = main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;');
     const senior = main.indexOf('style.textContent += `\\n${seniorDesignSystemCss}`;');
@@ -96,6 +99,21 @@ describe('senior design system v1', () => {
     expect(source).not.toContain('border-radius: 999px');
   });
 
+  it('removes nested utility-card chrome from Turnstile, invitation scopes, and onboarding plan detail', () => {
+    for (const marker of [
+      '.account-shell .turnstile-frame',
+      '.account-shell .status-note',
+      '.invitation-shell :is(.invitation-state,.usage-card,.scope-panel)',
+      '.invitation-shell .scope-list > div',
+      '.plan-onboarding .onboarding-plan-grid > article',
+      'min-height: 0 !important',
+      '.plan-onboarding .onboarding-baseline-preview'
+    ]) expect(detailControls).toContain(marker);
+    expect(detailControls).toContain('border-radius: 0 !important');
+    expect(detailControls).toContain('background: transparent !important');
+    expect(detailControls).not.toContain('border-radius: 999px');
+  });
+
   it('routes every standalone public page through the same final static authority and header wrapper', () => {
     expect(staticActions.startsWith('@import url("/senior-design-system-static-v1.css?v=20260818-v1");')).toBe(true);
     for (const path of ['../public/how-it-works.html', '../public/pricing.html', '../public/faq.html', '../public/404.html', '../public/consent.html']) {
@@ -121,7 +139,7 @@ describe('senior design system v1', () => {
   });
 
   it('keeps final presentation files structurally balanced', () => {
-    for (const source of [system, demoSystem, finalPolish, staticSystem, staticActions]) {
+    for (const source of [system, detailControls, demoSystem, finalPolish, staticSystem, staticActions]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
