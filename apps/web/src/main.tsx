@@ -40,6 +40,7 @@ import publicIntelligenceDemonstrationCss from './public-intelligence-demonstrat
 import productionVisualAuthorityCss from './production-visual-authority-v1.css?inline';
 import seniorDesignSystemCss from './senior-design-system-v1.css?inline';
 import publicIntelligenceDemonstrationV2Css from './public-intelligence-demonstration-v2.css?inline';
+import launchPolishFinalCss from './launch-polish-final-v1.css?inline';
 
 /* Component foundations */
 import './styles.css';
@@ -118,6 +119,7 @@ function installPlatformVisualCohesion(): void {
   style.textContent += `\n${productionVisualAuthorityCss}`;
   style.textContent += `\n${seniorDesignSystemCss}`;
   style.textContent += `\n${publicIntelligenceDemonstrationV2Css}`;
+  style.textContent += `\n${launchPolishFinalCss}`;
   document.head.append(style);
 }
 
@@ -203,6 +205,7 @@ document.documentElement.dataset.sovereignProductionReadiness = 'desktop-ios-v1'
 document.documentElement.dataset.sovereignHeroComposition = 'v3-bounded';
 document.documentElement.dataset.sovereignVisualAuthority = 'senior-design-system-v1';
 document.documentElement.dataset.sovereignPublicDemoAuthority = 'text-first-v2';
+document.documentElement.dataset.sovereignLaunchPolish = 'final-v1';
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'
