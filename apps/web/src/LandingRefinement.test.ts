@@ -21,11 +21,12 @@ const typography = read('./typography-system.css');
 const sansAuthority = read('./sans-typography-authority-v1.css');
 const seniorSystem = read('./senior-design-system-v1.css');
 const demoV2 = read('./public-intelligence-demonstration-v2.css');
+const launchPolish = read('./launch-polish-final-v1.css');
 const languageAuthority = read('../../../docs/product-language-system.md');
 const visualContract = read('../../../docs/v0-visual-port-contract.md');
 
 describe('public positioning reset', () => {
-  it('preserves the component cascade and gives the new public demo sub-system the final narrow authority', () => {
+  it('preserves component order and makes cross-route launch polish the terminal authority', () => {
     const imports = [
       "import './landing-expression-field-v3.css';",
       "import './landing-expression-field-integration.css';",
@@ -39,8 +40,10 @@ describe('public positioning reset', () => {
     for (let index = 1; index < imports.length; index += 1) expect(main.indexOf(imports[index]!)).toBeGreaterThan(main.indexOf(imports[index - 1]!));
     const senior = main.indexOf('style.textContent += `\\n${seniorDesignSystemCss}`;');
     const demos = main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationV2Css}`;');
+    const final = main.indexOf('style.textContent += `\\n${launchPolishFinalCss}`;');
     expect(demos).toBeGreaterThan(senior);
-    expect(main.slice(demos + 'style.textContent += `\\n${publicIntelligenceDemonstrationV2Css}`;'.length)).not.toContain('style.textContent +=');
+    expect(final).toBeGreaterThan(demos);
+    expect(main.slice(final + 'style.textContent += `\\n${launchPolishFinalCss}`;'.length)).not.toContain('style.textContent +=');
   });
 
   it('keeps the founder hero and actual public product hierarchy intact', () => {
@@ -73,7 +76,7 @@ describe('public positioning reset', () => {
     ]) expect(languageAuthority).toContain(marker);
     expect(visualContract).toContain('section identity is `01 · You`');
     expect(visualContract).toContain('source codes stay hidden by default behind a plain `See source details` disclosure');
-    for (const source of [typography, sansAuthority, seniorSystem]) {
+    for (const source of [typography, sansAuthority, seniorSystem, launchPolish]) {
       expect(source).toContain('-apple-system');
       expect(source).toContain('"SF Pro Display"');
       expect(source).not.toContain('\n    Optima,');
@@ -120,6 +123,8 @@ describe('public positioning reset', () => {
     expect(renderedStories).not.toContain('function WorkflowPanel(');
     expect(renderedStories).not.toContain('useWorkflowProgress');
     expect(renderedStories).not.toContain('data-motion-state');
+    expect(renderedStories.toLowerCase()).not.toContain('compatibility');
+    expect(renderedStories).not.toContain('consented participant context');
   });
 
   it('keeps source codes secondary and collapsed by default', () => {
@@ -148,6 +153,8 @@ describe('public positioning reset', () => {
     expect(renderedStories).toContain('className="system-field__state system-field__state--changed"');
     expect(demoV2).toContain('grid-template-columns: minmax(0, 1.18fr) minmax(360px, .82fr) !important');
     expect(demoV2).toContain('@media (max-width: 760px)');
+    expect(launchPolish).toContain("[data-product-stories='text-first-intelligence-v2']");
+    expect(launchPolish).toContain('visibility: visible !important');
   });
 
   it('uses finite reveal motion only and leaves all meaning present under reduced motion', () => {
@@ -160,10 +167,11 @@ describe('public positioning reset', () => {
       'opacity: 1 !important'
     ]) expect(demoV2).toContain(marker);
     expect(demoV2).not.toContain('infinite');
+    expect(launchPolish).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
   it('keeps all active CSS layers structurally balanced', () => {
-    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, typography, sansAuthority, seniorSystem, demoV2]) {
+    for (const source of [fieldStyles, integrationStyles, storyStyles, approvedStyles, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, typography, sansAuthority, seniorSystem, demoV2, launchPolish]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
