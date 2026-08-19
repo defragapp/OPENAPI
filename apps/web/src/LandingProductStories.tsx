@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode, RefObject } from 'react';
+import {
+  SELF_EVIDENCE_GROUPS,
+  SELF_PRODUCT_PROOF,
+  type RepresentativeEvidenceGroup
+} from './landing-demo-fixtures';
 
-type EvidencePoint = { code: string; label: string };
-type EvidenceGroup = { name?: string; points: readonly EvidencePoint[] };
+type EvidenceGroup = RepresentativeEvidenceGroup;
 type WorkflowStep = {
   kind: 'input' | 'read' | 'connect' | 'direction';
   title: string;
@@ -28,20 +32,11 @@ const RELEASE_LINEAGE_MARKERS = [
 void RELEASE_LINEAGE_MARKERS;
 
 /*
- * Public examples use sanitized representative fixture values, not visitor data.
- * Each answer below is authored against the same exact example sources available
- * inside its collapsed source-details disclosure.
+ * Public examples use deterministic sanitized representative fixtures, not visitor data.
+ * The Self proof imports a typed representative Baseline profile whose semantic support
+ * is verified separately. Relationship/System remain on their existing fixture path until
+ * the new insight-first visual grammar passes human review.
  */
-const SELF_BASELINE: readonly EvidenceGroup[] = [
-  {
-    points: [
-      { code: 'HD G13.1', label: 'Example Human Design personality activation: Gate 13 line 1' },
-      { code: 'GK ACT13', label: 'Example Gene Keys activation number 13' },
-      { code: '☉ CAN 04.2°', label: 'Example natal Sun at 4.2 degrees Cancer' }
-    ]
-  }
-] as const;
-
 const DUO_BASELINE: readonly EvidenceGroup[] = [
   {
     name: 'You',
@@ -75,34 +70,6 @@ const SYSTEM_BASIS: readonly EvidenceGroup[] = [
       { code: 'U✓', label: 'Example observation: you move into mediation' },
       { code: 'U✓', label: 'Example observation: a sibling withdraws as pressure rises' }
     ]
-  }
-] as const;
-
-const SELF_FLOW: readonly WorkflowStep[] = [
-  {
-    kind: 'input',
-    title: 'Start with the question',
-    body: 'The question is whether the idea is becoming clearer or being changed mainly to make other people’s reactions easier to manage.'
-  },
-  {
-    kind: 'read',
-    title: 'Use what matters from your Baseline',
-    body: 'Sovereign uses only the parts of your Baseline that help with this question instead of loading every possible interpretation.'
-  },
-  {
-    kind: 'connect',
-    title: 'Find the useful difference',
-    body: 'The key distinction is whether the next change makes the idea clearer to you or mainly makes it easier to defend to someone else.'
-  },
-  {
-    kind: 'read',
-    title: 'Leave what is not known unanswered',
-    body: 'Real project constraints and the quality of the feedback still matter. Your Baseline cannot decide whether a specific edit is objectively better.'
-  },
-  {
-    kind: 'direction',
-    title: 'Give you something you can try',
-    body: 'Compare the version you made before feedback with the version you made after it and notice what became clearer versus what changed mainly for someone else.'
   }
 ] as const;
 
@@ -187,32 +154,60 @@ function PersonalStory() {
         <StoryHeading step="01 · You" title="Explore how you think, decide, communicate, create, connect, and grow.">
           Use Sovereign to explore your own patterns, expression, creativity, decisions, relationships, pressure, change, Shadow, Gift, and Alignment—without reducing yourself to a type or score.
         </StoryHeading>
-        <div className="landing-story__stage" data-viewport-stage="personal">
-          <WorkflowPanel
-            title="How Sovereign builds the answer"
-            steps={SELF_FLOW}
-            result="You get a distinction you can use: is the change making the idea clearer to you, or mainly easier to defend to someone else?"
-            surface="personal-reasoning"
-          />
-          <ChatWindow title="Sovereign — You" surface="personal-chat" composer="What changes when I get feedback too early?">
-            <Message side="user">How do I know whether I’m refining an idea because it’s getting clearer—or changing it because I’m anticipating everyone else’s reaction?</Message>
-            <Message side="assistant" wide>
-              <DemoAnswer
-                direct="A useful distinction may be whether the next change makes the idea more coherent to you or merely more defensible to an imagined audience. In this example, the Baseline suggests strong sensitivity to meaning and response; under pressure, that sensitivity can become editing before you have decided what you actually want to preserve."
-                sections={[
-                  { label: 'What may be steady', body: 'You may naturally notice subtext, patterns, and how something will be received. That can make refinement one of your real strengths.' },
-                  { label: 'Under pressure', body: 'When outside expectations arrive too early, refinement can shift into pre-emptive explanation: solving objections before the idea has had enough room to become your own.' },
-                  { label: 'The difference', body: 'Clarity simplifies the idea without making you disappear from it. Anticipation often adds explanation, qualification, or compromise before anyone has actually asked for it.', tone: 'distinction' },
-                  { label: 'Try this', body: 'Save one version before feedback. After revising, compare the two and ask: what became more precise, and what changed mainly to make the work easier for someone else to accept?', tone: 'bridge' },
-                  { label: 'What is still unknown', body: 'Real constraints, expertise, deadlines, and good feedback can absolutely improve the work. Your Baseline cannot decide that part for you.', tone: 'unknown' }
-                ]}
-                basis={SELF_BASELINE}
-              />
-            </Message>
-          </ChatWindow>
+        <div className="landing-story__stage landing-story__stage--self-proof" data-viewport-stage="personal">
+          <SelfProductProof />
         </div>
       </div>
     </section>
+  );
+}
+
+function SelfProductProof() {
+  return (
+    <article
+      className="landing-product-proof landing-product-proof--self"
+      data-product-proof="self-v1"
+      data-viewport-surface="personal-proof"
+      aria-label="Representative Sovereign self intelligence example"
+    >
+      <header className="landing-product-proof__bar">
+        <div><span className="landing-product-proof__status" aria-hidden="true" /><strong>Sovereign</strong><small>You</small></div>
+        <span>Representative example</span>
+      </header>
+
+      <div className="landing-product-proof__body">
+        <section className="landing-product-proof__question" aria-label="Example user question">
+          <small>You asked</small>
+          <p>{SELF_PRODUCT_PROOF.question}</p>
+        </section>
+
+        <section className="landing-product-proof__response" aria-label="Example Sovereign answer">
+          <div className="landing-product-proof__response-label"><span>Sovereign · Baseline</span><small>Direct answer</small></div>
+          <h3>{SELF_PRODUCT_PROOF.directAnswer}</h3>
+
+          <div className="landing-product-proof__mechanism">
+            {SELF_PRODUCT_PROOF.mechanism.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+          </div>
+
+          <blockquote className="landing-product-proof__insight">
+            <small>The distinction</small>
+            <p>{SELF_PRODUCT_PROOF.insight}</p>
+          </blockquote>
+
+          <p className="landing-product-proof__closing">{SELF_PRODUCT_PROOF.closing}</p>
+
+          <footer className="landing-product-proof__evidence">
+            <span>{SELF_PRODUCT_PROOF.contextLine}</span>
+            <SourceDetails groups={SELF_EVIDENCE_GROUPS} />
+          </footer>
+        </section>
+      </div>
+
+      <div className="landing-product-proof__composer" aria-hidden="true">
+        <span>Ask Sovereign about yourself…</span>
+        <i>→</i>
+      </div>
+    </article>
   );
 }
 
