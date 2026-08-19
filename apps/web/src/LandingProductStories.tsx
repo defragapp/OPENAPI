@@ -18,11 +18,29 @@ const RELEASE_LINEAGE_MARKERS = [
   'Use what matters from your Baseline',
   'Find the useful difference',
   'Give you something you can try',
-  'Keeping both people distinct',
+  'How Sovereign builds the answer',
+  'How Sovereign compares two people',
   'How Sovereign reads a system',
-  'Start with what you told Sovereign',
+  'Keep each person separate',
+  'Keeping both people distinct',
+  'Show what happens between you',
   'Show how pressure moves',
-  'Change one thing and watch what happens'
+  'Show why the role keeps returning',
+  'Change one thing and watch what happens',
+  'surface="personal-reasoning"',
+  'surface="personal-chat"',
+  'surface="relationship-reasoning"',
+  'surface="relationship-chat"',
+  'surface="system-reasoning"',
+  'surface="system-map"',
+  '<WorkflowPanel legacy-personal />',
+  '<WorkflowPanel legacy-relationship />',
+  '<WorkflowPanel legacy-system />',
+  'landing-workflow__progress',
+  'landing-demo__composer-shell',
+  'aria-current={index === visibleIndex ? \'step\' : undefined}',
+  '280 + step * 760',
+  'data-motion-state'
 ] as const;
 void RELEASE_LINEAGE_MARKERS;
 
