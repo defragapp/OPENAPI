@@ -9,6 +9,7 @@ const fingerprint = read('./v0-release-fingerprint.ts');
 const app = read('./App.tsx');
 const landing = read('./PublicLanding.tsx');
 const stories = read('./LandingProductStories.tsx');
+const demoFixtures = read('./landing-demo-fixtures.ts');
 const field = read('./expression-field/LandingExpressionSlice.tsx');
 const viewportProbe = read('./PublicLandingViewportContract.ts');
 const authenticated = read('./AuthenticatedWorkspace.tsx');
@@ -146,12 +147,12 @@ describe('founder visual port — public positioning reset', () => {
     expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
   });
 
-  it('shows broad self exploration, relationship intelligence, and whole-system intelligence in approved language', () => {
+  it('shows insight-first Self plus relationship and whole-system intelligence in approved language', () => {
     for (const marker of [
       '01 · You',
       'Explore how you think, decide, communicate, create, connect, and grow.',
-      'How Sovereign builds the answer',
-      'Start with the question',
+      'data-product-proof="self-v1"',
+      'data-viewport-surface="personal-proof"',
       '02 · You + your people',
       'See why the same moment lands differently—and how to bridge the gap.',
       'How Sovereign compares two people',
@@ -162,8 +163,6 @@ describe('founder visual port — public positioning reset', () => {
       'How Sovereign reads a system',
       'Show how pressure moves',
       'Change one thing and watch what happens',
-      'surface="personal-chat"',
-      'surface="personal-reasoning"',
       'surface="relationship-chat"',
       'surface="relationship-reasoning"',
       'surface="system-map"',
@@ -171,8 +170,15 @@ describe('founder visual port — public positioning reset', () => {
       '280 + step * 760',
       'data-motion-state'
     ]) expect(stories).toContain(marker);
-    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(3);
-    expect(stories).toContain('landing-workflow__progress');
+    for (const marker of [
+      'Why am I so good at knowing what everyone else needs from me, but so unsure what I want?',
+      'You may not have trouble knowing what you want. Your own preference may be arriving after everyone else’s signals.',
+      'The Shadow is not caring too much. It is letting responsiveness become the way the decision gets made.'
+    ]) expect(demoFixtures).toContain(marker);
+    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(2);
+    expect(stories).not.toContain('surface="personal-chat"');
+    expect(stories).not.toContain('surface="personal-reasoning"');
+    expect(stories).toContain('landing-product-proof__composer');
     expect(stories).not.toContain('<FamilySystemMap />');
     expect(stories).not.toContain('capacity beneath');
     expect(stories).not.toContain('permitted perspectives');
@@ -180,7 +186,8 @@ describe('founder visual port — public positioning reset', () => {
   });
 
   it('keeps public source details exact, fixture-backed, and collapsed by default', () => {
-    for (const marker of ["{ code: 'HD G13.1'", "{ code: 'GK ACT13'", "{ code: '☉ CAN 04.2°'", "{ code: 'HD G22.4'", "{ code: 'HD G57.2'", "{ code: 'REL ☿ □ ☿ 1.8°'"]) expect(stories).toContain(marker);
+    const fixtureAndStorySource = `${demoFixtures}\n${stories}`;
+    for (const marker of ['HD G13.1', 'GK ACT13', 'N LP1', '☉ CAN 04.2°', 'HD G22.4', 'HD G57.2', 'REL ☿ □ ☿ 1.8°']) expect(fixtureAndStorySource).toContain(marker);
     expect(stories).toContain('<details className="landing-evidence">');
     expect(stories).toContain('<strong>See source details</strong>');
     expect(stories).toContain('These values are not visitor data.');
@@ -193,18 +200,23 @@ describe('founder visual port — public positioning reset', () => {
     expect(intelligenceDemoCss).toContain('.landing-evidence > summary');
   });
 
-  it('puts workflow on the left and the conversation on the right while preserving mobile stacking', () => {
-    expect(stories.indexOf('surface="personal-reasoning"')).toBeLessThan(stories.indexOf('surface="personal-chat"'));
+  it('uses a single Self proof and preserves transitional relationship/system stacking', () => {
+    expect(stories).toContain('data-viewport-surface="personal-proof"');
+    expect(stories).toContain('landing-product-proof__composer');
     expect(stories.indexOf('surface="relationship-reasoning"')).toBeLessThan(stories.indexOf('surface="relationship-chat"'));
     expect(stories.indexOf('surface="system-reasoning"')).toBeLessThan(stories.indexOf('surface="system-map"'));
     expect(stories).toContain('landing-demo__composer-shell');
-    expect(intelligenceDemoCss).toContain('grid-template-columns: minmax(320px, .88fr) minmax(0, 1.12fr) !important;');
+    expect(intelligenceDemoCss).toContain('.landing-story__stage.landing-story__stage--self-proof');
+    expect(intelligenceDemoCss).toContain('.landing-product-proof__response h3');
+    expect(intelligenceDemoCss).toContain('.landing-product-proof__insight p');
     expect(intelligenceDemoCss).toContain('.landing-demo__composer-shell');
     expect(intelligenceDemoCss).toContain('@media (max-width: 900px)');
   });
 
   it('measures the complete rendered landing at desktop and phone widths', () => {
-    for (const surface of ['hero', 'expression-slice', 'personal-chat', 'personal-reasoning', 'relationship-chat', 'relationship-reasoning', 'system-map', 'system-reasoning', 'comparison']) expect(viewportProbe).toContain(`'${surface}'`);
+    for (const surface of ['hero', 'expression-slice', 'personal-proof', 'relationship-chat', 'relationship-reasoning', 'system-map', 'system-reasoning', 'comparison']) expect(viewportProbe).toContain(`'${surface}'`);
+    expect(viewportProbe).not.toContain("'personal-chat'");
+    expect(viewportProbe).not.toContain("'personal-reasoning'");
     expect(viewportProbe).toContain('const narrow = snapshot.viewportWidth <= narrowViewportMaximum');
     expect(viewportProbe).toContain('getBoundingClientRect()');
     expect(viewportProbe).toContain('comparisonStacked');
