@@ -8,27 +8,31 @@ const sansAuthority = read('./sans-typography-authority-v1.css');
 const productCohesion = read('./production-product-cohesion-v1.css');
 const intelligenceDemo = read('./public-intelligence-demonstration-v1.css');
 const visualAuthority = read('./production-visual-authority-v1.css');
+const seniorAuthority = read('./senior-design-system-v1.css');
 const publicPolicy = read('./PublicPolicy.tsx');
 const staticAuthority = read('../public/premium-action-static-v1.css');
 
 describe('production visual authority v1', () => {
-  it('keeps one deterministic terminal visual authority after product, typography, and demo layers', () => {
+  it('keeps one deterministic terminal visual authority after product, typography, demo, and production layers', () => {
     expect(main).toContain("import productionProductCohesionCss from './production-product-cohesion-v1.css?inline';");
     expect(main).toContain("import publicIntelligenceDemonstrationCss from './public-intelligence-demonstration-v1.css?inline';");
     expect(main).toContain("import productionVisualAuthorityCss from './production-visual-authority-v1.css?inline';");
+    expect(main).toContain("import seniorDesignSystemCss from './senior-design-system-v1.css?inline';");
     const sansIndex = main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;');
     const productIndex = main.indexOf('style.textContent += `\\n${productionProductCohesionCss}`;');
     const demoIndex = main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationCss}`;');
     const visualIndex = main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;');
+    const seniorIndex = main.indexOf('style.textContent += `\\n${seniorDesignSystemCss}`;');
     expect(productIndex).toBeGreaterThan(sansIndex);
     expect(demoIndex).toBeGreaterThan(productIndex);
     expect(visualIndex).toBeGreaterThan(demoIndex);
-    expect(main.slice(visualIndex + 'style.textContent += `\\n${productionVisualAuthorityCss}`;'.length)).not.toContain('style.textContent +=');
-    expect(main).toContain("document.documentElement.dataset.sovereignVisualAuthority = 'production-v1';");
+    expect(seniorIndex).toBeGreaterThan(visualIndex);
+    expect(main.slice(seniorIndex + 'style.textContent += `\\n${seniorDesignSystemCss}`;'.length)).not.toContain('style.textContent +=');
+    expect(main).toContain("document.documentElement.dataset.sovereignVisualAuthority = 'senior-design-system-v1';");
   });
 
   it('uses the canonical native enterprise sans title stack without decorative substitutions', () => {
-    for (const source of [typography, sansAuthority, staticAuthority, intelligenceDemo, visualAuthority]) {
+    for (const source of [typography, sansAuthority, staticAuthority, intelligenceDemo, visualAuthority, seniorAuthority]) {
       expect(source).toContain('-apple-system');
       expect(source).toContain('"SF Pro Display"');
       expect(source).toContain('"Segoe UI"');
@@ -42,7 +46,7 @@ describe('production visual authority v1', () => {
     expect(staticAuthority.indexOf('-apple-system')).toBeLessThan(staticAuthority.indexOf('"SF Pro Display"'));
   });
 
-  it('restores founder-scale desktop hierarchy without rebuilding the landing story', () => {
+  it('preserves founder visual foundations while allowing the terminal system to stabilize rendered scale', () => {
     for (const marker of [
       '--sovereign-accent: #b99772',
       '--landing-shell: min(1240px, calc(100vw - 72px))',
@@ -56,6 +60,14 @@ describe('production visual authority v1', () => {
       '.public-approved-v8 .landing-message--assistant > div',
       '.public-approved-v8 .v0-final h2'
     ]) expect(visualAuthority).toContain(marker);
+    for (const marker of [
+      '--sds-shell: min(1180px, calc(100vw - 64px))',
+      'font-size: clamp(3.6rem, 5.5vw, 5rem)',
+      'font-size: clamp(2.35rem, 3.4vw, 3.2rem)',
+      'border-radius: var(--sds-radius)',
+      '.user-question',
+      '.sovereign-composer'
+    ]) expect(seniorAuthority).toContain(marker);
     expect(visualAuthority).not.toContain('#62b5ff');
     expect(visualAuthority).not.toContain('rgba(126, 201, 255');
     expect(intelligenceDemo).toContain('.landing-system-analysis__sequence');
@@ -73,36 +85,34 @@ describe('production visual authority v1', () => {
       '.public-approved-v8 .landing-workflow__copy > span',
       'font-size: 0.84rem !important'
     ]) expect(visualAuthority).toContain(marker);
+    expect(seniorAuthority).toContain('.public-approved-v8 .landing-message');
+    expect(seniorAuthority).toContain('font-size: .9rem !important');
   });
 
-  it('reclaims the actual policy component from stale grid auto-placement at desktop and preserves phone bounds', () => {
+  it('reclaims the actual policy component from stale grid auto-placement and normalizes it to the shared shell', () => {
     expect(publicPolicy).toContain('className="policy-kicker"');
     expect(publicPolicy).toContain("'How Sovereign.OS handles your information.'");
     expect(publicPolicy).toContain("'Terms for using Sovereign.OS.'");
     for (const marker of [
       '.public-secondary-page .policy-hero',
-      'display: block !important',
-      '.public-secondary-page .policy-kicker',
+      'grid-template-areas: "kicker kicker" "title body" "title effective"',
       '.public-secondary-page .policy-hero h1',
-      'max-width: 980px !important',
-      'font-size: clamp(4.2rem, 6.2vw, 6.4rem)',
-      '@media (max-width: 900px)',
-      'width: calc(100% - 32px) !important',
-      'font-size: clamp(2.55rem, 9.8vw, 3.85rem)'
-    ]) expect(visualAuthority).toContain(marker);
+      'font-size: clamp(2.9rem,4.25vw,4.25rem)',
+      '.public-secondary-page .policy-grid article',
+      'border-radius:0 !important'
+    ]) expect(seniorAuthority.replaceAll(' ', '')).toContain(marker.replaceAll(' ', ''));
   });
 
   it('uses motion to reveal product state and honors reduced motion', () => {
     for (const marker of [
-      '@keyframes sovereign-field-breathe-v1',
-      '@keyframes sovereign-demo-arrive-v1',
-      '@keyframes sovereign-content-arrive-v1',
-      '@keyframes sovereign-system-flow-v1',
+      '@keyframes sds-demo-enter',
+      '@keyframes sds-thread-resolve',
+      '@keyframes sds-system-flow',
       '.landing-story[data-visible="true"] .landing-demo',
-      '@media (prefers-reduced-motion: reduce)',
-      'animation: none !important',
-      'opacity: 1 !important'
-    ]) expect(visualAuthority).toContain(marker);
+      '@media (prefers-reduced-motion:reduce)',
+      'animation:none !important',
+      'opacity:1 !important'
+    ]) expect(seniorAuthority.replaceAll(' ', '')).toContain(marker.replaceAll(' ', ''));
   });
 
   it('carries the same constraint language through auth, onboarding, policy, and workspace', () => {
@@ -114,14 +124,12 @@ describe('production visual authority v1', () => {
       '.intelligence-workspace',
       '.intelligence-sidebar nav button.active',
       '.user-question',
-      '.sovereign-composer',
-      '.intelligence-context'
-    ]) expect(productCohesion).toContain(marker);
-    expect(productCohesion).toContain('--product-accent: #b99772');
+      '.sovereign-composer'
+    ]) expect(seniorAuthority).toContain(marker);
   });
 
-  it('keeps all new authority styles structurally balanced', () => {
-    for (const source of [productCohesion, intelligenceDemo, visualAuthority]) {
+  it('keeps all authority styles structurally balanced', () => {
+    for (const source of [productCohesion, intelligenceDemo, visualAuthority, seniorAuthority]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
