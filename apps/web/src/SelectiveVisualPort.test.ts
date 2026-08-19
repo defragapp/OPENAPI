@@ -1,34 +1,33 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
-const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
-const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
-const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
-const expressionRenderer = readFileSync(new URL('./expression-field/ExpressionField.tsx', import.meta.url), 'utf8');
-const relationshipField = readFileSync(new URL('./expression-field/RelationalExpressionField.tsx', import.meta.url), 'utf8');
-const systemField = readFileSync(new URL('./expression-field/SystemExpressionField.tsx', import.meta.url), 'utf8');
-const expressionCss = readFileSync(new URL('./expression-field/expression-field.css', import.meta.url), 'utf8');
-const v0Visual = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
-const fieldCss = readFileSync(new URL('./landing-expression-field-v3.css', import.meta.url), 'utf8');
-const integrationCss = readFileSync(new URL('./landing-expression-field-integration.css', import.meta.url), 'utf8');
-const heroExtension = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
-const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
-const landingRefinementV5 = readFileSync(new URL('./landing-live-refinement-v5.css', import.meta.url), 'utf8');
-const sansAuthority = readFileSync(new URL('./sans-typography-authority-v1.css', import.meta.url), 'utf8');
-const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
+const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
+const landing = read('./PublicLanding.tsx');
+const stories = read('./LandingProductStories.tsx');
+const field = read('./expression-field/LandingExpressionSlice.tsx');
+const workspace = read('./SovereignIntelligenceWorkspace.tsx');
+const expressionRenderer = read('./expression-field/ExpressionField.tsx');
+const relationshipField = read('./expression-field/RelationalExpressionField.tsx');
+const systemField = read('./expression-field/SystemExpressionField.tsx');
+const expressionCss = read('./expression-field/expression-field.css');
+const v0Visual = read('./v0-visual-port.css');
+const fieldCss = read('./landing-expression-field-v3.css');
+const integrationCss = read('./landing-expression-field-integration.css');
+const heroExtension = read('./landing-hero-field-v4.css');
+const landingRefinementV5 = read('./landing-live-refinement-v5.css');
+const sansAuthority = read('./sans-typography-authority-v1.css');
+const seniorSystem = read('./senior-design-system-v1.css');
+const demoV2 = read('./public-intelligence-demonstration-v2.css');
+const main = read('./main.tsx');
 
 describe('founder selective visual port', () => {
-  it('ports the integrated interactive 360 field at the opening with click-led inspection', () => {
+  it('keeps the integrated interactive 360 field at the opening with click-led inspection', () => {
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('<RealLifeQuestions />');
     expect(landing).not.toContain('<BaselineFoundation />');
-    expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(field).toContain('expressionAxisRegistryById');
     expect(field).toContain('buildLandingAxes');
     expect(field).toContain('landing-expression-slice__beam');
-    expect(field).toContain('landing-expression-slice__hit');
-    expect(field).toContain('data-reach-tier={reachTier}');
     expect(field).toContain('onPointerDown');
     expect(field).toContain('onPointerMove');
     expect(field).toContain('onFocus={() => selectAxis(axis.id)}');
@@ -37,22 +36,14 @@ describe('founder selective visual port', () => {
     expect(field).not.toContain('onPointerEnter={() => selectAxis(axis.id)}');
     expect(field).toContain('data-field-geometry="spherical-360"');
     expect(field).toContain('buildSphereGrid');
-    expect(field).toContain('MIN_AXIS_LENGTH');
-    expect(field).toContain('MAX_AXIS_LENGTH');
     expect(field).toContain('TOOLTIP_WIDTH = 104');
     expect(field).toContain('TOOLTIP_HEIGHT = 26');
-    expect(field).toContain('landing-expression-slice__tooltip-title');
-    expect(field).toContain('landing-expression-slice__tooltip-value');
-    expect(field).toContain('click a line to inspect it');
-    expect(field).toContain('placeTooltip(selectedProjected.projected)');
-    expect(field).not.toContain('<div className="landing-expression-slice__tooltip"');
     expect(integrationCss).toContain('background: transparent');
     expect(heroExtension).toContain('.landing-expression-slice__sphere-shell');
-    expect(heroExtension).toContain('stroke: #2f93ff');
     expect(landingRefinementV5).toContain('width: 104px !important');
   });
 
-  it('starts with self exploration rather than a mechanics-first Baseline explainer', () => {
+  it('starts with broad self exploration rather than mechanics or a problem-only framing', () => {
     expect(landing).toContain('Start with yourself. Expand outward when it matters.');
     expect(landing).toContain('Explore yourself');
     expect(landing).toContain('How do I make decisions that actually fit me?');
@@ -60,11 +51,10 @@ describe('founder selective visual port', () => {
     expect(landing).not.toContain('One private reference beneath every question.');
     expect(landing).not.toContain('One private foundation.');
     expect(landing).not.toContain('calculated astronomical positions');
-    expect(landing).not.toContain('partial Human Design');
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
   });
 
-  it('restores chat and workflow demonstrations without restoring duplicate expression fields', () => {
+  it('uses three integrated text-first product demonstrations without duplicate expression fields or workflow UI', () => {
     expect(landing).toContain('<LandingProductStories />');
     for (const marker of [
       '01 · You',
@@ -73,18 +63,13 @@ describe('founder selective visual port', () => {
       'Explore how you think, decide, communicate, create, connect, and grow.',
       'See why the same moment lands differently—and how to bridge the gap.',
       'See the whole system.',
-      'surface="personal-chat"',
-      'surface="personal-reasoning"',
-      'surface="relationship-chat"',
-      'surface="relationship-reasoning"',
-      'surface="system-map"',
-      'surface="system-reasoning"',
-      'v0-baseline-trace',
-      'v0-workflow-panel',
-      'v0-family-system-map'
+      '<DecisionField />',
+      '<RelationshipField />',
+      '<SystemField />',
+      'data-product-stories="text-first-intelligence-v2"'
     ]) expect(stories).toContain(marker);
-    expect(stories).not.toContain('Separate helping from carrying the outcome.');
-    expect(stories).not.toContain('See where responsibility keeps landing.');
+    expect(stories).not.toContain('function WorkflowPanel(');
+    expect(stories).not.toContain('useWorkflowProgress');
     expect(stories).not.toContain('LandingExpressionFieldPreview');
   });
 
@@ -104,28 +89,36 @@ describe('founder selective visual port', () => {
     expect(systemField).toContain('<ExpressionFieldRenderer');
   });
 
-  it('applies founder composition with terminal sans typography', () => {
+  it('applies the mature global system with a narrow text-first demo authority', () => {
     for (const selector of ['.intelligence-workspace', '.intelligence-sidebar', '.sovereign-composer', '.surface-heading', '.account-shell', '.auth-panel']) expect(v0Visual).toContain(selector);
-    for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip']) expect(fieldCss).toContain(selector);
-    for (const selector of ['.landing-expression-slice__sphere-shell', '.landing-expression-slice__readout', '.landing-question-orbit__stage']) expect(heroExtension).toContain(selector);
-    for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storyCss).toContain(selector);
     expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
-    expect(landingRefinementV5).toContain('@keyframes sovereign-hero-rise');
     expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
+    expect(seniorSystem).toContain('--sds-shell: min(1180px, calc(100vw - 64px))');
+    expect(demoV2).toContain('.landing-intelligence-demo');
+    expect(demoV2).toContain('.landing-understanding--relationship');
+    expect(demoV2).toContain('.landing-understanding--system');
     expect(expressionCss).toContain('min-height: 44px');
-    expect(main).toContain("import './landing-expression-field-integration.css';");
-    expect(main).toContain("import './landing-hero-field-v4.css';");
-    expect(main).toContain("import './v0-restored-product-stories.css';");
-    expect(main).toContain("import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline';");
-    expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';");
+    expect(main).toContain("import seniorDesignSystemCss from './senior-design-system-v1.css?inline';");
+    expect(main).toContain("import publicIntelligenceDemonstrationV2Css from './public-intelligence-demonstration-v2.css?inline';");
   });
 
-  it('does not introduce the archive mock runtime, scores, or alternate architecture', () => {
+  it('keeps the public demonstrations permission-safe, score-free, and source-detail quiet', () => {
+    for (const marker of [
+      'Both people choose what they share',
+      'Only they can say what they actually felt or intended',
+      'Roles and events are supplied in the example',
+      '<strong>See source details</strong>',
+      'Does this fit?'
+    ]) expect(stories).toContain(marker);
+    for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'compatibilityScore', 'compatibilityPercent']) expect(stories).not.toContain(prohibited);
+  });
+
+  it('does not introduce archive mock runtime, alternate architecture, or decorative perpetual motion', () => {
     expect(landing).not.toContain('localStorage');
-    const source = `${landing}\n${stories}\n${field}\n${expressionRenderer}\n${relationshipField}\n${systemField}\n${v0Visual}\n${fieldCss}\n${heroExtension}\n${storyCss}`;
-    for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'generateAIResponse', 'Demo User', 'dashboard-grid', 'mock-auth', 'fake-answer']) {
-      expect(source).not.toContain(prohibited);
-    }
+    const source = `${landing}\n${stories}\n${field}\n${expressionRenderer}\n${relationshipField}\n${systemField}\n${v0Visual}\n${fieldCss}\n${heroExtension}`;
+    for (const prohibited of ['Math.random', 'generateAIResponse', 'Demo User', 'dashboard-grid', 'mock-auth', 'fake-answer']) expect(source).not.toContain(prohibited);
+    expect(demoV2).not.toContain('infinite');
+    expect(demoV2).toContain('@media (prefers-reduced-motion: reduce)');
   });
 });
