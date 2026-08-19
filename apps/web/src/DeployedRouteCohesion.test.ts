@@ -26,10 +26,10 @@ const productionRelease = read('../../../scripts/cloudflare-production-release.m
 const packageJson = JSON.parse(read('../../../package.json')) as { scripts?: Record<string, string> };
 
 const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2';
-const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1';
+const terminalCssPath = '/premium-action-static-v1.css?v=20260819-founder-display-v1';
 
 describe('deployed route cohesion contract', () => {
-  it('keeps component stylesheet order and appends terminal Geist typography after inline authorities', () => {
+  it('keeps component stylesheet order and appends the split typography authority before terminal visual authority', () => {
     const cohesion = "import './deployed-route-cohesion.css';";
     const passkey = "import './passkey-auth.css';";
     expect(main).toContain(cohesion);
@@ -38,6 +38,7 @@ describe('deployed route cohesion contract', () => {
     expect(main.slice(main.indexOf(passkey) + passkey.length)).not.toContain("import './");
     expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';");
     expect(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
+    expect(main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;'));
   });
 
   it('keeps route, refinement, and typography CSS structurally balanced', () => {
@@ -46,16 +47,19 @@ describe('deployed route cohesion contract', () => {
     }
   });
 
-  it('keeps shared static pages on current route and terminal typography authorities', () => {
+  it('keeps shared static pages on current route and founder-display terminal authorities', () => {
     for (const document of [how, pricing, faq, notFound]) expect(document).toContain('/deployed-route-cohesion.css?v=20260803-route-v1');
     for (const document of [how, pricing, faq, consent, notFound]) {
       expect(document).toContain(refinementCssPath);
       expect(document).toContain(terminalCssPath);
     }
     expect(consent).not.toContain('/deployed-route-cohesion.css?v=20260803-route-v1');
-    expect(staticTerminal).toContain('--static-title-font:');
-    expect(staticTerminal).toContain('font-family: var(--static-title-font) !important');
-    expect(staticTerminal).not.toContain('Sovereign Display');
+    expect(staticTerminal).toContain('--static-display-font:');
+    expect(staticTerminal).toContain('--static-ui-title-font:');
+    expect(staticTerminal).toContain('font-family: var(--static-display-font) !important');
+    expect(staticTerminal).toContain('font-family: var(--static-ui-title-font) !important');
+    expect(staticTerminal).toContain('Sovereign Display');
+    expect(staticTerminal).toContain('Geist Sans');
   });
 
   it('keeps public-page language aligned with the canonical product-language authority', () => {
@@ -90,7 +94,7 @@ describe('deployed route cohesion contract', () => {
     ]) expect(staticRouteCss).toContain(marker);
   });
 
-  it('keeps the Browser audit transport external, deterministic, and rate-limit aware', () => {
+  it('keeps the Browser audit transport external, deterministic, rate-limit aware, and typography route-aware', () => {
     expect(routeAuditAsset).toContain('document.currentScript');
     expect(routeAuditAsset).toContain('setTimeout(inspect, pollInterval)');
     expect(routeAuditAsset).toContain("document.addEventListener('DOMContentLoaded', start");
@@ -105,35 +109,31 @@ describe('deployed route cohesion contract', () => {
     expect(verifier).toContain("url: `${appBase}/invitation?token=route-cohesion-audit`");
     expect(verifierV2).toContain('mkdirSync(routeScreenshotDirectory');
     expect(verifierV2).toContain('screenshotPath');
-    expect(verifierV2).toContain('const serifTypographyMarker =');
-    expect(verifierV2).toContain("headingFamily).includes('Sovereign Display')");
-    expect(verifierV2).toContain('const sansTypographyReplacement =');
-    expect(verifierV2).toContain("Geist Sans title stack");
-    expect(verifierV2).toContain('Geist Sans title stack');
+    expect(verifierV2).toContain('const typographyMarker =');
+    expect(verifierV2).toContain("publicTypographyFamilies.has(family) ? 'Sovereign Display' : 'Geist Sans'");
+    expect(verifierV2).toContain('heading family mismatch');
     expect(verifierV2).toContain('for (const [from, to] of replacements) generated = generated.replace(from, to);');
-    expect(verifierV2).toContain('Route cohesion v2 still certifies the retired display serif.');
+    expect(verifierV2).toContain('split founder-display/product-UI typography contract');
     expect(productionRelease).toContain("['verify-route-cohesion', 'scripts/verify-live-route-cohesion-v2.mjs']");
   });
 
   it('keeps both fast and rendered route verification production-authoritative', () => {
     expect(secondaryVerifier).toContain("const routeCssPath = '/deployed-route-cohesion.css?v=20260803-route-v1'");
     expect(secondaryVerifier).toContain("const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2'");
-    expect(secondaryVerifier).toContain("const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1'");
-    expect(secondaryVerifier).toContain('positioning=self-people-systems typography=geist-sans');
+    expect(secondaryVerifier).toContain(`const terminalCssPath = '${terminalCssPath}'`);
+    expect(secondaryVerifier).toContain('positioning=self-people-systems typography=founder-display+geist-ui');
     expect(packageJson.scripts?.['verify:live-route-cohesion']).toBe('node scripts/verify-live-route-cohesion-v2.mjs');
   });
 
-  it('keeps rendered visual refinements coherent with the Geist Sans public release', () => {
+  it('keeps rendered visual refinements coherent with the founder display and Geist UI release', () => {
     expect(experienceRefinement).toContain('--landing-blue: #e8ddd0 !important');
     expect(renderedFidelity).toContain('--v8-blue: #d8d0c5 !important');
     expect(landingRefinement).toContain('.landing-workflow__progress');
-    expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
-    expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
-    expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
     expect(sansAuthority).toContain('--font-title:');
     expect(sansAuthority).toContain('-apple-system');
     expect(sansAuthority).toContain('"SF Pro Display"');
     expect(sansAuthority).toContain('"Segoe UI"');
+    expect(sansAuthority).toContain('font-family: var(--font-public-display) !important');
     expect(sansAuthority).not.toMatch(/^[ \t]*(?:Optima,|"Avenir Next",)/m);
     expect(invitationFidelity).toContain('@media (min-width: 901px)');
     expect(staticRefinement).toContain('--v0-blue: #e8ddd0');
