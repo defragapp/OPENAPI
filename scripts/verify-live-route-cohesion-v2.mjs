@@ -23,8 +23,12 @@ const desktopProgressMarker = "      verify(desktop);\n      results.push(deskto
 const desktopProgressReplacement = "      verify(desktop);\n      console.log('[route-cohesion] label=' + desktop.route + '/' + desktop.profile + ' status=pass');\n      results.push(desktop);";
 const mobileProgressMarker = "      verify(mobile);\n      results.push(mobile);";
 const mobileProgressReplacement = "      verify(mobile);\n      console.log('[route-cohesion] label=' + mobile.route + '/' + mobile.profile + ' status=pass');\n      results.push(mobile);";
-const serifTypographyMarker = "  assert(String(audit.typography.headingFamily).includes('Sovereign Display'), `${label}: heading is not using Sovereign Display (${audit.typography.headingFamily})`);";
-const sansTypographyReplacement = "  assert(String(audit.typography.headingFamily).includes(\"Geist Sans\"), \"heading is not using the approved Geist Sans title stack: \" + audit.typography.headingFamily);";
+const typographyMarker = "  assert(String(audit.typography.headingFamily).includes('Sovereign Display'), `${label}: heading is not using Sovereign Display (${audit.typography.headingFamily})`);";
+const typographyReplacement = [
+  "  const publicTypographyFamilies = new Set(['static-public', 'policy']);",
+  "  const expectedHeadingFamily = publicTypographyFamilies.has(family) ? 'Sovereign Display' : 'Geist Sans';",
+  "  assert(String(audit.typography.headingFamily).includes(expectedHeadingFamily), `${label}: heading family mismatch; expected ${expectedHeadingFamily}, received ${audit.typography.headingFamily}`);"
+].join('\n');
 const reportMarker = `  console.log(JSON.stringify({
     ok: true,
     release: 'sovereign-deployed-route-cohesion-v1',
@@ -74,7 +78,7 @@ const replacements = [
   [resultMarker, resultReplacement],
   [desktopProgressMarker, desktopProgressReplacement],
   [mobileProgressMarker, mobileProgressReplacement],
-  [serifTypographyMarker, sansTypographyReplacement],
+  [typographyMarker, typographyReplacement],
   [reportMarker, reportReplacement]
 ];
 
@@ -89,8 +93,8 @@ for (const [, marker] of replacements) {
     throw new Error(`Route cohesion v2 did not apply required persistence hardening: ${marker.slice(0, 120)}`);
   }
 }
-if (generated.includes("headingFamily).includes('Sovereign Display')")) {
-  throw new Error('Route cohesion v2 still certifies the retired display serif.');
+if (!generated.includes("publicTypographyFamilies.has(family) ? 'Sovereign Display' : 'Geist Sans'")) {
+  throw new Error('Route cohesion v2 did not install the split founder-display/product-UI typography contract.');
 }
 
 writeFileSync(generatedPath, generated);
