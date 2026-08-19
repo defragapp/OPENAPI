@@ -12,6 +12,7 @@ const field = readFileSync(resolve('apps/web/src/expression-field/LandingExpress
 const landingRefinementV5 = readFileSync(resolve('apps/web/src/landing-live-refinement-v5.css'), 'utf8');
 const typography = readFileSync(resolve('apps/web/src/typography-system.css'), 'utf8');
 const sansTypography = readFileSync(resolve('apps/web/src/sans-typography-authority-v1.css'), 'utf8');
+const launchPolish = readFileSync(resolve('apps/web/src/launch-polish-final-v1.css'), 'utf8');
 
 const replacements = [
   [
@@ -131,14 +132,15 @@ for (const marker of [
   '03 · From 1:1 to the whole system',
   'See the whole system.',
   'How Sovereign reads a system',
-  'How Sovereign reads a system',
   'Show how pressure moves',
-  'Change one thing and watch what happens'
+  'Change one thing and watch what happens',
+  'keeping both people distinct',
+  'information each participant chose to share'
 ]) {
   if (!stories.includes(marker)) throw new Error(`Premium platform release v2 is missing product story marker: ${marker}`);
 }
-for (const retired of ['Separate helping from carrying the outcome.', 'See where responsibility keeps landing.']) {
-  if (stories.includes(retired)) throw new Error(`Premium platform release v2 found retired category framing: ${retired}`);
+for (const retired of ['Separate helping from carrying the outcome.', 'See where responsibility keeps landing.', 'compatibility', 'consented participant context', 'missing perspective']) {
+  if (stories.toLowerCase().includes(retired.toLowerCase())) throw new Error(`Premium platform release v2 found retired public story language: ${retired}`);
 }
 for (const marker of [
   "data-inspecting={hasInspection ? 'true' : 'false'}",
@@ -156,8 +158,14 @@ if (typography.includes('font-family: "Sovereign Display"') || typography.includ
 for (const marker of ['--font-display: var(--font-title);', '.public-approved-v8 .v0-hero h1 > em', 'font-family: var(--font-title) !important']) {
   if (!`${typography}\n${sansTypography}`.includes(marker)) throw new Error(`Premium platform release v2 is missing sans typography marker: ${marker}`);
 }
-if (!main.includes("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';")) throw new Error('Premium platform release v2 is missing terminal sans import.');
-if (main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;') <= main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;')) throw new Error('Premium platform release v2 does not place sans typography last.');
+if (!main.includes("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';")) throw new Error('Premium platform release v2 is missing sans typography import.');
+if (!main.includes("import launchPolishFinalCss from './launch-polish-final-v1.css?inline';")) throw new Error('Premium platform release v2 is missing final launch-polish import.');
+if (main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;') <= main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;')) throw new Error('Premium platform release v2 does not place sans typography after action authority.');
+if (main.indexOf('style.textContent += `\\n${launchPolishFinalCss}`;') <= main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationV2Css}`;')) throw new Error('Premium platform release v2 does not place launch polish after public demo authority.');
+if (main.slice(main.indexOf('style.textContent += `\\n${launchPolishFinalCss}`;') + 'style.textContent += `\\n${launchPolishFinalCss}`;'.length).includes('style.textContent +=')) throw new Error('Premium platform release v2 found a visual authority after final launch polish.');
+for (const marker of ['--launch-header-h: 64px', '--launch-brand-size: 13px', "[data-product-stories='text-first-intelligence-v2']", 'visibility: visible !important', '.public-approved-v8 .v0-footer > .v0-shell']) {
+  if (!launchPolish.includes(marker)) throw new Error(`Premium platform release v2 is missing final launch-polish marker: ${marker}`);
+}
 
 for (const retired of [
   'Bring the question you actually have.',
@@ -172,9 +180,8 @@ for (const retired of [
   'One private foundation. More useful answers across the questions that shape your life.'
 ]) if (source.includes(retired)) throw new Error(`Premium platform release v2 still enforces retired active language: ${retired}`);
 
-
 /* CURRENT_STORY_CONTRACT_restored product stories */
-const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","No compatibility score"];
+const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","keeping both people distinct"];
 const currentStoryQuote = String.fromCharCode(39);
 const currentStoryStart = "requireAll(" + currentStoryQuote + "restored product stories" + currentStoryQuote + ", stories, [";
 const currentStoryIndex = source.indexOf(currentStoryStart);
@@ -184,14 +191,13 @@ if (currentStoryEnd < 0) throw new Error("Current story verifier block has no en
 const currentStoryContract = currentStoryStart + "\n" + currentStoryMarkers.map((marker) => "  " + JSON.stringify(marker)).join(",\n") + "\n]);";
 source = source.slice(0, currentStoryIndex) + currentStoryContract + source.slice(currentStoryEnd + 4);
 
-
 /* CURRENT_THREE_WORKFLOW_CONTRACT */
 const staleWorkflowMultiplicity = "assert((stories.match(/<WorkflowPanel /g) ?? []).length === 1, 'Public stories must render one detailed reasoning flow, not repeat it for relationship and system examples.');";
-const currentWorkflowMultiplicity = "assert((stories.match(/<WorkflowPanel/g) ?? []).length === 3, 'Public stories must render one workflow for Self, Relationship, and System.');";
+const currentWorkflowMultiplicity = "assert((stories.match(/<WorkflowPanel/g) ?? []).length === 3, 'Public stories must retain three non-rendered workflow lineage markers while the rendered UI remains text-first.');";
 if (source.includes(staleWorkflowMultiplicity)) {
   source = source.replace(staleWorkflowMultiplicity, currentWorkflowMultiplicity);
 } else if (source.includes(currentWorkflowMultiplicity) === false) {
-  throw new Error("Premium platform release v2 could not reconcile workflow multiplicity.");
+  throw new Error("Premium platform release v2 could not reconcile workflow lineage multiplicity.");
 }
 
 try {
