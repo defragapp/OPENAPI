@@ -25,9 +25,9 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
           </nav>
           <div className="v0-nav-actions">
             <a className="v0-sign-in" href="/login">Sign in</a>
-            <a className="landing-control landing-control--nav" href="/signup">Get started <span aria-hidden="true">→</span></a>
+            <a className="landing-control landing-control--nav" href="/signup">Get started</a>
             <details className="v0-mobile-menu">
-              <summary aria-label="Open navigation"><PolicyMenuIcon /></summary>
+              <summary aria-label="Open navigation">Menu</summary>
               <nav className="v0-mobile-menu__panel" style={{ display: 'grid' }} aria-label="Mobile navigation">
                 <a href="/how-it-works">How it works</a>
                 <a href="/pricing">Pricing</a>
@@ -66,7 +66,7 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
           <h2>Talk to a person.</h2>
           <p>Send privacy requests, account questions, billing concerns, public inquiries, or safety feedback to info@defrag.app.</p>
         </div>
-        <a className="landing-control" href="mailto:info@defrag.app">Email Sovereign.OS <span aria-hidden="true">→</span></a>
+        <a className="landing-control" href="mailto:info@defrag.app">Email Sovereign.OS</a>
       </section>
 
       <footer className="v0-footer">
@@ -83,13 +83,5 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
         </div>
       </footer>
     </main>
-  );
-}
-
-function PolicyMenuIcon() {
-  return (
-    <svg className="v0-mobile-menu__icon" viewBox="0 0 32 24" aria-hidden="true" focusable="false">
-      <path d="M1 2h30M1 12h30M1 22h30" />
-    </svg>
   );
 }
