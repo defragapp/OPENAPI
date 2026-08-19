@@ -127,6 +127,14 @@ for (const [retiredMarker, currentMarker] of replacements) {
   if (occurrences !== 1) throw new Error(`Visual intelligence release v2 expected one retired marker but found ${occurrences}: ${retiredMarker}`);
   source = source.replace(retiredMarker, currentMarker);
 }
+
+const retiredStoryDataset = "  \"dataset.sovereignProductStories = 'isolated-mobile-first-v2'\",\n";
+const currentStoryDataset = "  \"dataset.sovereignProductStories = 'text-first-intelligence-v2'\",\n";
+if (source.split(retiredStoryDataset).length - 1 !== 1) {
+  throw new Error('Visual intelligence release v2 could not reconcile the retired product-story dataset authority.');
+}
+source = source.replace(retiredStoryDataset, currentStoryDataset);
+
 const currentWorkspaceReplacements = [
   [
     "  'Look closer at the pattern.',",
