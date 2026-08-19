@@ -10,6 +10,7 @@ const intelligenceDemo = read('./public-intelligence-demonstration-v1.css');
 const visualAuthority = read('./production-visual-authority-v1.css');
 const seniorAuthority = read('./senior-design-system-v1.css');
 const demoV2 = read('./public-intelligence-demonstration-v2.css');
+const stories = read('./LandingProductStories.tsx');
 const publicPolicy = read('./PublicPolicy.tsx');
 const staticAuthority = read('../public/premium-action-static-v1.css');
 
@@ -85,10 +86,11 @@ describe('production visual authority v1', () => {
       '.relationship-field__center',
       '.relationship-field__bridge',
       '.landing-understanding--system',
-      '.system-field__state--current',
-      '.system-field__state--changed',
+      '.system-field__state',
       '.system-field__route--direct'
     ]) expect(demoV2).toContain(marker);
+    expect(stories).toContain('className="system-field__state system-field__state--current"');
+    expect(stories).toContain('className="system-field__state system-field__state--changed"');
   });
 
   it('uses one finite explanatory motion sequence and preserves reduced-motion meaning', () => {
