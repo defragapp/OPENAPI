@@ -69,17 +69,21 @@ These instructions apply to the entire OPENAPI repository.
 
 ## Typography contract
 - Treat `apps/web/src/typography-system.css` as the platform-wide typography source of truth.
-- The rendered title/heading face is self-hosted `Geist Sans`. Apple/SF Pro Display, Segoe Variable/Segoe, system-ui, Helvetica, and Arial are fallback only and must not win when the bundled Geist asset is present.
-- The canonical self-hosted asset is `apps/web/public/fonts/geist/Geist-Variable.woff2`; do not replace Geist with a native-only stack during release or visual hardening.
-- `Sovereign Display`, the retired bundled `Sovereign Sans`, `Optima`, `Avenir Next`, and serif fallbacks must not become active title authorities.
+- Sovereign uses a deliberate split typography system rather than one typeface everywhere.
+- Public brand identity—the root hero, major public-section titles, public secondary-page titles, and public `SOVEREIGN.OS` wordmarks—uses the existing self-hosted `Sovereign Display` face first, followed by `Iowan Old Style`, Palatino/Book Antiqua, Georgia, and serif fallbacks. This is the founder editorial voice, not a decorative product-UI font.
+- Product UI—including authentication, onboarding, account, workspace, composer, controls, product demonstrations, labels, and authenticated headings—uses self-hosted `Geist Sans` first. Apple/SF Pro Display, Segoe Variable/Segoe, system-ui, Helvetica, and Arial are fallback only and must not win when the bundled Geist asset is present.
+- The canonical assets are `apps/web/public/fonts/sovereign-display.woff2` and `apps/web/public/fonts/geist/Geist-Variable.woff2`. Do not introduce a new title font or native-only replacement during release hardening.
+- The retired bundled `Sovereign Sans`, `Optima`, and `Avenir Next` must not become active title authorities. Do not replace the public founder display face with those alternatives.
+- `--font-public-display` owns public brand/display typography. `--font-title` owns product/UI title typography. `--font-body` remains the native long-form/body stack.
 - The terminal typography authority may enforce font family only; it must not impose a universal `h1`/`h2`/`h3` size or spacing system over route-owned composition.
 - `apps/web/src/production-visual-authority-v1.css` owns final live visual proportions, warm-metal interface accent, demo organization, navigation/brand geometry, and motion after route/component foundations have loaded.
-- `SOVEREIGN.OS` public wordmark sizing is a shared sitewide contract. React and standalone public routes must use the same visual hierarchy while allowing breakpoint-specific placement; navigation tests must not freeze a temporary redesign geometry as product authority.
+- `SOVEREIGN.OS` public wordmark sizing is a shared sitewide contract. React and standalone public routes must use the same founder-display identity while allowing breakpoint-specific placement; account/workspace branding may remain on the product/UI sans stack.
 - Product demonstrations must remain visible without JavaScript reveal state. Motion may enhance entry/progression but must never gate comprehension or create blank product sections.
-- Use `--font-display` for every meaningful heading and title across public, authenticated, onboarding, policy, modal, drawer, answer, relationship, system, Alignment, and Covenant surfaces.
+- Use `--font-public-display` only for public identity headings/wordmarks and other explicitly documented public editorial moments. Do not leak it into forms, buttons, account surfaces, the authenticated workspace, source details, or product-demo chrome.
+- Use `--font-title` for meaningful product/UI headings and titles across authenticated, onboarding, modal, drawer, answer, relationship, system, Alignment, and Covenant surfaces.
 - Use `--font-subheading` only for short supporting introductions and secondary headings.
 - Preserve `--font-body` for paragraphs, controls, source details, metadata, inputs, and long-form answers.
-- New headings must use semantic heading elements whenever possible so the typography contract applies automatically.
+- New headings must use semantic heading elements whenever possible so the correct route-level typography contract can apply automatically.
 - Do not add component-local font families or bypass shared typography tokens without a documented product exception.
 - Typography-only work must not alter copy, line breaks, layout, spacing, dimensions, colors, backgrounds, borders, imagery, motion, responsive behavior, or product logic.
 
