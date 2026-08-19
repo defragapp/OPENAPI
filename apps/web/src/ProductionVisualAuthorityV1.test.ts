@@ -28,7 +28,7 @@ describe('production visual authority v1', () => {
   });
 
   it('uses the canonical native enterprise sans title stack without decorative substitutions', () => {
-    for (const source of [typography, sansAuthority, staticAuthority, intelligenceDemo, visualAuthority, seniorAuthority, demoV2]) {
+    for (const source of [typography, sansAuthority, staticAuthority, intelligenceDemo, visualAuthority, seniorAuthority]) {
       expect(source).toContain('-apple-system');
       expect(source).toContain('"SF Pro Display"');
       expect(source).toContain('"Segoe UI"');
@@ -36,6 +36,11 @@ describe('production visual authority v1', () => {
       expect(source).not.toContain('\n    "Avenir Next",');
       expect(source).not.toContain('font-family: "Sovereign Display"');
       expect(source).not.toContain('font-family: "Sovereign Sans"');
+    }
+    expect(demoV2).toContain('var(--sds-title, system-ui, sans-serif)');
+    expect(demoV2).toContain('var(--sds-body, system-ui, sans-serif)');
+    for (const retired of ['Optima', 'Avenir Next', 'Sovereign Display', 'Sovereign Sans', 'Georgia, serif']) {
+      expect(demoV2).not.toContain(retired);
     }
   });
 
