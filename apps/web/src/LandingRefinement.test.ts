@@ -5,6 +5,7 @@ const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf
 const main = read('./main.tsx');
 const landing = read('./PublicLanding.tsx');
 const stories = read('./LandingProductStories.tsx');
+const demoFixtures = read('./landing-demo-fixtures.ts');
 const field = read('./expression-field/LandingExpressionSlice.tsx');
 const fieldStyles = read('./landing-expression-field-v3.css');
 const integrationStyles = read('./landing-expression-field-integration.css');
@@ -22,6 +23,7 @@ const sansAuthority = read('./sans-typography-authority-v1.css');
 const languageAuthority = read('../../../docs/product-language-system.md');
 const visualContract = read('../../../docs/v0-visual-port-contract.md');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
+const demoSource = `${stories}\n${demoFixtures}`;
 
 describe('public positioning reset', () => {
   it('preserves the visual cascade and keeps production visual authority terminal', () => {
@@ -97,6 +99,8 @@ describe('public positioning reset', () => {
 
     for (const marker of [
       'section identity is `01 · You`',
+      'use an insight-first product proof',
+      'do not require a parallel five-step workflow tutorial',
       'section identity is `02 · You + your people`',
       'section identity is `03 · From 1:1 to the whole system`',
       'source codes stay hidden by default behind a plain `See source details` disclosure',
@@ -158,13 +162,13 @@ describe('public positioning reset', () => {
     expect(renderedFidelity).toContain('--v8-blue: #d8d0c5 !important');
   });
 
-  it('shows self, relationship, and system intelligence as substantive product behavior in approved language', () => {
+  it('shows Self insight first while preserving relationship and system product behavior during migration', () => {
     for (const marker of [
       '01 · You',
       'Explore how you think, decide, communicate, create, connect, and grow.',
-      'How Sovereign builds the answer',
-      'Start with the question',
-      'Find the useful difference',
+      'data-product-proof="self-v1"',
+      'surface="relationship-chat"',
+      'surface="relationship-reasoning"',
       '02 · You + your people',
       'See why the same moment lands differently—and how to bridge the gap.',
       'How Sovereign compares two people',
@@ -175,13 +179,20 @@ describe('public positioning reset', () => {
       'How Sovereign reads a system',
       'Show how pressure moves',
       'Show why the role keeps returning',
-      'Change one thing and watch what happens',
-      'What this gives you'
+      'Change one thing and watch what happens'
     ]) expect(stories).toContain(marker);
 
-    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(3);
-    expect(stories).toContain('landing-workflow__progress');
-    expect(stories).toContain('280 + step * 760');
+    for (const marker of [
+      'Why am I so good at knowing what everyone else needs from me, but so unsure what I want?',
+      'You may not have trouble knowing what you want. Your own preference may be arriving after everyone else’s signals.',
+      'The Shadow is not caring too much. It is letting responsiveness become the way the decision gets made.',
+      'Your Baseline · Shadow + Gift · Alignment'
+    ]) expect(demoFixtures).toContain(marker);
+
+    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(2);
+    expect(stories).not.toContain('surface="personal-reasoning"');
+    expect(stories).not.toContain('surface="personal-chat"');
+    expect(stories).toContain('data-viewport-surface="personal-proof"');
     expect(renderedStories).not.toContain('<FamilySystemMap />');
     expect(renderedStories).not.toContain('<RelationshipContext />');
     expect(renderedStories).not.toContain('<SystemContext />');
@@ -192,8 +203,8 @@ describe('public positioning reset', () => {
   });
 
   it('keeps exact fixture-backed source codes secondary and collapsed by default', () => {
-    for (const marker of ["{ code: 'HD G13.1'", "{ code: 'GK ACT13'", "{ code: '☉ CAN 04.2°'", "{ code: 'HD G22.4'", "{ code: 'HD G57.2'", "{ code: 'REL ☿ □ ☿ 1.8°'"]) {
-      expect(stories).toContain(marker);
+    for (const marker of ['HD G13.1', 'GK ACT13', 'N LP1', '☉ CAN 04.2°', 'HD G22.4', 'HD G57.2', 'REL ☿ □ ☿ 1.8°']) {
+      expect(demoSource).toContain(marker);
     }
     expect(stories).toContain('<details className="landing-evidence">');
     expect(stories).toContain('<strong>See source details</strong>');
@@ -205,24 +216,27 @@ describe('public positioning reset', () => {
     expect(intelligenceDemoStyles).toContain('.landing-evidence > summary');
   });
 
-  it('places workflow before conversation and anchors the composer outside the answer body', () => {
-    expect(renderedStories.indexOf('surface="personal-reasoning"')).toBeLessThan(renderedStories.indexOf('surface="personal-chat"'));
-    expect(renderedStories.indexOf('surface="relationship-reasoning"')).toBeLessThan(renderedStories.indexOf('surface="relationship-chat"'));
-    expect(renderedStories.indexOf('surface="system-reasoning"')).toBeLessThan(renderedStories.indexOf('surface="system-map"'));
+  it('keeps Self insight-first and anchors composers at the bottom of product surfaces', () => {
+    expect(stories).toContain('data-viewport-surface="personal-proof"');
+    expect(stories).toContain('landing-product-proof__composer');
+    expect(stories.indexOf('surface="relationship-reasoning"')).toBeLessThan(stories.indexOf('surface="relationship-chat"'));
+    expect(stories.indexOf('surface="system-reasoning"')).toBeLessThan(stories.indexOf('surface="system-map"'));
     expect(stories).toContain('landing-demo__composer-shell');
+    expect(intelligenceDemoStyles).toContain('.landing-product-proof__response h3');
+    expect(intelligenceDemoStyles).toContain('.landing-product-proof__insight p');
     expect(intelligenceDemoStyles).toContain('.landing-demo__composer-shell');
     expect(intelligenceDemoStyles).toContain('flex: 1 1 auto !important;');
-    expect(intelligenceDemoStyles).toContain('grid-template-columns: repeat(5, minmax(0, 1fr)) !important;');
   });
 
-  it('makes desktop demonstrations larger while making mobile proof shorter and swipeable', () => {
+  it('makes the Self proof dominant while preserving responsive relationship/system migration behavior', () => {
     for (const marker of [
       'width: min(1280px, calc(100% - 64px)) !important',
       'font-size: 0.92rem !important',
       'scroll-snap-type: inline mandatory !important',
       'grid-auto-columns: minmax(252px, 82vw) !important'
     ]) expect(landingRefinementV2).toContain(marker);
-    expect(intelligenceDemoStyles).toContain('grid-template-columns: minmax(320px, .88fr) minmax(0, 1.12fr) !important;');
+    expect(intelligenceDemoStyles).toContain('.landing-story__stage.landing-story__stage--self-proof');
+    expect(intelligenceDemoStyles).toContain('font-size: clamp(2rem, 3.35vw, 3.35rem) !important;');
     expect(intelligenceDemoStyles).toContain('@media (max-width: 900px)');
     expect(intelligenceDemoStyles).toContain('@media (max-width: 760px)');
     expect(approvedStyles).toContain('@media (max-width: 760px)');
