@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">Sovereign.OS — Private personal AI for real life</title>
-  <desc id="desc">Understand yourself, relationships, decisions, and family or group dynamics from a private Baseline.</desc>
+  <desc id="desc">Understand yourself, understand your people, and see the whole system from a private Baseline Design.</desc>
   <defs>
     <radialGradient id="glow" cx="78%" cy="62%" r="48%">
       <stop offset="0" stop-color="#f1e9de" stop-opacity=".10"/>
@@ -11,15 +11,15 @@
   <rect width="1200" height="630" fill="#080a0d"/>
   <rect width="1200" height="630" fill="url(#glow)"/>
 
-  <text x="78" y="82" fill="#f1e9de" font-family="Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="5">SOVEREIGN.OS</text>
-  <text x="78" y="158" fill="#9d978f" font-family="Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="4">PRIVATE PERSONAL AI FOR REAL LIFE</text>
+  <text x="78" y="82" fill="#f1e9de" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" letter-spacing="5">SOVEREIGN.OS</text>
+  <text x="78" y="158" fill="#9d978f" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="4">PRIVATE PERSONAL AI FOR REAL LIFE</text>
 
-  <g font-family="Georgia, serif" fill="#f5f1e8">
-    <text x="78" y="238" font-size="52">Understand yourself,</text>
-    <text x="78" y="298" font-size="52">relationships, decisions,</text>
-    <text x="78" y="358" font-size="52">and the groups around you.</text>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#f5f1e8" font-weight="500">
+    <text x="78" y="238" font-size="48">Understand yourself.</text>
+    <text x="78" y="296" font-size="48">Understand your people.</text>
+    <text x="78" y="354" font-size="48">See the whole system.</text>
   </g>
-  <text x="80" y="420" fill="#918b83" font-family="Arial, sans-serif" font-size="21">Starts with your private Baseline Design, then adds the context you choose.</text>
+  <text x="80" y="418" fill="#918b83" font-family="Arial, Helvetica, sans-serif" font-size="21">Starts with your private Baseline Design, then expands only when the question does.</text>
 
   <g transform="translate(810 170)" fill="none" stroke="#f1e9de" stroke-linecap="round">
     <path d="M-150 255A255 255 0 0 1 360 255" stroke-opacity=".12" stroke-width="2"/>
@@ -42,5 +42,5 @@
     </g>
   </g>
 
-  <text x="80" y="552" fill="#69655f" font-family="Arial, sans-serif" font-size="17">Self · Relationships · Decisions · Family and group dynamics</text>
+  <text x="80" y="552" fill="#69655f" font-family="Arial, Helvetica, sans-serif" font-size="17">Self · People · Systems</text>
 </svg>
