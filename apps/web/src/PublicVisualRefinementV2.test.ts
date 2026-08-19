@@ -5,6 +5,7 @@ const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf
 const main = read('./main.tsx');
 const stories = read('./LandingProductStories.tsx');
 const refinement = read('./public-visual-refinement-v2.css');
+const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
 
 describe('public visual refinement v2', () => {
   it('loads the bounded refinement immediately before terminal production authority', () => {
@@ -16,20 +17,18 @@ describe('public visual refinement v2', () => {
     expect(main).toContain("document.documentElement.dataset.sovereignPublicVisualRefinement = 'v2';");
   });
 
-  it('keeps the existing story architecture while making the AI answer the visual proof point', () => {
+  it('makes one answer surface the public proof point instead of presenting a workflow beside it', () => {
     for (const marker of [
-      'grid-template-columns: minmax(260px, 0.68fr) minmax(0, 1.32fr)',
+      'display: block !important',
       '.landing-demo--workflow',
-      '.landing-demo--chat',
-      '.landing-workflow__copy > span',
       'display: none !important',
+      '.landing-demo--chat',
+      'width: min(980px, 100%) !important',
+      '.landing-demo__traffic',
       '.landing-answer__direct',
-      'font-size: 1.08rem !important',
+      'font-size: 1.13rem !important',
       '.landing-answer__section',
-      'grid-template-columns: minmax(88px, 0.22fr) minmax(0, 0.78fr)',
-      '.landing-answer__section:nth-child(3)',
-      '.landing-message--user',
-      'max-width: 68% !important'
+      '.landing-demo__composer-shell'
     ]) expect(refinement).toContain(marker);
   });
 
@@ -46,38 +45,37 @@ describe('public visual refinement v2', () => {
     expect(refinement).not.toContain('Sovereign Sans');
   });
 
-  it('removes redundant workflow chrome while keeping status accessible', () => {
-    expect(refinement).toContain('.landing-demo__bar--workflow > small');
-    expect(refinement).toContain('clip-path: inset(50%) !important');
-    expect(refinement).toContain('white-space: nowrap !important');
-    expect(refinement).toContain('.landing-workflow__copy > span');
+  it('uses documented human questions and direct Sovereign intelligence instead of coaching-workbook vocabulary', () => {
+    for (const marker of [
+      'How do I know when I’m adapting too early?',
+      'You may be changing yourself around an anticipated reaction before you have finished deciding what you actually think.',
+      'Why does the same conversation feel urgent to me and pressuring to them?',
+      'This may be a timing mismatch before it is a disagreement about care, commitment, or the relationship itself.',
+      'Why does one disagreement pull the whole family into it?',
+      'The whole family may be reacting to how the disagreement moves through the group, not only to the original issue.'
+    ]) expect(renderedStories).toContain(marker);
+
+    for (const prohibited of [
+      'Name the loop',
+      'The loop',
+      'A bridge',
+      'timing loop',
+      'interaction loop',
+      'lower pressure without leaving the issue indefinite',
+      'What may be happening',
+      'Try this',
+      'Still unknown'
+    ]) expect(renderedStories).not.toContain(prohibited);
+  });
+
+  it('keeps explanation in natural prose rather than visible template labels', () => {
+    expect((stories.match(/sections=\{\[/g) ?? []).length).toBe(3);
+    expect(renderedStories).not.toContain('<small>{section.label}</small>');
+    expect(refinement).toContain('.landing-answer__section > small');
     expect(refinement).toContain('display: none !important');
   });
 
-  it('reduces the public demonstrations to three understandable reasoning steps and compact answer rows', () => {
-    for (const marker of [
-      'Start with the question',
-      'Find the useful difference',
-      'Give you something you can try',
-      'Start with what happened',
-      'Show what happens between you',
-      'Find a lower-pressure next step',
-      'Start with what you told Sovereign',
-      'Show how pressure moves',
-      'Change one thing and watch what happens',
-      'Am I refining this idea—or editing myself to avoid other people’s reactions?',
-      'I want to resolve things now. My partner goes quiet.',
-      'Why do I keep ending up as the mediator in my family?'
-    ]) expect(stories).toContain(marker);
-
-    expect((stories.match(/const SELF_FLOW[\s\S]*?\] as const;/) ?? [''])[0].match(/kind:/g)?.length).toBe(3);
-    expect((stories.match(/const RELATIONSHIP_FLOW[\s\S]*?\] as const;/) ?? [''])[0].match(/kind:/g)?.length).toBe(3);
-    expect((stories.match(/const SYSTEM_FLOW[\s\S]*?\] as const;/) ?? [''])[0].match(/kind:/g)?.length).toBe(3);
-    expect((stories.match(/sections=\{\[/g) ?? []).length).toBe(3);
-    expect(stories).not.toContain('<SystemAnalysis />');
-  });
-
-  it('preserves consent, source details, and reduced-motion/mobile behavior', () => {
+  it('preserves consent, source details, and mobile behavior', () => {
     expect(stories).toContain('Both people must agree before their Baselines can be used together');
     expect(stories).toContain('Each person controls whether their Baseline can be included');
     expect(stories).toContain('<strong>See source details</strong>');
