@@ -39,6 +39,7 @@ import productionProductCohesionCss from './production-product-cohesion-v1.css?i
 import publicIntelligenceDemonstrationCss from './public-intelligence-demonstration-v1.css?inline';
 import productionVisualAuthorityCss from './production-visual-authority-v1.css?inline';
 import seniorDesignSystemCss from './senior-design-system-v1.css?inline';
+import publicIntelligenceDemonstrationV2Css from './public-intelligence-demonstration-v2.css?inline';
 
 /* Component foundations */
 import './styles.css';
@@ -115,6 +116,7 @@ function installPlatformVisualCohesion(): void {
   style.textContent += `\n${publicIntelligenceDemonstrationCss}`;
   style.textContent += `\n${productionVisualAuthorityCss}`;
   style.textContent += `\n${seniorDesignSystemCss}`;
+  style.textContent += `\n${publicIntelligenceDemonstrationV2Css}`;
   document.head.append(style);
 }
 
@@ -193,12 +195,13 @@ refreshStaleIosPageRestore();
 installMobileViewportStability();
 
 document.documentElement.dataset.sovereignLayoutRelease = 'approved-public-v8';
-document.documentElement.dataset.sovereignProductStories = 'isolated-mobile-first-v2';
+document.documentElement.dataset.sovereignProductStories = 'text-first-intelligence-v2';
 document.documentElement.dataset.sovereignMotionRelease = 'v0-motion-workflows-v8';
 document.documentElement.dataset.sovereignPlatformCohesion = 'v1';
 document.documentElement.dataset.sovereignProductionReadiness = 'desktop-ios-v1';
 document.documentElement.dataset.sovereignHeroComposition = 'v3-bounded';
 document.documentElement.dataset.sovereignVisualAuthority = 'senior-design-system-v1';
+document.documentElement.dataset.sovereignPublicDemoAuthority = 'text-first-v2';
 
 const isPublicHome = location.pathname === '/';
 const publicPolicyKind = location.pathname === '/privacy'
