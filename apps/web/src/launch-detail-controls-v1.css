@@ -1,0 +1,145 @@
+/* Fine-detail launch cohesion for component-owned account/onboarding surfaces.
+   The terminal launch-polish authority still loads after this file. */
+
+html:root:root:root body .account-shell .turnstile-frame {
+  padding: 10px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(242,235,225,.10) !important;
+  border-bottom: 1px solid rgba(242,235,225,.10) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .account-shell .turnstile-slot {
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+html:root:root:root body .account-shell .turnstile-frame > p {
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+html:root:root:root body .account-shell .status-note {
+  min-height: 0 !important;
+  margin-top: 12px !important;
+  padding: 12px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(242,235,225,.10) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+html:root:root:root body .account-shell .status-note.success,
+html:root:root:root body .account-shell .status-note.error {
+  background: transparent !important;
+}
+
+html:root:root:root body .invitation-shell .auth-panel {
+  width: min(760px,100%) !important;
+  margin-inline: auto !important;
+  padding: clamp(28px,4vw,44px) !important;
+}
+
+html:root:root:root body .invitation-shell :is(.invitation-state,.usage-card,.scope-panel) {
+  margin: 0 !important;
+  padding: 20px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(242,235,225,.10) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .invitation-shell .scope-list {
+  display: grid !important;
+  gap: 0 !important;
+}
+
+html:root:root:root body .invitation-shell .scope-list > div {
+  min-height: 64px !important;
+  padding: 14px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(242,235,225,.10) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+html:root:root:root body .invitation-shell .scope-list > div:first-child {
+  border-top: 0 !important;
+}
+
+html:root:root:root body .invitation-shell .scope-list [role='group'] {
+  display: flex !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
+}
+
+html:root:root:root body .invitation-shell .consent-choice {
+  width: auto !important;
+  min-width: 96px !important;
+  padding-inline: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(242,235,225,.20) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .invitation-shell .consent-choice[aria-pressed='true'] {
+  border-bottom-color: rgba(242,235,225,.72) !important;
+  color: #f2ece3 !important;
+}
+
+html:root:root:root body .plan-onboarding .onboarding-plan-grid > article {
+  min-height: 0 !important;
+}
+
+html:root:root:root body .plan-onboarding .onboarding-baseline-preview {
+  min-height: 0 !important;
+  padding: 28px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(242,235,225,.12) !important;
+  border-bottom: 1px solid rgba(242,235,225,.10) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .plan-onboarding .onboarding-baseline-preview > div {
+  margin-top: 18px !important;
+  padding: 14px 0 14px 16px !important;
+  background: transparent !important;
+}
+
+html:root:root:root body .plan-onboarding .plan-visual {
+  align-self: start !important;
+}
+
+html:root:root:root body .plan-onboarding .plan-status {
+  min-height: 0 !important;
+  padding-top: 8px !important;
+}
+
+html:root:root:root body .plan-onboarding .onboarding-progress {
+  scrollbar-width: none !important;
+}
+
+html:root:root:root body .plan-onboarding .onboarding-progress::-webkit-scrollbar {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  html:root:root:root body .invitation-shell .auth-panel {
+    padding: 24px 0 !important;
+  }
+
+  html:root:root:root body .invitation-shell .scope-list > div {
+    gap: 12px !important;
+  }
+
+  html:root:root:root body .invitation-shell .scope-list [role='group'] {
+    width: 100% !important;
+  }
+}
