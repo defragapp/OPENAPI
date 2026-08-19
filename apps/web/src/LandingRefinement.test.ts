@@ -107,8 +107,10 @@ describe('public positioning reset', () => {
     expect(landing).toContain('Know yourself. Understand your people. See the whole system.');
   });
 
-  it('uses the canonical native enterprise sans title authority', () => {
+  it('uses the canonical self-hosted Geist Sans title authority', () => {
     for (const source of [typography, sansAuthority]) {
+      expect(source).toContain("\"Geist Sans\"");
+
       expect(source).toContain('-apple-system');
       expect(source).toContain('"SF Pro Display"');
       expect(source).toContain('"Segoe UI Variable Display"');

@@ -79,7 +79,7 @@ Port and maintain:
 - near-black, cream, white/gray line, spacing, radius, and depth language;
 - responsive behavior and reduced-motion treatment.
 
-`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. The retired bundled `Sovereign Sans`, `Optima`, and `Avenir Next` are also excluded as title/heading authorities. Titles inherit the approved native enterprise sans stack defined by `docs/product-language-system.md` and `apps/web/src/typography-system.css`: Apple system/SF Pro Display on Apple platforms, Segoe Variable/Segoe on Windows, followed by system-ui and resilient native sans fallbacks. Visual hierarchy comes from scale, weight, spacing, opacity, and layout rather than a decorative face.
+`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. The retired bundled `Sovereign Sans`, `Optima`, and `Avenir Next` are also excluded as title/heading authorities. Titles inherit self-hosted Geist Sans from `apps/web/src/typography-system.css`; Apple/SF Pro Display, Segoe Variable/Segoe, system-ui, Helvetica, and Arial remain resilient fallbacks only. The hero and meaningful product headings must visibly resolve to Geist whenever the bundled font asset is available. Visual hierarchy comes from scale, weight, spacing, opacity, and layout rather than a decorative face.
 
 The refined product should not depend on electric blue, cyan glow, neon, generic AI gradients, or glassmorphism as primary UI language. Spectral color, where intentionally used, should behave like physical light rather than a generic interface accent.
 
@@ -162,7 +162,7 @@ The complete Vite foundation and final refinement are required:
 9. `apps/web/src/premium-action-authority-v1.css`
    - preserves editorial action language for navigation and low-emphasis actions while transactional authentication, onboarding, consent, billing, and account controls retain clear visible affordance.
 10. `apps/web/src/sans-typography-authority-v1.css`
-   - enforces the active native sans title family after legacy visual layers;
+   - enforces the active self-hosted Geist Sans title family after legacy visual layers;
    - prevents legacy selector specificity from restoring retired display faces;
    - does not own global heading dimensions.
 11. `apps/web/src/production-product-cohesion-v1.css`
@@ -177,7 +177,7 @@ The complete Vite foundation and final refinement are required:
 14. Standalone public documents
    - retain the deployed static foundations;
    - load `apps/web/public/premium-action-static-v1.css` last;
-   - that terminal static authority must inherit the same native sans title system, public header/wordmark hierarchy, and final static presentation.
+   - that terminal static authority must inherit the same Geist Sans title system, public header/wordmark hierarchy, and final static presentation.
 
 Removing or bypassing any one of these means the visual port is not sitewide.
 

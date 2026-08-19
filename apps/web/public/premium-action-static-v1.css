@@ -1,4 +1,12 @@
-/* Standalone public-route action and typography authority. */
+@font-face {
+  font-family: "Geist Sans";
+  src: url("/fonts/geist/Geist-Variable.woff2?v=1.7.2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Standalone public-route action and typography authority. Geist Sans owns rendered titles; native sans remains fallback only. */
 :root {
   --static-action-ink: #f2ede5;
   --static-action-muted: rgba(242, 237, 229, 0.62);
@@ -6,6 +14,7 @@
   --static-action-line-strong: rgba(242, 237, 229, 0.54);
   --static-action-bg: #080a0d;
   --static-title-font:
+    "Geist Sans",
     -apple-system,
     BlinkMacSystemFont,
     "SF Pro Display",

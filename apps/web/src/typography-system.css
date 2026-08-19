@@ -1,13 +1,22 @@
+@font-face {
+  font-family: "Geist Sans";
+  src: url("/fonts/geist/Geist-Variable.woff2?v=1.7.2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /*
  * Sovereign.OS typography contract.
  *
- * Titles use the native enterprise sans stack defined by the product-language
- * authority. Body text stays native and highly legible. Retired bundled
+ * Titles use self-hosted Geist Sans with native enterprise fallbacks defined by
+ * the product-language authority. Body text stays native and highly legible. Retired bundled
  * display faces and decorative title substitutions are excluded.
  */
 
 :root {
   --font-title:
+    "Geist Sans",
     -apple-system,
     BlinkMacSystemFont,
     "SF Pro Display",

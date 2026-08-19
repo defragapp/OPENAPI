@@ -21,7 +21,7 @@ const replacements = [
   ],
   [
     "['data-visual-contract=\"founder-v0-static\"', '/v0-public-static.css?v=20260801-v0-global', 'Release compatibility marker only; the retired stylesheet is not loaded']",
-    "['data-visual-contract=\"founder-v0-static\"', 'data-secondary-visual-contract=\"founder-v0-locked-v1\"', 'data-route-cohesion=\"v1\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260817-action-v1', 'class=\"launch-nav-inner\"', 'class=\"launch-mobile-menu-panel\"']"
+    "['data-visual-contract=\"founder-v0-static\"', 'data-secondary-visual-contract=\"founder-v0-locked-v1\"', 'data-route-cohesion=\"v1\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260818-geist-v1', 'class=\"launch-nav-inner\"', 'class=\"launch-mobile-menu-panel\"']"
   ],
   [
     "const passkeyMigration = read('apps/sovereign-worker/migrations/0014_passkey_authentication.sql');",

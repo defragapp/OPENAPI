@@ -28,7 +28,7 @@ const productionRelease = read('../../../scripts/cloudflare-production-release.m
 
 const refinedCssPath = '/v0-public-static.css?v=20260803-refined-v2';
 const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2';
-const terminalCssPath = '/premium-action-static-v1.css?v=20260817-action-v1';
+const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1';
 
 describe('secondary public visual parity', () => {
   it.each(staticPages)('%s uses the same Sovereign identity and terminal static authority', (_label, path) => {
@@ -49,10 +49,11 @@ describe('secondary public visual parity', () => {
     expect(document).toContain('apple-touch-icon.png');
   });
 
-  it('keeps the historical static foundation but lets terminal sans authority own rendered headings', () => {
+  it('keeps the historical static foundation but lets terminal Geist Sans authority own rendered headings', () => {
     expect(staticCss).toContain('--v0-page: #090b0e');
     expect(staticCss).toContain('--v0-cream: #f1e9de');
     expect(staticTerminalCss).toContain('"Helvetica Neue"');
+    expect(staticTerminalCss.indexOf("\"Geist Sans\"")).toBeLessThan(staticTerminalCss.indexOf("\"SF Pro Display\""));
     expect(staticTerminalCss.indexOf('"SF Pro Display"')).toBeLessThan(staticTerminalCss.indexOf('"Helvetica Neue"'));
     expect(staticTerminalCss).not.toContain('Avenir Next');
     expect(staticTerminalCss).toContain('--static-title-font:');

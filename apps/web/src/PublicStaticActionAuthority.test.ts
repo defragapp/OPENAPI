@@ -18,7 +18,7 @@ const RETIRED_DEV_LANGUAGE = [
 describe('standalone public action authority', () => {
   it('loads the same no-button visual authority on every standalone public route', () => {
     for (const source of [pricing, faq, how]) {
-      expect(source).toContain('/premium-action-static-v1.css?v=20260817-action-v1');
+      expect(source).toContain('/premium-action-static-v1.css?v=20260818-geist-v1');
       expect(source).toContain('>Sign in</a>');
       expect(source).toContain('>Get started');
       expect(source).toContain('<a href="/signup">Get started</a>');

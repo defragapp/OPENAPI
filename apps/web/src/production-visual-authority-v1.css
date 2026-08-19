@@ -6,7 +6,7 @@
  * It must load after all route refinements and before no later visual override.
  *
  * Principles:
- * - native enterprise sans typography with restrained scale
+ * - self-hosted Geist Sans title typography with native enterprise fallbacks
  * - near-black / cream / warm-metal interface chrome
  * - hard alignment and deliberate whitespace
  * - demos read as real product workflows, not decorative cards
@@ -15,6 +15,7 @@
 
 :root {
   --sovereign-title:
+    "Geist Sans",
     -apple-system,
     BlinkMacSystemFont,
     "SF Pro Display",

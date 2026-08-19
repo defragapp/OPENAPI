@@ -27,8 +27,10 @@ describe('production visual authority v1', () => {
     expect(main).toContain("document.documentElement.dataset.sovereignVisualAuthority = 'production-v1';");
   });
 
-  it('uses the canonical native enterprise sans title stack without decorative substitutions', () => {
+  it('uses self-hosted Geist Sans titles with native enterprise fallbacks', () => {
     for (const source of [typography, sansAuthority, staticAuthority, intelligenceDemo, visualAuthority]) {
+      expect(source).toContain("\"Geist Sans\"");
+
       expect(source).toContain('-apple-system');
       expect(source).toContain('"SF Pro Display"');
       expect(source).toContain('"Segoe UI"');

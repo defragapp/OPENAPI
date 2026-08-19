@@ -26,10 +26,10 @@ const productionRelease = read('../../../scripts/cloudflare-production-release.m
 const packageJson = JSON.parse(read('../../../package.json')) as { scripts?: Record<string, string> };
 
 const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2';
-const terminalCssPath = '/premium-action-static-v1.css?v=20260817-action-v1';
+const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1';
 
 describe('deployed route cohesion contract', () => {
-  it('keeps component stylesheet order and appends terminal sans typography after inline authorities', () => {
+  it('keeps component stylesheet order and appends terminal Geist typography after inline authorities', () => {
     const cohesion = "import './deployed-route-cohesion.css';";
     const passkey = "import './passkey-auth.css';";
     expect(main).toContain(cohesion);
@@ -108,8 +108,8 @@ describe('deployed route cohesion contract', () => {
     expect(verifierV2).toContain('const serifTypographyMarker =');
     expect(verifierV2).toContain("headingFamily).includes('Sovereign Display')");
     expect(verifierV2).toContain('const sansTypographyReplacement =');
-    expect(verifierV2).toContain("['-apple-system', 'SF Pro Display', 'Segoe UI', 'system-ui', 'Helvetica Neue']");
-    expect(verifierV2).toContain('native sans title stack');
+    expect(verifierV2).toContain("Geist Sans title stack");
+    expect(verifierV2).toContain('Geist Sans title stack');
     expect(verifierV2).toContain('for (const [from, to] of replacements) generated = generated.replace(from, to);');
     expect(verifierV2).toContain('Route cohesion v2 still certifies the retired display serif.');
     expect(productionRelease).toContain("['verify-route-cohesion', 'scripts/verify-live-route-cohesion-v2.mjs']");
@@ -118,12 +118,12 @@ describe('deployed route cohesion contract', () => {
   it('keeps both fast and rendered route verification production-authoritative', () => {
     expect(secondaryVerifier).toContain("const routeCssPath = '/deployed-route-cohesion.css?v=20260803-route-v1'");
     expect(secondaryVerifier).toContain("const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2'");
-    expect(secondaryVerifier).toContain("const terminalCssPath = '/premium-action-static-v1.css?v=20260817-action-v1'");
-    expect(secondaryVerifier).toContain('positioning=self-people-systems typography=sans-only');
+    expect(secondaryVerifier).toContain("const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1'");
+    expect(secondaryVerifier).toContain('positioning=self-people-systems typography=geist-sans');
     expect(packageJson.scripts?.['verify:live-route-cohesion']).toBe('node scripts/verify-live-route-cohesion-v2.mjs');
   });
 
-  it('keeps rendered visual refinements coherent with the sans-only public release', () => {
+  it('keeps rendered visual refinements coherent with the Geist Sans public release', () => {
     expect(experienceRefinement).toContain('--landing-blue: #e8ddd0 !important');
     expect(renderedFidelity).toContain('--v8-blue: #d8d0c5 !important');
     expect(landingRefinement).toContain('.landing-workflow__progress');

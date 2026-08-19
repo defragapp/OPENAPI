@@ -88,7 +88,7 @@ const replacements = [
   ],
   [
     "supportPages.forEach((page) => requireAll('support page', page, ['/premium-public-release.css?v=20260730-final', 'Sovereign.OS']));",
-    "supportPages.forEach((page) => requireAll('support page', page, ['/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260817-action-v1', 'Sovereign.OS']));"
+    "supportPages.forEach((page) => requireAll('support page', page, ['/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260818-geist-v1', 'Sovereign.OS']));"
   ],
   [
     "  ['passkey authority', passkeyVisual],\n  ['standalone authority', staticV0Visual],",

@@ -2,7 +2,7 @@ const publicBase = String(process.env.PUBLIC_BASE_URL || 'https://sovereign.defr
 const expectedCssPath = '/v0-public-static.css?v=20260803-refined-v2';
 const routeCssPath = '/deployed-route-cohesion.css?v=20260803-route-v1';
 const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2';
-const terminalCssPath = '/premium-action-static-v1.css?v=20260817-action-v1';
+const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1';
 const expectedContract = 'founder-v0-locked-v1';
 const staticRoutes = ['/how-it-works', '/pricing', '/faq'];
 const policyRoutes = ['/privacy', '/terms'];
@@ -189,6 +189,8 @@ for (const marker of [
 ]) assert(refinementCss.text.includes(marker), `static refinement stylesheet is missing ${marker}`);
 for (const marker of [
   '--static-title-font:',
+  'font-family: "Geist Sans";',
+  '/fonts/geist/Geist-Variable.woff2?v=1.7.2',
   'font-family: var(--static-title-font) !important',
   'border-radius: 0 !important;'
 ]) assert(terminalCss.text.includes(marker), `terminal static stylesheet is missing ${marker}`);
@@ -246,4 +248,4 @@ for (const marker of [
 ]) assert(compactJavaScript.includes(marker), `compiled injected refinement is missing ${marker}`);
 assert(compactJavaScript.includes('sans-typography-authority-v1.css') || compactJavaScript.includes('--font-title:'), 'compiled release is missing the sans typography authority');
 
-console.log(`Secondary public release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} positioning=self-people-systems typography=sans-only`);
+console.log(`Secondary public release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} positioning=self-people-systems typography=geist-sans`);

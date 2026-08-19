@@ -133,7 +133,7 @@ Exact source data does not measure personality. Facets and answers are interpret
 
 The active product is sans-only. `Sovereign Display` is retired from rendered UI use.
 
-Headings and titles must use the approved sans system. Visual hierarchy comes from scale, weight, spacing, opacity, and composition rather than a serif/sans contrast.
+Headings and titles must use the approved self-hosted Geist Sans system, with native sans families retained only as fallback. Visual hierarchy comes from scale, weight, spacing, opacity, and composition rather than a serif/sans contrast.
 
 ## Language boundary
 

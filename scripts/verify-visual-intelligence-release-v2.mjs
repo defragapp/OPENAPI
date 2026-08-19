@@ -116,7 +116,7 @@ const replacements = [
   ["  'What could change',", "  'Give you something you can try',"],
   ["  'System structure',", "  'How Sovereign reads a system',"],
   ["  'Illustrative permitted Baselines',", "  'Start with what you told Sovereign',"],
-  ["  '/experience-static-refinement-v1.css?v=20260816-refinement-v1',", "  '/experience-static-refinement-v1.css?v=20260817-cohesion-v2',\n  '/premium-action-static-v1.css?v=20260817-action-v1',"],
+  ["  '/experience-static-refinement-v1.css?v=20260816-refinement-v1',", "  '/experience-static-refinement-v1.css?v=20260817-cohesion-v2',\n  '/premium-action-static-v1.css?v=20260818-geist-v1',"],
   ["  'Build my Baseline',", "  'Get started',"],
   ["  'Your thoughts deserve'", "  'Know yourself. Understand your people. See the whole system.'"],
   ["  'Look closer at the pattern.',", "  'Explore yourself more deeply.',"],

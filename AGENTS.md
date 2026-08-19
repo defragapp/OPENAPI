@@ -69,7 +69,8 @@ These instructions apply to the entire OPENAPI repository.
 
 ## Typography contract
 - Treat `apps/web/src/typography-system.css` as the platform-wide typography source of truth.
-- The rendered title/heading stack is the approved native enterprise sans system: Apple system/SF Pro Display on Apple platforms, Segoe Variable/Segoe on Windows, followed by system-ui and resilient native sans fallbacks.
+- The rendered title/heading face is self-hosted `Geist Sans`. Apple/SF Pro Display, Segoe Variable/Segoe, system-ui, Helvetica, and Arial are fallback only and must not win when the bundled Geist asset is present.
+- The canonical self-hosted asset is `apps/web/public/fonts/geist/Geist-Variable.woff2`; do not replace Geist with a native-only stack during release or visual hardening.
 - `Sovereign Display`, the retired bundled `Sovereign Sans`, `Optima`, `Avenir Next`, and serif fallbacks must not become active title authorities.
 - The terminal typography authority may enforce font family only; it must not impose a universal `h1`/`h2`/`h3` size or spacing system over route-owned composition.
 - `apps/web/src/production-visual-authority-v1.css` owns final live visual proportions, warm-metal interface accent, demo organization, navigation/brand geometry, and motion after route/component foundations have loaded.
