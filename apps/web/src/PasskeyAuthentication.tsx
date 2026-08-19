@@ -113,7 +113,6 @@ export function PasskeyAuthentication() {
       <h2 id="passkey-login-title">Choose a secure way to sign in.</h2>
       <p className="passkey-intro">Use your device passkey, or enter your email below for a one-time link and six-digit code.</p>
       <button type="button" className="passkey-button" onClick={() => void signInWithPasskey()} disabled={state === 'working' || state === 'success'}>
-        <span aria-hidden="true">◎</span>
         {state === 'working' ? 'Waiting for your device…' : state === 'success' ? 'Passkey verified' : 'Sign in with a passkey'}
       </button>
       <p className={`passkey-status ${state}`} role="status" aria-live="polite">{message}</p>
