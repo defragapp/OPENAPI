@@ -14,9 +14,9 @@
   font-display: swap;
 }
 
-/* Standalone public-route action and typography authority. Public titles use
- * the founder display voice; controls, metadata, pricing figures, and product
- * UI remain on the clean Geist/native sans stack. */
+/* Standalone route action and typography authority. Public launch pages use
+ * the founder display voice; account-bound consent and all controls remain on
+ * the clean Geist/native sans stack. */
 :root {
   --static-action-ink: #f2ede5;
   --static-action-muted: rgba(242, 237, 229, 0.62);
@@ -44,7 +44,7 @@
     sans-serif;
 }
 
-html:root:root:root body :is(
+html:root:root:root body.launch-page :is(
   h1,
   h2,
   h3,
@@ -64,6 +64,16 @@ html:root:root:root body :is(
 html:root:root:root body :is(
   .price,
   .faq-category .launch-kicker
+),
+html:root:root:root body.consent-page :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  [role="heading"],
+  .launch-wordmark
 ) {
   font-family: var(--static-ui-title-font) !important;
   font-style: normal !important;
