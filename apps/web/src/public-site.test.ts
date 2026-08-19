@@ -80,7 +80,7 @@ describe('Sovereign.OS public experience', () => {
     expect(stories).toContain('data-product-stories="text-first-intelligence-v2"');
   });
 
-  it('keeps the public progression visually distinct without scoring or personality-card framing', () => {
+  it('keeps the public progression visually distinct without numeric scoring or personality-card framing', () => {
     for (const marker of [
       '<DecisionField />',
       '<RelationshipField />',
@@ -94,9 +94,7 @@ describe('Sovereign.OS public experience', () => {
       'When you stop mediating',
       'You remain in the system; the communication path is what changes.'
     ]) expect(stories).toContain(marker);
-    expect(stories).not.toContain('83%');
-    expect(stories).not.toContain('Alignment meter');
-    expect(stories).not.toContain('compatibility score');
+    for (const prohibited of ['83%', 'Alignment meter', 'compatibilityPercent', 'compatibilityScore', 'alignmentScore']) expect(stories).not.toContain(prohibited);
   });
 
   it('keeps relationship and system examples permission-safe and source codes optional', () => {
