@@ -17,10 +17,24 @@
     "Helvetica Neue",
     Arial,
     sans-serif;
+  --static-body-font:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "Segoe UI Variable Text",
+    "Segoe UI",
+    system-ui,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
   --static-shell:min(1180px,calc(100vw - 64px));
   --static-header-h:64px;
   --static-brand-size:13px;
   --static-nav-size:13px;
+}
+
+html:root:root:root body {
+  font-family:var(--static-body-font) !important;
 }
 
 html:root:root:root body :is(
@@ -31,8 +45,6 @@ html:root:root:root body :is(
   h5,
   h6,
   [role="heading"],
-  .launch-wordmark,
-  .launch-footer-wordmark,
   .price,
   .faq-category .launch-kicker
 ) {
@@ -75,6 +87,11 @@ html:root:root:root body :is(
   border-bottom: 1px solid var(--static-action-line) !important;
 }
 
+.launch-cta > span,
+.launch-button > span {
+  display:none !important;
+}
+
 .launch-cta:hover,
 .launch-cta:focus-visible,
 .launch-button:hover,
@@ -96,6 +113,26 @@ html:root:root:root body :is(
 .consent-actions button:focus-visible {
   outline: 1px solid var(--static-action-line-strong) !important;
   outline-offset: 5px !important;
+}
+
+.launch-mobile-menu summary {
+  min-width:44px !important;
+  min-height:44px !important;
+  display:grid !important;
+  place-items:center !important;
+  color:var(--static-action-ink) !important;
+  font-family:var(--static-body-font) !important;
+  font-size:12px !important;
+  font-weight:560 !important;
+  text-transform:none !important;
+}
+
+.launch-mobile-menu summary .launch-mobile-menu-icon {
+  display:none !important;
+}
+
+.launch-mobile-menu summary::after {
+  content:"Menu" !important;
 }
 
 .launch-mobile-menu-panel {
@@ -225,7 +262,7 @@ html:root:root:root body.consent-page .launch-wordmark {
   margin:0 !important;
   padding:0 !important;
   color:#f2ece3 !important;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif !important;
+  font-family:var(--static-body-font) !important;
   font-size:var(--static-brand-size) !important;
   font-weight:700 !important;
   line-height:1 !important;
@@ -260,7 +297,7 @@ html:root:root:root body.consent-page :is(.launch-links a,.launch-sign-in,.launc
   align-items:center !important;
   margin:0 !important;
   padding:0 !important;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif !important;
+  font-family:var(--static-body-font) !important;
   font-size:var(--static-nav-size) !important;
   font-weight:520 !important;
   line-height:1 !important;
@@ -294,6 +331,12 @@ html:root:root:root body.questions-page .faq-category + .faq-category {
   padding-top:42px !important;
 }
 
+html:root:root:root body.questions-page .faq-list summary {
+  min-height:60px !important;
+  display:flex !important;
+  align-items:center !important;
+}
+
 html:root:root:root body.pricing-page .pricing-section {
   padding-top:56px !important;
 }
@@ -303,10 +346,41 @@ html:root:root:root body.not-found-page .not-found-stage {
   padding:64px 0 72px !important;
 }
 
-html:root:root:root body.launch-page .launch-footer-inner {
+html:root:root:root body.not-found-page .not-found-code {
+  color:rgba(242,235,225,.08) !important;
+  font-size:clamp(4.5rem,7vw,6.5rem) !important;
+}
+
+html:root:root:root body.launch-page .launch-footer-inner,
+html:root:root:root body.consent-page .launch-footer-inner {
+  display:grid !important;
+  grid-template-columns:minmax(180px,1fr) auto minmax(180px,1fr) !important;
+  align-items:center !important;
+  gap:24px !important;
   width:var(--static-shell) !important;
   max-width:1180px !important;
+  min-height:72px !important;
   margin-inline:auto !important;
+  padding:16px 0 !important;
+}
+
+html:root:root:root body.launch-page .launch-footer-inner > nav,
+html:root:root:root body.consent-page .launch-footer-inner > nav {
+  justify-self:center !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:18px !important;
+  flex-wrap:wrap !important;
+  justify-content:center !important;
+}
+
+html:root:root:root body.launch-page .launch-footer-inner > :last-child:not(nav) {
+  justify-self:end !important;
+}
+
+html:root:root:root body.consent-page .launch-footer-inner > span {
+  justify-self:start !important;
+  max-width:42ch !important;
 }
 
 @media (max-width: 760px) {
@@ -343,6 +417,20 @@ html:root:root:root body.launch-page .launch-footer-inner {
 
   html:root:root:root body.launch-page :is(.launch-band,.launch-section) {
     padding:46px 0 !important;
+  }
+
+  html:root:root:root body.launch-page .launch-footer-inner,
+  html:root:root:root body.consent-page .launch-footer-inner {
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+    padding:22px 0 !important;
+  }
+
+  html:root:root:root body.launch-page .launch-footer-inner > nav,
+  html:root:root:root body.consent-page .launch-footer-inner > nav,
+  html:root:root:root body.launch-page .launch-footer-inner > :last-child:not(nav) {
+    justify-self:start !important;
+    justify-content:flex-start !important;
   }
 
   .consent-actions button {
