@@ -44,8 +44,8 @@ describe('production visual authority v1', () => {
     expect(typography).toContain('font-family: "Sovereign Display";');
     expect(typography).toContain('--font-public-display:');
     expect(typography).toContain('"Iowan Old Style"');
+    expect(sansAuthority).toContain('--sovereign-title: var(--font-public-display);');
     expect(sansAuthority).toContain('font-family: var(--font-public-display) !important;');
-    expect(visualAuthority).toContain('font-family: var(--font-public-display, var(--sovereign-title)) !important;');
     expect(visualAuthority).toContain('.public-approved-v8 .v0-hero h1 > span');
     expect(visualAuthority).toContain('.public-approved-v8 .landing-story__heading h2');
     expect(visualAuthority).toContain('.public-secondary-page .policy-hero h1');
