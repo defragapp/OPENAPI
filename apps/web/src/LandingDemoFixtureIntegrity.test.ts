@@ -28,7 +28,7 @@ describe('representative landing intelligence fixtures', () => {
   });
 
   it('keeps every representative facet grounded in the explicit source registry', () => {
-    const sourceIds = new Set(SELF_REPRESENTATIVE_SOURCES.map((source) => source.id));
+    const sourceIds = new Set<string>(SELF_REPRESENTATIVE_SOURCES.map((source) => source.id));
     const sourceCodes = SELF_REPRESENTATIVE_SOURCES.map((source) => source.code);
 
     expect(sourceCodes).toEqual(['HD G13.1', 'GK ACT13', 'N LP1', '☉ CAN 04.2°']);
