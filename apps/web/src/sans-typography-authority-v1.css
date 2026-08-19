@@ -64,21 +64,26 @@ html:root:root:root body :is(
 }
 
 /* Public identity: restore the founder editorial voice without carrying it
- * into product UI, demo chrome, forms, account surfaces, or the workspace. */
-html:root:root:root body .public-approved-v8 :is(
-  h1,
-  h2,
-  .v0-wordmark
-),
-html:root:root:root body .public-approved-v8 .v0-hero h1 > span,
-html:root:root:root body .public-approved-v8 .v0-hero h1 > em,
+ * into product UI, demo chrome, forms, account surfaces, or the workspace.
+ *
+ * production-visual-authority-v1.css is intentionally terminal and resolves
+ * several heading families through --sovereign-title. Setting that custom
+ * property on the bounded public identity elements lets the terminal layer
+ * remain authoritative while resolving those specific titles to the founder
+ * display face instead of flattening them back to Geist.
+ */
+html:root:root:root body .public-approved-v8 .v0-hero h1,
+html:root:root:root body .public-approved-v8 .landing-question-orbit h2,
+html:root:root:root body .public-approved-v8 .landing-story__heading h2,
+html:root:root:root body .public-approved-v8 .v0-comparison .v0-story-heading h2,
+html:root:root:root body .public-approved-v8 .v0-final h2,
+html:root:root:root body .public-approved-v8 .v0-wordmark,
 html:root:root:root body .public-approved-v8 .landing-question-orbit__stage > span > strong,
-html:root:root:root body .public-secondary-page :is(
-  .policy-hero h1,
-  .policy-grid h2,
-  .policy-contact h2,
-  .v0-wordmark
-) {
+html:root:root:root body .public-secondary-page .policy-hero h1,
+html:root:root:root body .public-secondary-page .policy-grid h2,
+html:root:root:root body .public-secondary-page .policy-contact h2,
+html:root:root:root body .public-secondary-page .v0-wordmark {
+  --sovereign-title: var(--font-public-display);
   font-family: var(--font-public-display) !important;
   font-kerning: normal;
   font-synthesis: none;
