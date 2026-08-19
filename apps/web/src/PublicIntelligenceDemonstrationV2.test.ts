@@ -57,7 +57,7 @@ describe('public intelligence demonstrations v2', () => {
     ]) expect(renderedStories).toContain(marker);
   });
 
-  it('uses one progressively richer comprehension visual without scores', () => {
+  it('uses one progressively richer comprehension visual without scores or compatibility vocabulary', () => {
     for (const marker of [
       'function DecisionField()',
       'decision-field__choice',
@@ -69,7 +69,7 @@ describe('public intelligence demonstrations v2', () => {
       'system-field__state--current',
       'system-field__state--changed'
     ]) expect(renderedStories).toContain(marker);
-    for (const prohibited of ['83%', 'alignmentScore', 'compatibilityScore', 'compatibilityPercent', 'personality score']) {
+    for (const prohibited of ['83%', 'alignmentScore', 'compatibility', 'compatibilityScore', 'compatibilityPercent', 'personality score']) {
       expect(renderedStories.toLowerCase()).not.toContain(prohibited.toLowerCase());
     }
   });
@@ -82,10 +82,12 @@ describe('public intelligence demonstrations v2', () => {
       'Only they can say what they actually felt or intended',
       'Roles and events are supplied in the example',
       'What you told Sovereign',
+      'information each participant chose to share',
       'You remain in the system; the communication path is what changes.'
     ]) expect(renderedStories).toContain(marker);
     expect(renderedStories.toLowerCase()).not.toContain('missing perspective');
     expect(renderedStories.toLowerCase()).not.toContain('authority as a systems');
+    expect(renderedStories.toLowerCase()).not.toContain('consented participant context');
   });
 
   it('keeps exact representative source values collapsed and secondary', () => {
