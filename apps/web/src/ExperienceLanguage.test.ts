@@ -106,18 +106,18 @@ describe('Sovereign.OS active experience language', () => {
     expect(stories).not.toContain('<strong>Example Basis</strong>');
   });
 
-  it('keeps People language consent-aware and avoids private-state claims', () => {
+  it('keeps People language consent-aware, compatibility-free, and avoids private-state claims', () => {
     const stories = activeExperience.find(([label]) => label === 'landing demonstrations')?.[1] ?? '';
     for (const marker of [
       'Both people choose what they share',
-      'No compatibility score',
       'Only they can say what they actually felt or intended',
-      'Alex’s shared Baseline'
+      'Alex’s shared Baseline',
+      'keeping both people distinct'
     ]) expect(stories).toContain(marker);
-    for (const prohibited of ['They secretly', 'They definitely feel', 'compatibilityScore', 'compatibilityPercent']) expect(stories).not.toContain(prohibited);
+    for (const prohibited of ['They secretly', 'They definitely feel', 'compatibility', 'compatibilityScore', 'compatibilityPercent']) expect(stories.toLowerCase()).not.toContain(prohibited.toLowerCase());
   });
 
-  it('keeps Systems language grounded in supplied roles and observed interaction', () => {
+  it('keeps Systems language grounded in supplied roles, observed interaction, and chosen information', () => {
     const stories = activeExperience.find(([label]) => label === 'landing demonstrations')?.[1] ?? '';
     for (const marker of [
       'Roles and events are supplied in the example',
@@ -125,9 +125,11 @@ describe('Sovereign.OS active experience language', () => {
       'A parent pushes for immediate resolution.',
       'A sibling pulls away when tension rises.',
       'You often step in to translate or mediate',
+      'information each participant chose to share',
       'You remain in the system; the communication path is what changes.'
     ]) expect(stories).toContain(marker);
     expect(stories.toLowerCase()).not.toContain('missing perspective');
+    expect(stories.toLowerCase()).not.toContain('consented participant context');
   });
 
   it('keeps secondary pages understandable before framework/source mechanics', () => {
@@ -144,6 +146,7 @@ describe('Sovereign.OS active experience language', () => {
     expect(faq).toContain('Do those source details prove the interpretation is true?');
     expect(faq).not.toContain('What is Basis?');
     expect(faq).not.toContain('What does Basis prove?');
+    expect(faq.toLowerCase()).not.toContain('compatibility');
   });
 
   it('keeps authenticated Explore, People, Systems, and source-detail language aligned with the same product model', () => {
