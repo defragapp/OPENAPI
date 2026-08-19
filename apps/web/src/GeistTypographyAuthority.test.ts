@@ -47,8 +47,10 @@ describe("Sovereign split typography authority", () => {
     expect(publicStack).toContain('"Iowan Old Style",');
     expect(publicStack.indexOf('"Sovereign Display"')).toBeLessThan(publicStack.indexOf('"Iowan Old Style"'));
 
-    expect(sansAuthority).toContain(".public-approved-v8 :is(");
-    expect(sansAuthority).toContain(".public-secondary-page :is(");
+    expect(sansAuthority).toContain("html:root:root:root body .public-approved-v8 :is(");
+    expect(sansAuthority).toContain("html:root:root:root body .public-approved-v8 .v0-hero h1 > span");
+    expect(sansAuthority).toContain("html:root:root:root body .public-approved-v8 .landing-question-orbit__stage > span > strong");
+    expect(sansAuthority).toContain("html:root:root:root body .public-secondary-page :is(");
     expect(sansAuthority).toContain("font-family: var(--font-public-display) !important;");
     expect(sansAuthority).toContain(".account-intro h1");
     expect(sansAuthority).toContain("font-family: var(--font-title) !important;");
