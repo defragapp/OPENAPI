@@ -1,0 +1,534 @@
+/*
+ * Sovereign.OS launch polish final v1
+ * Terminal presentation authority for the launch candidate.
+ * Presentation only: no product, auth, billing, Baseline, consent, or AI logic.
+ */
+
+html:root {
+  --launch-shell: min(1180px, calc(100vw - 64px));
+  --launch-header-h: 64px;
+  --launch-brand-size: 13px;
+  --launch-nav-size: 13px;
+  --launch-ink: #f2ece3;
+  --launch-muted: rgba(232,224,214,.70);
+  --launch-faint: rgba(232,224,214,.46);
+  --launch-line: rgba(242,235,225,.10);
+  --launch-line-strong: rgba(242,235,225,.20);
+  --launch-page: #080a0d;
+  --launch-panel: #101317;
+  --launch-title: -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI Variable Display","Segoe UI",system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --launch-body: -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+html:root:root:root body {
+  background: var(--launch-page) !important;
+  color: var(--launch-ink) !important;
+  font-family: var(--launch-body) !important;
+}
+
+/* ---------------------------------------------------------------------
+   ONE BRAND / HEADER GEOMETRY
+   ------------------------------------------------------------------ */
+
+html:root:root:root body .public-approved-v8 .v0-nav,
+html:root:root:root body .public-secondary-page .v0-nav,
+html:root:root:root body .account-shell .account-nav,
+html:root:root:root body .plan-onboarding .plan-nav {
+  min-height: var(--launch-header-h) !important;
+  height: var(--launch-header-h) !important;
+  border-bottom: 1px solid var(--launch-line) !important;
+  background: rgba(8,10,13,.96) !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-nav-inner,
+html:root:root:root body .public-secondary-page .v0-nav-inner {
+  display: grid !important;
+  grid-template-columns: minmax(180px,1fr) auto minmax(180px,1fr) !important;
+  align-items: center !important;
+  width: var(--launch-shell) !important;
+  max-width: 1180px !important;
+  height: var(--launch-header-h) !important;
+  margin-inline: auto !important;
+  padding: 0 !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-nav-inner > nav,
+html:root:root:root body .public-secondary-page .v0-nav-inner > nav {
+  display: flex !important;
+  align-items: center !important;
+  justify-self: center !important;
+  gap: 30px !important;
+  height: 100% !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-nav-actions,
+html:root:root:root body .public-secondary-page .v0-nav-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-self: end !important;
+  justify-content: flex-end !important;
+  gap: 24px !important;
+  height: 100% !important;
+}
+
+html:root:root:root body :is(.brand-mark,.v0-wordmark,.wordmark,.private-route-brand strong,.plan-nav > a:first-child,.intelligence-brand) {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--launch-ink) !important;
+  font-family: var(--launch-body) !important;
+  font-size: var(--launch-brand-size) !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: .16em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-wordmark,
+html:root:root:root body .public-secondary-page .v0-wordmark {
+  justify-self: start !important;
+  height: var(--launch-header-h) !important;
+  display: flex !important;
+  align-items: center !important;
+  text-decoration: none !important;
+}
+
+html:root:root:root body .public-approved-v8 .v0-wordmark--mobile,
+html:root:root:root body .public-secondary-page .v0-wordmark--mobile {
+  display: none !important;
+}
+
+html:root:root:root body :is(.public-approved-v8,.public-secondary-page) .v0-nav :is(nav a,.v0-sign-in,.v0-get-started,.landing-control--nav) {
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: rgba(232,224,214,.68) !important;
+  font-family: var(--launch-body) !important;
+  font-size: var(--launch-nav-size) !important;
+  font-weight: 520 !important;
+  line-height: 1 !important;
+  letter-spacing: .01em !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+html:root:root:root body :is(.public-approved-v8,.public-secondary-page) .v0-nav :is(nav a[aria-current='page'],nav a:hover,nav a:focus-visible,.v0-sign-in:hover,.v0-sign-in:focus-visible) {
+  color: var(--launch-ink) !important;
+}
+
+html:root:root:root body :is(.public-approved-v8,.public-secondary-page) .v0-nav :is(.v0-get-started,.landing-control--nav) {
+  border-bottom: 1px solid rgba(242,235,225,.30) !important;
+  color: var(--launch-ink) !important;
+}
+
+html:root:root:root body .account-shell .account-nav,
+html:root:root:root body .plan-onboarding .plan-nav {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) auto !important;
+  align-items: center !important;
+  width: var(--launch-shell) !important;
+  max-width: 1180px !important;
+  margin-inline: auto !important;
+  padding: 0 !important;
+}
+
+html:root:root:root body .account-shell .account-nav > a:first-child,
+html:root:root:root body .plan-onboarding .plan-nav > a:first-child {
+  justify-self: start !important;
+  text-decoration: none !important;
+}
+
+html:root:root:root body .account-shell .account-nav > a:last-child,
+html:root:root:root body .plan-onboarding .plan-nav > span {
+  justify-self: end !important;
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(242,235,225,.24) !important;
+  border-radius: 0 !important;
+  color: rgba(232,224,214,.66) !important;
+  background: transparent !important;
+  font-family: var(--launch-body) !important;
+  font-size: var(--launch-nav-size) !important;
+  font-weight: 520 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+}
+
+html:root:root:root body .invitation-shell::before {
+  height: var(--launch-header-h) !important;
+  border-bottom-color: var(--launch-line) !important;
+  background: rgba(8,10,13,.96) !important;
+}
+
+html:root:root:root body .invitation-shell > .wordmark {
+  top: 0 !important;
+  left: max(32px,calc((100vw - 1180px)/2)) !important;
+  height: var(--launch-header-h) !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+html:root:root:root body .public-not-found .private-route-brand > span {
+  display: none !important;
+}
+
+/* ---------------------------------------------------------------------
+   LANDING: PRODUCT PROOF MUST BE VISIBLE AND DENSE ENOUGH TO READ
+   ------------------------------------------------------------------ */
+
+html:root:root:root body .public-approved-v8 .landing-story {
+  padding: 68px 0 76px !important;
+}
+
+html:root:root:root body .public-approved-v8 .landing-story__heading {
+  width: min(780px,100%) !important;
+  max-width: 780px !important;
+  margin: 0 0 28px !important;
+  text-align: left !important;
+}
+
+html:root:root:root body .public-approved-v8 .landing-story__heading h2 {
+  max-width: 760px !important;
+  margin-top: 12px !important;
+  font-size: clamp(2.45rem,3.5vw,3.35rem) !important;
+  font-weight: 560 !important;
+  line-height: 1 !important;
+  letter-spacing: -.036em !important;
+  text-wrap: balance !important;
+}
+
+html:root:root:root body .public-approved-v8 .landing-story__heading > div {
+  max-width: 700px !important;
+  margin-top: 14px !important;
+  color: var(--launch-muted) !important;
+  font-size: .96rem !important;
+  line-height: 1.62 !important;
+}
+
+html:root:root:root body .public-approved-v8 .landing-story__stage,
+html:root:root:root body .public-approved-v8 .landing-story__stage--relationship,
+html:root:root:root body .public-approved-v8 .landing-story__stage--system {
+  display: block !important;
+  width: 100% !important;
+  max-width: 1180px !important;
+  min-height: 0 !important;
+  margin-top: 0 !important;
+}
+
+html:root:root:root body .public-approved-v8 .landing-stories[data-product-stories='text-first-intelligence-v2'] :is(.landing-intelligence-demo,.landing-demo-question,.landing-demo-copy,.landing-demo-visual,.landing-demo-insights) {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+html:root:root:root body .public-approved-v8 .landing-intelligence-demo {
+  width: 100% !important;
+  max-width: 1120px !important;
+  margin: 0 !important;
+  border-color: var(--launch-line-strong) !important;
+  border-radius: 2px !important;
+  background: linear-gradient(180deg,rgba(255,255,255,.012),transparent 24%),var(--launch-panel) !important;
+  box-shadow: 0 26px 72px rgba(0,0,0,.28), 0 0 46px rgba(92,123,158,.045) !important;
+}
+
+html:root:root:root body .public-approved-v8 .landing-demo-question {
+  padding: 22px 36px !important;
+}
+
+html:root:root:root body .public-approved-v8 .landing-demo-core {
+  grid-template-columns: minmax(0,1.12fr) minmax(330px,.78fr) !important;
+  gap: clamp(34px,5vw,68px) !important;
+  padding: 40px 36px 44px !important;
+}
+
+html:root:root:root body .public-approved-v8 .landing-demo-copy > h3 {
+  font-size: clamp(2.05rem,3vw,2.9rem) !important;
+  line-height: 1.03 !important;
+}
+
+html:root:root:root body .public-approved-v8 .landing-demo-insights {
+  padding-inline: 36px !important;
+}
+
+html:root:root:root body .public-approved-v8 .landing-demo-close {
+  padding: 18px 36px 22px !important;
+}
+
+/* ---------------------------------------------------------------------
+   PUBLIC / POLICY / ACCOUNT PAGE RHYTHM
+   ------------------------------------------------------------------ */
+
+html:root:root:root body .public-secondary-page .policy-hero {
+  min-height: 390px !important;
+  padding: 64px 0 54px !important;
+}
+
+html:root:root:root body .public-secondary-page .policy-grid article {
+  padding-block: 20px !important;
+}
+
+html:root:root:root body .account-shell .account-layout {
+  min-height: calc(100svh - var(--launch-header-h)) !important;
+  padding: 56px 0 72px !important;
+  align-items: center !important;
+}
+
+html:root:root:root body .account-shell .account-intro {
+  margin-top: 0 !important;
+}
+
+html:root:root:root body .account-shell .auth-panel {
+  margin-top: 0 !important;
+  border-radius: 2px !important;
+}
+
+html:root:root:root body .account-shell :is(.auth-panel,.account-intro) .eyebrow,
+html:root:root:root body .plan-onboarding .eyebrow,
+html:root:root:root body .invitation-shell .eyebrow {
+  color: var(--launch-faint) !important;
+  font-size: .66rem !important;
+  font-weight: 650 !important;
+  line-height: 1.4 !important;
+  letter-spacing: .15em !important;
+}
+
+html:root:root:root body :is(.account-shell,.plan-onboarding,.invitation-shell) :is(input,select,textarea) {
+  min-height: 48px !important;
+  border: 1px solid var(--launch-line-strong) !important;
+  border-radius: 2px !important;
+  background: #090c0f !important;
+  color: var(--launch-ink) !important;
+  font-family: var(--launch-body) !important;
+  font-size: 16px !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body :is(.account-shell,.plan-onboarding,.invitation-shell) :is(label,.field-label) {
+  font-family: var(--launch-body) !important;
+}
+
+html:root:root:root body :is(.account-shell,.plan-onboarding,.invitation-shell) :is(.primary-button,.secondary-button,.consent-choice) {
+  min-height: 48px !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .plan-onboarding .plan-layout {
+  width: min(960px,calc(100vw - 64px)) !important;
+  padding: 36px 0 68px !important;
+}
+
+html:root:root:root body .plan-onboarding .baseline-onboarding-form,
+html:root:root:root body .plan-onboarding .onboarding-message {
+  border-radius: 2px !important;
+}
+
+html:root:root:root body .invitation-shell {
+  padding-top: 104px !important;
+}
+
+/* ---------------------------------------------------------------------
+   AUTHENTICATED WORKSPACE: SAME SYSTEM, CONVERSATION FIRST
+   ------------------------------------------------------------------ */
+
+html:root:root:root body .intelligence-topbar {
+  min-height: var(--launch-header-h) !important;
+  height: var(--launch-header-h) !important;
+  padding: 0 24px !important;
+  border-bottom: 1px solid var(--launch-line) !important;
+  background: rgba(8,10,13,.96) !important;
+}
+
+html:root:root:root body .intelligence-sidebar {
+  width: 236px !important;
+  padding: 18px 16px !important;
+  border-right: 1px solid var(--launch-line) !important;
+}
+
+html:root:root:root body .intelligence-main {
+  margin-left: 236px !important;
+}
+
+html:root:root:root body .intelligence-scroll {
+  width: min(100%,920px) !important;
+  padding: 38px 38px 168px !important;
+}
+
+html:root:root:root body .intelligence-sidebar nav button,
+html:root:root:root body .recent-threads button,
+html:root:root:root body .workspace-sheet nav button,
+html:root:root:root body .library-list button {
+  min-height: 44px !important;
+  padding-inline: 4px !important;
+  border-radius: 0 !important;
+  font-size: .86rem !important;
+}
+
+html:root:root:root body .surface-heading h1 {
+  font-size: clamp(2rem,3vw,2.7rem) !important;
+  line-height: 1.04 !important;
+}
+
+html:root:root:root body .user-question {
+  max-width: min(72%,620px) !important;
+  border-radius: 0 !important;
+}
+
+html:root:root:root body .composer-shell,
+html:root:root:root body .workspace-composer,
+html:root:root:root body .thread-composer {
+  border-radius: 2px !important;
+}
+
+html:root:root:root body :is(.topbar-actions button,.answer-actions button,.fit-controls button,.new-conversation,.covenant-action) {
+  min-height: 44px !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ---------------------------------------------------------------------
+   FOCUS + ACTION CONSISTENCY
+   ------------------------------------------------------------------ */
+
+html:root:root:root body :is(a,button,input,select,textarea,summary):focus-visible {
+  outline: 1px solid rgba(242,235,225,.72) !important;
+  outline-offset: 4px !important;
+}
+
+html:root:root:root body button:disabled,
+html:root:root:root body [aria-disabled='true'] {
+  opacity: .42 !important;
+}
+
+/* ---------------------------------------------------------------------
+   MOBILE / IPHONE
+   ------------------------------------------------------------------ */
+
+@media (max-width: 760px) {
+  html:root {
+    --launch-shell: calc(100vw - 36px);
+    --launch-brand-size: 12px;
+    --launch-nav-size: 13px;
+  }
+
+  html:root:root:root body .public-approved-v8 .v0-nav-inner,
+  html:root:root:root body .public-secondary-page .v0-nav-inner {
+    grid-template-columns: minmax(0,1fr) auto !important;
+  }
+
+  html:root:root:root body .public-approved-v8 .v0-nav-inner > nav,
+  html:root:root:root body .public-secondary-page .v0-nav-inner > nav,
+  html:root:root:root body .public-approved-v8 .v0-nav-actions > :is(.v0-sign-in,.v0-get-started),
+  html:root:root:root body .public-secondary-page .v0-nav-actions > :is(.v0-sign-in,.landing-control--nav) {
+    display: none !important;
+  }
+
+  html:root:root:root body .public-approved-v8 .v0-wordmark--desktop,
+  html:root:root:root body .public-secondary-page .v0-wordmark--desktop {
+    display: none !important;
+  }
+
+  html:root:root:root body .public-approved-v8 .v0-wordmark--mobile,
+  html:root:root:root body .public-secondary-page .v0-wordmark--mobile {
+    display: flex !important;
+  }
+
+  html:root:root:root body .public-approved-v8 .v0-mobile-menu,
+  html:root:root:root body .public-secondary-page .v0-mobile-menu {
+    display: block !important;
+  }
+
+  html:root:root:root body .account-shell .account-nav,
+  html:root:root:root body .plan-onboarding .plan-nav {
+    width: var(--launch-shell) !important;
+  }
+
+  html:root:root:root body .account-shell .account-nav > a:last-child,
+  html:root:root:root body .plan-onboarding .plan-nav > span {
+    font-size: 12px !important;
+  }
+
+  html:root:root:root body .public-approved-v8 .landing-story {
+    padding: 52px 0 60px !important;
+  }
+
+  html:root:root:root body .public-approved-v8 .landing-story__heading h2 {
+    font-size: clamp(2.15rem,10vw,2.8rem) !important;
+  }
+
+  html:root:root:root body .public-approved-v8 .landing-demo-question,
+  html:root:root:root body .public-approved-v8 .landing-demo-core,
+  html:root:root:root body .public-approved-v8 .landing-demo-insights,
+  html:root:root:root body .public-approved-v8 .landing-demo-close {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  html:root:root:root body .public-approved-v8 .landing-demo-core {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  html:root:root:root body .account-shell .account-layout {
+    width: var(--launch-shell) !important;
+    padding: 34px 0 54px !important;
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+    align-items: start !important;
+  }
+
+  html:root:root:root body .account-shell .account-intro h1 {
+    font-size: clamp(2.45rem,12vw,3.2rem) !important;
+  }
+
+  html:root:root:root body .account-shell .auth-panel {
+    max-width: none !important;
+    padding: 24px 20px !important;
+  }
+
+  html:root:root:root body .plan-onboarding .plan-layout {
+    width: var(--launch-shell) !important;
+    padding: 26px 0 54px !important;
+  }
+
+  html:root:root:root body .invitation-shell {
+    padding: 92px 18px 54px !important;
+  }
+
+  html:root:root:root body .invitation-shell > .wordmark {
+    left: 18px !important;
+  }
+
+  html:root:root:root body .intelligence-sidebar {
+    width: auto !important;
+  }
+
+  html:root:root:root body .intelligence-main {
+    margin-left: 0 !important;
+  }
+
+  html:root:root:root body .intelligence-scroll {
+    width: 100% !important;
+    padding: 26px 18px 152px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:root:root:root body *,
+  html:root:root:root body *::before,
+  html:root:root:root body *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
