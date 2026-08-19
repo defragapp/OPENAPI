@@ -11,6 +11,7 @@ const landingRefinement = readFileSync(resolve('apps/web/src/landing-refinement-
 const landingRefinementV5 = readFileSync(resolve('apps/web/src/landing-live-refinement-v5.css'), 'utf8');
 const sansTypography = readFileSync(resolve('apps/web/src/sans-typography-authority-v1.css'), 'utf8');
 const typography = readFileSync(resolve('apps/web/src/typography-system.css'), 'utf8');
+const launchPolish = readFileSync(resolve('apps/web/src/launch-polish-final-v1.css'), 'utf8');
 const landing = readFileSync(resolve('apps/web/src/PublicLanding.tsx'), 'utf8');
 const stories = readFileSync(resolve('apps/web/src/LandingProductStories.tsx'), 'utf8');
 const field = readFileSync(resolve('apps/web/src/expression-field/LandingExpressionSlice.tsx'), 'utf8');
@@ -23,18 +24,22 @@ for (const marker of [
   "import landingRefinementV2Css from './landing-refinement-v2.css?inline';",
   "import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline';",
   "import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';",
+  "import launchPolishFinalCss from './launch-polish-final-v1.css?inline';",
   'style.textContent += `\\n${experienceRefinementCss}`;',
   'style.textContent += `\\n${renderedFidelityCss}`;',
   'style.textContent += `\\n${landingRefinementV2Css}`;',
   'style.textContent += `\\n${landingLiveRefinementV5Css}`;',
-  'style.textContent += `\\n${sansTypographyAuthorityCss}`;'
+  'style.textContent += `\\n${sansTypographyAuthorityCss}`;',
+  'style.textContent += `\\n${launchPolishFinalCss}`;'
 ]) {
   if (!main.includes(marker)) throw new Error(`Visual intelligence release v2 is missing ${marker}`);
 }
 if (main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;') <= main.indexOf('style.textContent += `\\n${experienceRefinementCss}`;')) throw new Error('Visual intelligence release v2 does not place rendered fidelity after experience refinement.');
 if (main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;') <= main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;')) throw new Error('Visual intelligence release v2 does not place landing refinement v2 after rendered fidelity.');
 if (main.indexOf('style.textContent += `\\n${landingLiveRefinementV5Css}`;') <= main.indexOf('style.textContent += `\\n${landingLiveRefinementV4Css}`;')) throw new Error('Visual intelligence release v2 does not place landing refinement v5 after v4.');
-if (main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;') <= main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;')) throw new Error('Visual intelligence release v2 does not place sans typography last.');
+if (main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;') <= main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;')) throw new Error('Visual intelligence release v2 does not place sans typography after action authority.');
+if (main.indexOf('style.textContent += `\\n${launchPolishFinalCss}`;') <= main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationV2Css}`;')) throw new Error('Visual intelligence release v2 does not place final launch polish after the public intelligence demos.');
+if (main.slice(main.indexOf('style.textContent += `\\n${launchPolishFinalCss}`;') + 'style.textContent += `\\n${launchPolishFinalCss}`;'.length).includes('style.textContent +=')) throw new Error('Visual intelligence release v2 found a visual authority after final launch polish.');
 
 for (const marker of [
   '--v8-blue: #d8d0c5 !important',
@@ -69,6 +74,17 @@ if (typography.includes('font-family: "Sovereign Display"') || typography.includ
 for (const marker of ['--font-display: var(--font-title);', '.public-approved-v8 .v0-hero h1 > em', 'font-family: var(--font-title) !important']) {
   if (!`${typography}\n${sansTypography}`.includes(marker)) throw new Error(`Visual intelligence release v2 is missing sans typography marker ${marker}`);
 }
+for (const marker of [
+  '--launch-header-h: 64px',
+  '--launch-brand-size: 13px',
+  'grid-template-columns: minmax(180px,1fr) auto minmax(180px,1fr) !important',
+  "[data-product-stories='text-first-intelligence-v2']",
+  'visibility: visible !important',
+  '.public-approved-v8 .v0-footer > .v0-shell',
+  '.account-shell .account-nav',
+  '.plan-onboarding .plan-nav',
+  '.intelligence-topbar'
+]) if (!launchPolish.includes(marker)) throw new Error(`Visual intelligence release v2 is missing final launch-polish marker ${marker}`);
 
 for (const marker of [
   'data-public-narrative="self-people-systems-v1"',
@@ -81,11 +97,11 @@ for (const marker of [
 for (const retired of ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'calculated astronomical positions and selected interpretive frameworks']) {
   if (landing.includes(retired)) throw new Error(`Visual intelligence release v2 found retired landing language ${retired}`);
 }
-for (const marker of ['01 · You', 'Explore how you think, decide, communicate, create, connect, and grow.', '02 · You + your people', 'See why the same moment lands differently—and how to bridge the gap.', '03 · From 1:1 to the whole system', 'See the whole system.']) {
+for (const marker of ['01 · You', 'Explore how you think, decide, communicate, create, connect, and grow.', '02 · You + your people', 'See why the same moment lands differently—and how to bridge the gap.', '03 · From 1:1 to the whole system', 'See the whole system.', 'keeping both people distinct', 'information each participant chose to share']) {
   if (!stories.includes(marker)) throw new Error(`Visual intelligence release v2 is missing story marker ${marker}`);
 }
-for (const retired of ['Separate helping from carrying the outcome.', 'See where responsibility keeps landing.']) {
-  if (stories.includes(retired)) throw new Error(`Visual intelligence release v2 found retired category framing ${retired}`);
+for (const retired of ['Separate helping from carrying the outcome.', 'See where responsibility keeps landing.', 'compatibility', 'consented participant context', 'missing perspective']) {
+  if (stories.toLowerCase().includes(retired.toLowerCase())) throw new Error(`Visual intelligence release v2 found retired public story language ${retired}`);
 }
 
 for (const marker of [
@@ -194,9 +210,8 @@ replaceVisualSectionMarker(
   "  'See how the same moment can land differently.',"
 );
 
-
 /* CURRENT_STORY_CONTRACT_isolated landing demonstrations */
-const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","No compatibility score"];
+const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","keeping both people distinct"];
 const currentStoryQuote = String.fromCharCode(39);
 const currentStoryStart = "requireAll(" + currentStoryQuote + "isolated landing demonstrations" + currentStoryQuote + ", stories, [";
 const currentStoryIndex = source.indexOf(currentStoryStart);
