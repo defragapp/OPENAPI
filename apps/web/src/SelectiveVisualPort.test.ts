@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
+const selfProof = readFileSync(new URL('./LandingSelfEditorialProof.tsx', import.meta.url), 'utf8');
 const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const expressionRenderer = readFileSync(new URL('./expression-field/ExpressionField.tsx', import.meta.url), 'utf8');
@@ -70,11 +71,10 @@ describe('founder selective visual port', () => {
       '01 · You',
       '02 · You + your people',
       '03 · From 1:1 to the whole system',
-      'Explore how you think, decide, communicate, create, connect, and grow.',
+      'Explore how you operate before you have to explain everything.',
       'See why the same moment lands differently—and how to bridge the gap.',
       'See the whole system.',
-      'data-product-proof="self-v1"',
-      'data-viewport-surface="personal-proof"',
+      '<LandingSelfEditorialProof />',
       'surface="relationship-chat"',
       'surface="relationship-reasoning"',
       'surface="system-map"',
@@ -83,6 +83,18 @@ describe('founder selective visual port', () => {
       'v0-workflow-panel',
       'v0-family-system-map'
     ]) expect(stories).toContain(marker);
+
+    for (const marker of [
+      'data-product-proof="self-editorial-v1"',
+      'data-viewport-surface="personal-proof"',
+      '<ExpressionFieldRenderer',
+      'suspendWhenOffscreen={false}',
+      'landing-self-editorial__distinction',
+      'See source details'
+    ]) expect(selfProof).toContain(marker);
+
+    expect(expressionRenderer).toContain('suspendWhenOffscreen?: boolean');
+    expect(expressionRenderer).toContain('suspendWhenOffscreen = true');
     expect(stories).not.toContain('surface="personal-chat"');
     expect(stories).not.toContain('surface="personal-reasoning"');
     expect(stories).not.toContain('Separate helping from carrying the outcome.');
@@ -125,7 +137,7 @@ describe('founder selective visual port', () => {
 
   it('does not introduce the archive mock runtime, scores, or alternate architecture', () => {
     expect(landing).not.toContain('localStorage');
-    const source = `${landing}\n${stories}\n${field}\n${expressionRenderer}\n${relationshipField}\n${systemField}\n${v0Visual}\n${fieldCss}\n${heroExtension}\n${storyCss}`;
+    const source = `${landing}\n${stories}\n${selfProof}\n${field}\n${expressionRenderer}\n${relationshipField}\n${systemField}\n${v0Visual}\n${fieldCss}\n${heroExtension}\n${storyCss}`;
     for (const prohibited of ['Alignment Score', 'Stability Index', 'Growth Rate', 'Math.random', 'generateAIResponse', 'Demo User', 'dashboard-grid', 'mock-auth', 'fake-answer']) {
       expect(source).not.toContain(prohibited);
     }
