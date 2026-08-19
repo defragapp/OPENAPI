@@ -123,12 +123,12 @@ const AXIS_CONFIG: Record<ExpressionAxisId, AxisConfig> = {
 };
 
 const SOURCE_IDS = SELF_REPRESENTATIVE_SOURCES.map((source) => source.id);
-const FACET_IDS = new Set(SELF_REPRESENTATIVE_PROFILE.facets.map((facet) => facet.id));
+const FACET_IDS = new Set<string>(SELF_REPRESENTATIVE_PROFILE.facets.map((facet) => facet.id));
 
 function buildSelfExpressionAxes(): readonly ExpressionAxisValue[] {
   return expressionAxisRegistry.map((axis) => {
     const config = AXIS_CONFIG[axis.id];
-    const facetIds = config.facets.filter((id) => FACET_IDS.has(id as never));
+    const facetIds = config.facets.filter((id) => FACET_IDS.has(id));
     return {
       id: axis.id,
       label: axis.label,
