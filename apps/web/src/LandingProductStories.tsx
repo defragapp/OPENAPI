@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode, RefObject } from 'react';
-import {
-  SELF_EVIDENCE_GROUPS,
-  SELF_PRODUCT_PROOF,
-  type RepresentativeEvidenceGroup
-} from './landing-demo-fixtures';
+import { LandingSelfEditorialProof } from './LandingSelfEditorialProof';
+import type { RepresentativeEvidenceGroup } from './landing-demo-fixtures';
 
 type EvidenceGroup = RepresentativeEvidenceGroup;
 type WorkflowStep = {
@@ -33,9 +30,9 @@ void RELEASE_LINEAGE_MARKERS;
 
 /*
  * Public examples use deterministic sanitized representative fixtures, not visitor data.
- * The Self proof imports a typed representative Baseline profile whose semantic support
- * is verified separately. Relationship/System remain on their existing fixture path until
- * the new insight-first visual grammar passes human review.
+ * Self now uses the production Expression Field renderer with a typed representative fixture.
+ * Relationship/System remain on their existing fixture path until the Self visual grammar
+ * passes desktop and iPhone human review.
  */
 const DUO_BASELINE: readonly EvidenceGroup[] = [
   {
@@ -151,63 +148,14 @@ function PersonalStory() {
   return (
     <section ref={sectionRef} id="how" className="landing-story landing-story--personal" data-viewport-section="personal">
       <div className="landing-story__shell">
-        <StoryHeading step="01 · You" title="Explore how you think, decide, communicate, create, connect, and grow.">
-          Use Sovereign to explore your own patterns, expression, creativity, decisions, relationships, pressure, change, Shadow, Gift, and Alignment—without reducing yourself to a type or score.
+        <StoryHeading step="01 · You" title="Explore how you operate before you have to explain everything.">
+          Ask about a real decision, reaction, or relationship. Sovereign can use your private Baseline to surface the pattern underneath the question—and show you what it used.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--self-proof" data-viewport-stage="personal">
-          <SelfProductProof />
+          <LandingSelfEditorialProof />
         </div>
       </div>
     </section>
-  );
-}
-
-function SelfProductProof() {
-  return (
-    <article
-      className="landing-product-proof landing-product-proof--self"
-      data-product-proof="self-v1"
-      data-viewport-surface="personal-proof"
-      aria-label="Representative Sovereign self intelligence example"
-    >
-      <header className="landing-product-proof__bar">
-        <div><span className="landing-product-proof__status" aria-hidden="true" /><strong>Sovereign</strong><small>You</small></div>
-        <span>Representative example</span>
-      </header>
-
-      <div className="landing-product-proof__body">
-        <section className="landing-product-proof__question" aria-label="Example user question">
-          <small>You asked</small>
-          <p>{SELF_PRODUCT_PROOF.question}</p>
-        </section>
-
-        <section className="landing-product-proof__response" aria-label="Example Sovereign answer">
-          <div className="landing-product-proof__response-label"><span>Sovereign · Baseline</span><small>Direct answer</small></div>
-          <h3>{SELF_PRODUCT_PROOF.directAnswer}</h3>
-
-          <div className="landing-product-proof__mechanism">
-            {SELF_PRODUCT_PROOF.mechanism.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-          </div>
-
-          <blockquote className="landing-product-proof__insight">
-            <small>The distinction</small>
-            <p>{SELF_PRODUCT_PROOF.insight}</p>
-          </blockquote>
-
-          <p className="landing-product-proof__closing">{SELF_PRODUCT_PROOF.closing}</p>
-
-          <footer className="landing-product-proof__evidence">
-            <span>{SELF_PRODUCT_PROOF.contextLine}</span>
-            <SourceDetails groups={SELF_EVIDENCE_GROUPS} />
-          </footer>
-        </section>
-      </div>
-
-      <div className="landing-product-proof__composer" aria-hidden="true">
-        <span>Ask Sovereign about yourself…</span>
-        <i>→</i>
-      </div>
-    </article>
   );
 }
 
