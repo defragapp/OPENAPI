@@ -64,7 +64,7 @@ describe('founder selective visual port', () => {
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
   });
 
-  it('restores chat and workflow demonstrations without restoring duplicate expression fields', () => {
+  it('uses an insight-first Self proof while preserving transitional relationship/system workflows and lineage', () => {
     expect(landing).toContain('<LandingProductStories />');
     for (const marker of [
       '01 · You',
@@ -73,8 +73,8 @@ describe('founder selective visual port', () => {
       'Explore how you think, decide, communicate, create, connect, and grow.',
       'See why the same moment lands differently—and how to bridge the gap.',
       'See the whole system.',
-      'surface="personal-chat"',
-      'surface="personal-reasoning"',
+      'data-product-proof="self-v1"',
+      'data-viewport-surface="personal-proof"',
       'surface="relationship-chat"',
       'surface="relationship-reasoning"',
       'surface="system-map"',
@@ -83,6 +83,8 @@ describe('founder selective visual port', () => {
       'v0-workflow-panel',
       'v0-family-system-map'
     ]) expect(stories).toContain(marker);
+    expect(stories).not.toContain('surface="personal-chat"');
+    expect(stories).not.toContain('surface="personal-reasoning"');
     expect(stories).not.toContain('Separate helping from carrying the outcome.');
     expect(stories).not.toContain('See where responsibility keeps landing.');
     expect(stories).not.toContain('LandingExpressionFieldPreview');
