@@ -144,7 +144,7 @@ function RelationshipStory() {
     <section ref={sectionRef} id="relationship" className="landing-story landing-story--relationship" data-viewport-section="relationship">
       <div className="landing-story__shell">
         <StoryHeading step="02 · You + your people" title="See why the same moment lands differently—and how to bridge the gap.">
-          With permission, Sovereign can use two separate Baselines to explain what each person may be bringing and what happens when those patterns meet—without flattening either person into a compatibility result.
+          With permission, Sovereign can use two separate Baselines to explain what each person may be bringing and what happens when those patterns meet while keeping both people distinct.
         </StoryHeading>
 
         <div className="landing-story__stage landing-story__stage--relationship" data-viewport-stage="relationship">
@@ -158,7 +158,7 @@ function RelationshipStory() {
             visual={<RelationshipField />}
             continuation="What would clear communication look like for each of us? →"
             sources={DUO_BASELINE}
-            consent="Representative example · Both people choose what they share · No compatibility score · Only they can say what they actually felt or intended"
+            consent="Representative example · Both people choose what they share · Only they can say what they actually felt or intended"
           >
             <div className="landing-demo-contrast landing-demo-contrast--people" aria-label="What each person may be bringing">
               <KeyInsight label="You may be bringing">More definition → more orientation.</KeyInsight>
@@ -179,7 +179,7 @@ function SystemStory() {
     <section ref={sectionRef} id="system" className="landing-story landing-story--system" data-viewport-section="system">
       <div className="landing-story__shell">
         <StoryHeading step="03 · From 1:1 to the whole system" title="See the whole system.">
-          Move from one relationship to a family, household, team, or group. Sovereign can use supplied roles, responsibilities, observed interaction, and consented participant context to show how the larger structure changes when one person responds differently.
+          Move from one relationship to a family, household, team, or group. Sovereign can use supplied roles, responsibilities, observed interaction, and information each participant chose to share to show how the larger structure changes when one person responds differently.
         </StoryHeading>
 
         <div className="landing-story__stage landing-story__stage--system" data-viewport-stage="system">
