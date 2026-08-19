@@ -24,40 +24,19 @@ export type PublicLandingViewportResult = {
 };
 
 const narrowViewportMaximum = 760;
-const desktopRequiredSurfaces = [
+const requiredSurfaces = [
   'hero',
   'expression-slice',
   'personal-proof',
-  'relationship-chat',
-  'relationship-reasoning',
-  'system-map',
-  'system-reasoning',
+  'relationship-proof',
+  'system-proof',
   'comparison'
 ] as const;
-const narrowRequiredSurfaces = [
-  'hero',
-  'expression-slice',
-  'personal-proof',
-  'relationship-chat',
-  'relationship-reasoning',
-  'system-map',
-  'comparison'
-] as const;
-const productSurfaceIds = new Set([
-  'personal-proof',
-  'relationship-chat',
-  'relationship-reasoning',
-  'system-map',
-  'system-reasoning'
-]);
-const narrowProductPairs = [
-  ['relationship-chat', 'relationship-reasoning']
-] as const;
+const productSurfaceIds = new Set(['personal-proof', 'relationship-proof', 'system-proof']);
 
 export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSnapshot): PublicLandingViewportResult {
   const failures: string[] = [];
   const narrow = snapshot.viewportWidth <= narrowViewportMaximum;
-  const requiredSurfaces = narrow ? narrowRequiredSurfaces : desktopRequiredSurfaces;
 
   if (snapshot.scrollWidth > snapshot.viewportWidth + 1) {
     failures.push(`horizontal overflow ${snapshot.scrollWidth}px > ${snapshot.viewportWidth}px`);
@@ -80,23 +59,14 @@ export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSna
     }
 
     if (productSurfaceIds.has(id)) {
-      const maximumHeight = narrow ? 1100 : 1000;
+      const maximumHeight = narrow ? 1500 : 1050;
       if (surface.height > maximumHeight) failures.push(`${id} height ${surface.height}px > ${maximumHeight}px`);
+      if (!narrow && surface.height < 420) failures.push(`${id} height ${surface.height}px < 420px`);
     }
 
     if (surface.layoutWidth > 0) {
       const scale = surface.width / surface.layoutWidth;
       if (scale < 0.98 || scale > 1.02) failures.push(`${id} rendered scale ${scale.toFixed(3)} is not 1`);
-    }
-  }
-
-  if (narrow) {
-    for (const [chatId, workflowId] of narrowProductPairs) {
-      const chat = snapshot.surfaces.find((item) => item.id === chatId);
-      const workflow = snapshot.surfaces.find((item) => item.id === workflowId);
-      if (chat && workflow && workflow.top < chat.bottom + 10) {
-        failures.push(`${workflowId} is not clearly stacked below ${chatId}`);
-      }
     }
   }
 
