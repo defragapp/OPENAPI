@@ -1,0 +1,504 @@
+/*
+ * Sovereign.OS senior design system — static surfaces v1
+ * Final static presentation authority for How it works, Pricing, FAQ, 404,
+ * and account-bound consent. Presentation only; no route or product behavior.
+ */
+
+body.launch-page,
+body.consent-page {
+  --sds-page:#080a0d;
+  --sds-surface:#0c0f12;
+  --sds-panel:#101317;
+  --sds-ink:#f2ece3;
+  --sds-muted:rgba(232,224,214,.70);
+  --sds-faint:rgba(232,224,214,.44);
+  --sds-line:rgba(242,235,225,.10);
+  --sds-line-strong:rgba(242,235,225,.19);
+  --sds-metal:#b99570;
+  --sds-metal-soft:rgba(185,149,112,.12);
+  --sds-shell:min(1180px,calc(100vw - 64px));
+  --sds-radius:4px;
+  --sds-title:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI Variable Display","Segoe UI",system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --sds-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 72% 0,rgba(92,123,158,.028),transparent 28rem),
+    var(--sds-page) !important;
+  color:var(--sds-ink) !important;
+  font-family:var(--sds-body) !important;
+}
+
+body.launch-page :is(h1,h2,h3,h4),
+body.consent-page :is(h1,h2,h3,h4) {
+  font-family:var(--sds-title) !important;
+  font-style:normal !important;
+  font-weight:560 !important;
+  letter-spacing:-.028em !important;
+}
+
+/* One public header. */
+body.launch-page .launch-nav,
+body.consent-page .launch-nav {
+  min-height:64px !important;
+  height:64px !important;
+  border-bottom:1px solid var(--sds-line) !important;
+  background:rgba(8,10,13,.94) !important;
+  backdrop-filter:blur(18px) saturate(104%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(104%) !important;
+}
+
+body.launch-page .launch-nav-inner,
+body.consent-page .launch-nav {
+  width:var(--sds-shell) !important;
+  max-width:1180px !important;
+  min-height:64px !important;
+  height:64px !important;
+  margin-inline:auto !important;
+  padding:0 !important;
+}
+
+body.launch-page .launch-wordmark,
+body.launch-page .launch-footer-wordmark,
+body.consent-page .launch-wordmark {
+  color:var(--sds-ink) !important;
+  font-family:var(--sds-body) !important;
+  font-size:.74rem !important;
+  font-weight:720 !important;
+  line-height:1 !important;
+  letter-spacing:.17em !important;
+}
+
+body.launch-page .launch-links a,
+body.launch-page .launch-sign-in,
+body.launch-page .launch-cta,
+body.consent-page .launch-links a,
+body.consent-page .launch-cta {
+  min-height:40px !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  color:rgba(232,224,214,.66) !important;
+  font-family:var(--sds-body) !important;
+  font-size:.76rem !important;
+  font-weight:540 !important;
+  letter-spacing:.015em !important;
+}
+
+body.launch-page .launch-cta,
+body.consent-page .launch-cta {
+  border-bottom:1px solid var(--sds-line-strong) !important;
+  color:var(--sds-ink) !important;
+}
+
+body.launch-page .launch-cta span,
+body.consent-page .launch-cta span {
+  display:none !important;
+}
+
+/* Shared compact hero. */
+body.launch-page .launch-hero.launch-hero-compact {
+  width:var(--sds-shell) !important;
+  max-width:1180px !important;
+  min-height:470px !important;
+  padding:82px 0 68px !important;
+  grid-template-columns:minmax(0,1.08fr) minmax(300px,.68fr) !important;
+  grid-template-areas:"kicker kicker" "title body" !important;
+  column-gap:clamp(50px,7vw,92px) !important;
+  row-gap:18px !important;
+  align-content:center !important;
+  border-bottom:1px solid var(--sds-line) !important;
+}
+
+body.launch-page .launch-hero.launch-hero-compact::before {
+  height:420px !important;
+  background:radial-gradient(ellipse at 72% 32%,rgba(92,123,158,.035),transparent 34rem) !important;
+}
+
+body.launch-page :is(.launch-kicker,.price-tag,.plan-audience),
+body.consent-page :is(.launch-kicker,.consent-card-label) {
+  color:var(--sds-faint) !important;
+  font-family:var(--sds-body) !important;
+  font-size:.64rem !important;
+  font-weight:650 !important;
+  letter-spacing:.16em !important;
+}
+
+body.launch-page .launch-hero.launch-hero-compact > h1 {
+  max-width:12ch !important;
+  font-size:clamp(3.35rem,5vw,4.75rem) !important;
+  font-weight:560 !important;
+  line-height:.98 !important;
+  letter-spacing:-.04em !important;
+}
+
+body.launch-page .launch-hero.launch-hero-compact > p:last-child {
+  max-width:42ch !important;
+  margin-bottom:2px !important;
+  color:var(--sds-muted) !important;
+  font-size:.98rem !important;
+  line-height:1.62 !important;
+}
+
+body.launch-page :is(.launch-band,.launch-section) {
+  width:var(--sds-shell) !important;
+  max-width:1180px !important;
+  padding:72px 0 !important;
+  border-bottom:1px solid var(--sds-line) !important;
+}
+
+body.launch-page .launch-heading,
+body.launch-page .pricing-details-heading {
+  margin-bottom:42px !important;
+  grid-template-columns:minmax(0,1fr) minmax(300px,.62fr) !important;
+  gap:clamp(44px,6vw,82px) !important;
+}
+
+body.launch-page :is(.launch-heading,.pricing-details-heading) h2,
+body.launch-page .baseline-explainer > div > h2,
+body.launch-page .support-note h2,
+body.launch-page .launch-callout h2 {
+  max-width:13ch !important;
+  font-size:clamp(2.45rem,3.8vw,3.6rem) !important;
+  font-weight:560 !important;
+  line-height:1 !important;
+  letter-spacing:-.034em !important;
+}
+
+body.launch-page :is(.launch-heading,.pricing-details-heading) > p,
+body.launch-page .baseline-explainer > div > p,
+body.launch-page .support-note > div > p,
+body.launch-page .launch-callout > div > p {
+  color:var(--sds-muted) !important;
+  font-size:.94rem !important;
+  line-height:1.6 !important;
+}
+
+/* How it works. */
+body.how-page .journey-steps > article {
+  min-height:136px !important;
+  padding:26px 0 !important;
+  grid-template-columns:64px minmax(220px,.72fr) minmax(300px,1fr) !important;
+  gap:clamp(24px,4vw,58px) !important;
+  border-bottom:1px solid var(--sds-line) !important;
+}
+
+body.how-page .journey-steps > article > h3 {
+  font-size:clamp(1.55rem,2.2vw,2.15rem) !important;
+  font-weight:560 !important;
+  line-height:1.05 !important;
+}
+
+body.how-page .journey-steps > article > p {
+  color:var(--sds-muted) !important;
+  font-size:.92rem !important;
+  line-height:1.58 !important;
+}
+
+body.how-page .product-proof-window {
+  border:1px solid var(--sds-line-strong) !important;
+  border-radius:var(--sds-radius) !important;
+  background:var(--sds-panel) !important;
+  box-shadow:0 26px 76px rgba(0,0,0,.32),0 0 54px rgba(92,123,158,.055) !important;
+}
+
+body.how-page .product-proof-topbar {
+  min-height:42px !important;
+  border-bottom:1px solid var(--sds-line) !important;
+}
+
+body.how-page .product-proof-topbar > span,
+body.how-page .worlds-proof-topbar > span {
+  display:none !important;
+}
+
+body.how-page .product-proof-question {
+  font-size:clamp(1.65rem,2.8vw,2.65rem) !important;
+  font-weight:540 !important;
+}
+
+body.how-page .product-proof-conversation,
+body.how-page .product-proof-flow {
+  padding:30px 32px !important;
+}
+
+body.how-page .framework-disclosure,
+body.how-page .billing-note,
+body.how-page .support-note {
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+/* Pricing ledger. */
+body.pricing-page .pricing-section {
+  padding-top:70px !important;
+}
+
+body.pricing-page .pricing-grid {
+  border-top:1px solid var(--sds-line-strong) !important;
+  border-bottom:1px solid var(--sds-line) !important;
+}
+
+body.pricing-page .price-card,
+body.pricing-page .price-card.featured {
+  min-height:500px !important;
+  padding:36px 40px !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+body.pricing-page .price-card.featured {
+  background:linear-gradient(145deg,rgba(185,149,112,.035),transparent 56%) !important;
+}
+
+body.pricing-page .price-card h2 {
+  max-width:14ch !important;
+  font-size:clamp(1.8rem,2.6vw,2.55rem) !important;
+  font-weight:560 !important;
+  line-height:1.03 !important;
+}
+
+body.pricing-page .price {
+  font-size:clamp(3.4rem,5vw,4.8rem) !important;
+  font-weight:520 !important;
+  line-height:.92 !important;
+}
+
+body.pricing-page .feature-list li::before {
+  width:16px !important;
+  height:1px !important;
+  top:21px !important;
+  border-radius:0 !important;
+  background:rgba(242,235,225,.32) !important;
+}
+
+body.pricing-page .feature-list li {
+  padding-left:26px !important;
+  color:var(--sds-muted) !important;
+}
+
+body.pricing-page .price-card > .launch-button {
+  min-width:0 !important;
+  border:0 !important;
+  border-bottom:1px solid var(--sds-line-strong) !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  color:var(--sds-ink) !important;
+}
+
+body.pricing-page .pricing-details-section {
+  padding-top:76px !important;
+}
+
+/* FAQ: useful content begins sooner. */
+body.questions-page .faq-section {
+  max-width:1040px !important;
+  padding-top:64px !important;
+}
+
+body.questions-page .faq-category {
+  padding-bottom:56px !important;
+  grid-template-columns:156px minmax(0,1fr) !important;
+  gap:48px !important;
+}
+
+body.questions-page .faq-category + .faq-category {
+  padding-top:52px !important;
+}
+
+body.questions-page .faq-list summary {
+  min-height:62px !important;
+  padding:18px 46px 18px 0 !important;
+  color:rgba(242,236,227,.88) !important;
+  font-size:1rem !important;
+  font-weight:540 !important;
+}
+
+body.questions-page .faq-list summary::after {
+  top:16px !important;
+  color:var(--sds-faint) !important;
+}
+
+body.questions-page .faq-list details > p {
+  margin:0 0 22px !important;
+  color:var(--sds-muted) !important;
+  font-size:.92rem !important;
+  line-height:1.62 !important;
+}
+
+/* 404: same document system, no giant blue poster. */
+body.not-found-page .not-found-main {
+  background:var(--sds-page) !important;
+}
+
+body.not-found-page .not-found-stage {
+  display:grid !important;
+  width:var(--sds-shell) !important;
+  max-width:1180px !important;
+  min-height:calc(100svh - 64px) !important;
+  padding:86px 0 96px !important;
+  grid-template-columns:190px minmax(0,1fr) !important;
+  gap:72px !important;
+  align-items:center !important;
+  border-bottom:1px solid var(--sds-line) !important;
+}
+
+body.not-found-page .not-found-code {
+  align-self:center !important;
+  color:rgba(242,235,225,.12) !important;
+  font-size:clamp(5rem,9vw,8rem) !important;
+  font-weight:500 !important;
+  line-height:1 !important;
+}
+
+body.not-found-page .not-found-copy {
+  max-width:700px !important;
+}
+
+body.not-found-page .not-found-copy h1 {
+  max-width:12ch !important;
+  font-size:clamp(3rem,4.6vw,4.35rem) !important;
+  font-weight:550 !important;
+  line-height:.98 !important;
+}
+
+body.not-found-page .not-found-copy > p:not(.launch-kicker) {
+  color:var(--sds-muted) !important;
+}
+
+body.not-found-page .not-found-copy .launch-button {
+  border:0 !important;
+  border-bottom:1px solid var(--sds-line-strong) !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  color:var(--sds-ink) !important;
+  box-shadow:none !important;
+}
+
+/* Consent: open two-column account document, not nested cards. */
+body.consent-page .consent-main {
+  width:var(--sds-shell) !important;
+  max-width:1180px !important;
+  padding:84px 0 92px !important;
+}
+
+body.consent-page .consent-hero {
+  grid-template-columns:minmax(0,.92fr) minmax(350px,.7fr) !important;
+  gap:clamp(54px,8vw,104px) !important;
+}
+
+body.consent-page .consent-intro h1 {
+  max-width:10ch !important;
+  font-size:clamp(3.1rem,4.8vw,4.65rem) !important;
+  font-weight:550 !important;
+  line-height:.98 !important;
+}
+
+body.consent-page .consent-lede {
+  color:var(--sds-muted) !important;
+  font-size:.96rem !important;
+  line-height:1.62 !important;
+}
+
+body.consent-page .consent-panel {
+  padding:28px 0 0 30px !important;
+  border:0 !important;
+  border-left:1px solid var(--sds-line-strong) !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+body.consent-page .consent-panel h2 {
+  font-size:clamp(1.8rem,2.6vw,2.45rem) !important;
+  font-weight:560 !important;
+}
+
+body.consent-page :is(.launch-button,.consent-choice) {
+  border:0 !important;
+  border-bottom:1px solid var(--sds-line-strong) !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  color:var(--sds-ink) !important;
+  box-shadow:none !important;
+}
+
+/* Footer. */
+body.launch-page .launch-footer,
+body.consent-page .launch-footer {
+  width:var(--sds-shell) !important;
+  max-width:1180px !important;
+  border-top:1px solid var(--sds-line) !important;
+  background:transparent !important;
+}
+
+/* Responsive. */
+@media (max-width:900px) {
+  body.launch-page,
+  body.consent-page { --sds-shell:min(100% - 40px,760px); }
+
+  body.launch-page .launch-hero.launch-hero-compact {
+    min-height:auto !important;
+    padding:72px 0 62px !important;
+    grid-template-columns:1fr !important;
+    grid-template-areas:"kicker" "title" "body" !important;
+    gap:18px !important;
+  }
+
+  body.launch-page .launch-hero.launch-hero-compact > h1 {
+    max-width:12ch !important;
+    font-size:clamp(3rem,8.5vw,4.6rem) !important;
+  }
+
+  body.launch-page .launch-heading,
+  body.launch-page .pricing-details-heading,
+  body.how-page .baseline-explainer,
+  body.launch-page .launch-callout,
+  body.how-page .support-note,
+  body.consent-page .consent-hero {
+    grid-template-columns:1fr !important;
+  }
+
+  body.how-page .journey-steps > article {
+    grid-template-columns:52px minmax(0,1fr) !important;
+  }
+  body.how-page .journey-steps > article > p { grid-column:2 !important; }
+  body.questions-page .faq-category { grid-template-columns:128px minmax(0,1fr) !important; gap:34px !important; }
+  body.not-found-page .not-found-stage { grid-template-columns:1fr !important; gap:18px !important; align-content:center !important; }
+  body.not-found-page .not-found-code { font-size:4.5rem !important; }
+}
+
+@media (max-width:650px) {
+  body.launch-page,
+  body.consent-page { --sds-shell:calc(100% - 30px); }
+  body.launch-page .launch-nav-inner,
+  body.consent-page .launch-nav { width:var(--sds-shell) !important; }
+  body.launch-page :is(.launch-band,.launch-section) { padding:56px 0 !important; }
+  body.launch-page .launch-heading,
+  body.launch-page .pricing-details-heading { margin-bottom:30px !important; }
+  body.launch-page :is(.launch-heading,.pricing-details-heading) h2,
+  body.launch-page .baseline-explainer > div > h2,
+  body.launch-page .support-note h2,
+  body.launch-page .launch-callout h2 { font-size:clamp(2.2rem,10vw,3.1rem) !important; }
+  body.how-page .journey-steps > article { padding:22px 0 !important; grid-template-columns:38px minmax(0,1fr) !important; gap:12px !important; }
+  body.how-page .journey-steps > article > p { grid-column:1 / -1 !important; padding-left:50px !important; }
+  body.pricing-page .pricing-grid { grid-template-columns:1fr !important; }
+  body.pricing-page .price-card,
+  body.pricing-page .price-card.featured { min-height:0 !important; padding:34px 0 !important; }
+  body.pricing-page .price-card + .price-card { border-left:0 !important; border-top:1px solid var(--sds-line-strong) !important; }
+  body.questions-page .faq-category { grid-template-columns:1fr !important; gap:16px !important; padding-bottom:46px !important; }
+  body.questions-page .faq-category + .faq-category { padding-top:44px !important; }
+  body.consent-page .consent-main { padding:64px 0 76px !important; }
+  body.consent-page .consent-panel { padding:24px 0 0 !important; border-left:0 !important; border-top:1px solid var(--sds-line-strong) !important; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  body.launch-page *,
+  body.consent-page * {
+    animation:none !important;
+    transition:none !important;
+    scroll-behavior:auto !important;
+  }
+}
