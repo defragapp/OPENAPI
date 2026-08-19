@@ -51,12 +51,13 @@ describe("Sovereign split typography authority", () => {
     expect(sansAuthority).toContain("html:root:root:root body .public-approved-v8 .v0-hero h1 > span");
     expect(sansAuthority).toContain("html:root:root:root body .public-approved-v8 .landing-question-orbit__stage > span > strong");
     expect(sansAuthority).toContain("html:root:root:root body .public-secondary-page :is(");
+    expect(sansAuthority).toContain("--sovereign-title: var(--font-public-display);");
     expect(sansAuthority).toContain("font-family: var(--font-public-display) !important;");
     expect(sansAuthority).toContain(".account-intro h1");
     expect(sansAuthority).toContain("font-family: var(--font-title) !important;");
   });
 
-  it("keeps the terminal visual authority from flattening public identity back to Geist", () => {
+  it("keeps the terminal visual authority compatible with the bounded public display override", () => {
     for (const selector of [
       ".public-approved-v8 .v0-hero h1 {",
       ".public-approved-v8 .v0-hero h1 > span {",
@@ -65,14 +66,13 @@ describe("Sovereign split typography authority", () => {
       ".public-approved-v8 .landing-question-orbit__stage > span > strong {",
       ".public-approved-v8 .landing-story__heading h2 {",
       ".public-approved-v8 .v0-comparison .v0-story-heading h2 {",
-      ".public-approved-v8 .v0-final h2 {",
-      ".public-secondary-page .policy-hero h1 {"
+      ".public-approved-v8 .v0-final h2 {"
     ]) {
       const start = visualAuthority.indexOf(selector);
       expect(start).toBeGreaterThanOrEqual(0);
       const end = visualAuthority.indexOf("}", start);
       expect(end).toBeGreaterThan(start);
-      expect(visualAuthority.slice(start, end)).toContain("font-family: var(--font-public-display, var(--sovereign-title)) !important;");
+      expect(visualAuthority.slice(start, end)).toContain("font-family: var(--sovereign-title) !important;");
     }
 
     const contextStart = visualAuthority.indexOf(".public-approved-v8 .landing-context-view strong,");
