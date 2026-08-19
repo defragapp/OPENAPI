@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
+const demoFixtures = readFileSync(new URL('./landing-demo-fixtures.ts', import.meta.url), 'utf8');
 const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
 const policy = readFileSync(new URL('./PublicPolicy.tsx', import.meta.url), 'utf8');
 const policyAuthority = readFileSync(new URL('../../../config/policies.ts', import.meta.url), 'utf8');
@@ -63,19 +64,14 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).toContain('Know yourself. Understand your people. See the whole system.');
   });
 
-  it('shows visible self, relationship, and system workflows in user language', () => {
+  it('shows insight-first Self proof while preserving transitional relationship/system workflows', () => {
     for (const marker of [
-      'surface="personal-chat"',
-      'surface="personal-reasoning"',
+      'data-product-proof="self-v1"',
+      'data-viewport-surface="personal-proof"',
       'surface="relationship-chat"',
       'surface="relationship-reasoning"',
       'surface="system-map"',
       'surface="system-reasoning"',
-      'Start with the question',
-      'Use what matters from your Baseline',
-      'Find the useful difference',
-      'Leave what is not known unanswered',
-      'Give you something you can try',
       'Start with what happened',
       'Keep each person separate',
       'Show what happens between you',
@@ -86,9 +82,15 @@ describe('Sovereign.OS public experience', () => {
       'Show why the role keeps returning',
       'Change one thing and watch what happens'
     ]) expect(stories).toContain(marker);
-    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(3);
-    expect(stories).toContain("aria-current={index === visibleIndex ? 'step' : undefined}");
-    expect(stories).toContain('landing-workflow__progress');
+    for (const marker of [
+      'Why am I so good at knowing what everyone else needs from me, but so unsure what I want?',
+      'You may not have trouble knowing what you want. Your own preference may be arriving after everyone else’s signals.',
+      'The Shadow is not caring too much. It is letting responsiveness become the way the decision gets made.'
+    ]) expect(demoFixtures).toContain(marker);
+    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(2);
+    expect(stories).not.toContain('surface="personal-chat"');
+    expect(stories).not.toContain('surface="personal-reasoning"');
+    expect(stories).toContain('landing-product-proof__composer');
     expect(stories).not.toContain('<RelationshipContext />');
     expect(stories).not.toContain('<SystemContext />');
   });
