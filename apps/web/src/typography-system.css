@@ -6,12 +6,22 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Sovereign Display";
+  src: url("/fonts/sovereign-display.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0, U+00B0, U+00D7, U+2013-2014, U+2018-201D, U+2022, U+2026, U+2032-2033, U+20AC, U+2190-2193, U+2212;
+}
+
 /*
  * Sovereign.OS typography contract.
  *
- * Titles use self-hosted Geist Sans with native enterprise fallbacks defined by
- * the product-language authority. Body text stays native and highly legible. Retired bundled
- * display faces and decorative title substitutions are excluded.
+ * Product UI, account, onboarding, and workspace headings use self-hosted Geist
+ * Sans. The public brand voice uses the existing self-hosted founder display
+ * face with Iowan Old Style and classic editorial fallbacks. Body text stays
+ * native and highly legible.
  */
 
 :root {
@@ -27,6 +37,14 @@
     Helvetica,
     Arial,
     sans-serif;
+  --font-public-display:
+    "Sovereign Display",
+    "Iowan Old Style",
+    "Palatino Linotype",
+    Palatino,
+    "Book Antiqua",
+    Georgia,
+    serif;
   --font-subheading: var(--font-title);
   --font-body:
     -apple-system,
