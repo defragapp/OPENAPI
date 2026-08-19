@@ -21,6 +21,7 @@ const typography = read('./typography-system.css');
 const sansAuthority = read('./sans-typography-authority-v1.css');
 const seniorSystem = read('./senior-design-system-v1.css');
 const demoV2 = read('./public-intelligence-demonstration-v2.css');
+const launchPolish = read('./launch-polish-final-v1.css');
 const main = read('./main.tsx');
 
 const retiredInterfacePhrases = [
@@ -118,12 +119,13 @@ describe('public production positioning release', () => {
   it('keeps relationship and system boundaries explicit without making caveats the product', () => {
     for (const marker of [
       'Both people choose what they share',
-      'No compatibility score',
+      'keeping both people distinct',
       'Only they can say what they actually felt or intended',
       'Roles and events are supplied in the example',
-      'Each person controls whether their Baseline can be included'
+      'Each person controls whether their Baseline can be included',
+      'information each participant chose to share'
     ]) expect(stories).toContain(marker);
-    for (const prohibited of ['compatibilityPercent', 'compatibilityScore', 'alignmentScore', 'missing perspective']) expect(stories.toLowerCase()).not.toContain(prohibited.toLowerCase());
+    for (const prohibited of ['compatibility', 'compatibilityPercent', 'compatibilityScore', 'alignmentScore', 'missing perspective', 'consented participant context']) expect(stories.toLowerCase()).not.toContain(prohibited.toLowerCase());
   });
 
   it('keeps internal implementation vocabulary out of active public surfaces', () => {
@@ -145,9 +147,10 @@ describe('public production positioning release', () => {
     expect(sansAuthority).not.toContain('\n    "Avenir Next",');
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(seniorSystem).toContain('--sds-title: -apple-system');
+    expect(launchPolish).toContain('--launch-title: -apple-system');
   });
 
-  it('uses one integrated demo surface with progressively richer intelligence and finite motion', () => {
+  it('uses one integrated demo surface with progressively richer intelligence, fail-open visibility, and finite motion', () => {
     for (const marker of [
       '.landing-intelligence-demo',
       '.landing-demo-core',
@@ -160,7 +163,10 @@ describe('public production positioning release', () => {
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(demoV2).toContain(marker);
     expect(demoV2).not.toContain('infinite');
+    expect(launchPolish).toContain("[data-product-stories='text-first-intelligence-v2']");
+    expect(launchPolish).toContain('visibility: visible !important');
     expect(main).toContain("dataset.sovereignPublicDemoAuthority = 'text-first-v2'");
+    expect(main).toContain("dataset.sovereignLaunchPolish = 'final-v1'");
   });
 
   it('retains accessible hero and demo behavior across responsive modes', () => {
@@ -169,5 +175,6 @@ describe('public production positioning release', () => {
     expect(landingRefinementV5).toContain('@media (prefers-reduced-motion: reduce)');
     expect(demoV2).toContain('min-width: 44px !important');
     expect(demoV2).toContain('min-height: 44px !important');
+    expect(launchPolish).toContain('min-height: 44px !important');
   });
 });
