@@ -21,8 +21,8 @@ The root landing must preserve the archive’s recognizable sequence while using
 3. Hero:
    - `Healing isn’t optional.`
    - `Holding onto the pain is.`
-   - both lines use the active sans typography authority;
-   - hierarchy may use scale, weight, opacity, or a restrained outline treatment, but must not switch to the retired display serif or a decorative replacement;
+   - both lines use the founder public display authority defined by `--font-public-display`;
+   - hierarchy may use scale, weight, opacity, or a restrained outline treatment, but must not switch to a different decorative replacement or leak the display face into product UI;
    - supporting copy immediately explains that Sovereign is private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
 4. Self exploration:
    - current language inherited from `product-language-system.md`;
@@ -65,7 +65,7 @@ These are component and sequence requirements, not merely copy strings. Retired 
 Port and maintain:
 
 - the full-screen dark hero composition;
-- large restrained sans typography with hierarchy created by scale, weight, spacing, opacity, and layout;
+- large restrained editorial display typography for public identity, paired with clean sans typography for product/UI content;
 - rotating question treatment;
 - self, relationship, and system storytelling sequence;
 - chat-window demonstrations;
@@ -79,7 +79,7 @@ Port and maintain:
 - near-black, cream, white/gray line, spacing, radius, and depth language;
 - responsive behavior and reduced-motion treatment.
 
-`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. The retired bundled `Sovereign Sans`, `Optima`, and `Avenir Next` are also excluded as title/heading authorities. Titles inherit self-hosted Geist Sans from `apps/web/src/typography-system.css`; Apple/SF Pro Display, Segoe Variable/Segoe, system-ui, Helvetica, and Arial remain resilient fallbacks only. The hero and meaningful product headings must visibly resolve to Geist whenever the bundled font asset is available. Visual hierarchy comes from scale, weight, spacing, opacity, and layout rather than a decorative face.
+The active typography system is intentionally split. Public brand identity uses the existing bundled `Sovereign Display` face first with `Iowan Old Style`, Palatino/Book Antiqua, Georgia, and serif fallbacks. Product UI—including authentication, onboarding, account, workspace, composer, controls, and demonstration chrome—uses self-hosted Geist Sans first with Apple/SF Pro Display, Segoe Variable/Segoe, system-ui, Helvetica, and Arial as resilient fallbacks. The retired bundled `Sovereign Sans`, `Optima`, and `Avenir Next` remain excluded as active title authorities. The public display face must not leak into authenticated/product UI, and Geist must not flatten the public founder identity into a single sitewide sans system.
 
 The refined product should not depend on electric blue, cyan glow, neon, generic AI gradients, or glassmorphism as primary UI language. Spectral color, where intentionally used, should behave like physical light rather than a generic interface accent.
 
@@ -162,8 +162,8 @@ The complete Vite foundation and final refinement are required:
 9. `apps/web/src/premium-action-authority-v1.css`
    - preserves editorial action language for navigation and low-emphasis actions while transactional authentication, onboarding, consent, billing, and account controls retain clear visible affordance.
 10. `apps/web/src/sans-typography-authority-v1.css`
-   - enforces the active self-hosted Geist Sans title family after legacy visual layers;
-   - prevents legacy selector specificity from restoring retired display faces;
+   - enforces the split typography contract after legacy visual layers: Geist for product/UI titles and `--font-public-display` for bounded public identity selectors;
+   - prevents legacy selector specificity from flattening public identity or leaking the display face into product UI;
    - does not own global heading dimensions.
 11. `apps/web/src/production-product-cohesion-v1.css`
    - preserves private-product structure and launch-surface cohesion after typography family authority.
@@ -177,7 +177,7 @@ The complete Vite foundation and final refinement are required:
 14. Standalone public documents
    - retain the deployed static foundations;
    - load `apps/web/public/premium-action-static-v1.css` last;
-   - that terminal static authority must inherit the same Geist Sans title system, public header/wordmark hierarchy, and final static presentation.
+   - that terminal static authority uses the same founder display stack for public launch-page headings/wordmarks while preserving Geist/native sans for controls and the account-bound consent surface.
 
 Removing or bypassing any one of these means the visual port is not sitewide.
 
@@ -203,8 +203,8 @@ A production release must fail unless all of the following are true:
 - root marketing communicates You → You + your people → whole system before source mechanics;
 - the root landing does not use `foundation` as its Baseline metaphor or enumerate framework sources in its main narrative;
 - the terminal production visual authority remains the final inline presentation layer;
-- active headings/titles resolve to the approved native sans title system and never to `Sovereign Display`, the retired bundled `Sovereign Sans`, `Optima`, `Avenir Next`, or serif fallbacks;
-- root/static/policy public navigation exposes the expected page-in/page-out destinations with one consistent `SOVEREIGN.OS` wordmark identity without freezing temporary breakpoint geometry as the design authority;
+- public brand headings/wordmarks resolve to the approved founder display stack, while authentication, onboarding, account, workspace, composer, controls, and product-demo UI resolve to Geist Sans; the retired bundled `Sovereign Sans`, `Optima`, and `Avenir Next` must not become active title authorities;
+- root/static/policy public navigation exposes the expected page-in/page-out destinations with one consistent `SOVEREIGN.OS` public wordmark identity without freezing temporary breakpoint geometry as the design authority;
 - product demonstrations remain visible without reveal-state success;
 - public demo workflow precedes the conversation at desktop widths and the composer reads as the bottom of the thread rather than floating in the middle of the answer field;
 - public source codes remain collapsed by default behind `See source details`, stay tied to the exact representative fixture, and never imply visitor/private runtime data;
