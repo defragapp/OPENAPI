@@ -4,20 +4,26 @@ import { describe, expect, it } from 'vitest';
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const main = read('./main.tsx');
 const system = read('./senior-design-system-v1.css');
+const demoSystem = read('./public-intelligence-demonstration-v2.css');
 const staticSystem = read('../public/senior-design-system-static-v1.css');
 const staticActions = read('../public/premium-action-static-v1.css');
 const app = read('./App.tsx');
 const landing = read('./PublicLanding.tsx');
+const stories = read('./LandingProductStories.tsx');
 
 const compact = (source: string) => source.replace(/\s+/g, ' ');
 
 describe('senior design system v1', () => {
-  it('is an off-production presentation authority over the existing product DOM', () => {
+  it('is an off-production presentation authority over the existing product DOM with a narrow demo sub-authority', () => {
     expect(main).toContain("import seniorDesignSystemCss from './senior-design-system-v1.css?inline';");
+    expect(main).toContain("import publicIntelligenceDemonstrationV2Css from './public-intelligence-demonstration-v2.css?inline';");
     const production = main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;');
     const senior = main.indexOf('style.textContent += `\\n${seniorDesignSystemCss}`;');
+    const demos = main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationV2Css}`;');
     expect(senior).toBeGreaterThan(production);
+    expect(demos).toBeGreaterThan(senior);
     expect(main).toContain("document.documentElement.dataset.sovereignVisualAuthority = 'senior-design-system-v1';");
+    expect(main).toContain("document.documentElement.dataset.sovereignPublicDemoAuthority = 'text-first-v2';");
     expect(landing).toContain('<V0Navigation />');
     expect(landing).toContain('<V0Hero />');
     expect(landing).toContain('<LandingProductStories />');
@@ -39,6 +45,8 @@ describe('senior design system v1', () => {
     }
     expect(system).toContain('height: 64px !important');
     expect(staticSystem).toContain('height:64px !important');
+    expect(demoSystem).toContain('var(--sds-title, system-ui, sans-serif)');
+    expect(demoSystem).toContain('var(--sds-body, system-ui, sans-serif)');
   });
 
   it('removes rounded SaaS chrome from primary actions, threads, invitation, and workspace', () => {
@@ -55,22 +63,27 @@ describe('senior design system v1', () => {
     expect(source).not.toContain('border-radius: 999px');
   });
 
-  it('keeps the actual landing product demonstrations and makes motion explain thread progression', () => {
+  it('keeps the three public product demonstrations text-first inside the same mature visual grammar', () => {
+    expect(stories).toContain('data-product-stories="text-first-intelligence-v2"');
+    expect(stories).not.toContain('function WorkflowPanel(');
     for (const marker of [
-      '.public-approved-v8 .landing-demo',
-      '.public-approved-v8 .landing-message--user',
-      '.public-approved-v8 .landing-message--assistant > div',
-      '.public-approved-v8 .landing-workflow > li.is-active',
-      '.public-approved-v8 .landing-system-map path',
-      '@keyframes sds-demo-enter',
-      '@keyframes sds-thread-resolve',
-      '@keyframes sds-system-flow',
-      '@media (prefers-reduced-motion:reduce)'
-    ]) expect(system).toContain(marker);
-    expect(system).toContain('box-shadow:0 28px 78px rgba(0,0,0,.34), 0 0 58px var(--sds-cool-glow) !important');
+      '.landing-intelligence-demo',
+      '.landing-demo-question',
+      '.landing-demo-core',
+      '.landing-understanding--decision',
+      '.landing-understanding--relationship',
+      '.landing-understanding--system',
+      '.landing-fit-check',
+      '.landing-evidence',
+      '@keyframes public-demo-arrive-v2',
+      '@keyframes public-demo-line-v2',
+      '@keyframes public-demo-resolve-v2',
+      '@media (prefers-reduced-motion: reduce)'
+    ]) expect(demoSystem).toContain(marker);
+    expect(demoSystem).not.toContain('infinite');
   });
 
-  it('reduces keynote-scale public typography and vertical acreage without rewriting content', () => {
+  it('reduces keynote-scale public typography and vertical acreage without rewriting the rest of the landing content', () => {
     expect(system).toContain('min-height: 680px !important');
     expect(system).toContain('font-size: clamp(3.6rem, 5.5vw, 5rem) !important');
     expect(system).toContain('.public-approved-v8 .landing-story');
@@ -106,7 +119,7 @@ describe('senior design system v1', () => {
   });
 
   it('keeps presentation files structurally balanced', () => {
-    for (const source of [system, staticSystem]) {
+    for (const source of [system, demoSystem, staticSystem]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });
