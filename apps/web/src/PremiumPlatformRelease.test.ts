@@ -136,8 +136,8 @@ describe('premium platform release — current public product contract', () => {
       '.relationship-field__center',
       '.relationship-field__bridge',
       '.landing-understanding--system',
-      '.system-field__state--current',
-      '.system-field__state--changed',
+      '.system-field__state',
+      '.system-field__route--direct',
       '@keyframes public-demo-arrive-v2',
       '@keyframes public-demo-line-v2',
       '@media (max-width: 760px)',
@@ -145,6 +145,8 @@ describe('premium platform release — current public product contract', () => {
       'min-width: 44px !important',
       'min-height: 44px !important'
     ]) expect(demoV2).toContain(marker);
+    expect(stories).toContain('className="system-field__state system-field__state--current"');
+    expect(stories).toContain('className="system-field__state system-field__state--changed"');
     expect(demoV2).not.toContain('infinite');
     balanced(demoV2);
     balanced(seniorSystem);
