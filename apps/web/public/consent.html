@@ -21,11 +21,24 @@
 <body class="consent-page">
   <div class="launch-shell">
     <header class="launch-nav">
-      <a class="launch-wordmark" href="/app">SOVEREIGN.OS</a>
-      <nav class="launch-links" aria-label="Account navigation">
-        <a href="/app">Workspace</a>
-        <a href="/privacy">Privacy</a>
-      </nav>
+      <div class="launch-nav-inner">
+        <a class="launch-wordmark" href="/app" aria-label="Sovereign.OS workspace">SOVEREIGN.OS</a>
+        <nav class="launch-links" aria-label="Account navigation">
+          <a href="/app">Workspace</a>
+          <a href="/privacy">Privacy</a>
+        </nav>
+        <div class="launch-nav-actions">
+          <a class="launch-sign-in" href="/app">Workspace</a>
+          <details class="launch-mobile-menu">
+            <summary aria-label="Open navigation"><span class="launch-mobile-menu-icon" aria-hidden="true"></span></summary>
+            <nav class="launch-mobile-menu-panel" aria-label="Mobile account navigation">
+              <a href="/app">Workspace</a>
+              <a href="/privacy">Privacy</a>
+              <a href="/terms">Terms</a>
+            </nav>
+          </details>
+        </div>
+      </div>
     </header>
 
     <main class="consent-main">
