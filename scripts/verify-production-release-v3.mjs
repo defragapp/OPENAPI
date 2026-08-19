@@ -21,7 +21,7 @@ const replacements = [
   ],
   [
     "['data-visual-contract=\"founder-v0-static\"', '/v0-public-static.css?v=20260801-v0-global', 'Release compatibility marker only; the retired stylesheet is not loaded']",
-    "['data-visual-contract=\"founder-v0-static\"', 'data-secondary-visual-contract=\"founder-v0-locked-v1\"', 'data-route-cohesion=\"v1\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260818-geist-v1', 'class=\"launch-nav-inner\"', 'class=\"launch-mobile-menu-panel\"']"
+    "['data-visual-contract=\"founder-v0-static\"', 'data-secondary-visual-contract=\"founder-v0-locked-v1\"', 'data-route-cohesion=\"v1\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260819-founder-display-v1', 'class=\"launch-nav-inner\"', 'class=\"launch-mobile-menu-panel\"']"
   ],
   [
     "const passkeyMigration = read('apps/sovereign-worker/migrations/0014_passkey_authentication.sql');",
@@ -131,15 +131,15 @@ rejectAll('retired landing positioning', landing, ['<BaselineFoundation />', 'On
   ],
   [
     `requireAll('landing refinement v5', landingRefinementV5Css, ['.v0-hero h1 > span', '.v0-hero h1 > em', '@keyframes sovereign-hero-rise', '@keyframes sovereign-field-arrive', '.landing-baseline-intro__heading', '.landing-baseline-intro__principles', '.landing-expression-slice__tooltip-panel', 'width: 104px !important', 'height: 26px !important', '@media (prefers-reduced-motion: reduce)']);`,
-    `requireAll('landing refinement v5', landingRefinementV5Css, ['One typeface. Hierarchy comes from weight, scale, and opacity.', '.v0-hero h1 > span', '.v0-hero h1 > em', 'font-family: inherit !important', '@keyframes sovereign-hero-rise', '@keyframes sovereign-field-arrive', '.landing-expression-slice__tooltip-panel', 'width: 104px !important', 'height: 26px !important', '@media (prefers-reduced-motion: reduce)']);`
+    `requireAll('landing refinement v5', landingRefinementV5Css, ['.v0-hero h1 > span', '.v0-hero h1 > em', 'font-family: inherit !important', '@keyframes sovereign-hero-rise', '@keyframes sovereign-field-arrive', '.landing-expression-slice__tooltip-panel', 'width: 104px !important', 'height: 26px !important', '@media (prefers-reduced-motion: reduce)']);`
   ],
   [
     `requireAll('How it works document', how, ['Your Baseline first. The situation second.', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`,
-    `requireAll('How it works document', how, ['Start with yourself. Add another person or the wider situation only when it helps.', 'Ask about what you actually want to understand.', '<summary>See source details</summary>', '<dt>Sources</dt>', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`
+    `requireAll('How it works document', how, ['Start with yourself. Add another person or the wider situation only when it helps.', 'Ask about what you actually want to understand.', '<summary>See source details</summary>', '<dt>Source details</dt>', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260819-founder-display-v1']);`
   ],
   [
     `requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe securely handles checkout, invoices, payment methods, and subscription changes.', 'If paid access ends, your account stays open and returns to Free.', 'Start with your Baseline. Add more only when you need it.', 'one-time amount from $1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`,
-    `requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Explore yourself for free. Add People and Systems with Sovereign+.', 'Explore yourself with Sovereign.', 'Understand your people and the systems around you.', 'Your Baseline stays yours. Plus expands what you can explore.', 'Stripe securely handles checkout, invoices, payment methods, and subscription changes.', 'If paid access ends, your account stays open and returns to Free.', 'one-time amount from $1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`
+    `requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Explore yourself for free. Add People and Systems with Sovereign+.', 'Explore yourself with Sovereign.', 'Understand your people and the systems around you.', 'Your Baseline stays yours. Plus expands what you can explore.', 'Stripe securely handles checkout, invoices, payment methods, and subscription changes.', 'If paid access ends, your account stays open and returns to Free.', 'one-time amount from $1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260819-founder-display-v1']);`
   ]
 ];
 
@@ -175,6 +175,8 @@ assert(!deploy.includes('cloudflare-production-deploy-v2.mjs'), 'Production v3 m
 
 if (source.includes('/v0-public-static.css?v=20260801-v0-global')) throw new Error('Production release v3 still contains the retired static public stylesheet contract.');
 if (source.includes('/v0-public-static.css?v=20260803-locked-v1')) throw new Error('Production release v3 still contains the pre-refinement secondary stylesheet contract.');
+if (source.includes('/premium-action-static-v1.css?v=20260818-geist-v1')) throw new Error('Production release v3 still contains the retired Geist-only static typography cache key.');
+if (!source.includes('/premium-action-static-v1.css?v=20260819-founder-display-v1')) throw new Error('Production release v3 is missing the founder-display static typography cache key.');
 if (source.includes("'--v0-page:#0f0f0f'")) throw new Error('Production release v3 still contains the retired standalone public page token.');
 if (!source.includes("import './deployed-route-cohesion.css'")) throw new Error('Production release v3 is missing the deployed route cohesion visual layer.');
 if (!source.includes('/experience-static-refinement-v1.css?v=20260817-cohesion-v2')) throw new Error('Production release v3 is missing the final static refinement contract.');
