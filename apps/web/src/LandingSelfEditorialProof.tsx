@@ -123,6 +123,7 @@ export function LandingSelfEditorialProof() {
             onSelectAxis={setSelectedAxisId}
             draggable
             variant="preview"
+            suspendWhenOffscreen={false}
             ariaLabel="Representative Self Expression Field. Sixteen lines begin at one stable center. Line length shows relative expression salience in this example, not a psychological score or diagnosis. Select a line to inspect it."
           />
         </div>
