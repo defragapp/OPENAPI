@@ -72,17 +72,23 @@ html:root:root:root body :is(
  * remain authoritative while resolving those specific titles to the founder
  * display face instead of flattening them back to Geist.
  */
-html:root:root:root body .public-approved-v8 .v0-hero h1,
-html:root:root:root body .public-approved-v8 .landing-question-orbit h2,
-html:root:root:root body .public-approved-v8 .landing-story__heading h2,
-html:root:root:root body .public-approved-v8 .v0-comparison .v0-story-heading h2,
-html:root:root:root body .public-approved-v8 .v0-final h2,
-html:root:root:root body .public-approved-v8 .v0-wordmark,
+html:root:root:root body .public-approved-v8 :is(
+  .v0-hero h1,
+  .landing-question-orbit h2,
+  .landing-story__heading h2,
+  .v0-comparison .v0-story-heading h2,
+  .v0-final h2,
+  .v0-wordmark
+),
+html:root:root:root body .public-approved-v8 .v0-hero h1 > span,
+html:root:root:root body .public-approved-v8 .v0-hero h1 > em,
 html:root:root:root body .public-approved-v8 .landing-question-orbit__stage > span > strong,
-html:root:root:root body .public-secondary-page .policy-hero h1,
-html:root:root:root body .public-secondary-page .policy-grid h2,
-html:root:root:root body .public-secondary-page .policy-contact h2,
-html:root:root:root body .public-secondary-page .v0-wordmark {
+html:root:root:root body .public-secondary-page :is(
+  .policy-hero h1,
+  .policy-grid h2,
+  .policy-contact h2,
+  .v0-wordmark
+) {
   --sovereign-title: var(--font-public-display);
   font-family: var(--font-public-display) !important;
   font-kerning: normal;
