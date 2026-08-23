@@ -41,6 +41,13 @@ describe('production launch preflight', () => {
       .toBeLessThan(messagePreflight.lastIndexOf('return null;'));
   });
 
+  it('bounds the request before production preflight parses or delegates a message', () => {
+    expect(productionEntry).toContain("import { readThreadMessageBody } from './security/request-body'");
+    expect(productionEntry).toContain('await readThreadMessageBody(request.clone())');
+    expect(productionEntry.indexOf('await readThreadMessageBody(request.clone())'))
+      .toBeLessThan(productionEntry.indexOf('decideSovereignInputSafety(message)'));
+  });
+
   it('keeps urgent/grounded/refusal handling outside paid entitlement preflight', () => {
     expect(productionEntry.indexOf("if (safety.disposition !== 'standard') return null"))
       .toBeLessThan(productionEntry.indexOf('const entitlements = await getEntitlements(env, auth.accountId)'));
