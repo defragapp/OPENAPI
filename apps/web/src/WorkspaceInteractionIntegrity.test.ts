@@ -48,7 +48,8 @@ describe('Sovereign workspace interaction integrity', () => {
     expect(workspace).not.toContain('problem.message || problem.error');
     expect(workspace).not.toContain('payload.message || payload.error');
     expect(workspace).toContain('That request could not be completed.');
-    expect(workspace).toContain('Sovereign.OS could not complete that request. Try again in a moment.');
-    expect(workspace).toContain('Sovereign is at capacity right now. Try again in a moment.');
+    expect(workspace).toContain('Sovereign is temporarily unavailable.');
+    expect(workspace).toContain('Sovereign could not complete this response.');
+    expect(workspace).toContain('Sovereign has reached today’s shared free AI capacity.');
   });
 });
