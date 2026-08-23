@@ -31,6 +31,12 @@ describe('Workers AI Free capacity', () => {
     expect(large).toBeLessThan(7_500);
   });
 
+  it('uses UTF-8 bytes so non-ASCII input cannot be under-reserved', () => {
+    const ascii = estimateWorkersAiNeurons({ messages: [{ role: 'user', content: 'a'.repeat(10_000) }], max_completion_tokens: 1 });
+    const unicode = estimateWorkersAiNeurons({ messages: [{ role: 'user', content: '🧭'.repeat(10_000) }], max_completion_tokens: 1 });
+    expect(unicode).toBeGreaterThan(ascii);
+  });
+
   it('records a Cloudflare-hosted model reservation against the UTC day', async () => {
     const { db, bind } = capacityDb({ reserved_neurons: 500, request_count: 3 });
     const reservation = await reserveWorkersAiCapacity(
