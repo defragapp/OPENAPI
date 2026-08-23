@@ -29,6 +29,9 @@ const honoApp = read('apps/sovereign-worker/src/index.ts');
 const requestBodyLimits = read('apps/sovereign-worker/src/security/request-body.ts');
 const aiCapacity = read('apps/sovereign-worker/src/ai/free-tier-capacity.ts');
 const sovereignWorkspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
+const launchSaturation = read('scripts/launch-saturation.mjs');
+const launchSaturationDoc = read('docs/launch-saturation-runbook.md');
+const ownerActions = read('docs/release/OWNER_ACTIONS.md');
 
 const expectedObservability = {
   enabled: true,
@@ -188,6 +191,31 @@ requireAll('Unicode-conservative AI capacity', aiCapacity, [
   'CONSERVATIVE_BYTES_PER_TOKEN = 1',
   'new TextEncoder().encode(serialized).byteLength'
 ]);
+requireAll('guarded launch saturation', launchSaturation, [
+  'SATURATION_APPROVED_CANARY_ORIGIN',
+  'Refusing to run saturation traffic against a production or branded domain',
+  "SATURATION_ENABLE_BILLED_AI !== 'true'",
+  'A single billed-AI canary run is capped at 60 requests and concurrency 5',
+  'sovereign-launch-saturation-result.v1',
+  'stageConcurrency(config.concurrency)'
+]);
+requireAll('launch saturation runbook', launchSaturationDoc, [
+  'Status: controlled canary authority for #259.',
+  'pnpm test:launch-saturation',
+  'pnpm saturation:canary',
+  'pnpm exec wrangler rollback STABLE_VERSION_ID --config wrangler.jsonc',
+  'Do not remove general Access'
+]);
+requireAll('current owner gates', ownerActions, [
+  'Cloudflare credential containment and replacement',
+  'Paid Workers AI capacity',
+  'Human product acceptance',
+  'Terms, Privacy, and launch-market approval',
+  'General public Access cutover'
+]);
+requireValue(packageJson.scripts?.['test:launch-saturation'] === 'node scripts/launch-saturation.mjs --self-test', 'Saturation self-test command drifted');
+requireValue(packageJson.scripts?.['saturation:canary'] === 'node scripts/launch-saturation.mjs', 'Canary saturation command drifted');
+requireValue(packageJson.scripts?.test?.includes('node scripts/launch-saturation.mjs --self-test'), 'Root test must exercise saturation safety controls');
 
 requireAll('single-deploy implementation', deployV3, [
   'WORKERS_CI_COMMIT_SHA',
