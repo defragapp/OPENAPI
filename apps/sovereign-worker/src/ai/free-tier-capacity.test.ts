@@ -18,7 +18,7 @@ function capacityDb(row: { reserved_neurons: number; request_count: number } | n
 describe('Workers AI Free capacity', () => {
   it('uses the safe default and validates explicit paid capacity', () => {
     expect(resolveWorkersAiDailyNeuronBudget(undefined)).toBe(DEFAULT_DAILY_NEURON_BUDGET);
-    expect(resolveWorkersAiDailyNeuronBudget('5000000')).toBe(5_000_000);
+    expect(resolveWorkersAiDailyNeuronBudget('250000')).toBe(250_000);
     expect(() => resolveWorkersAiDailyNeuronBudget('7500.5')).toThrow(/whole number/);
     expect(() => resolveWorkersAiDailyNeuronBudget('7499')).toThrow(/at least/);
   });
@@ -50,9 +50,9 @@ describe('Workers AI Free capacity', () => {
       '@cf/zai-org/glm-4.7-flash',
       { messages: [{ role: 'user', content: 'hello' }], max_completion_tokens: 100 },
       new Date('2026-07-30T23:30:00Z'),
-      '5000000'
+      '250000'
     );
-    expect(bind).toHaveBeenCalledWith('2026-07-30', expect.any(Number), 5_000_000);
+    expect(bind).toHaveBeenCalledWith('2026-07-30', expect.any(Number), 250_000);
   });
 
   it('fails closed before Cloudflare reaches its daily free allocation', async () => {
