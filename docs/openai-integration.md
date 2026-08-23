@@ -57,6 +57,8 @@ The Workers AI adapter also reserves conservative daily capacity in D1 before ea
 
 A source-level model failure releases the daily reservation and refunds the user’s monthly turn where the current contract requires it.
 
+Public questions are bounded before inference work: 10,000 characters in the composer, 64 KiB for the streamed JSON request, and 12,000 normalized message characters at the Worker. Production applies this parser before safety, entitlement, database, Durable Object, or model work. Capacity estimation uses serialized UTF-8 bytes at a conservative one-byte-per-token upper bound so unusual Unicode cannot reduce the reservation.
+
 Migration `0013_workers_ai_free_capacity` introduced the global capacity ledger. Release-evidence tables were introduced by `0015_release_evidence`. **Current production schema parity is `0017_privacy_access_and_eligibility`.** Readiness requires the current migration plus release evidence, policy receipt, and privacy-access dependencies.
 
 ## Failure behavior
