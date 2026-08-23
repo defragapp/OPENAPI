@@ -94,6 +94,10 @@ Sovereign reserves conservatively below the account-level Workers AI allocation.
 
 A failed generation also releases the user’s monthly reservation where the current product contract requires it.
 
+## Public API request boundary
+
+Every `/api/*` request entering the Hono runtime is bounded at 1 MiB before route parsing. This is a general denial-of-service guard, not permission to send large application payloads. Stricter route ceilings remain authoritative: Stripe webhook bodies are capped at 512 KiB, AI thread-message JSON at 64 KiB and normalized messages at 12,000 characters, with the public composer capped at 10,000 characters. Oversized requests receive a private, non-cacheable `413` response.
+
 ## AI request boundary
 
 The public composer accepts at most 10,000 characters. The Worker independently enforces a 64 KiB JSON-body ceiling while streaming and a 12,000-character normalized-message ceiling on every thread-message route. The production preflight applies the same bounded parser before safety, entitlement, database, Durable Object, or model work. Requests above either server limit receive a controlled `413` response and are not delegated to inference.
