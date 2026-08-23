@@ -100,6 +100,14 @@ The public composer accepts at most 10,000 characters. The Worker independently 
 
 Neuron reservation estimates use serialized UTF-8 byte length with a conservative one-byte-per-token upper bound. This prevents non-ASCII input from receiving a smaller reservation than its encoded payload warrants. The output reservation still uses the requested maximum or the guarded 3,200-token default.
 
+## Public Stripe webhook ingress
+
+Cloudflare Access bypass remains scoped only to `app.defrag.app/api/v1/stripe/webhook`. The Worker streams and bounds the raw request body at 512 KiB before signature verification or database work. A larger declared or chunked body receives `413` and creates no webhook-event record.
+
+The bounded reader preserves the exact UTF-8 body string because Stripe signature verification requires the unmodified raw payload. The Worker then verifies the Stripe signature and timestamp before parsing the event, applies provider/event idempotency in D1, retries previously failed projections, and treats an already processed event as a successful duplicate.
+
+Unsigned live probes prove the Access bypass reaches Worker signature enforcement. Final public acceptance still requires one controlled valid signed delivery/replay that creates no real customer, payment, subscription, email, or entitlement side effect.
+
 ## Monthly account allowances
 
 - Free: 10 Sovereign turns per UTC month.
