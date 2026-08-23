@@ -17,6 +17,7 @@ Current runtime configuration:
 ```text
 AI_PROVIDER=cloudflare-gateway
 AI_GATEWAY_ID=sovereign-ai-gateway
+WORKERS_AI_DAILY_NEURON_BUDGET=5000000
 AI_MODEL=@cf/zai-org/glm-4.7-flash
 AI_FREE_MONTHLY_TURNS=10
 AI_SOVEREIGN_PLUS_MONTHLY_TURNS=300
@@ -52,7 +53,7 @@ Stripe subscription webhooks project effective Free/Sovereign+ state into D1. Be
 - Free: 10 turns per UTC month.
 - Sovereign+: 300 turns per UTC month.
 
-The Workers AI adapter also reserves conservative daily capacity in D1 before each hosted-model call. `WORKERS_AI_DAILY_NEURON_BUDGET` may raise that atomic reservation ceiling only after paid Workers AI capacity and a founder-approved spend boundary are active. When the binding is absent, the Worker retains the safe 7,500-neuron development/default ceiling. Invalid or lower configured values fail closed. If the active daily budget is exhausted, Sovereign returns a controlled unavailable/capacity response rather than inventing an answer.
+The Workers AI adapter also reserves conservative daily capacity in D1 before each hosted-model call. `WORKERS_AI_DAILY_NEURON_BUDGET=5000000` is the founder-approved launch ceiling. It is a maximum reservation boundary, not a demand target or proof of provider capacity. Production activation still requires active Workers Paid coverage. When the binding is absent, the Worker retains the safe 7,500-neuron development/default ceiling. Invalid or lower configured values fail closed. If the active daily budget is exhausted, Sovereign returns a controlled unavailable/capacity response rather than inventing an answer.
 
 A source-level model failure releases the daily reservation and refunds the user’s monthly turn where the current contract requires it.
 
