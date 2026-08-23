@@ -21,7 +21,7 @@ function tooLargeResponse(): Response {
   return jsonError(
     413,
     'sovereign_message_too_large',
-    'Keep each message under 10,000 characters and try again.'
+    'Keep each message to 12,000 characters or fewer.'
   );
 }
 
