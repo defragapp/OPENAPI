@@ -195,6 +195,12 @@ requireAll('bounded Hono message route', honoApp, [
   "import { readThreadMessageBody } from './security/request-body'",
   'readThreadMessageBody(context.req.raw)'
 ]);
+requireAll('bounded public API ingress', honoApp, [
+  "import { bodyLimit } from 'hono/body-limit'",
+  'MAX_API_REQUEST_BODY_BYTES = 1024 * 1024',
+  "app.use('/api/*', bodyLimit({",
+  "error: 'request_body_too_large'"
+]);
 requireAll('bounded public composer', sovereignWorkspace, [
   'MAX_COMPOSER_CHARACTERS = 10_000',
   'MAX_THREAD_MESSAGE_CHARACTERS = 12_000',
@@ -338,4 +344,4 @@ requireValue(!authenticatedWorkspace.includes("import { WorldVideoLauncher } fro
 requireValue(!authenticatedWorkspace.includes('<WorldVideoLauncher />'), 'Current authenticated workspace must not mount the video launcher');
 requireValue(authenticatedWorkspace.includes('data-workspace-contract="one-room"'), 'Canonical one-room workspace contract is missing');
 
-console.log('Direct Cloudflare release config verified production_root=true text_first_release=true browser_rendering_optional=true current_migration=0017 privacy_export=on_demand_no_artifact worlds_video=false current_main_only=true github_workflows_non_authoritative=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
+console.log('Direct Cloudflare release config verified production_root=true text_first_release=true browser_rendering_optional=true current_migration=0017 privacy_export=on_demand_no_artifact worlds_video=false current_main_only=true github_workflows_non_authoritative=true d1_replication=true gateway_rate_limit=true api_body_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
