@@ -1,7 +1,20 @@
-const FREE_DAILY_NEURON_BUDGET = 7_500;
+export const DEFAULT_DAILY_NEURON_BUDGET = 7_500;
 const INPUT_NEURONS_PER_MILLION_TOKENS = 5_500;
 const OUTPUT_NEURONS_PER_MILLION_TOKENS = 36_400;
 const CONSERVATIVE_CHARACTERS_PER_TOKEN = 2;
+
+export function resolveWorkersAiDailyNeuronBudget(configured: string | undefined): number {
+  const value = configured?.trim();
+  if (!value) return DEFAULT_DAILY_NEURON_BUDGET;
+  if (!/^\d+$/.test(value)) {
+    throw new Error('WORKERS_AI_DAILY_NEURON_BUDGET must be a whole number');
+  }
+  const budget = Number(value);
+  if (!Number.isSafeInteger(budget) || budget < DEFAULT_DAILY_NEURON_BUDGET) {
+    throw new Error(`WORKERS_AI_DAILY_NEURON_BUDGET must be at least ${DEFAULT_DAILY_NEURON_BUDGET}`);
+  }
+  return budget;
+}
 
 interface CapacityDatabase {
   prepare(query: string): D1PreparedStatement;
@@ -31,9 +44,11 @@ export async function reserveWorkersAiCapacity(
   db: CapacityDatabase,
   model: string,
   input: unknown,
-  now = new Date()
+  now = new Date(),
+  dailyBudgetConfig?: string
 ): Promise<WorkersAiCapacityReservation | undefined> {
   if (!model.startsWith('@cf/')) return undefined;
+  const dailyNeuronBudget = resolveWorkersAiDailyNeuronBudget(dailyBudgetConfig);
   const usageDay = now.toISOString().slice(0, 10);
   const reservedNeurons = estimateWorkersAiNeurons(input);
   const row = await db.prepare(`INSERT INTO workers_ai_daily_capacity
@@ -45,10 +60,10 @@ export async function reserveWorkersAiCapacity(
       updated_at = datetime('now')
     WHERE workers_ai_daily_capacity.reserved_neurons + excluded.reserved_neurons <= ?
     RETURNING reserved_neurons, request_count`)
-    .bind(usageDay, reservedNeurons, FREE_DAILY_NEURON_BUDGET)
+    .bind(usageDay, reservedNeurons, dailyNeuronBudget)
     .first<{ reserved_neurons: number; request_count: number }>();
 
-  if (!row) throw freeCapacityResponse(now, reservedNeurons);
+  if (!row) throw freeCapacityResponse(now, reservedNeurons, dailyNeuronBudget);
   return {
     usageDay,
     reservedNeurons,
@@ -71,7 +86,7 @@ export async function releaseWorkersAiCapacity(
     .run();
 }
 
-function freeCapacityResponse(now: Date, requestedNeurons: number): Response {
+function freeCapacityResponse(now: Date, requestedNeurons: number, dailyNeuronBudget: number): Response {
   const resetsAt = new Date(Date.UTC(
     now.getUTCFullYear(),
     now.getUTCMonth(),
@@ -83,7 +98,7 @@ function freeCapacityResponse(now: Date, requestedNeurons: number): Response {
     message: 'Sovereign has reached today’s shared free AI capacity. Your workspace and saved understanding remain available.',
     retryable: true,
     requestedNeurons,
-    dailyReservationBudget: FREE_DAILY_NEURON_BUDGET,
+    dailyReservationBudget: dailyNeuronBudget,
     resetsAt
   }, {
     status: 429,
