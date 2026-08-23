@@ -86,11 +86,29 @@ export function assertRequiredProductionControls(controls) {
     failures.push('D1 read replication is not verified in automatic mode');
   }
 
-  const gatewayVerified = controls?.gateway?.management === 'verified';
-  const gatewayRequestPrivacy = controls?.gateway?.perRequestPrivacy?.skipCache === true
-    && controls?.gateway?.perRequestPrivacy?.collectLog === false;
-  if (!gatewayVerified && !gatewayRequestPrivacy) {
-    failures.push('AI Gateway privacy controls are neither management-verified nor protected per request');
+  const expectedGatewaySpendLimits = [
+    { id: 'sovereign_global_daily_spend', limitUsd: 2.75, windowSeconds: 86_400, technique: 'sliding' },
+    { id: 'sovereign_global_30_day_spend', limitUsd: 75, windowSeconds: 2_592_000, technique: 'sliding' }
+  ];
+  if (controls?.gateway?.management !== 'verified') {
+    failures.push(
+      controls?.gateway?.reason
+        || 'AI Gateway launch rate/spend controls are not management-verified'
+    );
+  } else {
+    if (controls.gateway.rateLimit !== '500/60s' || controls.gateway.technique !== 'sliding') {
+      failures.push('AI Gateway launch rate limit is not verified at 500 requests / 60 seconds');
+    }
+    for (const expected of expectedGatewaySpendLimits) {
+      const actual = (controls.gateway.spendLimits || []).find((rule) => rule.id === expected.id);
+      if (
+        Number(actual?.limitUsd) !== expected.limitUsd
+        || Number(actual?.windowSeconds) !== expected.windowSeconds
+        || actual?.technique !== expected.technique
+      ) {
+        failures.push(`AI Gateway spend limit ${expected.id} is not release-verified`);
+      }
+    }
   }
 
   // Wrangler OAuth does not expose zone WAF/API Gateway management scopes.
