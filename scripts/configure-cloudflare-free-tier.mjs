@@ -7,6 +7,14 @@ const API_ROOT = 'https://api.cloudflare.com/client/v4';
 const SCHEMA_NAME = 'Sovereign.OS Critical API';
 const RATE_RULE_REF = 'sovereign_ai_messages_free_tier';
 const RATE_PHASE = 'http_ratelimit';
+const AI_GATEWAY_RATE_LIMIT = 500;
+const AI_GATEWAY_RATE_WINDOW_SECONDS = 60;
+const AI_GATEWAY_DAILY_SPEND_LIMIT_USD = 2.75;
+const AI_GATEWAY_DAILY_SPEND_WINDOW_SECONDS = 86_400;
+const AI_GATEWAY_30_DAY_SPEND_LIMIT_USD = 75;
+const AI_GATEWAY_30_DAY_SPEND_WINDOW_SECONDS = 2_592_000;
+const AI_GATEWAY_DAILY_SPEND_RULE_ID = 'sovereign_global_daily_spend';
+const AI_GATEWAY_30_DAY_SPEND_RULE_ID = 'sovereign_global_30_day_spend';
 
 const CRITICAL_OPERATIONS = [
   ['POST', '/api/v1/account/onboarding'],
@@ -125,15 +133,60 @@ async function configureD1Replication(client, accountId, databaseId) {
   return { databaseId, readReplication: 'auto' };
 }
 
+function expectedAiGatewaySpendLimits() {
+  return {
+    enabled: true,
+    rules: [
+      {
+        id: AI_GATEWAY_DAILY_SPEND_RULE_ID,
+        enabled: true,
+        limit: AI_GATEWAY_DAILY_SPEND_LIMIT_USD,
+        limitType: 'cost',
+        window: AI_GATEWAY_DAILY_SPEND_WINDOW_SECONDS,
+        technique: 'sliding'
+      },
+      {
+        id: AI_GATEWAY_30_DAY_SPEND_RULE_ID,
+        enabled: true,
+        limit: AI_GATEWAY_30_DAY_SPEND_LIMIT_USD,
+        limitType: 'cost',
+        window: AI_GATEWAY_30_DAY_SPEND_WINDOW_SECONDS,
+        technique: 'sliding'
+      }
+    ]
+  };
+}
+
+function verifyAiGatewaySpendLimits(actual) {
+  const expected = expectedAiGatewaySpendLimits();
+  if (actual?.enabled !== true) throw new Error('AI Gateway spend limits are not enabled');
+  for (const expectedRule of expected.rules) {
+    const actualRule = (actual.rules || []).find((rule) => rule.id === expectedRule.id);
+    const matches = actualRule?.enabled === true
+      && actualRule.limitType === expectedRule.limitType
+      && Number(actualRule.limit) === expectedRule.limit
+      && Number(actualRule.window) === expectedRule.window
+      && actualRule.technique === expectedRule.technique;
+    if (!matches) throw new Error(`AI Gateway spend limit ${expectedRule.id} is not active`);
+  }
+  return expected.rules.map((rule) => ({
+    id: rule.id,
+    limitUsd: rule.limit,
+    windowSeconds: rule.window,
+    technique: rule.technique
+  }));
+}
+
 async function configureAiGateway(client, accountId, gatewayId) {
   const path = `/accounts/${accountId}/ai-gateway/gateways/${encodeURIComponent(gatewayId)}`;
   const body = {
     cache_invalidate_on_update: true,
     cache_ttl: 0,
     collect_logs: false,
-    rate_limiting_interval: 60,
-    rate_limiting_limit: 50,
-    rate_limiting_technique: 'sliding'
+    rate_limiting_interval: AI_GATEWAY_RATE_WINDOW_SECONDS,
+    rate_limiting_limit: AI_GATEWAY_RATE_LIMIT,
+    rate_limiting_technique: 'sliding',
+    spend_limits: expectedAiGatewaySpendLimits()
   };
 
   try {
@@ -141,14 +194,18 @@ async function configureAiGateway(client, accountId, gatewayId) {
     const verified = await client.request(path);
     const result = verified.result || {};
     if (result.cache_ttl !== 0 || result.collect_logs !== false) throw new Error('AI Gateway privacy controls are not active');
-    if (result.rate_limiting_interval !== 60 || result.rate_limiting_limit !== 50) throw new Error('AI Gateway rate limit is not active');
+    if (result.rate_limiting_interval !== AI_GATEWAY_RATE_WINDOW_SECONDS || result.rate_limiting_limit !== AI_GATEWAY_RATE_LIMIT) {
+      throw new Error('AI Gateway rate limit is not active');
+    }
+    const spendLimits = verifyAiGatewaySpendLimits(result.spend_limits);
     return {
       id: gatewayId,
       management: 'verified',
       cacheTtl: result.cache_ttl,
       collectLogs: result.collect_logs,
       rateLimit: `${result.rate_limiting_limit}/${result.rate_limiting_interval}s`,
-      technique: result.rate_limiting_technique || 'sliding'
+      technique: result.rate_limiting_technique || 'sliding',
+      spendLimits
     };
   } catch (error) {
     const status = Number(error?.status || 0);
@@ -160,7 +217,7 @@ async function configureAiGateway(client, accountId, gatewayId) {
       management: 'unavailable',
       reason: status === 404
         ? 'Cloudflare AI Gateway management API is unavailable for this account or credential'
-        : 'Cloudflare AI Gateway management requires a credential accepted by the AI Gateway management API; continuing with per-request privacy controls',
+        : 'Cloudflare AI Gateway management requires a credential accepted by the AI Gateway management API; continuing with the strict D1 neuron ledger and per-request privacy controls',
       status: status || undefined,
       code: authCode || undefined,
       perRequestPrivacy: {
