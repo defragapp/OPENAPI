@@ -25,19 +25,20 @@ function tooLargeResponse(): Response {
   );
 }
 
-export async function readBoundedJson(
+export async function readBoundedText(
   request: Request,
-  maxBytes = MAX_THREAD_MESSAGE_BODY_BYTES
-): Promise<{ ok: true; value: unknown } | { ok: false; response: Response }> {
+  maxBytes: number,
+  bodyTooLargeResponse = tooLargeResponse()
+): Promise<{ ok: true; value: string } | { ok: false; response: Response }> {
   const declaredLength = request.headers.get('content-length');
   if (declaredLength) {
     const parsedLength = Number(declaredLength);
     if (Number.isFinite(parsedLength) && parsedLength > maxBytes) {
-      return { ok: false, response: tooLargeResponse() };
+      return { ok: false, response: bodyTooLargeResponse };
     }
   }
 
-  if (!request.body) return { ok: true, value: {} };
+  if (!request.body) return { ok: true, value: '' };
 
   const reader = request.body.getReader();
   const chunks: Uint8Array[] = [];
@@ -49,12 +50,10 @@ export async function readBoundedJson(
     totalBytes += value.byteLength;
     if (totalBytes > maxBytes) {
       await reader.cancel('request_body_limit_exceeded').catch(() => undefined);
-      return { ok: false, response: tooLargeResponse() };
+      return { ok: false, response: bodyTooLargeResponse };
     }
     chunks.push(value);
   }
-
-  if (totalBytes === 0) return { ok: true, value: {} };
 
   const bytes = new Uint8Array(totalBytes);
   let offset = 0;
@@ -62,9 +61,19 @@ export async function readBoundedJson(
     bytes.set(chunk, offset);
     offset += chunk.byteLength;
   }
+  return { ok: true, value: new TextDecoder().decode(bytes) };
+}
+
+export async function readBoundedJson(
+  request: Request,
+  maxBytes = MAX_THREAD_MESSAGE_BODY_BYTES
+): Promise<{ ok: true; value: unknown } | { ok: false; response: Response }> {
+  const body = await readBoundedText(request, maxBytes);
+  if (!body.ok) return body;
+  if (!body.value) return { ok: true, value: {} };
 
   try {
-    return { ok: true, value: JSON.parse(new TextDecoder().decode(bytes)) };
+    return { ok: true, value: JSON.parse(body.value) };
   } catch {
     return {
       ok: false,
