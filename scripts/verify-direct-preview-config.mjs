@@ -24,6 +24,11 @@ const freeTierControls = read('scripts/configure-cloudflare-free-tier.mjs');
 const parentDomainVerifier = read('scripts/verify-parent-domain-routes-v3.mjs');
 const authenticatedWorkspace = read('apps/web/src/AuthenticatedWorkspace.tsx');
 const productionEntry = read('apps/sovereign-worker/src/production-entry.ts');
+const runtimeEntry = read('apps/sovereign-worker/src/entry.ts');
+const honoApp = read('apps/sovereign-worker/src/index.ts');
+const requestBodyLimits = read('apps/sovereign-worker/src/security/request-body.ts');
+const aiCapacity = read('apps/sovereign-worker/src/ai/free-tier-capacity.ts');
+const sovereignWorkspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
 
 const expectedObservability = {
   enabled: true,
@@ -152,6 +157,38 @@ requireAll('text-first release', textRelease, [
 ]);
 requireValue(!textRelease.includes('verify-live-route-cohesion'), 'Text-first release must not invoke live route Browser Rendering');
 requireValue(!textRelease.includes('verify-live-visual-release'), 'Text-first release must not invoke live visual Browser Rendering');
+requireAll('bounded AI message request helper', requestBodyLimits, [
+  'MAX_THREAD_MESSAGE_BODY_BYTES = 64 * 1024',
+  'MAX_THREAD_MESSAGE_CHARACTERS = 12_000',
+  "reader.cancel('request_body_limit_exceeded')",
+  "error: 'sovereign_message_too_large'"
+]);
+requireAll('bounded production message preflight', productionEntry, [
+  "import { readThreadMessageBody } from './security/request-body'",
+  'readThreadMessageBody(request.clone())'
+]);
+requireValue(
+  productionEntry.indexOf('readThreadMessageBody(request.clone())') < productionEntry.indexOf('decideSovereignInputSafety(message)'),
+  'Production must bound the message request before safety, entitlement, or delegated runtime work'
+);
+requireAll('bounded runtime message route', runtimeEntry, [
+  "import { readThreadMessageBody } from './security/request-body'",
+  'readThreadMessageBody(request)'
+]);
+requireAll('bounded Hono message route', honoApp, [
+  "import { readThreadMessageBody } from './security/request-body'",
+  'readThreadMessageBody(context.req.raw)'
+]);
+requireAll('bounded public composer', sovereignWorkspace, [
+  'MAX_COMPOSER_CHARACTERS = 10_000',
+  'MAX_THREAD_MESSAGE_CHARACTERS = 12_000',
+  'maxLength={MAX_COMPOSER_CHARACTERS}'
+]);
+requireAll('Unicode-conservative AI capacity', aiCapacity, [
+  'CONSERVATIVE_BYTES_PER_TOKEN = 1',
+  'new TextEncoder().encode(serialized).byteLength'
+]);
+
 requireAll('single-deploy implementation', deployV3, [
   'WORKERS_CI_COMMIT_SHA',
   "runWrangler(['deploy', '--config', generatedConfigPath])",
