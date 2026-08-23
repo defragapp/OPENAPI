@@ -1,7 +1,7 @@
 export const DEFAULT_DAILY_NEURON_BUDGET = 7_500;
 const INPUT_NEURONS_PER_MILLION_TOKENS = 5_500;
 const OUTPUT_NEURONS_PER_MILLION_TOKENS = 36_400;
-const CONSERVATIVE_CHARACTERS_PER_TOKEN = 2;
+const CONSERVATIVE_BYTES_PER_TOKEN = 1;
 
 export function resolveWorkersAiDailyNeuronBudget(configured: string | undefined): number {
   const value = configured?.trim();
@@ -29,7 +29,8 @@ export interface WorkersAiCapacityReservation {
 
 export function estimateWorkersAiNeurons(input: unknown): number {
   const serialized = typeof input === 'string' ? input : JSON.stringify(input ?? '');
-  const inputTokens = Math.max(1, Math.ceil(serialized.length / CONSERVATIVE_CHARACTERS_PER_TOKEN));
+  const inputBytes = new TextEncoder().encode(serialized).byteLength;
+  const inputTokens = Math.max(1, Math.ceil(inputBytes / CONSERVATIVE_BYTES_PER_TOKEN));
   const record = input && typeof input === 'object' && !Array.isArray(input) ? input as Record<string, unknown> : {};
   const configuredOutput = Number(record.max_completion_tokens ?? record.max_output_tokens ?? 0);
   const outputTokens = Number.isFinite(configuredOutput) && configuredOutput > 0
