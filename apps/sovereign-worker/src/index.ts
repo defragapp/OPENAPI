@@ -22,7 +22,7 @@ import { runDueJobs, runOneJob } from './jobs';
 import { applyBiblicalLens, assertCovenantSafe, retrieveScripture } from './covenant/scripture';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 
-export const MAX_API_REQUEST_BODY_BYTES = 256 * 1024;
+export const MAX_API_REQUEST_BODY_BYTES = 1024 * 1024;
 
 const app = new Hono<{ Bindings: Env }>();
 
