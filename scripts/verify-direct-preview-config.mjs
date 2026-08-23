@@ -156,6 +156,11 @@ requireAll('single-deploy implementation', deployV3, [
   'WORKERS_CI_COMMIT_SHA',
   "runWrangler(['deploy', '--config', generatedConfigPath])",
   'configureCloudflareFreeTier',
+  "controls?.gateway?.management !== 'verified'",
+  'AI Gateway launch rate/spend controls are not management-verified',
+  "controls.gateway.rateLimit !== '500/60s'",
+  'sovereign_global_daily_spend',
+  'sovereign_global_30_day_spend',
   'applyMigrations = true',
   'if (applyMigrations)',
   'applyD1Migrations'
