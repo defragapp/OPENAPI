@@ -94,6 +94,12 @@ Sovereign reserves conservatively below the account-level Workers AI allocation.
 
 A failed generation also releases the user’s monthly reservation where the current product contract requires it.
 
+## AI request boundary
+
+The public composer accepts at most 10,000 characters. The Worker independently enforces a 64 KiB JSON-body ceiling while streaming and a 12,000-character normalized-message ceiling on every thread-message route. The production preflight applies the same bounded parser before safety, entitlement, database, Durable Object, or model work. Requests above either server limit receive a controlled `413` response and are not delegated to inference.
+
+Neuron reservation estimates use serialized UTF-8 byte length with a conservative one-byte-per-token upper bound. This prevents non-ASCII input from receiving a smaller reservation than its encoded payload warrants. The output reservation still uses the requested maximum or the guarded 3,200-token default.
+
 ## Monthly account allowances
 
 - Free: 10 Sovereign turns per UTC month.
