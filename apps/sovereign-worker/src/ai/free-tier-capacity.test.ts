@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { estimateWorkersAiNeurons, releaseWorkersAiCapacity, reserveWorkersAiCapacity } from './free-tier-capacity';
+import {
+  DEFAULT_DAILY_NEURON_BUDGET,
+  estimateWorkersAiNeurons,
+  releaseWorkersAiCapacity,
+  reserveWorkersAiCapacity,
+  resolveWorkersAiDailyNeuronBudget
+} from './free-tier-capacity';
 
 function capacityDb(row: { reserved_neurons: number; request_count: number } | null) {
   const run = vi.fn(async () => ({ success: true }));
@@ -10,6 +16,13 @@ function capacityDb(row: { reserved_neurons: number; request_count: number } | n
 }
 
 describe('Workers AI Free capacity', () => {
+  it('uses the safe default and validates explicit paid capacity', () => {
+    expect(resolveWorkersAiDailyNeuronBudget(undefined)).toBe(DEFAULT_DAILY_NEURON_BUDGET);
+    expect(resolveWorkersAiDailyNeuronBudget('25000000')).toBe(25_000_000);
+    expect(() => resolveWorkersAiDailyNeuronBudget('7500.5')).toThrow(/whole number/);
+    expect(() => resolveWorkersAiDailyNeuronBudget('7499')).toThrow(/at least/);
+  });
+
   it('reserves conservatively from input and maximum output size', () => {
     const small = estimateWorkersAiNeurons({ messages: [{ role: 'user', content: 'hello' }], max_completion_tokens: 100 });
     const large = estimateWorkersAiNeurons({ messages: [{ role: 'user', content: 'x'.repeat(20_000) }], max_completion_tokens: 6_000 });
@@ -28,6 +41,18 @@ describe('Workers AI Free capacity', () => {
     );
     expect(reservation).toMatchObject({ usageDay: '2026-07-30', totalReservedNeurons: 500, requestCount: 3 });
     expect(bind).toHaveBeenCalledWith('2026-07-30', reservation?.reservedNeurons, 7_500);
+  });
+
+  it('passes an explicit paid capacity budget to the atomic reservation', async () => {
+    const { db, bind } = capacityDb({ reserved_neurons: 500, request_count: 3 });
+    await reserveWorkersAiCapacity(
+      db,
+      '@cf/zai-org/glm-4.7-flash',
+      { messages: [{ role: 'user', content: 'hello' }], max_completion_tokens: 100 },
+      new Date('2026-07-30T23:30:00Z'),
+      '25000000'
+    );
+    expect(bind).toHaveBeenCalledWith('2026-07-30', expect.any(Number), 25_000_000);
   });
 
   it('fails closed before Cloudflare reaches its daily free allocation', async () => {
