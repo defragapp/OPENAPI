@@ -90,7 +90,7 @@ The current product is text-first; no video-provider budget or generated-media p
 
 Migration `0013_workers_ai_free_capacity` creates the D1 ledger `workers_ai_daily_capacity`.
 
-Sovereign reserves conservatively below the account-level Workers AI allocation. Before a hosted-model call, the Worker atomically reserves estimated capacity. Source-level model failure releases the reservation. If internal capacity is unavailable, Sovereign returns a controlled capacity response and does not guess or save an invented answer.
+Sovereign reserves conservatively below the account-level Workers AI allocation. Production is configured for `250,000` neurons per UTC day, while the fail-closed runtime default remains `7,500` when the variable is absent or invalid. At the current Workers AI neuron price, the configured ceiling is approximately `$2.64/day` after the included daily allocation, before any applicable taxes or plan fees. Before a hosted-model call, the Worker atomically reserves estimated capacity. Source-level model failure releases the reservation. If internal capacity is unavailable, Sovereign returns a controlled capacity response and does not guess or save an invented answer.
 
 A failed generation also releases the user’s monthly reservation where the current product contract requires it.
 
@@ -105,11 +105,13 @@ Monthly plan access is server-derived. The browser cannot self-declare Sovereign
 
 The production control script verifies the existing `sovereign-ai-gateway` configuration, including:
 
-- bounded account-wide rate limiting;
+- account-wide rate limiting at `500 requests / 60 seconds` with a sliding window;
+- a `$2.75` rolling 24-hour spend rule;
+- a `$75` rolling 30-day spend rule;
 - cache TTL zero for the configured path;
 - persistent request-content logging disabled.
 
-No paid video-model spend guard is required for the current launch because video generation is not activated.
+Gateway spend enforcement is eventually consistent, so the atomic D1 neuron ledger remains the strict primary cost ceiling during concurrent bursts. Gateway rules are defense in depth and return `429` after their tracked window reaches the configured amount. No paid video-model spend guard is required for the current launch because video generation is not activated.
 
 ## Zone rate limiting
 
