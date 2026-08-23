@@ -32,6 +32,7 @@ const sovereignWorkspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx
 const launchSaturation = read('scripts/launch-saturation.mjs');
 const launchSaturationDoc = read('docs/launch-saturation-runbook.md');
 const ownerActions = read('docs/release/OWNER_ACTIONS.md');
+const stripeWebhook = read('apps/sovereign-worker/src/routes/stripe.ts');
 
 const expectedObservability = {
   enabled: true,
@@ -166,6 +167,18 @@ requireAll('bounded AI message request helper', requestBodyLimits, [
   "reader.cancel('request_body_limit_exceeded')",
   "error: 'sovereign_message_too_large'"
 ]);
+requireAll('bounded public Stripe webhook', stripeWebhook, [
+  'MAX_STRIPE_WEBHOOK_BODY_BYTES = 512 * 1024',
+  'readBoundedText(',
+  "new Response('Payload too large'",
+  'if (!boundedBody.ok) return boundedBody.response',
+  'verifyStripeSignature({ body, header: signature'
+]);
+requireValue(
+  stripeWebhook.indexOf('readBoundedText(') < stripeWebhook.indexOf('verifyStripeSignature({ body, header: signature'),
+  'Stripe webhook must bound the raw body before signature or database work'
+);
+
 requireAll('bounded production message preflight', productionEntry, [
   "import { readThreadMessageBody } from './security/request-body'",
   'readThreadMessageBody(request.clone())'
