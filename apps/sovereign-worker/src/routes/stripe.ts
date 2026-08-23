@@ -2,6 +2,9 @@ import type { Env } from '../env';
 import { priceToSubscription, projectSubscriptionEvent, type NormalizedStripeEvent } from '../billing/stripe';
 import { notifyBillingLifecycle, type BillingNotificationKind } from '../billing/notifications';
 import { verifyStripeSignature } from '../security/stripe-signature';
+import { readBoundedText } from '../security/request-body';
+
+export const MAX_STRIPE_WEBHOOK_BODY_BYTES = 512 * 1024;
 
 interface StripeEvent {
   id: string;
@@ -86,7 +89,16 @@ function notificationKind(event: NormalizedStripeEvent): BillingNotificationKind
 }
 
 export async function handleStripeWebhook(request: Request, env: Env): Promise<Response> {
-  const body = await request.text();
+  const boundedBody = await readBoundedText(
+    request,
+    MAX_STRIPE_WEBHOOK_BODY_BYTES,
+    new Response('Payload too large', {
+      status: 413,
+      headers: { 'cache-control': 'private, no-store' }
+    })
+  );
+  if (!boundedBody.ok) return boundedBody.response;
+  const body = boundedBody.value;
   const signature = request.headers.get('stripe-signature') ?? '';
   const valid = await verifyStripeSignature({ body, header: signature, secret: env.STRIPE_WEBHOOK_SECRET });
   if (!valid) return new Response('Invalid signature', { status: 400 });
