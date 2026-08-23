@@ -9,7 +9,7 @@
     "build": "pnpm -r --filter './packages/*' build && pnpm --filter @sovereign/web build && pnpm --filter @sovereign/worker build",
     "dev": "pnpm --parallel --filter './apps/*' dev",
     "lint": "pnpm -r lint",
-    "test": "node scripts/verify-live-route-cohesion-v2.mjs --self-test && node scripts/verify-release-report-delivery.mjs && node scripts/write-cloudflare-release-progress.mjs --self-test && pnpm exec vitest run scripts/__tests__/release-evidence-lib.test.mjs scripts/__tests__/release-orchestrator.test.mjs scripts/__tests__/configure-cloudflare-free-tier.test.mjs && pnpm -r test",
+    "test": "node scripts/launch-saturation.mjs --self-test && node scripts/verify-live-route-cohesion-v2.mjs --self-test && node scripts/verify-release-report-delivery.mjs && node scripts/write-cloudflare-release-progress.mjs --self-test && pnpm exec vitest run scripts/__tests__/release-evidence-lib.test.mjs scripts/__tests__/release-orchestrator.test.mjs scripts/__tests__/configure-cloudflare-free-tier.test.mjs && pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "verify:foundation": "node scripts/verify-foundation.mjs",
     "verify:migrations": "node scripts/validate-migrations.mjs",
@@ -46,7 +46,9 @@
     "smoke:baseline": "node --import tsx scripts/baseline-smoke.ts",
     "smoke:jobs": "node --import tsx scripts/jobs-smoke.ts",
     "verify:release-config": "node scripts/verify-direct-preview-config.mjs",
-    "smoke:release-closure": "node --import tsx scripts/release-closure-smoke.ts"
+    "smoke:release-closure": "node --import tsx scripts/release-closure-smoke.ts",
+    "test:launch-saturation": "node scripts/launch-saturation.mjs --self-test",
+    "saturation:canary": "node scripts/launch-saturation.mjs"
   },
   "devDependencies": {
     "@types/node": "22.12.0",
