@@ -2,6 +2,7 @@ import app, { ThreadCoordinator, queue as queueHandler, scheduled as scheduledHa
 import type { Env } from './env';
 import { requireAuth, requireSameOrigin } from './security/auth';
 import { withSecurityHeaders } from './security/headers';
+import { readThreadMessageBody } from './security/request-body';
 import { decideInviteeConsent, listInviteeInvitations, previewInvitation, redeemInvitation, sendInvitation } from './invitation-service';
 import { addConsentedSystemMember, buildPairComparison, buildSystemAnalysis } from './relational-context';
 import { createPerson, removePerson } from './db/people';
@@ -251,9 +252,9 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
   requireSameOrigin(request);
   const auth = await requireAuth(request, env);
   await requireCompletedBaseline(env, auth.accountId);
-  const body = await request.json().catch(() => ({})) as { message?: string; context?: unknown };
-  const message = body.message?.trim();
-  if (!message) return Response.json({ error: 'Message required' }, { status: 400 });
+  const parsed = await readThreadMessageBody(request);
+  if (!parsed.ok) return parsed.response;
+  const { body, message } = parsed;
   const safetyDecision = decideSovereignInputSafety(message);
   const idempotencyKey = request.headers.get('x-idempotency-key');
   if (!idempotencyKey) return Response.json({ error: 'Idempotency key required' }, { status: 400 });
