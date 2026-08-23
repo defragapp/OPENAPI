@@ -1238,19 +1238,14 @@ function SystemAnswer({ sections, expressionFieldContext }: { sections: Sovereig
 }
 
 function userFacingApiError(status: number) {
-  if (status === 403) return 'This action is not available for this account.';
-  if (status === 404) return 'That item is no longer available.';
-  if (status === 409) return 'That changed before the request completed. Refresh and try again.';
-  if (status === 429) return 'Too many requests. Wait a moment and try again.';
-  if (status >= 500) return 'Sovereign.OS is temporarily unavailable. Try again in a moment.';
+  if (status >= 500) return 'Sovereign is temporarily unavailable.';
   return 'That request could not be completed.';
 }
 
 function userFacingSovereignError(status: number) {
-  if (status === 403) return 'This request is not available with your current access.';
-  if (status === 429) return 'Sovereign is at capacity right now. Try again in a moment.';
-  if (status >= 500) return 'Sovereign.OS could not complete that request. Try again in a moment.';
-  return 'Sovereign could not complete this response. Check your question and try again.';
+  if (status === 429) return 'Sovereign has reached today’s shared free AI capacity. Your workspace and saved understanding remain available.';
+  if (status >= 500) return 'Sovereign is temporarily unavailable.';
+  return 'Sovereign could not complete this response.';
 }
 
 function CovenantAnswer({ sections }: { sections: SovereignAnswer['sections'] }) {
