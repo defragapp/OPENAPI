@@ -3,6 +3,7 @@ import {
   MAX_THREAD_MESSAGE_BODY_BYTES,
   MAX_THREAD_MESSAGE_CHARACTERS,
   readBoundedJson,
+  readBoundedText,
   readThreadMessageBody
 } from './request-body';
 
@@ -53,6 +54,16 @@ describe('bounded thread message requests', () => {
     const result = await readBoundedJson(request);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.response.status).toBe(413);
+  });
+
+  it('preserves raw text bytes for signature-sensitive handlers', async () => {
+    const raw = '{\n  "id": "evt_raw", "data": {"object": {}}\n}';
+    const result = await readBoundedText(new Request('https://app.defrag.app/api/v1/stripe/webhook', {
+      method: 'POST',
+      body: raw
+    }), 1024);
+
+    expect(result).toEqual({ ok: true, value: raw });
   });
 
   it('rejects invalid JSON without throwing', async () => {
