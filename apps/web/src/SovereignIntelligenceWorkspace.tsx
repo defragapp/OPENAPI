@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent, KeyboardEvent, ReactNode } from 'react';
 import { ThreadExpressionField } from './expression-field/ThreadExpressionField';
 import { WorkspaceExpressionField } from './expression-field/WorkspaceExpressionField';
@@ -139,7 +139,6 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
   const [status, setStatus] = useState('Loading Sovereign.OS…');
   const [restoreError, setRestoreError] = useState('');
   const [apiState, setApiState] = useState<ApiState>('loading');
-  const responseProgressTimer = useRef<number | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceState>({
     today: null,
     people: [],
@@ -166,9 +165,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       ? await response.json().catch(() => ({}))
       : await response.text();
     if (!response.ok) {
-      const problem = typeof body === 'object' && body ? body as Json : {};
-      const textMessage = typeof body === 'string' ? body.trim() : '';
-      throw new Error(problem.message || problem.error || textMessage || 'That request could not be completed.');
+      throw new Error(userFacingApiError(response.status));
     }
     return body as Json;
   }
@@ -234,7 +231,6 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     return () => window.clearInterval(timer);
   }, [surface, composerFocused, draft]);
 
-  useEffect(() => () => clearResponseProgress(), []);
 
   const selectedPersonRecord = useMemo(
     () => workspace.people.find((person) => person.id === selectedPerson) ?? null,
@@ -255,32 +251,10 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     && workspace.today?.baseline?.facetProfileStatus === 'ready';
   const surfaceEntitled = !missingSurfaceEntitlement(surface, workspace.billing);
 
-  function clearResponseProgress() {
-    if (responseProgressTimer.current) window.clearInterval(responseProgressTimer.current);
-    responseProgressTimer.current = null;
-  }
-
   function beginResponseProgress(assistantId: string) {
-    clearResponseProgress();
-    const phases = [
-      'Connecting your Baseline',
-      workspace.today?.current?.status === 'ready' ? 'Checking what may be more relevant now' : 'Looking at the pattern',
-      'Connecting the situation',
-      'Preparing your answer'
-    ];
-    let phase = 0;
-    const show = () => {
-      const next = phases[Math.min(phase, phases.length - 1)]!;
-      setStatus(next);
-      setMessages((current) => current.map((item) => item.id === assistantId ? { ...item, text: next } : item));
-    };
-    show();
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    responseProgressTimer.current = window.setInterval(() => {
-      if (phase >= phases.length - 1) return clearResponseProgress();
-      phase += 1;
-      show();
-    }, 1_200);
+    const message = 'Preparing your answer…';
+    setStatus(message);
+    setMessages((current) => current.map((item) => item.id === assistantId ? { ...item, text: message } : item));
   }
 
   function startNewThread(nextSurface: Surface = surface) {
@@ -304,12 +278,9 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     setRestoreError('');
     setBaselineExperience('idle');
     setBaselineReveal(null);
-    if (next !== surface && (messages.length || draft.trim())) startNewThread(next);
-    else {
-      setSurface(next);
-      if (next !== 'People') setSelectedPerson('');
-      if (next !== 'Systems') setSelectedSystem('');
-    }
+    setSurface(next);
+    if (next !== 'People') setSelectedPerson('');
+    if (next !== 'Systems') setSelectedSystem('');
     setContextOpen(false);
     setMenuOpen(false);
   }
@@ -408,7 +379,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     };
     const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', text: clean, context: messageContext };
     const assistantId = crypto.randomUUID();
-    setMessages((current) => [...current, userMessage, { id: assistantId, role: 'assistant', text: 'Connecting your Baseline', context: messageContext }]);
+    setMessages((current) => [...current, userMessage, { id: assistantId, role: 'assistant', text: 'Preparing your answer…', context: messageContext }]);
     setDraft('');
     setApiState('loading');
     beginResponseProgress(assistantId);
@@ -428,9 +399,8 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       }
       const payload = await response.json().catch(() => ({})) as Json;
       if (!response.ok || !isSovereignAnswer(payload.answer)) {
-        throw new Error(payload.message || payload.error || 'Sovereign is temporarily unavailable.');
+        throw new Error(userFacingSovereignError(response.status));
       }
-      clearResponseProgress();
       setMessages((current) => current.map((item) => item.id === assistantId
         ? {
             ...item,
@@ -446,7 +416,6 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       const threadData = await api('/api/v1/threads');
       setWorkspace((current) => ({ ...current, threads: threadData.threads ?? [] }));
     } catch (error) {
-      clearResponseProgress();
       setApiState('error');
       setMessages((current) => current.map((item) => item.id === assistantId
         ? { ...item, text: error instanceof Error ? error.message : 'Sovereign could not complete this response.' }
@@ -1266,6 +1235,22 @@ function SystemAnswer({ sections, expressionFieldContext }: { sections: Sovereig
       {sections.map((section) => <article key={`${section.id}-${section.label}`}><span>{section.label}</span><p>{section.body}</p></article>)}
     </section>
   );
+}
+
+function userFacingApiError(status: number) {
+  if (status === 403) return 'This action is not available for this account.';
+  if (status === 404) return 'That item is no longer available.';
+  if (status === 409) return 'That changed before the request completed. Refresh and try again.';
+  if (status === 429) return 'Too many requests. Wait a moment and try again.';
+  if (status >= 500) return 'Sovereign.OS is temporarily unavailable. Try again in a moment.';
+  return 'That request could not be completed.';
+}
+
+function userFacingSovereignError(status: number) {
+  if (status === 403) return 'This request is not available with your current access.';
+  if (status === 429) return 'Sovereign is at capacity right now. Try again in a moment.';
+  if (status >= 500) return 'Sovereign.OS could not complete that request. Try again in a moment.';
+  return 'Sovereign could not complete this response. Check your question and try again.';
 }
 
 function CovenantAnswer({ sections }: { sections: SovereignAnswer['sections'] }) {
