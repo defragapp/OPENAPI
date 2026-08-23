@@ -60,6 +60,7 @@ requireValue(rootConfig.vars?.APP_ENV === 'production', 'Production APP_ENV drif
 requireValue(rootConfig.vars?.AI_PROVIDER === 'cloudflare-gateway', 'Production AI provider drifted');
 requireValue(rootConfig.vars?.AI_MODEL === expectedModel, 'Production AI model drifted');
 requireValue(rootConfig.vars?.AI_GATEWAY_ID === expectedGatewayId, 'Production AI Gateway drifted');
+requireValue(rootConfig.vars?.WORKERS_AI_DAILY_NEURON_BUDGET === '250000', 'Production Workers AI daily budget drifted');
 requireValue(rootConfig.vars?.PUBLIC_CONTACT_EMAIL === 'info@defrag.app', 'Production public contact drifted');
 requireValue(rootConfig.vars?.WORLDS_VIDEO_ENABLED === 'false', 'Worlds video must remain disabled for the text-first launch');
 requireValue(rootConfig.d1_databases?.some((item) => item.binding === 'DB' && item.database_name === 'sovereign-openapi-db'), 'Production D1 binding drifted');
@@ -176,7 +177,10 @@ requireAll('release evidence provenance', releaseEvidence, [
 
 requireAll('Cloudflare controls', freeTierControls, [
   "read_replication: { mode: 'auto' }",
-  'rate_limiting_limit: 50',
+  'rate_limiting_limit: AI_GATEWAY_RATE_LIMIT',
+  'AI_GATEWAY_DAILY_SPEND_LIMIT_USD = 2.75',
+  'AI_GATEWAY_30_DAY_SPEND_LIMIT_USD = 75',
+  'spend_limits: expectedAiGatewaySpendLimits()',
   'collect_logs: false',
   'schema_validation/schemas',
   'sovereign_ai_messages_free_tier'
