@@ -3,6 +3,7 @@ import type { Env } from './env';
 import { ThreadCoordinator } from './durable/ThreadCoordinator';
 import { requireAuth, requireSameOrigin } from './security/auth';
 import { withSecurityHeaders } from './security/headers';
+import { readThreadMessageBody } from './security/request-body';
 import { getEntitlements, requireFeature } from './db/entitlements';
 import { ensureThread, appendThreadEvent, listThreadMessages, listThreads, recordCorrection, setThreadCovenant, touchThread } from './db/threads';
 import { getTurn, startTurn, updateTurnStatus } from './db/turns';
@@ -467,17 +468,18 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
   await requireCompletedBaseline(context.env, auth.accountId);
-  const body = await context.req.json<{
-    message?: string;
+  const parsed = await readThreadMessageBody(context.req.raw);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body as {
+    message: string;
     context?: {
       surface?: string;
       personId?: string;
       systemId?: string;
       covenantEnabled?: boolean;
     };
-  }>();
-  const message = body.message?.trim();
-  if (!message) return context.json({ error: 'Message required' }, 400);
+  };
+  const { message } = parsed;
 
   const idempotencyKey = context.req.header('x-idempotency-key');
   if (!idempotencyKey) return context.json({ error: 'Idempotency key required' }, 400);
