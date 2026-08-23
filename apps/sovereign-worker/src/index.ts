@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { bodyLimit } from 'hono/body-limit';
 import type { Env } from './env';
 import { ThreadCoordinator } from './durable/ThreadCoordinator';
 import { requireAuth, requireSameOrigin } from './security/auth';
@@ -21,12 +22,24 @@ import { runDueJobs, runOneJob } from './jobs';
 import { applyBiblicalLens, assertCovenantSafe, retrieveScripture } from './covenant/scripture';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 
+export const MAX_API_REQUEST_BODY_BYTES = 256 * 1024;
+
 const app = new Hono<{ Bindings: Env }>();
 
 app.use('*', async (context, next) => {
   await next();
   context.res = withSecurityHeaders(context.res);
 });
+
+app.use('/api/*', bodyLimit({
+  maxSize: MAX_API_REQUEST_BODY_BYTES,
+  onError: (context) => context.json({
+    error: 'request_body_too_large',
+    message: 'Request body is too large.'
+  }, 413, {
+    'cache-control': 'private, no-store'
+  })
+}));
 
 async function healthPayload(env: Env) {
   const db = await env.DB.prepare(`SELECT 1 AS ok,
