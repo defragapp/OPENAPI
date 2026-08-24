@@ -10,8 +10,8 @@ export function resolveWorkersAiDailyNeuronBudget(configured: string | undefined
     throw new Error('WORKERS_AI_DAILY_NEURON_BUDGET must be a whole number');
   }
   const budget = Number(value);
-  if (!Number.isSafeInteger(budget) || budget < DEFAULT_DAILY_NEURON_BUDGET) {
-    throw new Error(`WORKERS_AI_DAILY_NEURON_BUDGET must be at least ${DEFAULT_DAILY_NEURON_BUDGET}`);
+  if (!Number.isSafeInteger(budget) || budget < 1 || budget > DEFAULT_DAILY_NEURON_BUDGET) {
+    throw new Error(`WORKERS_AI_DAILY_NEURON_BUDGET must be between 1 and ${DEFAULT_DAILY_NEURON_BUDGET} for the Cloudflare Free launch`);
   }
   return budget;
 }
