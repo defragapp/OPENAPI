@@ -90,9 +90,9 @@ The current product is text-first; no video-provider budget or generated-media p
 
 Migration `0013_workers_ai_free_capacity` creates the D1 ledger `workers_ai_daily_capacity`.
 
-Sovereign reserves conservatively below the account-level Workers AI allocation. Production is configured for `250,000` neurons per UTC day, while the fail-closed runtime default remains `7,500` when the variable is absent or invalid. At the current Workers AI neuron price, the configured ceiling is approximately `$2.64/day` after the included daily allocation, before any applicable taxes or plan fees. Before a hosted-model call, the Worker atomically reserves estimated capacity. Source-level model failure releases the reservation. If internal capacity is unavailable, Sovereign returns a controlled capacity response and does not guess or save an invented answer.
+Sovereign deliberately remains below Cloudflare Workers AI's Free daily allocation. Production is configured for `7,500` neurons per UTC day. The runtime default is also `7,500`, accepts a deliberately lower value for controlled canary testing, and rejects any configured value above `7,500`. Before a hosted-model call, the Worker atomically reserves estimated capacity. Source-level model failure releases the reservation. If internal capacity is unavailable, Sovereign returns a controlled `429 sovereign_free_capacity_reached` response and does not guess or save an invented answer.
 
-A failed generation also releases the user’s monthly reservation where the current product contract requires it.
+This Free launch contract has no Workers AI overage path: provider capacity beyond the Free allocation is not purchased or assumed. The 7,500-neuron application ceiling preserves headroom beneath the provider's 10,000-neuron Free limit so the application-owned ledger should fail closed first. A failed generation also releases the user’s monthly reservation where the current product contract requires it.
 
 ## Public API request boundary
 
@@ -124,12 +124,12 @@ Monthly plan access is server-derived. The browser cannot self-declare Sovereign
 The production control script verifies the existing `sovereign-ai-gateway` configuration, including:
 
 - account-wide rate limiting at `500 requests / 60 seconds` with a sliding window;
-- a `$2.75` rolling 24-hour spend rule;
-- a `$75` rolling 30-day spend rule;
 - cache TTL zero for the configured path;
 - persistent request-content logging disabled.
 
-Gateway spend enforcement is eventually consistent, so the atomic D1 neuron ledger remains the strict primary cost ceiling during concurrent bursts. Gateway rules are defense in depth and return `429` after their tracked window reaches the configured amount. No paid video-model spend guard is required for the current launch because video generation is not activated.
+Dollar spend rules are not a Workers AI Free launch requirement because the Free Workers AI allocation has no overage billing path. If a future owner-approved change introduces BYOK inference, Workers Paid, Unified Billing, or prepaid AI capacity, dollar spend limits must be designed and verified as part of that separate paid-provider change before activation.
+
+The atomic D1 neuron ledger remains the strict application-owned capacity ceiling during concurrent bursts. No paid video-model spend guard is required for the current launch because video generation is not activated.
 
 ## Zone rate limiting
 
