@@ -20,8 +20,23 @@ const previewHostname = previewBaseUrl ? new URL(previewBaseUrl).hostname : '';
 const env = { ...process.env };
 const APPROVED_AI_PROVIDER = 'cloudflare-gateway';
 const APPROVED_AI_MODEL = '@cf/zai-org/glm-4.7-flash';
+const FREE_AI_NEURON_CEILING = 7_500;
 const CAPACITY_LEDGER_MIGRATION = '0013_workers_ai_free_capacity';
 const CURRENT_MIGRATION_TARGET = '0017_privacy_access_and_eligibility';
+
+function resolvePreviewNeuronBudget(value) {
+  const raw = String(value || FREE_AI_NEURON_CEILING).trim();
+  if (!/^\d+$/.test(raw)) {
+    throw new Error('Preview WORKERS_AI_DAILY_NEURON_BUDGET must be a whole number');
+  }
+  const budget = Number(raw);
+  if (!Number.isSafeInteger(budget) || budget < 1 || budget > FREE_AI_NEURON_CEILING) {
+    throw new Error(`Preview WORKERS_AI_DAILY_NEURON_BUDGET must be between 1 and ${FREE_AI_NEURON_CEILING}`);
+  }
+  return String(budget);
+}
+
+const previewNeuronBudget = resolvePreviewNeuronBudget(process.env.WORKERS_AI_DAILY_NEURON_BUDGET);
 
 if (accountId) env.CLOUDFLARE_ACCOUNT_ID = accountId;
 if (token) env.CLOUDFLARE_API_TOKEN = token;
@@ -134,6 +149,7 @@ try {
     AI_PROVIDER: APPROVED_AI_PROVIDER,
     AI_MODEL: APPROVED_AI_MODEL,
     AI_GATEWAY_ID: process.env.AI_GATEWAY_ID || config.env.preview.vars.AI_GATEWAY_ID,
+    WORKERS_AI_DAILY_NEURON_BUDGET: previewNeuronBudget,
     SOVV_INTERNAL_BASE_URL: process.env.SOVV_BASE_URL || '',
     STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY:
       process.env.STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY || '',
@@ -213,7 +229,8 @@ try {
     ai: {
       provider: APPROVED_AI_PROVIDER,
       model: APPROVED_AI_MODEL,
-      gateway: process.env.AI_GATEWAY_ID || config.env.preview.vars.AI_GATEWAY_ID
+      gateway: process.env.AI_GATEWAY_ID || config.env.preview.vars.AI_GATEWAY_ID,
+      dailyNeuronBudget: Number(previewNeuronBudget)
     },
     migrationTarget: CURRENT_MIGRATION_TARGET,
     capacityLedgerMigration: CAPACITY_LEDGER_MIGRATION,
