@@ -21,9 +21,17 @@ A technical release is complete only when both branded readiness endpoints prove
 
 Automated Browser audit fields in release evidence are truthful booleans. They remain `false` when the current text-first release intentionally does not run Browser Rendering.
 
+## Workers AI Free launch posture
+
+Workers AI remains on the Cloudflare Free plan for launch. This is not a provider billing activation task.
+
+Repository authority must keep production at `WORKERS_AI_DAILY_NEURON_BUDGET=7500`, use the Free-compatible `@cf/zai-org/glm-4.7-flash` model, reject any configured neuron ceiling above 7,500, and preserve controlled `429` degradation when the application-owned daily ledger is exhausted. AI Gateway release evidence still requires content logging disabled and the 500 requests / 60 seconds sliding rate limit. Dollar spend rules and Workers Paid/prepaid activation are not launch requirements while inference remains Workers AI Free-only and no BYOK provider traffic is enabled.
+
+Any future decision to enable paid Workers AI, Unified Billing, prepaid credits, or BYOK inference is a separate owner-approved financial/product change and must not be inferred from this launch authority.
+
 ## Current owner-gated launch actions
 
-These actions affect external account authority, billing, legal approval, or human acceptance and cannot be completed truthfully by source changes alone.
+These actions affect external account authority, legal approval, or human acceptance and cannot be completed truthfully by source changes alone.
 
 ### 1. Cloudflare credential containment and replacement
 
@@ -41,22 +49,7 @@ Pass condition:
 
 Follow `docs/security/credential-rotation-runbook.md`. Do not post replacement values in chat, GitHub, screenshots, logs, or documentation.
 
-### 2. Paid Workers AI capacity
-
-Target: the Cloudflare account containing `sovv-web` and AI Gateway `sovereign-ai-gateway`.
-
-Reason: the staged 250,000-neuron application ceiling exceeds the daily included allocation and therefore requires active Workers Paid coverage or an approved prepaid/unified Workers AI capacity arrangement.
-
-Pass condition:
-
-- the applicable paid/prepaid capacity is visibly active;
-- a bounded canary inference succeeds through the intended Gateway;
-- the Gateway is independently re-read at 500 requests per 60 seconds, $2.75 per rolling 24 hours, and $75 per rolling 30 days;
-- the production release credential can perform that read/write/re-read cycle.
-
-Activating or changing paid capacity is a financial transaction and requires the owner to confirm it in the provider account.
-
-### 3. Human product acceptance
+### 2. Human product acceptance
 
 Targets: #214 and the real production journeys in #208, #210, #211, #212, #213, and #230.
 
@@ -64,7 +57,7 @@ Reason: desktop, iPhone/Safari/PWA, real account, email, billing, consent, relat
 
 Pass condition: each launch-required lane contains real PASS/FAIL evidence for the exact final candidate and #216 contains no unresolved P0/P1 defect.
 
-### 4. Terms, Privacy, and launch-market approval
+### 3. Terms, Privacy, and launch-market approval
 
 Target: #225.
 
@@ -72,7 +65,7 @@ Reason: contracting entity, governing terms, recurring-subscription obligations,
 
 Pass condition: approved Terms/Privacy and any implementation consequences are reflected deliberately in the versioned policy authority; #225 is closed and #216 no longer reports `OWNER-LEGAL-ACTION`.
 
-### 5. General public Access cutover
+### 4. General public Access cutover
 
 Target: the account-wide Cloudflare Access policy protecting Sovereign.OS.
 
