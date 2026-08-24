@@ -17,7 +17,7 @@ Current runtime configuration:
 ```text
 AI_PROVIDER=cloudflare-gateway
 AI_GATEWAY_ID=sovereign-ai-gateway
-WORKERS_AI_DAILY_NEURON_BUDGET=250000
+WORKERS_AI_DAILY_NEURON_BUDGET=7500
 AI_MODEL=@cf/zai-org/glm-4.7-flash
 AI_FREE_MONTHLY_TURNS=10
 AI_SOVEREIGN_PLUS_MONTHLY_TURNS=300
@@ -53,11 +53,13 @@ Stripe subscription webhooks project effective Free/Sovereign+ state into D1. Be
 - Free: 10 turns per UTC month.
 - Sovereign+: 300 turns per UTC month.
 
-The Workers AI adapter also reserves conservative daily capacity in D1 before each hosted-model call. `WORKERS_AI_DAILY_NEURON_BUDGET=250000` is the initial guarded public-launch ceiling. At current Cloudflare pricing, fully exhausting this application ceiling costs at most $2.64 per day after the daily free allocation; it must be paired with AI Gateway daily and monthly spend limits. It is a maximum reservation boundary, not a demand target or proof of provider capacity, and it should be raised only after measured utilization, quality, and billing evidence. Production activation still requires active Workers Paid coverage. When the binding is absent, the Worker retains the safe 7,500-neuron development/default ceiling. Invalid or lower configured values fail closed. If the active daily budget is exhausted, Sovereign returns a controlled unavailable/capacity response rather than inventing an answer.
+The Workers AI adapter also reserves conservative daily capacity in D1 before each hosted-model call. `WORKERS_AI_DAILY_NEURON_BUDGET=7500` is the Free-only public-launch ceiling. It deliberately stays below Cloudflare Workers AI's 10,000-neuron daily Free allocation and has no paid overage assumption. The runtime accepts a lower value for isolated canary testing but rejects any configured ceiling above 7,500. If the active daily budget is exhausted, Sovereign returns a controlled `429 sovereign_free_capacity_reached` response rather than inventing an answer.
 
 A source-level model failure releases the daily reservation and refunds the user’s monthly turn where the current contract requires it.
 
 Public questions are bounded before inference work: 10,000 characters in the composer, 64 KiB for the streamed JSON request, and 12,000 normalized message characters at the Worker. Production applies this parser before safety, entitlement, database, Durable Object, or model work. Capacity estimation uses serialized UTF-8 bytes at a conservative one-byte-per-token upper bound so unusual Unicode cannot reduce the reservation.
+
+AI Gateway remains defense in depth for privacy and burst control: persistent content logging must be disabled and the launch rate limit must remain 500 requests per 60 seconds using a sliding window. Dollar spend rules are not required for this Workers AI Free-only path. Any future BYOK, Workers Paid, prepaid, or Unified Billing path requires separate owner approval and a new cost-control review before activation.
 
 Migration `0013_workers_ai_free_capacity` introduced the global capacity ledger. Release-evidence tables were introduced by `0015_release_evidence`. **Current production schema parity is `0017_privacy_access_and_eligibility`.** Readiness requires the current migration plus release evidence, policy receipt, and privacy-access dependencies.
 
