@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Env } from '../env';
-import { handleStripeWebhook } from './stripe';
+import { handleStripeWebhook, MAX_STRIPE_WEBHOOK_BODY_BYTES } from './stripe';
 
 async function signature(body: string, secret: string, timestamp: number): Promise<string> {
   const key = await crypto.subtle.importKey(
@@ -77,6 +77,22 @@ function webhookEnv() {
 }
 
 describe('Stripe webhook delivery recovery', () => {
+  it('rejects an oversized public body before signature or database work', async () => {
+    const fixture = webhookEnv();
+    const response = await handleStripeWebhook(new Request('https://app.defrag.app/api/v1/stripe/webhook', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'content-length': String(MAX_STRIPE_WEBHOOK_BODY_BYTES + 1)
+      },
+      body: '{}'
+    }), fixture.env);
+
+    expect(response.status).toBe(413);
+    await expect(response.text()).resolves.toBe('Payload too large');
+    expect(fixture.writes).toEqual([]);
+  });
+
   it('reprocesses a previously failed signed delivery and only deduplicates after success', async () => {
     const fixture = webhookEnv();
     const event = {

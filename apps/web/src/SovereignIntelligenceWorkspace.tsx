@@ -110,6 +110,8 @@ const surfaces: Array<{ name: Surface; label: string; description: string }> = [
 ];
 
 const expressionAxisIdSet = new Set<string>(expressionAxisIds);
+const MAX_COMPOSER_CHARACTERS = 10_000;
+const MAX_THREAD_MESSAGE_CHARACTERS = 12_000;
 
 const composerExamples: Record<Surface, string[]> = {
   Today: ['What feels different today?', 'What still feels steady underneath it?'],
@@ -395,6 +397,11 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
   async function sendMessage(message: string, covenantForTurn = false) {
     const clean = message.trim();
     if (!clean || apiState === 'loading') return;
+    if (clean.length > MAX_THREAD_MESSAGE_CHARACTERS) {
+      setApiState('error');
+      setStatus('Keep your question to 12,000 characters or fewer.');
+      return;
+    }
     if (!baselineReady) {
       setApiState('error');
       setStatus('Finish your Baseline before asking Sovereign a question.');
@@ -625,6 +632,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
                 onFocus={() => setComposerFocused(true)}
                 onBlur={() => setComposerFocused(false)}
                 placeholder={composerPlaceholder(surface)}
+                maxLength={MAX_COMPOSER_CHARACTERS}
                 rows={2}
                 aria-label={`Message Sovereign from ${surface}`}
                 onKeyDown={(event) => {

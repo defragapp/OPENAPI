@@ -21,7 +21,13 @@ export function withD1SessionEnv(env: Env, session: D1DatabaseSession): Env {
     const wrapped: NonNullable<Env['AI']> = {
       async run(model, input, options) {
         const normalizedInput = normalizeWorkersAiInput(model, input);
-        const reservation = await reserveWorkersAiCapacity(session, model, normalizedInput);
+        const reservation = await reserveWorkersAiCapacity(
+          session,
+          model,
+          normalizedInput,
+          new Date(),
+          env.WORKERS_AI_DAILY_NEURON_BUDGET
+        );
         try {
           const result = await source.run(
             model,

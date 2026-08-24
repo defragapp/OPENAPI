@@ -1,8 +1,10 @@
 import { Hono } from 'hono';
+import { bodyLimit } from 'hono/body-limit';
 import type { Env } from './env';
 import { ThreadCoordinator } from './durable/ThreadCoordinator';
 import { requireAuth, requireSameOrigin } from './security/auth';
 import { withSecurityHeaders } from './security/headers';
+import { readThreadMessageBody } from './security/request-body';
 import { getEntitlements, requireFeature } from './db/entitlements';
 import { ensureThread, appendThreadEvent, listThreadMessages, listThreads, recordCorrection, setThreadCovenant, touchThread } from './db/threads';
 import { getTurn, startTurn, updateTurnStatus } from './db/turns';
@@ -20,12 +22,24 @@ import { runDueJobs, runOneJob } from './jobs';
 import { applyBiblicalLens, assertCovenantSafe, retrieveScripture } from './covenant/scripture';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 
+export const MAX_API_REQUEST_BODY_BYTES = 1024 * 1024;
+
 const app = new Hono<{ Bindings: Env }>();
 
 app.use('*', async (context, next) => {
   await next();
   context.res = withSecurityHeaders(context.res);
 });
+
+app.use('/api/*', bodyLimit({
+  maxSize: MAX_API_REQUEST_BODY_BYTES,
+  onError: (context) => context.json({
+    error: 'request_body_too_large',
+    message: 'Request body is too large.'
+  }, 413, {
+    'cache-control': 'private, no-store'
+  })
+}));
 
 async function healthPayload(env: Env) {
   const db = await env.DB.prepare(`SELECT 1 AS ok,
@@ -467,17 +481,18 @@ app.post('/api/v1/threads/:threadId/messages', async (context) => {
   requireSameOrigin(context.req.raw);
   const auth = await requireAuth(context.req.raw, context.env);
   await requireCompletedBaseline(context.env, auth.accountId);
-  const body = await context.req.json<{
-    message?: string;
+  const parsed = await readThreadMessageBody(context.req.raw);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body as {
+    message: string;
     context?: {
       surface?: string;
       personId?: string;
       systemId?: string;
       covenantEnabled?: boolean;
     };
-  }>();
-  const message = body.message?.trim();
-  if (!message) return context.json({ error: 'Message required' }, 400);
+  };
+  const { message } = parsed;
 
   const idempotencyKey = context.req.header('x-idempotency-key');
   if (!idempotencyKey) return context.json({ error: 'Idempotency key required' }, 400);

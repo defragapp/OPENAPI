@@ -5,6 +5,9 @@ const productionEntry = readFileSync(new URL('./production-entry.ts', import.met
 const rootConfig = readFileSync(new URL('../../../wrangler.jsonc', import.meta.url), 'utf8');
 const directConfig = readFileSync(new URL('../../../wrangler.production-direct.jsonc', import.meta.url), 'utf8');
 const verifier = readFileSync(new URL('../../../scripts/verify-direct-preview-config.mjs', import.meta.url), 'utf8');
+const delegatedRuntime = readFileSync(new URL('./index.ts', import.meta.url), 'utf8');
+const stripeRoute = readFileSync(new URL('./routes/stripe.ts', import.meta.url), 'utf8');
+const requestBody = readFileSync(new URL('./security/request-body.ts', import.meta.url), 'utf8');
 
 describe('production launch preflight', () => {
   it('is the exact production entry in both canonical Wrangler configs', () => {
@@ -39,6 +42,22 @@ describe('production launch preflight', () => {
     const messagePreflight = productionEntry.slice(messageStart, messageEnd);
     expect(messagePreflight.indexOf('await authorizeConversationContext(env, auth.accountId, selection, entitlements)'))
       .toBeLessThan(messagePreflight.lastIndexOf('return null;'));
+  });
+
+  it('bounds the request before production preflight parses or delegates a message', () => {
+    expect(productionEntry).toContain("import { readThreadMessageBody } from './security/request-body'");
+    expect(productionEntry).toContain('await readThreadMessageBody(request.clone())');
+    expect(productionEntry.indexOf('await readThreadMessageBody(request.clone())'))
+      .toBeLessThan(productionEntry.indexOf('decideSovereignInputSafety(message)'));
+  });
+
+  it('layers a generic public API ceiling above stricter Stripe and AI ceilings', () => {
+    expect(delegatedRuntime).toContain("import { bodyLimit } from 'hono/body-limit'");
+    expect(delegatedRuntime).toContain('MAX_API_REQUEST_BODY_BYTES = 1024 * 1024');
+    expect(delegatedRuntime).toContain("app.use('/api/*', bodyLimit({");
+    expect(stripeRoute).toContain('MAX_STRIPE_WEBHOOK_BODY_BYTES = 512 * 1024');
+    expect(stripeRoute).toContain('readBoundedText(request, MAX_STRIPE_WEBHOOK_BODY_BYTES');
+    expect(requestBody).toContain('MAX_THREAD_MESSAGE_BODY_BYTES = 64 * 1024');
   });
 
   it('keeps urgent/grounded/refusal handling outside paid entitlement preflight', () => {

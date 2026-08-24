@@ -5,6 +5,7 @@ import { withSecurityHeaders } from './security/headers';
 import { getEntitlements, requireFeature } from './db/entitlements';
 import { authorizeConversationContext, parseConversationContext } from './conversation-context';
 import { decideSovereignInputSafety } from './agent/input-safety';
+import { readThreadMessageBody } from './security/request-body';
 
 const THREAD_MESSAGE_PATH = /^\/api\/v1\/threads\/([^/]+)\/messages$/;
 const LEGACY_SYSTEM_ALIGNMENT_PATH = /^\/api\/v1\/systems\/([^/]+)\/alignment$/;
@@ -53,12 +54,9 @@ async function launchPreflight(request: Request, env: Env): Promise<Response | n
   const messageMatch = url.pathname.match(THREAD_MESSAGE_PATH);
   if (request.method === 'POST' && messageMatch) {
     requireSameOrigin(request);
-    const body = await request.clone().json().catch(() => ({})) as {
-      message?: string;
-      context?: unknown;
-    };
-    const message = body.message?.trim();
-    if (!message) return null;
+    const parsed = await readThreadMessageBody(request.clone());
+    if (!parsed.ok) return parsed.response;
+    const { body, message } = parsed;
 
     const safety = decideSovereignInputSafety(message);
     if (safety.disposition !== 'standard') return null;

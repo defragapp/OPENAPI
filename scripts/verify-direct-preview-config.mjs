@@ -24,6 +24,15 @@ const freeTierControls = read('scripts/configure-cloudflare-free-tier.mjs');
 const parentDomainVerifier = read('scripts/verify-parent-domain-routes-v3.mjs');
 const authenticatedWorkspace = read('apps/web/src/AuthenticatedWorkspace.tsx');
 const productionEntry = read('apps/sovereign-worker/src/production-entry.ts');
+const runtimeEntry = read('apps/sovereign-worker/src/entry.ts');
+const honoApp = read('apps/sovereign-worker/src/index.ts');
+const requestBodyLimits = read('apps/sovereign-worker/src/security/request-body.ts');
+const aiCapacity = read('apps/sovereign-worker/src/ai/free-tier-capacity.ts');
+const sovereignWorkspace = read('apps/web/src/SovereignIntelligenceWorkspace.tsx');
+const launchSaturation = read('scripts/launch-saturation.mjs');
+const launchSaturationDoc = read('docs/launch-saturation-runbook.md');
+const ownerActions = read('docs/release/OWNER_ACTIONS.md');
+const stripeWebhook = read('apps/sovereign-worker/src/routes/stripe.ts');
 
 const expectedObservability = {
   enabled: true,
@@ -60,6 +69,7 @@ requireValue(rootConfig.vars?.APP_ENV === 'production', 'Production APP_ENV drif
 requireValue(rootConfig.vars?.AI_PROVIDER === 'cloudflare-gateway', 'Production AI provider drifted');
 requireValue(rootConfig.vars?.AI_MODEL === expectedModel, 'Production AI model drifted');
 requireValue(rootConfig.vars?.AI_GATEWAY_ID === expectedGatewayId, 'Production AI Gateway drifted');
+requireValue(rootConfig.vars?.WORKERS_AI_DAILY_NEURON_BUDGET === '7500', 'Production Workers AI Free daily budget drifted');
 requireValue(rootConfig.vars?.PUBLIC_CONTACT_EMAIL === 'info@defrag.app', 'Production public contact drifted');
 requireValue(rootConfig.vars?.WORLDS_VIDEO_ENABLED === 'false', 'Worlds video must remain disabled for the text-first launch');
 requireValue(rootConfig.d1_databases?.some((item) => item.binding === 'DB' && item.database_name === 'sovereign-openapi-db'), 'Production D1 binding drifted');
@@ -151,14 +161,100 @@ requireAll('text-first release', textRelease, [
 ]);
 requireValue(!textRelease.includes('verify-live-route-cohesion'), 'Text-first release must not invoke live route Browser Rendering');
 requireValue(!textRelease.includes('verify-live-visual-release'), 'Text-first release must not invoke live visual Browser Rendering');
+requireAll('bounded AI message request helper', requestBodyLimits, [
+  'MAX_THREAD_MESSAGE_BODY_BYTES = 64 * 1024',
+  'MAX_THREAD_MESSAGE_CHARACTERS = 12_000',
+  "reader.cancel('request_body_limit_exceeded')",
+  "error: 'sovereign_message_too_large'"
+]);
+requireAll('bounded public Stripe webhook', stripeWebhook, [
+  'MAX_STRIPE_WEBHOOK_BODY_BYTES = 512 * 1024',
+  'readBoundedText(',
+  "new Response('Payload too large'",
+  'if (!boundedBody.ok) return boundedBody.response',
+  'verifyStripeSignature({ body, header: signature'
+]);
+requireValue(
+  stripeWebhook.indexOf('readBoundedText(') < stripeWebhook.indexOf('verifyStripeSignature({ body, header: signature'),
+  'Stripe webhook must bound the raw body before signature or database work'
+);
+
+requireAll('bounded production message preflight', productionEntry, [
+  "import { readThreadMessageBody } from './security/request-body'",
+  'readThreadMessageBody(request.clone())'
+]);
+requireValue(
+  productionEntry.indexOf('readThreadMessageBody(request.clone())') < productionEntry.indexOf('decideSovereignInputSafety(message)'),
+  'Production must bound the message request before safety, entitlement, or delegated runtime work'
+);
+requireAll('bounded runtime message route', runtimeEntry, [
+  "import { readThreadMessageBody } from './security/request-body'",
+  'readThreadMessageBody(request)'
+]);
+requireAll('bounded Hono message route', honoApp, [
+  "import { readThreadMessageBody } from './security/request-body'",
+  'readThreadMessageBody(context.req.raw)'
+]);
+requireAll('bounded public API ingress', honoApp, [
+  "import { bodyLimit } from 'hono/body-limit'",
+  'MAX_API_REQUEST_BODY_BYTES = 1024 * 1024',
+  "app.use('/api/*', bodyLimit({",
+  "error: 'request_body_too_large'"
+]);
+requireAll('bounded public composer', sovereignWorkspace, [
+  'MAX_COMPOSER_CHARACTERS = 10_000',
+  'MAX_THREAD_MESSAGE_CHARACTERS = 12_000',
+  'maxLength={MAX_COMPOSER_CHARACTERS}'
+]);
+requireAll('Unicode-conservative AI capacity', aiCapacity, [
+  'CONSERVATIVE_BYTES_PER_TOKEN = 1',
+  'new TextEncoder().encode(serialized).byteLength',
+  'budget < 1 || budget > DEFAULT_DAILY_NEURON_BUDGET',
+  'sovereign_free_capacity_reached'
+]);
+requireAll('guarded launch saturation', launchSaturation, [
+  'SATURATION_APPROVED_CANARY_ORIGIN',
+  'Refusing to run saturation traffic against a production or branded domain',
+  "'ai-free-capacity'",
+  'A single Free-capacity canary run is capped at 60 requests and concurrency 5',
+  'capacityExhaustionObserved',
+  'sovereign-launch-saturation-result.v1',
+  'stageConcurrency(config.concurrency)'
+]);
+requireAll('launch saturation runbook', launchSaturationDoc, [
+  'Status: controlled canary authority for #259.',
+  'Free capacity exhaustion and graceful degradation',
+  'pnpm test:launch-saturation',
+  'pnpm saturation:canary',
+  'pnpm exec wrangler rollback STABLE_VERSION_ID --config wrangler.jsonc',
+  'Do not remove general Access'
+]);
+requireAll('current owner gates', ownerActions, [
+  'Cloudflare credential containment and replacement',
+  'Workers AI Free launch posture',
+  'Human product acceptance',
+  'Terms, Privacy, and launch-market approval',
+  'General public Access cutover'
+]);
+requireValue(packageJson.scripts?.['test:launch-saturation'] === 'node scripts/launch-saturation.mjs --self-test', 'Saturation self-test command drifted');
+requireValue(packageJson.scripts?.['saturation:canary'] === 'node scripts/launch-saturation.mjs', 'Canary saturation command drifted');
+requireValue(packageJson.scripts?.test?.includes('node scripts/launch-saturation.mjs --self-test'), 'Root test must exercise saturation safety controls');
+
 requireAll('single-deploy implementation', deployV3, [
   'WORKERS_CI_COMMIT_SHA',
   "runWrangler(['deploy', '--config', generatedConfigPath])",
   'configureCloudflareFreeTier',
+  "controls?.gateway?.management !== 'verified'",
+  'AI Gateway launch rate/privacy controls are not management-verified',
+  'controls.gateway.collectLogs !== false',
+  "controls.gateway.rateLimit !== '500/60s'",
+  "controls.gateway.technique !== 'sliding'",
   'applyMigrations = true',
   'if (applyMigrations)',
   'applyD1Migrations'
 ]);
+requireValue(!deployV3.includes('sovereign_global_daily_spend'), 'Free release deploy must not require a daily Gateway dollar spend rule');
+requireValue(!deployV3.includes('sovereign_global_30_day_spend'), 'Free release deploy must not require a 30-day Gateway dollar spend rule');
 requireAll('release orchestrator', releaseOrchestrator, [
   'applyD1Migrations',
   'writeReleaseEvidence',
@@ -176,11 +272,14 @@ requireAll('release evidence provenance', releaseEvidence, [
 
 requireAll('Cloudflare controls', freeTierControls, [
   "read_replication: { mode: 'auto' }",
-  'rate_limiting_limit: 50',
+  'rate_limiting_interval: AI_GATEWAY_RATE_WINDOW_SECONDS',
+  'rate_limiting_limit: AI_GATEWAY_RATE_LIMIT',
+  "rate_limiting_technique: 'sliding'",
   'collect_logs: false',
   'schema_validation/schemas',
   'sovereign_ai_messages_free_tier'
 ]);
+requireValue(!freeTierControls.includes('spend_limits'), 'Workers AI Free controls must not require Gateway dollar spend rules');
 requireValue(!freeTierControls.includes('http.request.method'), 'Free-plan rate-limit expression must use path-only fields');
 requireAll('parent-domain verifier', parentDomainVerifier, [
   `const expectedMigration = '${currentMigration}'`,
@@ -196,6 +295,10 @@ requireAll('preview bootstrap', bootstrap, [
   'PREVIEW_SESSION_SIGNING_SECRET',
   "const APPROVED_AI_PROVIDER = 'cloudflare-gateway'",
   `const APPROVED_AI_MODEL = '${expectedModel}'`,
+  'const FREE_AI_NEURON_CEILING = 7_500',
+  'resolvePreviewNeuronBudget',
+  'WORKERS_AI_DAILY_NEURON_BUDGET: previewNeuronBudget',
+  'dailyNeuronBudget: Number(previewNeuronBudget)',
   `const CAPACITY_LEDGER_MIGRATION = '${capacityMigration}'`,
   `const CURRENT_MIGRATION_TARGET = '${currentMigration}'`,
   'migrationTarget: CURRENT_MIGRATION_TARGET',
@@ -251,4 +354,4 @@ requireValue(!authenticatedWorkspace.includes("import { WorldVideoLauncher } fro
 requireValue(!authenticatedWorkspace.includes('<WorldVideoLauncher />'), 'Current authenticated workspace must not mount the video launcher');
 requireValue(authenticatedWorkspace.includes('data-workspace-contract="one-room"'), 'Canonical one-room workspace contract is missing');
 
-console.log('Direct Cloudflare release config verified production_root=true text_first_release=true browser_rendering_optional=true current_migration=0017 privacy_export=on_demand_no_artifact worlds_video=false current_main_only=true github_workflows_non_authoritative=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
+console.log('Direct Cloudflare release config verified production_root=true text_first_release=true browser_rendering_optional=true current_migration=0017 privacy_export=on_demand_no_artifact worlds_video=false current_main_only=true github_workflows_non_authoritative=true d1_replication=true workers_ai_free=true gateway_rate_limit=true api_body_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');

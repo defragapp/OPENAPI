@@ -86,11 +86,18 @@ export function assertRequiredProductionControls(controls) {
     failures.push('D1 read replication is not verified in automatic mode');
   }
 
-  const gatewayVerified = controls?.gateway?.management === 'verified';
-  const gatewayRequestPrivacy = controls?.gateway?.perRequestPrivacy?.skipCache === true
-    && controls?.gateway?.perRequestPrivacy?.collectLog === false;
-  if (!gatewayVerified && !gatewayRequestPrivacy) {
-    failures.push('AI Gateway privacy controls are neither management-verified nor protected per request');
+  if (controls?.gateway?.management !== 'verified') {
+    failures.push(
+      controls?.gateway?.reason
+        || 'AI Gateway launch rate/privacy controls are not management-verified'
+    );
+  } else {
+    if (controls.gateway.collectLogs !== false) {
+      failures.push('AI Gateway content logging is not verified disabled');
+    }
+    if (controls.gateway.rateLimit !== '500/60s' || controls.gateway.technique !== 'sliding') {
+      failures.push('AI Gateway launch rate limit is not verified at 500 requests / 60 seconds sliding');
+    }
   }
 
   // Wrangler OAuth does not expose zone WAF/API Gateway management scopes.

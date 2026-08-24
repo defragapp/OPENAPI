@@ -8,6 +8,7 @@ export interface Env {
   AI_PROVIDER?: string;
   AI_MODEL?: string;
   AI_GATEWAY_ID?: string;
+  WORKERS_AI_DAILY_NEURON_BUDGET?: string;
   AI?: { run: (model: string, input: unknown, options?: unknown) => Promise<unknown>; aiGatewayLogId?: string };
   ASSETS?: { fetch: (request: Request) => Promise<Response> };
   EMAIL?: { send: (message: { from: string; to: string; subject: string; text?: string; html?: string }) => Promise<unknown> };

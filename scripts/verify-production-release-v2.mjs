@@ -86,10 +86,14 @@ for (const [label, config] of configs) {
   assert(!config.includes('r2_buckets'), `${label} enables R2`);
   assert(!config.includes('"queues"'), `${label} enables Queues`);
 }
+for (const [label, config] of configs.slice(0, 2)) {
+  requireAll(label, config, ['"WORKERS_AI_DAILY_NEURON_BUDGET": "7500"']);
+  assert(!config.includes('"WORKERS_AI_DAILY_NEURON_BUDGET": "250000"'), `${label} still selects paid Workers AI capacity`);
+}
 
 requireAll('model config', modelConfig, ["DEFAULT_AI_MODEL = '@cf/zai-org/glm-4.7-flash'", "DEFAULT_AI_PROVIDER = 'cloudflare-gateway'"]);
 requireAll('D1 session and AI privacy boundary', session, ['db.withSession(bookmark)', "readD1Bookmark(request) ?? 'first-primary'", 'reserveWorkersAiCapacity', 'releaseWorkersAiCapacity', 'skipCache: true', 'collectLog: false']);
-requireAll('free capacity ledger', capacity, ['FREE_DAILY_NEURON_BUDGET = 7_500', 'workers_ai_daily_capacity', 'sovereign_free_capacity_reached', 'retry-after']);
+requireAll('free capacity ledger', capacity, ['DEFAULT_DAILY_NEURON_BUDGET = 7_500', 'budget < 1 || budget > DEFAULT_DAILY_NEURON_BUDGET', 'workers_ai_daily_capacity', 'sovereign_free_capacity_reached', 'retry-after']);
 requireAll('capacity migration', capacityMigration, ['CREATE TABLE IF NOT EXISTS workers_ai_daily_capacity', 'reserved_neurons INTEGER NOT NULL', 'request_count INTEGER NOT NULL']);
 requireAll('failed response refunds', usage, [
   'export async function releaseAiTurn',
@@ -144,8 +148,9 @@ requireAll('runtime passkey readiness', runtime, [
 requireAll('transactional email', email, ['background:#0f0f0f', 'color:#f5f1e8', 'background:#e8ddd0', 'Sovereign.OS', 'Private account message', 'Do not forward it.', "provider: 'resend'"]);
 requireAll('Cloudflare controls', controls, [
   "read_replication: { mode: 'auto' }",
-  'rate_limiting_interval: 60',
-  'rate_limiting_limit: 50',
+  'rate_limiting_interval: AI_GATEWAY_RATE_WINDOW_SECONDS',
+  'rate_limiting_limit: AI_GATEWAY_RATE_LIMIT',
+  "rate_limiting_technique: 'sliding'",
   'collect_logs: false',
   'sovereign_ai_messages_free_tier',
   'schema_validation/schemas',
@@ -153,6 +158,7 @@ requireAll('Cloudflare controls', controls, [
   'configureOptionalZoneControl',
   "error?.status !== 403"
 ]);
+assert(!controls.includes('spend_limits'), 'Workers AI Free release controls must not require AI Gateway dollar spend rules');
 assert(!controls.includes('http.request.method'), 'Free-plan rate-limit expression must use path-only fields');
 
 requireAll('production deploy compatibility', deploy, [
@@ -317,4 +323,4 @@ for (const [label, css] of [
   ['v0 static public', staticV0]
 ]) balanced(label, css);
 
-console.log('Production release v2 verification passed: founder-v0 global surfaces, passkey-first auth, Resend v0 email, Stripe plan proof, interactive 360 landing field, rotating real-life questions, and restored product workflows are enforced.');
+console.log('Production release v2 verification passed: founder-v0 global surfaces, passkey-first auth, Resend v0 email, Stripe plan proof, interactive 360 landing field, rotating real-life questions, restored product workflows, and Workers AI Free capacity are enforced.');

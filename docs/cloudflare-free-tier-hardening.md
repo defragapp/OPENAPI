@@ -90,9 +90,27 @@ The current product is text-first; no video-provider budget or generated-media p
 
 Migration `0013_workers_ai_free_capacity` creates the D1 ledger `workers_ai_daily_capacity`.
 
-Sovereign reserves conservatively below the account-level Workers AI allocation. Before a hosted-model call, the Worker atomically reserves estimated capacity. Source-level model failure releases the reservation. If internal capacity is unavailable, Sovereign returns a controlled capacity response and does not guess or save an invented answer.
+Sovereign deliberately remains below Cloudflare Workers AI's Free daily allocation. Production is configured for `7,500` neurons per UTC day. The runtime default is also `7,500`, accepts a deliberately lower value for controlled canary testing, and rejects any configured value above `7,500`. Before a hosted-model call, the Worker atomically reserves estimated capacity. Source-level model failure releases the reservation. If internal capacity is unavailable, Sovereign returns a controlled `429 sovereign_free_capacity_reached` response and does not guess or save an invented answer.
 
-A failed generation also releases the user’s monthly reservation where the current product contract requires it.
+This Free launch contract has no Workers AI overage path: provider capacity beyond the Free allocation is not purchased or assumed. The 7,500-neuron application ceiling preserves headroom beneath the provider's 10,000-neuron Free limit so the application-owned ledger should fail closed first. A failed generation also releases the user’s monthly reservation where the current product contract requires it.
+
+## Public API request boundary
+
+Every `/api/*` request entering the Hono runtime is bounded at 1 MiB before route parsing. This is a general denial-of-service guard, not permission to send large application payloads. Stricter route ceilings remain authoritative: Stripe webhook bodies are capped at 512 KiB, AI thread-message JSON at 64 KiB and normalized messages at 12,000 characters, with the public composer capped at 10,000 characters. Oversized requests receive a private, non-cacheable `413` response.
+
+## AI request boundary
+
+The public composer accepts at most 10,000 characters. The Worker independently enforces a 64 KiB JSON-body ceiling while streaming and a 12,000-character normalized-message ceiling on every thread-message route. The production preflight applies the same bounded parser before safety, entitlement, database, Durable Object, or model work. Requests above either server limit receive a controlled `413` response and are not delegated to inference.
+
+Neuron reservation estimates use serialized UTF-8 byte length with a conservative one-byte-per-token upper bound. This prevents non-ASCII input from receiving a smaller reservation than its encoded payload warrants. The output reservation still uses the requested maximum or the guarded 3,200-token default.
+
+## Public Stripe webhook ingress
+
+Cloudflare Access bypass remains scoped only to `app.defrag.app/api/v1/stripe/webhook`. The Worker streams and bounds the raw request body at 512 KiB before signature verification or database work. A larger declared or chunked body receives `413` and creates no webhook-event record.
+
+The bounded reader preserves the exact UTF-8 body string because Stripe signature verification requires the unmodified raw payload. The Worker then verifies the Stripe signature and timestamp before parsing the event, applies provider/event idempotency in D1, retries previously failed projections, and treats an already processed event as a successful duplicate.
+
+Unsigned live probes prove the Access bypass reaches Worker signature enforcement. Final public acceptance still requires one controlled valid signed delivery/replay that creates no real customer, payment, subscription, email, or entitlement side effect.
 
 ## Monthly account allowances
 
@@ -105,11 +123,13 @@ Monthly plan access is server-derived. The browser cannot self-declare Sovereign
 
 The production control script verifies the existing `sovereign-ai-gateway` configuration, including:
 
-- bounded account-wide rate limiting;
+- account-wide rate limiting at `500 requests / 60 seconds` with a sliding window;
 - cache TTL zero for the configured path;
 - persistent request-content logging disabled.
 
-No paid video-model spend guard is required for the current launch because video generation is not activated.
+Dollar spend rules are not a Workers AI Free launch requirement because the Free Workers AI allocation has no overage billing path. If a future owner-approved change introduces BYOK inference, Workers Paid, Unified Billing, or prepaid AI capacity, dollar spend limits must be designed and verified as part of that separate paid-provider change before activation.
+
+The atomic D1 neuron ledger remains the strict application-owned capacity ceiling during concurrent bursts. No paid video-model spend guard is required for the current launch because video generation is not activated.
 
 ## Zone rate limiting
 
