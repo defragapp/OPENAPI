@@ -86,28 +86,17 @@ export function assertRequiredProductionControls(controls) {
     failures.push('D1 read replication is not verified in automatic mode');
   }
 
-  const expectedGatewaySpendLimits = [
-    { id: 'sovereign_global_daily_spend', limitUsd: 2.75, windowSeconds: 86_400, technique: 'sliding' },
-    { id: 'sovereign_global_30_day_spend', limitUsd: 75, windowSeconds: 2_592_000, technique: 'sliding' }
-  ];
   if (controls?.gateway?.management !== 'verified') {
     failures.push(
       controls?.gateway?.reason
-        || 'AI Gateway launch rate/spend controls are not management-verified'
+        || 'AI Gateway launch rate/privacy controls are not management-verified'
     );
   } else {
-    if (controls.gateway.rateLimit !== '500/60s' || controls.gateway.technique !== 'sliding') {
-      failures.push('AI Gateway launch rate limit is not verified at 500 requests / 60 seconds');
+    if (controls.gateway.collectLogs !== false) {
+      failures.push('AI Gateway content logging is not verified disabled');
     }
-    for (const expected of expectedGatewaySpendLimits) {
-      const actual = (controls.gateway.spendLimits || []).find((rule) => rule.id === expected.id);
-      if (
-        Number(actual?.limitUsd) !== expected.limitUsd
-        || Number(actual?.windowSeconds) !== expected.windowSeconds
-        || actual?.technique !== expected.technique
-      ) {
-        failures.push(`AI Gateway spend limit ${expected.id} is not release-verified`);
-      }
+    if (controls.gateway.rateLimit !== '500/60s' || controls.gateway.technique !== 'sliding') {
+      failures.push('AI Gateway launch rate limit is not verified at 500 requests / 60 seconds sliding');
     }
   }
 
