@@ -16,11 +16,14 @@ function capacityDb(row: { reserved_neurons: number; request_count: number } | n
 }
 
 describe('Workers AI Free capacity', () => {
-  it('uses the safe default and validates explicit paid capacity', () => {
+  it('uses the safe default and rejects any configuration above the Free launch ceiling', () => {
     expect(resolveWorkersAiDailyNeuronBudget(undefined)).toBe(DEFAULT_DAILY_NEURON_BUDGET);
-    expect(resolveWorkersAiDailyNeuronBudget('250000')).toBe(250_000);
+    expect(resolveWorkersAiDailyNeuronBudget('7500')).toBe(7_500);
+    expect(resolveWorkersAiDailyNeuronBudget('5000')).toBe(5_000);
     expect(() => resolveWorkersAiDailyNeuronBudget('7500.5')).toThrow(/whole number/);
-    expect(() => resolveWorkersAiDailyNeuronBudget('7499')).toThrow(/at least/);
+    expect(() => resolveWorkersAiDailyNeuronBudget('0')).toThrow(/between 1 and 7500/);
+    expect(() => resolveWorkersAiDailyNeuronBudget('7501')).toThrow(/between 1 and 7500/);
+    expect(() => resolveWorkersAiDailyNeuronBudget('250000')).toThrow(/between 1 and 7500/);
   });
 
   it('reserves conservatively from input and maximum output size', () => {
@@ -49,16 +52,16 @@ describe('Workers AI Free capacity', () => {
     expect(bind).toHaveBeenCalledWith('2026-07-30', reservation?.reservedNeurons, 7_500);
   });
 
-  it('passes an explicit paid capacity budget to the atomic reservation', async () => {
+  it('allows a lower canary budget without permitting a paid-capacity ceiling', async () => {
     const { db, bind } = capacityDb({ reserved_neurons: 500, request_count: 3 });
     await reserveWorkersAiCapacity(
       db,
       '@cf/zai-org/glm-4.7-flash',
       { messages: [{ role: 'user', content: 'hello' }], max_completion_tokens: 100 },
       new Date('2026-07-30T23:30:00Z'),
-      '250000'
+      '5000'
     );
-    expect(bind).toHaveBeenCalledWith('2026-07-30', expect.any(Number), 250_000);
+    expect(bind).toHaveBeenCalledWith('2026-07-30', expect.any(Number), 5_000);
   });
 
   it('fails closed before Cloudflare reaches its daily free allocation', async () => {
