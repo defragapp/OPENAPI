@@ -16,14 +16,16 @@ const RETIRED_DEV_LANGUAGE = [
 ] as const;
 
 describe('standalone public action authority', () => {
-  it('loads the same no-button visual authority on every standalone public route', () => {
+  it('loads the same founder-display action authority on every standalone public route', () => {
     for (const source of [pricing, faq, how]) {
-      expect(source).toContain('/premium-action-static-v1.css?v=20260818-geist-v1');
+      expect(source).toContain('/premium-action-static-v1.css?v=20260819-founder-display-v1');
       expect(source).toContain('>Sign in</a>');
       expect(source).toContain('>Get started');
       expect(source).toContain('<a href="/signup">Get started</a>');
       expect(source).not.toContain('Build my Baseline');
     }
+    expect(css).toContain('--static-display-font:');
+    expect(css).toContain('--static-ui-title-font:');
   });
 
   it('keeps pricing informational instead of turning plan cards into checkout buttons', () => {
@@ -55,5 +57,6 @@ describe('standalone public action authority', () => {
     expect(css).toContain('border-radius: 0 !important;');
     expect(css).toContain('box-shadow: none !important;');
     expect(css).toContain('min-height: 44px !important;');
+    expect(css).toContain('font-family: var(--static-ui-title-font) !important;');
   });
 });

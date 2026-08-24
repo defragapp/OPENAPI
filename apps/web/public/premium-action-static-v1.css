@@ -6,14 +6,32 @@
   font-display: swap;
 }
 
-/* Standalone public-route action and typography authority. Geist Sans owns rendered titles; native sans remains fallback only. */
+@font-face {
+  font-family: "Sovereign Display";
+  src: url("/fonts/sovereign-display.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* Standalone route action and typography authority. Public launch pages use
+ * the founder display voice; account-bound consent and all controls remain on
+ * the clean Geist/native sans stack. */
 :root {
   --static-action-ink: #f2ede5;
   --static-action-muted: rgba(242, 237, 229, 0.62);
   --static-action-line: rgba(242, 237, 229, 0.26);
   --static-action-line-strong: rgba(242, 237, 229, 0.54);
   --static-action-bg: #080a0d;
-  --static-title-font:
+  --static-display-font:
+    "Sovereign Display",
+    "Iowan Old Style",
+    "Palatino Linotype",
+    Palatino,
+    "Book Antiqua",
+    Georgia,
+    serif;
+  --static-ui-title-font:
     "Geist Sans",
     -apple-system,
     BlinkMacSystemFont,
@@ -26,7 +44,7 @@
     sans-serif;
 }
 
-html:root:root:root body :is(
+html:root:root:root body.launch-page :is(
   h1,
   h2,
   h3,
@@ -35,14 +53,40 @@ html:root:root:root body :is(
   h6,
   [role="heading"],
   .launch-wordmark,
-  .launch-footer-wordmark,
-  .price,
-  .faq-category .launch-kicker
+  .launch-footer-wordmark
 ) {
-  font-family: var(--static-title-font) !important;
+  font-family: var(--static-display-font) !important;
   font-style: normal !important;
   font-kerning: normal;
   font-synthesis: none;
+}
+
+html:root:root:root body :is(
+  .price,
+  .faq-category .launch-kicker
+),
+html:root:root:root body.consent-page :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  [role="heading"],
+  .launch-wordmark
+) {
+  font-family: var(--static-ui-title-font) !important;
+  font-style: normal !important;
+  font-kerning: normal;
+  font-synthesis: none;
+}
+
+.launch-sign-in,
+.launch-cta,
+.launch-button,
+.launch-mobile-menu summary,
+.consent-actions button {
+  font-family: var(--static-ui-title-font) !important;
 }
 
 .launch-cta,

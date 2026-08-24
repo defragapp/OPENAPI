@@ -130,9 +130,8 @@ describe('founder visual port — public positioning reset', () => {
     expect(landingRefinementV5).toContain('height: 26px !important');
   });
 
-  it('uses one sans hero system and constrained entry motion', () => {
+  it('restores founder display typography on public identity while keeping product UI on Geist', () => {
     for (const marker of [
-      'One typeface. Hierarchy comes from weight, scale, and opacity.',
       '.v0-hero h1 > span',
       '.v0-hero h1 > em',
       'font-family: inherit !important',
@@ -142,8 +141,12 @@ describe('founder visual port — public positioning reset', () => {
     ]) expect(landingRefinementV5).toContain(marker);
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
-    expect(typography).not.toContain('font-family: "Sovereign Display"');
+    expect(typography).toContain('font-family: "Sovereign Display";');
+    expect(typography).toContain('font-family: "Geist Sans";');
+    expect(typography).toContain('--font-public-display:');
     expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
+    expect(sansAuthority).toContain('font-family: var(--font-public-display) !important');
+    expect(sansAuthority).toContain('font-family: var(--font-title) !important');
   });
 
   it('shows broad self exploration, relationship intelligence, and whole-system intelligence in approved language', () => {

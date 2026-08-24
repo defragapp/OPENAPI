@@ -91,7 +91,7 @@ describe('public positioning reset', () => {
       '`Basis` remains the internal/server contract name',
       '**Sources** or **See source details**',
       '## Retired and prohibited phrasing',
-      '`Sovereign Display` is retired from rendered UI use.',
+      'Public brand identity—the root hero, major public-section titles, public secondary-page titles, and public `SOVEREIGN.OS` wordmarks—uses the bundled `Sovereign Display` face first',
       '**See why the same moment lands differently—and how to bridge the gap.**'
     ]) expect(languageAuthority).toContain(marker);
 
@@ -100,34 +100,34 @@ describe('public positioning reset', () => {
       'section identity is `02 · You + your people`',
       'section identity is `03 · From 1:1 to the whole system`',
       'source codes stay hidden by default behind a plain `See source details` disclosure',
-      '`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product.'
+      'The active typography system is intentionally split.'
     ]) expect(visualContract).toContain(marker);
 
     expect(landing).toContain('Most AI starts with the prompt. Sovereign starts with you.');
     expect(landing).toContain('Know yourself. Understand your people. See the whole system.');
   });
 
-  it('uses the canonical self-hosted Geist Sans title authority', () => {
-    for (const source of [typography, sansAuthority]) {
-      expect(source).toContain("\"Geist Sans\"");
-
-      expect(source).toContain('-apple-system');
-      expect(source).toContain('"SF Pro Display"');
-      expect(source).toContain('"Segoe UI Variable Display"');
-      expect(source).toContain('"Segoe UI"');
-      expect(source).toContain('font-family: var(--font-title) !important');
-      expect(source).not.toContain('\n    Optima,');
-      expect(source).not.toContain('\n    "Avenir Next",');
-      expect(source).not.toContain('font-family: "Sovereign Display"');
-      expect(source).not.toContain('font-family: "Sovereign Sans"');
-    }
-    expect(typography).not.toContain('/fonts/sovereign-display.woff2');
+  it('uses founder display typography for public identity and Geist Sans for product UI', () => {
+    expect(typography).toContain('font-family: "Geist Sans";');
+    expect(typography).toContain('font-family: "Sovereign Display";');
+    expect(typography).toContain('/fonts/geist/Geist-Variable.woff2?v=1.7.2');
+    expect(typography).toContain('/fonts/sovereign-display.woff2');
+    expect(typography).toContain('--font-public-display:');
+    expect(typography).toContain('"Iowan Old Style"');
     expect(typography).toContain('--font-display: var(--font-title);');
     expect(typography).toContain('--serif: var(--font-title);');
-    expect(typography.indexOf('-apple-system')).toBeLessThan(typography.indexOf('"SF Pro Display"'));
-    expect(sansAuthority.indexOf('-apple-system')).toBeLessThan(sansAuthority.indexOf('"SF Pro Display"'));
-    expect(sansAuthority).toContain('Component and route styles');
-    expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
+    expect(typography.indexOf('"Geist Sans"')).toBeLessThan(typography.indexOf('-apple-system'));
+
+    expect(sansAuthority).toContain('"Geist Sans",');
+    expect(sansAuthority).toContain('font-family: var(--font-title) !important');
+    expect(sansAuthority).toContain('font-family: var(--font-public-display) !important');
+    expect(sansAuthority).toContain('.public-approved-v8 :is(');
+    expect(sansAuthority).toContain('.public-secondary-page :is(');
+    expect(sansAuthority).toContain('.account-intro h1');
+    expect(sansAuthority).not.toContain('\n    Optima,');
+    expect(sansAuthority).not.toContain('\n    "Avenir Next",');
+    expect(sansAuthority).not.toContain('font-family: "Sovereign Sans"');
+
     expect(landingRefinementV5).toContain('font-family: inherit !important');
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).not.toContain('.landing-baseline-intro');

@@ -147,19 +147,24 @@ describe('public production positioning release', () => {
     expect(language).toContain('`What is Basis?`;');
   });
 
-  it('renders headings through the canonical Geist Sans title authority', () => {
-    expect(typography).not.toContain('font-family: "Sovereign Display"');
-    expect(typography).not.toContain('/fonts/sovereign-display.woff2');
+  it('restores the founder editorial voice on public identity while keeping product UI on Geist', () => {
+    expect(typography).toContain('font-family: "Sovereign Display";');
+    expect(typography).toContain('/fonts/sovereign-display.woff2');
+    expect(typography).toContain('--font-public-display:');
+    expect(typography).toContain('"Sovereign Display",');
+    expect(typography).toContain('"Iowan Old Style",');
     expect(typography).toContain('--font-display: var(--font-title);');
-    expect(typography).toContain("\"Geist Sans\",");
+    expect(typography).toContain('"Geist Sans",');
     expect(typography).toContain('-apple-system');
     expect(typography).toContain('"SF Pro Display"');
-    expect(sansAuthority).toContain("\"Geist Sans\",");
+    expect(sansAuthority).toContain('"Geist Sans",');
     expect(sansAuthority).toContain('font-family: var(--font-title) !important');
+    expect(sansAuthority).toContain('font-family: var(--font-public-display) !important');
+    expect(sansAuthority).toContain('.public-approved-v8 :is(');
+    expect(sansAuthority).toContain('.public-secondary-page :is(');
     expect(sansAuthority).not.toContain('\n    Optima,');
     expect(sansAuthority).not.toContain('\n    "Avenir Next",');
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
-    expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
   });
 
   it('puts workflow before the conversation and anchors the composer below the answer surface', () => {

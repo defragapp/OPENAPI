@@ -452,19 +452,19 @@ Do not use `What is Basis?` or `What does Basis prove?` as public FAQ questions.
 
 ## Typography authority
 
-`Sovereign Display` is retired from rendered UI use.
+Typography is visual identity, not product-language content. The founder public voice and the product interface intentionally use different title families.
 
-Do not render `Sovereign Display`, Georgia, Palatino, Iowan Old Style, Book Antiqua, or another serif as a heading/title fallback anywhere in the active product or public site.
+Public brand identity—the root hero, major public-section titles, public secondary-page titles, and public `SOVEREIGN.OS` wordmarks—uses the bundled `Sovereign Display` face first, followed by `Iowan Old Style`, Palatino/Book Antiqua, Georgia, and serif fallbacks. This is the founder editorial voice; it is bounded to public identity surfaces rather than applied to every heading in the product.
 
-The approved rendered title stack is native enterprise sans: Apple system/SF Pro Display first on Apple platforms, Segoe Variable/Segoe on Windows, followed by system-ui and native sans fallbacks. `Optima`, `Avenir Next`, the retired bundled `Sovereign Sans`, and `Sovereign Display` are not title or heading authorities.
+Authentication, onboarding, account, workspace, composer, controls, product demonstrations, labels, and authenticated headings use the bundled `Geist Sans` face first. Apple/SF Pro Display, Segoe Variable/Segoe, system-ui, Helvetica, and Arial remain resilient UI fallbacks. `Optima`, `Avenir Next`, and the retired bundled `Sovereign Sans` are not active title authorities.
 
-Typography authority sets the family, not a universal heading size. Page and component composition own title scale, line height, wrapping, spacing, and responsive behavior. `production-visual-authority-v1.css` owns final presentation after the family authority.
+Typography authority sets family, not a universal heading size. Page and component composition own title scale, line height, wrapping, spacing, and responsive behavior. `production-visual-authority-v1.css` owns final presentation after the family authority.
 
-Headings, titles, product labels, and body text use the approved sans system. Hierarchy comes from scale, weight, spacing, opacity, and layout—not from switching to a decorative display face.
+Public display typography must not leak into forms, buttons, consent/account surfaces, the authenticated workspace, source details, or product-demo chrome. Conversely, release hardening must not flatten the public founder identity into one sitewide sans system.
 
 Product demonstrations must remain understandable when motion or reveal observers do not run. Motion may enhance progression but must never hide the primary product proof.
 
-The bundled legacy display font file may remain in the repository only as an unused historical asset until a separate cleanup removes it. It must not be referenced by active CSS.
+Both bundled font assets are active production dependencies within their documented boundaries; neither should be removed or replaced as a side effect of release or typography hardening.
 
 ## Authentication
 

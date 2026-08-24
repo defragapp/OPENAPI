@@ -2,7 +2,7 @@ const publicBase = String(process.env.PUBLIC_BASE_URL || 'https://sovereign.defr
 const expectedCssPath = '/v0-public-static.css?v=20260803-refined-v2';
 const routeCssPath = '/deployed-route-cohesion.css?v=20260803-route-v1';
 const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2';
-const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1';
+const terminalCssPath = '/premium-action-static-v1.css?v=20260819-founder-display-v1';
 const expectedContract = 'founder-v0-locked-v1';
 const staticRoutes = ['/how-it-works', '/pricing', '/faq'];
 const policyRoutes = ['/privacy', '/terms'];
@@ -188,13 +188,21 @@ for (const marker of [
   '@media (prefers-reduced-motion: reduce)'
 ]) assert(refinementCss.text.includes(marker), `static refinement stylesheet is missing ${marker}`);
 for (const marker of [
-  '--static-title-font:',
+  '--static-display-font:',
+  'font-family: "Sovereign Display";',
+  '/fonts/sovereign-display.woff2',
+  '--static-ui-title-font:',
   'font-family: "Geist Sans";',
   '/fonts/geist/Geist-Variable.woff2?v=1.7.2',
-  'font-family: var(--static-title-font) !important',
+  'font-family: var(--static-display-font) !important',
+  'font-family: var(--static-ui-title-font) !important',
   'border-radius: 0 !important;'
 ]) assert(terminalCss.text.includes(marker), `terminal static stylesheet is missing ${marker}`);
-assert(!terminalCss.text.includes('Sovereign Display'), 'terminal static typography references the retired display face');
+const displayStart = terminalCss.text.indexOf('--static-display-font:');
+const uiStart = terminalCss.text.indexOf('--static-ui-title-font:');
+assert(terminalCss.text.indexOf('"Sovereign Display",', displayStart) > displayStart, 'terminal static display stack does not start from the founder face');
+assert(terminalCss.text.indexOf('"Iowan Old Style",', displayStart) > terminalCss.text.indexOf('"Sovereign Display",', displayStart), 'terminal static display stack lost the Iowan fallback');
+assert(terminalCss.text.indexOf('"Geist Sans",', uiStart) > uiStart, 'terminal static UI stack does not start from Geist');
 for (const marker of [
   'body.how-page .journey-steps',
   'grid-template-columns: repeat(2, minmax(0, 1fr))',
@@ -237,15 +245,17 @@ for (const marker of [
   '.account-shell',
   '.plan-onboarding',
   '.sovereign-app-runtime',
-  'var(--route-blue-bright)'
+  'var(--route-blue-bright)',
+  '--font-public-display:'
 ]) assert(compactCss.includes(marker), `compiled route stylesheet is missing ${marker}`);
 const compactJavaScript = javascript.text.replace(/\s+/g, '');
 for (const marker of [
   '--refine-paper:#e8ddd0',
   '--refine-page:#080a0d',
   '--route-blue:#e8ddd0!important',
-  '--landing-blue:#e8ddd0!important'
+  '--landing-blue:#e8ddd0!important',
+  'font-family:var(--font-public-display)!important'
 ]) assert(compactJavaScript.includes(marker), `compiled injected refinement is missing ${marker}`);
-assert(compactJavaScript.includes('sans-typography-authority-v1.css') || compactJavaScript.includes('--font-title:'), 'compiled release is missing the sans typography authority');
+assert(compactJavaScript.includes('sans-typography-authority-v1.css') || compactJavaScript.includes('--font-title:'), 'compiled release is missing the split typography authority');
 
-console.log(`Secondary public release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} positioning=self-people-systems typography=geist-sans`);
+console.log(`Secondary public release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} positioning=self-people-systems typography=founder-display+geist-ui`);

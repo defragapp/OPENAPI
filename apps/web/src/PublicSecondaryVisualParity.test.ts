@@ -28,7 +28,7 @@ const productionRelease = read('../../../scripts/cloudflare-production-release.m
 
 const refinedCssPath = '/v0-public-static.css?v=20260803-refined-v2';
 const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2';
-const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1';
+const terminalCssPath = '/premium-action-static-v1.css?v=20260819-founder-display-v1';
 
 describe('secondary public visual parity', () => {
   it.each(staticPages)('%s uses the same Sovereign identity and terminal static authority', (_label, path) => {
@@ -49,16 +49,19 @@ describe('secondary public visual parity', () => {
     expect(document).toContain('apple-touch-icon.png');
   });
 
-  it('keeps the historical static foundation but lets terminal Geist Sans authority own rendered headings', () => {
+  it('keeps the historical static foundation and restores founder display titles above Geist UI controls', () => {
     expect(staticCss).toContain('--v0-page: #090b0e');
     expect(staticCss).toContain('--v0-cream: #f1e9de');
-    expect(staticTerminalCss).toContain('"Helvetica Neue"');
-    expect(staticTerminalCss.indexOf("\"Geist Sans\"")).toBeLessThan(staticTerminalCss.indexOf("\"SF Pro Display\""));
-    expect(staticTerminalCss.indexOf('"SF Pro Display"')).toBeLessThan(staticTerminalCss.indexOf('"Helvetica Neue"'));
+    expect(staticTerminalCss).toContain('--static-display-font:');
+    expect(staticTerminalCss).toContain('"Sovereign Display",');
+    expect(staticTerminalCss).toContain('"Iowan Old Style",');
+    expect(staticTerminalCss).toContain('--static-ui-title-font:');
+    const uiStart = staticTerminalCss.indexOf('--static-ui-title-font:');
+    expect(staticTerminalCss.indexOf('"Geist Sans",', uiStart)).toBeLessThan(staticTerminalCss.indexOf('"SF Pro Display"', uiStart));
+    expect(staticTerminalCss.indexOf('"SF Pro Display"', uiStart)).toBeLessThan(staticTerminalCss.indexOf('"Helvetica Neue"', uiStart));
     expect(staticTerminalCss).not.toContain('Avenir Next');
-    expect(staticTerminalCss).toContain('--static-title-font:');
-    expect(staticTerminalCss).toContain('font-family: var(--static-title-font) !important');
-    expect(staticTerminalCss).not.toContain('Sovereign Display');
+    expect(staticTerminalCss).toContain('font-family: var(--static-display-font) !important');
+    expect(staticTerminalCss).toContain('font-family: var(--static-ui-title-font) !important');
     for (const marker of [
       '--static-shell: min(1180px, calc(100vw - 96px))',
       'body.launch-page .launch-hero.launch-hero-compact',
@@ -138,8 +141,10 @@ describe('secondary public visual parity', () => {
 
   it('extends the final static authority to 404 and account-bound consent without changing their behavior contracts', () => {
     expect(notFound).toContain(refinementCssPath);
+    expect(notFound).toContain(terminalCssPath);
     expect(notFound).toContain('This page is not part of Sovereign.OS.');
     expect(consent).toContain(refinementCssPath);
+    expect(consent).toContain(terminalCssPath);
     expect(consent).toContain('You control what another person can use with you.');
     expect(consent).toContain('id="status"');
     expect(consent).toContain('id="invitations"');
@@ -157,7 +162,7 @@ describe('secondary public visual parity', () => {
     expect(policyCss).not.toContain('.public-approved-v8 .landing-story');
   });
 
-  it('keeps landing refinement order and terminal sans authority explicit', () => {
+  it('keeps landing refinement order and split typography authority explicit', () => {
     const landingAuthority = main.indexOf("import './public-landing-approved-v8.css'");
     const iosAuthority = main.indexOf("import './landing-ios-parity-density-v1.css'");
     const secondaryAuthority = main.indexOf("import './public-secondary-pages-locked.css'");
@@ -175,6 +180,8 @@ describe('secondary public visual parity', () => {
     expect(liveVerifier).toContain("const expectedContract = 'founder-v0-locked-v1'");
     expect(liveVerifier).toContain(`const expectedCssPath = '${refinedCssPath}'`);
     expect(liveVerifier).toContain(`const refinementCssPath = '${refinementCssPath}'`);
+    expect(liveVerifier).toContain(`const terminalCssPath = '${terminalCssPath}'`);
+    expect(liveVerifier).toContain('typography=founder-display+geist-ui');
     expect(liveVerifier).toContain('assertSecurityHeaders');
     expect(productionRelease).toContain("['verify-secondary-public', 'scripts/verify-live-secondary-public.mjs']");
   });

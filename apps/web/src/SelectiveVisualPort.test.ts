@@ -16,6 +16,7 @@ const heroExtension = readFileSync(new URL('./landing-hero-field-v4.css', import
 const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
 const landingRefinementV5 = readFileSync(new URL('./landing-live-refinement-v5.css', import.meta.url), 'utf8');
 const sansAuthority = readFileSync(new URL('./sans-typography-authority-v1.css', import.meta.url), 'utf8');
+const typography = readFileSync(new URL('./typography-system.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('founder selective visual port', () => {
@@ -104,7 +105,7 @@ describe('founder selective visual port', () => {
     expect(systemField).toContain('<ExpressionFieldRenderer');
   });
 
-  it('applies founder composition with terminal sans typography', () => {
+  it('applies founder composition with split public-display and product-UI typography', () => {
     for (const selector of ['.intelligence-workspace', '.intelligence-sidebar', '.sovereign-composer', '.surface-heading', '.account-shell', '.auth-panel']) expect(v0Visual).toContain(selector);
     for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip']) expect(fieldCss).toContain(selector);
     for (const selector of ['.landing-expression-slice__sphere-shell', '.landing-expression-slice__readout', '.landing-question-orbit__stage']) expect(heroExtension).toContain(selector);
@@ -112,7 +113,12 @@ describe('founder selective visual port', () => {
     expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
     expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).toContain('@keyframes sovereign-hero-rise');
+    expect(typography).toContain('font-family: "Sovereign Display";');
+    expect(typography).toContain('font-family: "Geist Sans";');
+    expect(typography).toContain('--font-public-display:');
     expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
+    expect(sansAuthority).toContain('font-family: var(--font-public-display) !important');
+    expect(sansAuthority).toContain('font-family: var(--font-title) !important');
     expect(expressionCss).toContain('min-height: 44px');
     expect(main).toContain("import './landing-expression-field-integration.css';");
     expect(main).toContain("import './landing-hero-field-v4.css';");

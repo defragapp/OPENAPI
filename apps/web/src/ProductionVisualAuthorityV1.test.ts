@@ -27,21 +27,40 @@ describe('production visual authority v1', () => {
     expect(main).toContain("document.documentElement.dataset.sovereignVisualAuthority = 'production-v1';");
   });
 
-  it('uses self-hosted Geist Sans titles with native enterprise fallbacks', () => {
-    for (const source of [typography, sansAuthority, staticAuthority, intelligenceDemo, visualAuthority]) {
-      expect(source).toContain("\"Geist Sans\"");
+  it('keeps Geist for product UI while restoring the founder display face on public identity surfaces', () => {
+    for (const source of [typography, sansAuthority, intelligenceDemo, visualAuthority, staticAuthority]) {
+      expect(source).toContain('"Geist Sans"');
+      expect(source).not.toContain('\n    Optima,');
+      expect(source).not.toContain('\n    "Avenir Next",');
+      expect(source).not.toContain('font-family: "Sovereign Sans"');
+    }
 
+    for (const source of [typography, sansAuthority, intelligenceDemo, visualAuthority]) {
       expect(source).toContain('-apple-system');
       expect(source).toContain('"SF Pro Display"');
       expect(source).toContain('"Segoe UI"');
-      expect(source).not.toContain('\n    Optima,');
-      expect(source).not.toContain('\n    "Avenir Next",');
-      expect(source).not.toContain('font-family: "Sovereign Display"');
-      expect(source).not.toContain('font-family: "Sovereign Sans"');
     }
+
+    expect(typography).toContain('font-family: "Sovereign Display";');
+    expect(typography).toContain('--font-public-display:');
+    expect(typography).toContain('"Iowan Old Style"');
+    expect(sansAuthority).toContain('--sovereign-title: var(--font-public-display);');
+    expect(sansAuthority).toContain('font-family: var(--font-public-display) !important;');
+    expect(visualAuthority).toContain('.public-approved-v8 .v0-hero h1 > span');
+    expect(visualAuthority).toContain('.public-approved-v8 .landing-story__heading h2');
+    expect(visualAuthority).toContain('.public-secondary-page .policy-hero h1');
+    expect(visualAuthority).toContain('.public-approved-v8 .landing-context-view strong,');
+    expect(visualAuthority).toContain('font-family: var(--sovereign-title) !important;');
+    expect(staticAuthority).toContain('--static-display-font:');
+    expect(staticAuthority).toContain('"Sovereign Display",');
+    expect(staticAuthority).toContain('--static-ui-title-font:');
+    expect(staticAuthority).toContain('font-family: var(--static-display-font) !important;');
+    expect(staticAuthority).toContain('font-family: var(--static-ui-title-font) !important;');
+
     expect(typography.indexOf('-apple-system')).toBeLessThan(typography.indexOf('"SF Pro Display"'));
     expect(sansAuthority.indexOf('-apple-system')).toBeLessThan(sansAuthority.indexOf('"SF Pro Display"'));
-    expect(staticAuthority.indexOf('-apple-system')).toBeLessThan(staticAuthority.indexOf('"SF Pro Display"'));
+    const staticUi = staticAuthority.indexOf('--static-ui-title-font:');
+    expect(staticAuthority.indexOf('"Geist Sans",', staticUi)).toBeLessThan(staticAuthority.indexOf('"SF Pro Display"', staticUi));
   });
 
   it('restores founder-scale desktop hierarchy without rebuilding the landing story', () => {
@@ -123,7 +142,7 @@ describe('production visual authority v1', () => {
   });
 
   it('keeps all new authority styles structurally balanced', () => {
-    for (const source of [productCohesion, intelligenceDemo, visualAuthority]) {
+    for (const source of [productCohesion, intelligenceDemo, visualAuthority, sansAuthority, staticAuthority]) {
       expect((source.match(/{/g) ?? []).length).toBe((source.match(/}/g) ?? []).length);
     }
   });

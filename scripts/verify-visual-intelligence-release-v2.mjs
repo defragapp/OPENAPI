@@ -34,7 +34,7 @@ for (const marker of [
 if (main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;') <= main.indexOf('style.textContent += `\\n${experienceRefinementCss}`;')) throw new Error('Visual intelligence release v2 does not place rendered fidelity after experience refinement.');
 if (main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;') <= main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;')) throw new Error('Visual intelligence release v2 does not place landing refinement v2 after rendered fidelity.');
 if (main.indexOf('style.textContent += `\\n${landingLiveRefinementV5Css}`;') <= main.indexOf('style.textContent += `\\n${landingLiveRefinementV4Css}`;')) throw new Error('Visual intelligence release v2 does not place landing refinement v5 after v4.');
-if (main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;') <= main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;')) throw new Error('Visual intelligence release v2 does not place sans typography last.');
+if (main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;') <= main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;')) throw new Error('Visual intelligence release v2 does not place split typography after action authority.');
 
 for (const marker of [
   '--v8-blue: #d8d0c5 !important',
@@ -52,7 +52,6 @@ for (const marker of [
 ]) if (!landingRefinement.includes(marker)) throw new Error(`Visual intelligence release v2 is missing landing refinement marker ${marker}`);
 
 for (const marker of [
-  'One typeface. Hierarchy comes from weight, scale, and opacity.',
   '.v0-hero h1 > span',
   '.v0-hero h1 > em',
   'font-family: inherit !important',
@@ -63,11 +62,17 @@ for (const marker of [
   'height: 26px !important',
   '@media (prefers-reduced-motion: reduce)'
 ]) if (!landingRefinementV5.includes(marker)) throw new Error(`Visual intelligence release v2 is missing landing refinement v5 marker ${marker}`);
-if (landingRefinementV5.includes('var(--font-display, Georgia, serif)')) throw new Error('Visual intelligence release v2 found the retired display serif.');
+if (landingRefinementV5.includes('var(--font-display, Georgia, serif)')) throw new Error('Visual intelligence release v2 found a component-local display-serif override.');
 if (landingRefinementV5.includes('.landing-baseline-intro')) throw new Error('Visual intelligence release v2 found the retired root Baseline intro styling.');
-if (typography.includes('font-family: "Sovereign Display"') || typography.includes('/fonts/sovereign-display.woff2')) throw new Error('Visual intelligence release v2 found active Sovereign Display typography.');
-for (const marker of ['--font-display: var(--font-title);', '.public-approved-v8 .v0-hero h1 > em', 'font-family: var(--font-title) !important']) {
-  if (!`${typography}\n${sansTypography}`.includes(marker)) throw new Error(`Visual intelligence release v2 is missing sans typography marker ${marker}`);
+for (const marker of [
+  'font-family: "Geist Sans";',
+  'font-family: "Sovereign Display";',
+  '/fonts/sovereign-display.woff2',
+  '--font-public-display:',
+  '--font-display: var(--font-title);'
+]) if (!typography.includes(marker)) throw new Error(`Visual intelligence release v2 is missing split typography marker ${marker}`);
+for (const marker of ['.public-approved-v8 .v0-hero h1 > em', 'font-family: var(--font-title) !important', 'font-family: var(--font-public-display) !important']) {
+  if (!sansTypography.includes(marker)) throw new Error(`Visual intelligence release v2 is missing split typography authority marker ${marker}`);
 }
 
 for (const marker of [
@@ -116,7 +121,7 @@ const replacements = [
   ["  'What could change',", "  'Give you something you can try',"],
   ["  'System structure',", "  'How Sovereign reads a system',"],
   ["  'Illustrative permitted Baselines',", "  'Start with what you told Sovereign',"],
-  ["  '/experience-static-refinement-v1.css?v=20260816-refinement-v1',", "  '/experience-static-refinement-v1.css?v=20260817-cohesion-v2',\n  '/premium-action-static-v1.css?v=20260818-geist-v1',"],
+  ["  '/experience-static-refinement-v1.css?v=20260816-refinement-v1',", "  '/experience-static-refinement-v1.css?v=20260817-cohesion-v2',\n  '/premium-action-static-v1.css?v=20260819-founder-display-v1',"],
   ["  'Build my Baseline',", "  'Get started',"],
   ["  'Your thoughts deserve'", "  'Know yourself. Understand your people. See the whole system.'"],
   ["  'Look closer at the pattern.',", "  'Explore yourself more deeply.',"],
@@ -185,7 +190,6 @@ replaceVisualSectionMarker(
   "  'Understand what happens between you.',",
   "  'See how the same moment can land differently.',"
 );
-
 
 /* CURRENT_STORY_CONTRACT_isolated landing demonstrations */
 const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","No compatibility score"];
