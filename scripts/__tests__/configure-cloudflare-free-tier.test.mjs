@@ -90,22 +90,9 @@ describe('configureCloudflareFreeTier', () => {
       gateway: {
         id: 'sovereign-ai-gateway',
         management: 'verified',
+        collectLogs: false,
         rateLimit: '500/60s',
-        technique: 'sliding',
-        spendLimits: [
-          {
-            id: 'sovereign_global_daily_spend',
-            limitUsd: 2.75,
-            windowSeconds: 86_400,
-            technique: 'sliding'
-          },
-          {
-            id: 'sovereign_global_30_day_spend',
-            limitUsd: 75,
-            windowSeconds: 2_592_000,
-            technique: 'sliding'
-          }
-        ]
+        technique: 'sliding'
       }
     };
     expect(() => assertRequiredProductionControls(externallyManagedZoneControls)).not.toThrow();
@@ -114,36 +101,16 @@ describe('configureCloudflareFreeTier', () => {
       rateLimit: { management: 'unavailable', status: 500, reason: 'unexpected failure' }
     })).toThrow(/unexpected failure/);
   });
-  it('writes and verifies the exact launch Gateway burst and spend controls', async () => {
+
+  it('writes and verifies the exact Free launch Gateway privacy and burst controls', async () => {
     const gatewayResult = {
       cache_ttl: 0,
       collect_logs: false,
       rate_limiting_interval: 60,
       rate_limiting_limit: 500,
-      rate_limiting_technique: 'sliding',
-      spend_limits: {
-        enabled: true,
-        rules: [
-          {
-            id: 'sovereign_global_daily_spend',
-            enabled: true,
-            limit: 2.75,
-            limitType: 'cost',
-            window: 86_400,
-            technique: 'sliding'
-          },
-          {
-            id: 'sovereign_global_30_day_spend',
-            enabled: true,
-            limit: 75,
-            limitType: 'cost',
-            window: 2_592_000,
-            technique: 'sliding'
-          }
-        ]
-      }
+      rate_limiting_technique: 'sliding'
     };
-    const fetchMock = vi.fn(async (input, init = {}) => {
+    const fetchMock = vi.fn(async (input) => {
       const url = new URL(String(input));
       const path = url.pathname;
 
@@ -190,22 +157,9 @@ describe('configureCloudflareFreeTier', () => {
     expect(result.gateway).toMatchObject({
       id: 'sovereign-ai-gateway',
       management: 'verified',
+      collectLogs: false,
       rateLimit: '500/60s',
-      technique: 'sliding',
-      spendLimits: [
-        {
-          id: 'sovereign_global_daily_spend',
-          limitUsd: 2.75,
-          windowSeconds: 86_400,
-          technique: 'sliding'
-        },
-        {
-          id: 'sovereign_global_30_day_spend',
-          limitUsd: 75,
-          windowSeconds: 2_592_000,
-          technique: 'sliding'
-        }
-      ]
+      technique: 'sliding'
     });
     expect(() => assertRequiredProductionControls(result)).not.toThrow();
 
@@ -214,12 +168,14 @@ describe('configureCloudflareFreeTier', () => {
       && init?.method === 'PUT'
     );
     expect(gatewayWrite).toBeTruthy();
-    expect(JSON.parse(gatewayWrite[1].body)).toMatchObject({
+    expect(JSON.parse(gatewayWrite[1].body)).toEqual({
+      cache_invalidate_on_update: true,
+      cache_ttl: 0,
+      collect_logs: false,
       rate_limiting_interval: 60,
       rate_limiting_limit: 500,
-      rate_limiting_technique: 'sliding',
-      spend_limits: gatewayResult.spend_limits
+      rate_limiting_technique: 'sliding'
     });
+    expect(JSON.parse(gatewayWrite[1].body)).not.toHaveProperty('spend_limits');
   });
-
 });
