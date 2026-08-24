@@ -18,7 +18,7 @@ These instructions apply to the entire OPENAPI repository.
 - `pnpm production:release:text` is the single-deploy production mutation path for this launch and intentionally excludes live Browser Rendering.
 - `pnpm production:release:oauth` remains an optional Browser-audited path; do not invoke it when the owner has explicitly excluded Browser Rendering from the acceptance pass.
 - GitHub Actions, deploy hooks, Cloudflare Pages, duplicate production Workers, preview Workers, historical Workers Builds triggers, and alternate repositories are not production release authorities.
-- A technical release is complete only when both branded `/ready` endpoints report the exact target SHA, `ready: true`, migration `0017_privacy_access_and_eligibility`, migration parity `current`, configured policy/privacy dependencies, and exact matching release evidence.
+- A technical release is complete only when both branded `/ready` endpoints report the exact target SHA, `ready: true`, migration `0018_workers_ai_capacity_reservations`, migration parity `current`, configured policy/privacy/capacity-reservation dependencies, and exact matching release evidence.
 - Release evidence must describe what actually ran. Never set automated route/rendered verification fields to `true` unless those automated Browser checks ran and passed.
 - Human desktop/iPhone review is separate product acceptance evidence and must not be relabeled as automated Browser Rendering.
 - Extend canonical components and contracts in place. Do not create duplicate workspaces, alternative landing implementations, second agents, or disconnected product shells.
@@ -61,7 +61,7 @@ These instructions apply to the entire OPENAPI repository.
 - Contribution is not causation, feedback is not blame, and pattern analysis must never mutualize harm.
 
 ## Current data/privacy boundary
-- Current D1 schema is `0017_privacy_access_and_eligibility`.
+- Current candidate D1 schema is `0018_workers_ai_capacity_reservations`; deployed `0017_privacy_access_and_eligibility` remains immutable.
 - Signup and material policy review require the exact current Terms/Privacy tuple plus the 18+ launch-eligibility confirmation.
 - Private account export is authenticated, generated on demand from account-owned D1 data, returned with private/no-store behavior, and not retained as an export artifact.
 - R2 remains disabled.

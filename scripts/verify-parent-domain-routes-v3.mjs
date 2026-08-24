@@ -1,7 +1,7 @@
 const commitSha = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || process.env.APP_VERSION || '').trim();
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
-const expectedMigration = '0017_privacy_access_and_eligibility';
+const expectedMigration = '0018_workers_ai_capacity_reservations';
 const expectedArchive = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 const expectedSequence = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${expectedArchive}`;
 
@@ -41,6 +41,7 @@ function verifyRuntime(label, result, readyExpected) {
   assert(result.json?.dependencies?.migrationParity === 'current', `${label} does not enforce migration parity`);
   assert(result.json?.dependencies?.policyAcceptanceReceipts === 'configured', `${label} policy acceptance receipt store is not configured`);
   assert(result.json?.dependencies?.privacyAccessControls === 'configured', `${label} privacy access controls are not configured`);
+  assert(result.json?.dependencies?.aiCapacityReservations === 'configured', `${label} AI capacity reservations are not configured`);
   assert(result.json?.dependencies?.privateExports === 'on-demand-no-artifact', `${label} private export contract is stale`);
   assert(result.json?.visualRelease?.contract === 'v0-public-landing-v3', `${label} visual contract is stale`);
   assert(result.json?.visualRelease?.field === 'landing-expression-field-v3', `${label} expression field contract is stale`);

@@ -88,8 +88,8 @@ for (const [label, config] of configs) {
 }
 
 requireAll('model config', modelConfig, ["DEFAULT_AI_MODEL = '@cf/zai-org/glm-4.7-flash'", "DEFAULT_AI_PROVIDER = 'cloudflare-gateway'"]);
-requireAll('D1 session and AI privacy boundary', session, ['db.withSession(bookmark)', "readD1Bookmark(request) ?? 'first-primary'", 'reserveWorkersAiCapacity', 'releaseWorkersAiCapacity', 'skipCache: true', 'collectLog: false']);
-requireAll('free capacity ledger', capacity, ['FREE_DAILY_NEURON_BUDGET = 7_500', 'workers_ai_daily_capacity', 'sovereign_free_capacity_reached', 'retry-after']);
+requireAll('D1 session and AI privacy boundary', session, ['db.withSession(bookmark)', "readD1Bookmark(request) ?? 'first-primary'", 'reserveWorkersAiCapacity', 'settleWorkersAiCapacity', 'skipCache: true', 'collectLog: false']);
+requireAll('free capacity ledger', capacity, ['MAX_WORKERS_AI_DAILY_NEURON_BUDGET = 7_500', 'workers_ai_daily_capacity', 'workers_ai_capacity_reservations', 'sovereign_free_capacity_reached', 'retry-after']);
 requireAll('capacity migration', capacityMigration, ['CREATE TABLE IF NOT EXISTS workers_ai_daily_capacity', 'reserved_neurons INTEGER NOT NULL', 'request_count INTEGER NOT NULL']);
 requireAll('failed response refunds', usage, [
   'export async function releaseAiTurn',

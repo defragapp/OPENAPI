@@ -138,6 +138,9 @@ const worker = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
     try {
       const url = new URL(request.url);
+      const bounded = await enforceIngressLimits(request, url.pathname);
+      if (bounded instanceof Response) return secure(bounded);
+      request = bounded;
       let response: Response;
 
       const messageMatch = url.pathname.match(/^\/api\/v1\/threads\/([^/]+)\/messages$/);
@@ -230,6 +233,38 @@ const worker = {
     }
   }
 };
+
+export const GENERAL_API_BODY_LIMIT = 1_048_576;
+export const STRIPE_WEBHOOK_BODY_LIMIT = 524_288;
+export const AI_MESSAGE_JSON_BODY_LIMIT = 65_536;
+export const AI_MESSAGE_CONTENT_LIMIT = 12_000;
+
+export async function enforceIngressLimits(request: Request, pathname: string): Promise<Request | Response> {
+  if (!pathname.startsWith('/api/') || !['POST', 'PUT', 'PATCH'].includes(request.method)) return request;
+  const isStripe = pathname === '/api/v1/stripe/webhook';
+  const isMessage = /^\/api\/v1\/threads\/[^/]+\/messages$/.test(pathname);
+  const limit = isStripe ? STRIPE_WEBHOOK_BODY_LIMIT : isMessage ? AI_MESSAGE_JSON_BODY_LIMIT : GENERAL_API_BODY_LIMIT;
+  const declared = Number(request.headers.get('content-length'));
+  if (Number.isFinite(declared) && declared > limit) return requestTooLarge();
+  const bytes = new Uint8Array(await request.arrayBuffer());
+  if (bytes.byteLength > limit) return requestTooLarge();
+  if (isMessage) {
+    try {
+      const parsed = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes)) as { message?: unknown };
+      if (typeof parsed.message === 'string' && parsed.message.trim().length > AI_MESSAGE_CONTENT_LIMIT) return messageTooLong();
+    } catch { /* The route returns its existing sanitized invalid-body response. */ }
+  }
+  // Rebuilding from bytes preserves Stripe's exact raw UTF-8 octets for signature verification.
+  return new Request(request, { body: bytes });
+}
+
+function requestTooLarge(): Response {
+  return Response.json({ error: 'request_too_large', message: 'This request is too large to process safely.' }, { status: 413, headers: { 'cache-control': 'private, no-store' } });
+}
+
+function messageTooLong(): Response {
+  return Response.json({ error: 'message_too_long', message: 'Your message must be 12,000 characters or fewer.' }, { status: 413, headers: { 'cache-control': 'private, no-store' } });
+}
 
 function secure(response: Response): Response {
   return withSecurityHeaders(response);

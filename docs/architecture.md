@@ -46,7 +46,7 @@ See `docs/production-release.md` for the executable sequence and exact evidence 
 - Durable Object: `ThreadCoordinator`
 - AI Gateway: `sovereign-ai-gateway`
 - Workers AI model: `@cf/zai-org/glm-4.7-flash`
-- current schema: `0017_privacy_access_and_eligibility`
+- current candidate schema: `0018_workers_ai_capacity_reservations` (after immutable deployed `0017_privacy_access_and_eligibility`)
 - daily Workers AI capacity ledger foundation: `0013_workers_ai_free_capacity`
 - release-evidence table foundation: `0015_release_evidence`
 - policy receipt foundation: `0016_policy_acceptance_receipts`
@@ -117,7 +117,7 @@ D1 is canonical for:
 - daily Workers AI capacity reservations;
 - release progress/evidence.
 
-Current migration parity is `0017_privacy_access_and_eligibility`.
+Current candidate migration parity is `0018_workers_ai_capacity_reservations`.
 
 Private account export is assembled on demand from account-owned D1 data and returned directly with private/no-store behavior. It is not written to R2 or retained as an export artifact.
 
@@ -173,7 +173,7 @@ Required behavior includes:
 The exact target commit must:
 
 1. pass `pnpm verify:cloudflare-build`;
-2. apply migrations through `0017_privacy_access_and_eligibility`;
+2. apply migrations through `0018_workers_ai_capacity_reservations`;
 3. reconcile required Cloudflare controls;
 4. deploy `sovv-web` exactly once;
 5. report the exact SHA from both branded hosts;

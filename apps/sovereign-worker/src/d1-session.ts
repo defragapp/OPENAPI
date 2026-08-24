@@ -1,5 +1,5 @@
 import type { Env } from './env';
-import { releaseWorkersAiCapacity, reserveWorkersAiCapacity } from './ai/free-tier-capacity';
+import { actualWorkersAiNeurons, reserveWorkersAiCapacity, settleWorkersAiCapacity } from './ai/free-tier-capacity';
 
 export const D1_BOOKMARK_HEADER = 'x-d1-bookmark';
 const MAX_D1_BOOKMARK_LENGTH = 1_024;
@@ -21,20 +21,19 @@ export function withD1SessionEnv(env: Env, session: D1DatabaseSession): Env {
     const wrapped: NonNullable<Env['AI']> = {
       async run(model, input, options) {
         const normalizedInput = normalizeWorkersAiInput(model, input);
-        const reservation = await reserveWorkersAiCapacity(session, model, normalizedInput);
+        const reservation = await reserveWorkersAiCapacity(session, model, normalizedInput, env.WORKERS_AI_DAILY_NEURON_BUDGET);
         try {
           const result = await source.run(
             model,
             normalizedInput,
             normalizeGatewayOptions(options)
           );
+          await settleWorkersAiCapacity(session, reservation, actualWorkersAiNeurons(normalizedInput, result)).catch((settlementError) => {
+            console.error('workers_ai_capacity_settlement_failed', { error: settlementError instanceof Error ? settlementError.name : 'unknown' });
+          });
           return normalizeWorkersAiOutput(model, result);
         } catch (error) {
-          await releaseWorkersAiCapacity(session, reservation).catch((releaseError) => {
-            console.error('workers_ai_capacity_release_failed', {
-              error: releaseError instanceof Error ? releaseError.name : 'unknown'
-            });
-          });
+          // Failed and ambiguous provider calls retain their conservative reservation.
           throw error;
         }
       }

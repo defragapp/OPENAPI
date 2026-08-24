@@ -32,7 +32,7 @@ Cloudflare Workers Builds records, former trigger/build-token instructions, GitH
 - Model: `@cf/zai-org/glm-4.7-flash`
 - Daily capacity ledger introduced by migration `0013_workers_ai_free_capacity`
 - Release-evidence tables introduced by migration `0015_release_evidence`
-- Current schema: migration `0017_privacy_access_and_eligibility`
+- Current candidate schema: migration `0018_workers_ai_capacity_reservations` (immutable upgrade from deployed `0017_privacy_access_and_eligibility`)
 - Private export: authenticated, on-demand, no retained export artifact
 - Assets: compiled web application
 - Background cleanup: scheduled D1 work every 15 minutes
@@ -83,7 +83,7 @@ The text-first release path:
 2. verifies migrations and production release configuration;
 3. verifies the publicly served DMARC record before mutation;
 4. prepares the exact production Wrangler configuration;
-5. applies D1 migrations through `0017_privacy_access_and_eligibility`;
+5. applies D1 migrations through `0018_workers_ai_capacity_reservations`;
 6. verifies required Worker secrets;
 7. reconciles the repository-owned Free-plan Cloudflare controls when the authenticated credential exposes the required management APIs; HTTP 403 from the WAF/ruleset or API Gateway management APIs records those zone controls as externally managed and leaves them untouched;
 8. when API Shield management is available, normalizes Endpoint Management templates because Cloudflare may return named OpenAPI parameters as positional `{var1}`, `{var2}`, and equivalent forms;
@@ -115,14 +115,14 @@ Required state:
 - `ready: true` on both `/ready` endpoints;
 - `version` equal to the exact target SHA;
 - `/ready.sha` equal to the exact target SHA where exposed;
-- `migrationVersion: 0017_privacy_access_and_eligibility`;
-- `latestMigrationVersion: 0017_privacy_access_and_eligibility`;
+- `migrationVersion: 0018_workers_ai_capacity_reservations`;
+- `latestMigrationVersion: 0018_workers_ai_capacity_reservations`;
 - `dependencies.migrationParity: current`;
 - `dependencies.policyAcceptanceReceipts: configured`;
 - `dependencies.privacyAccessControls: configured`;
 - `dependencies.privateExports: on-demand-no-artifact` where exposed;
 - `releaseEvidence.sha` equal to the target SHA;
-- `releaseEvidence.migrationVersion` equal to `0017_privacy_access_and_eligibility`;
+- `releaseEvidence.migrationVersion` equal to `0018_workers_ai_capacity_reservations`;
 - verified DMARC evidence;
 - release evidence converged across both branded domains.
 

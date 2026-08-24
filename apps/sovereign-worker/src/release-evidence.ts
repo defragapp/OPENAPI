@@ -3,7 +3,7 @@ import type { Env } from './env';
 export const RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1';
 export const RELEASE_ROUTE_COHESION_CONTRACT = 'sovereign-deployed-route-cohesion-v1';
 export const RELEASE_RENDERED_VISUAL_CONTRACT = 'sovereign-rendered-page-family-audit-v1';
-export const RELEASE_MIGRATION_VERSION = '0017_privacy_access_and_eligibility';
+export const RELEASE_MIGRATION_VERSION = '0018_workers_ai_capacity_reservations';
 const RELEASE_EVIDENCE_KEYS = [
   'contract',
   'sha',

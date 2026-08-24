@@ -27,8 +27,10 @@ describe('unified Sovereign intelligence experience', () => {
     expect(authenticatedWorkspace).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
   });
 
-  it('starts a clean exploration when context changes with active content', () => {
-    expect(workspace).toContain('if (next !== surface && (messages.length || draft.trim())) startNewThread(next)');
+  it('preserves active work during navigation and keeps reset explicit', () => {
+    expect(workspace).not.toContain('startNewThread(next)');
+    expect(workspace).toContain('function openSurface(next: Surface)');
+    expect(workspace).toContain('function startNewThread(nextSurface: Surface = surface)');
     expect(workspace).toContain('setThreadId(newThreadId(nextSurface))');
     expect(workspace).toContain("if (nextSurface !== 'People') setSelectedPerson('')");
     expect(workspace).toContain("if (nextSurface !== 'Systems') setSelectedSystem('')");
@@ -45,7 +47,7 @@ describe('unified Sovereign intelligence experience', () => {
   it('keeps each message attached to the context used for the question', () => {
     expect(workspace).toContain('const messageContext = {');
     expect(workspace).toContain("role: 'user', text: clean, context: messageContext");
-    expect(workspace).toContain("role: 'assistant', text: 'Connecting your Baseline', context: messageContext");
+    expect(workspace).toContain("role: 'assistant', text: 'Preparing your answer…', context: messageContext");
     expect(workspace).toContain("...(row.context && typeof row.context === 'object' ? { context: row.context } : {})");
   });
 

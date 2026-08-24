@@ -58,7 +58,7 @@ Do not allow a historical file to redefine current product or release authority.
 
 `0013_workers_ai_free_capacity` is retained as schema lineage for the daily capacity control; it is not the current schema version.
 
-Current schema: **`0017_privacy_access_and_eligibility`**.
+Current candidate schema: **`0018_workers_ai_capacity_reservations`**, an immutable upgrade after deployed **`0017_privacy_access_and_eligibility`**.
 
 Release-evidence tables were introduced by historical migration `0015_release_evidence`; `0015` is not the current schema version.
 
@@ -91,7 +91,7 @@ The release command must target the same exact current `origin/main` SHA that pa
 
 Release evidence records actual provenance. `routeCohesionVerified` and `renderedVisualVerified` are `true` only if those automated Browser audits actually ran and passed. Human desktop/iPhone QA is separate evidence and must never be represented as automated Browser Rendering.
 
-A technical release is live only when both branded `/ready` endpoints prove the exact deployed SHA, `ready: true`, migration `0017_privacy_access_and_eligibility`, migration parity `current`, policy-acceptance receipts configured, privacy-access controls configured, and exact matching release evidence.
+A technical release is live only when both branded `/ready` endpoints prove the exact deployed SHA, `ready: true`, migration `0018_workers_ai_capacity_reservations`, migration parity `current`, policy-acceptance receipts configured, privacy-access controls and AI capacity reservations configured, and exact matching release evidence.
 
 GitHub Actions, deploy hooks, Cloudflare Pages, preview Workers, duplicate production Workers, historical Workers Builds triggers, and alternate repositories are not production release authorities.
 

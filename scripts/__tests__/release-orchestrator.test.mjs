@@ -64,8 +64,8 @@ function harness({
       ok: true,
       ready: true,
       version: sha,
-      migrationVersion: '0017_privacy_access_and_eligibility',
-      latestMigrationVersion: '0017_privacy_access_and_eligibility',
+      migrationVersion: '0018_workers_ai_capacity_reservations',
+      latestMigrationVersion: '0018_workers_ai_capacity_reservations',
       dependencies: {
         migrationParity: 'current',
         policyAcceptanceReceipts: 'configured',

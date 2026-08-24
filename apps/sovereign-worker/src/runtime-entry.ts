@@ -1,4 +1,4 @@
-import worker, { ThreadCoordinator, queue, scheduled } from './entry';
+import worker, { enforceIngressLimits, ThreadCoordinator, queue, scheduled } from './entry';
 import type { Env } from './env';
 import { transactionalEmailProvider } from './email';
 import { handleExpressionFieldRequest } from './expression-field';
@@ -56,8 +56,9 @@ const CAPACITY_MIGRATION_VERSION = '0013_workers_ai_free_capacity';
 const PASSKEY_MIGRATION_VERSION = '0014_passkey_authentication';
 const RELEASE_EVIDENCE_MIGRATION_VERSION = '0015_release_evidence';
 const POLICY_RECEIPT_MIGRATION_VERSION = '0016_policy_acceptance_receipts';
-const LATEST_MIGRATION_VERSION = '0017_privacy_access_and_eligibility';
-const LATEST_MIGRATION_FILENAME = '0017_privacy_access_and_eligibility.sql';
+const PRIVACY_ACCESS_MIGRATION_VERSION = '0017_privacy_access_and_eligibility';
+const LATEST_MIGRATION_VERSION = '0018_workers_ai_capacity_reservations';
+const LATEST_MIGRATION_FILENAME = '0018_workers_ai_capacity_reservations.sql';
 const LEGACY_HEALTH_METADATA_COMPATIBILITY = "migrationVersion: '0015_release_evidence' · latestMigrationVersion: '0016_policy_acceptance_receipts'";
 const VISUAL_ARCHIVE_SHA256 = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 const VISUAL_SEQUENCE_FINGERPRINT = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${VISUAL_ARCHIVE_SHA256}`;
@@ -79,6 +80,11 @@ const PASSKEY_DELETE_PATH = /^\/api\/v1\/auth\/passkeys\/([^/]+)$/;
 
 const runtime = {
   async fetch(request: Request, env: Env, executionContext: ExecutionContext): Promise<Response> {
+    const pathname = new URL(request.url).pathname;
+    const ingressPath = STRIPE_WEBHOOK_PATHS.has(pathname) ? '/api/v1/stripe/webhook' : pathname;
+    const boundedRequest = await enforceIngressLimits(request, ingressPath);
+    if (boundedRequest instanceof Response) return withSecurityHeaders(boundedRequest);
+    request = boundedRequest;
     const session = createD1RequestSession(request, env.DB);
     const requestEnv = session ? withD1SessionEnv(env, session) : env;
     try {
@@ -335,6 +341,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'release_progress') AS release_progress_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'policy_acceptance_receipts') AS policy_receipts_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'privacy_request_events') AS privacy_requests_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_capacity_reservations') AS capacity_reservations_ready,
       EXISTS(SELECT 1 FROM pragma_table_info('accounts') WHERE name = 'eligibility_rule_version') AS eligibility_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'd1_migrations') AS migration_history_ready`)
       .first<{
@@ -345,6 +352,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
         release_progress_ready: number;
         policy_receipts_ready: number;
         privacy_requests_ready: number;
+        capacity_reservations_ready: number;
         eligibility_ready: number;
         migration_history_ready: number;
       }>();
@@ -375,25 +383,28 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
     const releaseSchemaReady = db?.release_evidence_ready === 1
       && db?.release_progress_ready === 1;
     const policyReceiptSchemaReady = db?.policy_receipts_ready === 1;
-    const privacyAccessSchemaReady = db?.privacy_requests_ready === 1
-      && db?.eligibility_ready === 1
+    const privacyAccessSchemaReady = db?.privacy_requests_ready === 1 && db?.eligibility_ready === 1;
+    const capacityReservationSchemaReady = db?.capacity_reservations_ready === 1
       && migrationHistory?.release_migration_applied === 1;
-    const migrationVersion = privacyAccessSchemaReady
+    const migrationVersion = capacityReservationSchemaReady
       ? LATEST_MIGRATION_VERSION
-      : policyReceiptSchemaReady
-        ? POLICY_RECEIPT_MIGRATION_VERSION
-        : releaseSchemaReady
-          ? RELEASE_EVIDENCE_MIGRATION_VERSION
-          : db?.passkeys_ready === 1
-            ? PASSKEY_MIGRATION_VERSION
-            : db?.capacity_ready === 1
-              ? CAPACITY_MIGRATION_VERSION
-              : 'unknown';
+      : privacyAccessSchemaReady
+        ? PRIVACY_ACCESS_MIGRATION_VERSION
+        : policyReceiptSchemaReady
+          ? POLICY_RECEIPT_MIGRATION_VERSION
+          : releaseSchemaReady
+            ? RELEASE_EVIDENCE_MIGRATION_VERSION
+            : db?.passkeys_ready === 1
+              ? PASSKEY_MIGRATION_VERSION
+              : db?.capacity_ready === 1
+                ? CAPACITY_MIGRATION_VERSION
+                : 'unknown';
     const migrationParity = migrationVersion === LATEST_MIGRATION_VERSION;
     const dependencies = {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
       migrationParity: migrationParity ? 'current' : 'behind',
       aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing',
+      aiCapacityReservations: capacityReservationSchemaReady ? 'configured' : 'missing',
       passkeys: db?.passkeys_ready === 1 ? 'configured' : 'missing',
       releaseEvidenceStore: releaseSchemaReady ? 'configured' : 'missing',
       policyAcceptanceReceipts: policyReceiptSchemaReady ? 'configured' : 'missing',
@@ -423,6 +434,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
     const ready = ok
       && migrationParity
       && dependencies.aiFreeCapacity === 'configured'
+      && dependencies.aiCapacityReservations === 'configured'
       && dependencies.passkeys === 'configured'
       && dependencies.releaseEvidenceStore === 'configured'
       && dependencies.policyAcceptanceReceipts === 'configured'

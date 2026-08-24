@@ -183,15 +183,16 @@ describe('account onboarding, recovery, and conversation persistence', () => {
     expect(entry).not.toContain("'user_message', { redacted: true");
   });
 
-  it('reports migration 0017 and privacy-access readiness from the authoritative production health layer', () => {
+  it('reports migration 0018 with privacy and capacity-reservation readiness', () => {
     expect(runtime).toContain("CAPACITY_MIGRATION_VERSION = '0013_workers_ai_free_capacity'");
     expect(runtime).toContain("PASSKEY_MIGRATION_VERSION = '0014_passkey_authentication'");
     expect(runtime).toContain("RELEASE_EVIDENCE_MIGRATION_VERSION = '0015_release_evidence'");
     expect(runtime).toContain("POLICY_RECEIPT_MIGRATION_VERSION = '0016_policy_acceptance_receipts'");
-    expect(runtime).toContain("LATEST_MIGRATION_VERSION = '0017_privacy_access_and_eligibility'");
-    expect(runtime).toContain('const migrationVersion = privacyAccessSchemaReady');
+    expect(runtime).toContain("LATEST_MIGRATION_VERSION = '0018_workers_ai_capacity_reservations'");
+    expect(runtime).toContain('const migrationVersion = capacityReservationSchemaReady');
     expect(runtime).toContain("policyAcceptanceReceipts: policyReceiptSchemaReady ? 'configured' : 'missing'");
     expect(runtime).toContain("privacyAccessControls: privacyAccessSchemaReady ? 'configured' : 'missing'");
+    expect(runtime).toContain("aiCapacityReservations: capacityReservationSchemaReady ? 'configured' : 'missing'");
     expect(policyReceiptMigration).toContain('CREATE TABLE policy_acceptance_receipts');
     expect(privacyAccessMigration).toContain('CREATE TABLE privacy_request_events');
     expect(runtime).toContain("answerContract: 'sovereign-answer.v2'");

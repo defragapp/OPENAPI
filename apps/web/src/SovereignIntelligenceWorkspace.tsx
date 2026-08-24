@@ -139,7 +139,6 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
   const [status, setStatus] = useState('Loading Sovereign.OS…');
   const [restoreError, setRestoreError] = useState('');
   const [apiState, setApiState] = useState<ApiState>('loading');
-  const responseProgressTimer = useRef<number | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceState>({
     today: null,
     people: [],
@@ -166,9 +165,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       ? await response.json().catch(() => ({}))
       : await response.text();
     if (!response.ok) {
-      const problem = typeof body === 'object' && body ? body as Json : {};
-      const textMessage = typeof body === 'string' ? body.trim() : '';
-      throw new Error(problem.message || problem.error || textMessage || 'That request could not be completed.');
+      throw new Error('That request could not be completed safely.');
     }
     return body as Json;
   }
@@ -234,7 +231,6 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     return () => window.clearInterval(timer);
   }, [surface, composerFocused, draft]);
 
-  useEffect(() => () => clearResponseProgress(), []);
 
   const selectedPersonRecord = useMemo(
     () => workspace.people.find((person) => person.id === selectedPerson) ?? null,
@@ -255,32 +251,10 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     && workspace.today?.baseline?.facetProfileStatus === 'ready';
   const surfaceEntitled = !missingSurfaceEntitlement(surface, workspace.billing);
 
-  function clearResponseProgress() {
-    if (responseProgressTimer.current) window.clearInterval(responseProgressTimer.current);
-    responseProgressTimer.current = null;
-  }
-
   function beginResponseProgress(assistantId: string) {
-    clearResponseProgress();
-    const phases = [
-      'Connecting your Baseline',
-      workspace.today?.current?.status === 'ready' ? 'Checking what may be more relevant now' : 'Looking at the pattern',
-      'Connecting the situation',
-      'Preparing your answer'
-    ];
-    let phase = 0;
-    const show = () => {
-      const next = phases[Math.min(phase, phases.length - 1)]!;
-      setStatus(next);
-      setMessages((current) => current.map((item) => item.id === assistantId ? { ...item, text: next } : item));
-    };
-    show();
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    responseProgressTimer.current = window.setInterval(() => {
-      if (phase >= phases.length - 1) return clearResponseProgress();
-      phase += 1;
-      show();
-    }, 1_200);
+    const preparing = 'Preparing your answer…';
+    setStatus(preparing);
+    setMessages((current) => current.map((item) => item.id === assistantId ? { ...item, text: preparing } : item));
   }
 
   function startNewThread(nextSurface: Surface = surface) {
@@ -304,12 +278,9 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     setRestoreError('');
     setBaselineExperience('idle');
     setBaselineReveal(null);
-    if (next !== surface && (messages.length || draft.trim())) startNewThread(next);
-    else {
-      setSurface(next);
-      if (next !== 'People') setSelectedPerson('');
-      if (next !== 'Systems') setSelectedSystem('');
-    }
+    setSurface(next);
+    if (next !== 'People') setSelectedPerson('');
+    if (next !== 'Systems') setSelectedSystem('');
     setContextOpen(false);
     setMenuOpen(false);
   }
@@ -395,6 +366,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
   async function sendMessage(message: string, covenantForTurn = false) {
     const clean = message.trim();
     if (!clean || apiState === 'loading') return;
+    if (clean.length > 10_000) { setStatus('Your message must be 10,000 characters or fewer.'); return; }
     if (!baselineReady) {
       setApiState('error');
       setStatus('Finish your Baseline before asking Sovereign a question.');
@@ -408,8 +380,8 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     };
     const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', text: clean, context: messageContext };
     const assistantId = crypto.randomUUID();
-    setMessages((current) => [...current, userMessage, { id: assistantId, role: 'assistant', text: 'Connecting your Baseline', context: messageContext }]);
-    setDraft('');
+    const previousDraft = draft;
+    setMessages((current) => [...current, userMessage, { id: assistantId, role: 'assistant', text: 'Preparing your answer…', context: messageContext }]);
     setApiState('loading');
     beginResponseProgress(assistantId);
     try {
@@ -430,7 +402,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       if (!response.ok || !isSovereignAnswer(payload.answer)) {
         throw new Error(payload.message || payload.error || 'Sovereign is temporarily unavailable.');
       }
-      clearResponseProgress();
+      setDraft('');
       setMessages((current) => current.map((item) => item.id === assistantId
         ? {
             ...item,
@@ -446,10 +418,10 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       const threadData = await api('/api/v1/threads');
       setWorkspace((current) => ({ ...current, threads: threadData.threads ?? [] }));
     } catch (error) {
-      clearResponseProgress();
       setApiState('error');
+      setDraft(previousDraft || clean);
       setMessages((current) => current.map((item) => item.id === assistantId
-        ? { ...item, text: error instanceof Error ? error.message : 'Sovereign could not complete this response.' }
+        ? { ...item, text: 'Sovereign could not complete this response. Your draft and conversation are unchanged.' }
         : item));
       setStatus('Needs attention');
     }
@@ -622,6 +594,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
               <textarea
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
+                maxLength={10_000}
                 onFocus={() => setComposerFocused(true)}
                 onBlur={() => setComposerFocused(false)}
                 placeholder={composerPlaceholder(surface)}

@@ -32,7 +32,7 @@ const expectedObservability = {
 };
 const expectedGatewayId = 'sovereign-ai-gateway';
 const expectedModel = '@cf/zai-org/glm-4.7-flash';
-const currentMigration = '0017_privacy_access_and_eligibility';
+const currentMigration = '0018_workers_ai_capacity_reservations';
 const capacityMigration = '0013_workers_ai_free_capacity';
 
 function requireValue(condition, message) {
@@ -186,6 +186,7 @@ requireAll('parent-domain verifier', parentDomainVerifier, [
   `const expectedMigration = '${currentMigration}'`,
   "dependencies?.policyAcceptanceReceipts === 'configured'",
   "dependencies?.privacyAccessControls === 'configured'",
+  "dependencies?.aiCapacityReservations === 'configured'",
   "dependencies?.privateExports === 'on-demand-no-artifact'",
   'https://defrag.app/',
   'https://www.defrag.app/'
@@ -251,4 +252,4 @@ requireValue(!authenticatedWorkspace.includes("import { WorldVideoLauncher } fro
 requireValue(!authenticatedWorkspace.includes('<WorldVideoLauncher />'), 'Current authenticated workspace must not mount the video launcher');
 requireValue(authenticatedWorkspace.includes('data-workspace-contract="one-room"'), 'Canonical one-room workspace contract is missing');
 
-console.log('Direct Cloudflare release config verified production_root=true text_first_release=true browser_rendering_optional=true current_migration=0017 privacy_export=on_demand_no_artifact worlds_video=false current_main_only=true github_workflows_non_authoritative=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
+console.log(`Direct Cloudflare release config verified production_root=true text_first_release=true browser_rendering_optional=true current_migration=${currentMigration} privacy_export=on_demand_no_artifact worlds_video=false current_main_only=true github_workflows_non_authoritative=true d1_replication=true gateway_rate_limit=true api_shield=true waf_rate_limit=true r2=false queues=false`);

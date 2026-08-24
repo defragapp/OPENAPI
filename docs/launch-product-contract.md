@@ -139,7 +139,7 @@ No video-generation turn cost is part of the current launch because video genera
 
 ## Policy, privacy, retention, and account control
 
-Current schema is `0017_privacy_access_and_eligibility`.
+Current candidate schema is `0018_workers_ai_capacity_reservations`; deployed migration `0017_privacy_access_and_eligibility` is immutable.
 
 Signup requires the exact current Terms/Privacy tuple and separate 18+ launch-eligibility confirmation. Material policy changes may pause normal private workspace/API use until re-review while bounded account rights remain available.
 
@@ -176,7 +176,7 @@ Both commands must apply to the same exact current `origin/main` SHA. The releas
 Production release requires:
 
 - foundation/type/unit/build/smoke/secret/removal gates passing;
-- successful idempotent D1 migration replay through `0017_privacy_access_and_eligibility`;
+- successful ordered D1 migration application through `0018_workers_ai_capacity_reservations` without replaying applied migrations;
 - exact-SHA `/health` and `/ready` convergence on both branded hosts;
 - policy acceptance receipts and privacy access controls configured;
 - private export reported as on-demand/no-artifact;

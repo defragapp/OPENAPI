@@ -1,0 +1,12 @@
+{
+  "status": "staged_not_live",
+  "workersAiDailyNeuronBudget": 7500,
+  "aiGateway": {
+    "burstRequests": 500,
+    "burstWindowSeconds": 60,
+    "loggingEnabled": false,
+    "dollarSpendRule": null
+  },
+  "r2Enabled": false,
+  "queuesEnabled": false
+}

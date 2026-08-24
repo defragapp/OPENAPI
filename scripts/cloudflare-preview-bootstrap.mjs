@@ -21,7 +21,7 @@ const env = { ...process.env };
 const APPROVED_AI_PROVIDER = 'cloudflare-gateway';
 const APPROVED_AI_MODEL = '@cf/zai-org/glm-4.7-flash';
 const CAPACITY_LEDGER_MIGRATION = '0013_workers_ai_free_capacity';
-const CURRENT_MIGRATION_TARGET = '0017_privacy_access_and_eligibility';
+const CURRENT_MIGRATION_TARGET = '0018_workers_ai_capacity_reservations';
 
 if (accountId) env.CLOUDFLARE_ACCOUNT_ID = accountId;
 if (token) env.CLOUDFLARE_API_TOKEN = token;
