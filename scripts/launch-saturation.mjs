@@ -14,7 +14,7 @@ const AUTHENTICATED_READ_PATHS = [
   '/api/v1/threads',
   '/api/v1/you'
 ];
-const PROFILE_NAMES = new Set(['public', 'authenticated-read', 'message-boundary', 'ai-standard']);
+const PROFILE_NAMES = new Set(['public', 'authenticated-read', 'message-boundary', 'ai-free-capacity']);
 
 function integer(env, name, fallback, minimum, maximum) {
   const raw = env[name]?.trim();
@@ -64,8 +64,8 @@ function loadConfig(env) {
 
   const requests = integer(env, 'SATURATION_REQUESTS', 30, 1, 600);
   const concurrency = integer(env, 'SATURATION_CONCURRENCY', 5, 1, 25);
-  const timeoutMs = integer(env, 'SATURATION_TIMEOUT_MS', profile === 'ai-standard' ? 30_000 : 10_000, 1_000, 60_000);
-  const maxP95Ms = integer(env, 'SATURATION_MAX_P95_MS', profile === 'ai-standard' ? 20_000 : 3_000, 100, 60_000);
+  const timeoutMs = integer(env, 'SATURATION_TIMEOUT_MS', profile === 'ai-free-capacity' ? 30_000 : 10_000, 1_000, 60_000);
+  const maxP95Ms = integer(env, 'SATURATION_MAX_P95_MS', profile === 'ai-free-capacity' ? 20_000 : 3_000, 100, 60_000);
   const max5xxRate = number(env, 'SATURATION_MAX_5XX_RATE', 0.01, 0, 1);
 
   const accessClientId = env.CF_ACCESS_CLIENT_ID?.trim();
@@ -75,7 +75,7 @@ function loadConfig(env) {
   }
 
   const sessionCookie = env.SATURATION_SESSION_COOKIE?.trim();
-  if (['authenticated-read', 'ai-standard'].includes(profile) && !sessionCookie) {
+  if (['authenticated-read', 'ai-free-capacity'].includes(profile) && !sessionCookie) {
     throw new Error(`SATURATION_SESSION_COOKIE is required for ${profile}`);
   }
   if (sessionCookie && !sessionCookie.startsWith('__Host-sovereign_session=')) {
@@ -83,20 +83,15 @@ function loadConfig(env) {
   }
 
   const threadId = env.SATURATION_THREAD_ID?.trim();
-  if (['message-boundary', 'ai-standard'].includes(profile) && !threadId) {
+  if (['message-boundary', 'ai-free-capacity'].includes(profile) && !threadId) {
     throw new Error(`SATURATION_THREAD_ID is required for ${profile}`);
   }
   if (threadId && !/^[A-Za-z0-9._:-]{1,160}$/.test(threadId)) {
     throw new Error('SATURATION_THREAD_ID contains unsupported characters');
   }
 
-  if (profile === 'ai-standard') {
-    if (env.SATURATION_ENABLE_BILLED_AI !== 'true') {
-      throw new Error('SATURATION_ENABLE_BILLED_AI=true is required for billed AI traffic');
-    }
-    if (requests > 60 || concurrency > 5) {
-      throw new Error('A single billed-AI canary run is capped at 60 requests and concurrency 5');
-    }
+  if (profile === 'ai-free-capacity' && (requests > 60 || concurrency > 5)) {
+    throw new Error('A single Free-capacity canary run is capped at 60 requests and concurrency 5');
   }
 
   return {
@@ -154,7 +149,7 @@ function requestSpec(config, index) {
     path,
     expected: [200, 429],
     body: JSON.stringify({
-      message: 'Synthetic launch canary. Reply with one short sentence confirming controlled availability.',
+      message: 'Synthetic Free-capacity launch canary. Reply with one short sentence confirming controlled availability.',
       context: { surface: 'Today' }
     })
   };
@@ -283,7 +278,11 @@ async function run(config) {
     if (!report.passed) break;
   }
 
-  const passed = reports.length === counts.length && reports.every((report) => report.passed);
+  const capacityExhaustionObserved = config.profile !== 'ai-free-capacity'
+    || reports.some((report) => Number(report.statuses['429'] || 0) > 0);
+  const passed = reports.length === counts.length
+    && reports.every((report) => report.passed)
+    && capacityExhaustionObserved;
   console.log(JSON.stringify({
     type: 'sovereign-launch-saturation-result.v1',
     targetHost: config.targetHost,
@@ -293,6 +292,7 @@ async function run(config) {
     maxConcurrency: config.concurrency,
     maxP95Ms: config.maxP95Ms,
     max5xxRate: config.max5xxRate,
+    capacityExhaustionObserved,
     passed,
     stages: reports
   }));
@@ -315,19 +315,27 @@ function selfTest() {
     SATURATION_APPROVED_CANARY_ORIGIN: 'https://other.example.net'
   }), /does not match/);
   assert.throws(() => loadConfig({ ...valid, SATURATION_CONCURRENCY: '26' }), /SATURATION_CONCURRENCY/);
-  assert.throws(() => loadConfig({
+  const freeCapacity = loadConfig({
     ...valid,
-    SATURATION_PROFILE: 'ai-standard',
+    SATURATION_PROFILE: 'ai-free-capacity',
     SATURATION_SESSION_COOKIE: '__Host-sovereign_session=test',
     SATURATION_THREAD_ID: 'synthetic-thread'
-  }), /SATURATION_ENABLE_BILLED_AI/);
+  });
+  assert.equal(freeCapacity.profile, 'ai-free-capacity');
+  assert.throws(() => loadConfig({
+    ...valid,
+    SATURATION_PROFILE: 'ai-free-capacity',
+    SATURATION_SESSION_COOKIE: '__Host-sovereign_session=test',
+    SATURATION_THREAD_ID: 'synthetic-thread',
+    SATURATION_REQUESTS: '61'
+  }), /Free-capacity canary run/);
   assert.deepEqual(stageConcurrency(10), [1, 4, 10]);
   assert.deepEqual(stageRequestCounts(10, [1, 4, 10]), [4, 3, 3]);
   assert.equal(percentile([1, 2, 3, 4], 0.95), 4);
   const boundary = requestSpec({ ...loadConfig(valid), profile: 'message-boundary', threadId: 'synthetic-thread' }, 0);
   assert.deepEqual(boundary.expected, [413]);
   assert.match(boundary.body, /"message":/);
-  console.log('Launch saturation self-test passed production_refusal=true gradual_ramp=true bounded_profiles=true');
+  console.log('Launch saturation self-test passed production_refusal=true gradual_ramp=true bounded_profiles=true free_capacity_profile=true');
 }
 
 if (process.argv.includes('--self-test')) {
