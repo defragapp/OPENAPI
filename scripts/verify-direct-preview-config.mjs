@@ -69,7 +69,7 @@ requireValue(rootConfig.vars?.APP_ENV === 'production', 'Production APP_ENV drif
 requireValue(rootConfig.vars?.AI_PROVIDER === 'cloudflare-gateway', 'Production AI provider drifted');
 requireValue(rootConfig.vars?.AI_MODEL === expectedModel, 'Production AI model drifted');
 requireValue(rootConfig.vars?.AI_GATEWAY_ID === expectedGatewayId, 'Production AI Gateway drifted');
-requireValue(rootConfig.vars?.WORKERS_AI_DAILY_NEURON_BUDGET === '250000', 'Production Workers AI daily budget drifted');
+requireValue(rootConfig.vars?.WORKERS_AI_DAILY_NEURON_BUDGET === '7500', 'Production Workers AI Free daily budget drifted');
 requireValue(rootConfig.vars?.PUBLIC_CONTACT_EMAIL === 'info@defrag.app', 'Production public contact drifted');
 requireValue(rootConfig.vars?.WORLDS_VIDEO_ENABLED === 'false', 'Worlds video must remain disabled for the text-first launch');
 requireValue(rootConfig.d1_databases?.some((item) => item.binding === 'DB' && item.database_name === 'sovereign-openapi-db'), 'Production D1 binding drifted');
@@ -208,18 +208,22 @@ requireAll('bounded public composer', sovereignWorkspace, [
 ]);
 requireAll('Unicode-conservative AI capacity', aiCapacity, [
   'CONSERVATIVE_BYTES_PER_TOKEN = 1',
-  'new TextEncoder().encode(serialized).byteLength'
+  'new TextEncoder().encode(serialized).byteLength',
+  'budget < 1 || budget > DEFAULT_DAILY_NEURON_BUDGET',
+  'sovereign_free_capacity_reached'
 ]);
 requireAll('guarded launch saturation', launchSaturation, [
   'SATURATION_APPROVED_CANARY_ORIGIN',
   'Refusing to run saturation traffic against a production or branded domain',
-  "SATURATION_ENABLE_BILLED_AI !== 'true'",
-  'A single billed-AI canary run is capped at 60 requests and concurrency 5',
+  "'ai-free-capacity'",
+  'A single Free-capacity canary run is capped at 60 requests and concurrency 5',
+  'capacityExhaustionObserved',
   'sovereign-launch-saturation-result.v1',
   'stageConcurrency(config.concurrency)'
 ]);
 requireAll('launch saturation runbook', launchSaturationDoc, [
   'Status: controlled canary authority for #259.',
+  'Free capacity exhaustion and graceful degradation',
   'pnpm test:launch-saturation',
   'pnpm saturation:canary',
   'pnpm exec wrangler rollback STABLE_VERSION_ID --config wrangler.jsonc',
@@ -227,7 +231,7 @@ requireAll('launch saturation runbook', launchSaturationDoc, [
 ]);
 requireAll('current owner gates', ownerActions, [
   'Cloudflare credential containment and replacement',
-  'Paid Workers AI capacity',
+  'Workers AI Free launch posture',
   'Human product acceptance',
   'Terms, Privacy, and launch-market approval',
   'General public Access cutover'
@@ -241,14 +245,16 @@ requireAll('single-deploy implementation', deployV3, [
   "runWrangler(['deploy', '--config', generatedConfigPath])",
   'configureCloudflareFreeTier',
   "controls?.gateway?.management !== 'verified'",
-  'AI Gateway launch rate/spend controls are not management-verified',
+  'AI Gateway launch rate/privacy controls are not management-verified',
+  'controls.gateway.collectLogs !== false',
   "controls.gateway.rateLimit !== '500/60s'",
-  'sovereign_global_daily_spend',
-  'sovereign_global_30_day_spend',
+  "controls.gateway.technique !== 'sliding'",
   'applyMigrations = true',
   'if (applyMigrations)',
   'applyD1Migrations'
 ]);
+requireValue(!deployV3.includes('sovereign_global_daily_spend'), 'Free release deploy must not require a daily Gateway dollar spend rule');
+requireValue(!deployV3.includes('sovereign_global_30_day_spend'), 'Free release deploy must not require a 30-day Gateway dollar spend rule');
 requireAll('release orchestrator', releaseOrchestrator, [
   'applyD1Migrations',
   'writeReleaseEvidence',
@@ -266,14 +272,14 @@ requireAll('release evidence provenance', releaseEvidence, [
 
 requireAll('Cloudflare controls', freeTierControls, [
   "read_replication: { mode: 'auto' }",
+  'rate_limiting_interval: AI_GATEWAY_RATE_WINDOW_SECONDS',
   'rate_limiting_limit: AI_GATEWAY_RATE_LIMIT',
-  'AI_GATEWAY_DAILY_SPEND_LIMIT_USD = 2.75',
-  'AI_GATEWAY_30_DAY_SPEND_LIMIT_USD = 75',
-  'spend_limits: expectedAiGatewaySpendLimits()',
+  "rate_limiting_technique: 'sliding'",
   'collect_logs: false',
   'schema_validation/schemas',
   'sovereign_ai_messages_free_tier'
 ]);
+requireValue(!freeTierControls.includes('spend_limits'), 'Workers AI Free controls must not require Gateway dollar spend rules');
 requireValue(!freeTierControls.includes('http.request.method'), 'Free-plan rate-limit expression must use path-only fields');
 requireAll('parent-domain verifier', parentDomainVerifier, [
   `const expectedMigration = '${currentMigration}'`,
@@ -344,4 +350,4 @@ requireValue(!authenticatedWorkspace.includes("import { WorldVideoLauncher } fro
 requireValue(!authenticatedWorkspace.includes('<WorldVideoLauncher />'), 'Current authenticated workspace must not mount the video launcher');
 requireValue(authenticatedWorkspace.includes('data-workspace-contract="one-room"'), 'Canonical one-room workspace contract is missing');
 
-console.log('Direct Cloudflare release config verified production_root=true text_first_release=true browser_rendering_optional=true current_migration=0017 privacy_export=on_demand_no_artifact worlds_video=false current_main_only=true github_workflows_non_authoritative=true d1_replication=true gateway_rate_limit=true api_body_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
+console.log('Direct Cloudflare release config verified production_root=true text_first_release=true browser_rendering_optional=true current_migration=0017 privacy_export=on_demand_no_artifact worlds_video=false current_main_only=true github_workflows_non_authoritative=true d1_replication=true workers_ai_free=true gateway_rate_limit=true api_body_limit=true api_shield=true waf_rate_limit=true r2=false queues=false');
