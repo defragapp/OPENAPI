@@ -338,6 +338,72 @@ Keep, as applicable:
 
 ---
 
+---
+
+## Post-Launch Acceptance (2026-08-25)
+
+Appended after the initial launch certification. Production release SHA unchanged.
+
+### Product Acceptance Matrix
+
+| Journey | Source | Production | Evidence | Status |
+|---------|--------|------------|----------|--------|
+| Public landing | implemented | sovereign.defrag.app serves correct product messaging, meta description, founder visual authority | HTTP 200, correct `<title>`, CSS authorities loaded | PASS |
+| Authentication | implemented | WebAuthn passkeys + HMAC sessions; unauthenticated boundary returns 401 | HTTP 401 on unauthenticated `/api/v1/sovereign/turn` | PASS |
+| Onboarding | implemented | PlanOnboarding with baseline collection, policy acceptance, 18+ eligibility | Source verified, policy gates wired | PASS (source) |
+| Baseline | implemented | baseline-source.v1 + baseline-facets.v1, Baseline engine configured | `/ready` reports `baselineEngine: configured` | PASS (source) |
+| Expression Field | implemented | 15 axes, deterministic from Baseline, `cache-control: private, no-store` | Source verified, endpoint authenticated | PASS (source) |
+| Sovereign Answer | implemented | `sovereign-answer.v2` contract, recognition validation, dual safety gate | `/ready` reports `answerContract: sovereign-answer.v2` | PASS (source) |
+| Persistence | implemented | D1 with bookmark forwarding, session-scoped reads | `/ready` reports `d1: ok`, `migrationParity: current` | PASS |
+| Relationship | implemented | Pair comparison, consent-gated, framework display consent | Source verified | PASS (source) |
+| System | implemented | System analysis, consent enforcement | Source verified | PASS (source) |
+| Billing | implemented | Stripe configured, 6 webhook paths, unsigned requests rejected | HTTP 405 on unsigned Stripe webhook | PASS |
+| Privacy | implemented | On-demand export, no retained artifacts, policy receipts | `/ready` reports `privateExports: on-demand-no-artifact`, `policyAcceptanceReceipts: configured` | PASS |
+| Email | implemented | Resend, `info@defrag.app`, DMARC verified | `/ready` reports `transactionalEmail: resend`, DMARC verified | PASS |
+| Frontend | implemented | SovereignIntelligenceWorkspace (6 surfaces), responsive, Geist Sans, near-black foundation | CSS authorities loaded, `viewport-fit=cover`, `prefers-reduced-motion` support | PASS |
+
+### Visual Acceptance
+
+| Surface | Status | Evidence |
+|---------|--------|----------|
+| Near-black foundation | PASS | `theme-color: #080a0d` |
+| Warm cream typography | PASS | Geist Sans loaded, CSS custom properties active |
+| Mobile viewport | PASS | `viewport-fit=cover`, safe-area-inset support in 30+ CSS files |
+| Reduced motion | PASS | `prefers-reduced-motion: reduce` in 57+ CSS files |
+| Safe area (notch) | PASS | `env(safe-area-inset-*)` in 30+ CSS files |
+| Landing content | PASS | Correct product messaging: "private personal AI", "understanding", "relationships", "decisions", "Baseline" |
+| Policy pages | PASS | `/terms` and `/privacy` return HTTP 200 |
+
+### Authenticated E2E
+
+```text
+NOT VERIFIED — authorized test account unavailable in this environment.
+```
+
+The authenticated intelligence path (session → workspace → Baseline → Expression Field → intelligence → sovereign-answer.v2 → persistence) is fully implemented and passes local integration tests. Production exercise requires an authorized test account with an active session.
+
+### Product Journey Evidence
+
+| Journey | Intent | Implementation | Production State | Evidence | Remaining Gap |
+|---------|--------|---------------|-----------------|----------|---------------|
+| #210 Account → Baseline → Workspace → first answer | Account creation → policy → plan → Baseline → Workspace → sovereign-answer.v2 | PlanOnboarding + SovereignIntelligenceWorkspace + sovereign.ts | Infrastructure ready; authenticated path requires real account | Source certified, deployment certified | Real user journey execution |
+| #211 auth/email/billing lifecycle | Email passkey, session, billing, account lifecycle | WebAuthn + Stripe + Resend | All dependencies configured | `/ready` reports all configured | Real user journey execution |
+| #212 People/Relationship/System | Invitation → consent → relationship → System → revoke | relational-context.ts, consent enforcement | Source implemented | Source certified | Real user journey execution |
+| #213 text AI modes, Basis, safety | Representative AI modes, source attribution, failure handling | sovereign.ts, recognition.ts, safety.ts, input-safety.ts | AI Gateway configured, model available | Worker Gateway smoke passed (202) | Real user journey execution |
+| #214 visual/interaction QA | Human desktop + iPhone/Safari/PWA review | CSS authorities, responsive design, accessibility | Visual checks pass (see above) | HTTP evidence, CSS verification | Human desktop/iPhone review |
+| #215 documentation authority | Documentation free of contradictions | docs/ reconciled | Migration references updated | Launch record created | Human review |
+| #216 stability matrix | Final PASS/FAIL/N/A and sign-off | All gates pass | 23/23 stages, 457 tests | This document | Owner sign-off |
+
+### Release Impact
+
+```text
+NO PRODUCTION CHANGE REQUIRED
+```
+
+No genuine production defect was discovered during post-launch acceptance. The authenticated E2E gap is an evidence gap, not a production defect.
+
+---
+
 ## Documentation Map
 
 | Document | Purpose |
