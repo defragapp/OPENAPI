@@ -55,7 +55,7 @@ The ordinary answer model does not receive raw birth inputs, exact private locat
 
 The deterministic input router receives the bounded user message only. It does not receive Baseline data, People/System records, entitlements, exact location, credentials, or hidden prompts.
 
-Current policy/privacy schema is `0017_privacy_access_and_eligibility`. Authenticated account export is generated on demand and is not part of model context.
+Current policy/privacy schema is `0018_workers_ai_capacity_reservations`. Authenticated account export is generated on demand and is not part of model context.
 
 ## Product scope decisions
 
@@ -65,6 +65,6 @@ Worlds/video generation is not part of the current launch runtime and is not req
 
 ## Release evidence
 
-Production safety is releasable only when the exact current `origin/main` SHA passes `pnpm verify:cloudflare-build`, is released through the current procedure in `docs/production-release.md`, and both branded hosts report exact-SHA readiness with migration `0017_privacy_access_and_eligibility`, migration parity `current`, configured policy/privacy dependencies, and matching release evidence.
+Production safety is releasable only when the exact current `origin/main` SHA passes `pnpm verify:cloudflare-build`, is released through the current procedure in `docs/production-release.md`, and both branded hosts report exact-SHA readiness with migration `0018_workers_ai_capacity_reservations`, migration parity `current`, configured policy/privacy dependencies, and matching release evidence.
 
 Automated Browser Rendering is not safety evidence unless it actually ran. Human visual review and automated Browser evidence remain separate.

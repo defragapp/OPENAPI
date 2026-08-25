@@ -23,6 +23,7 @@ Documentation covering Baseline, data flows, current conditions, relationship/sy
 
 ## 3. Backend
 Documentation covering actual API/routes, authentication, authorization, data model, request/AI flows, and testing.
+- **[API & Backend Contract](API_BACKEND_CONTRACT.md)** — Concrete mapping of Backend APIs, Request Flow, and Data Model Schemas.
 - **[Launch Surface](launch-surface.md)** — Current route, access, plan, and launch-acceptance boundaries.
 - **[AI Integration Notes](openai-integration.md)** — Details the production inference path via Cloudflare Workers AI and AI Gateway.
 - **[Current-condition computation port](current-conditions-port.md)** — Implementation provenance for the current-condition layer.

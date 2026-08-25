@@ -2,7 +2,7 @@
 
 Status: historical release record only. This file preserves the facts/acceptance language of an earlier migration `0011_email_code_recovery` release and is **not** current product, schema, or deployment guidance.
 
-Current production authority is `docs/production-release.md`; current schema is `0017_privacy_access_and_eligibility`.
+Current production authority is `docs/production-release.md`; current schema is `0018_workers_ai_capacity_reservations`.
 
 ## Historical correction
 

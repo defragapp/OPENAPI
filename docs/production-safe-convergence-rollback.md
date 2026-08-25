@@ -8,4 +8,4 @@ Code and release configuration at that time matched deployed classifier commit `
 
 Do not use this SHA, checkpoint, or old deployment process for current production decisions.
 
-Current authority is `docs/production-release.md`; current schema is `0017_privacy_access_and_eligibility`; current acceptance is tracked under #207/#210–#216.
+Current authority is `docs/production-release.md`; current schema is `0018_workers_ai_capacity_reservations`; current acceptance is tracked under #207/#210–#216.

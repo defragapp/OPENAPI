@@ -56,7 +56,7 @@ The Workers AI adapter also reserves conservative daily capacity in D1 before ea
 
 A source-level model failure releases the daily reservation and refunds the user’s monthly turn where the current contract requires it.
 
-Migration `0013_workers_ai_free_capacity` introduced the global capacity ledger. Release-evidence tables were introduced by `0015_release_evidence`. **Current production schema parity is `0017_privacy_access_and_eligibility`.** Readiness requires the current migration plus release evidence, policy receipt, and privacy-access dependencies.
+Migration `0013_workers_ai_free_capacity` introduced the global capacity ledger. Release-evidence tables were introduced by `0015_release_evidence`. **Current production schema parity is `0018_workers_ai_capacity_reservations`.**\n\n*Historical / Reconciliation Note: Previously, this document incorrectly stated parity was at . The codebase and  confirm  as current.* Readiness requires the current migration plus release evidence, policy receipt, and privacy-access dependencies.
 
 ## Failure behavior
 

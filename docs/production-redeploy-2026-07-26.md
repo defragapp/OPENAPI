@@ -8,4 +8,4 @@ At that time, completion required the deployment script to apply migrations, dep
 
 The file changed no product behavior, billing behavior, entitlement logic, user data, or runtime configuration.
 
-Current authority is `docs/production-release.md`; current schema is `0017_privacy_access_and_eligibility`; historical Workers Builds are not a production release path.
+Current authority is `docs/production-release.md`; current schema is `0018_workers_ai_capacity_reservations`; historical Workers Builds are not a production release path.

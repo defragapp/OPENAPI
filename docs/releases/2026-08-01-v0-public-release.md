@@ -13,4 +13,4 @@ Historical record:
 
 This manifest existed to force and identify a clean production build. It did not itself alter application behavior.
 
-Current language/product/visual/release authority comes from the current canonical documents. Current schema is `0017_privacy_access_and_eligibility`, and historical Workers Builds are not current release authority.
+Current language/product/visual/release authority comes from the current canonical documents. Current schema is `0018_workers_ai_capacity_reservations`, and historical Workers Builds are not current release authority.
