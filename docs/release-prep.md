@@ -16,7 +16,7 @@ Production:
 - model: `@cf/zai-org/glm-4.7-flash`.
 - capacity ledger foundation: `0013_workers_ai_free_capacity`.
 - release-evidence table foundation: `0015_release_evidence`.
-- current schema: `0017_privacy_access_and_eligibility`.
+- current schema: `0018_workers_ai_capacity_reservations`.
 - current private export: authenticated on-demand/no-artifact.
 - Queue/R2: disabled.
 - Worlds/video: not part of current launch.
@@ -54,7 +54,7 @@ The text-first release:
 2. verifies production release config/migrations;
 3. verifies public DMARC;
 4. prepares the production config;
-5. applies migrations through `0017_privacy_access_and_eligibility`;
+5. applies migrations through `0018_workers_ai_capacity_reservations`;
 6. verifies Worker secrets and repository-owned Cloudflare controls;
 7. deploys exactly one Worker version;
 8. verifies runtime/parent-domain/secondary public behavior without Browser Rendering;
@@ -100,7 +100,7 @@ Preview acceptance should cover the same current product boundaries relevant to 
 Expected production readiness includes:
 
 - exact target version/SHA;
-- migration `0017_privacy_access_and_eligibility` current;
+- migration `0018_workers_ai_capacity_reservations` current;
 - D1, Durable Object, AI Gateway/Workers AI, email, Stripe, scheduled cleanup, and adapter readiness as exposed by the endpoint contract;
 - policy acceptance receipts configured;
 - privacy access controls configured;

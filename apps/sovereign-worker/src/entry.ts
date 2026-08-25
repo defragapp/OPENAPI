@@ -222,7 +222,7 @@ const worker = {
         headers.delete('content-length');
         response = Response.json({
           ...payload,
-          migrationVersion: '0013_workers_ai_free_capacity',
+          migrationVersion: '0018_workers_ai_capacity_reservations',
           answerContract: 'sovereign-answer.v2'
         }, { status: response.status, headers });
       }

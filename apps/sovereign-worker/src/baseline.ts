@@ -34,6 +34,7 @@ async function sha256(value: string) { const hash = await crypto.subtle.digest('
 function assertDate(value: string) { if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00Z`))) throw new Response('Invalid birth date', { status: 400 }); }
 function assertTime(value: string | undefined, certainty: BirthTimeCertainty) { if (certainty !== 'unknown' && !/^([01]\d|2[0-3]):[0-5]\d$/.test(value ?? '')) throw new Response('Birth time required for exact or approximate certainty', { status: 400 }); }
 function frameworkAvailability(certainty: BirthTimeCertainty, providerStatus: string) { return { astrology: providerStatus === 'computed' ? 'available' : 'unavailable', humanDesign: certainty === 'unknown' || providerStatus !== 'computed' ? 'unavailable' : 'partial', geneKeys: certainty === 'unknown' || providerStatus !== 'computed' ? 'unavailable' : 'partial', numerology: 'available', houses: 'unavailable' }; }
+function safeParseJson<T>(value: string | undefined | null, fallback: T): T { try { return JSON.parse(value ?? '') as T; } catch { return fallback; } }
 
 export function parseLocationPrecision(value: unknown): LocationPrecision {
   if (typeof value === 'string' && LOCATION_PRECISIONS.includes(value as LocationPrecision)) return value as LocationPrecision;
@@ -329,8 +330,8 @@ export async function getBaselineStatus(env: Env, accountId: string) {
     nextAction: readiness.nextAction,
     facetProfileStatus: readiness.ready ? 'ready' : 'pending',
     uncertainty: row.uncertainty,
-    reducedContext: JSON.parse(row.reduced_context_json),
-    provenance: JSON.parse(row.provenance_json),
+    reducedContext: safeParseJson(row.reduced_context_json, {}),
+    provenance: safeParseJson(row.provenance_json, {}),
     computationVersion: row.computation_version,
     lastComputedAt: row.last_computed_at,
     providerStatus: row.provider_status

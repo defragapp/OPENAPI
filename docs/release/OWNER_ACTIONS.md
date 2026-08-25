@@ -17,7 +17,7 @@ pnpm production:release:text
 
 The second command is run only for the same SHA that passed the full gate.
 
-A technical release is complete only when both branded readiness endpoints prove the exact target SHA, `ready: true`, migration `0017_privacy_access_and_eligibility`, migration parity `current`, configured policy/privacy dependencies, and matching release evidence.
+A technical release is complete only when both branded readiness endpoints prove the exact target SHA, `ready: true`, migration `0018_workers_ai_capacity_reservations`, migration parity `current`, configured policy/privacy dependencies, and matching release evidence.
 
 Automated Browser audit fields in release evidence are truthful booleans. They remain `false` when the current text-first release intentionally does not run Browser Rendering.
 

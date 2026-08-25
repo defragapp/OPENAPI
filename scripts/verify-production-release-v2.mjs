@@ -98,7 +98,7 @@ requireAll('failed response refunds', usage, [
   'turns_used = MAX(0, turns_used - ?)',
   '.bind(count, accountId, periodKey)'
 ]);
-requireAll('entry release integration', entry, ['releaseAiTurn(env, auth.accountId, usage.periodKey)', "migrationVersion: '0013_workers_ai_free_capacity'"]);
+requireAll('entry release integration', entry, ['releaseAiTurn(env, auth.accountId, usage.periodKey)', "migrationVersion: '0018_workers_ai_capacity_reservations'"]);
 
 requireAll('passkey migration', passkeyMigration, [
   'CREATE TABLE auth_passkeys',

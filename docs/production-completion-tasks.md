@@ -24,7 +24,7 @@ At minimum both branded `/ready` endpoints must report:
 
 - `ready: true`;
 - exact target SHA;
-- migration `0017_privacy_access_and_eligibility`;
+- migration `0018_workers_ai_capacity_reservations`;
 - migration parity `current`;
 - configured policy acceptance receipts/privacy access controls;
 - matching exact-SHA release evidence.

@@ -54,7 +54,7 @@ pnpm build:preview
 
 ## Preview bootstrap
 
-`pnpm preview:bootstrap` resolves/creates the isolated preview D1 database, writes temporary preview configuration, applies migrations through **`0017_privacy_access_and_eligibility`**, uploads only preview secrets, deploys the preview Worker, records sanitized preview metadata, and removes temporary configuration.
+`pnpm preview:bootstrap` resolves/creates the isolated preview D1 database, writes temporary preview configuration, applies migrations through **`0018_workers_ai_capacity_reservations`**, uploads only preview secrets, deploys the preview Worker, records sanitized preview metadata, and removes temporary configuration.
 
 It must not be used for production or attach a production route/database.
 

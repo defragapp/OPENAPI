@@ -409,10 +409,6 @@ function sanitizeRoleContext(value: unknown): Record<string, unknown> {
   return source;
 }
 
-function extractRoleContext(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
-}
-
 function extractArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value.slice(0, 20) : [];
 }

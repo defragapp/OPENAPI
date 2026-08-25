@@ -36,7 +36,7 @@ async function healthPayload(env: Env) {
     sha: env.APP_VERSION,
     version: env.APP_VERSION,
     environment: env.APP_ENV,
-    migrationVersion: '0013_workers_ai_free_capacity',
+    migrationVersion: '0018_workers_ai_capacity_reservations',
     dependencies: {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
       aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing',
