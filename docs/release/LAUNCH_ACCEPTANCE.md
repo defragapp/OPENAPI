@@ -491,7 +491,7 @@ Owner sign-off:                         PENDING
 Production status:                      LIVE — ACCEPTANCE EVIDENCE PENDING
 
 PRODUCTION RELEASE SHA  = 31da213ba542b55a519d1e930f6bfa50d4d5db4e
-ACCEPTANCE DOCS SHA     = <to be set on commit>
+ACCEPTANCE DOCS SHA     = bbc5412
 ```
 
 ---
