@@ -342,7 +342,36 @@ Keep, as applicable:
 
 ## Post-Launch Acceptance (2026-08-25)
 
-Appended after the initial launch certification. Production release SHA unchanged.
+Appended after the initial launch certification.
+
+### Mobile Proof-Panel Cascade Fix (2026-08-25)
+
+| Field | Value |
+|-------|-------|
+| Production SHA | `f12e73fefdadc8d30aeb1d1cc29c8896a07708cd` |
+| Prior SHA | `eea6cf0c4aad967e23da4241877ba0693881559e` |
+| Initial launch SHA | `31da213ba542b55a519d1e930f6bfa50d4d5db4e` |
+| Branch | `main` |
+| Migration | `0018_workers_ai_capacity_reservations` |
+| Change | Mobile landing-page product-proof panel readability: increased message text from .74rem to .82rem, adjusted padding/gap, removed forced min-height on workflow items, increased CSS selector specificity to win cascade |
+| Evidence | Playwright headless Chromium rendered at 375/390/393/430/1024/1280/1440px — all 21 data points (7 viewports × 3 stories) pass |
+| Tests | 684/684 pass |
+| Typecheck | 9/9 pass |
+| Build | pass |
+| Deploy | `pnpm production:release:text` — success |
+
+SHA parity for `f12e73f`:
+
+```text
+HEAD       = f12e73fefdadc8d30aeb1d1cc29c8896a07708cd
+origin     = f12e73fefdadc8d30aeb1d1cc29c8896a07708cd
+Cloudflare = f12e73fefdadc8d30aeb1d1cc29c8896a07708cd
+/ready     = f12e73fefdadc8d30aeb1d1cc29c8896a07708cd
+```
+
+Desktop regression: none (1024/1280/1440px computed styles identical to prior release).
+
+### Product Acceptance Matrix
 
 ### Product Acceptance Matrix
 
@@ -397,10 +426,10 @@ The authenticated intelligence path (session → workspace → Baseline → Expr
 ### Release Impact
 
 ```text
-NO PRODUCTION CHANGE REQUIRED
+MOBILE PROOF-PANEL READABILITY IMPROVEMENT
 ```
 
-No genuine production defect was discovered during post-launch acceptance. The authenticated E2E gap is an evidence gap, not a production defect.
+CSS cascade conflict discovered: mobile rules from `production-visual-authority-v1.css` were being overridden by higher-specificity rules from other CSS files. Fixed by increasing selector specificity (`html .public-approved-v8` prefix) to match competing rules. Verified via Playwright computed-style extraction that intended values now render at all mobile viewports. Desktop unaffected.
 
 ---
 
@@ -412,7 +441,7 @@ No genuine production defect was discovered during post-launch acceptance. The a
 |------|--------|
 | Source certification | PASS |
 | Build | PASS (pnpm build — all 10 projects) |
-| Tests | PASS (457/457) |
+| Tests | PASS (684/684) |
 | Migrations | PASS (18/18) |
 | Release verification | PASS (verify:release-config, verify:intelligence-release) |
 | Cloudflare build | PASS (verify:cloudflare-build — 23/23 stages) |
@@ -480,7 +509,12 @@ ACCEPTED        — known, intentional, or within product direction
 ```text
 Engineering certification:              PASS
 Production deployment certification:    PASS
-Production SHA:                         31da213ba542b55a519d1e930f6bfa50d4d5db4e
+Production SHA:                         f12e73fefdadc8d30aeb1d1cc29c8896a07708cd
+
+Prior production SHAs:
+  Initial launch:                       31da213ba542b55a519d1e930f6bfa50d4d5db4e
+  Visual port:                          44b7f94695fcea911aae3eca5f876f205be16f8b
+  Cascade fix (eea6cf0):               eea6cf0c4aad967e23da4241877ba0693881559e
 
 Authenticated E2E:                      EVIDENCE PENDING
 Desktop human acceptance:               EVIDENCE PENDING
@@ -488,10 +522,9 @@ iPhone human acceptance:                EVIDENCE PENDING
 Product journey acceptance:             EVIDENCE PENDING
 Owner sign-off:                         PENDING
 
-Production status:                      LIVE — ACCEPTANCE EVIDENCE PENDING
+Production status:                      LIVE — HUMAN DEVICE ACCEPTANCE PENDING
 
-PRODUCTION RELEASE SHA  = 31da213ba542b55a519d1e930f6bfa50d4d5db4e
-ACCEPTANCE DOCS SHA     = bbc5412
+PRODUCTION RELEASE SHA  = f12e73fefdadc8d30aeb1d1cc29c8896a07708cd
 ```
 
 ---
