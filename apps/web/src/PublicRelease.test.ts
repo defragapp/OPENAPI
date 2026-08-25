@@ -96,6 +96,8 @@ describe('public production positioning release', () => {
     for (const marker of [
       '01 · You',
       'Explore how you think, decide, communicate, create, connect, and grow.',
+      'data-product-proof="self-v1"',
+      'data-viewport-surface="personal-proof"',
       '02 · You + your people',
       'See why the same moment lands differently—and how to bridge the gap.',
       '03 · From 1:1 to the whole system',
@@ -110,6 +112,8 @@ describe('public production positioning release', () => {
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
     expect(stories).not.toContain('capacity beneath');
     expect(stories).not.toContain('LandingExpressionFieldPreview');
+    expect(stories).not.toContain('surface="personal-reasoning"');
+    expect(stories).not.toContain('surface="personal-chat"');
   });
 
   it('keeps framework mechanics off the root narrative and source codes collapsed behind inspection', () => {
@@ -162,13 +166,15 @@ describe('public production positioning release', () => {
     expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
   });
 
-  it('puts workflow before the conversation and anchors the composer below the answer surface', () => {
-    expect(stories.indexOf('surface="personal-reasoning"')).toBeLessThan(stories.indexOf('surface="personal-chat"'));
+  it('keeps Self insight-first and anchors composers below product surfaces', () => {
+    expect(stories).toContain('data-viewport-surface="personal-proof"');
+    expect(stories).toContain('landing-product-proof__composer');
     expect(stories.indexOf('surface="relationship-reasoning"')).toBeLessThan(stories.indexOf('surface="relationship-chat"'));
     expect(stories.indexOf('surface="system-reasoning"')).toBeLessThan(stories.indexOf('surface="system-map"'));
     expect(stories).toContain('landing-demo__composer-shell');
+    expect(intelligenceDemoCss).toContain('.landing-product-proof__response h3');
+    expect(intelligenceDemoCss).toContain('.landing-product-proof__insight p');
     expect(intelligenceDemoCss).toContain('.landing-demo__composer-shell');
-    expect(intelligenceDemoCss).toContain('grid-template-columns: minmax(320px, .88fr) minmax(0, 1.12fr) !important;');
     expect(intelligenceDemoCss).toContain('@media (max-width: 900px)');
   });
 

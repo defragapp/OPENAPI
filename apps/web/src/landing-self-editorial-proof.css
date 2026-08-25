@@ -1,0 +1,421 @@
+/*
+ * Self editorial proof gate.
+ * The page is the product surface. The production Expression Field remains the only precision visual.
+ * Relationship and System stay on their existing implementation until Self passes human review.
+ */
+
+html body .public-approved-v8 .landing-story--personal {
+  padding-top: clamp(104px, 8.5vw, 132px) !important;
+  padding-bottom: clamp(116px, 9.5vw, 150px) !important;
+}
+
+html body .public-approved-v8 .landing-story--personal .landing-story__shell {
+  width: min(1320px, calc(100vw - 96px)) !important;
+  max-width: 1320px !important;
+}
+
+html body .public-approved-v8 .landing-story--personal .landing-story__heading {
+  width: min(820px, 100%) !important;
+  max-width: 820px !important;
+  margin: 0 0 clamp(50px, 5vw, 72px) !important;
+  text-align: left !important;
+}
+
+html body .public-approved-v8 .landing-story--personal .landing-story__heading h2 {
+  max-width: 19ch !important;
+  margin-top: 12px !important;
+  font-size: clamp(2.75rem, 3.9vw, 4rem) !important;
+  font-weight: 580 !important;
+  line-height: .98 !important;
+  letter-spacing: -.034em !important;
+  text-wrap: balance !important;
+}
+
+html body .public-approved-v8 .landing-story--personal .landing-story__heading > div {
+  max-width: 60ch !important;
+  margin-top: 18px !important;
+  color: rgba(222, 214, 204, .65) !important;
+  font-size: .98rem !important;
+  line-height: 1.62 !important;
+}
+
+html body .public-approved-v8 .landing-story__stage.landing-story__stage--self-proof {
+  display: block !important;
+  width: 100% !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial {
+  display: grid !important;
+  width: 100% !important;
+  grid-template-columns: minmax(0, 1fr) minmax(560px, 1.08fr) !important;
+  grid-template-areas:
+    "question vector"
+    "answer vector"
+    "mechanism vector"
+    "distinction distinction"
+    "closing evidence" !important;
+  column-gap: clamp(72px, 6.2vw, 108px) !important;
+  row-gap: clamp(24px, 2.4vw, 38px) !important;
+  align-items: start !important;
+  color: rgba(243, 236, 226, .94) !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__question {
+  grid-area: question !important;
+  width: min(100%, 370px) !important;
+  justify-self: start !important;
+  margin: 0 0 4px !important;
+  padding: 15px 17px 16px !important;
+  border: 0 !important;
+  border-radius: 1px !important;
+  background: #e9dfd1 !important;
+  box-shadow: none !important;
+  color: #111315 !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__question small,
+html body .public-approved-v8 .landing-self-editorial__answer > small,
+html body .public-approved-v8 .landing-self-editorial__distinction > small,
+html body .public-approved-v8 .landing-self-vector figcaption > span,
+html body .public-approved-v8 .landing-self-vector__readout > small {
+  display: block !important;
+  color: rgba(185, 151, 114, .8) !important;
+  font-family: var(--font-body, system-ui, sans-serif) !important;
+  font-size: .58rem !important;
+  font-weight: 720 !important;
+  letter-spacing: .14em !important;
+  line-height: 1.4 !important;
+  text-transform: uppercase !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__question small {
+  color: rgba(17, 19, 21, .46) !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__question p {
+  margin: 6px 0 0 !important;
+  color: #111315 !important;
+  font-family: var(--font-body, system-ui, sans-serif) !important;
+  font-size: clamp(.95rem, 1vw, 1.04rem) !important;
+  font-weight: 520 !important;
+  line-height: 1.4 !important;
+  letter-spacing: -.012em !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__answer {
+  grid-area: answer !important;
+  align-self: start !important;
+  padding-top: 10px !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__answer h3 {
+  max-width: 23ch !important;
+  margin: 12px 0 0 !important;
+  color: rgba(250, 247, 242, .98) !important;
+  font-family: var(--font-title, var(--sovereign-title)) !important;
+  font-size: clamp(2.45rem, 3.25vw, 3.55rem) !important;
+  font-weight: 560 !important;
+  line-height: 1.005 !important;
+  letter-spacing: -.034em !important;
+  text-wrap: balance !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__mechanism {
+  grid-area: mechanism !important;
+  display: grid !important;
+  align-content: start !important;
+  gap: 16px !important;
+  max-width: 58ch !important;
+  padding-top: 2px !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__mechanism p {
+  margin: 0 !important;
+  color: rgba(222, 214, 204, .74) !important;
+  font-family: var(--font-body, system-ui, sans-serif) !important;
+  font-size: 1rem !important;
+  line-height: 1.64 !important;
+}
+
+html body .public-approved-v8 .landing-self-vector {
+  grid-area: vector !important;
+  align-self: start !important;
+  width: min(100%, 700px) !important;
+  margin: -16px 0 0 auto !important;
+  color: rgba(232, 221, 208, .72) !important;
+}
+
+html body .public-approved-v8 .landing-self-vector__canvas {
+  width: min(100%, 700px) !important;
+  min-height: 580px !important;
+  margin-left: auto !important;
+}
+
+html body .public-approved-v8 .landing-self-vector .expression-field-renderer {
+  display: block !important;
+  width: 100% !important;
+  min-height: 580px !important;
+  aspect-ratio: 1 / 1 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html body .public-approved-v8 .landing-self-vector .expression-field-canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 580px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html body .public-approved-v8 .landing-self-vector figcaption {
+  display: grid !important;
+  grid-template-columns: minmax(0, .25fr) minmax(0, .75fr) !important;
+  gap: 26px !important;
+  align-items: start !important;
+  margin-top: 2px !important;
+  padding-top: 15px !important;
+  border-top: 1px solid rgba(241, 233, 222, .1) !important;
+}
+
+html body .public-approved-v8 .landing-self-vector figcaption > span {
+  color: rgba(226, 218, 207, .38) !important;
+  letter-spacing: .09em !important;
+}
+
+html body .public-approved-v8 .landing-self-vector__readout {
+  display: grid !important;
+  gap: 4px !important;
+}
+
+html body .public-approved-v8 .landing-self-vector__readout strong {
+  color: rgba(247, 242, 235, .94) !important;
+  font-family: var(--font-title, var(--sovereign-title)) !important;
+  font-size: clamp(1.25rem, 1.6vw, 1.62rem) !important;
+  font-weight: 560 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -.022em !important;
+}
+
+html body .public-approved-v8 .landing-self-vector__readout em {
+  color: rgba(185, 151, 114, .74) !important;
+  font-family: var(--font-body, system-ui, sans-serif) !important;
+  font-size: .66rem !important;
+  font-style: normal !important;
+  letter-spacing: .025em !important;
+}
+
+html body .public-approved-v8 .landing-self-vector__readout p {
+  max-width: 46ch !important;
+  margin: 4px 0 0 !important;
+  color: rgba(216, 208, 198, .66) !important;
+  font-family: var(--font-body, system-ui, sans-serif) !important;
+  font-size: .84rem !important;
+  line-height: 1.55 !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__distinction {
+  grid-area: distinction !important;
+  width: 100% !important;
+  align-self: start !important;
+  margin: 18px 0 0 !important;
+  padding: 38px 0 42px !important;
+  border-top: 1px solid rgba(185, 151, 114, .3) !important;
+  border-bottom: 1px solid rgba(241, 233, 222, .09) !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__distinction p {
+  max-width: 30ch !important;
+  margin: 12px 0 0 !important;
+  color: rgba(250, 247, 242, .98) !important;
+  font-family: var(--font-title, var(--sovereign-title)) !important;
+  font-size: clamp(2.45rem, 3.45vw, 3.55rem) !important;
+  font-weight: 540 !important;
+  line-height: 1.025 !important;
+  letter-spacing: -.032em !important;
+  text-wrap: balance !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__closing {
+  grid-area: closing !important;
+  max-width: 52ch !important;
+  margin: 0 !important;
+  color: rgba(229, 221, 211, .76) !important;
+  font-family: var(--font-body, system-ui, sans-serif) !important;
+  font-size: .98rem !important;
+  line-height: 1.64 !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__evidence {
+  grid-area: evidence !important;
+  justify-self: end !important;
+  width: min(100%, 490px) !important;
+  color: rgba(226, 218, 207, .44) !important;
+  font-family: var(--font-body, system-ui, sans-serif) !important;
+  font-size: .7rem !important;
+  line-height: 1.48 !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__evidence > span {
+  display: block !important;
+  margin-bottom: 8px !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__evidence details {
+  padding-top: 8px !important;
+  border-top: 1px solid rgba(241, 233, 222, .08) !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__evidence summary {
+  min-height: 42px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  color: rgba(232, 224, 214, .7) !important;
+  cursor: pointer !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__evidence details > p {
+  max-width: 46ch !important;
+  margin: 8px 0 10px !important;
+  color: rgba(210, 202, 192, .54) !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__evidence details > div {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 7px 12px !important;
+}
+
+html body .public-approved-v8 .landing-self-editorial__evidence code {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: rgba(185, 151, 114, .64) !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: .65rem !important;
+}
+
+@media (max-width: 1180px) {
+  html body .public-approved-v8 .landing-story--personal .landing-story__shell {
+    width: min(1180px, calc(100vw - 64px)) !important;
+  }
+
+  html body .public-approved-v8 .landing-self-editorial {
+    grid-template-columns: minmax(0, .94fr) minmax(500px, 1.06fr) !important;
+    column-gap: clamp(48px, 5vw, 72px) !important;
+  }
+
+  html body .public-approved-v8 .landing-self-vector,
+  html body .public-approved-v8 .landing-self-vector__canvas {
+    width: min(100%, 620px) !important;
+  }
+
+  html body .public-approved-v8 .landing-self-vector__canvas,
+  html body .public-approved-v8 .landing-self-vector .expression-field-renderer,
+  html body .public-approved-v8 .landing-self-vector .expression-field-canvas {
+    min-height: 500px !important;
+  }
+}
+
+@media (max-width: 960px) {
+  html body .public-approved-v8 .landing-story--personal .landing-story__shell {
+    width: min(100%, calc(100vw - 40px)) !important;
+  }
+
+  html body .public-approved-v8 .landing-self-editorial {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "question"
+      "answer"
+      "vector"
+      "mechanism"
+      "distinction"
+      "closing"
+      "evidence" !important;
+    row-gap: 34px !important;
+  }
+
+  html body .public-approved-v8 .landing-self-editorial__question,
+  html body .public-approved-v8 .landing-self-vector,
+  html body .public-approved-v8 .landing-self-editorial__evidence {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    justify-self: stretch !important;
+  }
+
+  html body .public-approved-v8 .landing-self-editorial__question {
+    width: min(100%, 500px) !important;
+    justify-self: start !important;
+  }
+
+  html body .public-approved-v8 .landing-self-vector {
+    margin-top: 0 !important;
+  }
+
+  html body .public-approved-v8 .landing-self-vector__canvas {
+    width: min(100%, 580px) !important;
+    margin-inline: auto !important;
+  }
+}
+
+@media (max-width: 760px) {
+  html body .public-approved-v8 .landing-story--personal {
+    padding-top: 78px !important;
+    padding-bottom: 92px !important;
+  }
+
+  html body .public-approved-v8 .landing-story--personal .landing-story__heading {
+    margin-bottom: 34px !important;
+  }
+
+  html body .public-approved-v8 .landing-story--personal .landing-story__heading h2 {
+    max-width: 15ch !important;
+    font-size: clamp(2.2rem, 9.4vw, 3rem) !important;
+  }
+
+  html body .public-approved-v8 .landing-self-editorial {
+    row-gap: 28px !important;
+  }
+
+  html body .public-approved-v8 .landing-self-editorial__question {
+    padding: 15px 16px 16px !important;
+  }
+
+  html body .public-approved-v8 .landing-self-editorial__answer h3 {
+    max-width: 17ch !important;
+    font-size: clamp(2.15rem, 9.2vw, 2.95rem) !important;
+  }
+
+  html body .public-approved-v8 .landing-self-vector__canvas,
+  html body .public-approved-v8 .landing-self-vector .expression-field-renderer,
+  html body .public-approved-v8 .landing-self-vector .expression-field-canvas {
+    min-height: 350px !important;
+  }
+
+  html body .public-approved-v8 .landing-self-vector__canvas {
+    width: min(100%, 380px) !important;
+  }
+
+  html body .public-approved-v8 .landing-self-vector figcaption {
+    grid-template-columns: 1fr !important;
+    gap: 9px !important;
+  }
+
+  html body .public-approved-v8 .landing-self-editorial__distinction {
+    padding: 28px 0 32px !important;
+  }
+
+  html body .public-approved-v8 .landing-self-editorial__distinction p {
+    max-width: 19ch !important;
+    font-size: clamp(2.05rem, 8.8vw, 2.75rem) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .public-approved-v8 .landing-self-vector .expression-field-renderer,
+  html body .public-approved-v8 .landing-self-vector .expression-field-canvas {
+    scroll-behavior: auto !important;
+  }
+}

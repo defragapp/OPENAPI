@@ -5,8 +5,7 @@ import type { PublicLandingViewportSnapshot, ViewportSurfaceMeasurement } from '
 const desktopRequiredSurfaceIds = [
   'hero',
   'expression-slice',
-  'personal-chat',
-  'personal-reasoning',
+  'personal-proof',
   'relationship-chat',
   'relationship-reasoning',
   'system-map',
@@ -41,13 +40,12 @@ function passingPhoneSnapshot(): PublicLandingViewportSnapshot {
     surfaces: [
       surface('hero', 16, 359, 0, 620),
       surface('expression-slice', 0, 375, 620, 320),
-      surface('personal-chat', 16, 359, 1120, 510),
-      surface('personal-reasoning', 16, 359, 1648, 540),
-      surface('relationship-chat', 16, 359, 2380, 450),
-      surface('relationship-reasoning', 16, 359, 2848, 610),
-      surface('system-map', 16, 359, 3650, 760),
+      surface('personal-proof', 16, 359, 1120, 790),
+      surface('relationship-chat', 16, 359, 2120, 450),
+      surface('relationship-reasoning', 16, 359, 2588, 610),
+      surface('system-map', 16, 359, 3390, 760),
       surface('system-reasoning', 0, 0, 0, 0, 0),
-      surface('comparison', 16, 359, 4430, 430)
+      surface('comparison', 16, 359, 4170, 430)
     ],
     stageGaps: [42, 36, 36],
     comparisonStacked: true
@@ -61,13 +59,12 @@ function passingDesktopSnapshot(): PublicLandingViewportSnapshot {
     surfaces: [
       surface('hero', 220, 1220, 0, 780),
       surface('expression-slice', 0, 1440, 780, 520),
-      surface('personal-chat', 100, 665, 1480, 560),
-      surface('personal-reasoning', 713, 1340, 1480, 610),
-      surface('relationship-chat', 100, 665, 2320, 500),
-      surface('relationship-reasoning', 713, 1340, 2320, 650),
-      surface('system-map', 100, 820, 3220, 820),
-      surface('system-reasoning', 860, 1340, 3220, 570),
-      surface('comparison', 160, 1280, 4300, 520)
+      surface('personal-proof', 100, 1340, 1480, 830),
+      surface('relationship-chat', 100, 665, 2540, 500),
+      surface('relationship-reasoning', 713, 1340, 2540, 650),
+      surface('system-map', 100, 820, 3440, 820),
+      surface('system-reasoning', 860, 1340, 3440, 570),
+      surface('comparison', 160, 1280, 4520, 520)
     ],
     stageGaps: [58, 54, 54],
     comparisonStacked: false
@@ -112,23 +109,23 @@ describe('restored landing rendered viewport contract', () => {
     expect(result.failures).toContain('comparison section is not stacked');
   });
 
-  it('rejects missing, stretched, or side-by-side required workflow surfaces', () => {
+  it('rejects missing, stretched, or side-by-side required product surfaces', () => {
     const missing = passingPhoneSnapshot();
     missing.surfaces = missing.surfaces.filter((item) => item.id !== 'relationship-reasoning');
     expect(evaluatePublicLandingViewport(missing).failures).toContain('missing surface relationship-reasoning');
 
     const stretched = passingPhoneSnapshot();
-    const personalWorkflow = stretched.surfaces.find((item) => item.id === 'personal-reasoning')!;
-    personalWorkflow.height = 2400;
-    personalWorkflow.bottom = personalWorkflow.top + personalWorkflow.height;
-    expect(evaluatePublicLandingViewport(stretched).failures).toContain('personal-reasoning height 2400px > 1100px');
+    const selfProof = stretched.surfaces.find((item) => item.id === 'personal-proof')!;
+    selfProof.height = 2400;
+    selfProof.bottom = selfProof.top + selfProof.height;
+    expect(evaluatePublicLandingViewport(stretched).failures).toContain('personal-proof height 2400px > 1100px');
 
     const sideBySide = passingPhoneSnapshot();
-    const chat = sideBySide.surfaces.find((item) => item.id === 'personal-chat')!;
-    const workflow = sideBySide.surfaces.find((item) => item.id === 'personal-reasoning')!;
+    const chat = sideBySide.surfaces.find((item) => item.id === 'relationship-chat')!;
+    const workflow = sideBySide.surfaces.find((item) => item.id === 'relationship-reasoning')!;
     workflow.top = chat.top;
     workflow.bottom = workflow.top + workflow.height;
-    expect(evaluatePublicLandingViewport(sideBySide).failures).toContain('personal-reasoning is not clearly stacked below personal-chat');
+    expect(evaluatePublicLandingViewport(sideBySide).failures).toContain('relationship-reasoning is not clearly stacked below relationship-chat');
   });
 
   it('rejects collapsed or excessive heading-to-stage spacing', () => {
@@ -145,8 +142,7 @@ describe('restored landing rendered viewport contract', () => {
     expect(desktopRequiredSurfaceIds).toEqual([
       'hero',
       'expression-slice',
-      'personal-chat',
-      'personal-reasoning',
+      'personal-proof',
       'relationship-chat',
       'relationship-reasoning',
       'system-map',

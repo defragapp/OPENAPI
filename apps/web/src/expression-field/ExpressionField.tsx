@@ -43,6 +43,7 @@ interface CanvasProps {
   engagementDirection?: ExpressionFieldEngagementDirection;
   engagementPhase: number;
   draggable: boolean;
+  suspendWhenOffscreen: boolean;
   ariaLabel: string;
 }
 
@@ -55,6 +56,7 @@ export interface ExpressionFieldRendererProps {
   engagementDirection?: ExpressionFieldEngagementDirection;
   engagementPhase?: number;
   draggable?: boolean;
+  suspendWhenOffscreen?: boolean;
   className?: string;
   ariaLabel: string;
 }
@@ -311,6 +313,7 @@ export function ExpressionFieldRenderer({
   engagementDirection,
   engagementPhase = 0,
   draggable = false,
+  suspendWhenOffscreen = true,
   className = '',
   ariaLabel,
   ...internal
@@ -327,6 +330,7 @@ export function ExpressionFieldRenderer({
         {...(engagementDirection ? { engagementDirection } : {})}
         engagementPhase={engagementPhase}
         draggable={draggable}
+        suspendWhenOffscreen={suspendWhenOffscreen}
         ariaLabel={ariaLabel}
       />
     </div>
@@ -343,6 +347,7 @@ function ExpressionFieldCanvas({
   engagementDirection,
   engagementPhase,
   draggable,
+  suspendWhenOffscreen,
   ariaLabel
 }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -406,15 +411,21 @@ function ExpressionFieldCanvas({
     resizeObserver.observe(canvas);
     resize();
 
-    const intersectionObserver = new IntersectionObserver(([entry]) => {
-      visibleRef.current = entry?.isIntersecting ?? true;
-      if (visibleRef.current) start();
-      else if (frame) {
-        cancelAnimationFrame(frame);
-        frame = 0;
-      }
-    }, { rootMargin: '120px' });
-    intersectionObserver.observe(canvas);
+    let intersectionObserver: IntersectionObserver | null = null;
+    if (suspendWhenOffscreen) {
+      intersectionObserver = new IntersectionObserver(([entry]) => {
+        visibleRef.current = entry?.isIntersecting ?? true;
+        if (visibleRef.current) start();
+        else if (frame) {
+          cancelAnimationFrame(frame);
+          frame = 0;
+        }
+      }, { rootMargin: '120px' });
+      intersectionObserver.observe(canvas);
+    } else {
+      visibleRef.current = true;
+      start();
+    }
 
     function render(time: number) {
       frame = 0;
@@ -469,12 +480,12 @@ function ExpressionFieldCanvas({
       active = false;
       cancelAnimationFrame(frame);
       resizeObserver.disconnect();
-      intersectionObserver.disconnect();
+      intersectionObserver?.disconnect();
       document.removeEventListener('visibilitychange', visibilityChange);
       reducedMotionQuery.removeEventListener('change', onReducedMotionChange);
       requestRenderRef.current = () => undefined;
     };
-  }, [axesById, autoRotate, engagementDirection, engagementPhase, selectedAxisId, variant]);
+  }, [axesById, autoRotate, engagementDirection, engagementPhase, selectedAxisId, suspendWhenOffscreen, variant]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

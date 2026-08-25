@@ -41,7 +41,7 @@ describe('production mobile and responsive experience', () => {
   it('measures required mobile product surfaces while allowing redundant system reasoning to collapse', () => {
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(landing).toContain('data-viewport-surface="hero"');
-    for (const surface of ['expression-slice', 'personal-chat', 'personal-reasoning', 'relationship-chat', 'relationship-reasoning', 'system-map', 'comparison']) {
+    for (const surface of ['expression-slice', 'personal-proof', 'relationship-chat', 'relationship-reasoning', 'system-map', 'comparison']) {
       expect(viewportProbe).toContain(`'${surface}'`);
     }
     expect(viewportProbe).toContain('desktopRequiredSurfaces');
@@ -50,6 +50,7 @@ describe('production mobile and responsive experience', () => {
     expect(stories).toContain('data-viewport-stage="personal"');
     expect(stories).toContain('data-viewport-stage="relationship"');
     expect(stories).toContain('data-viewport-stage="system"');
+    expect(stories).toContain('data-viewport-surface="personal-proof"');
     expect(viewportProbe).toContain('getBoundingClientRect()');
     expect(viewportCss).toContain('.sovereign-landing [data-viewport-surface]');
   });

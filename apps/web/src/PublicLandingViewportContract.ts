@@ -27,8 +27,7 @@ const narrowViewportMaximum = 760;
 const desktopRequiredSurfaces = [
   'hero',
   'expression-slice',
-  'personal-chat',
-  'personal-reasoning',
+  'personal-proof',
   'relationship-chat',
   'relationship-reasoning',
   'system-map',
@@ -38,23 +37,20 @@ const desktopRequiredSurfaces = [
 const narrowRequiredSurfaces = [
   'hero',
   'expression-slice',
-  'personal-chat',
-  'personal-reasoning',
+  'personal-proof',
   'relationship-chat',
   'relationship-reasoning',
   'system-map',
   'comparison'
 ] as const;
 const productSurfaceIds = new Set([
-  'personal-chat',
-  'personal-reasoning',
+  'personal-proof',
   'relationship-chat',
   'relationship-reasoning',
   'system-map',
   'system-reasoning'
 ]);
 const narrowProductPairs = [
-  ['personal-chat', 'personal-reasoning'],
   ['relationship-chat', 'relationship-reasoning']
 ] as const;
 
