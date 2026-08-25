@@ -404,6 +404,98 @@ No genuine production defect was discovered during post-launch acceptance. The a
 
 ---
 
+## Owner Acceptance Checklist
+
+### Engineering Certification
+
+| Item | Status |
+|------|--------|
+| Source certification | PASS |
+| Build | PASS (pnpm build — all 10 projects) |
+| Tests | PASS (457/457) |
+| Migrations | PASS (18/18) |
+| Release verification | PASS (verify:release-config, verify:intelligence-release) |
+| Cloudflare build | PASS (verify:cloudflare-build — 23/23 stages) |
+| Deployment | PASS (production:release:text — success) |
+| SHA parity | PASS (HEAD = origin = Cloudflare = /ready = 31da213...) |
+| Migration parity | PASS (source = deployed = /ready = 0018_workers_ai_capacity_reservations, parity: current) |
+| Production readiness | PASS (/ready — all dependencies configured) |
+| Security configuration | PASS (scan:secrets — clean) |
+| Visual implementation checks | PASS (CSS authorities, typography, viewport, reduced-motion, safe-area) |
+
+### Requires Human Acceptance
+
+| Item | Status | Owner Action |
+|------|--------|--------------|
+| Authenticated real-user journey | EVIDENCE PENDING | Exercise the full first-user path with a real test account |
+| Desktop interaction review | EVIDENCE PENDING | Review live app in desktop browser |
+| iPhone interaction review | EVIDENCE PENDING | Review live app on iPhone/Safari |
+| Owner acceptance of product messaging/experience | EVIDENCE PENDING | Review and accept the overall product experience |
+
+### How to Close These Gaps
+
+When an authorized production test account is available:
+
+```text
+landing → authentication → account/session → baseline → workspace
+→ first question → Sovereign Answer → follow-up → persistence
+```
+
+Then test one representative Relationship or System journey.
+
+Record only: journey completed, success/failure, route, contract status, persistence result, release SHA.
+
+On desktop and iPhone, review:
+
+```text
+landing page — authentication — onboarding — workspace — composer
+— answer rendering — navigation — error/loading states — responsive behavior
+— typography — spacing — information hierarchy
+```
+
+Classify any issues found:
+
+```text
+BLOCKING        — prevents user from completing core journey
+NON-BLOCKING    — cosmetic or minor, does not block acceptance
+ACCEPTED        — known, intentional, or within product direction
+```
+
+### Product Journey Acceptance
+
+| Journey | Classification | Evidence |
+|---------|---------------|----------|
+| #210 Account → Baseline → Workspace → first answer | EVIDENCE PENDING | Real user journey not yet executed |
+| #211 auth/email/billing lifecycle | EVIDENCE PENDING | Real user journey not yet executed |
+| #212 People/Relationship/System | EVIDENCE PENDING | Real user journey not yet executed |
+| #213 text AI modes / Basis / safety | EVIDENCE PENDING | Real user journey not yet executed |
+| #214 visual / interaction QA | EVIDENCE PENDING | Human desktop/iPhone review pending |
+| #215 documentation authority | ACCEPTED | Launch record reconciled |
+| #216 stability matrix / owner sign-off | EVIDENCE PENDING | Depends on #210–#214 closure |
+
+---
+
+## Final Owner Sign-Off
+
+```text
+Engineering certification:              PASS
+Production deployment certification:    PASS
+Production SHA:                         31da213ba542b55a519d1e930f6bfa50d4d5db4e
+
+Authenticated E2E:                      EVIDENCE PENDING
+Desktop human acceptance:               EVIDENCE PENDING
+iPhone human acceptance:                EVIDENCE PENDING
+Product journey acceptance:             EVIDENCE PENDING
+Owner sign-off:                         PENDING
+
+Production status:                      LIVE — ACCEPTANCE EVIDENCE PENDING
+
+PRODUCTION RELEASE SHA  = 31da213ba542b55a519d1e930f6bfa50d4d5db4e
+ACCEPTANCE DOCS SHA     = <to be set on commit>
+```
+
+---
+
 ## Documentation Map
 
 | Document | Purpose |
