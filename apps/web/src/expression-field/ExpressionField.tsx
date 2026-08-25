@@ -138,6 +138,11 @@ export function AccountExpressionField() {
 
   useEffect(() => { void load(); }, []);
   useEffect(() => {
+    const openField = () => setOpen(true);
+    window.addEventListener('sovereign:open-expression-field', openField);
+    return () => window.removeEventListener('sovereign:open-expression-field', openField);
+  }, []);
+  useEffect(() => {
     if (!open) return;
     const close = (event: KeyboardEvent) => { if (event.key === 'Escape') setOpen(false); };
     window.addEventListener('keydown', close);
@@ -154,7 +159,7 @@ export function AccountExpressionField() {
         type="button"
         onClick={() => setOpen(true)}
         disabled={loading}
-        aria-label="Open Expression Field"
+        aria-label="Open Expression Field — how your Baseline expresses across 16 dimensions"
       >
         <span aria-hidden="true" />
         <strong>{loading ? 'Preparing field' : 'Expression Field'}</strong>

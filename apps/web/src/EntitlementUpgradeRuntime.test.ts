@@ -31,7 +31,8 @@ describe('visible entitlement handoff', () => {
   it('routes authenticated upgrade handoffs to the public pricing authority', () => {
     expect(routeAuthority).toContain("const PUBLIC_ORIGIN = 'https://sovereign.defrag.app'");
     expect(routeAuthority).toContain("a[href=\"/pricing\"]");
-    expect(routeAuthority).toContain('anchor.href = `${PUBLIC_ORIGIN}/pricing`');
+    expect(routeAuthority).toContain('EXTERNAL_PUBLIC_PATHS');
+    expect(routeAuthority).toContain('anchor.href = `${PUBLIC_ORIGIN}${path}`');
     expect(main).toContain("import { installPublicRouteAuthorityRuntime } from './PublicRouteAuthorityRuntime'");
     expect(main).toContain('installPublicRouteAuthorityRuntime();');
   });

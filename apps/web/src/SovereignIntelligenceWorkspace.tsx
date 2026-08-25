@@ -309,7 +309,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
   }
 
   function beginBaseline() {
-    location.assign('/onboarding?baseline=review');
+    location.assign('/onboarding');
   }
 
   async function completeBaseline(result: Json) {
@@ -902,7 +902,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   );
   return (
     <div className="surface-home">
-      <SurfaceHeading kicker="You" title="Your Baseline, plan, permissions, and account." body="Review your Baseline, current context, permissions, privacy, plan, and account controls in one place." />
+      <SurfaceHeading kicker="You" title="Your Baseline, plan, permissions, and account." body="Review your Baseline, Expression Field, current context, permissions, privacy, plan, and account controls in one place." />
       <AccountSummary workspace={workspace} onOpenContext={onOpenContext} onBuildBaseline={onBuildBaseline} />
     </div>
   );
@@ -984,7 +984,7 @@ function RelationshipOverview({ person, api }: { person: Json; api: (path: strin
       .catch((problem) => setError(problem instanceof Error ? problem.message : 'Comparison unavailable.'));
   }, [person.id]);
   if (error) return <EmptyState title="This relationship needs one more permission." body={error} action="Manage permissions" onAction={openConsentControls} />;
-  if (!comparison) return <p className="loading-state">Loading the relationship context…</p>;
+  if (!comparison) return <p className="loading-state" role="status">Loading the relationship context…</p>;
   const participants = comparison.participants ?? [];
   const fieldSubjects: ExpressionFieldSubject[] = participants.slice(0, 2).map((participant: Json, index: number) => ({
     id: String(participant.key ?? `participant-${index}`),
@@ -1030,7 +1030,7 @@ function SystemOverview({ system, api }: { system: Json; api: (path: string, ini
       .catch((problem) => setError(problem instanceof Error ? problem.message : 'System analysis unavailable.'));
   }, [system.id]);
   if (error) return <EmptyState title="This system needs more confirmed context." body={error} action="Review members" onAction={openConsentControls} />;
-  if (!analysis) return <p className="loading-state">Loading the permitted system…</p>;
+  if (!analysis) return <p className="loading-state" role="status">Loading the permitted system…</p>;
   const participants = analysis.participants ?? [];
   const edges = analysis.relationshipGraph ?? [];
   const edge = edges[activeConnection];
@@ -1298,6 +1298,7 @@ function AccountSummary({ workspace, onOpenContext, onBuildBaseline }: { workspa
   return (
     <nav className="account-settings-index" aria-label="You settings">
       <button onClick={onBuildBaseline}><span>Baseline</span><small>{baselineReady ? 'Ready · review or rebuild' : 'Required before conversation'}</small></button>
+      <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('sovereign:open-expression-field'))}><span>Expression Field</span><small>How your Baseline expresses across 16 dimensions — steady, active, protective, or at its best</small></button>
       <button onClick={onOpenContext}><span>Current context</span><small>{workspace.today?.current?.status === 'ready' ? 'On for a limited window' : workspace.today?.current?.status === 'expired' ? 'Expired · refresh only if you choose' : workspace.today?.current?.status === 'unavailable' ? 'Current context unavailable · Baseline unchanged' : 'Off · stable Baseline remains available'}</small></button>
       <button onClick={openConsentControls}><span>Permissions</span><small>Review, deny, or revoke each person’s specific use</small></button>
       <button onClick={openConsentControls}><span>People and invitations</span><small>{workspace.people.length ? `${workspace.people.length} private connection${workspace.people.length === 1 ? '' : 's'}` : 'No shared relationship context yet'}</small></button>

@@ -206,6 +206,7 @@ function FinalCallToAction() {
         Know yourself.<br />Understand your people.<br />See the whole system.
       </h2>
       <p>Start free. Build your Baseline, then explore what you want to understand next.</p>
+      <a className="v0-get-started" href="/signup">Start free <ArrowIcon /></a>
     </section>
   );
 }

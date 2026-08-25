@@ -73,7 +73,7 @@ describe('authenticated launch cohesion', () => {
     expect(workspace).toContain('className={`intelligence-workspace');
     expect(workspace).toContain('className="sovereign-composer"');
     expect(workspace).toContain('function beginBaseline()');
-    expect(workspace).toContain("location.assign('/onboarding?baseline=review')");
+    expect(workspace).toContain("location.assign('/onboarding')");
     expect(workspace).not.toContain('capacity beneath patterns');
   });
 });
