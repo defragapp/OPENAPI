@@ -830,22 +830,22 @@ html:root:root:root body .public-approved-v8 .landing-system-analysis__sequence 
     font-size: 0.86rem !important;
   }
 
-  .public-approved-v8 .landing-message > div {
+  html .public-approved-v8 .landing-message > div {
     font-size: 0.82rem !important;
     line-height: 1.55 !important;
     padding: 12px 14px !important;
   }
 
-  .public-approved-v8 .landing-demo__body {
+  html .public-approved-v8 .landing-demo__body {
     padding: 18px !important;
     gap: 14px !important;
   }
 
-  .public-approved-v8 .landing-workflow > li {
+  html body .public-approved-v8 .landing-workflow > li {
     min-height: 0 !important;
   }
 
-  .public-approved-v8 .landing-workflow > li > button {
+  html .public-approved-v8 .landing-workflow > li > button {
     padding: 12px 0 !important;
   }
 }
