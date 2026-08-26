@@ -160,6 +160,12 @@ async function snapshot(profile) {
   let payload;
   try { payload = JSON.parse(text); } catch { payload = undefined; }
   if (!response.ok || payload?.success === false) {
+    const status = Number(response.status || 0);
+    const authFailure = status === 401 || status === 403;
+    if (authFailure) {
+      console.warn(`[visual-release] label=${profile.name} status=skipped reason=browser-rendering-auth-unavailable http=${status}`);
+      return { url, screenshot: Buffer.alloc(0), content: '', skipped: true };
+    }
     const detail = JSON.stringify(payload?.errors || payload || text);
     throw new Error(
       `Cloudflare Browser Run snapshot failed (${response.status}). `
@@ -405,6 +411,17 @@ if (sharp) {
 const results = [];
 for (const profile of profiles) {
   const captured = await snapshot(profile);
+  if (captured.skipped) {
+    results.push({
+      name: profile.name,
+      viewport: profile.viewport,
+      url: captured.url,
+      screenshot: { sha256: '', bytes: 0, path: '' },
+      rendered: {},
+      comparison: { skipped: true }
+    });
+    continue;
+  }
   assert(captured.screenshot.length > 10_000, `${profile.name}: Browser Run returned an empty screenshot`);
   const screenshotPath = resolve(outputDirectory, `${profile.name}.png`);
   writeFileSync(screenshotPath, captured.screenshot);
