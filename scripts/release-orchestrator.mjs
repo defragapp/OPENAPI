@@ -175,14 +175,17 @@ export async function orchestrateRelease({
       return { status: 'prepare-failed', deploys, output: error instanceof Error ? error.message : String(error) };
     }
 
-    const migrationResult = applyMigrations({
-      databaseName: prepared.databaseName,
-      configPath: generatedConfigPath,
-      runWrangler: countedWrangler
-    });
-    const migrationFailure = wranglerFailure(migrationResult, 'wrangler d1 migrations apply');
-    if (migrationFailure) {
-      return { status: 'migration-failed', deploys, output: migrationFailure.message };
+    const skipMigrations = String(process.env.SKIP_D1_MIGRATIONS || '').trim() === 'true';
+    if (!skipMigrations) {
+      const migrationResult = applyMigrations({
+        databaseName: prepared.databaseName,
+        configPath: generatedConfigPath,
+        runWrangler: countedWrangler
+      });
+      const migrationFailure = wranglerFailure(migrationResult, 'wrangler d1 migrations apply');
+      if (migrationFailure) {
+        return { status: 'migration-failed', deploys, output: migrationFailure.message };
+      }
     }
     migrationsApplied = true;
 
