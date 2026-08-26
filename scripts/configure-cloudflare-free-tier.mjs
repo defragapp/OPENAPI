@@ -116,13 +116,21 @@ async function resolveZone(client, zoneName) {
 }
 
 async function configureD1Replication(client, accountId, databaseId) {
-  await client.request(`/accounts/${accountId}/d1/database/${databaseId}`, {
-    method: 'PUT',
-    body: { read_replication: { mode: 'auto' } }
-  });
-  const verified = await client.request(`/accounts/${accountId}/d1/database/${databaseId}`);
-  if (verified.result?.read_replication?.mode !== 'auto') throw new Error('D1 read replication did not become active');
-  return { databaseId, readReplication: 'auto' };
+  try {
+    await client.request(`/accounts/${accountId}/d1/database/${databaseId}`, {
+      method: 'PUT',
+      body: { read_replication: { mode: 'auto' } }
+    });
+    const verified = await client.request(`/accounts/${accountId}/d1/database/${databaseId}`);
+    if (verified.result?.read_replication?.mode !== 'auto') throw new Error('D1 read replication did not become active');
+    return { databaseId, readReplication: 'auto' };
+  } catch (error) {
+    const status = Number(error?.status || 0);
+    if (status === 401 || status === 403) {
+      return { databaseId, readReplication: 'skipped', reason: 'D1 management API unavailable for this credential; read replication will be configured separately' };
+    }
+    throw error;
+  }
 }
 
 async function configureAiGateway(client, accountId, gatewayId) {

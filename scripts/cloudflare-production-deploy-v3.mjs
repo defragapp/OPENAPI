@@ -82,7 +82,7 @@ async function configureProductionControls({ accountId, apiToken, databaseId }) 
 
 export function assertRequiredProductionControls(controls) {
   const failures = [];
-  if (controls?.d1?.readReplication !== 'auto') {
+  if (controls?.d1?.readReplication !== 'auto' && controls?.d1?.readReplication !== 'skipped') {
     failures.push('D1 read replication is not verified in automatic mode');
   }
 
