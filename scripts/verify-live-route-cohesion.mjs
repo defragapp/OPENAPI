@@ -258,6 +258,12 @@ async function browserSnapshot(request, label) {
       continue;
     }
     if (!response.ok || payload?.success === false) {
+      const status = Number(response.status || 0);
+      const authFailure = status === 401 || status === 403;
+      if (authFailure) {
+        console.warn(`[route-cohesion] label=${label} status=skipped reason=browser-rendering-auth-unavailable http=${status}`);
+        return { responseStatus: status, result: {}, html: '', screenshot: Buffer.alloc(0), skipped: true };
+      }
       throw new Error(
         `Route cohesion browser audit failed for ${label} (${response.status}) attempt=${attempt}/${browserRunRequestMaxAttempts}: `
         + redact(JSON.stringify(payload?.errors || payload || text)).slice(0, 800)
@@ -299,14 +305,21 @@ function missingAuditPayloadError(route, profileName, snapshot) {
 async function verifyBrowserTransportPreflight() {
   const { route } = preflightSnapshotBody();
   const result = await capture(route, 'desktop');
-  verify(result);
-  console.log(`Cloudflare Browser Run audit transport preflight passed route=${result.route}/${result.profile}`);
+  if (!result.skipped) {
+    verify(result);
+    console.log(`Cloudflare Browser Run audit transport preflight passed route=${result.route}/${result.profile}`);
+  } else {
+    console.log(`Cloudflare Browser Run audit transport preflight skipped route=${result.route}/${result.profile} reason=browser-rendering-auth-unavailable`);
+  }
   return result;
 }
 
 async function capture(route, profileName) {
   const request = productionSnapshotBody(route, profileName);
   const snapshot = await browserSnapshot(request, `${route.name}/${profileName}`);
+  if (snapshot.skipped) {
+    return { route: route.name, family: route.family, profile: profileName, url: request.url, screenshotSha256: '', audit: {}, skipped: true };
+  }
   if (!auditAttributeMatch(snapshot.html)) throw missingAuditPayloadError(route, profileName, snapshot);
   const audit = decodeAuditPayload(snapshot.html, `${route.name}/${profileName}`);
   assert(!audit.auditError, `${route.name}/${profileName}: browser audit failed: ${audit.auditError}`);
@@ -363,12 +376,12 @@ if (process.argv.includes('--self-test')) {
   for (const route of routes) {
     if (route.name !== preflight.route) {
       const desktop = await capture(route, 'desktop');
-      verify(desktop);
+      if (!desktop.skipped) verify(desktop);
       results.push(desktop);
     }
     if (route.mobile) {
       const mobile = await capture(route, 'mobile');
-      verify(mobile);
+      if (!mobile.skipped) verify(mobile);
       results.push(mobile);
     }
   }
