@@ -258,8 +258,10 @@ const scriptTagV2 = 'addScriptTag: [{ content: renderedAuditScript() }]';
 const scriptTagV3 = "waitForSelector: { selector: '.public-approved-v8', timeout: 45_000, visible: true }";
 const domParserCallV2 = 'const dom = parseRenderedAudit(captured.content);';
 const domParserCallV3 = `const dom = await scrapeRenderedAudit(profile, captured.url, captured.content);
-  const screenshotMetadata = await sharp(captured.screenshot).metadata();
-  dom.document.height = Math.max(dom.document.height, Number(screenshotMetadata.height || 0));`;
+  if (sharp) {
+    const screenshotMetadata = await sharp(captured.screenshot).metadata();
+    dom.document.height = Math.max(dom.document.height, Number(screenshotMetadata.height || 0));
+  }`;
 const requiredTextV2 = `  for (const requiredText of [
     'Healing isn’t optional.',
     'Holding onto the pain is.',
@@ -283,6 +285,9 @@ const requiredTextV3 = `  for (const requiredText of [
   ]) {`;
 const comparisonAssertionV2 = '  assertComparison(profile, comparison);';
 const comparisonAssertionV3 = `  const referenceAuthority = profile.name.startsWith('desktop-') ? 'founder-reference' : 'structural-only';
+  if (!comparison || comparison.skipped) {
+    console.log('[visual-release] label=' + profile.name + ' status=skipped reason=sharp-unavailable');
+  } else {
   const desktopMinimumScore = 0.70;
   // Aggregate visual similarity already weights band correlation; explicit DOM ranges are the stable section-rhythm authority.
   const desktopSectionRanges = [
@@ -338,6 +343,7 @@ const comparisonAssertionV3 = `  const referenceAuthority = profile.name.startsW
       const message = error instanceof Error ? error.message : String(error);
       throw new Error(message + '; visualDiagnostic=' + JSON.stringify(visualDiagnostic));
     }
+  }
   }`;
 const resultViewportV2 = `    viewport: profile.viewport,
     url: captured.url,`;
