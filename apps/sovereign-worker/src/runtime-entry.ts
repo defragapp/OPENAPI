@@ -340,18 +340,18 @@ async function handleInternalReleaseEvidence(request: Request, env: Env): Promis
   const providedSha = request.headers.get('x-release-sha');
   const providedToken = request.headers.get('x-release-secret');
   const expectedSecret = env.RELEASE_EVIDENCE_SECRET;
-  if (expectedSecret) {
-    if (!providedToken || providedToken !== expectedSecret) {
-      return withSecurityHeaders(Response.json({ error: 'unauthorized' }, { status: 401 }));
-    }
-  } else {
-    if (!providedSha || !/^[0-9a-f]{40}$/i.test(providedSha)) {
-      return withSecurityHeaders(Response.json({ error: 'unauthorized' }, { status: 401 }));
-    }
+
+  const secretMatch = expectedSecret && providedToken && providedToken === expectedSecret;
+  let shaMatch = false;
+  if (providedSha && /^[0-9a-f]{40}$/i.test(providedSha)) {
     const appVersion = String(env.APP_VERSION || '').trim().toLowerCase();
-    if (appVersion && providedSha !== appVersion) {
-      return withSecurityHeaders(Response.json({ error: 'sha_mismatch' }, { status: 403 }));
+    if (!appVersion || providedSha === appVersion) {
+      shaMatch = true;
     }
+  }
+
+  if (!secretMatch && !shaMatch) {
+    return withSecurityHeaders(Response.json({ error: 'unauthorized' }, { status: 401 }));
   }
   const body = await request.json().catch(() => null) as {
     sha?: string;
