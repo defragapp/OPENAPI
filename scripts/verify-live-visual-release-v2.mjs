@@ -364,6 +364,10 @@ function assertDom(profile, dom) {
 }
 
 function assertComparison(profile, comparison) {
+  if (!comparison || comparison.skipped) {
+    console.log(`[visual-release] label=${profile.name} status=skipped reason=sharp-unavailable`);
+    return;
+  }
   assert(comparison.score >= profile.minimumScore, `${profile.name}: visual similarity ${comparison.score.toFixed(3)} is below ${profile.minimumScore}`);
   assert(
     comparison.bandCorrelation >= profile.minimumBandCorrelation,
@@ -408,7 +412,7 @@ for (const profile of profiles) {
   const actualFeatures = sharp ? await normalizedFeatures(sharp, captured.screenshot) : null;
   const comparison = sharp && referenceFeatures ? compareFeatures(referenceFeatures, actualFeatures) : { pixelCorrelation: null, skipped: true };
   assertDom(profile, dom);
-  if (!comparison.skipped) assertComparison(profile, comparison);
+  assertComparison(profile, comparison);
   results.push({
     name: profile.name,
     viewport: profile.viewport,
