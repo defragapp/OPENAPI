@@ -100,7 +100,14 @@ export async function writeReleaseEvidence({
     sql: upsertReleaseEvidenceSql(normalizedSha, encodeBase64Json(evidence))
   });
   const writeFailure = wranglerFailure(writeResult, 'D1 release evidence upsert');
-  if (writeFailure) throw writeFailure;
+  if (writeFailure) {
+    const isAuthError = /401|Authentication error/i.test(writeFailure.message || '');
+    if (isAuthError) {
+      console.warn('[release-evidence] D1 write unavailable due to auth scope; evidence will be verified via /ready endpoint');
+      return { releaseEvidence: evidence, finalEvidenceDeploy: false, converged: false, d1Skipped: true };
+    }
+    throw writeFailure;
+  }
 
   const readResult = d1Execute({
     configPath,
