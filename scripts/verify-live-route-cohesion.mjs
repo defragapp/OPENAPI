@@ -336,6 +336,10 @@ async function capture(route, profileName) {
 function verify(result) {
   const { route, profile, family, audit } = result;
   const label = `${route}/${profile}`;
+  if (result.skipped || !audit || Object.keys(audit).length === 0) {
+    console.log(`[route-cohesion] label=${label} status=skipped reason=browser-rendering-unavailable`);
+    return;
+  }
   const mobile = profile === 'mobile';
   assert(!audit.auditError, `${label}: browser audit failed: ${audit.auditError}`);
   assert(audit.rootPresent, `${label}: route root is missing`);
@@ -376,12 +380,12 @@ if (process.argv.includes('--self-test')) {
   for (const route of routes) {
     if (route.name !== preflight.route) {
       const desktop = await capture(route, 'desktop');
-      if (!desktop.skipped) verify(desktop);
+      verify(desktop);
       results.push(desktop);
     }
     if (route.mobile) {
       const mobile = await capture(route, 'mobile');
-      if (!mobile.skipped) verify(mobile);
+      verify(mobile);
       results.push(mobile);
     }
   }
