@@ -101,7 +101,8 @@ export async function writeReleaseEvidence({
   });
   const writeFailure = wranglerFailure(writeResult, 'D1 release evidence upsert');
   if (writeFailure) {
-    const isAuthError = /401|Authentication error/i.test(writeFailure.message || '');
+    const detail = writeFailure.message || '';
+    const isAuthError = /401|Authentication error|permission to access|code[:\s]*10000/i.test(detail);
     if (isAuthError) {
       console.warn('[release-evidence] D1 write unavailable due to auth scope; evidence will be verified via /ready endpoint');
       return { releaseEvidence: evidence, finalEvidenceDeploy: false, converged: false, d1Skipped: true };
