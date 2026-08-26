@@ -41,9 +41,9 @@ export function runNodeScript(path, { args = [], env = process.env } = {}) {
 }
 
 function checkoutSha() {
-  const declared = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
+  const declared = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.CF_COMMIT_HASH || process.env.CF_PAGES_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
   if (declared) return assertReleaseSha(declared);
-  const result = spawnSync('git', ['rev-parse', 'HEAD'], {
+  const result = spawnSync('git', ['rev-parse', 'HEAD^{commit}'], {
     cwd: root,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
