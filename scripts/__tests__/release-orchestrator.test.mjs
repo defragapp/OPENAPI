@@ -56,7 +56,16 @@ function harness({
     }
     return { status: 0, stdout: '[{"results":[]}]' };
   });
-  const fetchImpl = vi.fn(async () => {
+  const fetchImpl = vi.fn(async (url, init) => {
+    const isWorkerPost = init?.method === 'POST' && String(url).includes('/internal/release-evidence');
+    if (isWorkerPost) {
+      if (evidenceFailure) return Response.json({ ok: false, error: 'evidence write failed' }, { status: 500 });
+      const body = JSON.parse(init.body || '{}');
+      if (body.sha === sha && body.evidence_b64) {
+        state.evidenceB64 = body.evidence_b64;
+      }
+      return Response.json({ ok: true });
+    }
     const evidence = state.evidenceB64
       ? JSON.parse(Buffer.from(state.evidenceB64, 'base64').toString('utf8'))
       : null;
@@ -194,7 +203,7 @@ describe('single-deploy release orchestrator', () => {
     expect(result.evidence.releaseEvidence.sha).toBe(sha);
     expect(result.evidence.releaseEvidence.routeCohesionVerified).toBe(false);
     expect(result.evidence.releaseEvidence.renderedVisualVerified).toBe(false);
-    expect(test.fetchImpl).toHaveBeenCalledTimes(4);
+    expect(test.fetchImpl).toHaveBeenCalledTimes(5);
   });
 
   it('marks browser evidence true only when the matching post-deploy checks complete', async () => {

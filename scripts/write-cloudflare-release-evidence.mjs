@@ -19,6 +19,63 @@ const PRODUCTION_ENDPOINTS = [
   'https://sovereign.defrag.app/health'
 ];
 
+const INTERNAL_EVIDENCE_URL = 'https://app.defrag.app/internal/release-evidence';
+
+async function postEvidenceToWorker({
+  sha,
+  evidenceB64,
+  releaseSecret,
+  fetchImpl = fetch
+}) {
+  const headers = {
+    'content-type': 'application/json',
+    'x-release-sha': sha,
+    'cache-control': 'no-store'
+  };
+  if (releaseSecret) headers['x-release-secret'] = releaseSecret;
+  try {
+    const response = await fetchImpl(INTERNAL_EVIDENCE_URL, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ sha, evidence_b64: evidenceB64 }),
+      signal: AbortSignal.timeout(15_000)
+    });
+    const payload = await response.json().catch(() => null);
+    if (response.ok && payload?.ok) return { ok: true };
+    return { ok: false, error: `status=${response.status} ${JSON.stringify(payload || {})}` };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+async function postProgressToWorker({
+  sha,
+  stage,
+  summaryB64,
+  releaseSecret,
+  fetchImpl = fetch
+}) {
+  const headers = {
+    'content-type': 'application/json',
+    'x-release-sha': sha,
+    'cache-control': 'no-store'
+  };
+  if (releaseSecret) headers['x-release-secret'] = releaseSecret;
+  try {
+    const response = await fetchImpl(INTERNAL_EVIDENCE_URL, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ sha, stage, summary_b64: summaryB64 }),
+      signal: AbortSignal.timeout(15_000)
+    });
+    const payload = await response.json().catch(() => null);
+    if (response.ok && payload?.ok) return { ok: true };
+    return { ok: false, error: `status=${response.status} ${JSON.stringify(payload || {})}` };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
 function firstD1Row(result, label) {
   const failure = wranglerFailure(result, label);
   if (failure) throw failure;
@@ -84,7 +141,8 @@ export async function writeReleaseEvidence({
   endpoints = PRODUCTION_ENDPOINTS,
   attempts = 30,
   delayMs = 5_000,
-  completedAt
+  completedAt,
+  releaseSecret = String(process.env.RELEASE_EVIDENCE_SECRET || '').trim()
 } = {}) {
   const normalizedSha = assertReleaseSha(sha);
   const evidence = createReleaseEvidence({
@@ -94,22 +152,41 @@ export async function writeReleaseEvidence({
     dmarcVerified,
     completedAt
   });
+  const evidenceB64 = encodeBase64Json(evidence);
+
+  let writeMethod = 'unknown';
+
+  const workerResult = await postEvidenceToWorker({
+    sha: normalizedSha,
+    evidenceB64,
+    releaseSecret,
+    fetchImpl
+  });
+  if (workerResult.ok) {
+    writeMethod = 'worker-endpoint';
+    console.log('[release-evidence] wrote via worker endpoint');
+    await convergeReleaseEvidence({
+      sha: normalizedSha,
+      evidence,
+      fetchImpl,
+      endpoints,
+      attempts,
+      delayMs
+    });
+    return { releaseEvidence: evidence, finalEvidenceDeploy: false, converged: true, writeMethod };
+  }
+
+  console.warn(`[release-evidence] worker endpoint failed: ${workerResult.error}; falling back to direct D1`);
   const writeResult = d1Execute({
     configPath,
     runWrangler,
-    sql: upsertReleaseEvidenceSql(normalizedSha, encodeBase64Json(evidence))
+    sql: upsertReleaseEvidenceSql(normalizedSha, evidenceB64)
   });
   const writeFailure = wranglerFailure(writeResult, 'D1 release evidence upsert');
   if (writeFailure) {
-    const detail = String(writeFailure.message || writeFailure || '').toLowerCase();
-    const isAuthError = /401|authentication|permission|access|denied|forbidden|code.*10000/i.test(detail)
-      || /query failed/i.test(detail);
-    if (isAuthError) {
-      console.warn('[release-evidence] D1 write unavailable due to auth scope; evidence will be verified via /ready endpoint');
-      return { releaseEvidence: evidence, finalEvidenceDeploy: false, converged: false, d1Skipped: true };
-    }
-    throw writeFailure;
+    throw new Error(`Release evidence write failed (worker endpoint: ${workerResult.error}; D1: ${writeFailure})`);
   }
+  writeMethod = 'wrangler-d1';
 
   const readResult = d1Execute({
     configPath,
@@ -131,7 +208,7 @@ export async function writeReleaseEvidence({
     attempts,
     delayMs
   });
-  return { releaseEvidence: readback, finalEvidenceDeploy: false, converged: true };
+  return { releaseEvidence: readback, finalEvidenceDeploy: false, converged: true, writeMethod };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

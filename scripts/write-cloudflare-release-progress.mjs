@@ -11,6 +11,30 @@ import {
 } from './release-evidence-lib.mjs';
 import { DEFAULT_PRODUCTION_CONFIG_PATH } from './prepare-cloudflare-production-config.mjs';
 
+const INTERNAL_EVIDENCE_URL = 'https://app.defrag.app/internal/release-evidence';
+
+async function postProgressToWorker({ sha, stage, summaryB64, releaseSecret, fetchImpl = fetch }) {
+  const headers = {
+    'content-type': 'application/json',
+    'x-release-sha': sha,
+    'cache-control': 'no-store'
+  };
+  if (releaseSecret) headers['x-release-secret'] = releaseSecret;
+  try {
+    const response = await fetchImpl(INTERNAL_EVIDENCE_URL, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ sha, stage, summary_b64: summaryB64 }),
+      signal: AbortSignal.timeout(15_000)
+    });
+    const payload = await response.json().catch(() => null);
+    if (response.ok && payload?.ok) return { ok: true };
+    return { ok: false, error: `status=${response.status} ${JSON.stringify(payload || {})}` };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
 export async function writeReleaseProgress({
   sha,
   stage,
@@ -18,7 +42,8 @@ export async function writeReleaseProgress({
   configPath = DEFAULT_PRODUCTION_CONFIG_PATH,
   runWrangler = runWranglerCli,
   d1Execute = executeD1,
-  failedAt = new Date().toISOString()
+  failedAt = new Date().toISOString(),
+  releaseSecret = String(process.env.RELEASE_EVIDENCE_SECRET || '').trim()
 } = {}) {
   const normalizedSha = assertReleaseSha(sha);
   const normalizedStage = assertReleaseStage(stage);
@@ -32,10 +57,24 @@ export async function writeReleaseProgress({
     summary: normalizedSummary,
     failedAt
   };
+  const summaryB64 = encodeBase64Json(progress);
+
+  const workerResult = await postProgressToWorker({
+    sha: normalizedSha,
+    stage: normalizedStage,
+    summaryB64,
+    releaseSecret
+  });
+  if (workerResult.ok) {
+    console.log('[release-progress] wrote via worker endpoint');
+    return { releaseProgress: progress, failureProgressDeploy: false, writeMethod: 'worker-endpoint' };
+  }
+
+  console.warn(`[release-progress] worker endpoint failed: ${workerResult.error}; falling back to direct D1`);
   const result = d1Execute({
     configPath,
     runWrangler,
-    sql: upsertReleaseProgressSql(normalizedSha, normalizedStage, encodeBase64Json(progress))
+    sql: upsertReleaseProgressSql(normalizedSha, normalizedStage, summaryB64)
   });
   const failure = wranglerFailure(result, 'D1 release progress upsert');
   if (failure) throw failure;
@@ -51,7 +90,7 @@ export async function writeReleaseProgress({
   if (!row?.summary_b64) throw new Error('D1 release progress readback returned no failure progress');
   const readback = decodeBase64Json(row.summary_b64);
   if (JSON.stringify(readback) !== JSON.stringify(progress)) throw new Error('D1 release progress readback did not match');
-  return { releaseProgress: readback, failureProgressDeploy: false };
+  return { releaseProgress: readback, failureProgressDeploy: false, writeMethod: 'wrangler-d1' };
 }
 
 function selfTest() {

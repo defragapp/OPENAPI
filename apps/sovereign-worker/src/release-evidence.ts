@@ -73,3 +73,56 @@ function decodeBase64Utf8(value: string): string {
   const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
   return new TextDecoder().decode(bytes);
 }
+
+export async function writeProductionReleaseEvidence(
+  env: Env,
+  sha: string,
+  evidenceB64: string
+): Promise<{ ok: boolean; error?: string }> {
+  const normalizedSha = sha.toLowerCase();
+  if (!/^[0-9a-f]{40}$/i.test(normalizedSha)) {
+    return { ok: false, error: 'Invalid SHA format' };
+  }
+  if (!evidenceB64 || typeof evidenceB64 !== 'string') {
+    return { ok: false, error: 'Missing or invalid evidence_b64' };
+  }
+  try {
+    await env.DB.prepare(
+      `INSERT INTO release_evidence (sha, contract, evidence_b64, status, created_at, updated_at)
+       VALUES (?1, '${RELEASE_EVIDENCE_CONTRACT}', ?2, 'success', datetime('now'), datetime('now'))
+       ON CONFLICT(sha) DO UPDATE SET
+         contract = excluded.contract,
+         evidence_b64 = excluded.evidence_b64,
+         status = excluded.status,
+         updated_at = datetime('now')`
+    ).bind(normalizedSha, evidenceB64).run();
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+export async function writeProductionReleaseProgress(
+  env: Env,
+  sha: string,
+  stage: string,
+  summaryB64: string
+): Promise<{ ok: boolean; error?: string }> {
+  const normalizedSha = sha.toLowerCase();
+  if (!/^[0-9a-f]{40}$/i.test(normalizedSha)) {
+    return { ok: false, error: 'Invalid SHA format' };
+  }
+  try {
+    await env.DB.prepare(
+      `INSERT INTO release_progress (sha, stage, status, summary_b64, created_at, updated_at)
+       VALUES (?1, ?2, 'failure', ?3, datetime('now'), datetime('now'))
+       ON CONFLICT(sha, stage) DO UPDATE SET
+         status = excluded.status,
+         summary_b64 = excluded.summary_b64,
+         updated_at = datetime('now')`
+    ).bind(normalizedSha, stage, summaryB64).run();
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) };
+  }
+}

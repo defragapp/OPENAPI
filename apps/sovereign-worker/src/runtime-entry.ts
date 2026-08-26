@@ -2,7 +2,7 @@ import worker, { enforceIngressLimits, ThreadCoordinator, queue, scheduled } fro
 import type { Env } from './env';
 import { transactionalEmailProvider } from './email';
 import { handleExpressionFieldRequest } from './expression-field';
-import { readProductionReleaseEvidence } from './release-evidence';
+import { readProductionReleaseEvidence, writeProductionReleaseEvidence, writeProductionReleaseProgress } from './release-evidence';
 import { requireAuth, requireSameOrigin } from './security/auth';
 import { withDocumentSecurityHeaders, withSecurityHeaders } from './security/headers';
 import { resolveAiModelConfig } from '@sovereign/agent-contracts';
@@ -201,6 +201,10 @@ async function dispatchRequest(request: Request, env: Env, executionContext: Exe
     return healthResponse(url.pathname, env);
   }
 
+  if (request.method === 'POST' && url.pathname === '/internal/release-evidence') {
+    return handleInternalReleaseEvidence(request, env);
+  }
+
   if (request.method === 'GET' && url.pathname === '/api/v1/worlds/video/status') {
     return withSecurityHeaders(await handleWorldVideoStatusRequest(request, env));
   }
@@ -330,6 +334,43 @@ async function shareFirstAccountResponse(request: Request, env: Env, executionCo
       }
     }
   }, { status: response.status, headers }));
+}
+
+async function handleInternalReleaseEvidence(request: Request, env: Env): Promise<Response> {
+  const providedSha = request.headers.get('x-release-sha');
+  const providedToken = request.headers.get('x-release-secret');
+  const expectedSecret = env.RELEASE_EVIDENCE_SECRET;
+  if (expectedSecret) {
+    if (!providedToken || providedToken !== expectedSecret) {
+      return withSecurityHeaders(Response.json({ error: 'unauthorized' }, { status: 401 }));
+    }
+  } else {
+    if (!providedSha || !/^[0-9a-f]{40}$/i.test(providedSha)) {
+      return withSecurityHeaders(Response.json({ error: 'unauthorized' }, { status: 401 }));
+    }
+    const appVersion = String(env.APP_VERSION || '').trim().toLowerCase();
+    if (appVersion && providedSha !== appVersion) {
+      return withSecurityHeaders(Response.json({ error: 'sha_mismatch' }, { status: 403 }));
+    }
+  }
+  const body = await request.json().catch(() => null) as {
+    sha?: string;
+    evidence_b64?: string;
+    stage?: string;
+    summary_b64?: string;
+  } | null;
+  if (!body || typeof body !== 'object') {
+    return withSecurityHeaders(Response.json({ error: 'invalid_body' }, { status: 400 }));
+  }
+  if (body.sha && body.evidence_b64) {
+    const result = await writeProductionReleaseEvidence(env, body.sha, body.evidence_b64);
+    return withSecurityHeaders(Response.json(result, { status: result.ok ? 200 : 500 }));
+  }
+  if (body.sha && body.stage && body.summary_b64) {
+    const result = await writeProductionReleaseProgress(env, body.sha, body.stage, body.summary_b64);
+    return withSecurityHeaders(Response.json(result, { status: result.ok ? 200 : 500 }));
+  }
+  return withSecurityHeaders(Response.json({ error: 'missing_fields' }, { status: 400 }));
 }
 
 async function healthResponse(pathname: string, env: Env): Promise<Response> {

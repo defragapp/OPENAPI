@@ -158,7 +158,7 @@ describe('production release parity contract', () => {
     expect(releaseEvidenceRuntime).toContain("RELEASE_MIGRATION_VERSION = '0018_workers_ai_capacity_reservations'");
     expect(releaseEvidenceRuntime).toContain('evidence.sha !== sha');
     expect(releaseEvidenceRuntime).toContain('evidence.dmarcVerified !== true');
-    expect(runtime).toContain("import { readProductionReleaseEvidence } from './release-evidence'");
+    expect(runtime).toContain("import { readProductionReleaseEvidence, writeProductionReleaseEvidence, writeProductionReleaseProgress } from './release-evidence'");
     expect(runtime).toContain('const releaseEvidence = await readProductionReleaseEvidence(env)');
     expect(runtime).toContain('releaseEvidence,');
     expect(runtime).toContain("aiGatewayId: env.AI_GATEWAY_ID || 'missing'");
