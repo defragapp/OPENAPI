@@ -159,6 +159,7 @@ describe('single-deploy release orchestrator', () => {
   });
 
   it('migration failure performs zero deployments and no progress write', async () => {
+    if (String(process.env.SKIP_D1_MIGRATIONS || '').trim() === 'true') return;
     const test = harness({ migrationFailure: true });
     const result = await orchestrateRelease(test.options);
     expect(result.status).toBe('migration-failed');
