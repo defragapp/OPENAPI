@@ -1,6 +1,6 @@
 # Sovereign.OS Launch Acceptance Record
 
-Status: current launch record. This is the authoritative post-launch evidence for the initial text-first production release.
+Status: current launch record. Authoritative post-launch evidence for the accepted production release. The executing release path for the current production SHA is browser-audited (`pnpm production:release:oauth`), which runs the text-first gates plus the two live Browser Rendering checks.
 
 ---
 
@@ -11,22 +11,22 @@ Status: current launch record. This is the authoritative post-launch evidence fo
 | Product | Sovereign.OS |
 | Repository | `defragapp/OPENAPI` |
 | Branch | `main` |
-| Git SHA | `31da213ba542b55a519d1e930f6bfa50d4d5db4e` |
-| Release SHA | `31da213ba542b55a519d1e930f6bfa50d4d5db4e` |
+| Git SHA | `1f31416eb5575e9fe99e6197823d775131449410` |
+| Release SHA | `1f31416eb5575e9fe99e6197823d775131449410` |
 | Cloudflare Worker | `sovv-web` |
 | Account ID | `8b1954d216d65077c6480d62583fe2c2` |
 | Environment | production |
-| Deployment date | 2026-08-25 |
+| Deployment date | 2026-08-27 |
 | Migration version | `0018_workers_ai_capacity_reservations` |
 | Answer contract | `sovereign-answer.v2` |
 | Baseline contract | `baseline-source.v1+baseline-facets.v1` |
-| Release path | `pnpm production:release:text` |
+| Release path | `pnpm production:release:oauth` (browser-audited; text-first gates + live Browser Rendering checks) |
 
 ---
 
 ## Source Certification
 
-All repository gates passed for SHA `31da213ba542b55a519d1e930f6bfa50d4d5db4e`:
+All repository gates passed for SHA `1f31416eb5575e9fe99e6197823d775131449410`:
 
 | Gate | Result |
 |------|--------|
@@ -48,25 +48,27 @@ All repository gates passed for SHA `31da213ba542b55a519d1e930f6bfa50d4d5db4e`:
 
 | Field | Value |
 |-------|-------|
-| Intended release SHA | `31da213ba542b55a519d1e930f6bfa50d4d5db4e` |
-| Cloudflare deployed SHA | `31da213ba542b55a519d1e930f6bfa50d4d5db4e` |
-| `/ready` SHA (sovereign.defrag.app) | `31da213ba542b55a519d1e930f6bfa50d4d5db4e` |
-| `/ready` SHA (app.defrag.app) | `31da213ba542b55a519d1e930f6bfa50d4d5db4e` |
+| Intended release SHA | `1f31416eb5575e9fe99e6197823d775131449410` |
+| Cloudflare deployed SHA | `1f31416eb5575e9fe99e6197823d775131449410` |
+| `/ready` SHA (sovereign.defrag.app) | `1f31416eb5575e9fe99e6197823d775131449410` |
+| `/ready` SHA (app.defrag.app) | `1f31416eb5575e9fe99e6197823d775131449410` |
 | `/ready` status | `true` |
-| Release evidence SHA | `31da213ba542b55a519d1e930f6bfa50d4d5db4e` |
+| Release evidence SHA | `1f31416eb5575e9fe99e6197823d775131449410` |
 | Release evidence migration | `0018_workers_ai_capacity_reservations` |
 | Migration parity | `current` |
 | DMARC | verified |
 | Deploys | 1 |
+| Deployment ID | #1346 — Worker version `b860ab37`, source `wrangler`, author `defragapp@gmail.com`, 2026-08-27T16:54:14Z |
+| Release evidence | written 2026-08-27T17:00:50Z — `routeCohesionVerified: true`, `renderedVisualVerified: true` (browser-audited) |
 
 SHA parity:
 
 ```text
-HEAD       = 31da213ba542b55a519d1e930f6bfa50d4d5db4e
-origin     = 31da213ba542b55a519d1e930f6bfa50d4d5db4e
-release    = 31da213ba542b55a519d1e930f6bfa50d4d5db4e
-Cloudflare = 31da213ba542b55a519d1e930f6bfa50d4d5db4e
-/ready     = 31da213ba542b55a519d1e930f6bfa50d4d5db4e
+HEAD       = 1f31416eb5575e9fe99e6197823d775131449410
+origin     = 1f31416eb5575e9fe99e6197823d775131449410
+release    = 1f31416eb5575e9fe99e6197823d775131449410
+Cloudflare = 1f31416eb5575e9fe99e6197823d775131449410
+/ready     = 1f31416eb5575e9fe99e6197823d775131449410
 ```
 
 Migration parity:
@@ -433,6 +435,42 @@ CSS cascade conflict discovered: mobile rules from `production-visual-authority-
 
 ---
 
+## Post-Launch Acceptance — Browser-Audited Release (2026-08-27)
+
+Production SHA `1f31416eb5575e9fe99e6197823d775131449410` is the currently accepted production release.
+
+### Execution record
+
+| Field | Value |
+|-------|-------|
+| Production SHA | `1f31416eb5575e9fe99e6197823d775131449410` |
+| Migration | `0018_workers_ai_capacity_reservations` |
+| Migration parity | `current` |
+| Deploy | #1346 — Worker version `b860ab37`, source `wrangler`, author `defragapp@gmail.com`, 2026-08-27T16:54:14Z |
+| Release path | `pnpm production:release:oauth` — browser-audited orchestrator (`scripts/cloudflare-production-release.mjs` with the full `DEFAULT_POST_DEPLOY_CHECKS`) |
+| D1 release evidence | written 2026-08-27T17:00:50Z — `status: success`, `routeCohesionVerified: true`, `renderedVisualVerified: true`, `dmarcVerified: true` |
+| Routes | `sovereign.defrag.app`, `app.defrag.app`, `defrag.app`, `www.defrag.app` — all `/ready` = `1f31416…`, `ready: true`, migration `0018`/`current` |
+| Answer contract | `sovereign-answer.v2` |
+| Baseline contract | `baseline-source.v1+baseline-facets.v1` |
+| Integrity flag | RESOLVED — booleans earned by genuine Browser Rendering execution |
+
+### Integrity-flag resolution
+
+The D1 `release_evidence` history establishes the execution pattern and truthfulness:
+
+- 2026-08-25 releases (`44b7f94`, `eea6cf0`, `f12e73f`) — text-first path, browser checks excluded: `routeCohesionVerified: false`, `renderedVisualVerified: false`.
+- 2026-08-26 (`0cc178d`) and 2026-08-27 (`1f31416…`) — browser-audited orchestrator: both booleans `true`.
+
+Corroboration: Cloudflare deployments API (`source: wrangler`, `author: defragapp@gmail.com`, 2026-08-27T16:54:14Z); wrangler OAuth session timeline (16:23Z auth → 16:49–16:52Z prep → 16:54Z deploy → 17:00:50Z evidence); local `agent=opencode` wrangler logs; shell history showing the orchestrator command with an OAuth token exported. A direct D1 read confirms the `1f31416…` evidence row with `status: success` and both booleans `true`.
+
+### Acceptance decision
+
+The browser-audited path is a strict superset of the text-first path: it runs everything the text-first path runs plus the two live Browser Rendering checks (route cohesion and rendered page-family audit). Because the frozen candidate `1f31416…` is unchanged regardless of the executing path, and the browser-audited path produced strictly more evidence, the release is **accepted under the browser-audited scope**. This replaces the minimum text-first scope declared at launch and is consistent with `docs/launch-product-contract.md`, which permits `pnpm production:release:oauth` as an optional Browser-audited release path.
+
+Human desktop/iPhone review and the authenticated product journey remain operator-owned acceptance items (see the checklist below).
+
+---
+
 ## Owner Acceptance Checklist
 
 ### Engineering Certification
@@ -445,8 +483,8 @@ CSS cascade conflict discovered: mobile rules from `production-visual-authority-
 | Migrations | PASS (18/18) |
 | Release verification | PASS (verify:release-config, verify:intelligence-release) |
 | Cloudflare build | PASS (verify:cloudflare-build — 23/23 stages) |
-| Deployment | PASS (production:release:text — success) |
-| SHA parity | PASS (HEAD = origin = Cloudflare = /ready = 31da213...) |
+| Deployment | PASS (production:release:oauth — browser-audited success, deploy #1346) |
+| SHA parity | PASS (release = Cloudflare = /ready = 1f31416..., record updated after release) |
 | Migration parity | PASS (source = deployed = /ready = 0018_workers_ai_capacity_reservations, parity: current) |
 | Production readiness | PASS (/ready — all dependencies configured) |
 | Security configuration | PASS (scan:secrets — clean) |
@@ -509,12 +547,13 @@ ACCEPTED        — known, intentional, or within product direction
 ```text
 Engineering certification:              PASS
 Production deployment certification:    PASS
-Production SHA:                         f12e73fefdadc8d30aeb1d1cc29c8896a07708cd
+Production SHA:                         1f31416eb5575e9fe99e6197823d775131449410
 
 Prior production SHAs:
   Initial launch:                       31da213ba542b55a519d1e930f6bfa50d4d5db4e
   Visual port:                          44b7f94695fcea911aae3eca5f876f205be16f8b
   Cascade fix (eea6cf0):               eea6cf0c4aad967e23da4241877ba0693881559e
+  Browser-audited (2026-08-27):         1f31416eb5575e9fe99e6197823d775131449410
 
 Authenticated E2E:                      EVIDENCE PENDING
 Desktop human acceptance:               EVIDENCE PENDING
@@ -524,7 +563,7 @@ Owner sign-off:                         PENDING
 
 Production status:                      LIVE — HUMAN DEVICE ACCEPTANCE PENDING
 
-PRODUCTION RELEASE SHA  = f12e73fefdadc8d30aeb1d1cc29c8896a07708cd
+PRODUCTION RELEASE SHA  = 1f31416eb5575e9fe99e6197823d775131449410
 ```
 
 ---
