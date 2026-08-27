@@ -10,8 +10,8 @@ function notificationEnv(authSubject = 'email:user@example.com'): Env {
   return {
     APP_ENV: 'production',
     PUBLIC_APP_URL: 'https://app.defrag.app',
-    PUBLIC_CONTACT_EMAIL: 'info@defrag.app',
-    TRANSACTIONAL_FROM_EMAIL: 'info@defrag.app',
+    PUBLIC_CONTACT_EMAIL: 'info@sovereign.defrag.app',
+    TRANSACTIONAL_FROM_EMAIL: 'info@sovereign.defrag.app',
     RESEND_API_KEY: 're_test_billing',
     DB: {
       prepare() {
@@ -55,7 +55,7 @@ describe('Stripe-projected billing lifecycle email', () => {
     expect(result.payload.subject).toBe('Sovereign+ is active');
     expect(String(result.payload.html)).toContain('Your expanded access is active.');
     expect(String(result.payload.text)).toContain('Billing cadence: annual.');
-    expect(result.payload.reply_to).toBe('info@defrag.app');
+    expect(result.payload.reply_to).toBe('info@sovereign.defrag.app');
     expect(result.payload.tags).toEqual(expect.arrayContaining([
       { name: 'category', value: 'operational' },
       { name: 'product', value: 'sovereign-os' }

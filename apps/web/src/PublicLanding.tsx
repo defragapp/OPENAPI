@@ -223,7 +223,7 @@ function V0Footer() {
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
           <a href="/pricing#support">Support</a>
-          <a href="mailto:info@defrag.app">Contact</a>
+          <a href="mailto:info@sovereign.defrag.app">Contact</a>
         </nav>
         <p>© 2026 Sovereign.OS</p>
       </div>

@@ -328,7 +328,7 @@ export function PolicyGateAccountRights() {
           Privacy
         </a>
 
-        <a href="mailto:info@defrag.app">
+        <a href="mailto:info@sovereign.defrag.app">
           Contact support
         </a>
       </div>

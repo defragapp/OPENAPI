@@ -31,8 +31,8 @@ export interface SovereignEmailTemplate {
   contactEmail?: string;
 }
 
-const DEFAULT_FROM_ADDRESS = 'info@defrag.app';
-const DEFAULT_PUBLIC_CONTACT = 'info@defrag.app';
+const DEFAULT_FROM_ADDRESS = 'info@sovereign.defrag.app';
+const DEFAULT_PUBLIC_CONTACT = 'info@sovereign.defrag.app';
 const BRAND_MARK_URL = 'https://sovereign.defrag.app/brand-mark.svg';
 const EMAIL_DISPLAY_FONT = "Optima,'Helvetica Neue',Arial,sans-serif";
 const EMAIL_BODY_FONT = "-apple-system,BlinkMacSystemFont,'Helvetica Neue','Segoe UI',Arial,sans-serif";

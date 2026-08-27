@@ -162,7 +162,7 @@ describe('production release parity contract', () => {
     expect(runtime).toContain('const releaseEvidence = await readProductionReleaseEvidence(env)');
     expect(runtime).toContain('releaseEvidence,');
     expect(runtime).toContain("aiGatewayId: env.AI_GATEWAY_ID || 'missing'");
-    expect(runtime).toContain("publicContactEmail: env.PUBLIC_CONTACT_EMAIL || 'info@defrag.app'");
+    expect(runtime).toContain("publicContactEmail: env.PUBLIC_CONTACT_EMAIL || 'info@sovereign.defrag.app'");
   });
 
   it('honors the Workers Free Quick Actions rate limit and validates the founder reference', () => {

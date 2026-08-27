@@ -155,9 +155,9 @@ Production account and invitation email uses Resend through `apps/sovereign-work
 
 Recommended identities:
 
-- `TRANSACTIONAL_FROM_EMAIL=info@defrag.app`
-- `PUBLIC_CONTACT_EMAIL=info@defrag.app`
-- `EMAIL_SMOKE_TEST_RECIPIENT=info@defrag.app`
+- `TRANSACTIONAL_FROM_EMAIL=info@sovereign.defrag.app`
+- `PUBLIC_CONTACT_EMAIL=info@sovereign.defrag.app`
+- `EMAIL_SMOKE_TEST_RECIPIENT=info@sovereign.defrag.app`
 
 The sender domain must remain verified by the transactional provider.
 

@@ -8,7 +8,7 @@ Security fixes are applied to the current production line on `main`. Historical 
 
 Do not open a public issue, pull request, discussion, or social post containing a suspected vulnerability, secret, exploit, customer data, or reproduction material.
 
-Use GitHub private vulnerability reporting when it is available for this repository. A deterministic public reporting contact is also published at `https://sovereign.defrag.app/.well-known/security.txt`; the current contact is `info@defrag.app`. Send only the minimum non-sensitive description needed to establish contact before transmitting exploit details, secrets, customer data, or other sensitive reproduction material.
+Use GitHub private vulnerability reporting when it is available for this repository. A deterministic public reporting contact is also published at `https://sovereign.defrag.app/.well-known/security.txt`; the current contact is `info@sovereign.defrag.app`. Send only the minimum non-sensitive description needed to establish contact before transmitting exploit details, secrets, customer data, or other sensitive reproduction material.
 
 Include only what is necessary to reproduce and assess the issue:
 

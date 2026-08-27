@@ -12,7 +12,7 @@ describe('public AI transparency', () => {
       'do not use one of your monthly Sovereign AI turns',
       'A framework, coincidence, current astronomical condition, or strong feeling is not treated as proof',
       'Open source details beneath an answer when you want to inspect the exact source information that materially shaped the interpretation',
-      'info@defrag.app'
+      'info@sovereign.defrag.app'
     ]) {
       expect(faq).toContain(marker);
     }

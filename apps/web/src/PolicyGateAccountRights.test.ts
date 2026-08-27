@@ -39,7 +39,7 @@ describe('stale-policy account rights', () => {
     expect(rights).toContain('Sign out all sessions');
     expect(rights).toContain('Account deletion');
     expect(rights).toContain('https://sovereign.defrag.app/privacy');
-    expect(rights).toContain('mailto:info@defrag.app');
+    expect(rights).toContain('mailto:info@sovereign.defrag.app');
   });
 
   it('uses only server-authorized stale-policy account-rights routes', () => {

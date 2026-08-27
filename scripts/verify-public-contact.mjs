@@ -2,10 +2,10 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { extname, join, relative, resolve } from 'node:path';
 
 const root = resolve('.');
-const approvedPublicContact = 'info@defrag.app';
-const verifiedTransactionalSender = 'info@defrag.app';
+const approvedPublicContact = 'info@sovereign.defrag.app';
+const verifiedTransactionalSender = 'info@sovereign.defrag.app';
 const retiredPublicAddress = 'info@sovereign.os';
-const prohibitedPublicAddress = 'support@defrag.app';
+const prohibitedPublicAddresses = ['info@defrag.app', 'support@defrag.app'];
 const scanRoots = [
   'apps/web/src',
   'apps/web/public',
@@ -24,8 +24,10 @@ for (const path of [...explicitFiles, ...scanRoots.flatMap(walk)]) {
   const source = readFileSync(resolve(root, path), 'utf8');
   approvedOccurrences += source.split(approvedPublicContact).length - 1;
 
-  if (source.includes(prohibitedPublicAddress)) {
-    errors.push(`${normalizedPath}: contains prohibited public address ${prohibitedPublicAddress}`);
+  for (const prohibitedPublicAddress of prohibitedPublicAddresses) {
+    if (source.includes(prohibitedPublicAddress)) {
+      errors.push(`${normalizedPath}: contains prohibited public address ${prohibitedPublicAddress}`);
+    }
   }
   if (source.includes(retiredPublicAddress)) {
     errors.push(`${normalizedPath}: contains retired public address ${retiredPublicAddress}`);

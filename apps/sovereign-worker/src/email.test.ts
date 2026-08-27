@@ -19,7 +19,7 @@ describe('Sovereign.OS transactional email', () => {
 
     expect(message.text).toContain('SOVEREIGN.OS');
     expect(message.text).toContain('Open Sovereign.OS:');
-    expect(message.text).toContain('Questions or account support: info@defrag.app');
+    expect(message.text).toContain('Questions or account support: info@sovereign.defrag.app');
     expect(message.text).toContain('Do not forward it.');
     expect(message.html).toContain('SOVEREIGN.OS');
     expect(message.html).toContain('background:#0f0f0f');
@@ -29,7 +29,7 @@ describe('Sovereign.OS transactional email', () => {
     expect(message.html).not.toContain("'Times New Roman'");
     expect(message.html).toContain('border-radius:2px');
     expect(message.html).not.toContain('border-radius:999px');
-    expect(message.html).toContain('mailto:info@defrag.app');
+    expect(message.html).toContain('mailto:info@sovereign.defrag.app');
     expect(message.html).not.toContain('<script');
   });
 
@@ -91,8 +91,8 @@ describe('Sovereign.OS transactional email', () => {
       APP_ENV: 'production',
       RESEND_API_KEY: 're_test_key',
       EMAIL: { send: bindingSend },
-      TRANSACTIONAL_FROM_EMAIL: 'info@defrag.app',
-      PUBLIC_CONTACT_EMAIL: 'info@defrag.app'
+      TRANSACTIONAL_FROM_EMAIL: 'info@sovereign.defrag.app',
+      PUBLIC_CONTACT_EMAIL: 'info@sovereign.defrag.app'
     } as unknown as Env;
 
     expect(transactionalEmailProvider(env)).toBe('resend');
@@ -110,8 +110,8 @@ describe('Sovereign.OS transactional email', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
     const payload = JSON.parse(String(options.body));
-    expect(payload.from).toBe('Sovereign.OS <info@defrag.app>');
-    expect(payload.reply_to).toBe('info@defrag.app');
+    expect(payload.from).toBe('Sovereign.OS <info@sovereign.defrag.app>');
+    expect(payload.reply_to).toBe('info@sovereign.defrag.app');
     expect(payload.tags).toEqual(expect.arrayContaining([
       { name: 'product', value: 'sovereign-os' },
       { name: 'category', value: 'account_signin' },

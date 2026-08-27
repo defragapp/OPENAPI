@@ -53,7 +53,7 @@ describe('public production positioning release', () => {
   });
 
   it('publishes one deterministic vulnerability-reporting contact', () => {
-    expect(securityTxt).toContain('Contact: mailto:info@defrag.app');
+    expect(securityTxt).toContain('Contact: mailto:info@sovereign.defrag.app');
     expect(securityTxt).toContain('Canonical: https://sovereign.defrag.app/.well-known/security.txt');
     expect(securityTxt).toContain('Preferred-Languages: en');
     expect(securityTxt).toMatch(/Expires: 20\d{2}-\d{2}-\d{2}T00:00:00Z/);

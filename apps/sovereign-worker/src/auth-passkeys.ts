@@ -102,7 +102,7 @@ async function sendPasskeyAddedNotice(env: Env, accountId: string, passkeyId: st
         'Email link and six-digit code recovery remain available for the account.',
         'Remove an unfamiliar passkey from You → Account access.'
       ],
-      footer: 'If you did not add this passkey, sign in through email recovery, remove it, and contact info@defrag.app.'
+      footer: 'If you did not add this passkey, sign in through email recovery, remove it, and contact info@sovereign.defrag.app.'
     });
     await sendOperationalEmail(env, {
       to: recipient,

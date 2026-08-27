@@ -1,4 +1,4 @@
-Contact: mailto:info@defrag.app
+Contact: mailto:info@sovereign.defrag.app
 Expires: 2027-08-18T00:00:00Z
 Preferred-Languages: en
 Canonical: https://sovereign.defrag.app/.well-known/security.txt

@@ -28,11 +28,12 @@
 ---
 
 ## Verified Transactional Email Domain
-- **Sender Identity:** `Sovereign.OS <info@defrag.app>` (or `info@defrag.app`)
-- **Reply-To:** `info@defrag.app`
-- **Inbound / Contact:** `info@defrag.app`
-- **Resend Domain Status:** `defrag.app` is **Verified** with **Sending: Enabled** in the connected Resend production account.
-- **Status:** Verified live and operational in production email pipeline.
+- **Sender Identity:** `Sovereign.OS <info@sovereign.defrag.app>` (or `info@sovereign.defrag.app`)
+- **Reply-To:** `info@sovereign.defrag.app`
+- **Inbound / Contact:** `info@sovereign.defrag.app`
+- **Resend Domain Status:** `defrag.app` is **Verified** with **Sending: Enabled** in the connected Resend production account. The branded subdomain `sovereign.defrag.app` is the transactional from-domain and must be verified in Resend (SPF/DKIM/DMARC) before the new sender address is exercised in production.
+- **Forwarding:** Inbound/contact mail to `info@sovereign.defrag.app` is a private control-plane destination (Cloudflare Email Routing resolves the address on the owned `defrag.app` zone); the personal delivery mailbox must never appear in repository sources or public surfaces.
+- **Status:** Verified live in the production email pipeline; user-facing sender name is always `Sovereign.OS`.
 
 ---
 
@@ -74,6 +75,6 @@ The string `.os` in "Sovereign.OS" represents the product brand naming conventio
    - Canonical Redirects: `https://defrag.app` and `https://www.defrag.app` → `https://sovereign.defrag.app`
    - Authenticated App & API: `https://app.defrag.app`
 3. **Email Authority:**
-   - Outbound: `Sovereign.OS <info@defrag.app>`
-   - Contact / Inbound: `info@defrag.app`
-   - Resend Domain: `defrag.app` (currently verified and active).
+   - Outbound: `Sovereign.OS <info@sovereign.defrag.app>`
+   - Contact / Inbound: `info@sovereign.defrag.app`
+   - Resend Domain: `sovereign.defrag.app` (branded subdomain; parent `defrag.app` verified and active).
