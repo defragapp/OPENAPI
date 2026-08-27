@@ -55,7 +55,7 @@ describe('public positioning reset', () => {
       '<LandingExpressionSlice />',
       '<RealLifeQuestions />',
       '<LandingProductStories />',
-      'Sovereign.OS begins from a private reference grounded in who you are',
+      'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
       'How do I make decisions that actually fit me?',
       'Why does the same conversation feel urgent to me and pressuring to them?',
       'How does pressure move through this team?',
@@ -158,7 +158,7 @@ describe('public positioning reset', () => {
   it('shows self, relationship, and system intelligence as substantive product behavior in approved language', () => {
     for (const marker of [
       '01 · You',
-      'See how you think, decide, communicate, create, connect, and grow.',
+      'Explore how you think, decide, communicate, create, connect, and grow.',
       'How Sovereign builds the answer',
       'Start with the question',
       'Find the useful distinction',

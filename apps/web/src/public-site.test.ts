@@ -28,10 +28,10 @@ const publicCopy = `${landing}\n${stories}\n${policy}\n${how}\n${pricing}\n${faq
 
 describe('Sovereign.OS public experience', () => {
   it('keeps the founder statement but makes the opening product value explicit', () => {
-    expect(landing).toContain('Baseline-first personal intelligence');
+    expect(landing).toContain('Personal AI for real life');
     expect(landing).toContain('Healing isn\u2019t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Sovereign.OS begins from a private reference grounded in who you are');
+    expect(landing).toContain('Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.');
     expect(landing).toContain('Get started');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(field).toContain('Drag to rotate');

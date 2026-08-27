@@ -91,7 +91,7 @@ function V0Hero() {
   return (
     <section className="v0-hero sovereign-opening-field" data-viewport-section="hero">
       <div className="v0-hero-content" data-viewport-surface="hero">
-        <p className="v0-badge landing-hero-kicker"><span />Baseline-first personal intelligence</p>
+        <p className="v0-badge landing-hero-kicker"><span />Personal AI for real life</p>
         <h1>
           <span aria-label="Healing isn’t optional.">
             Healing<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />isn’t optional.
@@ -101,10 +101,10 @@ function V0Hero() {
           </em>
         </h1>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
-          Sovereign.OS begins from a private reference grounded in who you are — your Baseline. From there, it reveals how you think, decide, communicate, create, connect, respond under pressure, and change. Not a chatbot. Not a profile. A living instrument for understanding yourself and the people and systems around you.
+          Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you. Build your Baseline once, then explore how you think, decide, communicate, create, connect, respond under pressure, and change.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
-          A private personal intelligence grounded in who you are. Not a chatbot. Not a profile. A living instrument for understanding yourself.
+          Private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
         <p className="sovereign-opening-trust">
           <LockIcon />

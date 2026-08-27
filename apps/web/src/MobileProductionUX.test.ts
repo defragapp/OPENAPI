@@ -69,8 +69,7 @@ describe('production mobile and responsive experience', () => {
     for (const marker of [
       'v0-wordmark--mobile',
       'v0-mobile-menu',
-      'Baseline-first personal intelligence',
-      'A private personal intelligence grounded in who you are.',
+      'Private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
       'Start free · No card required',
       '<MobileCapabilityRail />',
       'Explore yourself',

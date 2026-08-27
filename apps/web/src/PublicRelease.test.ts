@@ -82,7 +82,7 @@ describe('public production positioning release', () => {
 
   it('introduces self exploration before People and Systems with recognizable high-value questions', () => {
     for (const marker of [
-      'Sovereign.OS begins from a private reference grounded in who you are',
+      'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
       'How do I make decisions that actually fit me?',
       'Why does the same conversation feel urgent to me and pressuring to them?',
       'How does pressure move through this team?',
@@ -93,7 +93,7 @@ describe('public production positioning release', () => {
 
     for (const marker of [
       '01 · You',
-      'See how you think, decide, communicate, create, connect, and grow.',
+      'Explore how you think, decide, communicate, create, connect, and grow.',
       '02 · You + your people',
       'See why the same moment lands differently',
       '03 · From 1:1 to the whole system',

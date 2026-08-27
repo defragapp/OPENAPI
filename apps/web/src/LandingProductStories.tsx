@@ -184,7 +184,7 @@ function PersonalStory() {
   return (
     <section ref={sectionRef} id="how" className="landing-story landing-story--personal" data-viewport-section="personal">
       <div className="landing-story__shell">
-        <StoryHeading step="01 · You" title="See how you think, decide, communicate, create, connect, and grow.">
+        <StoryHeading step="01 · You" title="Explore how you think, decide, communicate, create, connect, and grow.">
           Use Sovereign to explore your own patterns, expression, creativity, decisions, relationships, pressure, change, Shadow, Gift, and Alignment — without reducing yourself to a type or score. Every answer begins from your Baseline.
         </StoryHeading>
         <div className="landing-story__stage" data-viewport-stage="personal">
@@ -221,7 +221,7 @@ function RelationshipStory() {
   return (
     <section ref={sectionRef} id="relationship" className="landing-story landing-story--relationship" data-viewport-section="relationship">
       <div className="landing-story__shell">
-        <StoryHeading step="02 · You + your people" title="See why the same moment lands differently — and how to bridge the gap.">
+        <StoryHeading step="02 · You + your people" title="See why the same moment lands differently—and how to bridge the gap.">
           With permission, Sovereign uses both people's Baselines while keeping each person distinct. See where timing, communication, pressure, or decision styles differ, what happens when they meet, and what each person can do differently. No compatibility score. No private-thought claims.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--relationship" data-viewport-stage="relationship">
