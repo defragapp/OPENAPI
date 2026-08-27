@@ -124,7 +124,7 @@ function MobileCapabilityRail() {
       <a href="#how">
         <CapabilityIcon kind="self" />
         <strong>Explore yourself</strong>
-        <small>Capacity, expression,<br />decisions, Alignment.</small>
+        <small>Expression, decisions,<br />creativity, Alignment.</small>
       </a>
       <a href="#relationship">
         <CapabilityIcon kind="people" />

@@ -189,7 +189,7 @@ describe('public positioning reset', () => {
   });
 
   it('keeps exact fixture-backed source codes secondary and collapsed by default', () => {
-    for (const marker of ["{ code: 'HD G13.1'", "{ code: 'GK ACT13'", "{ code: '☉ CAN 04.2°'", "{ code: 'HD G22.4'", "{ code: 'HD G57.2'", "{ code: 'REL ☿ □ ☿ 1.8°'"]) {
+    for (const marker of ["{ code: 'clarity'", "{ code: 'focus'", "{ code: 'steadiness'", "{ code: 'clarity □ steadiness'"]) {
       expect(stories).toContain(marker);
     }
     expect(stories).toContain('<details className="landing-evidence">');

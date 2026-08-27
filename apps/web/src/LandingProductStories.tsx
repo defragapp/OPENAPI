@@ -35,9 +35,9 @@ void RELEASE_LINEAGE_MARKERS;
 const SELF_BASELINE: readonly EvidenceGroup[] = [
   {
     points: [
-      { code: 'HD G13.1', label: 'Example Human Design personality activation: Gate 13 line 1' },
-      { code: 'GK ACT13', label: 'Example Gene Keys activation number 13' },
-      { code: '☉ CAN 04.2°', label: 'Example natal Sun at 4.2 degrees Cancer' }
+      { code: 'clarity', label: 'Example Baseline facet: Clarity' },
+      { code: 'focus', label: 'Example Baseline facet: Focus' },
+      { code: 'steadiness', label: 'Example Baseline facet: Steadiness' }
     ]
   }
 ] as const;
@@ -46,27 +46,27 @@ const DUO_BASELINE: readonly EvidenceGroup[] = [
   {
     name: 'You',
     points: [
-      { code: 'HD G22.4', label: 'Example Human Design personality activation for you: Gate 22 line 4' },
-      { code: '☿ CAN 18.4°', label: 'Example Mercury placement for you: 18.4 degrees Cancer' }
+      { code: 'clarity', label: 'Example Baseline facet for you: Clarity' },
+      { code: 'focus', label: 'Example Baseline facet for you: Focus' }
     ]
   },
   {
     name: 'Partner',
     points: [
-      { code: 'HD G57.2', label: 'Example Human Design personality activation for your partner: Gate 57 line 2' },
-      { code: '☿ LIB 16.6°', label: 'Example Mercury placement for your partner: 16.6 degrees Libra' }
+      { code: 'steadiness', label: 'Example Baseline facet for your partner: Steadiness' },
+      { code: 'patience', label: 'Example Baseline facet for your partner: Patience' }
     ]
   },
   {
     name: 'Between you',
-    points: [{ code: 'REL ☿ □ ☿ 1.8°', label: 'Example pair Mercury square with a 1.8 degree orb' }]
+    points: [{ code: 'clarity □ steadiness', label: 'Example pair interaction: Clarity/Steadiness dynamic' }]
   }
 ] as const;
 
 const SYSTEM_BASIS: readonly EvidenceGroup[] = [
   {
     name: 'You',
-    points: [{ code: 'HD G13.1', label: 'Example Human Design personality activation: Gate 13 line 1' }]
+    points: [{ code: 'responsibility', label: 'Example Baseline facet: Responsibility' }]
   },
   {
     name: 'What you told Sovereign',

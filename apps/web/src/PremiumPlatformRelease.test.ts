@@ -177,7 +177,7 @@ describe('founder visual port — public positioning reset', () => {
   });
 
   it('keeps public source details exact, fixture-backed, and collapsed by default', () => {
-    for (const marker of ["{ code: 'HD G13.1'", "{ code: 'GK ACT13'", "{ code: '☉ CAN 04.2°'", "{ code: 'HD G22.4'", "{ code: 'HD G57.2'", "{ code: 'REL ☿ □ ☿ 1.8°'"]) expect(stories).toContain(marker);
+    for (const marker of ["{ code: 'clarity'", "{ code: 'focus'", "{ code: 'steadiness'", "{ code: 'clarity □ steadiness'"]) expect(stories).toContain(marker);
     expect(stories).toContain('<details className="landing-evidence">');
     expect(stories).toContain('<strong>See source details</strong>');
     expect(stories).toContain('These values are not visitor data.');

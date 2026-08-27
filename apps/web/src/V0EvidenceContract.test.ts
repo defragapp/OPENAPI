@@ -44,8 +44,8 @@ describe('public evidence contract', () => {
     expect(stories).toContain('<details className="landing-evidence">');
     expect(stories).toContain('<strong>See source details</strong>');
     expect(stories).toContain('Example data used in this demonstration. These values are not visitor data.');
-    expect(stories).toContain("{ code: 'HD G13.1'");
-    expect(stories).toContain("{ code: 'REL ☿ □ ☿ 1.8°'");
+    expect(stories).toContain("{ code: 'clarity'");
+    expect(stories).toContain("{ code: 'clarity □ steadiness'");
     expect(stories).not.toContain('<strong>Example Basis</strong>');
     expect(stories).not.toContain("chips: ['HD G13.1'");
   });
