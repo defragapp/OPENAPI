@@ -130,7 +130,7 @@ describe('Sovereign.OS active experience language', () => {
     expect(workspace).toContain("{ name: 'Explore', label: 'Explore', description: 'Explore yourself more deeply' }");
     expect(workspace).toContain("{ name: 'People', label: 'People', description: 'See how the same moment can land differently' }");
     expect(workspace).toContain("{ name: 'Systems', label: 'Systems', description: 'See the whole system' }");
-    expect(workspace).toContain('title="See what happens between you."');
+    expect(workspace).toContain('title="See how the same moment can land differently."');
     expect(workspace).toContain('body="Keep each person distinct. See what each person brings');
     expect(workspace).toContain("Explore: ['What capacity or pattern do I want to understand?', 'What changes in me under pressure?']");
     expect(workspace).toContain("Systems: ['What role do I keep ending up in?', 'What changes when the usual roles shift?']");

@@ -205,7 +205,7 @@ function FinalCallToAction() {
       <h2 aria-label="Know yourself. Understand your people. See the whole system.">
         Know yourself.<br />Understand your people.<br />See the whole system.
       </h2>
-      <p>Start free. Build your Baseline — the private reference Sovereign uses across self, decisions, relationships, and systems. Then explore what you want to understand next.</p>
+      <p>Start free. Build your Baseline, then explore what you want to understand next.</p>
       <a className="v0-get-started" href="/signup">Start free <ArrowIcon /></a>
     </section>
   );

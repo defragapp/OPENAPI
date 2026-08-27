@@ -879,7 +879,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   if (surface === 'Explore') return <ExploreHome workspace={workspace} />;
   if (surface === 'People') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="People" title="See what happens between you." body="Keep each person distinct. See what each person brings, what happens when they meet, and what may help the next conversation go differently." />
+      <SurfaceHeading kicker="People" title="See how the same moment can land differently." body="Keep each person distinct. See what each person brings, what happens when they meet, and what may help the next conversation go differently." />
       {selectedPerson
         ? <RelationshipOverview person={selectedPerson} api={api} />
         : <EmptyState title="Choose one relationship to examine." body="A name alone does not create access. The other person connects their account and chooses what Sovereign may use." action="Invite or choose someone" onAction={onOpenContext} />}
@@ -887,7 +887,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   );
   if (surface === 'Systems') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="Systems" title="See how pressure moves through the group." body="See who is involved, where responsibility sits, how pressure moves, and what changes when one person responds differently." />
+      <SurfaceHeading kicker="Systems" title="See the whole system." body="See who is involved, where responsibility sits, how pressure moves, and what changes when one person responds differently." />
       {selectedSystem
         ? <SystemOverview system={selectedSystem} api={api} />
         : <EmptyState title="Choose a system to examine." body="Choose a group to see who is involved, what each person is carrying, where pressure gathers, and how the group responds." action="Choose a system" onAction={onOpenContext} />}
@@ -895,7 +895,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   );
   if (surface === 'Library') return (
     <div className="surface-home">
-      <SurfaceHeading kicker="Library" title="Return to what changed your understanding." body="Saved distinctions, relationship understandings, and system views. Library is not a journal or transcript archive — it is a collection of what was useful." />
+      <SurfaceHeading kicker="Library" title="Keep what changes your understanding." body="Saved distinctions, relationship understandings, and system views. Library is not a journal or transcript archive — it is a collection of what was useful." />
       <LibraryGrid library={workspace.library} onPrompt={onPrompt} />
     </div>
   );
@@ -952,7 +952,7 @@ function TodayFacetView({ facets, current, registry }: { facets: Json[]; current
     <section className="today-facet-view">
       <header>
         <p>Today</p>
-        <h1>What is active in your Baseline right now?</h1>
+        <h1>What is active for you now?</h1>
         <span>Begin with what remains steady, then see what may be louder today. Your Baseline stays beneath every exploration.</span>
       </header>
       <p className="today-steady"><strong>What remains steady</strong>{core?.description ?? 'Your Baseline remains available beneath the conversation.'}</p>
@@ -968,7 +968,7 @@ function ExploreHome({ workspace }: { workspace: WorkspaceState }) {
     : [];
   return (
     <div className="surface-home explore-home">
-      <SurfaceHeading kicker="Explore" title="Explore your capacity, expression, and patterns." body="See how you think, decide, create, connect, and grow. Bring in a decision, relationship, pressure point, or recurring pattern to see how it connects to your Baseline." />
+      <SurfaceHeading kicker="Explore" title="Explore yourself more deeply." body="See how you think, decide, create, connect, and grow. Bring in a decision, relationship, pressure point, or recurring pattern to see how it connects to your Baseline." />
       <BasisStrip values={registry} />
     </div>
   );
