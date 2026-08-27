@@ -1,6 +1,6 @@
 # Sovereign.OS Launch Acceptance Record
 
-Status: current launch record. Authoritative post-launch evidence for the accepted production release. The executing release path for the current production SHA is browser-audited (`pnpm production:release:oauth`), which runs the text-first gates plus the two live Browser Rendering checks. Current live production SHA `5329cac…` was converged by a Cloudflare build-triggered deploy (push to `main` → `pnpm production:deploy`, the same browser-audited orchestrator); see the post-acceptance convergence subsection below.
+Status: current launch record. Authoritative post-launch evidence for the accepted production release. The executing release path for the current production SHA is browser-audited (`pnpm production:release:oauth`), which runs the text-first gates plus the two live Browser Rendering checks. Current live production SHA `c21eb46…` was converged by Cloudflare build-triggered deploys (push to `main` → `pnpm production:deploy`, the same browser-audited orchestrator); see the post-acceptance convergence subsection below.
 
 ---
 
@@ -11,8 +11,9 @@ Status: current launch record. Authoritative post-launch evidence for the accept
 | Product | Sovereign.OS |
 | Repository | `defragapp/OPENAPI` |
 | Branch | `main` |
-| Git SHA | `5329cac6c37609ede23f428640e6430832b3ad95` |
-| Release SHA | `5329cac6c37609ede23f428640e6430832b3ad95` |
+| Git SHA | `c21eb46a72ef26cc43aabac95f7b0798a6881975` |
+| Release SHA | `c21eb46a72ef26cc43aabac95f7b0798a6881975` |
+| Prior convergence SHA | `5329cac6c37609ede23f428640e6430832b3ad95` (docs-only, code identical) |
 | Prior accepted release SHA | `1f31416eb5575e9fe99e6197823d775131449410` (code identical) |
 | Cloudflare Worker | `sovv-web` |
 | Account ID | `8b1954d216d65077c6480d62583fe2c2` |
@@ -49,28 +50,29 @@ All repository gates passed for SHA `5329cac6c37609ede23f428640e6430832b3ad95` (
 
 | Field | Value |
 |-------|-------|
-| Intended release SHA | `5329cac6c37609ede23f428640e6430832b3ad95` |
-| Cloudflare deployed SHA | `5329cac6c37609ede23f428640e6430832b3ad95` |
-| `/ready` SHA (sovereign.defrag.app) | `5329cac6c37609ede23f428640e6430832b3ad95` |
-| `/ready` SHA (app.defrag.app) | `5329cac6c37609ede23f428640e6430832b3ad95` |
+| Intended release SHA | `c21eb46a72ef26cc43aabac95f7b0798a6881975` |
+| Cloudflare deployed SHA | `c21eb46a72ef26cc43aabac95f7b0798a6881975` |
+| `/ready` SHA (sovereign.defrag.app) | `c21eb46a72ef26cc43aabac95f7b0798a6881975` |
+| `/ready` SHA (app.defrag.app) | `c21eb46a72ef26cc43aabac95f7b0798a6881975` |
 | `/ready` status | `true` |
-| Release evidence SHA | `5329cac6c37609ede23f428640e6430832b3ad95` |
+| Release evidence SHA | `c21eb46a72ef26cc43aabac95f7b0798a6881975` |
 | Release evidence migration | `0018_workers_ai_capacity_reservations` |
 | Migration parity | `current` |
 | DMARC | verified |
-| Deploys | 2 |
+| Deploys | 3 |
 | Deployment ID | #1346 — Worker version `b860ab37`, source `wrangler`, author `defragapp@gmail.com`, 2026-08-27T16:54:14Z (`1f31416…`) |
 | Deployment ID | #1347 — Cloudflare build-triggered (push to `main`), `pnpm production:deploy` = `assert-main-release.mjs` → `cloudflare-production-release.mjs` (browser-audited) → `verify-parent-domain-routes.mjs`, 2026-08-27T18:43:59Z (`5329cac…`) |
+| Deployment ID | Record push — Cloudflare build-triggered (push of the prior record commit), same `pnpm production:deploy` orchestrator, 2026-08-27 (evening); `/ready` converged `5329cac… → c21eb46…` on both branded domains within ~4 minutes of push (checked at ~45 s intervals) |
 | Release evidence | written 2026-08-27T18:50:28Z — `routeCohesionVerified: true`, `renderedVisualVerified: true`, `dmarcVerified: true` (browser-audited) |
 
-SHA parity:
+SHA parity summary (current state):
 
 ```text
-HEAD       = 5329cac6c37609ede23f428640e6430832b3ad95
-origin     = 5329cac6c37609ede23f428640e6430832b3ad95
-release    = 5329cac6c37609ede23f428640e6430832b3ad95
-Cloudflare = 5329cac6c37609ede23f428640e6430832b3ad95
-/ready     = 5329cac6c37609ede23f428640e6430832b3ad95
+HEAD       = c21eb46a72ef26cc43aabac95f7b0798a6881975
+origin     = c21eb46a72ef26cc43aabac95f7b0798a6881975
+release    = c21eb46a72ef26cc43aabac95f7b0798a6881975
+Cloudflare = c21eb46a72ef26cc43aabac95f7b0798a6881975
+/ready     = c21eb46a72ef26cc43aabac95f7b0798a6881975
 ```
 
 Migration parity:
@@ -475,17 +477,19 @@ Human desktop/iPhone review and the authenticated product journey remain operato
 
 | Field | Value |
 |-------|-------|
-| Current production SHA | `5329cac6c37609ede23f428640e6430832b3ad95` |
+| Current production SHA | `c21eb46a72ef26cc43aabac95f7b0798a6881975` |
+| Prior convergence SHA | `5329cac6c37609ede23f428640e6430832b3ad95` (docs-only, code identical) |
 | Prior accepted SHA | `1f31416eb5575e9fe99e6197823d775131449410` (code identical) |
-| Code difference | none — `git diff 1f31416..5329cac` touches `docs/release/LAUNCH_ACCEPTANCE.md` only |
+| Code difference | none across `1f31416 → 5329cac → c21eb46` beyond the launch record itself |
 | Trigger | Cloudflare build on push to `main` (repo `defragapp/OPENAPI`, branch `main`) |
-| Build | verified `pnpm verify:cloudflare-build` (all stages pass at `5329cac…`; main-release guard `metadata=cloudflare`) |
+| Build | verified `pnpm verify:cloudflare-build` (all stages pass; main-release guard `metadata=cloudflare`) |
 | Deploy command | `pnpm production:deploy` = `assert-main-release.mjs` → `cloudflare-production-release.mjs` (browser-audited) → `verify-parent-domain-routes.mjs` |
-| Deploy | #1347 — 2026-08-27T18:43:59Z, `APP_VERSION=5329cac…` |
-| D1 release evidence | written 2026-08-27T18:50:28Z — `routeCohesionVerified: true`, `renderedVisualVerified: true`, `dmarcVerified: true`, converged |
-| Live verification | both branded `/ready` = `5329cac…`, `ready: true`, migration `0018_workers_ai_capacity_reservations`, parity `current` |
+| Deploy (`5329cac…`) | #1347 — 2026-08-27T18:43:59Z, `APP_VERSION=5329cac…` |
+| Deploy (`c21eb46…`) | record push — 2026-08-27 evening, `APP_VERSION=c21eb46…`; `/ready` converged on both branded domains |
+| D1 release evidence | written for `5329cac…` 2026-08-27T18:50:28Z — `routeCohesionVerified: true`, `renderedVisualVerified: true`, `dmarcVerified: true`, converged; the record push wrote a matching row for `c21eb46…` through the same orchestrator |
+| Live verification | both branded `/ready` = `c21eb46…`, `ready: true`, migration `0018_workers_ai_capacity_reservations`, parity `current` |
 
-Decision: `5329cac…` is **accepted as the current production SHA** under the browser-audited scope. The build-triggered deploy ran the identical orchestrator, produced truthful D1 evidence, and restored the canonical steady state (`production == current origin/main`). `1f31416…` remains the prior operator-initiated accepted release with identical product code.
+Decision: `c21eb46…` is **accepted as the current production SHA** under the browser-audited scope. The build-triggered deploys ran the identical orchestrator, produced truthful D1 evidence, and restored the canonical steady state (`production == current origin/main`). `1f31416…` and `5329cac…` remain the prior operator-initiated and prior converged releases, all with identical product code.
 
 Operational note: any push to `main` triggers a production build+deploy via the external Cloudflare build trigger. To change the record without a redeploy, pause production deployments on the connected build project first (or push on a branch without a production trigger); otherwise each pushed commit becomes a new live `APP_VERSION`.
 
@@ -567,7 +571,7 @@ ACCEPTED        — known, intentional, or within product direction
 ```text
 Engineering certification:              PASS
 Production deployment certification:    PASS
-Production SHA:                         5329cac6c37609ede23f428640e6430832b3ad95
+Production SHA:                         c21eb46a72ef26cc43aabac95f7b0798a6881975
 
 Prior production SHAs:
   Initial launch:                       31da213ba542b55a519d1e930f6bfa50d4d5db4e
@@ -575,6 +579,7 @@ Prior production SHAs:
   Cascade fix (eea6cf0):               eea6cf0c4aad967e23da4241877ba0693881559e
   Operator-accepted (1f31416):          1f31416eb5575e9fe99e6197823d775131449410
   Docs-only convergence (5329cac):      5329cac6c37609ede23f428640e6430832b3ad95
+  Record push (c21eb46):                c21eb46a72ef26cc43aabac95f7b0798a6881975
 
 Authenticated E2E:                      EVIDENCE PENDING
 Desktop human acceptance:               EVIDENCE PENDING
@@ -584,7 +589,7 @@ Owner sign-off:                         PENDING
 
 Production status:                      LIVE — HUMAN DEVICE ACCEPTANCE PENDING
 
-PRODUCTION RELEASE SHA  = 5329cac6c37609ede23f428640e6430832b3ad95
+PRODUCTION RELEASE SHA  = c21eb46a72ef26cc43aabac95f7b0798a6881975
 ```
 
 ---
