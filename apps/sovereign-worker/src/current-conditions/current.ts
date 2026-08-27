@@ -1,6 +1,7 @@
 import type { Env } from '../env';
 import { parseHorizonsJson, type HorizonsPayload } from '../baseline-engine';
 import { baselineFacetIds, type BaselineFacetId, type BaselineSourceData } from '../baseline-contracts';
+import { longitudeToSign, signedLongitudeDelta, BODY_GLYPHS, SIGN_CODES, ASPECT_GLYPHS } from '../astronomy';
 
 export interface CurrentConditionInput {
   accountId: string;
@@ -65,21 +66,12 @@ const PLANET_IDS: Record<string, string> = {
   sun: '10', moon: '301', mercury: '199', venus: '299', mars: '499', jupiter: '599', saturn: '699', uranus: '799', neptune: '899', pluto: '999', chiron: '2060'
 };
 
-const ZODIAC_SIGNS = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'] as const;
-
-export function eclipticLongitudeToSign(longitude: number): { sign: string; degree: number } {
-  const normalized = ((longitude % 360) + 360) % 360;
-  const signIndex = Math.floor(normalized / 30);
-  const degree = normalized % 30;
-  return { sign: ZODIAC_SIGNS[signIndex] ?? 'Aries', degree: Math.round(degree * 100) / 100 };
-}
-
 export async function computeReducedCurrentConditions(env: Env, input: CurrentConditionInput): Promise<ReducedCurrentCondition> {
   const computedAt = new Date(input.timestamp ?? Date.now()).toISOString();
   const expiresAt = new Date(new Date(computedAt).getTime() + 6 * 60 * 60 * 1000).toISOString();
   const bodies = input.fixtureBodies ?? await fetchCurrentBodies(env, computedAt, input.location);
   const activeFactors = Object.entries(bodies).map(([body, position]) => {
-    const { sign, degree } = eclipticLongitudeToSign(position.longitude);
+    const { sign, degree } = longitudeToSign(position.longitude);
     const retrograde = position.retrograde === true;
     return {
       id: `current.${body}`,
@@ -202,10 +194,6 @@ export function buildCurrentHorizonsEndpoint(
 function horizonsDate(date: Date): string {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return `${date.getUTCFullYear()}-${months[date.getUTCMonth()]}-${String(date.getUTCDate()).padStart(2, '0')} ${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
-}
-
-function signedLongitudeDelta(from: number, to: number) {
-  return ((to - from + 540) % 360) - 180;
 }
 
 function facetsForBody(body: string): BaselineFacetId[] {

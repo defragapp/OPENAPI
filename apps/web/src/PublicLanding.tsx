@@ -18,16 +18,16 @@ const REAL_LIFE_QUESTIONS = [
 
 const COMPARISON = {
   blank: [
-    'Starts from the prompt and what you explain in that conversation',
+    'Begins from the prompt and what you explain in that conversation',
     'Your history and recurring patterns must be explained again or inferred from the thread',
-    'Another person’s information is not automatically protected by Sovereign’s sharing permissions',
-    'Does not show Sovereign’s exact source details for an interpretation'
+    'Another person\'s information is not automatically protected by Sovereign\'s sharing permissions',
+    'Does not show its exact source details for an interpretation'
   ],
   sovereign: [
-    'Carries your private Baseline across conversations',
-    'Uses what is happening now, another person’s shared Baseline, or the wider family or team situation only when it helps answer the question',
+    'Carries your private Baseline across every conversation',
+    'Uses what is happening now, another person\'s shared Baseline, or the wider situation only when it helps answer the question',
     'Keeps each person separate and uses only what they chose to share',
-    'Lets you inspect source details and review, correct, or reject interpretations'
+    'Lets you inspect source details and review, correct, or reject any interpretation'
   ]
 } as const;
 const RELEASE_COPY_MARKERS = ['everyone the same.'] as const;
@@ -91,7 +91,7 @@ function V0Hero() {
   return (
     <section className="v0-hero sovereign-opening-field" data-viewport-section="hero">
       <div className="v0-hero-content" data-viewport-surface="hero">
-        <p className="v0-badge landing-hero-kicker"><span />Personal AI for real life</p>
+        <p className="v0-badge landing-hero-kicker"><span />Baseline-first personal intelligence</p>
         <h1>
           <span aria-label="Healing isn’t optional.">
             Healing<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />isn’t optional.
@@ -101,10 +101,10 @@ function V0Hero() {
           </em>
         </h1>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
-          Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you. Build your Baseline once, then explore how you think, decide, communicate, create, connect, respond under pressure, and change.
+          Sovereign.OS begins from a private reference grounded in who you are — your Baseline. From there, it reveals how you think, decide, communicate, create, connect, respond under pressure, and change. Not a chatbot. Not a profile. A living instrument for understanding yourself and the people and systems around you.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
-          Private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
+          A private personal intelligence grounded in who you are. Not a chatbot. Not a profile. A living instrument for understanding yourself.
         </p>
         <p className="sovereign-opening-trust">
           <LockIcon />
@@ -124,12 +124,12 @@ function MobileCapabilityRail() {
       <a href="#how">
         <CapabilityIcon kind="self" />
         <strong>Explore yourself</strong>
-        <small>Decisions, expression,<br />connection, Alignment.</small>
+        <small>Capacity, expression,<br />decisions, Alignment.</small>
       </a>
       <a href="#relationship">
         <CapabilityIcon kind="people" />
         <strong>Understand your people</strong>
-        <small>See why the same moment<br />can land differently.</small>
+        <small>See why the same moment<br />lands differently.</small>
       </a>
       <a href="#system">
         <CapabilityIcon kind="system" />
@@ -184,10 +184,10 @@ function ComparisonStory() {
     <section className="v0-comparison" data-viewport-section="comparison">
       <div className="v0-shell">
         <header className="v0-story-heading v0-story-heading-left">
-          <p>Why this AI is different</p>
+          <p>The Baseline difference</p>
           <h2 aria-label="Most AI starts with the prompt. Sovereign starts with you.">
             Most AI starts<br />with the prompt.<br />
-            <span>Sovereign<br />starts with you.</span>
+            <span>Sovereign starts<br />from who you are.</span>
           </h2>
         </header>
         <div className="v0-comparison-grid" data-viewport-surface="comparison">
@@ -205,7 +205,7 @@ function FinalCallToAction() {
       <h2 aria-label="Know yourself. Understand your people. See the whole system.">
         Know yourself.<br />Understand your people.<br />See the whole system.
       </h2>
-      <p>Start free. Build your Baseline, then explore what you want to understand next.</p>
+      <p>Start free. Build your Baseline — the private reference Sovereign uses across self, decisions, relationships, and systems. Then explore what you want to understand next.</p>
       <a className="v0-get-started" href="/signup">Start free <ArrowIcon /></a>
     </section>
   );

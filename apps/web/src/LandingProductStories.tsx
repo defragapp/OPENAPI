@@ -82,17 +82,17 @@ const SELF_FLOW: readonly WorkflowStep[] = [
   {
     kind: 'input',
     title: 'Start with the question',
-    body: 'The question is whether the idea is becoming clearer or being changed mainly to make other people’s reactions easier to manage.'
+    body: 'The question is whether the idea is becoming clearer or being changed mainly to make other people\'s reactions easier to manage.'
   },
   {
     kind: 'read',
-    title: 'Use what matters from your Baseline',
-    body: 'Sovereign uses only the parts of your Baseline that help with this question instead of loading every possible interpretation.'
+    title: 'Draw from your Baseline',
+    body: 'Sovereign uses only the parts of your Baseline that help with this question — not every possible interpretation.'
   },
   {
     kind: 'connect',
-    title: 'Find the useful difference',
-    body: 'The key distinction is whether the next change makes the idea clearer to you or mainly makes it easier to defend to someone else.'
+    title: 'Find the useful distinction',
+    body: 'The key difference is whether the next change makes the idea clearer to you or mainly makes it easier to defend to someone else.'
   },
   {
     kind: 'read',
@@ -138,12 +138,12 @@ const SYSTEM_FLOW: readonly WorkflowStep[] = [
   {
     kind: 'input',
     title: 'Start with what you told Sovereign',
-    body: 'The example begins with the people, roles, and events that were actually described rather than assigning identities from Baseline data.'
+    body: 'The example begins with the people, roles, and events that were actually described — not identities assigned from Baseline data.'
   },
   {
     kind: 'read',
     title: 'Keep each person separate',
-    body: 'Parent, you, sibling, and partner remain separate people. Sovereign does not create a single “family personality.”'
+    body: 'Parent, you, sibling, and partner remain separate people. Sovereign does not create a single "family personality."'
   },
   {
     kind: 'connect',
@@ -153,7 +153,7 @@ const SYSTEM_FLOW: readonly WorkflowStep[] = [
   {
     kind: 'read',
     title: 'Show why the role keeps returning',
-    body: 'Mediation lowers tension in the moment, but it also lets direct communication stay unfinished. Because it works short term, the same role can become easy to repeat.'
+    body: 'Mediation lowers tension in the moment, but it also lets direct communication stay unfinished. Because it works short term, the same route can become easy to repeat.'
   },
   {
     kind: 'direction',
@@ -184,8 +184,8 @@ function PersonalStory() {
   return (
     <section ref={sectionRef} id="how" className="landing-story landing-story--personal" data-viewport-section="personal">
       <div className="landing-story__shell">
-        <StoryHeading step="01 · You" title="Explore how you think, decide, communicate, create, connect, and grow.">
-          Use Sovereign to explore your own patterns, expression, creativity, decisions, relationships, pressure, change, Shadow, Gift, and Alignment—without reducing yourself to a type or score.
+        <StoryHeading step="01 · You" title="See how you think, decide, communicate, create, connect, and grow.">
+          Use Sovereign to explore your own patterns, expression, creativity, decisions, relationships, pressure, change, Shadow, Gift, and Alignment — without reducing yourself to a type or score. Every answer begins from your Baseline.
         </StoryHeading>
         <div className="landing-story__stage" data-viewport-stage="personal">
           <WorkflowPanel
@@ -198,7 +198,7 @@ function PersonalStory() {
             <Message side="user">How do I know whether I’m refining an idea because it’s getting clearer—or changing it because I’m anticipating everyone else’s reaction?</Message>
             <Message side="assistant" wide>
               <DemoAnswer
-                direct="A useful distinction may be whether the next change makes the idea more coherent to you or merely more defensible to an imagined audience. In this example, the Baseline suggests strong sensitivity to meaning and response; under pressure, that sensitivity can become editing before you have decided what you actually want to preserve."
+                direct="A useful distinction may be whether the next change makes the idea more coherent to you or merely more defensible to an imagined audience. In this example, your Baseline suggests strong sensitivity to meaning and response; under pressure, that sensitivity can become editing before you have decided what you actually want to preserve."
                 sections={[
                   { label: 'What may be steady', body: 'You may naturally notice subtext, patterns, and how something will be received. That can make refinement one of your real strengths.' },
                   { label: 'Under pressure', body: 'When outside expectations arrive too early, refinement can shift into pre-emptive explanation: solving objections before the idea has had enough room to become your own.' },
@@ -221,8 +221,8 @@ function RelationshipStory() {
   return (
     <section ref={sectionRef} id="relationship" className="landing-story landing-story--relationship" data-viewport-section="relationship">
       <div className="landing-story__shell">
-        <StoryHeading step="02 · You + your people" title="See why the same moment lands differently—and how to bridge the gap.">
-          With permission, Sovereign can use both people’s Baselines while keeping each person distinct. See where timing, communication, pressure, or decision styles differ, what happens when they meet, and what each person can do differently.
+        <StoryHeading step="02 · You + your people" title="See why the same moment lands differently — and how to bridge the gap.">
+          With permission, Sovereign uses both people's Baselines while keeping each person distinct. See where timing, communication, pressure, or decision styles differ, what happens when they meet, and what each person can do differently. No compatibility score. No private-thought claims.
         </StoryHeading>
         <div className="landing-story__stage landing-story__stage--relationship" data-viewport-stage="relationship">
           <WorkflowPanel
@@ -237,10 +237,10 @@ function RelationshipStory() {
               <DemoAnswer
                 direct="You may be colliding at the point where each of you tries to regain clarity. In this example, you appear to settle by defining the issue and the next step; your partner may need the pressure to come down before they can tell what they actually think. That means your move toward resolution can arrive to them as more demand, while their pause can arrive to you as less care. The conflict can become a timing loop before it becomes a disagreement about the relationship itself."
                 sections={[
-                  { label: 'You may be bringing', body: 'Ambiguity may stay active for you until there is a clear next step. Asking another question can be an attempt to restore connection and orientation—not necessarily an attempt to control the outcome.' },
+                  { label: 'You may be bringing', body: 'Ambiguity may stay active for you until there is a clear next step. Asking another question can be an attempt to restore connection and orientation — not necessarily an attempt to control the outcome.' },
                   { label: 'They may be bringing', body: 'In this example, their Baseline suggests clarity may improve when input and pressure reduce. A quieter response can therefore be part of processing, although only they can say what they actually feel or intend.' },
                   { label: 'Between you', body: 'You ask for more definition → they reduce their response → the reduction raises your uncertainty → you ask with more urgency → the added urgency increases pressure. Each move makes sense from inside one person and becomes harder from inside the other.', tone: 'distinction' },
-                  { label: 'A bridge that protects both', body: 'Separate reassurance from resolution. For example: “I care about this, and I don’t need the full answer right now. Can we come back at 7 and decide only what happens next?” You get a defined return point; they get room that is not indefinite.', tone: 'bridge' },
+                  { label: 'A bridge that protects both', body: 'Separate reassurance from resolution. For example: "I care about this, and I don\'t need the full answer right now. Can we come back at 7 and decide only what happens next?" You get a defined return point; they get room that is not indefinite.', tone: 'bridge' },
                   { label: 'What still must be asked', body: 'Silence does not tell us whether your partner feels hurt, overwhelmed, uncertain, angry, or simply unfinished. That remains theirs to name directly.', tone: 'unknown' }
                 ]}
                 basis={DUO_BASELINE}
@@ -248,7 +248,7 @@ function RelationshipStory() {
             </Message>
           </ChatWindow>
         </div>
-        <p className="landing-story__consent">Representative example · Both people must agree before their Baselines can be used together · No compatibility score · No private-thought claims</p>
+        <p className="landing-story__consent">Representative example · Both people must agree before their Baselines can be used together · Each person's Baseline stays private · No compatibility score</p>
       </div>
     </section>
   );
@@ -287,7 +287,7 @@ function SystemStory() {
             <SystemAnalysis />
           </ChatWindow>
         </div>
-        <p className="landing-story__consent">Representative example · Each person controls whether their Baseline can be included</p>
+        <p className="landing-story__consent">Representative example · Each person controls whether their Baseline can be included · No family personality profiles</p>
       </div>
     </section>
   );

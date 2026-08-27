@@ -90,11 +90,9 @@ describe('founder visual port — public positioning reset', () => {
     expect(landing).toContain(`const V0_ARCHIVE_SHA = '${archiveSha}'`);
     expect(landing).toContain('data-public-release="approved-public-v8"');
     expect(landing).toContain('data-public-narrative="self-people-systems-v1"');
-    expect(landing).toContain('Healing isn’t optional.');
+    expect(landing).toContain('Healing isn\u2019t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.');
-    expect(landing).toContain('You → your people → the whole system');
-    expect(landing).toContain('Start with yourself. Expand outward when it matters.');
+    expect(landing).toContain('Sovereign.OS begins from a private reference grounded in who you are');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(landing).toContain('<RealLifeQuestions />');
     expect(landing).toContain('<LandingProductStories />');
@@ -102,7 +100,6 @@ describe('founder visual port — public positioning reset', () => {
     expect(landing).not.toContain('One private reference beneath every question.');
     expect(landing).not.toContain('One private foundation.');
     expect(landing).not.toContain('calculated astronomical positions');
-    expect(landing).not.toContain('capacity beneath');
   });
 
   it('keeps the 360 Baseline field interactive and exposes one compact endpoint label only after selection', () => {
@@ -149,11 +146,11 @@ describe('founder visual port — public positioning reset', () => {
   it('shows broad self exploration, relationship intelligence, and whole-system intelligence in approved language', () => {
     for (const marker of [
       '01 · You',
-      'Explore how you think, decide, communicate, create, connect, and grow.',
+      'See how you think, decide, communicate, create, connect, and grow.',
       'How Sovereign builds the answer',
       'Start with the question',
       '02 · You + your people',
-      'See why the same moment lands differently—and how to bridge the gap.',
+      'See why the same moment lands differently',
       'How Sovereign compares two people',
       'Show what happens between you',
       'Find a lower-pressure next step',

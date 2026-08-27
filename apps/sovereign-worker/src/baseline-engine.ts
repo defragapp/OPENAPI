@@ -5,6 +5,7 @@ import {
   type BaselineSourceData,
   type DataUncertainty
 } from './baseline-contracts';
+import { longitudeToSign, signedLongitudeDelta, reduceNumber, titleCase } from './astronomy';
 
 const DEFAULT_HORIZONS_URL = 'https://ssd.jpl.nasa.gov/api/horizons.api';
 const CACHE_TTL_SECONDS = 60 * 60 * 24 * 365;
@@ -22,11 +23,6 @@ const PLANET_IDS: Record<string, string> = {
   neptune: '899',
   pluto: '999'
 };
-
-const ZODIAC_SIGNS = [
-  'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
-  'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
-] as const;
 
 const SIGN_THEMES: Record<string, string> = {
   Aries: 'direct action and clear initiation',
@@ -308,7 +304,7 @@ function computeMajorAspects(
             aspect: definition.name,
             rightBody: rightName,
             orb: Math.round(orb * 10) / 10,
-            display: `${title(leftName)} ${definition.name} ${title(rightName)} (${orb.toFixed(1)}° orb)`,
+            display: `${titleCase(leftName)} ${definition.name} ${titleCase(rightName)} (${orb.toFixed(1)}° orb)`,
             uncertainty: certaintyUncertainty(certainty, leftName === 'moon' || rightName === 'moon')
           });
         }
@@ -412,15 +408,7 @@ function summarizeBaseline(positions: Record<string, BodyPosition>): string {
   return `This reduced interpretive Baseline emphasizes ${themes.join('; ')}. These are reflection themes, not measurements of personality or proof of present behavior.`;
 }
 
-function longitudeToSign(longitude: number) {
-  const normalized = ((longitude % 360) + 360) % 360;
-  const index = Math.floor(normalized / 30);
-  return { sign: ZODIAC_SIGNS[index] ?? 'Aries', degree: normalized % 30 };
-}
 
-function signedLongitudeDelta(from: number, to: number) {
-  return ((to - from + 540) % 360) - 180;
-}
 
 export function localCivilTimeToUtc(date: string, time: string, timezone: string): Date {
   if (!isValidTimeZone(timezone)) throw new Response('Invalid birthplace timezone', { status: 400 });
@@ -476,18 +464,6 @@ async function sha256(value: string) {
   const bytes = new TextEncoder().encode(value);
   const digest = await crypto.subtle.digest('SHA-256', bytes);
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
-}
-
-function reduceNumber(value: number): number {
-  let current = value;
-  while (current > 9 && current !== 11 && current !== 22 && current !== 33) {
-    current = String(current).split('').reduce((sum, digit) => sum + Number(digit), 0);
-  }
-  return current;
-}
-
-function title(value: string) {
-  return value.slice(0, 1).toUpperCase() + value.slice(1);
 }
 
 function delay(milliseconds: number) {

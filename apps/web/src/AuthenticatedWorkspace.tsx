@@ -221,15 +221,15 @@ export function AuthenticatedWorkspace() {
           <strong>SOVEREIGN.OS</strong>
         </a>
         <section role={failed ? 'alert' : 'status'} aria-live="polite">
-          <span>{pendingPayment ? 'STRIPE CONFIRMATION' : 'SOVEREIGN'}</span>
-          <h1>{failed ? 'Sovereign.OS could not open yet.' : pendingPayment ? 'Your payment is still being confirmed.' : 'Opening Sovereign.OS.'}</h1>
+          <span>{pendingPayment ? 'PAYMENT' : 'SOVEREIGN'}</span>
+          <h1>{failed ? 'Sovereign.OS could not open yet.' : pendingPayment ? 'Your payment is still being confirmed.' : 'Opening your workspace.'}</h1>
           <p>
             {failed
               ? 'Your workspace was not shown. Check your connection and try again.'
               : pendingPayment
-                ? 'Stripe returned successfully, but the signed subscription event has not reached your account yet. Sovereign+ remains locked until that authoritative event arrives; checking again will not create another charge.'
+                ? 'Payment received, but your Sovereign+ access has not been confirmed yet. Sovereign+ remains locked until that confirmation arrives; checking again will not create another charge.'
                 : state === 'confirming_plan'
-                  ? 'Confirming the signed Stripe entitlement and connecting it to your private workspace.'
+                  ? 'Confirming your Sovereign+ access and connecting it to your workspace.'
                   : 'Confirming your account, current policy acceptance, Baseline, and plan before the private workspace is shown.'}
           </p>
           {(failed || pendingPayment) && (

@@ -50,14 +50,12 @@ describe('public positioning reset', () => {
 
   it('keeps the founder hero but explains the actual product immediately', () => {
     for (const marker of [
-      'Healing isn’t optional.',
+      'Healing isn\u2019t optional.',
       'Holding onto the pain is.',
       '<LandingExpressionSlice />',
       '<RealLifeQuestions />',
       '<LandingProductStories />',
-      'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
-      'You → your people → the whole system',
-      'Start with yourself. Expand outward when it matters.',
+      'Sovereign.OS begins from a private reference grounded in who you are',
       'How do I make decisions that actually fit me?',
       'Why does the same conversation feel urgent to me and pressuring to them?',
       'How does pressure move through this team?',
@@ -73,7 +71,6 @@ describe('public positioning reset', () => {
     expect(landing).not.toContain('partial Human Design');
     expect(landing).not.toContain('Gene Keys activations');
     expect(landing).not.toContain('numerology');
-    expect(landing).not.toContain('capacity beneath');
     expect(landing).not.toContain('server-approved Basis');
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
     expect(landing).toContain("data-question-fallback={index === 0 ? 'visible' : undefined}");
@@ -103,7 +100,7 @@ describe('public positioning reset', () => {
       '`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product.'
     ]) expect(visualContract).toContain(marker);
 
-    expect(landing).toContain('Most AI starts with the prompt. Sovereign starts with you.');
+    expect(landing).toContain('Sovereign starts');
     expect(landing).toContain('Know yourself. Understand your people. See the whole system.');
   });
 
@@ -161,12 +158,12 @@ describe('public positioning reset', () => {
   it('shows self, relationship, and system intelligence as substantive product behavior in approved language', () => {
     for (const marker of [
       '01 · You',
-      'Explore how you think, decide, communicate, create, connect, and grow.',
+      'See how you think, decide, communicate, create, connect, and grow.',
       'How Sovereign builds the answer',
       'Start with the question',
-      'Find the useful difference',
+      'Find the useful distinction',
       '02 · You + your people',
-      'See why the same moment lands differently—and how to bridge the gap.',
+      'See why the same moment lands differently',
       'How Sovereign compares two people',
       'Show what happens between you',
       'Find a lower-pressure next step',

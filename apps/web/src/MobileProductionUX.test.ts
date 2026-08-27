@@ -69,7 +69,8 @@ describe('production mobile and responsive experience', () => {
     for (const marker of [
       'v0-wordmark--mobile',
       'v0-mobile-menu',
-      'Private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
+      'Baseline-first personal intelligence',
+      'A private personal intelligence grounded in who you are.',
       'Start free · No card required',
       '<MobileCapabilityRail />',
       'Explore yourself',
@@ -78,7 +79,6 @@ describe('production mobile and responsive experience', () => {
       'Keep what matters',
       'Get started'
     ]) expect(landing).toContain(marker);
-    expect(landing).not.toContain('capacity beneath');
     expect(landing).not.toContain('Build my Baseline');
     expect(landing).not.toContain('One private foundation. More useful answers across the questions that shape your life.');
     expect(landing).not.toContain('Build a private Baseline once.');
@@ -91,7 +91,7 @@ describe('production mobile and responsive experience', () => {
   it('keeps all six workspace surfaces reachable through one mobile menu sheet', () => {
     expect(workspace).toContain('className="mobile-menu-trigger"');
     expect(workspace).toContain('className="workspace-sheet"');
-    expect(workspace).toContain('aria-label="Workspace destinations"');
+    expect(workspace).toContain('aria-label="Navigate"');
     expect(workspace).toContain('surfaces.map((item)');
     expect(workspace).toContain("{ name: 'You', label: 'You', description: 'Baseline, plan, permissions, and account' }");
     expect(workspace).not.toContain('mobile-bottom-nav');
@@ -102,7 +102,7 @@ describe('production mobile and responsive experience', () => {
     expect(authenticatedWorkspace).toContain('<WorkspaceMobileUtilities />');
     expect(mobileUtilities).toContain('createPortal');
     expect(mobileUtilities).toContain('<details className="workspace-mobile-utilities">');
-    expect(mobileUtilities).toContain('Workspace tools');
+    expect(mobileUtilities).toContain('Tools');
     expect(mobileUtilities).toContain('Expression Field');
     expect(mobileUtilities).toContain('System members');
     expect(mobileUtilities).toContain('Account & Library');

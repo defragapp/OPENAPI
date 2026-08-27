@@ -12,6 +12,7 @@ import {
   type BaselineSourceData
 } from './baseline-contracts';
 import { ensureBaselineFacetProfile, getCachedBaselineFacetProfile } from './baseline-facets';
+import { reduceNumber, BODY_GLYPHS, SIGN_CODES, ASPECT_GLYPHS } from './astronomy';
 
 export type BirthTimeCertainty = 'exact' | 'approximate' | 'unknown';
 export type LocationPrecision = 'none' | 'approximate' | 'city_or_regional' | 'ephemeral_current' | 'stored_permitted' | 'geocentric';
@@ -148,7 +149,6 @@ export function deterministicRecordedProvider(): BaselineProvider {
   } };
 }
 
-function reduceNumber(value: number): number { let current = value; while (current > 9) current = String(current).split('').reduce((sum, character) => sum + Number(character), 0); return current; }
 function partialBaseline(certainty: BirthTimeCertainty, unavailable: string[]) { return { status: 'partial', providerStatus: 'unavailable', uncertainty: 'high', computationVersion: VERSION, provenance: { deterministicCalculation: false, engine: 'openapi-owned', sovvReferenceCommit: SOVV_REFERENCE_COMMIT, sovvRuntimeDependency: false, birthplaceSentToExternalProvider: false, unavailable }, reducedContext: modelSafeContext(certainty, 'unavailable', frameworkAvailability(certainty, 'unavailable')) }; }
 function reduceComputedBaseline(certainty: BirthTimeCertainty, computed: BaselineProviderOutput) {
   const availability = frameworkAvailability(certainty, 'computed');
@@ -643,18 +643,15 @@ function buildCurrentBasisRegistry(value: Record<string, unknown>): BasisRegistr
       : 'Current astronomical calculation';
   const bodies = Array.isArray(value.activeFactors) ? value.activeFactors : [];
   const contacts = Array.isArray(value.currentToNatalContacts) ? value.currentToNatalContacts : [];
-  const bodyGlyphs: Record<string, string> = { sun: '☉', moon: '☾', mercury: '☿', venus: '♀', mars: '♂', jupiter: '♃', saturn: '♄', uranus: '♅', neptune: '♆', pluto: '♇', chiron: '⚷' };
-  const signCodes: Record<string, string> = { Aries: 'ARI', Taurus: 'TAU', Gemini: 'GEM', Cancer: 'CAN', Leo: 'LEO', Virgo: 'VIR', Libra: 'LIB', Scorpio: 'SCO', Sagittarius: 'SAG', Capricorn: 'CAP', Aquarius: 'AQU', Pisces: 'PIS' };
-  const aspectGlyphs: Record<string, string> = { conjunction: '☌', sextile: '⚹', square: '□', trine: '△', opposition: '☍' };
   const items: BasisRegistryItem[] = [];
   for (const raw of bodies) {
     const factor = asRecord(raw);
     if (typeof factor.id !== 'string' || typeof factor.body !== 'string' || typeof factor.sign !== 'string' || typeof factor.displayDegree !== 'string') continue;
-    const symbol = bodyGlyphs[factor.body] ?? factor.body;
+    const symbol = BODY_GLYPHS[factor.body] ?? factor.body;
     items.push({
       id: factor.id,
       category: 'live',
-      display: `LIVE ${symbol} ${signCodes[factor.sign] ?? factor.sign.slice(0, 3).toUpperCase()} ${factor.displayDegree}${factor.retrograde === true ? 'R' : ''}`,
+      display: `LIVE ${symbol} ${SIGN_CODES[factor.sign] ?? factor.sign.slice(0, 3).toUpperCase()} ${factor.displayDegree}${factor.retrograde === true ? 'R' : ''}`,
       accessibleLabel: `Current ${factor.body} in ${factor.sign} at ${factor.displayDegree}${factor.retrograde === true ? ', retrograde' : ''}`,
       computedAt,
       ...(expiresAt ? { expiresAt } : {}),
@@ -666,12 +663,12 @@ function buildCurrentBasisRegistry(value: Record<string, unknown>): BasisRegistr
   for (const raw of contacts) {
     const contact = asRecord(raw);
     if (typeof contact.id !== 'string' || typeof contact.currentBody !== 'string' || typeof contact.natalBody !== 'string' || typeof contact.aspect !== 'string' || typeof contact.orb !== 'number') continue;
-    const currentGlyph = bodyGlyphs[contact.currentBody] ?? contact.currentBody;
-    const natalGlyph = bodyGlyphs[contact.natalBody] ?? contact.natalBody;
+    const currentGlyph = BODY_GLYPHS[contact.currentBody] ?? contact.currentBody;
+    const natalGlyph = BODY_GLYPHS[contact.natalBody] ?? contact.natalBody;
     items.push({
       id: contact.id,
       category: 'live',
-      display: `LIVE ${currentGlyph} ${aspectGlyphs[contact.aspect] ?? contact.aspect} ${natalGlyph} ${contact.orb.toFixed(1)}°`,
+      display: `LIVE ${currentGlyph} ${ASPECT_GLYPHS[contact.aspect] ?? contact.aspect} ${natalGlyph} ${contact.orb.toFixed(1)}°`,
       accessibleLabel: `Current ${contact.currentBody} ${contact.aspect} natal ${contact.natalBody}, ${contact.orb.toFixed(1)} degree orb`,
       computedAt,
       ...(expiresAt ? { expiresAt } : {}),

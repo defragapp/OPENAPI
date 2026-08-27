@@ -81,8 +81,8 @@ describe('account journey AI, Baseline, and Stripe tiering release chain', () =>
     expect(verifiedPlan).toContain("fetch('/api/v1/billing/entitlements'");
     expect(verifiedPlan).toContain('body.aiUsage');
     expect(verifiedPlan).toContain('Sovereign turns remaining this UTC month');
-    expect(verifiedPlan).toContain('Server verified');
-    expect(verifiedPlan).toContain('Paid capabilities remain locked until the authoritative entitlement can be read.');
+    expect(verifiedPlan).toContain('Verified');
+    expect(verifiedPlan).toContain('Paid capabilities are locked until verification completes.');
   });
 
   it('keeps support contributions entirely outside subscription entitlement projection', () => {

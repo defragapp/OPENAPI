@@ -103,7 +103,7 @@ describe('Baseline-required account journey release', () => {
     expect(workspaceGate).toContain('STRIPE_CONFIRMATION_ATTEMPTS = 12');
     expect(workspaceGate).toContain('await waitForStripeConfirmation(controller.signal)');
     expect(workspaceGate).toContain("setState('payment_pending')");
-    expect(workspaceGate).toContain('the signed subscription event has not reached your account yet');
+    expect(workspaceGate).toContain('your Sovereign+ access has not been confirmed yet');
     expect(workspaceGate).toContain('checking again will not create another charge');
     expect(workspaceGate).not.toContain("fetch('/api/v1/billing/checkout'");
   });

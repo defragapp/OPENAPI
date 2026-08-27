@@ -32,9 +32,9 @@ describe('shared Sovereign intelligence stage', () => {
     expect(field).toContain('line length follows relative emphasis');
     expect(field).toContain('not a diagnosis, score, or claim about anyone’s internal state');
     expect(field).toContain('click a line to inspect it');
-    expect(stories).toContain('With permission, Sovereign can use both people’s Baselines while keeping each person distinct');
-    expect(stories).toContain('Representative example · Both people must agree before their Baselines can be used together · No compatibility score · No private-thought claims');
-    expect(stories).toContain('Representative example · Each person controls whether their Baseline can be included');
+    expect(stories).toContain("With permission, Sovereign uses both people's Baselines while keeping each person distinct");
+    expect(stories).toContain('Representative example · Both people must agree before their Baselines can be used together · Each person\'s Baseline stays private · No compatibility score');
+    expect(stories).toContain('Representative example · Each person controls whether their Baseline can be included · No family personality profiles');
     expect(stories).toContain('See the whole system.');
     expect(stories).toContain('what each person is responsible for');
     expect(stories).toContain('What remains unknown');

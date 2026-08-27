@@ -18,7 +18,7 @@ const consentRuntime = readFileSync(new URL('../public/consent.js', import.meta.
 describe('Sovereign account and workspace shell', () => {
   it('contains every product surface inside one canonical workspace', () => {
     for (const label of ['Today', 'Explore', 'People', 'Systems', 'Library', 'You']) expect(workspace).toContain(`name: '${label}'`);
-    expect(workspace).toContain('New exploration');
+    expect(workspace).toContain('Ask something new');
     expect(workspace).toContain('Recent explorations');
     expect(main).toContain('<AuthenticatedWorkspace />');
     expect(authenticatedWorkspace).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
@@ -80,7 +80,7 @@ describe('Sovereign account and workspace shell', () => {
   });
 
   it('keeps Library explicit and user-controlled', () => {
-    expect(workspace).toContain('Library is not a journal or transcript archive.');
+    expect(workspace).toContain('Library is not a journal or transcript archive');
     expect(workspace).toContain("action.type === 'save_to_library'");
     expect(workspace).toContain('Save this understanding');
     expect(workspace).toContain('Nothing has been kept yet.');

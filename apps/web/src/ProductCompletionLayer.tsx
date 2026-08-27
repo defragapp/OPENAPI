@@ -253,7 +253,7 @@ export function ProductCompletionLayer() {
 
   async function refreshControls() {
     setLoading(true);
-    setStatus('Loading current consent state…');
+    setStatus('Loading your permissions…');
     try {
       const [ownerData, inviteeData] = await Promise.all([
         api('/api/v1/people'),
@@ -264,7 +264,7 @@ export function ProductCompletionLayer() {
       ]);
       setPeople(ownerData.people ?? []);
       setInvitations(inviteeData.invitations ?? []);
-      setStatus('Current consent state loaded.');
+      setStatus('');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Shared context is unavailable.');
     } finally {

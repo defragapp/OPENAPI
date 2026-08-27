@@ -42,7 +42,7 @@ export function VerifiedPlanStatus({ expanded = false }: Props) {
   const [entitlement, setEntitlement] = useState<Entitlement | null>(null);
   const [usage, setUsage] = useState<AiUsage | null>(null);
   const [state, setState] = useState<VerificationState>('loading');
-  const [message, setMessage] = useState('Verifying your plan from the authoritative account record.');
+  const [message, setMessage] = useState('Checking your plan status…');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -67,23 +67,23 @@ export function VerifiedPlanStatus({ expanded = false }: Props) {
         if (billingReturn === 'success' && effective.plan !== 'sovereign_plus' && attempt < 8) {
           attempt += 1;
           setState('confirming');
-          setMessage('Stripe returned successfully. Waiting for the signed webhook to confirm Sovereign+ access. Free access remains available while confirmation completes.');
+          setMessage('Payment received. Waiting for access to be confirmed. Free access remains available while confirmation completes.');
           retryTimer = window.setTimeout(() => void verifyEntitlement(), 1_500);
           return;
         }
 
         if (billingReturn === 'success' && effective.plan !== 'sovereign_plus') {
           setState('confirming');
-          setMessage('Payment returned successfully, but Sovereign+ access is still being confirmed from the signed Stripe event. Refresh this page in a moment or continue using Free.');
+          setMessage('Payment received, but Sovereign+ access is still being confirmed. Refresh this page in a moment or continue using Free.');
           return;
         }
 
         setState('ready');
         setMessage(effective.plan === 'sovereign_plus'
-          ? `Sovereign+ access is verified from the latest signed Stripe event. ${usageLabel(body.aiUsage)}`
+          ? `Sovereign+ access is confirmed. ${usageLabel(body.aiUsage)}`
           : billingReturn === 'cancelled'
-            ? `Stripe checkout was cancelled. Your Free access is unchanged. ${usageLabel(body.aiUsage)}`
-            : `Free access is verified. ${usageLabel(body.aiUsage)} Upgrade remains available through secure Stripe checkout.`);
+            ? `Checkout was cancelled. Your Free access is unchanged. ${usageLabel(body.aiUsage)}`
+            : `Free access is confirmed. ${usageLabel(body.aiUsage)} Upgrade remains available.`);
 
         if (billingReturn && effective.plan === 'sovereign_plus') {
           const url = new URL(location.href);
@@ -93,7 +93,7 @@ export function VerifiedPlanStatus({ expanded = false }: Props) {
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') return;
         setState('error');
-        setMessage('Plan verification is temporarily unavailable. Paid capabilities remain locked until the authoritative entitlement can be read.');
+        setMessage('Plan verification is temporarily unavailable. Paid capabilities are locked until verification completes.');
       }
     }
 
@@ -110,12 +110,12 @@ export function VerifiedPlanStatus({ expanded = false }: Props) {
     return (
       <section className="account-plan-verification" aria-label="Verified plan and AI allowance">
         <div>
-          <small>SERVER-VERIFIED PLAN</small>
+          <small>Your plan</small>
           <strong>
             {state === 'loading'
               ? 'Verifying your plan…'
               : state === 'confirming'
-                ? 'Confirming your Stripe entitlement…'
+                ? 'Confirming your access…'
                 : state === 'error'
                   ? 'Plan verification unavailable'
                   : `${planLabel(entitlement?.plan)} verified`}
@@ -137,10 +137,10 @@ export function VerifiedPlanStatus({ expanded = false }: Props) {
         {state === 'loading'
           ? 'Verifying plan'
           : state === 'confirming'
-            ? 'Confirming Stripe'
+            ? 'Confirming'
             : state === 'error'
               ? 'Plan unavailable'
-              : 'Server verified'}
+              : 'Verified'}
       </span>
       {(state === 'ready' || state === 'confirming') && (
         <strong>

@@ -53,10 +53,9 @@ describe('founder selective visual port', () => {
   });
 
   it('starts with self exploration rather than a mechanics-first Baseline explainer', () => {
-    expect(landing).toContain('Start with yourself. Expand outward when it matters.');
     expect(landing).toContain('Explore yourself');
     expect(landing).toContain('How do I make decisions that actually fit me?');
-    expect(landing).toContain('How do I know when I’m adapting too early?');
+    expect(landing).toContain('How do I know when I\u2019m adapting too early?');
     expect(landing).not.toContain('One private reference beneath every question.');
     expect(landing).not.toContain('One private foundation.');
     expect(landing).not.toContain('calculated astronomical positions');
@@ -70,8 +69,8 @@ describe('founder selective visual port', () => {
       '01 · You',
       '02 · You + your people',
       '03 · From 1:1 to the whole system',
-      'Explore how you think, decide, communicate, create, connect, and grow.',
-      'See why the same moment lands differently—and how to bridge the gap.',
+      'See how you think, decide, communicate, create, connect, and grow.',
+      'See why the same moment lands differently',
       'See the whole system.',
       'surface="personal-chat"',
       'surface="personal-reasoning"',

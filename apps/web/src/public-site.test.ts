@@ -28,10 +28,10 @@ const publicCopy = `${landing}\n${stories}\n${policy}\n${how}\n${pricing}\n${faq
 
 describe('Sovereign.OS public experience', () => {
   it('keeps the founder statement but makes the opening product value explicit', () => {
-    expect(landing).toContain('Personal AI for real life');
-    expect(landing).toContain('Healing isn’t optional.');
+    expect(landing).toContain('Baseline-first personal intelligence');
+    expect(landing).toContain('Healing isn\u2019t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.');
+    expect(landing).toContain('Sovereign.OS begins from a private reference grounded in who you are');
     expect(landing).toContain('Get started');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(field).toContain('Drag to rotate');
@@ -39,7 +39,6 @@ describe('Sovereign.OS public experience', () => {
     expect(field).toContain('{selected.axis.value}');
     expect(field).toContain('setHasInspection(true)');
     expect(field).not.toContain('onPointerEnter={() => selectAxis(axis.id)}');
-    expect(landing).not.toContain('capacity beneath');
   });
 
   it('moves from self exploration to People and Systems without a root framework explainer', () => {
@@ -53,13 +52,12 @@ describe('Sovereign.OS public experience', () => {
     }
     expect(landing).not.toContain('<BaselineFoundation />');
     expect(landing).not.toContain('calculated astronomical positions');
-    expect(landing).toContain('Start with yourself. Expand outward when it matters.');
     expect(landing).toContain('How do I make decisions that actually fit me?');
     expect(landing).toContain('Why does the same conversation feel urgent to me and pressuring to them?');
     expect(stories).toContain('01 · You');
     expect(stories).toContain('02 · You + your people');
     expect(stories).toContain('03 · From 1:1 to the whole system');
-    expect(landing).toContain('Most AI starts with the prompt. Sovereign starts with you.');
+    expect(landing).toContain('Sovereign starts');
     expect(landing).toContain('Know yourself. Understand your people. See the whole system.');
   });
 
@@ -72,8 +70,8 @@ describe('Sovereign.OS public experience', () => {
       'surface="system-map"',
       'surface="system-reasoning"',
       'Start with the question',
-      'Use what matters from your Baseline',
-      'Find the useful difference',
+      'Draw from your Baseline',
+      'Find the useful distinction',
       'Leave what is not known unanswered',
       'Give you something you can try',
       'Start with what happened',

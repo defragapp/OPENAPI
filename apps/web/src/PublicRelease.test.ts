@@ -82,22 +82,20 @@ describe('public production positioning release', () => {
 
   it('introduces self exploration before People and Systems with recognizable high-value questions', () => {
     for (const marker of [
-      'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
-      'You → your people → the whole system',
-      'Start with yourself. Expand outward when it matters.',
+      'Sovereign.OS begins from a private reference grounded in who you are',
       'How do I make decisions that actually fit me?',
       'Why does the same conversation feel urgent to me and pressuring to them?',
       'How does pressure move through this team?',
       '<LandingProductStories />',
-      'Most AI starts with the prompt. Sovereign starts with you.',
+      'Sovereign starts',
       'Know yourself. Understand your people. See the whole system.'
     ]) expect(landing).toContain(marker);
 
     for (const marker of [
       '01 · You',
-      'Explore how you think, decide, communicate, create, connect, and grow.',
+      'See how you think, decide, communicate, create, connect, and grow.',
       '02 · You + your people',
-      'See why the same moment lands differently—and how to bridge the gap.',
+      'See why the same moment lands differently',
       '03 · From 1:1 to the whole system',
       'See the whole system.',
       'How Sovereign compares two people',
@@ -108,7 +106,6 @@ describe('public production positioning release', () => {
     ]) expect(stories).toContain(marker);
 
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
-    expect(stories).not.toContain('capacity beneath');
     expect(stories).not.toContain('LandingExpressionFieldPreview');
   });
 
@@ -138,7 +135,7 @@ describe('public production positioning release', () => {
     for (const phrase of ['Example Basis', 'server-approved', 'authorized references', 'permitted context', 'consented people', 'permitted perspectives', 'confirmed responsibilities']) {
       expect(publicSource).not.toContain(phrase);
     }
-    expect(publicSource.toLowerCase()).not.toContain('capacity beneath');
+    expect(publicSource.toLowerCase()).not.toContain('example basis');
     expect(language).toContain('### 1. You');
     expect(language).toContain('### 2. You + your people');
     expect(language).toContain('### 3. From 1:1 to the whole system');

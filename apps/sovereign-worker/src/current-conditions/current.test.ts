@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildCurrentHorizonsEndpoint, computeReducedCurrentConditions, eclipticLongitudeToSign } from './current';
+import { buildCurrentHorizonsEndpoint, computeReducedCurrentConditions } from './current';
+import { longitudeToSign } from '../astronomy';
 import type { Env } from '../env';
 import { clearCurrentConditions, parseLocationPrecision } from '../baseline';
 
@@ -11,10 +12,10 @@ const fixtureBodies = {
 
 describe('current-condition computation port', () => {
   it('matches the inspected SOVV longitude-to-sign normalization for sanitized fixture values', () => {
-    expect(eclipticLongitudeToSign(15.25)).toEqual({ sign: 'Aries', degree: 15.25 });
-    expect(eclipticLongitudeToSign(72.4)).toEqual({ sign: 'Gemini', degree: 12.4 });
-    expect(eclipticLongitudeToSign(359.9)).toEqual({ sign: 'Pisces', degree: 29.9 });
-    expect(eclipticLongitudeToSign(-1)).toEqual({ sign: 'Pisces', degree: 29 });
+    expect(longitudeToSign(15.25)).toEqual({ sign: 'Aries', degree: 15.25 });
+    expect(longitudeToSign(72.4)).toEqual({ sign: 'Gemini', degree: 12.4 });
+    expect(longitudeToSign(359.9)).toEqual({ sign: 'Pisces', degree: 29.9 });
+    expect(longitudeToSign(-1)).toEqual({ sign: 'Pisces', degree: 29 });
   });
 
   it('returns reduced, versioned, non-deterministic current-condition output without private coordinates', async () => {

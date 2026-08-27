@@ -27,7 +27,7 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
       <main className="account-shell">
         <a className="wordmark" href="/">SOVEREIGN.OS</a>
         <section className="auth-panel" role="alert">
-          <p className="eyebrow">VIEW INTERRUPTED</p>
+          <p className="eyebrow">Something went wrong</p>
           <h1>Sovereign could not open this view safely.</h1>
           <p className="lede">Nothing new was submitted or saved from the interrupted view. Reload it, or return to the public entry page.</p>
           <div className="action-row">

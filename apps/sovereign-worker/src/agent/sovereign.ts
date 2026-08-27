@@ -16,6 +16,10 @@ import {
 } from './recognition';
 import type { BasisRegistryItem } from '../baseline-contracts';
 import { assertCovenantSafe, retrieveCovenantContext, type ScripturePassage } from '../covenant/scripture';
+import { buildEmotionalField } from '../emotional-field';
+import { buildExpressionAxisValues } from '../expression-field';
+import { buildRelationshipField } from '../relationship-field';
+import type { RelationshipField } from '@sovereign/agent-contracts';
 
 export interface SovereignContext {
   env: Env;
@@ -117,6 +121,17 @@ async function buildCloudflareGatewayPrompt(input: string, context: SovereignCon
   const covenantInstruction = covenantEnabled
     ? `Covenant was explicitly enabled for this thread. Use mode "covenant". Keep the grounded answer complete on its own. Use only these retrieved passages and quote no passage not present here:\n${JSON.stringify(covenantContext)}`
     : 'Covenant is off. Do not apply Scripture or biblical metaphor automatically.';
+
+  const emotionalField = buildEmotionalFieldFromContext(authorizedContext);
+  const emotionalFieldInstruction = emotionalField
+    ? `\n\nEmotional Field — the dynamic pattern layer computed from Baseline and Expression Field:\n${JSON.stringify(emotionalField, null, 2)}\n\nUse the Emotional Field as structured evidence for the relevant loop phases. Ground observations in the pattern descriptions and expression dynamics provided. Do not use the Emotional Field to diagnose, assign hidden motives, claim exact emotions, or make deterministic predictions. The Emotional Field describes observable patterns and their possible dynamics; actual experience remains unknown unless the user confirms it. Select basis_refs from the Emotional Field's basisRefs when they materially support the answer.`
+    : '';
+
+  const relationshipField = buildRelationshipFieldFromContext(authorizedContext);
+  const relationshipFieldInstruction = relationshipField
+    ? `\n\nRelationship Field — the interaction dynamics layer computed from two Emotional Fields and pair contacts:\n${JSON.stringify(relationshipField, null, 2)}\n\nUse the Relationship Field as structured evidence for the relationship answer. Ground observations in the shared structures, contrasting structures, interaction dynamics, and recurring patterns provided. Do not use the Relationship Field to score compatibility, diagnose relationship health, assign hidden motives, claim certainty about what either person intends or feels, or predict outcomes. The Relationship Field describes observable interaction patterns and their possible dynamics; actual experience between participants remains unknown unless directly confirmed. Select basis_refs from the Relationship Field's basisRefs when they materially support the answer.`
+    : '';
+
   const prompt = `${sovereignRuntimePromptV2}
 
 Authorization-checked server context, stripped of raw birth inputs, exact private location, secrets, source paths, and private identifiers:
@@ -128,7 +143,7 @@ ${JSON.stringify(continuity)}
 Authorized exact Basis registry. Select IDs only in basis_refs:
 ${JSON.stringify(basisRegistry.map(({ id, display, uncertainty, subject }) => ({ id, display, uncertainty, subject })))}
 
-${groundedIntelligencePrompt(input)}
+${groundedIntelligencePrompt(input)}${emotionalFieldInstruction}${relationshipFieldInstruction}
 
 Required JSON shape:
 ${sovereignAnswerJsonContract()}
@@ -205,6 +220,140 @@ async function isCovenantEnabledForThread(context: SovereignContext): Promise<bo
 
 function asksForFrameworkDetail(input: string): boolean {
   return /\b(?:Bowen|IFS|internal family systems|attachment theory|psychological framework|sources?|research)\b/i.test(input);
+}
+
+/**
+ * Attempt to build an Emotional Field from the authorized context.
+ * Returns null if the context does not contain valid Baseline + Expression Field data.
+ * This is a best-effort computation; the answer remains valid without it.
+ */
+export function buildEmotionalFieldFromContext(authorizedContext: unknown): ReturnType<typeof buildEmotionalField> | null {
+  try {
+    const root = authorizedContext as Record<string, unknown>;
+    const selected = root.selectedContext as Record<string, unknown> | undefined;
+    const baseline = (selected?.baseline ?? root.baseline) as Record<string, unknown> | undefined;
+    if (!baseline) return null;
+
+    const reducedContext = baseline.reducedContext as Record<string, unknown> | undefined;
+    if (!reducedContext) return null;
+
+    const rawFacetProfile = reducedContext.facetProfile as Record<string, unknown> | undefined;
+    if (!rawFacetProfile || !Array.isArray(rawFacetProfile.facets)) return null;
+
+    const facets = rawFacetProfile.facets.map((f: Record<string, unknown>) => ({
+      id: String(f.id ?? ''),
+      title: String(f.title ?? ''),
+      description: String(f.description ?? ''),
+      shadowExpression: String(f.shadowExpression ?? ''),
+      giftExpression: String(f.giftExpression ?? ''),
+      basisRefs: Array.isArray(f.basisRefs) ? f.basisRefs.map(String) : []
+    })).filter((f: { id: string }) => f.id.length > 0);
+
+    if (facets.length === 0) return null;
+
+    const axes = buildExpressionAxisValues({ facets: facets as Parameters<typeof buildExpressionAxisValues>[0]['facets'] });
+
+    return buildEmotionalField({
+      facets: facets as Parameters<typeof buildEmotionalField>[0]['facets'],
+      axes,
+      domain: 'self'
+    });
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Attempt to build a Relationship Field from a pair comparison authorized context.
+ * Returns null if the context does not contain two participants with valid data.
+ * This is a best-effort computation; the answer remains valid without it.
+ */
+export function buildRelationshipFieldFromContext(authorizedContext: unknown): RelationshipField | null {
+  try {
+    const root = authorizedContext as Record<string, unknown>;
+    const participants = root.participants as Array<Record<string, unknown>> | undefined;
+    if (!participants || participants.length < 2) return null;
+
+    const interaction = root.interaction as Record<string, unknown> | undefined;
+    if (!interaction) return null;
+
+    const a = participants[0]!;
+    const b = participants[1]!;
+    const labelA = typeof a.label === 'string' ? a.label : 'Participant A';
+    const labelB = typeof b.label === 'string' ? b.label : 'Participant B';
+    const keyA = typeof a.key === 'string' ? a.key : 'a';
+    const keyB = typeof b.key === 'string' ? b.key : 'b';
+
+    const emotionalFieldA = buildEmotionalFieldForParticipant(a, labelA, keyA);
+    const emotionalFieldB = buildEmotionalFieldForParticipant(b, labelB, keyB);
+    if (!emotionalFieldA || !emotionalFieldB) return null;
+
+    const rawPairContacts = interaction.exactPairContacts as Array<Record<string, unknown>> | undefined;
+    const pairContacts = (rawPairContacts ?? []).map((c) => ({
+      id: String(c.id ?? c.display ?? ''),
+      display: String(c.display ?? ''),
+      accessibleLabel: String(c.accessibleLabel ?? c.display ?? ''),
+      uncertainty: String(c.uncertainty ?? 'medium')
+    }));
+
+    const rawFacetPairs = interaction.facetPairs as Array<Record<string, unknown>> | undefined;
+    const facetPairs = (rawFacetPairs ?? []).map((fp) => ({
+      facetId: String(fp.facetId ?? ''),
+      participantA: extractFacetSnapshot(fp.you),
+      participantB: extractFacetSnapshot(fp.other)
+    })).filter((fp) => fp.facetId.length > 0 && fp.participantA && fp.participantB);
+
+    return buildRelationshipField({
+      emotionalFieldA,
+      emotionalFieldB,
+      pairContacts,
+      facetPairs: facetPairs as Parameters<typeof buildRelationshipField>[0]['facetPairs']
+    });
+  } catch {
+    return null;
+  }
+}
+
+function buildEmotionalFieldForParticipant(
+  participant: Record<string, unknown>,
+  label: string,
+  key: string
+): { label: string; key: string; field: ReturnType<typeof buildEmotionalField> } | null {
+  const rawFacets = participant.facets as Array<Record<string, unknown>> | undefined;
+  if (!rawFacets || rawFacets.length === 0) return null;
+
+  const facets = rawFacets.map((f) => ({
+    id: String(f.id ?? ''),
+    title: String(f.title ?? ''),
+    description: String(f.description ?? ''),
+    shadowExpression: String(f.shadowExpression ?? ''),
+    giftExpression: String(f.giftExpression ?? ''),
+    basisRefs: Array.isArray(f.basisRefs) ? f.basisRefs.map(String) : []
+  })).filter((f) => f.id.length > 0);
+
+  if (facets.length === 0) return null;
+
+  const axes = buildExpressionAxisValues({ facets: facets as Parameters<typeof buildExpressionAxisValues>[0]['facets'] });
+  const field = buildEmotionalField({
+    facets: facets as Parameters<typeof buildEmotionalField>[0]['facets'],
+    axes,
+    domain: 'self'
+  });
+
+  return { label, key, field };
+}
+
+function extractFacetSnapshot(raw: unknown): { id: string; title: string; description: string; basisRefs: string[] } | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const f = raw as Record<string, unknown>;
+  const id = String(f.id ?? '');
+  if (!id) return null;
+  return {
+    id,
+    title: String(f.title ?? ''),
+    description: String(f.description ?? ''),
+    basisRefs: Array.isArray(f.basisRefs) ? f.basisRefs.map(String) : []
+  };
 }
 
 export function sanitizeSovereignAnswerLanguage(answer: SovereignAnswerV2, allowFrameworkLabels: boolean): void {

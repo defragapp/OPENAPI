@@ -12,7 +12,7 @@ const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('unified Sovereign intelligence experience', () => {
   it('offers useful Baseline questions before an incident is supplied', () => {
-    for (const phrase of ['What feels different today?', 'What still feels steady underneath it?', 'What part of myself do I want to understand more clearly?', 'What changes in me under pressure?']) {
+    for (const phrase of ['What feels different today?', 'What still feels steady underneath it?', 'What capacity or pattern do I want to understand?', 'What changes in me under pressure?']) {
       expect(workspace).toContain(phrase);
     }
     expect(workspace).toContain('composerExamples');
@@ -22,7 +22,7 @@ describe('unified Sovereign intelligence experience', () => {
   it('treats Today, Explore, People, Systems, Library, and You as one intelligence', () => {
     for (const surface of ['Today', 'Explore', 'People', 'Systems', 'Library', 'You']) expect(workspace).toContain(`name: '${surface}'`);
     expect(workspace).toContain('Sovereign navigation');
-    expect(workspace).toContain('New exploration');
+    expect(workspace).toContain('Ask something new');
     expect(main).toContain('<AuthenticatedWorkspace />');
     expect(authenticatedWorkspace).toContain('<SovereignIntelligenceWorkspace onboardingVerified />');
   });
@@ -47,7 +47,7 @@ describe('unified Sovereign intelligence experience', () => {
   it('keeps each message attached to the context used for the question', () => {
     expect(workspace).toContain('const messageContext = {');
     expect(workspace).toContain("role: 'user', text: clean, context: messageContext");
-    expect(workspace).toContain("role: 'assistant', text: 'Preparing your answer…', context: messageContext");
+    expect(workspace).toContain("role: 'assistant', text: 'Thinking about your question…', context: messageContext");
     expect(workspace).toContain("...(row.context && typeof row.context === 'object' ? { context: row.context } : {})");
   });
 

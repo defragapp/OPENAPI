@@ -25,4 +25,6 @@ export interface PairComparisonOutput {
 }
 
 export * from './expression-field';
+export * from './emotional-field';
+export * from './relationship-field';
 export * from './model-config';

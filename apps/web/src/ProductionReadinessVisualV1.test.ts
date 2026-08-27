@@ -113,7 +113,7 @@ describe('desktop and iOS production readiness v1', () => {
       'height: 44px !important'
     ]) expect(css).toContain(marker);
     expect(mobileUtilities).toContain('<details className="workspace-mobile-utilities">');
-    expect(mobileUtilities).toContain('Workspace tools');
+    expect(mobileUtilities).toContain('Tools');
     expect(mobileUtilities).toContain('workspace-mobile-utilities-content');
   });
 

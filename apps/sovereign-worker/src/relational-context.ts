@@ -13,6 +13,7 @@ import {
 import { getCachedBaselineFacetProfile } from './baseline-facets';
 import { buildExpressionAxisValues } from './expression-field';
 import type { ExpressionAxisValue } from '@sovereign/agent-contracts';
+import { signedLongitudeDelta, BODY_GLYPHS, ASPECT_GLYPHS } from './astronomy';
 
 interface BaselineRow {
   status: string;
@@ -333,13 +334,12 @@ function remapAxisRefs(axes: ExpressionAxisValue[], prefix: string): ExpressionA
 
 function buildPairContacts(first: BaselineSourceData, second: BaselineSourceData) {
   const definitions = [
-    { aspect: 'conjunction', glyph: '☌', angle: 0, orb: 3 },
-    { aspect: 'sextile', glyph: '⚹', angle: 60, orb: 2 },
-    { aspect: 'square', glyph: '□', angle: 90, orb: 3 },
-    { aspect: 'trine', glyph: '△', angle: 120, orb: 3 },
-    { aspect: 'opposition', glyph: '☍', angle: 180, orb: 3 }
+    { aspect: 'conjunction' as const, glyph: '☌', angle: 0, orb: 3 },
+    { aspect: 'sextile' as const, glyph: '⚹', angle: 60, orb: 2 },
+    { aspect: 'square' as const, glyph: '□', angle: 90, orb: 3 },
+    { aspect: 'trine' as const, glyph: '△', angle: 120, orb: 3 },
+    { aspect: 'opposition' as const, glyph: '☍', angle: 180, orb: 3 }
   ] as const;
-  const glyphs: Record<string, string> = { sun: '☉', moon: '☾', mercury: '☿', venus: '♀', mars: '♂', jupiter: '♃', saturn: '♄', uranus: '♅', neptune: '♆', pluto: '♇' };
   const contacts: Array<{ id: string; display: string; accessibleLabel: string; uncertainty: 'low' | 'medium' | 'high' }> = [];
   for (const left of first.natalBodies) {
     for (const right of second.natalBodies) {
@@ -350,7 +350,7 @@ function buildPairContacts(first: BaselineSourceData, second: BaselineSourceData
         const rounded = Math.round(orb * 10) / 10;
         contacts.push({
           id: `relationship.${left.body}.${definition.aspect}.${right.body}`,
-          display: `REL ${glyphs[left.body] ?? left.body} ${definition.glyph} ${glyphs[right.body] ?? right.body} ${rounded.toFixed(1)}°`,
+          display: `REL ${BODY_GLYPHS[left.body] ?? left.body} ${definition.glyph} ${BODY_GLYPHS[right.body] ?? right.body} ${rounded.toFixed(1)}°`,
           accessibleLabel: `Relationship contact, your ${left.body} ${definition.aspect} their ${right.body}, ${rounded.toFixed(1)} degree orb`,
           uncertainty: left.uncertainty === 'high' || right.uncertainty === 'high'
             ? 'high'
@@ -411,10 +411,6 @@ function sanitizeRoleContext(value: unknown): Record<string, unknown> {
 
 function extractArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value.slice(0, 20) : [];
-}
-
-function signedLongitudeDelta(from: number, to: number) {
-  return ((to - from + 540) % 360) - 180;
 }
 
 function safeJson(value: unknown): Record<string, unknown> {
