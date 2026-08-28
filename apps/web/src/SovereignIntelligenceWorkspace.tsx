@@ -434,27 +434,35 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
 
   async function saveAnswer(answer: SovereignAnswer) {
     if (!window.confirm('Save this understanding to your Library?')) return;
-    await api('/api/v1/library', {
-      method: 'POST',
-      body: JSON.stringify({
-        title: answer.headline,
-        summary: answer.direct_answer,
-        threadId,
-        type: `${answer.mode}_understanding`,
-        links: { personId: selectedPerson, systemId: selectedSystem },
-        uncertainty: answer.confidence
-      })
-    });
-    await refreshWorkspace();
-    setStatus('Saved to Library.');
+    try {
+      await api('/api/v1/library', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: answer.headline,
+          summary: answer.direct_answer,
+          threadId,
+          type: `${answer.mode}_understanding`,
+          links: { personId: selectedPerson, systemId: selectedSystem },
+          uncertainty: answer.confidence
+        })
+      });
+      await refreshWorkspace();
+      setStatus('Saved to Library.');
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'This could not be saved to Library.');
+    }
   }
 
   async function saveCorrection(correction: 'yes' | 'partly' | 'not_today') {
-    await api(`/api/v1/threads/${encodeURIComponent(threadId)}/corrections`, {
-      method: 'POST',
-      body: JSON.stringify({ correction })
-    });
-    setStatus(correction === 'yes' ? 'Marked as fitting.' : correction === 'partly' ? 'Marked as partly fitting.' : 'Marked as not fitting today.');
+    try {
+      await api(`/api/v1/threads/${encodeURIComponent(threadId)}/corrections`, {
+        method: 'POST',
+        body: JSON.stringify({ correction })
+      });
+      setStatus(correction === 'yes' ? 'Marked as fitting.' : correction === 'partly' ? 'Marked as partly fitting.' : 'Marked as not fitting today.');
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'That response could not be saved.');
+    }
   }
 
   async function useCovenantForQuestion() {
@@ -462,12 +470,18 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     if (!latestQuestion) return;
     setCovenantSheetOpen(false);
     setStatus('Adding Covenant for this question…');
-    await api(`/api/v1/threads/${encodeURIComponent(threadId)}/covenant`, {
-      method: 'POST',
-      body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', personId: selectedPerson || undefined, subject: 'this question' })
-    });
-    setCovenantEnabled(true);
-    await sendMessage(`Explore this question through Covenant:\n\n${latestQuestion}`, true);
+    try {
+      await api(`/api/v1/threads/${encodeURIComponent(threadId)}/covenant`, {
+        method: 'POST',
+        body: JSON.stringify({ enabled: true, bibleTranslation: 'WEB', personId: selectedPerson || undefined, subject: 'this question' })
+      });
+      setCovenantEnabled(true);
+      await sendMessage(`Explore this question through Covenant:\n\n${latestQuestion}`, true);
+    } catch (error) {
+      setCovenantEnabled(false);
+      setStatus(error instanceof Error ? error.message : 'Covenant could not be added to this question.');
+      return;
+    }
     await api(`/api/v1/threads/${encodeURIComponent(threadId)}/covenant`, {
       method: 'POST',
       body: JSON.stringify({ enabled: false })
@@ -1507,9 +1521,14 @@ function YouControls({ workspace, api, refresh, onBuildBaseline }: any) {
   const current = workspace.today?.current ?? { status: 'not_started' };
   const currentReady = current.status === 'ready';
   async function handoff(path: string, body: Json = {}) {
-    const data = await api(path, { method: 'POST', body: JSON.stringify(body) });
-    const url = data.checkout?.url ?? data.portal?.url;
-    if (url) location.assign(url);
+    try {
+      const data = await api(path, { method: 'POST', body: JSON.stringify(body) });
+      const url = data.checkout?.url ?? data.portal?.url;
+      if (url) location.assign(url);
+    } catch (error) {
+      setCurrentAction('error');
+      setCurrentMessage(error instanceof Error ? error.message : 'Billing is temporarily unavailable.');
+    }
   }
   async function enableCurrentContext() {
     setCurrentAction('loading');

@@ -839,3 +839,15 @@ details p { margin: 0 0 16px; color: var(--muted); font-size: .82rem; }
   }
 }
 :root { scrollbar-gutter: stable; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

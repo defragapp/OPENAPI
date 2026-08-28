@@ -948,9 +948,18 @@
   width: 100%;
   padding: 9px 11px;
   border: 1px solid var(--sov-line);
+  border-radius: 10px;
   background: var(--sov-page);
   color: var(--sov-ink);
   font-size: 1rem;
+}
+
+.context-stack input:focus,
+.context-stack select:focus,
+.context-stack textarea:focus {
+  border-color: var(--sov-clay-line);
+  box-shadow: 0 0 0 3px var(--sov-focus-ring);
+  outline: 0;
 }
 
 .permission-card,
@@ -1053,6 +1062,21 @@
 
 .loading-state {
   color: var(--sov-muted);
+}
+
+.context-feedback {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--sov-raised);
+  color: var(--sov-muted);
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+.context-feedback.error {
+  background: color-mix(in srgb, var(--sov-danger) 8%, transparent);
+  color: var(--sov-danger);
 }
 
 .mobile-menu-trigger {
@@ -1253,8 +1277,7 @@
   }
 
   .intelligence-topbar > div:first-of-type span,
-  .workspace-status,
-  .topbar-actions button {
+  .workspace-status {
     display: none;
   }
 
