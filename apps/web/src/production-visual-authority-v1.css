@@ -933,7 +933,160 @@ html:root:root:root body .intelligence-topbar {
   height: var(--sov-nav-height) !important;
 }
 
+/* ─── Scroll-Led Section Reveals ───────────────────────────────────────────── */
+
+@supports (animation-timeline: view()) {
+  html:root:root:root body :is(
+    .v0-hero-content,
+    .landing-question-orbit__inner,
+    .landing-stories,
+    .v0-comparison .v0-shell,
+    .v0-final
+  ) {
+    animation: sovereign-section-reveal linear both;
+    animation-timeline: view(block);
+    animation-range: entry 0% entry 35%;
+  }
+}
+
+@keyframes sovereign-section-reveal {
+  from {
+    opacity: 0.3;
+    transform: translateY(32px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* ─── Landing Editorial Typography ─────────────────────────────────────────── */
+
+html:root:root:root body .v0-hero h1 {
+  font-size: clamp(3.2rem, 7vw, 6.4rem) !important;
+  letter-spacing: -0.055em !important;
+  line-height: 0.98 !important;
+}
+
+html:root:root:root body .v0-hero h1 em {
+  -webkit-text-stroke: 1.2px rgba(232, 221, 208, 0.5) !important;
+}
+
+html:root:root:root body .sovereign-opening-copy {
+  font-size: clamp(1.02rem, 1.5vw, 1.22rem) !important;
+  line-height: 1.75 !important;
+  letter-spacing: -0.005em !important;
+}
+
+html:root:root:root body .landing-question-orbit h2 {
+  font-size: clamp(2rem, 4.5vw, 3.2rem) !important;
+  letter-spacing: -0.035em !important;
+  line-height: 1.05 !important;
+}
+
+html:root:root:root body .v0-comparison h2 {
+  font-size: clamp(2.2rem, 5vw, 3.6rem) !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1.02 !important;
+}
+
+html:root:root:root body .v0-final h2 {
+  font-size: clamp(2.4rem, 5.5vw, 4rem) !important;
+  letter-spacing: -0.042em !important;
+  line-height: 1.03 !important;
+}
+
+/* ─── Workspace Intelligence Canvas ────────────────────────────────────────── */
+
+html:root:root:root body .sovereign-answer > header h2 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem) !important;
+  letter-spacing: -0.028em !important;
+  line-height: 1.15 !important;
+  font-weight: 450 !important;
+}
+
+html:root:root:root body .sovereign-answer > header > small {
+  font-size: .65rem !important;
+  letter-spacing: 0.12em !important;
+  padding: 4px 10px !important;
+  border-radius: var(--sov-radius-pill) !important;
+  background: rgba(185, 151, 114, 0.08) !important;
+  color: var(--sovereign-accent) !important;
+}
+
+html:root:root:root body .user-question {
+  border-radius: var(--sov-radius-xl) !important;
+  border-color: var(--sov-nav-border) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+html:root:root:root body .user-question p {
+  font-size: 1.02rem !important;
+  line-height: 1.6 !important;
+}
+
+/* ─── Composer as Intelligence Instrument ──────────────────────────────────── */
+
+html:root:root:root body .sovereign-composer {
+  border-radius: var(--sov-radius-xl) !important;
+  border-color: var(--sov-nav-border) !important;
+  background: rgba(16, 18, 21, 0.92) !important;
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(241, 233, 222, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(28px) saturate(120%) !important;
+}
+
+html:root:root:root body .sovereign-composer textarea {
+  font-size: 1.02rem !important;
+  line-height: 1.55 !important;
+  letter-spacing: -0.005em !important;
+}
+
+html:root:root:root body .sovereign-composer textarea:focus {
+  caret-color: var(--sovereign-accent) !important;
+}
+
+html:root:root:root body .composer-send {
+  background: var(--sovereign-accent) !important;
+  color: var(--sovereign-panel) !important;
+  transition: transform var(--sov-motion-micro) var(--sov-ease), opacity var(--sov-motion-micro) ease !important;
+}
+
+html:root:root:root body .composer-send:hover:not(:disabled) {
+  transform: scale(1.05) !important;
+}
+
+html:root:root:root body .composer-send:active:not(:disabled) {
+  transform: scale(0.95) !important;
+}
+
+/* ─── Response Mark Intelligence Indicator ─────────────────────────────────── */
+
+html:root:root:root body .response-mark {
+  background: radial-gradient(circle at 50% 40%, rgba(185, 151, 114, 0.12), transparent 70%) !important;
+  border-color: rgba(185, 151, 114, 0.2) !important;
+  box-shadow: 0 2px 12px rgba(185, 151, 114, 0.08) !important;
+  color: var(--sovereign-accent) !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html:root:root:root body :is(
+    .v0-hero-content,
+    .landing-question-orbit__inner,
+    .landing-stories,
+    .v0-comparison .v0-shell,
+    .v0-final
+  ) {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
   .public-approved-v8 .landing-expression-slice__canvas,
   .public-approved-v8 .landing-demo,
   .public-approved-v8 .landing-message,
