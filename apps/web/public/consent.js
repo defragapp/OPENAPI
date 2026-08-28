@@ -1,21 +1,21 @@
 const labels = {
-  'pair.compare': 'Compare your two Baselines',
-  'system.include': 'Include you in a family, household, friendship, or team view',
-  'trait.display': 'Use the plain-language themes you chose to share',
-  'framework.display': 'Show optional supporting framework detail',
-  'current_conditions.use': 'Use your temporary current context',
-  'library.link': 'Link a saved understanding',
-  'covenant.include': 'Include your context in an explicit Scripture lens'
+  'pair.compare': 'Compare Baselines',
+  'system.include': 'Include in family/team view',
+  'trait.display': 'Share Baseline Design themes',
+  'framework.display': 'Show source details',
+  'current_conditions.use': 'Include what\'s active now',
+  'library.link': 'Link saved understandings',
+  'covenant.include': 'Include in Covenant exploration'
 };
 
 const descriptions = {
-  'pair.compare': 'Compare permitted context from both accounts while keeping each person distinct.',
-  'system.include': 'Use your permitted context inside one named group view.',
-  'trait.display': 'Show only the reduced themes you chose to share.',
-  'framework.display': 'Show optional supporting framework details for this connection.',
-  'current_conditions.use': 'Include temporary current context without treating it as confirmed fact.',
+  'pair.compare': 'Compare both Baselines while keeping each person distinct.',
+  'system.include': 'Include this person in a family, household, friendship, or team view.',
+  'trait.display': 'Share the plain-language Baseline Design themes you chose.',
+  'framework.display': 'Show optional source details.',
+  'current_conditions.use': 'Include what\'s active now without treating it as confirmed fact.',
   'library.link': 'Use a saved understanding as shared context for this connection.',
-  'covenant.include': 'Include your context only when the optional Covenant lens is explicitly enabled.'
+  'covenant.include': 'Include this person only when the optional Covenant lens is on.'
 };
 
 const status = document.querySelector('#status');
