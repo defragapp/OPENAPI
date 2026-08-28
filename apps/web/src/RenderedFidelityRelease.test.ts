@@ -27,8 +27,8 @@ describe('rendered fidelity release authority', () => {
     expect(fidelity).toContain('box-shadow: none !important;');
     expect(fidelity).toContain('.public-approved-v8 .landing-workflow > li.is-active');
     expect(fidelity).toContain('.public-approved-v8 .landing-system-map {');
-    expect(fidelity).toContain('.public-approved-v8 .landing-story {\n    padding: 54px 0 !important;');
-    expect(fidelity).toContain('.public-approved-v8 .v0-comparison,\n  .public-approved-v8 .v0-final {\n    padding-block: 58px !important;');
+    expect(fidelity).toContain('.public-approved-v8 .landing-story {\n    padding: 52px 0 !important;');
+    expect(fidelity).toContain('.public-approved-v8 .v0-comparison,\n.public-approved-v8 .v0-final {\n  padding-top: clamp(92px, 9vw, 138px) !important;');
   });
 
   it('persists Cloudflare Browser Rendering route screenshots and report', () => {

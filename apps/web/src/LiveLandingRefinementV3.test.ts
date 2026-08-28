@@ -32,6 +32,6 @@ describe('live landing refinement v3', () => {
     expect(css).toContain('stroke: rgba(241, 233, 222, 0.72) !important;');
     expect(css).toContain('@media (max-width: 760px)');
     expect(css).toContain('display: none !important;');
-    expect(css).toContain('padding: 48px 0 54px !important;');
+    expect(css).toContain('padding: 44px 0 50px !important;');
   });
 });

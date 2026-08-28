@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const css = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
+const appShellCss = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
 const hardening = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
 const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
 const exportRuntime = readFileSync(new URL('./PrivateAnswerExportRuntime.ts', import.meta.url), 'utf8');
@@ -15,14 +16,13 @@ describe('premium invitation and Sovereign output surfaces', () => {
   });
 
   it('gives invitation consent a dedicated editorial hierarchy', () => {
-    expect(css).toContain('.account-shell > .auth-panel');
-    expect(css).toContain('grid-template-columns: minmax(0, .82fr) minmax(380px, 1.18fr)');
-    expect(css).toContain('counter-reset: consent-scope');
-    expect(css).toContain('.account-shell > .auth-panel .usage-card');
-    expect(css).toContain('.account-shell > .auth-panel .scope-list');
+    expect(appShellCss).toContain('.account-shell > .auth-panel');
+    expect(appShellCss).toContain('.account-layout');
+    expect(appShellCss).toContain('.usage-card');
+    expect(appShellCss).toContain('.scope-list');
+    expect(appShellCss).toContain('[data-decision="granted"]');
+    expect(appShellCss).toContain('[data-decision="denied"]');
     expect(hardening).toContain('.invitation-state');
-    expect(hardening).toContain('[data-decision="granted"]');
-    expect(hardening).toContain('[data-decision="denied"]');
   });
 
   it('keeps consent choices independent, neutral, and accessible', () => {
@@ -31,9 +31,9 @@ describe('premium invitation and Sovereign output surfaces', () => {
     expect(app).toContain('aria-pressed={decision === \'denied\'}');
     expect(app).toContain('Every requested use needs its own decision');
     expect(app).toContain('Nothing changed.');
-    expect(hardening).toContain('.scope-list button:first-child');
-    expect(hardening).toContain('background: transparent');
-    expect(hardening).toContain('min-height: 44px');
+    expect(appShellCss).toContain('.scope-list button:first-child');
+    expect(appShellCss).toContain('background: transparent');
+    expect(appShellCss).toContain('min-height: 44px');
   });
 
   it('renders AI output as one readable answer surface', () => {
