@@ -696,6 +696,12 @@
   font-family: ui-monospace, "SFMono-Regular", Menlo, monospace !important;
   font-size: .7rem !important;
   white-space: nowrap;
+  transition: border-color 180ms ease, color 180ms ease;
+}
+
+.basis-strip:hover {
+  border-color: var(--sov-clay);
+  color: var(--sov-ink) !important;
 }
 
 .basis-strip strong {
@@ -1261,6 +1267,55 @@
 @keyframes sovereign-answer-arrive {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.surface-heading > p {
+  animation: sovereign-arrive 420ms ease 80ms both;
+}
+
+.surface-heading h1 {
+  animation: sovereign-arrive 480ms ease 160ms both;
+}
+
+.surface-heading > span {
+  animation: sovereign-arrive 480ms ease 240ms both;
+}
+
+.composer-context-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: .72rem;
+  letter-spacing: .02em;
+}
+
+.composer-context-line span {
+  color: var(--sov-clay);
+  opacity: .7;
+}
+
+.composer-context-line button {
+  padding: 3px 8px;
+  border: 1px solid var(--sov-line);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--sov-clay);
+  font-size: .68rem;
+  transition: border-color 180ms ease, color 180ms ease;
+}
+
+.composer-context-line button:hover {
+  border-color: var(--sov-clay);
+  color: var(--sov-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface-heading > p,
+  .surface-heading h1,
+  .surface-heading > span {
+    animation: none;
+  }
 }
 
 @media (max-width: 1180px) {

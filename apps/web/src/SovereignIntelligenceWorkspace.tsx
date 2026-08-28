@@ -599,7 +599,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
         {baselineExperience === 'idle' && baselineReady && surfaceEntitled && (
           <form className="sovereign-composer" onSubmit={submit}>
             <div className="composer-context-line">
-              <span>Context · {contextItems.join(' · ')}</span>
+              <span>Drawing from · {contextItems.join(' · ')}</span>
               <button type="button" onClick={() => setContextOpen(true)}>Adjust who and what</button>
             </div>
             {!composerFocused && !draft && <span className="composer-example" key={`${surface}-${exampleIndex}`} aria-hidden="true">{composerExamples[surface][exampleIndex % composerExamples[surface].length]}</span>}
