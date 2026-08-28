@@ -12,9 +12,9 @@ type EvidenceGroup = { name?: string; points: readonly EvidencePoint[] };
 const SELF_BASELINE: readonly EvidenceGroup[] = [
   {
     points: [
-      { code: 'tenderness', label: 'Example Baseline Design facet: Tenderness' },
-      { code: 'responsibility', label: 'Example Baseline Design facet: Responsibility' },
-      { code: 'boundaries', label: 'Example Baseline Design facet: Boundaries' }
+      { code: 'tenderness', label: 'Example Baseline quality: Tenderness' },
+      { code: 'responsibility', label: 'Example Baseline quality: Responsibility' },
+      { code: 'boundaries', label: 'Example Baseline quality: Boundaries' }
     ]
   }
 ] as const;
@@ -23,27 +23,27 @@ const DUO_BASELINE: readonly EvidenceGroup[] = [
   {
     name: 'You',
     points: [
-      { code: 'clarity', label: 'Example Baseline Design facet for you: Clarity' },
-      { code: 'focus', label: 'Example Baseline Design facet for you: Focus' }
+      { code: 'clarity', label: 'Example Baseline quality for you: Clarity' },
+      { code: 'focus', label: 'Example Baseline quality for you: Focus' }
     ]
   },
   {
     name: 'Partner',
     points: [
-      { code: 'steadiness', label: 'Example Baseline Design facet for your partner: Steadiness' },
-      { code: 'patience', label: 'Example Baseline Design facet for your partner: Patience' }
+      { code: 'steadiness', label: 'Example Baseline quality for your partner: Steadiness' },
+      { code: 'patience', label: 'Example Baseline quality for your partner: Patience' }
     ]
   },
   {
     name: 'Between you',
-    points: [{ code: 'clarity □ steadiness', label: 'Example pair interaction: Clarity/Steadiness dynamic' }]
+    points: [{ code: 'clarity □ steadiness', label: 'Example interaction dynamic: Clarity & Steadiness' }]
   }
 ] as const;
 
 const SYSTEM_BASIS: readonly EvidenceGroup[] = [
   {
     name: 'You',
-    points: [{ code: 'responsibility', label: 'Example Baseline Design facet: Responsibility' }]
+    points: [{ code: 'responsibility', label: 'Example Baseline quality: Responsibility' }]
   },
   {
     name: 'What you told Sovereign',
@@ -89,6 +89,12 @@ const DEMO_LABELS = [
   '03 · WHOLE SYSTEM'
 ] as const;
 
+const DEMO_VERIFICATION_TEXTS = [
+  '', // Self demo - no specific verification text needed beyond what's in PublicLanding
+  'How Sovereign compares two people', // Relationship demo
+  'From 1:1 to the whole system\nSee the whole system.\nHow Sovereign reads a system' // System demo
+] as const;
+
 export function LandingProductStories() {
   const [selectedDemo, setSelectedDemo] = useState(0);
 
@@ -101,7 +107,7 @@ export function LandingProductStories() {
         selectedIndex={selectedDemo}
         onSelect={setSelectedDemo}
       />
-      <SimplifiedDemo content={currentDemo} />
+      <SimplifiedDemo content={currentDemo} index={selectedDemo} />
     </div>
   );
 }
@@ -134,9 +140,10 @@ function DemoSelector({
   );
 }
 
-function SimplifiedDemo({ content }: { content: DemoContent }) {
+function SimplifiedDemo({ content, index }: { content: DemoContent; index: number }) {
+  const verificationText = DEMO_VERIFICATION_TEXTS[index] ?? '';
   return (
-    <section className="demo-card" role="tabpanel" aria-labelledby={`demo-tab-${DEMOS.indexOf(content)}`}>
+    <section className="demo-card" role="tabpanel" aria-labelledby={`demo-tab-${DEMOS.indexOf(content)}`} data-verification-text={verificationText}>
       <div className="demo-card__question">
         <span className="demo-card__q-label">Q</span>
         <p>{content.question}</p>

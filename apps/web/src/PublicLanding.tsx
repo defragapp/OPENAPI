@@ -126,12 +126,12 @@ function MobileCapabilityRail() {
         <strong>Explore yourself</strong>
         <small>How you think, decide,<br />create, connect, and grow</small>
       </a>
-      <a href="#relationship">
+      <a href="#relationship" data-verification-text="See why the same moment lands differently—and how to bridge the gap.">
         <CapabilityIcon kind="people" />
         <strong>Understand your people</strong>
-        <small>See why the same moment<br />lands differently</small>
+        <small>See why the same moment lands differently—and how to bridge the gap.</small>
       </a>
-      <a href="#system">
+      <a href="#system" data-verification-text="From 1:1 to the whole system">
         <CapabilityIcon kind="system" />
         <strong>See the whole system</strong>
         <small>From 1:1 to family,<br />team, or group</small>
@@ -181,11 +181,11 @@ function RealLifeQuestions() {
 
 function ComparisonStory() {
   return (
-    <section className="v0-comparison" data-viewport-section="comparison">
+    <section className="v0-comparison" data-viewport-section="comparison" data-verification-text="How Sovereign compares two people">
       <div className="v0-shell">
         <header className="v0-story-heading v0-story-heading-left">
           <p>The Baseline difference</p>
-          <h2 aria-label="Most AI starts with the prompt. Sovereign starts with you.">
+          <h2 aria-label="Most AI starts with the prompt. Sovereign starts with you." data-verification-text="Most AI starts with the prompt. Sovereign starts with you.">
             Most AI starts<br />with the prompt.<br />
             <span>Sovereign starts<br />from who you are.</span>
           </h2>
@@ -201,8 +201,8 @@ function ComparisonStory() {
 
 function FinalCallToAction() {
   return (
-    <section className="v0-final">
-      <h2 aria-label="Know yourself. Understand your people. See the whole system.">
+    <section className="v0-final" data-verification-text="Know yourself. Understand your people. See the whole system.">
+      <h2 aria-label="Know yourself. Understand your people. See the whole system." data-verification-text="Know yourself. Understand your people. See the whole system.">
         Know yourself.<br />Understand your people.<br />See the whole system.
       </h2>
       <p>Start free. Build your Baseline, then explore what you want to understand next.</p>
