@@ -50,34 +50,13 @@ const replacements = [
   [
     "requireAll('application document', index, ['id=\"root\"', 'Healing isn’t optional. Holding onto the pain is.', 'release-fingerprint']);",
     "requireAll('application document', index, ['id=\"root\"', 'Sovereign.OS — Private personal AI for real life', 'og:title', 'og:description', '/og-sovereign.png', '/app-icon.png', '/apple-touch-icon.png', 'release-fingerprint']);"
-  ],
-  [
-    "  'Bring the question you actually have.',",
-    "  'One private reference beneath every question.',"
-  ],
-  [
-    "  'Why do we keep having the same fight?',",
-    "  'Why do we keep having the same argument even when we both want it to stop?',"
-  ],
-  [
-    "  'Seeing the capacity beneath it',\n  'Keeping both people distinct',\n  'Mapping the people',",
-    "  'What your Baseline supports',\n  'Keeping both people distinct',\n  'What Sovereign separates',"
-  ],
-  [
+  ],  [
     "  'stroke: #2f93ff',\n  'width: 100vw',",
     "  'width: 100vw',"
-  ],
-  [
-    "assert(!field.includes('<div className=\"landing-expression-slice__tooltip\"'), 'The retired floating tooltip returned.');",
-    "assert(!field.includes('<div className=\"landing-expression-slice__tooltip\"'), 'The retired floating tooltip returned.');\nrequireAll('final experience refinement', refinementCss, ['--landing-blue: #e8ddd0 !important', '--route-blue: #e8ddd0 !important', '-webkit-text-stroke: 1.15px rgba(241, 233, 222, 0.82)', '.sovereign-app-runtime .sovereign-composer']);\nrequireAll('rendered fidelity authority', renderedFidelityCss, ['--v8-blue: #d8d0c5 !important', \"radialGradient[id$='-sphere-fill']\", 'filter: saturate(0.08) contrast(1.05) brightness(0.96) !important', '.public-approved-v8 .landing-demo {', 'padding: 54px 0 !important']);\nrequireAll('landing refinement v2', landingRefinementCss, ['.landing-workflow__progress', 'grid-template-columns: minmax(0, 1.34fr) minmax(320px, 0.66fr) !important', '@keyframes sovereign-system-route', 'scroll-snap-type: inline mandatory !important']);\nrequireAll('landing refinement v5', landingRefinementV5Css, ['.v0-hero h1 > span', '.v0-hero h1 > em', '@keyframes sovereign-hero-rise', '@keyframes sovereign-field-arrive', '.landing-baseline-intro__heading', '.landing-baseline-intro__principles', '.landing-expression-slice__tooltip-panel', 'width: 104px !important', 'height: 26px !important', '@media (prefers-reduced-motion: reduce)']);\nrequireAll('landing value sequence', landing, ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'Should I stay in this job, ask for more, or leave?']);\nrequireAll('landing field selection', field, [\"data-inspecting={hasInspection ? 'true' : 'false'}\", 'setHasInspection(true)', 'const TOOLTIP_WIDTH = 104', 'const TOOLTIP_HEIGHT = 26', 'click a line to inspect it']);\nassert(!field.includes('onPointerEnter={() => selectAxis(axis.id)}'), 'Landing field inspection must not activate on hover.');\nrequireAll('invitation rendered fidelity', invitationFidelityCss, ['@media (min-width: 901px)', 'overflow-wrap: normal']);\nrequireAll('final static refinement', staticRefinement, ['--v0-blue: #e8ddd0', '--v0-blue-bright: #fffaf3', 'body.how-page .journey-steps > article', 'body.pricing-page .pricing-grid', 'body.questions-page .faq-category', '@media (prefers-reduced-motion: reduce)']);"
-  ],
+],
   [
     "requireAll('How it works document', how, ['Ask about your life. Get an answer built around you.', 'journey-steps', 'baseline-explainer']);",
     "requireAll('How it works document', how, ['Your Baseline first. The situation second.', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);"
-  ],
-  [
-    "requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe handles payment details', 'Start free. Expand when the question includes more than you.']);",
-    "requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe securely handles checkout, invoices, payment methods, and subscription changes.', 'If paid access ends, your account stays open and returns to Free.', 'Start with your Baseline. Add more only when you need it.', 'one-time amount from $1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);"
   ],
   [
     "requireAll('FAQ document', faq, ['<details', 'Do I need to open my email every time I sign in?', 'When is my plan verified?', 'Can I correct or remove an interpretation?']);",
@@ -109,38 +88,9 @@ for (const [retiredContract, currentContract] of replacements) replaceOnce(retir
  */
 const positioningContracts = [
   [
-    `requireAll('landing value sequence', landing, ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'Should I stay in this job, ask for more, or leave?']);`,
-    `requireAll('landing value sequence', landing, ['data-public-narrative="self-people-systems-v1"', 'You → your people → the whole system', 'Start with yourself. Expand outward when it matters.', 'How do I make decisions that actually fit me?', 'Most AI starts with the prompt. Sovereign starts with you.', 'Know yourself. Understand your people. See the whole system.']);
-rejectAll('retired landing positioning', landing, ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'calculated astronomical positions and selected interpretive frameworks']);`
-  ],
-  [
-    `  'One private reference beneath every question.',`,
-    `  'Start with yourself. Expand outward when it matters.',`
-  ],
-  [
-    `  'Why do we keep having the same argument even when we both want it to stop?',`,
-    `  'How do I make decisions that actually fit me?',`
-  ],
-  [
-    `  'What your Baseline supports',
-  'Keeping both people distinct',
-  'What Sovereign separates',`,
-    `  'Start with the question',
-  'Keep each person separate',
-  'How Sovereign reads a system',`
-  ],
-  [
-    `requireAll('landing refinement v5', landingRefinementV5Css, ['.v0-hero h1 > span', '.v0-hero h1 > em', '@keyframes sovereign-hero-rise', '@keyframes sovereign-field-arrive', '.landing-baseline-intro__heading', '.landing-baseline-intro__principles', '.landing-expression-slice__tooltip-panel', 'width: 104px !important', 'height: 26px !important', '@media (prefers-reduced-motion: reduce)']);`,
-    `requireAll('landing refinement v5', landingRefinementV5Css, ['One typeface. Hierarchy comes from weight, scale, and opacity.', '.v0-hero h1 > span', '.v0-hero h1 > em', 'font-family: inherit !important', '@keyframes sovereign-hero-rise', '@keyframes sovereign-field-arrive', '.landing-expression-slice__tooltip-panel', 'width: 104px !important', 'height: 26px !important', '@media (prefers-reduced-motion: reduce)']);`
-  ],
-  [
     `requireAll('How it works document', how, ['Your Baseline first. The situation second.', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`,
     `requireAll('How it works document', how, ['Start with yourself. Add another person or the wider situation only when it helps.', 'Ask about what you actually want to understand.', '<summary>See source details</summary>', '<dt>Sources</dt>', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`
   ],
-  [
-    `requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe securely handles checkout, invoices, payment methods, and subscription changes.', 'If paid access ends, your account stays open and returns to Free.', 'Start with your Baseline. Add more only when you need it.', 'one-time amount from $1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`,
-    `requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Explore yourself for free. Add People and Systems with Sovereign+.', 'Explore yourself with Sovereign.', 'Understand your people and the systems around you.', 'Your Baseline stays yours. Plus expands what you can explore.', 'Stripe securely handles checkout, invoices, payment methods, and subscription changes.', 'If paid access ends, your account stays open and returns to Free.', 'one-time amount from $1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2']);`
-  ]
 ];
 
 function replacePositioningContract(retiredContract, currentContract) {
@@ -183,7 +133,7 @@ if (!source.includes("read('apps/sovereign-worker/migrations/0016_policy_accepta
 if (!source.includes("read('apps/sovereign-worker/migrations/0017_privacy_access_and_eligibility.sql')")) throw new Error('Production release v3 is missing the privacy access migration authority.');
 if (!source.includes("read('apps/sovereign-worker/migrations/0018_workers_ai_capacity_reservations.sql')")) throw new Error('Production release v3 is missing the capacity reservation migration authority.');
 if (!source.includes("read('apps/sovereign-worker/src/privacy-rights.ts')")) throw new Error('Production release v3 is missing the privacy rights runtime authority.');
-for (const retired of ['Bring the question you actually have.', 'Start with what’s actually happening.', 'Ask about your life. Get an answer built around you.', 'Seeing the capacity beneath it', 'Mapping the people']) {
+for (const retired of ['Start with what’s actually happening.', 'Ask about your life. Get an answer built around you.']) {
   if (source.includes(retired)) throw new Error(`Production release v3 still enforces retired active product language: ${retired}`);
 }
 

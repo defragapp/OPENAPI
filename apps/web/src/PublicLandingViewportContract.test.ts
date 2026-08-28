@@ -26,7 +26,7 @@ function surface(
     width: right - left,
     height,
     layoutWidth
-  };
+  } as ViewportSurfaceMeasurement;
 }
 
 function passingPhoneSnapshot(): PublicLandingViewportSnapshot {
@@ -105,21 +105,23 @@ describe('restored landing rendered viewport contract', () => {
 
     const stretched = passingPhoneSnapshot();
     const demoCardIdx = stretched.surfaces.findIndex((item) => item.id === 'demo-card');
+    const stretchedDemoCard = stretched.surfaces[demoCardIdx]!;
     stretched.surfaces[demoCardIdx] = {
-      ...stretched.surfaces[demoCardIdx],
+      ...stretchedDemoCard,
       height: 2400,
-      bottom: stretched.surfaces[demoCardIdx].top + 2400
-    };
+      bottom: stretchedDemoCard.top + 2400
+    } as ViewportSurfaceMeasurement;
     expect(evaluatePublicLandingViewport(stretched).failures).toContain('demo-card height 2400px > 1100px');
 
     const sideBySide = passingPhoneSnapshot();
     const hero = sideBySide.surfaces.find((item) => item.id === 'hero')!;
     const demoIdx = sideBySide.surfaces.findIndex((item) => item.id === 'demo-card');
+    const sideBySideDemoCard = sideBySide.surfaces[demoIdx]!;
     sideBySide.surfaces[demoIdx] = {
-      ...sideBySide.surfaces[demoIdx],
+      ...sideBySideDemoCard,
       top: hero.top,
-      bottom: hero.top + sideBySide.surfaces[demoIdx].height
-    };
+      bottom: hero.top + sideBySideDemoCard.height
+    } as ViewportSurfaceMeasurement;
     expect(evaluatePublicLandingViewport(sideBySide).failures).toContain('demo-card is not clearly stacked below hero');
   });
 

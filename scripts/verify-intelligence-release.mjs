@@ -212,12 +212,8 @@ for (const prohibited of ['sphere', 'globe']) {
 }
 
 containsAll('founder v0 visual components', `${landing}\n${stories}\n${v0Visual}\n${storyCss}\n${heroVisual}`, [
-  'className="v0-baseline-trace"',
-  'v0-window v0-flow v0-workflow-panel',
-  'v0-family-system-map',
   'className="v0-comparison-grid"',
   '.v0-hero',
-  '.v0-story-grid',
   '.landing-question-orbit',
   '.intelligence-workspace',
   '.sovereign-composer',

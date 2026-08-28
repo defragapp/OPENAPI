@@ -234,12 +234,17 @@ requireAll('landing v3 composition', landing, [
   'Holding onto the pain is.',
   '<LandingExpressionSlice />',
   '<RealLifeQuestions />',
-  'Bring the question you actually have.',
-  'Why do we keep having the same fight?',
-  '<LandingProductStories />',
+  'Why did their tone affect me more than their words?',
   '<ComparisonStory />'
 ]);
 requireAll('restored landing stories', stories, [
+  'export function LandingProductStories()',
+  'demo-selector',
+  'demo-card',
+  'See source details',
+  'Representative example · Not your Baseline Design'
+]);
+rejectAll('restored landing stories', stories, [
   '<PersonalStory />',
   '<RelationshipStory />',
   '<SystemStory />',
@@ -249,9 +254,6 @@ requireAll('restored landing stories', stories, [
   'surface="relationship-reasoning"',
   'surface="system-map"',
   'surface="system-reasoning"',
-  'Seeing the capacity beneath it',
-  'Keeping both people distinct',
-  'Mapping the people',
   'v0-workflow-panel',
   'v0-family-system-map'
 ]);
@@ -295,7 +297,7 @@ for (const [label, document] of [['How it works', how], ['pricing', pricing], ['
   assert(!/<link[^>]+v0-public-port\.css/i.test(document), `${label} still loads the retired static bridge`);
 }
 requireAll('How it works document', how, ['Ask about your life. Get an answer built around you.', 'journey-steps', 'baseline-explainer']);
-requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe handles payment details', 'Start free. Expand when the question includes more than you.']);
+requireAll('pricing document', pricing, ['$0', '$20', '$99 / year', 'Stripe securely handles checkout, invoices, payment methods, and subscription changes.', 'If paid access ends, your account stays open and returns to Free.']);
 assert(!pricing.includes('Begin with yourself.'), 'Pricing retains rejected product language');
 requireAll('FAQ document', faq, ['<details', 'Do I need to open my email every time I sign in?', 'When is my plan verified?', 'Can I correct or remove an interpretation?']);
 requireAll('cross-platform composition', composition, ['.sovereign-landing', '.account-shell', '.plan-onboarding', '.sovereign-policy', '.public-not-found', '.intelligence-workspace', '@media (max-width: 700px)']);

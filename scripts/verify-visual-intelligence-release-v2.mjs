@@ -81,7 +81,7 @@ for (const marker of [
 for (const retired of ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'calculated astronomical positions and selected interpretive frameworks']) {
   if (landing.includes(retired)) throw new Error(`Visual intelligence release v2 found retired landing language ${retired}`);
 }
-for (const marker of ['01 · You', 'Explore how you think, decide, communicate, create, connect, and grow.', '02 · You + your people', 'See why the same moment lands differently—and how to bridge the gap.', '03 · From 1:1 to the whole system', 'See the whole system.']) {
+for (const marker of ['01 · YOU', '02 · YOU & YOUR PEOPLE', '03 · WHOLE SYSTEM', 'Why do I keep saying yes when I want to say no?', 'Why does my partner\\\'s silence feel like punishment?', 'Why do I always end up managing the family crisis?', 'See source details', 'Representative example · Not your Baseline Design']) {
   if (!stories.includes(marker)) throw new Error(`Visual intelligence release v2 is missing story marker ${marker}`);
 }
 for (const retired of ['Separate helping from carrying the outcome.', 'See where responsibility keeps landing.']) {
@@ -188,7 +188,7 @@ replaceVisualSectionMarker(
 
 
 /* CURRENT_STORY_CONTRACT_isolated landing demonstrations */
-const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","No compatibility score"];
+const currentStoryMarkers = ["DemoSelector", "SimplifiedDemo", "demo-selector", "demo-card", "See source details", "Representative example · Not your Baseline Design", "Why do I keep saying yes when I want to say no?", "Why does my partner\\'s silence feel like punishment?", "Why do I always end up managing the family crisis?"];
 const currentStoryQuote = String.fromCharCode(39);
 const currentStoryStart = "requireAll(" + currentStoryQuote + "isolated landing demonstrations" + currentStoryQuote + ", stories, [";
 const currentStoryIndex = source.indexOf(currentStoryStart);

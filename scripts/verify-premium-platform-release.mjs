@@ -157,7 +157,7 @@ requireAll('restored product stories', stories, [
   'No private-thought claims',
   'Each person controls what may be included'
 ]);
-assert((stories.match(/<WorkflowPanel /g) ?? []).length === 1, 'Public stories must render one detailed reasoning flow, not repeat it for relationship and system examples.');
+assert((stories.match(/className="demo-selector"(?![^">]*__)/g) ?? []).length === 1 && (stories.match(/className="demo-card"(?![^">]*__)/g) ?? []).length === 1, 'Public stories must render one demo selector with one reusable demo card for Self, People, and System.');
 rejectAll('restored product stories', stories, [
   'LandingExpressionFieldPreview',
   'sphere',

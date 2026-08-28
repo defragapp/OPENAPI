@@ -123,17 +123,14 @@ for (const retired of ['<BaselineFoundation />', 'One private reference beneath 
   if (landing.includes(retired)) throw new Error(`Premium platform release v2 found retired root language: ${retired}`);
 }
 for (const marker of [
-  '01 · You',
-  'Explore how you think, decide, communicate, create, connect, and grow.',
-  '02 · You + your people',
-  'See why the same moment lands differently—and how to bridge the gap.',
-  'Keep each person separate',
-  '03 · From 1:1 to the whole system',
-  'See the whole system.',
-  'How Sovereign reads a system',
-  'How Sovereign reads a system',
-  'Show how pressure moves',
-  'Change one thing and watch what happens'
+  '01 · YOU',
+  '02 · YOU & YOUR PEOPLE',
+  '03 · WHOLE SYSTEM',
+  'Why do I keep saying yes when I want to say no?',
+  'Why does my partner\\\'s silence feel like punishment?',
+  'Why do I always end up managing the family crisis?',
+  'See source details',
+  'Representative example · Not your Baseline Design'
 ]) {
   if (!stories.includes(marker)) throw new Error(`Premium platform release v2 is missing product story marker: ${marker}`);
 }
@@ -173,8 +170,7 @@ for (const retired of [
 ]) if (source.includes(retired)) throw new Error(`Premium platform release v2 still enforces retired active language: ${retired}`);
 
 
-/* CURRENT_STORY_CONTRACT_restored product stories */
-const currentStoryMarkers = ["<PersonalStory />","<RelationshipStory />","<SystemStory />","Explore how you think, decide, communicate, create, connect, and grow.","See why the same moment lands differently—and how to bridge the gap.","See the whole system.","How Sovereign builds the answer","How Sovereign compares two people","How Sovereign reads a system","Keep each person separate","Show what happens between you","Show how pressure moves","Show why the role keeps returning","Change one thing and watch what happens","surface=\"personal-chat\"","surface=\"relationship-chat\"","surface=\"system-map\"","No compatibility score"];
+const currentStoryMarkers = ["DemoSelector", "SimplifiedDemo", "demo-selector", "demo-card", "See source details", "Representative example · Not your Baseline Design", "Why do I keep saying yes when I want to say no?", "Why does my partner\\'s silence feel like punishment?", "Why do I always end up managing the family crisis?"];
 const currentStoryQuote = String.fromCharCode(39);
 const currentStoryStart = "requireAll(" + currentStoryQuote + "restored product stories" + currentStoryQuote + ", stories, [";
 const currentStoryIndex = source.indexOf(currentStoryStart);
@@ -185,14 +181,7 @@ const currentStoryContract = currentStoryStart + "\n" + currentStoryMarkers.map(
 source = source.slice(0, currentStoryIndex) + currentStoryContract + source.slice(currentStoryEnd + 4);
 
 
-/* CURRENT_THREE_WORKFLOW_CONTRACT */
-const staleWorkflowMultiplicity = "assert((stories.match(/<WorkflowPanel /g) ?? []).length === 1, 'Public stories must render one detailed reasoning flow, not repeat it for relationship and system examples.');";
-const currentWorkflowMultiplicity = "assert((stories.match(/<WorkflowPanel/g) ?? []).length === 3, 'Public stories must render one workflow for Self, Relationship, and System.');";
-if (source.includes(staleWorkflowMultiplicity)) {
-  source = source.replace(staleWorkflowMultiplicity, currentWorkflowMultiplicity);
-} else if (source.includes(currentWorkflowMultiplicity) === false) {
-  throw new Error("Premium platform release v2 could not reconcile workflow multiplicity.");
-}
+
 
 try {
   writeFileSync(temporaryPath, source, 'utf8');

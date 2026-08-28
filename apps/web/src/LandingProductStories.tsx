@@ -92,6 +92,8 @@ const DEMO_LABELS = [
 export function LandingProductStories() {
   const [selectedDemo, setSelectedDemo] = useState(0);
 
+  const currentDemo = DEMOS[selectedDemo] ?? DEMOS[0] as DemoContent;
+
   return (
     <div className="landing-stories" data-product-stories="high-value-intelligence-v1">
       <DemoSelector
@@ -99,7 +101,7 @@ export function LandingProductStories() {
         selectedIndex={selectedDemo}
         onSelect={setSelectedDemo}
       />
-      <SimplifiedDemo content={DEMOS[selectedDemo]} />
+      <SimplifiedDemo content={currentDemo} />
     </div>
   );
 }
@@ -122,7 +124,7 @@ function DemoSelector({
           aria-selected={index === selectedIndex}
           aria-controls={`demo-panel-${index}`}
           id={`demo-tab-${index}`}
-          className={`demo-selector__tab${index === selectedDemo ? ' is-active' : ''}`}
+          className={`demo-selector__tab${index === selectedIndex ? ' is-active' : ''}`}
           onClick={() => onSelect(index)}
         >
           {label}
