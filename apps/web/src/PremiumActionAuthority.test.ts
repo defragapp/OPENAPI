@@ -3,15 +3,12 @@ import { readFileSync } from 'node:fs';
 
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
-const css = readFileSync(new URL('./premium-action-authority-v1.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
 
 describe('premium action authority', () => {
-  it('loads editorial action authority before authenticated launch cohesion restores critical private actions', () => {
-    expect(main).toContain("import premiumActionAuthorityCss from './premium-action-authority-v1.css?inline'");
-    expect(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'))
-      .toBeGreaterThan(main.indexOf('style.textContent += `\\n${workspaceProductionRefinementCss}`;'));
-    expect(main.indexOf('style.textContent += `\\n${authenticatedLaunchCohesionCss}`;'))
-      .toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
+  it('loads editorial action authority as part of the single terminal inline authority', () => {
+    expect(main).toContain("import releasesCss from './releases.css?inline'");
+    expect(main).toContain("style.textContent = releasesCss;");
   });
 
   it('uses one acquisition vocabulary without duplicate hero/final CTAs', () => {

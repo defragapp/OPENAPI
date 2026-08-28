@@ -5,7 +5,7 @@ const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'u
 const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
 const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
 const fixture = readFileSync(new URL('./expression-field/expression-field.fixture.ts', import.meta.url), 'utf8');
-const releaseCss = readFileSync(new URL('./v0-single-example-release.css', import.meta.url), 'utf8');
+const releaseCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 
 describe('public evidence contract', () => {
   it('uses deterministic relative-expression data rather than unsupported identity claims', () => {

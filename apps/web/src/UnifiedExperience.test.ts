@@ -4,9 +4,9 @@ import { readFileSync } from 'node:fs';
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
 const css = [
-  readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8'),
-  readFileSync(new URL('./sovereign-cohesion.css', import.meta.url), 'utf8'),
-  readFileSync(new URL('./sovereign-modern.css', import.meta.url), 'utf8')
+  readFileSync(new URL('./workspace.css', import.meta.url), 'utf8'),
+  readFileSync(new URL('./workspace.css', import.meta.url), 'utf8'),
+  readFileSync(new URL('./workspace.css', import.meta.url), 'utf8')
 ].join('\n');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 

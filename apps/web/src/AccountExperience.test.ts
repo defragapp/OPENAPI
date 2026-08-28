@@ -4,9 +4,9 @@ import { readFileSync } from 'node:fs';
 const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
 const passkey = readFileSync(new URL('./PasskeyAuthentication.tsx', import.meta.url), 'utf8');
 const runtime = readFileSync(new URL('./ProductionRuntime.ts', import.meta.url), 'utf8');
-const css = readFileSync(new URL('./auth-onboarding.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
 const accountControls = readFileSync(new URL('./AccountControlCenter.tsx', import.meta.url), 'utf8');
-const accountControlCss = readFileSync(new URL('./account-control.css', import.meta.url), 'utf8');
+const accountControlCss = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('account access experience', () => {
@@ -51,7 +51,7 @@ describe('account access experience', () => {
   });
 
   it('loads the consolidated auth and onboarding stylesheet', () => {
-    expect(main).toContain("import './auth-onboarding.css'");
+    expect(main).toContain("import './app-shell.css'");
     expect(css).toContain('.turnstile-frame');
     expect(css).toContain('justify-items: center');
     expect(css).not.toContain('border: 1px dashed');

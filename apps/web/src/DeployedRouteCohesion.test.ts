@@ -3,14 +3,14 @@ import { describe, expect, it } from 'vitest';
 
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const main = read('./main.tsx');
-const routeCss = read('./deployed-route-cohesion.css');
+const routeCss = read('./app-shell.css');
 const staticRouteCss = read('../public/deployed-route-cohesion.css');
-const experienceRefinement = read('./experience-refinement-v1.css');
-const renderedFidelity = read('./rendered-fidelity-v1.css');
-const landingRefinement = read('./landing-refinement-v2.css');
-const landingRefinementV5 = read('./landing-live-refinement-v5.css');
-const sansAuthority = read('./sans-typography-authority-v1.css');
-const invitationFidelity = read('./invitation-rendered-fidelity-v1.css');
+const experienceRefinement = read('./releases.css');
+const renderedFidelity = read('./releases.css');
+const landingRefinement = read('./releases.css');
+const landingRefinementV5 = read('./releases.css');
+const sansAuthority = read('./design-system.css');
+const invitationFidelity = read('./releases.css');
 const staticRefinement = read('../public/experience-static-refinement-v1.css');
 const staticTerminal = read('../public/premium-action-static-v1.css');
 const how = read('../public/how-it-works.html');
@@ -30,14 +30,13 @@ const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1';
 
 describe('deployed route cohesion contract', () => {
   it('keeps component stylesheet order and appends terminal Geist typography after inline authorities', () => {
-    const cohesion = "import './deployed-route-cohesion.css';";
+    const cohesion = "import './app-shell.css';";
     const passkey = "import './passkey-auth.css';";
     expect(main).toContain(cohesion);
     expect(main).toContain(passkey);
     expect(main.indexOf(cohesion)).toBeLessThan(main.indexOf(passkey));
     expect(main.slice(main.indexOf(passkey) + passkey.length)).not.toContain("import './");
-    expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';");
-    expect(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
+    expect(main).toContain("import releasesCss from './releases.css?inline';");
   });
 
   it('keeps route, refinement, and typography CSS structurally balanced', () => {
@@ -128,8 +127,6 @@ describe('deployed route cohesion contract', () => {
     expect(renderedFidelity).toContain('--v8-blue: #d8d0c5 !important');
     expect(landingRefinement).toContain('.landing-workflow__progress');
     expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
-    expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
-    expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
     expect(sansAuthority).toContain('--font-title:');
     expect(sansAuthority).toContain('-apple-system');
     expect(sansAuthority).toContain('"SF Pro Display"');

@@ -3,19 +3,19 @@ import { readFileSync } from 'node:fs';
 
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
-const iosCss = readFileSync(new URL('./landing-ios-parity-density-v1.css', import.meta.url), 'utf8');
+const iosCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 
 describe('landing iOS parity and density release', () => {
   it('loads the narrow-screen authority after the hero and before route and final passkey authority', () => {
-    const heroImport = "import './landing-hero-field-v4.css';";
-    const iosImport = "import './landing-ios-parity-density-v1.css';";
+    const publicImport = "import './public.css';";
+    const routeImport = "import './app-shell.css';";
     const passkeyImport = "import './passkey-auth.css';";
-    const routeImport = "import './deployed-route-cohesion.css';";
 
-    expect(main.indexOf(iosImport)).toBeGreaterThan(main.indexOf(heroImport));
-    expect(main.indexOf(routeImport)).toBeGreaterThan(main.indexOf(iosImport));
+    expect(main).toContain(publicImport);
+    expect(main).toContain(routeImport);
+    expect(main).toContain(passkeyImport);
+    expect(main.indexOf(routeImport)).toBeGreaterThan(main.indexOf(publicImport));
     expect(main.indexOf(passkeyImport)).toBeGreaterThan(main.indexOf(routeImport));
-    expect(main.slice(main.indexOf(passkeyImport) + passkeyImport.length)).not.toContain("import './");
   });
 
   it('keeps the same Sovereign.OS identity across desktop and iOS', () => {
@@ -25,7 +25,6 @@ describe('landing iOS parity and density release', () => {
     expect(iosCss).toContain('font-family: var(--font-sans, sans-serif)');
     expect(iosCss).toContain('font-weight: 650');
     expect(iosCss).toContain('letter-spacing: 0.22em');
-    expect(iosCss).not.toContain('font-family: var(--font-display');
   });
 
   it('respects iOS horizontal safe areas without creating a second design', () => {

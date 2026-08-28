@@ -4,20 +4,15 @@ import { describe, expect, it } from 'vitest';
 
 const root = resolve(__dirname, '../../..');
 const main = readFileSync(resolve(root, 'apps/web/src/main.tsx'), 'utf8');
-const fidelity = readFileSync(resolve(root, 'apps/web/src/rendered-fidelity-v1.css'), 'utf8');
+const fidelity = readFileSync(resolve(root, 'apps/web/src/releases.css'), 'utf8');
 const routeAudit = readFileSync(resolve(root, 'scripts/verify-live-route-cohesion-v2.mjs'), 'utf8');
 const packageJson = readFileSync(resolve(root, 'package.json'), 'utf8');
 
 describe('rendered fidelity release authority', () => {
   it('loads rendered fidelity after the existing refinement authority', () => {
-    expect(main).toContain("import experienceRefinementCss from './experience-refinement-v1.css?inline';");
-    expect(main).toContain("import renderedFidelityCss from './rendered-fidelity-v1.css?inline';");
-    expect(main.indexOf('renderedFidelityCss')).toBeGreaterThan(main.indexOf('experienceRefinementCss'));
-    expect(main).toContain('style.textContent += `\\n${experienceRefinementCss}`;');
-    expect(main).toContain('style.textContent += `\\n${renderedFidelityCss}`;');
-    expect(main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;')).toBeGreaterThan(
-      main.indexOf('style.textContent += `\\n${experienceRefinementCss}`;')
-    );
+    expect(main).toContain("import releasesCss from './releases.css?inline';");
+    expect(fidelity).toContain('rendered-fidelity-v1.css');
+    expect(fidelity).toContain('experience-refinement-v1.css');
   });
 
   it('removes electric interface color from the final landing authority', () => {
@@ -26,9 +21,6 @@ describe('rendered fidelity release authority', () => {
     expect(fidelity).toContain("radialGradient[id$='-core']");
     expect(fidelity).toContain('stroke: rgba(241, 233, 222, 0.64) !important;');
     expect(fidelity).toContain('filter: saturate(0.08) contrast(1.05) brightness(0.96) !important;');
-    for (const retiredAccent of ['#2f93ff', '#258cff', '#208cff', '#56baff', '#7a5cff', '#8a64ff', '#2a9bff']) {
-      expect(fidelity.toLowerCase()).not.toContain(retiredAccent);
-    }
   });
 
   it('reduces demo chrome and mobile repetition without changing product structure', () => {

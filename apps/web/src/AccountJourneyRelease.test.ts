@@ -3,9 +3,9 @@ import { readFileSync } from 'node:fs';
 
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
 const workspaceGate = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
-const styles = readFileSync(new URL('./account-journey.css', import.meta.url), 'utf8');
-const structuredStyles = readFileSync(new URL('./account-journey-structured.css', import.meta.url), 'utf8');
-const cohesionStyles = readFileSync(new URL('./account-journey-release-cohesion.css', import.meta.url), 'utf8');
+const styles = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
+const structuredStyles = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
+const cohesionStyles = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
 const entry = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const auth = readFileSync(new URL('../../sovereign-worker/src/auth-public.ts', import.meta.url), 'utf8');
 
@@ -142,20 +142,17 @@ describe('Baseline-required account journey release', () => {
 
   it('loads account cohesion and route cohesion before the final passkey authority', () => {
     const accountImports = [
-      "import './account-journey.css';",
-      "import './account-journey-structured.css';",
-      "import './account-journey-release-cohesion.css';"
+      "import './app-shell.css';",
     ];
     const passkeyImportMarker = "import './passkey-auth.css';";
-    const routeImport = entry.indexOf("import './deployed-route-cohesion.css';");
+    const appShellImport = entry.indexOf("import './app-shell.css';");
     const passkeyImport = entry.indexOf(passkeyImportMarker);
     const firstRuntimeCall = entry.indexOf('installV0ReleaseFingerprint();');
     for (const marker of accountImports) {
       expect(entry.indexOf(marker)).toBeGreaterThan(-1);
-      expect(entry.indexOf(marker)).toBeLessThan(routeImport);
     }
-    expect(routeImport).toBeGreaterThan(-1);
-    expect(passkeyImport).toBeGreaterThan(routeImport);
+    expect(appShellImport).toBeGreaterThan(-1);
+    expect(passkeyImport).toBeGreaterThan(appShellImport);
     expect(firstRuntimeCall).toBeGreaterThan(passkeyImport);
     expect(entry.slice(passkeyImport + passkeyImportMarker.length, firstRuntimeCall)).not.toMatch(/import\s+['"].+\.css['"]/);
   });

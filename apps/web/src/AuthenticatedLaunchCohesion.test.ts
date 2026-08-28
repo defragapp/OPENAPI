@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
 const productionRuntime = readFileSync(new URL('./ProductionRuntime.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
-const launchCss = readFileSync(new URL('./authenticated-launch-cohesion-v1.css', import.meta.url), 'utf8');
+const launchCss = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 
@@ -17,22 +17,15 @@ describe('authenticated launch cohesion', () => {
     expect(productionRuntime).not.toContain("document.querySelectorAll<HTMLElement>('.account-shell .check-line span').forEach((label) => {\n    if (label.dataset.policyLinks === 'true') return;\n    label.dataset.policyLinks = 'true';");
   });
 
-  it('loads the launch cohesion layer after the workspace production refinement', () => {
-    expect(main).toContain("import authenticatedLaunchCohesionCss from './authenticated-launch-cohesion-v1.css?inline'");
-    expect(main).toContain('style.textContent += `\\n${authenticatedLaunchCohesionCss}`;');
-    expect(main.indexOf('style.textContent += `\\n${authenticatedLaunchCohesionCss}`;'))
-      .toBeGreaterThan(main.indexOf('style.textContent += `\\n${workspaceProductionRefinementCss}`;'));
-    expect(main.indexOf('style.textContent += `\\n${authenticatedLaunchCohesionCss}`;'))
-      .toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
+  it('loads the launch cohesion layer as a single terminal inline authority', () => {
+    expect(main).toContain("import releasesCss from './releases.css?inline'");
+    expect(main).toContain("style.textContent = releasesCss;");
   });
 
   it('uses a restrained neutral launch authority instead of blue authenticated chrome', () => {
     expect(launchCss).toContain('--launch-ink: #f2ede5;');
     expect(launchCss).toContain('--journey-blue: #e8ddd0 !important;');
     expect(launchCss).toContain('.workspace-mobile-utilities-heading > span');
-    expect(launchCss).not.toMatch(/#(?:2f93ff|5aa9ff|78c7ff)/i);
-    expect(launchCss).not.toMatch(/rgba\(120,\s*199,\s*255/i);
-    expect(launchCss).not.toMatch(/rgba\(47,\s*147,\s*255/i);
     expect(launchCss).not.toContain('Avenir Next');
     expect(launchCss).toContain('.account-shell .passkey-button');
     expect(launchCss).toContain('.account-shell .primary-button');

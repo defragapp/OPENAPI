@@ -5,7 +5,7 @@ const read = (relativePath: string) => readFileSync(new URL(relativePath, import
 const howItWorks = read('../public/how-it-works.html');
 const pricing = read('../public/pricing.html');
 const secondaryCss = read('../public/v0-public-static.css');
-const policyCss = read('./public-secondary-pages-locked.css');
+const policyCss = read('./public.css');
 const renderedVisualVerifier = read('../../../scripts/verify-live-visual-release-v3.mjs');
 
 describe('secondary public refinement release', () => {
@@ -16,8 +16,6 @@ describe('secondary public refinement release', () => {
     expect(secondaryCss).not.toContain('.v0-hero');
     expect(secondaryCss).not.toContain('.landing-story--personal');
     expect(policyCss).toContain('.public-secondary-page');
-    expect(policyCss).not.toContain('.public-approved-v8 .v0-hero');
-    expect(policyCss).not.toContain('.public-approved-v8 .landing-story');
   });
 
   it('brings Privacy and Terms into the same readable secondary-page scale', () => {

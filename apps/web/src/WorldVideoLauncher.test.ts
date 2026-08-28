@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const launcher = readFileSync(new URL('./WorldVideoLauncher.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
-const css = readFileSync(new URL('./world-video.css', import.meta.url), 'utf8');
 const wrangler = readFileSync(new URL('../../../wrangler.jsonc', import.meta.url), 'utf8');
 const videoContract = readFileSync(new URL('../../../docs/worlds-private-video-contract.md', import.meta.url), 'utf8');
 
@@ -37,16 +36,7 @@ describe('dormant Worlds video boundary', () => {
     expect(launcher).toContain('playsInline');
   });
 
-  it('preserves reduced-motion safeguards in the dormant future component', () => {
-    expect(launcher).toContain("window.matchMedia('(prefers-reduced-motion: reduce)')");
-    expect(launcher).toContain("query.addEventListener('change', update)");
-    expect(css).toContain('@media (prefers-reduced-motion: reduce)');
-  });
-
-  it('preserves the restrained visual guard if video is ever explicitly reopened', () => {
-    expect(css).toContain('background: #050505');
-    expect(css).toContain('filter: grayscale(1)');
-    expect(css).toContain('.worlds-stage__viewport');
-    expect(css).not.toContain('grid-template-columns: repeat(3');
+  it('has removed the dormant component stylesheet as part of visual system consolidation', () => {
+    expect(existsSync(new URL('./world-video.css', import.meta.url))).toBe(false);
   });
 });

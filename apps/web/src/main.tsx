@@ -19,100 +19,21 @@ import { PublicPolicyMetadata } from './PublicPolicyMetadata';
 import { installReleaseInteractionRuntime } from './release-interaction-runtime';
 import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
 import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
-import platformVisualCohesionCss from './platform-visual-cohesion-v1.css?inline';
-import sitewideCohesionRefinementCss from './sitewide-cohesion-refinement-v2.css?inline';
-import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline';
-import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline';
-import publicLandingFinalAuthorityCss from './public-landing-final-authority.css?inline';
-import experienceRefinementCss from './experience-refinement-v1.css?inline';
-import renderedFidelityCss from './rendered-fidelity-v1.css?inline';
-import landingRefinementV2Css from './landing-refinement-v2.css?inline';
-import landingLiveRefinementV3Css from './landing-live-refinement-v3.css?inline';
-import landingLiveRefinementV4Css from './landing-live-refinement-v4.css?inline';
-import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline';
-import invitationRenderedFidelityCss from './invitation-rendered-fidelity-v1.css?inline';
-import workspaceProductionRefinementCss from './workspace-production-refinement-v1.css?inline';
-import authenticatedLaunchCohesionCss from './authenticated-launch-cohesion-v1.css?inline';
-import premiumActionAuthorityCss from './premium-action-authority-v1.css?inline';
-import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';
-import productionProductCohesionCss from './production-product-cohesion-v1.css?inline';
-import publicIntelligenceDemonstrationCss from './public-intelligence-demonstration-v1.css?inline';
-import productionVisualAuthorityCss from './production-visual-authority-v1.css?inline';
+import releasesCss from './releases.css?inline';
 
-/* Component foundations */
-import './styles.css';
-import './product-completion.css';
-import './public-landing.css';
-import './public-release.css';
-import './workspace-chat.css';
-import './workspace-mobile.css';
-import './system-membership.css';
-import './auth-onboarding.css';
-import './email-code-fallback.css';
-import './unified-entry.css';
-import './account-control.css';
-import './safety-response-runtime.css';
-
-/* Existing production product surfaces and behavior. */
-import './sovereign-cohesion.css';
-import './sovereign-modern.css';
-import './landing-production.css';
-import './interface-composition.css';
-import './premium-surfaces.css';
-import './premium-surface-hardening.css';
-import './selective-visual-port.css';
-import './premium-platform-release.css';
-import './sovereign-visual-system.css';
-import './typography-system.css';
-import './expression-field/expression-field.css';
-import './expression-field/expression-field-precision.css';
-import './responsive-viewport-contract.css';
-import './public-landing-editorial.css';
-
-/* Founder v0 foundation and integrated Expression Field. */
-import './v0-platform-port.css';
-import './v0-motion-accessibility.css';
-import './v0-visual-port.css';
-import './v0-global-experience.css';
-import './v0-landing-refinement.css';
-import './v0-single-example-release.css';
-import './emergency-public-removal.css';
-import './landing-expression-field-v3.css';
-import './landing-expression-field-integration.css';
-import './v0-restored-product-stories.css';
-import './landing-product-stories-v2.css';
-
-/* Public component language, interaction details, iOS behavior, secondary surfaces, account journey, then passkey authority. */
-import './public-landing-approved-v8.css';
-import './landing-hero-field-v4.css';
-import './landing-ios-parity-density-v1.css';
-import './public-secondary-pages-locked.css';
-import './account-journey.css';
-import './account-journey-structured.css';
-import './account-journey-release-cohesion.css';
-import './deployed-route-cohesion.css';
-/* Passkey authentication remains the final component stylesheet; terminal inline release authorities follow below. */
+/* Canonical visual system */
+import './design-system.css';
+import './public.css';
+import './workspace.css';
+import './app-shell.css';
+/* Passkey authentication remains the final component stylesheet; terminal inline release authority follows below. */
 import './passkey-auth.css';
 
 function installPlatformVisualCohesion(): void {
   if (document.head.querySelector('style[data-sovereign-platform-cohesion="v1"]')) return;
   const style = document.createElement('style');
   style.dataset.sovereignPlatformCohesion = 'v1';
-  style.textContent = `${platformVisualCohesionCss}\n${sitewideCohesionRefinementCss}\n${workspaceMobileReleaseCss}\n${productionReadinessVisualCss}\n${publicLandingFinalAuthorityCss}`;
-  style.textContent += `\n${experienceRefinementCss}`;
-  style.textContent += `\n${renderedFidelityCss}`;
-  style.textContent += `\n${landingRefinementV2Css}`;
-  style.textContent += `\n${landingLiveRefinementV3Css}`;
-  style.textContent += `\n${landingLiveRefinementV4Css}`;
-  style.textContent += `\n${landingLiveRefinementV5Css}`;
-  style.textContent += `\n${invitationRenderedFidelityCss}`;
-  style.textContent += `\n${workspaceProductionRefinementCss}`;
-  style.textContent += `\n${premiumActionAuthorityCss}`;
-  style.textContent += `\n${authenticatedLaunchCohesionCss}`;
-  style.textContent += `\n${sansTypographyAuthorityCss}`;
-  style.textContent += `\n${productionProductCohesionCss}`;
-  style.textContent += `\n${publicIntelligenceDemonstrationCss}`;
-  style.textContent += `\n${productionVisualAuthorityCss}`;
+  style.textContent = releasesCss;
   document.head.append(style);
 }
 

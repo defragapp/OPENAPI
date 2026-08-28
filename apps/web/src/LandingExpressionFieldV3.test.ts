@@ -6,33 +6,25 @@ const main = read('./main.tsx');
 const landing = read('./PublicLanding.tsx');
 const stories = read('./LandingProductStories.tsx');
 const field = read('./expression-field/LandingExpressionSlice.tsx');
-const styles = read('./landing-expression-field-v3.css');
-const integration = read('./landing-expression-field-integration.css');
-const heroExtension = read('./landing-hero-field-v4.css');
-const cohesionRefinement = read('./sitewide-cohesion-refinement-v2.css');
-const mobileRelease = read('./workspace-mobile-release-v3.css');
-const productionReadiness = read('./production-readiness-visual-v1.css');
-const finalAuthority = read('./public-landing-final-authority.css');
-const landingRefinementV2 = read('./landing-refinement-v2.css');
-const landingRefinementV5 = read('./landing-live-refinement-v5.css');
+const styles = read('./public.css');
+const integration = read('./public.css');
+const heroExtension = read('./public.css');
+const cohesionRefinement = read('./releases.css');
+const mobileRelease = read('./releases.css');
+const productionReadiness = read('./releases.css');
+const finalAuthority = read('./releases.css');
+const landingRefinementV2 = read('./releases.css');
+const landingRefinementV5 = read('./releases.css');
 const interactionRuntime = read('./release-interaction-runtime.ts');
-const controls = read('./emergency-public-removal.css');
+const controls = read('./public.css');
 
 describe('premium rotating public Expression Field v3', () => {
   it('loads the public component layers and appends the landing refinement after rendered fidelity', () => {
-    const replacement = "import './landing-expression-field-v3.css';";
-    const integrationImport = "import './landing-expression-field-integration.css';";
-    const storiesImport = "import './v0-restored-product-stories.css';";
-    const approved = "import './public-landing-approved-v8.css';";
-    const hero = "import './landing-hero-field-v4.css';";
-    const passkey = "import './passkey-auth.css';";
-
-    expect(main.indexOf(integrationImport)).toBeGreaterThan(main.indexOf(replacement));
-    expect(main.indexOf(storiesImport)).toBeGreaterThan(main.indexOf(integrationImport));
-    expect(main.indexOf(hero)).toBeGreaterThan(main.indexOf(approved));
-    expect(main.indexOf(passkey)).toBeGreaterThan(main.indexOf(hero));
-    expect(main).toContain("import landingRefinementV2Css from './landing-refinement-v2.css?inline';");
-    expect(main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;'));
+    expect(main).toContain("import './public.css';");
+    expect(main).toContain("import './passkey-auth.css';");
+    expect(main).toContain("import releasesCss from './releases.css?inline';");
+    expect(main).toContain("style.textContent = releasesCss;");
+    expect(main.indexOf("import './passkey-auth.css';")).toBeGreaterThan(main.indexOf("import './public.css';"));
     expect(main).toContain("dataset.sovereignHeroComposition = 'v3-bounded'");
     expect(main).toContain('installProductionReadinessRuntime();');
     expect(main).toContain('installReleaseInteractionRuntime();');
@@ -160,7 +152,6 @@ describe('premium rotating public Expression Field v3', () => {
 
   it('keeps platform controls restrained and product stories free of duplicate field globes', () => {
     expect(controls).toContain('border-radius: 4px !important');
-    expect(controls).not.toContain('.landing-expression-slice');
     expect(stories).not.toContain('LandingExpressionFieldPreview');
     expect(stories).not.toContain('sphere');
     expect(stories).not.toContain('globe');

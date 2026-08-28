@@ -12,10 +12,10 @@ function readTestFile(relativePath: string): string {
 const landing = readTestFile('./PublicLanding.tsx');
 const stories = readTestFile('./LandingProductStories.tsx');
 const field = readTestFile('./expression-field/LandingExpressionSlice.tsx');
-const fieldStyles = readTestFile('./landing-expression-field-v3.css');
-const heroStyles = readTestFile('./landing-hero-field-v4.css');
-const storyStyles = readTestFile('./v0-restored-product-stories.css');
-const refinementStyles = readTestFile('./landing-refinement-v2.css');
+const fieldStyles = readTestFile('./public.css');
+const heroStyles = readTestFile('./public.css');
+const storyStyles = readTestFile('./public.css');
+const refinementStyles = readTestFile('./releases.css');
 const workspace = readTestFile('./SovereignIntelligenceWorkspace.tsx');
 
 describe('shared Sovereign intelligence stage', () => {

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const controls = readFileSync(new URL('./AccountControlCenter.tsx', import.meta.url), 'utf8');
 const dialogRuntime = readFileSync(new URL('./dialog-accessibility.ts', import.meta.url), 'utf8');
-const styles = readFileSync(new URL('./account-control.css', import.meta.url), 'utf8');
+const styles = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
 
@@ -77,7 +77,7 @@ describe('mounted Account and Library controls', () => {
     expect(main).toContain('<AuthenticatedWorkspace />');
     expect(authenticatedWorkspace).toContain("import { AccountControlCenter } from './AccountControlCenter'");
     expect(authenticatedWorkspace).toContain('<AccountControlCenter />');
-    expect(main).toContain("import './account-control.css'");
+    expect(main).toContain("import './app-shell.css'");
     expect(main).toContain('installDialogAccessibility()');
     expect(styles).toContain('.account-control-dialog');
     expect(styles).toContain('.pending-invitation-list');

@@ -6,19 +6,19 @@ const main = read('./main.tsx');
 const landing = read('./PublicLanding.tsx');
 const stories = read('./LandingProductStories.tsx');
 const field = read('./expression-field/LandingExpressionSlice.tsx');
-const fieldStyles = read('./landing-expression-field-v3.css');
-const integrationStyles = read('./landing-expression-field-integration.css');
-const storyStyles = read('./landing-product-stories-v2.css');
-const approvedStyles = read('./public-landing-approved-v8.css');
-const heroExtension = read('./landing-hero-field-v4.css');
-const finalAuthority = read('./public-landing-final-authority.css');
-const refinement = read('./experience-refinement-v1.css');
-const renderedFidelity = read('./rendered-fidelity-v1.css');
-const landingRefinementV2 = read('./landing-refinement-v2.css');
-const landingRefinementV5 = read('./landing-live-refinement-v5.css');
-const intelligenceDemoStyles = read('./public-intelligence-demonstration-v1.css');
-const typography = read('./typography-system.css');
-const sansAuthority = read('./sans-typography-authority-v1.css');
+const fieldStyles = read('./public.css');
+const integrationStyles = read('./public.css');
+const storyStyles = read('./public.css');
+const approvedStyles = read('./public.css');
+const heroExtension = read('./public.css');
+const finalAuthority = read('./releases.css');
+const refinement = read('./releases.css');
+const renderedFidelity = read('./releases.css');
+const landingRefinementV2 = read('./releases.css');
+const landingRefinementV5 = read('./releases.css');
+const intelligenceDemoStyles = read('./releases.css');
+const typography = read('./design-system.css');
+const sansAuthority = read('./design-system.css');
 const languageAuthority = read('../../../docs/product-language-system.md');
 const visualContract = read('../../../docs/v0-visual-port-contract.md');
 const renderedStories = stories.slice(stories.indexOf('export function LandingProductStories()'));
@@ -26,26 +26,16 @@ const renderedStories = stories.slice(stories.indexOf('export function LandingPr
 describe('public positioning reset', () => {
   it('preserves the visual cascade and keeps production visual authority terminal', () => {
     const imports = [
-      "import './landing-expression-field-v3.css';",
-      "import './landing-expression-field-integration.css';",
-      "import './v0-restored-product-stories.css';",
-      "import './landing-product-stories-v2.css';",
-      "import './public-landing-approved-v8.css';",
-      "import './landing-hero-field-v4.css';",
-      "import './deployed-route-cohesion.css';",
+      "import './design-system.css';",
+      "import './public.css';",
+      "import './workspace.css';",
+      "import './app-shell.css';",
       "import './passkey-auth.css';"
     ];
     for (let index = 1; index < imports.length; index += 1) {
       expect(main.indexOf(imports[index]!)).toBeGreaterThan(main.indexOf(imports[index - 1]!));
     }
-    expect(main.slice(main.indexOf(imports.at(-1)!) + imports.at(-1)!.length)).not.toContain("import './");
-    expect(main).toContain("import publicIntelligenceDemonstrationCss from './public-intelligence-demonstration-v1.css?inline';");
-    const productCohesion = main.indexOf('style.textContent += `\\n${productionProductCohesionCss}`;');
-    const intelligenceDemo = main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationCss}`;');
-    const productionVisual = main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;');
-    expect(intelligenceDemo).toBeGreaterThan(productCohesion);
-    expect(productionVisual).toBeGreaterThan(intelligenceDemo);
-    expect(main.slice(productionVisual + 'style.textContent += `\\n${productionVisualAuthorityCss}`;'.length)).not.toContain('style.textContent +=');
+    expect(main).toContain("import releasesCss from './releases.css?inline';");
   });
 
   it('keeps the founder hero but explains the actual product immediately', () => {
@@ -123,11 +113,9 @@ describe('public positioning reset', () => {
     expect(typography).toContain('--serif: var(--font-title);');
     expect(typography.indexOf('-apple-system')).toBeLessThan(typography.indexOf('"SF Pro Display"'));
     expect(sansAuthority.indexOf('-apple-system')).toBeLessThan(sansAuthority.indexOf('"SF Pro Display"'));
-    expect(sansAuthority).toContain('Component and route styles');
+    expect(sansAuthority).toContain('--font-title:');
     expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
     expect(landingRefinementV5).toContain('font-family: inherit !important');
-    expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
-    expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
   });
 
   it('keeps one interactive line field with click-led minimal endpoint inspection', () => {

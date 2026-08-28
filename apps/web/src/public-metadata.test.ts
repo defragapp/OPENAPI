@@ -11,7 +11,7 @@ const appIcon = readFileSync(new URL('../public/app-icon.svg', import.meta.url),
 const pinnedIcon = readFileSync(new URL('../public/safari-pinned-tab.svg', import.meta.url), 'utf8');
 const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
-const productStories = readFileSync(new URL('./landing-product-stories-v2.css', import.meta.url), 'utf8');
+const productStories = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 
 describe('public metadata and fallback documents', () => {
   it('explains the product category in document and shared-link metadata', () => {
@@ -29,7 +29,7 @@ describe('public metadata and fallback documents', () => {
   it('delivers product-story layout through the compiled application bundle', () => {
     expect(index).toContain('<script type="module" src="/src/main.tsx"></script>');
     expect(index).not.toContain('v0-product-story-layout-hotfix.css');
-    expect(main).toContain("import './landing-product-stories-v2.css';");
+    expect(main).toContain("import './public.css';");
     for (const marker of [
       '.landing-story__stage',
       'display: flex',

@@ -4,13 +4,13 @@ import { readFileSync } from 'node:fs';
 const layer = readFileSync(new URL('./ProductCompletionLayer.tsx', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
-const css = readFileSync(new URL('./product-completion.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
 
 describe('product completion layer', () => {
   it('is activated by the production React entrypoint', () => {
     expect(main).toContain('installProductRuntime()');
     expect(main).toContain('<ProductCompletionLayer />');
-    expect(main).toContain("import './product-completion.css'");
+    expect(main).toContain("import './workspace.css'");
   });
 
   it('renders Turnstile explicitly from a public build-time site key', () => {

@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs';
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
-const approvedCss = readFileSync(new URL('./public-landing-approved-v8.css', import.meta.url), 'utf8');
-const heroCss = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
+const approvedCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const heroCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 
 describe('landing iOS visual parity release', () => {
   it('keeps one canonical landing narrative across desktop and mobile', () => {

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const css = readFileSync(new URL('./safety-response-runtime.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
 
 type FakeTextNode = { textContent: string };
 type FakeAnswer = {

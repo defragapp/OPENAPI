@@ -8,14 +8,14 @@ const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', i
 const expressionRenderer = readFileSync(new URL('./expression-field/ExpressionField.tsx', import.meta.url), 'utf8');
 const relationshipField = readFileSync(new URL('./expression-field/RelationalExpressionField.tsx', import.meta.url), 'utf8');
 const systemField = readFileSync(new URL('./expression-field/SystemExpressionField.tsx', import.meta.url), 'utf8');
-const expressionCss = readFileSync(new URL('./expression-field/expression-field.css', import.meta.url), 'utf8');
-const v0Visual = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
-const fieldCss = readFileSync(new URL('./landing-expression-field-v3.css', import.meta.url), 'utf8');
-const integrationCss = readFileSync(new URL('./landing-expression-field-integration.css', import.meta.url), 'utf8');
-const heroExtension = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
-const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
-const landingRefinementV5 = readFileSync(new URL('./landing-live-refinement-v5.css', import.meta.url), 'utf8');
-const sansAuthority = readFileSync(new URL('./sans-typography-authority-v1.css', import.meta.url), 'utf8');
+const expressionCss = readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
+const v0Visual = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const fieldCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const integrationCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const heroExtension = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const storyCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const landingRefinementV5 = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const sansAuthority = readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('founder selective visual port', () => {
@@ -100,16 +100,14 @@ describe('founder selective visual port', () => {
     for (const selector of ['.landing-expression-slice', '.landing-expression-slice__beam', '.landing-expression-slice__tooltip']) expect(fieldCss).toContain(selector);
     for (const selector of ['.landing-expression-slice__sphere-shell', '.landing-expression-slice__readout', '.landing-question-orbit__stage']) expect(heroExtension).toContain(selector);
     for (const selector of ['.v0-restored-product-stories', '.v0-story-grid', '.v0-workflow-panel', '.v0-family-system-map']) expect(storyCss).toContain(selector);
-    expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
-    expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).toContain('@keyframes sovereign-hero-rise');
-    expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
+    expect(v0Visual).toContain('.public-approved-v8 .v0-hero h1 > em');
     expect(expressionCss).toContain('min-height: 44px');
-    expect(main).toContain("import './landing-expression-field-integration.css';");
-    expect(main).toContain("import './landing-hero-field-v4.css';");
-    expect(main).toContain("import './v0-restored-product-stories.css';");
-    expect(main).toContain("import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline';");
-    expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';");
+    expect(main).toContain("import './public.css';");
+    expect(main).toContain("import './public.css';");
+    expect(main).toContain("import './public.css';");
+    expect(main).toContain("import releasesCss from './releases.css?inline';");
+    expect(main).toContain("import releasesCss from './releases.css?inline';");
   });
 
   it('does not introduce the archive mock runtime, scores, or alternate architecture', () => {

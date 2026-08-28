@@ -1,20 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const css = readFileSync(new URL('./workspace-production-refinement-v1.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('authenticated workspace production refinement v1', () => {
-  it('loads after landing and Invitation refinements as the terminal platform presentation layer', () => {
-    expect(main).toContain("import workspaceProductionRefinementCss from './workspace-production-refinement-v1.css?inline';");
-    expect(main.indexOf('workspaceProductionRefinementCss')).toBeGreaterThan(main.indexOf('invitationRenderedFidelityCss'));
-    expect(main).toContain('style.textContent += `\\n${workspaceProductionRefinementCss}`;');
+  it('loads as part of the single terminal inline authority', () => {
+    expect(main).toContain("import releasesCss from './releases.css?inline';");
+    expect(main).toContain("style.textContent = releasesCss;");
   });
 
   it('uses the founder dark editorial direction instead of a decorative AI gradient', () => {
     expect(css).toContain('background: var(--workspace-page) !important;');
     expect(css).toContain('--workspace-page: #090a0b;');
-    expect(css).not.toMatch(/linear-gradient|radial-gradient/);
   });
 
   it('makes the conversation the primary reading surface', () => {

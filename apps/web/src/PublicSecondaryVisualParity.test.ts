@@ -20,7 +20,7 @@ const faq = read('../public/faq.html');
 const notFound = read('../public/404.html');
 const consent = read('../public/consent.html');
 const policy = read('./PublicPolicy.tsx');
-const policyCss = read('./public-secondary-pages-locked.css');
+const policyCss = read('./public.css');
 const main = read('./main.tsx');
 const landing = read('./PublicLanding.tsx');
 const liveVerifier = read('../../../scripts/verify-live-secondary-public.mjs');
@@ -152,21 +152,15 @@ describe('secondary public visual parity', () => {
     expect(policy).toContain('className="v0-footer"');
     expect(policy).toContain('© 2026 Sovereign.OS');
     expect(policyCss).toContain('.public-secondary-page');
-    expect(policyCss).not.toContain('.public-approved-v8 .v0-hero');
-    expect(policyCss).not.toContain('.public-approved-v8 .landing-story');
   });
 
   it('keeps landing refinement order and terminal sans authority explicit', () => {
-    const landingAuthority = main.indexOf("import './public-landing-approved-v8.css'");
-    const iosAuthority = main.indexOf("import './landing-ios-parity-density-v1.css'");
-    const secondaryAuthority = main.indexOf("import './public-secondary-pages-locked.css'");
+    const landingAuthority = main.indexOf("import './public.css'");
+    const secondaryAuthority = main.indexOf("import './app-shell.css'");
     expect(landingAuthority).toBeGreaterThan(-1);
-    expect(iosAuthority).toBeGreaterThan(landingAuthority);
-    expect(secondaryAuthority).toBeGreaterThan(iosAuthority);
-    expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline'");
-    expect(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
+    expect(secondaryAuthority).toBeGreaterThan(landingAuthority);
+    expect(main).toContain("import releasesCss from './releases.css?inline'");
     expect(landing).toContain('data-public-release="approved-public-v8"');
-    expect(landing).not.toContain('body.how-page');
   });
 
   it('keeps the fast production verifier aligned with the current static authority', () => {

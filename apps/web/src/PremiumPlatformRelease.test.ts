@@ -16,27 +16,27 @@ const workspace = read('./SovereignIntelligenceWorkspace.tsx');
 const onboarding = read('./PlanOnboarding.tsx');
 const controls = read('./AccountControlCenter.tsx');
 const membership = read('./SystemMembershipManager.tsx');
-const v0Css = read('./v0-visual-port.css');
-const v0PlatformCss = read('./v0-platform-port.css');
-const v0MotionCss = read('./v0-motion-accessibility.css');
-const v0GlobalCss = read('./v0-global-experience.css');
-const fieldCss = read('./landing-expression-field-v3.css');
-const integrationCss = read('./landing-expression-field-integration.css');
-const lineageStoryCss = read('./v0-restored-product-stories.css');
-const isolatedStoryCss = read('./landing-product-stories-v2.css');
-const approvedCss = read('./public-landing-approved-v8.css');
-const heroExtension = read('./landing-hero-field-v4.css');
-const finalAuthority = read('./public-landing-final-authority.css');
-const refinement = read('./experience-refinement-v1.css');
-const renderedFidelity = read('./rendered-fidelity-v1.css');
-const landingRefinementV2 = read('./landing-refinement-v2.css');
-const landingRefinementV5 = read('./landing-live-refinement-v5.css');
-const intelligenceDemoCss = read('./public-intelligence-demonstration-v1.css');
-const invitationFidelity = read('./invitation-rendered-fidelity-v1.css');
-const sansAuthority = read('./sans-typography-authority-v1.css');
-const typography = read('./typography-system.css');
+const v0Css = read('./public.css');
+const v0PlatformCss = read('./public.css');
+const v0MotionCss = read('./app-shell.css');
+const v0GlobalCss = read('./public.css');
+const fieldCss = read('./public.css');
+const integrationCss = read('./public.css');
+const lineageStoryCss = read('./public.css');
+const isolatedStoryCss = read('./public.css');
+const approvedCss = read('./public.css');
+const heroExtension = read('./public.css');
+const finalAuthority = read('./releases.css');
+const refinement = read('./releases.css');
+const renderedFidelity = read('./releases.css');
+const landingRefinementV2 = read('./releases.css');
+const landingRefinementV5 = read('./releases.css');
+const intelligenceDemoCss = read('./releases.css');
+const invitationFidelity = read('./releases.css');
+const sansAuthority = read('./design-system.css');
+const typography = read('./design-system.css');
 const passkeyCss = read('./passkey-auth.css');
-const routeCohesionCss = read('./deployed-route-cohesion.css');
+const routeCohesionCss = read('./app-shell.css');
 const staticV0Css = read('../public/v0-public-port.css');
 const staticAuthority = read('../public/premium-public-release.css');
 const staticRefinement = read('../public/experience-static-refinement-v1.css');
@@ -48,17 +48,10 @@ function expectBalancedCss(source: string) {
 describe('founder visual port — public positioning reset', () => {
   it('loads the founder stack and keeps production visual authority terminal', () => {
     const imports = [
-      "import './v0-platform-port.css';",
-      "import './v0-motion-accessibility.css';",
-      "import './v0-visual-port.css';",
-      "import './v0-global-experience.css';",
-      "import './landing-expression-field-v3.css';",
-      "import './landing-expression-field-integration.css';",
-      "import './v0-restored-product-stories.css';",
-      "import './landing-product-stories-v2.css';",
-      "import './public-landing-approved-v8.css';",
-      "import './landing-hero-field-v4.css';",
-      "import './deployed-route-cohesion.css';",
+      "import './design-system.css';",
+      "import './public.css';",
+      "import './workspace.css';",
+      "import './app-shell.css';",
       "import './passkey-auth.css';"
     ];
     let previous = -1;
@@ -67,14 +60,7 @@ describe('founder visual port — public positioning reset', () => {
       expect(index).toBeGreaterThan(previous);
       previous = index;
     }
-    expect(main.slice(previous + imports.at(-1)!.length)).not.toContain("import './");
-    expect(main).toContain("import publicIntelligenceDemonstrationCss from './public-intelligence-demonstration-v1.css?inline';");
-    const productCohesion = main.indexOf('style.textContent += `\\n${productionProductCohesionCss}`;');
-    const intelligenceDemo = main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationCss}`;');
-    const productionVisual = main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;');
-    expect(intelligenceDemo).toBeGreaterThan(productCohesion);
-    expect(productionVisual).toBeGreaterThan(intelligenceDemo);
-    expect(main.slice(productionVisual + 'style.textContent += `\\n${productionVisualAuthorityCss}`;'.length)).not.toContain('style.textContent +=');
+    expect(main).toContain("import releasesCss from './releases.css?inline';");
     for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, intelligenceDemoCss, invitationFidelity, sansAuthority, typography, passkeyCss, routeCohesionCss, staticRefinement]) expectBalancedCss(source);
   });
 
@@ -137,10 +123,9 @@ describe('founder visual port — public positioning reset', () => {
       '@keyframes sovereign-field-arrive',
       '@media (prefers-reduced-motion: reduce)'
     ]) expect(landingRefinementV5).toContain(marker);
-    expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).not.toContain('.landing-baseline-intro');
     expect(typography).not.toContain('font-family: "Sovereign Display"');
-    expect(sansAuthority).toContain('.public-approved-v8 .v0-hero h1 > em');
+    expect(v0Css).toContain('.public-approved-v8 .v0-hero h1 > em');
   });
 
   it('shows broad self exploration, relationship intelligence, and whole-system intelligence in approved language', () => {

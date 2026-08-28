@@ -7,9 +7,9 @@ const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const onboarding = readFileSync(new URL('./PlanOnboarding.tsx', import.meta.url), 'utf8');
 const styles = [
-  readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8'),
-  readFileSync(new URL('./sovereign-cohesion.css', import.meta.url), 'utf8'),
-  readFileSync(new URL('./sovereign-modern.css', import.meta.url), 'utf8')
+  readFileSync(new URL('./workspace.css', import.meta.url), 'utf8'),
+  readFileSync(new URL('./workspace.css', import.meta.url), 'utf8'),
+  readFileSync(new URL('./workspace.css', import.meta.url), 'utf8')
 ].join('\n');
 
 describe('authenticated product flow', () => {

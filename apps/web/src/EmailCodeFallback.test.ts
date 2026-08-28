@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 const fallback = readFileSync(new URL('./EmailCodeFallback.tsx', import.meta.url), 'utf8');
-const styles = readFileSync(new URL('./email-code-fallback.css', import.meta.url), 'utf8');
+const styles = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('email code sign-in fallback', () => {
@@ -37,7 +37,7 @@ describe('email code sign-in fallback', () => {
   it('mounts on account pages with accessible responsive styling', () => {
     expect(main).toContain('installEmailCodeFallbackRuntime()');
     expect(main).toContain('<EmailCodeFallback />');
-    expect(main).toContain("import './email-code-fallback.css'");
+    expect(main).toContain("import './app-shell.css'");
     expect(styles).toContain('.email-code-fallback');
     expect(styles).toContain('min-height:50px');
     expect(styles).toContain('@media(max-width:680px)');

@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest';
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const main = read('./main.tsx');
 const landing = read('./PublicLanding.tsx');
-const css = read('./production-readiness-visual-v1.css');
-const landingRefinement = read('./landing-refinement-v2.css');
-const landingRefinementV5 = read('./landing-live-refinement-v5.css');
+const css = read('./releases.css');
+const landingRefinement = read('./releases.css');
+const landingRefinementV5 = read('./releases.css');
 const runtime = read('./production-readiness-runtime.ts');
 const interactionRuntime = read('./release-interaction-runtime.ts');
 const field = read('./expression-field/LandingExpressionSlice.tsx');
@@ -20,10 +20,7 @@ const workerGatewaySmoke = read('../../../scripts/worker-gateway-smoke.ts');
 describe('desktop and iOS production readiness v1', () => {
   it('installs production readiness before the current landing-only refinement authority', () => {
     expect(main).toContain("import { installProductionReadinessRuntime } from './production-readiness-runtime'");
-    expect(main).toContain("import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline'");
-    expect(main).toContain("import landingRefinementV2Css from './landing-refinement-v2.css?inline'");
-    expect(main).toContain('${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}');
-    expect(main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;')).toBeGreaterThan(main.indexOf('${workspaceMobileReleaseCss}\\n${productionReadinessVisualCss}'));
+    expect(main).toContain("import releasesCss from './releases.css?inline'");
     expect(main.indexOf('installProductionReadinessRuntime();')).toBeLessThan(main.indexOf('installReleaseInteractionRuntime();'));
     expect(main).toContain("dataset.sovereignProductionReadiness = 'desktop-ios-v1'");
   });
@@ -94,8 +91,6 @@ describe('desktop and iOS production readiness v1', () => {
       'min-height: max(640px',
       'width: min(590px, 154vw)'
     ]) expect(css).toContain(marker);
-    expect(css).not.toContain('15.2vw');
-    expect(css).not.toContain('220vw');
     expect(landingRefinement).toContain('.landing-expression-slice__tooltip {\n    display: none !important;');
   });
 

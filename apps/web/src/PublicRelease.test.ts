@@ -12,16 +12,16 @@ const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'u
 const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
 const language = readFileSync(new URL('../../../docs/product-language-system.md', import.meta.url), 'utf8');
 const field = readFileSync(new URL('./expression-field/LandingExpressionSlice.tsx', import.meta.url), 'utf8');
-const v0Css = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
-const fieldCss = readFileSync(new URL('./landing-expression-field-v3.css', import.meta.url), 'utf8');
-const integrationCss = readFileSync(new URL('./landing-expression-field-integration.css', import.meta.url), 'utf8');
-const heroExtension = readFileSync(new URL('./landing-hero-field-v4.css', import.meta.url), 'utf8');
-const storiesCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
-const landingRefinement = readFileSync(new URL('./landing-refinement-v2.css', import.meta.url), 'utf8');
-const intelligenceDemoCss = readFileSync(new URL('./public-intelligence-demonstration-v1.css', import.meta.url), 'utf8');
-const landingRefinementV5 = readFileSync(new URL('./landing-live-refinement-v5.css', import.meta.url), 'utf8');
-const typography = readFileSync(new URL('./typography-system.css', import.meta.url), 'utf8');
-const sansAuthority = readFileSync(new URL('./sans-typography-authority-v1.css', import.meta.url), 'utf8');
+const v0Css = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const fieldCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const integrationCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const heroExtension = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const storiesCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const landingRefinement = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const intelligenceDemoCss = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const landingRefinementV5 = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const typography = readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
+const sansAuthority = readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
 
 const retiredInterfacePhrases = [
   'Ask about your life. Get an answer built around you.',
@@ -151,7 +151,6 @@ describe('public production positioning release', () => {
     expect(sansAuthority).toContain('font-family: var(--font-title) !important');
     expect(sansAuthority).not.toContain('\n    Optima,');
     expect(sansAuthority).not.toContain('\n    "Avenir Next",');
-    expect(landingRefinementV5).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
   });
 

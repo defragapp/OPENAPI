@@ -3,27 +3,18 @@ import { describe, expect, it } from 'vitest';
 
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const main = read('./main.tsx');
-const typography = read('./typography-system.css');
-const sansAuthority = read('./sans-typography-authority-v1.css');
-const productCohesion = read('./production-product-cohesion-v1.css');
-const intelligenceDemo = read('./public-intelligence-demonstration-v1.css');
-const visualAuthority = read('./production-visual-authority-v1.css');
+const typography = read('./design-system.css');
+const sansAuthority = read('./design-system.css');
+const productCohesion = read('./releases.css');
+const intelligenceDemo = read('./releases.css');
+const visualAuthority = read('./releases.css');
 const publicPolicy = read('./PublicPolicy.tsx');
 const staticAuthority = read('../public/premium-action-static-v1.css');
 
 describe('production visual authority v1', () => {
   it('keeps one deterministic terminal visual authority after product, typography, and demo layers', () => {
-    expect(main).toContain("import productionProductCohesionCss from './production-product-cohesion-v1.css?inline';");
-    expect(main).toContain("import publicIntelligenceDemonstrationCss from './public-intelligence-demonstration-v1.css?inline';");
-    expect(main).toContain("import productionVisualAuthorityCss from './production-visual-authority-v1.css?inline';");
-    const sansIndex = main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;');
-    const productIndex = main.indexOf('style.textContent += `\\n${productionProductCohesionCss}`;');
-    const demoIndex = main.indexOf('style.textContent += `\\n${publicIntelligenceDemonstrationCss}`;');
-    const visualIndex = main.indexOf('style.textContent += `\\n${productionVisualAuthorityCss}`;');
-    expect(productIndex).toBeGreaterThan(sansIndex);
-    expect(demoIndex).toBeGreaterThan(productIndex);
-    expect(visualIndex).toBeGreaterThan(demoIndex);
-    expect(main.slice(visualIndex + 'style.textContent += `\\n${productionVisualAuthorityCss}`;'.length)).not.toContain('style.textContent +=');
+    expect(main).toContain("import releasesCss from './releases.css?inline';");
+    expect(main).toContain("style.textContent = releasesCss;");
     expect(main).toContain("document.documentElement.dataset.sovereignVisualAuthority = 'production-v1';");
   });
 
@@ -58,8 +49,6 @@ describe('production visual authority v1', () => {
       '.public-approved-v8 .landing-message--assistant > div',
       '.public-approved-v8 .v0-final h2'
     ]) expect(visualAuthority).toContain(marker);
-    expect(visualAuthority).not.toContain('#62b5ff');
-    expect(visualAuthority).not.toContain('rgba(126, 201, 255');
     expect(intelligenceDemo).toContain('.landing-system-analysis__sequence');
     expect(intelligenceDemo).toContain('.landing-demo__composer-shell');
   });

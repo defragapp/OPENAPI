@@ -5,37 +5,32 @@ const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const stories = readFileSync(new URL('./LandingProductStories.tsx', import.meta.url), 'utf8');
 const viewportProbe = readFileSync(new URL('./PublicLandingViewportContract.ts', import.meta.url), 'utf8');
-const viewportCss = readFileSync(new URL('./responsive-viewport-contract.css', import.meta.url), 'utf8');
-const fieldCss = readFileSync(new URL('./landing-expression-field-v3.css', import.meta.url), 'utf8');
-const integrationCss = readFileSync(new URL('./landing-expression-field-integration.css', import.meta.url), 'utf8');
-const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
-const approvedCss = readFileSync(new URL('./public-landing-approved-v8.css', import.meta.url), 'utf8');
-const landingRefinement = readFileSync(new URL('./landing-refinement-v2.css', import.meta.url), 'utf8');
-const workspaceCss = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
-const workspaceMobileCss = readFileSync(new URL('./workspace-mobile.css', import.meta.url), 'utf8');
-const mobileReleaseCss = readFileSync(new URL('./workspace-mobile-release-v3.css', import.meta.url), 'utf8');
-const productionReadinessCss = readFileSync(new URL('./production-readiness-visual-v1.css', import.meta.url), 'utf8');
+const viewportCss = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
+const fieldCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const integrationCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const storyCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const approvedCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const landingRefinement = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const workspaceCss = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
+const workspaceMobileCss = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
+const mobileReleaseCss = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const productionReadinessCss = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
 const mobileUtilities = readFileSync(new URL('./WorkspaceMobileUtilities.tsx', import.meta.url), 'utf8');
-const compositionCss = readFileSync(new URL('./interface-composition.css', import.meta.url), 'utf8');
-const landingCss = readFileSync(new URL('./public-landing.css', import.meta.url), 'utf8');
-const authCss = readFileSync(new URL('./auth-onboarding.css', import.meta.url), 'utf8');
+const compositionCss = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
+const landingCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const authCss = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
 const authenticatedWorkspace = readFileSync(new URL('./AuthenticatedWorkspace.tsx', import.meta.url), 'utf8');
 
 describe('production mobile and responsive experience', () => {
   it('loads the integrated field, product stories, and terminal landing refinement in order', () => {
-    expect(main).toContain("import './public-landing.css'");
-    expect(main).toContain("import './workspace-chat.css'");
-    expect(main).toContain("import './workspace-mobile.css'");
-    expect(main).toContain("import './auth-onboarding.css'");
-    expect(main).toContain("import './responsive-viewport-contract.css'");
-    expect(main).toContain("import './landing-expression-field-v3.css'");
-    expect(main).toContain("import './landing-expression-field-integration.css'");
-    expect(main).toContain("import './v0-restored-product-stories.css'");
-    expect(main).toContain("import workspaceMobileReleaseCss from './workspace-mobile-release-v3.css?inline'");
-    expect(main).toContain("import productionReadinessVisualCss from './production-readiness-visual-v1.css?inline'");
-    expect(main).toContain("import landingRefinementV2Css from './landing-refinement-v2.css?inline'");
-    expect(main.indexOf('style.textContent += `\\n${landingRefinementV2Css}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${renderedFidelityCss}`;'));
+    expect(main).toContain("import './design-system.css';");
+    expect(main).toContain("import './public.css';");
+    expect(main).toContain("import './workspace.css';");
+    expect(main).toContain("import './app-shell.css';");
+    expect(main).toContain("import './passkey-auth.css';");
+    expect(main).toContain("import releasesCss from './releases.css?inline'");
+    expect(main).toContain("style.textContent = releasesCss;");
   });
 
   it('measures required mobile product surfaces while allowing redundant system reasoning to collapse', () => {

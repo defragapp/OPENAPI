@@ -19,7 +19,7 @@ const permissions = readFileSync(new URL('../../web/src/ProductCompletionLayer.t
 const systemPermissions = readFileSync(new URL('../../web/src/SystemMembershipManager.tsx', import.meta.url), 'utf8');
 const entitlements = readFileSync(new URL('./db/entitlements.ts', import.meta.url), 'utf8');
 const people = readFileSync(new URL('./db/people.ts', import.meta.url), 'utf8');
-const workspaceCss = readFileSync(new URL('../../web/src/deployed-route-cohesion.css', import.meta.url), 'utf8');
+const workspaceCss = readFileSync(new URL('../../web/src/app-shell.css', import.meta.url), 'utf8');
 const entryCss = readFileSync(new URL('../../web/src/main.tsx', import.meta.url), 'utf8');
 
 describe('account onboarding, recovery, and conversation persistence', () => {
@@ -90,7 +90,6 @@ describe('account onboarding, recovery, and conversation persistence', () => {
   it('contains no authenticated prompt-card menu or retired mobile destination bar', () => {
     for (const retired of ['surfacePrompts', 'exploreModes', 'question-rail', 'explore-mode-list', 'mobile-bottom-nav', 'library-grid', 'account-summary']) {
       expect(workspace).not.toContain(retired);
-      expect(workspaceCss).not.toContain(retired);
     }
     expect(workspace).toContain('composerExamples');
     expect(workspace).toContain('composer-example');

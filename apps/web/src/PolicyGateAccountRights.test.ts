@@ -17,7 +17,7 @@ const runtimeEntry = readFileSync(
 );
 
 const launchCss = readFileSync(
-  new URL('./authenticated-launch-cohesion-v1.css', import.meta.url),
+  new URL('./releases.css', import.meta.url),
   'utf8'
 );
 

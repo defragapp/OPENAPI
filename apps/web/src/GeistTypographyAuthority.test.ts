@@ -3,10 +3,10 @@ import { describe, expect, it } from "vitest";
 
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), "utf8");
 
-const typography = read("./typography-system.css");
-const sansAuthority = read("./sans-typography-authority-v1.css");
-const intelligenceDemo = read("./public-intelligence-demonstration-v1.css");
-const visualAuthority = read("./production-visual-authority-v1.css");
+const typography = read("./design-system.css");
+const sansAuthority = read("./design-system.css");
+const intelligenceDemo = read("./releases.css");
+const visualAuthority = read("./releases.css");
 const staticAuthority = read("../public/premium-action-static-v1.css");
 const fontUrl = new URL("../public/fonts/geist/Geist-Variable.woff2", import.meta.url);
 

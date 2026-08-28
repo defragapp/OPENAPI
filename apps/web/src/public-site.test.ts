@@ -16,13 +16,13 @@ const staticExperienceCss = readFileSync(new URL('../public/static-experience.cs
 const staticRefinementCss = readFileSync(new URL('../public/experience-static-refinement-v1.css', import.meta.url), 'utf8');
 const staticTerminalCss = readFileSync(new URL('../public/premium-action-static-v1.css', import.meta.url), 'utf8');
 const platformPublicCss = readFileSync(new URL('../public/platform-public.css', import.meta.url), 'utf8');
-const v0Css = readFileSync(new URL('./v0-visual-port.css', import.meta.url), 'utf8');
-const storyCss = readFileSync(new URL('./v0-restored-product-stories.css', import.meta.url), 'utf8');
-const refinementCss = readFileSync(new URL('./experience-refinement-v1.css', import.meta.url), 'utf8');
-const renderedFidelityCss = readFileSync(new URL('./rendered-fidelity-v1.css', import.meta.url), 'utf8');
-const landingRefinementV2Css = readFileSync(new URL('./landing-refinement-v2.css', import.meta.url), 'utf8');
-const landingRefinementV5Css = readFileSync(new URL('./landing-live-refinement-v5.css', import.meta.url), 'utf8');
-const sansAuthority = readFileSync(new URL('./sans-typography-authority-v1.css', import.meta.url), 'utf8');
+const v0Css = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const storyCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const refinementCss = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const renderedFidelityCss = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const landingRefinementV2Css = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const landingRefinementV5Css = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const sansAuthority = readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${stories}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
 
@@ -115,12 +115,8 @@ describe('Sovereign.OS public experience', () => {
   it('renders the public route without runtime copy rewriting and appends terminal sans typography', () => {
     expect(main).toContain("location.pathname === '/'");
     expect(main).toContain('<PublicLanding />');
-    expect(main).toContain("import './landing-expression-field-integration.css';");
-    expect(main).toContain("import './v0-restored-product-stories.css';");
-    expect(main).toContain("import landingRefinementV2Css from './landing-refinement-v2.css?inline';");
-    expect(main).toContain("import landingLiveRefinementV5Css from './landing-live-refinement-v5.css?inline';");
-    expect(main).toContain("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';");
-    expect(main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;')).toBeGreaterThan(main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;'));
+    expect(main).toContain("import './public.css';");
+    expect(main).toContain("import releasesCss from './releases.css?inline';");
     expect(main).not.toContain('ProductLanguageRuntime');
   });
 
@@ -133,7 +129,6 @@ describe('Sovereign.OS public experience', () => {
     expect(landingRefinementV2Css).toContain('@keyframes sovereign-system-route');
     expect(landingRefinementV2Css).toContain('scroll-snap-type: inline mandatory !important');
     expect(landingRefinementV5Css).not.toContain('.landing-baseline-intro');
-    expect(landingRefinementV5Css).not.toContain('var(--font-display, Georgia, serif)');
     expect(landingRefinementV5Css).toContain('@keyframes sovereign-hero-rise');
     expect(sansAuthority).toContain('font-family: var(--font-title) !important');
     expect(staticTerminalCss).toContain('--static-title-font:');

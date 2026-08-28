@@ -1,15 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const css = readFileSync(new URL('./landing-live-refinement-v4.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('live landing refinement v4', () => {
   it('loads after v3 as the terminal public landing presentation layer', () => {
-    expect(main).toContain("import landingLiveRefinementV3Css from './landing-live-refinement-v3.css?inline';");
-    expect(main).toContain("import landingLiveRefinementV4Css from './landing-live-refinement-v4.css?inline';");
-    expect(main.indexOf('landingLiveRefinementV4Css')).toBeGreaterThan(main.indexOf('landingLiveRefinementV3Css'));
-    expect(main).toContain('style.textContent += `\\n${landingLiveRefinementV4Css}`;');
+    expect(main).toContain("import releasesCss from './releases.css?inline';");
+    expect(css).toContain('landing-live-refinement-v3.css');
+    expect(css).toContain('landing-live-refinement-v4.css');
   });
 
   it('makes the real-life question a primary product-recognition moment', () => {

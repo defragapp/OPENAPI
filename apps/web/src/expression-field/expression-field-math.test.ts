@@ -11,8 +11,8 @@ import {
 } from './expression-field-math';
 
 const componentSource = readFileSync(new URL('./ExpressionField.tsx', import.meta.url), 'utf8');
-const cssSource = readFileSync(new URL('./expression-field.css', import.meta.url), 'utf8');
-const precisionCssSource = readFileSync(new URL('./expression-field-precision.css', import.meta.url), 'utf8');
+const cssSource = readFileSync(new URL('../design-system.css', import.meta.url), 'utf8');
+const precisionCssSource = readFileSync(new URL('../design-system.css', import.meta.url), 'utf8');
 
 describe('Expression Field geometry', () => {
   it('covers the full sphere and keeps permanent normalized registry directions', () => {

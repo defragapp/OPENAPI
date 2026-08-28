@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('./SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
-const styles = readFileSync(new URL('./workspace-chat.css', import.meta.url), 'utf8');
+const styles = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
 const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
 const prompt = readFileSync(new URL('../../sovereign-worker/src/agent/prompt-v1.ts', import.meta.url), 'utf8');
 

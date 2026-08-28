@@ -1,15 +1,15 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-const css = readFileSync(new URL('./premium-surfaces.css', import.meta.url), 'utf8');
-const hardening = readFileSync(new URL('./premium-surface-hardening.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
+const hardening = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
 const app = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
 const exportRuntime = readFileSync(new URL('./PrivateAnswerExportRuntime.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('premium invitation and Sovereign output surfaces', () => {
   it('loads the final composition and release-hardening layers in deterministic order', () => {
-    expect(main).toContain("import './interface-composition.css';\nimport './premium-surfaces.css';\nimport './premium-surface-hardening.css';");
+    expect(main).toContain("import './workspace.css';");
     expect(main).toContain("import { installPrivateAnswerExportRuntime } from './PrivateAnswerExportRuntime';");
     expect(main).toContain('installPrivateAnswerExportRuntime();');
   });
