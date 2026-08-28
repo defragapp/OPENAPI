@@ -3595,12 +3595,6 @@ body {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  }
-
-@media (forced-colors: active) {
-  }
-
 
 /* ── premium-surface-hardening.css ── */
 /* Release hardening for consent states, private answer export, and long-form output. */
