@@ -1095,20 +1095,204 @@ html:root:root:root body .response-mark {
   html:root:root:root body .v0-final h2 {
     font-size: clamp(1.6rem, 6vw, 2.4rem) !important;
   }
+}
 
-  html:root:root:root body .sovereign-composer {
-    border-radius: 16px !important;
-    box-shadow:
-      0 12px 32px rgba(0, 0, 0, 0.18),
-      0 0 0 1px rgba(241, 233, 222, 0.04) !important;
+/* ═══════════════════════════════════════════════════════════════════════════════
+   WORKSPACE INTELLIGENCE RECOMPOSITION
+   Remove chatbot patterns, establish editorial intelligence document
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* User question: Remove chat bubble, restyle as editorial callout */
+html:root:root:root body .user-question {
+  max-width: none !important;
+  margin-left: 0 !important;
+  padding: 16px 0 16px 20px !important;
+  border: 0 !important;
+  border-left: 2px solid var(--sov-clay) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .user-question p {
+  color: var(--sov-ink) !important;
+  font-size: 1.05rem !important;
+  font-weight: 450 !important;
+  line-height: 1.6 !important;
+}
+
+/* Remove avatar-like response mark */
+html:root:root:root body .response-mark {
+  display: none !important;
+}
+
+/* Remove avatar space from sovereign-response */
+html:root:root:root body .sovereign-response {
+  padding-left: 0 !important;
+}
+
+/* Give sovereign-answer more typographic dominance */
+html:root:root:root body .sovereign-answer {
+  max-width: none !important;
+  margin-top: 8px !important;
+}
+
+html:root:root:root body .sovereign-answer > header h2 {
+  max-width: none !important;
+  font-size: clamp(2rem, 3.8vw, 2.85rem) !important;
+  font-weight: 450 !important;
+  letter-spacing: -0.035em !important;
+  line-height: 1.08 !important;
+  margin-bottom: 22px !important;
+}
+
+/* Direct answer: more presence */
+html:root:root:root body .direct-answer {
+  max-width: none !important;
+  font-size: 1.15rem !important;
+  line-height: 1.72 !important;
+  font-weight: 400 !important;
+}
+
+/* Answer sections: Remove card styling, flow as document sections */
+html:root:root:root body .answer-sections article {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .answer-sections article > span {
+  display: block !important;
+  margin-bottom: 8px !important;
+  color: var(--sov-clay) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+html:root:root:root body .answer-sections article > p {
+  color: var(--sov-ink) !important;
+  font-size: 1.02rem !important;
+  line-height: 1.68 !important;
+}
+
+/* Relationship/System/Covenant answers: Remove card borders */
+html:root:root:root body .relationship-answer > article,
+html:root:root:root body .system-answer article,
+html:root:root:root body .covenant-answer article {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:root:root:root body .covenant-answer article:nth-child(2) {
+  border-left: 2px solid var(--sov-clay) !important;
+  padding-left: 20px !important;
+}
+
+/* Alignment view: Remove grid borders, simplify */
+html:root:root:root body .alignment-view {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  gap: 24px !important;
+}
+
+html:root:root:root body .alignment-view > div {
+  gap: 24px !important;
+}
+
+html:root:root:root body .alignment-view article {
+  padding: 0 !important;
+  min-height: auto !important;
+  background: transparent !important;
+}
+
+html:root:root:root body .alignment-view .tradeoff-line {
+  border-block: 0 !important;
+  border-left: 2px solid var(--sov-clay) !important;
+  padding-left: 20px !important;
+  background: transparent !important;
+}
+
+/* Answer limit: More editorial */
+html:root:root:root body .answer-limit {
+  max-width: none !important;
+  padding: 20px 0 0 !important;
+  border-top: 1px solid var(--sov-line) !important;
+  margin-top: 32px !important;
+  color: var(--sov-muted) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.65 !important;
+}
+
+html:root:root:root body .answer-limit strong {
+  display: block !important;
+  margin-bottom: 6px !important;
+  color: var(--sov-clay) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+/* Composer: Recede as quiet instrument */
+html:root:root:root body .sovereign-composer {
+  border-color: color-mix(in srgb, var(--sov-line) 60%, transparent) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px color-mix(in srgb, var(--sov-clay) 4%, transparent) !important;
+}
+
+html:root:root:root body .sovereign-composer textarea {
+  font-size: 1.02rem !important;
+  line-height: 1.55 !important;
+}
+
+/* Answer actions: Simplify */
+html:root:root:root body .answer-actions {
+  border-top-color: color-mix(in srgb, var(--sov-line) 70%, transparent) !important;
+}
+
+html:root:root:root body .fit-controls > span {
+  font-size: 0.75rem !important;
+}
+
+/* Basis strip: More refined */
+html:root:root:root body .basis-strip {
+  border-color: color-mix(in srgb, var(--sov-line) 70%, transparent) !important;
+}
+
+/* Mobile workspace intelligence overrides */
+@media (max-width: 760px) {
+  html:root:root:root body .sovereign-answer > header h2 {
+    font-size: clamp(1.5rem, 6vw, 1.85rem) !important;
+    line-height: 1.12 !important;
   }
 
-  html:root:root:root body .sovereign-answer > header h2 {
-    font-size: 1.35rem !important;
+  html:root:root:root body .direct-answer {
+    font-size: 1.05rem !important;
+    line-height: 1.65 !important;
+  }
+
+  html:root:root:root body .user-question {
+    padding: 14px 0 14px 16px !important;
   }
 
   html:root:root:root body .user-question p {
-    font-size: 0.95rem !important;
+    font-size: 0.98rem !important;
+  }
+
+  html:root:root:root body .sovereign-composer {
+    border-radius: 16px !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14), 0 0 0 1px color-mix(in srgb, var(--sov-clay) 4%, transparent) !important;
+  }
+
+  html:root:root:root body .answer-limit {
+    font-size: 0.9rem !important;
   }
 }
 
@@ -1135,6 +1319,12 @@ html:root:root:root body .response-mark {
   .public-approved-v8 .landing-system-map__test {
     animation: none !important;
     transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  html:root:root:root body :is(.thinking, .sovereign-response, .workspace-arrival, .workspace-arrival > *) {
+    animation: none !important;
     opacity: 1 !important;
     transform: none !important;
   }

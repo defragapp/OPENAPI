@@ -400,7 +400,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       }
       const payload = await response.json().catch(() => ({})) as Json;
       if (!response.ok || !isSovereignAnswer(payload.answer)) {
-        throw new Error(payload.message || payload.error || 'Sovereign is temporarily unavailable.');
+        throw new Error(payload.message || payload.error || 'Sovereign is not available right now. Your private context was not analyzed or saved. Try again when ready.');
       }
       setDraft('');
       setMessages((current) => current.map((item) => item.id === assistantId
