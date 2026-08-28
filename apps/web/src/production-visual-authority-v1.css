@@ -35,6 +35,27 @@
   --sovereign-accent-bright: #e1cdb5;
   --sovereign-panel: #101215;
   --sovereign-panel-raised: #15181c;
+  --sov-nav-height: 72px;
+  --sov-nav-bg: rgba(12, 14, 16, 0.85);
+  --sov-nav-blur: blur(20px) saturate(110%);
+  --sov-nav-border: rgba(241, 233, 222, 0.09);
+  --sov-space-xs: 4px;
+  --sov-space-sm: 8px;
+  --sov-space-md: 16px;
+  --sov-space-lg: 24px;
+  --sov-space-xl: 40px;
+  --sov-space-section: 80px;
+  --sov-space-page: 56px;
+  --sov-radius-sm: 6px;
+  --sov-radius-md: 10px;
+  --sov-radius-lg: 14px;
+  --sov-radius-xl: 20px;
+  --sov-radius-pill: 999px;
+  --sov-motion-micro: 120ms;
+  --sov-motion-standard: 200ms;
+  --sov-motion-entrance: 380ms;
+  --sov-motion-expansion: 480ms;
+  --sov-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html:root:root:root body :is(
@@ -884,6 +905,32 @@ html:root:root:root body .public-approved-v8 .landing-system-analysis__sequence 
   .public-approved-v8 .v0-comparison-grid {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* ─── Unified Navigation Shell ─────────────────────────────────────────────── */
+
+html:root:root:root body :is(
+  .v0-nav,
+  .intelligence-topbar,
+  body.launch-page .launch-nav,
+  body.consent-page .launch-nav
+) {
+  min-height: var(--sov-nav-height) !important;
+  background: var(--sov-nav-bg) !important;
+  backdrop-filter: var(--sov-nav-blur) !important;
+  -webkit-backdrop-filter: var(--sov-nav-blur) !important;
+  border-bottom: 1px solid var(--sov-nav-border) !important;
+}
+
+html:root:root:root body :is(
+  .v0-nav-inner,
+  body.launch-page .launch-nav-inner
+) {
+  min-height: var(--sov-nav-height) !important;
+}
+
+html:root:root:root body .intelligence-topbar {
+  height: var(--sov-nav-height) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
