@@ -106,7 +106,7 @@ assert(!howItWorks.toLowerCase().includes('capacity beneath'), '/how-it-works re
 
 const pricing = staticDocuments[1].text;
 for (const marker of [
-  'Explore yourself for free. Add People and Systems with Sovereign+.',
+  'Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.',
   'aria-label="Sovereign.OS plans"',
   'class="annual-price"',
   '$0',
@@ -114,11 +114,10 @@ for (const marker of [
   '$99 / year',
   '10 Sovereign AI turns each month',
   '300 Sovereign AI turns each month',
-  'Explore yourself with Sovereign.',
-  'Understand your people and the systems around you.',
-  'Two-person Baseline comparison when both people agree',
+  'Your personal Baseline Design.',
+  'Understand another person with their permission',
   'Private invitations and sharing controls',
-  'Your Baseline stays yours. Plus expands what you can explore.',
+  'Your Baseline Design stays yours. Plus expands what you can explore.',
   'one-time amount from $1'
 ]) assert(pricing.includes(marker), `/pricing is missing ${marker}`);
 for (const retired of ['permission-based relationship and system context', 'Permission-aware invitations and controls']) {
