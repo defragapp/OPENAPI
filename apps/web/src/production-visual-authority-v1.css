@@ -1266,8 +1266,139 @@ html:root:root:root body .basis-strip {
   border-color: color-mix(in srgb, var(--sov-line) 70%, transparent) !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════════
+   WORKSPACE SHELL RECOMPOSITION
+   Make sidebar and topbar recede so intelligence content dominates
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Sidebar: Remove dashboard feel, make it a subtle navigation aid */
+html:root:root:root body .intelligence-sidebar {
+  border-right: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  width: 240px !important;
+  padding: calc(20px + env(safe-area-inset-top)) 16px 18px !important;
+}
+
+html:root:root:root body .intelligence-brand {
+  opacity: 0.7 !important;
+  font-size: 0.72rem !important;
+  min-height: 40px !important;
+}
+
+html:root:root:root body .intelligence-brand > span {
+  width: 32px !important;
+  height: 32px !important;
+  font-size: 0.92rem !important;
+  opacity: 0.6 !important;
+}
+
+html:root:root:root body .intelligence-sidebar nav {
+  gap: 2px !important;
+  margin-top: 20px !important;
+}
+
+html:root:root:root body .intelligence-sidebar nav button {
+  min-height: 36px !important;
+  padding: 6px 12px !important;
+  border-radius: 8px !important;
+  font-size: 0.82rem !important;
+  opacity: 0.65 !important;
+  transition: opacity 180ms ease, background 180ms ease !important;
+}
+
+html:root:root:root body .intelligence-sidebar nav button:hover {
+  opacity: 0.85 !important;
+  background: rgba(185, 151, 114, 0.04) !important;
+}
+
+html:root:root:root body .intelligence-sidebar nav button.active {
+  opacity: 1 !important;
+  background: rgba(185, 151, 114, 0.08) !important;
+}
+
+html:root:root:root body .intelligence-sidebar nav button strong {
+  font-size: 0.82rem !important;
+  font-weight: 550 !important;
+  letter-spacing: 0 !important;
+}
+
+html:root:root:root body .recent-threads {
+  opacity: 0.5 !important;
+  margin-top: 16px !important;
+}
+
+html:root:root:root body .recent-threads p {
+  font-size: 0.65rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  opacity: 0.6 !important;
+}
+
+html:root:root:root body .recent-threads button {
+  font-size: 0.78rem !important;
+  opacity: 0.7 !important;
+  min-height: 32px !important;
+}
+
+html:root:root:root body .new-conversation {
+  min-height: 40px !important;
+  font-size: 0.78rem !important;
+  opacity: 0.7 !important;
+  border-radius: 10px !important;
+  margin-top: 16px !important;
+}
+
+/* Topbar: Remove dashboard header feel, make it subtle */
+html:root:root:root body .intelligence-topbar {
+  border-bottom: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  min-height: 56px !important;
+  padding: 8px 28px !important;
+}
+
+html:root:root:root body .intelligence-topbar strong {
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  opacity: 0.5 !important;
+  font-family: var(--sans) !important;
+  letter-spacing: 0.02em !important;
+}
+
+html:root:root:root body .topbar-actions button {
+  min-height: 36px !important;
+  padding: 6px 12px !important;
+  font-size: 0.72rem !important;
+  opacity: 0.6 !important;
+  border-radius: 8px !important;
+  border-color: color-mix(in srgb, var(--sov-line) 50%, transparent) !important;
+  background: transparent !important;
+}
+
+html:root:root:root body .topbar-actions button:hover {
+  opacity: 0.85 !important;
+  border-color: var(--sov-clay) !important;
+}
+
+/* Main content: Adjust margin for narrower sidebar */
+html:root:root:root body .intelligence-main {
+  margin-left: 240px !important;
+}
+
+/* Context panel: Subtler appearance */
+html:root:root:root body .intelligence-context {
+  border-left: 1px solid color-mix(in srgb, var(--sov-line) 50%, transparent) !important;
+  background: color-mix(in srgb, var(--sov-panel) 60%, transparent) !important;
+}
+
 /* Mobile workspace intelligence overrides */
 @media (max-width: 760px) {
+  /* Reset sidebar-dependent margins — sidebar is hidden on mobile */
+  html:root:root:root body .intelligence-main {
+    margin-left: 0 !important;
+  }
+
   html:root:root:root body .sovereign-answer > header h2 {
     font-size: clamp(1.5rem, 6vw, 1.85rem) !important;
     line-height: 1.12 !important;
@@ -1293,6 +1424,16 @@ html:root:root:root body .basis-strip {
 
   html:root:root:root body .answer-limit {
     font-size: 0.9rem !important;
+  }
+
+  /* Topbar: even more subtle on mobile */
+  html:root:root:root body .intelligence-topbar {
+    min-height: 48px !important;
+    padding: 6px 16px !important;
+  }
+
+  html:root:root:root body .intelligence-topbar strong {
+    font-size: 0.78rem !important;
   }
 }
 
