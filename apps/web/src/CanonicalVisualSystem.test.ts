@@ -40,11 +40,17 @@ describe('canonical visual system architecture', () => {
   });
 
   it('tracks terminal override cascade elimination progress', () => {
-    // releases.css still exists in current state - elimination is future work
+    // releases.css file still exists but is not imported - canonical imports are used
     expect(existsSync(new URL('./releases.css', import.meta.url))).toBe(true);
-    // main.tsx still imports releases.css for inline overrides
-    expect(main).toContain('releases.css');
-    expect(main).toContain('installPlatformVisualCohesion');
+    // main.tsx uses canonical imports, not releases.css
+    expect(main).not.toContain('releases.css');
+    expect(main).not.toContain('installPlatformVisualCohesion');
+    // Canonical imports are present
+    expect(main).toContain("import './design-system.css';");
+    expect(main).toContain("import './public.css';");
+    expect(main).toContain("import './workspace.css';");
+    expect(main).toContain("import './app-shell.css';");
+    expect(main).toContain("import './passkey-auth.css';");
   });
 
   it('imports exactly the canonical files in main.tsx', () => {
