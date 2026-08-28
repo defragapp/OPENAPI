@@ -1081,9 +1081,18 @@ function ResponseThread({ messages, onAction, onSave, onCorrection, onShowPlan }
   onCorrection: (value: 'yes' | 'partly' | 'not_today') => void;
   onShowPlan: (feature: EntitledFeature) => void;
 }) {
+  const threadRef = useRef<HTMLDivElement>(null);
   const latestAnswerId = [...messages].reverse().find((message) => message.answer)?.id;
+
+  useEffect(() => {
+    const el = threadRef.current;
+    if (!el) return;
+    const last = el.lastElementChild;
+    if (last) last.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages.length, messages[messages.length - 1]?.text]);
+
   return (
-    <div className="response-thread">
+    <div className="response-thread" ref={threadRef}>
       {messages.map((message) => message.role === 'user'
         ? <article key={message.id} className="user-question"><p>{message.text}</p></article>
         : <article key={message.id} className="sovereign-response">
@@ -1347,6 +1356,9 @@ function PeopleControls({ workspace, selectedPerson, setSelectedPerson, api, ref
 
   const selected = permitted.find((person: Json) => person.id === selectedPerson);
 
+  const [inviteStatus, setInviteStatus] = useState('');
+  const [inviteError, setInviteError] = useState('');
+
   async function invite() {
     const displayName = name.trim();
     const relationshipRole = role.trim();
@@ -1360,21 +1372,29 @@ function PeopleControls({ workspace, selectedPerson, setSelectedPerson, api, ref
 
     if (!window.confirm(`Send a private Sovereign.OS invitation to ${invitationEmail}?`)) return;
 
-    await api('/api/v1/invitations/send', {
-      method: 'POST',
-      body: JSON.stringify({
-        displayName,
-        role: relationshipRole,
-        email: invitationEmail,
-        requestedScopes: ['pair.compare', 'trait.display', 'system.include']
-      })
-    });
+    setInviteError('');
+    setInviteStatus('Sending invitation…');
+    try {
+      await api('/api/v1/invitations/send', {
+        method: 'POST',
+        body: JSON.stringify({
+          displayName,
+          role: relationshipRole,
+          email: invitationEmail,
+          requestedScopes: ['pair.compare', 'trait.display', 'system.include']
+        })
+      });
 
-    setName('');
-    setRole('');
-    setEmail('');
-    setSelectedPerson('');
-    await refresh();
+      setName('');
+      setRole('');
+      setEmail('');
+      setSelectedPerson('');
+      setInviteStatus('Invitation sent.');
+      await refresh();
+    } catch (error) {
+      setInviteStatus('');
+      setInviteError(error instanceof Error ? error.message : 'The invitation could not be sent.');
+    }
   }
 
   return (
@@ -1423,6 +1443,9 @@ function PeopleControls({ workspace, selectedPerson, setSelectedPerson, api, ref
         Send private invitation
       </button>
 
+      {inviteStatus && <p className="context-feedback" role="status">{inviteStatus}</p>}
+      {inviteError && <p className="context-feedback error" role="alert">{inviteError}</p>}
+
       <label>
         Choose a permitted person
         <select
@@ -1448,15 +1471,21 @@ function PeopleControls({ workspace, selectedPerson, setSelectedPerson, api, ref
 function SystemControls({ workspace, selectedSystem, setSelectedSystem, api, refresh }: any) {
   const [name, setName] = useState('');
   const [type, setType] = useState('family');
+  const [systemError, setSystemError] = useState('');
   async function createSystem() {
     if (!name.trim()) return;
-    const data = await api('/api/v1/systems', {
-      method: 'POST',
-      body: JSON.stringify({ name: name.trim(), systemType: type, metadata: { sharedObjective: null, constraints: [], observations: [] } })
-    });
-    setName('');
-    await refresh();
-    if (data.system?.id) setSelectedSystem(data.system.id);
+    setSystemError('');
+    try {
+      const data = await api('/api/v1/systems', {
+        method: 'POST',
+        body: JSON.stringify({ name: name.trim(), systemType: type, metadata: { sharedObjective: null, constraints: [], observations: [] } })
+      });
+      setName('');
+      await refresh();
+      if (data.system?.id) setSelectedSystem(data.system.id);
+    } catch (error) {
+      setSystemError(error instanceof Error ? error.message : 'The system could not be created.');
+    }
   }
   return (
     <div className="context-stack">
@@ -1464,6 +1493,7 @@ function SystemControls({ workspace, selectedSystem, setSelectedSystem, api, ref
       <label>New system<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Family, household, team…" /></label>
       <label>Type<select value={type} onChange={(event) => setType(event.target.value)}>{['family', 'household', 'friendship_group', 'team', 'workplace', 'custom'].map((item) => <option key={item} value={item}>{systemTypeLabel(item)}</option>)}</select></label>
       <button className="secondary-action" onClick={() => void createSystem()}>Create system</button>
+      {systemError && <p className="context-feedback error" role="alert">{systemError}</p>}
       <label>Choose a system<select value={selectedSystem} onChange={(event) => setSelectedSystem(event.target.value)}><option value="">No system</option>{workspace.systems.map((system: Json) => <option key={system.id} value={system.id}>{system.name}</option>)}</select></label>
       <button className="secondary-action" onClick={openConsentControls}>Review members and permissions</button>
     </div>
@@ -1544,7 +1574,7 @@ function YouControls({ workspace, api, refresh, onBuildBaseline }: any) {
         {workspace.billing?.effective?.plan === 'sovereign_plus' && <button className="secondary-action" onClick={() => void handoff('/api/v1/billing/portal')}>Manage billing</button>}
       </section>
       <section className="control-section"><p>PRIVACY AND SAVED DATA</p><h3>Your controls stay together.</h3><div className="control-links"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><button onClick={openConsentControls}>Permissions</button><button onClick={openAccountControls}>Library and account data</button></div></section>
-      <section className="control-section"><p>ACCOUNT</p><button className="secondary-action" onClick={() => void api('/api/v1/auth/logout', { method: 'POST' })}>Log out</button></section>
+      <section className="control-section"><p>ACCOUNT</p><button className="secondary-action" onClick={async () => { try { await api('/api/v1/auth/logout', { method: 'POST' }); } catch { /* logout even if the request fails */ } location.assign('/login'); }}>Log out</button></section>
       <section className="control-section"><p>ACCESSIBILITY</p><h3>The same workspace, without relying on motion.</h3><span>Keyboard navigation, visible focus, text scaling, screen-reader names, and reduced-motion preferences are supported automatically.</span></section>
     </div>
   );

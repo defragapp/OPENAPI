@@ -243,7 +243,6 @@ export function AccountControlCenter() {
 
             <nav className="account-control-links" aria-label="Account links">
               <button onClick={openPermissions}>People & permissions</button>
-              <button onClick={() => void downloadPrivateExport()} disabled={loading}>Download my data</button>
               <button onClick={() => void openBilling()} disabled={loading}>Manage billing</button>
               <a href={SUPPORT_PAYMENT_URL} target="_blank" rel="noreferrer">Support development</a>
               <a href="https://sovereign.defrag.app/privacy">Privacy</a>
