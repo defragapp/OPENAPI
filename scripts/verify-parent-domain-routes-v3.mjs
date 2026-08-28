@@ -116,7 +116,7 @@ for (const marker of [
   'landing-expression-field-v3',
   'Healing isn’t optional.',
   'Holding onto the pain is.',
-  'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
+  'Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation.',
   'Start with yourself. Expand outward when it matters.',
   'Explore how you think, decide, communicate, create, and respond.',
   'See why the same moment lands differently—and how to bridge the gap.',
@@ -125,7 +125,7 @@ for (const marker of [
   'From 1:1 to the whole system',
   'See the whole system.',
   'How Sovereign reads a system',
-  'Most AI starts with the prompt. Sovereign starts with you.',
+  'Most tools start with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
 ]) {
   assert(javascript.text.includes(marker), `compiled production JavaScript is missing ${marker}`);

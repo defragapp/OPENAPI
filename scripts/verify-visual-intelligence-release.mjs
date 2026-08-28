@@ -109,7 +109,7 @@ requireAll('public landing', landing, [
   'data-viewport-contract="v0-public-landing-v3"',
   'Healing isn’t optional.',
   'Holding onto the pain is.',
-  'Personal AI for real life',
+  'Personal intelligence for real life',
   'Sovereign begins with the capacity beneath a pattern.',
   'See a Sovereign answer',
   '<LandingExpressionSlice />',

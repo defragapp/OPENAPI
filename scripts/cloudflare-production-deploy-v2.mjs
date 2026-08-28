@@ -207,7 +207,7 @@ async function verifyLiveProduction() {
     'v0-landing-selective-port',
     'v0-public-landing-v2',
     'v0-single-example-landing',
-    'Personal AI for real life',
+    'Personal intelligence for real life',
     'Healing isn’t optional.',
     'Holding onto the pain is.',
     'Illustrative Baseline',

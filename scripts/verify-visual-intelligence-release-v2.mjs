@@ -75,7 +75,7 @@ for (const marker of [
   'You → your people → the whole system',
   'Start with yourself. Expand outward when it matters.',
   'How do I make decisions that actually fit me?',
-  'Most AI starts with the prompt. Sovereign starts with you.',
+  'Most tools start with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
 ]) if (!landing.includes(marker)) throw new Error(`Visual intelligence release v2 is missing current landing marker ${marker}`);
 for (const retired of ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'calculated astronomical positions and selected interpretive frameworks']) {
@@ -108,8 +108,8 @@ const replacements = [
   ["  'See a Sovereign answer',", "  'Start with yourself. Expand outward when it matters.',"],
   ["  'Start with what’s actually happening.',", "  'You → your people → the whole system',"],
   ["  'Why do we keep having the same fight?',", "  'How do I make decisions that actually fit me?',"],
-  ["  'Sovereign begins with the capacity beneath a pattern.',", "  'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',"],
-  ["  'Generic AI',", "  'Most AI starts with the prompt. Sovereign starts with you.',"],
+  ["  'Sovereign begins with the capacity beneath a pattern.',", "  'Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation.',"],
+  ["  'Generic AI',", "  'Most tools start with the prompt. Sovereign starts with you.',"],
   ["  'Capacity beneath the pattern',", "  'Start with the question',"],
   ["  'How pressure changes the expression',", "  'Use what matters from your Baseline',"],
   ["  'What may keep it going',", "  'Find the useful difference',"],

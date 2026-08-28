@@ -36,7 +36,7 @@ const replacements = [
   ],
   [
     "  'Sovereign begins with the capacity beneath a pattern—showing how it may express, what happens between people, and what could change.',",
-    "  'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',"
+    "  'Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation.',"
   ],
   [
     "  'Bring the question you actually have.',",
@@ -116,7 +116,7 @@ for (const marker of [
   'You → your people → the whole system',
   'Start with yourself. Expand outward when it matters.',
   'How do I make decisions that actually fit me?',
-  'Most AI starts with the prompt. Sovereign starts with you.',
+  'Most tools start with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
 ]) if (!landing.includes(marker)) throw new Error(`Premium platform release v2 is missing landing marker: ${marker}`);
 for (const retired of ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'calculated astronomical positions and selected interpretive frameworks']) {

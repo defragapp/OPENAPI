@@ -87,7 +87,7 @@ requireAll('landing archive and hero contract', landing, [
   'data-visual-contract="v0-landing-selective-port"',
   'data-v0-archive-sha={V0_ARCHIVE_SHA}',
   'data-viewport-contract="v0-public-landing-v3"',
-  'Personal AI for real life',
+  'Personal intelligence for real life',
   'Healing isn’t optional.',
   'Holding onto the pain is.',
   'Sovereign begins with the capacity beneath a pattern—showing how it may express, what happens between people, and what could change.',

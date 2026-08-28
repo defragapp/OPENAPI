@@ -80,11 +80,11 @@ for (const marker of ['--font-title:', '.public-approved-v8 .v0-hero h1 > em', '
 }
 for (const marker of [
   'data-public-narrative="self-people-systems-v1"',
-  'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
+  'Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation.',
   'You → your people → the whole system',
   'Start with yourself. Expand outward when it matters.',
   'How do I make decisions that actually fit me?',
-  'Most AI starts with the prompt. Sovereign starts with you.',
+  'Most tools start with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
 ]) {
   if (!landing.includes(marker)) throw new Error(`Intelligence release v2 is missing current landing marker ${marker}`);
@@ -127,7 +127,7 @@ const languageReplacements = [
   ["  'Start with what’s actually happening.',", "  'You → your people → the whole system',"],
   ["  'Why do we keep having the same fight?',", "  'How do I make decisions that actually fit me?',"],
   ["  'What is mine, what is theirs, and what happens between us?',", "  'Why does the same conversation feel urgent to me and pressuring to them?',"],
-  ["  'Sovereign begins with the capacity beneath a pattern.',", "  'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',"],
+  ["  'Sovereign begins with the capacity beneath a pattern.',", "  'Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation.',"],
   ["  'See the capacity beneath the pattern.',", "  'Explore how you think, decide, communicate, create, connect, and grow.',"],
   ["  'See what keeps the pattern going—and what could change it.',", "  'See the whole system.',"],
   ["  'Capacity beneath the pattern',", "  'Start with the question',"],
@@ -136,9 +136,9 @@ const languageReplacements = [
   ["  'What could change',", "  'Give you something you can try',"],
   ["  'System structure',", "  'How Sovereign reads a system',"],
   ["  'Illustrative permitted Baselines',", "  'Start with what you told Sovereign',"],
-  ["  'A blank conversation starts with the prompt. Sovereign starts with your Baseline.',", "  'Most AI starts with the prompt. Sovereign starts with you.',"],
+  ["  'A blank conversation starts with the prompt. Sovereign starts with your Baseline.',", "  'Most tools start with the prompt. Sovereign starts with you.',"],
   ["  'Your thoughts deserve',", "  'Know yourself. Understand your people. See the whole system.',"],
-  ["  'a better place to live.'", "  'Start free. Build your Baseline, then explore what you want to understand next.'"],
+  ["  'a better place to live.'", "  'Build your private Baseline intelligence, then explore what you want to understand next.'"],
 ];
 for (const [from, to] of languageReplacements) {
   if (source.split(from).length - 1 !== 1) throw new Error(`Intelligence release v2 could not reconcile historical marker: ${from}`);
