@@ -8,6 +8,14 @@ const serviceWorker = readFileSync(new URL('../public/sw.js', import.meta.url), 
 const prompt = readFileSync(new URL('../../sovereign-worker/src/agent/prompt-v1.ts', import.meta.url), 'utf8');
 
 describe('Baseline-first Sovereign answer UI', () => {
+  it('keeps the collapsed Sources control free of raw source codes and the drawer explanation exact', () => {
+    expect(workspace).toContain('value.accessibleLabel');
+    expect(workspace).not.toContain('<b aria-label={value.accessibleLabel}>{value.display}</b>');
+    expect(workspace).toContain('<b aria-label={value.accessibleLabel}>{value.accessibleLabel}</b>');
+    expect(workspace).toContain('They can inform reflection; they do not prove personality or current state.');
+    expect(workspace).not.toContain('They inform the interpretation; they do not prove personality or current state. You can review, correct, or reject any of them.');
+  });
+
   it('ships one React-owned workspace without obsolete DOM enhancement runtimes', () => {
     expect(index).toContain('/src/main.tsx');
     for (const file of ['recognition-ui.js', 'intelligence-ui.js', 'ux-audit-runtime.js']) expect(index).not.toContain(file);

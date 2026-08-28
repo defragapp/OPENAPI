@@ -1255,7 +1255,7 @@ function BasisStrip({ values }: { values: BasisValue[] }) {
     <>
       <button className="basis-strip" onClick={() => setOpen(true)} aria-label={`Sources. Open ${available.length} source details.`}>
         <strong>Sources</strong>
-        <span className="basis-values">{visible.map((value, index) => <span key={value.id}>{index > 0 && <i aria-hidden="true"> · </i>}<b aria-label={value.accessibleLabel}>{value.display}</b></span>)}</span>
+        <span className="basis-values">{visible.map((value, index) => <span key={value.id}>{index > 0 && <i aria-hidden="true"> · </i>}<b aria-label={value.accessibleLabel}>{value.accessibleLabel}</b></span>)}</span>
         {available.length > limit && <em>+{available.length - limit}</em>}
         <i aria-hidden="true">⌄</i>
       </button>
@@ -1264,7 +1264,7 @@ function BasisStrip({ values }: { values: BasisValue[] }) {
           <button className="sheet-backdrop" onClick={() => setOpen(false)} aria-label="Close source details" />
           <section>
             <header><div><span>Sources</span><h2 id="basis-title">Source details</h2></div><button onClick={() => setOpen(false)} aria-label="Close">×</button></header>
-            <p>These are the source values Sovereign used for this answer. They inform the interpretation; they do not prove personality or current state. You can review, correct, or reject any of them.</p>
+            <p>These are the source values Sovereign used for this answer. They can inform reflection; they do not prove personality or current state.</p>
             <dl>{available.map((value) => <div key={value.id}><dt>{value.display}</dt><dd><span>{value.accessibleLabel}</span><span>Source · {value.provenance}</span><span>Calculated · {formatDate(value.computedAt)}</span><span>Uncertainty · {value.uncertainty}</span><span>Applies to · {value.subject === 'self' ? 'You' : value.subject === 'other' ? 'Other person' : 'Relationship'}</span>{value.expiresAt && <span>Expires · {formatDate(value.expiresAt)}</span>}</dd></div>)}</dl>
           </section>
         </ModalDialog>

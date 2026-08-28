@@ -11,7 +11,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@openai/agents": "0.13.5",
     "hono": "4.12.31",
     "zod": "4.4.3",
     "@sovereign/agent-contracts": "workspace:*"

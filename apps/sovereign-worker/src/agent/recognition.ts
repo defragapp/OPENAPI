@@ -130,6 +130,9 @@ export function parseSovereignAnswer(raw: string, registry: BasisRegistryItem[])
   if (parsed.depth !== 'focused' && parsed.sections.length < 2) {
     throw new Error('Standard and deep Sovereign answers require at least two useful sections');
   }
+  if (parsed.depth !== 'focused' && parsed.sections.length > 5) {
+    throw new Error('Standard and deep Sovereign answers may contain at most five sections');
+  }
   if (parsed.mode === 'relationship') {
     if (parsed.depth !== 'deep') throw new Error('Relationship answers require deep depth');
     requireSectionIds(parsed, ['you', 'other', 'interaction', 'responsibility', 'unknowns']);

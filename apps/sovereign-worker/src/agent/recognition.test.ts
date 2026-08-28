@@ -108,6 +108,21 @@ describe('sovereign-answer.v2', () => {
     expect(parseSovereignAnswer(answer({ sections }), registry).sections).toHaveLength(5);
   });
 
+  it('rejects standard and deep answers that exceed the two-to-five section contract', () => {
+    const numbered = (n: string) => ({ id: 'steady' as const, label: `Section ${n}`, body: `Section ${n} supports a correctable interpretation rather than a fixed verdict.` });
+    const sections = [
+      numbered('one'),
+      numbered('two'),
+      numbered('three'),
+      numbered('four'),
+      numbered('five'),
+      numbered('six')
+    ];
+    expect(parseSovereignAnswer(answer({ mode: 'baseline', depth: 'standard', sections: sections.slice(0, 5) }), registry).sections).toHaveLength(5);
+    expect(() => parseSovereignAnswer(answer({ mode: 'baseline', depth: 'deep', sections }), registry))
+      .toThrow(/at most five sections/);
+  });
+
   it('rejects a partial pattern lens that joins expression to interaction without boundaries', () => {
     const sections = [
       section('shadow', 'How it may be expressing'),
@@ -136,6 +151,19 @@ describe('sovereign-answer.v2', () => {
     };
     expect(deriveAuthorizedBasisRegistry(context)).toEqual(registry);
     expect(deriveAuthorizedBasisRegistry({ basisRegistry: [{ ...registry[0], display: 'status withheld' }] })).toEqual([]);
+  });
+
+  it('enforces a full system-sectional answer for permitted system questions', () => {
+    const systemSections = [
+      { id: 'system' as const, label: 'Pressure', body: 'Planning and caregiving load currently concentrate on one person late in the week.' },
+      { id: 'responsibility' as const, label: 'Responsibility', body: 'Each participant keeps a distinct role from supplied context; no participant owns another.' },
+      { id: 'unknowns' as const, label: 'Unknowns', body: 'What would change if the planner shared the calendar earlier remains to be confirmed.' }
+    ];
+    expect(parseSovereignAnswer(answer({ mode: 'system', depth: 'deep', sections: systemSections }), registry).mode).toBe('system');
+    expect(() => parseSovereignAnswer(answer({ mode: 'system', depth: 'standard', sections: systemSections }), registry))
+      .toThrow(/System answers require deep depth/);
+    expect(() => parseSovereignAnswer(answer({ mode: 'system', depth: 'deep', sections: systemSections.slice(0, 2) }), registry))
+      .toThrow(/missing unknowns/);
   });
 
   it('rejects the score-based external mock because it is not the canonical contract', () => {
