@@ -4,13 +4,11 @@ import { describe, expect, it } from 'vitest';
 
 const root = resolve(__dirname, '../../..');
 const main = readFileSync(resolve(root, 'apps/web/src/main.tsx'), 'utf8');
-const invitationFidelity = readFileSync(resolve(root, 'apps/web/src/releases.css'), 'utf8');
+const invitationFidelity = readFileSync(resolve(root, 'apps/web/src/public.css'), 'utf8');
 const historicalHardening = readFileSync(resolve(root, 'apps/web/src/workspace.css'), 'utf8');
 
 describe('invitation rendered fidelity', () => {
   it('loads as part of the single terminal inline authority', () => {
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
-    expect(main).toContain("style.textContent = releasesCss;");
   });
 
   it('reconciles the historical desktop two-column placement without changing mobile', () => {

@@ -9,12 +9,12 @@ const field = read('./expression-field/LandingExpressionSlice.tsx');
 const styles = read('./public.css');
 const integration = read('./public.css');
 const heroExtension = read('./public.css');
-const cohesionRefinement = read('./releases.css');
-const mobileRelease = read('./releases.css');
-const productionReadiness = read('./releases.css');
-const finalAuthority = read('./releases.css');
-const landingRefinementV2 = read('./releases.css');
-const landingRefinementV5 = read('./releases.css');
+const cohesionRefinement = read('./workspace.css');
+const mobileRelease = read('./public.css');
+const productionReadiness = read('./public.css');
+const finalAuthority = read('./public.css');
+const landingRefinementV2 = read('./public.css');
+const landingRefinementV5 = read('./public.css');
 const interactionRuntime = read('./release-interaction-runtime.ts');
 const controls = read('./public.css');
 
@@ -22,8 +22,6 @@ describe('premium rotating public Expression Field v3', () => {
   it('loads the public component layers and appends the landing refinement after rendered fidelity', () => {
     expect(main).toContain("import './public.css';");
     expect(main).toContain("import './passkey-auth.css';");
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
-    expect(main).toContain("style.textContent = releasesCss;");
     expect(main.indexOf("import './passkey-auth.css';")).toBeGreaterThan(main.indexOf("import './public.css';"));
     expect(main).toContain("dataset.sovereignHeroComposition = 'v3-bounded'");
     expect(main).toContain('installProductionReadinessRuntime();');

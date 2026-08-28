@@ -26,13 +26,13 @@ const lineageStoryCss = read('./public.css');
 const isolatedStoryCss = read('./public.css');
 const approvedCss = read('./public.css');
 const heroExtension = read('./public.css');
-const finalAuthority = read('./releases.css');
-const refinement = read('./releases.css');
-const renderedFidelity = read('./releases.css');
-const landingRefinementV2 = read('./releases.css');
-const landingRefinementV5 = read('./releases.css');
-const intelligenceDemoCss = read('./releases.css');
-const invitationFidelity = read('./releases.css');
+const finalAuthority = read('./public.css');
+const refinement = read('./public.css');
+const renderedFidelity = read('./public.css');
+const landingRefinementV2 = read('./public.css');
+const landingRefinementV5 = read('./public.css');
+const intelligenceDemoCss = read('./public.css');
+const invitationFidelity = read('./public.css');
 const sansAuthority = read('./design-system.css');
 const typography = read('./design-system.css');
 const passkeyCss = read('./passkey-auth.css');
@@ -60,7 +60,6 @@ describe('founder visual port — public positioning reset', () => {
       expect(index).toBeGreaterThan(previous);
       previous = index;
     }
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
     for (const source of [v0PlatformCss, v0MotionCss, v0Css, v0GlobalCss, fieldCss, integrationCss, lineageStoryCss, isolatedStoryCss, approvedCss, heroExtension, finalAuthority, refinement, renderedFidelity, landingRefinementV2, landingRefinementV5, intelligenceDemoCss, invitationFidelity, sansAuthority, typography, passkeyCss, routeCohesionCss, staticRefinement]) expectBalancedCss(source);
   });
 

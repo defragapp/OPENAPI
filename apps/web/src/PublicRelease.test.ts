@@ -17,9 +17,9 @@ const fieldCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const integrationCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const heroExtension = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const storiesCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
-const landingRefinement = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
-const intelligenceDemoCss = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
-const landingRefinementV5 = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const landingRefinement = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const intelligenceDemoCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const landingRefinementV5 = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const typography = readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
 const sansAuthority = readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
 

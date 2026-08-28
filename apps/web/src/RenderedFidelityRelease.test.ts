@@ -4,13 +4,12 @@ import { describe, expect, it } from 'vitest';
 
 const root = resolve(__dirname, '../../..');
 const main = readFileSync(resolve(root, 'apps/web/src/main.tsx'), 'utf8');
-const fidelity = readFileSync(resolve(root, 'apps/web/src/releases.css'), 'utf8');
+const fidelity = readFileSync(resolve(root, 'apps/web/src/public.css'), 'utf8');
 const routeAudit = readFileSync(resolve(root, 'scripts/verify-live-route-cohesion-v2.mjs'), 'utf8');
 const packageJson = readFileSync(resolve(root, 'package.json'), 'utf8');
 
 describe('rendered fidelity release authority', () => {
   it('loads rendered fidelity after the existing refinement authority', () => {
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
     expect(fidelity).toContain('rendered-fidelity-v1.css');
     expect(fidelity).toContain('experience-refinement-v1.css');
   });

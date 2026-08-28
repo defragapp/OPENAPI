@@ -159,7 +159,6 @@ describe('secondary public visual parity', () => {
     const secondaryAuthority = main.indexOf("import './app-shell.css'");
     expect(landingAuthority).toBeGreaterThan(-1);
     expect(secondaryAuthority).toBeGreaterThan(landingAuthority);
-    expect(main).toContain("import releasesCss from './releases.css?inline'");
     expect(landing).toContain('data-public-release="approved-public-v8"');
   });
 

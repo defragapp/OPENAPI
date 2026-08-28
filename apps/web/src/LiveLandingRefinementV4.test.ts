@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const css = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('live landing refinement v4', () => {
   it('loads after v3 as the terminal public landing presentation layer', () => {
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
     expect(css).toContain('landing-live-refinement-v3.css');
     expect(css).toContain('landing-live-refinement-v4.css');
   });

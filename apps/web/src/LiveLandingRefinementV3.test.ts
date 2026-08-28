@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const css = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('live landing refinement v3', () => {
   it('loads after the prior landing refinement authority', () => {
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
     expect(css).toContain('width: min(1360px, calc(100% - 52px)) !important;');
   });
 

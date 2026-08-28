@@ -5,12 +5,12 @@ const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf
 const main = read('./main.tsx');
 const routeCss = read('./app-shell.css');
 const staticRouteCss = read('../public/deployed-route-cohesion.css');
-const experienceRefinement = read('./releases.css');
-const renderedFidelity = read('./releases.css');
-const landingRefinement = read('./releases.css');
-const landingRefinementV5 = read('./releases.css');
+const experienceRefinement = read('./public.css');
+const renderedFidelity = read('./public.css');
+const landingRefinement = read('./public.css');
+const landingRefinementV5 = read('./public.css');
 const sansAuthority = read('./design-system.css');
-const invitationFidelity = read('./releases.css');
+const invitationFidelity = read('./public.css');
 const staticRefinement = read('../public/experience-static-refinement-v1.css');
 const staticTerminal = read('../public/premium-action-static-v1.css');
 const how = read('../public/how-it-works.html');
@@ -36,7 +36,6 @@ describe('deployed route cohesion contract', () => {
     expect(main).toContain(passkey);
     expect(main.indexOf(cohesion)).toBeLessThan(main.indexOf(passkey));
     expect(main.slice(main.indexOf(passkey) + passkey.length)).not.toContain("import './");
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
   });
 
   it('keeps route, refinement, and typography CSS structurally balanced', () => {

@@ -17,7 +17,7 @@ const runtimeEntry = readFileSync(
 );
 
 const launchCss = readFileSync(
-  new URL('./releases.css', import.meta.url),
+  new URL('./public.css', import.meta.url),
   'utf8'
 );
 

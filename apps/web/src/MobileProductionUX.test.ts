@@ -10,11 +10,11 @@ const fieldCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const integrationCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const storyCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const approvedCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
-const landingRefinement = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const landingRefinement = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
 const workspaceCss = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
 const workspaceMobileCss = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
-const mobileReleaseCss = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
-const productionReadinessCss = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const mobileReleaseCss = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
+const productionReadinessCss = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
 const mobileUtilities = readFileSync(new URL('./WorkspaceMobileUtilities.tsx', import.meta.url), 'utf8');
 const compositionCss = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
 const landingCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
@@ -29,8 +29,6 @@ describe('production mobile and responsive experience', () => {
     expect(main).toContain("import './workspace.css';");
     expect(main).toContain("import './app-shell.css';");
     expect(main).toContain("import './passkey-auth.css';");
-    expect(main).toContain("import releasesCss from './releases.css?inline'");
-    expect(main).toContain("style.textContent = releasesCss;");
   });
 
   it('measures required mobile product surfaces while allowing redundant system reasoning to collapse', () => {

@@ -5,8 +5,8 @@ const read = (path: string) => readFileSync(new URL(path, import.meta.url), "utf
 
 const typography = read("./design-system.css");
 const sansAuthority = read("./design-system.css");
-const intelligenceDemo = read("./releases.css");
-const visualAuthority = read("./releases.css");
+const intelligenceDemo = read("./public.css");
+const visualAuthority = read("./public.css");
 const staticAuthority = read("../public/premium-action-static-v1.css");
 const fontUrl = new URL("../public/fonts/geist/Geist-Variable.woff2", import.meta.url);
 

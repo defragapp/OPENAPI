@@ -14,7 +14,7 @@ const fieldCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const integrationCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const heroExtension = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const storyCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
-const landingRefinementV5 = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const landingRefinementV5 = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const sansAuthority = readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
@@ -106,8 +106,6 @@ describe('founder selective visual port', () => {
     expect(main).toContain("import './public.css';");
     expect(main).toContain("import './public.css';");
     expect(main).toContain("import './public.css';");
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
   });
 
   it('does not introduce the archive mock runtime, scores, or alternate architecture', () => {

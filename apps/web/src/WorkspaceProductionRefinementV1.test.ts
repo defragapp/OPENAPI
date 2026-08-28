@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const css = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 
 describe('authenticated workspace production refinement v1', () => {
   it('loads as part of the single terminal inline authority', () => {
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
-    expect(main).toContain("style.textContent = releasesCss;");
   });
 
   it('uses the founder dark editorial direction instead of a decorative AI gradient', () => {

@@ -180,7 +180,6 @@ requireAll('application visual entry', main, [
   "import './workspace.css'",
   "import './app-shell.css'",
   "import './passkey-auth.css'",
-  "import releasesCss from './releases.css?inline'",
   "import { PasskeyAuthentication } from './PasskeyAuthentication'",
   '<PasskeyAuthentication />',
   '<PublicLanding />',

@@ -15,7 +15,7 @@ const field = readTestFile('./expression-field/LandingExpressionSlice.tsx');
 const fieldStyles = readTestFile('./public.css');
 const heroStyles = readTestFile('./public.css');
 const storyStyles = readTestFile('./public.css');
-const refinementStyles = readTestFile('./releases.css');
+const refinementStyles = readTestFile('./public.css');
 const workspace = readTestFile('./SovereignIntelligenceWorkspace.tsx');
 
 describe('shared Sovereign intelligence stage', () => {

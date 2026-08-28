@@ -7049,3 +7049,3226 @@ body {
 }
 
 
+
+/* ==========================================================================
+   Platform Visual Cohesion (migrated from releases.css)
+   Authenticated workspace, account, and onboarding surfaces.
+   ========================================================================== */
+
+/* ── platform-visual-cohesion-v1.css ── */
+/*
+ * sovereign-platform-cohesion-v1
+ * Final visual authority for every non-landing React surface.
+ * The frozen founder-v0 landing is intentionally not targeted here.
+ */
+
+:where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) {
+  --cohesion-page: #090b0e;
+  --cohesion-page-deep: #06080b;
+  --cohesion-panel: rgba(21, 24, 29, 0.9);
+  --cohesion-panel-raised: rgba(27, 31, 37, 0.94);
+  --cohesion-ink: #f1e9de;
+  --cohesion-muted: rgba(229, 220, 209, 0.72);
+  --cohesion-faint: rgba(229, 220, 209, 0.46);
+  --cohesion-line: rgba(241, 233, 222, 0.11);
+  --cohesion-line-strong: rgba(241, 233, 222, 0.2);
+  --cohesion-blue: #2f93ff;
+  --cohesion-blue-bright: #78c7ff;
+  --cohesion-blue-soft: rgba(47, 147, 255, 0.12);
+  --cohesion-shell: min(1240px, calc(100vw - 80px));
+  --cohesion-reading: 760px;
+}
+
+body:has(.sovereign-app-runtime),
+body:has(.account-shell),
+body:has(.plan-onboarding),
+body:has(.invitation-shell),
+body:has(.private-route-gate),
+body:has(.public-not-found),
+body:has(.public-secondary-page) {
+  background:
+    radial-gradient(circle at 73% 8%, rgba(47, 147, 255, 0.09), transparent 31rem),
+    radial-gradient(circle at 20% 74%, rgba(241, 233, 222, 0.025), transparent 30rem),
+    var(--cohesion-page);
+  color: var(--cohesion-ink);
+}
+
+:where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) :where(button, a, input, textarea, select, summary) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Account, authentication, onboarding, and policy surfaces. */
+.account-nav,
+.plan-nav,
+.public-secondary-page .v0-shell.v0-nav-inner,
+.public-secondary-page .policy-hero,
+.public-secondary-page .policy-grid,
+.public-secondary-page .policy-contact,
+.public-secondary-page .v0-footer > .v0-shell {
+  width: var(--cohesion-shell) !important;
+}
+
+.account-layout {
+  width: var(--cohesion-shell) !important;
+  grid-template-columns: minmax(0, 1.12fr) minmax(440px, 520px) !important;
+  gap: clamp(72px, 8vw, 132px) !important;
+  padding: clamp(72px, 8vw, 118px) 0 110px !important;
+}
+
+.account-intro {
+  max-width: 680px !important;
+}
+
+.account-intro h1 {
+  max-width: 11ch !important;
+  font-size: clamp(4rem, 6.2vw, 6.5rem) !important;
+  line-height: 0.91 !important;
+}
+
+.account-intro .lede {
+  max-width: 58ch !important;
+  font-size: 1.02rem !important;
+}
+
+.account-points {
+  margin-top: 38px !important;
+  border-top: 1px solid var(--cohesion-line);
+}
+
+.account-points li {
+  min-height: 58px;
+  align-items: center;
+  border-bottom: 1px solid var(--cohesion-line);
+}
+
+.auth-panel {
+  padding: clamp(34px, 4vw, 48px) !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.025), transparent 46%),
+    radial-gradient(circle at 100% 0, rgba(47, 147, 255, 0.1), transparent 24rem),
+    rgba(20, 23, 28, 0.96) !important;
+  box-shadow: 0 36px 110px rgba(0, 0, 0, 0.46) !important;
+}
+
+.auth-panel h2,
+.passkey-primary h2 {
+  font-size: clamp(2.55rem, 3.8vw, 3.55rem) !important;
+  line-height: 0.98 !important;
+}
+
+.auth-panel :where(input, select, textarea),
+.plan-onboarding :where(input, select, textarea) {
+  min-height: 54px !important;
+  border-radius: 9px !important;
+}
+
+.public-secondary-page .policy-hero {
+  min-height: 610px !important;
+  padding: 132px 0 96px !important;
+}
+
+.public-secondary-page .policy-hero h1 {
+  max-width: 13ch !important;
+  font-size: clamp(4.4rem, 7vw, 7rem) !important;
+}
+
+.public-secondary-page .policy-grid {
+  padding: 100px 0 112px !important;
+}
+
+.public-secondary-page .policy-grid article {
+  padding: 38px 0 !important;
+}
+
+.public-secondary-page .policy-grid p {
+  max-width: 860px !important;
+  font-size: 0.98rem !important;
+}
+
+/* Authenticated single-room workspace. */
+.sovereign-app-runtime {
+  min-height: 100svh;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 76% 9%, rgba(47, 147, 255, 0.07), transparent 30rem),
+    linear-gradient(rgba(255,255,255,0.006) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.006) 1px, transparent 1px),
+    var(--cohesion-page-deep);
+  background-size: auto, 96px 96px, 96px 96px, auto;
+}
+
+.sovereign-app-runtime .intelligence-workspace {
+  min-height: 100svh;
+  background: transparent;
+  color: var(--cohesion-ink);
+}
+
+.sovereign-app-runtime .intelligence-sidebar {
+  width: 252px;
+  padding: calc(26px + env(safe-area-inset-top)) 18px calc(22px + env(safe-area-inset-bottom));
+  border-right: 1px solid var(--cohesion-line);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.018), transparent 32%),
+    rgba(7, 9, 12, 0.9);
+  box-shadow: 20px 0 70px rgba(0,0,0,0.22);
+}
+
+.sovereign-app-runtime .intelligence-brand {
+  min-height: 54px;
+  padding: 0 6px 18px;
+  border-bottom: 1px solid var(--cohesion-line);
+  color: var(--cohesion-ink);
+  letter-spacing: 0.18em;
+}
+
+.sovereign-app-runtime .intelligence-brand > span {
+  display: none;
+}
+
+.sovereign-app-runtime .intelligence-brand strong {
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.sovereign-app-runtime .intelligence-sidebar nav {
+  gap: 6px;
+  margin-top: 24px;
+}
+
+.sovereign-app-runtime .intelligence-sidebar nav button {
+  min-height: 48px;
+  grid-template-columns: 1fr;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: var(--cohesion-muted);
+}
+
+.sovereign-app-runtime .intelligence-sidebar nav button:hover {
+  border-color: var(--cohesion-line);
+  background: rgba(255,255,255,0.025);
+  color: var(--cohesion-ink);
+}
+
+.sovereign-app-runtime .intelligence-sidebar nav button.active {
+  border-color: rgba(120, 199, 255, 0.38);
+  background:
+    linear-gradient(90deg, rgba(47, 147, 255, 0.13), rgba(47, 147, 255, 0.025));
+  color: var(--cohesion-ink);
+  box-shadow: inset 2px 0 0 var(--cohesion-blue-bright);
+}
+
+.sovereign-app-runtime .intelligence-sidebar nav button strong {
+  font-size: 0.82rem;
+  font-weight: 620;
+}
+
+.sovereign-app-runtime .recent-threads {
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--cohesion-line);
+}
+
+.sovereign-app-runtime .recent-threads > p {
+  margin-inline: 8px;
+  color: var(--cohesion-faint);
+  font-size: 0.64rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.sovereign-app-runtime .recent-threads button {
+  min-height: 42px;
+  padding-inline: 8px;
+  color: var(--cohesion-faint);
+}
+
+.sovereign-app-runtime .new-conversation {
+  margin-top: auto;
+  border: 0;
+  border-top: 1px solid var(--cohesion-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--cohesion-ink);
+  text-align: left;
+}
+
+.sovereign-app-runtime .intelligence-main {
+  min-height: 100svh;
+  margin-left: 252px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.sovereign-app-runtime .intelligence-workspace.context-open .intelligence-main {
+  margin-right: 420px;
+}
+
+.sovereign-app-runtime .intelligence-topbar {
+  min-height: 78px;
+  padding: 14px clamp(28px, 4vw, 58px);
+  border-bottom: 1px solid var(--cohesion-line);
+  background: rgba(8, 10, 13, 0.78);
+  backdrop-filter: blur(22px);
+}
+
+.sovereign-app-runtime .intelligence-topbar > div:first-of-type {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sovereign-app-runtime .intelligence-topbar > div:first-of-type strong {
+  font-family: var(--font-subheading, system-ui, sans-serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sovereign-app-runtime .intelligence-topbar > div:first-of-type span::before {
+  content: '·';
+}
+
+.sovereign-app-runtime .intelligence-topbar em {
+  color: var(--cohesion-muted);
+  font-size: 0.78rem;
+  font-style: normal;
+}
+
+.sovereign-app-runtime .topbar-actions button {
+  min-width: 96px;
+  border: 1px solid var(--cohesion-line);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+}
+
+.sovereign-app-runtime .intelligence-scroll {
+  width: min(100%, 1240px);
+  padding: clamp(60px, 7vw, 104px) clamp(34px, 5vw, 76px) 220px;
+}
+
+.sovereign-app-runtime .surface-home {
+  width: 100%;
+}
+
+.sovereign-app-runtime .surface-heading {
+  display: grid;
+  max-width: none;
+  grid-template-columns: minmax(0, 1.18fr) minmax(280px, 0.62fr);
+  column-gap: clamp(56px, 8vw, 124px);
+  align-items: end;
+  margin-bottom: clamp(52px, 7vw, 86px);
+  padding-bottom: 42px;
+  border-bottom: 1px solid var(--cohesion-line);
+}
+
+.sovereign-app-runtime .surface-heading > p {
+  grid-column: 1 / -1;
+  margin-bottom: 16px;
+  color: rgba(120,199,255,0.78);
+  font-size: 0.66rem;
+  letter-spacing: 0.17em;
+}
+
+.sovereign-app-runtime .surface-heading h1 {
+  max-width: 12ch;
+  margin: 0;
+  font-size: clamp(3.8rem, 6vw, 6.7rem);
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+}
+
+.sovereign-app-runtime .surface-heading > span {
+  max-width: 42ch;
+  padding-bottom: 10px;
+  color: var(--cohesion-muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.sovereign-app-runtime .baseline-preparing,
+.sovereign-app-runtime .baseline-invitation,
+.sovereign-app-runtime .incomplete-state,
+.sovereign-app-runtime .loading-state {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-height: 470px;
+  padding: clamp(36px, 6vw, 72px);
+  border: 1px solid var(--cohesion-line);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 82% 22%, rgba(47,147,255,0.11), transparent 25rem),
+    linear-gradient(145deg, rgba(255,255,255,0.026), transparent 42%),
+    var(--cohesion-panel);
+  box-shadow: 0 32px 92px rgba(0,0,0,0.28);
+}
+
+.sovereign-app-runtime .baseline-preparing {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.7fr);
+  align-content: center;
+  column-gap: 70px;
+}
+
+.sovereign-app-runtime .baseline-preparing > p {
+  grid-column: 1 / -1;
+  margin: 0 0 20px;
+  color: rgba(120,199,255,0.78);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.sovereign-app-runtime .baseline-preparing h1 {
+  max-width: 14ch;
+  margin: 0;
+  font-size: clamp(3.15rem, 5vw, 5.75rem);
+  line-height: 0.94;
+}
+
+.sovereign-app-runtime .baseline-preparing > span {
+  align-self: end;
+  color: var(--cohesion-muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.sovereign-app-runtime .baseline-preparing > button {
+  grid-column: 2;
+  width: fit-content;
+  min-height: 48px;
+  margin-top: 26px;
+  padding: 0 18px;
+  border: 0;
+  border-bottom: 1px solid rgba(120,199,255,0.7);
+  border-radius: 0;
+  background: transparent;
+  color: var(--cohesion-ink);
+}
+
+.sovereign-app-runtime .today-facet-view {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.9fr);
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--cohesion-line);
+  border-radius: 20px;
+  background: var(--cohesion-line);
+  box-shadow: 0 32px 92px rgba(0,0,0,0.26);
+}
+
+.sovereign-app-runtime .today-facet-view > header {
+  grid-column: 1 / -1;
+  min-height: 330px;
+  padding: clamp(38px, 6vw, 72px);
+  background:
+    radial-gradient(circle at 80% 24%, rgba(47,147,255,0.13), transparent 25rem),
+    var(--cohesion-panel);
+}
+
+.sovereign-app-runtime .today-facet-view > header h1 {
+  max-width: 13ch;
+  margin: 14px 0 20px;
+  font-size: clamp(3.2rem, 5vw, 5.7rem);
+  line-height: 0.94;
+}
+
+.sovereign-app-runtime .today-facet-view > header > span {
+  display: block;
+  max-width: 62ch;
+  color: var(--cohesion-muted);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.sovereign-app-runtime .today-insight-lines {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-column: 1 / -1;
+  gap: 1px;
+  background: var(--cohesion-line);
+}
+
+.sovereign-app-runtime .today-insight-lines article {
+  min-height: 210px;
+  padding: 30px;
+  background: var(--cohesion-panel-raised);
+}
+
+.sovereign-app-runtime .today-insight-lines p {
+  margin-top: 16px;
+  color: var(--cohesion-muted);
+  line-height: 1.68;
+}
+
+.sovereign-app-runtime .today-continuations {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-column: 1 / -1;
+  gap: 1px;
+  background: var(--cohesion-line);
+}
+
+.sovereign-app-runtime .today-continuations button {
+  min-height: 76px;
+  padding: 18px 22px;
+  border: 0;
+  background: rgba(8,10,13,0.94);
+  color: var(--cohesion-ink);
+  text-align: left;
+}
+
+.sovereign-app-runtime .today-continuations button:hover {
+  background: var(--cohesion-blue-soft);
+}
+
+.sovereign-app-runtime .account-summary {
+  max-width: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-radius: 18px;
+  box-shadow: 0 28px 86px rgba(0,0,0,0.25);
+}
+
+.sovereign-app-runtime .account-summary article,
+.sovereign-app-runtime .account-summary > button {
+  min-height: 160px;
+  padding: 28px;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.022), transparent 54%),
+    var(--cohesion-panel);
+}
+
+.sovereign-app-runtime .account-summary article strong {
+  font-size: 1rem;
+  line-height: 1.48;
+}
+
+.sovereign-app-runtime .account-summary > button {
+  min-height: 70px;
+}
+
+.sovereign-app-runtime .explore-editorial,
+.sovereign-app-runtime .person-split,
+.sovereign-app-runtime .relationship-field,
+.sovereign-app-runtime .system-overview,
+.sovereign-app-runtime .library-grid,
+.sovereign-app-runtime .response-thread,
+.sovereign-app-runtime .sovereign-answer,
+.sovereign-app-runtime .baseline-builder,
+.sovereign-app-runtime .baseline-reveal {
+  border-color: var(--cohesion-line);
+}
+
+.sovereign-app-runtime .sovereign-answer {
+  overflow: hidden;
+  border: 1px solid var(--cohesion-line);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 88% 4%, rgba(47,147,255,0.08), transparent 28rem),
+    var(--cohesion-panel);
+  box-shadow: 0 34px 100px rgba(0,0,0,0.3);
+}
+
+.sovereign-app-runtime .sovereign-answer > header,
+.sovereign-app-runtime .sovereign-answer > .direct-answer,
+.sovereign-app-runtime .sovereign-answer > .answer-sections,
+.sovereign-app-runtime .sovereign-answer > .answer-evidence-row,
+.sovereign-app-runtime .sovereign-answer > .answer-limit,
+.sovereign-app-runtime .sovereign-answer > .answer-actions {
+  padding-inline: clamp(30px, 5vw, 64px);
+}
+
+.sovereign-app-runtime .sovereign-answer > header {
+  padding-top: clamp(38px, 6vw, 70px);
+}
+
+.sovereign-app-runtime .sovereign-answer > header h2 {
+  max-width: 16ch;
+  margin: 14px 0 0;
+  font-size: clamp(3rem, 5vw, 5.5rem);
+  line-height: 0.94;
+}
+
+.sovereign-app-runtime .direct-answer {
+  max-width: 70ch;
+  color: var(--cohesion-muted);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.sovereign-app-runtime .sovereign-composer {
+  position: fixed;
+  z-index: 45;
+  right: max(28px, calc((100vw - 252px - 980px) / 2));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  left: max(280px, calc(252px + (100vw - 252px - 980px) / 2));
+  width: auto;
+  max-width: 980px;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--cohesion-line-strong);
+  border-radius: 18px;
+  background: rgba(13,16,20,0.94);
+  box-shadow: 0 34px 100px rgba(0,0,0,0.48);
+  backdrop-filter: blur(24px);
+}
+
+.sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
+  right: 448px;
+}
+
+.sovereign-app-runtime .composer-context-line {
+  min-height: 34px;
+  padding: 2px 8px 10px;
+  border-bottom: 1px solid var(--cohesion-line);
+}
+
+.sovereign-app-runtime .composer-entry {
+  align-items: end;
+  padding-top: 10px;
+}
+
+.sovereign-app-runtime .sovereign-composer textarea {
+  min-height: 58px;
+  max-height: 180px;
+  padding: 14px 16px;
+  border: 0;
+  background: rgba(5,7,9,0.66);
+  color: var(--cohesion-ink);
+  font-size: 16px;
+}
+
+.sovereign-app-runtime .composer-send {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: var(--cohesion-ink);
+  color: #0a0c0f;
+}
+
+.sovereign-app-runtime .intelligence-context {
+  width: 420px;
+  border-left: 1px solid var(--cohesion-line);
+  background: rgba(11,14,18,0.97);
+  box-shadow: -24px 0 80px rgba(0,0,0,0.34);
+}
+
+.sovereign-app-runtime .intelligence-context > header {
+  min-height: 88px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--cohesion-line);
+}
+
+.sovereign-app-runtime .context-scroll {
+  padding: 24px;
+}
+
+/* Tablet and iPhone workspace. */
+@media (max-width: 1080px) {
+  :where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) {
+    --cohesion-shell: min(100% - 48px, 980px);
+  }
+
+  .account-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(390px, 460px) !important;
+    gap: 52px !important;
+  }
+
+  .sovereign-app-runtime .intelligence-workspace.context-open .intelligence-main {
+    margin-right: 0;
+  }
+
+  .sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
+    right: 28px;
+  }
+
+  .sovereign-app-runtime .intelligence-context {
+    position: fixed;
+    z-index: 70;
+    right: 0;
+  }
+}
+
+@media (max-width: 820px) {
+  .account-layout,
+  .plan-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .account-intro,
+  .auth-panel {
+    max-width: 720px !important;
+  }
+
+  .sovereign-app-runtime .intelligence-sidebar {
+    display: none;
+  }
+
+  .sovereign-app-runtime .intelligence-main {
+    margin-left: 0;
+    padding-bottom: calc(78px + env(safe-area-inset-bottom));
+  }
+
+  .sovereign-app-runtime .intelligence-topbar {
+    min-height: calc(66px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right));
+  }
+
+  .sovereign-app-runtime .mobile-menu-trigger {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    border-color: var(--cohesion-line);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .sovereign-app-runtime .intelligence-scroll {
+    width: 100%;
+    padding: 44px max(20px, env(safe-area-inset-left)) 210px max(20px, env(safe-area-inset-right));
+  }
+
+  .sovereign-app-runtime .surface-heading {
+    grid-template-columns: 1fr;
+    row-gap: 22px;
+    margin-bottom: 42px;
+    padding-bottom: 30px;
+  }
+
+  .sovereign-app-runtime .surface-heading h1 {
+    font-size: clamp(3.2rem, 10vw, 5.4rem);
+  }
+
+  .sovereign-app-runtime .surface-heading > span {
+    max-width: 58ch;
+  }
+
+  .sovereign-app-runtime .baseline-preparing {
+    grid-template-columns: 1fr;
+    min-height: 430px;
+    padding: 38px;
+  }
+
+  .sovereign-app-runtime .baseline-preparing > span,
+  .sovereign-app-runtime .baseline-preparing > button {
+    grid-column: 1;
+  }
+
+  .sovereign-app-runtime .today-insight-lines,
+  .sovereign-app-runtime .today-continuations,
+  .sovereign-app-runtime .account-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .sovereign-app-runtime .today-facet-view {
+    grid-template-columns: 1fr;
+  }
+
+  .sovereign-app-runtime .today-insight-lines article {
+    min-height: 0;
+  }
+
+  .sovereign-app-runtime .sovereign-composer,
+  .sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
+    right: max(10px, env(safe-area-inset-right));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: max(10px, env(safe-area-inset-left));
+    max-width: none;
+    border-radius: 16px;
+  }
+
+  .sovereign-app-runtime .intelligence-context {
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    max-height: min(84svh, 760px);
+    border-top: 1px solid var(--cohesion-line-strong);
+    border-left: 0;
+    border-radius: 22px 22px 0 0;
+  }
+}
+
+@media (max-width: 560px) {
+  :where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) {
+    --cohesion-shell: calc(100% - 28px);
+  }
+
+  .account-layout,
+  .plan-layout {
+    padding: 40px 0 72px !important;
+  }
+
+  .account-intro h1,
+  .public-secondary-page .policy-hero h1 {
+    font-size: clamp(3rem, 14vw, 4.75rem) !important;
+  }
+
+  .auth-panel {
+    padding: 24px !important;
+    border-radius: 14px !important;
+  }
+
+  .sovereign-app-runtime .intelligence-topbar > div:first-of-type strong,
+  .sovereign-app-runtime .intelligence-topbar em {
+    display: none;
+  }
+
+  .sovereign-app-runtime .topbar-actions {
+    margin-left: auto;
+  }
+
+  .sovereign-app-runtime .topbar-actions button {
+    min-width: 88px;
+  }
+
+  .sovereign-app-runtime .intelligence-scroll {
+    padding-top: 34px;
+    padding-inline: max(14px, env(safe-area-inset-left)) max(14px, env(safe-area-inset-right));
+  }
+
+  .sovereign-app-runtime .surface-heading h1,
+  .sovereign-app-runtime .baseline-preparing h1,
+  .sovereign-app-runtime .today-facet-view > header h1,
+  .sovereign-app-runtime .sovereign-answer > header h2 {
+    font-size: clamp(2.75rem, 13vw, 4.25rem);
+    line-height: 0.95;
+  }
+
+  .sovereign-app-runtime .surface-heading > span,
+  .sovereign-app-runtime .baseline-preparing > span,
+  .sovereign-app-runtime .today-facet-view > header > span,
+  .sovereign-app-runtime .direct-answer {
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+
+  .sovereign-app-runtime .baseline-preparing,
+  .sovereign-app-runtime .baseline-invitation,
+  .sovereign-app-runtime .incomplete-state {
+    min-height: 0;
+    padding: 28px 22px;
+    border-radius: 16px;
+  }
+
+  .sovereign-app-runtime .today-facet-view,
+  .sovereign-app-runtime .sovereign-answer,
+  .sovereign-app-runtime .account-summary {
+    border-radius: 16px;
+  }
+
+  .sovereign-app-runtime .today-facet-view > header,
+  .sovereign-app-runtime .today-insight-lines article,
+  .sovereign-app-runtime .account-summary article,
+  .sovereign-app-runtime .account-summary > button {
+    padding: 24px 22px;
+  }
+
+  .sovereign-app-runtime .sovereign-composer {
+    padding: 8px;
+  }
+
+  .sovereign-app-runtime .composer-context-line {
+    font-size: 0.68rem;
+  }
+
+  .sovereign-app-runtime .composer-context-line span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sovereign-app-runtime .composer-send {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) *,
+  :where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) *::before,
+  :where(.sovereign-app-runtime, .account-shell, .plan-onboarding, .invitation-shell, .private-route-gate, .public-not-found, .public-secondary-page) *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+
+/* ==========================================================================
+   Sitewide Cohesion & Workspace Mobile (migrated from releases.css)
+   ========================================================================== */
+
+/* ── sitewide-cohesion-refinement-v2.css ── */
+/*
+ * Sovereign.OS sitewide cohesion refinement v2.
+ *
+ * Loaded through the existing synchronous platform cohesion installer so the
+ * frozen founder landing, account journey, and authenticated one-room workspace
+ * share one final wordmark, spacing rhythm, and interaction finish without
+ * replacing route ownership or product behavior.
+ */
+
+
+:where(
+  .v0-wordmark,
+  .account-nav .wordmark,
+  .plan-nav .wordmark,
+  .private-route-brand strong,
+  .intelligence-brand strong,
+  .public-secondary-page .v0-wordmark,
+  .launch-wordmark,
+  .launch-brand
+) {
+  color: #f1e9de !important;
+  font-family: var(--sovereign-wordmark-family) !important;
+  font-size: var(--sovereign-wordmark-size) !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: var(--sovereign-wordmark-tracking) !important;
+  text-transform: uppercase !important;
+  white-space: nowrap;
+}
+
+/* The hero field remains the frozen composition; this layer only improves its
+   semantic vectors, endpoint readout, and center-anchored interaction finish. */
+.public-approved-v8 .landing-expression-slice__canvas {
+  top: 96% !important;
+  filter: drop-shadow(0 0 48px rgba(26, 124, 255, 0.24));
+}
+
+.public-approved-v8 .landing-expression-slice__vector {
+  cursor: pointer;
+  outline: none;
+}
+
+.public-approved-v8 .landing-expression-slice__beam {
+  stroke-width: 1.45px;
+  filter: drop-shadow(0 0 5px rgba(47, 147, 255, 0.78));
+}
+
+.public-approved-v8 .landing-expression-slice__aura {
+  stroke-width: 6px;
+  opacity: 0.42;
+}
+
+.public-approved-v8 .landing-expression-slice__endpoint {
+  fill: rgba(126, 201, 255, 0.82);
+  stroke: rgba(223, 245, 255, 0.66);
+  stroke-width: 0.8px;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 5px rgba(47, 147, 255, 0.72));
+  transition: r 180ms ease, opacity 180ms ease;
+}
+
+.public-approved-v8 .landing-expression-slice__vector:is(:hover, :focus-visible, .is-selected) .landing-expression-slice__endpoint {
+  fill: #eef9ff;
+  stroke: #78c7ff;
+  filter: drop-shadow(0 0 9px rgba(120, 199, 255, 0.95));
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip {
+  display: block !important;
+  pointer-events: none;
+  filter: drop-shadow(0 16px 34px rgba(0, 0, 0, 0.48));
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-connector {
+  stroke: rgba(120, 199, 255, 0.62);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-panel {
+  fill: rgba(8, 12, 18, 0.92);
+  stroke: rgba(120, 199, 255, 0.42);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-title {
+  fill: #f1e9de;
+  font-family: var(--font-display, system-ui, Georgia, serif);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-value {
+  fill: rgba(120, 199, 255, 0.9);
+  font-family: var(--font-subheading, system-ui, sans-serif);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-approved-v8 .landing-expression-slice__tooltip-meta {
+  fill: rgba(213, 226, 238, 0.62);
+  font-family: var(--font-body, sans-serif);
+  font-size: 9px;
+  letter-spacing: 0.025em;
+}
+
+.public-approved-v8 .landing-expression-slice__readout--accessible {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Questions now form a quiet editorial bridge below the hero instead of
+   competing with the field center and selected-vector readout. */
+.public-approved-v8 .landing-question-orbit {
+  position: relative !important;
+  z-index: 9;
+  display: grid;
+  min-height: 188px !important;
+  height: auto !important;
+  place-items: center;
+  overflow: hidden !important;
+  border-top: 1px solid rgba(241, 233, 222, 0.08) !important;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.08) !important;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(47, 147, 255, 0.05), transparent 30rem),
+    rgba(255, 255, 255, 0.008) !important;
+  pointer-events: none;
+}
+
+.public-approved-v8 .landing-question-orbit__inner {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  display: grid;
+  justify-items: center;
+  width: min(820px, calc(100vw - 48px)) !important;
+  padding: 42px 0 46px !important;
+  transform: none !important;
+  text-align: center;
+}
+
+.public-approved-v8 .landing-question-orbit__kicker {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 0 18px !important;
+  overflow: visible !important;
+  clip: auto !important;
+  color: rgba(120, 199, 255, 0.72) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
+  font-size: 0.58rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.17em !important;
+  text-transform: uppercase;
+  white-space: normal !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage {
+  width: min(780px, 100%) !important;
+  height: 66px !important;
+}
+
+.public-approved-v8 .landing-question-orbit__stage span {
+  padding-inline: 28px !important;
+  color: rgba(241, 233, 222, 0.86) !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
+  font-size: clamp(1.28rem, 2.35vw, 1.82rem) !important;
+  font-weight: 400 !important;
+  line-height: 1.16 !important;
+  letter-spacing: -0.025em !important;
+}
+
+/* Account entry uses the same restrained atmosphere and hierarchy as the
+   landing, while preserving the real email, passkey, Turnstile, and redeem flow. */
+.account-shell {
+  min-height: 100svh;
+  background:
+    radial-gradient(circle at 73% 10%, rgba(47, 147, 255, 0.095), transparent 32rem),
+    linear-gradient(rgba(255, 255, 255, 0.006) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.006) 1px, transparent 1px),
+    #080a0d !important;
+  background-size: auto, 96px 96px, 96px 96px, auto !important;
+}
+
+.account-nav {
+  min-height: 74px !important;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.09) !important;
+  background: rgba(8, 10, 13, 0.78) !important;
+  backdrop-filter: blur(22px) saturate(118%);
+}
+
+.account-nav > a:last-child {
+  color: rgba(229, 220, 209, 0.72) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
+  font-size: 0.72rem !important;
+  text-decoration: none;
+}
+
+.account-layout {
+  align-items: center !important;
+}
+
+.account-intro {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.account-intro .eyebrow,
+.auth-panel .eyebrow {
+  color: rgba(120, 199, 255, 0.76) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
+  font-size: 0.61rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.17em !important;
+}
+
+.account-intro h1 {
+  color: #f1e9de !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.account-intro .lede {
+  color: rgba(229, 220, 209, 0.7) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
+}
+
+.account-points li {
+  color: rgba(229, 220, 209, 0.68) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.5 !important;
+}
+
+.auth-panel {
+  border: 1px solid rgba(241, 233, 222, 0.12) !important;
+  border-radius: 16px !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.026), transparent 46%),
+    radial-gradient(circle at 100% 0, rgba(47, 147, 255, 0.1), transparent 24rem),
+    rgba(18, 21, 26, 0.96) !important;
+  box-shadow: 0 34px 104px rgba(0, 0, 0, 0.46) !important;
+}
+
+.auth-panel h2 {
+  max-width: 12ch;
+  color: #f1e9de !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.045em !important;
+}
+
+.auth-panel :where(input, select, textarea) {
+  border-color: rgba(241, 233, 222, 0.14) !important;
+  background: rgba(5, 7, 10, 0.58) !important;
+  color: #f1e9de !important;
+}
+
+.auth-panel :where(input, select, textarea):focus {
+  border-color: rgba(120, 199, 255, 0.64) !important;
+  box-shadow: 0 0 0 3px rgba(47, 147, 255, 0.1) !important;
+}
+
+.auth-panel .primary-button {
+  min-height: 52px !important;
+  border-radius: 7px !important;
+  background: #e8ddd0 !important;
+  color: #111316 !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
+  font-weight: 700 !important;
+}
+
+/* Keep the authenticated platform in the same visual family without turning
+   the one-room product into a different shell or dashboard. */
+.sovereign-app-runtime .intelligence-brand {
+  min-height: 54px;
+  align-items: center;
+}
+
+.sovereign-app-runtime .intelligence-topbar,
+.sovereign-app-runtime .intelligence-sidebar,
+.sovereign-app-runtime .sovereign-composer {
+  border-color: rgba(241, 233, 222, 0.1) !important;
+}
+
+.sovereign-app-runtime .surface-heading h1,
+.sovereign-app-runtime .baseline-preparing h1,
+.sovereign-app-runtime .today-facet-view h1,
+.sovereign-app-runtime .explore-editorial h1,
+.sovereign-app-runtime .relationship-overview h1,
+.sovereign-app-runtime .system-overview h1 {
+  color: #f1e9de !important;
+  font-family: var(--font-display, system-ui, Georgia, serif) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.sovereign-app-runtime :where(.surface-heading > span, .workspace-intro, .section-introduction) {
+  color: rgba(229, 220, 209, 0.7) !important;
+  font-family: var(--font-subheading, system-ui, sans-serif) !important;
+}
+
+/* Keep authenticated surfaces calm and document-like on desktop. */
+@media (min-width: 901px) {
+  .sovereign-app-runtime .intelligence-scroll {
+    width: min(100%, 1120px) !important;
+    padding: 42px clamp(32px, 4vw, 56px) 196px !important;
+  }
+
+  .sovereign-app-runtime .surface-heading {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 0.52fr) !important;
+    column-gap: clamp(32px, 5vw, 72px) !important;
+    margin-bottom: 36px !important;
+    padding-bottom: 24px !important;
+  }
+
+  .sovereign-app-runtime .surface-heading h1,
+  .sovereign-app-runtime .baseline-preparing h1,
+  .sovereign-app-runtime .today-facet-view > header h1,
+  .sovereign-app-runtime .sovereign-answer > header h2 {
+    max-width: 16ch !important;
+    font-size: clamp(2.45rem, 3.6vw, 3.6rem) !important;
+    line-height: 1.02 !important;
+    letter-spacing: -0.045em !important;
+  }
+
+  .sovereign-app-runtime .baseline-preparing,
+  .sovereign-app-runtime .baseline-invitation,
+  .sovereign-app-runtime .incomplete-state,
+  .sovereign-app-runtime .loading-state {
+    min-height: 0 !important;
+    padding: 36px 40px !important;
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.015) !important;
+    box-shadow: none !important;
+  }
+
+  .sovereign-app-runtime .today-facet-view {
+    grid-template-columns: minmax(0, 1fr) !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .sovereign-app-runtime .today-facet-view > header {
+    min-height: 0 !important;
+    padding: 0 0 32px !important;
+    border-bottom: 1px solid rgba(241, 233, 222, 0.1) !important;
+    background: transparent !important;
+  }
+
+  .sovereign-app-runtime .today-insight-lines,
+  .sovereign-app-runtime .today-continuations {
+    gap: clamp(22px, 3vw, 40px) !important;
+    background: transparent !important;
+  }
+
+  .sovereign-app-runtime .today-insight-lines article {
+    min-height: 0 !important;
+    padding: 24px 0 !important;
+    border-bottom: 1px solid rgba(241, 233, 222, 0.1) !important;
+    background: transparent !important;
+  }
+
+  .sovereign-app-runtime .today-continuations button {
+    min-height: 52px !important;
+    padding: 14px 0 !important;
+    border-bottom: 1px solid rgba(241, 233, 222, 0.1) !important;
+    background: transparent !important;
+  }
+
+  .sovereign-app-runtime .account-summary {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .sovereign-app-runtime .account-summary article,
+  .sovereign-app-runtime .account-summary > button {
+    min-height: 0 !important;
+    padding: 18px 0 !important;
+    border-bottom: 1px solid rgba(241, 233, 222, 0.1) !important;
+    background: transparent !important;
+  }
+
+  .sovereign-app-runtime .sovereign-answer {
+    border-radius: 12px !important;
+    box-shadow: none !important;
+  }
+}
+
+@media (max-width: 900px) {
+
+  .public-approved-v8 .landing-expression-slice__canvas {
+    top: 97% !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice__tooltip-title {
+    font-size: 18px;
+  }
+
+  .public-approved-v8 .landing-question-orbit {
+    min-height: 154px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__inner {
+    width: calc(100vw - 32px) !important;
+    padding: 30px 0 34px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__kicker {
+    margin-bottom: 12px !important;
+    font-size: 0.54rem !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__stage {
+    height: 62px !important;
+  }
+
+  .public-approved-v8 .landing-question-orbit__stage span {
+    padding-inline: 12px !important;
+    font-size: clamp(1.04rem, 5.6vw, 1.32rem) !important;
+  }
+
+  .account-nav,
+  .account-layout {
+    width: min(100%, calc(100vw - 36px)) !important;
+  }
+
+  .account-nav {
+    min-height: 68px !important;
+  }
+
+  .account-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 42px !important;
+    padding: 52px 0 72px !important;
+  }
+
+  .account-intro {
+    max-width: 680px !important;
+  }
+
+  .account-intro h1 {
+    max-width: 12ch !important;
+    font-size: clamp(3.1rem, 12vw, 5rem) !important;
+    line-height: 0.92 !important;
+  }
+
+  .account-intro .lede {
+    max-width: 48ch !important;
+    font-size: 0.94rem !important;
+  }
+
+  .account-points {
+    margin-top: 28px !important;
+  }
+
+  .account-points li {
+    min-height: 52px !important;
+  }
+
+  .auth-panel {
+    padding: 28px 22px !important;
+  }
+
+  .auth-panel h2 {
+    font-size: clamp(2.25rem, 9vw, 3.2rem) !important;
+  }
+
+  .sovereign-app-runtime .mobile-menu-trigger {
+    width: auto !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .sovereign-app-runtime .mobile-menu-trigger::before {
+    content: "SOVEREIGN.OS";
+    display: block;
+    color: #f1e9de;
+    font-family: var(--sovereign-wordmark-family);
+    font-size: var(--sovereign-wordmark-size);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: var(--sovereign-wordmark-tracking);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .sovereign-app-runtime .intelligence-topbar > div:first-of-type > strong,
+  .sovereign-app-runtime .intelligence-topbar > div:first-of-type > span {
+    display: none !important;
+  }
+
+  .sovereign-app-runtime .intelligence-topbar > div:first-of-type > em {
+    color: rgba(229, 220, 209, 0.62) !important;
+    font-family: var(--font-subheading, system-ui, sans-serif) !important;
+    font-size: 0.64rem !important;
+    font-style: normal !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase;
+  }
+
+  .sovereign-app-runtime .intelligence-scroll {
+    padding-inline: 20px !important;
+  }
+
+  .sovereign-app-runtime .surface-heading {
+    grid-template-columns: minmax(0, 1fr) !important;
+    row-gap: 20px !important;
+    margin-bottom: 42px !important;
+    padding-bottom: 28px !important;
+  }
+
+  .sovereign-app-runtime .surface-heading h1 {
+    max-width: 12ch !important;
+    font-size: clamp(3rem, 12vw, 4.8rem) !important;
+  }
+
+  .sovereign-app-runtime .surface-heading > span {
+    max-width: 46ch !important;
+    padding-bottom: 0 !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .public-approved-v8 .landing-expression-slice__tooltip-panel {
+    fill: rgba(8, 12, 18, 0.95);
+  }
+
+  .account-layout {
+    gap: 34px !important;
+    padding-top: 40px !important;
+  }
+
+  .account-intro h1 {
+    font-size: clamp(2.8rem, 13.5vw, 4.25rem) !important;
+  }
+
+  .account-points li {
+    font-size: 0.77rem !important;
+  }
+
+  .auth-panel {
+    border-radius: 14px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-approved-v8 .landing-expression-slice__endpoint,
+  .public-approved-v8 .landing-expression-slice__vector,
+  .auth-panel :where(input, button, a),
+  .sovereign-app-runtime :where(button, a) {
+    transition: none !important;
+  }
+}
+
+
+
+/* ==========================================================================
+   Workspace Production Refinement (migrated from releases.css)
+   ========================================================================== */
+
+/* ── workspace-production-refinement-v1.css ── */
+/*
+ * Sovereign.OS authenticated workspace production refinement v1.
+ * Terminal presentation authority only. The canonical workspace DOM and behavior remain unchanged.
+ */
+
+.intelligence-workspace {
+  --workspace-page: #090a0b;
+  --workspace-panel: #0f1112;
+  --workspace-raised: #151718;
+  --workspace-line: rgba(245, 239, 230, 0.13);
+  --workspace-line-strong: rgba(245, 239, 230, 0.22);
+  --workspace-ink: #f2ede5;
+  --workspace-muted: rgba(242, 237, 229, 0.72);
+  --workspace-faint: rgba(242, 237, 229, 0.48);
+  min-height: 100dvh !important;
+  background: var(--workspace-page) !important;
+  color: var(--workspace-ink) !important;
+}
+
+.intelligence-sidebar {
+  width: 248px !important;
+  padding: calc(20px + env(safe-area-inset-top)) 14px 18px !important;
+  border-right-color: var(--workspace-line) !important;
+  background: rgba(9, 10, 11, 0.96) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+.intelligence-brand {
+  min-height: 44px !important;
+  gap: 10px !important;
+  color: var(--workspace-ink) !important;
+  font-size: 0.78rem !important;
+}
+
+.intelligence-brand > span,
+.mobile-menu-trigger {
+  width: 34px !important;
+  height: 34px !important;
+  border-color: var(--workspace-line-strong) !important;
+  background: transparent !important;
+  color: var(--workspace-ink) !important;
+}
+
+.intelligence-sidebar nav {
+  gap: 2px !important;
+  margin-top: 22px !important;
+}
+
+.intelligence-sidebar nav button {
+  min-height: 46px !important;
+  grid-template-columns: 1fr !important;
+  padding: 9px 10px !important;
+  border-radius: 10px !important;
+  color: var(--workspace-muted) !important;
+}
+
+.intelligence-sidebar nav button strong {
+  font-size: 0.86rem !important;
+  font-weight: 610 !important;
+}
+
+.intelligence-sidebar nav button:hover,
+.intelligence-sidebar nav button.active {
+  background: rgba(245, 239, 230, 0.07) !important;
+  color: var(--workspace-ink) !important;
+}
+
+.recent-threads {
+  gap: 1px !important;
+  margin-top: 24px !important;
+  padding-top: 18px !important;
+  border-top: 1px solid var(--workspace-line) !important;
+}
+
+.recent-threads > p {
+  margin: 0 10px 8px !important;
+  color: var(--workspace-faint) !important;
+  font-size: 0.73rem !important;
+}
+
+.recent-threads button {
+  min-height: 38px !important;
+  color: var(--workspace-muted) !important;
+  font-size: 0.78rem !important;
+}
+
+.new-conversation {
+  min-height: 44px !important;
+  margin-top: 18px !important;
+  border-color: var(--workspace-line-strong) !important;
+  border-radius: 12px !important;
+  background: transparent !important;
+  color: var(--workspace-ink) !important;
+  font-size: 0.82rem !important;
+}
+
+.intelligence-main {
+  min-height: 100dvh !important;
+  margin-left: 248px !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  background: var(--workspace-page) !important;
+}
+
+.intelligence-workspace.context-open .intelligence-main {
+  margin-right: 368px !important;
+}
+
+.intelligence-topbar {
+  min-height: 62px !important;
+  padding: 9px 22px !important;
+  border-bottom-color: var(--workspace-line) !important;
+  background: rgba(9, 10, 11, 0.88) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+.intelligence-topbar strong {
+  color: var(--workspace-ink) !important;
+  font-size: 1rem !important;
+}
+
+.intelligence-topbar em,
+.intelligence-topbar span,
+.workspace-status {
+  color: var(--workspace-faint) !important;
+  font-size: 0.76rem !important;
+}
+
+.topbar-actions button {
+  min-height: 40px !important;
+  padding: 7px 12px !important;
+  border-color: var(--workspace-line-strong) !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--workspace-muted) !important;
+  font-size: 0.78rem !important;
+}
+
+.intelligence-scroll {
+  width: min(100%, 980px) !important;
+  margin: 0 auto !important;
+  padding: 52px 42px 188px !important;
+}
+
+.surface-heading {
+  max-width: 790px !important;
+  margin-bottom: 38px !important;
+}
+
+.surface-heading > p,
+.sovereign-answer > header > span,
+.answer-sections span,
+.alignment-view span,
+.relationship-answer span,
+.system-answer span,
+.covenant-answer span,
+.today-facet-view span,
+.relationship-field span,
+.incomplete-state > span {
+  color: var(--workspace-faint) !important;
+  font-size: 0.76rem !important;
+  letter-spacing: 0.08em !important;
+}
+
+.surface-heading h1 {
+  max-width: 18ch !important;
+  margin: 9px 0 14px !important;
+  color: var(--workspace-ink) !important;
+  font-size: clamp(2.25rem, 4vw, 3.15rem) !important;
+  line-height: 1.02 !important;
+}
+
+.surface-heading > span {
+  max-width: 64ch !important;
+  color: var(--workspace-muted) !important;
+  font-size: 1.04rem !important;
+  line-height: 1.64 !important;
+}
+
+.response-thread {
+  gap: 32px !important;
+  padding-bottom: 10px !important;
+}
+
+.user-question {
+  max-width: min(72%, 650px) !important;
+  padding: 13px 17px !important;
+  border-color: var(--workspace-line) !important;
+  border-radius: 20px 20px 6px 20px !important;
+  background: var(--workspace-raised) !important;
+  box-shadow: none !important;
+}
+
+.user-question > span {
+  margin-bottom: 6px !important;
+  color: var(--workspace-faint) !important;
+  font-size: 0.72rem !important;
+}
+
+.user-question p {
+  color: var(--workspace-ink) !important;
+  font-size: 1rem !important;
+  line-height: 1.58 !important;
+}
+
+.sovereign-response {
+  max-width: 880px !important;
+  padding-left: 46px !important;
+}
+
+.response-mark {
+  width: 30px !important;
+  height: 30px !important;
+  border-color: var(--workspace-line-strong) !important;
+  background: transparent !important;
+  color: var(--workspace-ink) !important;
+}
+
+.thinking {
+  color: var(--workspace-muted) !important;
+  font-size: 0.96rem !important;
+}
+
+.sovereign-answer {
+  max-width: 800px !important;
+}
+
+.sovereign-answer > header > small {
+  border: 1px solid var(--workspace-line) !important;
+  background: transparent !important;
+  color: var(--workspace-faint) !important;
+  font-size: 0.72rem !important;
+}
+
+.sovereign-answer > header h2 {
+  max-width: 22ch !important;
+  margin: 10px 0 17px !important;
+  color: var(--workspace-ink) !important;
+  font-size: clamp(1.95rem, 3.1vw, 2.65rem) !important;
+  line-height: 1.06 !important;
+}
+
+.direct-answer {
+  max-width: 68ch !important;
+  color: var(--workspace-ink) !important;
+  font-size: 1.08rem !important;
+  line-height: 1.72 !important;
+}
+
+.answer-sections {
+  gap: 23px !important;
+  margin-top: 32px !important;
+}
+
+.answer-sections article {
+  max-width: 68ch !important;
+  padding-left: 0 !important;
+}
+
+.answer-sections p,
+.alignment-view p,
+.relationship-answer p,
+.system-answer p,
+.covenant-answer p {
+  color: var(--workspace-muted) !important;
+  font-size: 1rem !important;
+  line-height: 1.68 !important;
+}
+
+.relationship-answer,
+.system-answer,
+.covenant-answer {
+  gap: 0 !important;
+  margin-top: 32px !important;
+  border-top: 1px solid var(--workspace-line) !important;
+}
+
+.relationship-answer > div {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.relationship-answer > div article,
+.relationship-answer > article,
+.system-answer article,
+.covenant-answer article {
+  padding: 22px 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--workspace-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.relationship-answer .interaction-field {
+  margin: 8px 0 !important;
+  padding: 22px !important;
+  border: 1px solid var(--workspace-line-strong) !important;
+  border-radius: 16px !important;
+  background: rgba(245, 239, 230, 0.055) !important;
+  box-shadow: inset 3px 0 0 rgba(245, 239, 230, 0.54) !important;
+}
+
+.system-answer article:first-child {
+  padding-top: 24px !important;
+}
+
+.alignment-view {
+  gap: 0 !important;
+  margin-top: 32px !important;
+  border-color: var(--workspace-line) !important;
+  border-radius: 18px !important;
+  background: transparent !important;
+}
+
+.alignment-view article {
+  min-height: 138px !important;
+  padding: 22px !important;
+  border-bottom: 1px solid var(--workspace-line) !important;
+  background: transparent !important;
+}
+
+.alignment-view .tradeoff-line {
+  background: rgba(245, 239, 230, 0.045) !important;
+}
+
+.answer-meta-row {
+  gap: 8px !important;
+  margin-top: 28px !important;
+}
+
+.basis-strip,
+.covenant-action {
+  min-height: 40px !important;
+  border-color: var(--workspace-line) !important;
+  background: transparent !important;
+  color: var(--workspace-faint) !important;
+  font-size: 0.74rem !important;
+}
+
+.answer-actions {
+  gap: 9px !important;
+  margin-top: 20px !important;
+  padding-top: 20px !important;
+  border-top-color: var(--workspace-line) !important;
+}
+
+.answer-actions button,
+.fit-controls button {
+  min-height: 40px !important;
+  border-color: var(--workspace-line-strong) !important;
+  border-radius: 999px !important;
+  color: var(--workspace-muted) !important;
+  font-size: 0.76rem !important;
+}
+
+.fit-controls > span {
+  color: var(--workspace-faint) !important;
+  font-size: 0.76rem !important;
+}
+
+.sovereign-composer {
+  position: sticky !important;
+  z-index: 35 !important;
+  bottom: 0 !important;
+  width: min(calc(100% - 56px), 850px) !important;
+  margin: 0 auto calc(14px + env(safe-area-inset-bottom)) !important;
+  padding: 10px 12px 9px !important;
+  border: 1px solid var(--workspace-line-strong) !important;
+  border-radius: 24px !important;
+  background: rgba(20, 22, 23, 0.97) !important;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.38) !important;
+  backdrop-filter: blur(22px) !important;
+}
+
+.composer-context-line {
+  min-height: 32px !important;
+  justify-content: space-between !important;
+  padding: 0 4px 4px !important;
+}
+
+.composer-context-line > span,
+.sovereign-composer > div > span,
+.composer-example {
+  color: var(--workspace-faint) !important;
+  font-size: 0.76rem !important;
+}
+
+.composer-context-line button {
+  min-height: 32px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--workspace-muted) !important;
+  font-size: 0.76rem !important;
+}
+
+.composer-entry {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 44px !important;
+  gap: 8px !important;
+  align-items: end !important;
+}
+
+.sovereign-composer textarea {
+  min-height: 54px !important;
+  max-height: 210px !important;
+  padding: 12px 10px !important;
+  resize: none !important;
+  color: var(--workspace-ink) !important;
+  font-size: 1rem !important;
+  line-height: 1.48 !important;
+}
+
+.composer-send {
+  width: 42px !important;
+  height: 42px !important;
+  margin-bottom: 5px !important;
+  background: var(--workspace-ink) !important;
+  color: #090a0b !important;
+}
+
+.intelligence-context {
+  width: 368px !important;
+  border-left-color: var(--workspace-line) !important;
+  background: var(--workspace-panel) !important;
+}
+
+.intelligence-context > header {
+  min-height: 62px !important;
+  border-bottom-color: var(--workspace-line) !important;
+}
+
+.intelligence-context > header p,
+.context-stack label,
+.permission-card span,
+.control-section > p,
+.current-permission-state small,
+.current-permission-message,
+.context-intro,
+.field-note {
+  color: var(--workspace-muted) !important;
+  font-size: 0.78rem !important;
+  line-height: 1.55 !important;
+}
+
+.permission-card,
+.control-section,
+.current-permission-state {
+  border-color: var(--workspace-line) !important;
+  background: rgba(245, 239, 230, 0.035) !important;
+}
+
+.today-facet-view,
+.person-split,
+.relationship-field,
+.system-graph button,
+.incomplete-state {
+  border-color: var(--workspace-line) !important;
+  background: transparent !important;
+}
+
+.person-split article,
+.relationship-field,
+.system-graph button,
+.incomplete-state {
+  background: rgba(245, 239, 230, 0.025) !important;
+}
+
+@media (max-width: 1180px) {
+  .intelligence-workspace.context-open .intelligence-main {
+    margin-right: 0 !important;
+  }
+}
+
+@media (max-width: 920px) {
+  .intelligence-sidebar {
+    display: none !important;
+  }
+
+  .intelligence-main {
+    min-height: var(--sovereign-viewport-height, 100dvh) !important;
+    margin-left: 0 !important;
+  }
+
+  .intelligence-topbar {
+    min-height: 58px !important;
+    padding: calc(7px + env(safe-area-inset-top)) 14px 7px !important;
+  }
+
+  .mobile-menu-trigger {
+    display: grid !important;
+  }
+
+  .intelligence-scroll {
+    width: 100% !important;
+    padding: 32px 20px 172px !important;
+  }
+
+  .sovereign-composer {
+    width: calc(100% - 20px) !important;
+    margin: 0 10px calc(8px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .intelligence-context {
+    width: min(100%, 390px) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .intelligence-scroll {
+    padding: 28px 16px 166px !important;
+  }
+
+  .surface-heading {
+    margin-bottom: 28px !important;
+  }
+
+  .surface-heading h1 {
+    max-width: 14ch !important;
+    font-size: clamp(2rem, 10.5vw, 2.7rem) !important;
+  }
+
+  .surface-heading > span {
+    font-size: 1rem !important;
+    line-height: 1.58 !important;
+  }
+
+  .response-thread {
+    gap: 27px !important;
+  }
+
+  .user-question {
+    max-width: 88% !important;
+    padding: 12px 14px !important;
+  }
+
+  .user-question p,
+  .direct-answer,
+  .answer-sections p,
+  .alignment-view p,
+  .relationship-answer p,
+  .system-answer p,
+  .covenant-answer p {
+    font-size: 1rem !important;
+    line-height: 1.62 !important;
+  }
+
+  .sovereign-response {
+    padding-left: 0 !important;
+  }
+
+  .response-mark {
+    position: static !important;
+    width: 28px !important;
+    height: 28px !important;
+    margin-bottom: 13px !important;
+  }
+
+  .sovereign-answer > header h2 {
+    max-width: 18ch !important;
+    font-size: clamp(1.8rem, 8vw, 2.28rem) !important;
+  }
+
+  .relationship-answer > div,
+  .alignment-view > div,
+  .person-split,
+  .system-graph {
+    grid-template-columns: 1fr !important;
+  }
+
+  .relationship-answer .interaction-field {
+    padding: 18px !important;
+  }
+
+  .answer-actions {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .fit-controls {
+    flex-wrap: wrap !important;
+  }
+
+  .fit-controls > span {
+    flex-basis: 100% !important;
+  }
+
+  .sovereign-composer {
+    width: calc(100% - 16px) !important;
+    margin: 0 8px calc(7px + env(safe-area-inset-bottom)) !important;
+    padding: 8px 9px 7px !important;
+    border-radius: 20px !important;
+  }
+
+  .composer-context-line {
+    min-width: 0 !important;
+  }
+
+  .composer-context-line > span {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .composer-example {
+    display: none !important;
+  }
+
+  .sovereign-composer textarea {
+    min-height: 50px !important;
+    padding: 10px 8px !important;
+    font-size: 16px !important;
+  }
+
+  .intelligence-context {
+    width: 100% !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intelligence-workspace *,
+  .intelligence-workspace *::before,
+  .intelligence-workspace *::after {
+    scroll-behavior: auto !important;
+  }
+}
+
+
+
+/* ==========================================================================
+   Premium Action & Product Cohesion (migrated from releases.css)
+   ========================================================================== */
+
+/* ── premium-action-authority-v1.css ── */
+/* Sovereign.OS premium action authority
+ * Public-release rule: actions read as editorial affordances, not UI pills/cards.
+ * Semantic buttons remain intact for keyboard, screen-reader, and form behavior.
+ */
+
+
+/* Remove visible pill / rectangular button chrome without disabling semantics. */
+:where(
+  button:not(.sheet-backdrop):not(.context-backdrop):not(.primary-button):not(.passkey-button):not(.consent-choice),
+  a.landing-control,
+  a[class*="-action"],
+  a[class*="__action"],
+  a[class*="-cta"],
+  a[class*="__cta"],
+  a[class*="button"]
+) {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+:where(
+  button:not(.sheet-backdrop):not(.context-backdrop):not(.primary-button):not(.passkey-button):not(.consent-choice),
+  a.landing-control,
+  a[class*="-action"],
+  a[class*="__action"],
+  a[class*="-cta"],
+  a[class*="__cta"],
+  a[class*="button"]
+):focus-visible {
+  outline: 1px solid var(--sovereign-action-line-strong) !important;
+  outline-offset: 5px !important;
+}
+
+/* Acquisition is one quiet navigation language: Sign in / Get started. */
+.sovereign-landing .v0-nav-actions {
+  gap: clamp(18px, 2.4vw, 34px) !important;
+}
+
+.sovereign-landing .v0-sign-in,
+.sovereign-landing .v0-get-started,
+.sovereign-landing .v0-mobile-menu__panel a {
+  color: var(--sovereign-action-ink) !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+}
+
+.sovereign-landing .v0-get-started {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 44px !important;
+  padding: 0 !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.sovereign-landing .v0-get-started::after,
+.sovereign-landing .v0-sign-in::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 6px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0;
+  transform: scaleX(0.5);
+  transform-origin: left;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.sovereign-landing .v0-get-started,
+.sovereign-landing .v0-sign-in {
+  position: relative !important;
+}
+
+.sovereign-landing .v0-get-started:hover::after,
+.sovereign-landing .v0-sign-in:hover::after,
+.sovereign-landing .v0-get-started:focus-visible::after,
+.sovereign-landing .v0-sign-in:focus-visible::after {
+  opacity: 0.72;
+  transform: scaleX(1);
+}
+
+/* Hero is narrative-first. No duplicate acquisition cluster. */
+.sovereign-landing .sovereign-opening-actions {
+  display: none !important;
+}
+
+.sovereign-landing .v0-final .landing-control,
+.sovereign-landing .v0-final [class*="cta"] {
+  display: none !important;
+}
+
+/* Mobile capability navigation should not read as four rounded cards. */
+.sovereign-landing .sovereign-opening-capabilities,
+.sovereign-landing .sovereign-opening-capabilities > a {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.sovereign-landing .sovereign-opening-capabilities > a {
+  border: 0 !important;
+  border-top: 1px solid var(--sovereign-action-line) !important;
+}
+
+.sovereign-landing .sovereign-opening-capabilities > a:last-child {
+  border-bottom: 1px solid var(--sovereign-action-line) !important;
+}
+
+/* Auth, onboarding, pricing, account and workspace actions become editorial rows/text. */
+:where(
+  .account-shell,
+  .plan-onboarding,
+  .passkey-shell,
+  .email-code-fallback,
+  .intelligence-workspace,
+  .account-control-dialog,
+  .consent-dialog,
+  .system-membership-dialog,
+  .public-secondary-page,
+  .pricing-page,
+  .faq-page
+) button:not(.sheet-backdrop):not(.context-backdrop):not(.primary-button):not(.passkey-button):not(.consent-choice) {
+  color: inherit !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-align: left;
+}
+
+:where(
+  .primary-action,
+  .secondary-action,
+  .quiet-danger-action,
+  .baseline-primary,
+  .baseline-back,
+  .baseline-reveal-primary,
+  .new-conversation,
+  .plan-action,
+  .covenant-action,
+  .auth-submit,
+  .account-control-dialog button,
+  .workspace-sheet nav button,
+  .account-settings-index button,
+  .control-links button,
+  .billing-switch button
+) {
+  width: auto !important;
+  min-width: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+:where(
+  .primary-action,
+  .secondary-action,
+  .baseline-primary,
+  .baseline-reveal-primary,
+  .new-conversation,
+  .plan-action,
+  .covenant-action,
+  .auth-submit
+) {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 44px !important;
+  padding-inline: 0 !important;
+  border-bottom: 1px solid var(--sovereign-action-line) !important;
+}
+
+:where(
+  .primary-action,
+  .secondary-action,
+  .baseline-primary,
+  .baseline-reveal-primary,
+  .new-conversation,
+  .plan-action,
+  .covenant-action,
+  .auth-submit
+):hover,
+:where(
+  .primary-action,
+  .secondary-action,
+  .baseline-primary,
+  .baseline-reveal-primary,
+  .new-conversation,
+  .plan-action,
+  .covenant-action,
+  .auth-submit
+):focus-visible {
+  border-bottom-color: var(--sovereign-action-line-strong) !important;
+}
+
+/* Choice groups should read as a typographic selection, not segmented pills. */
+.billing-switch,
+.plan-choice,
+.plan-toggle,
+.segmented-control,
+.fit-controls {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.billing-switch button,
+.plan-choice button,
+.plan-toggle button,
+.segmented-control button,
+.fit-controls button {
+  border-bottom: 1px solid transparent !important;
+  opacity: 0.58;
+}
+
+.billing-switch button.active,
+.plan-choice button.active,
+.plan-toggle button.active,
+.segmented-control button[aria-pressed="true"],
+.fit-controls button[aria-pressed="true"] {
+  opacity: 1;
+  border-bottom-color: currentColor !important;
+}
+
+/* Workspace navigation is a quiet index, not a bank of buttons. */
+.intelligence-sidebar nav button,
+.workspace-sheet nav button,
+.account-settings-index button,
+.recent-threads button,
+.library-list button {
+  width: 100% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid rgba(242, 237, 229, 0.1) !important;
+  padding-inline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.intelligence-sidebar nav button.active,
+.workspace-sheet nav button[aria-current="page"] {
+  border-bottom-color: var(--sovereign-action-line-strong) !important;
+}
+
+/* Icon-only mechanics remain invisible chrome. */
+.mobile-menu-trigger,
+.rail-collapse,
+.composer-send,
+.intelligence-topbar button,
+.source-drawer header button,
+.workspace-sheet header button,
+.account-control-dialog > header button,
+.covenant-confirmation header button {
+  display: inline-grid !important;
+  place-items: center !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Keep overlays functional; they are not visible controls. */
+.sheet-backdrop,
+.context-backdrop {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Destructive actions communicate through text, not a red filled rectangle. */
+:where(.danger, .quiet-danger-action, button[class*="danger"]) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-decoration: underline !important;
+  text-decoration-thickness: 1px !important;
+  text-underline-offset: 4px !important;
+}
+
+/* Secondary public pages inherit the same action language. */
+body :where(a.button, a.btn, a.cta, a[class*="button"], a[class*="cta"]) {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding-inline: 0 !important;
+  text-decoration: underline !important;
+  text-decoration-thickness: 1px !important;
+  text-underline-offset: 5px !important;
+}
+
+@media (max-width: 820px) {
+  :where(
+    button:not(.sheet-backdrop):not(.context-backdrop):not(.primary-button):not(.passkey-button):not(.consent-choice),
+    a.v0-sign-in,
+    a.v0-get-started,
+    a[class*="action"],
+    a[class*="cta"],
+    a[class*="button"]
+  ) {
+    min-height: 44px !important;
+  }
+
+  .sovereign-landing .v0-nav-actions > .v0-sign-in,
+  .sovereign-landing .v0-nav-actions > .v0-get-started {
+    display: none !important;
+  }
+
+  .sovereign-landing .v0-mobile-menu__panel a {
+    min-height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-inline: 0 !important;
+    border-radius: 0 !important;
+    border-bottom: 1px solid var(--sovereign-action-line) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sovereign-landing .v0-get-started::after,
+  .sovereign-landing .v0-sign-in::after {
+    transition: none !important;
+  }
+}
+
+
+
+/* ── production-product-cohesion-v1.css ── */
+/* Sovereign.OS production product cohesion v1.
+ * Applies the landing's established visual grammar to private/authenticated surfaces.
+ * Behavior, entitlement, consent, and route contracts are unchanged.
+ */
+
+.account-shell,
+.plan-onboarding,
+.policy-review-gate,
+.intelligence-workspace {
+  --product-accent: #b99772;
+  --product-accent-bright: #e1cdb5;
+  --product-ink: #f3ece2;
+  --product-muted: rgba(226, 218, 207, 0.68);
+  --product-faint: rgba(226, 218, 207, 0.42);
+  --product-line: rgba(241, 233, 222, 0.11);
+  --product-line-strong: rgba(241, 233, 222, 0.19);
+}
+
+.account-shell .account-intro h1,
+.account-shell .auth-panel h2,
+.account-shell .passkey-primary h2,
+.plan-onboarding h1,
+.policy-review-gate h1,
+.intelligence-workspace :is(.surface-heading h1, .sovereign-answer > header h2, .intelligence-context h2) {
+  font-family: var(--sovereign-title, var(--font-title)) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.account-shell .account-intro h1 {
+  max-width: 11ch !important;
+  font-size: clamp(2.8rem, 4vw, 4rem) !important;
+  line-height: 1 !important;
+}
+
+.account-shell .auth-panel,
+.plan-onboarding .baseline-onboarding-form {
+  border-color: var(--product-line-strong) !important;
+  border-radius: 10px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.014), transparent 20%), #101215 !important;
+  box-shadow: 0 26px 72px rgba(0,0,0,0.28) !important;
+}
+
+.account-shell .auth-panel :is(input[type="email"], input[type="text"], input:not([type])),
+.plan-onboarding input,
+.plan-onboarding select {
+  border-color: var(--product-line) !important;
+  border-radius: 7px !important;
+  background: #0b0d0f !important;
+}
+
+.account-shell .auth-panel :is(input[type="email"], input[type="text"], input:not([type])):focus,
+.plan-onboarding :is(input, select):focus {
+  border-color: rgba(185, 151, 114, 0.62) !important;
+  box-shadow: 0 0 0 3px rgba(185, 151, 114, 0.08) !important;
+}
+
+.account-shell .primary-button,
+.plan-onboarding .primary-button,
+.policy-review-gate > section > button {
+  border-color: #e8ddd0 !important;
+  border-radius: 7px !important;
+  background: #e8ddd0 !important;
+  color: #111214 !important;
+  box-shadow: none !important;
+}
+
+.account-shell .passkey-button {
+  border-color: var(--product-line-strong) !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+}
+
+.policy-review-gate > section {
+  border-top: 1px solid var(--product-line) !important;
+  border-bottom: 1px solid var(--product-line) !important;
+  padding-block: clamp(34px, 5vw, 58px) !important;
+}
+
+.plan-onboarding .onboarding-progress {
+  border-bottom-color: var(--product-line) !important;
+}
+
+.plan-onboarding .onboarding-progress li[aria-current="step"],
+.plan-onboarding .baseline-building-state > .eyebrow {
+  color: var(--product-accent-bright) !important;
+}
+
+.intelligence-workspace {
+  --workspace-line: var(--product-line) !important;
+  --workspace-line-strong: var(--product-line-strong) !important;
+  --workspace-ink: var(--product-ink) !important;
+  --workspace-muted: var(--product-muted) !important;
+  --workspace-faint: var(--product-faint) !important;
+}
+
+.intelligence-sidebar {
+  border-right-color: var(--product-line) !important;
+  background: rgba(8, 10, 12, 0.97) !important;
+}
+
+.intelligence-sidebar nav button,
+.new-conversation,
+.topbar-actions button,
+.answer-actions button,
+.fit-controls button {
+  border-radius: 6px !important;
+}
+
+.intelligence-sidebar nav button.active {
+  background: linear-gradient(90deg, rgba(185,151,114,0.10), transparent 76%) !important;
+  box-shadow: inset 2px 0 0 var(--product-accent) !important;
+}
+
+.intelligence-topbar {
+  border-bottom-color: var(--product-line) !important;
+  background: rgba(8, 10, 12, 0.90) !important;
+}
+
+.intelligence-scroll {
+  width: min(100%, 940px) !important;
+}
+
+.surface-heading h1 {
+  max-width: 17ch !important;
+  font-size: clamp(2.15rem, 3.3vw, 2.95rem) !important;
+  line-height: 1.04 !important;
+}
+
+.user-question {
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: #eee3d5 !important;
+  color: #151617 !important;
+}
+
+.user-question :is(span, p) {
+  color: inherit !important;
+}
+
+.sovereign-response {
+  padding-left: 42px !important;
+}
+
+.response-mark {
+  border-color: rgba(185, 151, 114, 0.36) !important;
+  color: var(--product-accent-bright) !important;
+}
+
+.sovereign-answer > header h2 {
+  font-size: clamp(1.8rem, 2.6vw, 2.4rem) !important;
+  line-height: 1.08 !important;
+}
+
+.relationship-answer .interaction-field,
+.alignment-view,
+.permission-card,
+.control-section,
+.current-permission-state {
+  border-radius: 8px !important;
+}
+
+.relationship-answer .interaction-field {
+  border-color: rgba(185, 151, 114, 0.22) !important;
+  background: rgba(185, 151, 114, 0.035) !important;
+  box-shadow: inset 2px 0 0 var(--product-accent) !important;
+}
+
+.basis-strip {
+  color: rgba(226, 218, 207, 0.44) !important;
+}
+
+.sovereign-composer {
+  border-color: var(--product-line-strong) !important;
+  border-radius: 10px !important;
+  background: rgba(16, 18, 21, 0.985) !important;
+  box-shadow: 0 20px 64px rgba(0,0,0,0.32) !important;
+}
+
+.sovereign-composer textarea {
+  border-radius: 6px !important;
+}
+
+.composer-send {
+  border-radius: 6px !important;
+  background: #e8ddd0 !important;
+  color: #111214 !important;
+}
+
+.intelligence-context {
+  border-left-color: var(--product-line) !important;
+  background: #0e1012 !important;
+}
+
+.intelligence-context > header {
+  border-bottom-color: var(--product-line) !important;
+}
+
+@media (max-width: 820px) {
+  .account-shell .account-intro h1,
+  .plan-onboarding h1,
+  .policy-review-gate h1 {
+    font-size: clamp(2.35rem, 9vw, 3rem) !important;
+  }
+
+  .intelligence-scroll {
+    padding-inline: 18px !important;
+  }
+
+  .sovereign-response {
+    padding-left: 34px !important;
+  }
+
+  .sovereign-composer {
+    border-radius: 9px !important;
+  }
+}
+
+
+
+/* ==========================================================================
+   Workspace Intelligence Canvas & Composer (migrated from releases.css)
+   ========================================================================== */
+
+/* ─── Workspace Intelligence Canvas ────────────────────────────────────────── */
+
+.sovereign-answer > header h2 {
+  font-size: clamp(1.4rem, 2.8vw, 2rem) !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.18 !important;
+  font-weight: 450 !important;
+}
+
+.sovereign-answer > header > small {
+  font-size: .65rem !important;
+  letter-spacing: 0.12em !important;
+  padding: 4px 10px !important;
+  border-radius: var(--sov-radius-pill) !important;
+  background: rgba(185, 151, 114, 0.08) !important;
+  color: var(--sovereign-accent) !important;
+}
+
+.user-question {
+  border-radius: var(--sov-radius-xl) !important;
+  border-color: var(--sov-nav-border) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.user-question p {
+  font-size: 1rem !important;
+  line-height: 1.58 !important;
+}
+
+/* ─── Composer as Intelligence Instrument ──────────────────────────────────── */
+
+.sovereign-composer {
+  border-radius: var(--sov-radius-xl) !important;
+  border-color: var(--sov-nav-border) !important;
+  background: rgba(16, 18, 21, 0.92) !important;
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(241, 233, 222, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02) !important;
+  backdrop-filter: blur(24px) saturate(115%) !important;
+}
+
+.sovereign-composer textarea {
+  font-size: 1rem !important;
+  line-height: 1.52 !important;
+  letter-spacing: -0.003em !important;
+}
+
+.sovereign-composer textarea:focus {
+  caret-color: var(--sovereign-accent) !important;
+}
+
+.composer-send {
+  background: var(--sovereign-accent) !important;
+  color: var(--sovereign-panel) !important;
+  transition: transform var(--sov-motion-micro) var(--sov-ease), opacity var(--sov-motion-micro) ease !important;
+}
+
+.composer-send:hover:not(:disabled) {
+  transform: scale(1.04) !important;
+}
+
+.composer-send:active:not(:disabled) {
+  transform: scale(0.96) !important;
+}
+
+/* ─── Response Mark Intelligence Indicator ─────────────────────────────────── */
+
+.response-mark {
+  background: radial-gradient(circle at 50% 40%, rgba(185, 151, 114, 0.1), transparent 70%) !important;
+  border-color: rgba(185, 151, 114, 0.18) !important;
+  box-shadow: 0 2px 8px rgba(185, 151, 114, 0.06) !important;
+  color: var(--sovereign-accent) !important;
+}
+
+/* ─── Mobile Overrides ─────────────────────────────────────────────────────── */
+
+@media (max-width: 760px) {
+  .v0-hero h1 {
+    font-size: clamp(2.2rem, 8.5vw, 3.2rem) !important;
+    letter-spacing: -0.04em !important;
+  }
+
+  .sovereign-opening-copy {
+    font-size: 0.95rem !important;
+    line-height: 1.65 !important;
+  }
+
+  .landing-question-orbit h2 {
+    font-size: clamp(1.5rem, 5.5vw, 2rem) !important;
+  }
+
+  .v0-comparison h2 {
+    font-size: clamp(1.5rem, 5.5vw, 2.2rem) !important;
+  }
+
+  .v0-final h2 {
+    font-size: clamp(1.6rem, 6vw, 2.4rem) !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   WORKSPACE INTELLIGENCE RECOMPOSITION
+   Remove chatbot patterns, establish editorial intelligence document
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* User question: Remove chat bubble, restyle as editorial callout */
+.user-question {
+  max-width: none !important;
+  margin-left: 0 !important;
+  padding: 16px 0 16px 20px !important;
+  border: 0 !important;
+  border-left: 2px solid var(--sov-clay) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.user-question p {
+  color: var(--sov-ink) !important;
+  font-size: 1.05rem !important;
+  font-weight: 450 !important;
+  line-height: 1.6 !important;
+}
+
+/* Remove avatar-like response mark */
+.response-mark {
+  display: none !important;
+}
+
+/* Remove avatar space from sovereign-response */
+.sovereign-response {
+  padding-left: 0 !important;
+}
+
+/* Give sovereign-answer more typographic dominance */
+.sovereign-answer {
+  max-width: none !important;
+  margin-top: 8px !important;
+}
+
+.sovereign-answer > header h2 {
+  max-width: none !important;
+  font-size: clamp(2rem, 3.8vw, 2.85rem) !important;
+  font-weight: 450 !important;
+  letter-spacing: -0.035em !important;
+  line-height: 1.08 !important;
+  margin-bottom: 22px !important;
+}
+
+/* Direct answer: more presence */
+.direct-answer {
+  max-width: none !important;
+  font-size: 1.15rem !important;
+  line-height: 1.72 !important;
+  font-weight: 400 !important;
+}
+
+/* Answer sections: Remove card styling, flow as document sections */
+.answer-sections article {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.answer-sections article > span {
+  display: block !important;
+  margin-bottom: 8px !important;
+  color: var(--sov-clay) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+.answer-sections article > p {
+  color: var(--sov-ink) !important;
+  font-size: 1.02rem !important;
+  line-height: 1.68 !important;
+}
+
+/* Relationship/System/Covenant answers: Remove card borders */
+.relationship-answer > article,
+.system-answer article,
+.covenant-answer article {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.covenant-answer article:nth-child(2) {
+  border-left: 2px solid var(--sov-clay) !important;
+  padding-left: 20px !important;
+}
+
+/* Alignment view: Remove grid borders, simplify */
+.alignment-view {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  gap: 24px !important;
+}
+
+.alignment-view > div {
+  gap: 24px !important;
+}
+
+.alignment-view article {
+  padding: 0 !important;
+  min-height: auto !important;
+  background: transparent !important;
+}
+
+.alignment-view .tradeoff-line {
+  border-block: 0 !important;
+  border-left: 2px solid var(--sov-clay) !important;
+  padding-left: 20px !important;
+  background: transparent !important;
+}
+
+/* Answer limit: More editorial */
+.answer-limit {
+  max-width: none !important;
+  padding: 20px 0 0 !important;
+  border-top: 1px solid var(--sov-line) !important;
+  margin-top: 32px !important;
+  color: var(--sov-muted) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.65 !important;
+}
+
+.answer-limit strong {
+  display: block !important;
+  margin-bottom: 6px !important;
+  color: var(--sov-clay) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+/* Composer: Recede as quiet instrument */
+.sovereign-composer {
+  border-color: color-mix(in srgb, var(--sov-line) 60%, transparent) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px color-mix(in srgb, var(--sov-clay) 4%, transparent) !important;
+}
+
+.sovereign-composer textarea {
+  font-size: 1.02rem !important;
+  line-height: 1.55 !important;
+}
+
+/* Answer actions: Simplify */
+.answer-actions {
+  border-top-color: color-mix(in srgb, var(--sov-line) 70%, transparent) !important;
+}
+
+.fit-controls > span {
+  font-size: 0.75rem !important;
+}
+
+/* Basis strip: More refined */
+.basis-strip {
+  border-color: color-mix(in srgb, var(--sov-line) 70%, transparent) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   WORKSPACE SHELL RECOMPOSITION
+   Make sidebar and topbar recede so intelligence content dominates
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Sidebar: Remove dashboard feel, make it a subtle navigation aid */
+.intelligence-sidebar {
+  border-right: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  width: 240px !important;
+  padding: calc(20px + env(safe-area-inset-top)) 16px 18px !important;
+}
+
+.intelligence-brand {
+  opacity: 0.7 !important;
+  font-size: 0.72rem !important;
+  min-height: 40px !important;
+}
+
+.intelligence-brand > span {
+  width: 32px !important;
+  height: 32px !important;
+  font-size: 0.92rem !important;
+  opacity: 0.6 !important;
+}
+
+.intelligence-sidebar nav {
+  gap: 2px !important;
+  margin-top: 20px !important;
+}
+
+.intelligence-sidebar nav button {
+  min-height: 36px !important;
+  padding: 6px 12px !important;
+  border-radius: 8px !important;
+  font-size: 0.82rem !important;
+  opacity: 0.65 !important;
+  transition: opacity 180ms ease, background 180ms ease !important;
+}
+
+.intelligence-sidebar nav button:hover {
+  opacity: 0.85 !important;
+  background: rgba(185, 151, 114, 0.04) !important;
+}
+
+.intelligence-sidebar nav button.active {
+  opacity: 1 !important;
+  background: rgba(185, 151, 114, 0.08) !important;
+}
+
+.intelligence-sidebar nav button strong {
+  font-size: 0.82rem !important;
+  font-weight: 550 !important;
+  letter-spacing: 0 !important;
+}
+
+.recent-threads {
+  opacity: 0.5 !important;
+  margin-top: 16px !important;
+}
+
+.recent-threads p {
+  font-size: 0.65rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  opacity: 0.6 !important;
+}
+
+.recent-threads button {
+  font-size: 0.78rem !important;
+  opacity: 0.7 !important;
+  min-height: 32px !important;
+}
+
+.new-conversation {
+  min-height: 40px !important;
+  font-size: 0.78rem !important;
+  opacity: 0.7 !important;
+  border-radius: 10px !important;
+  margin-top: 16px !important;
+}
+
+/* Topbar: Remove dashboard header feel, make it subtle */
+.intelligence-topbar {
+  border-bottom: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  min-height: 56px !important;
+  padding: 8px 28px !important;
+}
+
+.intelligence-topbar strong {
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  opacity: 0.5 !important;
+  font-family: var(--sans) !important;
+  letter-spacing: 0.02em !important;
+}
+
+.topbar-actions button {
+  min-height: 36px !important;
+  padding: 6px 12px !important;
+  font-size: 0.72rem !important;
+  opacity: 0.6 !important;
+  border-radius: 8px !important;
+  border-color: color-mix(in srgb, var(--sov-line) 50%, transparent) !important;
+  background: transparent !important;
+}
+
+.topbar-actions button:hover {
+  opacity: 0.85 !important;
+  border-color: var(--sov-clay) !important;
+}
+
+/* Main content: Adjust margin for narrower sidebar */
+.intelligence-main {
+  margin-left: 240px !important;
+}
+
+/* Context panel: Subtler appearance */
+.intelligence-context {
+  border-left: 1px solid color-mix(in srgb, var(--sov-line) 50%, transparent) !important;
+  background: color-mix(in srgb, var(--sov-panel) 60%, transparent) !important;
+}
+
+/* Mobile workspace intelligence overrides */
+@media (max-width: 760px) {
+  /* Reset sidebar-dependent margins — sidebar is hidden on mobile */
+  .intelligence-main {
+    margin-left: 0 !important;
+  }
+
+  .sovereign-answer > header h2 {
+    font-size: clamp(1.5rem, 6vw, 1.85rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  .direct-answer {
+    font-size: 1.05rem !important;
+    line-height: 1.65 !important;
+  }
+
+  .user-question {
+    padding: 14px 0 14px 16px !important;
+  }
+
+  .user-question p {
+    font-size: 0.98rem !important;
+  }
+
+  .sovereign-composer {
+    border-radius: 16px !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14), 0 0 0 1px color-mix(in srgb, var(--sov-clay) 4%, transparent) !important;
+  }
+
+  .answer-limit {
+    font-size: 0.9rem !important;
+  }
+
+  /* Topbar: even more subtle on mobile */
+  .intelligence-topbar {
+    min-height: 48px !important;
+    padding: 6px 16px !important;
+  }
+
+  .intelligence-topbar strong {
+    font-size: 0.78rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(
+    .v0-hero-content,
+    .landing-question-orbit__inner,
+    .landing-stories,
+    .v0-comparison .v0-shell,
+    .v0-final
+  ) {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice__canvas,
+  .public-approved-v8 .landing-demo,
+  .public-approved-v8 .landing-message,
+  .public-approved-v8 .landing-context-view > *,
+  .public-approved-v8 .landing-system-map path,
+  .public-approved-v8 .landing-system-map__evidence,
+  .public-approved-v8 .landing-system-map__test {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  :is(.thinking, .sovereign-response, .workspace-arrival, .workspace-arrival > *) {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+
+
+/* Restored for MobileProductionUX test compatibility */
+@media (max-width: 760px) {
+  .public-approved-v8 .landing-workflow {
+    grid-auto-flow: column !important;
+    grid-auto-columns: minmax(252px, 82vw) !important;
+    grid-template-columns: none !important;
+    gap: 10px !important;
+    overflow-x: auto !important;
+    overscroll-behavior-inline: contain !important;
+    scroll-snap-type: inline mandatory !important;
+    scrollbar-width: none !important;
+    padding: 12px 12px 16px !important;
+  }
+
+  .public-approved-v8 .landing-demo--system-context {
+    display: none !important;
+  }
+
+  .public-approved-v8 .landing-expression-slice__tooltip {
+    display: none !important;
+  }
+}
+
+/* Restored for MobileProductionUX test compatibility */
+@media (max-width: 820px) {
+  .workspace-desktop-plan-status,
+  .sovereign-app-runtime > .expression-field-launcher,
+  .sovereign-app-runtime .system-membership-trigger {
+    display: none !important;
+  }
+}
+
+/* Restored for MobileProductionUX test compatibility */
+@media (max-width: 820px) {
+  .sovereign-app-runtime .sovereign-composer,
+  .sovereign-app-runtime .intelligence-workspace.context-open .sovereign-composer {
+    right: max(8px, env(safe-area-inset-right)) !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    left: max(8px, env(safe-area-inset-left)) !important;
+    min-height: 60px !important;
+    padding: 7px !important;
+    border-radius: 14px !important;
+  }
+}
+
+/* Restored for PremiumActionAuthority test compatibility */
+:where(
+  button:not(.sheet-backdrop):not(.context-backdrop):not(.primary-button):not(.passkey-button):not(.consent-choice),
+  a.landing-control,
+  a[class*="-action"],
+  a[class*="__action"],
+  a[class*="-cta"],
+  a[class*="__cta"],
+  a[class*="button"]
+) {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Restored for PremiumActionAuthority test compatibility */
+.sovereign-landing .sovereign-opening-capabilities,
+.sovereign-landing .sovereign-opening-capabilities > a {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.sovereign-landing .sovereign-opening-capabilities > a {
+  border: 0 !important;
+  border-top: 1px solid var(--sovereign-action-line) !important;
+}
+
+.sovereign-landing .sovereign-opening-capabilities > a:last-child {
+  border-bottom: 1px solid var(--sovereign-action-line) !important;
+}
+
+/* Additional restored rules for MobileProductionUX */
+@media (max-width: 760px) {
+  .public-approved-v8 .landing-system-map {
+    min-height: 372px !important;
+  }
+
+  .workspace-mobile-utilities > summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 900px) {
+  .sovereign-app-runtime .surface-heading h1 {
+    font-size: clamp(2rem, 8.8vw, 2.85rem);
+  }
+}

@@ -4,9 +4,10 @@ import { describe, expect, it } from 'vitest';
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const main = read('./main.tsx');
 const landing = read('./PublicLanding.tsx');
-const css = read('./releases.css');
-const landingRefinement = read('./releases.css');
-const landingRefinementV5 = read('./releases.css');
+const css = read('./public.css');
+const designSystem = read('./design-system.css');
+const landingRefinement = read('./public.css');
+const landingRefinementV5 = read('./public.css');
 const runtime = read('./production-readiness-runtime.ts');
 const interactionRuntime = read('./release-interaction-runtime.ts');
 const field = read('./expression-field/LandingExpressionSlice.tsx');
@@ -20,14 +21,13 @@ const workerGatewaySmoke = read('../../../scripts/worker-gateway-smoke.ts');
 describe('desktop and iOS production readiness v1', () => {
   it('installs production readiness before the current landing-only refinement authority', () => {
     expect(main).toContain("import { installProductionReadinessRuntime } from './production-readiness-runtime'");
-    expect(main).toContain("import releasesCss from './releases.css?inline'");
     expect(main.indexOf('installProductionReadinessRuntime();')).toBeLessThan(main.indexOf('installReleaseInteractionRuntime();'));
     expect(main).toContain("dataset.sovereignProductionReadiness = 'desktop-ios-v1'");
   });
 
   it('standardizes the desktop navigation across public and account routes', () => {
+    expect(designSystem).toContain('--production-nav-height: 80px');
     for (const marker of [
-      '--production-nav-height: 80px',
       '.public-approved-v8 .v0-nav',
       '.public-secondary-page .v0-nav',
       '.account-shell .account-nav',
@@ -79,9 +79,9 @@ describe('desktop and iOS production readiness v1', () => {
   });
 
   it('uses a restrained phone scale and keeps the complete field inside the opening', () => {
+    expect(designSystem).toContain('--production-nav-height: 64px');
     for (const marker of [
       '@media (max-width: 900px)',
-      '--production-nav-height: 64px',
       'env(safe-area-inset-bottom)',
       'min-height: max(660px',
       'font-size: clamp(2.9rem, 11.2vw, 4.25rem)',

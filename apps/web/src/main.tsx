@@ -19,25 +19,15 @@ import { PublicPolicyMetadata } from './PublicPolicyMetadata';
 import { installReleaseInteractionRuntime } from './release-interaction-runtime';
 import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
 import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
-import releasesCss from './releases.css?inline';
 
 /* Canonical visual system */
 import './design-system.css';
 import './public.css';
 import './workspace.css';
 import './app-shell.css';
-/* Passkey authentication remains the final component stylesheet; terminal inline release authority follows below. */
+/* Passkey authentication remains the final component stylesheet. */
 import './passkey-auth.css';
 
-function installPlatformVisualCohesion(): void {
-  if (document.head.querySelector('style[data-sovereign-platform-cohesion="v1"]')) return;
-  const style = document.createElement('style');
-  style.dataset.sovereignPlatformCohesion = 'v1';
-  style.textContent = releasesCss;
-  document.head.append(style);
-}
-
-installPlatformVisualCohesion();
 installProductionReadinessRuntime();
 installReleaseInteractionRuntime();
 installV0ReleaseFingerprint();

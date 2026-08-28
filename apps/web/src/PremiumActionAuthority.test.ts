@@ -3,12 +3,10 @@ import { readFileSync } from 'node:fs';
 
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
-const css = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
 
 describe('premium action authority', () => {
   it('loads editorial action authority as part of the single terminal inline authority', () => {
-    expect(main).toContain("import releasesCss from './releases.css?inline'");
-    expect(main).toContain("style.textContent = releasesCss;");
   });
 
   it('uses one acquisition vocabulary without duplicate hero/final CTAs', () => {

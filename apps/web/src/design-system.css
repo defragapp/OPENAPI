@@ -78,6 +78,81 @@
   --danger: var(--sov-danger);
   --serif: var(--font-title);
   --sans: var(--font-body);
+
+  /* Tokens migrated from releases.css terminal override layer */
+  --sovereign-wordmark-family: var(--font-subheading, system-ui, "Helvetica Neue", Arial, sans-serif);
+  --sovereign-wordmark-size: 0.69rem;
+  --sovereign-wordmark-tracking: 0.22em;
+  --production-nav-height: 80px;
+  --refine-ink: #f1e9de;
+  --refine-paper: #e8ddd0;
+  --refine-muted: rgba(229, 220, 209, 0.68);
+  --refine-faint: rgba(229, 220, 209, 0.44);
+  --refine-line: rgba(241, 233, 222, 0.1);
+  --refine-line-strong: rgba(241, 233, 222, 0.17);
+  --refine-panel: #121417;
+  --refine-page: #080a0d;
+  --launch-page: #090a0b;
+  --launch-panel: #101112;
+  --launch-raised: #151617;
+  --launch-ink: #f2ede5;
+  --launch-muted: rgba(242, 237, 229, 0.68);
+  --launch-faint: rgba(242, 237, 229, 0.44);
+  --launch-line: rgba(242, 237, 229, 0.13);
+  --launch-line-strong: rgba(242, 237, 229, 0.24);
+  --launch-focus: rgba(242, 237, 229, 0.82);
+  --sovereign-action-ink: #f2ede5;
+  --sovereign-action-muted: rgba(242, 237, 229, 0.62);
+  --sovereign-action-line: rgba(242, 237, 229, 0.28);
+  --sovereign-action-line-strong: rgba(242, 237, 229, 0.56);
+  --sovereign-title:
+    "Geist Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "Segoe UI Variable Display",
+    "Segoe UI",
+    system-ui,
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+  --sovereign-ink: #f3ece2;
+  --sovereign-muted: rgba(226, 218, 207, 0.68);
+  --sovereign-faint: rgba(226, 218, 207, 0.42);
+  --sovereign-line: rgba(241, 233, 222, 0.105);
+  --sovereign-line-strong: rgba(241, 233, 222, 0.18);
+  --sovereign-accent: #b99772;
+  --sovereign-accent-bright: #e1cdb5;
+  --sovereign-panel: #101215;
+  --sovereign-panel-raised: #15181c;
+  --sov-nav-height: 72px;
+  --sov-nav-bg: rgba(12, 14, 16, 0.85);
+  --sov-nav-blur: blur(20px) saturate(110%);
+  --sov-nav-border: rgba(241, 233, 222, 0.09);
+  --sov-space-xs: 4px;
+  --sov-space-sm: 8px;
+  --sov-space-md: 16px;
+  --sov-space-lg: 24px;
+  --sov-space-xl: 40px;
+  --sov-space-section: 80px;
+  --sov-space-page: 56px;
+  --sov-radius-sm: 6px;
+  --sov-radius-md: 10px;
+  --sov-radius-lg: 14px;
+  --sov-radius-xl: 20px;
+  --sov-radius-pill: 999px;
+  --sov-motion-micro: 120ms;
+  --sov-motion-standard: 200ms;
+  --sov-motion-entrance: 380ms;
+  --sov-motion-expansion: 480ms;
+  --sov-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 900px) {
+  :root {
+    --production-nav-height: 64px;
+  }
 }
 
 /* ── typography ── */
@@ -1060,3 +1135,4 @@
     transition: none !important;
   }
 }
+

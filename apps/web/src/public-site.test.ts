@@ -18,10 +18,10 @@ const staticTerminalCss = readFileSync(new URL('../public/premium-action-static-
 const platformPublicCss = readFileSync(new URL('../public/platform-public.css', import.meta.url), 'utf8');
 const v0Css = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const storyCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
-const refinementCss = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
-const renderedFidelityCss = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
-const landingRefinementV2Css = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
-const landingRefinementV5Css = readFileSync(new URL('./releases.css', import.meta.url), 'utf8');
+const refinementCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const renderedFidelityCss = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const landingRefinementV2Css = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
+const landingRefinementV5Css = readFileSync(new URL('./public.css', import.meta.url), 'utf8');
 const sansAuthority = readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const publicCopy = `${landing}\n${stories}\n${policy}\n${how}\n${pricing}\n${faq}\n${consent}`;
@@ -116,7 +116,6 @@ describe('Sovereign.OS public experience', () => {
     expect(main).toContain("location.pathname === '/'");
     expect(main).toContain('<PublicLanding />');
     expect(main).toContain("import './public.css';");
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
     expect(main).not.toContain('ProductLanguageRuntime');
   });
 

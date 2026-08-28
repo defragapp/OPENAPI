@@ -11,12 +11,12 @@ const integrationStyles = read('./public.css');
 const storyStyles = read('./public.css');
 const approvedStyles = read('./public.css');
 const heroExtension = read('./public.css');
-const finalAuthority = read('./releases.css');
-const refinement = read('./releases.css');
-const renderedFidelity = read('./releases.css');
-const landingRefinementV2 = read('./releases.css');
-const landingRefinementV5 = read('./releases.css');
-const intelligenceDemoStyles = read('./releases.css');
+const finalAuthority = read('./public.css');
+const refinement = read('./public.css');
+const renderedFidelity = read('./public.css');
+const landingRefinementV2 = read('./public.css');
+const landingRefinementV5 = read('./public.css');
+const intelligenceDemoStyles = read('./public.css');
 const typography = read('./design-system.css');
 const sansAuthority = read('./design-system.css');
 const languageAuthority = read('../../../docs/product-language-system.md');
@@ -35,7 +35,6 @@ describe('public positioning reset', () => {
     for (let index = 1; index < imports.length; index += 1) {
       expect(main.indexOf(imports[index]!)).toBeGreaterThan(main.indexOf(imports[index - 1]!));
     }
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
   });
 
   it('keeps the founder hero but explains the actual product immediately', () => {

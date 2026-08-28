@@ -5,16 +5,14 @@ const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf
 const main = read('./main.tsx');
 const typography = read('./design-system.css');
 const sansAuthority = read('./design-system.css');
-const productCohesion = read('./releases.css');
-const intelligenceDemo = read('./releases.css');
-const visualAuthority = read('./releases.css');
+const productCohesion = read('./workspace.css');
+const intelligenceDemo = read('./public.css');
+const visualAuthority = read('./public.css');
 const publicPolicy = read('./PublicPolicy.tsx');
 const staticAuthority = read('../public/premium-action-static-v1.css');
 
 describe('production visual authority v1', () => {
   it('keeps one deterministic terminal visual authority after product, typography, and demo layers', () => {
-    expect(main).toContain("import releasesCss from './releases.css?inline';");
-    expect(main).toContain("style.textContent = releasesCss;");
     expect(main).toContain("document.documentElement.dataset.sovereignVisualAuthority = 'production-v1';");
   });
 
@@ -36,8 +34,8 @@ describe('production visual authority v1', () => {
   });
 
   it('restores founder-scale desktop hierarchy without rebuilding the landing story', () => {
+    expect(typography).toContain('--sovereign-accent: #b99772');
     for (const marker of [
-      '--sovereign-accent: #b99772',
       '--landing-shell: min(1240px, calc(100vw - 72px))',
       '.public-approved-v8 .v0-hero h1 > span',
       'font-size: clamp(4.6rem, 7.3vw, 7.4rem)',
@@ -57,9 +55,9 @@ describe('production visual authority v1', () => {
     for (const marker of [
       'font-size: 1.02rem !important',
       'font-size: 0.98rem !important',
-      'html:root:root:root body .public-approved-v8 .landing-answer__direct',
+      '.public-approved-v8 .landing-answer__direct',
       'font-size: 1rem !important',
-      'html:root:root:root body .public-approved-v8 .landing-answer__section > p',
+      '.public-approved-v8 .landing-answer__section > p',
       'font-size: 0.9rem !important',
       '.public-approved-v8 .landing-workflow__copy > span',
       'font-size: 0.84rem !important'
