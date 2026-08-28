@@ -71,7 +71,7 @@ describe('authenticated launch cohesion', () => {
 
   it('routes every reachable Baseline edit back through canonical onboarding', () => {
     expect(workspace).toContain('className={`intelligence-workspace');
-    expect(workspace).toContain('className="sovereign-composer"');
+    expect(workspace).toContain('className="sovereign-composer sovereign-composer--enhanced"');
     expect(workspace).toContain('function beginBaseline()');
     expect(workspace).toContain("location.assign('/onboarding')");
     expect(workspace).not.toContain('capacity beneath patterns');

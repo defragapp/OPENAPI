@@ -597,10 +597,13 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
         </section>
 
         {baselineExperience === 'idle' && baselineReady && surfaceEntitled && (
-          <form className="sovereign-composer" onSubmit={submit}>
-            <div className="composer-context-line">
-              <span>Drawing from · {contextItems.join(' · ')}</span>
-              <button type="button" onClick={() => setContextOpen(true)}>Adjust who and what</button>
+          <form className="sovereign-composer sovereign-composer--enhanced" onSubmit={submit}>
+            <div className="composer-header">
+              <div className="composer-context-line">
+                <span className="composer-context-label">Drawing from</span>
+                <span className="composer-context-items">{contextItems.join(' · ')}</span>
+                <button type="button" className="composer-context-adjust" onClick={() => setContextOpen(true)}>Adjust</button>
+              </div>
             </div>
             {!composerFocused && !draft && <span className="composer-example" key={`${surface}-${exampleIndex}`} aria-hidden="true">{composerExamples[surface][exampleIndex % composerExamples[surface].length]}</span>}
             <div className="composer-entry">
@@ -620,7 +623,9 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
                   }
                 }}
               />
-              <button className="composer-send" disabled={!draft.trim() || apiState === 'loading'} aria-label="Send message">→</button>
+              <button className="composer-send" disabled={!draft.trim() || apiState === 'loading'} aria-label="Send message">
+                <span aria-hidden="true">→</span>
+              </button>
             </div>
           </form>
         )}
@@ -1297,7 +1302,23 @@ function BasisStrip({ values }: { values: BasisValue[] }) {
 }
 
 function EmptyState({ title, body, action, onAction }: { title: string; body: string; action: string; onAction: () => void }) {
-  return <section className="empty-state"><h2>{title}</h2><p>{body}</p><button onClick={onAction}>{action} <span aria-hidden="true">→</span></button></section>;
+  return (
+    <section className="empty-state empty-state--enhanced">
+      <div className="empty-state__icon" aria-hidden="true">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="23" stroke="currentColor" strokeWidth="2" opacity="0.2"/>
+          <circle cx="24" cy="24" r="16" stroke="currentColor" strokeWidth="2" opacity="0.4"/>
+          <circle cx="24" cy="24" r="8" fill="currentColor" opacity="0.6"/>
+        </svg>
+      </div>
+      <h2 className="empty-state__title">{title}</h2>
+      <p className="empty-state__body">{body}</p>
+      <button className="empty-state__action" onClick={onAction}>
+        {action}
+        <span className="empty-state__arrow" aria-hidden="true">→</span>
+      </button>
+    </section>
+  );
 }
 
 function EntitlementRequired({ surface, feature, onOpenPlan }: { surface: Surface; feature: EntitledFeature; onOpenPlan: (feature: EntitledFeature) => void }) {
@@ -1305,7 +1326,18 @@ function EntitlementRequired({ surface, feature, onOpenPlan }: { surface: Surfac
 }
 
 function WorkspaceArrival() {
-  return <section className="workspace-arrival" role="status"><span>Sovereign</span><h1>Opening your workspace.</h1><p>Bringing your Baseline, current context, conversations, and permissions together.</p></section>;
+  return (
+    <section className="workspace-arrival workspace-arrival--enhanced" role="status">
+      <div className="workspace-arrival__indicator" aria-hidden="true">
+        <div className="workspace-arrival__ring workspace-arrival__ring--outer" />
+        <div className="workspace-arrival__ring workspace-arrival__ring--middle" />
+        <div className="workspace-arrival__ring workspace-arrival__ring--inner" />
+      </div>
+      <span className="workspace-arrival__label">Sovereign</span>
+      <h1 className="workspace-arrival__title">Opening your workspace.</h1>
+      <p className="workspace-arrival__body">Bringing your Baseline, current context, conversations, and permissions together.</p>
+    </section>
+  );
 }
 
 function WorkspaceUnavailable({ message, onRetry }: { message: string; onRetry: () => void }) {

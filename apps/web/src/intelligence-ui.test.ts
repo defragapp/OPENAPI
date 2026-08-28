@@ -20,7 +20,7 @@ describe('Baseline-first Sovereign answer UI', () => {
     expect(index).toContain('/src/main.tsx');
     for (const file of ['recognition-ui.js', 'intelligence-ui.js', 'ux-audit-runtime.js']) expect(index).not.toContain(file);
     expect(workspace).toContain('className={`intelligence-workspace');
-    expect(workspace).toContain('className="sovereign-composer"');
+    expect(workspace).toContain('className="sovereign-composer sovereign-composer--enhanced"');
     expect(workspace).not.toContain('MutationObserver');
   });
 
