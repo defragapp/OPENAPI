@@ -148,7 +148,7 @@ describe('Sovereign.OS public experience', () => {
     expect(how).toContain('A private reference built around you.');
     expect(how).toContain('<summary>See source details</summary>');
     expect(how).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');
-    expect(pricing).toContain('Explore yourself for free. Add People and Systems with Sovereign+.');
+    expect(pricing).toContain('Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.');
     expect(pricing).toContain('$20');
     expect(pricing).toContain('$99 / year');
     expect(pricing).toContain('/experience-static-refinement-v1.css?v=20260817-cohesion-v2');

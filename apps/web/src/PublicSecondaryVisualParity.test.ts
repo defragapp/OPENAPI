@@ -100,9 +100,9 @@ describe('secondary public visual parity', () => {
   });
 
   it('makes pricing explicit without changing products or prices', () => {
-    expect(pricing).toContain('Explore yourself for free. Add People and Systems with Sovereign+.');
-    expect(pricing).toContain('Explore yourself with Sovereign.');
-    expect(pricing).toContain('Understand your people and the systems around you.');
+    expect(pricing).toContain('Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.');
+    expect(pricing).toContain('Your personal Baseline Design.');
+    expect(pricing).toContain('Your people, your systems, your Library.');
     expect(pricing).toContain('aria-label="Sovereign.OS plans"');
     expect(pricing).toContain('class="annual-price"');
     expect(pricing).toContain('$0');
@@ -110,9 +110,8 @@ describe('secondary public visual parity', () => {
     expect(pricing).toContain('$99 / year');
     expect(pricing).toContain('10 Sovereign AI turns each month');
     expect(pricing).toContain('300 Sovereign AI turns each month');
-    expect(pricing).toContain('Your Baseline stays yours. Plus expands what you can explore.');
-    expect(pricing).toContain('Two-person Baseline comparison when both people agree');
-    expect(pricing).toContain('Private invitations and sharing controls');
+    expect(pricing).toContain('Your Baseline Design stays yours. Plus expands what you can explore.');
+    expect(pricing).toContain('Understand another person with their permission');
     expect(pricing).not.toContain('permission-based relationship and system context');
     expect(pricing).not.toContain('pricing-dashboard');
     expect(pricing).not.toContain('pricing-toggle');

@@ -64,8 +64,8 @@ describe('deployed route cohesion contract', () => {
     expect(how).toContain('Ask about what you actually want to understand.');
     expect(how).toContain('A private reference built around you.');
     expect(how).toContain('<summary>See source details</summary>');
-    expect(pricing).toContain('Explore yourself for free. Add People and Systems with Sovereign+.');
-    expect(pricing).toContain('Your Baseline stays yours. Plus expands what you can explore.');
+    expect(pricing).toContain('Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.');
+    expect(pricing).toContain('Your Baseline Design stays yours. Plus expands what you can explore.');
     expect(faq).toContain('What can Sovereign help you understand?');
     expect(faq).toContain('What can I use Sovereign to explore about myself?');
     expect(faq).toContain('Can I see what information Sovereign used for an answer?');

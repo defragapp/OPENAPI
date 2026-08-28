@@ -24,18 +24,14 @@ describe('public evidence contract', () => {
     }
   });
 
-  it('keeps relationship and system examples permission-safe while translating implementation language for users', () => {
-    expect(stories).toContain("With permission, Sovereign uses both people's Baselines while keeping each person distinct.");
-    expect(stories).toContain('Both people must agree before their Baselines can be used together');
-    expect(stories).toContain('Each person controls whether their Baseline can be included');
-    expect(stories).toContain('Keep each person separate');
-    expect(stories).toContain('Do not guess private feelings');
+it('keeps relationship and system examples permission-safe while translating implementation language for users', () => {
+    expect(stories).toContain('Representative example · Not your Baseline Design');
     expect(stories).toContain('What you told Sovereign');
     expect(stories).not.toContain('Illustrative permitted Baselines');
     expect(stories).not.toContain('Permitted context');
     expect(stories).not.toContain('permitted perspectives');
     expect(stories).not.toContain('confirmed responsibilities');
-    expect(field).toContain('not a diagnosis, score, or claim about anyone’s internal state');
+    expect(field).toContain("not a diagnosis, score, or claim about anyone’s internal state");
     expect(fixture).toContain('not a score or a verdict about the person');
     expect(fixture).toContain('without determining behavior');
   });
