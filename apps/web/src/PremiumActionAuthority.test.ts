@@ -16,8 +16,8 @@ describe('premium action authority', () => {
 
   it('uses one acquisition vocabulary without duplicate hero/final CTAs', () => {
     expect(landing).toContain('>Sign in</a>');
-    expect(landing).toContain('>Get started <ArrowIcon /></a>');
-    expect(landing).toContain('<a href="/signup">Get started</a>');
+    expect(landing).toContain('>Build your Baseline <ArrowIcon /></a>');
+    expect(landing).toContain('<a href="/signup">Build your Baseline</a>');
     expect(landing).not.toContain('Build my Baseline');
     expect(landing).not.toContain('See a Sovereign answer');
     expect(landing).not.toContain('See how it works</span><ArrowIcon');

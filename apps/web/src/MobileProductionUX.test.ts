@@ -65,14 +65,14 @@ describe('production mobile and responsive experience', () => {
     for (const marker of [
       'v0-wordmark--mobile',
       'v0-mobile-menu',
-      'Private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
-      'Start free · No card required',
+      'Your private Baseline intelligence for understanding yourself, your relationships, and the systems around you.',
+      'Private by design · Your data never trains a model',
       '<MobileCapabilityRail />',
       'Explore yourself',
       'Understand your people',
       'See the whole system',
       'Keep what matters',
-      'Get started'
+      'Build your Baseline'
     ]) expect(landing).toContain(marker);
     expect(landing).not.toContain('Build my Baseline');
     expect(landing).not.toContain('One private foundation. More useful answers across the questions that shape your life.');

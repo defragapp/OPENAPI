@@ -47,7 +47,7 @@ describe('unified Sovereign intelligence experience', () => {
   it('keeps each message attached to the context used for the question', () => {
     expect(workspace).toContain('const messageContext = {');
     expect(workspace).toContain("role: 'user', text: clean, context: messageContext");
-    expect(workspace).toContain("role: 'assistant', text: 'Thinking about your question…', context: messageContext");
+    expect(workspace).toContain("role: 'assistant', text: 'Exploring your question through your Baseline…', context: messageContext");
     expect(workspace).toContain("...(row.context && typeof row.context === 'object' ? { context: row.context } : {})");
   });
 

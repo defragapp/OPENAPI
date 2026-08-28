@@ -252,7 +252,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
   const surfaceEntitled = !missingSurfaceEntitlement(surface, workspace.billing);
 
   function beginResponseProgress(assistantId: string) {
-    const preparing = 'Thinking about your question…';
+    const preparing = 'Exploring your question through your Baseline…';
     setStatus(preparing);
     setMessages((current) => current.map((item) => item.id === assistantId ? { ...item, text: preparing } : item));
   }
@@ -381,7 +381,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
     const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', text: clean, context: messageContext };
     const assistantId = crypto.randomUUID();
     const previousDraft = draft;
-    setMessages((current) => [...current, userMessage, { id: assistantId, role: 'assistant', text: 'Thinking about your question…', context: messageContext }]);
+    setMessages((current) => [...current, userMessage, { id: assistantId, role: 'assistant', text: 'Exploring your question through your Baseline…', context: messageContext }]);
     setApiState('loading');
     beginResponseProgress(assistantId);
     try {

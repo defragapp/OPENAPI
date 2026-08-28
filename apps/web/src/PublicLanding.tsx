@@ -18,14 +18,14 @@ const REAL_LIFE_QUESTIONS = [
 
 const COMPARISON = {
   blank: [
-    'Begins from the prompt and what you explain in that conversation',
-    'Your history and recurring patterns must be explained again or inferred from the thread',
-    'Another person\'s information is not automatically protected by Sovereign\'s sharing permissions',
-    'Does not show its exact source details for an interpretation'
+    'Starts from the prompt and what you explain in that conversation',
+    'Your history and patterns must be re-explained or inferred each time',
+    'Another person\'s information is not protected by sharing permissions',
+    'Does not show exact source details for its interpretations'
   ],
   sovereign: [
-    'Carries your private Baseline across every conversation',
-    'Uses what is happening now, another person\'s shared Baseline, or the wider situation only when it helps answer the question',
+    'Carries your private Baseline intelligence across every conversation',
+    'Uses what is happening now, another person\'s shared Baseline, or the wider situation only when it helps',
     'Keeps each person separate and uses only what they chose to share',
     'Lets you inspect source details and review, correct, or reject any interpretation'
   ]
@@ -70,7 +70,7 @@ function V0Navigation() {
         </nav>
         <div className="v0-nav-actions">
           <a className="v0-sign-in" href="/login">Sign in</a>
-          <a className="v0-get-started" href="/signup">Get started <ArrowIcon /></a>
+          <a className="v0-get-started" href="/signup">Build your Baseline <ArrowIcon /></a>
           <details className="v0-mobile-menu">
             <summary aria-label="Open navigation"><MenuIcon /></summary>
             <nav className="v0-mobile-menu__panel" aria-label="Mobile navigation">
@@ -78,7 +78,7 @@ function V0Navigation() {
               <a href="/pricing">Pricing</a>
               <a href="/faq">FAQ</a>
               <a href="/login">Sign in</a>
-              <a href="/signup">Get started</a>
+              <a href="/signup">Build your Baseline</a>
             </nav>
           </details>
         </div>
@@ -91,7 +91,7 @@ function V0Hero() {
   return (
     <section className="v0-hero sovereign-opening-field" data-viewport-section="hero">
       <div className="v0-hero-content" data-viewport-surface="hero">
-        <p className="v0-badge landing-hero-kicker"><span />Personal AI for real life</p>
+        <p className="v0-badge landing-hero-kicker"><span />Personal intelligence for real life</p>
         <h1>
           <span aria-label="Healing isn’t optional.">
             Healing<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />isn’t optional.
@@ -101,15 +101,15 @@ function V0Hero() {
           </em>
         </h1>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
-          Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you. Build your Baseline once, then explore how you think, decide, communicate, create, connect, respond under pressure, and change.
+          Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation. Understand how you think, decide, communicate, and respond. Then explore relationships and systems from the same stable foundation.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
-          Private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
+          Your private Baseline intelligence for understanding yourself, your relationships, and the systems around you.
         </p>
         <p className="sovereign-opening-trust">
           <LockIcon />
-          <span className="v0-desktop-only">Start free · No card required · Review, correct, or reject any interpretation</span>
-          <span className="v0-mobile-only">Start free · No card required</span>
+          <span className="v0-desktop-only">Private by design · Your data never trains a model · Review, correct, or reject any interpretation</span>
+          <span className="v0-mobile-only">Private by design · Your data never trains a model</span>
         </p>
       </div>
       <LandingExpressionSlice />
@@ -185,8 +185,8 @@ function ComparisonStory() {
       <div className="v0-shell">
         <header className="v0-story-heading v0-story-heading-left">
           <p>The Baseline difference</p>
-          <h2 aria-label="Most AI starts with the prompt. Sovereign starts with you." data-verification-text="Most AI starts with the prompt. Sovereign starts with you.">
-            Most AI starts<br />with the prompt.<br />
+          <h2 aria-label="Most tools start with the prompt. Sovereign starts with you." data-verification-text="Most tools start with the prompt. Sovereign starts with you.">
+            Most tools start<br />with the prompt.<br />
             <span>Sovereign starts<br />from who you are.</span>
           </h2>
         </header>
@@ -205,8 +205,8 @@ function FinalCallToAction() {
       <h2 aria-label="Know yourself. Understand your people. See the whole system." data-verification-text="Know yourself. Understand your people. See the whole system.">
         Know yourself.<br />Understand your people.<br />See the whole system.
       </h2>
-      <p>Start free. Build your Baseline, then explore what you want to understand next.</p>
-      <a className="v0-get-started" href="/signup">Start free <ArrowIcon /></a>
+      <p>Build your private Baseline intelligence, then explore what you want to understand next.</p>
+      <a className="v0-get-started" href="/signup">Build your Baseline <ArrowIcon /></a>
     </section>
   );
 }
