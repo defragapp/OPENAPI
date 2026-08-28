@@ -63,24 +63,16 @@ describe('founder selective visual port', () => {
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
   });
 
-  it('restores chat and workflow demonstrations without restoring duplicate expression fields', () => {
+  it('restores simplified demonstrations without restoring duplicate expression fields', () => {
     expect(landing).toContain('<LandingProductStories />');
     for (const marker of [
-      '01 · You',
-      '02 · You + your people',
-      '03 · From 1:1 to the whole system',
-      'Explore how you think, decide, communicate, create, connect, and grow.',
-      'See why the same moment lands differently',
-      'See the whole system.',
-      'surface="personal-chat"',
-      'surface="personal-reasoning"',
-      'surface="relationship-chat"',
-      'surface="relationship-reasoning"',
-      'surface="system-map"',
-      'surface="system-reasoning"',
-      'v0-baseline-trace',
-      'v0-workflow-panel',
-      'v0-family-system-map'
+      '01 · YOU',
+      '02 · YOU & YOUR PEOPLE',
+      '03 · WHOLE SYSTEM',
+      'demo-selector',
+      'demo-card',
+      'See source details',
+      'Representative example · Not your Baseline Design'
     ]) expect(stories).toContain(marker);
     expect(stories).not.toContain('Separate helping from carrying the outcome.');
     expect(stories).not.toContain('See where responsibility keeps landing.');

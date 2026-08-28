@@ -145,31 +145,16 @@ describe('founder visual port — public positioning reset', () => {
 
   it('shows broad self exploration, relationship intelligence, and whole-system intelligence in approved language', () => {
     for (const marker of [
-      '01 · You',
-      'Explore how you think, decide, communicate, create, connect, and grow.',
-      'How Sovereign builds the answer',
-      'Start with the question',
-      '02 · You + your people',
-      'See why the same moment lands differently',
-      'How Sovereign compares two people',
-      'Show what happens between you',
-      'Find a lower-pressure next step',
-      '03 · From 1:1 to the whole system',
-      'See the whole system.',
-      'How Sovereign reads a system',
-      'Show how pressure moves',
-      'Change one thing and watch what happens',
-      'surface="personal-chat"',
-      'surface="personal-reasoning"',
-      'surface="relationship-chat"',
-      'surface="relationship-reasoning"',
-      'surface="system-map"',
-      'surface="system-reasoning"',
-      '280 + step * 760',
-      'data-motion-state'
+      '01 · YOU',
+      '02 · YOU & YOUR PEOPLE',
+      '03 · WHOLE SYSTEM',
+      'demo-selector',
+      'demo-card',
+      'See source details',
+      'Representative example · Not your Baseline Design'
     ]) expect(stories).toContain(marker);
-    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(3);
-    expect(stories).toContain('landing-workflow__progress');
+    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(0);
+    expect(stories).not.toContain('landing-workflow__progress');
     expect(stories).not.toContain('<FamilySystemMap />');
     expect(stories).not.toContain('capacity beneath');
     expect(stories).not.toContain('permitted perspectives');
@@ -177,31 +162,28 @@ describe('founder visual port — public positioning reset', () => {
   });
 
   it('keeps public source details exact, fixture-backed, and collapsed by default', () => {
-    for (const marker of ["{ code: 'clarity'", "{ code: 'focus'", "{ code: 'steadiness'", "{ code: 'clarity □ steadiness'"]) expect(stories).toContain(marker);
+    for (const marker of ["{ code: 'tenderness'", "{ code: 'responsibility'", "{ code: 'boundaries'", "{ code: 'clarity □ steadiness'"]) expect(stories).toContain(marker);
     expect(stories).toContain('<details className="landing-evidence">');
     expect(stories).toContain('<strong>See source details</strong>');
     expect(stories).toContain('These values are not visitor data.');
     expect(stories).not.toContain('<strong>Example Basis</strong>');
     expect(stories).not.toContain("chips: ['HD G13.1'");
-    expect(stories).toContain('Both people must agree before their Baselines can be used together');
-    expect(stories).toContain('Each person controls whether their Baseline can be included');
     expect(stories).not.toContain('GATE 4.11');
     expect(finalAuthority).toContain('.landing-evidence__code');
     expect(intelligenceDemoCss).toContain('.landing-evidence > summary');
   });
 
-  it('puts workflow on the left and the conversation on the right while preserving mobile stacking', () => {
-    expect(stories.indexOf('surface="personal-reasoning"')).toBeLessThan(stories.indexOf('surface="personal-chat"'));
-    expect(stories.indexOf('surface="relationship-reasoning"')).toBeLessThan(stories.indexOf('surface="relationship-chat"'));
-    expect(stories.indexOf('surface="system-reasoning"')).toBeLessThan(stories.indexOf('surface="system-map"'));
-    expect(stories).toContain('landing-demo__composer-shell');
+  it('places simplified demo before source details and anchors the composer outside the answer body', () => {
+    expect(stories).toContain('demo-selector');
+    expect(stories).toContain('demo-card');
+    expect(stories).toContain('landing-evidence');
     expect(intelligenceDemoCss).toContain('grid-template-columns: minmax(320px, .88fr) minmax(0, 1.12fr) !important;');
     expect(intelligenceDemoCss).toContain('.landing-demo__composer-shell');
     expect(intelligenceDemoCss).toContain('@media (max-width: 900px)');
   });
 
   it('measures the complete rendered landing at desktop and phone widths', () => {
-    for (const surface of ['hero', 'expression-slice', 'personal-chat', 'personal-reasoning', 'relationship-chat', 'relationship-reasoning', 'system-map', 'system-reasoning', 'comparison']) expect(viewportProbe).toContain(`'${surface}'`);
+    for (const surface of ['hero', 'expression-slice', 'demo-card', 'comparison']) expect(viewportProbe).toContain(`'${surface}'`);
     expect(viewportProbe).toContain('const narrow = snapshot.viewportWidth <= narrowViewportMaximum');
     expect(viewportProbe).toContain('getBoundingClientRect()');
     expect(viewportProbe).toContain('comparisonStacked');

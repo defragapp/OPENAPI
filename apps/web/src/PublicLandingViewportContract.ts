@@ -27,36 +27,18 @@ const narrowViewportMaximum = 760;
 const desktopRequiredSurfaces = [
   'hero',
   'expression-slice',
-  'personal-chat',
-  'personal-reasoning',
-  'relationship-chat',
-  'relationship-reasoning',
-  'system-map',
-  'system-reasoning',
+  'demo-card',
   'comparison'
 ] as const;
 const narrowRequiredSurfaces = [
   'hero',
   'expression-slice',
-  'personal-chat',
-  'personal-reasoning',
-  'relationship-chat',
-  'relationship-reasoning',
-  'system-map',
   'comparison'
 ] as const;
 const productSurfaceIds = new Set([
-  'personal-chat',
-  'personal-reasoning',
-  'relationship-chat',
-  'relationship-reasoning',
-  'system-map',
-  'system-reasoning'
+  'demo-card'
 ]);
-const narrowProductPairs = [
-  ['personal-chat', 'personal-reasoning'],
-  ['relationship-chat', 'relationship-reasoning']
-] as const;
+const narrowProductPairs: readonly [string, string][] = [['hero', 'demo-card']] as const;
 
 export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSnapshot): PublicLandingViewportResult {
   const failures: string[] = [];
@@ -83,14 +65,17 @@ export function evaluatePublicLandingViewport(snapshot: PublicLandingViewportSna
       if (snapshot.viewportWidth - surface.right < minimumGutter) failures.push(`${id} right gutter ${snapshot.viewportWidth - surface.right}px < ${minimumGutter}px`);
     }
 
-    if (productSurfaceIds.has(id)) {
-      const maximumHeight = narrow ? 1100 : 1000;
-      if (surface.height > maximumHeight) failures.push(`${id} height ${surface.height}px > ${maximumHeight}px`);
-    }
-
     if (surface.layoutWidth > 0) {
       const scale = surface.width / surface.layoutWidth;
       if (scale < 0.98 || scale > 1.02) failures.push(`${id} rendered scale ${scale.toFixed(3)} is not 1`);
+    }
+  }
+
+  // Check heights for all product surfaces (not just required ones)
+  for (const surface of snapshot.surfaces) {
+    if (productSurfaceIds.has(surface.id)) {
+      const maximumHeight = narrow ? 1100 : 1000;
+      if (surface.height > maximumHeight) failures.push(`${surface.id} height ${surface.height}px > ${maximumHeight}px`);
     }
   }
 

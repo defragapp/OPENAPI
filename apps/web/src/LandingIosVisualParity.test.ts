@@ -18,9 +18,9 @@ describe('landing iOS visual parity release', () => {
     ]) expect(landing).toContain(marker);
 
     for (const marker of [
-      'landing-story--personal',
-      'landing-story--relationship',
-      'landing-story--system'
+      'demo-selector',
+      'demo-card',
+      'demo-selector__tab'
     ]) expect(stories).toContain(marker);
 
     expect(approvedCss).toContain('founder story on one quiet editorial rail');

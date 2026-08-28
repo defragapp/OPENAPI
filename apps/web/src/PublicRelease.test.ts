@@ -92,17 +92,13 @@ describe('public production positioning release', () => {
     ]) expect(landing).toContain(marker);
 
     for (const marker of [
-      '01 · You',
-      'Explore how you think, decide, communicate, create, connect, and grow.',
-      '02 · You + your people',
-      'See why the same moment lands differently',
-      '03 · From 1:1 to the whole system',
-      'See the whole system.',
-      'How Sovereign compares two people',
-      'How Sovereign reads a system',
-      'Show what happens between you',
-      'Show how pressure moves',
-      'What you can change'
+      '01 · YOU',
+      '02 · YOU & YOUR PEOPLE',
+      '03 · WHOLE SYSTEM',
+      'demo-selector',
+      'demo-card',
+      'See source details',
+      'Representative example · Not your Baseline Design'
     ]) expect(stories).toContain(marker);
 
     expect(landing.indexOf('<RealLifeQuestions />')).toBeLessThan(landing.indexOf('<LandingProductStories />'));
@@ -159,11 +155,10 @@ describe('public production positioning release', () => {
     expect(landingRefinementV5).toContain('One typeface. Hierarchy comes from weight, scale, and opacity.');
   });
 
-  it('puts workflow before the conversation and anchors the composer below the answer surface', () => {
-    expect(stories.indexOf('surface="personal-reasoning"')).toBeLessThan(stories.indexOf('surface="personal-chat"'));
-    expect(stories.indexOf('surface="relationship-reasoning"')).toBeLessThan(stories.indexOf('surface="relationship-chat"'));
-    expect(stories.indexOf('surface="system-reasoning"')).toBeLessThan(stories.indexOf('surface="system-map"'));
-    expect(stories).toContain('landing-demo__composer-shell');
+  it('places simplified demo before source details and anchors the composer below the answer surface', () => {
+    expect(stories).toContain('demo-selector');
+    expect(stories).toContain('demo-card');
+    expect(stories).toContain('landing-evidence');
     expect(intelligenceDemoCss).toContain('.landing-demo__composer-shell');
     expect(intelligenceDemoCss).toContain('grid-template-columns: minmax(320px, .88fr) minmax(0, 1.12fr) !important;');
     expect(intelligenceDemoCss).toContain('@media (max-width: 900px)');

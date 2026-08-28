@@ -157,28 +157,18 @@ describe('public positioning reset', () => {
 
   it('shows self, relationship, and system intelligence as substantive product behavior in approved language', () => {
     for (const marker of [
-      '01 · You',
-      'Explore how you think, decide, communicate, create, connect, and grow.',
-      'How Sovereign builds the answer',
-      'Start with the question',
-      'Find the useful distinction',
-      '02 · You + your people',
-      'See why the same moment lands differently',
-      'How Sovereign compares two people',
-      'Show what happens between you',
-      'Find a lower-pressure next step',
-      '03 · From 1:1 to the whole system',
-      'See the whole system.',
-      'How Sovereign reads a system',
-      'Show how pressure moves',
-      'Show why the role keeps returning',
-      'Change one thing and watch what happens',
-      'What this gives you'
+      '01 · YOU',
+      '02 · YOU & YOUR PEOPLE',
+      '03 · WHOLE SYSTEM',
+      'demo-selector',
+      'demo-card',
+      'See source details',
+      'Representative example · Not your Baseline Design'
     ]) expect(stories).toContain(marker);
 
-    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(3);
-    expect(stories).toContain('landing-workflow__progress');
-    expect(stories).toContain('280 + step * 760');
+    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(0);
+    expect(stories).not.toContain('landing-workflow__progress');
+    expect(stories).not.toContain('280 + step * 760');
     expect(renderedStories).not.toContain('<FamilySystemMap />');
     expect(renderedStories).not.toContain('<RelationshipContext />');
     expect(renderedStories).not.toContain('<SystemContext />');
@@ -189,7 +179,7 @@ describe('public positioning reset', () => {
   });
 
   it('keeps exact fixture-backed source codes secondary and collapsed by default', () => {
-    for (const marker of ["{ code: 'clarity'", "{ code: 'focus'", "{ code: 'steadiness'", "{ code: 'clarity □ steadiness'"]) {
+    for (const marker of ["{ code: 'tenderness'", "{ code: 'responsibility'", "{ code: 'boundaries'", "{ code: 'clarity □ steadiness'"]) {
       expect(stories).toContain(marker);
     }
     expect(stories).toContain('<details className="landing-evidence">');
@@ -202,11 +192,10 @@ describe('public positioning reset', () => {
     expect(intelligenceDemoStyles).toContain('.landing-evidence > summary');
   });
 
-  it('places workflow before conversation and anchors the composer outside the answer body', () => {
-    expect(renderedStories.indexOf('surface="personal-reasoning"')).toBeLessThan(renderedStories.indexOf('surface="personal-chat"'));
-    expect(renderedStories.indexOf('surface="relationship-reasoning"')).toBeLessThan(renderedStories.indexOf('surface="relationship-chat"'));
-    expect(renderedStories.indexOf('surface="system-reasoning"')).toBeLessThan(renderedStories.indexOf('surface="system-map"'));
-    expect(stories).toContain('landing-demo__composer-shell');
+  it('places simplified demo before source details and anchors the composer outside the answer body', () => {
+    expect(stories).toContain('demo-selector');
+    expect(stories).toContain('demo-card');
+    expect(stories).toContain('landing-evidence');
     expect(intelligenceDemoStyles).toContain('.landing-demo__composer-shell');
     expect(intelligenceDemoStyles).toContain('flex: 1 1 auto !important;');
     expect(intelligenceDemoStyles).toContain('grid-template-columns: repeat(5, minmax(0, 1fr)) !important;');

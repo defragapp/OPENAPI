@@ -5,12 +5,7 @@ import type { PublicLandingViewportSnapshot, ViewportSurfaceMeasurement } from '
 const desktopRequiredSurfaceIds = [
   'hero',
   'expression-slice',
-  'personal-chat',
-  'personal-reasoning',
-  'relationship-chat',
-  'relationship-reasoning',
-  'system-map',
-  'system-reasoning',
+  'demo-card',
   'comparison'
 ] as const;
 
@@ -41,15 +36,10 @@ function passingPhoneSnapshot(): PublicLandingViewportSnapshot {
     surfaces: [
       surface('hero', 16, 359, 0, 620),
       surface('expression-slice', 0, 375, 620, 320),
-      surface('personal-chat', 16, 359, 1120, 510),
-      surface('personal-reasoning', 16, 359, 1648, 540),
-      surface('relationship-chat', 16, 359, 2380, 450),
-      surface('relationship-reasoning', 16, 359, 2848, 610),
-      surface('system-map', 16, 359, 3650, 760),
-      surface('system-reasoning', 0, 0, 0, 0, 0),
-      surface('comparison', 16, 359, 4430, 430)
+      surface('demo-card', 16, 359, 1120, 800),
+      surface('comparison', 16, 359, 2120, 430)
     ],
-    stageGaps: [42, 36, 36],
+    stageGaps: [42, 36],
     comparisonStacked: true
   };
 }
@@ -61,15 +51,10 @@ function passingDesktopSnapshot(): PublicLandingViewportSnapshot {
     surfaces: [
       surface('hero', 220, 1220, 0, 780),
       surface('expression-slice', 0, 1440, 780, 520),
-      surface('personal-chat', 100, 665, 1480, 560),
-      surface('personal-reasoning', 713, 1340, 1480, 610),
-      surface('relationship-chat', 100, 665, 2320, 500),
-      surface('relationship-reasoning', 713, 1340, 2320, 650),
-      surface('system-map', 100, 820, 3220, 820),
-      surface('system-reasoning', 860, 1340, 3220, 570),
-      surface('comparison', 160, 1280, 4300, 520)
+      surface('demo-card', 100, 1340, 1480, 800),
+      surface('comparison', 160, 1280, 2480, 520)
     ],
-    stageGaps: [58, 54, 54],
+    stageGaps: [58, 54],
     comparisonStacked: false
   };
 }
@@ -83,14 +68,15 @@ describe('restored landing rendered viewport contract', () => {
     expect(evaluatePublicLandingViewport(passingDesktopSnapshot())).toMatchObject({ ok: true, failures: [] });
   });
 
-  it('allows the secondary system reasoning panel to collapse on narrow screens only', () => {
+  it('allows the demo card to collapse on narrow screens only', () => {
     const narrow = passingPhoneSnapshot();
-    narrow.surfaces = narrow.surfaces.filter((item) => item.id !== 'system-reasoning');
+    narrow.surfaces = narrow.surfaces.filter((item) => item.id !== 'demo-card');
+    narrow.stageGaps = [42, 36];
     expect(evaluatePublicLandingViewport(narrow)).toMatchObject({ ok: true, failures: [] });
 
     const desktop = passingDesktopSnapshot();
-    desktop.surfaces = desktop.surfaces.filter((item) => item.id !== 'system-reasoning');
-    expect(evaluatePublicLandingViewport(desktop).failures).toContain('missing surface system-reasoning');
+    desktop.surfaces = desktop.surfaces.filter((item) => item.id !== 'demo-card');
+    expect(evaluatePublicLandingViewport(desktop).failures).toContain('missing surface demo-card');
   });
 
   it('rejects a desktop-scaled expression field on a phone', () => {
@@ -112,32 +98,38 @@ describe('restored landing rendered viewport contract', () => {
     expect(result.failures).toContain('comparison section is not stacked');
   });
 
-  it('rejects missing, stretched, or side-by-side required workflow surfaces', () => {
+  it('rejects missing, stretched, or side-by-side required surfaces', () => {
     const missing = passingPhoneSnapshot();
-    missing.surfaces = missing.surfaces.filter((item) => item.id !== 'relationship-reasoning');
-    expect(evaluatePublicLandingViewport(missing).failures).toContain('missing surface relationship-reasoning');
+    missing.surfaces = missing.surfaces.filter((item) => item.id !== 'comparison');
+    expect(evaluatePublicLandingViewport(missing).failures).toContain('missing surface comparison');
 
     const stretched = passingPhoneSnapshot();
-    const personalWorkflow = stretched.surfaces.find((item) => item.id === 'personal-reasoning')!;
-    personalWorkflow.height = 2400;
-    personalWorkflow.bottom = personalWorkflow.top + personalWorkflow.height;
-    expect(evaluatePublicLandingViewport(stretched).failures).toContain('personal-reasoning height 2400px > 1100px');
+    const demoCardIdx = stretched.surfaces.findIndex((item) => item.id === 'demo-card');
+    stretched.surfaces[demoCardIdx] = {
+      ...stretched.surfaces[demoCardIdx],
+      height: 2400,
+      bottom: stretched.surfaces[demoCardIdx].top + 2400
+    };
+    expect(evaluatePublicLandingViewport(stretched).failures).toContain('demo-card height 2400px > 1100px');
 
     const sideBySide = passingPhoneSnapshot();
-    const chat = sideBySide.surfaces.find((item) => item.id === 'personal-chat')!;
-    const workflow = sideBySide.surfaces.find((item) => item.id === 'personal-reasoning')!;
-    workflow.top = chat.top;
-    workflow.bottom = workflow.top + workflow.height;
-    expect(evaluatePublicLandingViewport(sideBySide).failures).toContain('personal-reasoning is not clearly stacked below personal-chat');
+    const hero = sideBySide.surfaces.find((item) => item.id === 'hero')!;
+    const demoIdx = sideBySide.surfaces.findIndex((item) => item.id === 'demo-card');
+    sideBySide.surfaces[demoIdx] = {
+      ...sideBySide.surfaces[demoIdx],
+      top: hero.top,
+      bottom: hero.top + sideBySide.surfaces[demoIdx].height
+    };
+    expect(evaluatePublicLandingViewport(sideBySide).failures).toContain('demo-card is not clearly stacked below hero');
   });
 
   it('rejects collapsed or excessive heading-to-stage spacing', () => {
     const collapsed = passingPhoneSnapshot();
-    collapsed.stageGaps = [8, 36, 36];
+    collapsed.stageGaps = [8, 36];
     expect(evaluatePublicLandingViewport(collapsed).failures).toContain('stage gap 1 is 8px');
 
     const excessive = passingDesktopSnapshot();
-    excessive.stageGaps = [58, 140, 54];
+    excessive.stageGaps = [58, 140];
     expect(evaluatePublicLandingViewport(excessive).failures).toContain('stage gap 2 is 140px');
   });
 
@@ -145,12 +137,7 @@ describe('restored landing rendered viewport contract', () => {
     expect(desktopRequiredSurfaceIds).toEqual([
       'hero',
       'expression-slice',
-      'personal-chat',
-      'personal-reasoning',
-      'relationship-chat',
-      'relationship-reasoning',
-      'system-map',
-      'system-reasoning',
+      'demo-card',
       'comparison'
     ]);
   });

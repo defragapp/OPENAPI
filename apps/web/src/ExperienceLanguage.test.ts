@@ -68,12 +68,13 @@ describe('Sovereign.OS active experience language', () => {
     const stories = activeExperience.find(([label]) => label === 'landing demonstrations')?.[1] ?? '';
 
     expect(landing).toContain('How do I make decisions that actually fit me?');
-    expect(stories).toContain('01 · You');
-    expect(stories).toContain('Explore how you think, decide, communicate, create, connect, and grow.');
-    expect(stories).toContain('02 · You + your people');
-    expect(stories).toContain('See why the same moment lands differently');
-    expect(stories).toContain('03 · From 1:1 to the whole system');
-    expect(stories).toContain('See the whole system.');
+    expect(stories).toContain('01 · YOU');
+    expect(stories).toContain('demo-selector');
+    expect(stories).toContain('demo-card');
+    expect(stories).toContain('See source details');
+    expect(stories).toContain('Representative example · Not your Baseline Design');
+    expect(stories).toContain('02 · YOU & YOUR PEOPLE');
+    expect(stories).toContain('03 · WHOLE SYSTEM');
 
     for (const phrase of rejectedPublicCategoryPhrases) {
       expect(landing).not.toContain(phrase);
@@ -84,22 +85,9 @@ describe('Sovereign.OS active experience language', () => {
   it('keeps public workflows in approved adult language and hides exact source codes until inspection', () => {
     const stories = activeExperience.find(([label]) => label === 'landing demonstrations')?.[1] ?? '';
     for (const marker of [
-      'Start with the question',
-      'Draw from your Baseline',
-      'Find the useful distinction',
-      'Leave what is not known unanswered',
-      'Give you something you can try',
-      'Start with what happened',
-      'Keep each person separate',
-      'Show what happens between you',
-      'Do not guess private feelings',
-      'Find a lower-pressure next step',
-      'Start with what you told Sovereign',
-      'Show how pressure moves',
-      'Show why the role keeps returning',
-      'Change one thing and watch what happens',
       '<strong>See source details</strong>',
-      '<details className="landing-evidence">'
+      '<details className="landing-evidence">',
+      'Representative example · Not your Baseline Design'
     ]) expect(stories).toContain(marker);
 
     expect(stories).not.toContain('<strong>Example Basis</strong>');

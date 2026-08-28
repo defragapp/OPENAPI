@@ -124,22 +124,22 @@ function MobileCapabilityRail() {
       <a href="#how">
         <CapabilityIcon kind="self" />
         <strong>Explore yourself</strong>
-        <small>Expression, decisions,<br />creativity, Alignment.</small>
+        <small>How you think, decide,<br />create, connect, and grow</small>
       </a>
       <a href="#relationship">
         <CapabilityIcon kind="people" />
         <strong>Understand your people</strong>
-        <small>See why the same moment<br />lands differently.</small>
+        <small>See why the same moment<br />lands differently</small>
       </a>
       <a href="#system">
         <CapabilityIcon kind="system" />
         <strong>See the whole system</strong>
-        <small>From 1:1 to family,<br />team, or group.</small>
+        <small>From 1:1 to family,<br />team, or group</small>
       </a>
       <a href="/login">
         <CapabilityIcon kind="library" />
         <strong>Keep what matters</strong>
-        <small>Return to what changed<br />your understanding.</small>
+        <small>Return to what changed<br />your understanding</small>
       </a>
     </nav>
   );

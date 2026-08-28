@@ -41,15 +41,11 @@ describe('production mobile and responsive experience', () => {
   it('measures required mobile product surfaces while allowing redundant system reasoning to collapse', () => {
     expect(landing).toContain('data-viewport-contract="v0-public-landing-v3"');
     expect(landing).toContain('data-viewport-surface="hero"');
-    for (const surface of ['expression-slice', 'personal-chat', 'personal-reasoning', 'relationship-chat', 'relationship-reasoning', 'system-map', 'comparison']) {
+    for (const surface of ['expression-slice', 'demo-card', 'comparison']) {
       expect(viewportProbe).toContain(`'${surface}'`);
     }
     expect(viewportProbe).toContain('desktopRequiredSurfaces');
     expect(viewportProbe).toContain('narrowRequiredSurfaces');
-    expect(viewportProbe).toContain("'system-reasoning'");
-    expect(stories).toContain('data-viewport-stage="personal"');
-    expect(stories).toContain('data-viewport-stage="relationship"');
-    expect(stories).toContain('data-viewport-stage="system"');
     expect(viewportProbe).toContain('getBoundingClientRect()');
     expect(viewportCss).toContain('.sovereign-landing [data-viewport-surface]');
   });
@@ -83,8 +79,8 @@ describe('production mobile and responsive experience', () => {
     expect(landing).not.toContain('Build a private Baseline once.');
     expect(landing).toContain('<small>{question.scope}</small>');
     expect(landing).toContain('<strong>{question.text}</strong>');
-    expect(stories).toContain('id="relationship"');
-    expect(stories).toContain('id="system"');
+    expect(stories).toContain('demo-selector');
+    expect(stories).toContain('demo-card');
   });
 
   it('keeps all six workspace surfaces reachable through one mobile menu sheet', () => {

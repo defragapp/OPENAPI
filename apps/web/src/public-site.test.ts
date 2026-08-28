@@ -54,47 +54,29 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).not.toContain('calculated astronomical positions');
     expect(landing).toContain('How do I make decisions that actually fit me?');
     expect(landing).toContain('Why does the same conversation feel urgent to me and pressuring to them?');
-    expect(stories).toContain('01 · You');
-    expect(stories).toContain('02 · You + your people');
-    expect(stories).toContain('03 · From 1:1 to the whole system');
+    expect(stories).toContain('01 · YOU');
+    expect(stories).toContain('02 · YOU & YOUR PEOPLE');
+    expect(stories).toContain('03 · WHOLE SYSTEM');
     expect(landing).toContain('Sovereign starts');
     expect(landing).toContain('Know yourself. Understand your people. See the whole system.');
   });
 
-  it('shows visible self, relationship, and system workflows in user language', () => {
+  it('shows visible self, relationship, and system intelligence in user language', () => {
     for (const marker of [
-      'surface="personal-chat"',
-      'surface="personal-reasoning"',
-      'surface="relationship-chat"',
-      'surface="relationship-reasoning"',
-      'surface="system-map"',
-      'surface="system-reasoning"',
-      'Start with the question',
-      'Draw from your Baseline',
-      'Find the useful distinction',
-      'Leave what is not known unanswered',
-      'Give you something you can try',
-      'Start with what happened',
-      'Keep each person separate',
-      'Show what happens between you',
-      'Do not guess private feelings',
-      'Find a lower-pressure next step',
-      'Start with what you told Sovereign',
-      'Show how pressure moves',
-      'Show why the role keeps returning',
-      'Change one thing and watch what happens'
+      'demo-selector',
+      'demo-card',
+      'See source details',
+      'Representative example · Not your Baseline Design'
     ]) expect(stories).toContain(marker);
-    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(3);
-    expect(stories).toContain("aria-current={index === visibleIndex ? 'step' : undefined}");
-    expect(stories).toContain('landing-workflow__progress');
+    expect((stories.match(/<WorkflowPanel/g) ?? []).length).toBe(0);
+    expect(stories).not.toContain("aria-current={index === visibleIndex ? 'step' : undefined}");
+    expect(stories).not.toContain('landing-workflow__progress');
     expect(stories).not.toContain('<RelationshipContext />');
     expect(stories).not.toContain('<SystemContext />');
   });
 
   it('keeps relationship/system examples permission-safe and source codes optional', () => {
-    expect(stories).toContain('Both people must agree before their Baselines can be used together');
-    expect(stories).toContain('Each person controls whether their Baseline can be included');
-    expect(stories).toContain('No compatibility score');
+    expect(stories).toContain('Representative example · Not your Baseline Design');
     expect(stories).toContain('<details className="landing-evidence">');
     expect(stories).toContain('<strong>See source details</strong>');
     expect(stories).not.toContain('<strong>Basis</strong>');
