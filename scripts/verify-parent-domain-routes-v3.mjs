@@ -118,7 +118,7 @@ for (const marker of [
   'Holding onto the pain is.',
   'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
   'Start with yourself. Expand outward when it matters.',
-  'Explore how you think, decide, communicate, create, connect, and grow.',
+  'Explore how you think, decide, communicate, create, and respond.',
   'See why the same moment lands differently—and how to bridge the gap.',
   'How Sovereign compares two people',
   'See source details',
