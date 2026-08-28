@@ -945,65 +945,63 @@ html:root:root:root body .intelligence-topbar {
   ) {
     animation: sovereign-section-reveal linear both;
     animation-timeline: view(block);
-    animation-range: entry 0% entry 35%;
+    animation-range: entry 0% entry 30%;
   }
 }
 
 @keyframes sovereign-section-reveal {
   from {
-    opacity: 0.3;
-    transform: translateY(32px);
-    filter: blur(4px);
+    opacity: 0.55;
+    transform: translateY(18px);
   }
   to {
     opacity: 1;
     transform: none;
-    filter: none;
   }
 }
 
 /* ─── Landing Editorial Typography ─────────────────────────────────────────── */
 
 html:root:root:root body .v0-hero h1 {
-  font-size: clamp(3.2rem, 7vw, 6.4rem) !important;
-  letter-spacing: -0.055em !important;
-  line-height: 0.98 !important;
+  font-size: clamp(2.6rem, 6.5vw, 5.8rem) !important;
+  letter-spacing: -0.05em !important;
+  line-height: 0.99 !important;
 }
 
 html:root:root:root body .v0-hero h1 em {
-  -webkit-text-stroke: 1.2px rgba(232, 221, 208, 0.5) !important;
+  -webkit-text-stroke: 1.1px rgba(232, 221, 208, 0.48) !important;
 }
 
 html:root:root:root body .sovereign-opening-copy {
-  font-size: clamp(1.02rem, 1.5vw, 1.22rem) !important;
-  line-height: 1.75 !important;
+  font-size: clamp(0.95rem, 1.4vw, 1.18rem) !important;
+  line-height: 1.72 !important;
   letter-spacing: -0.005em !important;
 }
 
 html:root:root:root body .landing-question-orbit h2 {
-  font-size: clamp(2rem, 4.5vw, 3.2rem) !important;
-  letter-spacing: -0.035em !important;
-  line-height: 1.05 !important;
+  font-size: clamp(1.7rem, 4vw, 3rem) !important;
+  letter-spacing: -0.032em !important;
+  line-height: 1.06 !important;
 }
 
 html:root:root:root body .v0-comparison h2 {
-  font-size: clamp(2.2rem, 5vw, 3.6rem) !important;
-  letter-spacing: -0.04em !important;
-  line-height: 1.02 !important;
+  font-size: clamp(1.8rem, 4.5vw, 3.2rem) !important;
+  letter-spacing: -0.036em !important;
+  line-height: 1.03 !important;
 }
 
 html:root:root:root body .v0-final h2 {
-  font-size: clamp(2.4rem, 5.5vw, 4rem) !important;
-  letter-spacing: -0.042em !important;
-  line-height: 1.03 !important;
+  font-size: clamp(2rem, 5vw, 3.6rem) !important;
+  letter-spacing: -0.038em !important;
+  line-height: 1.04 !important;
 }
 
 /* ─── Workspace Intelligence Canvas ────────────────────────────────────────── */
 
 html:root:root:root body .sovereign-answer > header h2 {
-  font-size: clamp(1.6rem, 3vw, 2.2rem) !important;
-  letter-spacing: -0.028em !important;
-  line-height: 1.15 !important;
+  font-size: clamp(1.4rem, 2.8vw, 2rem) !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.18 !important;
   font-weight: 450 !important;
 }
 
@@ -1023,8 +1021,8 @@ html:root:root:root body .user-question {
 }
 
 html:root:root:root body .user-question p {
-  font-size: 1.02rem !important;
-  line-height: 1.6 !important;
+  font-size: 1rem !important;
+  line-height: 1.58 !important;
 }
 
 /* ─── Composer as Intelligence Instrument ──────────────────────────────────── */
@@ -1034,16 +1032,16 @@ html:root:root:root body .sovereign-composer {
   border-color: var(--sov-nav-border) !important;
   background: rgba(16, 18, 21, 0.92) !important;
   box-shadow:
-    0 24px 80px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(241, 233, 222, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
-  backdrop-filter: blur(28px) saturate(120%) !important;
+    0 16px 48px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(241, 233, 222, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02) !important;
+  backdrop-filter: blur(24px) saturate(115%) !important;
 }
 
 html:root:root:root body .sovereign-composer textarea {
-  font-size: 1.02rem !important;
-  line-height: 1.55 !important;
-  letter-spacing: -0.005em !important;
+  font-size: 1rem !important;
+  line-height: 1.52 !important;
+  letter-spacing: -0.003em !important;
 }
 
 html:root:root:root body .sovereign-composer textarea:focus {
@@ -1057,20 +1055,61 @@ html:root:root:root body .composer-send {
 }
 
 html:root:root:root body .composer-send:hover:not(:disabled) {
-  transform: scale(1.05) !important;
+  transform: scale(1.04) !important;
 }
 
 html:root:root:root body .composer-send:active:not(:disabled) {
-  transform: scale(0.95) !important;
+  transform: scale(0.96) !important;
 }
 
 /* ─── Response Mark Intelligence Indicator ─────────────────────────────────── */
 
 html:root:root:root body .response-mark {
-  background: radial-gradient(circle at 50% 40%, rgba(185, 151, 114, 0.12), transparent 70%) !important;
-  border-color: rgba(185, 151, 114, 0.2) !important;
-  box-shadow: 0 2px 12px rgba(185, 151, 114, 0.08) !important;
+  background: radial-gradient(circle at 50% 40%, rgba(185, 151, 114, 0.1), transparent 70%) !important;
+  border-color: rgba(185, 151, 114, 0.18) !important;
+  box-shadow: 0 2px 8px rgba(185, 151, 114, 0.06) !important;
   color: var(--sovereign-accent) !important;
+}
+
+/* ─── Mobile Overrides ─────────────────────────────────────────────────────── */
+
+@media (max-width: 760px) {
+  html:root:root:root body .v0-hero h1 {
+    font-size: clamp(2.2rem, 8.5vw, 3.2rem) !important;
+    letter-spacing: -0.04em !important;
+  }
+
+  html:root:root:root body .sovereign-opening-copy {
+    font-size: 0.95rem !important;
+    line-height: 1.65 !important;
+  }
+
+  html:root:root:root body .landing-question-orbit h2 {
+    font-size: clamp(1.5rem, 5.5vw, 2rem) !important;
+  }
+
+  html:root:root:root body .v0-comparison h2 {
+    font-size: clamp(1.5rem, 5.5vw, 2.2rem) !important;
+  }
+
+  html:root:root:root body .v0-final h2 {
+    font-size: clamp(1.6rem, 6vw, 2.4rem) !important;
+  }
+
+  html:root:root:root body .sovereign-composer {
+    border-radius: 16px !important;
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.18),
+      0 0 0 1px rgba(241, 233, 222, 0.04) !important;
+  }
+
+  html:root:root:root body .sovereign-answer > header h2 {
+    font-size: 1.35rem !important;
+  }
+
+  html:root:root:root body .user-question p {
+    font-size: 0.95rem !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
