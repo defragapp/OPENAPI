@@ -83,15 +83,15 @@ describe('desktop and iOS production readiness v1', () => {
     for (const marker of [
       '@media (max-width: 900px)',
       'env(safe-area-inset-bottom)',
-      'min-height: max(760px',
+      'min-height: max(660px',
       'font-size: clamp(2.9rem, 11.2vw, 4.25rem)',
-      'height: 340px !important',
-      'width: min(760px, 178vw) !important',
+      'height: clamp(212px, 27%, 258px)',
+      'width: min(660px, 165vw)',
       '@media (max-width: 430px)',
       'min-height: max(640px',
       'width: min(590px, 154vw)'
     ]) expect(css).toContain(marker);
-    expect(landingRefinement).toContain('.public-approved-v8 .landing-expression-slice__tooltip {\n  display: none !important;');
+    expect(landingRefinement).toContain('.landing-expression-slice__tooltip {\n    display: none !important;');
   });
 
   it('organizes policy, account, onboarding, and workspace pages with one mobile hierarchy', () => {

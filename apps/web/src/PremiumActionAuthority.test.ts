@@ -4,7 +4,6 @@ import { readFileSync } from 'node:fs';
 const main = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const landing = readFileSync(new URL('./PublicLanding.tsx', import.meta.url), 'utf8');
 const css = readFileSync(new URL('./app-shell.css', import.meta.url), 'utf8');
-const workspaceCss = readFileSync(new URL('./workspace.css', import.meta.url), 'utf8');
 
 describe('premium action authority', () => {
   it('loads editorial action authority as part of the single terminal inline authority', () => {
@@ -29,7 +28,7 @@ describe('premium action authority', () => {
     expect(css).toContain('box-shadow: none !important;');
     expect(css).toContain('min-height: 44px !important;');
     expect(css).toContain(':focus-visible');
-    expect(workspaceCss).toContain('.billing-switch button.active');
+    expect(css).toContain('.billing-switch button.active');
     expect(css).toContain('.intelligence-sidebar nav button');
   });
 
