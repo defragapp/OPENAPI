@@ -527,6 +527,7 @@
 .sovereign-response {
   position: relative;
   padding-left: 52px;
+  animation: sovereign-answer-arrive 480ms ease both;
 }
 
 .response-mark {
@@ -540,12 +541,13 @@
   border: 1px solid var(--sov-line);
   border-radius: 50%;
   color: var(--sov-clay);
-  font-family: var(--serif);
+  font-family: var(--font-display, var(--serif));
 }
 
 .thinking {
   margin: 4px 0;
   color: var(--sov-muted);
+  animation: sovereign-thinking-breathe 2.4s ease-in-out infinite alternate;
 }
 
 .sovereign-answer {
@@ -852,6 +854,11 @@
   color: var(--sov-paper-ink) !important;
   cursor: pointer;
   font-size: 1.25rem !important;
+}
+
+.composer-send:disabled {
+  opacity: .35;
+  cursor: default;
 }
 
 .intelligence-context {
@@ -1225,9 +1232,35 @@
   clip: rect(0 0 0 0);
 }
 
+.workspace-arrival {
+  animation: sovereign-arrive 480ms ease both;
+}
+
+.workspace-arrival > span {
+  animation: sovereign-arrive 480ms ease 100ms both;
+}
+
+.workspace-arrival > h1 {
+  animation: sovereign-arrive 480ms ease 200ms both;
+}
+
+.workspace-arrival > p {
+  animation: sovereign-arrive 480ms ease 300ms both;
+}
+
 @keyframes sovereign-arrive {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }
+}
+
+@keyframes sovereign-thinking-breathe {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
+}
+
+@keyframes sovereign-answer-arrive {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 1180px) {

@@ -165,7 +165,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       ? await response.json().catch(() => ({}))
       : await response.text();
     if (!response.ok) {
-      throw new Error('That request could not be completed safely.');
+      throw new Error('This request could not be completed. Your information is safe. Try again when ready.');
     }
     return body as Json;
   }
@@ -200,7 +200,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       setStatus('Ready');
     } catch (error) {
       setApiState('error');
-      setStatus(error instanceof Error ? error.message : 'Some context is unavailable.');
+      setStatus(error instanceof Error ? error.message : 'Some of your workspace context is temporarily unavailable. Your saved data is unchanged.');
     }
   }
 
@@ -421,7 +421,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       setApiState('error');
       setDraft(previousDraft || clean);
       setMessages((current) => current.map((item) => item.id === assistantId
-        ? { ...item, text: 'Sovereign could not complete this response. Your draft and conversation are unchanged.' }
+        ? { ...item, text: 'Sovereign could not complete this response yet. Your draft and conversation are unchanged. Try again when ready.' }
         : item));
       setStatus('Needs attention');
     }

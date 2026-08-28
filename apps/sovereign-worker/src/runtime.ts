@@ -16,6 +16,6 @@ export function canUseDevelopmentFixtures(env: Env): boolean {
   return mode === 'development' || mode === 'test';
 }
 
-export function serviceUnavailable(message = 'Sovereign is not available right now. Your private context was not analyzed or saved as a model response.'): Response {
+export function serviceUnavailable(message = 'Sovereign is not available right now. Your private context was not analyzed or saved. Try again when ready.'): Response {
   return Response.json({ error: 'service_unavailable', message }, { status: 503, headers: { 'cache-control': 'no-store' } });
 }
