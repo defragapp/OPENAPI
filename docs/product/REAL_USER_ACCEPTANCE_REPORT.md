@@ -6,7 +6,7 @@ Reviewed: 2026-08-29
 
 Live funnel session: 2026-08-29 (real browser, real Turnstile solve, real mailbox) — see "Live signup funnel session" below.
 
-Post-release re-run: 2026-08-29, after the sovereign.os identity release (`release d78f4fa1` → SHA `a28f4b26`): both branded `/ready` endpoints `ready: true`, and two fresh real-Turnstile signup attempts reproduced the same owner-gated delivery boundary (`resend_403_The sovereign.defrag.app domain is not verified` in worker tail; 503, no account created).
+Post-release re-run: 2026-08-29, after the sovereign.os identity release (SHA `5df75dd7`): both branded `/ready` endpoints `ready: true` (live: `publicContactEmail: info@sovereign.os`), and two fresh real-Turnstile signup attempts reproduced the same owner-gated delivery boundary (`resend_403_The sovereign.defrag.app domain is not verified` in worker tail; 503, no account created).
 
 This report verifies that a real human can use Sovereign.OS end-to-end, from discovery through daily use. Verification is based on source-code audit and live production probing.
 
@@ -156,12 +156,12 @@ Harness: `visual-inspection/signup-funnel.mjs` (Playwright, headed Chromium, dis
 | Email delivery | **FAILED — production blocker** `resend_403_The sovereign.defrag.app domain is not verified.` observed live in worker tail (`email_delivery_failed`) |
 | Fail-closed behavior | VERIFIED — 503 `Email delivery unavailable`, UI: "No account change was made", no magic link row consumed |
 
-Post-release re-run (same day, after `release d78f4fa1`): identical outcome — real Turnstile solve accepted, `resend_403_The sovereign.defrag.app domain is not verified` in worker tail, 503 fail-closed, no account created. The sovereign.os identity change did not alter the delivery boundary; the Resend domain verification remains the sole blocker.
+Post-release re-run (same day, after the sovereign.os identity release, SHA `5df75dd7`): identical outcome — real Turnstile solve accepted, `resend_403_The sovereign.defrag.app domain is not verified` in worker tail, 503 fail-closed, no account created. The sovereign.os identity change did not alter the delivery boundary; the Resend domain verification remains the sole blocker.
 
 ### Repairs applied this session
 
 1. **P0-001 Turnstile (RESOLVED):** production `TURNSTILE_SECRET_KEY` on worker `sovv-web` returned `invalid-input-secret`. The secret was reconciled to the exact value of Turnstile widget `0x4AAAAAADhGIF8-iOLIg8MU` via the Cloudflare API (`GET /accounts/8b1954…/challenges/widgets/…`) using the owner's authenticated session; the value was piped directly into the worker secret store and never exposed. Live proof: bogus-token signup/login probes now return 400 `invalid` (siteverify accepts the secret, rejects only the token); both branded `/ready` endpoints remain `ready: true` at the deployed SHA with migration parity current.
-2. **P0-002 Email domain (BLOCKED — owner action):** production Resend sends must originate from a verified domain. The worker's sender identity is now `info@sovereign.os` (`TRANSACTIONAL_FROM_EMAIL`, pinned by `scripts/verify-public-contact.mjs`), but delivery still transmits through the `sovereign.defrag.app` sending domain, which was never added/verified in the Resend account. The apex `defrag.app` is verified in Resend but is a **prohibited** sender per the same verifier, so no code or config override may substitute it. Live proof (2026-08-29, post-release): worker tail captured `resend_403_The sovereign.defrag.app domain is not verified` during two fresh real-Turnstile signup attempts; each returned 503 `Email delivery unavailable` with the UI fail-closed message and no account created.
+2. **P0-002 Email domain (BLOCKED — owner action):** production Resend sends must originate from a verified domain. The public contact identity is now `info@sovereign.os` (`PUBLIC_CONTACT_EMAIL`, pinned by `scripts/verify-public-contact.mjs` as the approved public contact), while the transactional sender and reply-to remain pinned to the deliverable operational address `info@sovereign.defrag.app` (`TRANSACTIONAL_FROM_EMAIL` / `TRANSACTIONAL_REPLY_TO_EMAIL`). Delivery still transmits through the `sovereign.defrag.app` sending domain, which was never added/verified in the Resend account. The apex `defrag.app` is verified in Resend but is a **prohibited** sender per the same verifier, so no code or config override may substitute it. Live proof (2026-08-29, post-release): worker tail captured `resend_403_The sovereign.defrag.app domain is not verified` during two fresh real-Turnstile signup attempts; each returned 503 `Email delivery unavailable` with the UI fail-closed message and no account created.
 
 ### Required owner actions to unblock signup delivery
 
