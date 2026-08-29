@@ -97,7 +97,7 @@ function V0Hero() {
             Healing<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />isn’t optional.
           </span>
           <em aria-label="Holding onto the pain is.">
-            Holding onto<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />the pain is.
+            <span className="v0-desktop-space"> </span>Holding onto<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />the pain is.
           </em>
         </h1>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">

@@ -115,7 +115,8 @@ const publicPolicyKind = location.pathname === '/privacy'
   : location.pathname === '/terms'
     ? 'terms'
     : null;
-const isDirectPublicSurface = isPublicHome || publicPolicyKind !== null;
+const isStaticPublicPage = ['/how-it-works', '/pricing', '/faq'].includes(location.pathname);
+const isDirectPublicSurface = isPublicHome || publicPolicyKind !== null || isStaticPublicPage;
 const isAuthenticatedWorkspace = location.pathname === '/app' || location.pathname.startsWith('/app/');
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -126,9 +127,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         ? <PublicLanding />
         : publicPolicyKind
           ? <><PublicPolicyMetadata kind={publicPolicyKind} /><PublicPolicy kind={publicPolicyKind} /></>
-          : isAuthenticatedWorkspace
-            ? <AuthenticatedWorkspace />
-            : <><App /><EmailCodeFallback /><PasskeyAuthentication /></>}
+          : isStaticPublicPage
+            ? null // Let the server serve the static HTML
+            : isAuthenticatedWorkspace
+              ? <AuthenticatedWorkspace />
+              : <><App /><EmailCodeFallback /><PasskeyAuthentication /></>}
     </AppErrorBoundary>
   </React.StrictMode>
 );
