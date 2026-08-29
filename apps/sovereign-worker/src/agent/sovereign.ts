@@ -81,10 +81,23 @@ function assertAuthorizedAnswerMode(answer: SovereignAnswerV2, context: Sovereig
   }
 }
 
+const GATEWAY_ANSWER_TIMEOUT_MS = 60_000;
+
+export async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(message)), timeoutMs);
+    promise.then(
+      (value) => { clearTimeout(timer); resolve(value); },
+      (error) => { clearTimeout(timer); reject(error); }
+    );
+  });
+}
+
 async function runCloudflareGateway(prompt: string, context: SovereignContext, model: string): Promise<string> {
   if (!context.env.AI) throw new Error('Cloudflare AI binding is not configured.');
   if (!context.env.AI_GATEWAY_ID) throw new Error('AI_GATEWAY_ID is not configured.');
-  const result = await context.env.AI.run(
+  const result = await withTimeout(
+    context.env.AI.run(
     model,
     { prompt, max_completion_tokens: 3_200 },
     {
@@ -98,7 +111,10 @@ async function runCloudflareGateway(prompt: string, context: SovereignContext, m
           response_contract: 'sovereign-answer.v2'
         }
       }
-    }
+      }
+    ),
+    GATEWAY_ANSWER_TIMEOUT_MS,
+    'Cloudflare AI Gateway answer timed out'
   );
   if (result instanceof Response) return result.text();
   if (result instanceof ReadableStream) return collectTextStream(decodeTextStream(result as ReadableStream<string | Uint8Array>));

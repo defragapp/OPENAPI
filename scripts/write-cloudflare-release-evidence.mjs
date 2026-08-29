@@ -29,10 +29,9 @@ async function postEvidenceToWorker({
 }) {
   const headers = {
     'content-type': 'application/json',
-    'x-release-sha': sha,
+    'x-release-secret': releaseSecret,
     'cache-control': 'no-store'
   };
-  if (releaseSecret) headers['x-release-secret'] = releaseSecret;
   try {
     const response = await fetchImpl(INTERNAL_EVIDENCE_URL, {
       method: 'POST',
@@ -176,7 +175,7 @@ export async function writeReleaseEvidence({
     return { releaseEvidence: evidence, finalEvidenceDeploy: false, converged: true, writeMethod };
   }
 
-  console.warn(`[release-evidence] worker endpoint failed: ${workerResult.error}; falling back to direct D1`);
+  console.warn(`[release-evidence] worker endpoint rejected (requires matching RELEASE_EVIDENCE_SECRET on the production Worker): ${workerResult.error}; falling back to direct D1`);
   const writeResult = d1Execute({
     configPath,
     runWrangler,

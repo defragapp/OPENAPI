@@ -337,20 +337,10 @@ async function shareFirstAccountResponse(request: Request, env: Env, executionCo
 }
 
 async function handleInternalReleaseEvidence(request: Request, env: Env): Promise<Response> {
-  const providedSha = request.headers.get('x-release-sha');
   const providedToken = request.headers.get('x-release-secret');
   const expectedSecret = env.RELEASE_EVIDENCE_SECRET;
 
-  const secretMatch = expectedSecret && providedToken && providedToken === expectedSecret;
-  let shaMatch = false;
-  if (providedSha && /^[0-9a-f]{40}$/i.test(providedSha)) {
-    const appVersion = String(env.APP_VERSION || '').trim().toLowerCase();
-    if (!appVersion || providedSha === appVersion) {
-      shaMatch = true;
-    }
-  }
-
-  if (!secretMatch && !shaMatch) {
+  if (!expectedSecret || !providedToken || providedToken !== expectedSecret) {
     return withSecurityHeaders(Response.json({ error: 'unauthorized' }, { status: 401 }));
   }
   const body = await request.json().catch(() => null) as {

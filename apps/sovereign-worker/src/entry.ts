@@ -453,6 +453,13 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       releaseAiTurn(env, auth.accountId, usage.periodKey)
     ]);
     if (error instanceof Response) throw error;
+    console.error('ai_answer_failure', {
+      name: error instanceof Error ? error.name : 'unknown',
+      message: error instanceof Error ? error.message : String(error),
+      traceId,
+      accountRef: auth.accountId.slice(0, 8),
+      status: 'recognition_failed'
+    });
     return answerServiceUnavailable();
   }
 }

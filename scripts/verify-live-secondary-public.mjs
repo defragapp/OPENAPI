@@ -244,7 +244,7 @@ for (const marker of [
   '--refine-page:#080a0d',
   '--route-blue:#e8ddd0!important',
   '--landing-blue:#e8ddd0!important'
-]) assert(compactJavaScript.includes(marker), `compiled injected refinement is missing ${marker}`);
-assert(compactJavaScript.includes('sans-typography-authority-v1.css') || compactJavaScript.includes('--font-title:'), 'compiled release is missing the sans typography authority');
+]) assert(compactCss.includes(marker), `compiled stylesheet is missing ${marker}`);
+assert(compactCss.includes('--font-title:'), 'compiled stylesheet is missing the typography authority');
 
 console.log(`Secondary public release verified routes=${[...staticRoutes, ...policyRoutes].join(',')} contract=${expectedContract} positioning=self-people-systems typography=geist-sans`);

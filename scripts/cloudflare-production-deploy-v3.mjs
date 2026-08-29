@@ -18,7 +18,8 @@ const REQUIRED_SECRETS = [
   'TURNSTILE_SECRET_KEY',
   'RESEND_API_KEY',
   'STRIPE_SECRET_KEY',
-  'STRIPE_WEBHOOK_SECRET'
+  'STRIPE_WEBHOOK_SECRET',
+  'RELEASE_EVIDENCE_SECRET'
 ];
 
 function resolveCheckoutSha() {
@@ -47,6 +48,10 @@ export async function ensureProductionSecrets({
   const additions = {};
   if (!existing.has('SESSION_SIGNING_SECRET')) {
     additions.SESSION_SIGNING_SECRET = randomBytes(48).toString('base64url');
+  }
+  const releaseEvidenceSecret = String(process.env.RELEASE_EVIDENCE_SECRET || '').trim();
+  if (!existing.has('RELEASE_EVIDENCE_SECRET') && releaseEvidenceSecret) {
+    additions.RELEASE_EVIDENCE_SECRET = releaseEvidenceSecret;
   }
   if (!existing.has('TURNSTILE_SECRET_KEY') && accountId && apiToken && turnstileSiteKey) {
     const response = await fetchImpl(

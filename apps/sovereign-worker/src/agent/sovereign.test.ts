@@ -208,3 +208,48 @@ describe('answer language review', () => {
     expect(JSON.stringify(answer)).not.toMatch(/trying to control|overfunctioner|secretly want/i);
   });
 });
+
+describe('AI failure-path bounds', () => {
+  it('bounds a hanging AI answer with a timeout instead of resolving indefinitely', async () => {
+    const { withTimeout } = await import('./sovereign');
+    const never = new Promise<string>(() => {});
+    await expect(withTimeout(never, 40, 'Cloudflare AI Gateway answer timed out'))
+      .rejects.toThrow('Cloudflare AI Gateway answer timed out');
+  });
+
+  it('does not conflate an AI timeout with a failed answer and leaves no partial result', async () => {
+    const { runSovereignResult } = await import('./sovereign');
+    const env = {
+      APP_ENV: 'test',
+      APP_VERSION: 'test',
+      AI_PROVIDER: 'cloudflare-gateway',
+      AI_MODEL: '@cf/zai-org/glm-4.7-flash',
+      AI_GATEWAY_ID: 'sovereign-ai-gateway',
+      STRIPE_SECRET_KEY: '',
+      STRIPE_WEBHOOK_SECRET: '',
+      SESSION_SIGNING_SECRET: 'test',
+      DB: {
+        prepare() {
+          return { bind() { return { async first() { return null; } }; } };
+        }
+      },
+      AI: {
+        async run() {
+          return {
+            output_text: 'this is not a valid sovereign-answer.v2 JSON payload at all'
+          };
+        }
+      }
+    } as never;
+
+    await expect(runSovereignResult('Who am I?', {
+      env,
+      accountId: 'acct_test',
+      threadId: 'thread_test',
+      traceId: 'trace_test',
+      covenantEnabled: false,
+      plan: 'free',
+      authorizedContext: { kind: 'baseline', personId: 'person_private', label: 'Private', baseline: { basisRegistry: [] } }
+    })).rejects.toThrow();
+  });
+});

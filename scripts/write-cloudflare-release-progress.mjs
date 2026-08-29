@@ -16,10 +16,9 @@ const INTERNAL_EVIDENCE_URL = 'https://app.defrag.app/internal/release-evidence'
 async function postProgressToWorker({ sha, stage, summaryB64, releaseSecret, fetchImpl = fetch }) {
   const headers = {
     'content-type': 'application/json',
-    'x-release-sha': sha,
+    'x-release-secret': releaseSecret,
     'cache-control': 'no-store'
   };
-  if (releaseSecret) headers['x-release-secret'] = releaseSecret;
   try {
     const response = await fetchImpl(INTERNAL_EVIDENCE_URL, {
       method: 'POST',
@@ -70,7 +69,7 @@ export async function writeReleaseProgress({
     return { releaseProgress: progress, failureProgressDeploy: false, writeMethod: 'worker-endpoint' };
   }
 
-  console.warn(`[release-progress] worker endpoint failed: ${workerResult.error}; falling back to direct D1`);
+  console.warn(`[release-progress] worker endpoint rejected (requires matching RELEASE_EVIDENCE_SECRET on the production Worker): ${workerResult.error}; falling back to direct D1`);
   const result = d1Execute({
     configPath,
     runWrangler,
