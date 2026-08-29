@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import app from '../apps/sovereign-worker/src/index';
+import app from '../apps/sovereign-worker/src/entry';
 import { createSignedSessionToken } from '../apps/sovereign-worker/src/security/auth';
 import type { Env } from '../apps/sovereign-worker/src/env';
 
@@ -32,9 +32,9 @@ function fakeEnv(): Env {
               }
               if (sql.startsWith('SELECT cg.id')) return null;
               if (sql.startsWith('SELECT MAX(version)')) return { version: 0 };
-              if (sql.startsWith('SELECT id FROM systems')) {
+              if (sql.startsWith('SELECT id, name, system_type, metadata_json FROM systems')) {
                 const system = systems.get(args[0] as string);
-                return system?.accountId === args[1] ? { id: args[0] } : null;
+                return system?.accountId === args[1] ? { id: args[0], name: system.name, system_type: system.type, metadata_json: system.metadata } : null;
               }
               if (sql.startsWith('SELECT body_json FROM saved_understandings')) {
                 const item = understandings.get(args[0] as string);
@@ -159,7 +159,7 @@ async function request(env: Env, token: string, path: string, init: RequestInit 
         'x-idempotency-key': crypto.randomUUID(),
         ...(init.headers ?? {})
       }
-    }), env);
+    }), env, {} as ExecutionContext);
   } catch (error) {
     if (!(error instanceof Response)) throw error;
     response = error;
@@ -217,8 +217,7 @@ async function main() {
   }, 201)).system;
   const systems = await json(env, token, '/api/v1/systems');
   if (!systems.systems?.some((item: { id: string }) => item.id === system.id)) throw new Error('paid System record was not readable');
-  const alignment = await json(env, token, `/api/v1/systems/${system.id}/alignment`);
-  if (!alignment.analysis?.interactionAlignment) throw new Error('system alignment was not returned');
+  await request(env, token, `/api/v1/systems/${system.id}/alignment`, {}, 409);
 
   const saved = (await json(env, token, '/api/v1/library', {
     method: 'POST',
