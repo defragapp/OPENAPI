@@ -186,6 +186,7 @@ After each release, verify:
 | `RESEND_API_KEY` | Transactional email | Same |
 | `STRIPE_SECRET_KEY` | Payment processing | Same |
 | `STRIPE_WEBHOOK_SECRET` | Webhook verification | Same |
+| `RELEASE_EVIDENCE_SECRET` | Authenticates `POST /internal/release-evidence` writes (public SHA alone is rejected) | Same |
 
 **Never** copy secret values into repository files, build output, issues, screenshots, or logs.
 

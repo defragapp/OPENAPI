@@ -32,6 +32,7 @@ Required encrypted Worker secrets:
 - `RESEND_API_KEY`
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
+- `RELEASE_EVIDENCE_SECRET` (authenticates the `POST /internal/release-evidence` write endpoint; the release environment must export the same value)
 
 No direct OpenAI provider key is accepted by the production answer Worker.
 

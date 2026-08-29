@@ -32,6 +32,7 @@ May include:
 - Resend API keys;
 - Turnstile secret keys;
 - session/auth/recovery/invitation signing material;
+- release-evidence write authentication secret (`RELEASE_EVIDENCE_SECRET`);
 - future third-party provider credentials only if a separately approved capability actually uses them;
 - legacy deployment credentials pending retirement.
 

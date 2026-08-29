@@ -452,13 +452,22 @@ async function handleRecognitionMessage(request: Request, env: Env, threadId: st
       updateTurnStatus(env, auth.accountId, threadId, idempotencyKey, 'failed', 'recognition_failed'),
       releaseAiTurn(env, auth.accountId, usage.periodKey)
     ]);
-    if (error instanceof Response) throw error;
+    if (error instanceof Response) {
+      console.warn('ai_capacity_exhausted', {
+        traceId,
+        accountRef: auth.accountId.slice(0, 8),
+        status: error.status,
+        retryAfter: error.headers.get('retry-after') ?? undefined
+      });
+      throw error;
+    }
     console.error('ai_answer_failure', {
       name: error instanceof Error ? error.name : 'unknown',
       message: error instanceof Error ? error.message : String(error),
       traceId,
       accountRef: auth.accountId.slice(0, 8),
-      status: 'recognition_failed'
+      status: 'recognition_failed',
+      recovery: 'turn_marked_failed_and_monthly_turn_released'
     });
     return answerServiceUnavailable();
   }

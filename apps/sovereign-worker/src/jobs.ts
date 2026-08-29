@@ -2,6 +2,8 @@ import type { Env } from './env';
 import { cancelAccountSubscriptions } from './billing/stripe';
 import { notifyAccountDeletionCompleted } from './account-notifications';
 import { notifyInvitationLifecycle } from './invitation-notifications';
+import { currentUsagePeriod, releaseAiTurn } from './billing/usage';
+import { voidStaleWorkersAiCapacityReservations } from './ai/free-tier-capacity';
 
 const ACCOUNT_TABLE_DELETES = [
   'auth_magic_links',
@@ -209,6 +211,7 @@ export async function cleanupExpired(env: Env) {
   const threadCutoff = `-${threadDays} days`;
   const auditCutoff = `-${auditDays} days`;
 
+  const turnRecovery = await recoverStaleTurns(env);
   const expiredInvitations = await expirePendingInvitations(env);
   const threadEvents = await env.DB.prepare("DELETE FROM thread_events WHERE created_at < datetime('now', ?)").bind(threadCutoff).run();
   const expiredThreads = await env.DB.prepare(`DELETE FROM threads
@@ -228,6 +231,8 @@ export async function cleanupExpired(env: Env) {
   await env.DB.prepare("DELETE FROM export_artifacts WHERE expires_at < datetime('now')").run();
 
   const counts = {
+    recoveredTurns: turnRecovery.recoveredTurns,
+    releasedCapacityNeurons: turnRecovery.releasedCapacityNeurons,
     expiredInvitations,
     threadEvents: threadEvents.meta?.changes ?? 0,
     expiredThreads: expiredThreads.meta?.changes ?? 0,
@@ -242,6 +247,34 @@ export async function cleanupExpired(env: Env) {
   };
   console.info('retention_cleanup', { threadDays, auditDays, counts });
   return { threadDays, auditDays, counts };
+}
+
+// Recovers turns stranded in 'started'/'streaming' by a platform interruption (for example a Worker
+// that was terminated mid-await). Each stale turn is atomically claimed and marked 'interrupted',
+// its monthly AI turn is released back to the account, and any abandoned shared-pool capacity
+// reservation for the same window is voided. Idempotent and safe under concurrent cron runs.
+export async function recoverStaleTurns(env: Env, staleSeconds = 120): Promise<{ recoveredTurns: number; releasedCapacityNeurons: number }> {
+  const modifier = `-${staleSeconds} seconds`;
+  const { periodKey } = currentUsagePeriod();
+  const stale = await env.DB.prepare(
+    `SELECT id, account_id FROM thread_turn_states
+     WHERE status IN ('started','streaming') AND updated_at < datetime('now', ?)`
+  ).bind(modifier).all<{ id: string; account_id: string }>();
+  let recoveredTurns = 0;
+  for (const turn of stale.results ?? []) {
+    const claimed = await env.DB.prepare(
+      `UPDATE thread_turn_states SET status = 'interrupted', error_code = 'stale_turn_recovery', updated_at = datetime('now')
+       WHERE id = ? AND status IN ('started','streaming') RETURNING id`
+    ).bind(turn.id).first<{ id: string }>();
+    if (!claimed) continue;
+    await releaseAiTurn(env, turn.account_id, periodKey);
+    recoveredTurns += 1;
+  }
+  const releasedCapacityNeurons = await voidStaleWorkersAiCapacityReservations(env.DB, staleSeconds);
+  if (recoveredTurns > 0 || releasedCapacityNeurons > 0) {
+    console.info('turn_recovery', { recoveredTurns, releasedCapacityNeurons });
+  }
+  return { recoveredTurns, releasedCapacityNeurons };
 }
 
 function retentionDays(value: string | undefined, fallback: number, minimum: number, maximum: number): number {

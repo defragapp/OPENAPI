@@ -38,7 +38,7 @@ export async function reserveAiTurns(env: Env, accountId: string, plan: string, 
   if (!Number.isInteger(count) || count < 1 || count > 100_000) throw new Error('invalid_ai_turn_reservation');
   const { periodKey, resetsAt } = currentUsagePeriod(now);
   const allowance = monthlyAllowance(env, plan);
-  if (count > allowance) throw monthlyAllowanceResponse(allowance, resetsAt, now);
+  if (count > allowance) throw logAiTurnDenied(accountId, plan, periodKey, allowance, monthlyAllowanceResponse(allowance, resetsAt, now));
   const row = await env.DB.prepare(`INSERT INTO ai_usage_windows (account_id, period_key, turns_used, updated_at)
     VALUES (?, ?, ?, datetime('now'))
     ON CONFLICT(account_id, period_key) DO UPDATE SET
@@ -48,8 +48,19 @@ export async function reserveAiTurns(env: Env, accountId: string, plan: string, 
     RETURNING turns_used`)
     .bind(accountId, periodKey, count, allowance)
     .first<{ turns_used: number }>();
-  if (!row) throw monthlyAllowanceResponse(allowance, resetsAt, now);
+  if (!row) throw logAiTurnDenied(accountId, plan, periodKey, allowance, monthlyAllowanceResponse(allowance, resetsAt, now));
   return { periodKey, used: row.turns_used, allowance, remaining: Math.max(allowance - row.turns_used, 0), resetsAt, reserved: count };
+}
+
+function logAiTurnDenied(accountId: string, plan: string, periodKey: string, allowance: number, response: Response): Response {
+  console.warn('ai_turn_denied', {
+    accountRef: accountId.slice(0, 8),
+    plan,
+    periodKey,
+    allowance,
+    retryAfter: response.headers.get('retry-after') ?? undefined
+  });
+  return response;
 }
 
 export async function releaseAiTurn(env: Env, accountId: string, periodKey: string): Promise<void> {

@@ -67,6 +67,29 @@ export async function settleWorkersAiCapacity(db: CapacityDatabase, reservation:
     .bind(refund, reservation.usageDay).run();
 }
 
+// Reclaims neurons from shared-pool reservations that were never settled (an abandoned turn or a
+// provider call that terminated before settlement). Each stale reservation is atomically claimed and
+// marked settled so it cannot be refunded twice. Idempotent and never negative.
+export async function voidStaleWorkersAiCapacityReservations(db: CapacityDatabase, staleSeconds = 120): Promise<number> {
+  const modifier = `-${staleSeconds} seconds`;
+  const stale = await db.prepare(
+    `SELECT reservation_id, usage_day, reserved_neurons FROM workers_ai_capacity_reservations
+     WHERE settled_at IS NULL AND created_at < datetime('now', ?)`
+  ).bind(modifier).all<{ reservation_id: string; usage_day: string; reserved_neurons: number }>();
+  let released = 0;
+  for (const row of stale.results ?? []) {
+    const claimed = await db.prepare(
+      `UPDATE workers_ai_capacity_reservations SET settled_neurons = 0, settled_at = datetime('now')
+       WHERE reservation_id = ? AND usage_day = ? AND reserved_neurons = ? AND settled_at IS NULL RETURNING reservation_id`
+    ).bind(row.reservation_id, row.usage_day, row.reserved_neurons).first<{ reservation_id: string }>();
+    if (!claimed) continue;
+    await db.prepare(`UPDATE workers_ai_daily_capacity SET reserved_neurons = MAX(0, reserved_neurons - ?), updated_at = datetime('now') WHERE usage_day = ?`)
+      .bind(row.reserved_neurons, row.usage_day).run();
+    released += 1;
+  }
+  return released;
+}
+
 function freeCapacityResponse(now: Date): Response {
   const resetsAt = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)).toISOString();
   return Response.json({ error: 'sovereign_free_capacity_reached', message: 'Sovereign has reached today’s shared AI capacity. Your workspace and draft remain unchanged.', retryable: true, resetsAt }, {

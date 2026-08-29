@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { actualWorkersAiNeurons, estimateWorkersAiNeurons, parseWorkersAiDailyBudget, reserveWorkersAiCapacity, settleWorkersAiCapacity } from './free-tier-capacity';
+import { actualWorkersAiNeurons, estimateWorkersAiNeurons, parseWorkersAiDailyBudget, reserveWorkersAiCapacity, settleWorkersAiCapacity, voidStaleWorkersAiCapacityReservations } from './free-tier-capacity';
 
 function db(daily: Array<object | null>, claims: Array<object | null> = [{}]) {
   const calls: Array<{ sql: string; args: unknown[] }> = [];
@@ -58,5 +58,26 @@ describe('atomic Workers AI capacity ledger', () => {
     const one = await reserveWorkersAiCapacity(store.db, '@cf/model', {}, '7500', new Date('2026-08-24T23:59:59Z'), 'one');
     const two = await reserveWorkersAiCapacity(store.db, '@cf/model', {}, '7500', new Date('2026-08-25T00:00:00Z'), 'two');
     expect(one?.usageDay).not.toBe(two?.usageDay);
+  });
+  it('voids abandoned unreserved-pool neurons once and never refunds twice', async () => {
+    const claims: Array<object | null> = [{ reservation_id: 'a' }, null];
+    const all = vi.fn(async (_sql: string, _args: unknown[]) => ({ results: [{ reservation_id: 'a', usage_day: '2099-01-01', reserved_neurons: 60 }] }));
+    const calls: Array<string> = [];
+    const prepare = vi.fn((sql: string) => ({ bind: (...args: unknown[]) => ({
+      all: async () => { const r = await all(sql, args); return r; },
+      first: async () => { calls.push(sql); return sql.includes('workers_ai_capacity_reservations SET') ? claims.shift() ?? null : null; },
+      run: async () => { calls.push(sql); return { success: true }; }
+    }) }));
+    const db = { prepare } as unknown as D1Database;
+    expect(await voidStaleWorkersAiCapacityReservations(db, 120)).toBe(1);
+    expect(await voidStaleWorkersAiCapacityReservations(db, 120)).toBe(0);
+    expect(calls.filter((sql) => sql.includes('UPDATE workers_ai_daily_capacity'))).toHaveLength(1);
+    expect(calls.filter((sql) => sql.includes('UPDATE workers_ai_capacity_reservations SET settled_neurons = 0'))).toHaveLength(2);
+  });
+  it('returns zero without touching storage when no stale reservation exists', async () => {
+    const all = vi.fn(async () => ({ results: [] }));
+    const prepare = vi.fn((sql: string) => ({ bind: () => ({ all, first: async () => null, run: async () => ({ success: true }) }) }));
+    expect(await voidStaleWorkersAiCapacityReservations({ prepare } as unknown as D1Database, 120)).toBe(0);
+    expect(prepare).toHaveBeenCalledTimes(1);
   });
 });

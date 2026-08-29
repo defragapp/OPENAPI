@@ -96,7 +96,7 @@ deployed    = 0018_workers_ai_capacity_reservations
 | Session signing | configured | `SESSION_SIGNING_SECRET` present in Worker secrets |
 | Account isolation | implemented | HMAC-signed sessions, DB-level `account_id` isolation |
 | Stripe webhook protection | verified | Unsigned POST to `/stripe/webhook` returns 405 |
-| Worker secrets | 5/5 configured | `SESSION_SIGNING_SECRET`, `TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` |
+| Worker secrets | 6/6 configured | `SESSION_SIGNING_SECRET`, `TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `RELEASE_EVIDENCE_SECRET` |
 | Input safety | implemented | 15-category deterministic classifier with safety resources |
 | Output safety | implemented | Dual-layer review (rewrite + hard gate) |
 | Privacy controls | configured | `policyAcceptanceReceipts`, `privacyAccessControls`, `privateExports: on-demand-no-artifact` |

@@ -50,8 +50,13 @@ Encrypted Worker secrets remain in Cloudflare:
 - `RESEND_API_KEY`
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
+- `RELEASE_EVIDENCE_SECRET` (authenticates the `POST /internal/release-evidence` write endpoint; see below)
 
 The release environment also needs the Cloudflare account identifier and an authenticated Cloudflare credential capable of the repository-owned production operations. Wrangler OAuth is the canonical interactive credential for Worker deployment, production D1 access, required Worker-secret inspection, and the Cloudflare surfaces exposed by Wrangler OAuth. Cloudflare zone WAF/ruleset and API Gateway management APIs may require zone-management permissions that Wrangler OAuth does not expose. When those two zone-control APIs return HTTP 403, the release treats the existing controls as externally managed and leaves them untouched; any non-403 reconciliation failure still blocks the release before deployment. Changing those externally managed zone controls requires separate zone-management authority and separate evidence.
+
+The release environment must export `RELEASE_EVIDENCE_SECRET` matching the Worker secret binding so `scripts/write-cloudflare-release-evidence.mjs` and `scripts/write-cloudflare-release-progress.mjs` can authenticate release-evidence writes against `app.defrag.app/internal/release-evidence`.
+
+Release-evidence writes are authenticated only by the secret: `POST /internal/release-evidence` requires the `x-release-secret` header to match the `RELEASE_EVIDENCE_SECRET` Worker secret. The deployed/public SHA alone returns `401` and is never accepted as release-evidence write authentication.
 
 Do not copy secret values into repository files, build output, issues, screenshots, or product logs.
 

@@ -11,7 +11,7 @@ import { runSovereignResult, runSovereignStream } from './agent/sovereign';
 import { handleStripeWebhook } from './routes/stripe';
 import { canUseDevelopmentFixtures, serviceUnavailable } from './runtime';
 import { createInvitation, createPerson, listPeople, requireConsent, setConsent, updateInvitationStatus, type InvitationStatus, type RelationshipMetadataInput } from './db/people';
-import { addSystemMember, analyzeSystem, cancelDeletionJob, createDeletionJob, createExportJob, createSystem, deleteUnderstanding, freeEntitlements, getActiveDeletionJob, listSystems, listUnderstandings, saveUnderstanding, updateUnderstanding, type SystemType } from './db/product';
+import { addSystemMember, cancelDeletionJob, createDeletionJob, createExportJob, createSystem, deleteUnderstanding, freeEntitlements, getActiveDeletionJob, listSystems, listUnderstandings, saveUnderstanding, updateUnderstanding, type SystemType } from './db/product';
 import { createCheckoutSession, createPortalSession, normalizeStripeFixtureEvent, projectSubscriptionEvent, type BillingInterval } from './billing/stripe';
 import { getAiUsage, releaseAiTurn, reserveAiTurn } from './billing/usage';
 import { requestMagicLink, redeemMagicLink, logout } from './auth-public';
@@ -156,24 +156,6 @@ app.put('/api/v1/people/:personId/consent/:scope', async (context) => {
   return context.json({ consent: result });
 });
 
-app.post('/api/v1/people/:personId/compare', async (context) => {
-  requireSameOrigin(context.req.raw);
-  const auth = await requireAuth(context.req.raw, context.env);
-  const personId = context.req.param('personId');
-  await requireConsent(context.env, auth.accountId, personId, 'pair.compare');
-  await requireConsent(context.env, auth.accountId, personId, 'trait.display');
-  return context.json({
-    personId,
-    comparison: {
-      individualAlignment: 'Available only as reduced, consented pattern language.',
-      interactionAlignment: 'Shows possible friction without assigning hidden intent.',
-      roleAlignment: 'Separates relationship role expectations from actual state.',
-      twoPlausiblePerspectives: ['You may read pace as pressure.', 'They may read pace as clarity.'],
-      unknownActualState: 'No exact emotion, motive, diagnosis, or future behavior is inferred.'
-    }
-  });
-});
-
 app.get('/api/v1/systems', async (context) => {
   const auth = await requireAuth(context.req.raw, context.env);
   return context.json({ systems: await listSystems(context.env, auth.accountId), supportedTypes: ['family', 'household', 'friendship_group', 'team', 'workplace', 'custom'] });
@@ -196,14 +178,6 @@ app.post('/api/v1/systems/:systemId/members', async (context) => {
   if (!body.personId) return context.json({ error: 'personId required' }, 400);
   const membership = await addSystemMember(context.env, auth.accountId, context.req.param('systemId'), body.personId, body.metadata ?? {});
   return context.json({ membership }, 201);
-});
-
-app.get('/api/v1/systems/:systemId/alignment', async (context) => {
-  const auth = await requireAuth(context.req.raw, context.env);
-  const systems = await listSystems(context.env, auth.accountId);
-  const system = systems.find((item) => item.id === context.req.param('systemId'));
-  if (!system) return context.json({ error: 'System not found' }, 404);
-  return context.json({ systemId: system.id, analysis: analyzeSystem(String(system.systemType)) });
 });
 
 app.get('/api/v1/library', async (context) => {
