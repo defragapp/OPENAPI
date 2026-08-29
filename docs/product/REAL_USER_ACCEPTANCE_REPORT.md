@@ -28,7 +28,7 @@ This report verifies that a real human can use Sovereign.OS end-to-end, from dis
 | Email capture | `/api/v1/auth/signup` endpoint | Source-verified |
 | Turnstile required | `verifyTurnstile` at `auth-public.ts:74-102` | VERIFIED — returns `verification_failed` without valid token |
 | Policy acceptance required | Terms + Privacy version + content hash + 18+ confirmation | Source-verified via `config/policies.ts` |
-| Magic link delivery | Resend API with Cloudflare Email fallback | Source-verified in `email.ts`; LIVE DELIVERY BLOCKED 2026-08-29 — sending domain not verified in Resend (see live session below) |
+| Magic link delivery | Resend API; Cloudflare email binding engaged only when `RESEND_API_KEY` is absent — provider priority, not a failure fallback (`email.ts`) | Source-verified in `email.ts`; LIVE DELIVERY BLOCKED 2026-08-29 — sending domain not verified in Resend (see live session below) |
 | Email code option | 6-digit code, 10-min expiry, 5 max attempts | Source-verified |
 | Session creation | HMAC-SHA256 JWT, 30-day TTL | Source-verified in `security/auth.ts` |
 | Cookie security | `__Host-sovereign_session`, HttpOnly, Secure, SameSite=Lax | Source-verified |
@@ -160,6 +160,8 @@ Harness: `visual-inspection/signup-funnel.mjs` (Playwright, headed Chromium, dis
 2. **P0-002 Email domain (BLOCKED — owner action):** the transactional sender is pinned by `scripts/verify-public-contact.mjs` to `info@sovereign.defrag.app`, and that subdomain was never added/verified in the Resend account. The apex `defrag.app` is verified in Resend but is a **prohibited** sender per the same verifier, so no code or config override may substitute it.
 
 ### Required owner actions to unblock signup delivery
+
+Context: the production `RESEND_API_KEY` exists only as an unreadable worker secret; no Resend credential capable of adding a domain exists in this environment, and the Cloudflare email binding cannot absorb Resend failures by design (`email.ts` provider priority). The domain step therefore requires Resend dashboard access.
 
 1. Resend dashboard → Domains → Add `sovereign.defrag.app`.
 2. Add the DNS records Resend presents for the subdomain (two DKIM TXT records at `resend._domainkey.sovereign.defrag.app`, SPF TXT at `send.sovereign.defrag.app` — pattern identical to the already-verified apex records).
