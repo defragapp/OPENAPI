@@ -4,6 +4,8 @@ Status: end-to-end user journey verification
 
 Reviewed: 2026-08-28
 
+Live funnel session: 2026-08-29 (real browser, real Turnstile solve, real mailbox) — see "Live signup funnel session" below.
+
 This report verifies that a real human can use Sovereign.OS end-to-end, from discovery through daily use. Verification is based on source-code audit and live production probing.
 
 ## New user flow verification
@@ -26,7 +28,7 @@ This report verifies that a real human can use Sovereign.OS end-to-end, from dis
 | Email capture | `/api/v1/auth/signup` endpoint | Source-verified |
 | Turnstile required | `verifyTurnstile` at `auth-public.ts:74-102` | VERIFIED — returns `verification_failed` without valid token |
 | Policy acceptance required | Terms + Privacy version + content hash + 18+ confirmation | Source-verified via `config/policies.ts` |
-| Magic link delivery | Resend API with Cloudflare Email fallback | Source-verified in `email.ts` |
+| Magic link delivery | Resend API with Cloudflare Email fallback | Source-verified in `email.ts`; LIVE DELIVERY BLOCKED 2026-08-29 — sending domain not verified in Resend (see live session below) |
 | Email code option | 6-digit code, 10-min expiry, 5 max attempts | Source-verified |
 | Session creation | HMAC-SHA256 JWT, 30-day TTL | Source-verified in `security/auth.ts` |
 | Cookie security | `__Host-sovereign_session`, HttpOnly, Secure, SameSite=Lax | Source-verified |
@@ -119,6 +121,8 @@ This report verifies that a real human can use Sovereign.OS end-to-end, from dis
 | `GET https://sovereign.defrag.app/ready` | SHA matches, ready: true | Yes |
 | `GET https://app.defrag.app/ready` | SHA matches, ready: true | Yes |
 | `POST /api/v1/auth/signup` (no Turnstile) | verification_failed | Yes |
+| `POST /api/v1/auth/signup` (bogus token, valid-shaped body) | 400 `verification_failed` reason `invalid` — secret valid, token rejected | Yes — 2026-08-29 after secret repair |
+| `POST /api/v1/auth/login` (bogus token) | 400 `verification_failed` reason `invalid` | Yes — 2026-08-29 |
 | `POST /api/v1/auth/signup` (wrong policy) | invalid/eligibility | Yes |
 | `GET /api/v1/account/export` (no auth) | 401 | Yes |
 | `POST /api/v1/stripe/webhook` (no sig) | Rejected | Yes |
@@ -137,7 +141,31 @@ The following verifications require a live user session and cannot be completed 
 | Mobile visual QA | Owner must verify on iPhone/Android |
 | Passkey enrollment | Owner must test WebAuthn flow |
 
-These are documented as GitHub issues #210–#216 in the product acceptance task graph.
+## Live signup funnel session — 2026-08-29
+
+Harness: `visual-inspection/signup-funnel.mjs` (Playwright, headed Chromium, disposable Guerrilla Mail inbox). Evidence screenshots in the session log; worker behavior confirmed via `wrangler tail sovv-web`.
+
+| Step | Result |
+| --- | --- |
+| Production signup page renders | VERIFIED — founder visual system intact at 1280×800 |
+| Turnstile widget renders | VERIFIED — managed widget, interactive checkbox (no headless auto-pass) |
+| Real Turnstile solve → widget token | VERIFIED — caption "Security check complete.", submit enabled |
+| Server accepts real token | VERIFIED — request passed `verifyTurnstile` and reached email delivery |
+| Email delivery | **FAILED — production blocker** `resend_403_The sovereign.defrag.app domain is not verified.` observed live in worker tail (`email_delivery_failed`) |
+| Fail-closed behavior | VERIFIED — 503 `Email delivery unavailable`, UI: "No account change was made", no magic link row consumed |
+
+### Repairs applied this session
+
+1. **P0-001 Turnstile (RESOLVED):** production `TURNSTILE_SECRET_KEY` on worker `sovv-web` returned `invalid-input-secret`. The secret was reconciled to the exact value of Turnstile widget `0x4AAAAAADhGIF8-iOLIg8MU` via the Cloudflare API (`GET /accounts/8b1954…/challenges/widgets/…`) using the owner's authenticated session; the value was piped directly into the worker secret store and never exposed. Live proof: bogus-token signup/login probes now return 400 `invalid` (siteverify accepts the secret, rejects only the token); both branded `/ready` endpoints remain `ready: true` at the deployed SHA with migration parity current.
+2. **P0-002 Email domain (BLOCKED — owner action):** the transactional sender is pinned by `scripts/verify-public-contact.mjs` to `info@sovereign.defrag.app`, and that subdomain was never added/verified in the Resend account. The apex `defrag.app` is verified in Resend but is a **prohibited** sender per the same verifier, so no code or config override may substitute it.
+
+### Required owner actions to unblock signup delivery
+
+1. Resend dashboard → Domains → Add `sovereign.defrag.app`.
+2. Add the DNS records Resend presents for the subdomain (two DKIM TXT records at `resend._domainkey.sovereign.defrag.app`, SPF TXT at `send.sovereign.defrag.app` — pattern identical to the already-verified apex records).
+3. Wait for Resend to mark the domain Verified, then rerun `node visual-inspection/signup-funnel.mjs` — the funnel resumes automatically at real email delivery, magic-link redeem, and onboarding.
+
+These are documented as GitHub issues #210–#216 in the product acceptance task graph; this session adds the delivery-domain blocker to that list.
 
 ## Verdict
 
