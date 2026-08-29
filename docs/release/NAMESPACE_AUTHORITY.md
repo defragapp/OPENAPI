@@ -28,8 +28,9 @@
 ---
 
 ## Verified Transactional Email Domain
+- **Public Contact Identity:** `info@sovereign.os` (`PUBLIC_CONTACT_EMAIL`). Identity/configuration and runtime metadata only; the `sovereign.os` zone is not resolvable at the DNS root, so this address is never a mail routing target (from, reply-to, or mailto).
 - **Sender Identity:** `Sovereign.OS <info@sovereign.defrag.app>` (or `info@sovereign.defrag.app`)
-- **Reply-To:** `info@sovereign.defrag.app`
+- **Reply-To:** `info@sovereign.defrag.app` (`TRANSACTIONAL_REPLY_TO_EMAIL`; deliverable operational inbox)
 - **Inbound / Contact:** `info@sovereign.defrag.app`
 - **Resend Domain Status:** `defrag.app` is **Verified** with **Sending: Enabled** in the connected Resend production account. The branded subdomain `sovereign.defrag.app` is the transactional from-domain and must be verified in Resend (SPF/DKIM/DMARC) before the new sender address is exercised in production.
 - **Forwarding:** Inbound/contact mail to `info@sovereign.defrag.app` is a private control-plane destination (Cloudflare Email Routing resolves the address on the owned `defrag.app` zone); the personal delivery mailbox must never appear in repository sources or public surfaces.
@@ -57,7 +58,7 @@ An earlier assumption that `sovereign.app` was an unallocated domain parked at N
 ---
 
 ## .os Root-Zone Finding
-The string `.os` in "Sovereign.OS" represents the product brand naming convention, not a valid Top-Level Domain (TLD). No TLD named `os` exists in the IANA root database. Deriving DNS records or email domains (`info@sovereign.os`) from the brand name is a namespace-design defect.
+The string `.os` in "Sovereign.OS" represents the product brand naming convention, not a valid Top-Level Domain (TLD). No TLD named `os` exists in the IANA root database (re-confirmed 2026-08-29: NXDOMAIN for `os.` at the DNS root on Cloudflare, Google, and Quad9 resolvers). Deriving mail routing (from, reply-to, mailto) from the brand string remains prohibited. Decision recorded 2026-08-29: `info@sovereign.os` is adopted strictly as the public contact identity string (`PUBLIC_CONTACT_EMAIL` configuration and runtime metadata) with enforced operational separation — transactional sender, reply-to, support, and security inbound remain on the deliverable `info@sovereign.defrag.app` monitored inbox, and `scripts/verify-public-contact.mjs` fails closed on any routable use of the identity address.
 
 ---
 

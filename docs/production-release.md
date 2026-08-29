@@ -161,10 +161,11 @@ Production account and invitation email uses Resend through `apps/sovereign-work
 Recommended identities:
 
 - `TRANSACTIONAL_FROM_EMAIL=info@sovereign.defrag.app`
-- `PUBLIC_CONTACT_EMAIL=info@sovereign.defrag.app`
+- `TRANSACTIONAL_REPLY_TO_EMAIL=info@sovereign.defrag.app`
+- `PUBLIC_CONTACT_EMAIL=info@sovereign.os`
 - `EMAIL_SMOKE_TEST_RECIPIENT=info@sovereign.defrag.app`
 
-The sender domain must remain verified by the transactional provider.
+The sender domain must remain verified by the transactional provider. `PUBLIC_CONTACT_EMAIL` is the public contact identity (configuration and runtime metadata only); the `sovereign.os` zone is not resolvable at the DNS root, so it must never be a mail routing target — reply routing, support, and security inbound stay on the deliverable operational address.
 
 ## Rollback
 

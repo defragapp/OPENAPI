@@ -32,7 +32,10 @@ export interface SovereignEmailTemplate {
 }
 
 const DEFAULT_FROM_ADDRESS = 'info@sovereign.defrag.app';
-const DEFAULT_PUBLIC_CONTACT = 'info@sovereign.defrag.app';
+// Operational contact: the deliverable, monitored inbox that receives transactional replies and support mail.
+// The public contact identity (PUBLIC_CONTACT_EMAIL, info@sovereign.os) is configured separately and must never
+// be used as a mail routing target while the sovereign.os zone is not resolvable at the DNS root.
+const DEFAULT_OPERATIONAL_CONTACT = 'info@sovereign.defrag.app';
 const BRAND_MARK_URL = 'https://sovereign.defrag.app/brand-mark.svg';
 const EMAIL_DISPLAY_FONT = "Optima,'Helvetica Neue',Arial,sans-serif";
 const EMAIL_BODY_FONT = "-apple-system,BlinkMacSystemFont,'Helvetica Neue','Segoe UI',Arial,sans-serif";
@@ -61,8 +64,8 @@ function fromAddress(env: Env): string {
   return validAddress(env.TRANSACTIONAL_FROM_EMAIL) ? env.TRANSACTIONAL_FROM_EMAIL.trim() : DEFAULT_FROM_ADDRESS;
 }
 
-function contactAddress(env: Env): string {
-  return validAddress(env.PUBLIC_CONTACT_EMAIL) ? env.PUBLIC_CONTACT_EMAIL.trim() : DEFAULT_PUBLIC_CONTACT;
+function replyToAddress(env: Env): string {
+  return validAddress(env.TRANSACTIONAL_REPLY_TO_EMAIL) ? env.TRANSACTIONAL_REPLY_TO_EMAIL.trim() : DEFAULT_OPERATIONAL_CONTACT;
 }
 
 function safeTag(value: string): string {
@@ -79,7 +82,7 @@ export function buildSovereignEmail(template: SovereignEmailTemplate): { text: s
   const actionUrl = safeActionUrl(template.actionUrl);
   const details = (template.details ?? []).map((detail) => detail.trim()).filter(Boolean).slice(0, 10);
   const footer = template.footer?.trim() || 'You control what enters Sovereign.OS and what may be shared.';
-  const support = validAddress(template.contactEmail) ? template.contactEmail.trim() : DEFAULT_PUBLIC_CONTACT;
+  const support = validAddress(template.contactEmail) ? template.contactEmail.trim() : DEFAULT_OPERATIONAL_CONTACT;
   const preheader = template.preheader?.trim() || template.intro.trim();
   const text = [
     'SOVEREIGN.OS',
@@ -176,7 +179,7 @@ export async function sendOperationalEmail(env: Env, message: EmailMessage): Pro
   }
 
   const from = `Sovereign.OS <${fromAddress(env)}>`;
-  const replyTo = contactAddress(env);
+  const replyTo = replyToAddress(env);
 
   try {
     if (env.RESEND_API_KEY) {

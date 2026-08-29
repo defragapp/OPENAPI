@@ -60,7 +60,8 @@ requireValue(rootConfig.vars?.APP_ENV === 'production', 'Production APP_ENV drif
 requireValue(rootConfig.vars?.AI_PROVIDER === 'cloudflare-gateway', 'Production AI provider drifted');
 requireValue(rootConfig.vars?.AI_MODEL === expectedModel, 'Production AI model drifted');
 requireValue(rootConfig.vars?.AI_GATEWAY_ID === expectedGatewayId, 'Production AI Gateway drifted');
-requireValue(rootConfig.vars?.PUBLIC_CONTACT_EMAIL === 'info@sovereign.defrag.app', 'Production public contact drifted');
+requireValue(rootConfig.vars?.PUBLIC_CONTACT_EMAIL === 'info@sovereign.os', 'Production public contact identity drifted');
+requireValue(rootConfig.vars?.TRANSACTIONAL_REPLY_TO_EMAIL === 'info@sovereign.defrag.app', 'Production operational reply-to drifted');
 requireValue(rootConfig.vars?.WORLDS_VIDEO_ENABLED === 'false', 'Worlds video must remain disabled for the text-first launch');
 requireValue(rootConfig.d1_databases?.some((item) => item.binding === 'DB' && item.database_name === 'sovereign-openapi-db'), 'Production D1 binding drifted');
 requireValue(rootConfig.durable_objects?.bindings?.some((item) => item.name === 'THREADS'), 'Production Durable Object binding drifted');

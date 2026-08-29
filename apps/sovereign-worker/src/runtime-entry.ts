@@ -452,7 +452,7 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       birthplaceGeocoder: 'disabled',
       authentication: authConfigured ? 'configured' : 'missing',
       transactionalEmail: emailProvider,
-      publicContactEmail: env.PUBLIC_CONTACT_EMAIL || 'info@sovereign.defrag.app',
+      publicContactEmail: env.PUBLIC_CONTACT_EMAIL || 'info@sovereign.os',
       transactionalFromEmail: env.TRANSACTIONAL_FROM_EMAIL || 'info@sovereign.defrag.app',
       legacySovvAdapter: env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'disabled',
       stripe: stripeConfigured ? 'configured' : 'missing',

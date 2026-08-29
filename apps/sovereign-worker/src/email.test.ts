@@ -118,4 +118,42 @@ describe('Sovereign.OS transactional email', () => {
       { name: 'environment', value: 'production' }
     ]));
   });
+
+  it('keeps reply routing on the operational contact when the public identity differs', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 'resend_identity_test' }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' }
+    }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const env = {
+      APP_ENV: 'production',
+      RESEND_API_KEY: 're_test_key',
+      PUBLIC_CONTACT_EMAIL: 'info@sovereign.os',
+      TRANSACTIONAL_REPLY_TO_EMAIL: 'info@sovereign.defrag.app'
+    } as unknown as Env;
+
+    await sendOperationalEmail(env, {
+      to: 'recipient@example.com',
+      subject: 'Identity separation check',
+      text: 'Operational routing check.',
+      category: 'operational'
+    });
+
+    const { TRANSACTIONAL_REPLY_TO_EMAIL: _omitted, ...envWithoutReplyTo } = env;
+    await sendOperationalEmail(envWithoutReplyTo, {
+      to: 'recipient@example.com',
+      subject: 'Operational fallback check',
+      text: 'Operational fallback check.',
+      category: 'operational'
+    });
+
+    const payloads = fetchMock.mock.calls.map((call) => JSON.parse(String((call[1] as RequestInit).body)));
+    expect(payloads[0].reply_to).toBe('info@sovereign.defrag.app');
+    expect(payloads[1].reply_to).toBe('info@sovereign.defrag.app');
+    for (const payload of payloads) {
+      expect(payload.from).toBe('Sovereign.OS <info@sovereign.defrag.app>');
+      expect(payload.reply_to).not.toBe('info@sovereign.os');
+    }
+  });
 });

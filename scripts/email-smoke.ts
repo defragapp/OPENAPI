@@ -7,13 +7,13 @@ const releaseLabel = appVersion.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 18) || '
 const defaultRecipient = `delivered+sovereign-${releaseLabel}@resend.dev`;
 const recipient = String(process.env.EMAIL_SMOKE_TEST_RECIPIENT || defaultRecipient).trim().toLowerCase();
 const fromAddress = String(process.env.TRANSACTIONAL_FROM_EMAIL || 'info@sovereign.defrag.app').trim().toLowerCase();
-const contactAddress = String(process.env.PUBLIC_CONTACT_EMAIL || 'info@sovereign.defrag.app').trim().toLowerCase();
+const operationalContact = String(process.env.TRANSACTIONAL_REPLY_TO_EMAIL || 'info@sovereign.defrag.app').trim().toLowerCase();
 const deliveryTimeoutMs = Math.max(15_000, Number(process.env.EMAIL_SMOKE_TIMEOUT_MS || 120_000));
 
 if (!apiKey) throw new Error('RESEND_API_KEY is required for the live email smoke test.');
 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) throw new Error('EMAIL_SMOKE_TEST_RECIPIENT must be a valid email address.');
 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fromAddress)) throw new Error('TRANSACTIONAL_FROM_EMAIL must be a valid email address.');
-if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactAddress)) throw new Error('PUBLIC_CONTACT_EMAIL must be a valid email address.');
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(operationalContact)) throw new Error('TRANSACTIONAL_REPLY_TO_EMAIL must be a valid email address.');
 
 const template = buildSovereignEmail({
   eyebrow: 'Delivery verification',
@@ -24,10 +24,10 @@ const template = buildSovereignEmail({
   details: [
     `Release: ${appVersion.slice(0, 40)}`,
     'Sender authentication must match the verified Resend domain.',
-    'Reply handling uses the public Sovereign.OS contact address.'
+    'Reply handling uses the monitored operational support address.'
   ],
   footer: 'No account action is required. This message was generated only to verify transactional email delivery.',
-  contactEmail: contactAddress
+  contactEmail: operationalContact
 });
 
 const env = {
@@ -35,7 +35,7 @@ const env = {
   APP_VERSION: appVersion,
   RESEND_API_KEY: apiKey,
   TRANSACTIONAL_FROM_EMAIL: fromAddress,
-  PUBLIC_CONTACT_EMAIL: contactAddress
+  TRANSACTIONAL_REPLY_TO_EMAIL: operationalContact
 } as unknown as Env;
 
 async function main(): Promise<void> {
