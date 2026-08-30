@@ -64,7 +64,7 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
         <div>
           <p className="policy-kicker"><span />QUESTIONS OR REQUESTS</p>
           <h2>Talk to a person.</h2>
-          <p>Send privacy requests, account questions, billing concerns, public inquiries, or safety feedback to info@sovereign.defrag.app.</p>
+          <p>Send privacy requests, account questions, billing concerns, public inquiries, or safety feedback to <a href="mailto:info@sovereign.defrag.app">Sovereign.OS</a>.</p>
         </div>
         <a className="landing-control" href="mailto:info@sovereign.defrag.app">Email Sovereign.OS <span aria-hidden="true">→</span></a>
       </section>

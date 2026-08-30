@@ -165,7 +165,7 @@ const FAQ_CONTENT = {
         },
         {
           question: 'Can I report an accuracy, privacy, or safety problem?',
-          answer: 'Yes. Use the correction controls beneath an ordinary answer or contact <a href="mailto:info@sovereign.defrag.app">info@sovereign.defrag.app</a>. Do not include passwords, API keys, exact private location, or another person\'s private information.',
+          answer: 'Yes. Use the correction controls beneath an ordinary answer or contact <a href="mailto:info@sovereign.defrag.app">Sovereign.OS</a>. Do not include passwords, API keys, exact private location, or another person\'s private information.',
         },
       ],
     },
