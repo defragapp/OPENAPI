@@ -68,13 +68,13 @@ describe('Sovereign.OS active experience language', () => {
     const stories = activeExperience.find(([label]) => label === 'landing demonstrations')?.[1] ?? '';
 
     expect(landing).toContain('How do I make decisions that actually fit me?');
-    expect(stories).toContain('01 · YOU');
-    expect(stories).toContain('demo-selector');
+    expect(stories).toContain('01 · You');
+    expect(stories).toContain('landing-stories__labels');
     expect(stories).toContain('demo-card');
     expect(stories).toContain('See source details');
     expect(stories).toContain('Representative example · Not your Baseline Design');
-    expect(stories).toContain('02 · YOU & YOUR PEOPLE');
-    expect(stories).toContain('03 · WHOLE SYSTEM');
+    expect(stories).toContain('02 · You + your people');
+    expect(stories).toContain('03 · From 1:1 to the whole system');
 
     for (const phrase of rejectedPublicCategoryPhrases) {
       expect(landing).not.toContain(phrase);

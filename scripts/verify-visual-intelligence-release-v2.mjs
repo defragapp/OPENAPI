@@ -188,7 +188,7 @@ replaceVisualSectionMarker(
 
 
 /* CURRENT_STORY_CONTRACT_isolated landing demonstrations */
-const currentStoryMarkers = ["DemoSelector", "SimplifiedDemo", "demo-selector", "demo-card", "See source details", "Representative example · Not your Baseline Design", "Why do I keep saying yes when I want to say no?", "Why does my partner\\'s silence feel like punishment?", "Why do I always end up managing the family crisis?"];
+const currentStoryMarkers = ["landing-stories__labels", "landing-story__label", "landing-story--${story.id}", "demo-card", "See source details", "Representative example · Not your Baseline Design", "Why do I keep saying yes when I want to say no?", "Why does my partner\\'s silence feel like punishment?", "Why do I always end up managing the family crisis?"];
 const currentStoryQuote = String.fromCharCode(39);
 const currentStoryStart = "requireAll(" + currentStoryQuote + "isolated landing demonstrations" + currentStoryQuote + ", stories, [";
 const currentStoryIndex = source.indexOf(currentStoryStart);

@@ -224,7 +224,9 @@ requireAll('landing v3 composition', landing, [
 ]);
 requireAll('restored landing stories', stories, [
   'export function LandingProductStories()',
-  'demo-selector',
+  'landing-stories__labels',
+  'landing-story__label',
+  'landing-story--${story.id}',
   'demo-card',
   'See source details',
   'Representative example · Not your Baseline Design'

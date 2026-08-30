@@ -26,21 +26,20 @@ describe('shared Sovereign intelligence stage', () => {
     expect(field).toContain('landing-expression-slice__beam');
     expect(field).toContain('landing-expression-slice__tooltip-value');
     expect(field).toContain('data-field-geometry="spherical-360"');
-    expect(stories).toContain('demo-selector');
+expect(stories).toContain('landing-stories__labels');
     expect(stories).toContain('demo-card');
-    expect(stories).toContain('See source details');
     expect(workspace).toContain('<SovereignAnswerView');
     expect(workspace).toContain('<RelationshipAnswer');
     expect(workspace).toContain('<SystemAnswer');
     expect(workspace).toContain('<BasisStrip');
   });
 
-  it('keeps expression, evidence, permission, and actual experience distinct', () => {
+it('keeps expression, evidence, permission, and actual experience distinct', () => {
     expect(field).toContain('Illustrative Baseline · relative emphasis');
     expect(field).toContain('line length follows relative emphasis');
-    expect(field).toContain("not a diagnosis, score, or claim about anyone’s internal state");
+    expect(field).toContain('not a diagnosis, score, or claim about anyone\u2019s internal state');
     expect(field).toContain('click a line to inspect it');
-    expect(stories).toContain('demo-selector');
+    expect(stories).toContain('landing-stories__labels');
     expect(stories).toContain('demo-card');
     expect(stories).toContain('See source details');
     expect(stories).toContain('Representative example · Not your Baseline Design');
@@ -63,7 +62,7 @@ describe('shared Sovereign intelligence stage', () => {
     expect(field).toContain('onClick={(event) =>');
     expect(field).toContain('onKeyDown={(event) => handleKeyDown(event, axis.id)}');
     expect(field).toContain('prefers-reduced-motion: reduce');
-    expect(stories).toContain('demo-selector__tab');
+    expect(stories).toContain('landing-stories__labels');
     expect(stories).not.toContain('landing-workflow__progress');
     expect(workspace).toContain('const limit = mobile ? 3 : 5');
     expect(fieldStyles).toContain('@media (max-width: 760px)');

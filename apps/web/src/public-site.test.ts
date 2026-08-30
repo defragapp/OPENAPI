@@ -54,17 +54,19 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).not.toContain('calculated astronomical positions');
     expect(landing).toContain('How do I make decisions that actually fit me?');
     expect(landing).toContain('Why does the same conversation feel urgent to me and pressuring to them?');
-    expect(stories).toContain('01 · YOU');
-    expect(stories).toContain('02 · YOU & YOUR PEOPLE');
-    expect(stories).toContain('03 · WHOLE SYSTEM');
+    expect(stories).toContain('01 · You');
+    expect(stories).toContain('02 · You + your people');
+    expect(stories).toContain('03 · From 1:1 to the whole system');
     expect(landing).toContain('Sovereign starts');
     expect(landing).toContain('Know yourself. Understand your people. See the whole system.');
   });
 
   it('shows visible self, relationship, and system intelligence in user language', () => {
     for (const marker of [
-      'demo-selector',
+      'landing-stories__labels',
+      'landing-story__label',
       'demo-card',
+      'landing-story--${story.id}',
       'See source details',
       'Representative example · Not your Baseline Design'
     ]) expect(stories).toContain(marker);
@@ -73,6 +75,13 @@ describe('Sovereign.OS public experience', () => {
     expect(stories).not.toContain('landing-workflow__progress');
     expect(stories).not.toContain('<RelationshipContext />');
     expect(stories).not.toContain('<SystemContext />');
+  });
+
+  it('renders three canonical story cards with correct class names', () => {
+    expect(stories).toContain('landing-story--${story.id}');
+    expect(stories).toContain("id: 'personal'");
+    expect(stories).toContain("id: 'relationship'");
+    expect(stories).toContain("id: 'system'");
   });
 
   it('keeps relationship/system examples permission-safe and source codes optional', () => {

@@ -129,11 +129,13 @@ describe('founder visual port — public positioning reset', () => {
 
   it('shows broad self exploration, relationship intelligence, and whole-system intelligence in approved language', () => {
     for (const marker of [
-      '01 · YOU',
-      '02 · YOU & YOUR PEOPLE',
-      '03 · WHOLE SYSTEM',
-      'demo-selector',
+      '01 · You',
+      '02 · You + your people',
+      '03 · From 1:1 to the whole system',
+      'landing-stories__labels',
+      'landing-story__label',
       'demo-card',
+      'landing-story--${story.id}',
       'See source details',
       'Representative example · Not your Baseline Design'
     ]) expect(stories).toContain(marker);
@@ -158,7 +160,7 @@ describe('founder visual port — public positioning reset', () => {
   });
 
   it('places simplified demo before source details and anchors the composer outside the answer body', () => {
-    expect(stories).toContain('demo-selector');
+    expect(stories).toContain('landing-stories__labels');
     expect(stories).toContain('demo-card');
     expect(stories).toContain('landing-evidence');
     expect(intelligenceDemoCss).toContain('grid-template-columns: minmax(320px, .88fr) minmax(0, 1.12fr) !important;');

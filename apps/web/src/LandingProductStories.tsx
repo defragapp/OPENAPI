@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type { ReactNode } from 'react';
 
 type EvidencePoint = { code: string; label: string };
@@ -55,108 +54,124 @@ const SYSTEM_BASIS: readonly EvidenceGroup[] = [
   }
 ] as const;
 
-interface DemoContent {
+interface StoryContent {
+  id: 'personal' | 'relationship' | 'system';
+  label: string;
   question: string;
   direct: string;
   distinction: string;
   basis: readonly EvidenceGroup[];
 }
 
-const DEMOS: readonly DemoContent[] = [
+const STORIES: readonly StoryContent[] = [
   {
+    id: 'personal',
+    label: '01 · You',
     question: 'Why do I keep saying yes when I want to say no?',
     direct: 'You may equate accommodation with connection, so refusing feels like risking the relationship. Your Baseline Design shows high tenderness and responsibility — under pressure, those become over-accommodation.',
     distinction: 'Being helpful is not the same as being responsible for someone else\'s reaction.',
-    basis: SELF_BASELINE
+    basis: [
+      {
+        points: [
+          { code: 'tenderness', label: 'Example Baseline quality: Tenderness' },
+          { code: 'responsibility', label: 'Example Baseline quality: Responsibility' },
+          { code: 'boundaries', label: 'Example Baseline quality: Boundaries' }
+        ]
+      }
+    ] as const
   },
   {
+    id: 'relationship',
+    label: '02 · You + your people',
     question: 'Why does my partner\'s silence feel like punishment?',
     direct: 'You may need verbal reassurance to regulate; they may need silence to process. When you pursue and they withdraw, each move makes sense from inside one person and becomes pressure from inside the other.',
     distinction: 'Different processing needs are not a lack of care.',
-    basis: DUO_BASELINE
+    basis: [
+      {
+        name: 'You',
+        points: [
+          { code: 'clarity', label: 'Example Baseline quality for you: Clarity' },
+          { code: 'focus', label: 'Example Baseline quality for you: Focus' }
+        ]
+      },
+      {
+        name: 'Partner',
+        points: [
+          { code: 'steadiness', label: 'Example Baseline quality for your partner: Steadiness' },
+          { code: 'patience', label: 'Example Baseline quality for your partner: Patience' }
+        ]
+      },
+      {
+        name: 'Between you',
+        points: [{ code: 'clarity □ steadiness', label: 'Example interaction dynamic: Clarity & Steadiness' }]
+      }
+    ] as const
   },
   {
+    id: 'system',
+    label: '03 · From 1:1 to the whole system',
     question: 'Why do I always end up managing the family crisis?',
     direct: 'The system may have organized around your reliability — you became the stabilizer because you stabilized things once. That doesn\'t mean the role is yours to carry now.',
     distinction: 'Being the one who can doesn\'t make it the one who must.',
-    basis: SYSTEM_BASIS
+    basis: [
+      {
+        name: 'You',
+        points: [{ code: 'responsibility', label: 'Example Baseline quality: Responsibility' }]
+      },
+      {
+        name: 'What you told Sovereign',
+        points: [
+          { code: 'U✓', label: 'Example observation: a parent pushes for immediate resolution' },
+          { code: 'U✓', label: 'Example observation: you move into mediation' },
+          { code: 'U✓', label: 'Example observation: a sibling withdraws as pressure rises' }
+        ]
+      }
+    ] as const
   }
 ] as const;
 
-const DEMO_LABELS = [
-  '01 · YOU',
-  '02 · YOU & YOUR PEOPLE',
-  '03 · WHOLE SYSTEM'
-] as const;
-
-const DEMO_VERIFICATION_TEXTS = [
-  '', // Self demo - no specific verification text needed beyond what's in PublicLanding
-  'How Sovereign compares two people', // Relationship demo
-  'From 1:1 to the whole system\nSee the whole system.\nHow Sovereign reads a system' // System demo
-] as const;
-
 export function LandingProductStories() {
-  const [selectedDemo, setSelectedDemo] = useState(0);
-
-  const currentDemo = DEMOS[selectedDemo] ?? DEMOS[0] as DemoContent;
-
   return (
     <div className="landing-stories" data-product-stories="high-value-intelligence-v1">
-      <DemoSelector
-        labels={DEMO_LABELS}
-        selectedIndex={selectedDemo}
-        onSelect={setSelectedDemo}
-      />
-      <SimplifiedDemo content={currentDemo} index={selectedDemo} />
+      <nav className="landing-stories__labels" aria-label="Product demonstrations">
+        {STORIES.map((story) => (
+          <span key={story.id} className="landing-story__label">{story.label}</span>
+        ))}
+      </nav>
+      <div className="landing-stories__cards">
+        {STORIES.map((story) => (
+          <StoryCard key={story.id} story={story} />
+        ))}
+      </div>
     </div>
   );
 }
 
-function DemoSelector({
-  labels,
-  selectedIndex,
-  onSelect
-}: {
-  labels: readonly string[];
-  selectedIndex: number;
-  onSelect: (index: number) => void;
-}) {
+function StoryCard({ story }: { story: StoryContent }) {
+  const suffix = story.id === 'personal' ? 'personal' : story.id === 'relationship' ? 'relationship' : 'system';
+  const className = `demo-card landing-story landing-story--${suffix}`;
   return (
-    <nav className="demo-selector" aria-label="Choose a demonstration" role="tablist">
-      {labels.map((label, index) => (
-        <button
-          key={label}
-          role="tab"
-          aria-selected={index === selectedIndex}
-          aria-controls={`demo-panel-${index}`}
-          id={`demo-tab-${index}`}
-          className={`demo-selector__tab${index === selectedIndex ? ' is-active' : ''}`}
-          onClick={() => onSelect(index)}
-        >
-          {label}
-        </button>
-      ))}
-    </nav>
-  );
-}
-
-function SimplifiedDemo({ content, index }: { content: DemoContent; index: number }) {
-  const verificationText = DEMO_VERIFICATION_TEXTS[index] ?? '';
-  return (
-    <section className="demo-card" role="tabpanel" aria-labelledby={`demo-tab-${DEMOS.indexOf(content)}`} data-verification-text={verificationText}>
+    <section
+      className={className}
+      data-story-id={story.id}
+      data-verification-text={story.label}
+    >
+      <header className="demo-card__header">
+        <span className="demo-card__label">{story.label}</span>
+      </header>
       <div className="demo-card__question">
         <span className="demo-card__q-label">Q</span>
-        <p>{content.question}</p>
+        <p>{story.question}</p>
       </div>
       <div className="demo-card__answer">
         <span className="demo-card__a-label">A</span>
-        <p>{content.direct}</p>
+        <p>{story.direct}</p>
       </div>
       <div className="demo-card__distinction">
         <span aria-hidden="true">✦</span>
-        <p>{content.distinction}</p>
+        <p>{story.distinction}</p>
       </div>
-      <SourceDetails groups={content.basis} />
+      <SourceDetails groups={story.basis} />
     </section>
   );
 }

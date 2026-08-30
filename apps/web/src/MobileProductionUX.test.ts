@@ -72,7 +72,7 @@ describe('production mobile and responsive experience', () => {
     expect(landing).not.toContain('Build a private Baseline once.');
     expect(landing).toContain('<small>{question.scope}</small>');
     expect(landing).toContain('<strong>{question.text}</strong>');
-    expect(stories).toContain('demo-selector');
+    expect(stories).toContain('landing-stories__labels');
     expect(stories).toContain('demo-card');
   });
 

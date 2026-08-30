@@ -151,9 +151,9 @@ for (const retired of ['<BaselineFoundation />', 'One private reference beneath 
   if (landing.includes(retired)) throw new Error(`Intelligence release v2 found retired root landing language: ${retired}`);
 }
 for (const marker of [
-  '01 · YOU',
-  '02 · YOU & YOUR PEOPLE',
-  '03 · WHOLE SYSTEM',
+  '01 · You',
+  '02 · You + your people',
+  '03 · From 1:1 to the whole system',
   'Why do I keep saying yes when I want to say no?',
   'Why does my partner\\\'s silence feel like punishment?',
   'Why do I always end up managing the family crisis?',
@@ -288,7 +288,7 @@ source = source.replace(staleStaticRouteAssertion, currentStaticRouteAssertion);
 
 
 /* CURRENT_STORY_CONTRACT_restored product stories */
-const currentStoryMarkers = ["DemoSelector", "SimplifiedDemo", "demo-selector", "demo-card", "See source details", "Representative example · Not your Baseline Design", "Why do I keep saying yes when I want to say no?", "Why does my partner\\'s silence feel like punishment?", "Why do I always end up managing the family crisis?"];
+const currentStoryMarkers = ["landing-stories__labels", "landing-story__label", "landing-story--${story.id}", "demo-card", "See source details", "Representative example · Not your Baseline Design", "Why do I keep saying yes when I want to say no?", "Why does my partner\\'s silence feel like punishment?", "Why do I always end up managing the family crisis?"];
 const currentStoryQuote = String.fromCharCode(39);
 const currentStoryStart = "containsAll(" + currentStoryQuote + "restored product stories" + currentStoryQuote + ", stories, [";
 const currentStoryIndex = source.indexOf(currentStoryStart);
