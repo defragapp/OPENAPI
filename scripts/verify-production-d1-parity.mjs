@@ -80,9 +80,10 @@ function getProductionSchema(configPath) {
   return { tables, indexes };
 }
 
-function getExpectedSchema() {
+async function getExpectedSchema() {
   const migrationFiles = readdirSync(migrationsDir).filter((f) => f.endsWith('.sql')).sort();
-  const db = new (require('node:sqlite').DatabaseSync)(':memory:');
+  const sqlite = await import('node:sqlite');
+  const db = new sqlite.DatabaseSync(':memory:');
   
   for (const file of migrationFiles) {
     const sql = readFileSync(join(migrationsDir, file), 'utf8');
@@ -95,6 +96,9 @@ function getExpectedSchema() {
   return { tables, indexes };
 }
 
+const SYSTEM_TABLES = new Set(['_cf_KV', 'd1_migrations', 'sqlite_sequence']);
+const SYSTEM_INDEXES = new Set(['d1_migrations.sqlite_autoindex_d1_migrations_1']);
+
 function compareSchemas(expected, actual) {
   const expectedTables = new Map(expected.tables.map(t => [t.name, t.sql]));
   const actualTables = new Map(actual.tables.map(t => [t.name, t.sql]));
@@ -103,7 +107,7 @@ function compareSchemas(expected, actual) {
   const actualIndexes = new Map(actual.indexes.map(i => [`${i.tbl_name}.${i.name}`, i.sql]));
   
   const missingTables = [...expectedTables.keys()].filter(name => !actualTables.has(name));
-  const extraTables = [...actualTables.keys()].filter(name => !expectedTables.has(name));
+  const extraTables = [...actualTables.keys()].filter(name => !expectedTables.has(name) && !SYSTEM_TABLES.has(name));
   
   const schemaMismatches = [];
   for (const [name, expectedSql] of expectedTables) {
@@ -114,7 +118,7 @@ function compareSchemas(expected, actual) {
   }
   
   const missingIndexes = [...expectedIndexes.keys()].filter(key => !actualIndexes.has(key));
-  const extraIndexes = [...actualIndexes.keys()].filter(key => !expectedIndexes.has(key));
+  const extraIndexes = [...actualIndexes.keys()].filter(key => !expectedIndexes.has(key) && !SYSTEM_INDEXES.has(key));
   
   const indexMismatches = [];
   for (const [key, expectedSql] of expectedIndexes) {
@@ -144,7 +148,7 @@ function normalizeSql(sql) {
     .trim();
 }
 
-function main() {
+async function main() {
   const configPath = process.env.WRANGLER_CONFIG_PATH;
   if (!configPath) {
     console.error('ERROR: WRANGLER_CONFIG_PATH environment variable is required');
@@ -156,7 +160,7 @@ function main() {
   console.log(`Found ${actual.tables.length} tables and ${actual.indexes.length} indexes in production`);
   
   console.log('Computing expected schema from migrations...');
-  const expected = getExpectedSchema();
+  const expected = await getExpectedSchema();
   console.log(`Expected ${expected.tables.length} tables and ${expected.indexes.length} indexes`);
   
   console.log('Comparing schemas...');
@@ -212,4 +216,7 @@ function main() {
   console.log('\nSUCCESS: Production D1 schema matches expected migrations.');
 }
 
-main();
+main().catch((error) => {
+  console.error('Fatal error:', error);
+  process.exit(1);
+});

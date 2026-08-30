@@ -1,3 +1,4 @@
+import { rmSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,6 +8,7 @@ import {
   sanitizeReleaseReportOutput
 } from './release-report-client.mjs';
 import { writeReleaseProgress } from './write-cloudflare-release-progress.mjs';
+import { prepareProductionConfig, DEFAULT_PRODUCTION_CONFIG_PATH } from './prepare-cloudflare-production-config.mjs';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const reportUrl = String(process.env.RELEASE_REPORT_URL || '').trim();
@@ -72,6 +74,21 @@ async function persistBuildFailure(sha, stage, output) {
 const checkoutSha = runGit(['rev-parse', 'HEAD'], 'unable to resolve checkout SHA');
 if (!/^[0-9a-f]{40}$/i.test(checkoutSha)) throw new Error('Cloudflare build checkout is not a full commit SHA');
 
+let generatedConfigPath;
+
+if (process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN) {
+  try {
+    const prepared = prepareProductionConfig({ commitSha: checkoutSha });
+    generatedConfigPath = prepared.generatedConfigPath;
+    process.env.WRANGLER_CONFIG_PATH = generatedConfigPath;
+    console.log(`[cloudflare-release] generated production config at ${generatedConfigPath}`);
+  } catch (error) {
+    console.warn(`[cloudflare-release] failed to generate production config: ${error instanceof Error ? error.message : String(error)}`);
+  }
+} else {
+  console.warn('[cloudflare-release] CLOUDFLARE_API_TOKEN not set; skipping production config generation');
+}
+
 const stages = [
   ['main-release', process.execPath, ['scripts/assert-main-release.mjs']],
   ['foundation', 'pnpm', ['verify:foundation']],
@@ -122,6 +139,15 @@ for (const [stage, command, args] of stages) {
   }
   await report(checkoutSha, stage, 'success', output);
   console.log(`[cloudflare-release] stage=${stage} status=success`);
+}
+
+if (generatedConfigPath) {
+  try {
+    rmSync(generatedConfigPath, { force: true });
+    console.log(`[cloudflare-release] cleaned up generated config`);
+  } catch {
+    // ignore cleanup errors
+  }
 }
 
 console.log(`[cloudflare-release] build gate complete commit=${checkoutSha}`);
