@@ -124,7 +124,6 @@ for (const marker of [
   'See source details',
   'From 1:1 to the whole system',
   'See the whole system.',
-  'How Sovereign reads a system',
   'Most tools start with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
 ]) {
