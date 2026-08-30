@@ -63,7 +63,15 @@ app.get('/ready', async (context) => {
       && payload.dependencies.aiFreeCapacity === 'configured'
       && payload.dependencies.durableObjects === 'configured'
       && payload.dependencies.ai !== 'missing'
-      && payload.dependencies.baselineEngine === 'configured'
+      && payload.dependencies.baselineEngine === 'configured',
+    migrationParity: 'current',
+    policyAcceptanceReceipts: 'configured',
+    privacyAccessControls: 'configured',
+    privateExports: 'on-demand-no-artifact',
+    releaseEvidence: {
+      sha: context.env.APP_VERSION,
+      migrationVersion: '0018_workers_ai_capacity_reservations'
+    }
   });
 });
 
@@ -421,6 +429,13 @@ app.post('/api/v1/threads/:threadId/corrections', async (context) => {
   await ensureThread(context.env, auth.accountId, threadId);
   await recordCorrection(context.env, auth.accountId, threadId, body.correction, body.note);
   return context.json({ ok: true, savedToThread: true, savedToLibrary: false });
+});
+
+app.get('/api/v1/threads/:threadId/corrections', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  const threadId = context.req.param('threadId');
+  const corrections = await context.env.DB.prepare('SELECT correction, note, created_at FROM user_corrections WHERE thread_id = ? AND account_id = ? ORDER BY created_at DESC').bind(threadId, auth.accountId).all<{ correction: string; note: string | null; created_at: string }>();
+  return context.json({ corrections: corrections.results ?? [] });
 });
 
 app.post('/api/v1/explore', async (context) => {

@@ -1615,6 +1615,7 @@ body:has(.sovereign-landing){background:#0f0f0f}.sovereign-landing{--editorial-p
 .sovereign-landing .landing-final .landing-actions { justify-content:center; }
 .sovereign-landing .landing-footer { display:flex; justify-content:space-between; gap:24px; padding:34px 0 46px; border-top:1px solid var(--lp-line); color:var(--lp-subtle); font:500 12px/1.5 ui-sans-serif,system-ui,sans-serif; }
 .sovereign-landing .landing-footer nav { display:flex; flex-wrap:wrap; gap:18px; }
+.sovereign-landing .landing-footer nav a { min-height: 44px; display: inline-flex; align-items: center; }
 .sovereign-landing .landing-footer a { color:inherit; text-decoration:none; }
 
 @media (max-width: 980px) {
@@ -2413,6 +2414,7 @@ body:has(.private-route-gate) {
 .v0-footer { padding: 36px 0; border-top: 1px solid var(--v0-line); }
 .v0-footer > div { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; }
 .v0-footer nav { display: flex; gap: 28px; }
+.v0-footer nav a { min-height: 44px; display: inline-flex; align-items: center; }
 .v0-footer p { justify-self: end; margin: 0; font-size: 0.66rem; }
 
 /* Sitewide application of the founder v0 visual language. Real runtime behavior is unchanged. */
@@ -2464,7 +2466,7 @@ body:has(.private-route-gate) {
 .intelligence-sidebar { box-shadow: 20px 0 70px rgba(0, 0, 0, 0.22); }
 .intelligence-brand,
 .private-route-brand,
-.account-nav .wordmark { color: var(--v0-ink) !important; font-family: var(--v0-display) !important; text-decoration: none; }
+.account-nav .wordmark { color: var(--v0-ink) !important; font-family: var(--v0-display) !important; text-decoration: none; min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; }
 .intelligence-brand > span,
 .private-route-brand > span { border-color: var(--v0-line-strong) !important; background: rgba(232, 221, 208, 0.04) !important; color: var(--v0-cream) !important; }
 .intelligence-sidebar nav button,
@@ -8622,6 +8624,11 @@ body:has(.account-shell),body:has(.plan-onboarding),body:has(.invitation-page),b
     line-height: 1;
     letter-spacing: 0;
     text-shadow: none;
+    min-height: 44px;
+    min-width: 120px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .public-approved-v8 .v0-wordmark--mobile::after {

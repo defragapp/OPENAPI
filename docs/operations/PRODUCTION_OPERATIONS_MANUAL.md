@@ -231,3 +231,111 @@ Rollback is NOT appropriate when:
 - `apps/sovereign-worker/src/index.ts` — health/readiness endpoints
 - `scripts/cloudflare-production-text-release.mjs` — release script
 - `scripts/configure-cloudflare-free-tier.mjs` — Cloudflare controls
+
+## AI Gateway failure runbook
+
+### Overview
+
+The AI Gateway (`sovereign-ai-gateway` with model `@cf/zai-org/glm-4.7-flash`) is the single AI provider for Sovereign.OS. If it becomes unavailable, the system must gracefully degrade without consuming user capacity.
+
+### Failure detection
+
+| Signal | Detection method | Threshold |
+| --- | --- | --- |
+| AI Gateway unavailable | `aiDependencyStatus()` returns `'missing'` | Immediate |
+| Request timeout | 60s gateway timeout (`GATEWAY_ANSWER_TIMEOUT_MS`) | Per request |
+| Capacity exhausted | 429 from gateway / `RETRY_AFTER` header | Per request |
+| Model error | Non-2xx response | Per request |
+
+### Deterministic fallback behavior
+
+When AI Gateway is unavailable or returns an error:
+
+1. **Capacity refund**: `releaseAiTurn()` is called automatically in catch block
+2. **No capacity consumed**: Turn is marked `failed` with `recognition_failed` status
+3. **User-facing response**: Generic `answer_service_unavailable` error (503)
+4. **User message**: "Sovereign is temporarily unavailable. Your private conversation and Baseline remain unchanged, and no answer was generated."
+5. **Retryable**: Yes (`retryable: true`, `nextAction: "retry_message"`)
+
+### User-facing fallback behavior
+
+**Current implementation** (`entry.ts:476-484`):
+```json
+{
+  "type": "https://sovereign.defrag.app/problems/answer-service-unavailable",
+  "error": "answer_service_unavailable",
+  "message": "Sovereign is temporarily unavailable. Your private conversation and Baseline remain unchanged, and no answer was generated.",
+  "nextAction": "retry_message",
+  "retryable": true
+}
+```
+
+**Future enhancement** (documented for future implementation):
+- Add user-facing status banner when AI Gateway is degraded
+- Expose estimated recovery time when available from Cloudflare status
+- Provide "Retry" button that re-sends the message
+
+### Operator actions
+
+| Scenario | Detection | Action |
+| --- | --- | --- |
+| Gateway 503/429 | `/ready` shows `ai: "missing"` or `aiGateway: "missing"` | Check Cloudflare status page; wait for recovery |
+| Gateway timeout | Requests taking >60s | Check Cloudflare AI status page; consider manual failover if available |
+| Capacity ledger full | `/ready` shows `aiFreeCapacity: "missing"` | Wait for daily reset (UTC midnight); monitor `workers_ai_daily_capacity` table |
+| Model hallucination/quality | User reports | Disable model in AI Gateway config; report to Cloudflare |
+
+### Capacity ledger monitoring
+
+```bash
+# Check current usage
+wrangler d1 execute sovereign-openapi-db --remote --command "SELECT * FROM workers_ai_daily_capacity WHERE usage_day = date('now')"
+
+# Check recent failures
+wrangler d1 execute sovereign-openapi-db --remote --command "SELECT * FROM threads WHERE status = 'failed' AND created_at > datetime('now', '-1 hour')"
+```
+
+### Staging test procedure
+
+1. Deploy to staging with AI Gateway enabled
+2. Disable AI Gateway in Cloudflare dashboard
+3. Send a test question from staging
+3. Verify:
+   - Response is 503 with `answer_service_unavailable`
+   - `Retry-After` header present
+   - Turn is refunded (capacity ledger released)
+   - No user data exposed in error
+4. Re-enable AI Gateway
+5. Verify normal operation restored
+
+### Decision criteria for manual failover
+
+**Do NOT manually failover** if:
+- Cloudflare status page shows ongoing incident
+- Failure is intermittent (< 5 minutes)
+- Capacity ledger shows available capacity
+
+**Consider manual intervention** if:
+- Cloudflare confirms extended outage (> 30 min)
+- Business impact is critical (e.g., launch day)
+- Alternative model available in Cloudflare AI Gateway
+
+**Manual failover steps** (if available):
+1. Update AI Gateway config to use fallback model
+2. Update `wrangler.jsonc` `AI_MODEL` if model change needed
+3. Re-run `pnpm production:release:text`
+4. Verify `/ready` shows `ai: "configured"`
+
+### Post-incident review
+
+Required within 48 hours:
+1. Timeline of events
+2. Root cause (Cloudflare status, capacity, model issue)
+3. User impact assessment (failed requests, affected users)
+4. Runbook effectiveness
+5. Action items for prevention
+
+---
+
+*Runbook last updated: 2026-08-29*
+*Source: `apps/sovereign-worker/src/agent/input-safety.ts`, `apps/sovereign-worker/src/entry.ts`, `apps/sovereign-worker/src/billing/usage.ts`*
+
