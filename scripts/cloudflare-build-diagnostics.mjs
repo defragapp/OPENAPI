@@ -99,10 +99,11 @@ const stages = [
   ['release-config', 'pnpm', ['verify:release-config']],
   ['production-release', 'pnpm', ['verify:production-release']],
   ['intelligence-release', 'pnpm', ['verify:intelligence-release']],
-  // Disabled: visual-intelligence and premium-platform check the old 72-file CSS architecture
-  // The canonical visual system is verified by CanonicalVisualSystem.test.ts
-  // ['visual-intelligence', 'pnpm', ['verify:visual-intelligence']],
-  // ['premium-platform', 'pnpm', ['verify:premium-platform']],
+  // Visual and premium verifiers check the current consolidated canonical CSS
+  // architecture (the per-file inline "authority" layers were folded into the
+  // five canonical sheets) alongside CanonicalVisualSystem.test.ts.
+  ['visual-intelligence', 'pnpm', ['verify:visual-intelligence']],
+  ['premium-platform', 'pnpm', ['verify:premium-platform']],
   ['typecheck', 'pnpm', ['typecheck']],
   ['tests', 'pnpm', ['test']],
   ['auth-smoke', 'pnpm', ['smoke:auth']],
