@@ -97,7 +97,8 @@ const stages = [
   ['release-closure-smoke', 'pnpm', ['smoke:release-closure']],
   ['build', 'pnpm', ['build']],
   ['public-source-maps', process.execPath, ['scripts/verify-no-public-source-maps.mjs']],
-  ['worker-bundle-size', 'pnpm', ['verify:worker-bundle-size']]
+  ['worker-bundle-size', 'pnpm', ['verify:worker-bundle-size']],
+  ['production-d1-parity', process.execPath, ['scripts/verify-production-d1-parity.mjs']]
 ];
 
 for (const [stage, command, args] of stages) {

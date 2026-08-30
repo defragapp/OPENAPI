@@ -261,6 +261,7 @@ export async function persistBaseline(
 
   if (options.deferFacetProfile) {
     reducedContext.facetProfileStatus = 'pending';
+    reducedContext.facetProfileStartedAt = new Date().toISOString();
     await writeBaselineRow();
 
     const task = (async (): Promise<void> => {
@@ -284,6 +285,7 @@ export async function persistBaseline(
         latest.facetProfileStatus = 'ready';
       } else if (latest.facetProfileStatus !== 'ready' && !latest.facetProfile) {
         latest.facetProfileStatus = 'retryable';
+        latest.facetProfileFailedAt = new Date().toISOString();
       }
 
       await env.DB.prepare(`UPDATE baseline_onboarding
@@ -413,6 +415,19 @@ export async function getBaselineReadiness(env: Env, accountId: string): Promise
   }
   const reduced = safeStoredRecord(row.reduced_context_json);
   if (reduced.facetProfileStatus === 'pending') {
+    // Check for timeout (60 seconds)
+    const startedAtRaw = reduced.facetProfileStartedAt;
+    const startedAt = typeof startedAtRaw === 'string' ? new Date(startedAtRaw).getTime() : null;
+    const now = Date.now();
+    const timeoutMs = 60_000; // 60 second timeout
+    if (startedAt && now - startedAt > timeoutMs) {
+      return baselineReadiness(
+        'facet_profile_preparing',
+        'Baseline preparation timed out. Your details are saved. Please try again to continue from where you left off.',
+        'retry_baseline',
+        true
+      );
+    }
     return baselineReadiness(
       'facet_profile_preparing',
       'Your exact Baseline source is saved. The plain-language profile is being prepared.',

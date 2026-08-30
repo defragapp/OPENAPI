@@ -44,7 +44,45 @@ export async function runSovereignText(input: string, context: SovereignContext)
 }
 
 export async function runSovereignStream(input: string, context: SovereignContext): Promise<globalThis.ReadableStream<string>> {
-  return oneChunkStream(Promise.resolve((await runSovereignResult(input, context)).text));
+  const result = await runSovereignResult(input, context);
+  
+  const structuredData = {
+    type: 'sovereign-structured',
+    version: 'sovereign-answer.v2',
+    answer: result.answer,
+    basis: result.basis,
+    expressionFieldContext: result.answer.mode === 'relationship' || result.answer.mode === 'system' 
+      ? { participants: 'included' } 
+      : undefined,
+    interfaceActions: result.answer.actions.length > 0 ? {
+      version: 2,
+      primary: result.answer.actions[0] || null,
+      contextual: result.answer.actions.slice(1),
+      confirmationRequired: true
+    } : undefined,
+  };
+  
+  const structuredChunk = JSON.stringify(structuredData) + '\n';
+  const textChunks = chunkText(result.text, 100);
+  
+  return new ReadableStream<string>({
+    async start(controller) {
+      controller.enqueue(structuredChunk);
+      for (const chunk of textChunks) {
+        controller.enqueue(chunk);
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+      controller.close();
+    }
+  });
+}
+
+function chunkText(text: string, chunkSize: number): string[] {
+  const chunks: string[] = [];
+  for (let i = 0; i < text.length; i += chunkSize) {
+    chunks.push(text.slice(i, i + chunkSize));
+  }
+  return chunks;
 }
 
 export async function runSovereignResult(input: string, context: SovereignContext): Promise<SovereignResult> {
@@ -148,6 +186,22 @@ async function buildCloudflareGatewayPrompt(input: string, context: SovereignCon
     ? `\n\nRelationship Field — the interaction dynamics layer computed from two Emotional Fields and pair contacts:\n${JSON.stringify(relationshipField, null, 2)}\n\nUse the Relationship Field as structured evidence for the relationship answer. Ground observations in the shared structures, contrasting structures, interaction dynamics, and recurring patterns provided. Do not use the Relationship Field to score compatibility, diagnose relationship health, assign hidden motives, claim certainty about what either person intends or feels, or predict outcomes. The Relationship Field describes observable interaction patterns and their possible dynamics; actual experience between participants remains unknown unless directly confirmed. Select basis_refs from the Relationship Field's basisRefs when they materially support the answer.`
     : '';
 
+  function isRelationshipContext(ctx: unknown): ctx is { kind: 'relationship'; [key: string]: unknown } {
+    return typeof ctx === 'object' && ctx !== null && 'kind' in ctx && (ctx as Record<string, unknown>).kind === 'relationship';
+  }
+
+  function isSystemContext(ctx: unknown): ctx is { kind: 'system'; [key: string]: unknown } {
+    return typeof ctx === 'object' && ctx !== null && 'kind' in ctx && (ctx as Record<string, unknown>).kind === 'system';
+  }
+
+  const pairComparisonInstruction = (context.personId && isRelationshipContext(authorizedContext))
+    ? `\n\nPERMITTED PAIR COMPARISON — Structured analytical output from buildPairComparison:\n${JSON.stringify(authorizedContext, null, 2)}\n\nMANDATORY: You MUST extract and surface the following analytical fields into your answer sections:\n- facetPairs: For each shared facet, explain the similarity/difference and its interaction significance\n- sharedNeeds: What both people need from the interaction\n- differentRoutes: How each person reaches clarity/connection/protection differently\n- interactionPressure: The specific mechanism of pressure between them\n- responsibilities: What each person owns (you/other/relationship)\n- userReportedObservations: What the user has directly observed\n- missingInformation: What still needs to be asked directly\n- exactPairContacts: The deterministic astrological contacts between them\n\nMap these to answer sections: 'you'/'other' for what each brings, 'interaction' for what happens between them, 'responsibility' for ownership, 'unknowns' for missing information.`
+    : '';
+
+  const systemAnalysisInstruction = (context.systemId && isSystemContext(authorizedContext))
+    ? `\n\nPERMITTED SYSTEM ANALYSIS — Structured analytical output from buildSystemAnalysis:\n${JSON.stringify(authorizedContext, null, 2)}\n\nMANDATORY: You MUST extract and surface the following analytical fields into your answer sections:\n- participants: Each person's role, facets, expression axes, and role context\n- systemView.roles: Each participant's role\n- systemView.responsibilityConcentration: Where responsibility concentrates\n- systemView.mediationAndWithdrawal: Communication patterns\n- systemView.roleExpectations: Role expectations\n- systemView.changeEffects: What changes when one person responds differently\n- systemView.unknownRoles: Missing perspectives\n- relationshipGraph: Supported relationship edges (responsibility/reliance/communication)\n- pressureField.observations: Pressure observations\n- missingInformation: What hasn't been supplied/confirmed\n- responsibilityBoundaries: Responsibility boundaries\n\nMap these to answer sections: 'system' for system-level analysis, 'you'/'other' for participant perspectives, 'responsibility' for responsibility concentration, 'unknowns' for missing information, 'experiment' for change effects.`
+    : '';
+
   const prompt = `${sovereignRuntimePromptV2}
 
 Authorization-checked server context, stripped of raw birth inputs, exact private location, secrets, source paths, and private identifiers:
@@ -159,7 +213,7 @@ ${JSON.stringify(continuity)}
 Authorized exact Basis registry. Select IDs only in basis_refs:
 ${JSON.stringify(basisRegistry.map(({ id, display, uncertainty, subject }) => ({ id, display, uncertainty, subject })))}
 
-${groundedIntelligencePrompt(input)}${emotionalFieldInstruction}${relationshipFieldInstruction}
+${groundedIntelligencePrompt(input)}${emotionalFieldInstruction}${relationshipFieldInstruction}${pairComparisonInstruction}${systemAnalysisInstruction}
 
 Required JSON shape:
 ${sovereignAnswerJsonContract()}

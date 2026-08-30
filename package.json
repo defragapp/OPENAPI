@@ -47,6 +47,9 @@
     "smoke:baseline": "node --import tsx scripts/baseline-smoke.ts",
     "smoke:jobs": "node --import tsx scripts/jobs-smoke.ts",
     "verify:release-config": "node scripts/verify-direct-preview-config.mjs",
+    "verify:production-d1-parity": "node scripts/verify-production-d1-parity.mjs",
+    "verify:sovv-adapter": "node scripts/verify-sovv-adapter.mjs",
+    "verify:email-config": "bash scripts/verify-email-config.sh",
     "smoke:release-closure": "node --import tsx scripts/release-closure-smoke.ts"
   },
   "devDependencies": {

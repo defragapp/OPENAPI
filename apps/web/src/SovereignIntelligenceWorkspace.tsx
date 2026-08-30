@@ -586,6 +586,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
                     onOpenContext={() => setContextOpen(true)}
                     onOpenPlan={openPlan}
                     onBuildBaseline={beginBaseline}
+onOpenCovenant={() => setCovenantEnabled(true)}
                   />
             : <ResponseThread
                 messages={messages}
@@ -646,6 +647,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
             setDraft={(value) => { setDraft(value); setContextOpen(false); }}
             onOpenPlan={openPlan}
             onBuildBaseline={beginBaseline}
+            onOpenCovenant={() => setCovenantEnabled(true)}
           />
         </div>
       </aside>
@@ -863,7 +865,7 @@ function BaselineReveal({ result, today, onOpenToday, onCurrentContext }: {
   );
 }
 
-function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, onPrompt, onOpenContext, onOpenPlan, onBuildBaseline }: {
+function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, onPrompt, onOpenContext, onOpenPlan, onBuildBaseline, onOpenCovenant }: {
   surface: Surface;
   workspace: WorkspaceState;
   selectedPerson: Json | null;
@@ -873,6 +875,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
   onOpenContext: () => void;
   onOpenPlan: (feature: EntitledFeature) => void;
   onBuildBaseline: () => void;
+  onOpenCovenant: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const missingFeature = missingSurfaceEntitlement(surface, workspace.billing);
   if (missingFeature) return <EntitlementRequired surface={surface} feature={missingFeature} onOpenPlan={onOpenPlan} />;
@@ -895,7 +898,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
       </div>
     );
   }
-  if (surface === 'Explore') return <ExploreHome workspace={workspace} />;
+  if (surface === 'Explore') return <ExploreHome workspace={workspace} onOpenCovenant={() => onOpenCovenant(true)} />;
   if (surface === 'People') return (
     <div className="surface-home">
       <SurfaceHeading kicker="People" title="See how the same moment can land differently." body="Keep each person distinct. See what each person brings, what happens when they meet, and what may help the next conversation go differently." />
@@ -981,13 +984,34 @@ function TodayFacetView({ facets, current, registry }: { facets: Json[]; current
   );
 }
 
-function ExploreHome({ workspace }: { workspace: WorkspaceState }) {
+function ExploreHome({ workspace, onOpenCovenant }: { workspace: WorkspaceState; onOpenCovenant?: () => void }) {
   const registry = Array.isArray(workspace.today?.baseline?.reducedContext?.basisRegistry)
     ? workspace.today.baseline.reducedContext.basisRegistry.filter(isBasisValue)
     : [];
+  const billing = workspace.billing?.effective;
+  const canAccessCovenant = billing?.plan === 'sovereign_plus' && billing?.features?.includes('covenant.lens');
   return (
     <div className="surface-home explore-home">
       <SurfaceHeading kicker="Explore" title="Explore yourself more deeply." body="See how you think, decide, create, connect, and grow. Bring in a decision, relationship, pressure point, or recurring pattern to see how it connects to your Baseline." />
+      <BasisStrip values={registry} />
+      {canAccessCovenant && (
+        <section className="explore-covenant-entry">
+          <div className="explore-covenant-card">
+            <div className="explore-covenant-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.95 2.25z"/>
+              </svg>
+            </div>
+            <div className="explore-covenant-content">
+              <strong>Explore through Christian Scripture</strong>
+              <span>When a question touches on meaning, purpose, or values, Sovereign can offer a grounded Christian perspective with cited Scripture. Your grounded answer remains complete on its own.</span>
+            </div>
+            <button className="secondary-action" onClick={() => onOpenCovenant?.()}>
+              Open Covenant for this question
+            </button>
+          </div>
+        </section>
+      )}
       <BasisStrip values={registry} />
     </div>
   );
@@ -1377,13 +1401,14 @@ function ContextPanel(props: {
   setDraft: (value: string) => void;
   onOpenPlan: (feature: EntitledFeature) => void;
   onBuildBaseline: () => void;
+  onOpenCovenant: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const missingFeature = missingSurfaceEntitlement(props.surface, props.workspace.billing);
   if (missingFeature) return <EntitlementRequired surface={props.surface} feature={missingFeature} onOpenPlan={props.onOpenPlan} />;
   if (props.surface === 'People') return <PeopleControls {...props} />;
   if (props.surface === 'Systems') return <SystemControls {...props} />;
   if (props.surface === 'Library') return <LibraryGrid library={props.workspace.library} onPrompt={props.setDraft} compact />;
-  if (props.surface === 'You') return <YouControls {...props} />;
+  if (props.surface === 'You') return <YouControls {...props} onOpenCovenant={() => props.onOpenCovenant(true)} />;
   return <div className="context-stack context-summary"><p className="context-intro">Sovereign uses the parts of your Baseline that matter to the situation you are examining.</p><small>Current context is added only while you choose to keep it on and it is still current.</small></div>;
 }
 
@@ -1546,7 +1571,7 @@ function SystemControls({ workspace, selectedSystem, setSelectedSystem, api, ref
   );
 }
 
-function YouControls({ workspace, api, refresh, onBuildBaseline }: any) {
+function YouControls({ workspace, api, refresh, onBuildBaseline, onOpenCovenant }: any) {
   const [interval, setInterval] = useState<'annual' | 'monthly'>('annual');
   const [currentAction, setCurrentAction] = useState<'idle' | 'loading' | 'error'>('idle');
   const [currentMessage, setCurrentMessage] = useState('');
@@ -1624,6 +1649,16 @@ function YouControls({ workspace, api, refresh, onBuildBaseline }: any) {
         {workspace.billing?.effective?.plan !== 'sovereign_plus' && <><div className="billing-switch"><button type="button" className={interval === 'annual' ? 'active' : ''} onClick={() => setInterval('annual')}>Annual billing</button><button type="button" className={interval === 'monthly' ? 'active' : ''} onClick={() => setInterval('monthly')}>Monthly billing</button></div><button className="primary-action" onClick={() => void handoff('/api/v1/billing/checkout', { interval })}>Choose Sovereign+</button></>}
         {workspace.billing?.effective?.plan === 'sovereign_plus' && <button className="secondary-action" onClick={() => void handoff('/api/v1/billing/portal')}>Manage billing</button>}
       </section>
+      {workspace.billing?.effective?.plan === 'sovereign_plus' && workspace.billing?.effective?.features?.includes('covenant.lens') && onOpenCovenant && (
+      <section className="control-section">
+        <p>COVENANT</p>
+        <h3>Explore through Christian Scripture</h3>
+        <span>When a question touches on meaning, purpose, or values, Sovereign can offer a grounded Christian perspective with cited Scripture. Your grounded answer remains complete on its own.</span>
+        <button className="secondary-action" onClick={onOpenCovenant}>
+          Open Covenant for this question
+        </button>
+      </section>
+    )}
       <section className="control-section"><p>PRIVACY AND SAVED DATA</p><h3>Your controls stay together.</h3><div className="control-links"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><button onClick={openConsentControls}>Permissions</button><button onClick={openAccountControls}>Library and account data</button></div></section>
       <section className="control-section"><p>ACCOUNT</p><button className="secondary-action" onClick={async () => { try { await api('/api/v1/auth/logout', { method: 'POST' }); } catch { /* logout even if the request fails */ } location.assign('/login'); }}>Log out</button></section>
       <section className="control-section"><p>ACCESSIBILITY</p><h3>The same workspace, without relying on motion.</h3><span>Keyboard navigation, visible focus, text scaling, screen-reader names, and reduced-motion preferences are supported automatically.</span></section>

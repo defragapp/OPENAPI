@@ -12,6 +12,9 @@ import { installPrivateAnswerExportRuntime } from './PrivateAnswerExportRuntime'
 import { installProductionReadinessRuntime } from './production-readiness-runtime';
 import { installProductionRuntime } from './ProductionRuntime';
 import { PublicLanding } from './PublicLanding';
+import { PublicHowItWorks } from './PublicHowItWorks';
+import { PublicPricing } from './PublicPricing';
+import { PublicFAQ } from './PublicFAQ';
 import { installPublicLandingViewportContract } from './PublicLandingViewportContract';
 import { installPublicRouteAuthorityRuntime } from './PublicRouteAuthorityRuntime';
 import { PublicPolicy } from './PublicPolicy';
@@ -128,7 +131,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         : publicPolicyKind
           ? <><PublicPolicyMetadata kind={publicPolicyKind} /><PublicPolicy kind={publicPolicyKind} /></>
           : isStaticPublicPage
-            ? null // Let the server serve the static HTML
+            ? (location.pathname === '/how-it-works' ? <PublicHowItWorks /> : location.pathname === '/pricing' ? <PublicPricing /> : <PublicFAQ />)
             : isAuthenticatedWorkspace
               ? <AuthenticatedWorkspace />
               : <><App /><EmailCodeFallback /><PasskeyAuthentication /></>}

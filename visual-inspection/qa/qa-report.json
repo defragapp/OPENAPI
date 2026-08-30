@@ -1,0 +1,812 @@
+[
+ {
+  "viewport": "desktop-1440",
+  "page": "landing",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Healing isn’t optional. Holding onto the pain is.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(168, 185, 166)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1440-landing.png"
+ },
+ {
+  "viewport": "desktop-1440",
+  "page": "how-it-works",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1440-how-it-works.png"
+ },
+ {
+  "viewport": "desktop-1440",
+  "page": "pricing",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1440-pricing.png"
+ },
+ {
+  "viewport": "desktop-1440",
+  "page": "faq",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1440-faq.png"
+ },
+ {
+  "viewport": "desktop-1440",
+  "page": "privacy",
+  "title": "Sovereign.OS privacy",
+  "h1": "How Sovereign.OS handles your information.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "3px",
+   "outlineColor": "rgb(241, 233, 222)",
+   "boxShadow": false,
+   "changed": false
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1440-privacy.png"
+ },
+ {
+  "viewport": "desktop-1440",
+  "page": "terms",
+  "title": "Sovereign.OS terms",
+  "h1": "Terms for using Sovereign.OS.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "3px",
+   "outlineColor": "rgb(241, 233, 222)",
+   "boxShadow": false,
+   "changed": false
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1440-terms.png"
+ },
+ {
+  "viewport": "desktop-1440",
+  "page": "login",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1440-login.png"
+ },
+ {
+  "viewport": "desktop-1440",
+  "page": "signup",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Create your Sovereign.OS account.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1440-signup.png"
+ },
+ {
+  "viewport": "desktop-1440",
+  "page": "workspace",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1440-workspace.png"
+ },
+ {
+  "viewport": "desktop-1440",
+  "page": "onboarding",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1440-onboarding.png"
+ },
+ {
+  "viewport": "desktop-1280",
+  "page": "landing",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Healing isn’t optional. Holding onto the pain is.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(168, 185, 166)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1280-landing.png"
+ },
+ {
+  "viewport": "desktop-1280",
+  "page": "how-it-works",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1280-how-it-works.png"
+ },
+ {
+  "viewport": "desktop-1280",
+  "page": "pricing",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1280-pricing.png"
+ },
+ {
+  "viewport": "desktop-1280",
+  "page": "faq",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1280-faq.png"
+ },
+ {
+  "viewport": "desktop-1280",
+  "page": "privacy",
+  "title": "Sovereign.OS privacy",
+  "h1": "How Sovereign.OS handles your information.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "3px",
+   "outlineColor": "rgb(241, 233, 222)",
+   "boxShadow": false,
+   "changed": false
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1280-privacy.png"
+ },
+ {
+  "viewport": "desktop-1280",
+  "page": "terms",
+  "title": "Sovereign.OS terms",
+  "h1": "Terms for using Sovereign.OS.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "3px",
+   "outlineColor": "rgb(241, 233, 222)",
+   "boxShadow": false,
+   "changed": false
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1280-terms.png"
+ },
+ {
+  "viewport": "desktop-1280",
+  "page": "login",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1280-login.png"
+ },
+ {
+  "viewport": "desktop-1280",
+  "page": "signup",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Create your Sovereign.OS account.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1280-signup.png"
+ },
+ {
+  "viewport": "desktop-1280",
+  "page": "workspace",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1280-workspace.png"
+ },
+ {
+  "viewport": "desktop-1280",
+  "page": "onboarding",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1280-onboarding.png"
+ },
+ {
+  "viewport": "desktop-1024",
+  "page": "landing",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Healing isn’t optional. Holding onto the pain is.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(168, 185, 166)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1024-landing.png"
+ },
+ {
+  "viewport": "desktop-1024",
+  "page": "how-it-works",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1024-how-it-works.png"
+ },
+ {
+  "viewport": "desktop-1024",
+  "page": "pricing",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1024-pricing.png"
+ },
+ {
+  "viewport": "desktop-1024",
+  "page": "faq",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1024-faq.png"
+ },
+ {
+  "viewport": "desktop-1024",
+  "page": "privacy",
+  "title": "Sovereign.OS privacy",
+  "h1": "How Sovereign.OS handles your information.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "3px",
+   "outlineColor": "rgb(241, 233, 222)",
+   "boxShadow": false,
+   "changed": false
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1024-privacy.png"
+ },
+ {
+  "viewport": "desktop-1024",
+  "page": "terms",
+  "title": "Sovereign.OS terms",
+  "h1": "Terms for using Sovereign.OS.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "3px",
+   "outlineColor": "rgb(241, 233, 222)",
+   "boxShadow": false,
+   "changed": false
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1024-terms.png"
+ },
+ {
+  "viewport": "desktop-1024",
+  "page": "login",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1024-login.png"
+ },
+ {
+  "viewport": "desktop-1024",
+  "page": "signup",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Create your Sovereign.OS account.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1024-signup.png"
+ },
+ {
+  "viewport": "desktop-1024",
+  "page": "workspace",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1024-workspace.png"
+ },
+ {
+  "viewport": "desktop-1024",
+  "page": "onboarding",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/desktop-1024-onboarding.png"
+ },
+ {
+  "viewport": "mobile-390",
+  "page": "landing",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Healing isn’t optional. Holding onto the pain is.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "g 12x62",
+   "g 68x27",
+   "g 37x107",
+   "g 129x5",
+   "g 28x157",
+   "g 135x10",
+   "g 34x165",
+   "g 130x20"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "3px",
+   "outlineColor": "rgb(241, 233, 222)",
+   "boxShadow": false,
+   "changed": false
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-390-landing.png"
+ },
+ {
+  "viewport": "mobile-390",
+  "page": "how-it-works",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "smallTouchTargets": [],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-390-how-it-works.png"
+ },
+ {
+  "viewport": "mobile-390",
+  "page": "pricing",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "smallTouchTargets": [],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-390-pricing.png"
+ },
+ {
+  "viewport": "mobile-390",
+  "page": "faq",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "smallTouchTargets": [],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-390-faq.png"
+ },
+ {
+  "viewport": "mobile-390",
+  "page": "privacy",
+  "title": "Sovereign.OS privacy",
+  "h1": "How Sovereign.OS handles your information.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "a.v0-wordmark.v0-wordmark--mobile 268x16",
+   "a.v0-wordmark 127x16",
+   "a 31x10",
+   "a 26x10",
+   "a 29x10",
+   "a 19x10",
+   "a 32x10"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "3px",
+   "outlineColor": "rgb(241, 233, 222)",
+   "boxShadow": false,
+   "changed": false
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-390-privacy.png"
+ },
+ {
+  "viewport": "mobile-390",
+  "page": "terms",
+  "title": "Sovereign.OS terms",
+  "h1": "Terms for using Sovereign.OS.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "a.v0-wordmark.v0-wordmark--mobile 268x16",
+   "a.v0-wordmark 127x16",
+   "a 31x10",
+   "a 26x10",
+   "a 29x10",
+   "a 19x10",
+   "a 32x10"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "3px",
+   "outlineColor": "rgb(241, 233, 222)",
+   "boxShadow": false,
+   "changed": false
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-390-terms.png"
+ },
+ {
+  "viewport": "mobile-390",
+  "page": "login",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "a.wordmark 120x13"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-390-login.png"
+ },
+ {
+  "viewport": "mobile-390",
+  "page": "signup",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Create your Sovereign.OS account.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "a.wordmark 120x13",
+   "a 35x44",
+   "input 19x54",
+   "a 42x17",
+   "a 216x37",
+   "input 20x54",
+   "a 260x34",
+   "a 46x19"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-390-signup.png"
+ },
+ {
+  "viewport": "mobile-390",
+  "page": "workspace",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "a.wordmark 120x13"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-390-workspace.png"
+ },
+ {
+  "viewport": "mobile-390",
+  "page": "onboarding",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "a.wordmark 120x13"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-390-onboarding.png"
+ },
+ {
+  "viewport": "mobile-430",
+  "page": "landing",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Healing isn’t optional. Holding onto the pain is.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "g 13x68",
+   "g 74x29",
+   "g 40x117",
+   "g 141x6",
+   "g 31x172",
+   "g 148x11",
+   "g 37x181",
+   "g 142x22"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "3px",
+   "outlineColor": "rgb(241, 233, 222)",
+   "boxShadow": false,
+   "changed": false
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-430-landing.png"
+ },
+ {
+  "viewport": "mobile-430",
+  "page": "how-it-works",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "smallTouchTargets": [],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-430-how-it-works.png"
+ },
+ {
+  "viewport": "mobile-430",
+  "page": "pricing",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "smallTouchTargets": [],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-430-pricing.png"
+ },
+ {
+  "viewport": "mobile-430",
+  "page": "faq",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "(no h1)",
+  "overflowX": 0,
+  "smallTouchTargets": [],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-430-faq.png"
+ },
+ {
+  "viewport": "mobile-430",
+  "page": "privacy",
+  "title": "Sovereign.OS privacy",
+  "h1": "How Sovereign.OS handles your information.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "a.v0-wordmark.v0-wordmark--mobile 308x16",
+   "a.v0-wordmark 127x16",
+   "a 31x10",
+   "a 26x10",
+   "a 29x10",
+   "a 19x10",
+   "a 32x10"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "3px",
+   "outlineColor": "rgb(241, 233, 222)",
+   "boxShadow": false,
+   "changed": false
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-430-privacy.png"
+ },
+ {
+  "viewport": "mobile-430",
+  "page": "terms",
+  "title": "Sovereign.OS terms",
+  "h1": "Terms for using Sovereign.OS.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "a.v0-wordmark.v0-wordmark--mobile 308x16",
+   "a.v0-wordmark 127x16",
+   "a 31x10",
+   "a 26x10",
+   "a 29x10",
+   "a 19x10",
+   "a 32x10"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "3px",
+   "outlineColor": "rgb(241, 233, 222)",
+   "boxShadow": false,
+   "changed": false
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-430-terms.png"
+ },
+ {
+  "viewport": "mobile-430",
+  "page": "login",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "a.wordmark 120x13"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-430-login.png"
+ },
+ {
+  "viewport": "mobile-430",
+  "page": "signup",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Create your Sovereign.OS account.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "a.wordmark 120x13",
+   "a 35x44",
+   "input 20x54",
+   "a 42x17",
+   "a 99x17",
+   "input 20x54",
+   "a 171x16",
+   "a 46x19"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-430-signup.png"
+ },
+ {
+  "viewport": "mobile-430",
+  "page": "workspace",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "a.wordmark 120x13"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-430-workspace.png"
+ },
+ {
+  "viewport": "mobile-430",
+  "page": "onboarding",
+  "title": "Sovereign.OS — Private personal AI for real life",
+  "h1": "Sign in to Sovereign.OS.",
+  "overflowX": 0,
+  "smallTouchTargets": [
+   "a.wordmark 120x13"
+  ],
+  "imagesMissingAlt": 0,
+  "unnamedButtons": 0,
+  "focusProbe": {
+   "outlineWidth": "2px",
+   "outlineColor": "rgb(232, 221, 208)",
+   "boxShadow": false,
+   "changed": true
+  },
+  "shot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/visual-inspection/qa/mobile-430-onboarding.png"
+ }
+]
