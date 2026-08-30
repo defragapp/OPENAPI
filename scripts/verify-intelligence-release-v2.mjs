@@ -288,7 +288,7 @@ source = source.replace(staleStaticRouteAssertion, currentStaticRouteAssertion);
 
 
 /* CURRENT_STORY_CONTRACT_restored product stories */
-const currentStoryMarkers = ["landing-stories__labels", "landing-story__label", "landing-story--${story.id}", "demo-card", "See source details", "Representative example · Not your Baseline Design", "Why do I keep saying yes when I want to say no?", "Why does my partner\\'s silence feel like punishment?", "Why do I always end up managing the family crisis?"];
+const currentStoryMarkers = ["landing-stories__labels", "landing-story__label", "landing-story--${suffix}", "demo-card", "See source details", "Representative example · Not your Baseline Design", "Why do I keep saying yes when I want to say no?", "Why does my partner\\'s silence feel like punishment?", "Why do I always end up managing the family crisis?"];
 const currentStoryQuote = String.fromCharCode(39);
 const currentStoryStart = "containsAll(" + currentStoryQuote + "restored product stories" + currentStoryQuote + ", stories, [";
 const currentStoryIndex = source.indexOf(currentStoryStart);

@@ -72,7 +72,7 @@ describe('founder selective visual port', () => {
       'landing-stories__labels',
       'landing-story__label',
       'demo-card',
-      'landing-story--${story.id}',
+      'landing-story--${suffix}',
       'See source details',
       'Representative example · Not your Baseline Design'
     ]) expect(stories).toContain(marker);

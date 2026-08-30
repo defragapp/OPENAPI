@@ -66,7 +66,7 @@ describe('Sovereign.OS public experience', () => {
       'landing-stories__labels',
       'landing-story__label',
       'demo-card',
-      'landing-story--${story.id}',
+      'landing-story--${suffix}',
       'See source details',
       'Representative example · Not your Baseline Design'
     ]) expect(stories).toContain(marker);
@@ -78,7 +78,7 @@ describe('Sovereign.OS public experience', () => {
   });
 
   it('renders three canonical story cards with correct class names', () => {
-    expect(stories).toContain('landing-story--${story.id}');
+    expect(stories).toContain('landing-story--${suffix}');
     expect(stories).toContain("id: 'personal'");
     expect(stories).toContain("id: 'relationship'");
     expect(stories).toContain("id: 'system'");

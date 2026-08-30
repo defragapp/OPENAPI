@@ -170,7 +170,7 @@ for (const retired of [
 ]) if (source.includes(retired)) throw new Error(`Premium platform release v2 still enforces retired active language: ${retired}`);
 
 
-const currentStoryMarkers = ["landing-stories__labels", "landing-story__label", "landing-story--${story.id}", "demo-card", "See source details", "Representative example · Not your Baseline Design", "Why do I keep saying yes when I want to say no?", "Why does my partner\\'s silence feel like punishment?", "Why do I always end up managing the family crisis?"];
+const currentStoryMarkers = ["landing-stories__labels", "landing-story__label", "landing-story--${suffix}", "demo-card", "See source details", "Representative example · Not your Baseline Design", "Why do I keep saying yes when I want to say no?", "Why does my partner\\'s silence feel like punishment?", "Why do I always end up managing the family crisis?"];
 const currentStoryQuote = String.fromCharCode(39);
 const currentStoryStart = "requireAll(" + currentStoryQuote + "restored product stories" + currentStoryQuote + ", stories, [";
 const currentStoryIndex = source.indexOf(currentStoryStart);

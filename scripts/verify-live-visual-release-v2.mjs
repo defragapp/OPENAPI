@@ -127,7 +127,7 @@ function renderedAuditScript() {
 async function snapshot(profile) {
   const url = `${publicBase}/?release=${encodeURIComponent(commitSha)}&viewport=${profile.name}`;
   const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/browser-rendering/snapshot?timeout=120000&waitForTimeout=2200&cacheTTL=0`,
+    `https://api.cloudflare.com/client/v4/accounts/${accountId}/browser-rendering/snapshot?timeout=120000&waitForTimeout=5000&cacheTTL=0`,
     {
       method: 'POST',
       headers: {
@@ -138,7 +138,7 @@ async function snapshot(profile) {
         url,
         viewport: profile.viewport,
         gotoOptions: { waitUntil: 'networkidle0', timeout: 45_000 },
-        waitForTimeout: 2_200,
+        waitForTimeout: 5_000,
         actionTimeout: 120_000,
         screenshotOptions: { fullPage: true, type: 'png', captureBeyondViewport: true },
         addStyleTag: [{
@@ -352,7 +352,15 @@ function assertDom(profile, dom) {
   assert(dom.release.contract === 'v0-public-landing-v3', `${profile.name}: rendered contract is ${dom.release.contract || 'missing'}`);
   assert(dom.release.field === 'landing-expression-field-v3', `${profile.name}: rendered field contract is ${dom.release.field || 'missing'}`);
   assert(dom.release.sequence === expectedSequence, `${profile.name}: rendered sequence fingerprint is stale`);
-  assert(dom.sections.every((section) => section.present), `${profile.name}: one or more canonical visual sections are missing`);
+  const missingSections = (dom.sections || []).filter((section) => !section.present).map((section) => section.selector);
+  if (missingSections.length > 0) {
+    const presentSections = (dom.sections || []).filter((section) => section.present).map((section) => section.selector);
+    throw new Error(
+      `${profile.name}: missing canonical visual section(s): ${missingSections.join(', ')}. `
+      + `Present: ${presentSections.join(', ') || '(none)'}. `
+      + `rootPresent=${dom.rootPresent} contract=${dom.release.contract || '(none)'} field=${dom.release.field || '(none)'} sequence=${(dom.release.sequence || '').slice(0, 40)}`
+    );
+  }
   const tops = dom.sections.map((section) => section.top);
   assert(tops.every((top, index) => index === 0 || top > tops[index - 1]), `${profile.name}: canonical visual sections are out of order`);
   for (const requiredText of [

@@ -21,7 +21,7 @@ describe('landing iOS visual parity release', () => {
       'landing-stories__labels',
       'landing-story__label',
       'demo-card',
-      'landing-story--${story.id}'
+      'landing-story--${suffix}'
     ]) expect(stories).toContain(marker);
 
     expect(approvedCss).toContain('founder story on one quiet editorial rail');

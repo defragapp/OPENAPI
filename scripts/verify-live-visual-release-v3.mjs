@@ -175,7 +175,7 @@ async function scrapeRenderedAudit(profile, url, html) {
         viewport: profile.viewport,
         gotoOptions: { waitUntil: 'networkidle0', timeout: 45_000 },
         waitForSelector: { selector: '.public-approved-v8', timeout: 45_000, visible: true },
-        waitForTimeout: 2_200,
+        waitForTimeout: 5_000,
         actionTimeout: 120_000,
         addStyleTag: [{
           content: [

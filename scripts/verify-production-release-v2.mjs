@@ -226,7 +226,7 @@ requireAll('restored landing stories', stories, [
   'export function LandingProductStories()',
   'landing-stories__labels',
   'landing-story__label',
-  'landing-story--${story.id}',
+  'landing-story--${suffix}',
   'demo-card',
   'See source details',
   'Representative example · Not your Baseline Design'
