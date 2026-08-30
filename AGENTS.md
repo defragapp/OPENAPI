@@ -31,12 +31,13 @@ These instructions apply to the entire OPENAPI repository.
 - Preserve the real OPENAPI routes, APIs, authentication, billing, consent, Baseline contracts, one-room workspace, and `sovereign-answer.v2`.
 - The authenticated launch is text-first. The landing demo-chat visual logic may inform the real thread hierarchy, but do not introduce a required video/media-generation workflow.
 - Preserve the certified local CSS import order in `apps/web/src/main.tsx`; no local component stylesheet may load after `passkey-auth.css`.
-- `apps/web/src/production-visual-authority-v1.css` is the terminal inline presentation authority and must be appended after all other inline visual/typography authorities. Do not add a later visual override.
+- The consolidated canonical stylesheets are `apps/web/src/{design-system,public,workspace,app-shell,passkey-auth}.css`, imported in that certified order with `passkey-auth.css` terminal. The historical per-file versions (`typography-system`, `sans-typography-authority-v1`, `production-visual-authority-v1`, `v0-platform-port`, `v0-visual-port`, `rendered-fidelity-v1`, and the inline `?inline` injection layer) were removed and folded in; `apps/web/src/releases.css` remains but is not imported, and `main.tsx` must not reintroduce any obsolete versioned authority. Do not add a later visual override after `passkey-auth.css`.
+- `apps/web/public/premium-action-static-v1.css` is the terminal authority for standalone public documents and must load last on those pages.
 - Do not call a visual implementation `canonical`, `approved`, `v0`, `editorial`, or `cinematic` unless its actual implementation and evidence support that claim.
 - Do not freeze or replace a founder visual reference while a known documentation-to-render contradiction remains unresolved. Inspect actual desktop and mobile production renders first.
 - Release, deployment, copy, verifier, navigation, and infrastructure work must not redefine the visual system as a side effect. A non-visual task may repair a visual defect only when the defect is directly evidenced and the smallest coherent visual change is made.
 - Do not replace the near-black/cream founder system with a white/light shell, generic enterprise SaaS styling, dashboard/card-grid composition, neon/glassmorphism chrome, or a new design language during release hardening.
-- Changes to `typography-system.css`, `sans-typography-authority-v1.css`, `production-visual-authority-v1.css`, or `premium-action-static-v1.css` must preserve the founder visual language, receive focused regression coverage, and remain subject to #214 desktop+iPhone human visual acceptance.
+- Changes to `apps/web/src/design-system.css`, `apps/web/src/public.css`, `apps/web/src/workspace.css`, `apps/web/src/app-shell.css`, `apps/web/src/passkey-auth.css`, or `apps/web/public/premium-action-static-v1.css` must preserve the founder visual language, receive focused regression coverage, and remain subject to #214 desktop+iPhone human visual acceptance.
 
 ## Product definition
 - Sovereign.OS is Baseline-first. The product must be useful before the user explains an incident.
@@ -68,12 +69,12 @@ These instructions apply to the entire OPENAPI repository.
 - Worlds/video generation is not part of the current launch runtime; do not activate it without a later explicit product decision.
 
 ## Typography contract
-- Treat `apps/web/src/typography-system.css` as the platform-wide typography source of truth.
+- Treat `apps/web/src/design-system.css` as the platform-wide typography source of truth. The historical `typography-system.css` authority was consolidated into it; `--font-title`, `--font-display`, `--font-subheading`, `--font-body`, and `--serif` live there.
 - The rendered title/heading face is self-hosted `Geist Sans`. Apple/SF Pro Display, Segoe Variable/Segoe, system-ui, Helvetica, and Arial are fallback only and must not win when the bundled Geist asset is present.
 - The canonical self-hosted asset is `apps/web/public/fonts/geist/Geist-Variable.woff2`; do not replace Geist with a native-only stack during release or visual hardening.
 - `Sovereign Display`, the retired bundled `Sovereign Sans`, `Optima`, `Avenir Next`, and serif fallbacks must not become active title authorities.
 - The terminal typography authority may enforce font family only; it must not impose a universal `h1`/`h2`/`h3` size or spacing system over route-owned composition.
-- `apps/web/src/production-visual-authority-v1.css` owns final live visual proportions, warm-metal interface accent, demo organization, navigation/brand geometry, and motion after route/component foundations have loaded.
+- `apps/web/src/public.css`, `apps/web/src/workspace.css`, and `apps/web/src/app-shell.css` own final live visual proportions, warm-metal interface accent, demo organization, navigation/brand geometry, and motion after route/component foundations have loaded, with `apps/web/src/passkey-auth.css` terminal in the certified import order. There is no separate per-file `production-visual-authority-v1.css`; the historical authority was folded into these consolidated sheets and `main.tsx` must not reintroduce it.
 - `SOVEREIGN.OS` public wordmark sizing is a shared sitewide contract. React and standalone public routes must use the same visual hierarchy while allowing breakpoint-specific placement; navigation tests must not freeze a temporary redesign geometry as product authority.
 - Product demonstrations must remain visible without JavaScript reveal state. Motion may enhance entry/progression but must never gate comprehension or create blank product sections.
 - Use `--font-display` for every meaningful heading and title across public, authenticated, onboarding, policy, modal, drawer, answer, relationship, system, Alignment, and Covenant surfaces.

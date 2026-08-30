@@ -79,7 +79,7 @@ Port and maintain:
 - near-black, cream, white/gray line, spacing, radius, and depth language;
 - responsive behavior and reduced-motion treatment.
 
-`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. The retired bundled `Sovereign Sans`, `Optima`, and `Avenir Next` are also excluded as title/heading authorities. Titles inherit self-hosted Geist Sans from `apps/web/src/typography-system.css`; Apple/SF Pro Display, Segoe Variable/Segoe, system-ui, Helvetica, and Arial remain resilient fallbacks only. The hero and meaningful product headings must visibly resolve to Geist whenever the bundled font asset is available. Visual hierarchy comes from scale, weight, spacing, opacity, and layout rather than a decorative face.
+`Sovereign Display` and serif fallback typography are explicitly excluded from the active rendered product. The retired bundled `Sovereign Sans`, `Optima`, and `Avenir Next` are also excluded as title/heading authorities. Titles inherit self-hosted Geist Sans from `apps/web/src/design-system.css` (the consolidated typography source of truth); Apple/SF Pro Display, Segoe Variable/Segoe, system-ui, Helvetica, and Arial remain resilient fallbacks only. The hero and meaningful product headings must visibly resolve to Geist whenever the bundled font asset is available. Visual hierarchy comes from scale, weight, spacing, opacity, and layout rather than a decorative face.
 
 The refined product should not depend on electric blue, cyan glow, neon, generic AI gradients, or glassmorphism as primary UI language. Spectral color, where intentionally used, should behave like physical light rather than a generic interface accent.
 
@@ -139,45 +139,26 @@ Across the landing and authenticated product, preserve the underlying intelligen
 
 ## Visual delivery paths
 
-The complete Vite foundation and final refinement are required:
+The complete Vite foundation and final refinement are required through the consolidated canonical stylesheets. The historical per-file authorities (`v0-platform-port.css`, `v0-motion-accessibility.css`, `v0-visual-port.css`, `v0-global-experience.css`, `experience-refinement-v1.css`, `rendered-fidelity-v1.css`, `landing-refinement-v2.css`, `premium-action-authority-v1.css`, `sans-typography-authority-v1.css`, `production-product-cohesion-v1.css`, `public-intelligence-demonstration-v1.css`, `production-visual-authority-v1.css`, and the inline `?inline` release layer) were removed and folded into the consolidated sheets. Their delivery roles now live in the actual files `apps/web/src/main.tsx` imports, in certified order with `passkey-auth.css` terminal:
 
-1. `apps/web/src/v0-platform-port.css`
-   - owns real plan onboarding, Privacy/Terms, and email-code access foundations.
-2. `apps/web/src/v0-motion-accessibility.css`
-   - preserves the complete founder composition for reduced-motion users.
-3. `apps/web/src/v0-visual-port.css`
-   - owns the founder landing composition and the real authenticated workspace foundation.
-4. `apps/web/src/v0-global-experience.css`
-   - extends the founder language across non-landing product surfaces without replacing the landing composition.
-5. Route-specific and account authorities, ending with `apps/web/src/passkey-auth.css`
-   - preserve the certified local import order;
-   - terminal inline release authorities follow the component stylesheet imports.
-6. `apps/web/src/experience-refinement-v1.css`
-   - is appended through the existing synchronous cohesion installer for bounded cross-platform presentation refinement.
-7. `apps/web/src/rendered-fidelity-v1.css`
-   - is appended after experience refinement and preserves monochrome fidelity and readable public proof.
-8. `apps/web/src/landing-refinement-v2.css` plus current landing live refinements
-   - own landing-only recognition, larger demonstrations, visible workflow behavior, Expression Field detail, and mobile proof;
+1. `apps/web/src/design-system.css`
+   - owns the platform-wide typography tokens (`--font-title`, `--font-display`, `--font-subheading`, `--font-body`, `--serif`) and the self-hosted Geist Sans title system;
+   - the token foundation, distinct from route-owned composition.
+2. `apps/web/src/public.css`
+   - owns the founder landing composition (`v0-landing-port`, `v0-hero`, `.public-approved-v8`), the warm-metal public palette, the monochrome-fidelity and reduced-motion treatment, the public demo surface, the click-led 360 Expression Field, and mobile proof;
    - must not alter product logic, consent, Baseline contracts, or answer contracts.
-9. `apps/web/src/premium-action-authority-v1.css`
-   - preserves editorial action language for navigation and low-emphasis actions while transactional authentication, onboarding, consent, billing, and account controls retain clear visible affordance.
-10. `apps/web/src/sans-typography-authority-v1.css`
-   - enforces the active self-hosted Geist Sans title family after legacy visual layers;
-   - prevents legacy selector specificity from restoring retired display faces;
-   - does not own global heading dimensions.
-11. `apps/web/src/production-product-cohesion-v1.css`
-   - preserves private-product structure and launch-surface cohesion after typography family authority.
-12. `apps/web/src/public-intelligence-demonstration-v1.css`
-   - owns the public demo composition, rich fixture-backed answer presentation, bottom-anchored demo composer, system pressure sequence, collapsed source-details disclosure, and the product-language title-variable correction;
-   - loads before the terminal production visual authority and uses bounded specificity only where a later legacy selector would otherwise restore the superseded demo layout.
-13. `apps/web/src/production-visual-authority-v1.css`
-   - remains the terminal inline presentation authority;
-   - owns final public/private proportions, shared navigation and wordmark geometry, product-demo visibility, policy-document hierarchy, restrained motion, and final interface presence;
-   - no later visual override may follow it.
-14. Standalone public documents
+3. `apps/web/src/workspace.css`
+   - owns the real authenticated workspace structure and launch-surface cohesion.
+4. `apps/web/src/app-shell.css`
+   - owns the shared navigation, wordmark, layout, and responsive shell geometry.
+5. `apps/web/src/passkey-auth.css`
+   - terminal in the certified local import order; no local component stylesheet or later visual override may load after it.
+6. Standalone public documents
    - retain the deployed static foundations;
-   - load `apps/web/public/premium-action-static-v1.css` last;
+   - load `apps/web/public/premium-action-static-v1.css` last as their terminal static authority;
    - that terminal static authority must inherit the same Geist Sans title system, public header/wordmark hierarchy, and final static presentation.
+
+`apps/web/src/releases.css` remains in the source tree but is not imported; `main.tsx` must not reintroduce any obsolete versioned authority or a later visual override after `passkey-auth.css`.
 
 Removing or bypassing any one of these means the visual port is not sitewide.
 

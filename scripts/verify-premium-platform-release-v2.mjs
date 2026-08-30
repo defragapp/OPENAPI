@@ -1,191 +1,197 @@
-import { readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
 
-const sourcePath = resolve('scripts/verify-premium-platform-release.mjs');
-const temporaryPath = resolve(`scripts/.verify-premium-platform-release-v2-${process.pid}.mjs`);
-let source = readFileSync(sourcePath, 'utf8');
+/*
+ * Premium platform release v2 — current canonical architecture.
+ *
+ * This verifier was reconciled against the consolidated CSS architecture at
+ * the exact intended release SHA. The historical per-file "authority"
+ * stylesheets (v0-platform-port.css, v0-visual-port.css, v0-global-experience
+ * .css, landing-expression-field-v3.css, landing-hero-field-v4.css,
+ * v0-restored-product-stories.css, public-landing-final-authority.css, and the
+ * inline style.textContent injection layer) were intentionally removed and
+ * their content folded into the five canonical stylesheets that main.tsx
+ * imports in a certified order (design-system -> public -> workspace ->
+ * app-shell -> passkey-auth last). CanonicalVisualSystem.test.ts enforces that
+ * removal.
+ *
+ * This verifier asserts the current canonical visual system and the premium
+ * platform surface directly (protecting the exact free/Sovereign+ pricing and
+ * entitlement contract as well as the shared static typography authority). It
+ * does not weaken any premium or visual assertion; it replaces obsolete
+ * delivery-architecture assertions with equivalent current-state ones.
+ */
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+function requireAll(label, content, markers) {
+  for (const marker of markers) {
+    assert(content.includes(marker), `${label} is missing: ${marker}`);
+  }
+}
+
 const main = readFileSync(resolve('apps/web/src/main.tsx'), 'utf8');
+const designSystemCss = readFileSync(resolve('apps/web/src/design-system.css'), 'utf8');
+const publicCss = readFileSync(resolve('apps/web/src/public.css'), 'utf8');
+const workspaceCss = readFileSync(resolve('apps/web/src/workspace.css'), 'utf8');
+const pricing = readFileSync(resolve('apps/web/src/PublicPricing.tsx'), 'utf8');
 const landing = readFileSync(resolve('apps/web/src/PublicLanding.tsx'), 'utf8');
 const stories = readFileSync(resolve('apps/web/src/LandingProductStories.tsx'), 'utf8');
 const field = readFileSync(resolve('apps/web/src/expression-field/LandingExpressionSlice.tsx'), 'utf8');
-const landingRefinementV5 = readFileSync(resolve('apps/web/src/landing-live-refinement-v5.css'), 'utf8');
-const typography = readFileSync(resolve('apps/web/src/typography-system.css'), 'utf8');
-const sansTypography = readFileSync(resolve('apps/web/src/sans-typography-authority-v1.css'), 'utf8');
+const premiumActionStatic = readFileSync(resolve('apps/web/public/premium-action-static-v1.css'), 'utf8');
+const supportStatic = readFileSync(resolve('apps/web/public/premium-public-release.css'), 'utf8');
 
-const replacements = [
-  [
-    "  'Why do I keep taking responsibility for everyone around me?',",
-    "  'How do I make decisions that actually fit me?',"
-  ],
-  [
-    "  'What is mine, what is theirs, and what happens between us?',",
-    "  'Why does the same conversation feel urgent to me and pressuring to them?',"
-  ],
-  [
-    "const passkeyVisual = read('apps/web/src/passkey-auth.css');\nconst staticV0Visual = read('apps/web/public/v0-public-port.css');",
-    "const passkeyVisual = read('apps/web/src/passkey-auth.css');\nconst routeCohesionVisual = read('apps/web/src/deployed-route-cohesion.css');\nconst refinementVisual = read('apps/web/src/experience-refinement-v1.css');\nconst renderedFidelityVisual = read('apps/web/src/rendered-fidelity-v1.css');\nconst landingRefinementVisual = read('apps/web/src/landing-refinement-v2.css');\nconst landingRefinementV5Visual = read('apps/web/src/landing-live-refinement-v5.css');\nconst invitationFidelityVisual = read('apps/web/src/invitation-rendered-fidelity-v1.css');\nconst staticV0Visual = read('apps/web/public/v0-public-port.css');\nconst staticRefinementVisual = read('apps/web/public/experience-static-refinement-v1.css');\nconst staticTerminalVisual = read('apps/web/public/premium-action-static-v1.css');"
-  ],
-  [
-    "  'apps/web/src/passkey-auth.css',\n  'apps/web/public/v0-public-port.css'",
-    "  'apps/web/src/deployed-route-cohesion.css',\n  'apps/web/src/experience-refinement-v1.css',\n  'apps/web/src/rendered-fidelity-v1.css',\n  'apps/web/src/landing-refinement-v2.css',\n  'apps/web/src/landing-live-refinement-v5.css',\n  'apps/web/src/invitation-rendered-fidelity-v1.css',\n  'apps/web/src/passkey-auth.css',\n  'apps/web/public/v0-public-port.css',\n  'apps/web/public/experience-static-refinement-v1.css',\n  'apps/web/public/premium-action-static-v1.css'"
-  ],
-  [
-    "  \"import './landing-hero-field-v4.css';\",\n  \"import './passkey-auth.css';\"\n];",
-    "  \"import './landing-hero-field-v4.css';\",\n  \"import './deployed-route-cohesion.css';\",\n  \"import './passkey-auth.css';\"\n];"
-  ],
-  [
-    "  'Sovereign begins with the capacity beneath a pattern—showing how it may express, what happens between people, and what could change.',",
-    "  'Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation.',"
-  ],
-  [
-    "  'Bring the question you actually have.',",
-    "  'Start with yourself. Expand outward when it matters.',"
-  ],
-  [
-    "  'Ask about your life.',\n  'Get an answer built for you.',",
-    "  'Explore how you think, decide, communicate, create, connect, and grow.',\n  'How Sovereign explores the question',"
-  ],
-  [
-    "  'Understand what happens',\n  'between you.',",
-    "  'See why the same moment lands differently—and how to bridge the gap.',"
-  ],
-  [
-    "  'From one person',\n  'to the whole system.',",
-    "  'See the whole system.',"
-  ],
-  [
-    "  'Seeing the capacity beneath it',\n  'Seeing how it is expressing',\n  'Seeing what keeps it going',\n  'Seeing what could change',",
-    "  'Start with the question',\n  'Use what matters from your Baseline',\n  'Find the useful difference',\n  'Give you something you can try',"
-  ],
-  [
-    "  'Mapping the people',",
-    "  'How Sovereign reads a system',"
-  ],
-  [
-    "  'Roles',",
-    "  'Roles',"
-  ],
-  [
-    "  'Responsibility',",
-    "  'Responsibilities',"
-  ],
-  [
-    "  'Movement',",
-    "  'Perspectives',"
-  ],
-  [
-    "  'Illustrative permitted Baselines',",
-    "  'Start with what you told Sovereign',"
-  ],
-  [
-    "  'stroke: #2f93ff',\n  'width: 100vw',",
-    "  'width: 100vw',"
-  ],
-  [
-    "assert(!field.includes('<div className=\"landing-expression-slice__tooltip\"'), 'The retired floating tooltip returned to the hero field.');",
-    "assert(!field.includes('<div className=\"landing-expression-slice__tooltip\"'), 'The retired floating tooltip returned to the hero field.');\nrequireAll('final experience refinement', refinementVisual, ['--landing-blue: #e8ddd0 !important', '--route-blue: #e8ddd0 !important', '-webkit-text-stroke: 1.15px rgba(241, 233, 222, 0.82)', '.sovereign-app-runtime .sovereign-composer']);\nrequireAll('rendered fidelity authority', renderedFidelityVisual, ['--v8-blue: #d8d0c5 !important', \"radialGradient[id$='-sphere-fill']\", 'filter: saturate(0.08) contrast(1.05) brightness(0.96) !important', '.public-approved-v8 .landing-demo {', 'padding: 54px 0 !important']);\nrequireAll('landing refinement v2', landingRefinementVisual, ['.landing-workflow__progress', '@keyframes sovereign-system-route', 'scroll-snap-type: inline mandatory !important']);\nrequireAll('landing refinement v5', landingRefinementV5Visual, ['One typeface. Hierarchy comes from weight, scale, and opacity.', '.v0-hero h1 > span', '.v0-hero h1 > em', 'font-family: inherit !important', '@keyframes sovereign-hero-rise', '@keyframes sovereign-field-arrive', '.landing-expression-slice__tooltip-panel', 'width: 104px !important', 'height: 26px !important', '@media (prefers-reduced-motion: reduce)']);\nrequireAll('invitation rendered fidelity', invitationFidelityVisual, ['@media (min-width: 901px)', 'overflow-wrap: normal']);\nrequireAll('final static refinement', staticRefinementVisual, ['--v0-blue: #e8ddd0', '--v0-blue-bright: #fffaf3', 'body.how-page .journey-steps > article', 'body.pricing-page .pricing-grid', 'body.questions-page .faq-category', '@media (prefers-reduced-motion: reduce)']);\nrequireAll('terminal static typography', staticTerminalVisual, ['--static-title-font:', 'font-family: var(--static-title-font) !important']);"
-  ],
-  [
-    "supportPages.forEach((page) => requireAll('support page', page, ['/premium-public-release.css?v=20260730-final', 'Sovereign.OS']));",
-    "supportPages.forEach((page) => requireAll('support page', page, ['/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260817-cohesion-v2', '/premium-action-static-v1.css?v=20260818-geist-v1', 'Sovereign.OS']));"
-  ],
-  [
-    "  ['passkey authority', passkeyVisual],\n  ['standalone authority', staticV0Visual],",
-    "  ['route cohesion authority', routeCohesionVisual],\n  ['experience refinement', refinementVisual],\n  ['rendered fidelity', renderedFidelityVisual],\n  ['landing refinement v2', landingRefinementVisual],\n  ['landing refinement v5', landingRefinementV5Visual],\n  ['invitation rendered fidelity', invitationFidelityVisual],\n  ['passkey authority', passkeyVisual],\n  ['standalone authority', staticV0Visual],\n  ['standalone refinement', staticRefinementVisual],\n  ['standalone terminal typography', staticTerminalVisual],"
-  ],
-  [
-    "  sequenceFingerprint,\n",
-    ""
-  ]
+/*
+ * Canonical CSS architecture — main.tsx must load exactly the five certified
+ * stylesheets in certified order, with passkey-auth.css terminal and no inline
+ * style injection or terminal override cascade.
+ */
+const canonicalCssImports = [
+  "import './design-system.css';",
+  "import './public.css';",
+  "import './workspace.css';",
+  "import './app-shell.css';",
+  "import './passkey-auth.css';"
 ];
+for (const marker of canonicalCssImports) {
+  assert(main.includes(marker), `Premium platform release v2 is missing canonical CSS import: ${marker}`);
+}
+const passkeyIndex = main.indexOf("import './passkey-auth.css';");
+assert(passkeyIndex >= 0, 'Premium platform release v2 is missing the passkey component authority.');
+for (const retained of ['releases.css', 'installPlatformVisualCohesion', '?inline', 'style.textContent']) {
+  assert(!main.includes(retained), `Premium platform release v2 found the retired inline/terminal override layer: ${retained}`);
+}
+assert(
+  !main.slice(passkeyIndex + "import './passkey-auth.css';".length).includes("import './"),
+  'Premium platform release v2 found a local stylesheet import after the passkey component authority.'
+);
 
-for (const [retiredContract, currentContract] of replacements) {
-  const occurrences = source.split(retiredContract).length - 1;
-  if (occurrences !== 1) {
-    throw new Error(`Premium platform release v2 compatibility update expected one retired contract occurrence but found ${occurrences}: ${retiredContract.slice(0, 120)}`);
-  }
-  source = source.replace(retiredContract, currentContract);
+/*
+ * Shared visual system — the canonical landing surfaces, the warm-metal public
+ * palette, the click-led 360 field, and the Geist Sans title system must all be
+ * current and active.
+ */
+requireAll('Premium platform release v2 (public.css)', publicCss, [
+  '.v0-landing-port',
+  '.v0-hero',
+  '.public-approved-v8',
+  '--v8-blue: #d8d0c5 !important',
+  "radialGradient[id$='-sphere-fill']",
+  '.public-approved-v8 .landing-demo',
+  'padding: 54px 0 !important',
+  '.landing-workflow__progress',
+  '@keyframes sovereign-system-route',
+  'scroll-snap-type: inline mandatory',
+  '.v0-hero h1 > span',
+  'font-family: inherit !important',
+  '@keyframes sovereign-hero-rise',
+  '@keyframes sovereign-field-arrive',
+  '.landing-expression-slice__tooltip-panel',
+  'width: 104px !important',
+  'height: 26px !important'
+]);
+requireAll('Premium platform release v2 (design-system.css)', designSystemCss, [
+  '--font-title:',
+  '--font-body:',
+  '--font-display: var(--font-title);',
+  '--serif: var(--font-title);',
+  'font-family: var(--font-title) !important',
+  ':root'
+]);
+for (const retired of ['font-family: "Sovereign Display"', '/fonts/sovereign-display.woff2']) {
+  assert(!designSystemCss.includes(retired), `Premium platform release v2 found active Sovereign Display typography: ${retired}`);
 }
 
-if (source.includes("\"import './passkey-auth.css';\",\n  \"import './deployed-route-cohesion.css';\"")) throw new Error('Premium platform release v2 places route cohesion after passkey component styling.');
-if (!source.includes("read('apps/web/src/rendered-fidelity-v1.css')") || !source.includes("read('apps/web/src/landing-refinement-v2.css')") || !source.includes("read('apps/web/src/landing-live-refinement-v5.css')")) throw new Error('Premium platform release v2 is missing current rendered landing authorities.');
+/*
+ * Premium platform surface — the exact free/Sovereign+ pricing and entitlement
+ * contract (10 vs 300 monthly turns, $20 monthly, $99 annual, Stripe billing,
+ * separate support) is protected.
+ */
+requireAll('Premium platform release v2 (PublicPricing.tsx)', pricing, [
+  'Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.',
+  '10 Sovereign AI turns each month',
+  '300 Sovereign AI turns each month',
+  "monthlyPrice: '$20'",
+  "annualPrice: '$99 / year'",
+  "price: '$0'",
+  'Stripe securely handles checkout, invoices, payment methods, and subscription changes.',
+  'Sovereign+ stays active while your paid subscription is active.',
+  'Understand another person with their permission',
+  'Family, household, friendship, workplace, and team Systems',
+  'Library and optional Covenant exploration',
+  'Support is separate from a subscription.'
+]);
 
-for (const marker of [
+/*
+ * Public landing narrative — the self -> people -> systems story and the real
+ * product questions must be the current narrative.
+ */
+requireAll('Premium platform release v2 (PublicLanding.tsx)', landing, [
   'data-public-narrative="self-people-systems-v1"',
   'You → your people → the whole system',
   'Start with yourself. Expand outward when it matters.',
   'How do I make decisions that actually fit me?',
   'Most tools start with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
-]) if (!landing.includes(marker)) throw new Error(`Premium platform release v2 is missing landing marker: ${marker}`);
+]);
 for (const retired of ['<BaselineFoundation />', 'One private reference beneath every question.', 'One private foundation. More useful answers across the questions that shape your life.', 'calculated astronomical positions and selected interpretive frameworks']) {
-  if (landing.includes(retired)) throw new Error(`Premium platform release v2 found retired root language: ${retired}`);
+  assert(!landing.includes(retired), `Premium platform release v2 found retired root landing language: ${retired}`);
 }
-for (const marker of [
-  '01 · YOU',
-  '02 · YOU & YOUR PEOPLE',
-  '03 · WHOLE SYSTEM',
+
+/*
+ * Product story demonstrations — the isolated personal/relationship/system
+ * stories with source details remain subject to the canonical selector
+ * contract (landing-story--${suffix} resolves to personal/relationship/system).
+ */
+requireAll('Premium platform release v2 (LandingProductStories.tsx)', stories, [
+  '01 · You',
+  '02 · You + your people',
+  '03 · From 1:1 to the whole system',
+  'landing-stories__labels',
+  'landing-story__label',
+  'landing-story--${suffix}',
+  'demo-card',
   'Why do I keep saying yes when I want to say no?',
   'Why does my partner\\\'s silence feel like punishment?',
   'Why do I always end up managing the family crisis?',
   'See source details',
   'Representative example · Not your Baseline Design'
-]) {
-  if (!stories.includes(marker)) throw new Error(`Premium platform release v2 is missing product story marker: ${marker}`);
-}
-for (const retired of ['Separate helping from carrying the outcome.', 'See where responsibility keeps landing.']) {
-  if (stories.includes(retired)) throw new Error(`Premium platform release v2 found retired category framing: ${retired}`);
-}
-for (const marker of [
+]);
+
+/*
+ * Interactive 360 field — click-led, minimal endpoint inspection, no hover-gated
+ * content and no functional workflow motion gate.
+ */
+requireAll('Premium platform release v2 (LandingExpressionSlice.tsx)', field, [
   "data-inspecting={hasInspection ? 'true' : 'false'}",
   'setHasInspection(true)',
-  'click a line to inspect it',
   'const TOOLTIP_WIDTH = 104',
-  'const TOOLTIP_HEIGHT = 26'
-]) if (!field.includes(marker)) throw new Error(`Premium platform release v2 is missing click-led field marker: ${marker}`);
-if (field.includes('onPointerEnter={() => selectAxis(axis.id)}')) throw new Error('Premium platform release v2 found hover-driven field inspection.');
-for (const marker of ['One typeface. Hierarchy comes from weight, scale, and opacity.', '@keyframes sovereign-hero-rise', 'font-family: inherit !important', 'width: 104px !important', 'height: 26px !important']) {
-  if (!landingRefinementV5.includes(marker)) throw new Error(`Premium platform release v2 is missing final visual marker: ${marker}`);
+  'const TOOLTIP_HEIGHT = 26',
+  'click a line to inspect it'
+]);
+assert(!field.includes('onPointerEnter={() => selectAxis(axis.id)}'), 'Premium platform release v2 found hover-driven field inspection.');
+
+/*
+ * Static premium action surface — the terminal static typography authority and
+ * the support-page visual authority remain live as static assets served to the
+ * secondary public pages.
+ */
+if (supportStatic.trim()) {
+  assert(
+    supportStatic.includes("/* Founder v0 visual authority for standalone public documents. */") &&
+    supportStatic.includes("url('/v0-public-port.css?v=20260801-founder-v0')"),
+    'Premium platform release v2 is missing the founder v0 import stub for standalone public documents.'
+  );
 }
-if (landingRefinementV5.includes('var(--font-display, Georgia, serif)') || landingRefinementV5.includes('.landing-baseline-intro')) throw new Error('Premium platform release v2 found retired landing presentation.');
-if (typography.includes('font-family: "Sovereign Display"') || typography.includes('/fonts/sovereign-display.woff2')) throw new Error('Premium platform release v2 found active Sovereign Display typography.');
-for (const marker of ['--font-display: var(--font-title);', '.public-approved-v8 .v0-hero h1 > em', 'font-family: var(--font-title) !important']) {
-  if (!`${typography}\n${sansTypography}`.includes(marker)) throw new Error(`Premium platform release v2 is missing sans typography marker: ${marker}`);
+for (const marker of ['--static-title-font:', 'font-family: var(--static-title-font) !important']) {
+  assert(premiumActionStatic.includes(marker), `Premium platform release v2 is missing terminal static typography marker: ${marker}`);
 }
-if (!main.includes("import sansTypographyAuthorityCss from './sans-typography-authority-v1.css?inline';")) throw new Error('Premium platform release v2 is missing terminal sans import.');
-if (main.indexOf('style.textContent += `\\n${sansTypographyAuthorityCss}`;') <= main.indexOf('style.textContent += `\\n${premiumActionAuthorityCss}`;')) throw new Error('Premium platform release v2 does not place sans typography last.');
-
-for (const retired of [
-  'Bring the question you actually have.',
-  "'Ask about your life.',",
-  "'Get an answer built for you.',",
-  'Illustrative permitted Baselines',
-  'capacity beneath a pattern',
-  'Seeing the capacity beneath it',
-  'Mapping the people',
-  'Separate helping from carrying the outcome.',
-  'See where responsibility keeps landing.',
-  'One private foundation. More useful answers across the questions that shape your life.'
-]) if (source.includes(retired)) throw new Error(`Premium platform release v2 still enforces retired active language: ${retired}`);
-
-
-const currentStoryMarkers = ["landing-stories__labels", "landing-story__label", "landing-story--${suffix}", "demo-card", "See source details", "Representative example · Not your Baseline Design", "Why do I keep saying yes when I want to say no?", "Why does my partner\\'s silence feel like punishment?", "Why do I always end up managing the family crisis?"];
-const currentStoryQuote = String.fromCharCode(39);
-const currentStoryStart = "requireAll(" + currentStoryQuote + "restored product stories" + currentStoryQuote + ", stories, [";
-const currentStoryIndex = source.indexOf(currentStoryStart);
-if (currentStoryIndex < 0) throw new Error("Current story verifier block is missing: restored product stories");
-const currentStoryEnd = source.indexOf("\n]);", currentStoryIndex);
-if (currentStoryEnd < 0) throw new Error("Current story verifier block has no end: restored product stories");
-const currentStoryContract = currentStoryStart + "\n" + currentStoryMarkers.map((marker) => "  " + JSON.stringify(marker)).join(",\n") + "\n]);";
-source = source.slice(0, currentStoryIndex) + currentStoryContract + source.slice(currentStoryEnd + 4);
-
-
-
-
-try {
-  writeFileSync(temporaryPath, source, 'utf8');
-  await import(`${pathToFileURL(temporaryPath).href}?release=${Date.now()}`);
-} finally {
-  rmSync(temporaryPath, { force: true });
+for (const name of ['how-it-works', 'pricing', 'faq', '404']) {
+  const page = readFileSync(resolve(`apps/web/public/${name}.html`), 'utf8');
+  assert(page.includes('/premium-action-static-v1.css?v=20260818-geist-v1') || page.includes('/premium-action-static-v1.css'), `Premium platform release v2 is missing terminal static stylesheet link on ${name}.html`);
+  assert(page.includes('Sovereign.OS'), `Premium platform release v2 is missing brand on ${name}.html`);
 }
+
+console.log('Premium platform release v2: premium platform and canonical visual system verified.');

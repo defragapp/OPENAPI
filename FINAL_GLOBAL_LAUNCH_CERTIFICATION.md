@@ -76,9 +76,9 @@ Release SHA: e2e7c2389dafa4621632db0dede9964d6ac80d08
 
 | Check | Finding | Status |
 | --- | --- | --- |
-| Typography | Geist Sans self-hosted; typography-system.css authority | PASS |
+| Typography | Geist Sans self-hosted; design-system.css authority | PASS |
 | Visual system | Near-black/cream founder system preserved | PASS |
-| CSS import order | passkey-auth.css last component; terminal inline authorities follow | PASS |
+| CSS import order | passkey-auth.css terminal in the certified 5-file order; premium-action-static-v1.css last on standalone public documents | PASS |
 | Motion | Respects prefers-reduced-motion; does not gate comprehension | PASS |
 | Responsive | Mobile viewport contract; orientation handling | PASS |
 | Meta tags | Complete OG tags, description, image (1200px) | PASS |
