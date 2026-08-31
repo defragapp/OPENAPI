@@ -29,7 +29,10 @@ Track names/IDs preserved from the recovered audit.
 - FIXED: added the beacon origin to `script-src` and its reporting origin to `connect-src` in `apps/sovereign-worker/src/security/headers.ts`; all other directives unchanged. Live proof at `52cad3a1`: CSP header served with the new origins and a Playwright probe on `sovereign.defrag.app/` reports 0 console errors / 0 failed requests. Sweep also confirmed all 6 public routes return 200 at all four viewports, founder hero intact, zero horizontal overflow.
 
 ### Track REL-1 — Release credential status
-- BLOCKED: the supplied Cloudflare API token verifies as active but has no D1/Workers permissions (API error 10000 on `/d1/database`, `/workers/scripts`), so the `production-d1-parity` gate stage and the `pnpm production:release:text` mutation cannot run with it. A token with D1 read + Workers deploy scopes is required. Live delivery continues via the deploy hook, which is not the authoritative release path per repo rules.
+- RESOLVED: a scoped Cloudflare API token (D1 read + Workers access) was supplied; `CLOUDFLARE_ACCOUNT_ID` was required in addition and set for the release mutation.
+- GATE: `pnpm verify:cloudflare-build` completed **all 24 stages green** at commit `3252747c…` including `production-d1-parity` — "SUCCESS: Production D1 schema matches expected migrations" (`/tmp/cf-gate-3.log` run evidence).
+- RELEASE: `pnpm production:release:text` for the same SHA succeeded — main parity verified, `status: success`, evidence `converged: true` (wrangler-d1 evidence write; Browser Rendering excluded per the text-launch contract).
+- LIVE PROOF at `3252747c…` (2026-08-31T03:26Z): both branded `/ready` endpoints report `ready:true`, exact SHA, migration `0018_workers_ai_capacity_reservations` current/latest, `sovereign-answer.v2`; `/login`, `/signup`, landing all 200; public landing probe shows 0 console errors / 0 failed requests.
 
 ### Track REL-1 — Release
 - GREEN at `a6faf87`: `/ready` reported `ready:true`, SHA match, migration `0018_workers_ai_capacity_reservations` current, `sovereign-answer.v2` contract.
