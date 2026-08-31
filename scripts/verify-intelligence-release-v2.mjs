@@ -282,7 +282,7 @@ if (source.split(staleRefinementAssertion).length - 1 !== 1) throw new Error('In
 source = source.replace(staleRefinementAssertion, currentRefinementAssertion);
 
 const staleStaticRouteAssertion = "  containsAll(label, document, ['Sovereign.OS', 'Build my Baseline', '/premium-public-release.css?v=20260730-final', '/experience-static-refinement-v1.css?v=20260816-refinement-v1']);";
-const currentStaticRouteAssertion = "  containsAll(label, document, ['Sovereign.OS', 'data-visual-contract=\\\"founder-v0-static\\\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260830-touch-v1', '/premium-action-static-v1.css?v=20260818-geist-v1']);";
+const currentStaticRouteAssertion = "  containsAll(label, document, ['Sovereign.OS', 'data-visual-contract=\\\"founder-v0-static\\\"', '/v0-public-static.css?v=20260803-refined-v2', '/deployed-route-cohesion.css?v=20260803-route-v1', '/experience-static-refinement-v1.css?v=20260831-acceptance-v1', '/premium-action-static-v1.css?v=20260818-geist-v1']);";
 if (source.split(staleStaticRouteAssertion).length - 1 !== 1) throw new Error('Intelligence release v2 could not reconcile the retired standalone-route contract.');
 source = source.replace(staleStaticRouteAssertion, currentStaticRouteAssertion);
 

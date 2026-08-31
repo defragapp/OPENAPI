@@ -22,7 +22,7 @@ describe('real static 404 cohesion', () => {
     const base = document.indexOf('/v0-public-static.css?v=20260803-refined-v2');
     const notFound = document.indexOf('/not-found-route.css?v=20260804-cohesion-v1');
     const routeAuthority = document.indexOf('/deployed-route-cohesion.css?v=20260803-route-v1');
-    const finalAuthority = document.indexOf('/experience-static-refinement-v1.css?v=20260830-touch-v1');
+    const finalAuthority = document.indexOf('/experience-static-refinement-v1.css?v=20260831-acceptance-v1');
     expect(base).toBeGreaterThan(-1);
     expect(notFound).toBeGreaterThan(base);
     expect(routeAuthority).toBeGreaterThan(notFound);

@@ -79,6 +79,18 @@ body.consent-page .launch-footer nav a {
   padding-inline: 4px;
 }
 
+/* Brand wordmark and donation links get an adequate hit area too, without
+   shifting the fixed wordmark or the footer layout (no lateral padding). */
+body.launch-page .launch-wordmark,
+body.launch-page .launch-footer-wordmark,
+body.launch-page a[href*="donate.stripe.com"],
+body.consent-page .launch-wordmark,
+body.consent-page .launch-footer-wordmark {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
 body.launch-page .launch-links a:is(:hover, :focus-visible),
 body.launch-page .launch-links a[aria-current="page"],
 body.launch-page .launch-sign-in:is(:hover, :focus-visible),

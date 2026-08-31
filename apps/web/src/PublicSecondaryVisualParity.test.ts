@@ -27,7 +27,7 @@ const liveVerifier = read('../../../scripts/verify-live-secondary-public.mjs');
 const productionRelease = read('../../../scripts/cloudflare-production-release.mjs');
 
 const refinedCssPath = '/v0-public-static.css?v=20260803-refined-v2';
-const refinementCssPath = '/experience-static-refinement-v1.css?v=20260830-touch-v1';
+const refinementCssPath = '/experience-static-refinement-v1.css?v=20260831-acceptance-v1';
 const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1';
 
 describe('secondary public visual parity', () => {
