@@ -4436,6 +4436,10 @@ body:has(.sovereign-app-runtime) {
 }
 
 .account-shell .account-nav {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 28px !important;
   min-height: 74px !important;
   padding-inline: max(28px, calc((100vw - 1180px) / 2)) !important;
   border-bottom: 1px solid rgba(242, 237, 229, 0.08) !important;

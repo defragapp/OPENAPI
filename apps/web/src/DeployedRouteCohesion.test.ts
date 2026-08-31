@@ -25,7 +25,7 @@ const secondaryVerifier = read('../../../scripts/verify-live-secondary-public.mj
 const productionRelease = read('../../../scripts/cloudflare-production-release.mjs');
 const packageJson = JSON.parse(read('../../../package.json')) as { scripts?: Record<string, string> };
 
-const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2';
+const refinementCssPath = '/experience-static-refinement-v1.css?v=20260830-touch-v1';
 const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1';
 
 describe('deployed route cohesion contract', () => {
@@ -115,7 +115,7 @@ describe('deployed route cohesion contract', () => {
 
   it('keeps both fast and rendered route verification production-authoritative', () => {
     expect(secondaryVerifier).toContain("const routeCssPath = '/deployed-route-cohesion.css?v=20260803-route-v1'");
-    expect(secondaryVerifier).toContain("const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2'");
+    expect(secondaryVerifier).toContain("const refinementCssPath = '/experience-static-refinement-v1.css?v=20260830-touch-v1'");
     expect(secondaryVerifier).toContain("const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1'");
     expect(secondaryVerifier).toContain('positioning=self-people-systems typography=geist-sans');
     expect(packageJson.scripts?.['verify:live-route-cohesion']).toBe('node scripts/verify-live-route-cohesion-v2.mjs');

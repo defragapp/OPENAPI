@@ -1,7 +1,7 @@
 const publicBase = String(process.env.PUBLIC_BASE_URL || 'https://sovereign.defrag.app').replace(/\/$/, '');
 const expectedCssPath = '/v0-public-static.css?v=20260803-refined-v2';
 const routeCssPath = '/deployed-route-cohesion.css?v=20260803-route-v1';
-const refinementCssPath = '/experience-static-refinement-v1.css?v=20260817-cohesion-v2';
+const refinementCssPath = '/experience-static-refinement-v1.css?v=20260830-touch-v1';
 const terminalCssPath = '/premium-action-static-v1.css?v=20260818-geist-v1';
 const expectedContract = 'founder-v0-locked-v1';
 const staticRoutes = ['/how-it-works', '/pricing', '/faq'];

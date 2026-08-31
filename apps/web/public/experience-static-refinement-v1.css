@@ -67,6 +67,18 @@ body.consent-page .launch-links a {
   color: rgba(229, 220, 209, 0.58);
 }
 
+/* Touch-target floor for static launch header/footer anchors (mobile acceptance). */
+body.launch-page .launch-links a,
+body.launch-page .launch-sign-in,
+body.launch-page .launch-footer nav a,
+body.consent-page .launch-links a,
+body.consent-page .launch-footer nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 4px;
+}
+
 body.launch-page .launch-links a:is(:hover, :focus-visible),
 body.launch-page .launch-links a[aria-current="page"],
 body.launch-page .launch-sign-in:is(:hover, :focus-visible),
