@@ -24,6 +24,13 @@ Track names/IDs preserved from the recovered audit.
 ### Track BILL-1 — Stripe / entitlement
 - GREEN: `/api/v1/stripe/webhook` correctly returns 401 without a signature at the application layer; signature verification is enforced in `apps/sovereign-worker` (`stripe-webhook-route-contract.test.ts`). The externally reported Cloudflare Access policy overprovisioning on that path is a Cloudflare dashboard configuration item, not a repository change; the app-layer contract is safe and Access changes must not break Stripe delivery.
 
+### Track CSP-1 — Public-host document CSP (found this sprint)
+- DEFECT (live, every public page at 1440/1280/390/430): Cloudflare Web Analytics beacon (`static.cloudflareinsights.com`) blocked by the document CSP `script-src`, producing one console error + one failed request per load (`visual-inspection/public-host-inspection-report.json`, sweep script `visual-inspection/inspect-public-host.mjs`).
+- FIXED: added the beacon origin to `script-src` and its reporting origin to `connect-src` in `apps/sovereign-worker/src/security/headers.ts`; all other directives unchanged. Live proof at `52cad3a1`: CSP header served with the new origins and a Playwright probe on `sovereign.defrag.app/` reports 0 console errors / 0 failed requests. Sweep also confirmed all 6 public routes return 200 at all four viewports, founder hero intact, zero horizontal overflow.
+
+### Track REL-1 — Release credential status
+- BLOCKED: the supplied Cloudflare API token verifies as active but has no D1/Workers permissions (API error 10000 on `/d1/database`, `/workers/scripts`), so the `production-d1-parity` gate stage and the `pnpm production:release:text` mutation cannot run with it. A token with D1 read + Workers deploy scopes is required. Live delivery continues via the deploy hook, which is not the authoritative release path per repo rules.
+
 ### Track REL-1 — Release
 - GREEN at `a6faf87`: `/ready` reported `ready:true`, SHA match, migration `0018_workers_ai_capacity_reservations` current, `sovereign-answer.v2` contract.
 - FIXED (this sprint): account-nav flex layout + static touch targets. Verified before release: `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm verify:foundation`, `pnpm scan:secrets`.

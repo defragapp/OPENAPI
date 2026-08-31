@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await (await b.newContext({viewport:{width:1440,height:900}})).newPage();
+const errs=[]; const failed=[];
+p.on('console',m=>{if(m.type()==='error')errs.push(m.text().slice(0,200))});
+p.on('requestfailed',r=>failed.push(r.url().slice(0,120)));
+await p.goto('https://sovereign.defrag.app/',{waitUntil:'load',timeout:30000});
+console.log('console errors:',errs.length, JSON.stringify(errs));
+console.log('failed requests:',failed.length, JSON.stringify(failed));
+await b.close();
