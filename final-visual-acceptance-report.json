@@ -1,0 +1,888 @@
+[
+  {
+    "surface": "sovereign.defrag.app/ (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Healing isn’t optional. Holding onto the pain is.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:SOVEREIGN.OS 413x16"
+    ],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:SOVEREIGN.OS 413x16",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1440-root.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/ (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Healing isn’t optional. Holding onto the pain is.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:SOVEREIGN.OS 397x16"
+    ],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:SOVEREIGN.OS 397x16",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1280-root.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/ (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Healing isn’t optional. Holding onto the pain is.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:SOVEREIGN.OS 127x16"
+    ],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:SOVEREIGN.OS 127x16",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile390-root.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/ (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Healing isn’t optional. Holding onto the pain is.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:SOVEREIGN.OS 127x16"
+    ],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:SOVEREIGN.OS 127x16",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile430-root.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/how-it-works (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "How Sovereign.OS works",
+    "h1": "Start with yourself. Add another person or the wider situation only when it helps.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1440--how-it-works.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/how-it-works (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "How Sovereign.OS works",
+    "h1": "Start with yourself. Add another person or the wider situation only when it helps.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1280--how-it-works.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/how-it-works (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "How Sovereign.OS works",
+    "h1": "Start with yourself. Add another person or the wider situation only when it helps.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile390--how-it-works.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/how-it-works (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "How Sovereign.OS works",
+    "h1": "Start with yourself. Add another person or the wider situation only when it helps.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile430--how-it-works.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/pricing (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Sovereign.OS pricing",
+    "h1": "Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1440--pricing.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/pricing (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Sovereign.OS pricing",
+    "h1": "Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1280--pricing.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/pricing (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Sovereign.OS pricing",
+    "h1": "Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile390--pricing.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/pricing (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Sovereign.OS pricing",
+    "h1": "Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile430--pricing.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/faq (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Questions about Sovereign.OS",
+    "h1": "What can Sovereign help you understand?",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1440--faq.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/faq (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Questions about Sovereign.OS",
+    "h1": "What can Sovereign help you understand?",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1280--faq.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/faq (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Questions about Sovereign.OS",
+    "h1": "What can Sovereign help you understand?",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile390--faq.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/faq (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Questions about Sovereign.OS",
+    "h1": "What can Sovereign help you understand?",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Baseline Design",
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile430--faq.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/privacy (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Sovereign.OS privacy",
+    "h1": "How Sovereign.OS handles your information.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:SOVEREIGN.OS 477x16",
+      "A:Sovereign.OS 90x19",
+      "A:SOVEREIGN.OS 472x16"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:SOVEREIGN.OS 477x16; A:Sovereign.OS 90x19; A:SOVEREIGN.OS 472x16",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1440--privacy.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/privacy (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Sovereign.OS privacy",
+    "h1": "How Sovereign.OS handles your information.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:SOVEREIGN.OS 461x16",
+      "A:Sovereign.OS 90x19",
+      "A:SOVEREIGN.OS 452x16"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:SOVEREIGN.OS 461x16; A:Sovereign.OS 90x19; A:SOVEREIGN.OS 452x16",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1280--privacy.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/privacy (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Sovereign.OS privacy",
+    "h1": "How Sovereign.OS handles your information.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:Sovereign.OS 90x19",
+      "A:SOVEREIGN.OS 127x16"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:Sovereign.OS 90x19; A:SOVEREIGN.OS 127x16",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile390--privacy.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/privacy (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Sovereign.OS privacy",
+    "h1": "How Sovereign.OS handles your information.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:Sovereign.OS 90x19",
+      "A:SOVEREIGN.OS 127x16"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:Sovereign.OS 90x19; A:SOVEREIGN.OS 127x16",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile430--privacy.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/terms (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Sovereign.OS terms",
+    "h1": "Terms for using Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:SOVEREIGN.OS 477x16",
+      "A:Sovereign.OS 90x19",
+      "A:SOVEREIGN.OS 472x16"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:SOVEREIGN.OS 477x16; A:Sovereign.OS 90x19; A:SOVEREIGN.OS 472x16",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1440--terms.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/terms (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Sovereign.OS terms",
+    "h1": "Terms for using Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:SOVEREIGN.OS 461x16",
+      "A:Sovereign.OS 90x19",
+      "A:SOVEREIGN.OS 452x16"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:SOVEREIGN.OS 461x16; A:Sovereign.OS 90x19; A:SOVEREIGN.OS 452x16",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1280--terms.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/terms (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Sovereign.OS terms",
+    "h1": "Terms for using Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:Sovereign.OS 90x19",
+      "A:SOVEREIGN.OS 127x16"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:Sovereign.OS 90x19; A:SOVEREIGN.OS 127x16",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile390--terms.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/terms (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Sovereign.OS terms",
+    "h1": "Terms for using Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:Sovereign.OS 90x19",
+      "A:SOVEREIGN.OS 127x16"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:Sovereign.OS 90x19; A:SOVEREIGN.OS 127x16",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile430--terms.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "sovereign.defrag.app/does-not-exist-xyz (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 404,
+    "title": "Page not found · Sovereign.OS",
+    "h1": "This page is not part of Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "1 console errors | 1 failed reqs | HTTP 404",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1440--does-not-exist-xyz.png",
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 ()"
+    ],
+    "failedRequests": [
+      "HTTP 404 https://sovereign.defrag.app/does-not-exist-xyz"
+    ]
+  },
+  {
+    "surface": "sovereign.defrag.app/does-not-exist-xyz (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 404,
+    "title": "Page not found · Sovereign.OS",
+    "h1": "This page is not part of Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "1 console errors | 1 failed reqs | HTTP 404",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-desktop1280--does-not-exist-xyz.png",
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 ()"
+    ],
+    "failedRequests": [
+      "HTTP 404 https://sovereign.defrag.app/does-not-exist-xyz"
+    ]
+  },
+  {
+    "surface": "sovereign.defrag.app/does-not-exist-xyz (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 404,
+    "title": "Page not found · Sovereign.OS",
+    "h1": "This page is not part of Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "1 console errors | 1 failed reqs | HTTP 404",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile390--does-not-exist-xyz.png",
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 ()"
+    ],
+    "failedRequests": [
+      "HTTP 404 https://sovereign.defrag.app/does-not-exist-xyz"
+    ]
+  },
+  {
+    "surface": "sovereign.defrag.app/does-not-exist-xyz (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 404,
+    "title": "Page not found · Sovereign.OS",
+    "h1": "This page is not part of Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "1 console errors | 1 failed reqs | HTTP 404",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-sovereign-mobile430--does-not-exist-xyz.png",
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 ()"
+    ],
+    "failedRequests": [
+      "HTTP 404 https://sovereign.defrag.app/does-not-exist-xyz"
+    ]
+  },
+  {
+    "surface": "app.defrag.app/login (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Sign in to Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-desktop1440--login.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/login (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Sign in to Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-desktop1280--login.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/login (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Sign in to Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-mobile390--login.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/login (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Sign in to Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-mobile430--login.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/signup (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Create your Sovereign.OS account.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:Terms 42x17",
+      "A:Privacy Policy 99x17",
+      "A:Sign in 46x19"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:Terms 42x17; A:Privacy Policy 99x17; A:Sign in 46x19",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-desktop1440--signup.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/signup (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Create your Sovereign.OS account.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:Terms 42x17",
+      "A:Privacy Policy 99x17",
+      "A:Sign in 46x19"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:Terms 42x17; A:Privacy Policy 99x17; A:Sign in 46x19",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-desktop1280--signup.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/signup (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Create your Sovereign.OS account.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:Terms 42x17",
+      "A:Privacy Policy 216x37",
+      "A:See how informat 260x34",
+      "A:Sign in 46x19"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:Terms 42x17; A:Privacy Policy 216x37; A:See how informat 260x34; A:Sign in 46x19",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-mobile390--signup.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/signup (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Create your Sovereign.OS account.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:Terms 42x17",
+      "A:Privacy Policy 99x17",
+      "A:See how informat 171x16",
+      "A:Sign in 46x19"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:Terms 42x17; A:Privacy Policy 99x17; A:See how informat 171x16; A:Sign in 46x19",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-mobile430--signup.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/onboarding (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Sign in to Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-desktop1440--onboarding.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/onboarding (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Sign in to Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-desktop1280--onboarding.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/onboarding (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Sign in to Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-mobile390--onboarding.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/onboarding (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Sign in to Sovereign.OS.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "GREEN",
+    "defect": "PASS",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-mobile430--onboarding.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/invitation (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Choose what this connection may use.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:SOVEREIGN.OS 123x12"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:SOVEREIGN.OS 123x12",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-desktop1440--invitation.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/invitation (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Choose what this connection may use.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:SOVEREIGN.OS 123x12"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:SOVEREIGN.OS 123x12",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-desktop1280--invitation.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/invitation (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Choose what this connection may use.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:SOVEREIGN.OS 123x12"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:SOVEREIGN.OS 123x12",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-mobile390--invitation.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  {
+    "surface": "app.defrag.app/invitation (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Choose what this connection may use.",
+    "overflowX": 0,
+    "emptySections": 0,
+    "smallTargets": [
+      "A:SOVEREIGN.OS 123x12"
+    ],
+    "productTermsFound": [
+      "Sovereign.OS"
+    ],
+    "status": "DEFECT",
+    "defect": "small targets: A:SOVEREIGN.OS 123x12",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/final-acceptance/final-app-mobile430--invitation.png",
+    "consoleErrors": [],
+    "failedRequests": []
+  }
+]

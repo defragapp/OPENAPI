@@ -38,8 +38,19 @@ Track names/IDs preserved from the recovered audit.
 - GREEN: webhook signature enforcement (unsigned → 400 live) and the in-memory Stripe contract (checkout/portal handoff, entitlement projection → `sovereign_plus`, portal URL) ran green in the deterministic gate.
 - BLOCKED: a live Stripe Checkout/portal round-trip against the real configured account requires the operational `STRIPE_SECRET_KEY` (and an owner-approved test transaction), which is not present in this environment. No secrets are invented.
 
-### Track TOOL-1 — Preview bootstrap D1 resolver
+### Track P2-VIS — Final visual acceptance (closeout sprint)
+- GREEN (live, both hosts, 1440/1280/390/430): all public routes + login/signup/onboarding/invitation render with zero horizontal overflow, zero empty sections, no failed assets, and no console errors other than the expected browser log of a 404 response on the 404 route itself. Screenshots + report: `visual-inspection/final-visual-acceptance.mjs`, `final-visual-acceptance-report.json`, `qa/final-acceptance/`.
+- FIXED + DEPLOYED: static 404 document (served via the ASSETS binding with `_headers`) still carried the OLD document CSP without the analytics beacon → every 404 visit logged a blocked-request console error. Aligned `apps/web/public/_headers` with the worker `documentSecurityHeaders` (adds `static.cloudflareinsights.com` to `script-src`, `cloudflareinsights.com` to `connect-src`, and the already-present `media-src`). Live-verified after deploy: 404 header now serves the fixed CSP and the console CSP violation is gone.
+- FIXED + DEPLOYED: extended the static launch touch-target floor to the brand wordmarks and the Support/donate links (44px hit area, no visual shift). Static how-it-works/pricing/faq now report 0 sub-44px targets.
+- ACCEPTED (not defects): SPA brand wordmark lockups and inline policy text links (`Terms`, `Privacy Policy`, `Sign in`, `See how…`) on login/signup/privacy/terms/invitation are 16–37px inline/brand links — conventionally exempt from the 44px guideline; enlarging them would redesign the established visual system, so they are intentionally left as-is.
+
+### Track REL-2 — Closeout application release
+- GATE: `pnpm verify:cloudflare-build` passed **all stages** at `936275a8` including `production-d1-parity`. Released via `pnpm production:release:text` (`status: success`, `converged: true`).
+- LIVE: both branded `/ready` endpoints report exact deployed SHA `936275a8…`, `ready:true`, migration `0018_workers_ai_capacity_reservations` current.
+- This was an application-code change (web bundle + `_headers` + static CSS + HTML), so a full gate + release was run and the deployed SHA now equals the repo HEAD.
 - FIXED: `scripts/cloudflare-preview-bootstrap.mjs` used `wrangler d1 list/create --json`, which the installed Wrangler (4.98) rejects ("Unknown argument: json"). Replaced with the Cloudflare REST API (`/accounts/{id}/d1/database`) for list/create — same D1 Edit permission scope, works across wrangler versions. Verified: preview D1 resolution succeeded, migrations applied (0018 target), and the preview Worker deployed. Developer tooling only; no app code change, so no redeploy required.
+
+### Track TOOL-1 — Preview bootstrap D1 resolver
 
 ### Track REL-1 — Release credential status
 - RESOLVED: a scoped Cloudflare API token (D1 read + Workers access) was supplied; `CLOUDFLARE_ACCOUNT_ID` was required in addition and set for the release mutation.
