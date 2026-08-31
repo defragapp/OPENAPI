@@ -4,9 +4,10 @@
 These instructions apply to the entire OPENAPI repository.
 
 ## Repository boundary
-- Write only inside `/workspace/OPENAPI` when using the canonical checkout.
-- `/workspace/SOVV` is read-only reference material. Never edit, format, generate files in, commit to, reset, merge, rebase, delete, or push SOVV.
-- Verify the SOVV commit and working tree after meaningful phases when that checkout is available.
+- Write only inside the canonical Git root reported by `git rev-parse --show-toplevel` for this checkout.
+- Do not invent alternate root paths (for example, `/workspace/OPENAPI`). Always use the actual Git root as the repository boundary on the current machine.
+- Any sibling/reference checkout (for example, historical SOVV or other local clones) is read‑only reference material. Never edit, format, generate files in, commit to, reset, merge, rebase, delete, or push those reference trees during consolidation.
+- When such a sibling/reference checkout is available, verify its commit and working tree after meaningful phases, but reconcile legitimate changes into the canonical repository rather than promoting an alternate root.
 
 ## Branch and release discipline
 - `main` is the single canonical development and production branch for Sovereign.OS.

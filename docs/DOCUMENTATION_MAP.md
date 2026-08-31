@@ -34,6 +34,8 @@ Documentation covering deployment, release authority, readiness, rollback, migra
 - **[Release Gates](release-gates.md)** — Current launch acceptance checklist and gates.
 - **[Preview and Production Preparation](release-prep.md)** — Resource inventory and preparation guidance for releases.
 - **[Launch Saturation and Rollback Runbook](launch-saturation-runbook.md)** — Runbook for controlled canary validation.
+- **Consolidation Reports**: Evidence-backed inventories and dispositions during drift recovery.
+  - [2026‑08‑31 Canonical Consolidation Report](consolidation/2026-08-31-canonical-consolidation-report.md)
 - **Historical References**:
   - [Historical production redeploy request (2026-07-26)](production-redeploy-2026-07-26.md)
   - [Historical production-safe convergence checkpoint](production-safe-convergence-rollback.md)
@@ -63,3 +65,19 @@ Documentation covering product positioning, founder contracts, launch contracts,
   - [Future Worlds private video contract](worlds-private-video-contract.md)
   - [Future Worlds experience contract](worlds-experience-contract.md)
   - [Release Manifests](releases/)
+
+## 7. Business and Entitlements
+- **Pricing and Plans**: See the authoritative terms in [Launch Product Contract](launch-product-contract.md#free-access-billing-and-voluntary-support)
+  - Free: $0, 10 Sovereign AI turns per UTC month
+  - Sovereign+: $20 monthly or $99 annually, 300 turns per UTC month
+  - People, Systems, Library continuity, Covenant, and consent-aware shared intelligence are Sovereign+ capabilities under server enforcement
+- **Entitlement/Authorization Rules**: Enforced server-side; Stripe Checkout/Portal/webhooks are authoritative (see [launch-product-contract.md](launch-product-contract.md#free-access-billing-and-voluntary-support)).
+
+## 8. Acceptance and Launch Ledger
+- **Acceptance Requirements**: See [Release Gates](release-gates.md) and [Production Release Procedure](production-release.md).
+- **Launch Ledger**: The current GREEN/FIXED/BLOCKED/REMAINING state and live evidence are tracked in the repository root file: [../SPRINT_ACCEPTANCE.md](../SPRINT_ACCEPTANCE.md).
+
+## 9. Known External Blockers (Reference)
+- Preview-host access needed for full authenticated journey (verify current status before execution).
+- Operational Stripe secret required for real Checkout/Portal flows (do not write secrets to the repo).
+- Treat these as environment requirements; do not rewrite application architecture to bypass them.
