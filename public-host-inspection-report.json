@@ -1,0 +1,410 @@
+[
+  {
+    "surface": "/ (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Healing isn’t optional. Holding onto the pain is.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-desktop1440-root.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/ (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Healing isn’t optional. Holding onto the pain is.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-desktop1280-root.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/ (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Healing isn’t optional. Holding onto the pain is.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-mobile390-root.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/ (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Sovereign.OS — Private personal AI for real life",
+    "h1": "Healing isn’t optional. Holding onto the pain is.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-mobile430-root.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/how-it-works (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "How Sovereign.OS works",
+    "h1": "Start with yourself. Add another person or the wider situation only when it helps.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-desktop1440-how-it-works.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/how-it-works (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "How Sovereign.OS works",
+    "h1": "Start with yourself. Add another person or the wider situation only when it helps.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-desktop1280-how-it-works.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/how-it-works (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "How Sovereign.OS works",
+    "h1": "Start with yourself. Add another person or the wider situation only when it helps.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-mobile390-how-it-works.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/how-it-works (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "How Sovereign.OS works",
+    "h1": "Start with yourself. Add another person or the wider situation only when it helps.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-mobile430-how-it-works.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/pricing (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Sovereign.OS pricing",
+    "h1": "Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-desktop1440-pricing.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/pricing (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Sovereign.OS pricing",
+    "h1": "Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-desktop1280-pricing.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/pricing (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Sovereign.OS pricing",
+    "h1": "Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-mobile390-pricing.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/pricing (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Sovereign.OS pricing",
+    "h1": "Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-mobile430-pricing.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/faq (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Questions about Sovereign.OS",
+    "h1": "What can Sovereign help you understand?",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-desktop1440-faq.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/faq (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Questions about Sovereign.OS",
+    "h1": "What can Sovereign help you understand?",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-desktop1280-faq.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/faq (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Questions about Sovereign.OS",
+    "h1": "What can Sovereign help you understand?",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-mobile390-faq.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/faq (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Questions about Sovereign.OS",
+    "h1": "What can Sovereign help you understand?",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-mobile430-faq.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/privacy (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Sovereign.OS privacy",
+    "h1": "How Sovereign.OS handles your information.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-desktop1440-privacy.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/privacy (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Sovereign.OS privacy",
+    "h1": "How Sovereign.OS handles your information.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-desktop1280-privacy.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/privacy (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Sovereign.OS privacy",
+    "h1": "How Sovereign.OS handles your information.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-mobile390-privacy.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/privacy (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Sovereign.OS privacy",
+    "h1": "How Sovereign.OS handles your information.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-mobile430-privacy.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/terms (desktop1440)",
+    "viewport": "1440x900",
+    "httpStatus": 200,
+    "title": "Sovereign.OS terms",
+    "h1": "Terms for using Sovereign.OS.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-desktop1440-terms.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/terms (desktop1280)",
+    "viewport": "1280x800",
+    "httpStatus": 200,
+    "title": "Sovereign.OS terms",
+    "h1": "Terms for using Sovereign.OS.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-desktop1280-terms.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/terms (mobile390)",
+    "viewport": "390x844",
+    "httpStatus": 200,
+    "title": "Sovereign.OS terms",
+    "h1": "Terms for using Sovereign.OS.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-mobile390-terms.png",
+    "status": "DEFECT"
+  },
+  {
+    "surface": "/terms (mobile430)",
+    "viewport": "430x932",
+    "httpStatus": 200,
+    "title": "Sovereign.OS terms",
+    "h1": "Terms for using Sovereign.OS.",
+    "overflowX": 0,
+    "consoleErrors": [
+      "Loading the script 'https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925' violates the following Content Security Policy directive: \"script-src 'self' https://challenges.cloudflare.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src'"
+    ],
+    "failedRequests": [
+      "GET https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925 csp"
+    ],
+    "defect": "1 console errors; 1 failed requests",
+    "screenshot": "/Users/cjo/Downloads/AZUP-SOV/OPENAPI/openapiii/qa/public-host/pub-mobile430-terms.png",
+    "status": "DEFECT"
+  }
+]
