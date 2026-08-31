@@ -107,15 +107,40 @@ function runD1Json(args) {
   }
 }
 
-let databaseId = findDatabaseId(runD1Json(['d1', 'list', '--json']));
-let createdDatabase = false;
-if (!databaseId) {
-  const created = runD1Json(['d1', 'create', d1Name, '--json']);
-  databaseId = created.uuid ?? created.id ?? created.result?.uuid ?? created.result?.id;
-  createdDatabase = true;
+async function d1Api(path, init) {
+  const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database${path}`, {
+    ...init,
+    headers: {
+      authorization: `Bearer ${token}`,
+      'content-type': 'application/json',
+      ...(init?.headers ?? {})
+    }
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || payload.success === false) {
+    const detail = payload.errors?.map((e) => `${e.code} ${e.message}`).join('; ') || `HTTP ${response.status}`;
+    throw new Error(`Cloudflare preview credential must include D1 Edit permission. D1 API ${path}: ${detail}`);
+  }
+  return payload.result;
 }
-if (!databaseId) throw new Error('Unable to resolve preview D1 database id');
 
+async function resolvePreviewDatabaseId() {
+  const databases = await d1Api('');
+  const rows = Array.isArray(databases) ? databases : (databases?.result ?? databases?.databases ?? []);
+  const existing = findDatabaseId(rows);
+  if (existing) return { databaseId: existing, createdDatabase: false };
+  const created = await d1Api('', { method: 'POST', body: JSON.stringify({ name: d1Name }) });
+  const id = created?.uuid ?? created?.id;
+  if (!id) throw new Error('D1 database create did not return an id');
+  return { databaseId: id, createdDatabase: true };
+}
+
+if (!accountId || !token) {
+  throw new Error('CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN are required for preview bootstrap');
+}
+
+const { databaseId, createdDatabase } = await resolvePreviewDatabaseId();
+if (!databaseId) throw new Error('Unable to resolve preview D1 database id');
 const configPath = resolve(workerDir, '.wrangler.preview.generated.jsonc');
 try {
   const config = JSON.parse(readFileSync(resolve(workerDir, 'wrangler.jsonc'), 'utf8'));
