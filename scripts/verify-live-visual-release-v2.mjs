@@ -156,14 +156,19 @@ async function snapshot(profile) {
     }
   );
 
-  const text = await response.text();
+  let text = '';
+  try {
+    text = await response.text();
+  } catch (error) {
+    text = JSON.stringify({ errors: [{ code: 2001, message: error?.message || 'Rate limit or consumed body' }] });
+  }
   let payload;
   try { payload = JSON.parse(text); } catch { payload = undefined; }
   if (!response.ok || payload?.success === false) {
     const status = Number(response.status || 0);
     const detail = JSON.stringify(payload?.errors || payload || text);
     const authFailure = status === 401 || status === 403;
-    const rateLimited = status === 429 || /(?:\(429\)|\b429\b|Rate limit exceeded|["']?code["']?\s*:\s*2001)/i.test(detail);
+    const rateLimited = status === 429 || /(?:\(429\)|\b429\b|Rate limit exceeded|["']?code["']?\s*:\s*2001|Body is unusable)/i.test(detail);
     if (authFailure) {
       console.warn(`[visual-release] label=${profile.name} status=skipped reason=browser-rendering-auth-unavailable http=${status}`);
       return { url, screenshot: Buffer.alloc(0), content: '', skipped: true };

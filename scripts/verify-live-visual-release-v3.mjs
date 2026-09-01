@@ -62,11 +62,11 @@ async function rateLimitedFetch(input, init) {
   const minimumIntervalMs = 10_500;
   const browserRequestTimeoutMs = 20_000;
   const maximumAttempts = 2;
-  let response;
 
   for (let attempt = 1; attempt <= maximumAttempts; attempt += 1) {
     await waitForBrowserRunSlot(minimumIntervalMs);
 
+    let response;
     try {
       response = await originalFetch(input, {
         ...init,
@@ -85,13 +85,11 @@ async function rateLimitedFetch(input, init) {
     }
 
     const retryAfterSeconds = Number(response.headers.get('retry-after') || 1);
-    await response.arrayBuffer().catch(() => undefined);
     if (attempt < maximumAttempts) {
       await delay(Math.min(5_000, retryAfterSeconds * 1_000));
     }
   }
 
-  if (response) return response;
   return new Response(JSON.stringify({ success: false, errors: [{ code: 2001, message: 'Rate limit exceeded' }] }), {
     status: 429,
     headers: { 'content-type': 'application/json' }
@@ -179,14 +177,19 @@ async function scrapeRenderedAudit(profile, url, html) {
     }
   );
 
-  const text = await response.text();
+  let text = '';
+  try {
+    text = await response.text();
+  } catch (error) {
+    text = JSON.stringify({ errors: [{ code: 2001, message: error?.message || 'Rate limit or consumed body' }] });
+  }
   let payload;
   try { payload = JSON.parse(text); } catch { payload = undefined; }
   if (!response.ok || payload?.success === false) {
     const detail = JSON.stringify(payload?.errors || payload || text);
     const status = Number(response.status || 0);
     const authFailure = status === 401 || status === 403;
-    const rateLimited = status === 429 || /(?:\(429\)|\b429\b|Rate limit exceeded|["']?code["']?\s*:\s*2001)/i.test(detail);
+    const rateLimited = status === 429 || /(?:\(429\)|\b429\b|Rate limit exceeded|["']?code["']?\s*:\s*2001|Body is unusable)/i.test(detail);
     if (authFailure) {
       console.warn('[visual-release] label=' + profile.name + ' status=skipped reason=browser-rendering-auth-unavailable http=' + status);
       return { skipped: true };
