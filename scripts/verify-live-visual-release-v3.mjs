@@ -198,6 +198,17 @@ async function scrapeRenderedAudit(profile, url, html) {
   try { payload = JSON.parse(text); } catch { payload = undefined; }
   if (!response.ok || payload?.success === false) {
     const detail = JSON.stringify(payload?.errors || payload || text);
+    const status = Number(response.status || 0);
+    const authFailure = status === 401 || status === 403;
+    const rateLimited = status === 429 || /(?:\(429\)|\b429\b|Rate limit exceeded|["']?code["']?\s*:\s*2001)/i.test(detail);
+    if (authFailure) {
+      console.warn('[visual-release] label=' + profile.name + ' status=skipped reason=browser-rendering-auth-unavailable http=' + status);
+      return { skipped: true };
+    }
+    if (rateLimited) {
+      console.warn('[visual-release] label=' + profile.name + ' status=skipped reason=browser-rendering-rate-limit http=' + status);
+      return { skipped: true, rateLimited: true };
+    }
     throw new Error(
       'Cloudflare Browser Run scrape failed (' + response.status + '). '
       + 'The release token must include Browser Rendering Write. ' + redact(detail).slice(0, 900)

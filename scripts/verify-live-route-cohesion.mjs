@@ -264,6 +264,10 @@ async function browserSnapshot(request, label) {
         console.warn(`[route-cohesion] label=${label} status=skipped reason=browser-rendering-auth-unavailable http=${status}`);
         return { responseStatus: status, result: {}, html: '', screenshot: Buffer.alloc(0), skipped: true };
       }
+      if (rateLimited) {
+        console.warn(`[route-cohesion] label=${label} status=skipped reason=browser-rendering-rate-limit http=${status}`);
+        return { responseStatus: status, result: {}, html: '', screenshot: Buffer.alloc(0), skipped: true, rateLimited: true };
+      }
       throw new Error(
         `Route cohesion browser audit failed for ${label} (${response.status}) attempt=${attempt}/${browserRunRequestMaxAttempts}: `
         + redact(JSON.stringify(payload?.errors || payload || text)).slice(0, 800)
