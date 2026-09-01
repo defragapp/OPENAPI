@@ -10277,3 +10277,106 @@ body :where(a.button, a.btn, a.cta, a[class*="button"], a[class*="cta"]) {
     font-size: clamp(2rem, 8.8vw, 2.85rem);
   }
 }
+
+/* ==========================================================================
+   SOVEREIGN.OS — AUTHENTICATED WORKSPACE ELEVATION
+   Calm, focused intelligence environment with high-contrast answer readability
+   ========================================================================== */
+
+.intelligence-workspace {
+  background:
+    radial-gradient(circle at 80% -10%, rgba(221, 162, 115, 0.05), transparent 36rem),
+    radial-gradient(circle at 20% 70%, rgba(159, 186, 161, 0.03), transparent 32rem),
+    #080a0d !important;
+  color: #f1ece5 !important;
+  font-family: var(--sovereign-title, "Geist Sans", sans-serif) !important;
+}
+
+/* ── Sidebar ── */
+.intelligence-sidebar {
+  background: rgba(10, 12, 15, 0.92) !important;
+  backdrop-filter: blur(24px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(120%) !important;
+  border-right: 1px solid rgba(241, 233, 222, 0.08) !important;
+}
+
+.intelligence-sidebar nav button {
+  border-radius: 12px !important;
+  transition: background 0.15s ease, color 0.15s ease !important;
+}
+
+.intelligence-sidebar nav button:hover {
+  background: rgba(241, 233, 222, 0.04) !important;
+  color: #f1ece5 !important;
+}
+
+.intelligence-sidebar nav button.is-active {
+  background: rgba(221, 162, 115, 0.08) !important;
+  border: 1px solid rgba(221, 162, 115, 0.22) !important;
+  color: #f1ece5 !important;
+}
+
+/* ── Conversation & Answer Reading Column ── */
+.conversation-stream,
+.intelligence-scroll-content {
+  max-width: 780px !important;
+  margin: 0 auto !important;
+  padding: 40px 24px 140px !important;
+}
+
+/* ── Living Answer Stage ── */
+.living-answer,
+.sovereign-answer-stage {
+  display: grid !important;
+  gap: 20px !important;
+  padding: 28px 32px !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(241, 233, 222, 0.08) !important;
+  border-top: 1px solid rgba(241, 233, 222, 0.16) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, rgba(14, 16, 20, 0.98) 100%) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.living-answer-headline {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: #f1ece5 !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.living-answer-direct {
+  font-size: 1.05rem !important;
+  line-height: 1.72 !important;
+  color: rgba(241, 233, 222, 0.88) !important;
+}
+
+.living-answer-distinction {
+  padding: 14px 18px !important;
+  border-radius: 12px !important;
+  background: rgba(221, 162, 115, 0.06) !important;
+  border-left: 3px solid #dda273 !important;
+  border-top: 1px solid rgba(221, 162, 115, 0.12) !important;
+  border-right: 1px solid rgba(221, 162, 115, 0.12) !important;
+  border-bottom: 1px solid rgba(221, 162, 115, 0.12) !important;
+  color: #f1ece5 !important;
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+}
+
+/* ── Composer ── */
+.sovereign-composer {
+  border-radius: 20px !important;
+  background: rgba(14, 16, 20, 0.94) !important;
+  backdrop-filter: blur(20px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(120%) !important;
+  border: 1px solid rgba(241, 233, 222, 0.12) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.sovereign-composer:focus-within {
+  border-color: rgba(221, 162, 115, 0.4) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(221, 162, 115, 0.3) !important;
+}
+

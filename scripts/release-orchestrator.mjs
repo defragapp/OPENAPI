@@ -233,10 +233,13 @@ export async function orchestrateRelease({
       }
     }
 
+    const routeCohesionVerified = passedPostDeployChecks.has('verify-route-cohesion');
+    const renderedVisualVerified = passedPostDeployChecks.has('verify-rendered-visuals');
+
     try {
       const evidence = await evidenceWriter({
         sha: normalizedSha,
-        routeCohesionVerified: passedPostDeployChecks.has('verify-route-cohesion') || passedPostDeployChecks.has('verify-secondary-public'),
+        routeCohesionVerified: passedPostDeployChecks.has('verify-route-cohesion'),
         renderedVisualVerified: passedPostDeployChecks.has('verify-rendered-visuals'),
         dmarcVerified: dmarc.verified === true,
         configPath: generatedConfigPath,
@@ -252,8 +255,8 @@ export async function orchestrateRelease({
         deploys,
         dmarc,
         verification: {
-          routeCohesionVerified: passedPostDeployChecks.has('verify-route-cohesion'),
-          renderedVisualVerified: passedPostDeployChecks.has('verify-rendered-visuals')
+          routeCohesionVerified,
+          renderedVisualVerified
         },
         evidence
       };
