@@ -59,11 +59,10 @@ ensure_oauth() {
     exit 3
   fi
 
-  # The canonical release path has direct Cloudflare REST calls in addition to
-  # Wrangler, including Browser Rendering. Feed every direct call the same fresh
-  # current-member OAuth credential without printing or persisting it.
-  export CLOUDFLARE_API_TOKEN="$oauth_token"
-  export CF_API_TOKEN="$oauth_token"
+  # Export CLOUDFLARE_BROWSER_API_TOKEN for Browser Rendering REST calls if needed,
+  # but keep CLOUDFLARE_API_TOKEN unset so Wrangler uses its native stored OAuth credentials for D1.
+  unset CLOUDFLARE_API_TOKEN || true
+  unset CF_API_TOKEN || true
   export CLOUDFLARE_BROWSER_API_TOKEN="$oauth_token"
   echo "WRANGLER_OAUTH: PASS"
 }
