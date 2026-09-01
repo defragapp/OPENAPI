@@ -58,6 +58,8 @@
   --sov-shadow-soft: rgba(0,0,0,.24);
   --sov-shadow: rgba(0,0,0,.42);
   --sov-shadow-strong: rgba(0,0,0,.55);
+  --sov-inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --sov-ambient-glow: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(221, 162, 115, 0.07), transparent 70%);
   --page: var(--sov-page);
   --page-soft: var(--sov-page-soft);
   --panel: var(--sov-panel);

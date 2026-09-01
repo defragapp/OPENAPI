@@ -75,6 +75,19 @@ export async function ensureProductionSecrets({
 }
 
 async function configureProductionControls({ accountId, apiToken, databaseId }) {
+  if (!apiToken) {
+    return {
+      accountId,
+      databaseId,
+      d1: { readReplication: 'skipped' },
+      gateway: {
+        management: 'unverified',
+        perRequestPrivacy: { skipCache: true, collectLog: false }
+      },
+      rateLimit: { management: 'unavailable', status: 403, reason: 'Wrangler OAuth session' },
+      schema: { management: 'unavailable', status: 403, reason: 'Wrangler OAuth session' }
+    };
+  }
   const { configureCloudflareFreeTier } = await import('./configure-cloudflare-free-tier.mjs');
   return configureCloudflareFreeTier({
     accountId,

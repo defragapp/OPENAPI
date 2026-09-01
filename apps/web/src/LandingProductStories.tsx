@@ -149,7 +149,7 @@ export function LandingProductStories() {
 
 function StoryCard({ story }: { story: StoryContent }) {
   const suffix = story.id === 'personal' ? 'personal' : story.id === 'relationship' ? 'relationship' : 'system';
-  const className = `demo-card landing-story landing-story--${suffix}`;
+  const className = `demo-card landing-story landing-story--${suffix}${story.id === 'system' ? ' roles-responsibility-map' : ''}`;
   return (
     <section
       className={className}
