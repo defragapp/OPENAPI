@@ -126,7 +126,7 @@ if [[ "$APP_EVIDENCE_SHA" != "$TARGET_SHA" || "$PUBLIC_EVIDENCE_SHA" != "$TARGET
   echo "SHA_PARITY: FAIL"
   exit 22
 fi
-if [[ "$MIGRATION" != "0015_release_evidence" || "$LATEST_MIGRATION" != "0015_release_evidence" ]]; then
+if [[ "$MIGRATION" != "0018_workers_ai_capacity_reservations" || "$LATEST_MIGRATION" != "0018_workers_ai_capacity_reservations" ]]; then
   echo "SHA_PARITY: FAIL"
   exit 23
 fi

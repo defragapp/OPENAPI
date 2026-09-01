@@ -275,14 +275,38 @@ const requiredTextV2 = `  for (const requiredText of [
 const requiredTextV3 = `  for (const requiredText of [
     'Healing isn’t optional.',
     'Holding onto the pain is.',
-    'Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics.',
-    'Separate helping from carrying the outcome.',
-    'Understand what happens between you.',
-    'See where responsibility keeps landing.',
+    'Sovereign.OS builds your private Baseline',
+    'Start with yourself. Expand outward when it matters.',
+    'Most tools start with the prompt. Sovereign starts from who you are.',
+    'Know yourself. Understand your people. See the whole system.',
     'A blank conversation starts with the prompt.',
     'Sovereign starts with your Baseline.',
     'Your thoughts deserve a better place to live.'
   ]) {`;
+
+const RETIRED_PUBLIC_LANGUAGE = [
+  'Understand both sides and what happens between you.',
+  'Example Basis',
+  'server-approved Basis',
+  'permitted context',
+  'consented people',
+  'permitted perspectives',
+  'confirmed responsibilities',
+  'One private reference beneath every question.',
+  'One private foundation. More useful answers across the questions that shape your life.',
+  'Separate helping from carrying the outcome.',
+  'See where responsibility keeps landing.',
+  'Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics.',
+  'Built for real situations',
+  'See the capacity beneath the pattern.',
+  'See what keeps the pattern going—and what could change it.'
+];
+
+for (const retired of RETIRED_PUBLIC_LANGUAGE) {
+  if (requiredTextV3.includes(retired)) {
+    throw new Error(`Contradiction detected: requiredTextV3 cannot require retired public language: "${retired}"`);
+  }
+}
 const comparisonAssertionV2 = '  assertComparison(profile, comparison);';
 const comparisonAssertionV3 = `  const referenceAuthority = profile.name.startsWith('desktop-') ? 'founder-reference' : 'structural-only';
   if (!comparison || comparison.skipped) {
