@@ -196,13 +196,18 @@ async function loadSharp() {
     return (await import('sharp')).default;
   } catch {
     try {
-      const pnpmDirectory = resolve(root, 'node_modules/.pnpm');
-      const entry = readdirSync(pnpmDirectory).find((name) => name.startsWith('sharp@'));
-      if (!entry) return null;
-      const modulePath = resolve(pnpmDirectory, entry, 'node_modules/sharp/lib/index.js');
-      return (await import(pathToFileURL(modulePath).href)).default;
+      const webSharpPath = resolve(root, 'apps/web/node_modules/sharp/lib/index.js');
+      return (await import(pathToFileURL(webSharpPath).href)).default;
     } catch {
-      return null;
+      try {
+        const pnpmDirectory = resolve(root, 'node_modules/.pnpm');
+        const entry = readdirSync(pnpmDirectory).find((name) => name.startsWith('sharp@'));
+        if (!entry) return null;
+        const modulePath = resolve(pnpmDirectory, entry, 'node_modules/sharp/lib/index.js');
+        return (await import(pathToFileURL(modulePath).href)).default;
+      } catch {
+        return null;
+      }
     }
   }
 }

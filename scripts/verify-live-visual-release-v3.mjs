@@ -269,9 +269,13 @@ const scriptTagV2 = 'addScriptTag: [{ content: renderedAuditScript() }]';
 const scriptTagV3 = "waitForSelector: { selector: '.public-approved-v8', timeout: 45_000, visible: true }";
 const domParserCallV2 = 'const dom = parseRenderedAudit(captured.content);';
 const domParserCallV3 = `const dom = await scrapeRenderedAudit(profile, captured.url, captured.content);
-  if (sharp) {
-    const screenshotMetadata = await sharp(captured.screenshot).metadata();
-    dom.document.height = Math.max(dom.document.height, Number(screenshotMetadata.height || 0));
+  if (sharp && captured.screenshot && captured.screenshot.length > 0) {
+    try {
+      const screenshotMetadata = await sharp(captured.screenshot).metadata();
+      dom.document.height = Math.max(dom.document.height, Number(screenshotMetadata.height || 0));
+    } catch {
+      // safe fallback if screenshot buffer is unreadable
+    }
   }`;
 const requiredTextV2 = `  for (const requiredText of [
     'Healing isn’t optional.',

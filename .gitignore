@@ -16,11 +16,14 @@ coverage/
 
 .idea/
 
+# Generated & transient release files
 preview-deployment.json
 production-candidate.json
 apps/sovereign-worker/.wrangler.preview.generated.jsonc
 apps/sovereign-worker/.wrangler.production.generated.jsonc
-scripts/.cloudflare-production-deploy-v3.generated.mjs
+scripts/.*.generated.mjs
+.visual-release-audit/
 
 # Stakpak session files
 .stakpak/session*
+
