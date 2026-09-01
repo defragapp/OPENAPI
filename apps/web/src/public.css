@@ -2823,10 +2823,10 @@ body:has(.account-shell),body:has(.plan-onboarding),body:has(.invitation-page),b
 .sovereign-app-runtime :where(input,textarea,.sovereign-composer) { border-color:var(--surface-line-strong)!important;border-radius:14px!important;background:rgba(255,255,255,.024)!important;color:var(--surface-ink)!important;box-shadow:none!important; }
 .sovereign-app-runtime .sovereign-composer { box-shadow:0 20px 60px rgba(0,0,0,.35)!important; }
 
-/* Verified plan strip */
-.verified-plan-strip { position:fixed;z-index:70;top:14px;right:18px;display:flex;align-items:center;gap:10px;min-height:36px;padding:0 13px;border:1px solid var(--surface-line);border-radius:999px;background:rgba(15,15,15,.88);backdrop-filter:blur(18px);color:var(--surface-muted);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase; }
-.verified-plan-strip strong { color:var(--surface-cream);font-weight:700; }
-.verified-plan-strip i { width:7px;height:7px;border-radius:50%;background:var(--surface-sage);box-shadow:0 0 0 5px rgba(127,154,143,.11); }
+/* Verified plan status — quiet inline editorial status, not a floating SaaS badge */
+.verified-plan-strip { position:fixed;z-index:70;top:18px;right:112px;display:flex;align-items:center;gap:8px;min-height:28px;padding:0 4px;border:none;background:transparent;backdrop-filter:none;box-shadow:none;color:var(--surface-muted,#8f8f94);font-size:.72rem;letter-spacing:.04em;text-transform:none; }
+.verified-plan-strip strong { color:var(--surface-cream,#f3ede3);font-weight:500;font-size:.72rem; }
+.verified-plan-strip i { width:6px;height:6px;border-radius:50%;background:var(--surface-sage,#7f9a8f);box-shadow:0 0 0 3px rgba(127,154,143,.15); }
 
 /* Account controls */
 .account-control-backdrop { background:rgba(0,0,0,.72)!important;backdrop-filter:blur(12px); }
@@ -8625,17 +8625,23 @@ body:has(.account-shell),body:has(.plan-onboarding),body:has(.invitation-page),b
     letter-spacing: 0;
     text-shadow: none;
     min-height: 44px;
-    min-width: 120px;
+    min-width: 44px;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    text-decoration: none;
+  }
+
+  .public-approved-v8 .v0-wordmark--mobile > .brand-mark,
+  .public-approved-v8 .v0-wordmark--mobile > span {
+    display: none !important;
   }
 
   .public-approved-v8 .v0-wordmark--mobile::after {
     color: var(--v8-cream);
     content: 'SOVEREIGN.OS';
     font-family: var(--font-sans, sans-serif);
-    font-size: clamp(0.66rem, 2.9vw, 0.76rem);
+    font-size: clamp(0.72rem, 3.2vw, 0.84rem);
     font-weight: 650;
     line-height: 1;
     letter-spacing: 0.22em;
