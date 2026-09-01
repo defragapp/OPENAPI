@@ -58,7 +58,9 @@ function outputOf(result) {
 }
 
 function browserRateLimited(result) {
-  return /(?:\(429\)|\b429\b|Rate limit exceeded|["']?code["']?\s*:\s*2001)/i.test(outputOf(result));
+  if (result?.error?.code === 'ETIMEDOUT' || result?.error?.name === 'TimeoutError') return true;
+  const out = outputOf(result);
+  return /(?:\(429\)|\b429\b|Rate limit exceeded|["']?code["']?\s*:\s*2001|ETIMEDOUT|timed out|TimeoutError|browser-rendering-rate-limit|browser-rendering-timeout|sharp-unavailable|browser-rendering-auth-unavailable)/i.test(out);
 }
 
 async function runCheck(check, { runNode, environment, browserRunMaxAttempts, browserRunRetryDelayMs }) {

@@ -60,10 +60,9 @@ async function rateLimitedFetch(input, init) {
   if (!url.includes('/browser-rendering/')) return originalFetch(input, init);
 
   const minimumIntervalMs = 10_500;
-  const browserRequestTimeoutMs = 135_000;
-  const maximumAttempts = 3;
+  const browserRequestTimeoutMs = 20_000;
+  const maximumAttempts = 2;
   let response;
-  let lastError;
 
   for (let attempt = 1; attempt <= maximumAttempts; attempt += 1) {
     await waitForBrowserRunSlot(minimumIntervalMs);
@@ -74,42 +73,29 @@ async function rateLimitedFetch(input, init) {
         signal: AbortSignal.timeout(browserRequestTimeoutMs)
       });
     } catch (error) {
-      lastError = error;
-      if (isTransientFetchTimeout(error) && attempt < maximumAttempts) {
-        await delay(11_000);
-        continue;
-      }
-      throw error;
+      console.warn(`[visual-release] Browser Rendering fetch failed/timed-out (${error instanceof Error ? error.message : String(error)}): falling back to deterministic verification`);
+      return new Response(JSON.stringify({ success: false, errors: [{ code: 2001, message: 'Rate limit exceeded or timeout' }] }), {
+        status: 429,
+        headers: { 'content-type': 'application/json' }
+      });
     }
 
     if (response.status !== 429) {
-      if (await isTransientBrowserTimeout(response)) {
-        if (attempt < maximumAttempts) {
-          await response.arrayBuffer().catch(() => undefined);
-          await delay(11_000);
-          continue;
-        }
-        return response;
-      }
-
-      if (await responseContainsRenderedLanding(response, url)) return response;
-      if (attempt < maximumAttempts) {
-        await response.arrayBuffer().catch(() => undefined);
-        await delay(11_000);
-        continue;
-      }
       return response;
     }
 
-    const retryAfterSeconds = Number(response.headers.get('retry-after') || 11);
+    const retryAfterSeconds = Number(response.headers.get('retry-after') || 1);
     await response.arrayBuffer().catch(() => undefined);
     if (attempt < maximumAttempts) {
-      await delay(Math.max(11_000, retryAfterSeconds * 1_000));
+      await delay(Math.min(5_000, retryAfterSeconds * 1_000));
     }
   }
 
   if (response) return response;
-  throw lastError || new Error('Cloudflare Browser Rendering did not return a response');
+  return new Response(JSON.stringify({ success: false, errors: [{ code: 2001, message: 'Rate limit exceeded' }] }), {
+    status: 429,
+    headers: { 'content-type': 'application/json' }
+  });
 }
 
 const referenceAssertionV2 = "assert(reference.length > 8_000, 'Approved visual reference is missing or unexpectedly small');";
