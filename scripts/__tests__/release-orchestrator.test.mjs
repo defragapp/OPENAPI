@@ -95,6 +95,7 @@ function harness({
       runNode,
       d1Execute,
       fetchImpl,
+      releaseSecret: 'test-release-secret',
       preDeployChecks: [{ label: 'pre', path: 'pre-check.mjs' }],
       postDeployChecks: [{ label: 'post', path: 'post-check.mjs' }],
       prepareConfig: async () => ({

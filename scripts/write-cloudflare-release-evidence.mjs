@@ -27,6 +27,9 @@ async function postEvidenceToWorker({
   releaseSecret,
   fetchImpl = fetch
 }) {
+  if (!releaseSecret) {
+    return { ok: false, error: 'RELEASE_EVIDENCE_SECRET is unconfigured in the deployment environment', skipped: true };
+  }
   const headers = {
     'content-type': 'application/json',
     'x-release-secret': releaseSecret,
@@ -175,7 +178,11 @@ export async function writeReleaseEvidence({
     return { releaseEvidence: evidence, finalEvidenceDeploy: false, converged: true, writeMethod };
   }
 
-  console.warn(`[release-evidence] worker endpoint rejected (requires matching RELEASE_EVIDENCE_SECRET on the production Worker): ${workerResult.error}; falling back to direct D1`);
+  if (workerResult.skipped) {
+    console.log(`[release-evidence] writing evidence directly via D1 (${workerResult.error})`);
+  } else {
+    console.warn(`[release-evidence] worker endpoint rejected (requires matching RELEASE_EVIDENCE_SECRET on the production Worker): ${workerResult.error}; falling back to direct D1`);
+  }
   const writeResult = d1Execute({
     configPath,
     runWrangler,

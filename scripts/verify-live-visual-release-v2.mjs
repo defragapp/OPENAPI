@@ -161,12 +161,17 @@ async function snapshot(profile) {
   try { payload = JSON.parse(text); } catch { payload = undefined; }
   if (!response.ok || payload?.success === false) {
     const status = Number(response.status || 0);
+    const detail = JSON.stringify(payload?.errors || payload || text);
     const authFailure = status === 401 || status === 403;
+    const rateLimited = status === 429 || /(?:\(429\)|\b429\b|Rate limit exceeded|["']?code["']?\s*:\s*2001)/i.test(detail);
     if (authFailure) {
       console.warn(`[visual-release] label=${profile.name} status=skipped reason=browser-rendering-auth-unavailable http=${status}`);
       return { url, screenshot: Buffer.alloc(0), content: '', skipped: true };
     }
-    const detail = JSON.stringify(payload?.errors || payload || text);
+    if (rateLimited) {
+      console.warn(`[visual-release] label=${profile.name} status=skipped reason=browser-rendering-rate-limit http=${status}`);
+      return { url, screenshot: Buffer.alloc(0), content: '', skipped: true, rateLimited: true };
+    }
     throw new Error(
       `Cloudflare Browser Run snapshot failed (${response.status}). `
       + `The release token must include Browser Rendering Write. ${redact(detail).slice(0, 900)}`

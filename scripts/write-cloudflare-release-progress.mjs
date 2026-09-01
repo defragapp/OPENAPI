@@ -14,6 +14,9 @@ import { DEFAULT_PRODUCTION_CONFIG_PATH } from './prepare-cloudflare-production-
 const INTERNAL_EVIDENCE_URL = 'https://app.defrag.app/internal/release-evidence';
 
 async function postProgressToWorker({ sha, stage, summaryB64, releaseSecret, fetchImpl = fetch }) {
+  if (!releaseSecret) {
+    return { ok: false, error: 'RELEASE_EVIDENCE_SECRET is unconfigured in the deployment environment', skipped: true };
+  }
   const headers = {
     'content-type': 'application/json',
     'x-release-secret': releaseSecret,
@@ -69,7 +72,11 @@ export async function writeReleaseProgress({
     return { releaseProgress: progress, failureProgressDeploy: false, writeMethod: 'worker-endpoint' };
   }
 
-  console.warn(`[release-progress] worker endpoint rejected (requires matching RELEASE_EVIDENCE_SECRET on the production Worker): ${workerResult.error}; falling back to direct D1`);
+  if (workerResult.skipped) {
+    console.log(`[release-progress] writing failure progress directly via D1 (${workerResult.error})`);
+  } else {
+    console.warn(`[release-progress] worker endpoint rejected (requires matching RELEASE_EVIDENCE_SECRET on the production Worker): ${workerResult.error}; falling back to direct D1`);
+  }
   const result = d1Execute({
     configPath,
     runWrangler,

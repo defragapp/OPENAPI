@@ -99,7 +99,8 @@ export async function orchestrateRelease({
   browserRunMaxAttempts = 2,
   browserRunRetryDelayMs = 65_000,
   evidenceAttempts = 30,
-  evidenceDelayMs = 5_000
+  evidenceDelayMs = 5_000,
+  releaseSecret = String(process.env.RELEASE_EVIDENCE_SECRET || '').trim()
 } = {}) {
   const normalizedSha = assertReleaseSha(sha);
   const requestedBrowserAttempts = Math.trunc(Number(process.env.BROWSER_RUN_REQUEST_MAX_ATTEMPTS || 4) || 4);
@@ -133,7 +134,8 @@ export async function orchestrateRelease({
         summary,
         configPath: generatedConfigPath,
         runWrangler: countedWrangler,
-        d1Execute
+        d1Execute,
+        releaseSecret
       });
       return { persisted: true, value };
     } catch (error) {
@@ -240,7 +242,8 @@ export async function orchestrateRelease({
         d1Execute,
         fetchImpl,
         attempts: evidenceAttempts,
-        delayMs: evidenceDelayMs
+        delayMs: evidenceDelayMs,
+        releaseSecret
       });
       return {
         status: 'success',
