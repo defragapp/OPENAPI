@@ -16,7 +16,7 @@ const PRICING_CONTENT = {
       priceNote: 'Permanent. No card required.',
       features: [
         'Complete Baseline Design',
-        'Explore yourself — decisions, communication, creativity, connection, pressure, Shadow, Gift, Alignment',
+        'Explore yourself — decisions, communication, creativity, connection, pressure, shadow and light, Alignment',
         'Today and what may be more relevant now',
         '10 Sovereign AI turns each month',
         'Review, correct, or reject any interpretation',

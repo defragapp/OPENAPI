@@ -1862,7 +1862,7 @@ function modeLabel(mode: SovereignAnswer['mode']) {
   return ({
     baseline: 'MY BASELINE',
     now: 'ACTIVE NOW',
-    shadow_gift: 'SHADOW & GIFT',
+    shadow_gift: 'SHADOW AND LIGHT',
     alignment: 'ALIGNMENT',
     relationship: 'RELATIONSHIP',
     system: 'SYSTEM',

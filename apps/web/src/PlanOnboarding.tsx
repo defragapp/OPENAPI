@@ -802,7 +802,7 @@ function PlanChoiceView({ interval, currentPlan, status, submitting, checkoutUna
         <article className={currentPlan === 'free' ? 'current' : ''}>
           <header><span>FREE</span><strong>$0</strong></header>
           <h2>Your personal Baseline.</h2>
-          <p>Use your private Baseline across Today, Explore, decisions, recurring patterns, Shadow and Gift, and Alignment.</p>
+          <p>Use your private Baseline across Today, Explore, decisions, recurring patterns, shadow and light, and Alignment.</p>
           <ul>
             <li>Complete private Baseline Design</li>
             <li>Today and Explore</li>
