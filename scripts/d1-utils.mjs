@@ -11,7 +11,8 @@ export function runWranglerCli(args, options = {}) {
     encoding: 'utf8',
     input: options.input,
     stdio: ['pipe', 'pipe', 'pipe'],
-    maxBuffer: 64 * 1024 * 1024
+    maxBuffer: 64 * 1024 * 1024,
+    timeout: options.timeoutMs || 120_000
   });
   return {
     status: result.status ?? (result.error ? 1 : 0),

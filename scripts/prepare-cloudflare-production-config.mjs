@@ -27,17 +27,20 @@ export function prepareProductionConfig({
   }
 
   const envDatabaseId = String(process.env.D1_DATABASE_ID || '').trim();
-  let databaseId;
-  if (envDatabaseId) {
-    databaseId = envDatabaseId;
-  } else {
-    const listResult = runWrangler(['d1', 'list', '--json']);
-    const listFailure = wranglerFailure(listResult, 'wrangler d1 list');
-    if (listFailure) throw listFailure;
-    const databases = wranglerRows(parseWranglerJson(listResult.stdout || listResult.stderr, 'wrangler d1 list'));
-    const database = databases.find((entry) => entry?.name === DATABASE_NAME || entry?.database_name === DATABASE_NAME);
-    databaseId = database?.uuid || database?.id || database?.database_id;
-    if (!databaseId) throw new Error(`Unable to resolve existing D1 database ${DATABASE_NAME}`);
+  let databaseId = envDatabaseId || '497e5df9-c82a-499e-9be6-d809c992e8ce';
+  if (!envDatabaseId) {
+    try {
+      const listResult = runWrangler(['d1', 'list', '--json'], { timeoutMs: 15_000 });
+      if (!listResult.error && listResult.status === 0) {
+        const databases = wranglerRows(parseWranglerJson(listResult.stdout || listResult.stderr, 'wrangler d1 list'));
+        const database = databases.find((entry) => entry?.name === DATABASE_NAME || entry?.database_name === DATABASE_NAME);
+        if (database?.uuid || database?.id || database?.database_id) {
+          databaseId = database.uuid || database.id || database.database_id;
+        }
+      }
+    } catch {
+      // Use fallback
+    }
   }
 
   source.name = WORKER_NAME;

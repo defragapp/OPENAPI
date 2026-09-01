@@ -24,13 +24,14 @@ export const DEFAULT_POST_DEPLOY_CHECKS = [
   { label: 'verify-rendered-visuals', path: 'scripts/verify-live-visual-release-v3.mjs', browserRun: true }
 ];
 
-export function runNodeScript(path, { args = [], env = process.env } = {}) {
+export function runNodeScript(path, { args = [], env = process.env, timeoutMs = 120_000 } = {}) {
   const result = spawnSync(process.execPath, [path, ...args], {
     cwd: root,
     env,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
-    maxBuffer: 64 * 1024 * 1024
+    maxBuffer: 64 * 1024 * 1024,
+    timeout: timeoutMs
   });
   return {
     status: result.status ?? (result.error ? 1 : 0),
@@ -142,6 +143,7 @@ export async function orchestrateRelease({
 
   try {
     for (const check of preDeployChecks) {
+      console.log(`[release-orchestrator] running pre-deploy check: ${check.label}`);
       const result = await runCheck(check, {
         runNode,
         environment,
@@ -153,6 +155,7 @@ export async function orchestrateRelease({
       }
     }
 
+    console.log('[release-orchestrator] reconciling DMARC configuration...');
     dmarc = await reconcileDmarc({ runNode, environment });
     if (dmarc?.verified !== true) {
       return {
@@ -163,6 +166,7 @@ export async function orchestrateRelease({
       };
     }
 
+    console.log('[release-orchestrator] preparing production config...');
     let prepared;
     try {
       prepared = await prepareConfig({
@@ -177,6 +181,7 @@ export async function orchestrateRelease({
 
     const skipMigrations = String(process.env.SKIP_D1_MIGRATIONS || '').trim() === 'true';
     if (!skipMigrations) {
+      console.log('[release-orchestrator] applying D1 migrations...');
       const migrationResult = applyMigrations({
         databaseName: prepared.databaseName,
         configPath: generatedConfigPath,
@@ -189,6 +194,7 @@ export async function orchestrateRelease({
     }
     migrationsApplied = true;
 
+    console.log('[release-orchestrator] deploying Worker sovv-web to Cloudflare...');
     const deployResult = await deployMain({
       ...deployOptions,
       runWrangler: countedWrangler,
@@ -202,7 +208,9 @@ export async function orchestrateRelease({
       return { status: 'deploy-failed', deploys, output: deployResult?.output || '', progress };
     }
 
+    console.log('[release-orchestrator] running post-deploy checks...');
     for (const check of postDeployChecks) {
+      console.log(`[release-orchestrator] post-deploy check: ${check.label}`);
       const result = await runCheck(check, {
         runNode,
         environment,
