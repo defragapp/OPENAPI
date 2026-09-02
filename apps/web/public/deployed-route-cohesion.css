@@ -3,6 +3,23 @@
  * The frozen home page does not load this file.
  */
 
+:root, html, body.launch-page {
+  --sov-bg-0: #0b0d10;
+  --sov-bg-1: #12161c;
+  --sov-bg-2: #1a2029;
+  --sov-bg-surface: rgba(18, 22, 28, 0.95);
+  --sov-bg-elevated: rgba(245, 241, 237, 0.04);
+  --sov-bg-card: rgba(245, 241, 237, 0.03);
+  --sov-earth-0: #2a2520;
+  --sov-earth-1: #6b5d52;
+  --sov-earth-2: #8b7f78;
+  --sov-cream: #f5f1ed;
+  --sov-accent: #c9b59a;
+  --sov-accent-clay: #dda273;
+  --sov-accent-sage: #9fbaa1;
+  --sov-accent-slate: #8ba8c4;
+}
+
 body.launch-page {
   --route-shell: min(1120px, calc(100vw - 72px));
   --route-reading: 720px;
