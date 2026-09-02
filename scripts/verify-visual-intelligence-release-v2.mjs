@@ -109,7 +109,7 @@ for (const marker of [
   'You → your people → the whole system',
   'Start with yourself. Expand outward when it matters.',
   'How do I make decisions that actually fit me?',
-  'Most tools start with the prompt. Sovereign starts with you.',
+  'Most AI starts with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
 ]) {
   assert(landing.includes(marker), `Visual intelligence release v2 is missing current landing marker: ${marker}`);

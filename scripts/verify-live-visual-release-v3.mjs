@@ -281,7 +281,7 @@ const requiredTextV3 = `  for (const requiredText of [
     'Holding onto the pain is.',
     'Sovereign.OS is a private personal AI for understanding yourself',
     'Start with yourself. Expand outward when it matters.',
-    'Most tools start with the prompt. Sovereign starts from who you are.',
+    'Most AI starts with the prompt. Sovereign starts with you.',
     'Know yourself. Understand your people. See the whole system.',
     'A blank conversation starts with the prompt.',
     'Sovereign starts with your Baseline.',

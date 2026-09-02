@@ -142,7 +142,7 @@ for (const marker of [
   'You → your people → the whole system',
   'Start with yourself. Expand outward when it matters.',
   'How do I make decisions that actually fit me?',
-  'Most tools start with the prompt. Sovereign starts with you.',
+  'Most AI starts with the prompt. Sovereign starts with you.',
   'Know yourself. Understand your people. See the whole system.'
 ]) {
   if (!landing.includes(marker)) throw new Error(`Intelligence release v2 is missing current landing marker ${marker}`);
@@ -194,7 +194,7 @@ const languageReplacements = [
   ["  'What could change',", "  'Give you something you can try',"],
   ["  'System structure',", "  'How Sovereign reads a system',"],
   ["  'Illustrative permitted Baselines',", "  'Start with what you told Sovereign',"],
-  ["  'A blank conversation starts with the prompt. Sovereign starts with your Baseline.',", "  'Most tools start with the prompt. Sovereign starts with you.',"],
+  ["  'A blank conversation starts with the prompt. Sovereign starts with your Baseline.',", "  'Most AI starts with the prompt. Sovereign starts with you.',"],
   ["  'Your thoughts deserve',", "  'Know yourself. Understand your people. See the whole system.',"],
   ["  'a better place to live.'", "  'Build your private Baseline intelligence, then explore what you want to understand next.'"],
 ];

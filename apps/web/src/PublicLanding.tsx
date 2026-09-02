@@ -105,7 +105,7 @@ function V0Hero() {
           Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
-          Your private Baseline intelligence for understanding yourself, your relationships, and the systems around you.
+          Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
         <p className="sovereign-opening-trust">
           <span className="v0-desktop-only">Start free · No card required · Review, correct, or reject any interpretation</span>
@@ -190,9 +190,9 @@ function ComparisonStory() {
       <div className="v0-shell">
         <header className="v0-story-heading v0-story-heading-left">
           <p>The Baseline difference</p>
-          <h2 aria-label="Most tools start with the prompt. Sovereign starts with you." data-verification-text="Most tools start with the prompt. Sovereign starts with you.">
-            Most tools start<br />with the prompt.<br />
-            <span>Sovereign starts<br />from who you are.</span>
+          <h2 aria-label="Most AI starts with the prompt. Sovereign starts with you." data-verification-text="Most AI starts with the prompt. Sovereign starts with you.">
+            Most AI starts<br />with the prompt.<br />
+            <span>Sovereign starts<br />with you.</span>
           </h2>
         </header>
         <div className="v0-comparison-grid" data-viewport-surface="comparison">
