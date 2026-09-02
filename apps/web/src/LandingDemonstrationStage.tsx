@@ -100,15 +100,6 @@ export function LandingDemonstrationStage() {
 
       <div className="landing-demo-stage__viewport" role="tabpanel">
         <div className="landing-demo-stage__window">
-          <div className="landing-demo-stage__header">
-            <div className="landing-demo-stage__status">
-              <span>●</span> ILLUSTRATIVE EXAMPLE · {active.scope.toUpperCase()}
-            </div>
-            <div className="landing-demo-stage__badge" style={{ borderColor: active.accent, color: active.accent }}>
-              {active.scope}
-            </div>
-          </div>
-
           <div className="landing-demo-stage__body">
             <div className="landing-demo-stage__prompt-row">
               <div className="landing-demo-stage__avatar">You</div>
@@ -120,9 +111,6 @@ export function LandingDemonstrationStage() {
             <div className="landing-demo-stage__response-row">
               <div className="landing-demo-stage__avatar is-sov">S</div>
               <div className="landing-demo-stage__answer-card">
-                <div className="landing-demo-stage__answer-kicker">
-                  SOVEREIGN BASELINE REFERENCE · PERSISTENT
-                </div>
                 <p className="landing-demo-stage__direct-answer">
                   {active.answer}
                 </p>
@@ -130,7 +118,7 @@ export function LandingDemonstrationStage() {
                 <div className="landing-demo-stage__distinction">
                   <span className="landing-demo-stage__distinction-icon">✦</span>
                   <div className="landing-demo-stage__distinction-content">
-                    <strong>The Distinction:</strong> {active.distinction}
+                    {active.distinction}
                   </div>
                 </div>
 

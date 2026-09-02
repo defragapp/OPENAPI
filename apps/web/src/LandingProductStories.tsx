@@ -11,9 +11,9 @@ type EvidenceGroup = { name?: string; points: readonly EvidencePoint[] };
 const SELF_BASELINE: readonly EvidenceGroup[] = [
   {
     points: [
-      { code: 'tenderness', label: 'Example Baseline quality: Tenderness' },
-      { code: 'responsibility', label: 'Example Baseline quality: Responsibility' },
-      { code: 'boundaries', label: 'Example Baseline quality: Boundaries' }
+      { code: 'tenderness', label: 'Tenderness' },
+      { code: 'responsibility', label: 'Responsibility' },
+      { code: 'boundaries', label: 'Boundaries' }
     ]
   }
 ] as const;
@@ -22,20 +22,20 @@ const DUO_BASELINE: readonly EvidenceGroup[] = [
   {
     name: 'You',
     points: [
-      { code: 'clarity', label: 'Example Baseline quality for you: Clarity' },
-      { code: 'focus', label: 'Example Baseline quality for you: Focus' }
+      { code: 'clarity', label: 'Clarity' },
+      { code: 'focus', label: 'Focus' }
     ]
   },
   {
     name: 'Partner',
     points: [
-      { code: 'steadiness', label: 'Example Baseline quality for your partner: Steadiness' },
-      { code: 'patience', label: 'Example Baseline quality for your partner: Patience' }
+      { code: 'steadiness', label: 'Steadiness' },
+      { code: 'patience', label: 'Patience' }
     ]
   },
   {
     name: 'Between you',
-    points: [{ code: 'clarity □ steadiness', label: 'Example interaction dynamic: Clarity & Steadiness' }]
+    points: [{ code: 'clarity □ steadiness', label: 'Clarity & Steadiness' }]
   }
 ] as const;
 
@@ -156,15 +156,10 @@ function StoryCard({ story }: { story: StoryContent }) {
       data-story-id={story.id}
       data-verification-text={story.label}
     >
-      <header className="demo-card__header">
-        <span className="demo-card__label">{story.label}</span>
-      </header>
       <div className="demo-card__question">
-        <span className="demo-card__q-label">Q</span>
         <p>{story.question}</p>
       </div>
       <div className="demo-card__answer">
-        <span className="demo-card__a-label">A</span>
         <p>{story.direct}</p>
       </div>
       <div className="demo-card__distinction">

@@ -69,7 +69,7 @@ for (const marker of [
   'Understand what happens between two people.',
   'See the wider system.',
   'Get the answer first.',
-  'Inquire about what you actually want to understand.',
+  'Ask about what you actually want to understand.',
   'A private reference built around you.',
   'Source details',
   'class="product-proof-window"',

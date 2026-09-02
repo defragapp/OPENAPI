@@ -7072,9 +7072,9 @@ body {
   --cohesion-faint: rgba(229, 220, 209, 0.46);
   --cohesion-line: rgba(241, 233, 222, 0.11);
   --cohesion-line-strong: rgba(241, 233, 222, 0.2);
-  --cohesion-blue: #2f93ff;
-  --cohesion-blue-bright: #78c7ff;
-  --cohesion-blue-soft: rgba(47, 147, 255, 0.12);
+  --cohesion-blue: #c89370;
+  --cohesion-blue-bright: #e8ddd0;
+  --cohesion-blue-soft: rgba(200, 147, 112, 0.1);
   --cohesion-shell: min(1240px, calc(100vw - 80px));
   --cohesion-reading: 760px;
 }

@@ -997,23 +997,15 @@ function ExploreHome({ workspace, onOpenCovenant }: { workspace: WorkspaceState;
       <BasisStrip values={registry} />
       {canAccessCovenant && (
         <section className="explore-covenant-entry">
-          <div className="explore-covenant-card">
-            <div className="explore-covenant-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.95 2.25z"/>
-              </svg>
-            </div>
-            <div className="explore-covenant-content">
-              <strong>Explore through Christian Scripture</strong>
-              <span>When a question touches on meaning, purpose, or values, Sovereign can offer a grounded Christian perspective with cited Scripture. Your grounded answer remains complete on its own.</span>
-            </div>
+          <div className="explore-covenant-content">
+            <strong>Explore through Christian Scripture</strong>
+            <p>When a question touches on meaning, purpose, or values, Sovereign can offer a grounded Christian perspective with cited Scripture. Your grounded answer remains complete on its own.</p>
             <button className="secondary-action" onClick={() => onOpenCovenant?.()}>
               Open Covenant for this question
             </button>
           </div>
         </section>
       )}
-      <BasisStrip values={registry} />
     </div>
   );
 }
@@ -1874,7 +1866,7 @@ function modeLabel(mode: SovereignAnswer['mode']) {
 function composerPlaceholder(surface: Surface) {
   return surface === 'People' ? 'What keeps happening between you?'
     : surface === 'Systems' ? 'What role do I keep ending up in?'
-      : surface === 'Explore' ? 'What capacity or pattern do I want to understand?'
+      : surface === 'Explore' ? 'Ask about what you actually want to understand.'
         : surface === 'Library' ? 'Continue from something you saved…'
           : surface === 'You' ? 'What does my Baseline support here?'
             : 'What feels different today?';
