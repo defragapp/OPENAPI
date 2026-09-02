@@ -3,7 +3,7 @@
    Natural earth tones, glassmorphism, motion timing, and responsive hierarchy
    ========================================================================== */
 
-:root {
+:root, html, body, .pricing-page, .public-page, .account-shell, .plan-onboarding, .intelligence-workspace {
   /* Surface & Background Levels */
   --sov-bg-0: #0b0d10;
   --sov-bg-1: #12161c;

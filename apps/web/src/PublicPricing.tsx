@@ -143,8 +143,8 @@ export function PublicPricing() {
 
       <main>
         <section className="pricing-hero">
-          <p className="pricing-kicker">{PRICING_CONTENT.hero.kicker}</p>
-          <h1>{PRICING_CONTENT.hero.title}</h1>
+          <p className="pricing-kicker sov-section-kicker">{PRICING_CONTENT.hero.kicker}</p>
+          <h1 className="sov-display-hero">{PRICING_CONTENT.hero.title}</h1>
           <p>{PRICING_CONTENT.hero.subtitle}</p>
         </section>
 
