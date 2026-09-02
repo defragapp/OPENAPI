@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { LandingDemonstrationStage } from './LandingDemonstrationStage';
 
 type EvidencePoint = { code: string; label: string };
 type EvidenceGroup = { name?: string; points: readonly EvidencePoint[] };
@@ -133,6 +134,7 @@ const STORIES: readonly StoryContent[] = [
 export function LandingProductStories() {
   return (
     <div className="landing-stories" data-product-stories="high-value-intelligence-v1">
+      <LandingDemonstrationStage />
       <nav className="landing-stories__labels" aria-label="Product demonstrations">
         {STORIES.map((story) => (
           <span key={story.id} className="landing-story__label">{story.label}</span>

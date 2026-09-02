@@ -1,0 +1,290 @@
+/* ==========================================================================
+   SOVEREIGN.OS — CUSTOM THEME & VISUAL PROCESSING SYSTEM
+   Muted earth tones, calm processing states, and shared demonstration stage
+   ========================================================================== */
+
+:root {
+  --sov-earth-dark: #2a2520;
+  --sov-earth-mid: #6b5d52;
+  --sov-warm-tan: #8b7f78;
+  --sov-warm-light: #c9b59a;
+  --sov-cream: #f5f1ed;
+  --sov-accent-clay: #dda273;
+  --sov-accent-sage: #9fbaa1;
+  --sov-accent-slate: #8ba8c4;
+}
+
+/* ── Answer Processing Indicator ── */
+.sovereign-processing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: rgba(241, 233, 222, 0.03);
+  border: 1px solid rgba(241, 233, 222, 0.08);
+  margin: 12px 0;
+  animation: sovereign-fade-in 0.3s ease-out;
+}
+
+.sovereign-processing-indicator__spinner {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+}
+
+.sovereign-processing-indicator__svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.sovereign-processing-indicator__text {
+  font-family: var(--sovereign-title, "Geist Sans", sans-serif);
+  font-size: 0.88rem;
+  color: rgba(241, 233, 222, 0.78);
+  letter-spacing: 0.01em;
+}
+
+/* ── Shared Demonstration Stage ── */
+.landing-demo-stage {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 32px;
+  width: min(1120px, calc(100vw - 48px));
+  margin: 48px auto 0;
+  align-items: start;
+}
+
+.landing-demo-stage__rail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 16px;
+  background: rgba(241, 233, 222, 0.02);
+  border: 1px solid rgba(241, 233, 222, 0.07);
+}
+
+.landing-demo-stage__rail-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(241, 233, 222, 0.65);
+  font-family: var(--sovereign-title, "Geist Sans", sans-serif);
+  font-size: 0.86rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 44px;
+}
+
+.landing-demo-stage__rail-btn:hover {
+  background: rgba(241, 233, 222, 0.05);
+  color: #f1ece5;
+}
+
+.landing-demo-stage__rail-btn.is-active {
+  background: rgba(241, 233, 222, 0.08);
+  border-color: rgba(241, 233, 222, 0.14);
+  color: #f1ece5;
+  font-weight: 600;
+}
+
+.landing-demo-stage__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 8px;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.landing-demo-stage__viewport {
+  position: relative;
+}
+
+.landing-demo-stage__window {
+  border-radius: 20px;
+  border: 1px solid rgba(241, 233, 222, 0.09);
+  border-top: 1px solid rgba(241, 233, 222, 0.18);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(221, 162, 115, 0.04), transparent 24rem),
+    linear-gradient(180deg, rgba(22, 25, 31, 0.95) 0%, rgba(12, 14, 18, 0.98) 100%);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.landing-demo-stage__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(241, 233, 222, 0.07);
+  background: rgba(8, 10, 13, 0.4);
+}
+
+.landing-demo-stage__controls {
+  display: flex;
+  gap: 6px;
+}
+
+.landing-demo-stage__controls span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(241, 233, 222, 0.2);
+}
+
+.landing-demo-stage__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(241, 233, 222, 0.55);
+}
+
+.landing-demo-stage__status span {
+  color: #dda273;
+  font-size: 0.6rem;
+}
+
+.landing-demo-stage__badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  border: 1px solid currentColor;
+  letter-spacing: 0.05em;
+}
+
+.landing-demo-stage__body {
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.landing-demo-stage__prompt-row,
+.landing-demo-stage__response-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.landing-demo-stage__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: rgba(241, 233, 222, 0.1);
+  color: #f1ece5;
+  flex: 0 0 32px;
+}
+
+.landing-demo-stage__avatar.is-sov {
+  background: #dda273;
+  color: #080a0d;
+}
+
+.landing-demo-stage__prompt-bubble {
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(241, 233, 222, 0.05);
+  border: 1px solid rgba(241, 233, 222, 0.08);
+  max-width: 680px;
+}
+
+.landing-demo-stage__prompt-text {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #f1ece5;
+  font-weight: 500;
+}
+
+.landing-demo-stage__answer-card {
+  flex: 1;
+  padding: 20px 24px;
+  border-radius: 16px;
+  background: rgba(241, 233, 222, 0.03);
+  border: 1px solid rgba(241, 233, 222, 0.08);
+}
+
+.landing-demo-stage__answer-kicker {
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  color: #dda273;
+  margin-bottom: 12px;
+}
+
+.landing-demo-stage__direct-answer {
+  margin: 0 0 16px;
+  font-size: 0.98rem;
+  line-height: 1.62;
+  color: rgba(241, 233, 222, 0.92);
+}
+
+.landing-demo-stage__distinction {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(221, 162, 115, 0.06);
+  border-left: 3px solid #dda273;
+  margin-bottom: 16px;
+}
+
+.landing-demo-stage__distinction-icon {
+  color: #dda273;
+  font-size: 1rem;
+}
+
+.landing-demo-stage__distinction-content {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(241, 233, 222, 0.88);
+}
+
+.landing-demo-stage__tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.landing-demo-stage__tag {
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(241, 233, 222, 0.04);
+  border: 1px solid rgba(241, 233, 222, 0.09);
+  color: rgba(241, 233, 222, 0.65);
+}
+
+@media (max-width: 860px) {
+  .landing-demo-stage {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .landing-demo-stage__rail {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 6px;
+  }
+
+  .landing-demo-stage__rail-btn {
+    white-space: nowrap;
+    padding: 8px 14px;
+  }
+}
