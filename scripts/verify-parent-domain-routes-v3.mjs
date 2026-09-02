@@ -116,7 +116,7 @@ for (const marker of [
   'landing-expression-field-v3',
   'Healing isn’t optional.',
   'Holding onto the pain is.',
-  'Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation.',
+  'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
   'Start with yourself. Expand outward when it matters.',
   'Explore how you think, decide, communicate, create, and respond.',
   'See why the same moment lands differently—and how to bridge the gap.',

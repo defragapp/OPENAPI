@@ -59,7 +59,7 @@ describe('production mobile and responsive experience', () => {
       'v0-wordmark--mobile',
       'v0-mobile-menu',
       'Your private Baseline intelligence for understanding yourself, your relationships, and the systems around you.',
-      'Private by design · Your data never trains a model',
+      'Start free · No card required · Review, correct, or reject any interpretation',
       '<MobileCapabilityRail />',
       'Explore yourself',
       'Understand your people',

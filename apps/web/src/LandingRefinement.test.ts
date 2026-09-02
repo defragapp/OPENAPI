@@ -44,11 +44,11 @@ describe('public positioning reset', () => {
       '<LandingExpressionSlice />',
       '<RealLifeQuestions />',
       '<LandingProductStories />',
-      'Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation.',
+      'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
       'How do I make decisions that actually fit me?',
       'Why does the same conversation feel urgent to me and pressuring to them?',
       'How does pressure move through this team?',
-      'Private by design · Your data never trains a model',
+      'Start free · No card required · Review, correct, or reject any interpretation',
       'Build your Baseline',
       'data-public-narrative="self-people-systems-v1"'
     ]) expect(landing).toContain(marker);

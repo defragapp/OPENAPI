@@ -31,7 +31,7 @@ describe('Sovereign.OS public experience', () => {
     expect(landing).toContain('Personal intelligence for real life');
     expect(landing).toContain('Healing isn\u2019t optional.');
     expect(landing).toContain('Holding onto the pain is.');
-    expect(landing).toContain('Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation.');
+    expect(landing).toContain('Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.');
     expect(landing).toContain('Build your Baseline');
     expect(landing).toContain('<LandingExpressionSlice />');
     expect(field).toContain('Drag to rotate');

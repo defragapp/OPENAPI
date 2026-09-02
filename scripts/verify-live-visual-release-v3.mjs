@@ -279,7 +279,7 @@ const requiredTextV2 = `  for (const requiredText of [
 const requiredTextV3 = `  for (const requiredText of [
     'Healing isn’t optional.',
     'Holding onto the pain is.',
-    'Sovereign.OS builds your private Baseline',
+    'Sovereign.OS is a private personal AI for understanding yourself',
     'Start with yourself. Expand outward when it matters.',
     'Most tools start with the prompt. Sovereign starts from who you are.',
     'Know yourself. Understand your people. See the whole system.',

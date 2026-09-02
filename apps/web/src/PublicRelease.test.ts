@@ -82,7 +82,7 @@ describe('public production positioning release', () => {
 
   it('introduces self exploration before People and Systems with recognizable high-value questions', () => {
     for (const marker of [
-      'Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation.',
+      'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
       'How do I make decisions that actually fit me?',
       'Why does the same conversation feel urgent to me and pressuring to them?',
       'How does pressure move through this team?',

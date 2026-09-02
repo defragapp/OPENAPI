@@ -101,15 +101,14 @@ function V0Hero() {
           </em>
         </h1>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
-          Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation. Understand how you think, decide, communicate, and respond. Then explore relationships and systems from the same stable foundation.
+          Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
           Your private Baseline intelligence for understanding yourself, your relationships, and the systems around you.
         </p>
         <p className="sovereign-opening-trust">
-          <LockIcon />
-          <span className="v0-desktop-only">Private by design · Your data never trains a model · Review, correct, or reject any interpretation</span>
-          <span className="v0-mobile-only">Private by design · Your data never trains a model</span>
+          <span className="v0-desktop-only">Start free · No card required · Review, correct, or reject any interpretation</span>
+          <span className="v0-mobile-only">Start free · No card required · Review, correct, or reject any interpretation</span>
         </p>
       </div>
       <LandingExpressionSlice />

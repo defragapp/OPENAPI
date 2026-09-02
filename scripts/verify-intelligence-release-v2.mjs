@@ -138,7 +138,7 @@ for (const marker of ['--font-title:', '.public-approved-v8 .v0-hero h1 > em', '
 */
 for (const marker of [
   'data-public-narrative="self-people-systems-v1"',
-  'Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation.',
+  'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
   'You → your people → the whole system',
   'Start with yourself. Expand outward when it matters.',
   'How do I make decisions that actually fit me?',
@@ -185,7 +185,7 @@ const languageReplacements = [
   ["  'Start with what’s actually happening.',", "  'You → your people → the whole system',"],
   ["  'Why do we keep having the same fight?',", "  'How do I make decisions that actually fit me?',"],
   ["  'What is mine, what is theirs, and what happens between us?',", "  'Why does the same conversation feel urgent to me and pressuring to them?',"],
-  ["  'Sovereign begins with the capacity beneath a pattern.',", "  'Sovereign.OS builds your private Baseline — the intelligence reference that carries across every conversation.',"],
+  ["  'Sovereign begins with the capacity beneath a pattern.',", "  'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',"],
   ["  'See the capacity beneath the pattern.',", "  'Explore how you think, decide, communicate, create, connect, and grow.',"],
   ["  'See what keeps the pattern going—and what could change it.',", "  'See the whole system.',"],
   ["  'Capacity beneath the pattern',", "  'Start with the question',"],
