@@ -63,7 +63,7 @@ export function LandingExpressionFieldPreview(props: LandingExpressionFieldPrevi
           selectedAxisId={props.subject.selectedAxisId ?? props.context.selectedAxisId}
           draggable
           variant="preview"
-          ariaLabel="A sanitized Baseline Expression Field with one stable center. Vector length shows relative salience in this example, not an emotional score or diagnosis."
+          ariaLabel="A sanitized Baseline Expression Field with one stable center. showing relative salience in this example."
         />
       </div>
       <figcaption>

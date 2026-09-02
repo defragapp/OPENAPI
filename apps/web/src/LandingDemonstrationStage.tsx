@@ -101,11 +101,8 @@ export function LandingDemonstrationStage() {
       <div className="landing-demo-stage__viewport" role="tabpanel">
         <div className="landing-demo-stage__window">
           <div className="landing-demo-stage__header">
-            <div className="landing-demo-stage__controls" aria-hidden="true">
-              <span /><span /><span />
-            </div>
             <div className="landing-demo-stage__status">
-              <span>●</span> LIVE SOVEREIGN BASELINE INQUIRY · {active.scope.toUpperCase()}
+              <span>●</span> ILLUSTRATIVE EXAMPLE · {active.scope.toUpperCase()}
             </div>
             <div className="landing-demo-stage__badge" style={{ borderColor: active.accent, color: active.accent }}>
               {active.scope}

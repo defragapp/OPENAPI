@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { BrandMark } from './BrandMark';
 import { LandingExpressionSlice } from './expression-field/LandingExpressionSlice';
+import { LandingDemonstrationStage } from './LandingDemonstrationStage';
 import { LandingProductStories } from './LandingProductStories';
 
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
@@ -111,8 +112,13 @@ function V0Hero() {
           <span className="v0-mobile-only">Start free · No card required · Review, correct, or reject any interpretation</span>
         </p>
       </div>
-      <LandingExpressionSlice />
+      <div className="landing-hero-atmosphere">
+        <LandingExpressionSlice />
+      </div>
       <MobileCapabilityRail />
+      <div className="landing-hero-product-preview">
+        <LandingDemonstrationStage />
+      </div>
     </section>
   );
 }
