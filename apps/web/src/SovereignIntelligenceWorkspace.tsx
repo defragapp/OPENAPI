@@ -5,6 +5,7 @@ import { WorkspaceExpressionField } from './expression-field/WorkspaceExpression
 import { expressionAxisIds } from './expression-field/expression-field-contract';
 import type { ExpressionAxisId, ExpressionAxisValue } from './expression-field/expression-field-contract';
 import type { ExpressionFieldConnection, ExpressionFieldSubject } from './expression-field/expression-field-view-contract';
+import { AnswerProcessingIndicator } from './AnswerProcessingIndicator';
 
 type Surface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
 type ApiState = 'idle' | 'loading' | 'ready' | 'error';
@@ -1151,7 +1152,7 @@ function ResponseThread({ messages, onAction, onSave, onCorrection, onShowPlan }
                   onCorrection={onCorrection}
                   onShowPlan={onShowPlan}
                 />
-              : <><p className="thinking" aria-hidden="true">{message.text || 'Considering your question…'}</p><span className="visually-hidden" role="status">Sovereign is building the answer.</span></>}
+              : <AnswerProcessingIndicator />}
           </article>)}
     </div>
   );
