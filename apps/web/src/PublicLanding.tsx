@@ -91,12 +91,12 @@ function V0Hero() {
   return (
     <section className="v0-hero sovereign-opening-field" data-viewport-section="hero">
       <div className="v0-hero-content" data-viewport-surface="hero">
-        <p className="v0-badge landing-hero-kicker"><span />Personal intelligence for real life</p>
-        <h1>
+        <p className="v0-badge landing-hero-kicker sov-section-kicker"><span />Personal intelligence for real life</p>
+        <h1 className="sov-display-hero">
           <span aria-label="Healing isn’t optional.">
             Healing<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />isn’t optional.
           </span>
-          <em aria-label="Holding onto the pain is.">
+          <em className="sov-display-hero-outline" aria-label="Holding onto the pain is.">
             <span className="v0-desktop-space"> </span>Holding onto<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />the pain is.
           </em>
         </h1>
