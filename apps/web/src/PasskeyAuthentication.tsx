@@ -35,7 +35,7 @@ export function PasskeyAuthentication() {
   const returnTo = useMemo(() => safeReturnTo(new URLSearchParams(location.search).get('returnTo')), []);
 
   useEffect(() => {
-    if (location.pathname !== '/login') return;
+    if (location.pathname !== '/login' && location.pathname !== '/signup') return;
     let active = true;
     let currentPanel: HTMLElement | null = null;
     let currentMount: HTMLElement | null = null;
