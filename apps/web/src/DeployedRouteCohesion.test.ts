@@ -59,7 +59,7 @@ describe('deployed route cohesion contract', () => {
   it('keeps public-page language aligned with the canonical product-language authority', () => {
     expect(how).toContain('Start with yourself. Add another person or the wider situation only when it helps.');
     expect(how).toContain('YOU → PEOPLE → SYSTEMS');
-    expect(how).toContain('Ask about what you actually want to understand.');
+    expect(how).toContain('Inquire about what you actually want to understand.');
     expect(how).toContain('A private reference built around you.');
     expect(how).toContain('<summary>See source details</summary>');
     expect(pricing).toContain('Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.');

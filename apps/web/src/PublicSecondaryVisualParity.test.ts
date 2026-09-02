@@ -84,7 +84,7 @@ describe('secondary public visual parity', () => {
     expect(howItWorks).toContain('Understand what happens between two people.');
     expect(howItWorks).toContain('See the wider system.');
     expect(howItWorks).toContain('Get the answer first.');
-    expect(howItWorks).toContain('Ask about what you actually want to understand.');
+    expect(howItWorks).toContain('Inquire about what you actually want to understand.');
     expect(howItWorks).toContain('A private reference built around you.');
     expect(howItWorks).toContain('class="product-proof-window"');
     expect(howItWorks).toContain('How do I know whether I’m refining an idea because it is getting clearer—or changing it because I’m anticipating everyone else’s reaction?');

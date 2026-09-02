@@ -204,7 +204,7 @@ export function AccountExpressionField() {
                       setOpen(false);
                     }}
                   >
-                    Ask Sovereign about {selected.label.toLowerCase()} <span aria-hidden="true">→</span>
+                    Explore {selected.label.toLowerCase()} <span aria-hidden="true">→</span>
                   </button>
                 )}
               </>
