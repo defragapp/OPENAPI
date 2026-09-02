@@ -101,7 +101,7 @@ describe('Sovereign.OS active experience language', () => {
     const faq = activeExperience.find(([label]) => label === 'faq')?.[1] ?? '';
 
     expect(how).toContain('Start with yourself. Add another person or the wider situation only when it helps.');
-    expect(how).toContain('Inquire about what you actually want to understand.');
+    expect(how).toContain('Ask about what you actually want to understand.');
     expect(how).toContain('<summary>See source details</summary>');
     expect(how).toContain('<dt>Sources</dt>');
     expect(how).not.toContain('EXAMPLE BASIS');

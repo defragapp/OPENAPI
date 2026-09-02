@@ -192,19 +192,23 @@ export function AccountExpressionField() {
                   variant="account"
                   selectedAxisId={selectedAxisId}
                   onSelectedAxisChange={setSelectedAxisId}
+                  onExplore={onExplore}
                 />
                 {selected && (
                   <button
                     className="expression-field-ask"
                     type="button"
                     onClick={() => {
-                      placePromptInComposer(
-                        `Help me understand ${selected.label} in my Expression Field. Show its gift, protective or shadow expression, what repression or overextension could look like, and what may be louder now.`
-                      );
+                      if (onExplore) {
+                        onExplore(
+                          `Help me understand ${selected.label} in my Expression Field. Show its gift, protective or shadow expression, what repression or overextension could look like, and what may be louder now.`
+                        );
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
                       setOpen(false);
                     }}
                   >
-                    Explore {selected.label.toLowerCase()} <span aria-hidden="true">→</span>
+                    Understand {selected.label.toLowerCase()} <span aria-hidden="true">→</span>
                   </button>
                 )}
               </>

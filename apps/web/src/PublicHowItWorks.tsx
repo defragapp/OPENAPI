@@ -9,7 +9,7 @@ const HOW_IT_WORKS_CONTENT = {
   steps: [
     {
       number: '01',
-      title: 'Inquire about what you actually want to understand.',
+      title: 'Ask about what you actually want to understand.',
       description: 'No special prompting required. Ask in your own words: a decision, a reaction, a recurring pattern, a family dynamic.',
     },
     {

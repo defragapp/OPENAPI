@@ -210,7 +210,7 @@ function FinalCallToAction() {
       <h2 aria-label="Know yourself. Understand your people. See the whole system." data-verification-text="Know yourself. Understand your people. See the whole system.">
         Know yourself.<br />Understand your people.<br />See the whole system.
       </h2>
-      <p>Build your private Baseline intelligence, then explore what you want to understand next.</p>
+      <p>Build your Baseline, then explore what you want to understand next.</p>
       <a className="v0-get-started" href="/signup">Build your Baseline <ArrowIcon /></a>
     </section>
   );

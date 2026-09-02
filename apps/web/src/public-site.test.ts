@@ -147,7 +147,7 @@ describe('Sovereign.OS public experience', () => {
   it('keeps support pages, consent, and fallback routes intact with current public language', () => {
     expect(how).toContain('Start with yourself. Add another person or the wider situation only when it helps.');
     expect(how).toContain('YOU → PEOPLE → SYSTEMS');
-    expect(how).toContain('Inquire about what you actually want to understand.');
+    expect(how).toContain('Ask about what you actually want to understand.');
     expect(how).toContain('A private reference built around you.');
     expect(how).toContain('<summary>See source details</summary>');
     expect(how).toContain('/experience-static-refinement-v1.css?v=20260831-acceptance-v1');
