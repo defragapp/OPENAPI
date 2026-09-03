@@ -17149,7 +17149,7 @@ html body .public-approved-v8 .powder-stage-response {
   display: none !important;
 }
 
-/* Suggestion List Rows */
+/* Suggestion List Rows - Powder compact 4-item display */
 .suggestion-list {
   list-style: none !important;
   padding: 0 !important;
@@ -17160,20 +17160,36 @@ html body .public-approved-v8 .powder-stage-response {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  padding: 12px 0 !important;
+  padding: 10px 0 !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
   color: #888888 !important;
   font-size: 13px !important;
   cursor: pointer !important;
+  transition: color 0.2s ease !important;
 }
 
-.suggestion-list li:last-child {
+.suggestion-list li:nth-child(n+5) {
+  display: none !important;
+}
+
+.suggestion-list li:nth-child(4) {
   border-bottom: none !important;
+}
+
+.suggestion-list li:hover,
+.suggestion-list li.is-active-suggestion {
+  color: #ffffff !important;
 }
 
 .suggestion-list li .arrow {
   color: #555555 !important;
   font-size: 12px !important;
+  transition: color 0.2s ease !important;
+}
+
+.suggestion-list li:hover .arrow,
+.suggestion-list li.is-active-suggestion .arrow {
+  color: #ffffff !important;
 }
 
 /* Collapse empty void beneath hero */
