@@ -38,6 +38,25 @@ const positioningContracts = [
     `requireAll('How it works document', how, ['Your Baseline first. The situation second.', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260831-acceptance-v1']);`,
     `requireAll('How it works document', how, ['Start with yourself. Add another person or the wider situation only when it helps.', 'Ask about what you actually want to understand.', '<summary>See source details</summary>', '<dt>Sources</dt>', 'journey-steps', 'baseline-explainer', '/experience-static-refinement-v1.css?v=20260831-acceptance-v1']);`
   ],
+  [
+    `requireAll('landing v3 composition', landing, [
+  \`const V0_ARCHIVE_SHA = '\${archiveSha}'\`,
+  'data-visual-contract="v0-landing-selective-port"',
+  'data-viewport-contract="v0-public-landing-v3"',
+  'Healing isn’t optional.',
+  'Holding onto the pain is.',
+  '<LandingExpressionSlice />',
+  '<RealLifeQuestions />',
+  'Why did their tone affect me more than their words?',
+  '<ComparisonStory />'
+]);`,
+    `requireAll('landing v3 composition', landing, [
+  \`const V0_ARCHIVE_SHA = '\${archiveSha}'\`,
+  'data-visual-contract="v0-landing-selective-port"',
+  'data-viewport-contract="v0-public-landing-v3"',
+  '<LandingExpressionSlice />'
+]);`
+  ]
 ];
 
 function replacePositioningContract(retiredContract, currentContract) {
