@@ -16415,32 +16415,34 @@ html[data-sovereign-production-readiness="desktop-ios-v1"] {
 
 
 
+
 /* ==========================================================================
-   TRUE POWDER 2-COLUMN SPLIT-SCREEN LAYOUT
+   POWDER FIDELITY HERO: UNCLIPPED 2-COLUMN SPLIT & SEAMLESS FADE
    ========================================================================== */
 
+/* 1. Expand the container and remove the clipping boundary */
 html body .public-approved-v8 .v0-hero.sovereign-opening-field {
   position: relative !important;
   display: grid !important;
-  grid-template-columns: 1fr 1.18fr !important;
+  grid-template-columns: 1fr 1.15fr !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 56px !important;
-  padding: 80px 48px 100px !important;
+  gap: 64px !important;
+  padding: 100px 48px 120px !important;
   margin: 0 auto !important;
   width: 100% !important;
   max-width: 1440px !important;
-  min-height: 840px !important;
+  min-height: auto !important; /* Allow natural card expansion */
   box-sizing: border-box !important;
-  overflow: hidden !important;
+  overflow: visible !important; /* Prevents chopping off the card */
   background-color: #000000 !important;
   background-image: 
-    radial-gradient(120% 65% at 50% 500px, rgba(211, 151, 148, 0.2) 0%, rgba(53, 63, 68, 0.28) 35%, rgba(27, 34, 40, 0.45) 60%, transparent 85%),
+    radial-gradient(100% 60% at 50% 400px, rgba(211, 151, 148, 0.18) 0%, rgba(53, 63, 68, 0.22) 40%, transparent 80%),
     linear-gradient(180deg, #000000 0%, #050709 100%) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-bottom: none !important; /* Remove harsh horizontal line */
 }
 
-/* Atmospheric hills */
+/* 2. Feather the background hills into the canvas */
 html body .public-approved-v8 .v0-hero.sovereign-opening-field::before {
   content: "" !important;
   position: absolute !important;
@@ -16452,9 +16454,12 @@ html body .public-approved-v8 .v0-hero.sovereign-opening-field::before {
   background-size: cover !important;
   background-position: center bottom !important;
   background-repeat: no-repeat !important;
-  opacity: 0.5 !important;
+  opacity: 0.45 !important;
   pointer-events: none !important;
   z-index: 1 !important;
+  /* Smooth mask fade to eliminate the bottom seam */
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 98%) !important;
+  mask-image: linear-gradient(to bottom, black 60%, transparent 98%) !important;
 }
 
 html body .public-approved-v8 .v0-hero.sovereign-opening-field::after {
@@ -16468,9 +16473,11 @@ html body .public-approved-v8 .v0-hero.sovereign-opening-field::after {
   background-size: cover !important;
   background-position: center bottom !important;
   background-repeat: no-repeat !important;
-  opacity: 0.6 !important;
+  opacity: 0.55 !important;
   pointer-events: none !important;
   z-index: 2 !important;
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 98%) !important;
+  mask-image: linear-gradient(to bottom, black 50%, transparent 98%) !important;
 }
 
 /* Left Column: Copy & CTA */
@@ -16511,15 +16518,17 @@ html body .public-approved-v8 .landing-hero-kicker > span {
   box-shadow: 0 0 8px rgba(212, 163, 115, 0.8) !important;
 }
 
+/* 3. Balanced headline layout */
 html body .public-approved-v8 .v0-hero h1 {
   text-align: left !important;
-  margin: 0 0 18px 0 !important;
+  margin: 0 0 20px 0 !important;
   font-family: Inter, system-ui, -apple-system, sans-serif !important;
-  font-size: clamp(38px, 3.8vw, 56px) !important;
-  font-weight: 400 !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.04em !important;
+  font-size: clamp(38px, 4vw, 54px) !important;
+  font-weight: 500 !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.035em !important;
   color: #ffffff !important;
+  max-width: 500px !important;
 }
 
 html body .public-approved-v8 .v0-hero h1 > span {
@@ -16529,10 +16538,10 @@ html body .public-approved-v8 .v0-hero h1 > span {
 
 html body .public-approved-v8 .v0-hero h1 > em {
   display: block !important;
-  color: #777777 !important;
+  color: #6e6e6e !important;
   font-style: normal !important;
   font-weight: 400 !important;
-  margin-left: 0 !important;
+  margin-top: 4px !important;
 }
 
 html body .public-approved-v8 .sovereign-opening-copy {
@@ -16570,28 +16579,28 @@ html body .public-approved-v8 .sovereign-opening-trust {
   display: block !important;
 }
 
-/* Right Column: Floating App Mockup Card */
+/* 4. Ensure complete card display with all borders and tags intact */
 html body .public-approved-v8 .landing-hero-product-preview {
   position: relative !important;
   z-index: 5 !important;
   width: 100% !important;
-  max-width: 680px !important;
+  max-width: 660px !important;
   margin: 0 !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage {
   display: grid !important;
-  grid-template-columns: 210px 1fr !important;
+  grid-template-columns: 200px 1fr !important;
   width: 100% !important;
-  margin: 0 !important;
-  background: rgba(20, 20, 20, 0.92) !important;
-  backdrop-filter: blur(28px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
-  border-radius: 20px !important;
+  height: auto !important;
+  min-height: 480px !important;
+  background: rgba(18, 18, 18, 0.88) !important;
+  backdrop-filter: blur(32px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 20px !important; /* Full 4-corner rounded pill */
+  box-shadow: 0 32px 72px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
   overflow: hidden !important;
-  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage__rail {
@@ -16643,10 +16652,10 @@ html body .public-approved-v8 .landing-demo-stage__window {
 }
 
 html body .public-approved-v8 .landing-demo-stage__body {
-  padding: 28px 30px !important;
+  padding: 24px 28px 28px !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 20px !important;
+  gap: 16px !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage__prompt-row {
@@ -16750,6 +16759,13 @@ html body .public-approved-v8 .landing-demo-stage__tag {
   background: rgba(255, 255, 255, 0.06) !important;
   border-radius: 6px !important;
   color: #999999 !important;
+}
+
+/* 5. Collapse the empty void box in the sub-hero section */
+html body .public-approved-v8 .landing-expression-field:empty,
+html body .public-approved-v8 .v0-single-example-landing .landing-expression-field {
+  min-height: auto !important;
+  margin-bottom: 32px !important;
 }
 
 @media (max-width: 1080px) {
