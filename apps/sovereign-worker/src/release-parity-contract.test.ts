@@ -62,7 +62,7 @@ describe('production release parity contract', () => {
     expect(privacyAccessMigration).toContain('CREATE TABLE privacy_request_events');
     expect(privacyAccessMigration).toContain('eligibility_rule_version TEXT');
     expect(privacyAccessMigration).not.toContain('workers_ai_capacity_reservations');
-    expect(capacityReservationMigration).toContain('CREATE TABLE workers_ai_capacity_reservations');
+    expect(capacityReservationMigration).toContain('ALTER TABLE workers_ai_capacity_reservations RENAME TO legacy_workers_ai_capacity_reservations');
   });
 
   it('publishes the v3 runtime visual release contract', () => {
