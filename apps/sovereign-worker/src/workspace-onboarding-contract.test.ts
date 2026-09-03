@@ -187,7 +187,7 @@ describe('account onboarding, recovery, and conversation persistence', () => {
     expect(runtime).toContain("PASSKEY_MIGRATION_VERSION = '0014_passkey_authentication'");
     expect(runtime).toContain("RELEASE_EVIDENCE_MIGRATION_VERSION = '0015_release_evidence'");
     expect(runtime).toContain("POLICY_RECEIPT_MIGRATION_VERSION = '0016_policy_acceptance_receipts'");
-    expect(runtime).toContain("LATEST_MIGRATION_VERSION = '0018_workers_ai_capacity_reservations'");
+    expect(runtime).toContain("LATEST_MIGRATION_VERSION = '0019_deprecate_manual_capacity'");
     expect(runtime).toContain('const migrationVersion = capacityReservationSchemaReady');
     expect(runtime).toContain("policyAcceptanceReceipts: policyReceiptSchemaReady ? 'configured' : 'missing'");
     expect(runtime).toContain("privacyAccessControls: privacyAccessSchemaReady ? 'configured' : 'missing'");
