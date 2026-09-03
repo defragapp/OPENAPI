@@ -23,7 +23,7 @@ Required Checks and Build/Release Workflow
 - Single production mutation path: pnpm production:release:text at the same SHA after the gate
 
 Live Verification Requirements
-- Verify both branded /ready endpoints return ready:true, exact deployed SHA, migration 0018 current/parity, sovereign-answer.v2
+- Verify both branded /ready endpoints return ready:true, exact deployed SHA, migration 0019_deprecate_manual_capacity current/parity, sovereign-answer.v2
 - Inspect public routes at 1440/1280/390/430: landing, how-it-works, pricing, faq, privacy, terms, 404, login, signup, invitation
 - Inspect authenticated/billing paths where access is available (do not invent credentials)
 - Preserve evidence under visual-inspection/ and .visual-release-audit/
