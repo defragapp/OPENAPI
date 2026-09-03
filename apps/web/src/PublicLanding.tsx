@@ -48,9 +48,12 @@ export function PublicLanding() {
       data-public-narrative="self-people-systems-v1"
     >
       <V0Navigation />
-      <V0Hero />
+      <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-8">
+        Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
+      </p>
+      <LandingExpressionSlice />
+      <LandingDemonstrationStage />
       <RealLifeQuestions />
-      <LandingProductStories />
       <ComparisonStory />
       <FinalCallToAction />
       <V0Footer />
