@@ -22,6 +22,7 @@ import { PublicPolicyMetadata } from './PublicPolicyMetadata';
 import { installReleaseInteractionRuntime } from './release-interaction-runtime';
 import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
 import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
+import { PowderDemo } from './PowderDemo';
 
 /* Canonical visual system */
 import './design-system.css';
@@ -119,14 +120,17 @@ const publicPolicyKind = location.pathname === '/privacy'
     ? 'terms'
     : null;
 const isStaticPublicPage = ['/how-it-works', '/pricing', '/faq'].includes(location.pathname);
-const isDirectPublicSurface = isPublicHome || publicPolicyKind !== null || isStaticPublicPage;
+const isPowderDemo = location.pathname === '/demo' || location.pathname === '/powder';
+const isDirectPublicSurface = isPublicHome || publicPolicyKind !== null || isStaticPublicPage || isPowderDemo;
 const isAuthenticatedWorkspace = location.pathname === '/app' || location.pathname.startsWith('/app/');
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AppErrorBoundary>
       {!isDirectPublicSurface && <ProductCompletionLayer />}
-      {isPublicHome
+      {isPowderDemo
+        ? <PowderDemo />
+        : isPublicHome
         ? <PublicLanding />
         : publicPolicyKind
           ? <><PublicPolicyMetadata kind={publicPolicyKind} /><PublicPolicy kind={publicPolicyKind} /></>
