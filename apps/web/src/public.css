@@ -16845,3 +16845,345 @@ html body .public-approved-v8 .v0-single-example-landing .landing-expression-fie
     padding: 60px 24px !important;
   }
 }
+
+/* ==========================================================================
+   AUTHENTIC POWDER TEMPLATE FIDELITY (CLEAN SPLIT & PROPORTIONAL CARD)
+   ========================================================================== */
+
+/* Full-bleed edge-to-edge hero wrapper */
+html body .public-approved-v8 .v0-hero.sovereign-opening-field {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  padding: 80px 48px 100px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  background-color: #000000 !important;
+  background-image: 
+    radial-gradient(90% 55% at 50% 380px, rgba(211, 151, 148, 0.18) 0%, rgba(53, 63, 68, 0.22) 35%, transparent 75%),
+    linear-gradient(180deg, #000000 0%, #050709 100%) !important;
+  border-bottom: none !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* Full-width landscape hills stretching across the entire viewport */
+html body .public-approved-v8 .v0-hero.sovereign-opening-field::before {
+  content: "" !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: 480px !important;
+  background-image: url("/powder-hills-far.png") !important;
+  background-size: cover !important;
+  background-position: center bottom !important;
+  background-repeat: no-repeat !important;
+  opacity: 0.45 !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 98%) !important;
+  mask-image: linear-gradient(to bottom, black 50%, transparent 98%) !important;
+}
+
+html body .public-approved-v8 .v0-hero.sovereign-opening-field::after {
+  content: "" !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: 380px !important;
+  background-image: url("/powder-hills-mid.png") !important;
+  background-size: cover !important;
+  background-position: center bottom !important;
+  background-repeat: no-repeat !important;
+  opacity: 0.55 !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+  -webkit-mask-image: linear-gradient(to bottom, black 45%, transparent 98%) !important;
+  mask-image: linear-gradient(to bottom, black 45%, transparent 98%) !important;
+}
+
+/* Constrained 2-column grid container */
+html body .public-approved-v8 .v0-hero.sovereign-opening-field > * {
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+html body .public-approved-v8 .v0-hero.sovereign-opening-field {
+  display: grid !important;
+  grid-template-columns: minmax(380px, 480px) minmax(460px, 580px) !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 72px !important;
+}
+
+/* Left Hero Column: Balanced Typography & Spacing */
+html body .public-approved-v8 .v0-hero-content {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  width: 100% !important;
+  max-width: 480px !important;
+  margin: 0 !important;
+}
+
+html body .public-approved-v8 .landing-hero-kicker {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 5px 14px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #e5e5e5 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  margin: 0 0 20px 0 !important;
+}
+
+html body .public-approved-v8 .landing-hero-kicker > span {
+  width: 5px !important;
+  height: 5px !important;
+  background: #d4a373 !important;
+  border-radius: 50% !important;
+}
+
+html body .public-approved-v8 .v0-hero h1 {
+  font-size: clamp(40px, 4vw, 56px) !important;
+  font-weight: 500 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.04em !important;
+  color: #ffffff !important;
+  margin: 0 0 20px 0 !important;
+}
+
+html body .public-approved-v8 .v0-hero h1 > span {
+  display: block !important;
+  color: #ffffff !important;
+}
+
+html body .public-approved-v8 .v0-hero h1 > em {
+  display: block !important;
+  color: #666666 !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+}
+
+html body .public-approved-v8 .sovereign-opening-copy {
+  color: #92ada9 !important;
+  font-size: 15px !important;
+  line-height: 1.5 !important;
+  margin: 0 0 28px 0 !important;
+  max-width: 420px !important;
+  text-align: left !important;
+}
+
+html body .public-approved-v8 .v0-get-started {
+  background: #ffffff !important;
+  color: #050505 !important;
+  padding: 12px 28px !important;
+  border-radius: 999px !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+html body .public-approved-v8 .sovereign-opening-trust {
+  font-size: 11px !important;
+  color: #666666 !important;
+  margin: 12px 0 0 0 !important;
+  text-align: left !important;
+}
+
+/* Right Column: Powder Compact Card Preview */
+html body .public-approved-v8 .landing-hero-product-preview {
+  width: 100% !important;
+  max-width: 580px !important;
+  margin: 0 !important;
+}
+
+html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  background: rgba(18, 18, 18, 0.9) !important;
+  backdrop-filter: blur(28px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  padding: 32px !important;
+  box-sizing: border-box !important;
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.card-top-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 20px !important;
+}
+
+.card-badge {
+  font-size: 10px !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #d4a373 !important;
+  font-weight: 600 !important;
+}
+
+.card-welcome {
+  text-align: left !important;
+  margin-bottom: 20px !important;
+}
+
+.card-welcome h2 {
+  font-size: 22px !important;
+  font-weight: 400 !important;
+  color: #ffffff !important;
+  margin: 0 0 4px 0 !important;
+}
+
+.card-welcome p {
+  color: #777777 !important;
+  font-size: 13.5px !important;
+  margin: 0 !important;
+}
+
+/* Prompt input field */
+.prompt-box {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 14px 16px !important;
+  margin-bottom: 16px !important;
+}
+
+.prompt-box input {
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  color: #ffffff !important;
+  margin-bottom: 14px !important;
+  outline: none !important;
+  font-size: 13.5px !important;
+}
+
+.prompt-tools {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.tools-left {
+  display: flex !important;
+  gap: 10px !important;
+}
+
+.tools-left button, .tools-right button {
+  background: transparent !important;
+  border: none !important;
+  color: #666666 !important;
+  font-size: 15px !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+}
+
+.tools-right .send-btn {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 12px !important;
+}
+
+/* Category Filter Pills */
+.category-filters {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 12px !important;
+  overflow-x: auto !important;
+}
+
+.filters-left {
+  display: flex !important;
+  gap: 8px !important;
+}
+
+.filters-left button {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #777777 !important;
+  padding: 5px 12px !important;
+  border-radius: 16px !important;
+  font-size: 12px !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+.filters-left button.active {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+/* CRITICAL: HIDE THE BLOATED ANSWER BLOCK IN THE HERO CARD */
+html body .public-approved-v8 .landing-demo-stage__response-row,
+html body .public-approved-v8 .landing-demo-stage__answer-card,
+html body .public-approved-v8 .powder-stage-response {
+  display: none !important;
+}
+
+/* Suggestion List Rows */
+.suggestion-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.suggestion-list li {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 12px 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #888888 !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+}
+
+.suggestion-list li:last-child {
+  border-bottom: none !important;
+}
+
+.suggestion-list li .arrow {
+  color: #555555 !important;
+  font-size: 12px !important;
+}
+
+/* Collapse empty void beneath hero */
+html body .public-approved-v8 .landing-expression-field:empty {
+  display: none !important;
+}
+
+@media (max-width: 1080px) {
+  html body .public-approved-v8 .v0-hero.sovereign-opening-field {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+    padding: 60px 24px !important;
+  }
+}
