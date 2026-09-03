@@ -16,7 +16,7 @@ Re-fetch all refs before acting. These values are audit anchors, not permission 
 - Production D1: `sovereign-openapi-db` / `497e5df9-c82a-499e-9be6-d809c992e8ce`
 - Last technically accepted production source before this directive: `ee8f80d55fd0314fcf61f126d92e39b777b307a3`
 - Its source tree includes the launch-capacity, ingress, Node 22, migration 0018, saturation-refusal, and workspace-continuity work.
-- Production migration: `0018_workers_ai_capacity_reservations`
+- Production migration: `0019_deprecate_manual_capacity`
 - Production daily Workers AI ceiling: `WORKERS_AI_DAILY_NEURON_BUDGET=7500`
 - R2 and Queues: absent
 - The last release was technically successful but did **not** deliver a public visual change. Its visual archive fingerprint remained `6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba`.
@@ -205,7 +205,7 @@ Require:
 - both domains report the exact new GitHub `main` SHA;
 - both readiness endpoints return `ready=true`;
 - release-evidence SHA equals the new live SHA;
-- migration is `0018_workers_ai_capacity_reservations`;
+- migration is `0019_deprecate_manual_capacity`;
 - migration parity is current;
 - AI capacity reservations are configured;
 - daily neuron budget remains 7500;

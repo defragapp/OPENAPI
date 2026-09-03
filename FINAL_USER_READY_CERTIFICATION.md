@@ -71,9 +71,9 @@ This document certifies that Sovereign.OS is complete for real human use — fro
 - Static assets: 54 files served from `apps/web/dist`, `run_worker_first` covers all SPA routes.
 
 ### D1 — PASS
-- 18 migrations present (`0001_initial.sql` through `0018_workers_ai_capacity_reservations.sql`).
-- Current schema: `0018_workers_ai_capacity_reservations`; deployed `0017` immutable per AGENTS.md.
-- Both `/ready` endpoints report `migrationVersion: 0018_workers_ai_capacity_reservations`, `migrationParity: current`.
+- 18 migrations present (`0001_initial.sql` through `0019_deprecate_manual_capacity.sql`).
+- Current schema: `0019_deprecate_manual_capacity`; deployed `0017` immutable per AGENTS.md.
+- Both `/ready` endpoints report `migrationVersion: 0019_deprecate_manual_capacity`, `migrationParity: current`.
 - Core tables: accounts, persons, baseline_onboarding, threads, thread_events, consent_grants, invitations, stripe_subscriptions, stripe_customers, entitlement_cache, webhook_events, auth_sessions, auth_magic_links, auth_email_codes, policy_acceptance_receipts, workers_ai_daily_capacity, current_conditions, systems, system_memberships, understandings, user_corrections.
 
 ### Durable Objects — PASS

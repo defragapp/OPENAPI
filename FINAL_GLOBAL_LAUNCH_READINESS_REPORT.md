@@ -4,7 +4,7 @@
 **Production SHA:** `6faebe759629bff41dc1a7f9d005a6315b062ab9`
 **Worker:** `sovv-web` (Version ID: `31c7e6d9-cdfe-46e0-a9c7-41ba037b77f3`)
 **Database:** `sovereign-openapi-db` (`497e5df9-c82a-499e-9be6-d809c992e8ce`)
-**Migration:** `0018_workers_ai_capacity_reservations` (current)
+**Migration:** `0019_deprecate_manual_capacity` (current)
 
 ---
 

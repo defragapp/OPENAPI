@@ -20,8 +20,8 @@ This document certifies the live production state of Sovereign.OS based on actua
   "sha": "e2e7c2389dafa4621632db0dede9964d6ac80d08",
   "version": "e2e7c2389dafa4621632db0dede9964d6ac80d08",
   "environment": "production",
-  "migrationVersion": "0018_workers_ai_capacity_reservations",
-  "latestMigrationVersion": "0018_workers_ai_capacity_reservations",
+  "migrationVersion": "0019_deprecate_manual_capacity",
+  "latestMigrationVersion": "0019_deprecate_manual_capacity",
   "dependencies": {
     "d1": "ok",
     "migrationParity": "current",
@@ -295,7 +295,7 @@ Cannot test live mobile experience without physical device.
 
 ### D1 Database
 - **Status:** ok
-- **Migration:** 0018_workers_ai_capacity_reservations
+- **Migration:** 0019_deprecate_manual_capacity
 - **Parity:** current
 
 ### Durable Objects

@@ -19,7 +19,7 @@ Status: current launch record. Authoritative post-launch evidence for the accept
 | Account ID | `8b1954d216d65077c6480d62583fe2c2` |
 | Environment | production |
 | Deployment date | 2026-08-27 |
-| Migration version | `0018_workers_ai_capacity_reservations` |
+| Migration version | `0019_deprecate_manual_capacity` |
 | Answer contract | `sovereign-answer.v2` |
 | Baseline contract | `baseline-source.v1+baseline-facets.v1` |
 | Release path | `pnpm production:deploy` via Cloudflare build trigger on push to `main` (browser-audited orchestrator); canonical operator path remains `pnpm production:release:oauth` |
@@ -56,7 +56,7 @@ All repository gates passed for SHA `5329cac6c37609ede23f428640e6430832b3ad95` (
 | `/ready` SHA (app.defrag.app) | `c21eb46a72ef26cc43aabac95f7b0798a6881975` |
 | `/ready` status | `true` |
 | Release evidence SHA | `c21eb46a72ef26cc43aabac95f7b0798a6881975` |
-| Release evidence migration | `0018_workers_ai_capacity_reservations` |
+| Release evidence migration | `0019_deprecate_manual_capacity` |
 | Migration parity | `current` |
 | DMARC | verified |
 | Deploys | 3 |
@@ -78,10 +78,10 @@ Cloudflare = c21eb46a72ef26cc43aabac95f7b0798a6881975
 Migration parity:
 
 ```text
-source      = 0018_workers_ai_capacity_reservations
-release     = 0018_workers_ai_capacity_reservations
-deployed    = 0018_workers_ai_capacity_reservations
-/ready      = 0018_workers_ai_capacity_reservations
+source      = 0019_deprecate_manual_capacity
+release     = 0019_deprecate_manual_capacity
+deployed    = 0019_deprecate_manual_capacity
+/ready      = 0019_deprecate_manual_capacity
 ```
 
 ---
@@ -219,7 +219,7 @@ curl -sS https://sovereign.defrag.app/ready | jq '{sha: .sha, ready: .ready, mig
 
 ### Migration compatibility
 
-Worker rollback does not reverse D1 migrations. If the rolled-back code expects a schema that no longer exists, forward-repair migrations must be applied before rollback. The current schema (`0018_workers_ai_capacity_reservations`) is backward-compatible with all code since `0017`.
+Worker rollback does not reverse D1 migrations. If the rolled-back code expects a schema that no longer exists, forward-repair migrations must be applied before rollback. The current schema (`0019_deprecate_manual_capacity`) is backward-compatible with all code since `0017`.
 
 ### What must NOT be manually changed during rollback
 
@@ -358,7 +358,7 @@ Appended after the initial launch certification.
 | Prior SHA | `eea6cf0c4aad967e23da4241877ba0693881559e` |
 | Initial launch SHA | `31da213ba542b55a519d1e930f6bfa50d4d5db4e` |
 | Branch | `main` |
-| Migration | `0018_workers_ai_capacity_reservations` |
+| Migration | `0019_deprecate_manual_capacity` |
 | Change | Mobile landing-page product-proof panel readability: increased message text from .74rem to .82rem, adjusted padding/gap, removed forced min-height on workflow items, increased CSS selector specificity to win cascade |
 | Evidence | Playwright headless Chromium rendered at 375/390/393/430/1024/1280/1440px — all 21 data points (7 viewports × 3 stories) pass |
 | Tests | 684/684 pass |
@@ -448,7 +448,7 @@ Production SHA `1f31416eb5575e9fe99e6197823d775131449410` was the accepted produ
 | Field | Value |
 |-------|-------|
 | Production SHA | `1f31416eb5575e9fe99e6197823d775131449410` |
-| Migration | `0018_workers_ai_capacity_reservations` |
+| Migration | `0019_deprecate_manual_capacity` |
 | Migration parity | `current` |
 | Deploy | #1346 — Worker version `b860ab37`, source `wrangler`, author `defragapp@gmail.com`, 2026-08-27T16:54:14Z |
 | Release path | `pnpm production:release:oauth` — browser-audited orchestrator (`scripts/cloudflare-production-release.mjs` with the full `DEFAULT_POST_DEPLOY_CHECKS`) |
@@ -487,7 +487,7 @@ Human desktop/iPhone review and the authenticated product journey remain operato
 | Deploy (`5329cac…`) | #1347 — 2026-08-27T18:43:59Z, `APP_VERSION=5329cac…` |
 | Deploy (`c21eb46…`) | record push — 2026-08-27 evening, `APP_VERSION=c21eb46…`; `/ready` converged on both branded domains |
 | D1 release evidence | written for `5329cac…` 2026-08-27T18:50:28Z — `routeCohesionVerified: true`, `renderedVisualVerified: true`, `dmarcVerified: true`, converged; the record push wrote a matching row for `c21eb46…` through the same orchestrator |
-| Live verification | both branded `/ready` = `c21eb46…`, `ready: true`, migration `0018_workers_ai_capacity_reservations`, parity `current` |
+| Live verification | both branded `/ready` = `c21eb46…`, `ready: true`, migration `0019_deprecate_manual_capacity`, parity `current` |
 
 Decision: `c21eb46…` is **accepted as the current production SHA** under the browser-audited scope. The build-triggered deploys ran the identical orchestrator, produced truthful D1 evidence, and restored the canonical steady state (`production == current origin/main`). `1f31416…` and `5329cac…` remain the prior operator-initiated and prior converged releases, all with identical product code.
 
@@ -509,7 +509,7 @@ Operational note: any push to `main` triggers a production build+deploy via the 
 | Cloudflare build | PASS (verify:cloudflare-build — 23/23 stages) |
 | Deployment | PASS (browser-audited orchestrator — operator deploy #1346 at `1f31416…`, build-triggered deploy #1347 at `5329cac…`; both D1 evidence-written) |
 | SHA parity | PASS (release = Cloudflare = /ready = 5329cac..., converged post-launch) |
-| Migration parity | PASS (source = deployed = /ready = 0018_workers_ai_capacity_reservations, parity: current) |
+| Migration parity | PASS (source = deployed = /ready = 0019_deprecate_manual_capacity, parity: current) |
 | Production readiness | PASS (/ready — all dependencies configured) |
 | Security configuration | PASS (scan:secrets — clean) |
 | Visual implementation checks | PASS (CSS authorities, typography, viewport, reduced-motion, safe-area) |

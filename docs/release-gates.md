@@ -31,7 +31,7 @@ The current launch is text-first. Video/Worlds generation is not required. Live 
 - Policy acceptance is bound to the exact current version/hash/release evidence.
 - Material policy updates can require re-review before normal private product use.
 - Export, deletion, logout, and bounded billing/account rights remain available through the documented policy gate.
-- Current candidate schema is `0018_workers_ai_capacity_reservations`; deployed `0017_privacy_access_and_eligibility` remains immutable.
+- Current candidate schema is `0019_deprecate_manual_capacity`; deployed `0017_privacy_access_and_eligibility` remains immutable.
 - Private export is authenticated, on-demand, account-scoped, private/no-store, and not retained as an artifact.
 - R2 and Queue remain disabled.
 - Unsaved thread content/complete answers follow the 30-day cleanup policy.
@@ -81,11 +81,11 @@ The current launch is text-first. Video/Worlds generation is not required. Live 
 - `pnpm verify:cloudflare-build` is green for the exact candidate SHA.
 - The same SHA is released through `pnpm production:release:text` for the current text-first launch.
 - The release path performs exactly one Worker deploy.
-- D1 migrations apply through `0018_workers_ai_capacity_reservations`.
+- D1 migrations apply through `0019_deprecate_manual_capacity`.
 - D1 Sessions/read replication, Durable Object sequencing, AI Gateway, rate limiting, API Shield, Resend, Stripe, scheduled cleanup, and bundle limits remain verified by repository/runtime checks.
 - API Shield endpoint comparison normalizes Cloudflare positional `{varN}` parameter templates before declaring a missing operation.
 - The release path never deletes an unrelated Free-plan rate-limit rule to make room for Sovereign.OS.
-- Both branded `/ready` endpoints report `ready: true`, exact target SHA, migration `0018_workers_ai_capacity_reservations`, migration parity `current`, configured policy receipts/privacy controls/capacity reservations, and matching release evidence.
+- Both branded `/ready` endpoints report `ready: true`, exact target SHA, migration `0019_deprecate_manual_capacity`, migration parity `current`, configured policy receipts/privacy controls/capacity reservations, and matching release evidence.
 - Private export state is reported as on-demand/no-artifact where the readiness contract exposes it.
 - Production evidence fails closed if exact-SHA readiness/evidence does not converge.
 - GitHub Actions, deploy hooks, Pages, preview Workers, duplicate Workers, historical Workers Builds triggers, and alternate repositories are not accepted release evidence.

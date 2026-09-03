@@ -46,7 +46,7 @@ Track names/IDs preserved from the recovered audit.
 
 ### Track REL-2 — Closeout application release
 - GATE: `pnpm verify:cloudflare-build` passed **all stages** at `936275a8` including `production-d1-parity`. Released via `pnpm production:release:text` (`status: success`, `converged: true`).
-- LIVE: both branded `/ready` endpoints report exact deployed SHA `936275a8…`, `ready:true`, migration `0018_workers_ai_capacity_reservations` current.
+- LIVE: both branded `/ready` endpoints report exact deployed SHA `936275a8…`, `ready:true`, migration `0019_deprecate_manual_capacity` current.
 - This was an application-code change (web bundle + `_headers` + static CSS + HTML), so a full gate + release was run and the deployed SHA now equals the repo HEAD.
 - FIXED: `scripts/cloudflare-preview-bootstrap.mjs` used `wrangler d1 list/create --json`, which the installed Wrangler (4.98) rejects ("Unknown argument: json"). Replaced with the Cloudflare REST API (`/accounts/{id}/d1/database`) for list/create — same D1 Edit permission scope, works across wrangler versions. Verified: preview D1 resolution succeeded, migrations applied (0018 target), and the preview Worker deployed. Developer tooling only; no app code change, so no redeploy required.
 
@@ -56,13 +56,13 @@ Track names/IDs preserved from the recovered audit.
 - RESOLVED: a scoped Cloudflare API token (D1 read + Workers access) was supplied; `CLOUDFLARE_ACCOUNT_ID` was required in addition and set for the release mutation.
 - GATE: `pnpm verify:cloudflare-build` completed **all 24 stages green** at commit `3252747c…` including `production-d1-parity` — "SUCCESS: Production D1 schema matches expected migrations" (`/tmp/cf-gate-3.log` run evidence).
 - RELEASE: `pnpm production:release:text` for the same SHA succeeded — main parity verified, `status: success`, evidence `converged: true` (wrangler-d1 evidence write; Browser Rendering excluded per the text-launch contract).
-- LIVE PROOF at `3252747c…` (2026-08-31T03:26Z): both branded `/ready` endpoints report `ready:true`, exact SHA, migration `0018_workers_ai_capacity_reservations` current/latest, `sovereign-answer.v2`; `/login`, `/signup`, landing all 200; public landing probe shows 0 console errors / 0 failed requests.
+- LIVE PROOF at `3252747c…` (2026-08-31T03:26Z): both branded `/ready` endpoints report `ready:true`, exact SHA, migration `0019_deprecate_manual_capacity` current/latest, `sovereign-answer.v2`; `/login`, `/signup`, landing all 200; public landing probe shows 0 console errors / 0 failed requests.
 
 ### Track REL-1 — Release
-- GREEN at `a6faf87`: `/ready` reported `ready:true`, SHA match, migration `0018_workers_ai_capacity_reservations` current, `sovereign-answer.v2` contract.
+- GREEN at `a6faf87`: `/ready` reported `ready:true`, SHA match, migration `0019_deprecate_manual_capacity` current, `sovereign-answer.v2` contract.
 - FIXED (this sprint): account-nav flex layout + static touch targets. Verified before release: `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm verify:foundation`, `pnpm scan:secrets`.
 - BLOCKED (environment): `pnpm verify:cloudflare-build` at candidate `21fff30e` passed every stage except `production-d1-parity`, which requires `CLOUDFLARE_API_TOKEN` to generate the production wrangler config (`WRANGLER_CONFIG_PATH`). No Cloudflare credentials exist in this environment (`wrangler whoami` → not authenticated), so the release mutation (`pnpm production:release:text`) could not be executed from this machine. All 21 preceding gate stages passed: main-release, foundation, migrations, secrets-scan, production-fixtures, public-contact, release-config, production-release, intelligence-release, visual-intelligence, premium-platform, typecheck, tests, auth/baseline/jobs/gateway/stripe/product/closure smokes, build, source-maps, worker-bundle-size.
-- LIVE PROOF at `21fff30e` (2026-08-30): both branded `/ready` endpoints (app.defrag.app and sovereign.defrag.app) report `ready:true`, exact SHA `21fff30e…`, migration `0018_workers_ai_capacity_reservations` current/parity, `sovereign-answer.v2`; `/signup`, `/login`, `/404` return 200; live Playwright check at 1440/1280/390/430 confirms `.account-nav` `display:flex / space-between / gap:28px` and 0 sub-44px static launch touch targets (`visual-inspection/nav-check.mjs`).
+- LIVE PROOF at `21fff30e` (2026-08-30): both branded `/ready` endpoints (app.defrag.app and sovereign.defrag.app) report `ready:true`, exact SHA `21fff30e…`, migration `0019_deprecate_manual_capacity` current/parity, `sovereign-answer.v2`; `/signup`, `/login`, `/404` return 200; live Playwright check at 1440/1280/390/430 confirms `.account-nav` `display:flex / space-between / gap:28px` and 0 sub-44px static launch touch targets (`visual-inspection/nav-check.mjs`).
 
 | Agent | Status | Surface | Defect/Gap | Change | Test | Evidence |
 |-------|--------|---------|-------------|--------|------|----------|

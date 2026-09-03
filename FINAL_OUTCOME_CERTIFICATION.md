@@ -67,10 +67,10 @@ owner through the Cloudflare dashboard/API or the branded release sequence.
 ## 7. Runtime and Deployment Readiness — PASS (repository) / BLOCKED_EXTERNAL (deployed state)
 
 Repository-verifiable:
-- `GET /ready` reports `sha`, `environment`, `migrationVersion: 0018_workers_ai_capacity_reservations`,
+- `GET /ready` reports `sha`, `environment`, `migrationVersion: 0019_deprecate_manual_capacity`,
   and configured dependencies (d1, aiFreeCapacity, durableObjects, assets, ai, aiGateway, baselineEngine,
   stripe) (`index.ts:30-68`).
-- Current candidate D1 schema `0018_workers_ai_capacity_reservations.sql` present; deployed `0017` immutable.
+- Current candidate D1 schema `0019_deprecate_manual_capacity.sql` present; deployed `0017` immutable.
 - Worker entry `src/runtime-entry.ts`; bindings: D1 `DB`, DO `THREADS`, AI binding; production vars correct.
 
 External (cannot be proven from repository — confirm in Cloudflare dashboard/API):

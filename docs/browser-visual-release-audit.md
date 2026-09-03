@@ -26,7 +26,7 @@ These evidence types are separate:
 
 The current text-first release records those automated fields as `false` when Browser Rendering was intentionally omitted.
 
-Before any visual acceptance, both branded `/ready` endpoints must prove the exact intended SHA, `ready: true`, migration `0018_workers_ai_capacity_reservations`, migration parity `current`, configured policy/privacy dependencies, and exact matching release evidence.
+Before any visual acceptance, both branded `/ready` endpoints must prove the exact intended SHA, `ready: true`, migration `0019_deprecate_manual_capacity`, migration parity `current`, configured policy/privacy dependencies, and exact matching release evidence.
 
 ## Visual authority
 

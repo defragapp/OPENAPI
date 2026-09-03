@@ -55,7 +55,7 @@ The ordinary answer model does not receive raw birth inputs, exact private locat
 
 The deterministic input router receives the bounded user message only. It does not receive Baseline data, People/System records, entitlements, exact location, credentials, or hidden prompts.
 
-Current policy/privacy schema is `0018_workers_ai_capacity_reservations`. Authenticated account export is generated on demand and is not part of model context.
+Current policy/privacy schema is `0019_deprecate_manual_capacity`. Authenticated account export is generated on demand and is not part of model context.
 
 ## Product scope decisions
 

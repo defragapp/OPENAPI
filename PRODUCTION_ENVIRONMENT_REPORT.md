@@ -31,7 +31,7 @@ Both hosts report identical, expected values (AGENTS.md line 21 satisfied):
 | `sha` | `e2e7c2389dafa4621632db0dede9964d6ac80d08` | same |
 | `version` | `e2e7c2389dafa4621632db0dede9964d6ac80d08` | same |
 | `environment` | production | production |
-| `migrationVersion` | `0018_workers_ai_capacity_reservations` | same |
+| `migrationVersion` | `0019_deprecate_manual_capacity` | same |
 | `latestMigrationVersion` | `0018_...` | same |
 | `dependencies.migrationParity` | `current` | same |
 | `releaseEvidence.sha` | `e2e7c23...` | same |

@@ -15,13 +15,13 @@ Production configuration remains repository-owned. Isolated review preview uses 
 - AI: Workers AI through Gateway `sovereign-ai-gateway`
 - model: `@cf/zai-org/glm-4.7-flash`
 - capacity-ledger foundation: migration `0013_workers_ai_free_capacity`
-- current schema target: `0018_workers_ai_capacity_reservations`
+- current schema target: `0019_deprecate_manual_capacity`
 - assets: compiled Sovereign.OS web application
 - R2/Queue: disabled
 - private export behavior: on-demand/no-artifact
 - video/Worlds: not required for current preview acceptance
 
-`0013_workers_ai_free_capacity` is retained as daily-ledger lineage, and deployed `0017_privacy_access_and_eligibility` remains immutable. Current preview parity must advance through `0018_workers_ai_capacity_reservations`.
+`0013_workers_ai_free_capacity` is retained as daily-ledger lineage, and deployed `0017_privacy_access_and_eligibility` remains immutable. Current preview parity must advance through `0019_deprecate_manual_capacity`.
 
 Preview must never attach a production custom domain, production D1 database, live Stripe credential/customer state, or production route.
 
@@ -40,7 +40,7 @@ pnpm verify:cloudflare-build
 pnpm preview:bootstrap
 ```
 
-The preview must apply migrations through `0018_workers_ai_capacity_reservations`, use the same structured text-answer adapter as production, bypass personalized Gateway cache, disable persistent prompt logging, and preserve controlled capacity/failure behavior.
+The preview must apply migrations through `0019_deprecate_manual_capacity`, use the same structured text-answer adapter as production, bypass personalized Gateway cache, disable persistent prompt logging, and preserve controlled capacity/failure behavior.
 
 Protect the entire preview hostname with Cloudflare Access before treating it as private founder/reviewer evidence.
 

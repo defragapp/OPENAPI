@@ -19,7 +19,7 @@ Release SHA: e2e7c2389dafa4621632db0dede9964d6ac80d08
 | Authenticated app | https://app.defrag.app |
 | Worker | `sovv-web` |
 | D1 database | `sovereign-openapi-db` |
-| Migration | `0018_workers_ai_capacity_reservations` (current) |
+| Migration | `0019_deprecate_manual_capacity` (current) |
 | AI model | `@cf/zai-org/glm-4.7-flash` via AI Gateway |
 | Release tags | `release-v1.0.0`, `release-certified-baseline` |
 

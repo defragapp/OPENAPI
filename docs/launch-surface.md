@@ -95,7 +95,7 @@ A launch candidate is not technically live until one exact current `origin/main`
 
 1. green `pnpm verify:cloudflare-build` evidence;
 2. successful release through `pnpm production:release:text` for that same SHA;
-3. D1 migration parity through `0018_workers_ai_capacity_reservations`;
+3. D1 migration parity through `0019_deprecate_manual_capacity`;
 4. exact-SHA `/health` and `/ready` convergence on both branded domains;
 5. configured policy acceptance receipts and privacy access controls;
 6. matching exact-SHA release evidence;

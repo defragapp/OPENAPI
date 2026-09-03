@@ -11,7 +11,7 @@ Earlier Sovereign.OS releases used Cloudflare Workers Builds triggers and build-
 - Worker: `sovv-web`;
 - public domain: `https://sovereign.defrag.app`;
 - authenticated app/API: `https://app.defrag.app`;
-- current candidate schema: `0018_workers_ai_capacity_reservations` after immutable deployed `0017_privacy_access_and_eligibility`;
+- current candidate schema: `0019_deprecate_manual_capacity` after immutable deployed `0017_privacy_access_and_eligibility`;
 - private export: on-demand/no-artifact;
 - current launch: text-first; Worlds/video not active.
 

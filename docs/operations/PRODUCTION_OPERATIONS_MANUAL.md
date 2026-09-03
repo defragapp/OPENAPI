@@ -99,7 +99,7 @@ These are documentation/audit artifacts, not production-impacting code.
 | Operation | Method | Notes |
 | --- | --- | --- |
 | Migration application | `pnpm production:release:text` (automatic) | Applied before deploy |
-| Migration verification | `GET /ready` → `migrationVersion` | Must be `0018_workers_ai_capacity_reservations` |
+| Migration verification | `GET /ready` → `migrationVersion` | Must be `0019_deprecate_manual_capacity` |
 | Migration parity | `GET /ready` → `dependencies.migrationParity` | Must be `current` |
 | Backup/recovery | Cloudflare D1 automatic backups | Verify backup schedule in dashboard |
 | Direct queries | `wrangler d1 execute sovereign-openapi-db` | Use read-replica when possible |
@@ -171,7 +171,7 @@ These are documentation/audit artifacts, not production-impacting code.
 After each release, verify:
 1. Both `/ready` endpoints report exact target SHA
 2. `ready: true` on both domains
-3. `migrationVersion: 0018_workers_ai_capacity_reservations`
+3. `migrationVersion: 0019_deprecate_manual_capacity`
 4. `migrationParity: current`
 5. `policyAcceptanceReceipts: configured`
 6. `privacyAccessControls: configured`

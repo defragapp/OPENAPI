@@ -8,7 +8,7 @@ Status: current production infrastructure guidance for `defragapp/OPENAPI`.
 - Production Worker: `sovv-web`.
 - D1 binding: `DB`.
 - D1 database: `sovereign-openapi-db`.
-- Current schema: `0018_workers_ai_capacity_reservations`.
+- Current schema: `0019_deprecate_manual_capacity`.
 - Capacity ledger foundation: `0013_workers_ai_free_capacity`.
 - Release-evidence table foundation: `0015_release_evidence`.
 - Policy-receipt foundation: `0016_policy_acceptance_receipts`.
@@ -44,7 +44,7 @@ The text-first release path:
 2. verifies migrations/release configuration;
 3. verifies the publicly served DMARC record;
 4. resolves the existing production D1 database and prepares the exact production config;
-5. applies migrations through `0018_workers_ai_capacity_reservations`;
+5. applies migrations through `0019_deprecate_manual_capacity`;
 6. verifies required Worker secrets;
 7. configures/verifies the Free-plan controls below;
 8. deploys exactly one `sovv-web` version;

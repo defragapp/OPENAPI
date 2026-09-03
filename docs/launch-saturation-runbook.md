@@ -29,6 +29,6 @@ Stop the harness and all canary traffic. Preserve its JSON artifact and logs wit
 
 ## Evidence and remaining acceptance gates
 
-Evidence must bind source SHA, built artifact SHA, Wrangler configuration hashes, immutable migration `0018_workers_ai_capacity_reservations`, timestamps, commands/results, canary target, harness artifact, and readiness payloads. Migration `0017_privacy_access_and_eligibility` remains unchanged because it is already deployed. Automated fields may be true only for checks that actually ran.
+Evidence must bind source SHA, built artifact SHA, Wrangler configuration hashes, immutable migration `0019_deprecate_manual_capacity`, timestamps, commands/results, canary target, harness artifact, and readiness payloads. Migration `0017_privacy_access_and_eligibility` remains unchanged because it is already deployed. Automated fields may be true only for checks that actually ran.
 
 Before merge or release, humans must review desktop and iPhone presentation, operational language, billing behavior, and accessibility. Provider owners must independently confirm Gateway rate limit/logging, Access, D1 bindings, disabled R2/Queues, secrets, and canary isolation. Production deployment and worldwide launch acceptance remain separate explicit decisions.

@@ -29,5 +29,5 @@
 - Ensured no files were deleted and no application code or behavior was modified during this audit.
 
 ## Remaining Launch-Readiness Documentation Gaps
-- Could benefit from a concrete data model schema mapping document to explicitly trace migrations to actual query patterns, helping future backend engineers navigate `0018_workers_ai_capacity_reservations` and `0017_privacy_access_and_eligibility`.
+- Could benefit from a concrete data model schema mapping document to explicitly trace migrations to actual query patterns, helping future backend engineers navigate `0019_deprecate_manual_capacity` and `0017_privacy_access_and_eligibility`.
 - Explicit documentation on frontend-backend contract types (e.g., the structure of API responses matching frontend expectations) would strengthen the Backend documentation pillar.
