@@ -1,6 +1,6 @@
 export const RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1';
-export const RELEASE_MIGRATION_VERSION = '0018_workers_ai_capacity_reservations';
-export const RELEASE_MIGRATION_FILENAME = '0018_workers_ai_capacity_reservations.sql';
+export const RELEASE_MIGRATION_VERSION = '0019_deprecate_manual_capacity';
+export const RELEASE_MIGRATION_FILENAME = '0019_deprecate_manual_capacity.sql';
 export const RELEASE_ROUTE_COHESION_CONTRACT = 'sovereign-deployed-route-cohesion-v1';
 export const RELEASE_RENDERED_VISUAL_CONTRACT = 'sovereign-rendered-page-family-audit-v1';
 export const RELEASE_PROGRESS_CONTRACT = 'sovereign-production-release-progress.v1';

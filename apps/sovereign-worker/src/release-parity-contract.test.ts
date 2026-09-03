@@ -8,7 +8,7 @@ const runtime = readFileSync(resolve(workerRoot, 'src/runtime-entry.ts'), 'utf8'
 const releaseEvidenceRuntime = readFileSync(resolve(workerRoot, 'src/release-evidence.ts'), 'utf8');
 const policyReceiptMigration = readFileSync(resolve(workerRoot, 'migrations/0016_policy_acceptance_receipts.sql'), 'utf8');
 const privacyAccessMigration = readFileSync(resolve(workerRoot, 'migrations/0017_privacy_access_and_eligibility.sql'), 'utf8');
-const capacityReservationMigration = readFileSync(resolve(workerRoot, 'migrations/0018_workers_ai_capacity_reservations.sql'), 'utf8');
+const capacityReservationMigration = readFileSync(resolve(workerRoot, 'migrations/0019_deprecate_manual_capacity.sql'), 'utf8');
 const packageJson = readFileSync(resolve(repositoryRoot, 'package.json'), 'utf8');
 const wranglerConfig = readFileSync(resolve(repositoryRoot, 'wrangler.jsonc'), 'utf8');
 const releaseWrapper = readFileSync(resolve(repositoryRoot, 'scripts/cloudflare-production-release.mjs'), 'utf8');
@@ -38,8 +38,8 @@ describe('production release parity contract', () => {
     expect(runtime).toContain("const RELEASE_EVIDENCE_MIGRATION_VERSION = '0015_release_evidence'");
     expect(runtime).toContain("const POLICY_RECEIPT_MIGRATION_VERSION = '0016_policy_acceptance_receipts'");
     expect(runtime).toContain("const PRIVACY_ACCESS_MIGRATION_VERSION = '0017_privacy_access_and_eligibility'");
-    expect(runtime).toContain("const LATEST_MIGRATION_VERSION = '0018_workers_ai_capacity_reservations'");
-    expect(runtime).toContain("const LATEST_MIGRATION_FILENAME = '0018_workers_ai_capacity_reservations.sql'");
+    expect(runtime).toContain("const LATEST_MIGRATION_VERSION = '0019_deprecate_manual_capacity'");
+    expect(runtime).toContain("const LATEST_MIGRATION_FILENAME = '0019_deprecate_manual_capacity.sql'");
     expect(runtime).toContain("name = 'release_evidence'");
     expect(runtime).toContain("name = 'release_progress'");
     expect(runtime).toContain("name = 'policy_acceptance_receipts'");
@@ -141,8 +141,8 @@ describe('production release parity contract', () => {
 
   it('publishes exact-SHA application release evidence with explicit verification provenance', () => {
     expect(releaseEvidenceLibrary).toContain("RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
-    expect(releaseEvidenceLibrary).toContain("RELEASE_MIGRATION_VERSION = '0018_workers_ai_capacity_reservations'");
-    expect(releaseEvidenceLibrary).toContain("RELEASE_MIGRATION_FILENAME = '0018_workers_ai_capacity_reservations.sql'");
+    expect(releaseEvidenceLibrary).toContain("RELEASE_MIGRATION_VERSION = '0019_deprecate_manual_capacity'");
+    expect(releaseEvidenceLibrary).toContain("RELEASE_MIGRATION_FILENAME = '0019_deprecate_manual_capacity.sql'");
     expect(evidenceWriter).toContain('upsertReleaseEvidenceSql');
     expect(evidenceWriter).toContain("status='success'");
     expect(evidenceWriter).toContain('releaseEvidenceEquals');
@@ -155,7 +155,7 @@ describe('production release parity contract', () => {
     expect(releaseEvidenceRuntime).toContain('env.DB.prepare');
     expect(releaseEvidenceRuntime).toContain("status = 'success'");
     expect(releaseEvidenceRuntime).toContain("RELEASE_EVIDENCE_CONTRACT = 'sovereign-production-release-evidence.v1'");
-    expect(releaseEvidenceRuntime).toContain("RELEASE_MIGRATION_VERSION = '0018_workers_ai_capacity_reservations'");
+    expect(releaseEvidenceRuntime).toContain("RELEASE_MIGRATION_VERSION = '0019_deprecate_manual_capacity'");
     expect(releaseEvidenceRuntime).toContain('evidence.sha !== sha');
     expect(releaseEvidenceRuntime).toContain('evidence.dmarcVerified !== true');
     expect(runtime).toContain("import { readProductionReleaseEvidence, writeProductionReleaseEvidence, writeProductionReleaseProgress } from './release-evidence'");
