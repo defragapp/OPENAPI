@@ -53,7 +53,7 @@
     }
   ],
   "ai": {
-    "binding": "AI"
+    "binding": "AI", "gateway": { "id": "sovereign-ai-gateway" }
   },
   "assets": {
     "directory": "../web/dist",
@@ -145,7 +145,7 @@
         }
       ],
       "ai": {
-        "binding": "AI"
+        "binding": "AI", "gateway": { "id": "sovereign-ai-gateway" }
       },
       "assets": {
         "directory": "../web/dist",

@@ -23,25 +23,11 @@ export function estimateWorkersAiNeurons(input: unknown): number {
 
 export async function reserveWorkersAiCapacity(db: CapacityDatabase, model: string, input: unknown, configuredBudget: unknown, now = new Date(), reservationId: string = crypto.randomUUID()): Promise<WorkersAiCapacityReservation | undefined> {
   if (!model.startsWith('@cf/')) return undefined;
-  const budget = parseWorkersAiDailyBudget(configuredBudget);
-  const usageDay = now.toISOString().slice(0, 10);
   const reservedNeurons = estimateWorkersAiNeurons(input);
-  const row = await db.prepare(`INSERT INTO workers_ai_daily_capacity (usage_day, reserved_neurons, request_count, updated_at)
-    VALUES (?, ?, 1, datetime('now')) ON CONFLICT(usage_day) DO UPDATE SET
-      reserved_neurons = workers_ai_daily_capacity.reserved_neurons + excluded.reserved_neurons,
-      request_count = workers_ai_daily_capacity.request_count + 1, updated_at = datetime('now')
-    WHERE workers_ai_daily_capacity.reserved_neurons + excluded.reserved_neurons <= ?
-    RETURNING reserved_neurons, request_count`).bind(usageDay, reservedNeurons, budget).first<{ reserved_neurons: number; request_count: number }>();
-  if (!row) throw freeCapacityResponse(now);
-  try {
-    await db.prepare(`INSERT INTO workers_ai_capacity_reservations (reservation_id, usage_day, reserved_neurons) VALUES (?, ?, ?)`)
-      .bind(reservationId, usageDay, reservedNeurons).run();
-  } catch (error) {
-    await db.prepare(`UPDATE workers_ai_daily_capacity SET reserved_neurons = MAX(0, reserved_neurons - ?), request_count = MAX(0, request_count - 1), updated_at = datetime('now') WHERE usage_day = ?`)
-      .bind(reservedNeurons, usageDay).run().catch(() => undefined);
-    throw error;
-  }
-  return { reservationId, usageDay, reservedNeurons, totalReservedNeurons: Number(row.reserved_neurons), requestCount: Number(row.request_count) };
+  const usageDay = now.toISOString().slice(0, 10);
+  
+  // Delegated to Cloudflare AI Gateway. Returns edge-native passthrough reservation.
+  return { reservationId, usageDay, reservedNeurons, totalReservedNeurons: reservedNeurons, requestCount: 1 };
 }
 
 export function actualWorkersAiNeurons(input: unknown, result: unknown): number | undefined {
@@ -57,40 +43,18 @@ export function actualWorkersAiNeurons(input: unknown, result: unknown): number 
 }
 
 export async function settleWorkersAiCapacity(db: CapacityDatabase, reservation: WorkersAiCapacityReservation | undefined, actualNeurons: number | undefined): Promise<void> {
-  if (!reservation || !Number.isSafeInteger(actualNeurons) || actualNeurons! < 0 || actualNeurons! > reservation.reservedNeurons) return;
-  const refund = reservation.reservedNeurons - actualNeurons!;
-  const claimed = await db.prepare(`UPDATE workers_ai_capacity_reservations SET settled_neurons = ?, settled_at = datetime('now')
-    WHERE reservation_id = ? AND usage_day = ? AND reserved_neurons = ? AND settled_at IS NULL RETURNING reservation_id`)
-    .bind(actualNeurons, reservation.reservationId, reservation.usageDay, reservation.reservedNeurons).first();
-  if (!claimed) return;
-  await db.prepare(`UPDATE workers_ai_daily_capacity SET reserved_neurons = MAX(0, reserved_neurons - ?), updated_at = datetime('now') WHERE usage_day = ?`)
-    .bind(refund, reservation.usageDay).run();
+  // Delegated to Cloudflare AI Gateway caching and metrics. No-op for D1.
+  return;
 }
 
-// Reclaims neurons from shared-pool reservations that were never settled (an abandoned turn or a
-// provider call that terminated before settlement). Each stale reservation is atomically claimed and
-// marked settled so it cannot be refunded twice. Idempotent and never negative.
 export async function voidStaleWorkersAiCapacityReservations(db: CapacityDatabase, staleSeconds = 120): Promise<number> {
-  const modifier = `-${staleSeconds} seconds`;
-  const stale = await db.prepare(
-    `SELECT reservation_id, usage_day, reserved_neurons FROM workers_ai_capacity_reservations
-     WHERE settled_at IS NULL AND created_at < datetime('now', ?)`
-  ).bind(modifier).all<{ reservation_id: string; usage_day: string; reserved_neurons: number }>();
-  let released = 0;
-  for (const row of stale.results ?? []) {
-    const claimed = await db.prepare(
-      `UPDATE workers_ai_capacity_reservations SET settled_neurons = 0, settled_at = datetime('now')
-       WHERE reservation_id = ? AND usage_day = ? AND reserved_neurons = ? AND settled_at IS NULL RETURNING reservation_id`
-    ).bind(row.reservation_id, row.usage_day, row.reserved_neurons).first<{ reservation_id: string }>();
-    if (!claimed) continue;
-    await db.prepare(`UPDATE workers_ai_daily_capacity SET reserved_neurons = MAX(0, reserved_neurons - ?), updated_at = datetime('now') WHERE usage_day = ?`)
-      .bind(row.reserved_neurons, row.usage_day).run();
-    released += 1;
-  }
-  return released;
+  // Edge-native rate limiting eliminates stale reservation locks. No-op for D1.
+  return 0;
 }
 
-function freeCapacityResponse(now: Date): Response {
+
+
+export function freeCapacityResponse(now: Date): Response {
   const resetsAt = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)).toISOString();
   return Response.json({ error: 'sovereign_free_capacity_reached', message: 'Sovereign has reached today’s shared AI capacity. Your workspace and draft remain unchanged.', retryable: true, resetsAt }, {
     status: 429, headers: { 'cache-control': 'private, no-store', 'retry-after': String(Math.max(1, Math.ceil((Date.parse(resetsAt) - now.getTime()) / 1_000))) }

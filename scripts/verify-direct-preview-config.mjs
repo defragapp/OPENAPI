@@ -32,7 +32,7 @@ const expectedObservability = {
 };
 const expectedGatewayId = 'sovereign-ai-gateway';
 const expectedModel = '@cf/zai-org/glm-4.7-flash';
-const currentMigration = '0018_workers_ai_capacity_reservations';
+const currentMigration = '0019_deprecate_manual_capacity';
 const capacityMigration = '0013_workers_ai_free_capacity';
 
 function requireValue(condition, message) {

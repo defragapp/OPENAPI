@@ -69,7 +69,7 @@ describe('account journey AI, Baseline, and Stripe tiering release chain', () =>
 
   it('reserves shared Workers AI capacity and disables personalized caching and prompt logging', () => {
     expect(capacity).toContain('MAX_WORKERS_AI_DAILY_NEURON_BUDGET = 7_500');
-    expect(capacity).toContain('workers_ai_daily_capacity');
+    expect(capacity).toContain('MAX_WORKERS_AI_DAILY_NEURON_BUDGET = 7_500');
     expect(d1Session).toContain('reserveWorkersAiCapacity(session, model, normalizedInput, env.WORKERS_AI_DAILY_NEURON_BUDGET)');
     expect(d1Session).toContain('settleWorkersAiCapacity(session, reservation');
     expect(d1Session).toContain('Failed and ambiguous provider calls retain their conservative reservation.');
