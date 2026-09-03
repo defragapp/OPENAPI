@@ -16011,18 +16011,17 @@ html[data-sovereign-production-readiness="desktop-ios-v1"] {
 }
 
 .landing-hero-atmosphere {
-  min-height: 320px;
-  position: relative;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.v0-hero .landing-hero-product-preview {
-  max-height: none !important;
-  overflow: visible !important;
-  padding-bottom: 2rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.4;
+  mask-image: radial-gradient(circle, black 40%, transparent 70%);
+  -webkit-mask-image: radial-gradient(circle, black 40%, transparent 70%);
 }
 
 .landing-hero-product-preview {
@@ -16046,4 +16045,3 @@ html[data-sovereign-production-readiness="desktop-ios-v1"] {
     border-right: 0;
   }
 }
-

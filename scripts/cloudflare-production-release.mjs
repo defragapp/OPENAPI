@@ -41,24 +41,7 @@ if (!apiToken) {
   process.env.CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID || '8b1954d216d65077c6480d62583fe2c2';
 }
 
-let result;
-try {
-  result = await orchestrateRelease();
-} catch (error) {
-  if (process.env.CI || process.env.CLOUDFLARE_BUILD) {
-    console.warn('[release-warning] Headless visual verification skipped due to environment limits:', error.message);
-    result = { status: 'success' };
-  } else {
-    throw error;
-  }
-}
+const result = await orchestrateRelease();
 console.log(JSON.stringify(result, null, 2));
-if (result.status !== 'success') {
-  if (process.env.CI || process.env.CLOUDFLARE_BUILD) {
-    console.warn('[release-warning] Forcing success despite post-deploy stage failure in cloud build:', result.stage);
-    result.status = 'success';
-  } else {
-    process.exitCode = 1;
-  }
-}
+if (result.status !== 'success') process.exitCode = 1;
 
