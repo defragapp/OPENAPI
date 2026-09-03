@@ -92,7 +92,7 @@ requireAll('failed response refunds', usage, [
   'turns_used = MAX(0, turns_used - ?)',
   '.bind(count, accountId, periodKey)'
 ]);
-requireAll('entry release integration', entry, ['releaseAiTurn(env, auth.accountId, usage.periodKey)', "migrationVersion: '0018_workers_ai_capacity_reservations'"]);
+requireAll('entry release integration', entry, ['releaseAiTurn(env, auth.accountId, usage.periodKey)', "migrationVersion: '0019_deprecate_manual_capacity'"]);
 
 requireAll('passkey migration', passkeyMigration, [
   'CREATE TABLE auth_passkeys',
@@ -131,7 +131,7 @@ requireAll('runtime passkey readiness', runtime, [
   "'/api/v1/auth/passkeys'",
   "passkeys: db?.passkeys_ready === 1 ? 'configured' : 'missing'",
   "dependencies.passkeys === 'configured'",
-  "const LATEST_MIGRATION_VERSION = '0018_workers_ai_capacity_reservations'"
+  "const LATEST_MIGRATION_VERSION = '0019_deprecate_manual_capacity'"
 ]);
 
 requireAll('transactional email', email, ['background:#0f0f0f', 'color:#f5f1e8', 'background:#e8ddd0', 'Sovereign.OS', 'Private account message', 'Do not forward it.', "provider: 'resend'"]);
@@ -150,7 +150,7 @@ assert(!controls.includes('http.request.method'), 'Free-plan rate-limit expressi
 
 requireAll('production deploy compatibility', deploy, [
   "const model = '@cf/zai-org/glm-4.7-flash'",
-  "const migrationVersion = '0018_workers_ai_capacity_reservations'",
+  "const migrationVersion = '0019_deprecate_manual_capacity'",
   'configureCloudflareFreeTier',
   "'d1', 'migrations', 'apply'",
   "'deploy', '--config', generatedConfigPath",

@@ -36,7 +36,7 @@ async function healthPayload(env: Env) {
     sha: env.APP_VERSION,
     version: env.APP_VERSION,
     environment: env.APP_ENV,
-    migrationVersion: '0018_workers_ai_capacity_reservations',
+    migrationVersion: '0019_deprecate_manual_capacity',
     dependencies: {
       d1: db?.ok === 1 ? 'ok' : 'degraded',
       aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing',
@@ -70,7 +70,7 @@ app.get('/ready', async (context) => {
     privateExports: 'on-demand-no-artifact',
     releaseEvidence: {
       sha: context.env.APP_VERSION,
-      migrationVersion: '0018_workers_ai_capacity_reservations'
+      migrationVersion: '0019_deprecate_manual_capacity'
     }
   });
 });

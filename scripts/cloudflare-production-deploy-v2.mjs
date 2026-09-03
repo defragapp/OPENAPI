@@ -19,7 +19,7 @@ const d1Name = 'sovereign-openapi-db';
 const model = '@cf/zai-org/glm-4.7-flash';
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
-const migrationVersion = '0018_workers_ai_capacity_reservations';
+const migrationVersion = '0019_deprecate_manual_capacity';
 const turnstileSiteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAADhGIF8-iOLIg8MU').trim();
 
 if (!accountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is required');
