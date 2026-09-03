@@ -16047,11 +16047,15 @@ html[data-sovereign-production-readiness="desktop-ios-v1"] {
 }
 
 .landing-question-orbit {
-  position: absolute;
-  top: 10vh;
-  left: 0;
-  width: 100%;
+  height: 1px !important;
+  min-height: 1px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  overflow: visible !important;
+  position: relative !important;
   z-index: 10;
 }
+
 
 
