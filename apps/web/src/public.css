@@ -16046,16 +16046,12 @@ html[data-sovereign-production-readiness="desktop-ios-v1"] {
   }
 }
 
-.sovereign-landing {
-  display: flex;
-  flex-direction: column;
+.landing-question-orbit {
+  position: absolute;
+  top: 10vh;
+  left: 0;
+  width: 100%;
+  z-index: 10;
 }
 
-.sovereign-landing > .landing-question-orbit {
-  order: 1;
-}
-
-.sovereign-landing > .v0-footer {
-  order: 2;
-}
 
