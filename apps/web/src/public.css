@@ -16591,7 +16591,9 @@ html body .public-approved-v8 .landing-hero-product-preview {
 html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
   display: flex !important;
   flex-direction: column !important;
+  align-items: stretch !important;
   width: 100% !important;
+  max-width: 680px !important;
   background: rgba(18, 18, 18, 0.92) !important;
   backdrop-filter: blur(32px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
@@ -16606,6 +16608,7 @@ html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
+  width: 100% !important;
   margin-bottom: 24px !important;
 }
 
@@ -16624,6 +16627,7 @@ html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
 
 .card-welcome {
   text-align: left !important;
+  width: 100% !important;
   margin-bottom: 24px !important;
 }
 
@@ -16643,6 +16647,8 @@ html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
 
 /* Prompt Box */
 .prompt-box {
+  width: 100% !important;
+  box-sizing: border-box !important;
   background: rgba(255, 255, 255, 0.03) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 12px !important;
@@ -16652,6 +16658,7 @@ html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
 
 .prompt-box input {
   width: 100% !important;
+  box-sizing: border-box !important;
   background: transparent !important;
   border: none !important;
   color: #ffffff !important;
@@ -16665,20 +16672,7 @@ html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-}
-
-.prompt-tools button {
-  background: transparent !important;
-  border: none !important;
-  color: #777777 !important;
-  font-size: 15px !important;
-  cursor: pointer !important;
-  padding: 4px !important;
-  transition: color 0.2s !important;
-}
-
-.prompt-tools button:hover {
-  color: #ffffff !important;
+  width: 100% !important;
 }
 
 .tools-left {
