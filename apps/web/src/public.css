@@ -16411,50 +16411,99 @@ html[data-sovereign-production-readiness="desktop-ios-v1"] {
   }
 }
 
-/* ==========================================================================
-   POWDER THEME OVERRIDES FOR SOVEREIGN HERO (SPLIT SCREEN LAYOUT)
-   ========================================================================== */
-html body .public-approved-v8 .v0-hero.sovereign-opening-field {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) !important;
-  align-items: center !important;
-  gap: clamp(40px, 5vw, 72px) !important;
-  width: min(calc(100% - 48px), 1360px) !important;
-  max-width: 1360px !important;
-  margin: 0 auto !important;
-  padding: clamp(120px, 14vh, 160px) 0 clamp(60px, 8vh, 100px) !important;
-  text-align: left !important;
-  min-height: 92svh !important;
-  background:
-    radial-gradient(circle at 15% 25%, rgba(221, 162, 115, 0.05), transparent 32rem),
-    radial-gradient(circle at 85% 65%, rgba(159, 186, 161, 0.04), transparent 28rem),
-    linear-gradient(180deg, #050505 0%, #0d0f13 100%) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-}
 
-html body .public-approved-v8 .v0-hero-content {
-  width: 100% !important;
-  max-width: 540px !important;
+
+
+/* ==========================================================================
+   TRUE POWDER TEMPLATE FIDELITY (https://powder.framer.website/)
+   Applied to Sovereign.OS Root Hero while preserving exact Sovereign copy
+   ========================================================================== */
+
+/* Outer Hero Container */
+html body .public-approved-v8 .v0-hero.sovereign-opening-field {
+  position: relative !important;
   display: flex !important;
   flex-direction: column !important;
-  align-items: flex-start !important;
-  text-align: left !important;
-  margin: 0 !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: center !important;
+  padding: 96px 24px 0 !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 940px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  background-color: #000000 !important;
+  /* Powder template hill-glow gradient background */
+  background-image: 
+    radial-gradient(130% 65% at 50% 550px, rgba(211, 151, 148, 0.22) 0%, rgba(53, 63, 68, 0.3) 35%, rgba(27, 34, 40, 0.5) 60%, transparent 85%),
+    linear-gradient(180deg, #000000 0%, #050709 100%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
+/* Background Atmospheric Hills Layer from Powder template */
+html body .public-approved-v8 .v0-hero.sovereign-opening-field::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 360px !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 520px !important;
+  background-image: url("https://framerusercontent.com/images/h5VHoQg2qBhfygdenEQ0WUtEZU.png?width=2464&height=909") !important;
+  background-size: cover !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  opacity: 0.55 !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+html body .public-approved-v8 .v0-hero.sovereign-opening-field::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 440px !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 440px !important;
+  background-image: url("https://framerusercontent.com/images/T6hTfVKiQ81oLHCljxjb0WPLHY8.png?width=2464&height=848") !important;
+  background-size: cover !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  opacity: 0.65 !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+
+/* Center Content Column */
+html body .public-approved-v8 .v0-hero-content {
+  position: relative !important;
+  z-index: 5 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  max-width: 820px !important;
+  margin: 0 auto !important;
+}
+
+/* Powder Pill Badge */
 html body .public-approved-v8 .landing-hero-kicker {
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
-  padding: 6px 14px !important;
-  border-radius: 20px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: #a3a3a3 !important;
-  font-size: 11px !important;
-  letter-spacing: 0.08em !important;
-  text-transform: uppercase !important;
-  margin-bottom: 28px !important;
+  padding: 5px 14px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #e5e5e5 !important;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.01em !important;
+  text-transform: none !important;
+  margin: 0 0 16px 0 !important;
 }
 
 html body .public-approved-v8 .landing-hero-kicker > span {
@@ -16462,99 +16511,117 @@ html body .public-approved-v8 .landing-hero-kicker > span {
   height: 6px !important;
   background: #d4a373 !important;
   border-radius: 50% !important;
-  box-shadow: 0 0 8px rgba(212, 163, 115, 0.6) !important;
+  box-shadow: 0 0 8px rgba(212, 163, 115, 0.8) !important;
 }
 
+/* Powder Giant Hero Title */
 html body .public-approved-v8 .v0-hero h1 {
-  text-align: left !important;
-  margin: 0 0 20px 0 !important;
-  font-size: clamp(3.2rem, 5.5vw, 4.8rem) !important;
-  font-weight: 500 !important;
-  line-height: 1.04 !important;
+  text-align: center !important;
+  margin: 0 0 14px 0 !important;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
+  font-size: clamp(36px, 4.4vw, 56px) !important;
+  font-weight: 400 !important;
+  line-height: 1.15 !important;
   letter-spacing: -0.04em !important;
+  color: #fff3f0 !important;
+  max-width: 780px !important;
 }
 
 html body .public-approved-v8 .v0-hero h1 > span {
-  color: #ffffff !important;
-  display: block !important;
+  display: inline !important;
+  color: #fff3f0 !important;
+  text-shadow: none !important;
 }
 
 html body .public-approved-v8 .v0-hero h1 > em {
-  display: block !important;
-  color: #666666 !important;
+  display: inline !important;
+  color: #888888 !important;
   font-style: normal !important;
   font-weight: 400 !important;
   -webkit-text-stroke: 0 !important;
   text-shadow: none !important;
-  margin-top: 6px !important;
+  margin-left: 8px !important;
 }
 
+/* Powder Subtitle Copy */
 html body .public-approved-v8 .sovereign-opening-copy {
-  color: #888888 !important;
-  font-size: 16px !important;
-  line-height: 1.6 !important;
-  margin: 0 0 36px 0 !important;
-  max-width: 440px !important;
-  text-align: left !important;
+  color: #92ada9 !important;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 1.45 !important;
+  margin: 0 auto 20px !important;
+  max-width: 520px !important;
+  text-align: center !important;
 }
 
+/* Powder CTA Button */
 html body .public-approved-v8 .v0-get-started {
-  display: inline-block !important;
-  background: #ffffff !important;
-  color: #000000 !important;
-  padding: 14px 30px !important;
-  border-radius: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #050505 !important;
+  padding: 12px 32px !important;
+  border-radius: 999px !important;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
   font-weight: 500 !important;
   font-size: 14px !important;
   text-decoration: none !important;
   margin-top: 0 !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
   transition: all 0.2s ease !important;
 }
 
 html body .public-approved-v8 .v0-get-started:hover {
-  background: #f0f0f0 !important;
-  transform: translateY(-1px) !important;
+  background: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 32px rgba(255, 255, 255, 0.15) !important;
 }
 
 html body .public-approved-v8 .sovereign-opening-trust {
-  font-size: 12px !important;
-  color: #555555 !important;
-  margin-top: 14px !important;
-  text-align: left !important;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
+  font-size: 11.5px !important;
+  color: #666666 !important;
+  margin: 10px auto 0 !important;
+  text-align: center !important;
   display: block !important;
 }
 
-html body .public-approved-v8 .landing-hero-atmosphere {
-  display: none !important;
-}
-
+/* Powder Centered Floating App Mockup Card overlapping the hills */
 html body .public-approved-v8 .landing-hero-product-preview {
+  position: relative !important;
+  z-index: 5 !important;
   width: 100% !important;
-  margin: 0 !important;
+  max-width: 960px !important;
+  margin: 36px auto 0 !important;
 }
 
-/* Right Pane: Powder Style Demonstration Window */
 html body .public-approved-v8 .landing-demo-stage {
   display: grid !important;
-  grid-template-columns: 210px 1fr !important;
+  grid-template-columns: 240px 1fr !important;
   gap: 0 !important;
   width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
-  background: #111111 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 16px !important;
+  max-width: 960px !important;
+  margin: 0 auto !important;
+  background: rgba(23, 23, 23, 0.88) !important;
+  backdrop-filter: blur(28px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 24px 24px 0 0 !important;
   overflow: hidden !important;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 0 36px 80px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
+/* Mockup Left Category Sidebar */
 html body .public-approved-v8 .landing-demo-stage__rail {
-  background: #0d0d0d !important;
+  background: rgba(18, 18, 18, 0.7) !important;
   border: none !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 0 !important;
-  padding: 20px 14px !important;
+  padding: 24px 16px !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 6px !important;
@@ -16562,11 +16629,12 @@ html body .public-approved-v8 .landing-demo-stage__rail {
 
 html body .public-approved-v8 .landing-demo-stage__rail-btn {
   background: transparent !important;
-  border: none !important;
+  border: 1px solid transparent !important;
   color: #888888 !important;
   text-align: left !important;
   padding: 10px 14px !important;
-  border-radius: 8px !important;
+  border-radius: 10px !important;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
   font-size: 13px !important;
   font-weight: 400 !important;
   cursor: pointer !important;
@@ -16578,12 +16646,13 @@ html body .public-approved-v8 .landing-demo-stage__rail-btn {
 }
 
 html body .public-approved-v8 .landing-demo-stage__rail-btn:hover {
-  background: rgba(255, 255, 255, 0.04) !important;
-  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #eeeeee !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage__rail-btn.is-active {
-  background: rgba(255, 255, 255, 0.07) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
   color: #ffffff !important;
   font-weight: 500 !important;
 }
@@ -16593,11 +16662,11 @@ html body .public-approved-v8 .landing-demo-stage__dot {
   height: 6px !important;
   border-radius: 50% !important;
   flex: 0 0 6px !important;
-  box-shadow: none !important;
 }
 
+/* Mockup Right Interactive Viewport */
 html body .public-approved-v8 .landing-demo-stage__viewport {
-  background: #141414 !important;
+  background: transparent !important;
   padding: 0 !important;
 }
 
@@ -16609,30 +16678,32 @@ html body .public-approved-v8 .landing-demo-stage__window {
 }
 
 html body .public-approved-v8 .landing-demo-stage__body {
-  padding: 28px !important;
+  padding: 32px 36px !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 20px !important;
+  gap: 24px !important;
 }
 
+/* Powder Input Search Prompt Box */
 html body .public-approved-v8 .landing-demo-stage__prompt-row {
   display: flex !important;
   align-items: center !important;
   gap: 14px !important;
-  background: rgba(255, 255, 255, 0.03) !important;
-  padding: 14px 18px !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  padding: 16px 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 14px !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage__avatar {
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
   font-size: 11px !important;
   font-weight: 600 !important;
-  color: #777777 !important;
-  background: transparent !important;
-  width: auto !important;
-  height: auto !important;
-  border-radius: 0 !important;
+  color: #888888 !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage__prompt-bubble {
@@ -16640,33 +16711,38 @@ html body .public-approved-v8 .landing-demo-stage__prompt-bubble {
   border: none !important;
   background: transparent !important;
   max-width: none !important;
+  flex: 1 !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage__prompt-text {
-  font-size: 13.5px !important;
-  color: #eeeeee !important;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
+  font-size: 14px !important;
+  color: #ffffff !important;
   font-weight: 400 !important;
   line-height: 1.4 !important;
 }
 
+/* Powder Response Display */
 html body .public-approved-v8 .landing-demo-stage__response-row {
   display: flex !important;
-  gap: 14px !important;
+  gap: 16px !important;
   align-items: flex-start !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage__avatar.is-sov {
-  width: 26px !important;
-  height: 26px !important;
+  width: 28px !important;
+  height: 28px !important;
   border-radius: 50% !important;
   background: #d4a373 !important;
-  color: #000000 !important;
-  font-size: 12px !important;
+  color: #050505 !important;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
+  font-size: 12.5px !important;
   font-weight: 700 !important;
-  flex: 0 0 26px !important;
+  flex: 0 0 28px !important;
   display: grid !important;
   place-items: center !important;
-  margin-top: 2px !important;
+  margin-top: 3px !important;
+  box-shadow: 0 2px 8px rgba(212, 163, 115, 0.4) !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage__answer-card {
@@ -16677,34 +16753,37 @@ html body .public-approved-v8 .landing-demo-stage__answer-card {
 }
 
 html body .public-approved-v8 .landing-demo-stage__direct-answer {
-  font-size: 13.5px !important;
-  line-height: 1.6 !important;
-  color: #aaaaaa !important;
-  margin: 0 0 16px 0 !important;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
+  font-size: 14.5px !important;
+  line-height: 1.65 !important;
+  color: #cccccc !important;
+  margin: 0 0 18px 0 !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage__distinction {
-  background: rgba(255, 255, 255, 0.03) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-left: 2px solid #d4a373 !important;
-  padding: 12px 16px !important;
-  border-radius: 6px !important;
-  margin-bottom: 16px !important;
+  padding: 14px 18px !important;
+  border-radius: 8px !important;
+  margin-bottom: 18px !important;
   display: flex !important;
-  gap: 10px !important;
+  gap: 12px !important;
   align-items: flex-start !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage__distinction-icon {
   color: #d4a373 !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
   flex-shrink: 0 !important;
+  margin-top: 1px !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage__distinction-content {
-  font-size: 13px !important;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
+  font-size: 13.5px !important;
   color: #ffffff !important;
-  line-height: 1.45 !important;
+  line-height: 1.5 !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage__tags {
@@ -16714,32 +16793,18 @@ html body .public-approved-v8 .landing-demo-stage__tags {
 }
 
 html body .public-approved-v8 .landing-demo-stage__tag {
-  font-size: 11px !important;
-  padding: 4px 10px !important;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
+  font-size: 11.5px !important;
+  padding: 4px 12px !important;
   background: rgba(255, 255, 255, 0.06) !important;
-  border-radius: 4px !important;
-  color: #888888 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 6px !important;
+  color: #999999 !important;
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 900px) {
   html body .public-approved-v8 .v0-hero.sovereign-opening-field {
-    grid-template-columns: 1fr !important;
-    gap: 48px !important;
     padding-top: 100px !important;
-  }
-  html body .public-approved-v8 .v0-hero-content {
-    max-width: 100% !important;
-    align-items: center !important;
-    text-align: center !important;
-  }
-  html body .public-approved-v8 .v0-hero h1 {
-    text-align: center !important;
-  }
-  html body .public-approved-v8 .sovereign-opening-copy {
-    text-align: center !important;
-  }
-  html body .public-approved-v8 .sovereign-opening-trust {
-    text-align: center !important;
   }
   html body .public-approved-v8 .landing-demo-stage {
     grid-template-columns: 1fr !important;
@@ -16748,9 +16813,6 @@ html body .public-approved-v8 .landing-demo-stage__tag {
     flex-direction: row !important;
     overflow-x: auto !important;
     border-right: none !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-  }
-  html body .public-approved-v8 .landing-demo-stage__rail-btn {
-    white-space: nowrap !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   }
 }
