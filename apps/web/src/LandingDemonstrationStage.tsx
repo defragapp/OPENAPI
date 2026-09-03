@@ -103,17 +103,6 @@ export function LandingDemonstrationStage() {
           readOnly 
           aria-label="Active situational inquiry"
         />
-        <div className="prompt-tools">
-          <div className="tools-left">
-            <button type="button" aria-label="Attachment">📎</button>
-            <button type="button" aria-label="Analytics">📊</button>
-            <button type="button" aria-label="Quick Actions">⚡</button>
-          </div>
-          <div className="tools-right">
-            <button type="button" aria-label="Microphone">🎙️</button>
-            <button type="submit" className="send-btn" aria-label="Submit prompt">↑</button>
-          </div>
-        </div>
       </div>
 
       {/* 3. Powder Category Filter Pills Across Top */}
