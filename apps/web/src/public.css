@@ -16817,36 +16817,30 @@ html body .public-approved-v8 .v0-single-example-landing .landing-expression-fie
 }
 
 /* ==========================================================================
-   AUTHENTIC POWDER TEMPLATE FIDELITY (CLEAN SPLIT & PROPORTIONAL CARD)
+   AUTHENTIC POWDER TEMPLATE (CENTERED STACKED HERO & PROPORTIONAL CARD)
    ========================================================================== */
 
-/* Full-bleed edge-to-edge hero wrapper */
+/* 1. Hero Container - Full Bleed, Atmospheric Sunset Sky Gradient */
 html body .public-approved-v8 .v0-hero.sovereign-opening-field {
   position: relative !important;
   width: 100% !important;
   max-width: 100% !important;
   margin: 0 auto !important;
-  padding: 80px 48px 100px !important;
+  padding: 80px 24px 0 !important;
   box-sizing: border-box !important;
   overflow: visible !important;
   background-color: #000000 !important;
   background-image: 
-    radial-gradient(90% 55% at 50% 380px, rgba(211, 151, 148, 0.18) 0%, rgba(53, 63, 68, 0.22) 35%, transparent 75%),
-    linear-gradient(180deg, #000000 0%, #050709 100%) !important;
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, transparent 25%),
+    radial-gradient(160% 85% at 50% 0px, rgb(27, 34, 40) 0%, rgb(53, 63, 68) 42%, rgb(211, 151, 148) 95%) !important;
   border-bottom: none !important;
-  display: grid !important;
-  grid-template-columns: minmax(380px, 480px) minmax(460px, 580px) !important;
-  justify-content: center !important;
+  display: flex !important;
+  flex-direction: column !important;
   align-items: center !important;
-  gap: 72px !important;
+  justify-content: flex-start !important;
 }
 
-/* Hide background atmosphere canvas so the two-column layout is strictly left copy / right card */
-html body .public-approved-v8 .v0-hero .landing-hero-atmosphere {
-  display: none !important;
-}
-
-/* Full-width landscape hills stretching across the entire viewport */
+/* 2. Full-Width Landscape Hills Layering */
 html body .public-approved-v8 .v0-hero.sovereign-opening-field::before {
   content: "" !important;
   position: absolute !important;
@@ -16854,16 +16848,16 @@ html body .public-approved-v8 .v0-hero.sovereign-opening-field::before {
   left: 0 !important;
   right: 0 !important;
   width: 100% !important;
-  height: 480px !important;
+  height: 520px !important;
   background-image: url("/powder-hills-far.png") !important;
   background-size: cover !important;
   background-position: center bottom !important;
   background-repeat: no-repeat !important;
-  opacity: 0.45 !important;
+  opacity: 0.55 !important;
   pointer-events: none !important;
-  z-index: 1 !important;
-  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 98%) !important;
-  mask-image: linear-gradient(to bottom, black 50%, transparent 98%) !important;
+  z-index: 10 !important; /* Hills layer in front of the card */
+  -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 100%) !important;
+  mask-image: linear-gradient(to bottom, black 65%, transparent 100%) !important;
 }
 
 html body .public-approved-v8 .v0-hero.sovereign-opening-field::after {
@@ -16873,137 +16867,148 @@ html body .public-approved-v8 .v0-hero.sovereign-opening-field::after {
   left: 0 !important;
   right: 0 !important;
   width: 100% !important;
-  height: 380px !important;
+  height: 400px !important;
   background-image: url("/powder-hills-mid.png") !important;
   background-size: cover !important;
   background-position: center bottom !important;
   background-repeat: no-repeat !important;
-  opacity: 0.55 !important;
+  opacity: 0.75 !important;
   pointer-events: none !important;
-  z-index: 2 !important;
-  -webkit-mask-image: linear-gradient(to bottom, black 45%, transparent 98%) !important;
-  mask-image: linear-gradient(to bottom, black 45%, transparent 98%) !important;
+  z-index: 11 !important; /* Mid hills layer over far hills */
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%) !important;
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%) !important;
 }
 
-/* Constrained 2-column grid container */
-html body .public-approved-v8 .v0-hero.sovereign-opening-field > * {
+/* Hide background atmosphere canvas from interfering with layout */
+html body .public-approved-v8 .v0-hero .landing-hero-atmosphere {
+  display: none !important;
+}
+
+/* 3. Centered Hero Content */
+html body .public-approved-v8 .v0-hero-content {
   position: relative !important;
   z-index: 5 !important;
-}
-
-/* Left Hero Column: Balanced Typography & Spacing */
-html body .public-approved-v8 .v0-hero-content {
-  grid-column: 1 !important;
   display: flex !important;
   flex-direction: column !important;
-  align-items: flex-start !important;
-  text-align: left !important;
+  align-items: center !important;
+  text-align: center !important;
   width: 100% !important;
-  max-width: 480px !important;
-  margin: 0 !important;
+  max-width: 820px !important;
+  margin: 0 auto 56px auto !important;
 }
 
 html body .public-approved-v8 .landing-hero-kicker {
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
-  padding: 5px 14px !important;
+  padding: 6px 16px !important;
   border-radius: 999px !important;
   background: rgba(255, 255, 255, 0.08) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   color: #e5e5e5 !important;
-  font-size: 11px !important;
-  letter-spacing: 0.04em !important;
-  text-transform: uppercase !important;
-  margin: 0 0 20px 0 !important;
+  font-size: 12px !important;
+  letter-spacing: 0.02em !important;
+  text-transform: none !important;
+  margin: 0 auto 28px auto !important;
 }
 
 html body .public-approved-v8 .landing-hero-kicker > span {
-  width: 5px !important;
-  height: 5px !important;
+  width: 6px !important;
+  height: 6px !important;
   background: #d4a373 !important;
   border-radius: 50% !important;
 }
 
 html body .public-approved-v8 .v0-hero h1 {
-  font-size: clamp(40px, 4vw, 56px) !important;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
+  font-size: clamp(40px, 5.2vw, 64px) !important;
   font-weight: 500 !important;
-  line-height: 1.08 !important;
+  line-height: 1.1 !important;
   letter-spacing: -0.04em !important;
-  color: #ffffff !important;
+  color: rgb(255, 243, 240) !important;
+  text-align: center !important;
   margin: 0 0 20px 0 !important;
 }
 
 html body .public-approved-v8 .v0-hero h1 > span {
   display: block !important;
-  color: #ffffff !important;
+  color: rgb(255, 243, 240) !important;
 }
 
 html body .public-approved-v8 .v0-hero h1 > em {
   display: block !important;
-  color: #666666 !important;
+  color: #8c7370 !important;
   font-style: normal !important;
   font-weight: 400 !important;
 }
 
 html body .public-approved-v8 .sovereign-opening-copy {
-  color: #92ada9 !important;
-  font-size: 15px !important;
-  line-height: 1.5 !important;
-  margin: 0 0 28px 0 !important;
-  max-width: 420px !important;
-  text-align: left !important;
+  color: #c5d6d3 !important;
+  font-size: 16px !important;
+  line-height: 1.55 !important;
+  margin: 0 auto 32px auto !important;
+  max-width: 580px !important;
+  text-align: center !important;
 }
 
 html body .public-approved-v8 .v0-get-started {
   background: #ffffff !important;
   color: #050505 !important;
-  padding: 12px 28px !important;
+  padding: 13px 32px !important;
   border-radius: 999px !important;
   font-weight: 500 !important;
-  font-size: 14px !important;
+  font-size: 14.5px !important;
   text-decoration: none !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+  margin: 0 auto !important;
 }
 
 html body .public-approved-v8 .sovereign-opening-trust {
-  font-size: 11px !important;
-  color: #666666 !important;
-  margin: 12px 0 0 0 !important;
-  text-align: left !important;
+  font-size: 11.5px !important;
+  color: #888888 !important;
+  margin: 14px auto 0 auto !important;
+  text-align: center !important;
 }
 
-/* Right Column: Powder Compact Card Preview */
+/* 4. Center-Aligned Powder App Window Stage */
 html body .public-approved-v8 .landing-hero-product-preview {
-  grid-column: 2 !important;
+  position: relative !important;
+  z-index: 4 !important; /* Sits behind the rising foreground hills */
   width: 100% !important;
-  max-width: 580px !important;
-  margin: 0 !important;
+  max-width: 960px !important;
+  margin: 0 auto !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
   display: flex !important;
   flex-direction: column !important;
   width: 100% !important;
-  background: rgba(18, 18, 18, 0.9) !important;
-  backdrop-filter: blur(28px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 20px !important;
-  padding: 32px !important;
+  background: rgba(23, 23, 23, 0.88) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-bottom: none !important;
+  border-radius: 24px 24px 0 0 !important; /* Top rounded only, sinking into the hills */
+  padding: 40px 44px 140px 44px !important; /* Generous bottom padding to sit behind landscape */
   box-sizing: border-box !important;
-  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
 }
 
 .card-top-header {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  margin-bottom: 20px !important;
+  width: 100% !important;
+  margin-bottom: 28px !important;
+}
+
+.card-top-logo {
+  display: flex !important;
+  align-items: center !important;
 }
 
 .card-badge {
-  font-size: 10px !important;
+  font-size: 10.5px !important;
   letter-spacing: 0.08em !important;
   text-transform: uppercase !important;
   color: #d4a373 !important;
@@ -17011,32 +17016,32 @@ html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
 }
 
 .card-welcome {
-  text-align: left !important;
-  margin-bottom: 20px !important;
+  text-align: center !important;
+  margin-bottom: 24px !important;
 }
 
 .card-welcome h2 {
-  font-size: 22px !important;
+  font-size: 26px !important;
   font-weight: 400 !important;
-  color: #ffffff !important;
-  margin: 0 0 4px 0 !important;
+  color: rgb(250, 230, 225) !important;
+  margin: 0 0 6px 0 !important;
 }
 
 .card-welcome p {
-  color: #777777 !important;
-  font-size: 13.5px !important;
+  color: rgb(146, 173, 169) !important;
+  font-size: 14px !important;
   margin: 0 !important;
 }
 
-/* Prompt input field */
+/* Prompt Box */
 .prompt-box {
   width: 100% !important;
   box-sizing: border-box !important;
   background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 12px !important;
-  padding: 14px 16px !important;
-  margin-bottom: 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 14px !important;
+  padding: 16px 20px !important;
+  margin-bottom: 20px !important;
 }
 
 .prompt-box input {
@@ -17044,41 +17049,11 @@ html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
   background: transparent !important;
   border: none !important;
   color: #ffffff !important;
-  margin-bottom: 0 !important;
+  margin: 0 !important;
   outline: none !important;
-  font-size: 13.5px !important;
-}
-
-.prompt-tools {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-}
-
-.tools-left {
-  display: flex !important;
-  gap: 10px !important;
-}
-
-.tools-left button, .tools-right button {
-  background: transparent !important;
-  border: none !important;
-  color: #666666 !important;
-  font-size: 15px !important;
-  cursor: pointer !important;
-  padding: 0 !important;
-}
-
-.tools-right .send-btn {
-  background: #2a2a2a !important;
-  color: #ffffff !important;
-  width: 24px !important;
-  height: 24px !important;
-  border-radius: 50% !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 12px !important;
+  font-size: 14px !important;
+  font-family: inherit !important;
+  text-align: left !important;
 }
 
 /* Category Filter Pills */
@@ -17086,40 +17061,47 @@ html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  margin-bottom: 12px !important;
-  overflow-x: auto !important;
+  margin-bottom: 16px !important;
 }
 
 .filters-left {
   display: flex !important;
   gap: 8px !important;
+  flex-wrap: wrap !important;
 }
 
 .filters-left button {
   background: transparent !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: #777777 !important;
-  padding: 5px 12px !important;
-  border-radius: 16px !important;
-  font-size: 12px !important;
+  color: #888888 !important;
+  padding: 6px 14px !important;
+  border-radius: 18px !important;
+  font-size: 12.5px !important;
   cursor: pointer !important;
   white-space: nowrap !important;
+  transition: all 0.2s ease !important;
+}
+
+.filters-left button:hover {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
 }
 
 .filters-left button.active {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
   border-color: transparent !important;
   color: #ffffff !important;
 }
 
-/* CRITICAL: HIDE THE BLOATED ANSWER BLOCK IN THE HERO CARD */
-html body .public-approved-v8 .landing-demo-stage__response-row,
-html body .public-approved-v8 .landing-demo-stage__answer-card,
-html body .public-approved-v8 .powder-stage-response {
-  display: none !important;
+.search-icon {
+  background: transparent !important;
+  border: none !important;
+  color: #777777 !important;
+  cursor: pointer !important;
+  padding: 4px !important;
 }
 
-/* Suggestion List Rows - Powder compact 4-item display */
+/* Suggestion List Rows */
 .suggestion-list {
   list-style: none !important;
   padding: 0 !important;
@@ -17130,19 +17112,19 @@ html body .public-approved-v8 .powder-stage-response {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  padding: 10px 0 !important;
+  padding: 12px 0 !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
   color: #888888 !important;
-  font-size: 13px !important;
+  font-size: 13.5px !important;
   cursor: pointer !important;
   transition: color 0.2s ease !important;
 }
 
-.suggestion-list li:nth-child(n+5) {
+.suggestion-list li:nth-child(n+4) {
   display: none !important;
 }
 
-.suggestion-list li:nth-child(4) {
+.suggestion-list li:nth-child(3) {
   border-bottom: none !important;
 }
 
@@ -17153,7 +17135,7 @@ html body .public-approved-v8 .powder-stage-response {
 
 .suggestion-list li .arrow {
   color: #555555 !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
   transition: color 0.2s ease !important;
 }
 
@@ -17162,15 +17144,14 @@ html body .public-approved-v8 .powder-stage-response {
   color: #ffffff !important;
 }
 
-/* Collapse empty void beneath hero */
-html body .public-approved-v8 .landing-expression-field:empty {
+/* Hide answer blocks inside the stage */
+html body .public-approved-v8 .landing-demo-stage__response-row,
+html body .public-approved-v8 .landing-demo-stage__answer-card,
+html body .public-approved-v8 .powder-stage-response {
   display: none !important;
 }
 
-@media (max-width: 1080px) {
-  html body .public-approved-v8 .v0-hero.sovereign-opening-field {
-    grid-template-columns: 1fr !important;
-    gap: 40px !important;
-    padding: 60px 24px !important;
-  }
+/* Collapse empty void beneath hero */
+html body .public-approved-v8 .landing-expression-field:empty {
+  display: none !important;
 }
