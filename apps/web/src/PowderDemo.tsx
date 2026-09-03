@@ -1,5 +1,5 @@
-import React from "react";
-import "./powder-demo.css";
+import React from 'react';
+import './powder-demo.css';
 
 export function PowderDemo() {
   return (
@@ -7,14 +7,15 @@ export function PowderDemo() {
       <header className="powder-header">
         <div className="header-logo">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 12l10 10 10-10L12 2z"/></svg>
+          <span>SOVEREIGN.OS</span>
         </div>
         <nav className="header-nav">
-          <a href="#about">About</a>
-          <a href="#changelog">Changelog</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#blog">Blog</a>
+          <a href="/how-it-works">About</a>
+          <a href="/pricing">Changelog</a>
+          <a href="/pricing">Pricing</a>
+          <a href="/faq">Blog</a>
         </nav>
-        <button className="btn-get-started" type="button">Get started</button>
+        <a href="/signup" className="btn-get-started">Get started</a>
       </header>
 
       <main className="powder-main">
@@ -25,7 +26,7 @@ export function PowderDemo() {
           </div>
           <h1>Get a demo</h1>
           <p>
-            See how Powder can help you today<br />
+            See how Sovereign.OS can help you today<br />
             (it might just blow your mind a little)
           </p>
           
@@ -54,7 +55,7 @@ export function PowderDemo() {
             </div>
 
             <div className="prompt-box">
-              <input type="text" placeholder="Ask anything. Type @ for mentions and / for shortcuts." />
+              <input type="text" placeholder="Ask anything. Type @ for mentions and / for shortcuts." readOnly />
               <div className="prompt-tools">
                 <div className="tools-left">
                   <button type="button" aria-label="Attachment">📎</button>
@@ -63,7 +64,7 @@ export function PowderDemo() {
                 </div>
                 <div className="tools-right">
                   <button type="button" aria-label="Microphone">🎙️</button>
-                  <button type="submit" className="send-btn" aria-label="Submit prompt">↑</button>
+                  <button type="button" className="send-btn" aria-label="Submit prompt">↑</button>
                 </div>
               </div>
             </div>
