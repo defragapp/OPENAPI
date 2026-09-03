@@ -16864,9 +16864,16 @@ html body .public-approved-v8 .v0-hero.sovereign-opening-field {
     radial-gradient(90% 55% at 50% 380px, rgba(211, 151, 148, 0.18) 0%, rgba(53, 63, 68, 0.22) 35%, transparent 75%),
     linear-gradient(180deg, #000000 0%, #050709 100%) !important;
   border-bottom: none !important;
-  display: flex !important;
+  display: grid !important;
+  grid-template-columns: minmax(380px, 480px) minmax(460px, 580px) !important;
   justify-content: center !important;
   align-items: center !important;
+  gap: 72px !important;
+}
+
+/* Hide background atmosphere canvas so the two-column layout is strictly left copy / right card */
+html body .public-approved-v8 .v0-hero .landing-hero-atmosphere {
+  display: none !important;
 }
 
 /* Full-width landscape hills stretching across the entire viewport */
@@ -16914,16 +16921,9 @@ html body .public-approved-v8 .v0-hero.sovereign-opening-field > * {
   z-index: 5 !important;
 }
 
-html body .public-approved-v8 .v0-hero.sovereign-opening-field {
-  display: grid !important;
-  grid-template-columns: minmax(380px, 480px) minmax(460px, 580px) !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 72px !important;
-}
-
 /* Left Hero Column: Balanced Typography & Spacing */
 html body .public-approved-v8 .v0-hero-content {
+  grid-column: 1 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
@@ -17005,6 +17005,7 @@ html body .public-approved-v8 .sovereign-opening-trust {
 
 /* Right Column: Powder Compact Card Preview */
 html body .public-approved-v8 .landing-hero-product-preview {
+  grid-column: 2 !important;
   width: 100% !important;
   max-width: 580px !important;
   margin: 0 !important;
