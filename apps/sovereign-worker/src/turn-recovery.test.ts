@@ -26,7 +26,7 @@ describe('stuck-turn recovery', () => {
       'FROM thread_turn_states': async () => ({ results: [{ id: 'turn-1', account_id: 'acct-1' }] }),
       "SET status = 'interrupted'": async () => ({ results: [{ id: 'turn-1' }] }),
       "UPDATE ai_usage_windows": async () => ({ meta: { changes: 1 } }),
-      'workers_ai_capacity_reservations': async () => ({ results: [] })
+      'legacy_workers_ai_capacity_reservations': async () => ({ results: [] })
     });
     const result = await recoverStaleTurns(env(store), 120);
     expect(result).toEqual({ recoveredTurns: 1, releasedCapacityNeurons: 0 });
@@ -40,7 +40,7 @@ describe('stuck-turn recovery', () => {
       'FROM thread_turn_states': async () => ({ results: [{ id: 'turn-1', account_id: 'acct-1' }] }),
       // Claim fails (returning no row) because another cron already marked it interrupted.
       "SET status = 'interrupted'": async () => ({ results: [] }),
-      'workers_ai_capacity_reservations': async () => ({ results: [] })
+      'legacy_workers_ai_capacity_reservations': async () => ({ results: [] })
     });
     const result = await recoverStaleTurns(env(store), 120);
     expect(result).toEqual({ recoveredTurns: 0, releasedCapacityNeurons: 0 });
@@ -49,7 +49,7 @@ describe('stuck-turn recovery', () => {
   it('returns zero when no stale turn exists and does not touch usage', async () => {
     const store = d1({
       'FROM thread_turn_states': async () => ({ results: [] }),
-      'workers_ai_capacity_reservations': async () => ({ results: [] })
+      'legacy_workers_ai_capacity_reservations': async () => ({ results: [] })
     });
     const result = await recoverStaleTurns(env(store), 120);
     expect(result).toEqual({ recoveredTurns: 0, releasedCapacityNeurons: 0 });

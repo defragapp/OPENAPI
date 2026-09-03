@@ -366,13 +366,13 @@ async function handleInternalReleaseEvidence(request: Request, env: Env): Promis
 async function healthResponse(pathname: string, env: Env): Promise<Response> {
   try {
     const db = await env.DB.prepare(`SELECT 1 AS ok,
-      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_daily_capacity') AS capacity_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'legacy_workers_ai_daily_capacity') AS capacity_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'auth_passkeys') AS passkeys_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'release_evidence') AS release_evidence_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'release_progress') AS release_progress_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'policy_acceptance_receipts') AS policy_receipts_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'privacy_request_events') AS privacy_requests_ready,
-      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_capacity_reservations') AS capacity_reservations_ready,
+      EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'legacy_workers_ai_capacity_reservations') AS capacity_reservations_ready,
       EXISTS(SELECT 1 FROM pragma_table_info('accounts') WHERE name = 'eligibility_rule_version') AS eligibility_ready,
       EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'd1_migrations') AS migration_history_ready`)
       .first<{

@@ -44,7 +44,7 @@ describe('production release parity contract', () => {
     expect(runtime).toContain("name = 'release_progress'");
     expect(runtime).toContain("name = 'policy_acceptance_receipts'");
     expect(runtime).toContain("name = 'privacy_request_events'");
-    expect(runtime).toContain("name = 'workers_ai_capacity_reservations'");
+    expect(runtime).toContain("name = 'legacy_workers_ai_capacity_reservations'");
     expect(runtime).toContain("pragma_table_info('accounts')");
     expect(runtime).toContain('FROM d1_migrations WHERE name = ?1');
     expect(runtime).toContain("policyAcceptanceReceipts: policyReceiptSchemaReady ? 'configured' : 'missing'");

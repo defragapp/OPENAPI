@@ -53,7 +53,7 @@ export async function readProductionReleaseEvidence(env: Env): Promise<Productio
     try {
       const dbCheck = await env.DB.prepare(`SELECT
         EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'release_evidence') AS release_evidence_ready,
-        EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_capacity_reservations') AS capacity_reservations_ready,
+        EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'legacy_workers_ai_capacity_reservations') AS capacity_reservations_ready,
         EXISTS(SELECT 1 FROM d1_migrations WHERE name = ?1) AS release_migration_applied
       `).bind(RELEASE_MIGRATION_FILENAME).first<{ release_evidence_ready: number; capacity_reservations_ready: number; release_migration_applied: number }>();
 

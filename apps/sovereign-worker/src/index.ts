@@ -29,7 +29,7 @@ app.use('*', async (context, next) => {
 
 async function healthPayload(env: Env) {
   const db = await env.DB.prepare(`SELECT 1 AS ok,
-    EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workers_ai_daily_capacity') AS capacity_ready`)
+    EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'legacy_workers_ai_daily_capacity') AS capacity_ready`)
     .first<{ ok: number; capacity_ready: number }>();
   return {
     ok: db?.ok === 1,
