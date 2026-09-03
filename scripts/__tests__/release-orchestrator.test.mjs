@@ -73,8 +73,8 @@ function harness({
       ok: true,
       ready: true,
       version: sha,
-      migrationVersion: '0018_workers_ai_capacity_reservations',
-      latestMigrationVersion: '0018_workers_ai_capacity_reservations',
+      migrationVersion: '0019_deprecate_manual_capacity',
+      latestMigrationVersion: '0019_deprecate_manual_capacity',
       dependencies: {
         migrationParity: 'current',
         policyAcceptanceReceipts: 'configured',
