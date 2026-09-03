@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { BrandMark } from './BrandMark';
 import { LandingExpressionSlice } from './expression-field/LandingExpressionSlice';
 import { LandingDemonstrationStage } from './LandingDemonstrationStage';
+import { LandingProductStories } from './LandingProductStories';
 
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 
@@ -47,12 +48,9 @@ export function PublicLanding() {
       data-public-narrative="self-people-systems-v1"
     >
       <V0Navigation />
-      <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-8">
-        Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
-      </p>
-      <LandingExpressionSlice />
-      <LandingDemonstrationStage />
+      <V0Hero />
       <RealLifeQuestions />
+      <LandingProductStories />
       <ComparisonStory />
       <FinalCallToAction />
       <V0Footer />
@@ -90,7 +88,68 @@ function V0Navigation() {
   );
 }
 
+function V0Hero() {
+  return (
+    <section className="v0-hero sovereign-opening-field" data-viewport-section="hero">
+      <div className="v0-hero-content" data-viewport-surface="hero">
+        <p className="v0-badge landing-hero-kicker sov-section-kicker"><span />Personal intelligence for real life</p>
+        <h1 className="sov-display-hero">
+          <span aria-label="Healing isn’t optional.">
+            Healing<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />isn’t optional.
+          </span>
+          <em className="sov-display-hero-outline" aria-label="Holding onto the pain is.">
+            <span className="v0-desktop-space"> </span>Holding onto<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />the pain is.
+          </em>
+        </h1>
+        <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
+          Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
+        </p>
+        <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
+          Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
+        </p>
+        <a className="v0-get-started" style={{ marginTop: '32px' }} href="/signup">Build your Baseline</a>
+        <p className="sovereign-opening-trust">
+          <span className="v0-desktop-only">Start free · No card required · Review, correct, or reject any interpretation</span>
+          <span className="v0-mobile-only">Start free · No card required · Review, correct, or reject any interpretation</span>
+        </p>
+      </div>
+      <div className="landing-hero-atmosphere">
+        <LandingExpressionSlice />
+      </div>
+      <MobileCapabilityRail />
+      <div className="landing-hero-product-preview">
+        <LandingDemonstrationStage />
+      </div>
+    </section>
+  );
+}
 
+function MobileCapabilityRail() {
+  return (
+    <nav className="sovereign-opening-capabilities" aria-label="Explore Sovereign">
+      <a href="#how">
+        <CapabilityIcon kind="self" />
+        <strong>Explore yourself</strong>
+        <small>How you think, decide,<br />create, connect, and grow</small>
+      </a>
+      <a href="#relationship" data-verification-text="See why the same moment lands differently—and how to bridge the gap.">
+        <CapabilityIcon kind="people" />
+        <strong>Understand your people</strong>
+        <small>See why the same moment lands differently—and how to bridge the gap.</small>
+      </a>
+      <a href="#system" data-verification-text="From 1:1 to the whole system">
+        <CapabilityIcon kind="system" />
+        <strong>See the whole system</strong>
+        <small>From 1:1 to family,<br />team, or group</small>
+      </a>
+      <a href="/login">
+        <CapabilityIcon kind="library" />
+        <strong>Keep what matters</strong>
+        <small>Return to what changed<br />your understanding</small>
+      </a>
+    </nav>
+  );
+}
 
 function RealLifeQuestions() {
   return (
