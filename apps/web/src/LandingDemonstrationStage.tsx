@@ -79,61 +79,97 @@ export function LandingDemonstrationStage() {
   const active: DemonstrationItem = DEMONSTRATION_QUESTIONS.find((item) => item.id === activeId) ?? DEMONSTRATION_QUESTIONS[0]!;
 
   return (
-    <div className="landing-demo-stage" data-testid="landing-demonstration-stage">
-      <div className="landing-demo-stage__rail" role="tablist" aria-label="Explore Situational Demonstrations">
-        {DEMONSTRATION_QUESTIONS.map((item) => {
-          const isSelected = item.id === activeId;
-          return (
-            <button
-              key={item.id}
-              role="tab"
-              aria-selected={isSelected}
-              className={`landing-demo-stage__rail-btn ${isSelected ? 'is-active' : ''}`}
-              onClick={() => setActiveId(item.id)}
-            >
-              <span className="landing-demo-stage__dot" style={{ backgroundColor: item.accent }} />
-              <span className="landing-demo-stage__btn-label">{item.label}</span>
-            </button>
-          );
-        })}
+    <div className="landing-demo-stage powder-interface-card" data-testid="landing-demonstration-stage">
+      {/* 1. Powder Top Logo & Greeting */}
+      <div className="card-top-header">
+        <div className="card-top-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="rgba(255,255,255,0.7)">
+            <path d="M12 2L2 12l10 10 10-10L12 2z"/>
+          </svg>
+        </div>
+        <span className="card-badge">✦ SOVEREIGN BASELINE</span>
       </div>
 
-      <div className="landing-demo-stage__viewport" role="tabpanel">
-        <div className="landing-demo-stage__window">
-          <div className="landing-demo-stage__body">
-            <div className="landing-demo-stage__prompt-row">
-              <div className="landing-demo-stage__avatar">You</div>
-              <div className="landing-demo-stage__prompt-bubble">
-                <p className="landing-demo-stage__prompt-text">{active.question}</p>
-              </div>
-            </div>
+      <div className="card-welcome">
+        <h2>Welcome back</h2>
+        <p>How can I help you today?</p>
+      </div>
 
-            <div className="landing-demo-stage__response-row">
-              <div className="landing-demo-stage__avatar is-sov">S</div>
-              <div className="landing-demo-stage__answer-card">
-                <p className="landing-demo-stage__direct-answer">
-                  {active.answer}
-                </p>
-
-                <div className="landing-demo-stage__distinction">
-                  <span className="landing-demo-stage__distinction-icon">✦</span>
-                  <div className="landing-demo-stage__distinction-content">
-                    {active.distinction}
-                  </div>
-                </div>
-
-                <div className="landing-demo-stage__tags">
-                  {active.tags.map((tag) => (
-                    <span key={tag} className="landing-demo-stage__tag">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
+      {/* 2. Powder Prompt Box with Utility Tools */}
+      <div className="prompt-box">
+        <input 
+          type="text" 
+          value={active.question} 
+          readOnly 
+          aria-label="Active situational inquiry"
+        />
+        <div className="prompt-tools">
+          <div className="tools-left">
+            <button type="button" aria-label="Attachment">📎</button>
+            <button type="button" aria-label="Analytics">📊</button>
+            <button type="button" aria-label="Quick Actions">⚡</button>
+          </div>
+          <div className="tools-right">
+            <button type="button" aria-label="Microphone">🎙️</button>
+            <button type="submit" className="send-btn" aria-label="Submit prompt">↑</button>
           </div>
         </div>
       </div>
+
+      {/* 3. Powder Category Filter Pills Across Top */}
+      <div className="category-filters" role="tablist" aria-label="Explore Situational Demonstrations">
+        <div className="filters-left">
+          {DEMONSTRATION_QUESTIONS.map((item) => {
+            const isSelected = item.id === activeId;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={isSelected}
+                className={isSelected ? 'active' : ''}
+                onClick={() => setActiveId(item.id)}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+        <button type="button" className="search-icon" aria-label="Search">🔍</button>
+      </div>
+
+      {/* 4. Active Situational Distinction & Answer Display */}
+      <div className="powder-stage-response" role="tabpanel">
+        <div className="powder-stage-response__answer">
+          <p>{active.answer}</p>
+        </div>
+        <div className="powder-stage-response__distinction">
+          <span className="powder-stage-response__icon">✦</span>
+          <div className="powder-stage-response__text">{active.distinction}</div>
+        </div>
+        <div className="powder-stage-response__tags">
+          {active.tags.map((tag) => (
+            <span key={tag} className="powder-stage-response__tag">{tag}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* 5. Powder Interactive Suggestion Rows with Right Arrows */}
+      <ul className="suggestion-list">
+        {DEMONSTRATION_QUESTIONS.map((item) => {
+          const isSelected = item.id === activeId;
+          return (
+            <li 
+              key={item.id} 
+              className={isSelected ? 'is-active-suggestion' : ''}
+              onClick={() => setActiveId(item.id)}
+            >
+              <span>{item.question}</span>
+              <span className="arrow">→</span>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
