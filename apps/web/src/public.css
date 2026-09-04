@@ -17142,3 +17142,38 @@ html, body, #root {
   background: rgba(40, 40, 46, 0.9) !important;
   border-color: rgba(255, 255, 255, 0.15) !important;
 }
+
+/* ==========================================================================
+   Hero Stage & Horizon Grounding Refinement
+   ========================================================================== */
+
+/* 1. Tighten Hero Vertical Flow */
+.v0-hero-content {
+  margin: 0 auto 24px auto !important;
+  padding-bottom: 0 !important;
+}
+
+.landing-hero-product-preview {
+  margin-top: 0 !important;
+  margin-bottom: 32px !important;
+}
+
+/* 2. Scale Preview Stage to Full Workspace Width */
+.landing-demo-stage.powder-interface-card,
+.powder-interface-card {
+  max-width: 1020px !important;
+  width: 94% !important;
+  margin: 0 auto !important;
+  position: relative !important;
+  z-index: 10 !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 3. Ground Horizon Ridge Below Interface Inputs */
+.v0-hero.sovereign-opening-field::before,
+.v0-hero.sovereign-opening-field::after {
+  bottom: -150px !important;
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%) !important;
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%) !important;
+}
+
