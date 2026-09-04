@@ -15241,15 +15241,16 @@ html[data-sovereign-production-readiness="desktop-ios-v1"] {
 }
 
 .public-approved-v8 .landing-stories__cards {
-  display: grid !important;
+  display: flex !important;
+  flex-direction: column !important;
   gap: 32px !important;
 }
 
 @media (min-width: 1024px) {
   .public-approved-v8 .landing-stories__cards {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 24px !important;
-    align-items: stretch !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 40px !important;
   }
 }
 
