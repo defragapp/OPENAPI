@@ -84,7 +84,7 @@ const STORIES: readonly StoryContent[] = [
     id: 'relationship',
     label: '02 · You + your people',
     question: 'Why does my partner\'s silence feel like punishment?',
-    direct: 'You may need verbal reassurance to regulate; they may need silence to process. When you pursue and they withdraw, each move makes sense from inside one person and becomes pressure from inside the other.',
+    direct: 'You may need verbal reassurance to settle; they may need silence to process. When one person seeks clarity and the other needs time to think, each move makes sense from the inside and creates pressure on the other.',
     distinction: 'Different processing needs are not a lack of care.',
     basis: [
       {
