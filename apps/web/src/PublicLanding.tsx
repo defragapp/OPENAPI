@@ -197,8 +197,16 @@ function ComparisonStory() {
           </h2>
         </header>
         <div className="v0-comparison-grid" data-viewport-surface="comparison">
-          <ComparisonPanel title="A blank conversation" items={COMPARISON.blank} positive={false} />
-          <ComparisonPanel title={<BrandMark />} items={COMPARISON.sovereign} positive />
+          <ComparisonPanel
+            title="A blank conversation starts with the prompt."
+            items={COMPARISON.blank}
+            positive={false}
+          />
+          <ComparisonPanel
+            title="Sovereign starts with your Baseline."
+            items={COMPARISON.sovereign}
+            positive
+          />
         </div>
       </div>
     </section>
@@ -212,6 +220,7 @@ function FinalCallToAction() {
         Know yourself.<br />Understand your people.<br />See the whole system.
       </h2>
       <p>Build your Baseline, then explore what you want to understand next.</p>
+      <p className="v0-final-motto">Your thoughts deserve a better place to live.</p>
       <a className="v0-get-started" href="/signup">Build your Baseline <ArrowIcon /></a>
     </section>
   );
