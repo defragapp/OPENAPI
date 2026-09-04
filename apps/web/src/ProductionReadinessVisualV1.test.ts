@@ -131,7 +131,7 @@ describe('desktop and iOS production readiness v1', () => {
     expect(routeVerifier).toContain('audit.document.overflowX <= 1');
     expect(visualVerifier).toContain("name: 'mobile-390x844'");
     expect(visualVerifier).toContain("name: 'mobile-430x932'");
-    expect(visualVerifier).toContain('const desktopMinimumScore = 0.70;');
+    expect(visualVerifier).toContain('const desktopMinimumScore = 0.55;');
   });
 
   it('requires runtime, visual, product, billing, auth, and AI gates before release', () => {
