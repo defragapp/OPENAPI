@@ -16732,7 +16732,7 @@ html body .public-approved-v8 .v0-hero.sovereign-opening-field {
   width: 100% !important;
   max-width: 100% !important;
   margin: 0 auto !important;
-  padding: 40px 24px 80px !important;
+  padding: 64px 24px 80px !important;
   box-sizing: border-box !important;
   overflow: visible !important;
   min-height: auto !important;
@@ -16802,7 +16802,7 @@ html body .public-approved-v8 .v0-hero-content {
   text-align: center !important;
   width: 100% !important;
   max-width: 820px !important;
-  margin: 0 auto 28px auto !important;
+  margin: 0 auto 36px auto !important;
 }
 
 html body .public-approved-v8 .landing-hero-kicker {
@@ -16819,7 +16819,7 @@ html body .public-approved-v8 .landing-hero-kicker {
   font-weight: 400 !important;
   letter-spacing: 0.02em !important;
   text-transform: none !important;
-  margin: 0 auto 24px auto !important;
+  margin: 0 auto 20px auto !important;
 }
 
 html body .public-approved-v8 .landing-hero-kicker > span {
@@ -16898,8 +16898,8 @@ html body .public-approved-v8 .landing-hero-product-preview {
   position: relative !important;
   z-index: 10 !important;
   width: 100% !important;
-  max-width: 960px !important;
-  margin: 40px auto 64px auto !important;
+  max-width: 1040px !important;
+  margin: 0 auto 40px auto !important;
 }
 
 html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
@@ -16907,15 +16907,15 @@ html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
   flex-direction: column !important;
   align-items: stretch !important;
   width: 100% !important;
-  max-width: 960px !important;
-  background: rgba(23, 23, 23, 0.88) !important;
-  backdrop-filter: blur(28px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  max-width: 1040px !important;
+  background: rgba(18, 18, 22, 0.88) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 24px !important;
   padding: 36px 40px 32px !important;
   box-sizing: border-box !important;
-  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 32px 96px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
 
 .card-top-header {
