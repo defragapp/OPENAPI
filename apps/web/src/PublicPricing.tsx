@@ -159,9 +159,9 @@ export function PublicPricing() {
           <header className="pricing-details-heading">
             <div>
               <p className="pricing-kicker">WHAT CHANGES WITH PLUS</p>
-              <h2 id="pricing-details-title">{PRICING_CONTENT.billing.title}</h2>
+              <h2 id="pricing-details-title">Your Baseline Design stays yours. Plus expands what you can explore.</h2>
             </div>
-            <p>{PRICING_CONTENT.billing.description}</p>
+            <p>Free is for exploring yourself. Sovereign+ lets you understand another person with their permission, step back to see a family or team, keep what matters in Library, and ask more each month.</p>
           </header>
           <dl className="plan-comparison-list">
             {PRICING_CONTENT.comparison.map((item, index) => (
