@@ -16428,11 +16428,11 @@ html body .public-approved-v8 .v0-hero.sovereign-opening-field {
   flex-direction: column !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  padding: 80px 24px 60px !important;
+  padding: 80px 24px 80px !important;
   margin: 0 auto !important;
   width: 100% !important;
   max-width: 100% !important;
-  min-height: auto !important;
+  min-height: 1100px !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
   background-color: #000000 !important;
@@ -16444,13 +16444,13 @@ html body .public-approved-v8 .v0-hero.sovereign-opening-field {
 html body .public-approved-v8 .v0-hero.sovereign-opening-field::before {
   content: "" !important;
   position: absolute !important;
-  top: 280px !important;
+  bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  height: 520px !important;
+  height: 480px !important;
   background-image: url("/powder-hills-far.png") !important;
   background-size: cover !important;
-  background-position: center top !important;
+  background-position: center bottom !important;
   background-repeat: no-repeat !important;
   opacity: 0.55 !important;
   pointer-events: none !important;
@@ -16460,13 +16460,13 @@ html body .public-approved-v8 .v0-hero.sovereign-opening-field::before {
 html body .public-approved-v8 .v0-hero.sovereign-opening-field::after {
   content: "" !important;
   position: absolute !important;
-  top: 360px !important;
+  bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  height: 440px !important;
+  height: 380px !important;
   background-image: url("/powder-hills-mid.png") !important;
   background-size: cover !important;
-  background-position: center top !important;
+  background-position: center bottom !important;
   background-repeat: no-repeat !important;
   opacity: 0.65 !important;
   pointer-events: none !important;
@@ -16482,7 +16482,7 @@ html body .public-approved-v8 .v0-hero-content {
   text-align: center !important;
   width: 100% !important;
   max-width: 820px !important;
-  margin: 0 auto 48px auto !important;
+  margin: 0 auto 56px auto !important;
 }
 
 html body .public-approved-v8 .landing-hero-product-preview {
