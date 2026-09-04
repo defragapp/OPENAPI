@@ -17076,19 +17076,27 @@ html body .public-approved-v8 .landing-expression-field:empty {
   display: none !important;
 }
 
-/* Global Powder Framer Template Application across all Sovereign OS pages and authed AI threads */
+/* Global Powder Background across all surfaces */
 html, body, #root {
   background-color: #000000 !important;
-  background-image: 
-    radial-gradient(120% 70% at 50% 0px, rgb(27, 34, 40) 0%, rgb(53, 63, 68) 45%, rgb(211, 151, 148) 95%) !important;
+  background-image: radial-gradient(120% 70% at 50% 0px, rgb(27, 34, 40) 0%, rgb(53, 63, 68) 45%, rgb(211, 151, 148) 95%) !important;
   color: #f1f5f9 !important;
   min-height: 100vh !important;
-  margin: 0 !important;
-  padding: 0 !important;
 }
 
-/* Authed Workspace & AI Threads Frame matching Powder Framer Template (Screenshot style) */
-.sovereign-app-shell, .workspace-main-container, .authenticated-workspace, [data-sovereign-workspace], .ai-thread-container {
+/* Ensure public app shell allows full document flow for canonical landing sections */
+.sovereign-app-shell {
+  width: 100% !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+/* Scope Powder frosted-glass frame strictly to authenticated workspaces and AI threads */
+.authenticated-workspace,
+[data-sovereign-workspace],
+.workspace-main-container,
+.ai-thread-container {
   background: rgba(18, 18, 20, 0.88) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 24px !important;
@@ -17103,7 +17111,7 @@ html, body, #root {
   overflow: hidden !important;
 }
 
-/* Sidebar and chat pane styling matching Powder template screenshot */
+/* Sidebar and chat controls */
 .workspace-sidebar, .chat-sidebar {
   background: rgba(14, 14, 16, 0.95) !important;
   border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
