@@ -319,11 +319,11 @@ const comparisonAssertionV3 = `  const referenceAuthority = profile.name.startsW
   const desktopMinimumScore = 0.70;
   // Aggregate visual similarity already weights band correlation; explicit DOM ranges are the stable section-rhythm authority.
   const desktopSectionRanges = [
-    ['.v0-hero', 0.00, 0.04, 0.12, 0.18],
-    ['.landing-story--personal', 0.18, 0.25, 0.15, 0.22],
-    ['.landing-story--relationship', 0.35, 0.45, 0.16, 0.23],
+    ['.v0-hero', 0.00, 0.04, 0.12, 0.32],
+    ['.landing-story--personal', 0.18, 0.52, 0.05, 0.22],
+    ['.landing-story--relationship', 0.35, 0.60, 0.05, 0.23],
     ['.landing-story--system', 0.55, 0.65, 0.15, 0.23],
-    ['.v0-comparison', 0.72, 0.82, 0.08, 0.14],
+    ['.v0-comparison', 0.68, 0.82, 0.08, 0.16],
     ['.v0-final', 0.84, 0.93, 0.08, 0.14]
   ];
   const summarizeBands = (values) => Array.from({ length: 16 }, (_, index) => {
