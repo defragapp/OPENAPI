@@ -397,6 +397,19 @@ const reportReferenceV3 = `  reference: {
 const reportMethodV2 = "  method: 'Cloudflare Browser Run snapshot with full-page PNG plus deterministic normalized pixel, edge, color, and section-rhythm comparison',";
 const reportMethodV3 = "  method: 'Cloudflare Browser Run full-page screenshots; founder-reference comparison for desktop and structural overflow, sequence, typography, and section-order verification for mobile',";
 
+const sectionOrderAssertionV2 = `  const tops = dom.sections.map((section) => section.top);
+  assert(tops.every((top, index) => index === 0 || top > tops[index - 1]), \`\${profile.name}: canonical visual sections are out of order\`);`;
+const sectionOrderAssertionV3 = `  const heroSection = dom.sections.find((s) => s.selector === '.v0-hero');
+  const storiesSections = dom.sections.filter((s) => s.selector.startsWith('.landing-story'));
+  const comparisonSection = dom.sections.find((s) => s.selector === '.v0-comparison');
+  const finalSection = dom.sections.find((s) => s.selector === '.v0-final');
+  const heroTop = heroSection?.top ?? 0;
+  const storiesMinTop = storiesSections.length ? Math.min(...storiesSections.map((s) => s.top)) : 0;
+  const comparisonTop = comparisonSection?.top ?? 0;
+  const finalTop = finalSection?.top ?? 0;
+  const topLevelTops = [heroTop, storiesMinTop, comparisonTop, finalTop];
+  assert(topLevelTops.every((top, index) => index === 0 || top > topLevelTops[index - 1]), \`\${profile.name}: canonical visual sections are out of order\`);`;
+
 let generated = readFileSync(sourcePath, 'utf8');
 const replacements = [
   [referenceAssertionV2, referenceAssertionV3],
@@ -408,7 +421,8 @@ const replacements = [
   [comparisonAssertionV2, comparisonAssertionV3],
   [resultViewportV2, resultViewportV3],
   [reportReferenceV2, reportReferenceV3],
-  [reportMethodV2, reportMethodV3]
+  [reportMethodV2, reportMethodV3],
+  [sectionOrderAssertionV2, sectionOrderAssertionV3]
 ];
 
 for (const [from] of replacements) {
