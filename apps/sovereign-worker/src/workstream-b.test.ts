@@ -119,9 +119,9 @@ function fakeEnv() {
   return {
     APP_ENV: 'development',
     APP_VERSION: 'test',
-    SESSION_SIGNING_SECRET: 'secret',
-    STRIPE_SECRET_KEY: 'sk_test',
-    STRIPE_WEBHOOK_SECRET: 'whsec_test',
+    SESSION_SIGNING_SECRET: 'mock_signing_secret',
+    STRIPE_SECRET_KEY: 'mock_stripe_secret_key',
+    STRIPE_WEBHOOK_SECRET: 'mock_stripe_webhook_secret',
     BASELINE_HORIZONS_URL: 'https://ssd.jpl.nasa.gov/api/horizons.api',
     DB: db,
     KV: kv as any,
@@ -144,7 +144,7 @@ function fakeEnv() {
 
 async function authHeader(sub = 'usr_workstream_b'): Promise<Record<string, string>> {
   return {
-    authorization: `Bearer ${await createSignedSessionToken({ sub, exp: Math.floor(Date.now() / 1000) + 3600 }, 'secret')}`
+    authorization: `Bearer ${await createSignedSessionToken({ sub, exp: Math.floor(Date.now() / 1000) + 3600 }, 'mock_signing_secret')}`
   };
 }
 
