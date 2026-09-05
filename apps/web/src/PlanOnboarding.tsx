@@ -583,9 +583,9 @@ function BaselineFormView({
 }) {
   return (
     <>
-      <p className="eyebrow">BUILD YOUR BASELINE</p>
+      <p className="eyebrow">STEP 1 OF 3 · PRIVATE BASELINE CREATION</p>
       <h1>Build your Baseline.</h1>
-      <p className="plan-intro">Add the birth details you know to build the private Baseline Sovereign uses across self, decisions, relationships, and systems.</p>
+      <p className="plan-intro">Used to calculate your objective celestial coordinates at birth to ground your baseline model across self, decisions, relationships, and systems.</p>
       {notice && <p className="plan-status baseline-retry-status" role="status" aria-live="polite">{notice}</p>}
 
       <form className="baseline-onboarding-form" onSubmit={onSubmit} noValidate>
@@ -718,16 +718,17 @@ function BaselineFormView({
 
 function BaselineBuildingView({ stage, status }: { stage: BaselineStage; status: string }) {
   return (
-    <section className="baseline-building-state" role="status" aria-live="polite">
-      <p className="eyebrow">BUILDING YOUR BASELINE</p>
-      <h1>Preparing your Baseline.</h1>
-      <div className="baseline-progress-light" aria-hidden="true"><i /></div>
-      <ol>
+    <section className="baseline-building-state flex flex-col items-center text-center p-8 bg-[#111317]/85 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl" role="status" aria-live="polite">
+      <p className="eyebrow text-xs font-mono text-neutral-400 uppercase tracking-widest mb-3">BUILDING YOUR BASELINE</p>
+      <h1 className="text-2xl sm:text-3xl font-medium text-white mb-2">Assembling your private Baseline reference...</h1>
+      <p className="text-neutral-400 text-sm mb-6">Grounding decision patterns, communication style, and strain tendencies.</p>
+      <div className="baseline-progress-light mb-6" aria-hidden="true"><i /></div>
+      <ol className="w-full text-left space-y-2 mb-4">
         {baselineStages.map((label, index) => (
           <li className={stageState(stage, index)} key={label}><span>{index + 1}</span><strong>{label}</strong></li>
         ))}
       </ol>
-      <p>{status}</p>
+      <p className="text-xs text-neutral-500">{status}</p>
     </section>
   );
 }

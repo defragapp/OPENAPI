@@ -209,6 +209,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
 
   useEffect(() => {
     if (new URLSearchParams(location.search).get('billing') !== 'success') return;
+    setStatus('Sovereign+ activated. 300 monthly turns and People & Systems spaces unlocked.');
     try {
       const saved = JSON.parse(sessionStorage.getItem('sovereign:upgrade-continuity') ?? 'null') as Json | null;
       if (!saved) return;
@@ -581,14 +582,18 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       </aside>
 
       <main className="intelligence-main">
-        <header className="intelligence-topbar">
+        <header className="intelligence-topbar flex items-center justify-between px-6 py-3 border-b border-white/10 bg-[#080a0d]/80 backdrop-blur-md">
           <button className="mobile-menu-trigger" onClick={() => setMenuOpen(true)} aria-label="Open workspace menu">S</button>
-          <div className="topbar-title-group">
+          <div className="topbar-title-group flex items-center gap-3">
             <strong>Sovereign</strong>
             <span className="topbar-surface-tag">{surface}</span>
+            <span className="inline-flex items-center gap-1.5 text-xs font-mono text-neutral-400 bg-white/5 border border-white/10 px-3 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              Baseline Reference Active · {workspace.today?.baseline?.status === 'completed' ? 'User' : 'Account'}
+            </span>
           </div>
           <div className="topbar-actions">
-            {(apiState === 'loading' || apiState === 'error') && <span className={`workspace-status ${apiState}`}>{status}</span>}
+            {status && status !== 'Ready' && <span className={`workspace-status ${apiState} text-xs text-amber-300 font-mono px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20`}>{status}</span>}
             <button className="topbar-search-btn" onClick={() => setContextOpen((open) => !open)} aria-label="Search and filter context">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="11" cy="11" r="8" />
@@ -644,6 +649,23 @@ onOpenCovenant={() => setCovenantEnabled(true)}
         {baselineExperience === 'idle' && baselineReady && surfaceEntitled && (
           <form className="sovereign-composer sovereign-composer--enhanced" onSubmit={submit}>
             <div className="composer-header">
+              <div className="composer-quick-chips flex flex-wrap gap-2 mb-3 px-2">
+                {[
+                  "Why do I react this way under pressure?",
+                  "What should I consider before making this decision?",
+                  "How does my communication style land with others?",
+                  "What pattern am I over-relying on right now?"
+                ].map((chip) => (
+                  <button
+                    type="button"
+                    key={chip}
+                    onClick={() => setDraft(chip)}
+                    className="bg-white/[0.03] border border-white/[0.08] hover:border-white/20 text-neutral-300 text-xs px-3.5 py-1.5 rounded-full transition-all cursor-pointer text-left"
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
               <div className="composer-context-line">
                 <span className="composer-context-label">Drawing from</span>
                 <span className="composer-context-items">{contextItems.join(' · ')}</span>
@@ -1552,6 +1574,9 @@ function PeopleControls({ workspace, selectedPerson, setSelectedPerson, api, ref
     <div className="context-stack">
       <p className="context-intro">
         Shared relationship intelligence begins with an invitation. The other person signs in or creates their account, completes their own Baseline, and decides what Sovereign may use.
+      </p>
+      <p className="text-xs text-neutral-400 italic bg-white/5 p-3 rounded-lg border border-white/10 my-2">
+        "Your people remain separate people. Sovereign only uses shared context when both individuals choose to connect."
       </p>
 
       <button className="secondary-action" onClick={openConsentControls}>
