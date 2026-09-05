@@ -5,16 +5,16 @@
 
 /* ── workspace-chat.css ── */
 :root {
-  --powder-start: #100814;
-  --powder-mid:   #1a101f;
-  --powder-end:   #0d0710;
+  --powder-start: #080a0d;
+  --powder-mid:   #090c10;
+  --powder-end:   #080a0d;
   --bronze-accent: #dda273;
   --geist-font: "Geist", system-ui, sans-serif;
 }
 
 .intelligence-workspace {
   min-height: 100dvh;
-  background: linear-gradient(to bottom, var(--powder-start), var(--powder-mid), var(--powder-end));
+  background: #080a0d;
   color: var(--sov-ink);
   font-family: var(--geist-font);
 }
