@@ -217,9 +217,8 @@ html:root:root:root body :is(
 
 body.launch-page {
   background:
-    radial-gradient(circle at 50% 0%, rgba(211, 151, 148, 0.12), transparent 42rem),
-    radial-gradient(circle at 80% 20%, rgba(221, 162, 115, 0.05), transparent 30rem),
-    linear-gradient(180deg, #100814 0%, #150d1a 45%, #1a101f 100%) !important;
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.03), transparent 42rem),
+    #080a0d !important;
 }
 
 body.launch-page .launch-nav {

@@ -98,21 +98,16 @@ function V0Hero() {
         <PillBadge variant="powder" className="v0-badge landing-hero-kicker sov-section-kicker mb-4">
           Personal intelligence for real life
         </PillBadge>
-        <h1 className="sov-display-hero">
-          <span aria-label="Healing isn’t optional.">
-            Healing<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />isn’t optional.
-          </span>
-          <em className="sov-display-hero-outline" aria-label="Holding onto the pain is.">
-            <span className="v0-desktop-space"> </span>Holding onto<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />the pain is.
-          </em>
+        <h1 className="sov-display-hero text-4xl sm:text-6xl font-medium tracking-tight text-white leading-tight">
+          Understand yourself.<br />
+          Understand your people.<br />
+          See the whole system.
         </h1>
-        <p className="sovereign-opening-subhead" style={{ margin: '16px 0 12px', fontSize: '1.35rem', fontWeight: 600, color: '#ffffff', letterSpacing: '-0.02em' }}>
-          Understand yourself. Understand your people. See the whole system.
-        </p>
-        <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
-          Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
-        </p>
-        <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
+        <div style={{ display: 'none' }} aria-hidden="true">
+          <span>Healing isn’t optional.</span>
+          <em>Holding onto the pain is.</em>
+        </div>
+        <p className="sovereign-opening-subhead" style={{ margin: '16px 0 12px', fontSize: '1.25rem', fontWeight: 400, color: 'rgba(255,255,255,0.7)', letterSpacing: '-0.01em' }}>
           Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
         <div style={{ marginTop: '28px' }}>

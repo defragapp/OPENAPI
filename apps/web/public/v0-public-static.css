@@ -266,7 +266,7 @@ main {
   width: 620px;
   height: 440px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(211, 151, 148, 0.09), transparent 68%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.03), transparent 68%);
   content: "";
   filter: blur(8px);
   pointer-events: none;
@@ -494,7 +494,7 @@ main {
   border-top: 1px solid var(--v0-line-strong);
   border-bottom: 1px solid var(--v0-line-strong);
   background:
-    radial-gradient(circle at 80% 50%, rgba(211, 151, 148, 0.08), transparent 24rem);
+    radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.02), transparent 24rem);
 }
 
 .launch-callout p {
@@ -507,7 +507,7 @@ main {
   border: 1px solid var(--v0-line-strong);
   border-radius: 14px;
   background:
-    radial-gradient(circle at 76% 10%, rgba(211, 151, 148, 0.08), transparent 24rem),
+    radial-gradient(circle at 76% 10%, rgba(255, 255, 255, 0.02), transparent 24rem),
     #14171b;
   box-shadow: 0 32px 88px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
@@ -703,7 +703,7 @@ main {
 .price-card.featured {
   border-color: rgba(120, 199, 255, 0.42);
   background:
-    radial-gradient(circle at 80% 0%, rgba(211, 151, 148, 0.12), transparent 20rem),
+    radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.03), transparent 20rem),
     var(--v0-panel-soft);
 }
 

@@ -17093,8 +17093,8 @@ html body .public-approved-v8 .landing-expression-field:empty {
 
 /* Global Powder Background across all surfaces */
 html, body, #root {
-  background-color: #000000 !important;
-  background-image: radial-gradient(120% 70% at 50% 0px, rgb(27, 34, 40) 0%, rgb(53, 63, 68) 45%, rgb(211, 151, 148) 95%) !important;
+  background-color: #080a0d !important;
+  background-image: none !important;
   color: #f1f5f9 !important;
   min-height: 100vh !important;
 }

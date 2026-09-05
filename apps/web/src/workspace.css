@@ -10579,8 +10579,8 @@ body:has(.sovereign-app-runtime)::before {
   left: 0;
   right: 0;
   height: 48vh;
-  background: url('/powder-hills-far.png') bottom center / cover no-repeat;
-  opacity: 0.35;
+  background: none;
+  opacity: 0;
   pointer-events: none;
   z-index: 0;
 }
@@ -10592,8 +10592,8 @@ body:has(.sovereign-app-runtime)::after {
   left: 0;
   right: 0;
   height: 38vh;
-  background: url('/powder-hills-mid.png') bottom center / cover no-repeat;
-  opacity: 0.55;
+  background: none;
+  opacity: 0;
   pointer-events: none;
   z-index: 0;
 }
