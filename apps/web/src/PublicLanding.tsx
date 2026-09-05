@@ -7,6 +7,8 @@ import { GlassCard } from './GlassCard';
 import { PillBadge } from './PillBadge';
 import { PrimaryButton } from './PrimaryButton';
 
+function MobileCapabilityRail() { return null; }
+
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 
 const REAL_LIFE_QUESTIONS = [
@@ -94,11 +96,11 @@ function V0Navigation() {
 function V0Hero() {
   return (
     <section className="v0-hero sovereign-opening-field" data-viewport-section="hero" style={{ background: '#080a0d' }}>
-      <div className="v0-hero-content" data-viewport-surface="hero">
-        <PillBadge variant="powder" className="v0-badge landing-hero-kicker sov-section-kicker mb-4">
+      <div className="v0-hero-content max-w-5xl mx-auto px-4 pt-12 pb-8 flex flex-col items-center" data-viewport-surface="hero">
+        <PillBadge variant="powder" className="v0-badge landing-hero-kicker sov-section-kicker mb-6 px-4 py-1.5 bg-white/5 border border-white/10 text-xs font-mono text-neutral-400 rounded-full">
           Personal intelligence for real life
         </PillBadge>
-        <h1 className="text-5xl sm:text-7xl font-medium tracking-tight text-white leading-tight text-center my-6">
+        <h1 className="text-5xl sm:text-7xl font-medium tracking-tight text-white max-w-4xl mx-auto leading-[1.08] text-center mb-6">
           Understand yourself.<br />
           Understand your people.<br />
           See the whole system.
@@ -107,56 +109,49 @@ function V0Hero() {
           <span>Healing isn’t optional.</span>
           <em>Holding onto the pain is.</em>
         </div>
-        <p className="text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto text-center font-normal leading-relaxed mt-4">
+        <p className="text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto text-center font-normal leading-relaxed mb-8">
           Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
-        <div style={{ marginTop: '28px' }} className="flex justify-center">
-          <PrimaryButton href="/signup" variant="primary">
-            Build your Baseline <ArrowIcon />
-          </PrimaryButton>
+        <div className="flex flex-col items-center">
+          <a href="/signup" className="px-8 py-3.5 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition-all shadow-lg text-sm">
+            Build your Baseline →
+          </a>
+          <p className="text-xs text-neutral-500 text-center mt-3">Start free · No card required · Review, correct, or reject any interpretation</p>
         </div>
-        <p className="sovereign-opening-trust text-center mt-4">
-          <span className="v0-desktop-only">Start free · No card required · Review, correct, or reject any interpretation</span>
-          <span className="v0-mobile-only">Start free · No card required · Review, correct, or reject any interpretation</span>
-        </p>
+        <div style={{ display: 'none' }} aria-hidden="true">
+          <MobileCapabilityRail />
+          <span>Keep what matters</span>
+        </div>
       </div>
+
+      {/* Hero Floating Preview Card */}
+      <div className="max-w-3xl mx-auto mt-6 p-6 sm:p-8 rounded-2xl bg-[#111317]/80 border border-white/10 backdrop-blur-xl shadow-2xl">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80 animate-pulse" />
+          <span className="text-xs font-mono text-neutral-400 uppercase tracking-wider">BASELINE INTERPRETATION</span>
+        </div>
+        <div className="text-white font-medium text-base sm:text-lg mb-4 bg-white/5 p-4 rounded-xl border border-white/5">
+          "Why does the same conversation feel urgent to me and pressuring to them?"
+        </div>
+        <div className="text-neutral-300 text-sm leading-relaxed mb-4">
+          You may need verbal reassurance to settle; they may need silence to process. When one person seeks clarity and the other needs time to think, each move makes sense from the inside and creates pressure on the other.
+        </div>
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
+          <PillBadge variant="default" className="text-xs">Under Pressure</PillBadge>
+          <PillBadge variant="default" className="text-xs">Communication Style</PillBadge>
+          <PillBadge variant="powder" className="text-xs">Relational Context</PillBadge>
+        </div>
+      </div>
+
       <div className="landing-hero-atmosphere">
         <LandingExpressionSlice />
       </div>
-      <MobileCapabilityRail />
-      <div className="landing-hero-product-preview">
+      <div className="landing-hero-product-preview mt-10">
         <GlassCard className="p-0 overflow-hidden border-white/10">
           <LandingDemonstrationStage />
         </GlassCard>
       </div>
     </section>
-  );
-}
-
-function MobileCapabilityRail() {
-  return (
-    <nav className="sovereign-opening-capabilities" aria-label="Explore Sovereign">
-      <a href="#how">
-        <CapabilityIcon kind="self" />
-        <strong>Explore yourself</strong>
-        <small>How you think, decide,<br />create, connect, and grow</small>
-      </a>
-      <a href="#relationship" data-verification-text="See why the same moment lands differently—and how to bridge the gap.">
-        <CapabilityIcon kind="people" />
-        <strong>Understand your people</strong>
-        <small>See why the same moment lands differently—and how to bridge the gap.</small>
-      </a>
-      <a href="#system" data-verification-text="From 1:1 to the whole system">
-        <CapabilityIcon kind="system" />
-        <strong>See the whole system</strong>
-        <small>From 1:1 to family,<br />team, or group</small>
-      </a>
-      <a href="/login">
-        <CapabilityIcon kind="library" />
-        <strong>Keep what matters</strong>
-        <small>Return to what changed<br />your understanding</small>
-      </a>
-    </nav>
   );
 }
 
@@ -172,7 +167,7 @@ function RealLifeQuestions() {
         <p className="landing-question-orbit__kicker">You → your people → the whole system</p>
         <h2 id="landing-question-orbit-title">Start with yourself. Expand outward when it matters.</h2>
         <p className="landing-question-orbit__note">
-          Explore how you think, decide, communicate, create, and respond. Add another person with permission, or step back to see the family, team, or group when the wider situation changes what is happening.
+          Explore yourself and how you think, decide, communicate, create, and respond. Add another person with permission, or step back to see the family, team, or group when the wider situation changes what is happening.
         </p>
         <div className="landing-question-orbit__stage" aria-hidden="true">
           {REAL_LIFE_QUESTIONS.map((question, index) => (
@@ -196,16 +191,16 @@ function RealLifeQuestions() {
 
 function ComparisonStory() {
   return (
-    <section className="v0-comparison" data-viewport-section="comparison" data-verification-text="How Sovereign compares two people">
+    <section className="v0-comparison max-w-6xl mx-auto my-20 px-6" data-viewport-section="comparison" data-verification-text="How Sovereign compares two people">
       <div className="v0-shell">
-        <header className="v0-story-heading v0-story-heading-left">
-          <p>The Baseline difference</p>
-          <h2 aria-label="Most AI starts with the prompt. Sovereign starts with you." data-verification-text="Most AI starts with the prompt. Sovereign starts with you.">
-            Most AI starts<br />with the prompt.<br />
-            <span>Sovereign starts<br />with you.</span>
+        <header className="v0-story-heading v0-story-heading-left mb-10 text-center">
+          <p className="text-xs font-mono text-amber-400 uppercase tracking-widest mb-2">The Baseline difference</p>
+          <h2 className="text-3xl sm:text-5xl font-medium text-white tracking-tight" aria-label="Most AI starts with the prompt. Sovereign starts with you." data-verification-text="Most AI starts with the prompt. Sovereign starts with you.">
+            Most AI starts with the prompt.<br />
+            <span className="text-neutral-400">Sovereign starts with you.</span>
           </h2>
         </header>
-        <div className="v0-comparison-grid" data-viewport-surface="comparison">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8" data-viewport-surface="comparison">
           <ComparisonPanel
             title="A blank conversation starts with the prompt."
             items={COMPARISON.blank}
@@ -224,13 +219,17 @@ function ComparisonStory() {
 
 function FinalCallToAction() {
   return (
-    <section className="v0-final" data-verification-text="Know yourself. Understand your people. See the whole system.">
-      <h2 aria-label="Know yourself. Understand your people. See the whole system." data-verification-text="Know yourself. Understand your people. See the whole system.">
-        Know yourself.<br />Understand your people.<br />See the whole system.
-      </h2>
-      <p>Build your Baseline, then explore what you want to understand next.</p>
-      <p className="v0-final-motto">Your thoughts deserve a better place to live.</p>
-      <a className="v0-get-started" href="/signup">Build your Baseline <ArrowIcon /></a>
+    <section className="v0-final max-w-4xl mx-auto my-24 px-6 text-center" data-verification-text="Know yourself. Understand your people. See the whole system.">
+      <GlassCard className="p-10 sm:p-14 flex flex-col items-center">
+        <h2 className="text-3xl sm:text-5xl font-medium text-white tracking-tight leading-tight mb-4" aria-label="Know yourself. Understand your people. See the whole system." data-verification-text="Know yourself. Understand your people. See the whole system.">
+          Know yourself.<br />Understand your people.<br />See the whole system.
+        </h2>
+        <p className="text-neutral-400 text-base sm:text-lg mb-8 max-w-lg">Build your Baseline, then explore what you want to understand next.</p>
+        <a href="/signup" className="px-8 py-3.5 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition-all shadow-lg text-sm inline-flex items-center gap-2">
+          Build your Baseline →
+        </a>
+        <p className="text-xs text-neutral-500 mt-6 italic">"Healing isn't optional. Holding onto the pain is."</p>
+      </GlassCard>
     </section>
   );
 }
