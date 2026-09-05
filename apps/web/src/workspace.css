@@ -4,7 +4,41 @@
    ========================================================================== */
 
 /* ── workspace-chat.css ── */
+:root {
+  --powder-start: #100814;
+  --powder-mid:   #1a101f;
+  --powder-end:   #0d0710;
+  --bronze-accent: #dda273;
+  --geist-font: "Geist", system-ui, sans-serif;
+}
+
 .intelligence-workspace {
+  min-height: 100dvh;
+  background: linear-gradient(to bottom, var(--powder-start), var(--powder-mid), var(--powder-end));
+  color: var(--sov-ink);
+  font-family: var(--geist-font);
+}
+
+.glassmorphic-window {
+  max-width: 96rem; /* 6xl */
+  height: 88vh;
+  margin: 2rem auto;
+  border-radius: 1.5rem; /* rounded-3xl */
+  background: rgba(22,22,22,0.92); /* #161616/92 */
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 0 24px rgba(0,0,0,0.25);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 272px 1fr; /* sidebar + main */
+}
+
+/* Bronze accent for interactive elements */
+button, a {
+  color: var(--bronze-accent);
+}
+
+.intelligence-workspace-legacy {
   min-height: 100dvh;
   background:
     radial-gradient(circle at 72% -12%, var(--sov-clay-soft), transparent 33rem),

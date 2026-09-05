@@ -623,17 +623,26 @@ function encodeTextStream(stream: ReadableStream<string>): ReadableStream<Uint8A
 
 function persistAssistantStream(stream: ReadableStream<string>, onComplete: (text: string) => Promise<void>, onFailure: () => Promise<void>): ReadableStream<string> {
   let collected = '';
+  let failed = false;
   return stream.pipeThrough(new TransformStream<string, string>({
     transform(chunk, controller) {
       collected += chunk;
       controller.enqueue(chunk);
     },
     async flush() {
-      try {
-        await onComplete(collected.slice(0, 8000));
-      } catch {
-        await onFailure();
+      if (!failed) {
+        try {
+          await onComplete(collected.slice(0, 8000));
+        } catch {
+          await onFailure();
+        }
       }
+    },
+    async cancel() {
+      failed = true;
+      try {
+        await onFailure();
+      } catch {}
     }
   }));
 }

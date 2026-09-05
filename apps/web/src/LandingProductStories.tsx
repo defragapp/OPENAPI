@@ -47,9 +47,9 @@ const SYSTEM_BASIS: readonly EvidenceGroup[] = [
   {
     name: 'What you told Sovereign',
     points: [
-      { code: 'U✓', label: 'Example observation: a parent pushes for immediate resolution' },
-      { code: 'U✓', label: 'Example observation: you move into mediation' },
-      { code: 'U✓', label: 'Example observation: a sibling withdraws as pressure rises' }
+      { code: 'parent pressure', label: 'Example observation: a parent pushes for immediate resolution' },
+      { code: 'mediation', label: 'Example observation: you move into mediation' },
+      { code: 'sibling withdrawal', label: 'Example observation: a sibling withdraws as pressure rises' }
     ]
   }
 ] as const;
@@ -121,9 +121,9 @@ const STORIES: readonly StoryContent[] = [
       {
         name: 'What you told Sovereign',
         points: [
-          { code: 'U✓', label: 'Example observation: a parent pushes for immediate resolution' },
-          { code: 'U✓', label: 'Example observation: you move into mediation' },
-          { code: 'U✓', label: 'Example observation: a sibling withdraws as pressure rises' }
+          { code: 'parent pressure', label: 'Example observation: a parent pushes for immediate resolution' },
+          { code: 'mediation', label: 'Example observation: you move into mediation' },
+          { code: 'sibling withdrawal', label: 'Example observation: a sibling withdraws as pressure rises' }
         ]
       }
     ] as const

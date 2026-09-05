@@ -176,45 +176,81 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
   }
 
   const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
-  await verifyTurnstile(env, body.turnstileToken, ip, kind);
+  try {
+    await verifyTurnstile(env, body.turnstileToken, ip, kind);
+  } catch (error) {
+    if (error instanceof Response) return error;
+    console.error('turnstile_error', { error: error instanceof Error ? error.message : 'unknown' });
+    return turnstileProblem('unavailable', 503);
+  }
   const [ipHash, userAgentHash] = await Promise.all([sha256(ip), sha256(request.headers.get('user-agent') ?? 'unknown')]);
-  const recent = await env.DB.prepare("SELECT id FROM auth_magic_links WHERE email_normalized = ? AND created_at > datetime('now', '-2 minutes')").bind(email).first<{ id: string }>();
-  const recentIp = await env.DB.prepare("SELECT COUNT(*) AS count FROM auth_magic_links WHERE requested_ip_hash = ? AND created_at > datetime('now', '-15 minutes')").bind(ipHash).first<{ count: number }>();
-  if (recent || Number(recentIp?.count ?? 0) >= MAX_MAGIC_LINKS_PER_IP_WINDOW) return Response.json({ status: 'rate limited' }, { status: 429 });
-
-  const existing = await env.DB.prepare('SELECT id FROM accounts WHERE auth_subject = ?').bind(`email:${email}`).first<{ id: string }>();
-  if (kind === 'login' && !existing) return Response.json({ status: 'sent', recovery: 'link_or_code' });
-
-  const token = newToken();
-  const tokenHash = await sha256(token);
-  const id = `magic_${crypto.randomUUID()}`;
-  const acceptedAt = kind === 'signup' ? new Date().toISOString() : null;
-  const policyReleaseSha = kind === 'signup' ? exactReleaseSha(env) : null;
-  await env.DB.prepare("INSERT INTO auth_magic_links (id, email_normalized, account_id, purpose, token_hash, name, terms_accepted_at, terms_version, privacy_version, policy_content_hash, policy_release_sha, expires_at, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+15 minutes'), ?, ?)")
-    .bind(
-      id,
-      email,
-      existing?.id ?? null,
-      kind,
-      tokenHash,
-      kind === 'signup' ? name : null,
-      acceptedAt,
-      kind === 'signup' ? POLICY_METADATA.terms.version : null,
-      kind === 'signup' ? POLICY_METADATA.privacy.version : null,
-      kind === 'signup' ? POLICY_CONTENT_HASH : null,
-      policyReleaseSha,
-      ipHash,
-      userAgentHash
-    ).run();
-
+  let token: string;
+  let id: string;
   let emailCode: string | undefined;
   let emailCodeId: string | undefined;
-  if (kind === 'login' && existing) {
-    emailCode = newEmailCode();
-    emailCodeId = `email_code_${crypto.randomUUID()}`;
-    await env.DB.prepare("UPDATE auth_email_codes SET used_at = COALESCE(used_at, datetime('now')) WHERE email_normalized = ? AND used_at IS NULL").bind(email).run();
-    await env.DB.prepare("INSERT INTO auth_email_codes (id, account_id, email_normalized, code_hash, return_to, max_attempts, expires_at, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, datetime('now', '+10 minutes'), ?, ?)")
-      .bind(emailCodeId, existing.id, email, await emailCodeHash(env, email, emailCode), returnTo, EMAIL_CODE_MAX_ATTEMPTS, ipHash, userAgentHash).run();
+  try {
+      const execStmt = async (sql: string) => {
+        const stmt = env.DB.prepare(sql);
+        if (typeof (stmt as any).run === 'function') return (stmt as any).run();
+        return stmt.bind().run();
+      };
+      await execStmt('BEGIN');
+      try {
+        const recent = await env.DB.prepare("SELECT id FROM auth_magic_links WHERE email_normalized = ? AND created_at > datetime('now', '-2 minutes')").bind(email).first<{ id: string }>();
+        const recentIp = await env.DB.prepare("SELECT COUNT(*) AS count FROM auth_magic_links WHERE requested_ip_hash = ? AND created_at > datetime('now', '-15 minutes')").bind(ipHash).first<{ count: number }>();
+        if (recent || Number(recentIp?.count ?? 0) >= MAX_MAGIC_LINKS_PER_IP_WINDOW) {
+          await execStmt('ROLLBACK');
+          return Response.json({ status: 'rate limited' }, { status: 429 });
+        }
+
+        const existing = await env.DB.prepare('SELECT id FROM accounts WHERE auth_subject = ?').bind(`email:${email}`).first<{ id: string }>();
+        if (kind === 'login' && !existing) {
+          await execStmt('ROLLBACK');
+          return Response.json({ status: 'sent', recovery: 'link_or_code' });
+        }
+
+        token = newToken();
+        const tokenHash = await sha256(token);
+        id = `magic_${crypto.randomUUID()}`;
+        const acceptedAt = kind === 'signup' ? new Date().toISOString() : null;
+        const policyReleaseSha = kind === 'signup' ? exactReleaseSha(env) : null;
+        await env.DB.prepare("INSERT INTO auth_magic_links (id, email_normalized, account_id, purpose, token_hash, name, terms_accepted_at, terms_version, privacy_version, policy_content_hash, policy_release_sha, expires_at, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+15 minutes'), ?, ?)")
+          .bind(
+            id,
+            email,
+            existing?.id ?? null,
+            kind,
+            tokenHash,
+            kind === 'signup' ? name : null,
+            acceptedAt,
+            kind === 'signup' ? POLICY_METADATA.terms.version : null,
+            kind === 'signup' ? POLICY_METADATA.privacy.version : null,
+            kind === 'signup' ? POLICY_CONTENT_HASH : null,
+            policyReleaseSha,
+            ipHash,
+            userAgentHash
+          ).run();
+
+        if (kind === 'login' && existing) {
+          emailCode = newEmailCode();
+          emailCodeId = `email_code_${crypto.randomUUID()}`;
+          await env.DB.prepare("UPDATE auth_email_codes SET used_at = COALESCE(used_at, datetime('now')) WHERE email_normalized = ? AND used_at IS NULL").bind(email).run();
+          await env.DB.prepare("INSERT INTO auth_email_codes (id, account_id, email_normalized, code_hash, return_to, max_attempts, expires_at, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, datetime('now', '+10 minutes'), ?, ?)")
+            .bind(emailCodeId, existing.id, email, await emailCodeHash(env, email, emailCode), returnTo, EMAIL_CODE_MAX_ATTEMPTS, ipHash, userAgentHash).run();
+        }
+        // Commit transaction after successful writes
+        await execStmt('COMMIT');
+      } catch (error) {
+        // Rollback on any error
+        await execStmt('ROLLBACK').catch(() => {});
+        if (error instanceof Response) return error;
+        console.error('auth_d1_error', { error: error instanceof Error ? error.message : 'unknown' });
+        return Response.json({ status: 'error', error: 'AUTH_D1_ERROR', code: 'AUTH_D1_ERROR', message: 'Authentication request failed during schema write' }, { status: 500, headers: { 'cache-control': 'no-store' } });
+      }
+  } catch (error) {
+    if (error instanceof Response) return error;
+    console.error('auth_d1_error', { error: error instanceof Error ? error.message : 'unknown' });
+    return Response.json({ status: 'error', error: 'AUTH_D1_ERROR', code: 'AUTH_D1_ERROR', message: 'Authentication request failed during schema write' }, { status: 500, headers: { 'cache-control': 'no-store' } });
   }
 
   const redeemUrl = new URL('/auth/redeem', publicBaseUrl(request, env));
@@ -263,30 +299,56 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   const subject = `email:${row.email_normalized}`;
   let accountId: string;
   let createdAccount = false;
-  if (row.account_id) {
-    const account = await env.DB.prepare('SELECT id, auth_subject FROM accounts WHERE id = ?').bind(row.account_id).first<{ id: string; auth_subject: string }>();
-    if (!account || account.auth_subject !== subject) return Response.json({ status: 'invalid' }, { status: 400 });
-    accountId = account.id;
-  } else {
-    if (row.purpose !== 'signup') return Response.json({ status: 'invalid' }, { status: 400 });
-    accountId = (await resolveAccount(env, subject)).accountId;
-    createdAccount = true;
-  }
-  const redeemed = await env.DB.prepare("UPDATE auth_magic_links SET used_at = datetime('now'), account_id = ? WHERE id = ? AND used_at IS NULL AND expires_at > datetime('now')").bind(accountId, row.id).run();
-  if ((redeemed.meta?.changes ?? 0) === 0) return Response.json({ status: 'already used' }, { status: 409 });
   try {
-    if (row.purpose === 'signup') {
-      await env.DB.prepare("UPDATE accounts SET terms_accepted_at = ?, terms_version = ?, privacy_version = ?, updated_at = datetime('now') WHERE id = ? AND auth_subject = ?")
-        .bind(row.terms_accepted_at, row.terms_version, row.privacy_version, accountId, subject).run();
-      for (const [policyType, policyVersion] of [['terms', row.terms_version], ['privacy', row.privacy_version]] as const) {
-        await env.DB.prepare("INSERT OR IGNORE INTO policy_acceptance_receipts (id, account_id, policy_type, policy_version, policy_content_hash, release_sha, accepted_at, acceptance_surface, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, ?, 'signup', ?, ?)")
-          .bind(`policy_${row.id}_${policyType}`, accountId, policyType, policyVersion, row.policy_content_hash, row.policy_release_sha, row.terms_accepted_at, row.requested_ip_hash, row.user_agent_hash).run();
-      }
-      if (row.name?.trim()) await env.DB.prepare("UPDATE persons SET display_name = ?, updated_at = datetime('now') WHERE account_id = ? AND role = 'self'").bind(row.name.trim().slice(0, MAX_NAME_LENGTH), accountId).run();
+    if (row.account_id) {
+      const account = await env.DB.prepare('SELECT id, auth_subject FROM accounts WHERE id = ?').bind(row.account_id).first<{ id: string; auth_subject: string }>();
+      if (!account || account.auth_subject !== subject) return Response.json({ status: 'invalid' }, { status: 400 });
+      accountId = account.id;
     } else {
-      await env.DB.prepare("UPDATE auth_email_codes SET used_at = COALESCE(used_at, datetime('now')) WHERE account_id = ? AND used_at IS NULL").bind(accountId).run();
+      if (row.purpose !== 'signup') return Response.json({ status: 'invalid' }, { status: 400 });
+      accountId = (await resolveAccount(env, subject)).accountId;
+      createdAccount = true;
     }
+
+    const statements = [
+      env.DB.prepare("UPDATE auth_magic_links SET used_at = datetime('now'), account_id = ? WHERE id = ? AND used_at IS NULL AND expires_at > datetime('now')").bind(accountId, row.id)
+    ];
+
+    if (row.purpose === 'signup') {
+      statements.push(
+        env.DB.prepare("UPDATE accounts SET terms_accepted_at = ?, terms_version = ?, privacy_version = ?, updated_at = datetime('now') WHERE id = ? AND auth_subject = ?")
+          .bind(row.terms_accepted_at, row.terms_version, row.privacy_version, accountId, subject)
+      );
+      for (const [policyType, policyVersion] of [['terms', row.terms_version], ['privacy', row.privacy_version]] as const) {
+        statements.push(
+          env.DB.prepare("INSERT OR IGNORE INTO policy_acceptance_receipts (id, account_id, policy_type, policy_version, policy_content_hash, release_sha, accepted_at, acceptance_surface, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, ?, 'signup', ?, ?)")
+            .bind(`policy_${row.id}_${policyType}`, accountId, policyType, policyVersion, row.policy_content_hash, row.policy_release_sha, row.terms_accepted_at, row.requested_ip_hash, row.user_agent_hash)
+        );
+      }
+      if (row.name?.trim()) {
+        statements.push(
+          env.DB.prepare("UPDATE persons SET display_name = ?, updated_at = datetime('now') WHERE account_id = ? AND role = 'self'").bind(row.name.trim().slice(0, MAX_NAME_LENGTH), accountId)
+        );
+      }
+    } else {
+      statements.push(
+        env.DB.prepare("UPDATE auth_email_codes SET used_at = COALESCE(used_at, datetime('now')) WHERE account_id = ? AND used_at IS NULL").bind(accountId)
+      );
+    }
+
+    let firstResult: { meta?: { changes?: number } } | undefined;
+    if (typeof env.DB.batch === 'function') {
+      const batchResults = await env.DB.batch(statements);
+      firstResult = batchResults[0];
+    } else {
+      for (const statement of statements) {
+        const res = await statement.run();
+        if (!firstResult) firstResult = res;
+      }
+    }
+    if ((firstResult?.meta?.changes ?? 0) === 0) return Response.json({ status: 'already used' }, { status: 409 });
   } catch (error) {
+    if (error instanceof Response) return error;
     console.error('auth_d1_error', { error: error instanceof Error ? error.message : 'unknown' });
     return Response.json({ status: 'error', error: 'AUTH_D1_ERROR', code: 'AUTH_D1_ERROR', message: 'Account creation failed during schema write' }, { status: 500, headers: { 'cache-control': 'no-store' } });
   }
@@ -308,19 +370,43 @@ async function redeemEmailCode(env: Env, rawEmail?: string, rawCode?: string): P
   const account = await env.DB.prepare('SELECT id, auth_subject FROM accounts WHERE id = ?').bind(row.account_id).first<{ id: string; auth_subject: string }>();
   const subject = `email:${email}`;
   if (!account || account.auth_subject !== subject) return invalidCodeResponse();
-  const redeemed = await env.DB.prepare("UPDATE auth_email_codes SET used_at = datetime('now') WHERE id = ? AND used_at IS NULL AND attempts < max_attempts AND expires_at > datetime('now')").bind(row.id).run();
-  if ((redeemed.meta?.changes ?? 0) === 0) return invalidCodeResponse();
-  await env.DB.prepare("UPDATE auth_magic_links SET used_at = COALESCE(used_at, datetime('now')) WHERE account_id = ? AND purpose = 'login' AND used_at IS NULL").bind(account.id).run();
+  try {
+    const statements = [
+      env.DB.prepare("UPDATE auth_email_codes SET used_at = datetime('now') WHERE id = ? AND used_at IS NULL AND attempts < max_attempts AND expires_at > datetime('now')").bind(row.id),
+      env.DB.prepare("UPDATE auth_magic_links SET used_at = COALESCE(used_at, datetime('now')) WHERE account_id = ? AND purpose = 'login' AND used_at IS NULL").bind(account.id)
+    ];
+    let firstResult: { meta?: { changes?: number } } | undefined;
+    if (typeof env.DB.batch === 'function') {
+      const batchResults = await env.DB.batch(statements);
+      firstResult = batchResults[0];
+    } else {
+      for (const statement of statements) {
+        const res = await statement.run();
+        if (!firstResult) firstResult = res;
+      }
+    }
+    if ((firstResult?.meta?.changes ?? 0) === 0) return invalidCodeResponse();
+  } catch (error) {
+    if (error instanceof Response) return error;
+    console.error('auth_d1_error', { error: error instanceof Error ? error.message : 'unknown' });
+    return Response.json({ status: 'error', error: 'AUTH_D1_ERROR', code: 'AUTH_D1_ERROR', message: 'Email code redemption failed during schema write' }, { status: 500, headers: { 'cache-control': 'no-store' } });
+  }
   return createSessionResponse(env, account.id, subject, false, safeReturnTo(row.return_to));
 }
 
 async function createSessionResponse(env: Env, accountId: string, subject: string, createdAccount: boolean, returnTo: string): Promise<Response> {
-  const sessionId = `session_${crypto.randomUUID()}`;
-  const exp = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
-  const tokenValue = await createSignedSessionToken({ sub: subject, exp, sid: sessionId }, env.SESSION_SIGNING_SECRET);
-  await env.DB.prepare("INSERT INTO auth_sessions (id, account_id, subject, session_hash, expires_at) VALUES (?, ?, ?, ?, datetime('now', '+30 days'))").bind(sessionId, accountId, subject, await sha256(tokenValue)).run();
-  const onboarding = await env.DB.prepare('SELECT onboarding_completed_at FROM accounts WHERE id = ?').bind(accountId).first<{ onboarding_completed_at?: string | null }>();
-  return Response.json({ status: 'success', createdAccount, next: onboarding?.onboarding_completed_at ? safeReturnTo(returnTo) : '/onboarding' }, { headers: { 'set-cookie': cookie('__Host-sovereign_session', tokenValue), 'cache-control': 'no-store' } });
+  try {
+    const sessionId = `session_${crypto.randomUUID()}`;
+    const exp = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
+    const tokenValue = await createSignedSessionToken({ sub: subject, exp, sid: sessionId }, env.SESSION_SIGNING_SECRET);
+    await env.DB.prepare("INSERT INTO auth_sessions (id, account_id, subject, session_hash, expires_at) VALUES (?, ?, ?, ?, datetime('now', '+30 days'))").bind(sessionId, accountId, subject, await sha256(tokenValue)).run();
+    const onboarding = await env.DB.prepare('SELECT onboarding_completed_at FROM accounts WHERE id = ?').bind(accountId).first<{ onboarding_completed_at?: string | null }>();
+    return Response.json({ status: 'success', createdAccount, next: onboarding?.onboarding_completed_at ? safeReturnTo(returnTo) : '/onboarding' }, { headers: { 'set-cookie': cookie('__Host-sovereign_session', tokenValue), 'cache-control': 'no-store' } });
+  } catch (error) {
+    if (error instanceof Response) return error;
+    console.error('auth_d1_error', { error: error instanceof Error ? error.message : 'unknown' });
+    return Response.json({ status: 'error', error: 'AUTH_D1_ERROR', code: 'AUTH_D1_ERROR', message: 'Session creation failed during schema write' }, { status: 500, headers: { 'cache-control': 'no-store' } });
+  }
 }
 
 function constantTimeEqual(left: string, right: string): boolean {

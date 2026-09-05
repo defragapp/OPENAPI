@@ -67,12 +67,17 @@ export async function runSovereignStream(input: string, context: SovereignContex
   
   return new ReadableStream<string>({
     async start(controller) {
-      controller.enqueue(structuredChunk);
-      for (const chunk of textChunks) {
-        controller.enqueue(chunk);
-        await new Promise(resolve => setTimeout(resolve, 10));
+      try {
+        controller.enqueue(structuredChunk);
+        for (const chunk of textChunks) {
+          controller.enqueue(chunk);
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        }
+      } catch (error) {
+        try { controller.error(error); } catch {}
+      } finally {
+        try { controller.close(); } catch {}
       }
-      controller.close();
     }
   });
 }
@@ -204,6 +209,7 @@ async function buildCloudflareGatewayPrompt(input: string, context: SovereignCon
 
   const prompt = `${sovereignRuntimePromptV2}
 
+AUTHENTICATED USER BASELINE & WORKSPACE CONTEXT:
 Authorization-checked server context, stripped of raw birth inputs, exact private location, secrets, source paths, and private identifiers:
 ${JSON.stringify(authorizedContext)}
 

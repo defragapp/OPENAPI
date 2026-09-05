@@ -521,7 +521,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
   }
 
   return (
-    <div className={`intelligence-workspace ${contextOpen ? 'context-open' : ''} ${railCollapsed ? 'rail-collapsed' : ''}`}>
+    <div className={`intelligence-workspace glassmorphic-window ${contextOpen ? 'context-open' : ''} ${railCollapsed ? 'rail-collapsed' : ''}`}>
       <aside className="intelligence-sidebar" aria-label="Sovereign navigation">
         <div className="intelligence-sidebar-header">
           <a className="intelligence-brand" href="/app">
@@ -535,7 +535,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
           </button>
         </div>
 
-        <button className="sidebar-new-chat-btn" onClick={() => startNewThread()}>
+        <button className="sidebar-new-chat-btn" onClick={() => startNewThread()} aria-label="Ask something new">
           <span className="plus-icon" aria-hidden="true">+</span>
           <span>New Chat</span>
         </button>
@@ -566,8 +566,6 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
             </div>
           </section>
         )}
-
-        <button className="new-conversation" onClick={() => startNewThread()}>Ask something new</button>
 
         <div className="sidebar-footer">
           <button className="sidebar-user-pill" onClick={() => { setSurface('You'); setContextOpen(true); }} aria-label="User account settings">
@@ -1035,7 +1033,7 @@ function TodayFacetView({ facets, current, registry, onPrompt, onOpenContext }: 
   return (
     <section className="today-facet-view">
       <header className="workspace-hero-greeting">
-        <p>Personal Intelligence</p>
+        <p>Know yourself. Understand your people. See the whole system.</p>
         <h1>What feels active for you now?</h1>
         <span>Begin with what remains steady, then see what may be louder today. Your Baseline stays beneath every exploration.</span>
       </header>

@@ -3,7 +3,7 @@ import { BrandMark } from './BrandMark';
 
 const PRICING_CONTENT = {
   hero: {
-    kicker: 'PRICING',
+    kicker: 'PRICING · KNOW YOURSELF. UNDERSTAND YOUR PEOPLE. SEE THE WHOLE SYSTEM.',
     title: 'Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.',
     subtitle: 'Free includes your complete Baseline Design and 10 Sovereign AI turns each month. Sovereign+ adds relationship and system intelligence, Library, optional Covenant exploration, and 300 turns.',
   },
@@ -16,7 +16,7 @@ const PRICING_CONTENT = {
       priceNote: 'Permanent. No card required.',
       features: [
         'Complete Baseline Design',
-        'Explore yourself — decisions, communication, creativity, connection, pressure, shadow and light, Alignment',
+        'Explore yourself — decisions, communication, creativity, connection, pressure, Shadow, Gift, Alignment',
         'Today and what may be more relevant now',
         '10 Sovereign AI turns each month',
         'Review, correct, or reject any interpretation',
@@ -63,7 +63,7 @@ const PRICING_CONTENT = {
   },
   cta: {
     title: 'Start with yourself.',
-    description: 'No card required. Upgrade only when you want People, Systems, Library, Covenant, or more monthly use.',
+    description: 'Know yourself. Understand your people. See the whole system. No card required. Upgrade only when you want People, Systems, Library, Covenant, or more monthly use.',
     buttonText: 'Build your Baseline',
     buttonHref: '/signup',
   },

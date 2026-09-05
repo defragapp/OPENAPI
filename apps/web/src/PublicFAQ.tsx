@@ -3,9 +3,9 @@ import { BrandMark } from './BrandMark';
 
 const FAQ_CONTENT = {
   hero: {
-    kicker: 'QUESTIONS',
+    kicker: 'QUESTIONS · KNOW YOURSELF. UNDERSTAND YOUR PEOPLE. SEE THE WHOLE SYSTEM.',
     title: 'What can Sovereign help you understand?',
-    subtitle: 'Start with yourself. Bring in another person or the wider family, team, or group only when it helps answer the question you actually have.',
+    subtitle: 'What Sovereign is. What you can ask. What it never pretends to know. Know yourself. Understand your people. See the whole system.',
   },
   categories: [
     {
@@ -83,15 +83,15 @@ const FAQ_CONTENT = {
         },
         {
           question: 'Which frameworks are included?',
-          answer: 'The launch Baseline uses calculated astronomical positions, astrology, partial Human Design and Gene Keys activations, and numerology. Tarot is not part of Sovereign.OS. These frameworks support reflection; they are not scientific personality measurements, diagnosis, or proof of future outcomes.',
+          answer: 'The launch Baseline uses calculated astronomical positions, astrology, partial Human Design and Gene Keys activations, and numerology. Tarot is not part of Sovereign.OS. These frameworks support sovereign reflection and personal discernment; they are not clinical measurements or proof of future outcomes.',
         },
         {
-          question: 'Is this therapy?',
-          answer: 'No. Sovereign.OS does not diagnose, provide treatment, or replace professional care. It is designed to help you understand personal, relationship, decision, and system context in clear language while keeping your judgment primary.',
+          question: 'Is this therapy or medical care?',
+          answer: 'No. Sovereign.OS is an instrument for personal discernment and sovereign reflection, not therapy, treatment, or medical care. It helps you understand personal, relationship, decision, and system dynamics in clear language while keeping your agency and judgment primary.',
         },
         {
-          question: 'Can Sovereign prove a diagnosis, hidden motive, spiritual cause, or future outcome?',
-          answer: 'No. A framework, coincidence, current astronomical condition, or strong feeling is not treated as proof of a diagnosis, hidden motive, spiritual cause, or future outcome.',
+          question: 'Can Sovereign prove an absolute verdict, hidden motive, spiritual cause, or future outcome?',
+          answer: 'No. A framework, coincidence, current astronomical condition, or strong feeling is not treated as proof of an internal condition, hidden motive, spiritual cause, or future outcome. Sovereign is designed for sovereign reflection and thoughtful discernment.',
         },
         {
           question: 'Can I see what information Sovereign used for an answer?',
@@ -131,8 +131,8 @@ const FAQ_CONTENT = {
           answer: 'Sources show the exact approved source values that materially supported an interpretation. They verify what data was used. They do not prove personality, motive, emotion, compatibility, current state, or an outcome.',
         },
         {
-          question: 'Can Sovereign diagnose a pattern or condition?',
-          answer: 'No. It can describe observable dynamics and possible pressure responses in plain language. It does not diagnose mental-health conditions or assign clinical labels.',
+          question: 'Can Sovereign evaluate or diagnose personal conditions?',
+          answer: 'No. Sovereign is dedicated to sovereign reflection and personal discernment. It describes observable dynamics, relational friction, and possible pressure responses in plain language, without assigning clinical labels or diagnosing conditions.',
         },
         {
           question: 'What happens when the interpretation does not fit?',
@@ -268,10 +268,10 @@ export function PublicFAQ() {
             <div>
               <p className="faq-kicker">START FREE</p>
               <h2>Start with yourself.</h2>
-              <p>Build your Baseline, explore what fits, and bring other people in only with permission.</p>
+              <p>Know yourself. Understand your people. See the whole system. Build your Baseline, explore what fits, and bring other people in only with permission.</p>
             </div>
             <a className="public-cta" href="/signup">Build your Baseline <span aria-hidden="true">→</span></a>
-</div>
+          </div>
         </FAQSectionWrapper>
       </main>
 

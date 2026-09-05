@@ -192,6 +192,29 @@ function reduceComputedBaseline(certainty: BirthTimeCertainty, computed: Baselin
 }
 function modelSafeContext(certainty: BirthTimeCertainty, providerStatus: string, availability: Record<string, string>) { return { baselineTendency: 'Enduring tendency is represented as reduced interpretive language, not a diagnosis.', currentAmplification: 'Current conditions are computed separately and never determine behavior.', userObservation: 'No observed behavior is assumed until supplied by the user.', interpretiveSignals: Object.entries(availability).filter(([, state]) => state === 'available' || state === 'partial').map(([name]) => name), systemInference: providerStatus === 'computed' ? 'Structured deterministic reduction is available.' : 'Structured deterministic reduction is unavailable.', uncertainty: certainty === 'unknown' ? 'high' : 'stated', unknownActualState: 'Actual state remains unknown unless the user confirms it.' }; }
 
+export async function writeBaselineToKV(env: Env, accountId: string, data: unknown): Promise<void> {
+  if (env.KV) {
+    try {
+      await env.KV.put(`baseline:${accountId}:latest`, JSON.stringify(data));
+    } catch (e) {
+      console.error('Failed to save baseline to KV:', e);
+    }
+  }
+}
+
+export async function getBaselineFromKV(env: Env, accountId: string): Promise<unknown | null> {
+  if (!env.KV) return null;
+  try {
+    const raw = await env.KV.get(`baseline:${accountId}:latest`);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch (e) {
+    console.error('Failed to read baseline from KV:', e);
+  }
+  return null;
+}
+
 export async function persistBaseline(
   env: Env,
   accountId: string,
@@ -256,13 +279,17 @@ export async function persistBaseline(
   if (!parsedSource.success || computed.status !== 'completed') {
     reducedContext.facetProfileStatus = 'unavailable';
     await writeBaselineRow();
-    return resultFor(null);
+    const finalResult = resultFor(null);
+    await writeBaselineToKV(env, accountId, finalResult);
+    return finalResult;
   }
 
   if (options.deferFacetProfile) {
     reducedContext.facetProfileStatus = 'pending';
     reducedContext.facetProfileStartedAt = new Date().toISOString();
     await writeBaselineRow();
+    const interimResult = resultFor(null);
+    await writeBaselineToKV(env, accountId, interimResult);
 
     const task = (async (): Promise<void> => {
       const facetProfile = await ensureBaselineFacetProfile(env, {
@@ -293,10 +320,13 @@ export async function persistBaseline(
         WHERE account_id = ? AND input_hash = ?`)
         .bind(JSON.stringify(latest), accountId, inputHash)
         .run();
+
+      const updatedStatus = await getBaselineStatus(env, accountId);
+      await writeBaselineToKV(env, accountId, updatedStatus);
     })();
 
     options.deferFacetProfile(task);
-    return resultFor(null);
+    return interimResult;
   }
 
   const facetProfile = await ensureBaselineFacetProfile(env, {
@@ -309,7 +339,9 @@ export async function persistBaseline(
   reducedContext.facetProfileStatus = facetProfile ? 'ready' : 'pending';
   await writeBaselineRow();
 
-  return resultFor(facetProfile);
+  const finalResult = resultFor(facetProfile);
+  await writeBaselineToKV(env, accountId, finalResult);
+  return finalResult;
 }
 
 export async function computeConfiguredBaseline(env: Env, input: BaselineInput) {
@@ -321,10 +353,18 @@ export async function computeConfiguredBaseline(env: Env, input: BaselineInput) 
 }
 
 export async function getBaselineStatus(env: Env, accountId: string) {
+  const kvBaseline = await getBaselineFromKV(env, accountId);
+  if (kvBaseline && typeof kvBaseline === 'object' && kvBaseline !== null) {
+    const kvObj = kvBaseline as Record<string, unknown>;
+    if (kvObj.ready === true || kvObj.status === 'completed') {
+      return kvObj;
+    }
+  }
+
   const row = await env.DB.prepare('SELECT status, uncertainty, reduced_context_json, provenance_json, computation_version, last_computed_at, provider_status FROM baseline_onboarding WHERE account_id = ?').bind(accountId).first<{ status: string; uncertainty: string; reduced_context_json: string; provenance_json: string; computation_version: string; last_computed_at: string; provider_status: string }>();
   if (!row) return { status: 'not_started' };
   const readiness = await getBaselineReadiness(env, accountId);
-  return {
+  const statusObj = {
     status: readiness.ready ? 'completed' : row.status === 'completed' ? 'preparing' : row.status,
     ready: readiness.ready,
     readinessState: readiness.state,
@@ -338,6 +378,10 @@ export async function getBaselineStatus(env: Env, accountId: string) {
     lastComputedAt: row.last_computed_at,
     providerStatus: row.provider_status
   };
+  if (readiness.ready) {
+    await writeBaselineToKV(env, accountId, statusObj);
+  }
+  return statusObj;
 }
 
 export async function prepareStoredBaselineFacetProfile(env: Env, accountId: string) {
@@ -399,7 +443,9 @@ export async function prepareStoredBaselineFacetProfile(env: Env, accountId: str
     .bind(JSON.stringify(reduced), accountId)
     .run();
 
-  return getBaselineStatus(env, accountId);
+  const finalStatus = await getBaselineStatus(env, accountId);
+  await writeBaselineToKV(env, accountId, finalStatus);
+  return finalStatus;
 }
 
 export async function getBaselineReadiness(env: Env, accountId: string): Promise<BaselineReadiness> {

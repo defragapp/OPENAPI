@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#090b0e">
+  <meta name="theme-color" content="#0a0a0a">
   <meta name="description" content="See how Sovereign.OS helps you understand yourself, your relationships, your decisions, and the systems around you.">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://sovereign.defrag.app/how-it-works">
@@ -23,6 +23,86 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://sovereign.defrag.app/og-sovereign.png">
   <title>How Sovereign.OS works</title>
+  <style>
+    /* Powder Framer glassmorphism & layout enhancements for how-it-works.html */
+    body.launch-page.how-page {
+      background-color: #0a0a0a !important;
+      color: #ffffff;
+    }
+    .powder-glass-card {
+      background-color: rgba(255, 255, 255, 0.03) !important;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      border-radius: 16px !important;
+      padding: 24px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .powder-glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    .powder-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      background: rgba(212, 163, 115, 0.15);
+      color: #ffffff;
+      border: 1px solid #d4a373;
+    }
+    .powder-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      background-color: #d4a373;
+      color: #0a0a0a;
+      border: 1px solid #d4a373;
+      transition: all 0.2s ease;
+    }
+    .powder-btn-primary:hover {
+      background-color: #e5b484;
+      border-color: #e5b484;
+    }
+    .timeline-vertical {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding-left: 28px;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 32px;
+    }
+    .timeline-item {
+      position: relative;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -35px;
+      top: 24px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #0a0a0a;
+      border: 2px solid #d4a373;
+      box-shadow: 0 0 10px rgba(212, 163, 115, 0.4);
+    }
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+  </style>
 </head>
 <body class="launch-page how-page" data-visual-contract="founder-v0-static" data-secondary-visual-contract="founder-v0-locked-v1" data-route-cohesion="v1">
   <div class="launch-shell">
@@ -52,22 +132,60 @@
     </header>
     <main>
       <section class="launch-hero launch-hero-compact">
-        <p class="launch-kicker">HOW SOVEREIGN WORKS</p>
+        <div style="margin-bottom: 16px;">
+          <span class="powder-pill">✦ PERSONAL INTELLIGENCE FOR REAL LIFE</span>
+        </div>
+        <p class="launch-kicker">HOW SOVEREIGN WORKS · KNOW YOURSELF. UNDERSTAND YOUR PEOPLE. SEE THE WHOLE SYSTEM.</p>
         <h1>Start with yourself. Add another person or the wider situation only when it helps.</h1>
         <p>Your Baseline gives Sovereign a consistent reference for how you may think, decide, communicate, create, connect, respond under pressure, and grow. From there, Sovereign can use what is happening now, another person’s shared Baseline, or the wider family or team situation when it helps answer your question.</p>
       </section>
 
       <section class="launch-band">
         <div class="launch-heading">
-          <div><p class="launch-kicker">YOU → PEOPLE → SYSTEMS</p><h2>Understand yourself first. Expand outward when the question does.</h2></div>
+          <div><p class="launch-kicker">YOU → PEOPLE → SYSTEMS · KNOW YOURSELF. UNDERSTAND YOUR PEOPLE. SEE THE WHOLE SYSTEM.</p><h2>Understand yourself first. Expand outward when the question does.</h2></div>
           <p>Explore yourself, bring in another person only with their permission, or step back to understand what is happening across a family, team, household, or group.</p>
         </div>
-        <div class="journey-steps five-step-journey">
-          <article><span>01</span><h3>Explore yourself.</h3><p>Look at how you decide, communicate, create, connect, respond under pressure, and recognize what feels aligned.</p></article>
-          <article><span>02</span><h3>See what may be more relevant now.</h3><p>Temporary current conditions can make part of your Baseline more relevant for a limited time without defining you or determining what you will do.</p></article>
-          <article><span>03</span><h3>Understand what happens between two people.</h3><p>When another person chooses to share, Sovereign can use both Baselines while keeping each person separate. It can show where timing, communication, pressure, or decision styles differ without pretending to know private thoughts.</p></article>
-          <article><span>04</span><h3>See the wider system.</h3><p>For a family, team, household, or group, Sovereign can help you see who is involved, where pressure builds, what roles keep repeating, how people respond to one another, and what may change when one person responds differently.</p></article>
-          <article><span>05</span><h3>Get the answer first.</h3><p>The useful answer stays primary. You can inspect source details, correct an interpretation, or continue the conversation when you want to go deeper.</p></article>
+        <div class="timeline-vertical journey-steps five-step-journey">
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <article class="powder-glass-card">
+              <span class="powder-pill" style="margin-bottom: 8px;">01</span>
+              <h3>Explore yourself.</h3>
+              <p>Look at how you decide, communicate, create, connect, respond under pressure, and recognize what feels aligned.</p>
+            </article>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <article class="powder-glass-card">
+              <span class="powder-pill" style="margin-bottom: 8px;">02</span>
+              <h3>See what may be more relevant now.</h3>
+              <p>Temporary current conditions can make part of your Baseline more relevant for a limited time without defining you or determining what you will do.</p>
+            </article>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <article class="powder-glass-card">
+              <span class="powder-pill" style="margin-bottom: 8px;">03</span>
+              <h3>Understand what happens between two people.</h3>
+              <p>When another person chooses to share, Sovereign can use both Baselines while keeping each person separate. It can show where timing, communication, pressure, or decision styles differ without pretending to know private thoughts.</p>
+            </article>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <article class="powder-glass-card">
+              <span class="powder-pill" style="margin-bottom: 8px;">04</span>
+              <h3>See the wider system.</h3>
+              <p>For a family, team, household, or group, Sovereign can help you see who is involved, where pressure builds, what roles keep repeating, how people respond to one another, and what may change when one person responds differently.</p>
+            </article>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <article class="powder-glass-card">
+              <span class="powder-pill" style="margin-bottom: 8px;">05</span>
+              <h3>Get the answer first.</h3>
+              <p>The useful answer stays primary. You can inspect source details, correct an interpretation, or continue the conversation when you want to go deeper.</p>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -78,13 +196,28 @@
             <h2>Ask about what you actually want to understand.</h2>
             <p>You do not need to learn framework language or choose a special mode. Start with the question, decision, relationship, pattern, or situation that matters to you.</p>
           </div>
-          <dl class="definition-list">
-            <div><dt>Yourself</dt><dd>How do I make decisions that fit me? What changes in me under pressure? What part of myself am I underusing?</dd></div>
-            <div><dt>A decision</dt><dd>Should I say something now or wait? What supports the fit? What is the real tradeoff?</dd></div>
-            <div><dt>A relationship</dt><dd>Why does the same conversation feel urgent to me and pressuring to them? What would repair require from each of us?</dd></div>
-            <div><dt>A family or team</dt><dd>How does pressure move through this group? What changes when I stop playing the role everyone expects?</dd></div>
-            <div><dt>What may be active now</dt><dd>What still feels steady? What may deserve more attention for a limited time? What still has to be confirmed in real life?</dd></div>
-          </dl>
+          <div class="grid-cards">
+            <div class="powder-glass-card">
+              <h3 style="color: #d4a373; font-size: 16px; margin: 0 0 8px 0;">Yourself</h3>
+              <p style="margin: 0;">How do I make decisions that fit me? What changes in me under pressure? What part of myself am I underusing?</p>
+            </div>
+            <div class="powder-glass-card">
+              <h3 style="color: #d4a373; font-size: 16px; margin: 0 0 8px 0;">A decision</h3>
+              <p style="margin: 0;">Should I say something now or wait? What supports the fit? What is the real tradeoff?</p>
+            </div>
+            <div class="powder-glass-card">
+              <h3 style="color: #d4a373; font-size: 16px; margin: 0 0 8px 0;">A relationship</h3>
+              <p style="margin: 0;">Why does the same conversation feel urgent to me and pressuring to them? What would repair require from each of us?</p>
+            </div>
+            <div class="powder-glass-card">
+              <h3 style="color: #d4a373; font-size: 16px; margin: 0 0 8px 0;">A family or team</h3>
+              <p style="margin: 0;">How does pressure move through this group? What changes when I stop playing the role everyone expects?</p>
+            </div>
+            <div class="powder-glass-card">
+              <h3 style="color: #d4a373; font-size: 16px; margin: 0 0 8px 0;">What may be active now</h3>
+              <p style="margin: 0;">What still feels steady? What may deserve more attention for a limited time? What still has to be confirmed in real life?</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -95,63 +228,53 @@
             <h2>What can Sovereign actually help you understand?</h2>
             <p>Start with the question you already have. Use five expandable intents to see real examples.</p>
           </div>
-          <dl class="definition-list intent-groups">
-            <div>
-              <dt>Myself</dt>
-              <dd>
-                <ul>
-                  <li>Why do I keep saying yes when I want to say no?</li>
-                  <li>What changes in me under pressure?</li>
-                  <li>What part of myself am I underusing?</li>
-                  <li>Why did their tone affect me more than their words?</li>
-                </ul>
-              </dd>
+          <div class="grid-cards">
+            <div class="powder-glass-card">
+              <h3 style="color: #ffffff; font-size: 16px; margin: 0 0 12px 0;">Myself</h3>
+              <ul style="padding-left: 18px; color: #a3a3a3; font-size: 14px; margin: 0;">
+                <li>Why do I keep saying yes when I want to say no?</li>
+                <li>What changes in me under pressure?</li>
+                <li>What part of myself am I underusing?</li>
+                <li>Why did their tone affect me more than their words?</li>
+              </ul>
             </div>
-            <div>
-              <dt>A Decision</dt>
-              <dd>
-                <ul>
-                  <li>Should I say something now or wait?</li>
-                  <li>What supports the fit? What pulls against it?</li>
-                  <li>What would a closer version of this choice look like?</li>
-                  <li>Am I choosing from clarity or pressure?</li>
-                </ul>
-              </dd>
+            <div class="powder-glass-card">
+              <h3 style="color: #ffffff; font-size: 16px; margin: 0 0 12px 0;">A Decision</h3>
+              <ul style="padding-left: 18px; color: #a3a3a3; font-size: 14px; margin: 0;">
+                <li>Should I say something now or wait?</li>
+                <li>What supports the fit? What pulls against it?</li>
+                <li>What would a closer version of this choice look like?</li>
+                <li>Am I choosing from clarity or pressure?</li>
+              </ul>
             </div>
-            <div>
-              <dt>A Relationship</dt>
-              <dd>
-                <ul>
-                  <li>Why does the same conversation feel urgent to me and pressuring to them?</li>
-                  <li>What is mine, theirs, and between us?</li>
-                  <li>Where is the timing mismatch?</li>
-                  <li>What would repair require from each of us?</li>
-                </ul>
-              </dd>
+            <div class="powder-glass-card">
+              <h3 style="color: #ffffff; font-size: 16px; margin: 0 0 12px 0;">A Relationship</h3>
+              <ul style="padding-left: 18px; color: #a3a3a3; font-size: 14px; margin: 0;">
+                <li>Why does the same conversation feel urgent to me and pressuring to them?</li>
+                <li>What is mine, theirs, and between us?</li>
+                <li>Where is the timing mismatch?</li>
+                <li>What would repair require from each of us?</li>
+              </ul>
             </div>
-            <div>
-              <dt>A Family or Team</dt>
-              <dd>
-                <ul>
-                  <li>Why do I always end up managing the family crisis?</li>
-                  <li>How does pressure move through this group?</li>
-                  <li>Where are authority and responsibility separated?</li>
-                  <li>What changes when I stop playing the role everyone expects?</li>
-                </ul>
-              </dd>
+            <div class="powder-glass-card">
+              <h3 style="color: #ffffff; font-size: 16px; margin: 0 0 12px 0;">A Family or Team</h3>
+              <ul style="padding-left: 18px; color: #a3a3a3; font-size: 14px; margin: 0;">
+                <li>Why do I always end up managing the family crisis?</li>
+                <li>How does pressure move through this group?</li>
+                <li>Where are authority and responsibility separated?</li>
+                <li>What changes when I stop playing the role everyone expects?</li>
+              </ul>
             </div>
-            <div>
-              <dt>What May Be Active Now</dt>
-              <dd>
-                <ul>
-                  <li>What still feels steady?</li>
-                  <li>What may deserve more attention for a limited time?</li>
-                  <li>What part of my Baseline Design may be more relevant now?</li>
-                  <li>What still has to be confirmed in real life?</li>
-                </ul>
-              </dd>
+            <div class="powder-glass-card">
+              <h3 style="color: #ffffff; font-size: 16px; margin: 0 0 12px 0;">What May Be Active Now</h3>
+              <ul style="padding-left: 18px; color: #a3a3a3; font-size: 14px; margin: 0;">
+                <li>What still feels steady?</li>
+                <li>What may deserve more attention for a limited time?</li>
+                <li>What part of my Baseline Design may be more relevant now?</li>
+                <li>What still has to be confirmed in real life?</li>
+              </ul>
             </div>
-          </dl>
+          </div>
         </div>
       </section>
 
@@ -163,13 +286,28 @@
             <p>Your Baseline helps Sovereign understand how you may think, decide, communicate, create, connect, respond under pressure, and grow.</p>
             <p>It is interpretive and correctable. Confirm what fits, partly accept it, correct it, or reject it.</p>
           </div>
-          <dl class="definition-list">
-            <div><dt>Your Baseline</dt><dd>The private reference Sovereign can return to across self, decisions, relationships, and systems.</dd></div>
-            <div><dt>Active now</dt><dd>A temporary layer that may make part of your Baseline more relevant for a limited time without determining your behavior.</dd></div>
-            <div><dt>People</dt><dd>Another person connects their own account and chooses whether their Baseline may be used with yours.</dd></div>
-            <div><dt>Systems</dt><dd>A way to look across a family, team, household, or group while keeping each person separate and using only information that belongs there.</dd></div>
-            <div><dt>Source details</dt><dd>See the source information used for an answer when you want to inspect it. Those details support an interpretation; they do not prove personality, motive, emotion, or outcome.</dd></div>
-          </dl>
+          <div class="grid-cards">
+            <div class="powder-glass-card">
+              <h4 style="color: #d4a373; margin: 0 0 6px 0;">Your Baseline</h4>
+              <p style="margin: 0; color: #a3a3a3; font-size: 14px;">The private reference Sovereign can return to across self, decisions, relationships, and systems.</p>
+            </div>
+            <div class="powder-glass-card">
+              <h4 style="color: #d4a373; margin: 0 0 6px 0;">Active now</h4>
+              <p style="margin: 0; color: #a3a3a3; font-size: 14px;">A temporary layer that may make part of your Baseline more relevant for a limited time without determining your behavior.</p>
+            </div>
+            <div class="powder-glass-card">
+              <h4 style="color: #d4a373; margin: 0 0 6px 0;">People</h4>
+              <p style="margin: 0; color: #a3a3a3; font-size: 14px;">Another person connects their own account and chooses whether their Baseline may be used with yours.</p>
+            </div>
+            <div class="powder-glass-card">
+              <h4 style="color: #d4a373; margin: 0 0 6px 0;">Systems</h4>
+              <p style="margin: 0; color: #a3a3a3; font-size: 14px;">A way to look across a family, team, household, or group while keeping each person separate and using only information that belongs there.</p>
+            </div>
+            <div class="powder-glass-card">
+              <h4 style="color: #d4a373; margin: 0 0 6px 0;">Source details</h4>
+              <p style="margin: 0; color: #a3a3a3; font-size: 14px;">See the source information used for an answer when you want to inspect it. Those details support an interpretation; they do not prove personality, motive, emotion, or outcome.</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -178,23 +316,23 @@
           <div><p class="launch-kicker">SELF EXPLORATION</p><h2 id="product-proof-title">See how a personal question becomes specific.</h2></div>
           <p>Sovereign answers in plain language first. The deeper detail stays underneath so the conversation remains easy to follow.</p>
         </header>
-        <div class="product-proof-window">
-          <div class="product-proof-topbar"><span aria-hidden="true"></span><strong>Sovereign · You</strong><small>REPRESENTATIVE EXAMPLE</small></div>
-          <div class="product-proof-grid">
+        <div class="product-proof-window" style="padding: 0; overflow: hidden;">
+          <div class="product-proof-topbar" style="background: rgba(255,255,255,0.02); padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between;"><span aria-hidden="true"></span><strong>Sovereign · You</strong><small style="color: #d4a373;">REPRESENTATIVE EXAMPLE</small></div>
+          <div class="product-proof-grid" style="padding: 24px;">
             <div class="product-proof-conversation">
-              <p class="product-proof-question">How do I know whether I’m refining an idea because it is getting clearer—or changing it because I’m anticipating everyone else’s reaction?</p>
-              <p class="product-proof-answer">A useful distinction may be whether the next change makes the idea more coherent to you or merely more defensible to an imagined audience. Under pressure, sensitivity to meaning and response can become editing before you have decided what you actually want to preserve.</p>
-              <details class="product-proof-basis">
+              <p class="product-proof-question" style="font-size: 16px; color: #ffffff; font-weight: 500;">How do I know whether I’m refining an idea because it is getting clearer—or changing it because I’m anticipating everyone else’s reaction?</p>
+              <p class="product-proof-answer" style="color: #ccc; line-height: 1.6;">A useful distinction may be whether the next change makes the idea more coherent to you or merely more defensible to an imagined audience. Under pressure, sensitivity to meaning and response can become editing before you have decided what you actually want to preserve.</p>
+              <details class="product-proof-basis" style="margin-top: 12px; color: #888; font-size: 13px;">
                 <summary>See source details</summary>
-                <p>Representative example data shaped this demonstration. These are not visitor data, and source details do not prove the interpretation is true.</p>
+                <p style="margin-top: 8px;">Representative example data shaped this demonstration. These are not visitor data, and source details do not prove the interpretation is true.</p>
               </details>
             </div>
-            <ol class="product-proof-flow" aria-label="How Sovereign makes the answer useful">
-              <li><span>01</span><div><strong>Start with the question</strong><small>Focus on what the person is actually trying to understand.</small></div></li>
-              <li><span>02</span><div><strong>Use what matters from your Baseline</strong><small>Bring in only the parts of the Baseline that help answer this question.</small></div></li>
-              <li><span>03</span><div><strong>Find the useful difference</strong><small>Separate clearer thinking from changing something mainly to manage another person’s reaction.</small></div></li>
-              <li><span>04</span><div><strong>Leave what is not known unanswered</strong><small>Real constraints and useful feedback still matter; the Baseline cannot decide those facts.</small></div></li>
-              <li><span>05</span><div><strong>Give you something you can try</strong><small>Return a concrete comparison or next step you can use in the real situation.</small></div></li>
+            <ol class="product-proof-flow" aria-label="How Sovereign makes the answer useful" style="margin-top: 24px; padding-left: 0; list-style: none;">
+              <li style="margin-bottom: 12px; display: flex; gap: 12px;"><span class="powder-pill" style="height: fit-content;">01</span><div><strong style="color: #fff;">Start with the question</strong><br><small style="color: #888;">Focus on what the person is actually trying to understand.</small></div></li>
+              <li style="margin-bottom: 12px; display: flex; gap: 12px;"><span class="powder-pill" style="height: fit-content;">02</span><div><strong style="color: #fff;">Use what matters from your Baseline</strong><br><small style="color: #888;">Bring in only the parts of the Baseline that help answer this question.</small></div></li>
+              <li style="margin-bottom: 12px; display: flex; gap: 12px;"><span class="powder-pill" style="height: fit-content;">03</span><div><strong style="color: #fff;">Find the useful difference</strong><br><small style="color: #888;">Separate clearer thinking from changing something mainly to manage another person’s reaction.</small></div></li>
+              <li style="margin-bottom: 12px; display: flex; gap: 12px;"><span class="powder-pill" style="height: fit-content;">04</span><div><strong style="color: #fff;">Leave what is not known unanswered</strong><br><small style="color: #888;">Real constraints and useful feedback still matter; the Baseline cannot decide those facts.</small></div></li>
+              <li style="margin-bottom: 12px; display: flex; gap: 12px;"><span class="powder-pill" style="height: fit-content;">05</span><div><strong style="color: #fff;">Give you something you can try</strong><br><small style="color: #888;">Return a concrete comparison or next step you can use in the real situation.</small></div></li>
             </ol>
           </div>
         </div>
@@ -207,41 +345,43 @@
             <h2 id="text-thread-proof-title">Get the answer. Go deeper when you want.</h2>
             <p>Sovereign does not make you navigate a report before you get an answer. The answer comes first, deeper detail stays quiet beneath it, and the same thread is ready for the next question.</p>
           </div>
-          <dl class="definition-list">
-            <div><dt>Direct answer</dt><dd>The useful answer appears before technical detail.</dd></div>
-            <div><dt>Relevant explanation</dt><dd>Only the parts that materially help answer the question are shown.</dd></div>
-            <div><dt>Sources</dt><dd>Open source details when you want to inspect the information used for an interpretation.</dd></div>
-            <div><dt>What still needs clarity</dt><dd>Missing information stays open instead of being filled in with certainty.</dd></div>
-            <div><dt>Continue</dt><dd>Keep asking from the same conversation without rebuilding your story from scratch.</dd></div>
+          <dl class="definition-list grid-cards">
+            <div class="powder-glass-card"><dt>Direct answer</dt><dd style="margin: 0; color: #a3a3a3; font-size: 14px;">The useful answer appears before technical detail.</dd></div>
+            <div class="powder-glass-card"><dt>Relevant explanation</dt><dd style="margin: 0; color: #a3a3a3; font-size: 14px;">Only the parts that materially help answer the question are shown.</dd></div>
+            <div class="powder-glass-card"><dt>Sources</dt><dd style="margin: 0; color: #a3a3a3; font-size: 14px;">Open source details when you want to inspect the information used for an interpretation.</dd></div>
+            <div class="powder-glass-card"><dt>What still needs clarity</dt><dd style="margin: 0; color: #a3a3a3; font-size: 14px;">Missing information stays open instead of being filled in with certainty.</dd></div>
+            <div class="powder-glass-card"><dt>Continue</dt><dd style="margin: 0; color: #a3a3a3; font-size: 14px;">Keep asking from the same conversation without rebuilding your story from scratch.</dd></div>
           </dl>
         </div>
       </section>
 
       <section class="launch-section">
-        <div class="billing-note framework-disclosure">
-          <strong>Where Baseline Design comes from</strong>
-          <p>Baseline Design combines calculated astronomical data with selected interpretive frameworks. These sources support reflection; they are not scientific personality measurements, diagnosis, or prediction. The FAQ explains the included frameworks if you want that deeper detail.</p>
+        <div class="powder-glass-card billing-note framework-disclosure">
+          <strong style="color: #d4a373; font-size: 16px;">Where Baseline Design comes from</strong>
+          <p style="color: #ccc; margin-top: 8px; line-height: 1.5;">Baseline Design combines calculated astronomical data with selected interpretive frameworks. These sources support personal discernment and sovereign reflection; they are not clinical measurements or destiny predictions. The FAQ explains the included frameworks if you want that deeper detail.</p>
         </div>
       </section>
 
       <section id="support" class="launch-section support-note-section" aria-labelledby="support-title">
-        <div class="support-note">
+        <div class="powder-glass-card support-note" style="display: flex; flex-direction: column; gap: 20px;">
           <div>
             <p class="launch-kicker">OPTIONAL SUPPORT</p>
             <h2 id="support-title">Support Sovereign.OS from $1.</h2>
-            <p>Free and Sovereign+ stand on their own. If you want to support continued development separately, choose any one-time amount from $1. Support does not unlock paid features or change your plan.</p>
+            <p style="color: #ccc; margin-top: 8px;">Free and Sovereign+ stand on their own. If you want to support continued development separately, choose any one-time amount from $1. Support does not unlock paid features or change your plan.</p>
           </div>
           <div class="support-links">
-            <a class="launch-button" href="https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02" target="_blank" rel="noopener noreferrer">Support Sovereign.OS <span aria-hidden="true">→</span></a>
+            <a class="powder-btn-primary" href="https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02" target="_blank" rel="noopener noreferrer">Support Sovereign.OS <span aria-hidden="true">→</span></a>
           </div>
         </div>
-        <div class="billing-note"><strong>Separate from subscriptions</strong><p>Support is voluntary and does not change Free or Sovereign+ access.</p></div>
+        <div class="billing-note" style="margin-top: 12px; color: #888; font-size: 13px;"><strong>Separate from subscriptions</strong><p>Support is voluntary and does not change Free or Sovereign+ access.</p></div>
       </section>
 
       <section class="launch-section">
-        <div class="launch-callout">
-          <div><p class="launch-kicker">START FREE</p><h2>Build your Baseline and begin exploring.</h2><p>No card required. Review what fits, correct what does not, and bring other people in only with permission.</p></div>
-          <a class="launch-button launch-cta" href="/signup">Build your Baseline <span aria-hidden="true">→</span></a>
+        <div class="powder-glass-card launch-callout" style="text-align: center; padding: 48px 24px;">
+          <span class="powder-pill" style="margin-bottom: 12px;">START FREE</span>
+          <h2 style="font-size: 32px; margin: 12px 0;">Build your Baseline and begin exploring.</h2>
+          <p style="max-width: 600px; margin: 0 auto 24px auto; color: #ccc; line-height: 1.6;">Know yourself. Understand your people. See the whole system. No card required. Review what fits, correct what does not, and bring other people in only with permission.</p>
+          <a class="powder-btn-primary" href="/signup">Build your Baseline <span aria-hidden="true">→</span></a>
         </div>
       </section>
     </main>

@@ -146,7 +146,7 @@ export function PowderLanding() {
             </div>
             
             <div className="app-welcome" style={{ textAlign: "left", marginBottom: "24px" }}>
-              <h2 style={{ fontSize: "22px", fontWeight: 500, margin: "0 0 6px 0" }}>Welcome back</h2>
+              <h2 style={{ fontSize: "22px", fontWeight: 500, margin: "0 0 6px 0" }}>What dynamic is alive for you right now?</h2>
               <p style={{ color: "#888", fontSize: "14px", margin: 0 }}>Explore what is active in your world right now.</p>
             </div>
 

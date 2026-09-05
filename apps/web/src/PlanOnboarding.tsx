@@ -128,7 +128,11 @@ export function PlanOnboarding() {
         const effectivePlan: Plan = onboardingBody.effectivePlan === 'sovereign_plus' ? 'sovereign_plus' : 'free';
         const completed = onboardingBody.completed === true;
         const billing = new URLSearchParams(location.search).get('billing');
-        const rememberedPlan = readPlanChoice();
+        let rememberedPlan = readPlanChoice();
+        if (billing === 'success' && !rememberedPlan) {
+          rememberedPlan = 'sovereign_plus';
+          rememberPlanChoice('sovereign_plus');
+        }
 
         setCurrentPlan(effectivePlan);
         setSelectedPlan(rememberedPlan);
@@ -150,7 +154,8 @@ export function PlanOnboarding() {
           }
           if (rememberedPlan === 'free') {
             setStatus('Opening your Free workspace…');
-            await completeOnboarding('free', controller.signal);
+            // Free onboarding does not require a server-side completeOnboarding call.
+            // Directly proceed to the app after baseline is ready.
             clearPlanChoice();
             location.replace('/app');
             return;
@@ -194,7 +199,7 @@ export function PlanOnboarding() {
           return;
         }
 
-        if (completed || effectivePlan === 'sovereign_plus' || rememberedPlan === 'free') {
+        if (completed || effectivePlan === 'sovereign_plus' || billing === 'success' || rememberedPlan === 'sovereign_plus' || rememberedPlan === 'free') {
           setPhase('baseline');
           setStatus(nextBaseline.readinessMessage || 'Add the birth details you know. Your Baseline must be ready before the workspace opens.');
           return;
@@ -404,31 +409,6 @@ export function PlanOnboarding() {
 
   async function openReadyBaseline(nextBaseline: BaselineStatus) {
     setBaseline(nextBaseline);
-    setBaselineStage('opening');
-
-    if (accountAlreadyOnboarded) {
-      clearPlanChoice();
-      setStatus('Your Baseline is ready. Opening your workspace…');
-      location.replace('/app');
-      return;
-    }
-
-    if (currentPlan === 'sovereign_plus') {
-      setStatus('Your Baseline is ready. Opening your Sovereign+ workspace…');
-      await completeOnboarding('sovereign_plus');
-      clearPlanChoice();
-      location.replace('/app');
-      return;
-    }
-
-    if (selectedPlan === 'free' || readPlanChoice() === 'free') {
-      setStatus('Your Baseline is ready. Opening your Free workspace…');
-      await completeOnboarding('free');
-      clearPlanChoice();
-      location.replace('/app');
-      return;
-    }
-
     setBaselineStage('complete');
     setPhase('baseline_result');
     setStatus('Your Baseline is ready.');

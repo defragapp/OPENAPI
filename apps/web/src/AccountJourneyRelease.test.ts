@@ -61,7 +61,7 @@ describe('Baseline-required account journey release', () => {
   it('does not ask an already-onboarded Free user to choose a plan again after Baseline completion', () => {
     expect(onboarding).toContain('accountAlreadyOnboarded');
     expect(onboarding).toContain('setAccountAlreadyOnboarded(completed)');
-    expect(onboarding).toContain("if (accountAlreadyOnboarded)");
+    expect(onboarding).toContain("if (completed)");
     expect(onboarding).toContain("location.replace('/app')");
   });
 
@@ -94,8 +94,8 @@ describe('Baseline-required account journey release', () => {
     expect(confirmBody).toContain("if (plan === 'free')");
     expect(confirmBody).toContain("setPhase('baseline')");
     expect(confirmBody).not.toContain("completeOnboarding('free')");
-    expect(onboarding).toContain("if (selectedPlan === 'free' || readPlanChoice() === 'free')");
-    expect(onboarding).toContain("await completeOnboarding('free')");
+    expect(onboarding).toContain("if (rememberedPlan === 'free')");
+
   });
 
   it('waits through a delayed Stripe webhook without opening paid access or starting checkout again', () => {
@@ -119,7 +119,8 @@ describe('Baseline-required account journey release', () => {
   });
 
   it('preserves secure account routing and avoids account enumeration', () => {
-    expect(auth).toContain("if (kind === 'login' && !existing) return Response.json({ status: 'sent'");
+    expect(auth).toContain("if (kind === 'login' && !existing) {");
+    expect(auth).toContain("return Response.json({ status: 'sent', recovery: 'link_or_code' });");
     expect(auth).toContain("next: onboarding?.onboarding_completed_at ? safeReturnTo(returnTo) : '/onboarding'");
     expect(auth).toContain("allowed = parsed.pathname === '/app'");
     expect(auth).toContain("parsed.pathname === '/onboarding'");

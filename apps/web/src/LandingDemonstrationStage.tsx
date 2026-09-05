@@ -103,8 +103,7 @@ export function LandingDemonstrationStage() {
       </div>
 
       <div className="card-welcome">
-        <h2>Welcome back</h2>
-        <p>How can I help you today?</p>
+        <h2>What dynamic is alive for you right now?</h2>
       </div>
 
       {/* 2. Powder Prompt Box with Utility Tools */}
