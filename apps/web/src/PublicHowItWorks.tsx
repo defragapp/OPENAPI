@@ -46,7 +46,7 @@ const HOW_IT_WORKS_CONTENT = {
     title: 'Your Baseline is a private reference Sovereign can return to across self, decisions, relationships, and systems.',
     details: [
       { title: 'Calculated baseline', description: 'Derived from your birth date, time, and place for deep individual resonance.' },
-      { title: 'Multi-framework synthesis', description: 'Combines astronomical data with interpretive frameworks (astrology, partial Human Design, partial Gene Keys, numerology).' },
+      { title: 'Multi-framework synthesis', description: 'Combines astronomical data with structured interpretive frameworks for nuanced personal reflection.' },
       { title: 'Flexible input precision', description: 'Unknown birth time is supported—some facets will be unavailable or less precise.' },
       { title: 'Interpretive & correctable', description: 'Designed for personal discernment and sovereign reflection, not clinical labels or destiny claims.' },
     ],
@@ -55,7 +55,7 @@ const HOW_IT_WORKS_CONTENT = {
     title: 'See the source information used for an answer when you want to inspect it.',
     details: [
       { title: 'Transparent inspection', description: 'Open "See source details" beneath any answer whenever you choose.' },
-      { title: 'Exact source values', description: 'Includes natal placements, verified aspects, partial Human Design/Gene Keys activations, numerology, and current planetary contacts.' },
+      { title: 'Exact source values', description: 'Includes planetary placements, verified aspects, personal activations, and current conditions.' },
       { title: 'Reflective foundation', description: 'Source details support reflection. They do not prove personality or current state.' },
       { title: 'Quiet by default', description: 'Exact codes remain collapsed until you choose to inspect them.' },
     ],

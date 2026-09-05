@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { FormEvent, KeyboardEvent, ReactNode } from 'react';
 import { ThreadExpressionField } from './expression-field/ThreadExpressionField';
 import { WorkspaceExpressionField } from './expression-field/WorkspaceExpressionField';
@@ -643,30 +644,24 @@ onOpenCovenant={() => setCovenantEnabled(true)}
                 onSave={(answer) => void saveAnswer(answer)}
                 onCorrection={(value) => void saveCorrection(value)}
                 onShowPlan={openPlan}
+                onPrompt={(prompt) => setDraft(prompt)}
+                onOpenPeople={() => { setSurface('People'); setContextOpen(true); }}
+                onOpenSystems={() => { setSurface('Systems'); setContextOpen(true); }}
               />}
         </section>
 
         {baselineExperience === 'idle' && baselineReady && surfaceEntitled && (
           <form className="sovereign-composer sovereign-composer--enhanced" onSubmit={submit}>
             <div className="composer-header">
-              <div className="composer-quick-chips flex flex-wrap gap-2 mb-3 px-2">
-                {[
-                  "Why do I react this way under pressure?",
-                  "What should I consider before making this decision?",
-                  "How does my communication style land with others?",
-                  "What pattern am I over-relying on right now?"
-                ].map((chip) => (
-                  <button
-                    type="button"
-                    key={chip}
-                    onClick={() => setDraft(chip)}
-                    className="bg-white/[0.03] border border-white/[0.08] hover:border-white/20 text-neutral-300 text-xs px-3.5 py-1.5 rounded-full transition-all cursor-pointer text-left"
-                  >
-                    {chip}
-                  </button>
-                ))}
-              </div>
               <div className="composer-context-line">
+                <button
+                  type="button"
+                  className="composer-add-context-btn"
+                  onClick={() => setContextOpen(true)}
+                  aria-label="Add to this question"
+                >
+                  <span aria-hidden="true">＋</span> Add to this question
+                </button>
                 <span className="composer-context-label">Drawing from</span>
                 <span className="composer-context-items">{contextItems.join(' · ')}</span>
                 <button type="button" className="composer-context-adjust" onClick={() => setContextOpen(true)}>Adjust</button>
@@ -690,25 +685,9 @@ onOpenCovenant={() => setCovenantEnabled(true)}
                   }
                 }}
               />
-              <div className="composer-dock-tools">
-                <div className="composer-dock-left">
-                  <button type="button" className="composer-tool-btn" onClick={() => setContextOpen(true)} aria-label="Attach context or file" title="Attach context">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-                    </svg>
-                  </button>
-                  <button type="button" className="composer-tool-btn" onClick={() => setDraft('Explore the tone and unspoken rhythm in this moment.')} aria-label="Audio waveform rhythm exploration" title="Tone rhythm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M2 10v4M6 6v12M10 3v18M14 8v8M18 5v14M22 10v4" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="composer-dock-right">
-                  <button className="composer-send" disabled={!draft.trim() || apiState === 'loading'} aria-label="Send message">
-                    <span aria-hidden="true">↑</span>
-                  </button>
-                </div>
-              </div>
+              <button className="composer-send" disabled={!draft.trim() || apiState === 'loading'} aria-label="Send message">
+                <span aria-hidden="true">↑</span>
+              </button>
             </div>
           </form>
         )}
@@ -726,7 +705,7 @@ onOpenCovenant={() => setCovenantEnabled(true)}
             refresh={refreshWorkspace}
             setSelectedPerson={(id) => { setSelectedPerson(id); if (id) setSelectedSystem(''); }}
             setSelectedSystem={(id) => { setSelectedSystem(id); if (id) setSelectedPerson(''); }}
-            setDraft={(value) => { setDraft(value); setContextOpen(false); }}
+            setDraft={(value) => { setDraft(value); }}
             onOpenPlan={openPlan}
             onBuildBaseline={beginBaseline}
             onOpenCovenant={() => setCovenantEnabled(true)}
@@ -1219,12 +1198,15 @@ function SystemOverview({ system, api }: { system: Json; api: (path: string, ini
   );
 }
 
-function ResponseThread({ messages, onAction, onSave, onCorrection, onShowPlan }: {
+function ResponseThread({ messages, onAction, onSave, onCorrection, onShowPlan, onPrompt, onOpenPeople, onOpenSystems }: {
   messages: ChatMessage[];
   onAction: (action: AnswerAction) => void;
   onSave: (answer: SovereignAnswer) => void;
   onCorrection: (value: 'yes' | 'partly' | 'not_today') => void;
   onShowPlan: (feature: EntitledFeature) => void;
+  onPrompt?: ((prompt: string) => void) | undefined;
+  onOpenPeople?: (() => void) | undefined;
+  onOpenSystems?: (() => void) | undefined;
 }) {
   const threadRef = useRef<HTMLDivElement>(null);
   const latestAnswerId = [...messages].reverse().find((message) => message.answer)?.id;
@@ -1252,6 +1234,9 @@ function ResponseThread({ messages, onAction, onSave, onCorrection, onShowPlan }
                   onSave={() => onSave(message.answer!)}
                   onCorrection={onCorrection}
                   onShowPlan={onShowPlan}
+                  {...(onPrompt ? { onPrompt } : {})}
+                  {...(onOpenPeople ? { onOpenPeople } : {})}
+                  {...(onOpenSystems ? { onOpenSystems } : {})}
                 />
               : <AnswerProcessingIndicator />}
           </article>)}
@@ -1259,17 +1244,21 @@ function ResponseThread({ messages, onAction, onSave, onCorrection, onShowPlan }
   );
 }
 
-function SovereignAnswerView({ answer, basis, expressionFieldContext, interfaceActions, latest, onAction, onSave, onCorrection, onShowPlan }: {
+function SovereignAnswerView({ answer, basis, expressionFieldContext, interfaceActions, latest, onAction, onSave, onCorrection, onShowPlan, onPrompt, onOpenPeople, onOpenSystems }: {
   answer: SovereignAnswer;
   basis: BasisValue[];
-  expressionFieldContext?: Json;
-  interfaceActions?: InterfaceActionEnvelope;
+  expressionFieldContext?: Json | undefined;
+  interfaceActions?: InterfaceActionEnvelope | undefined;
   latest: boolean;
   onAction: (action: AnswerAction) => void;
   onSave: () => void;
   onCorrection: (value: 'yes' | 'partly' | 'not_today') => void;
   onShowPlan: (feature: EntitledFeature) => void;
+  onPrompt?: ((prompt: string) => void) | undefined;
+  onOpenPeople?: (() => void) | undefined;
+  onOpenSystems?: (() => void) | undefined;
 }) {
+  const [refining, setRefining] = useState(false);
   const trustedAnswerActions = [interfaceActions?.primary, ...(interfaceActions?.contextual ?? [])]
     .filter((action): action is AnswerAction => Boolean(action && action.type !== 'show_plan'));
   const primaryAction = trustedAnswerActions.find((action) => ['explore_facet', 'examine_alignment', 'open_person', 'invite_person', 'open_system'].includes(action.type));
@@ -1307,6 +1296,58 @@ function SovereignAnswerView({ answer, basis, expressionFieldContext, interfaceA
 
       {latest && (
         <footer className="answer-actions">
+          <div className="answer-capability-bar flex flex-wrap gap-2 mb-2">
+            <button type="button" className="answer-action-chip" onClick={onSave} title="Save to Library">
+              <span aria-hidden="true">✦</span> Save to Library
+            </button>
+            <button
+              type="button"
+              className="answer-action-chip"
+              onClick={() => setRefining((prev) => !prev)}
+              aria-expanded={refining}
+              title="That's not quite right"
+            >
+              <span aria-hidden="true">✎</span> That’s not quite right
+            </button>
+          </div>
+
+          {refining && (
+            <div className="answer-refinement-drawer p-3 mb-3 rounded-xl bg-white/[0.03] border border-white/[0.08] flex flex-wrap items-center gap-2">
+              <span className="text-xs text-neutral-300 font-medium mr-1">Refine:</span>
+              <button
+                type="button"
+                className="refine-choice-btn"
+                onClick={() => {
+                  onCorrection('not_today');
+                  onPrompt?.('Let me correct something: ');
+                  setRefining(false);
+                }}
+              >
+                Correct something
+              </button>
+              <button
+                type="button"
+                className="refine-choice-btn"
+                onClick={() => {
+                  onPrompt?.('Here is what happened: ');
+                  setRefining(false);
+                }}
+              >
+                Add what happened
+              </button>
+              <button
+                type="button"
+                className="refine-choice-btn"
+                onClick={() => {
+                  onPrompt?.('Let me ask this another way: ');
+                  setRefining(false);
+                }}
+              >
+                Ask another way
+              </button>
+            </div>
+          )}
+
           <div className="fit-controls"><span>{answer.correction_prompt}</span><button onClick={() => onCorrection('yes')}>Yes</button><button onClick={() => onCorrection('partly')}>Partly</button><button onClick={() => onCorrection('not_today')}>Not today</button></div>
           <nav className="answer-continuations" aria-label="Continue this understanding">
             {primaryAction && <button onClick={() => onAction(primaryAction)}>{primaryAction.label} <span aria-hidden="true">→</span></button>}
@@ -1491,6 +1532,257 @@ function AccountSummary({ workspace, onOpenContext, onBuildBaseline }: { workspa
   );
 }
 
+const BASELINE_FACETS = [
+  { label: 'How I decide', prompt: 'How does my decision-making pattern apply here: ' },
+  { label: 'How I communicate', prompt: 'In terms of how I communicate: ' },
+  { label: 'How I connect', prompt: 'Looking through how I connect with others: ' },
+  { label: 'How I respond under pressure', prompt: 'When under pressure, how do my patterns show up: ' },
+  { label: 'How I create and express', prompt: 'In terms of my creative and expressive drive: ' },
+  { label: 'Boundaries', prompt: 'What boundaries should I hold in this situation: ' },
+  { label: 'Leadership', prompt: 'How does my leadership pattern approach this: ' },
+  { label: 'Shadow', prompt: 'What shadow or blind spot might I be overlooking: ' },
+  { label: 'Gift', prompt: 'What natural gift or capacity can I lean into: ' },
+  { label: 'Alignment', prompt: 'Is this aligned with my deeper patterns and values: ' }
+];
+
+const CURRENT_SITUATION_PROMPTS = [
+  { label: 'Current situation', prompt: 'Here is what is currently happening: ' },
+  { label: 'Recent observation', prompt: 'A recent observation: ' },
+  { label: 'Decision', prompt: 'I am facing a decision about: ' },
+  { label: 'Conversation', prompt: 'In a recent conversation: ' },
+  { label: 'Pressure or change', prompt: 'Under current pressure: ' }
+];
+
+function QuestionContextDrawer({
+  workspace,
+  selectedPerson,
+  selectedSystem,
+  setSelectedPerson,
+  setSelectedSystem,
+  setDraft,
+  api,
+  refresh
+}: {
+  workspace: WorkspaceState;
+  selectedPerson: string;
+  selectedSystem: string;
+  setSelectedPerson: (id: string) => void;
+  setSelectedSystem: (id: string) => void;
+  setDraft: (value: string | ((prev: string) => string)) => void;
+  api: (path: string, init?: RequestInit) => Promise<Json>;
+  refresh: () => Promise<void>;
+}) {
+  const [conditionsStatus, setConditionsStatus] = useState('');
+  const current = workspace.today?.current ?? { status: 'not_started' };
+  const currentReady = current.status === 'ready';
+
+  const permittedPeople = workspace.people.filter((person: Json) =>
+    person.identityBound === true
+    && person.baselineStatus === 'ready'
+    && Array.isArray(person.activeScopes)
+    && person.activeScopes.includes('pair.compare')
+    && person.activeScopes.includes('trait.display')
+  );
+
+  async function toggleConditions() {
+    setConditionsStatus('Updating…');
+    try {
+      if (currentReady) {
+        await api('/api/v1/current-conditions', { method: 'DELETE' });
+        await refresh();
+        setConditionsStatus('Current context removed.');
+      } else {
+        await api('/api/v1/current-conditions', {
+          method: 'POST',
+          body: JSON.stringify({ locationPrecision: 'geocentric' })
+        });
+        await refresh();
+        setConditionsStatus('Current context active for 6 hours.');
+      }
+    } catch (error) {
+      setConditionsStatus(error instanceof Error ? error.message : 'Conditions unavailable.');
+    }
+  }
+
+  return (
+    <div className="context-stack question-context-drawer">
+      <div className="context-header mb-3">
+        <h2 className="text-sm font-medium text-white">What should Sovereign consider?</h2>
+        <p className="context-intro text-xs text-neutral-400 mt-1">
+          Sovereign uses the parts of your Baseline that matter to what you are examining.
+        </p>
+      </div>
+
+      {/* 1. YOUR BASELINE */}
+      <section className="context-group">
+        <header className="flex justify-between items-center">
+          <strong className="text-xs tracking-wider text-neutral-300 font-semibold uppercase">Your Baseline</strong>
+          <small className="text-[11px] text-neutral-400">Select facet to focus</small>
+        </header>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {BASELINE_FACETS.map((facet) => (
+            <button
+              key={facet.label}
+              type="button"
+              className="context-chip-btn"
+              onClick={() => {
+                setDraft((prev: string) => (prev ? `${prev}\n\n[Focusing on ${facet.label}]` : facet.prompt));
+              }}
+            >
+              {facet.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* 2. WHAT’S HAPPENING NOW */}
+      <section className="context-group">
+        <header className="flex justify-between items-center">
+          <strong className="text-xs tracking-wider text-neutral-300 font-semibold uppercase">What’s Happening Now</strong>
+          <small className="text-[11px] text-neutral-400">Add current context</small>
+        </header>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {CURRENT_SITUATION_PROMPTS.map((item) => (
+            <button
+              key={item.label}
+              type="button"
+              className="context-chip-btn"
+              onClick={() => {
+                setDraft((prev: string) => (prev ? `${prev}\n\n${item.prompt}` : item.prompt));
+              }}
+            >
+              ＋ {item.label}
+            </button>
+          ))}
+        </div>
+        <div className="current-conditions-quick mt-2 pt-2 border-t border-white/[0.06] flex items-center justify-between text-xs">
+          <span className="text-neutral-400">
+            Current astronomy: {currentReady ? <span className="text-emerald-400">Active (6h)</span> : 'Off'}
+          </span>
+          <button
+            type="button"
+            className="text-xs text-neutral-300 underline hover:text-white"
+            onClick={() => void toggleConditions()}
+          >
+            {currentReady ? 'Remove' : 'Enable 6 hours'}
+          </button>
+        </div>
+        {conditionsStatus && <small className="text-[11px] text-neutral-400 mt-1 block">{conditionsStatus}</small>}
+      </section>
+
+      {/* 3. PEOPLE */}
+      <section className="context-group">
+        <header className="flex justify-between items-center">
+          <strong className="text-xs tracking-wider text-neutral-300 font-semibold uppercase">People</strong>
+          {selectedPerson && (
+            <button
+              type="button"
+              className="text-[11px] text-neutral-400 underline"
+              onClick={() => setSelectedPerson('')}
+            >
+              Clear
+            </button>
+          )}
+        </header>
+        <p className="text-[11px] text-neutral-400 italic">
+          "Your people remain separate people. Sovereign only uses shared context when both individuals choose to connect."
+        </p>
+        {permittedPeople.length > 0 ? (
+          <div className="flex flex-wrap gap-2 mt-1">
+            {permittedPeople.map((person: Json) => (
+              <button
+                key={person.id}
+                type="button"
+                className={`context-chip-btn ${selectedPerson === person.id ? 'active border-white/40 bg-white/10 text-white' : ''}`}
+                onClick={() => setSelectedPerson(selectedPerson === person.id ? '' : person.id)}
+              >
+                {person.displayName} ({person.role})
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-neutral-400 mt-1">No shared relationship context yet.</p>
+        )}
+        <div className="mt-2 pt-2 border-t border-white/[0.06]">
+          <button
+            type="button"
+            className="text-xs text-neutral-300 hover:text-white flex items-center gap-1"
+            onClick={openConsentControls}
+          >
+            <span>＋</span> Invite a person privately
+          </button>
+        </div>
+      </section>
+
+      {/* 4. SYSTEMS */}
+      <section className="context-group">
+        <header className="flex justify-between items-center">
+          <strong className="text-xs tracking-wider text-neutral-300 font-semibold uppercase">Systems</strong>
+          {selectedSystem && (
+            <button
+              type="button"
+              className="text-[11px] text-neutral-400 underline"
+              onClick={() => setSelectedSystem('')}
+            >
+              Clear
+            </button>
+          )}
+        </header>
+        {workspace.systems.length > 0 ? (
+          <div className="flex flex-wrap gap-2 mt-1">
+            {workspace.systems.map((system: Json) => (
+              <button
+                key={system.id}
+                type="button"
+                className={`context-chip-btn ${selectedSystem === system.id ? 'active border-white/40 bg-white/10 text-white' : ''}`}
+                onClick={() => setSelectedSystem(selectedSystem === system.id ? '' : system.id)}
+              >
+                {system.name}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-neutral-400 mt-1">No systems created yet.</p>
+        )}
+      </section>
+
+      {/* 5. FROM YOUR LIBRARY */}
+      <section className="context-group">
+        <header className="flex justify-between items-center">
+          <strong className="text-xs tracking-wider text-neutral-300 font-semibold uppercase">From Your Library</strong>
+          <small className="text-[11px] text-neutral-400">{workspace.library.length} saved</small>
+        </header>
+        {workspace.library.length > 0 ? (
+          <div className="flex flex-col gap-2 mt-1">
+            {workspace.library.slice(0, 4).map((item: Json) => (
+              <button
+                key={item.id}
+                type="button"
+                className="library-quick-item text-left p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:border-white/20 transition-all"
+                onClick={() => {
+                  setDraft((prev: string) => {
+                    const snippet = `Continue from this saved understanding: ${item.body?.summary ?? item.summary ?? ''}`;
+                    return prev ? `${prev}\n\n${snippet}` : snippet;
+                  });
+                }}
+              >
+                <strong className="text-xs text-neutral-200 block">{item.body?.title ?? item.title ?? 'Saved understanding'}</strong>
+                <p className="text-[11px] text-neutral-400 line-clamp-2 mt-0.5">{shorten(item.body?.summary ?? item.summary ?? '', 100)}</p>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-neutral-400 mt-1">Nothing has been kept yet. Save a Sovereign answer when it changes your understanding.</p>
+        )}
+      </section>
+
+      <small className="text-neutral-500 text-[11px] block mt-2">
+        Current context is added only while you choose to keep it on and it is still current.
+      </small>
+    </div>
+  );
+}
+
 function ContextPanel(props: {
   surface: Surface;
   workspace: WorkspaceState;
@@ -1500,7 +1792,7 @@ function ContextPanel(props: {
   refresh: () => Promise<void>;
   setSelectedPerson: (id: string) => void;
   setSelectedSystem: (id: string) => void;
-  setDraft: (value: string) => void;
+  setDraft: (value: string | ((prev: string) => string)) => void;
   onOpenPlan: (feature: EntitledFeature) => void;
   onBuildBaseline: () => void;
   onOpenCovenant: React.Dispatch<React.SetStateAction<boolean>>;
@@ -1511,7 +1803,7 @@ function ContextPanel(props: {
   if (props.surface === 'Systems') return <SystemControls {...props} />;
   if (props.surface === 'Library') return <LibraryGrid library={props.workspace.library} onPrompt={props.setDraft} compact />;
   if (props.surface === 'You') return <YouControls {...props} onOpenCovenant={() => props.onOpenCovenant(true)} />;
-  return <div className="context-stack context-summary"><p className="context-intro">Sovereign uses the parts of your Baseline that matter to the situation you are examining.</p><small>Current context is added only while you choose to keep it on and it is still current.</small></div>;
+  return <QuestionContextDrawer {...props} />;
 }
 
 function PeopleControls({ workspace, selectedPerson, setSelectedPerson, api, refresh }: any) {
@@ -1787,7 +2079,27 @@ function missingSurfaceEntitlement(surface: Surface, billing: Json | null): Enti
 
 function LibraryGrid({ library, onPrompt, compact = false }: { library: Json[]; onPrompt: (prompt: string) => void; compact?: boolean }) {
   if (!library.length) return <section className="empty-state"><h2>Nothing has been kept yet.</h2><p>Save a Sovereign answer when it changes your understanding. Library does not collect unsaved conversations.</p></section>;
-  return <div className={`library-list ${compact ? 'compact' : ''}`} role="list">{library.map((item) => <button role="listitem" key={item.id} onClick={() => onPrompt(`Continue from this saved understanding: ${item.body?.summary ?? item.summary ?? ''}`)}><span><strong>{item.body?.title ?? item.title ?? 'Saved understanding'}</strong><small>{String(item.body?.type ?? item.type ?? 'Saved understanding').replaceAll('_', ' ')} · {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Private Library'}</small></span><p>{shorten(item.body?.summary ?? item.summary ?? '', compact ? 120 : 220)}</p></button>)}</div>;
+  return (
+    <div className={`library-list ${compact ? 'compact' : ''}`} role="list">
+      {library.map((item) => (
+        <button
+          role="listitem"
+          key={item.id}
+          className="library-card-button"
+          onClick={() => onPrompt(`Continue from this saved understanding: ${item.body?.summary ?? item.summary ?? ''}`)}
+        >
+          <span>
+            <strong>{item.body?.title ?? item.title ?? 'Saved understanding'}</strong>
+            <small>{String(item.body?.type ?? item.type ?? 'Saved understanding').replaceAll('_', ' ')} · {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Private Library'}</small>
+          </span>
+          <p>{shorten(item.body?.summary ?? item.summary ?? '', compact ? 120 : 220)}</p>
+          <span className="library-ask-hint text-xs text-neutral-400 mt-1 inline-flex items-center gap-1">
+            Ask about this <span aria-hidden="true">→</span>
+          </span>
+        </button>
+      ))}
+    </div>
+  );
 }
 
 function openConsentControls() {
@@ -1960,7 +2272,13 @@ function ModalDialog({ className, labelledBy, onClose, children }: {
       first.focus();
     }
   }
-  return <div ref={dialog} className={className} role="dialog" aria-modal="true" aria-labelledby={labelledBy} tabIndex={-1} onKeyDown={keepFocus}>{children}</div>;
+  if (typeof document === 'undefined') return null;
+  return createPortal(
+    <div ref={dialog} className={className} role="dialog" aria-modal="true" aria-labelledby={labelledBy} tabIndex={-1} onKeyDown={keepFocus}>
+      {children}
+    </div>,
+    document.body
+  );
 }
 
 function modeLabel(mode: SovereignAnswer['mode']) {
@@ -1976,12 +2294,7 @@ function modeLabel(mode: SovereignAnswer['mode']) {
 }
 
 function composerPlaceholder(surface: Surface) {
-  return surface === 'People' ? 'What keeps happening between you?'
-    : surface === 'Systems' ? 'What role do I keep ending up in?'
-      : surface === 'Explore' ? 'Ask about what you actually want to understand.'
-        : surface === 'Library' ? 'Continue from something you saved…'
-          : surface === 'You' ? 'What does my Baseline support here?'
-            : 'What feels different today?';
+  return 'Ask Sovereign…';
 }
 
 function newThreadId(surface: Surface) {

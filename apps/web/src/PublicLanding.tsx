@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { BrandMark } from './BrandMark';
 import { LandingExpressionSlice } from './expression-field/LandingExpressionSlice';
 import { LandingDemonstrationStage } from './LandingDemonstrationStage';
@@ -7,7 +7,45 @@ import { GlassCard } from './GlassCard';
 import { PillBadge } from './PillBadge';
 import { PrimaryButton } from './PrimaryButton';
 
-function MobileCapabilityRail() { return null; }
+function MobileCapabilityRail() {
+  return (
+    <div
+      className="v0-capability-rail"
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '8px',
+        marginTop: '16px',
+        marginBottom: '8px'
+      }}
+      aria-label="Sovereign capabilities"
+    >
+      {[
+        'Explore yourself',
+        'Understand your people',
+        'See the whole system',
+        'Keep what matters'
+      ].map((cap) => (
+        <span
+          key={cap}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '999px',
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            fontSize: '0.75rem',
+            fontWeight: 500,
+            color: 'rgba(238, 229, 217, 0.8)'
+          }}
+        >
+          {cap}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 
@@ -93,154 +131,131 @@ function V0Navigation() {
   );
 }
 
-const POWDER_DEMO_TOPICS = {
-  myself: {
-    question: "Why do I keep saying yes when I want to say no?",
-    answer: "Accommodation is your learned baseline for maintaining connection. Under strain, preserving the relationship eclipses expressing your boundary.",
-    distinction: "Being helpful is not the same as being responsible for someone else's reaction.",
-    tags: ["Self Baseline", "Boundaries", "Tenderness vs Accommodation"]
-  },
-  reaction: {
-    question: "Why did their tone affect me more than their words?",
-    answer: "Tone carries implicit status and safety cues. When a tone shifts unexpectedly, your system registers relational risk before the verbal content can be evaluated.",
-    distinction: "Emotional sensitivity is an early detection system, not an overreaction.",
-    tags: ["Reaction Baseline", "Status Cues", "Relational Safety"]
-  },
-  decision: {
-    question: "Should I say something now or wait?",
-    answer: "The choice may not be between honesty and silence. It may be between speaking while pressure is high and agreeing on a time when the message can actually land.",
-    distinction: "Waiting with a return time is different from avoidance.",
-    tags: ["Decision Timing", "Pressure vs Clarity", "Alignment"]
-  },
-  relationship: {
-    question: "Why does the same conversation feel urgent to me and pressuring to them?",
-    answer: "You may need verbal reassurance to settle; they may need silence to process. When one person seeks clarity and the other needs time to think, each move makes sense from the inside and creates pressure on the other.",
-    distinction: "Different processing speeds do not automatically mean different levels of care.",
-    tags: ["Relational Context", "Processing Speeds", "Shared Boundary"]
-  },
-  system: {
-    question: "Why does everything fall to me when something goes wrong?",
-    answer: "The system may have organized around your reliability — you became the stabilizer because you stabilized things once. That doesn't mean the role is yours to carry now.",
-    distinction: "Being the one who can stabilize a situation doesn't make you the one who must always carry it.",
-    tags: ["System Dynamics", "Role Stabilizer", "Responsibility"]
-  }
-} as const;
-
-type PowderTopicKey = keyof typeof POWDER_DEMO_TOPICS;
-
 function V0Hero() {
-  const [activeTopic, setActiveTopic] = useState<PowderTopicKey>('relationship');
-  const activeData = POWDER_DEMO_TOPICS[activeTopic];
-
   return (
     <section className="v0-hero sovereign-opening-field" data-viewport-section="hero" style={{ background: '#080a0d', position: 'relative', overflow: 'hidden' }}>
       {/* Sunset horizon gradient glow */}
       <div className="powder-landscape-glow" aria-hidden="true" />
+
+      {/* Atmospheric expression slice */}
+      <div className="landing-hero-atmosphere" aria-hidden="true">
+        <LandingExpressionSlice />
+      </div>
 
       <div className="v0-hero-content max-w-5xl mx-auto px-4 pt-16 pb-8 flex flex-col items-center relative z-10" data-viewport-surface="hero">
         <PillBadge variant="powder" className="v0-badge landing-hero-kicker sov-section-kicker mb-6 px-4 py-1.5 bg-white/5 border border-white/10 text-xs font-mono text-neutral-300 rounded-full">
           Personal intelligence for real life
         </PillBadge>
         <h1 className="text-5xl sm:text-7xl font-medium tracking-tight text-white max-w-4xl mx-auto leading-[1.08] text-center mb-6">
-          Understand yourself.<br />
-          Understand your people.<br />
-          See the whole system.
+          <span>Healing isn’t optional.</span><br />
+          <span className="text-neutral-400">Holding onto the pain is.</span>
         </h1>
-        <div style={{ display: 'none' }} aria-hidden="true">
-          <span>Healing isn’t optional.</span>
-          <em>Holding onto the pain is.</em>
-        </div>
-        <p className="text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto text-center font-normal leading-relaxed mb-8">
+        <p className="text-lg sm:text-xl text-neutral-300 max-w-2xl mx-auto text-center font-normal leading-relaxed mb-8">
           Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
-        <div className="flex flex-col items-center mb-12">
-          <a href="/signup" className="px-8 py-3.5 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition-all shadow-xl text-sm">
-            Build your Baseline →
-          </a>
-          <p className="text-xs text-neutral-500 text-center mt-3">Start free · No card required · Review, correct, or reject any interpretation</p>
-        </div>
-        <div style={{ display: 'none' }} aria-hidden="true">
+        <div className="flex flex-col items-center mb-10">
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '14px' }}>
+            <PrimaryButton href="/signup" variant="primary" style={{ minHeight: '44px' }}>
+              Build your Baseline →
+            </PrimaryButton>
+            <PrimaryButton href="/how-it-works" variant="glass" style={{ minHeight: '44px' }}>
+              See how it works
+            </PrimaryButton>
+          </div>
+          <p style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.45)', textAlign: 'center', marginTop: '12px' }}>
+            Start free · No card required · Review, correct, or reject any interpretation
+          </p>
           <MobileCapabilityRail />
-          <span>Keep what matters</span>
         </div>
 
-        {/* Powder Floating App Window */}
-        <div className="w-full max-w-3xl mx-auto powder-interface-card text-left">
-          <div className="flex items-center justify-between border-b border-white/[0.08] pb-4 mb-6">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80 animate-pulse" />
-              <span className="text-xs font-mono text-neutral-400 uppercase tracking-wider">SOVEREIGN.OS · Private Baseline Active</span>
+        {/* Single Authentic Product Demonstration */}
+        <div
+          className="w-full max-w-3xl mx-auto powder-interface-card"
+          style={{
+            width: '100%',
+            maxWidth: '740px',
+            textAlign: 'left',
+            backgroundColor: 'rgba(17, 19, 23, 0.88)',
+            border: '1px solid rgba(255, 255, 255, 0.09)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            borderRadius: '20px',
+            padding: '28px',
+            boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.56)'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '14px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'rgba(245, 158, 11, 0.85)' }} />
+              <span style={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Representative Sovereign Conversation</span>
             </div>
-            <span className="text-xs font-mono text-neutral-500">Interactive Preview</span>
+            <span style={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.35)' }}>How Sovereign answers</span>
           </div>
 
-          <div className="mb-4">
-            <h2 className="text-xl sm:text-2xl font-medium text-white mb-1">What dynamic is alive for you right now?</h2>
-            <p className="text-xs sm:text-sm text-neutral-400">Ask about a decision, relationship, or recurring pattern.</p>
-          </div>
-
-          <div className="powder-prompt-box flex items-center justify-between gap-3">
-            <div className="text-white font-medium text-sm sm:text-base flex-1">
-              &ldquo;{activeData.question}&rdquo;
+          <div style={{ marginBottom: '20px' }}>
+            <span style={{ display: 'block', fontSize: '0.7rem', fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Question</span>
+            <div
+              className="powder-prompt-box"
+              style={{
+                padding: '16px 18px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid rgba(255, 255, 255, 0.07)',
+                color: '#ffffff',
+                fontWeight: 500,
+                fontSize: '1rem',
+                lineHeight: 1.45
+              }}
+            >
+              &ldquo;Why does the same conversation feel urgent to me and pressuring to them?&rdquo;
             </div>
-            <div className="flex items-center gap-2 text-neutral-400 text-sm">
-              <span className="text-xs font-mono text-neutral-500 hidden sm:inline">Baseline Insight</span>
-              <button type="button" className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-xs font-bold border border-amber-500/30">✦</button>
-            </div>
           </div>
 
-          {/* Category Chips */}
-          <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none">
-            <button
-              type="button"
-              className={`powder-cat-btn ${activeTopic === 'myself' ? 'active' : ''}`}
-              onClick={() => setActiveTopic('myself')}
-            >
-              Decisions
-            </button>
-            <button
-              type="button"
-              className={`powder-cat-btn ${activeTopic === 'reaction' ? 'active' : ''}`}
-              onClick={() => setActiveTopic('reaction')}
-            >
-              Reactions
-            </button>
-            <button
-              type="button"
-              className={`powder-cat-btn ${activeTopic === 'relationship' ? 'active' : ''}`}
-              onClick={() => setActiveTopic('relationship')}
-            >
-              Relationships
-            </button>
-            <button
-              type="button"
-              className={`powder-cat-btn ${activeTopic === 'system' ? 'active' : ''}`}
-              onClick={() => setActiveTopic('system')}
-            >
-              Family & Teams
-            </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '16px', padding: '0 4px' }}>
+            <span style={{ color: 'rgba(245, 158, 11, 0.9)', fontWeight: 600 }}>Drawing from:</span>
+            <span>Your Baseline (Communication &amp; Pressure) + Partner’s shared pace</span>
           </div>
 
-          {/* Answer Preview Box */}
-          <div className="powder-answer-box">
-            <p className="text-neutral-300 text-sm sm:text-base leading-relaxed mb-4">
-              {activeData.answer}
+          <div
+            className="powder-answer-box"
+            style={{
+              padding: '20px',
+              borderRadius: '14px',
+              background: 'rgba(0, 0, 0, 0.32)',
+              border: '1px solid rgba(255, 255, 255, 0.06)',
+              marginBottom: '20px'
+            }}
+          >
+            <span style={{ display: 'block', fontSize: '0.7rem', fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '10px' }}>Sovereign Answer</span>
+            <p style={{ color: 'rgba(255, 255, 255, 0.88)', fontSize: '0.95rem', lineHeight: 1.65, margin: '0 0 16px', fontWeight: 400 }}>
+              You may need verbal reassurance to settle; they may need silence to process. When one person seeks clarity and the other needs time to think, each move makes sense from the inside and creates pressure on the other.
             </p>
-            <div className="powder-insight-pill">
-              <span className="text-amber-400 font-bold">✦</span>
-              <span className="text-xs sm:text-sm text-white">{activeData.distinction}</span>
-            </div>
-            <div className="flex flex-wrap gap-2 pt-1">
-              {activeData.tags.map((tag) => (
-                <span key={tag} className="powder-tag font-mono">{tag}</span>
-              ))}
+            <div
+              className="powder-insight-pill"
+              style={{
+                padding: '12px 14px',
+                borderRadius: '10px',
+                background: 'rgba(245, 158, 11, 0.08)',
+                border: '1px solid rgba(245, 158, 11, 0.22)',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '10px'
+              }}
+            >
+              <span style={{ color: 'rgba(245, 158, 11, 0.95)', fontWeight: 'bold', lineHeight: 1, marginTop: '2px' }}>✦</span>
+              <span style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.88)', fontWeight: 500, lineHeight: 1.45 }}>
+                Different processing speeds do not automatically mean different levels of care.
+              </span>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div style={{ display: 'none' }} aria-hidden="true">
-        <LandingExpressionSlice />
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '12px', paddingTop: '14px', borderTop: '1px solid rgba(255, 255, 255, 0.06)', fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+            <span>Source values quiet beneath the answer · Inspectable anytime</span>
+            <a href="/signup" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#ffffff', fontWeight: 500, textDecoration: 'none', minHeight: '44px' }}>
+              Build your Baseline to begin <ArrowIcon />
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );
