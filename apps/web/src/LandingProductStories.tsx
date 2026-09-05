@@ -152,14 +152,18 @@ export function LandingProductStories() {
 function StoryCard({ story }: { story: StoryContent }) {
   const suffix = story.id === 'personal' ? 'personal' : story.id === 'relationship' ? 'relationship' : 'system';
   const className = `demo-card landing-story landing-story--${suffix}${story.id === 'system' ? ' roles-responsibility-map' : ''}`;
+  const num = story.id === 'personal' ? '01' : story.id === 'relationship' ? '02' : '03';
   return (
     <GlassCard
-      className={`${className} flex flex-col justify-between h-full p-6`}
+      className={`${className} powder-movement-card flex flex-col justify-between h-full p-8`}
       data-story-id={story.id}
       data-verification-text={story.label}
     >
       <div>
-        <PillBadge variant="powder" className="mb-3">{story.label}</PillBadge>
+        <div className="flex items-center justify-between mb-4">
+          <span className="powder-movement-num">{num}</span>
+          <PillBadge variant="powder">{story.label}</PillBadge>
+        </div>
         <div className="demo-card__question text-white font-medium text-lg mb-3">
           <p>{story.question}</p>
         </div>
