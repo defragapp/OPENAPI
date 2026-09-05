@@ -100,4 +100,22 @@ describe('OPENAPI Baseline engine', () => {
     expect(output.humanDesign).toBeNull();
     expect(output.geneKeys).toEqual({});
   });
+
+  it('limits concurrent Horizons requests to at most 2', async () => {
+    let active = 0;
+    let maxActive = 0;
+    const trackingFetch = vi.fn(async (input: RequestInfo | URL) => {
+      active += 1;
+      maxActive = Math.max(maxActive, active);
+      await new Promise((res) => setTimeout(res, 10));
+      active -= 1;
+      const command = new URL(String(input)).searchParams.get('COMMAND') ?? '';
+      const seed = [...command].reduce((sum, character) => sum + character.charCodeAt(0), 0) % 360;
+      return Response.json(horizonsPayload(seed, -0.5));
+    });
+    const provider = createOpenApiBaselineProvider(environment(), trackingFetch as unknown as typeof fetch);
+    await provider.compute(normalizeBaselineInput(exactInput));
+    expect(maxActive).toBeLessThanOrEqual(2);
+    expect(trackingFetch).toHaveBeenCalledTimes(10);
+  });
 });

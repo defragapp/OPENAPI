@@ -155,7 +155,7 @@ export function createOpenApiBaselineProvider(env: Env, fetchImpl: FetchLike = f
 async function computeNatalPositions(env: Env, instant: Date, fetchImpl: FetchLike): Promise<Record<string, BodyPosition>> {
   const positions: Record<string, BodyPosition> = {};
   const entries = Object.entries(PLANET_IDS);
-  const batchSize = 3;
+  const batchSize = 2;
 
   for (let offset = 0; offset < entries.length; offset += batchSize) {
     const batch = entries.slice(offset, offset + batchSize);
@@ -178,7 +178,7 @@ async function computeNatalPositions(env: Env, instant: Date, fetchImpl: FetchLi
       if (result) positions[result[0]] = result[1];
     }
 
-    if (offset + batchSize < entries.length) await delay(125);
+    if (offset + batchSize < entries.length) await delay(150);
   }
 
   return positions;
