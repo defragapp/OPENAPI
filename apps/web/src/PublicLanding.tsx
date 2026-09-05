@@ -127,7 +127,7 @@ function V0Hero() {
       {/* Hero Floating Preview Card */}
       <div className="max-w-3xl mx-auto mt-6 p-6 sm:p-8 rounded-2xl bg-[#111317]/80 border border-white/10 backdrop-blur-xl shadow-2xl">
         <div className="flex items-center gap-2 mb-4">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80 animate-pulse" />
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-xs font-mono text-neutral-400 uppercase tracking-wider">BASELINE INTERPRETATION</span>
         </div>
         <div className="text-white font-medium text-base sm:text-lg mb-4 bg-white/5 p-4 rounded-xl border border-white/5">
@@ -142,14 +142,8 @@ function V0Hero() {
           <PillBadge variant="powder" className="text-xs">Relational Context</PillBadge>
         </div>
       </div>
-
-      <div className="landing-hero-atmosphere">
+      <div style={{ display: 'none' }} aria-hidden="true">
         <LandingExpressionSlice />
-      </div>
-      <div className="landing-hero-product-preview mt-10">
-        <GlassCard className="p-0 overflow-hidden border-white/10">
-          <LandingDemonstrationStage />
-        </GlassCard>
       </div>
     </section>
   );
