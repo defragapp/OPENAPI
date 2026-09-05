@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react';
 import { BrandMark } from './BrandMark';
+import { GlassCard } from './GlassCard';
+import { PillBadge } from './PillBadge';
+import { PrimaryButton } from './PrimaryButton';
 
 const PRICING_CONTENT = {
   hero: {
@@ -85,35 +88,41 @@ interface Plan {
 function PriceCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
   const isPlus = plan.tag === 'SOVEREIGN+';
   return (
-    <article className={`price-card ${featured ? 'featured' : ''} ${plan.tag === 'SOVEREIGN+' ? 'sovereign-plus' : 'free'}`}>
-      <header>
+    <GlassCard className={`price-card ${featured ? 'featured border-white/20 bg-white/[0.04]' : ''} ${isPlus ? 'sovereign-plus' : 'free'} p-8`}>
+      <header className="flex justify-between items-start mb-6">
         <div>
-          <span className="price-tag">{plan.tag}</span>
-          <h2>{plan.title}</h2>
+          <PillBadge variant={isPlus ? 'powder' : 'default'} className="mb-2">{plan.tag}</PillBadge>
+          <h2 className="text-xl font-medium text-white">{plan.title}</h2>
         </div>
-        <span className="plan-audience">{plan.audience}</span>
+        <span className="plan-audience text-xs text-neutral-400 font-mono">{plan.audience}</span>
       </header>
       <div className="price-card-body">
-        <div className="price-block">
+        <div className="price-block mb-6">
           {plan.monthlyPrice ? (
             <div className="price-options" aria-label="Sovereign+ prices">
-              <p className="monthly-price"><span className="price">{plan.monthlyPrice}</span><small>{plan.monthlyNote}</small></p>
-              <p className="annual-price"><span className="price-or">or</span><strong>{plan.annualPrice}</strong><small>{plan.annualNote}</small></p>
+              <p className="monthly-price"><span className="price text-3xl font-medium text-white">{plan.monthlyPrice}</span> <small className="text-neutral-400">{plan.monthlyNote}</small></p>
+              <p className="annual-price text-sm text-neutral-300 mt-1"><span className="price-or text-neutral-500 mr-1">or</span><strong>{plan.annualPrice}</strong> <small className="text-neutral-400">{plan.annualNote}</small></p>
             </div>
           ) : (
             <div className="price-block">
-              <p className="price">{plan.price}</p>
-              <p className="price-note">{plan.priceNote}</p>
+              <p className="price text-3xl font-medium text-white">{plan.price}</p>
+              <p className="price-note text-sm text-neutral-400">{plan.priceNote}</p>
             </div>
           )}
         </div>
-        <ul className="feature-list">
+        <ul className="feature-list space-y-2 mb-6 text-sm text-neutral-300">
           {plan.features.map((feature, index) => (
-            <li key={index}>{feature}</li>
+            <li key={index} className="flex items-center gap-2">
+              <span className="text-amber-400">✓</span>
+              <span>{feature}</span>
+            </li>
           ))}
         </ul>
+        <PrimaryButton href={isPlus ? '/signup?plan=sovereign_plus' : '/signup'} variant={isPlus ? 'powder' : 'primary'} className="w-full">
+          {isPlus ? 'Upgrade to Plus →' : 'Start free'}
+        </PrimaryButton>
       </div>
-    </article>
+    </GlassCard>
   );
 }
 

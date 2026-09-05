@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { GlassCard } from './GlassCard';
+import { PillBadge } from './PillBadge';
 
 type EvidencePoint = { code: string; label: string };
 type EvidenceGroup = { name?: string; points: readonly EvidencePoint[] };
@@ -132,13 +134,13 @@ const STORIES: readonly StoryContent[] = [
 
 export function LandingProductStories() {
   return (
-    <div className="landing-stories" data-product-stories="high-value-intelligence-v1">
-      <nav className="landing-stories__labels" aria-label="Product demonstrations">
+    <div className="landing-stories max-w-6xl mx-auto my-16 px-4" data-product-stories="high-value-intelligence-v1">
+      <nav className="landing-stories__labels hidden" aria-label="Product demonstrations" style={{ display: 'none' }}>
         {STORIES.map((story) => (
           <span key={story.id} className="landing-story__label">{story.label}</span>
         ))}
       </nav>
-      <div className="landing-stories__cards">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {STORIES.map((story) => (
           <StoryCard key={story.id} story={story} />
         ))}
@@ -151,23 +153,26 @@ function StoryCard({ story }: { story: StoryContent }) {
   const suffix = story.id === 'personal' ? 'personal' : story.id === 'relationship' ? 'relationship' : 'system';
   const className = `demo-card landing-story landing-story--${suffix}${story.id === 'system' ? ' roles-responsibility-map' : ''}`;
   return (
-    <section
-      className={className}
+    <GlassCard
+      className={`${className} flex flex-col justify-between h-full p-6`}
       data-story-id={story.id}
       data-verification-text={story.label}
     >
-      <div className="demo-card__question">
-        <p>{story.question}</p>
-      </div>
-      <div className="demo-card__answer">
-        <p>{story.direct}</p>
-      </div>
-      <div className="demo-card__distinction">
-        <span aria-hidden="true">✦</span>
-        <p>{story.distinction}</p>
+      <div>
+        <PillBadge variant="powder" className="mb-3">{story.label}</PillBadge>
+        <div className="demo-card__question text-white font-medium text-lg mb-3">
+          <p>{story.question}</p>
+        </div>
+        <div className="demo-card__answer text-neutral-300 text-sm leading-relaxed mb-4">
+          <p>{story.direct}</p>
+        </div>
+        <div className="demo-card__distinction text-xs text-neutral-400 bg-white/5 border-l-2 border-amber-500/60 p-3 rounded mb-4">
+          <span aria-hidden="true" className="mr-1.5 text-amber-400">✦</span>
+          <span>{story.distinction}</span>
+        </div>
       </div>
       <SourceDetails groups={story.basis} />
-    </section>
+    </GlassCard>
   );
 }
 
