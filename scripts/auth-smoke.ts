@@ -16,6 +16,9 @@ function fakeEnv(): Env & { emails: string[]; accountsBySubject: Map<string, Acc
 
   const db = {
     prepare(sql: string) {
+      if (sql === 'BEGIN' || sql === 'COMMIT' || sql === 'ROLLBACK') {
+        throw new Error('D1 does not support manual transaction SQL');
+      }
       return {
         bind(...args: unknown[]) {
           return {
@@ -87,6 +90,9 @@ function fakeEnv(): Env & { emails: string[]; accountsBySubject: Map<string, Acc
           };
         }
       };
+    },
+    async batch(statements: Array<{ run: () => Promise<unknown> }>) {
+      return Promise.all(statements.map((s) => s.run()));
     }
   } as unknown as D1Database;
   const kv = { put: async (_key: string, value: string) => { emails.push(value); } } as unknown as KVNamespace;

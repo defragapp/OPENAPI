@@ -40,3 +40,60 @@ describe('Turnstile production failure handling', () => {
     expect(error).toHaveBeenCalledWith('turnstile_configuration_error', { invalidSecret: true });
   });
 });
+
+describe('requestMagicLink D1 transaction safety', () => {
+  it('executes database mutations via env.DB.batch without manual SQL transaction statements', async () => {
+    const executedSql: string[] = [];
+    const batchStatements: any[] = [];
+    const mockDb = {
+      prepare: vi.fn((sql: string) => {
+        executedSql.push(sql);
+        if (sql === 'BEGIN' || sql === 'COMMIT' || sql === 'ROLLBACK') {
+          throw new Error('D1 does not support manual transaction SQL');
+        }
+        return {
+          bind: vi.fn((...args: any[]) => ({
+            first: vi.fn(async () => null),
+            run: vi.fn(async () => ({ success: true, meta: { changes: 1 } }))
+          }))
+        };
+      }),
+      batch: vi.fn(async (stmts: any[]) => {
+        batchStatements.push(...stmts);
+        return stmts.map(() => ({ success: true, meta: { changes: 1 } }));
+      })
+    };
+
+    const env = {
+      APP_ENV: 'test',
+      APP_VERSION: '0'.repeat(40),
+      DB: mockDb,
+      KV: { put: vi.fn() }
+    } as unknown as Env;
+
+    const request = new Request('https://app.test/api/v1/auth/signup', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', origin: 'https://app.test' },
+      body: JSON.stringify({
+        email: 'user@example.com',
+        name: 'User',
+        turnstileToken: 'token',
+        termsAccepted: true,
+        termsVersion: '2026-08-17.2',
+        privacyVersion: '2026-08-17.2',
+        policyContentHash: '10e0e2e9f3a17c6860c91311f3cfcbca426b237e49f2380ac57d11dc23fbf822',
+        ageEligible: true,
+        eligibilityRuleVersion: '2026-08-17-18-plus'
+      })
+    });
+
+    const { requestMagicLink } = await import('./auth-public');
+    const response = await requestMagicLink(request, env, 'signup');
+    expect(response.status).toBe(200);
+    expect(mockDb.batch).toHaveBeenCalledTimes(1);
+    expect(batchStatements.length).toBe(1);
+    expect(executedSql).not.toContain('BEGIN');
+    expect(executedSql).not.toContain('COMMIT');
+    expect(executedSql).not.toContain('ROLLBACK');
+  });
+});
