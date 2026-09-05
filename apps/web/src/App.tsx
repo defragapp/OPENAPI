@@ -172,7 +172,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
           returnTo: requestedReturnTo
         })
       });
-      const problem = await response.clone().json().catch(() => ({})) as { reason?: string; field?: keyof FieldErrors; status?: string };
+      const problem = await response.clone().json().catch(() => ({})) as { reason?: string; field?: keyof FieldErrors; status?: string; error?: string; code?: string };
       if (!response.ok) {
         if (problem.field) setFieldErrors((current) => ({
           ...current,
@@ -180,11 +180,15 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
             ? 'Enter a complete email address.'
             : problem.field === 'name'
               ? 'Enter the name you want Sovereign.OS to use.'
-              : problem.field === 'eligibility'
-                ? 'Confirm that you are 18 or older to create a Sovereign.OS account.'
-                : 'Review the current Terms and Privacy Policy.'
+              : ''
         }));
-        if (problem.status === 'policy_update_required') {
+        if (problem.error === 'AUTH_D1_ERROR') {
+          setState('Account creation issue');
+          setMessage('The database could not complete your account setup. Please try again in a moment.');
+        } else if (problem.error === 'TURNSTILE_FAILED' || problem.code === 'TURNSTILE_FAILED') {
+          setState('Complete a fresh security check');
+          setMessage('The security check could not be verified. Complete a fresh check and try again.');
+        } else if (problem.status === 'policy_update_required') {
           setState('The policies changed before signup completed');
           setMessage('Refresh this page, review the current Terms and Privacy Policy, then choose again.');
         } else if (response.status === 429) {

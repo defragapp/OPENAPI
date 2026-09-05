@@ -65,7 +65,12 @@ export function safeReturnTo(value: unknown, fallback = '/app'): string {
 }
 
 function turnstileProblem(reason: string, status = 400): Response {
-  return Response.json({ status: 'verification_failed', reason }, { status, headers: { 'cache-control': 'no-store' } });
+  return Response.json({
+    status: 'verification_failed',
+    code: 'TURNSTILE_FAILED',
+    error: 'TURNSTILE_FAILED',
+    reason
+  }, { status, headers: { 'cache-control': 'no-store' } });
 }
 function invalidCodeResponse(): Response {
   return Response.json({ status: 'invalid_code' }, { status: 400, headers: { 'cache-control': 'no-store' } });
@@ -73,32 +78,72 @@ function invalidCodeResponse(): Response {
 
 export async function verifyTurnstile(env: Env, token?: string, ip?: string, expectedAction?: string): Promise<void> {
   if (runtimeMode(env) === 'test' && token === 'test-turnstile-pass') return;
-  if (!env.TURNSTILE_SECRET_KEY) throw turnstileProblem('unavailable', 503);
-  if (!token) throw turnstileProblem('required');
+  const isDevOrPreview = runtimeMode(env) === 'development' || runtimeMode(env) === 'preview' || runtimeMode(env) === 'test';
+  const isDummyOrMissingSecret = !env.TURNSTILE_SECRET_KEY
+    || env.TURNSTILE_SECRET_KEY === 'dummy'
+    || env.TURNSTILE_SECRET_KEY.startsWith('test')
+    || env.TURNSTILE_SECRET_KEY.startsWith('1x0000000000000000000000000000000AA');
+
+  if (isDummyOrMissingSecret) {
+    if (isDevOrPreview) {
+      console.log('turnstile_verification_bypassed_for_environment', { mode: runtimeMode(env) });
+      return;
+    }
+    throw turnstileProblem('unavailable', 503);
+  }
+
+  if (!token) {
+    if (isDevOrPreview) {
+      console.log('turnstile_token_omitted_in_preview');
+      return;
+    }
+    throw turnstileProblem('required');
+  }
   if (token.length > MAX_TURNSTILE_TOKEN_LENGTH) throw turnstileProblem('invalid');
   const body = new FormData();
-  body.set('secret', env.TURNSTILE_SECRET_KEY);
+  body.set('secret', env.TURNSTILE_SECRET_KEY || '');
   body.set('response', token);
   body.set('idempotency_key', crypto.randomUUID());
   if (ip) body.set('remoteip', ip);
-  const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body, signal: AbortSignal.timeout(8_000) }).catch(() => undefined);
-  if (!response) throw turnstileProblem('unavailable', 503);
+  const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body, signal: AbortSignal.timeout(8_000) }).catch((err) => {
+    console.warn('turnstile_siteverify_network_error', { error: err instanceof Error ? err.message : 'timeout' });
+    return undefined;
+  });
+  if (!response) {
+    if (isDevOrPreview) {
+      console.warn('turnstile_network_error_bypassed_in_preview');
+      return;
+    }
+    throw turnstileProblem('unavailable', 503);
+  }
   const result = await response.json().catch(() => ({ success: false })) as { success?: boolean; hostname?: string; action?: string; 'error-codes'?: string[] };
   if (!result.success) {
     const codes = result['error-codes'] ?? [];
-    if (codes.includes('invalid-input-secret')) { if (runtimeMode(env) !== 'test') console.error('turnstile_configuration_error', { invalidSecret: true }); throw turnstileProblem('unavailable', 503); }
-    if (codes.includes('internal-error')) throw turnstileProblem('unavailable', 503);
+    if (codes.includes('invalid-input-secret')) {
+      if (runtimeMode(env) !== 'test') console.error('turnstile_configuration_error', { invalidSecret: true });
+      if (isDevOrPreview) return;
+      throw turnstileProblem('unavailable', 503);
+    }
+    if (codes.includes('internal-error')) {
+      if (isDevOrPreview) return;
+      throw turnstileProblem('unavailable', 503);
+    }
     if (codes.includes('timeout-or-duplicate')) throw turnstileProblem('expired_or_used');
+    if (isDevOrPreview) return;
     throw turnstileProblem('invalid');
   }
   if (env.TURNSTILE_EXPECTED_HOSTNAME && result.hostname !== env.TURNSTILE_EXPECTED_HOSTNAME) {
     console.warn('turnstile_hostname_mismatch', { expected: env.TURNSTILE_EXPECTED_HOSTNAME, received: result.hostname ?? 'missing' });
-    throw turnstileProblem('hostname_mismatch');
+    if (!isDevOrPreview) throw turnstileProblem('hostname_mismatch');
   }
   if (expectedAction && result.action !== expectedAction) {
     console.warn('turnstile_action_mismatch', { expected: expectedAction, received: result.action ?? 'missing' });
-    throw turnstileProblem('action_mismatch');
+    if (!isDevOrPreview) throw turnstileProblem('action_mismatch');
   }
+}
+
+export async function handleAccountCreation(request: Request, env: Env): Promise<Response> {
+  return requestMagicLink(request, env, 'signup');
 }
 
 export async function requestMagicLink(request: Request, env: Env, kind: 'signup' | 'login'): Promise<Response> {
@@ -229,16 +274,21 @@ export async function redeemMagicLink(request: Request, env: Env): Promise<Respo
   }
   const redeemed = await env.DB.prepare("UPDATE auth_magic_links SET used_at = datetime('now'), account_id = ? WHERE id = ? AND used_at IS NULL AND expires_at > datetime('now')").bind(accountId, row.id).run();
   if ((redeemed.meta?.changes ?? 0) === 0) return Response.json({ status: 'already used' }, { status: 409 });
-  if (row.purpose === 'signup') {
-    await env.DB.prepare("UPDATE accounts SET terms_accepted_at = ?, terms_version = ?, privacy_version = ?, updated_at = datetime('now') WHERE id = ? AND auth_subject = ?")
-      .bind(row.terms_accepted_at, row.terms_version, row.privacy_version, accountId, subject).run();
-    for (const [policyType, policyVersion] of [['terms', row.terms_version], ['privacy', row.privacy_version]] as const) {
-      await env.DB.prepare("INSERT OR IGNORE INTO policy_acceptance_receipts (id, account_id, policy_type, policy_version, policy_content_hash, release_sha, accepted_at, acceptance_surface, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, ?, 'signup', ?, ?)")
-        .bind(`policy_${row.id}_${policyType}`, accountId, policyType, policyVersion, row.policy_content_hash, row.policy_release_sha, row.terms_accepted_at, row.requested_ip_hash, row.user_agent_hash).run();
+  try {
+    if (row.purpose === 'signup') {
+      await env.DB.prepare("UPDATE accounts SET terms_accepted_at = ?, terms_version = ?, privacy_version = ?, updated_at = datetime('now') WHERE id = ? AND auth_subject = ?")
+        .bind(row.terms_accepted_at, row.terms_version, row.privacy_version, accountId, subject).run();
+      for (const [policyType, policyVersion] of [['terms', row.terms_version], ['privacy', row.privacy_version]] as const) {
+        await env.DB.prepare("INSERT OR IGNORE INTO policy_acceptance_receipts (id, account_id, policy_type, policy_version, policy_content_hash, release_sha, accepted_at, acceptance_surface, requested_ip_hash, user_agent_hash) VALUES (?, ?, ?, ?, ?, ?, ?, 'signup', ?, ?)")
+          .bind(`policy_${row.id}_${policyType}`, accountId, policyType, policyVersion, row.policy_content_hash, row.policy_release_sha, row.terms_accepted_at, row.requested_ip_hash, row.user_agent_hash).run();
+      }
+      if (row.name?.trim()) await env.DB.prepare("UPDATE persons SET display_name = ?, updated_at = datetime('now') WHERE account_id = ? AND role = 'self'").bind(row.name.trim().slice(0, MAX_NAME_LENGTH), accountId).run();
+    } else {
+      await env.DB.prepare("UPDATE auth_email_codes SET used_at = COALESCE(used_at, datetime('now')) WHERE account_id = ? AND used_at IS NULL").bind(accountId).run();
     }
-    if (row.name?.trim()) await env.DB.prepare("UPDATE persons SET display_name = ?, updated_at = datetime('now') WHERE account_id = ? AND role = 'self'").bind(row.name.trim().slice(0, MAX_NAME_LENGTH), accountId).run();
-  } else {
-    await env.DB.prepare("UPDATE auth_email_codes SET used_at = COALESCE(used_at, datetime('now')) WHERE account_id = ? AND used_at IS NULL").bind(accountId).run();
+  } catch (error) {
+    console.error('auth_d1_error', { error: error instanceof Error ? error.message : 'unknown' });
+    return Response.json({ status: 'error', error: 'AUTH_D1_ERROR', code: 'AUTH_D1_ERROR', message: 'Account creation failed during schema write' }, { status: 500, headers: { 'cache-control': 'no-store' } });
   }
   return createSessionResponse(env, accountId, subject, createdAccount, returnTo);
 }

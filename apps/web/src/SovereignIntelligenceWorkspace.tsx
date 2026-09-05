@@ -523,8 +523,23 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
   return (
     <div className={`intelligence-workspace ${contextOpen ? 'context-open' : ''} ${railCollapsed ? 'rail-collapsed' : ''}`}>
       <aside className="intelligence-sidebar" aria-label="Sovereign navigation">
-        <a className="intelligence-brand" href="/app"><span aria-hidden="true">S</span><strong>SOVEREIGN.OS</strong></a>
-        <button className="rail-collapse" onClick={toggleRail} aria-label={railCollapsed ? 'Expand navigation' : 'Collapse navigation'} aria-expanded={!railCollapsed}><span aria-hidden="true">{railCollapsed ? '›' : '‹'}</span></button>
+        <div className="intelligence-sidebar-header">
+          <a className="intelligence-brand" href="/app">
+            <svg className="brand-diamond" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2L2 12l10 10 10-10L12 2z" />
+            </svg>
+            <strong>SOVEREIGN.OS</strong>
+          </a>
+          <button className="rail-collapse" onClick={toggleRail} aria-label={railCollapsed ? 'Expand navigation' : 'Collapse navigation'} aria-expanded={!railCollapsed}>
+            <span aria-hidden="true">{railCollapsed ? '›' : '‹'}</span>
+          </button>
+        </div>
+
+        <button className="sidebar-new-chat-btn" onClick={() => startNewThread()}>
+          <span className="plus-icon" aria-hidden="true">+</span>
+          <span>New Chat</span>
+        </button>
+
         <nav>
           {surfaces.map((item) => (
             <button
@@ -537,22 +552,52 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
             </button>
           ))}
         </nav>
-        {workspace.threads.length > 0 && <section className="recent-threads">
-          <p>Recent explorations</p>
-          {workspace.threads.slice(0, 10).map((thread) => (
-            <button key={thread.id} onClick={() => void openThread(thread.id)}>{thread.title}</button>
-          ))}
-        </section>}
+
+        {workspace.threads.length > 0 && (
+          <section className="recent-threads">
+            <p>Recent explorations</p>
+            <div className="sidebar-thread-list">
+              {workspace.threads.slice(0, 10).map((thread) => (
+                <button key={thread.id} className="sidebar-thread-item" onClick={() => void openThread(thread.id)}>
+                  <span className="sidebar-thread-title">{thread.title}</span>
+                  {thread.updatedAt && <span className="sidebar-thread-time">{formatRelativeTime(thread.updatedAt)}</span>}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
         <button className="new-conversation" onClick={() => startNewThread()}>Ask something new</button>
+
+        <div className="sidebar-footer">
+          <button className="sidebar-user-pill" onClick={() => { setSurface('You'); setContextOpen(true); }} aria-label="User account settings">
+            <span className="user-avatar" aria-hidden="true">
+              {workspace.today?.baseline?.status === 'completed' ? '✦' : 'S'}
+            </span>
+            <span className="user-info">
+              <strong className="user-name">Account</strong>
+              <small className="user-tier">{workspace.billing?.effective?.plan === 'sovereign_plus' ? 'Sovereign+' : 'Free'}</small>
+            </span>
+          </button>
+        </div>
       </aside>
 
       <main className="intelligence-main">
         <header className="intelligence-topbar">
           <button className="mobile-menu-trigger" onClick={() => setMenuOpen(true)} aria-label="Open workspace menu">S</button>
-          <div><strong>{surface}</strong></div>
+          <div className="topbar-title-group">
+            <strong>Sovereign</strong>
+            <span className="topbar-surface-tag">{surface}</span>
+          </div>
           <div className="topbar-actions">
             {(apiState === 'loading' || apiState === 'error') && <span className={`workspace-status ${apiState}`}>{status}</span>}
-            <button onClick={() => setContextOpen((open) => !open)}>{contextOpen ? 'Close' : 'Adjust'}</button>
+            <button className="topbar-search-btn" onClick={() => setContextOpen((open) => !open)} aria-label="Search and filter context">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <span>{contextOpen ? 'Close' : 'Adjust'}</span>
+            </button>
           </div>
         </header>
 
@@ -625,9 +670,25 @@ onOpenCovenant={() => setCovenantEnabled(true)}
                   }
                 }}
               />
-              <button className="composer-send" disabled={!draft.trim() || apiState === 'loading'} aria-label="Send message">
-                <span aria-hidden="true">→</span>
-              </button>
+              <div className="composer-dock-tools">
+                <div className="composer-dock-left">
+                  <button type="button" className="composer-tool-btn" onClick={() => setContextOpen(true)} aria-label="Attach context or file" title="Attach context">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                    </svg>
+                  </button>
+                  <button type="button" className="composer-tool-btn" onClick={() => setDraft('Explore the tone and unspoken rhythm in this moment.')} aria-label="Audio waveform rhythm exploration" title="Tone rhythm">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M2 10v4M6 6v12M10 3v18M14 8v8M18 5v14M22 10v4" />
+                    </svg>
+                  </button>
+                </div>
+                <div className="composer-dock-right">
+                  <button className="composer-send" disabled={!draft.trim() || apiState === 'loading'} aria-label="Send message">
+                    <span aria-hidden="true">↑</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </form>
         )}
@@ -892,7 +953,7 @@ function SurfaceHome({ surface, workspace, selectedPerson, selectedSystem, api, 
     return (
       <div className="surface-home today-home">
         {facets.length
-          ? <TodayFacetView facets={facets} current={current} registry={registry} />
+          ? <TodayFacetView facets={facets} current={current} registry={registry} onPrompt={onPrompt} onOpenContext={onOpenContext} />
           : baseline?.status === 'not_started' || !baseline
             ? <BaselineInvitation onBuild={onBuildBaseline} />
             : <BaselinePreparingState baseline={baseline} onReview={onBuildBaseline} />}
@@ -963,7 +1024,7 @@ function BaselinePreparingState({ baseline, onReview }: { baseline: Json; onRevi
   );
 }
 
-function TodayFacetView({ facets, current, registry }: { facets: Json[]; current: Json; registry: Json[] }) {
+function TodayFacetView({ facets, current, registry, onPrompt, onOpenContext }: { facets: Json[]; current: Json; registry: Json[]; onPrompt?: (prompt: string) => void; onOpenContext?: () => void }) {
   const facet = (id: string) => facets.find((item) => item.id === id);
   const core = facet('core_orientation') ?? facets[0];
   const activeIds = current?.status === 'ready' && Array.isArray(current?.reduced?.affectedBaselineFacetIds)
@@ -973,11 +1034,39 @@ function TodayFacetView({ facets, current, registry }: { facets: Json[]; current
   const support = registry.filter((item) => Array.isArray(core?.basisRefs) && core.basisRefs.includes(item.id));
   return (
     <section className="today-facet-view">
-      <header>
-        <p>Today</p>
-        <h1>What is active for you now?</h1>
+      <header className="workspace-hero-greeting">
+        <p>Personal Intelligence</p>
+        <h1>What feels active for you now?</h1>
         <span>Begin with what remains steady, then see what may be louder today. Your Baseline stays beneath every exploration.</span>
       </header>
+
+      <div className="workspace-action-grid" role="group" aria-label="Exploration shortcuts">
+        <button type="button" className="workspace-action-pill" onClick={() => onPrompt?.('What capacity or recurring pattern in me is operating here?')}>
+          <span className="action-pill-icon" aria-hidden="true">✦</span>
+          <span className="action-pill-text">Explore a pattern</span>
+        </button>
+        <button type="button" className="workspace-action-pill" onClick={() => onPrompt?.('Why does this dynamic between us keep landing this way?')}>
+          <span className="action-pill-icon" aria-hidden="true">👥</span>
+          <span className="action-pill-text">Understand a relationship</span>
+        </button>
+        <button type="button" className="workspace-action-pill" onClick={() => onPrompt?.('Help me evaluate what supports this decision, what pulls against it, and the real tradeoff.')}>
+          <span className="action-pill-icon" aria-hidden="true">⚖</span>
+          <span className="action-pill-text">Evaluate a decision</span>
+        </button>
+        <button type="button" className="workspace-action-pill" onClick={() => onPrompt?.('What role do I keep ending up in across this team or family system?')}>
+          <span className="action-pill-icon" aria-hidden="true">🕸</span>
+          <span className="action-pill-text">Family or team dynamic</span>
+        </button>
+        <button type="button" className="workspace-action-pill" onClick={() => onPrompt?.('What temporary factor or transit may be active for me right now?')}>
+          <span className="action-pill-icon" aria-hidden="true">⏱</span>
+          <span className="action-pill-text">What may be active now</span>
+        </button>
+        <button type="button" className="workspace-action-pill" onClick={() => onOpenContext?.()}>
+          <span className="action-pill-icon" aria-hidden="true">🔍</span>
+          <span className="action-pill-text">Inspect baseline sources</span>
+        </button>
+      </div>
+
       <p className="today-steady"><strong>What remains steady</strong>{core?.description ?? 'Your Baseline remains available beneath the conversation.'}</p>
       <p className="today-current" data-state={current?.status ?? 'not_started'}><strong>Temporary current context</strong>{active ? `${active.title} may be more relevant during this window. It does not determine your behavior.` : current?.status === 'ready' ? `On${current?.reduced?.expiresAt ? ` until ${formatCurrentExpiry(current.reduced.expiresAt)}` : ''}. No temporary factor is being elevated above your stable Baseline here.` : current?.status === 'expired' ? 'Expired. It will not be shown as live or used until you refresh it.' : current?.status === 'unavailable' ? 'Unavailable. Your stable Baseline remains unchanged.' : 'Off. Your stable Baseline remains available.'}</p>
       <BasisStrip values={support.filter(isBasisValue)} />
@@ -1896,4 +1985,21 @@ function systemTypeLabel(value: string) {
 function formatDate(value: string) {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? 'time unavailable' : date.toLocaleString();
+}
+
+function formatRelativeTime(value?: string) {
+  if (!value) return '';
+  const date = new Date(value);
+  const time = date.getTime();
+  if (Number.isNaN(time)) return '';
+  const diffSec = Math.floor((Date.now() - time) / 1000);
+  if (diffSec < 60) return 'just now';
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return 'yesterday';
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
