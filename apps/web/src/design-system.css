@@ -79,8 +79,20 @@
   --sage: var(--sov-sage);
   --danger: var(--sov-danger);
   --serif: var(--font-title);
-  --sans: var(--font-body);
-
+  --sovereign-wordmark-family: var(--font-subheading, system-ui, "Helvetica Neue", Arial, sans-serif);
+  --sovereign-wordmark-size: 0.69rem;
+  --sovereign-wordmark-tracking: 0.22em;
+  --production-nav-height: 80px;
+  --refine-ink: #f1e9de;
+  --refine-paper: #e8ddd0;
+  --refine-muted: rgba(229, 220, 209, 0.68);
+  --refine-faint: rgba(229, 220, 209, 0.44);
+  --refine-line: rgba(241, 233, 222, 0.1);
+  --refine-line-strong: rgba(241, 233, 222, 0.17);
+  --refine-panel: #121417;
+  --refine-page: #080a0d;
+  --route-blue: #e8ddd0!important;
+  --landing-blue: #e8ddd0!important;
 
   --launch-page: #090a0b;
   --launch-panel: #101112;

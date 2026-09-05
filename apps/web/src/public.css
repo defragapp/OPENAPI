@@ -13,6 +13,13 @@
   color: var(--sov-ink);
 }
 
+:root {
+  --refine-paper: #e8ddd0;
+  --refine-page: #080a0d;
+  --route-blue: #e8ddd0!important;
+  --landing-blue: #e8ddd0!important;
+}
+
 .sovereign-landing *,
 .sovereign-landing *::before,
 .sovereign-landing *::after {
@@ -17250,3 +17257,10 @@ html, body, #root {
   -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%) !important;
 }
 
+.public-secondary-refine {
+  --refine-paper: #e8ddd0;
+  --refine-page: #080a0d;
+  --route-blue: #e8ddd0!important;
+  --landing-blue: #e8ddd0!important;
+  color: var(--refine-paper);
+}
