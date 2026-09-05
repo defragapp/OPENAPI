@@ -77,6 +77,18 @@ export const DEMONSTRATION_QUESTIONS: DemonstrationItem[] = [
 export function LandingDemonstrationStage() {
   const [activeId, setActiveId] = useState<string>('myself');
   const active: DemonstrationItem = DEMONSTRATION_QUESTIONS.find((item) => item.id === activeId) ?? DEMONSTRATION_QUESTIONS[0]!;
+  const [inputValue, setInputValue] = useState<string>(active.question);
+
+  const handleSelect = (item: DemonstrationItem) => {
+    setActiveId(item.id);
+    setInputValue(item.question);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const targetUrl = `/signup?inquiry=${encodeURIComponent(inputValue.trim() || active.question)}`;
+    window.location.href = targetUrl;
+  };
 
   return (
     <div className="landing-demo-stage powder-interface-card" data-testid="landing-demonstration-stage">
@@ -96,14 +108,25 @@ export function LandingDemonstrationStage() {
       </div>
 
       {/* 2. Powder Prompt Box with Utility Tools */}
-      <div className="prompt-box">
+      <form className="prompt-box" onSubmit={handleSubmit}>
         <input 
           type="text" 
-          value={active.question} 
-          readOnly 
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="Ask about a decision, a reaction, a relationship, or a system…"
           aria-label="Active situational inquiry"
         />
-      </div>
+        <div className="prompt-tools">
+          <div className="tools-left">
+            <span className="chip-indicator">You</span>
+            <span className="chip-indicator">Baseline</span>
+            <span className="chip-indicator">Context</span>
+          </div>
+          <div className="tools-right">
+            <button type="submit" className="send-btn" aria-label="Submit prompt">↑</button>
+          </div>
+        </div>
+      </form>
 
       {/* 3. Powder Category Filter Pills Across Top */}
       <div className="category-filters" role="tablist" aria-label="Explore Situational Demonstrations">
@@ -117,7 +140,7 @@ export function LandingDemonstrationStage() {
                 role="tab"
                 aria-selected={isSelected}
                 className={isSelected ? 'active' : ''}
-                onClick={() => setActiveId(item.id)}
+                onClick={() => handleSelect(item)}
               >
                 {item.label}
               </button>
@@ -128,7 +151,10 @@ export function LandingDemonstrationStage() {
       </div>
 
       {/* 4. Active Situational Distinction & Answer Display */}
-      <div className="powder-stage-response" role="tabpanel">
+      <div className="powder-stage-response" role="tabpanel" aria-live="polite">
+        <div className="powder-stage-response__header">
+          <span className="powder-stage-response__badge">✦ SITUATIONAL INTERPRETATION · {active.scope.toUpperCase()}</span>
+        </div>
         <div className="powder-stage-response__answer">
           <p>{active.answer}</p>
         </div>
@@ -151,7 +177,7 @@ export function LandingDemonstrationStage() {
             <li 
               key={item.id} 
               className={isSelected ? 'is-active-suggestion' : ''}
-              onClick={() => setActiveId(item.id)}
+              onClick={() => handleSelect(item)}
             >
               <span>{item.question}</span>
               <span className="arrow">→</span>

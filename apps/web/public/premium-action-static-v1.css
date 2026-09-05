@@ -210,3 +210,46 @@ html:root:root:root body :is(
     min-height: 44px !important;
   }
 }
+
+/* ==========================================================================
+   Powder Aesthetic Polish for Secondary Public Pages
+   ========================================================================== */
+
+body.launch-page {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(211, 151, 148, 0.12), transparent 42rem),
+    radial-gradient(circle at 80% 20%, rgba(221, 162, 115, 0.05), transparent 30rem),
+    linear-gradient(180deg, #100814 0%, #150d1a 45%, #1a101f 100%) !important;
+}
+
+body.launch-page .launch-nav {
+  background: rgba(16, 8, 20, 0.82) !important;
+  border-bottom: 1px solid rgba(221, 162, 115, 0.12) !important;
+}
+
+/* Metallic accent highlights */
+body.launch-page .launch-kicker,
+body.launch-page .price-tag,
+body.launch-page .plan-audience {
+  color: #dda273 !important;
+}
+
+/* Glassmorphic cards */
+body.pricing-page .price-card,
+body.launch-page .product-proof-window,
+body.launch-page .launch-card,
+body.launch-page .journey-steps article,
+body.launch-page .launch-callout {
+  background: rgba(26, 18, 31, 0.65) !important;
+  border: 1px solid rgba(221, 162, 115, 0.18) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+body.pricing-page .price-card.featured {
+  background: linear-gradient(145deg, rgba(38, 24, 46, 0.8), rgba(26, 18, 31, 0.7)) !important;
+  border-color: rgba(221, 162, 115, 0.38) !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}

@@ -16582,6 +16582,56 @@ html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
   font-family: inherit !important;
 }
 
+.prompt-tools {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-top: 14px !important;
+  padding-top: 12px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+.tools-left {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.chip-indicator {
+  font-size: 11px !important;
+  padding: 3px 9px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #a3a3a3 !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em !important;
+}
+
+.tools-right {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.send-btn {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  border: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+}
+
+.send-btn:hover {
+  background: #dda273 !important;
+  color: #080a0d !important;
+}
+
 .category-filters {
   display: flex !important;
   justify-content: space-between !important;
@@ -16631,6 +16681,19 @@ html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
   border-radius: 12px !important;
   padding: 18px 20px !important;
   margin-bottom: 20px !important;
+}
+
+.powder-stage-response__header {
+  margin-bottom: 10px !important;
+}
+
+.powder-stage-response__badge {
+  display: inline-block !important;
+  font-size: 10px !important;
+  letter-spacing: 0.08em !important;
+  font-weight: 600 !important;
+  color: #dda273 !important;
+  text-transform: uppercase !important;
 }
 
 .powder-stage-response__answer p {
@@ -17078,10 +17141,9 @@ html body .public-approved-v8 .landing-demo-stage.powder-interface-card {
   color: #ffffff !important;
 }
 
-/* Hide answer blocks inside the stage */
+/* Hide legacy answer blocks inside the stage */
 html body .public-approved-v8 .landing-demo-stage__response-row,
-html body .public-approved-v8 .landing-demo-stage__answer-card,
-html body .public-approved-v8 .powder-stage-response {
+html body .public-approved-v8 .landing-demo-stage__answer-card {
   display: none !important;
 }
 
