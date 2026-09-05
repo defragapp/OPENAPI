@@ -2,10 +2,19 @@
 
 body:has(.account-shell) {
   background:
-    radial-gradient(circle at 18% 18%, rgba(90, 169, 255, 0.055), transparent 34rem),
-    radial-gradient(circle at 82% -8%, rgba(232, 221, 208, 0.05), transparent 32rem),
-    #0f0f0f;
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.03), transparent 70%),
+    #080a0d;
   color: #f5f1e8;
+}
+
+.auth-panel {
+  min-width: 0;
+  padding: clamp(26px, 4vw, 42px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 18px !important;
+  background: rgba(18, 20, 23, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  box-shadow: 0 34px 100px rgba(0, 0, 0, 0.42) !important;
 }
 
 .account-shell {
