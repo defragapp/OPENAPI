@@ -150,68 +150,82 @@ export function PublicPricing() {
         </div>
       </header>
 
-      <main>
-        <section className="pricing-hero">
-          <p className="pricing-kicker sov-section-kicker">{PRICING_CONTENT.hero.kicker}</p>
-          <h1 className="sov-display-hero">{PRICING_CONTENT.hero.title}</h1>
-          <p>{PRICING_CONTENT.hero.subtitle}</p>
+      <main className="max-w-6xl mx-auto px-6 py-12">
+        <section className="pricing-hero text-center mb-16 flex flex-col items-center">
+          <PillBadge variant="powder" className="mb-6">
+            TRANSPARENT PRICING
+          </PillBadge>
+          <p className="pricing-kicker sov-section-kicker text-xs font-mono text-neutral-400 uppercase tracking-widest mb-4">{PRICING_CONTENT.hero.kicker}</p>
+          <h1 className="sov-display-hero text-4xl sm:text-6xl font-medium tracking-tight text-white max-w-4xl leading-tight mb-6">{PRICING_CONTENT.hero.title}</h1>
+          <p className="text-neutral-400 text-base sm:text-lg max-w-2xl leading-relaxed">{PRICING_CONTENT.hero.subtitle}</p>
         </section>
 
-        <PricingSection className="pricing-plans" aria-label="Sovereign.OS plans">
-          <div className="pricing-grid">
+        <PricingSection className="pricing-plans mb-20" aria-label="Sovereign.OS plans">
+          <div className="pricing-grid grid grid-cols-1 md:grid-cols-2 gap-8">
             <PriceCard plan={PRICING_CONTENT.plans.free} />
             <PriceCard plan={PRICING_CONTENT.plans.sovereignPlus} featured />
           </div>
         </PricingSection>
 
-        <PricingSection className="pricing-details" aria-labelledby="pricing-details-title">
-          <header className="pricing-details-heading">
-            <div>
-              <p className="pricing-kicker">WHAT CHANGES WITH PLUS</p>
-              <h2 id="pricing-details-title">Your Baseline Design stays yours. Plus expands what you can explore.</h2>
-            </div>
-            <p>Free is for exploring yourself. Sovereign+ lets you understand another person with their permission, step back to see a family or team, keep what matters in Library, and ask more each month.</p>
-          </header>
-          <dl className="plan-comparison-list">
-            {PRICING_CONTENT.comparison.map((item, index) => (
-              <div key={index}>
-                <dt>{item.label}</dt>
-                <dd><span>Free</span>{item.free}</dd>
-                <dd><span>Sovereign+</span>{item.plus}</dd>
+        <PricingSection className="pricing-details mb-20" aria-labelledby="pricing-details-title">
+          <GlassCard className="p-8 sm:p-10">
+            <header className="pricing-details-heading mb-8">
+              <div>
+                <PillBadge variant="default" className="mb-3">WHAT CHANGES WITH PLUS</PillBadge>
+                <h2 id="pricing-details-title" className="text-2xl sm:text-3xl font-medium text-white tracking-tight mb-4">
+                  Your Baseline Design stays yours. Plus expands what you can explore.
+                </h2>
               </div>
-            ))}
-          </dl>
+              <p className="text-neutral-400 text-sm leading-relaxed max-w-3xl">Free is for exploring yourself. Sovereign+ lets you understand another person with their permission, step back to see a family or team, keep what matters in Library, and ask more each month.</p>
+            </header>
+            <dl className="plan-comparison-list divide-y divide-white/10">
+              {PRICING_CONTENT.comparison.map((item, index) => (
+                <div key={index} className="py-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                  <dt className="font-medium text-white text-sm">{item.label}</dt>
+                  <dd className="text-neutral-400 text-sm"><span className="text-xs font-mono text-neutral-500 block md:hidden mb-1">Free</span>{item.free}</dd>
+                  <dd className="text-neutral-300 text-sm font-medium"><span className="text-xs font-mono text-neutral-500 block md:hidden mb-1">Sovereign+</span>{item.plus}</dd>
+                </div>
+              ))}
+            </dl>
+          </GlassCard>
         </PricingSection>
 
-        <PricingSection className="billing-section">
-          <div className="billing-note"><strong>{PRICING_CONTENT.billing.title}</strong><p>{PRICING_CONTENT.billing.description}</p></div>
+        <PricingSection className="billing-section mb-16">
+          <GlassCard className="p-6 sm:p-8">
+            <div className="billing-note flex flex-col sm:flex-row gap-4 items-start">
+              <strong className="text-white font-medium whitespace-nowrap text-lg">{PRICING_CONTENT.billing.title}:</strong>
+              <p className="text-neutral-400 text-sm leading-relaxed">{PRICING_CONTENT.billing.description}</p>
+            </div>
+          </GlassCard>
         </PricingSection>
 
-        <PricingSection id="support" className="support-note-section" aria-labelledby="support-pricing-title">
-          <div className="support-note">
-            <div>
-              <p className="pricing-kicker">SUPPORT SOVEREIGN.OS</p>
-              <h2 id="support-pricing-title">{PRICING_CONTENT.support.title}</h2>
-              <p>{PRICING_CONTENT.support.description}</p>
+        <PricingSection id="support" className="support-note-section mb-16" aria-labelledby="support-pricing-title">
+          <GlassCard className="p-8 sm:p-10">
+            <div className="support-note flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+              <div>
+                <PillBadge variant="default" className="mb-3">SUPPORT SOVEREIGN.OS</PillBadge>
+                <h2 id="support-pricing-title" className="text-2xl font-medium text-white mb-2">{PRICING_CONTENT.support.title}</h2>
+                <p className="text-neutral-400 text-sm max-w-xl leading-relaxed">{PRICING_CONTENT.support.description}</p>
+              </div>
+              <div className="support-links shrink-0">
+                <PrimaryButton href={PRICING_CONTENT.support.buttonHref} target="_blank" rel="noopener noreferrer" variant="powder">
+                  {PRICING_CONTENT.support.buttonText} <span aria-hidden="true">→</span>
+                </PrimaryButton>
+              </div>
             </div>
-            <div className="support-links">
-              <a href={PRICING_CONTENT.support.buttonHref} target="_blank" rel="noopener noreferrer">
-                {PRICING_CONTENT.support.buttonText} <span aria-hidden="true">→</span>
-              </a>
-            </div>
-          </div>
+          </GlassCard>
         </PricingSection>
 
-        <PricingSection className="pricing-cta">
-          <div className="launch-callout">
-            <div>
-              <p className="pricing-kicker">{PRICING_CONTENT.cta.title}</p>
-              <h2>{PRICING_CONTENT.cta.description}</h2>
+        <PricingSection className="pricing-cta my-16 text-center">
+          <GlassCard className="launch-callout p-10 sm:p-14 flex flex-col items-center">
+            <div className="flex flex-col items-center mb-6">
+              <p className="pricing-kicker text-xs font-mono text-amber-400 uppercase tracking-widest mb-3">{PRICING_CONTENT.cta.title}</p>
+              <h2 className="text-2xl sm:text-4xl font-medium text-white max-w-xl leading-tight">{PRICING_CONTENT.cta.description}</h2>
             </div>
-            <a className="public-cta" href={PRICING_CONTENT.cta.buttonHref}>
+            <PrimaryButton href={PRICING_CONTENT.cta.buttonHref} variant="powder">
               {PRICING_CONTENT.cta.buttonText} <span aria-hidden="true">→</span>
-            </a>
-          </div>
+            </PrimaryButton>
+          </GlassCard>
         </PricingSection>
       </main>
 
