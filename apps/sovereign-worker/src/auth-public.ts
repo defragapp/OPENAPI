@@ -110,7 +110,7 @@ export async function verifyTurnstile(env: Env, token?: string, ip?: string, exp
     return undefined;
   });
   if (!response) {
-    if (isDevOrPreview) {
+    if (runtimeMode(env) !== 'production' && isDevOrPreview) {
       console.warn('turnstile_network_error_bypassed_in_preview');
       return;
     }
@@ -121,15 +121,15 @@ export async function verifyTurnstile(env: Env, token?: string, ip?: string, exp
     const codes = result['error-codes'] ?? [];
     if (codes.includes('invalid-input-secret')) {
       if (runtimeMode(env) !== 'test') console.error('turnstile_configuration_error', { invalidSecret: true });
-      if (isDevOrPreview) return;
+      if (runtimeMode(env) !== 'production' && isDevOrPreview) return;
       throw turnstileProblem('unavailable', 503);
     }
     if (codes.includes('internal-error')) {
-      if (isDevOrPreview) return;
+      if (runtimeMode(env) !== 'production' && isDevOrPreview) return;
       throw turnstileProblem('unavailable', 503);
     }
     if (codes.includes('timeout-or-duplicate')) throw turnstileProblem('expired_or_used');
-    if (isDevOrPreview) return;
+    if (runtimeMode(env) !== 'production' && isDevOrPreview) return;
     throw turnstileProblem('invalid');
   }
   if (env.TURNSTILE_EXPECTED_HOSTNAME && result.hostname !== env.TURNSTILE_EXPECTED_HOSTNAME) {
@@ -179,6 +179,7 @@ export async function requestMagicLink(request: Request, env: Env, kind: 'signup
   try {
     await verifyTurnstile(env, body.turnstileToken, ip, kind);
   } catch (error) {
+    if (runtimeMode(env) === 'production') throw error;
     if (error instanceof Response) return error;
     console.error('turnstile_error', { error: error instanceof Error ? error.message : 'unknown' });
     return turnstileProblem('unavailable', 503);
