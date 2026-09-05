@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react';
 import { BrandMark } from './BrandMark';
+import { GlassCard } from './GlassCard';
+import { PillBadge } from './PillBadge';
+import { PrimaryButton } from './PrimaryButton';
 
 const FAQ_CONTENT = {
   hero: {
@@ -212,17 +215,20 @@ function Section({ children, className }: { children: React.ReactNode; className
 
 function FAQCategory({ kicker, questions }: { kicker: string; questions: { question: string; answer: string }[] }) {
   return (
-    <div className="faq-category">
-      <p className="faq-kicker">{kicker}</p>
-      <div className="faq-list">
+    <GlassCard className="faq-category p-6 sm:p-8 mb-8">
+      <PillBadge variant="powder" className="mb-6">{kicker}</PillBadge>
+      <div className="faq-list space-y-4">
         {questions.map((item, index) => (
-          <details key={index} open={index === 0}>
-            <summary>{item.question}</summary>
-            <div dangerouslySetInnerHTML={{ __html: item.answer }} />
+          <details key={index} open={index === 0} className="group border-b border-white/10 pb-4 last:border-0 last:pb-0">
+            <summary className="font-medium text-white text-base sm:text-lg cursor-pointer hover:text-neutral-300 transition-colors list-none flex justify-between items-center py-2">
+              <span>{item.question}</span>
+              <span className="text-neutral-500 group-open:rotate-180 transition-transform text-sm ml-4">▼</span>
+            </summary>
+            <div className="text-neutral-400 text-sm leading-relaxed mt-2 pt-2" dangerouslySetInnerHTML={{ __html: item.answer }} />
           </details>
         ))}
       </div>
-    </div>
+    </GlassCard>
   );
 }
 
@@ -245,33 +251,38 @@ export function PublicFAQ() {
           </nav>
           <div className="public-nav-actions">
             <a className="public-sign-in" href="/login">Sign in</a>
-            <a className="public-cta" href="/signup">Get started <span aria-hidden="true">→</span></a>
+            <PrimaryButton href="/signup" variant="powder">Get started <span aria-hidden="true">→</span></PrimaryButton>
           </div>
         </div>
       </header>
 
-      <main>
-        <section className="faq-hero">
-          <p className="faq-kicker">{FAQ_CONTENT.hero.kicker}</p>
-          <h1>{FAQ_CONTENT.hero.title}</h1>
-          <p>{FAQ_CONTENT.hero.subtitle}</p>
+      <main className="max-w-4xl mx-auto px-6 py-12">
+        <section className="faq-hero text-center mb-16 flex flex-col items-center">
+          <PillBadge variant="powder" className="mb-6">FREQUENTLY ASKED QUESTIONS</PillBadge>
+          <p className="faq-kicker text-xs font-mono text-neutral-400 uppercase tracking-widest mb-4">{FAQ_CONTENT.hero.kicker}</p>
+          <h1 className="text-4xl sm:text-6xl font-medium tracking-tight text-white max-w-3xl leading-tight mb-6">{FAQ_CONTENT.hero.title}</h1>
+          <p className="text-neutral-400 text-base sm:text-lg max-w-2xl leading-relaxed">{FAQ_CONTENT.hero.subtitle}</p>
         </section>
 
-{FAQ_CONTENT.categories.map((category, index) => (
-          <FAQSectionWrapper key={index}>
-            <FAQCategory kicker={category.kicker} questions={category.questions} />
-          </FAQSectionWrapper>
-        ))}
+        <div className="faq-categories-container space-y-8">
+          {FAQ_CONTENT.categories.map((category, index) => (
+            <FAQSectionWrapper key={index}>
+              <FAQCategory kicker={category.kicker} questions={category.questions} />
+            </FAQSectionWrapper>
+          ))}
+        </div>
 
-        <FAQSectionWrapper className="faq-cta">
-          <div className="launch-callout">
-            <div>
-              <p className="faq-kicker">START FREE</p>
-              <h2>Start with yourself.</h2>
-              <p>Know yourself. Understand your people. See the whole system. Build your Baseline, explore what fits, and bring other people in only with permission.</p>
+        <FAQSectionWrapper className="faq-cta my-16 text-center">
+          <GlassCard className="launch-callout p-10 sm:p-14 flex flex-col items-center">
+            <div className="flex flex-col items-center mb-6">
+              <PillBadge variant="powder" className="mb-4">START FREE</PillBadge>
+              <h2 className="text-3xl font-medium text-white mb-3">Start with yourself.</h2>
+              <p className="text-neutral-400 text-sm sm:text-base max-w-lg leading-relaxed">Know yourself. Understand your people. See the whole system. Build your Baseline, explore what fits, and bring other people in only with permission.</p>
             </div>
-            <a className="public-cta" href="/signup">Build your Baseline <span aria-hidden="true">→</span></a>
-          </div>
+            <PrimaryButton href="/signup" variant="powder">
+              Build your Baseline <span aria-hidden="true">→</span>
+            </PrimaryButton>
+          </GlassCard>
         </FAQSectionWrapper>
       </main>
 
