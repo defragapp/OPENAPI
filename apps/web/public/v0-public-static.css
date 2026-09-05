@@ -51,15 +51,20 @@ body.launch-page {
   margin: 0;
   overflow-x: clip;
   background:
-    radial-gradient(circle at 50% 4%, rgba(211, 151, 148, 0.08), transparent 34rem),
-    linear-gradient(rgba(255, 255, 255, 0.008) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.008) 1px, transparent 1px),
+    radial-gradient(circle at 50% 4%, rgba(255, 255, 255, 0.03), transparent 34rem),
     var(--v0-page);
-  background-size: auto, 88px 88px, 88px 88px, auto;
+  background-size: auto;
   color: var(--v0-ink);
   font-family: var(--v0-sans);
   font-size: 17px;
   line-height: 1.62;
+}
+
+.price-card, .launch-card, .how-card, .faq-category {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(12px) !important;
 }
 
 a {

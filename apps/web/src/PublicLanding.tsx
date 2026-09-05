@@ -3,6 +3,9 @@ import { BrandMark } from './BrandMark';
 import { LandingExpressionSlice } from './expression-field/LandingExpressionSlice';
 import { LandingDemonstrationStage } from './LandingDemonstrationStage';
 import { LandingProductStories } from './LandingProductStories';
+import { GlassCard } from './GlassCard';
+import { PillBadge } from './PillBadge';
+import { PrimaryButton } from './PrimaryButton';
 
 const V0_ARCHIVE_SHA = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 
@@ -90,9 +93,11 @@ function V0Navigation() {
 
 function V0Hero() {
   return (
-    <section className="v0-hero sovereign-opening-field" data-viewport-section="hero">
+    <section className="v0-hero sovereign-opening-field" data-viewport-section="hero" style={{ background: '#080a0d' }}>
       <div className="v0-hero-content" data-viewport-surface="hero">
-        <p className="v0-badge landing-hero-kicker sov-section-kicker"><span />Personal intelligence for real life</p>
+        <PillBadge variant="powder" className="v0-badge landing-hero-kicker sov-section-kicker mb-4">
+          Personal intelligence for real life
+        </PillBadge>
         <h1 className="sov-display-hero">
           <span aria-label="Healing isn’t optional.">
             Healing<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />isn’t optional.
@@ -101,7 +106,7 @@ function V0Hero() {
             <span className="v0-desktop-space"> </span>Holding onto<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />the pain is.
           </em>
         </h1>
-        <p className="sovereign-opening-subhead" style={{ margin: '14px 0 10px', fontSize: '1.25rem', fontWeight: 600, color: '#ffffff' }}>
+        <p className="sovereign-opening-subhead" style={{ margin: '16px 0 12px', fontSize: '1.35rem', fontWeight: 600, color: '#ffffff', letterSpacing: '-0.02em' }}>
           Understand yourself. Understand your people. See the whole system.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
@@ -110,7 +115,11 @@ function V0Hero() {
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
           Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
-        <a className="v0-get-started" style={{ marginTop: '28px' }} href="/signup">Build your Baseline <span aria-hidden="true">→</span></a>
+        <div style={{ marginTop: '28px' }}>
+          <PrimaryButton href="/signup" variant="primary">
+            Build your Baseline <ArrowIcon />
+          </PrimaryButton>
+        </div>
         <p className="sovereign-opening-trust">
           <span className="v0-desktop-only">Start free · No card required · Review, correct, or reject any interpretation</span>
           <span className="v0-mobile-only">Start free · No card required · Review, correct, or reject any interpretation</span>
@@ -121,7 +130,9 @@ function V0Hero() {
       </div>
       <MobileCapabilityRail />
       <div className="landing-hero-product-preview">
-        <LandingDemonstrationStage />
+        <GlassCard className="p-0 overflow-hidden border-white/10">
+          <LandingDemonstrationStage />
+        </GlassCard>
       </div>
     </section>
   );
@@ -251,10 +262,10 @@ function V0Footer() {
 
 function ComparisonPanel({ title, items, positive }: { title: ReactNode; items: readonly string[]; positive: boolean }) {
   return (
-    <article className={`v0-comparison-panel${positive ? ' v0-comparison-positive' : ''}`}>
+    <GlassCard className={`v0-comparison-panel${positive ? ' v0-comparison-positive' : ''}`}>
       <h3>{title}</h3>
       <ul>{items.map((item) => <li key={item}><span aria-hidden="true">{positive ? '✓' : '×'}</span>{item}</li>)}</ul>
-    </article>
+    </GlassCard>
   );
 }
 
