@@ -101,13 +101,16 @@ function V0Hero() {
             <span className="v0-desktop-space"> </span>Holding onto<span className="v0-desktop-space"> </span><br className="v0-mobile-line-break" aria-hidden="true" />the pain is.
           </em>
         </h1>
+        <p className="sovereign-opening-subhead" style={{ margin: '14px 0 10px', fontSize: '1.25rem', fontWeight: 600, color: '#ffffff' }}>
+          Understand yourself. Understand your people. See the whole system.
+        </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--desktop">
           Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
         <p className="sovereign-opening-copy sovereign-opening-copy--mobile">
           Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
-        <a className="v0-get-started" style={{ marginTop: '32px' }} href="/signup">Build your Baseline</a>
+        <a className="v0-get-started" style={{ marginTop: '28px' }} href="/signup">Build your Baseline <span aria-hidden="true">→</span></a>
         <p className="sovereign-opening-trust">
           <span className="v0-desktop-only">Start free · No card required · Review, correct, or reject any interpretation</span>
           <span className="v0-mobile-only">Start free · No card required · Review, correct, or reject any interpretation</span>

@@ -152,7 +152,7 @@ export function LandingDemonstrationStage() {
       {/* 4. Active Situational Distinction & Answer Display */}
       <div className="powder-stage-response" role="tabpanel" aria-live="polite">
         <div className="powder-stage-response__header">
-          <span className="powder-stage-response__badge">✦ SITUATIONAL INTERPRETATION · {active.scope.toUpperCase()}</span>
+          <span className="powder-stage-response__badge">✦ BASELINE INSIGHT · {active.scope.toUpperCase()}</span>
         </div>
         <div className="powder-stage-response__answer">
           <p>{active.answer}</p>
