@@ -29,6 +29,7 @@ import './design-system.css';
 import './public.css';
 import './workspace.css';
 import './app-shell.css';
+import './powder.css';
 /* Passkey authentication remains the final component stylesheet. */
 import './passkey-auth.css';
 

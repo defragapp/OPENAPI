@@ -98,7 +98,7 @@ function V0Hero() {
         <PillBadge variant="powder" className="v0-badge landing-hero-kicker sov-section-kicker mb-4">
           Personal intelligence for real life
         </PillBadge>
-        <h1 className="sov-display-hero text-4xl sm:text-6xl font-medium tracking-tight text-white leading-tight">
+        <h1 className="text-5xl sm:text-7xl font-medium tracking-tight text-white leading-tight text-center my-6">
           Understand yourself.<br />
           Understand your people.<br />
           See the whole system.
@@ -107,15 +107,15 @@ function V0Hero() {
           <span>Healing isn’t optional.</span>
           <em>Holding onto the pain is.</em>
         </div>
-        <p className="sovereign-opening-subhead" style={{ margin: '16px 0 12px', fontSize: '1.25rem', fontWeight: 400, color: 'rgba(255,255,255,0.7)', letterSpacing: '-0.01em' }}>
+        <p className="text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto text-center font-normal leading-relaxed mt-4">
           Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
-        <div style={{ marginTop: '28px' }}>
+        <div style={{ marginTop: '28px' }} className="flex justify-center">
           <PrimaryButton href="/signup" variant="primary">
             Build your Baseline <ArrowIcon />
           </PrimaryButton>
         </div>
-        <p className="sovereign-opening-trust">
+        <p className="sovereign-opening-trust text-center mt-4">
           <span className="v0-desktop-only">Start free · No card required · Review, correct, or reject any interpretation</span>
           <span className="v0-mobile-only">Start free · No card required · Review, correct, or reject any interpretation</span>
         </p>
