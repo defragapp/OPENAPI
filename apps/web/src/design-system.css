@@ -91,8 +91,8 @@
   --refine-line-strong: rgba(241, 233, 222, 0.17);
   --refine-panel: #121417;
   --refine-page: #080a0d;
-  --route-blue: #e8ddd0!important;
-  --landing-blue: #e8ddd0!important;
+  --route-blue: #e8ddd0;
+  --landing-blue: #e8ddd0;
 
   --launch-page: #090a0b;
   --launch-panel: #101112;
