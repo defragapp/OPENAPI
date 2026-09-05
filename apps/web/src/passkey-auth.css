@@ -138,12 +138,10 @@ body:has(.account-shell) {
 .auth-panel {
   min-width: 0;
   padding: clamp(26px, 4vw, 42px) !important;
-  border: 1px solid var(--account-line) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 18px !important;
-  background:
-    radial-gradient(circle at 100% 0%, rgba(90, 169, 255, 0.055), transparent 22rem),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.014), transparent 30%),
-    #1a1a1a !important;
+  background: rgba(18, 20, 23, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
   box-shadow: 0 34px 100px rgba(0, 0, 0, 0.42) !important;
 }
 
