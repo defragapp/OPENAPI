@@ -94,34 +94,34 @@ export function PublicHowItWorks() {
         </div>
       </header>
 
-      <main className="how-main-container">
-        <section className="how-hero">
-          <PillBadge variant="powder" className="hero-pill">
+      <main className="how-main-container max-w-5xl mx-auto px-6 py-12">
+        <section className="how-hero text-center mb-16 flex flex-col items-center">
+          <PillBadge variant="powder" className="hero-pill mb-6">
             <span className="pulse-dot" /> PERSONAL INTELLIGENCE FOR REAL LIFE
           </PillBadge>
-          <p className="how-kicker">{HOW_IT_WORKS_CONTENT.hero.kicker}</p>
-          <h1>{HOW_IT_WORKS_CONTENT.hero.title}</h1>
-          <p className="how-hero-subtitle">{HOW_IT_WORKS_CONTENT.hero.subtitle}</p>
+          <p className="how-kicker text-xs font-mono text-neutral-400 uppercase tracking-widest mb-4">{HOW_IT_WORKS_CONTENT.hero.kicker}</p>
+          <h1 className="text-4xl sm:text-6xl font-medium tracking-tight text-white max-w-3xl leading-tight mb-6">{HOW_IT_WORKS_CONTENT.hero.title}</h1>
+          <p className="how-hero-subtitle text-lg text-neutral-400 max-w-2xl leading-relaxed">{HOW_IT_WORKS_CONTENT.hero.subtitle}</p>
         </section>
 
-        <Section className="how-steps">
-          <header className="section-header">
-            <PillBadge variant="default" className="section-badge">THE FIVE STEPS</PillBadge>
-            <h2>How Sovereign works</h2>
+        <Section className="how-steps mb-20">
+          <header className="section-header text-center mb-12 flex flex-col items-center">
+            <PillBadge variant="default" className="section-badge mb-4">THE FIVE STEPS</PillBadge>
+            <h2 className="text-3xl font-medium text-white tracking-tight">How Sovereign works</h2>
           </header>
           
-          <div className="timeline-container">
-            <div className="timeline-track" />
-            <div className="steps-timeline">
+          <div className="timeline-container relative">
+            <div className="timeline-track absolute left-1/2 top-0 bottom-0 w-px bg-white/10 hidden md:block" />
+            <div className="steps-timeline flex flex-col gap-6">
               {HOW_IT_WORKS_CONTENT.steps.map((step) => (
-                <GlassCard key={step.number} className="timeline-step-card">
-                  <div className="step-card-header">
-                    <span className="step-number-badge">{step.number}</span>
+                <GlassCard key={step.number} className="timeline-step-card p-6 sm:p-8 relative z-10 transition-all hover:border-white/20">
+                  <div className="step-card-header flex items-center justify-between mb-4">
+                    <span className="step-number-badge font-mono text-xl text-neutral-400 font-medium">{step.number}</span>
                     <PillBadge variant="powder">{step.badge}</PillBadge>
                   </div>
                   <div className="step-card-body">
-                    <h3>{step.title}</h3>
-                    <p>{step.description}</p>
+                    <h3 className="text-xl font-medium text-white mb-2">{step.title}</h3>
+                    <p className="text-neutral-400 text-sm leading-relaxed">{step.description}</p>
                   </div>
                 </GlassCard>
               ))}
@@ -129,44 +129,44 @@ export function PublicHowItWorks() {
           </div>
         </Section>
 
-        <Section className="baseline-explainer-section">
-          <header className="section-header">
-            <PillBadge variant="default" className="section-badge">YOUR BASELINE</PillBadge>
-            <h2>{HOW_IT_WORKS_CONTENT.baselineExplainer.title}</h2>
+        <Section className="baseline-explainer-section mb-20">
+          <header className="section-header text-center mb-12 flex flex-col items-center">
+            <PillBadge variant="default" className="section-badge mb-4">YOUR BASELINE</PillBadge>
+            <h2 className="text-2xl sm:text-3xl font-medium text-white tracking-tight max-w-2xl">{HOW_IT_WORKS_CONTENT.baselineExplainer.title}</h2>
           </header>
-          <div className="explainer-grid">
+          <div className="explainer-grid grid grid-cols-1 md:grid-cols-2 gap-6">
             {HOW_IT_WORKS_CONTENT.baselineExplainer.details.map((item, idx) => (
-              <GlassCard key={idx} className="explainer-card">
-                <div className="explainer-icon">✦</div>
-                <h4>{item.title}</h4>
-                <p>{item.description}</p>
+              <GlassCard key={idx} className="explainer-card p-6 flex flex-col items-start gap-3">
+                <div className="explainer-icon text-amber-400 text-lg">✦</div>
+                <h4 className="text-lg font-medium text-white">{item.title}</h4>
+                <p className="text-neutral-400 text-sm leading-relaxed">{item.description}</p>
               </GlassCard>
             ))}
           </div>
         </Section>
 
-        <Section className="source-detail-section">
-          <header className="section-header">
-            <PillBadge variant="default" className="section-badge">SOURCE DETAILS</PillBadge>
-            <h2>{HOW_IT_WORKS_CONTENT.sourceDetailExplainer.title}</h2>
+        <Section className="source-detail-section mb-20">
+          <header className="section-header text-center mb-12 flex flex-col items-center">
+            <PillBadge variant="default" className="section-badge mb-4">SOURCE DETAILS</PillBadge>
+            <h2 className="text-2xl sm:text-3xl font-medium text-white tracking-tight max-w-2xl">{HOW_IT_WORKS_CONTENT.sourceDetailExplainer.title}</h2>
           </header>
-          <div className="explainer-grid">
+          <div className="explainer-grid grid grid-cols-1 md:grid-cols-2 gap-6">
             {HOW_IT_WORKS_CONTENT.sourceDetailExplainer.details.map((item, idx) => (
-              <GlassCard key={idx} className="explainer-card">
-                <div className="explainer-icon">🔍</div>
-                <h4>{item.title}</h4>
-                <p>{item.description}</p>
+              <GlassCard key={idx} className="explainer-card p-6 flex flex-col items-start gap-3">
+                <div className="explainer-icon text-blue-400 text-lg">🔍</div>
+                <h4 className="text-lg font-medium text-white">{item.title}</h4>
+                <p className="text-neutral-400 text-sm leading-relaxed">{item.description}</p>
               </GlassCard>
             ))}
           </div>
         </Section>
 
-        <section className="how-cta-section">
-          <GlassCard className="cta-glass-card">
-            <div className="cta-content">
-              <PillBadge variant="powder" className="cta-pill">START FREE</PillBadge>
-              <h2>{HOW_IT_WORKS_CONTENT.cta.title}</h2>
-              <p>{HOW_IT_WORKS_CONTENT.cta.description}</p>
+        <section className="how-cta-section my-16 text-center">
+          <GlassCard className="cta-glass-card p-10 sm:p-14 flex flex-col items-center">
+            <div className="cta-content flex flex-col items-center">
+              <PillBadge variant="powder" className="cta-pill mb-4">START FREE</PillBadge>
+              <h2 className="text-3xl sm:text-4xl font-medium text-white tracking-tight mb-4">{HOW_IT_WORKS_CONTENT.cta.title}</h2>
+              <p className="text-neutral-400 text-base mb-8 max-w-lg">{HOW_IT_WORKS_CONTENT.cta.description}</p>
               <PrimaryButton href={HOW_IT_WORKS_CONTENT.cta.buttonHref} variant="powder">
                 {HOW_IT_WORKS_CONTENT.cta.buttonText} <span aria-hidden="true">→</span>
               </PrimaryButton>
