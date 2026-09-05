@@ -153,14 +153,14 @@ function RealLifeQuestions() {
   return (
     <section
       id="questions"
-      className="landing-question-orbit"
+      className="landing-question-orbit max-w-5xl mx-auto my-12 px-6"
       data-viewport-section="questions"
       aria-labelledby="landing-question-orbit-title"
     >
-      <div className="v0-shell landing-question-orbit__inner">
-        <p className="landing-question-orbit__kicker">You → your people → the whole system</p>
-        <h2 id="landing-question-orbit-title">Start with yourself. Expand outward when it matters.</h2>
-        <p className="landing-question-orbit__note">
+      <div className="v0-shell landing-question-orbit__inner p-8 rounded-3xl bg-[#111317]/60 border border-white/[0.08] backdrop-blur-xl text-center">
+        <p className="landing-question-orbit__kicker text-xs font-mono text-neutral-400 uppercase tracking-wider mb-2">You → your people → the whole system</p>
+        <h2 id="landing-question-orbit-title" className="text-2xl sm:text-4xl font-medium text-white tracking-tight mb-4">Start with yourself. Expand outward when it matters.</h2>
+        <p className="landing-question-orbit__note text-sm text-neutral-400 max-w-2xl mx-auto leading-relaxed mb-6">
           Explore yourself and how you think, decide, communicate, create, and respond. Add another person with permission, or step back to see the family, team, or group when the wider situation changes what is happening.
         </p>
         <div className="landing-question-orbit__stage" aria-hidden="true">
@@ -169,13 +169,14 @@ function RealLifeQuestions() {
               key={question.text}
               data-question-fallback={index === 0 ? 'visible' : undefined}
               style={index === 0 ? { opacity: 1, transform: 'translateY(0)' } : undefined}
+              className="inline-block p-4 rounded-xl bg-white/5 border border-white/10 text-white font-medium text-sm sm:text-base max-w-lg mx-auto my-2"
             >
               <small>{question.scope}</small>
               <strong>{question.text}</strong>
             </span>
           ))}
         </div>
-        <ul className="landing-question-orbit__accessible">
+        <ul className="landing-question-orbit__accessible hidden" style={{ display: 'none' }}>
           {REAL_LIFE_QUESTIONS.map((question) => <li key={question.text}>{question.scope}: {question.text}</li>)}
         </ul>
       </div>
