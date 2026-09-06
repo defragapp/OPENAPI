@@ -133,7 +133,7 @@ function assertAuthorizedAnswerMode(answer: SovereignAnswerV2, context: Sovereig
   }
 }
 
-const GATEWAY_ANSWER_TIMEOUT_MS = 60_000;
+const GATEWAY_ANSWER_TIMEOUT_MS = 100_000;
 
 export async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
   return new Promise<T>((resolve, reject) => {
