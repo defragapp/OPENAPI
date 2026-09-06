@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import { AppErrorBoundary } from './AppErrorBoundary';
-import { AuthenticatedWorkspace } from './AuthenticatedWorkspace';
+import { ChatLayout } from './authenticated-chat/ChatLayout';
 import { EmailCodeFallback, installEmailCodeFallbackRuntime } from './EmailCodeFallback';
 import { PasskeyAuthentication } from './PasskeyAuthentication';
 import { ProductCompletionLayer, installProductRuntime } from './ProductCompletionLayer';
@@ -11,10 +11,7 @@ import { installDialogAccessibility } from './dialog-accessibility';
 import { installPrivateAnswerExportRuntime } from './PrivateAnswerExportRuntime';
 import { installProductionReadinessRuntime } from './production-readiness-runtime';
 import { installProductionRuntime } from './ProductionRuntime';
-import { PublicLanding } from './PublicLanding';
-import { PublicHowItWorks } from './PublicHowItWorks';
-import { PublicPricing } from './PublicPricing';
-import { PublicFAQ } from './PublicFAQ';
+import { PublicSaaS } from './PublicSaaS';
 import { installPublicLandingViewportContract } from './PublicLandingViewportContract';
 import { installPublicRouteAuthorityRuntime } from './PublicRouteAuthorityRuntime';
 import { PublicPolicy } from './PublicPolicy';
@@ -32,6 +29,7 @@ import './app-shell.css';
 import './powder.css';
 /* Passkey authentication remains the final component stylesheet. */
 import './passkey-auth.css';
+import './sovereign.css';
 
 installProductionReadinessRuntime();
 installReleaseInteractionRuntime();
@@ -132,15 +130,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       {!isDirectPublicSurface && <ProductCompletionLayer />}
             {isPowderDemo
         ? <PowderDemo />
-        : isPublicHome
-        ? <PublicLanding />
+        : isPublicHome || isStaticPublicPage
+        ? <PublicSaaS />
         : publicPolicyKind
           ? <><PublicPolicyMetadata kind={publicPolicyKind} /><PublicPolicy kind={publicPolicyKind} /></>
-          : isStaticPublicPage
-            ? (location.pathname === '/how-it-works' ? <PublicHowItWorks /> : location.pathname === '/pricing' ? <PublicPricing /> : <PublicFAQ />)
-            : isAuthenticatedWorkspace
-              ? <AuthenticatedWorkspace />
-                            : <><App /><EmailCodeFallback /><PasskeyAuthentication /></>}
+          : isAuthenticatedWorkspace
+            ? <ChatLayout />
+            : <><App /><EmailCodeFallback /><PasskeyAuthentication /></>}
     </AppErrorBoundary>
   </React.StrictMode>
 );
