@@ -97,7 +97,16 @@ export async function runSovereignResult(input: string, context: SovereignContex
 
   const { prompt, basisRegistry, covenantPassages } = await buildCloudflareGatewayPrompt(input, context);
   const raw = await runCloudflareGateway(prompt, context, aiConfig.model);
-  const answer = parseSovereignAnswer(raw, basisRegistry);
+  let answer: SovereignAnswerV2;
+  try {
+    answer = parseSovereignAnswer(raw, basisRegistry);
+  } catch (err) {
+    console.error('sovereign_parse_failure', {
+      error: err instanceof Error ? err.message : String(err),
+      rawSnippet: typeof raw === 'string' ? raw.slice(0, 500) : String(raw)
+    });
+    throw err;
+  }
   assertAuthorizedAnswerMode(answer, context);
   groundCovenantScripture(answer, covenantPassages);
   const allowFrameworkLabels = asksForFrameworkDetail(input);

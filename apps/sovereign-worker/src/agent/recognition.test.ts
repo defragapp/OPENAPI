@@ -190,4 +190,24 @@ describe('sovereign-answer.v2', () => {
     scoredAnswer.alignment_score = 0.98;
     expect(sovereignAnswerSchema.safeParse(scoredAnswer).success).toBe(false);
   });
+
+  it('parses answers wrapped in think blocks containing internal braces', () => {
+    const rawWithThink = `<think>\nAnalyzing the context:\n{\n       \n       here is internal thought\n}\n</think>\n\`\`\`json\n${answer()}\n\`\`\``;
+    const parsed = parseSovereignAnswer(rawWithThink, registry);
+    expect(parsed.version).toBe('sovereign-answer.v2');
+    expect(parsed.headline).toContain('Direction becomes responsibility quickly.');
+  });
+
+  it('parses answers wrapped in markdown code blocks with conversational preamble', () => {
+    const rawWithPreamble = `Here is the structured Sovereign answer based on your Baseline:\n\n\`\`\`json\n${answer()}\n\`\`\`\n\nI hope this provides clear reflection.`;
+    const parsed = parseSovereignAnswer(rawWithPreamble, registry);
+    expect(parsed.version).toBe('sovereign-answer.v2');
+  });
+
+  it('parses answers with single-line comments, multi-line comments, and trailing commas', () => {
+    const rawWithComments = `{\n  // Headline of the answer\n  "version": "sovereign-answer.v2",\n  /* Mode */\n  "mode": "baseline",\n  "depth": "standard",\n  "headline": "Direction becomes responsibility quickly.",\n  "direct_answer": "You may be quick to create direction when a situation has no clear owner, which can be useful until the consequences become yours without matching authority.",\n  "sections": [\n    { "id": "shadow", "label": "Shadow", "body": "You may end uncertainty by taking over a decision before responsibility is shared." },\n    { "id": "gift", "label": "Gift", "body": "You can turn ambiguity into structure without becoming responsible for everyone inside it." },\n  ],\n  "basis_refs": ["natal.sun",],\n  "correction_prompt": "Does this fit your experience?",\n  "actions": [{ "type": "explore_facet", "label": "Explore this quality" }],\n  "confidence": "supported",\n  "safety_mode": "standard",\n}`;
+    const parsed = parseSovereignAnswer(rawWithComments, registry);
+    expect(parsed.version).toBe('sovereign-answer.v2');
+    expect(parsed.sections).toHaveLength(2);
+  });
 });

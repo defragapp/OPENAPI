@@ -268,11 +268,28 @@ export function basisRegistryMap(items: BasisRegistryItem[]): Record<string, Bas
 }
 
 export function parseJsonObject(raw: string): unknown {
-  const trimmed = raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
-  const start = trimmed.indexOf('{');
-  const end = trimmed.lastIndexOf('}');
+  let cleaned = raw.replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/<thought>[\s\S]*?<\/thought>/gi, '').trim();
+  const codeBlockMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  if (codeBlockMatch && codeBlockMatch[1]) {
+    cleaned = codeBlockMatch[1].trim();
+  }
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
   if (start < 0 || end <= start) throw new Error('Model response did not contain a JSON object');
-  return JSON.parse(trimmed.slice(start, end + 1));
+  let candidate = cleaned.slice(start, end + 1);
+  candidate = candidate.replace(/\/\*[\s\S]*?\*\//g, '');
+  candidate = candidate.replace(/(^|[^\\])\/\/.*$/gm, '$1');
+  candidate = candidate.replace(/,\s*([}\]])/g, '$1');
+  try {
+    return JSON.parse(candidate);
+  } catch (error) {
+    try {
+      const sanitized = candidate.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+      return JSON.parse(sanitized);
+    } catch {
+      throw error;
+    }
+  }
 }
 
 function title(value: string): string {

@@ -119,7 +119,19 @@ function isProhibitedBasisDisplay(value: string): boolean {
 }
 
 export function parseSovereignAnswer(raw: string, registry: BasisRegistryItem[]): SovereignAnswerV2 {
-  const parsed = sovereignAnswerSchema.parse(JSON.parse(extractJson(raw)));
+  const jsonText = extractJson(raw);
+  let parsedJson: unknown;
+  try {
+    parsedJson = JSON.parse(jsonText);
+  } catch (error) {
+    try {
+      const sanitized = jsonText.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+      parsedJson = JSON.parse(sanitized);
+    } catch {
+      throw error;
+    }
+  }
+  const parsed = sovereignAnswerSchema.parse(parsedJson);
   const allowed = new Set(registry.map((item) => item.id));
   if (parsed.basis_refs.some((id) => !allowed.has(id))) {
     throw new Error('Sovereign answer selected an invented or unauthorized Basis reference');
@@ -238,9 +250,17 @@ export function sovereignAnswerJsonContract(): string {
 }
 
 function extractJson(raw: string): string {
-  const trimmed = raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
-  const start = trimmed.indexOf('{');
-  const end = trimmed.lastIndexOf('}');
+  let cleaned = raw.replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/<thought>[\s\S]*?<\/thought>/gi, '').trim();
+  const codeBlockMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  if (codeBlockMatch && codeBlockMatch[1]) {
+    cleaned = codeBlockMatch[1].trim();
+  }
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
   if (start < 0 || end <= start) throw new Error('Sovereign did not return a JSON object');
-  return trimmed.slice(start, end + 1);
+  let candidate = cleaned.slice(start, end + 1);
+  candidate = candidate.replace(/\/\*[\s\S]*?\*\//g, '');
+  candidate = candidate.replace(/(^|[^\\])\/\/.*$/gm, '$1');
+  candidate = candidate.replace(/,\s*([}\]])/g, '$1');
+  return candidate;
 }
