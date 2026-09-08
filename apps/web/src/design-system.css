@@ -1145,3 +1145,86 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================================================
+   Sovereign.OS — Framer template visual foundation (sitewide)
+   --------------------------------------------------------------------------
+   This token block carries the design language of the approved Sovereign
+   "Sovereign.OS — Personal intelligence for real life" Framer template into
+   the platform design system as the sitewide visual foundation. It is a
+   neutral, minimal, near-black treatment with a cool blue action accent that
+   reads clearly against the founder near-black/cream base.
+
+   Activation: the public landing opts in via the
+   `data-visual-system="framer-template"` attribute on the landing root; other
+   authenticated/public routes adopt individual tokens where they refine the
+   existing founder language. No token here resets or bypasses the certified
+   consolidated stylesheet import order, and `passkey-auth.css` remains
+   terminal.
+   ========================================================================== */
+
+:root {
+  /* surfaces — neutral minimal near-black gradient family */
+  --ft-bg-0: #0a0a0a;
+  --ft-bg-1: #101010;
+  --ft-bg-2: #171717;
+  --ft-bg-3: #262626;
+  --ft-page: #0a0a0a;
+  --ft-surface: #161616;
+  --ft-surface-raised: #202020;
+  --ft-surface-soft: rgba(255, 255, 255, 0.045);
+  --ft-surface-quiet: rgba(255, 255, 255, 0.028);
+
+  /* lines */
+  --ft-line: rgba(255, 255, 255, 0.09);
+  --ft-line-soft: rgba(255, 255, 255, 0.06);
+  --ft-line-strong: rgba(255, 255, 255, 0.16);
+
+  /* text */
+  --ft-text: #f6f6f4;
+  --ft-text-soft: #ecece8;
+  --ft-text-muted: #a6a6a2;
+  --ft-text-faint: #6e6e6a;
+
+  /* accent — cool blue action color (Framer template link family) */
+  --ft-accent: #4d8dff;
+  --ft-accent-bright: #6ea2ff;
+  --ft-accent-ink: #0a0f1c;
+  --ft-accent-soft: rgba(77, 141, 255, 0.12);
+  --ft-accent-wash: rgba(77, 141, 255, 0.07);
+  --ft-accent-line: rgba(77, 141, 255, 0.42);
+  --ft-accent-line-soft: rgba(77, 141, 255, 0.24);
+
+  /* geometry & motion */
+  --ft-radius-sm: 10px;
+  --ft-radius-md: 14px;
+  --ft-radius-lg: 20px;
+  --ft-radius-xl: 26px;
+  --ft-radius-pill: 999px;
+  --ft-shadow-raised: 0 20px 50px -24px rgba(0, 0, 0, 0.72);
+  --ft-shadow-focus: 0 0 0 1px var(--ft-accent-line), 0 12px 40px -18px rgba(77, 141, 255, 0.32);
+
+  /* layout primitives */
+  --ft-nav-height: 78px;
+  --ft-shell: 1180px;
+  --ft-section-pad: clamp(76px, 9vw, 132px);
+
+  /* buttons */
+  --ft-btn-primary-bg: linear-gradient(180deg, #2c2c2c 0%, #1b1b1b 100%);
+  --ft-btn-primary-ink: #f6f6f4;
+  --ft-btn-primary-border: rgba(255, 255, 255, 0.12);
+  --ft-btn-accent-bg: var(--ft-accent);
+  --ft-btn-accent-ink: #0a0f1c;
+  --ft-btn-ghost-ink: var(--ft-text-soft);
+  --ft-btn-ghost-border: rgba(255, 255, 255, 0.14);
+  --ft-btn-ghost-border-hover: rgba(255, 255, 255, 0.28);
+  --ft-btn-pad: 14px 22px;
+  --ft-btn-radius: var(--ft-radius-pill);
+
+  /* typography refinements for the template treatment */
+  --ft-heading-track: -0.035em;
+  --ft-heading-scale: clamp(2.75rem, 6vw, 4.9rem);
+  --ft-subheading-track: 0.08em;
+  --ft-kicker-size: 0.72rem;
+  --ft-body-max: 58ch;
+}

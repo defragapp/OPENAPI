@@ -11218,3 +11218,116 @@ body:has(.sovereign-app-runtime)::after {
   padding: 10px 16px !important;
 }
 
+/* ==========================================================================
+   Sovereign.OS — Framer template: Authenticated workspace shell
+   --------------------------------------------------------------------------
+   Applied when the authenticated app runtime root carries
+   `data-visual-system="framer-template"`. The workspace is token-driven via
+   the shared `--cohesion-*` palette, so remapping those tokens under the
+   marker shifts the entire authenticated shell (sidebar, topbar, threads,
+   composer, context rail) to the Framer neutral near-black + cool blue accent
+   treatment while structure and product logic stay intact.
+   ========================================================================== */
+
+.sovereign-app-runtime[data-visual-system="framer-template"],
+.sovereign-app-runtime[data-visual-system="framer-template"] .intelligence-workspace,
+.sovereign-app-runtime[data-visual-system="framer-template"] .account-shell,
+.sovereign-app-runtime[data-visual-system="framer-template"] .plan-onboarding,
+.sovereign-app-runtime[data-visual-system="framer-template"] .private-route-gate {
+  --cohesion-night: var(--ft-page);
+  --cohesion-panel: var(--ft-bg-1);
+  --cohesion-panel-hover: var(--ft-bg-2);
+  --cohesion-ivory: var(--ft-text);
+  --cohesion-paper: var(--ft-text-soft);
+  --cohesion-paper-ink: #0a0a0a;
+  --cohesion-muted: var(--ft-text-muted);
+  --cohesion-faint: var(--ft-text-faint);
+  --cohesion-clay: var(--ft-accent);
+  --cohesion-clay-soft: var(--ft-accent-soft);
+  --cohesion-sage: var(--ft-accent-bright);
+  --cohesion-line: var(--ft-line);
+  --cohesion-line-soft: var(--ft-line-soft);
+
+  background: var(--ft-page);
+  color: var(--ft-text);
+}
+
+/* Workspace window: neutral cool surface rather than warm dusk glass */
+.sovereign-app-runtime[data-visual-system="framer-template"] .intelligence-workspace {
+  background:
+    radial-gradient(120% 80% at 50% -20%, rgba(77, 141, 255, 0.08), transparent 55%),
+    linear-gradient(180deg, var(--ft-bg-1) 0%, var(--ft-page) 100%) !important;
+}
+
+/* Sidebar + topbar */
+.sovereign-app-runtime[data-visual-system="framer-template"] .intelligence-sidebar {
+  background: rgba(13, 13, 13, 0.96) !important;
+  border-color: var(--ft-line) !important;
+}
+
+.sovereign-app-runtime[data-visual-system="framer-template"] .intelligence-topbar {
+  background: linear-gradient(180deg, rgba(16, 16, 16, 0.98), rgba(16, 16, 16, 0.84), transparent) !important;
+  border-color: var(--ft-line) !important;
+}
+
+.sovereign-app-runtime[data-visual-system="framer-template"] .intelligence-brand strong,
+.sovereign-app-runtime[data-visual-system="framer-template"] .brand-diamond {
+  color: var(--ft-text);
+}
+
+.sovereign-app-runtime[data-visual-system="framer-template"] .intelligence-sidebar nav button {
+  color: var(--ft-text-muted);
+}
+
+.sovereign-app-runtime[data-visual-system="framer-template"] .intelligence-sidebar nav button.active,
+.sovereign-app-runtime[data-visual-system="framer-template"] .intelligence-sidebar nav button:hover {
+  color: var(--ft-text);
+}
+
+.sovereign-app-runtime[data-visual-system="framer-template"] .intelligence-sidebar nav button.active:before {
+  background: var(--ft-accent);
+}
+
+.sovereign-app-runtime[data-visual-system="framer-template"] .sidebar-new-chat-btn,
+.sovereign-app-runtime[data-visual-system="framer-template"] .new-conversation {
+  background: var(--ft-surface) !important;
+  border-color: var(--ft-line)!important;
+  color: var(--ft-text) !important;
+}
+
+.sovereign-app-runtime[data-visual-system="framer-template"] .sidebar-new-chat-btn:hover {
+  border-color: var(--ft-accent-line) !important;
+}
+
+/* Composer + input dock */
+.sovereign-app-runtime[data-visual-system="framer-template"] .composer-entry {
+  background: var(--ft-bg-1) !important;
+  border-color: var(--ft-line) !important;
+  border-radius: var(--ft-radius-lg) !important;
+  box-shadow: var(--ft-shadow-raised);
+}
+
+.sovereign-app-runtime[data-visual-system="framer-template"] .composer-entry:focus-within {
+  border-color: var(--ft-accent-line) !important;
+  box-shadow: var(--ft-shadow-focus) !important;
+}
+
+/* Surface headings -> sans display */
+.sovereign-app-runtime[data-visual-system="framer-template"] .surface-heading h1 {
+  font-family: var(--font-display) !important;
+  color: var(--ft-text);
+}
+
+/* Status + context rail */
+.sovereign-app-runtime[data-visual-system="framer-template"] .intelligence-context {
+  background: rgba(14, 14, 14, 0.98) !important;
+  border-color: var(--ft-line) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sovereign-app-runtime[data-visual-system="framer-template"] *,
+  .sovereign-app-runtime[data-visual-system="framer-template"] *::before,
+  .sovereign-app-runtime[data-visual-system="framer-template"] *::after {
+    transition-duration: 0.01ms !important;
+  }
+}

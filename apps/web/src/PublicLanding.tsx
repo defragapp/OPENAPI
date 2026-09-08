@@ -84,6 +84,7 @@ export function PublicLanding() {
       data-product-contract="baseline-first"
       data-answer-contract="sovereign-answer.v2"
       data-visual-contract="v0-landing-selective-port"
+      data-visual-system="framer-template"
       data-v0-archive-sha={V0_ARCHIVE_SHA}
       data-viewport-contract="v0-public-landing-v3"
       data-layout-release="high-value-intelligence-v1"

@@ -12,6 +12,7 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
     <main
       className="sovereign-policy public-approved-v8 public-secondary-page"
       data-secondary-visual-contract="founder-v0-locked-v1"
+      data-visual-system="framer-template"
       data-policy-version={metadata.version}
     >
       <header className="v0-nav">

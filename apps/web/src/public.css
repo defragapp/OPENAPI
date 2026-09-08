@@ -17196,3 +17196,563 @@ html, body, #root {
   --landing-blue: #e8ddd0!important;
   color: var(--refine-paper);
 }
+/* ==========================================================================
+   Sovereign.OS — Framer template landing restyle
+   --------------------------------------------------------------------------
+   Active only on the public landing when `data-visual-system="framer-template"`
+   is present on the landing root. Ports the approved Sovereign Framer template
+   composition (clean minimal near-black sections, cool blue action accent,
+   refined type & spacing, pill CTA) onto the founder landing. Default landing
+   rendering is untouched because every rule below is scoped behind the marker.
+
+   Founder hero copy and all release-gated strings/data attributes remain intact.
+   ========================================================================== */
+
+.sovereign-landing[data-visual-system="framer-template"] {
+  background: var(--ft-page);
+  color: var(--ft-text);
+}
+
+/* ── Navigation ── */
+.sovereign-landing[data-visual-system="framer-template"] .v0-nav {
+  border-bottom: 1px solid var(--ft-line);
+  background: rgba(10, 10, 10, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-nav-inner,
+.sovereign-landing[data-visual-system="framer-template"] .v0-nav {
+  min-height: var(--ft-nav-height);
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-wordmark {
+  color: var(--ft-text);
+  letter-spacing: 0.2em;
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-nav nav a {
+  color: var(--ft-text-muted);
+  font-size: 0.86rem;
+  font-weight: 450;
+  letter-spacing: 0.01em;
+  transition: color 160ms ease;
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-nav nav a:hover {
+  color: var(--ft-text);
+}
+
+/* Ghost "Sign in" */
+.sovereign-landing[data-visual-system="framer-template"] .v0-sign-in {
+  color: var(--ft-text-soft);
+  border: 1px solid var(--ft-btn-ghost-border);
+  background: transparent;
+  border-radius: var(--ft-btn-radius);
+  padding: 10px 20px;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-sign-in:hover {
+  border-color: var(--ft-btn-ghost-border-hover);
+  background: var(--ft-surface-soft);
+}
+
+/* Primary "Build your Baseline" pill */
+.sovereign-landing[data-visual-system="framer-template"] .v0-get-started {
+  background: var(--ft-btn-primary-bg);
+  color: var(--ft-btn-primary-ink);
+  border: 1px solid var(--ft-btn-primary-border);
+  border-radius: var(--ft-btn-radius);
+  padding: 10px 20px;
+  font-weight: 500;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-get-started:hover {
+  border-color: var(--ft-accent-line);
+  box-shadow: var(--ft-shadow-focus);
+}
+
+/* ── Minimal neutral hero ── */
+.sovereign-landing[data-visual-system="framer-template"] .v0-hero.sovereign-opening-field {
+  background:
+    radial-gradient(120% 90% at 50% -20%, rgba(77, 141, 255, 0.10), transparent 55%),
+    linear-gradient(180deg, var(--ft-bg-2) 0%, var(--ft-bg-0) 46%, var(--ft-bg-0) 100%) !important;
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-hero .powder-landscape-glow,
+.sovereign-landing[data-visual-system="framer-template"] .v0-hero.sovereign-opening-field::before,
+.sovereign-landing[data-visual-system="framer-template"] .v0-hero.sovereign-opening-field::after {
+  opacity: 0.35;
+  filter: saturate(0.45);
+}
+
+/* Kicker badge */
+.sovereign-landing[data-visual-system="framer-template"] .v0-badge.landing-hero-kicker {
+  color: var(--ft-accent-bright);
+  border-color: var(--ft-accent-line);
+  background: var(--ft-accent-wash);
+  font-family: var(--font-subheading);
+  font-size: var(--ft-kicker-size);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Hero head — founder copy, template treatment */
+.sovereign-landing[data-visual-system="framer-template"] .v0-hero h1 {
+  color: var(--ft-text);
+  letter-spacing: var(--ft-heading-track);
+  font-weight: 520;
+  font-size: clamp(2.75rem, 6vw, 4.9rem);
+}
+
+/* Second hero line -> cool blue accent */
+.sovereign-landing[data-visual-system="framer-template"] .v0-hero h1 span.text-neutral-400 {
+  background: linear-gradient(90deg, var(--ft-accent-bright), var(--ft-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-hero h1 span.text-neutral-400 br {
+  display: none;
+}
+
+/* Hero supporting copy */
+.sovereign-landing[data-visual-system="framer-template"] .v0-hero-content p {
+  color: var(--ft-text-muted);
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  line-height: 1.6;
+}
+
+/* Hero -> secondary glass button */
+.sovereign-landing[data-visual-system="framer-template"] .v0-hero-content .landing-cta-secondary,
+.sovereign-landing[data-visual-system="framer-template"] .v0-hero-content a[data-variant="glass"],
+.sovereign-landing[data-visual-system="framer-template"] .v0-hero-content .glass-button {
+  border-color: var(--ft-btn-ghost-border);
+  color: var(--ft-btn-ghost-ink);
+}
+
+/* ── The Sovereign View / story card surfaces ── */
+.sovereign-landing[data-visual-system="framer-template"] .v0-story-heading > p,
+.sovereign-landing[data-visual-system="framer-template"] .v0-story-heading p {
+  color: var(--ft-accent-bright);
+  letter-spacing: 0.16em;
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-story-heading h2 {
+  color: var(--ft-text);
+  letter-spacing: var(--ft-heading-track);
+  font-weight: 540;
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-story-heading h2 span {
+  -webkit-text-stroke: 0.75px rgba(246, 246, 244, 0.5);
+  color: rgba(246, 246, 244, 0.09);
+}
+
+/* Demo/browser window + glass cards -> neutral cool surface */
+.sovereign-landing[data-visual-system="framer-template"] .v0-window,
+.sovereign-landing[data-visual-system="framer-template"] .v0-window-body,
+.sovereign-landing[data-visual-system="framer-template"] .v0-comparison-panel,
+.sovereign-landing[data-visual-system="framer-template"] .v0-final [class*="glass"],
+.sovereign-landing[data-visual-system="framer-template"] .landing-question-orbit__inner {
+  background: var(--ft-surface-soft) !important;
+  border-color: var(--ft-line) !important;
+  box-shadow: var(--ft-shadow-raised);
+}
+
+/* Story section background bands — neutral template gradient family */
+.sovereign-landing[data-visual-system="framer-template"] .v0-story-self {
+  background: linear-gradient(180deg, var(--ft-bg-1) 0%, var(--ft-bg-0) 100%);
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-story-relationship .v0-story {
+  background: linear-gradient(180deg, var(--ft-bg-2) 0%, var(--ft-bg-1) 100%);
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-story-system .v0-story {
+  background: linear-gradient(180deg, var(--ft-bg-1) 0%, var(--ft-bg-0) 100%);
+}
+
+/* Question kite/small labels */
+.sovereign-landing[data-visual-system="framer-template"] .landing-question-orbit__kicker {
+  color: var(--ft-accent-bright);
+  letter-spacing: 0.16em;
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .landing-question-orbit__inner h2 {
+  color: var(--ft-text);
+  letter-spacing: var(--ft-heading-track);
+}
+
+/* Comparison panel emphasis */
+.sovereign-landing[data-visual-system="framer-template"] .v0-comparison-panel h3 {
+  color: var(--ft-text);
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-comparison-panel.v0-comparison-positive {
+  border-color: var(--ft-accent-line);
+  box-shadow: 0 0 0 1px var(--ft-accent-line), var(--ft-shadow-raised);
+}
+
+/* ── Final CTA + footer ── */
+.sovereign-landing[data-visual-system="framer-template"] .v0-final h2 {
+  color: var(--ft-text);
+  letter-spacing: var(--ft-heading-track);
+  font-weight: 540;
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-final p {
+  color: var(--ft-text-muted);
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-footer {
+  background: linear-gradient(180deg, var(--ft-bg-1) 0%, var(--ft-bg-0) 100%);
+  border-top: 1px solid var(--ft-line);
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-footer nav a,
+.sovereign-landing[data-visual-system="framer-template"] .v0-footer p {
+  color: var(--ft-text-faint);
+}
+
+.sovereign-landing[data-visual-system="framer-template"] .v0-footer nav a:hover {
+  color: var(--ft-text);
+}
+
+/* Motion stays enhancement only; never a content gate. */
+@media (prefers-reduced-motion: reduce) {
+  .sovereign-landing[data-visual-system="framer-template"] *,
+  .sovereign-landing[data-visual-system="framer-template"] *::before,
+  .sovereign-landing[data-visual-system="framer-template"] *::after {
+    transition-duration: 0.01ms !important;
+  }
+/* ==========================================================================
+   Sovereign.OS — Framer template: React public secondary pages
+   --------------------------------------------------------------------------
+   Applied to the React-rendered `/how-it-works`, `/pricing`, and `/faq` pages
+   when `data-visual-system="framer-template"` is present on the page root.
+   Because the reusable `glass-card`, `pill-badge`, and `primary-button`
+   components carry inline styles, the stylistic overrides here use
+   `!important` so the Framer treatment wins while structure stays intact.
+
+   All security/contract strings (founder hero, secondary visual contract,
+   policy text) remain untouched.
+   ========================================================================== */
+
+.how-page[data-visual-system="framer-template"],
+.pricing-page[data-visual-system="framer-template"],
+.faq-page[data-visual-system="framer-template"] {
+  background: var(--ft-page) !important;
+  color: var(--ft-text);
+}
+
+/* ── Shared secondary nav ── */
+.how-page[data-visual-system="framer-template"] .public-nav,
+.pricing-page[data-visual-system="framer-template"] .public-nav,
+.faq-page[data-visual-system="framer-template"] .public-nav {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  border-bottom: 1px solid var(--ft-line);
+  background: rgba(10, 10, 10, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.how-page[data-visual-system="framer-template"] .public-nav-inner,
+.pricing-page[data-visual-system="framer-template"] .public-nav-inner,
+.faq-page[data-visual-system="framer-template"] .public-nav-inner {
+  display: flex;
+  min-height: var(--ft-nav-height);
+  width: min(var(--ft-shell), calc(100% - 48px));
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 auto;
+  padding: 14px 0;
+}
+
+.how-page[data-visual-system="framer-template"] .public-wordmark,
+.pricing-page[data-visual-system="framer-template"] .public-wordmark,
+.faq-page[data-visual-system="framer-template"] .public-wordmark {
+  color: var(--ft-text);
+  letter-spacing: 0.2em;
+}
+
+.how-page[data-visual-system="framer-template"] .public-nav-links,
+.pricing-page[data-visual-system="framer-template"] .public-nav-links,
+.faq-page[data-visual-system="framer-template"] .public-nav-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.4vw, 30px);
+}
+
+.how-page[data-visual-system="framer-template"] .public-nav-links a,
+.pricing-page[data-visual-system="framer-template"] .public-nav-links a,
+.faq-page[data-visual-system="framer-template"] .public-nav-links a {
+  color: var(--ft-text-muted);
+  font-size: 0.86rem;
+  font-weight: 450;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.how-page[data-visual-system="framer-template"] .public-nav-links a:hover,
+.how-page[data-visual-system="framer-template"] .public-nav-links a[aria-current="page"],
+.pricing-page[data-visual-system="framer-template"] .public-nav-links a:hover,
+.pricing-page[data-visual-system="framer-template"] .public-nav-links a[aria-current="page"],
+.faq-page[data-visual-system="framer-template"] .public-nav-links a:hover,
+.faq-page[data-visual-system="framer-template"] .public-nav-links a[aria-current="page"] {
+  color: var(--ft-text);
+}
+
+/* ── Signals in / sign in + CTA ── */
+.how-page[data-visual-system="framer-template"] .public-nav-actions,
+.pricing-page[data-visual-system="framer-template"] .public-nav-actions,
+.faq-page[data-visual-system="framer-template"] .public-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.how-page[data-visual-system="framer-template"] .public-sign-in,
+.pricing-page[data-visual-system="framer-template"] .public-sign-in,
+.faq-page[data-visual-system="framer-template"] .public-sign-in {
+  color: var(--ft-text-soft);
+  border: 1px solid var(--ft-btn-ghost-border);
+  border-radius: var(--ft-btn-radius);
+  padding: 10px 20px;
+  font-size: 0.86rem;
+  text-decoration: none;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.how-page[data-visual-system="framer-template"] .public-sign-in:hover,
+.pricing-page[data-visual-system="framer-template"] .public-sign-in:hover,
+.faq-page[data-visual-system="framer-template"] .public-sign-in:hover {
+  border-color: var(--ft-btn-ghost-border-hover);
+  background: var(--ft-surface-soft);
+}
+
+/* CTA (pricing/faq use .public-cta anchor; how uses PrimaryButton powder) */
+.how-page[data-visual-system="framer-template"] .public-cta,
+.pricing-page[data-visual-system="framer-template"] .public-cta,
+.faq-page[data-visual-system="framer-template"] .public-cta {
+  background: var(--ft-btn-primary-bg);
+  color: var(--ft-btn-primary-ink);
+  border: 1px solid var(--ft-btn-primary-border);
+  border-radius: var(--ft-btn-radius);
+  padding: 11px 22px;
+  font-size: 0.86rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.how-page[data-visual-system="framer-template"] .public-cta:hover,
+.pricing-page[data-visual-system="framer-template"] .public-cta:hover,
+.faq-page[data-visual-system="framer-template"] .public-cta:hover {
+  border-color: var(--ft-accent-line);
+  box-shadow: var(--ft-shadow-focus);
+}
+/* ── Kickers / hero headings ── */
+.how-page[data-visual-system="framer-template"] .how-kicker,
+.how-page[data-visual-system="framer-template"] .sov-section-kicker,
+.pricing-page[data-visual-system="framer-template"] .pricing-kicker,
+.pricing-page[data-visual-system="framer-template"] .sov-section-kicker,
+.faq-page[data-visual-system="framer-template"] .faq-kicker,
+.faq-page[data-visual-system="framer-template"] .sov-section-kicker {
+  color: var(--ft-accent-bright) !important;
+  letter-spacing: 0.16em;
+}
+
+.how-page[data-visual-system="framer-template"] h1,
+.how-page[data-visual-system="framer-template"] h2,
+.how-page[data-visual-system="framer-template"] h3,
+.how-page[data-visual-system="framer-template"] h4,
+.pricing-page[data-visual-system="framer-template"] h1,
+.pricing-page[data-visual-system="framer-template"] h2,
+.pricing-page[data-visual-system="framer-template"] h3,
+.pricing-page[data-visual-system="framer-template"] h4,
+.faq-page[data-visual-system="framer-template"] h1,
+.faq-page[data-visual-system="framer-template"] h2,
+.faq-page[data-visual-system="framer-template"] h3,
+.faq-page[data-visual-system="framer-template"] h4 {
+  color: var(--ft-text);
+  letter-spacing: var(--ft-heading-track);
+}
+
+.how-page[data-visual-system="framer-template"] h1,
+.pricing-page[data-visual-system="framer-template"] h1,
+.faq-page[data-visual-system="framer-template"] h1 {
+  font-family: var(--font-display);
+}
+
+/* ── Body copy ── */
+.how-page[data-visual-system="framer-template"] p,
+.pricing-page[data-visual-system="framer-template"] p,
+.faq-page[data-visual-system="framer-template"] p,
+.how-page[data-visual-system="framer-template"] dt,
+.how-page[data-visual-system="framer-template"] dd,
+.pricing-page[data-visual-system="framer-template"] dt,
+.pricing-page[data-visual-system="framer-template"] dd,
+.faq-page[data-visual-system="framer-template"] li,
+.how-page[data-visual-system="framer-template"] li {
+  color: var(--ft-text-muted);
+}
+
+/* ── Glass cards + pills + buttons (inline styles -> !important) ── */
+.how-page[data-visual-system="framer-template"] .glass-card,
+.pricing-page[data-visual-system="framer-template"] .glass-card,
+.faq-page[data-visual-system="framer-template"] .glass-card {
+  background-color: var(--ft-surface-soft) !important;
+  border: 1px solid var(--ft-line) !important;
+  border-radius: var(--ft-radius-lg) !important;
+  box-shadow: var(--ft-shadow-raised);
+}
+
+.how-page[data-visual-system="framer-template"] .pill-badge,
+.pricing-page[data-visual-system="framer-template"] .pill-badge,
+.faq-page[data-visual-system="framer-template"] .pill-badge {
+  border-radius: var(--ft-radius-pill) !important;
+  border-color: var(--ft-accent-line) !important;
+  color: var(--ft-accent-bright) !important;
+  background: var(--ft-accent-wash) !important;
+}
+
+.how-page[data-visual-system="framer-template"] .pill-badge:not([class*="default"]),
+.pricing-page[data-visual-system="framer-template"] .pill-badge:not([class*="default"]),
+.faq-page[data-visual-system="framer-template"] .pill-badge:not([class*="default"]) {
+  border-color: var(--ft-accent-line) !important;
+  background: var(--ft-accent-wash) !important;
+  color: var(--ft-accent-bright) !important;
+}
+
+/* Primary / powder buttons -> Framer neutral-or-accent pill */
+.how-page[data-visual-system="framer-template"] .primary-button,
+.pricing-page[data-visual-system="framer-template"] .primary-button,
+.faq-page[data-visual-system="framer-template"] .primary-button {
+  background: var(--ft-btn-primary-bg) !important;
+  color: var(--ft-btn-primary-ink) !important;
+  border: 1px solid var(--ft-btn-primary-border) !important;
+  border-radius: var(--ft-radius-pill) !important;
+}
+
+.how-page[data-visual-system="framer-template"] .primary-button:hover,
+.pricing-page[data-visual-system="framer-template"] .primary-button:hover,
+.faq-page[data-visual-system="framer-template"] .primary-button:hover {
+  border-color: var(--ft-accent-line) !important;
+  box-shadow: var(--ft-shadow-focus);
+}
+
+/* Pricing featured emphasis */
+.pricing-page[data-visual-system="framer-template"] .price-card.featured {
+  border-color: var(--ft-accent-line) !important;
+  box-shadow: 0 0 0 1px var(--ft-accent-line), var(--ft-shadow-raised);
+}
+/* ── Footer ── */
+.how-page[data-visual-system="framer-template"] .public-footer,
+.pricing-page[data-visual-system="framer-template"] .public-footer,
+.faq-page[data-visual-system="framer-template"] .public-footer {
+  border-top: 1px solid var(--ft-line);
+  background: linear-gradient(180deg, var(--ft-bg-1) 0%, var(--ft-bg-0) 100%);
+}
+
+.how-page[data-visual-system="framer-template"] .public-footer nav a,
+.how-page[data-visual-system="framer-template"] .public-footer p,
+.pricing-page[data-visual-system="framer-template"] .public-footer nav a,
+.pricing-page[data-visual-system="framer-template"] .public-footer p,
+.faq-page[data-visual-system="framer-template"] .public-footer nav a,
+.faq-page[data-visual-system="framer-template"] .public-footer p {
+  color: var(--ft-text-faint);
+}
+
+.how-page[data-visual-system="framer-template"] .public-footer nav a:hover,
+.pricing-page[data-visual-system="framer-template"] .public-footer nav a:hover,
+.faq-page[data-visual-system="framer-template"] .public-footer nav a:hover {
+  color: var(--ft-text);
+}
+
+/* ==========================================================================
+   Sovereign.OS — Framer template: Policy pages (Privacy + Terms)
+   --------------------------------------------------------------------------
+   Applied to the React-rendered `/privacy` and `/terms` pages when the root
+   carries `data-visual-system="framer-template"`.
+   ========================================================================== */
+
+.sovereign-policy[data-visual-system="framer-template"] {
+  background: var(--ft-page);
+  color: var(--ft-text);
+}
+
+.sovereign-policy[data-visual-system="framer-template"] .v0-nav {
+  border-bottom: 1px solid var(--ft-line);
+  background: rgba(10, 10, 10, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.sovereign-policy[data-visual-system="framer-template"] .v0-wordmark {
+  color: var(--ft-text);
+}
+
+.sovereign-policy[data-visual-system="framer-template"] .v0-nav nav a {
+  color: var(--ft-text-muted);
+}
+
+.sovereign-policy[data-visual-system="framer-template"] .v0-nav nav a:hover {
+  color: var(--ft-text);
+}
+
+.sovereign-policy[data-visual-system="framer-template"] .v0-sign-in,
+.sovereign-policy[data-visual-system="framer-template"] .landing-control--nav {
+  border-color: var(--ft-btn-ghost-border) !important;
+  color: var(--ft-text-soft) !important;
+  background: transparent !important;
+  border-radius: var(--ft-btn-radius) !important;
+}
+
+.sovereign-policy[data-visual-system="framer-template"] .policy-kicker {
+  color: var(--ft-accent-bright) !important;
+  letter-spacing: 0.16em;
+}
+
+.sovereign-policy[data-visual-system="framer-template"] .policy-hero h1,
+.sovereign-policy[data-visual-system="framer-template"] .policy-grid h2,
+.sovereign-policy[data-visual-system="framer-template"] .policy-contact h2 {
+  color: var(--ft-text);
+  letter-spacing: var(--ft-heading-track);
+  font-family: var(--font-display);
+}
+
+.sovereign-policy[data-visual-system="framer-template"] .policy-hero > p,
+.sovereign-policy[data-visual-system="framer-template"] .policy-grid p,
+.sovereign-policy[data-visual-system="framer-template"] .policy-contact p,
+.sovereign-policy[data-visual-system="framer-template"] .policy-effective {
+  color: var(--ft-text-muted);
+}
+
+.sovereign-policy[data-visual-system="framer-template"] .policy-grid > article,
+.sovereign-policy[data-visual-system="framer-template"] .policy-contact {
+  border-color: var(--ft-line) !important;
+  background: var(--ft-surface-soft) !important;
+}
+
+.sovereign-policy[data-visual-system="framer-template"] .v0-footer {
+  border-top: 1px solid var(--ft-line);
+  background: linear-gradient(180deg, var(--ft-bg-1) 0%, var(--ft-bg-0) 100%);
+}
+
+.sovereign-policy[data-visual-system="framer-template"] .v0-footer nav a,
+.sovereign-policy[data-visual-system="framer-template"] .v0-footer p {
+  color: var(--ft-text-faint);
+}
+
+.sovereign-policy[data-visual-system="framer-template"] .v0-footer nav a:hover {
+  color: var(--ft-text);
+}
+}

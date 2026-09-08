@@ -243,7 +243,7 @@ export function AuthenticatedWorkspace() {
   }
 
   return (
-    <div className="sovereign-app-runtime" data-workspace-contract="one-room">
+    <div className="sovereign-app-runtime" data-workspace-contract="one-room" data-visual-system="framer-template">
       <div className="workspace-desktop-plan-status"><VerifiedPlanStatus /></div>
       <SovereignIntelligenceWorkspace onboardingVerified />
       <WorkspaceMobileUtilities />

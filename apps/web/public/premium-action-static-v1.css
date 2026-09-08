@@ -252,3 +252,104 @@ body.pricing-page .price-card.featured {
   border-color: rgba(221, 162, 115, 0.38) !important;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
+/* ==========================================================================
+   Sovereign.OS — Framer template: standalone public pages (terminal authority)
+   --------------------------------------------------------------------------
+   This block is the terminal layer for the standalone public pages
+   (/how-it-works, /pricing, /faq served as static documents). It activates
+   only when the document `<body>` carries the Framer marker attribute
+   (`data-visual-system="framer-template"`), so the default founder treatment
+   and the static content/action contract strings are untouched.
+   ========================================================================== */
+
+body.launch-page[data-visual-system="framer-template"] {
+  background:
+    radial-gradient(120% 90% at 50% -20%, rgba(77, 141, 255, 0.08), transparent 55%),
+    linear-gradient(180deg, #171717 0%, #0a0a0a 46%, #0a0a0a 100%) !important;
+  color: #f6f6f4;
+}
+
+body.launch-page[data-visual-system="framer-template"] .launch-nav,
+body.launch-page[data-visual-system="framer-template"] .launch-nav-inner {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09) !important;
+  background: rgba(10, 10, 10, 0.82) !important;
+}
+
+body.launch-page[data-visual-system="framer-template"] .launch-wordmark {
+  color: #f6f6f4 !important;
+  letter-spacing: 0.2em;
+}
+
+body.launch-page[data-visual-system="framer-template"] .launch-links a {
+  color: #a6a6a2 !important;
+}
+
+body.launch-page[data-visual-system="framer-template"] .launch-links a:hover {
+  color: #f6f6f4 !important;
+}
+
+body.launch-page[data-visual-system="framer-template"] .launch-sign-in {
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 999px !important;
+  color: #ecece8 !important;
+  background: transparent !important;
+}
+
+body.launch-page[data-visual-system="framer-template"] .launch-cta,
+body.launch-page[data-visual-system="framer-template"] .launch-button {
+  background: linear-gradient(180deg, #2c2c2c 0%, #1b1b1b 100%) !important;
+  color: #f6f6f4 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 999px !important;
+}
+
+body.launch-page[data-visual-system="framer-template"] .launch-kicker,
+body.launch-page[data-visual-system="framer-template"] .price-tag,
+body.launch-page[data-visual-system="framer-template"] .plan-audience {
+  color: #6ea2ff !important;
+}
+
+body.launch-page[data-visual-system="framer-template"] h1,
+body.launch-page[data-visual-system="framer-template"] h2,
+body.launch-page[data-visual-system="framer-template"] h3 {
+  color: #f6f6f4 !important;
+  letter-spacing: -0.035em;
+}
+
+body.launch-page[data-visual-system="framer-template"] .price-card,
+body.launch-page[data-visual-system="framer-template"] .product-proof-window,
+body.launch-page[data-visual-system="framer-template"] .launch-card,
+body.launch-page[data-visual-system="framer-template"] .journey-steps article,
+body.launch-page[data-visual-system="framer-template"] .launch-callout {
+  background: rgba(255, 255, 255, 0.045) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.72) !important;
+}
+
+body.launch-page[data-visual-system="framer-template"] .price-card.featured {
+  border-color: rgba(77, 141, 255, 0.42) !important;
+  box-shadow: 0 0 0 1px rgba(77, 141, 255, 0.42), 0 24px 64px rgba(0, 0, 0, 0.6) !important;
+}
+
+body.launch-page[data-visual-system="framer-template"] .launch-footer-inner {
+  border-top: 1px solid rgba(255, 255, 255, 0.09) !important;
+  background: linear-gradient(180deg, #171717 0%, #0a0a0a 100%) !important;
+  color: #6e6e6a;
+}
+
+body.launch-page[data-visual-system="framer-template"] .launch-footer-inner a {
+  color: #6e6e6a !important;
+}
+
+body.launch-page[data-visual-system="framer-template"] .launch-footer-inner a:hover {
+  color: #f6f6f4 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.launch-page[data-visual-system="framer-template"] *,
+  body.launch-page[data-visual-system="framer-template"] *::before,
+  body.launch-page[data-visual-system="framer-template"] *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
