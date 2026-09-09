@@ -36,6 +36,8 @@ const publicCss = readFileSync(resolve('apps/web/src/public.css'), 'utf8');
 const designSystemCss = readFileSync(resolve('apps/web/src/design-system.css'), 'utf8');
 const templateDesignCss = readFileSync(resolve('apps/web/src/template-design.css'), 'utf8');
 const landing = readFileSync(resolve('apps/web/src/PublicLanding.tsx'), 'utf8');
+const stories = readFileSync(resolve('apps/web/src/LandingProductStories.tsx'), 'utf8');
+const field = readFileSync(resolve('apps/web/src/expression-field/LandingExpressionSlice.tsx'), 'utf8');
 
 const routeCohesionImport = "import './deployed-route-cohesion.css';";
 const passkeyImport = "import './passkey-auth.css';";
