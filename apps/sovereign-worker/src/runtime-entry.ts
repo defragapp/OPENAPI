@@ -70,7 +70,9 @@ const PUBLIC_PATHS = new Set([
   '/faq',
   '/faq.html',
   '/how-it-works',
-  '/how-it-works.html'
+  '/how-it-works.html',
+  '/demo',
+  '/powder'
 ]);
 const PUBLIC_ROUTE_ALIASES = new Map([
   ['/questions', '/faq']
