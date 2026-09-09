@@ -34,7 +34,7 @@ for (const retiredRead of retiredCssReads) {
 const main = readFileSync(resolve('apps/web/src/main.tsx'), 'utf8');
 const publicCss = readFileSync(resolve('apps/web/src/public.css'), 'utf8');
 const designSystemCss = readFileSync(resolve('apps/web/src/design-system.css'), 'utf8');
-const templateDesignCss = readFileSync(resolve('apps/web/src/template-design.css'), 'utf8');
+const indexHtml = readFileSync(resolve('apps/web/index.html'), 'utf8');
 const landing = readFileSync(resolve('apps/web/src/PublicLanding.tsx'), 'utf8');
 const stories = readFileSync(resolve('apps/web/src/LandingProductStories.tsx'), 'utf8');
 const field = readFileSync(resolve('apps/web/src/expression-field/LandingExpressionSlice.tsx'), 'utf8');
@@ -353,8 +353,11 @@ for (const marker of ['.v0-landing-port', '.v0-hero', '.public-approved-v8']) {
   if (!publicCss.includes(marker)) throw new Error(`Public CSS is missing landing component: ${marker}`);
 }
 
-for (const marker of ['.td-shell', '.td-hero', '.td-card', '.td-nav', '.td-go', '.td-footer']) {
-  if (!templateDesignCss.includes(marker)) throw new Error(`Template design CSS is missing component: ${marker}`);
+for (const marker of ['data-visual-system="framer-template"']) {
+  if (!indexHtml.includes(marker)) throw new Error(`Intelligence release v2 is missing founder visual contract marker: ${marker}`);
+}
+for (const marker of ['data-visual-contract=\"v0-landing-selective-port\"', 'data-visual-system=\"framer-template\"']) {
+  if (!landing.includes(marker)) throw new Error(`Intelligence release v2 is missing founder visual contract marker in PublicLanding: ${marker}`);
 }
 
 console.log('Intelligence release v2: canonical CSS architecture verified.');

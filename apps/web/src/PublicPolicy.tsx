@@ -94,11 +94,3 @@ function PolicyMenuIcon() {
     </svg>
   );
 }
-
-export function PrivacyPolicy() {
-  return <PublicPolicy kind="privacy" />;
-}
-
-export function TermsOfService() {
-  return <PublicPolicy kind="terms" />;
-}
