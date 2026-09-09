@@ -10,12 +10,16 @@ const auditScript = read('../public/route-cohesion-audit.js');
 const routeVerifier = read('../../../scripts/verify-live-route-cohesion.mjs');
 
 describe('real static 404 cohesion', () => {
-  it('keeps the real 404 boundary on the current founder route contract', () => {
-    expect(document).toContain('data-visual-contract="founder-v0-static"');
-    expect(document).toContain('data-secondary-visual-contract="founder-v0-locked-v1"');
+  it('keeps the real 404 boundary on the MindWave global visual contract', () => {
+    expect(document).toContain('data-visual-system="mindwave"');
+    expect(document).toContain('data-visual-contract="mindwave-global-v1"');
+    expect(document).toContain('data-secondary-visual-contract="mindwave-global-v1"');
     expect(document).toContain('data-route-cohesion="v1"');
     expect(document).toContain('/premium-public-release.css?v=20260730-final');
     expect(document).toContain('the retired stylesheet is not loaded');
+    // Founder v0 markers are provenance only; the active render contract is MindWave.
+    expect(document).not.toContain('data-visual-contract="founder-v0-static"');
+    expect(document).not.toContain('data-secondary-visual-contract="founder-v0-locked-v1"');
   });
 
   it('loads the final public cohesion after the established 404 and route foundations', () => {
