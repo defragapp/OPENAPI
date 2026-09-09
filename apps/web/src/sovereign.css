@@ -1,0 +1,132 @@
+/* ─────────────────────────────────────────────────────────────
+   Sovereign.OS — Clean Design System
+   One file. No patches. No accumulated cruft.
+   ───────────────────────────────────────────────────────────── */
+
+/* ─── Tokens ─── */
+:root {
+  --bg: #0a0a0f;
+  --bg-elevated: #131318;
+  --bg-card: #1a1a24;
+  --border: #2a2a3a;
+  --text: #e8e8f0;
+  --text-dim: #8888a0;
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --primary-dim: rgba(99, 102, 241, 0.15);
+  --danger: #ef4444;
+  --success: #22c55e;
+  --radius: 12px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --max-width: 1100px;
+}
+
+/* ─── Reset ─── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: var(--primary-hover); text-decoration: none; }
+a:hover { color: var(--text); }
+
+/* ─── Buttons ─── */
+.sov-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 10px 20px; border-radius: 8px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  border: 1px solid transparent; transition: all 0.15s ease;
+  white-space: nowrap; text-decoration: none;
+}
+.sov-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sov-btn-primary { background: var(--primary); color: #fff; }
+.sov-btn-primary:hover:not(:disabled) { background: var(--primary-hover); color: #fff; }
+.sov-btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
+.sov-btn-ghost:hover { border-color: var(--text-dim); background: var(--bg-elevated); }
+.sov-btn-lg { padding: 14px 32px; font-size: 16px; }
+.sov-btn-sm { padding: 6px 14px; font-size: 13px; }
+.sov-btn-block { width: 100%; }
+
+/* ─── Nav ─── */
+.sov-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 48px; max-width: var(--max-width); margin: 0 auto;
+}
+.sov-nav-brand { font-size: 20px; font-weight: 700; color: var(--text); }
+.sov-nav-links { display: flex; align-items: center; gap: 16px; }
+.sov-nav-links a:not(.sov-btn) { color: var(--text-dim); font-size: 14px; font-weight: 500; }
+.sov-nav-links a:not(.sov-btn):hover { color: var(--text); }
+
+/* ─── Hero ─── */
+.sov-hero { text-align: center; padding: 100px 24px 80px; max-width: 800px; margin: 0 auto; }
+.sov-hero h1 { font-size: 56px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 24px; }
+.sov-gradient {
+  background: linear-gradient(135deg, var(--primary), #ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.sov-hero-sub { font-size: 20px; color: var(--text-dim); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+.sov-hero-cta { display: flex; gap: 16px; justify-content: center; }
+
+/* ─── Sections ─── */
+.sov-section { max-width: var(--max-width); margin: 0 auto; padding: 80px 24px; }
+.sov-section h2 { text-align: center; font-size: 36px; font-weight: 700; margin-bottom: 48px; }
+
+/* ─── Feature grid ─── */
+.sov-feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.sov-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; transition: border-color 0.2s; }
+.sov-card:hover { border-color: var(--primary); }
+.sov-card-icon { font-size: 32px; margin-bottom: 16px; }
+.sov-card h3 { font-size: 18px; margin-bottom: 8px; }
+.sov-card p { color: var(--text-dim); font-size: 14px; }
+
+/* ─── Pricing ─── */
+.sov-pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.sov-pricing-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; position: relative; }
+.sov-pricing-featured { border-color: var(--primary); box-shadow: 0 0 40px var(--primary-dim); }
+.sov-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+.sov-pricing-card h3 { font-size: 20px; margin-bottom: 8px; }
+.sov-price { font-size: 40px; font-weight: 800; margin-bottom: 24px; }
+.sov-price span { font-size: 16px; font-weight: 400; color: var(--text-dim); }
+.sov-pricing-card ul { list-style: none; margin-bottom: 24px; }
+.sov-pricing-card li { padding: 8px 0; color: var(--text-dim); font-size: 14px; border-bottom: 1px solid var(--border); }
+.sov-pricing-card li::before { content: "✓ "; color: var(--success); }
+
+/* ─── Footer ─── */
+.sov-footer { text-align: center; padding: 40px; color: var(--text-dim); font-size: 14px; border-top: 1px solid var(--border); }
+.sov-footer-links { margin-top: 8px; }
+.sov-footer-links a { margin: 0 4px; }
+
+/* ─── Content pages ─── */
+.sov-content { max-width: 800px; margin: 0 auto; padding: 60px 24px; }
+.sov-content h1 { font-size: 42px; font-weight: 800; margin-bottom: 32px; }
+.sov-content h2 { font-size: 24px; font-weight: 700; margin-top: 40px; margin-bottom: 16px; }
+.sov-content p { color: var(--text-dim); font-size: 16px; margin-bottom: 16px; }
+.sov-content ul { margin-left: 24px; margin-bottom: 16px; }
+.sov-content li { color: var(--text-dim); font-size: 16px; margin-bottom: 8px; }
+.sov-content strong { color: var(--text); }
+.sov-content-cta { text-align: center; margin-top: 48px; }
+
+/* ─── FAQ ─── */
+.sov-faq-item { border-bottom: 1px solid var(--border); padding: 24px 0; }
+.sov-faq-item:last-child { border-bottom: none; }
+.sov-faq-item h3 { font-size: 18px; margin-bottom: 8px; }
+.sov-faq-item p { color: var(--text-dim); font-size: 15px; }
+
+/* ─── Page wrapper ─── */
+.sov-page { min-height: 100vh; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .sov-feature-grid, .sov-pricing-grid { grid-template-columns: 1fr; }
+  .sov-hero h1 { font-size: 36px; }
+  .sov-nav { padding: 16px 24px; }
+  .sov-nav-links a:not(.sov-btn) { display: none; }
+  .sov-hero-cta { flex-direction: column; }
+  .sov-section { padding: 48px 24px; }
+}
