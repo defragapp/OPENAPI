@@ -588,6 +588,11 @@ function isSpaDocumentPath(pathname: string): boolean {
   return pathname === '/'
     || pathname === '/privacy'
     || pathname === '/terms'
+    || pathname === '/pricing'
+    || pathname === '/faq'
+    || pathname === '/how-it-works'
+    || pathname === '/demo'
+    || pathname === '/powder'
     || pathname === '/app'
     || pathname.startsWith('/app/')
     || pathname === '/login'
