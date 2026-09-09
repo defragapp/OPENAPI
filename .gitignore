@@ -28,3 +28,4 @@ scripts/.*.generated.mjs
 .stakpak/session*
 
 apps/sovereign-worker/.wrangler.production-direct.generated.jsonc
+.env.production.release

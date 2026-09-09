@@ -5,7 +5,7 @@ import { parseWranglerJson, runWranglerCli, wranglerFailure, wranglerRows } from
 import { assertReleaseSha } from './release-evidence-lib.mjs';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
-export const DEFAULT_PRODUCTION_CONFIG_PATH = resolve(root, 'apps/sovereign-worker/.wrangler.production-direct.generated.jsonc');
+export const DEFAULT_PRODUCTION_CONFIG_PATH = resolve(root, '.wrangler.production-direct.generated.jsonc');
 const SOURCE_CONFIG_PATH = resolve(root, 'wrangler.production-direct.jsonc');
 const CANONICAL_CONFIG_PATH = resolve(root, 'wrangler.jsonc');
 const DATABASE_NAME = 'sovereign-openapi-db';

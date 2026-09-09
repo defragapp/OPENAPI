@@ -1,11 +1,32 @@
+import { relative, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const workerPkg = resolve(root, 'apps/sovereign-worker');
+
+function relativizeConfigPath(configPath) {
+  if (configPath && relative(workerPkg, configPath) !== '') {
+    return relative(workerPkg, configPath);
+  }
+  return configPath;
+}
+
+function resolveConfigArgs(args) {
+  const out = [];
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--config' && i + 1 < args.length) {
+      out.push('--config', relativizeConfigPath(args[i + 1]));
+      i++;
+    } else {
+      out.push(args[i]);
+    }
+  }
+  return out;
+}
 
 export function runWranglerCli(args, options = {}) {
-  const result = spawnSync('pnpm', ['--filter', '@sovereign/worker', 'exec', 'wrangler', ...args], {
+  const result = spawnSync('pnpm', ['--filter', '@sovereign/worker', 'exec', 'wrangler', ...resolveConfigArgs(args)], {
     cwd: options.cwd || root,
     env: options.env || process.env,
     encoding: 'utf8',
