@@ -1,10 +1,10 @@
 // Runtime v3 parent domain check — active (MindWave global visual contract).
-// process.exit(0); // bypass removed: visual contract must be enforced
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
 const expectedMigration = '0019_deprecate_manual_capacity';
 const expectedArchive = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
 const expectedSequence = `mindwave-global-v1|personal-intelligence-for-real-life|why-sovereign|self-between-whole|how-sovereign-works|the-intelligence|feature-grid|testimonials|faq-accordion|archive:${expectedArchive}`;
+const commitSha = String(process.env.WORKERS_CI_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
