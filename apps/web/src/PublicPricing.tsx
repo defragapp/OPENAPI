@@ -70,13 +70,13 @@ export default function PublicPricing() {
           </div>
           <div className="td-nav-actions">
             <a href="https://app.defrag.app/login" className="td-nav-signin">Sign in</a>
-            <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
+            <a href="https://app.defrag.app/signup" className="td-go td-go--primary">Enter Sovereign.OS</a>
           </div>
           <details className="td-mobile-menu">
             <summary aria-label="Open menu"><span className="td-mobile-menu-icon" /></summary>
             <div className="td-mobile-menu-panel">
               {NAV_LINKS.map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
-              <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
+              <a href="https://app.defrag.app/signup" className="td-go td-go--primary">Enter Sovereign.OS</a>
             </div>
           </details>
         </div>
@@ -114,7 +114,7 @@ export default function PublicPricing() {
               </ul>
               <a
                 href="https://app.defrag.app/signup"
-                className={`td-cta ${p.primary ? 'td-cta--primary' : ''}`}
+                className={`td-go ${p.primary ? 'td-go--primary' : ''}`}
                 style={{ width: '100%', justifyContent: 'center' }}
               >
                 {p.cta}
@@ -133,8 +133,8 @@ export default function PublicPricing() {
           Support does not unlock paid features or change your plan.
         </p>
         <div className="td-hero-actions" style={{ marginTop: 32 }}>
-          <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Build your Baseline</a>
-          <a href="mailto:support@sovereign.defrag.app" className="td-cta">Contact support</a>
+          <a href="https://app.defrag.app/signup" className="td-go td-go--primary">Build your Baseline</a>
+          <a href="mailto:support@sovereign.defrag.app" className="td-go">Contact support</a>
         </div>
       </section>
 

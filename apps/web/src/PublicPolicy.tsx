@@ -43,13 +43,13 @@ export function PolicyPage({ title, subtitle, children }: PolicyProps) {
           </div>
           <div className="td-nav-actions">
             <a href="https://app.defrag.app/login" className="td-nav-signin">Sign in</a>
-            <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
+            <a href="https://app.defrag.app/signup" className="td-go td-go--primary">Enter Sovereign.OS</a>
           </div>
           <details className="td-mobile-menu">
             <summary aria-label="Open menu"><span className="td-mobile-menu-icon" /></summary>
             <div className="td-mobile-menu-panel">
               {NAV_LINKS.map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
-              <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
+              <a href="https://app.defrag.app/signup" className="td-go td-go--primary">Enter Sovereign.OS</a>
             </div>
           </details>
         </div>

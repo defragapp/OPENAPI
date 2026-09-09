@@ -353,7 +353,7 @@ for (const marker of ['.v0-landing-port', '.v0-hero', '.public-approved-v8']) {
   if (!publicCss.includes(marker)) throw new Error(`Public CSS is missing landing component: ${marker}`);
 }
 
-for (const marker of ['.td-shell', '.td-hero', '.td-card', '.td-nav', '.td-cta', '.td-footer']) {
+for (const marker of ['.td-shell', '.td-hero', '.td-card', '.td-nav', '.td-go', '.td-footer']) {
   if (!templateDesignCss.includes(marker)) throw new Error(`Template design CSS is missing component: ${marker}`);
 }
 

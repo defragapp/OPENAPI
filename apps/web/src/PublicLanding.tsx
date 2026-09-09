@@ -92,13 +92,13 @@ export default function PublicLanding() {
           </div>
           <div className="td-nav-actions">
             <a href="https://app.defrag.app/login" className="td-nav-signin">Sign in</a>
-            <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
+            <a href="https://app.defrag.app/signup" className="td-go td-go--primary">Enter Sovereign.OS</a>
           </div>
           <details className="td-mobile-menu">
             <summary aria-label="Open menu"><span className="td-mobile-menu-icon" /></summary>
             <div className="td-mobile-menu-panel">
               {NAV_LINKS.map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
-              <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
+              <a href="https://app.defrag.app/signup" className="td-go td-go--primary">Enter Sovereign.OS</a>
             </div>
           </details>
         </div>
@@ -111,8 +111,8 @@ export default function PublicLanding() {
           Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you. A private Baseline, structured answers, and intelligence that extends outward — without turning interpretation into fact.
         </p>
         <div className="td-hero-actions">
-          <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
-          <a href="/how-it-works" className="td-cta">See how it works</a>
+          <a href="https://app.defrag.app/signup" className="td-go td-go--primary">Enter Sovereign.OS</a>
+          <a href="/how-it-works" className="td-go">See how it works</a>
         </div>
       </header>
       <section className="td-section td-shell">
@@ -205,7 +205,7 @@ export default function PublicLanding() {
           <h2 className="td-section-title">Start with your Baseline.</h2>
           <p className="td-section-lede">Sovereign is text-first, private by design, and useful from the first question.</p>
           <div className="td-hero-actions" style={{ marginTop: 32 }}>
-            <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
+            <a href="https://app.defrag.app/signup" className="td-go td-go--primary">Enter Sovereign.OS</a>
           </div>
         </div>
       </section>

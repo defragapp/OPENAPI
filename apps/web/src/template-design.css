@@ -122,7 +122,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 
 .td-nav-signin:hover { color: var(--td-ink); }
 
-.td-cta {
+.td-go {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -139,18 +139,18 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.td-cta:hover {
+.td-go:hover {
   border-color: rgba(255, 255, 255, 0.24);
   background: linear-gradient(180deg, #333 0%, #222 100%);
 }
 
-.td-cta--primary {
+.td-go--primary {
   background: var(--td-clay);
   color: #0a0a0a;
   border-color: var(--td-clay);
 }
 
-.td-cta--primary:hover {
+.td-go--primary:hover {
   background: #e0b080;
   border-color: #e0b080;
 }
@@ -600,7 +600,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   .td-hero-actions {
     flex-direction: column;
   }
-  .td-cta {
+  .td-go {
     width: 100%;
     justify-content: center;
   }

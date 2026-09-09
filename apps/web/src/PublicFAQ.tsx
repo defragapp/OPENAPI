@@ -72,13 +72,13 @@ export default function PublicFAQ() {
           </div>
           <div className="td-nav-actions">
             <a href="https://app.defrag.app/login" className="td-nav-signin">Sign in</a>
-            <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
+            <a href="https://app.defrag.app/signup" className="td-go td-go--primary">Enter Sovereign.OS</a>
           </div>
           <details className="td-mobile-menu">
             <summary aria-label="Open menu"><span className="td-mobile-menu-icon" /></summary>
             <div className="td-mobile-menu-panel">
               {NAV_LINKS.map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
-              <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
+              <a href="https://app.defrag.app/signup" className="td-go td-go--primary">Enter Sovereign.OS</a>
             </div>
           </details>
         </div>
@@ -108,7 +108,7 @@ export default function PublicFAQ() {
           <h2 className="td-section-title">Still have questions?</h2>
           <p className="td-section-lede">Reach out or explore the platform.</p>
           <div className="td-hero-actions" style={{ marginTop: 32 }}>
-            <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
+            <a href="https://app.defrag.app/signup" className="td-go td-go--primary">Enter Sovereign.OS</a>
           </div>
         </div>
       </section>
