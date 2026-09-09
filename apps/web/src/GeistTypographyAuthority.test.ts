@@ -16,7 +16,7 @@ const geistStacks = [
 ] as const;
 
 describe("Geist typography authority", () => {
-  it("keeps Geist self-hosted and terminal for standalone public documents; MindWave Fraunces leads live platform headings", () => {
+  it("keeps Geist self-hosted and terminal for standalone public documents; template Gambarino/Onest lead live platform surfaces", () => {
     expect(existsSync(fontUrl)).toBe(true);
     expect(readFileSync(fontUrl).subarray(0, 4).toString("ascii")).toBe("wOF2");
     // Geist remains registered as a bundled platform face (not a native-only stack).
@@ -36,7 +36,16 @@ describe("Geist typography authority", () => {
       expect(stack.indexOf("\"Geist Sans\"")).toBeLessThan(stack.indexOf("-apple-system"));
     }
 
-    // Live platform headings follow the MindWave display authority (Fraunces
+    // Template display authority is self-hosted Gambarino; body is self-hosted Onest.
+    expect(existsSync(new URL("../public/fonts/gambarino/Gambarino-Regular.woff2", import.meta.url))).toBe(true);
+    expect(existsSync(new URL("../public/fonts/onest/Onest-400.woff2", import.meta.url))).toBe(true);
+    expect(typography).toContain('@font-face {');
+    expect(typography).toContain('font-family: "Gambarino";');
+    expect(typography).toContain("/fonts/gambarino/Gambarino-Regular.woff2");
+    expect(typography).toContain('font-family: "Onest";');
+    expect(typography).toContain("/fonts/onest/Onest-400.woff2");
+
+    // Live platform headings follow the template display authority (Gambarino
     // first), ahead of ui-serif/Georgia fallbacks, via the shared tokens.
     expect(typography).toContain('--font-display: var(--font-title);');
     const titleStart = typography.indexOf('--font-title:');
@@ -44,7 +53,7 @@ describe("Geist typography authority", () => {
     const titleEnd = typography.indexOf('serif;', titleStart);
     expect(titleEnd).toBeGreaterThan(titleStart);
     const titleStack = typography.slice(titleStart, titleEnd);
-    expect(titleStack).toContain('"Fraunces",');
-    expect(titleStack.indexOf('"Fraunces"')).toBeLessThan(titleStack.indexOf('ui-serif'));
+    expect(titleStack).toContain('"Gambarino",');
+    expect(titleStack.indexOf('"Gambarino"')).toBeLessThan(titleStack.indexOf('ui-serif'));
   });
 });

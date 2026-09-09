@@ -22,8 +22,8 @@ describe('authenticated launch cohesion', () => {
   });
 
   it('uses a restrained neutral launch authority instead of blue authenticated chrome', () => {
-    expect(designSystem).toContain('--launch-ink: #1c1a17;');
-    expect(designSystem).toContain('--launch-page: #f7f5f1;');
+    expect(designSystem).toContain('--launch-ink: #fafafa;');
+    expect(designSystem).toContain('--launch-page: #0a0a0a;');
     expect(launchCss).toContain('--journey-blue: #e8ddd0 !important;');
     expect(launchCss).toContain('.workspace-mobile-utilities-heading > span');
     expect(launchCss).not.toContain('Avenir Next');

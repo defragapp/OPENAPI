@@ -373,13 +373,13 @@ body:has(.account-shell) {
 
 /* ── MindWave global standard (owner-approved 2026-09-09; terminal sheet) ── */
 /* Terminal authority. Loaded last. Redefines the residual founder-era dark
-   theme variables to the light MindWave palette and restores template
+   theme variables to the editorial template palette and restores template
    composition on every surface. Keeps copy, routes, and product logic. */
 
 /* 1. Neutralize founder-era dark theme variables (later :root declaration
       wins for custom properties; !important beats the powder-era marks). */
 :root, html, body {
-  color-scheme: light;
+  color-scheme: dark;
   --sov-page: var(--mw-page, #f7f5f1) !important;
   --sov-page-soft: var(--mw-card-tint, #fbf9f6) !important;
   --sov-panel: var(--mw-card, #ffffff) !important;
@@ -1085,10 +1085,66 @@ html body .auth-panel .passkey-status {
   color: var(--mw-muted, #6b645b) !important;
 }
 
-/* Hero sky: beat launch-era dark field */
+/* Hero field: template page gradient #171717 -> #0a0a0a, faint white drifts */
 html body .mindwave-page.public-approved-v8 .v0-hero.sovereign-opening-field {
   background:
-    radial-gradient(circle at 18% 8%, rgba(125, 139, 122, 0.10), transparent 32rem),
-    radial-gradient(circle at 85% 92%, rgba(125, 139, 122, 0.07), transparent 30rem),
-    var(--mw-page, #f7f5f1) !important;
+    radial-gradient(circle at 18% 8%, rgba(250, 250, 250, 0.055), transparent 34rem),
+    radial-gradient(circle at 85% 92%, rgba(250, 250, 250, 0.04), transparent 32rem),
+    linear-gradient(180deg, #171717 0%, var(--mw-page, #0a0a0a) 780px) !important;
+}
+
+/* ===== Template port: near-black editorial chrome (Gambarino display/Onest body) ===== */
+
+/* Route-passed title authority: template display leads ahead of Geist fallbacks
+   on every mindwave surface (secondary, pricing, FAQ, auth). */
+html body main.mindwave-page {
+  --sovereign-title: "Gambarino", ui-serif, Georgia, "Times New Roman", serif !important;
+  --editorial-warm: #a3a3a3 !important;
+  --editorial-warm-soft: rgba(250, 250, 250, 0.07) !important;
+}
+
+/* Primary nav links: template muted #a3a3a3, Onest 16px, -0.02em */
+html body main.mindwave-page .v0-nav nav a,
+html body main.mindwave-page .landing-nav nav a,
+html body main.mindwave-page header nav a {
+  color: #a3a3a3 !important;
+  font-family: var(--font-body) !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.02em !important;
+  text-transform: none !important;
+  min-height: 40px !important;
+}
+
+html body main.mindwave-page .v0-nav nav a:hover,
+html body main.mindwave-page .v0-nav nav a:focus-visible,
+html body main.mindwave-page .landing-nav nav a:hover,
+html body main.mindwave-page .landing-nav nav a:focus-visible {
+  color: #fafafa !important;
+}
+
+/* Wordmark: bright display token */
+html body main.mindwave-page .v0-wordmark,
+html body main.mindwave-page .landing-wordmark,
+html body main.mindwave-page .launch-wordmark,
+html body main.mindwave-page header a[href="/"] {
+  color: #fafafa !important;
+  font-family: var(--font-body) !important;
+  font-size: 1.05rem !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: none !important;
+}
+
+/* Nav CTA: template pill — transparent, hairline, 12px radius */
+html body main.mindwave-page .v0-nav nav a.v0-nav-cta,
+html body main.mindwave-page .landing-nav nav a.landing-nav-cta,
+html body main.mindwave-page nav a[href*="enter"],
+html body main.mindwave-page nav a[href*="login"] {
+  color: #fafafa !important;
+  background: rgba(250, 250, 250, 0.06) !important;
+  border: 1px solid rgba(250, 250, 250, 0.22) !important;
+  border-radius: 12px !important;
+  padding: 8px 16px !important;
+  font-size: 15px !important;
 }

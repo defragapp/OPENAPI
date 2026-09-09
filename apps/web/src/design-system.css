@@ -3,73 +3,118 @@
    Tokens, @font-face, typography primitives, expression field.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Onest:wght@400;500;600;700&display=swap');
-
 /* ── tokens ── */
 
 :root {
-  color-scheme: light;
-  /* ── MindWave global visual standard (owner-approved 2026-09-09) ── */
-  /* Design tokens derived from the Framer MindWave template
-     (https://slight-use-623506.framer.app/) */
-  --mw-page: #f7f5f1;
-  --mw-page-alt: #ffffff;
-  --mw-card: #ffffff;
-  --mw-card-tint: #fbf9f6;
-  --mw-ink: #1c1a17;
-  --mw-ink-soft: #302c26;
-  --mw-muted: #6b645b;
-  --mw-faint: #a39b8f;
-  --mw-line: rgba(28,26,23,.10);
-  --mw-line-strong: rgba(28,26,23,.16);
-  --mw-cta: #1c1a17;
-  --mw-cta-ink: #f7f5f1;
-  --mw-chip: #e9e2d6;
-  --mw-chip-ink: #1c1a17;
-  --mw-accent: #7d8b7a;
+  color-scheme: dark;
+  /* ── Editorial template standard (Framer #SOVEREIGNOS, slight-use-623506) ── */
+  /* Token scale transcribed from the published template: neutral ramp
+     #fafafa .. #0a0a0a, #a3a3a3 muted links, white-alpha hairlines, page
+     gradient #171717 -> #0a0a0a. */
+  --mw-page: #0a0a0a;
+  --mw-page-top: #171717;
+  --mw-page-alt: #0a0a0a;
+  --mw-card: #171717;
+  --mw-card-tint: #101010;
+  --mw-ink: #fafafa;
+  --mw-ink-soft: #f5f5f5;
+  --mw-muted: #a3a3a3;
+  --mw-faint: #737373;
+  --mw-line: rgba(250,250,250,.12);
+  --mw-line-strong: rgba(250,250,250,.22);
+  --mw-cta: #fafafa;
+  --mw-cta-ink: #0a0a0a;
+  --mw-chip: rgba(250,250,250,.12);
+  --mw-chip-ink: #fafafa;
+  --mw-accent: #fafafa;
   --mw-accent-alt: #5a54a4;
   --mw-success: #65bf72;
   --mw-warn: #f29220;
   --mw-danger: #eb2c50;
-  --mw-shadow: 0 20px 50px rgba(28,26,23,.08);
-  --mw-shadow-soft: 0 8px 24px rgba(28,26,23,.06);
-  --mw-radius-card: 24px;
-  --mw-radius-input: 16px;
+  --mw-shadow: 0 20px 50px rgba(0,0,0,.45);
+  --mw-shadow-soft: 0 8px 24px rgba(0,0,0,.30);
+  --mw-radius-card: 20px;
+  --mw-radius-input: 12px;
   --mw-radius-pill: 999px;
-  --mw-container: 1200px;
+  --mw-container: 1000px;
   --mw-section: 112px;
-  --mw-section-mobile: 72px;
-  --mw-nav-height: 80px;
-  /* Typography: Framer template uses Gambarino (serif) + Onest (sans) */
-  --mw-title: "Gambarino", "Onest", Inter, "Inter Placeholder", serif;
-  --mw-body: "Onest", Inter, "Inter Placeholder", sans-serif;
+  --mw-section-mobile: 64px;
+  --mw-nav-height: 72px;
+  /* Typography: Framer template uses Gambarino (serif display) + Onest (sans body) */
+  --mw-title: "Gambarino", "Onest", ui-serif, Georgia, serif;
+  --mw-body: "Onest", Inter, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
   --page: var(--mw-page);
   --ink: var(--mw-ink);
   --muted: var(--mw-muted);
   --faint: var(--mw-faint);
   --line: var(--mw-line);
   --line-strong: var(--mw-line-strong);
-  /* Neutral launch palette on the light MindWave system */
-  --launch-ink: #1c1a17;
-  --launch-muted: #6b645b;
-  --launch-faint: #a39b8f;
-  --launch-line: rgba(28,26,23,.10);
-  --launch-page: #f7f5f1;
+  /* Editorial launch palette on the template system */
+  --launch-ink: #fafafa;
+  --launch-muted: #a3a3a3;
+  --launch-faint: #737373;
+  --launch-line: rgba(250,250,250,.12);
+  --launch-page: #0a0a0a;
 }
 
-/* Self-hosted Geist/asset: retained as the registered platform face and the
-   terminal title authority for standalone public documents. MindWave display
-   headings lead via --font-display/--font-title below (owner-approved 2026-09-09). */
+/* Self-hosted platform faces. Geist remains registered for legacy standalone
+   documents; Gambarino + Onest lead everywhere else, matching the template. */
+@font-face {
+  font-family: "Gambarino";
+  src: url("/fonts/gambarino/Gambarino-Regular.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Onest";
+  src: url("/fonts/onest/Onest-400.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Onest";
+  src: url("/fonts/onest/Onest-500.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Onest";
+  src: url("/fonts/onest/Onest-600.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Onest";
+  src: url("/fonts/onest/Onest-700.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+}
+
 @font-face {
   font-family: "Geist Sans";
   src: url("/fonts/geist/Geist-Variable.woff2?v=1.7.2") format("woff2");
   font-display: swap;
 }
 
-/* MindWave global scope: every surface renders on the light calming system. */
+/* Template global scope: near-black editorial canvas. */
+html {
+  background: #0a0a0a;
+}
+
 body,
 [data-visual-system="mindwave"] {
-  background: var(--mw-page);
+  background:
+    linear-gradient(180deg, var(--mw-page-top) 0%, var(--mw-page) 860px);
   color: var(--mw-ink);
   font-family: var(--mw-body);
 }
@@ -81,12 +126,12 @@ body,
 }
 
 /* ── typography ── */
-/* Framer MindWave template fonts: Onest (sans body) + elegant serif headings.
-   Gambarino (template's premium serif) substituted with Fraunces via Google Fonts. */
+/* Framer editorial template fonts: Gambarino (serif display) + Onest (sans body),
+   self-hosted above. Geist remains the registered platform face for legacy
+   standalone public documents only. */
 
 :root {
   --font-title:
-    "Fraunces",
     "Gambarino",
     ui-serif,
     Georgia,
