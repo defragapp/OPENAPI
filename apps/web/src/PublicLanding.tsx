@@ -33,11 +33,11 @@ function MobileCapabilityRail() {
           style={{
             padding: '6px 14px',
             borderRadius: '999px',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'var(--mw-chip, #e9e2d6)',
+            border: '1px solid var(--mw-line, rgba(28,26,23,.10))',
             fontSize: '0.75rem',
-            fontWeight: 500,
-            color: 'rgba(238, 229, 217, 0.8)'
+            fontWeight: 600,
+            color: 'var(--mw-chip-ink, #1c1a17)'
           }}
         >
           {cap}
@@ -134,24 +134,21 @@ function V0Navigation() {
 
 function V0Hero() {
   return (
-    <section className="v0-hero sovereign-opening-field" data-viewport-section="hero" style={{ background: '#080a0d', position: 'relative', overflow: 'hidden' }}>
-      {/* Sunset horizon gradient glow */}
-      <div className="powder-landscape-glow" aria-hidden="true" />
-
+    <section className="v0-hero sovereign-opening-field" data-viewport-section="hero" style={{ position: 'relative', overflow: 'hidden' }}>
       {/* Atmospheric expression slice */}
       <div className="landing-hero-atmosphere" aria-hidden="true">
         <LandingExpressionSlice />
       </div>
 
       <div className="v0-hero-content max-w-5xl mx-auto px-4 pt-16 pb-8 flex flex-col items-center relative z-10" data-viewport-surface="hero">
-        <PillBadge variant="powder" className="v0-badge landing-hero-kicker sov-section-kicker mb-6 px-4 py-1.5 bg-white/5 border border-white/10 text-xs font-mono text-neutral-300 rounded-full">
+        <PillBadge variant="powder" className="v0-badge landing-hero-kicker sov-section-kicker mb-6 px-4 py-1.5 rounded-full">
           Personal intelligence for real life
         </PillBadge>
-        <h1 className="text-5xl sm:text-7xl font-medium tracking-tight text-white max-w-4xl mx-auto leading-[1.08] text-center mb-6">
+        <h1 className="text-5xl sm:text-7xl font-medium tracking-tight max-w-4xl mx-auto leading-[1.08] text-center mb-6">
           <span>Healing isn’t optional.</span><br />
-          <span className="text-neutral-400">Holding onto the pain is.</span>
+          <span>Holding onto the pain is.</span>
         </h1>
-        <p className="text-lg sm:text-xl text-neutral-300 max-w-2xl mx-auto text-center font-normal leading-relaxed mb-8">
+        <p className="text-lg sm:text-xl max-w-2xl mx-auto text-center font-normal leading-relaxed mb-8">
           Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
         </p>
         <div className="flex flex-col items-center mb-10">
@@ -163,7 +160,7 @@ function V0Hero() {
               See how it works
             </PrimaryButton>
           </div>
-          <p style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.45)', textAlign: 'center', marginTop: '12px' }}>
+          <p style={{ fontSize: '0.78rem', color: 'var(--mw-muted, #6b645b)', textAlign: 'center', marginTop: '12px' }}>
             Start free · No card required · Review, correct, or reject any interpretation
           </p>
           <MobileCapabilityRail />
@@ -176,33 +173,31 @@ function V0Hero() {
             width: '100%',
             maxWidth: '740px',
             textAlign: 'left',
-            backgroundColor: 'rgba(17, 19, 23, 0.88)',
-            border: '1px solid rgba(255, 255, 255, 0.09)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
+            backgroundColor: 'var(--mw-card, #ffffff)',
+            border: '1px solid var(--mw-line, rgba(28,26,23,.10))',
             borderRadius: '20px',
             padding: '28px',
-            boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.56)'
+            boxShadow: 'var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08))'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '14px', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--mw-line, rgba(28,26,23,.10))', paddingBottom: '14px', marginBottom: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'rgba(245, 158, 11, 0.85)' }} />
-              <span style={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Representative Sovereign Conversation</span>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--mw-accent, #7d8b7a)' }} />
+              <span style={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'var(--mw-faint, #a39b8f)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Representative Sovereign Conversation</span>
             </div>
-            <span style={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.35)' }}>How Sovereign answers</span>
+            <span style={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'var(--mw-faint, #a39b8f)' }}>How Sovereign answers</span>
           </div>
 
           <div style={{ marginBottom: '20px' }}>
-            <span style={{ display: 'block', fontSize: '0.7rem', fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Question</span>
+            <span style={{ display: 'block', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--mw-faint, #a39b8f)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Question</span>
             <div
               className="powder-prompt-box"
               style={{
                 padding: '16px 18px',
                 borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid rgba(255, 255, 255, 0.07)',
-                color: '#ffffff',
+                background: 'var(--mw-card-tint, #fbf9f6)',
+                border: '1px solid var(--mw-line, rgba(28,26,23,.10))',
+                color: 'var(--mw-ink, #1c1a17)',
                 fontWeight: 500,
                 fontSize: '1rem',
                 lineHeight: 1.45
@@ -212,8 +207,8 @@ function V0Hero() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '16px', padding: '0 4px' }}>
-            <span style={{ color: 'rgba(245, 158, 11, 0.9)', fontWeight: 600 }}>Drawing from:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--mw-muted, #6b645b)', marginBottom: '16px', padding: '0 4px' }}>
+            <span style={{ color: 'var(--mw-accent, #7d8b7a)', fontWeight: 600 }}>Drawing from:</span>
             <span>Your Baseline (Communication &amp; Pressure) + Partner’s shared pace</span>
           </div>
 
@@ -222,13 +217,13 @@ function V0Hero() {
             style={{
               padding: '20px',
               borderRadius: '14px',
-              background: 'rgba(0, 0, 0, 0.32)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
+              background: 'var(--mw-card-tint, #fbf9f6)',
+              border: '1px solid var(--mw-line, rgba(28,26,23,.10))',
               marginBottom: '20px'
             }}
           >
-            <span style={{ display: 'block', fontSize: '0.7rem', fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '10px' }}>Sovereign Answer</span>
-            <p style={{ color: 'rgba(255, 255, 255, 0.88)', fontSize: '0.95rem', lineHeight: 1.65, margin: '0 0 16px', fontWeight: 400 }}>
+            <span style={{ display: 'block', fontSize: '0.7rem', fontFamily: 'monospace', color: 'var(--mw-faint, #a39b8f)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '10px' }}>Sovereign Answer</span>
+            <p style={{ color: 'var(--mw-ink, #1c1a17)', fontSize: '0.95rem', lineHeight: 1.65, margin: '0 0 16px', fontWeight: 400 }}>
               You may need verbal reassurance to settle; they may need silence to process. When one person seeks clarity and the other needs time to think, each move makes sense from the inside and creates pressure on the other.
             </p>
             <div
@@ -236,23 +231,23 @@ function V0Hero() {
               style={{
                 padding: '12px 14px',
                 borderRadius: '10px',
-                background: 'rgba(245, 158, 11, 0.08)',
-                border: '1px solid rgba(245, 158, 11, 0.22)',
+                background: 'var(--mw-chip, #e9e2d6)',
+                border: '1px solid var(--mw-line, rgba(28,26,23,.10))',
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '10px'
               }}
             >
-              <span style={{ color: 'rgba(245, 158, 11, 0.95)', fontWeight: 'bold', lineHeight: 1, marginTop: '2px' }}>✦</span>
-              <span style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.88)', fontWeight: 500, lineHeight: 1.45 }}>
+              <span style={{ color: 'var(--mw-accent, #7d8b7a)', fontWeight: 'bold', lineHeight: 1, marginTop: '2px' }}>✦</span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--mw-ink, #1c1a17)', fontWeight: 500, lineHeight: 1.45 }}>
                 Different processing speeds do not automatically mean different levels of care.
               </span>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '12px', paddingTop: '14px', borderTop: '1px solid rgba(255, 255, 255, 0.06)', fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '12px', paddingTop: '14px', borderTop: '1px solid var(--mw-line, rgba(28,26,23,.10))', fontSize: '0.75rem', color: 'var(--mw-muted, #6b645b)' }}>
             <span>Source values quiet beneath the answer · Inspectable anytime</span>
-            <a href="/signup" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#ffffff', fontWeight: 500, textDecoration: 'none', minHeight: '44px' }}>
+            <a href="/signup" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--mw-ink, #1c1a17)', fontWeight: 500, textDecoration: 'none', minHeight: '44px' }}>
               Build your Baseline to begin <ArrowIcon />
             </a>
           </div>

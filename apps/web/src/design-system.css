@@ -3,167 +3,67 @@
    Tokens, @font-face, typography primitives, expression field.
    ========================================================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Onest:wght@400;500;600;700&display=swap');
+
 /* ── tokens ── */
 
 :root {
   color-scheme: light;
-  --sov-page: #0d0d0e;
-  --sov-panel: #151516;
-  --sov-raised: #1c1c1e;
-  --sov-paper: #eee8df;
-  --sov-paper-ink: #25211e;
-  --sov-ink: #f1ece5;
-  --sov-muted: #bbb3a8;
-  --sov-faint: #918a81;
-  --sov-line: rgba(255,255,255,.12);
-  --sov-clay: #dda273;
-  --sov-clay-soft: rgba(221,162,115,.14);
-  --sov-sage: #9fbaa1;
-  --sov-danger: #d19a9a;
-  --sov-page-soft: #111112;
-  --sov-paper-hover: #f7f2e9;
-  --sov-paper-muted: #625c55;
-  --sov-clay-deep: #c7794b;
-  --sov-clay-ink: #8b5434;
-  --sov-danger-ink: #f0b0a7;
-  --sov-sage-ink: #b8c0ac;
-  --sov-line-soft: rgba(255,255,255,.08);
-  --sov-line-strong: rgba(243,239,232,.21);
-  --sov-panel-soft: rgba(255,255,255,.035);
-  --sov-panel-faint: rgba(255,255,255,.025);
-  --sov-panel-quiet: rgba(255,255,255,.02);
-  --sov-input: rgba(6,6,7,.62);
-  --sov-chrome: rgba(24,24,25,.95);
-  --sov-chrome-strong: rgba(22,22,23,.96);
-  --sov-clay-hover: rgba(199,121,75,.07);
-  --sov-clay-glow: rgba(199,121,75,.10);
-  --sov-clay-glow-strong: rgba(199,121,75,.13);
-  --sov-clay-line: rgba(221,162,115,.48);
-  --sov-clay-line-soft: rgba(221,162,115,.30);
-  --sov-focus-ring: rgba(199,121,75,.09);
-  --sov-paper-surface: rgba(255,255,255,.40);
-  --sov-paper-wash: rgba(27,24,21,.045);
-  --sov-paper-line: rgba(27,24,21,.13);
-  --sov-paper-line-accent: rgba(139,84,52,.25);
-  --sov-danger-line: rgba(225,145,135,.46);
-  --sov-danger-line-strong: rgba(225,145,135,.62);
-  --sov-danger-line-soft: rgba(225,145,135,.28);
-  --sov-danger-wash: rgba(225,145,135,.045);
-  --sov-danger-ring: rgba(225,145,135,.08);
-  --sov-sage-line: rgba(152,161,140,.46);
-  --sov-sage-line-soft: rgba(152,161,140,.30);
-  --sov-sage-wash: rgba(152,161,140,.055);
-  --sov-sage-ring: rgba(152,161,140,.05);
-  --sov-scrim: rgba(0,0,0,.66);
-  --sov-shadow-soft: rgba(0,0,0,.24);
-  --sov-shadow: rgba(0,0,0,.42);
-  --sov-shadow-strong: rgba(0,0,0,.55);
-  --sov-inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --sov-ambient-glow: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(221, 162, 115, 0.07), transparent 70%);
-  --page: var(--sov-page);
-  --page-soft: var(--sov-page-soft);
-  --panel: var(--sov-panel);
-  --panel-raised: var(--sov-raised);
-  --panel-soft: var(--sov-panel-soft);
-  --ink: var(--sov-ink);
-  --muted: var(--sov-muted);
-  --faint: var(--sov-faint);
-  --line: var(--sov-line);
-  --line-strong: var(--sov-line-strong);
-  --paper: var(--sov-paper);
-  --paper-ink: var(--sov-paper-ink);
-  --paper-muted: var(--sov-paper-muted);
-  --clay: var(--sov-clay-deep);
-  --clay-light: var(--sov-clay);
-  --clay-soft: var(--sov-clay-soft);
-  --sage: var(--sov-sage);
-  --danger: var(--sov-danger);
-  --serif: var(--font-title);
-  --sovereign-wordmark-family: var(--font-subheading, system-ui, "Helvetica Neue", Arial, sans-serif);
-  --sovereign-wordmark-size: 0.69rem;
-  --sovereign-wordmark-tracking: 0.22em;
-  --production-nav-height: 80px;
-  --refine-ink: #f1e9de;
-  --refine-paper: #e8ddd0;
-  --refine-muted: rgba(229, 220, 209, 0.68);
-  --refine-faint: rgba(229, 220, 209, 0.44);
-  --refine-line: rgba(241, 233, 222, 0.1);
-  --refine-line-strong: rgba(241, 233, 222, 0.17);
-  --refine-panel: #121417;
-  --refine-page: #080a0d;
-  --route-blue: #e8ddd0;
-  --landing-blue: #e8ddd0;
-
-  --launch-page: #090a0b;
-  --launch-panel: #101112;
-  --launch-raised: #151617;
-  --launch-ink: #f2ede5;
-  --launch-muted: rgba(242, 237, 229, 0.68);
-  --launch-faint: rgba(242, 237, 229, 0.44);
-  --launch-line: rgba(242, 237, 229, 0.13);
-  --launch-line-strong: rgba(242, 237, 229, 0.24);
-  --launch-focus: rgba(242, 237, 229, 0.82);
-  --sovereign-action-ink: #f2ede5;
-  --sovereign-action-muted: rgba(242, 237, 229, 0.62);
-  --sovereign-action-line: rgba(242, 237, 229, 0.28);
-  --sovereign-action-line-strong: rgba(242, 237, 229, 0.56);
-  --sovereign-title:
-    "Geist Sans",
-    -apple-system,
-    BlinkMacSystemFont,
-    "SF Pro Display",
-    "Segoe UI Variable Display",
-    "Segoe UI",
-    system-ui,
-    "Helvetica Neue",
-    Helvetica,
-    Arial,
-    sans-serif;
-  --sovereign-ink: #f3ece2;
-  --sovereign-panel: #101215;
-  --sovereign-panel-raised: #15181c;
-  --sov-nav-height: 72px;
-  --sov-nav-bg: rgba(12, 14, 16, 0.85);
-  --sov-nav-blur: blur(20px) saturate(110%);
-  --sov-nav-border: rgba(241, 233, 222, 0.09);
-  --sov-space-xs: 4px;
-  --sov-space-sm: 8px;
-  --sov-space-md: 16px;
-  --sov-space-lg: 24px;
-  --sov-space-xl: 40px;
-  --sov-space-section: 80px;
-  --sov-space-page: 56px;
-  --sov-radius-sm: 6px;
-  --sov-radius-md: 10px;
-  --sov-radius-lg: 14px;
-  --sov-radius-xl: 20px;
-  --sov-radius-pill: 999px;
-  --sov-motion-micro: 120ms;
-  --sov-motion-standard: 200ms;
-  --sov-motion-entrance: 380ms;
-  --sov-motion-expansion: 480ms;
-  --sov-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --production-nav-height: 80px;
   /* ── MindWave global visual standard (owner-approved 2026-09-09) ── */
+  /* Design tokens derived from the Framer MindWave template
+     (https://slight-use-623506.framer.app/) */
   --mw-page: #f7f5f1;
   --mw-page-alt: #ffffff;
   --mw-card: #ffffff;
   --mw-card-tint: #fbf9f6;
   --mw-ink: #1c1a17;
+  --mw-ink-soft: #302c26;
   --mw-muted: #6b645b;
   --mw-faint: #a39b8f;
   --mw-line: rgba(28,26,23,.10);
-  --mw-line-strong: rgba(28,26,23,.18);
+  --mw-line-strong: rgba(28,26,23,.16);
   --mw-cta: #1c1a17;
   --mw-cta-ink: #f7f5f1;
   --mw-chip: #e9e2d6;
-  --mw-sage: #7d8b7a;
+  --mw-chip-ink: #1c1a17;
+  --mw-accent: #7d8b7a;
+  --mw-accent-alt: #5a54a4;
+  --mw-success: #65bf72;
+  --mw-warn: #f29220;
+  --mw-danger: #eb2c50;
   --mw-shadow: 0 20px 50px rgba(28,26,23,.08);
+  --mw-shadow-soft: 0 8px 24px rgba(28,26,23,.06);
   --mw-radius-card: 24px;
   --mw-radius-input: 16px;
+  --mw-radius-pill: 999px;
   --mw-container: 1200px;
   --mw-section: 112px;
   --mw-section-mobile: 72px;
+  --mw-nav-height: 80px;
+  /* Typography: Framer template uses Gambarino (serif) + Onest (sans) */
+  --mw-title: "Gambarino", "Onest", Inter, "Inter Placeholder", serif;
+  --mw-body: "Onest", Inter, "Inter Placeholder", sans-serif;
+  --page: var(--mw-page);
+  --ink: var(--mw-ink);
+  --muted: var(--mw-muted);
+  --faint: var(--mw-faint);
+  --line: var(--mw-line);
+  --line-strong: var(--mw-line-strong);
+  /* Neutral launch palette on the light MindWave system */
+  --launch-ink: #1c1a17;
+  --launch-muted: #6b645b;
+  --launch-faint: #a39b8f;
+  --launch-line: rgba(28,26,23,.10);
+  --launch-page: #f7f5f1;
+}
+
+/* Self-hosted Geist/asset: retained as the registered platform face and the
+   terminal title authority for standalone public documents. MindWave display
+   headings lead via --font-display/--font-title below (owner-approved 2026-09-09). */
+@font-face {
+  font-family: "Geist Sans";
+  src: url("/fonts/geist/Geist-Variable.woff2?v=1.7.2") format("woff2");
+  font-display: swap;
 }
 
 /* MindWave global scope: every surface renders on the light calming system. */
@@ -171,47 +71,31 @@ body,
 [data-visual-system="mindwave"] {
   background: var(--mw-page);
   color: var(--mw-ink);
+  font-family: var(--mw-body);
 }
 
 @media (max-width: 900px) {
   :root {
-    --production-nav-height: 64px;
+    --mw-nav-height: 64px;
   }
 }
 
 /* ── typography ── */
-
-@font-face {
-  font-family: "Geist Sans";
-  src: url("/fonts/geist/Geist-Variable.woff2?v=1.7.2") format("woff2");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-/*
- * Sovereign.OS typography contract.
- *
- * Titles use self-hosted Geist Sans with native enterprise fallbacks defined by
- * the product-language authority. Body text stays native and highly legible. Retired bundled
- * display faces and decorative title substitutions are excluded.
- */
+/* Framer MindWave template fonts: Onest (sans body) + elegant serif headings.
+   Gambarino (template's premium serif) substituted with Fraunces via Google Fonts. */
 
 :root {
   --font-title:
-    "Geist Sans",
-    -apple-system,
-    BlinkMacSystemFont,
-    "SF Pro Display",
-    "Segoe UI Variable Display",
-    "Segoe UI",
-    system-ui,
-    "Helvetica Neue",
-    Helvetica,
-    Arial,
-    sans-serif;
+    "Fraunces",
+    "Gambarino",
+    ui-serif,
+    Georgia,
+    "Times New Roman",
+    serif;
   --font-subheading: var(--font-title);
   --font-body:
+    "Onest",
+    Inter,
     -apple-system,
     BlinkMacSystemFont,
     "SF Pro Text",

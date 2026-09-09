@@ -372,33 +372,506 @@ body:has(.account-shell) {
 }
 
 /* ── MindWave global standard (owner-approved 2026-09-09; terminal sheet) ── */
+/* Terminal authority. Loaded last. Redefines the residual founder-era dark
+   theme variables to the light MindWave palette and restores template
+   composition on every surface. Keeps copy, routes, and product logic. */
+
+/* 1. Neutralize founder-era dark theme variables (later :root declaration
+      wins for custom properties; !important beats the powder-era marks). */
+:root, html, body {
+  color-scheme: light;
+  --sov-page: var(--mw-page, #f7f5f1) !important;
+  --sov-page-soft: var(--mw-card-tint, #fbf9f6) !important;
+  --sov-panel: var(--mw-card, #ffffff) !important;
+  --sov-panel-quiet: var(--mw-card-tint, #fbf9f6) !important;
+  --sov-panel-soft: var(--mw-card-tint, #fbf9f6) !important;
+  --sov-raised: var(--mw-card, #ffffff) !important;
+  --sov-paper: var(--mw-card, #ffffff) !important;
+  --sov-paper-hover: var(--mw-card, #ffffff) !important;
+  --sov-paper-ink: var(--mw-ink, #1c1a17) !important;
+  --sov-paper-muted: var(--mw-muted, #6b645b) !important;
+  --sov-ink: var(--mw-ink, #1c1a17) !important;
+  --sov-muted: var(--mw-muted, #6b645b) !important;
+  --sov-text-muted: var(--mw-muted, #6b645b) !important;
+  --sov-faint: var(--mw-faint, #a39b8f) !important;
+  --sov-text-secondary: var(--mw-muted, #6b645b) !important;
+  --sov-text-primary: var(--mw-ink, #1c1a17) !important;
+  --sov-text-faint: var(--mw-faint, #a39b8f) !important;
+  --sov-cream: var(--mw-ink, #1c1a17) !important;
+  --sov-line: var(--mw-line, rgba(28,26,23,.10)) !important;
+  --sov-line-soft: var(--mw-line, rgba(28,26,23,.10)) !important;
+  --sov-line-strong: var(--mw-line-strong, rgba(28,26,23,.16)) !important;
+  --sov-clay: var(--mw-muted, #6b645b) !important;
+  --sov-clay-deep: var(--mw-faint, #a39b8f) !important;
+  --sov-clay-soft: var(--mw-chip, #e9e2d6) !important;
+  --sov-clay-line: var(--mw-line, rgba(28,26,23,.10)) !important;
+  --sov-clay-line-soft: var(--mw-line, rgba(28,26,23,.10)) !important;
+  --sov-sage: var(--mw-accent, #7d8b7a) !important;
+  --sov-sage-ink: var(--mw-ink, #1c1a17) !important;
+  --sov-sage-wash: var(--mw-chip, #e9e2d6) !important;
+  --sov-sage-ring: var(--mw-line, rgba(28,26,23,.10)) !important;
+  --sov-sage-line: var(--mw-line, rgba(28,26,23,.10)) !important;
+  --sov-sage-line-soft: var(--mw-line, rgba(28,26,23,.10)) !important;
+  --sov-bg-0: var(--mw-page, #f7f5f1) !important;
+  --sov-bg-1: var(--mw-card-tint, #fbf9f6) !important;
+  --sov-bg-2: var(--mw-card-tint, #fbf9f6) !important;
+  --sov-bg-elevated: var(--mw-card, #ffffff) !important;
+  --sov-bg-card: var(--mw-card, #ffffff) !important;
+  --sov-input: var(--mw-card, #ffffff) !important;
+  --sov-content: var(--mw-ink, #1c1a17) !important;
+  --sov-shadow-soft: rgba(28,26,23,.06) !important;
+  --sov-shadow: rgba(28,26,23,.08) !important;
+  --sov-shadow-strong: rgba(28,26,23,.14) !important;
+  --premium-rule: var(--mw-line, rgba(28,26,23,.10)) !important;
+  --premium-glass: color-mix(in srgb, var(--mw-card, #ffffff) 92%, transparent) !important;
+  --premium-paper-wash: rgba(28,26,23,.03) !important;
+  --premium-clay-line: rgba(28,26,23,.12) !important;
+  --premium-sage-line: rgba(28,26,23,.12) !important;
+  --premium-danger-line: rgba(235, 44, 80, .35) !important;
+  --v0-page: var(--mw-page, #f7f5f1) !important;
+  --v0-card: var(--mw-card, #ffffff) !important;
+  --v0-cream: var(--mw-ink, #1c1a17) !important;
+  --v0-ink: var(--mw-ink, #1c1a17) !important;
+  --v0-line: var(--mw-line, rgba(28,26,23,.10)) !important;
+  --v0-warm: var(--mw-muted, #6b645b) !important;
+  --v8-page: var(--mw-page, #f7f5f1) !important;
+  --landing-page: var(--mw-page, #f7f5f1) !important;
+  --launch-page: var(--mw-page, #f7f5f1) !important;
+  --workspace-page: var(--mw-page, #f7f5f1) !important;
+  --visual-page: var(--mw-page, #f7f5f1) !important;
+  --visual-page-raised: var(--mw-card-tint, #fbf9f6) !important;
+  --cohesion-page: var(--mw-page, #f7f5f1) !important;
+  --ft-page: var(--mw-page, #f7f5f1) !important;
+  --route-page: var(--mw-page, #f7f5f1) !important;
+  --route-panel: var(--mw-card, #ffffff) !important;
+  --route-ink: var(--mw-ink, #1c1a17) !important;
+  --route-line: var(--mw-line, rgba(28,26,23,.10)) !important;
+  --route-blue: var(--mw-muted, #6b645b) !important;
+  --refine-page: var(--mw-page, #f7f5f1) !important;
+  --refine-paper: var(--mw-ink, #1c1a17) !important;
+}
+
+/* 2. Global light surfaces */
+html,
+body,
+#root {
+  background: var(--mw-page, #f7f5f1) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
 
 .mindwave-page,
 .public-page,
 .sovereign-app-runtime,
 .account-shell,
 .sovereign-policy,
+.plan-onboarding,
+.intelligence-workspace,
 .public-not-found {
-  background: var(--mw-page, #f7f5f1);
-  color: var(--mw-ink, #1c1a17);
+  background: var(--mw-page, #f7f5f1) !important;
+  color: var(--mw-ink, #1c1a17) !important;
 }
 
-.mindwave-page :is(h1, h2, h3),
-.public-page :is(h1, h2, h3),
-.sovereign-policy :is(h1, h2, h3) {
-  color: var(--mw-ink, #1c1a17);
+.mindwave-page :is(h1, h2, h3) {
   letter-spacing: -0.02em;
-}
-
-.mindwave-page :is(p, li),
-.public-page :is(p, li) {
-  color: var(--mw-muted, #6b645b);
 }
 
 .mindwave-page section {
   padding-block: clamp(var(--mw-section-mobile, 72px), 8vw, var(--mw-section, 112px));
 }
 
+/* 3. Typography: ink headings, muted body, on the MindWave surfaces */
+html body .mindwave-page :is(h2, h3, h4, h5),
+html body .mindwave-page :is(p, li) {
+  color: var(--mw-muted, #6b645b);
+}
+
+html body .mindwave-page :is(h1) {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+/* Landing hero (beats `html body .public-approved-v8 .v0-hero h1`, specificity 0,3,2) */
+html body .mindwave-page.sovereign-landing .v0-hero h1,
+html body .mindwave-page.sovereign-landing .v0-hero h1 > span {
+  color: var(--mw-ink, #1c1a17) !important;
+  font-family: var(--font-title) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.03em !important;
+}
+
+html body .mindwave-page.sovereign-landing .v0-hero h1 > em {
+  color: var(--mw-muted, #6b645b) !important;
+  -webkit-text-stroke: initial !important;
+}
+
+html body .mindwave-page.sovereign-landing .v0-hero-content p,
+html body .mindwave-page.sovereign-landing .sovereign-opening-copy,
+html body .mindwave-page.sovereign-landing .sovereign-opening-trust {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+/* Hero kicker: MindWave chip pill */
+html body .mindwave-page.sovereign-landing .landing-hero-kicker,
+html body .mindwave-page.sovereign-landing .v0-badge.landing-hero-kicker {
+  background: var(--mw-chip, #e9e2d6) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  color: var(--mw-chip-ink, #1c1a17) !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  border-radius: 999px !important;
+}
+
+/* Hero primary actions: MindWave dark pill + outline pill */
+html body .mindwave-page.sovereign-landing .v0-get-started,
+html body .mindwave-page.sovereign-landing .primary-button[data-variant="primary"],
+html body .mindwave-page.sovereign-landing .primary-button.variant-primary {
+  background: var(--mw-cta, #1c1a17) !important;
+  border: 1px solid var(--mw-cta, #1c1a17) !important;
+  color: var(--mw-cta-ink, #f7f5f1) !important;
+  border-radius: 999px !important;
+}
+
+html body .mindwave-page.sovereign-landing .primary-button[data-variant="glass"],
+html body .mindwave-page.sovereign-landing .primary-button.variant-glass {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line-strong, rgba(28,26,23,.16)) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+  border-radius: 999px !important;
+}
+
+/* Decorative founder atmosphere layers are hidden on the light system */
+html body .mindwave-page.sovereign-landing .v0-hero .powder-landscape-glow,
+html body .mindwave-page.sovereign-landing .v0-final .powder-dusk-horizon {
+  display: none !important;
+}
+
+/* Real-life question orbit: light centered prose + white stage card */
+html body .mindwave-page.sovereign-landing .landing-question-orbit {
+  background: var(--mw-page, #f7f5f1) !important;
+}
+
+html body .mindwave-page.sovereign-landing .landing-question-orbit__inner {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  border-radius: var(--mw-radius-card, 24px) !important;
+  box-shadow: var(--mw-shadow-soft, 0 8px 24px rgba(28,26,23,.06)) !important;
+}
+
+html body .mindwave-page.sovereign-landing .landing-question-orbit__kicker {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .mindwave-page.sovereign-landing .landing-question-orbit h2 {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page.sovereign-landing .landing-question-orbit__note {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .mindwave-page.sovereign-landing .landing-question-orbit__stage {
+  background: var(--mw-card-tint, #fbf9f6) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  box-shadow: none !important;
+}
+
+html body .mindwave-page.sovereign-landing .landing-question-orbit__stage span,
+html body .mindwave-page.sovereign-landing .landing-question-orbit__stage .inline-block {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+  box-shadow: var(--mw-shadow-soft, 0 8px 24px rgba(28,26,23,.06)) !important;
+}
+
+html body .mindwave-page.sovereign-landing .landing-question-orbit__stage small {
+  color: var(--mw-faint, #a39b8f) !important;
+}
+
+html body .mindwave-page.sovereign-landing .landing-question-orbit__stage strong {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+/* Product stories / demonstrations: white cards on the page */
+html body .mindwave-page.sovereign-landing .landing-stories {
+  border-bottom-color: var(--mw-line, rgba(28,26,23,.10)) !important;
+}
+
+html body .mindwave-page.sovereign-landing .landing-story__label {
+  background: var(--mw-card-tint, #fbf9f6) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .mindwave-page.sovereign-landing .demo-card.landing-story {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08)) !important;
+}
+
+html body .mindwave-page.sovereign-landing .demo-card__label {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .mindwave-page.sovereign-landing .demo-card__question p,
+html body .mindwave-page.sovereign-landing .demo-card__answer p {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page.sovereign-landing .demo-card__answer {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .mindwave-page.sovereign-landing .demo-card__distinction {
+  background: var(--mw-chip, #e9e2d6) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  border-left: 3px solid var(--mw-accent, #7d8b7a) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page.sovereign-landing .demo-card__distinction span {
+  color: var(--mw-accent, #7d8b7a) !important;
+}
+
+/* Comparison section: light background, white panels */
+html body .mindwave-page.sovereign-landing .v0-comparison {
+  background: var(--mw-page, #f7f5f1) !important;
+  border-bottom: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+}
+
+html body .mindwave-page.sovereign-landing .v0-story-heading p {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .mindwave-page.sovereign-landing .v0-story-heading h2,
+html body .mindwave-page.sovereign-landing .v0-story-heading h2 span {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page.sovereign-landing .v0-comparison-panel,
+html body .mindwave-page.sovereign-landing .v0-comparison-panel.v0-comparison-positive {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08)) !important;
+}
+
+html body .mindwave-page.sovereign-landing .v0-comparison-panel h3 {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page.sovereign-landing .v0-comparison-panel li {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .mindwave-page.sovereign-landing .v0-comparison-panel li span {
+  color: var(--mw-accent, #7d8b7a) !important;
+}
+
+/* Final call to action: white card on the page */
+html body .mindwave-page.sovereign-landing .v0-final {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08)) !important;
+}
+
+html body .mindwave-page.sovereign-landing .v0-final h2 {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page.sovereign-landing .v0-final p {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .mindwave-page.sovereign-landing .v0-final-motto {
+  color: var(--mw-muted, #6b645b) !important;
+  opacity: 0.85 !important;
+}
+
+/* Footer: MindWave light footer */
+html body .mindwave-page .v0-footer {
+  background: var(--mw-page, #f7f5f1) !important;
+  border-top: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+}
+
+html body .mindwave-page .v0-footer nav a {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .mindwave-page .v0-footer nav a:hover {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page .v0-footer p {
+  color: var(--mw-faint, #a39b8f) !important;
+}
+
+/* Hero interface card: MindWave white conversation demo */
+html body .mindwave-page.sovereign-landing .powder-interface-card {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08)) !important;
+}
+
+/* Landing demo stage (shared with the powder route) */
+html body .mindwave-page .landing-demo-stage.powder-interface-card {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08)) !important;
+}
+
+html body .mindwave-page .card-welcome h2 {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page .card-welcome p,
+html body .mindwave-page .card-badge {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .mindwave-page .prompt-box {
+  background: var(--mw-card-tint, #fbf9f6) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+}
+
+html body .mindwave-page .prompt-box input {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+/* Secondary pages: light typography and white surfaces */
+html body .mindwave-page.pricing-page .price-card {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+}
+
+html body .mindwave-page.pricing-page .sov-display-hero,
+html body .mindwave-page.pricing-page h1 {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page.how-page .timeline-step-card,
+html body .mindwave-page.how-page .glass-card {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+}
+
+html body .mindwave-page.faq-page details {
+  border-bottom-color: var(--mw-line, rgba(28,26,23,.10)) !important;
+}
+
+html body .mindwave-page.faq-page summary {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page .sovereign-policy,
+html body .mindwave-page.sovereign-policy,
+.sovereign-policy.mindwave-page {
+  background: var(--mw-page, #f7f5f1) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page .policy-h1,
+html body .mindwave-page.sovereign-policy h1,
+html body .mindwave-page.sovereign-policy h2,
+html body .mindwave-page.sovereign-policy h3 {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page.sovereign-policy p,
+html body .mindwave-page.sovereign-policy li {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .mindwave-page.sovereign-policy .policy-kicker,
+html body .mindwave-page.sovereign-policy .policy-effective {
+  color: var(--mw-faint, #a39b8f) !important;
+}
+
+/* Onboarding: white centered building state */
+html body .mindwave-page.plan-onboarding {
+  background: var(--mw-page, #f7f5f1) !important;
+}
+
+html body .mindwave-page.plan-onboarding .baseline-building-state {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08)) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page.plan-onboarding h1 {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page.plan-onboarding p {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .mindwave-page.plan-onboarding .eyebrow {
+  color: var(--mw-faint, #a39b8f) !important;
+}
+
+/* Workspace: light app shell, topbar, composer */
+html body .mindwave-page.intelligence-workspace,
+html body .mindwave-page.sovereign-app-runtime {
+  background: var(--mw-page, #f7f5f1) !important;
+}
+
+html body .mindwave-page .intelligence-topbar {
+  background: var(--mw-card, #ffffff) !important;
+  border-bottom: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+}
+
+html body .mindwave-page .intelligence-sidebar,
+html body .mindwave-page .workspace-sidebar {
+  background: var(--mw-card-tint, #fbf9f6) !important;
+  border-right: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+}
+
+/* Suggestion / composer light chips */
+html body .mindwave-page .suggestion-list {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+}
+
+html body .mindwave-page .suggestion-list li {
+  color: var(--mw-muted, #6b645b) !important;
+  background: var(--mw-card, #ffffff) !important;
+}
+
+html body .mindwave-page .suggestion-list li:hover,
+html body .mindwave-page .suggestion-list li.is-active-suggestion {
+  background: var(--mw-card-tint, #fbf9f6) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page .sovereign-composer,
+html body .mindwave-page .composer-example {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page .sovereign-app-runtime .composer-context-items button:hover {
+  background: var(--mw-card-tint, #fbf9f6) !important;
+}
+
+/* Remaining white-on-light / transparent-on-dark utilities neutralized */
+html body .mindwave-page .text-white,
+html body .mindwave-page .text-neutral-100,
+html body .mindwave-page .text-neutral-200,
+html body .mindwave-page .text-neutral-300,
+html body .mindwave-page .text-neutral-400,
+html body .mindwave-page .text-neutral-500 {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .mindwave-page .glassmorphic-window,
+html body .mindwave-page .sovereign-app-shell {
+  background: var(--mw-page, #f7f5f1) !important;
+}
+
+/* Existing MindWave primitives (cards, buttons, auth panels) */
 .mindwave-page .glass-card,
 .mindwave-page .v0-comparison-panel,
 .public-page .glass-card {
@@ -426,4 +899,196 @@ body:has(.account-shell) {
   border-radius: var(--mw-radius-card, 24px) !important;
   box-shadow: var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08)) !important;
   color: var(--mw-ink, #1c1a17) !important;
+}
+
+/* =====================================================================
+   MINDWAVE TERMINAL — LAUNCH-ERA !important SURFACES
+   Defeats app-shell.css launch-era rules (4420+) that force dark
+   account/onboarding/gate panes with !important. Higher specificity
+   via html-body chains; passkey-auth.css loads last.
+   ===================================================================== */
+
+html body .account-shell {
+  background:
+    radial-gradient(circle at 8% 12%, rgba(125, 139, 122, 0.12), transparent 30rem),
+    radial-gradient(circle at 92% 88%, rgba(125, 139, 122, 0.07), transparent 28rem),
+    var(--mw-page, #f7f5f1) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .account-shell .account-nav,
+html body .plan-onboarding .plan-nav {
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(18px) !important;
+  border-bottom: 1px solid var(--mw-line, rgba(28, 26, 23, 0.10)) !important;
+}
+
+html body .account-shell .account-nav .wordmark,
+html body .account-shell .account-nav a,
+html body .plan-onboarding .plan-nav a {
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .account-shell .account-nav span,
+html body .plan-onboarding .plan-nav span {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .account-shell .auth-panel,
+html body .auth-panel.passkey-enabled {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28, 26, 23, 0.10)) !important;
+  border-radius: var(--mw-radius-card, 24px) !important;
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28, 26, 23, 0.08)) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .account-shell .auth-panel h2,
+html body .account-shell .auth-panel h1,
+html body .account-shell .account-intro h1 {
+  color: var(--mw-ink, #1c1a17) !important;
+  font-family: var(--font-display, var(--mw-display, "Geist Sans")) !important;
+}
+
+html body .account-shell .auth-panel .eyebrow,
+html body .account-shell .account-intro .eyebrow {
+  color: var(--mw-faint, #a39b8f) !important;
+}
+
+html body .account-shell .account-intro .lede,
+html body .account-shell .auth-panel p,
+html body .account-shell .account-intro-note,
+html body .account-shell .form-stack label,
+html body .account-shell .check-line,
+html body .account-shell .account-policy-notice,
+html body .account-shell .account-switch {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .account-shell .form-stack :where(input[type="text"], input[type="email"], input:not([type]), select) {
+  background: var(--mw-card-tint, #fbf9f6) !important;
+  border-color: var(--mw-line, rgba(28, 26, 23, 0.10)) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .account-shell .check-line a,
+html body .account-shell .account-policy-notice a,
+html body .account-shell .account-switch a {
+  color: var(--mw-accent, #5a54a4) !important;
+}
+
+html body .account-shell .status-note,
+html body .account-shell .turnstile-frame {
+  border-color: var(--mw-line, rgba(28, 26, 23, 0.10)) !important;
+  background: var(--mw-card-tint, #fbf9f6) !important;
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .account-shell .primary-button,
+html body .account-shell .auth-panel.passkey-enabled .form-stack button[type="submit"] {
+  background: var(--mw-cta, #1c1a17) !important;
+  border: 1px solid var(--mw-cta, #1c1a17) !important;
+  border-radius: 999px !important;
+  color: var(--mw-cta-ink, #f7f5f1) !important;
+}
+
+html body .plan-onboarding .baseline-onboarding-form {
+  background: var(--mw-card, #ffffff) !important;
+  border-color: var(--mw-line, rgba(28, 26, 23, 0.10)) !important;
+  border-radius: var(--mw-radius-card, 24px) !important;
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28, 26, 23, 0.08)) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .plan-onboarding .baseline-field input,
+html body .plan-onboarding .baseline-field select {
+  background: var(--mw-card-tint, #fbf9f6) !important;
+  border-color: var(--mw-line, rgba(28, 26, 23, 0.10)) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .plan-onboarding .baseline-choice-row input:checked + span {
+  border-color: var(--mw-line-strong, rgba(28, 26, 23, 0.16)) !important;
+  background: var(--mw-chip, #e9e2d6) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body :is(main.private-route-gate, .sovereign-app-runtime) {
+  background: var(--mw-page, #f7f5f1) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body main.private-route-gate .private-route-brand strong,
+html body main.private-route-gate h1,
+html body .workspace-arrival h1 {
+  color: var(--mw-ink, #1c1a17) !important;
+  font-family: var(--font-display, var(--mw-display, "Geist Sans")) !important;
+}
+
+html body main.private-route-gate section > span,
+html body .workspace-arrival span {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body main.private-route-gate p,
+html body .workspace-arrival p {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body main.private-route-gate button {
+  background: var(--mw-cta, #1c1a17) !important;
+  border-radius: 999px !important;
+  color: var(--mw-cta-ink, #f7f5f1) !important;
+}
+
+/* Auth-panel descendants regardless of shell chain (passkey portal safety) */
+html body .auth-panel .eyebrow,
+html body .auth-panel .passkey-intro,
+html body .auth-panel .passkey-status,
+html body .auth-panel .passkey-recovery-divider span,
+html body .auth-panel .form-stack label,
+html body .auth-panel .check-line,
+html body .auth-panel .account-policy-notice,
+html body .auth-panel .account-switch {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+html body .auth-panel h2,
+html body .auth-panel h1 {
+  color: var(--mw-ink, #1c1a17) !important;
+  font-family: var(--font-display, var(--mw-display, "Geist Sans")) !important;
+}
+
+html body .auth-panel .check-line a,
+html body .auth-panel .account-policy-notice a,
+html body .auth-panel .account-switch a {
+  color: var(--mw-accent, #5a54a4) !important;
+}
+
+html body .auth-panel :where(input[type="text"], input[type="email"], input:not([type]), select) {
+  background: var(--mw-card-tint, #fbf9f6) !important;
+  border-color: var(--mw-line, rgba(28, 26, 23, 0.10)) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .auth-panel .passkey-button {
+  background: var(--mw-card-tint, #fbf9f6) !important;
+  border: 1px solid var(--mw-line, rgba(28, 26, 23, 0.10)) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}
+
+html body .auth-panel .check-line span,
+html body .auth-panel .account-policy-notice span,
+html body .auth-panel .account-switch span,
+html body .auth-panel .passkey-intro,
+html body .auth-panel .passkey-status {
+  color: var(--mw-muted, #6b645b) !important;
+}
+
+/* Hero sky: beat launch-era dark field */
+html body .mindwave-page.public-approved-v8 .v0-hero.sovereign-opening-field {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(125, 139, 122, 0.10), transparent 32rem),
+    radial-gradient(circle at 85% 92%, rgba(125, 139, 122, 0.07), transparent 30rem),
+    var(--mw-page, #f7f5f1) !important;
 }
