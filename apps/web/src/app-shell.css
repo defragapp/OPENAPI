@@ -5498,7 +5498,7 @@ body:has(.sovereign-app-runtime) {
   a[class*="__action"],
   a[class*="-cta"],
   a[class*="__cta"],
-  a[class*="button"]
+  a[class*="button"]:not(.primary-button):not([class="primary-button"])
 ) {
   background: transparent !important;
   background-image: none !important;

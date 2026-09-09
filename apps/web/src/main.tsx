@@ -11,10 +11,10 @@ import { installDialogAccessibility } from './dialog-accessibility';
 import { installPrivateAnswerExportRuntime } from './PrivateAnswerExportRuntime';
 import { installProductionReadinessRuntime } from './production-readiness-runtime';
 import { installProductionRuntime } from './ProductionRuntime';
-import PublicLanding from './PublicLanding';
-import PublicHowItWorks from './PublicHowItWorks';
-import PublicPricing from './PublicPricing';
-import PublicFAQ from './PublicFAQ';
+import { PublicLanding } from './PublicLanding';
+import { PublicHowItWorks } from './PublicHowItWorks';
+import { PublicPricing } from './PublicPricing';
+import { PublicFAQ } from './PublicFAQ';
 import { installPublicRouteAuthorityRuntime } from './PublicRouteAuthorityRuntime';
 import { PrivacyPolicy, TermsOfService } from './PublicPolicy';
 import { installReleaseInteractionRuntime } from './release-interaction-runtime';
@@ -22,9 +22,7 @@ import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
 import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
 import { PowderDemo } from './PowderDemo';
 
-/* Template design system (MindWave-based) */
-import './template-design.css';
-/* Legacy visual system — retained for authenticated workspace */
+/* Founder v0 visual system — canonical public template */
 import './design-system.css';
 import './public.css';
 import './workspace.css';

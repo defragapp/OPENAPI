@@ -7724,7 +7724,7 @@ html:root:root:root body .account-shell .passkey-button:hover:not(:disabled) {
   a[class*="__action"],
   a[class*="-cta"],
   a[class*="__cta"],
-  a[class*="button"]
+  a[class*="button"]:not(.primary-button):not([class="primary-button"])
 ) {
   background: transparent !important;
   background-image: none !important;
@@ -7741,7 +7741,7 @@ html:root:root:root body .account-shell .passkey-button:hover:not(:disabled) {
   a[class*="__action"],
   a[class*="-cta"],
   a[class*="__cta"],
-  a[class*="button"]
+  a[class*="button"]:not(.primary-button):not([class="primary-button"])
 ):focus-visible {
   outline: 1px solid var(--sovereign-action-line-strong) !important;
   outline-offset: 5px !important;
@@ -8005,7 +8005,7 @@ html:root:root:root body .account-shell .passkey-button:hover:not(:disabled) {
 }
 
 /* Secondary public pages inherit the same action language. */
-body :where(a.button, a.btn, a.cta, a[class*="button"], a[class*="cta"]) {
+body :where(a.button, a.btn, a.cta, a[class*="button"]:not(.primary-button):not([class="primary-button"]), a[class*="cta"]) {
   background: transparent !important;
   background-image: none !important;
   border: 0 !important;
@@ -8024,7 +8024,7 @@ body :where(a.button, a.btn, a.cta, a[class*="button"], a[class*="cta"]) {
     a.v0-get-started,
     a[class*="action"],
     a[class*="cta"],
-    a[class*="button"]
+    a[class*="button"]:not(.primary-button):not([class="primary-button"])
   ) {
     min-height: 44px !important;
   }

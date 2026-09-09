@@ -9174,7 +9174,7 @@ body:has(.public-secondary-page) {
   a[class*="__action"],
   a[class*="-cta"],
   a[class*="__cta"],
-  a[class*="button"]
+  a[class*="button"]:not(.primary-button)
 ) {
   background: transparent !important;
   background-image: none !important;
@@ -9191,7 +9191,7 @@ body:has(.public-secondary-page) {
   a[class*="__action"],
   a[class*="-cta"],
   a[class*="__cta"],
-  a[class*="button"]
+  a[class*="button"]:not(.primary-button)
 ):focus-visible {
   outline: 1px solid var(--sovereign-action-line-strong) !important;
   outline-offset: 5px !important;
@@ -9455,7 +9455,7 @@ body:has(.public-secondary-page) {
 }
 
 /* Secondary public pages inherit the same action language. */
-body :where(a.button, a.btn, a.cta, a[class*="button"], a[class*="cta"]) {
+body :where(a.button, a.btn, a.cta, a[class*="button"]:not(.primary-button), a[class*="cta"]:not(.primary-button)) {
   background: transparent !important;
   background-image: none !important;
   border: 0 !important;
@@ -9474,7 +9474,7 @@ body :where(a.button, a.btn, a.cta, a[class*="button"], a[class*="cta"]) {
     a.v0-get-started,
     a[class*="action"],
     a[class*="cta"],
-    a[class*="button"]
+    a[class*="button"]:not(.primary-button)
   ) {
     min-height: 44px !important;
   }
@@ -10263,7 +10263,7 @@ body :where(a.button, a.btn, a.cta, a[class*="button"], a[class*="cta"]) {
   a[class*="__action"],
   a[class*="-cta"],
   a[class*="__cta"],
-  a[class*="button"]
+  a[class*="button"]:not(.primary-button)
 ) {
   background: transparent !important;
   background-image: none !important;

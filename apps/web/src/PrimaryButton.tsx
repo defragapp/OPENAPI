@@ -62,12 +62,13 @@ export function PrimaryButton({
   };
 
   if (href) {
+    const { style: _ignoredStyle, ...anchorProps } = props as AnchorHTMLAttributes<HTMLAnchorElement> & { style?: React.CSSProperties };
     return (
       <a
         href={href}
         className={`primary-button ${className}`.trim()}
         style={style}
-        {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)}
+        {...anchorProps}
       >
         {children}
       </a>
@@ -78,7 +79,7 @@ export function PrimaryButton({
     <button
       className={`primary-button ${className}`.trim()}
       style={style}
-      {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
+      {...((({ style: _ignoredStyle2, ...rest }) => rest)(props as ButtonHTMLAttributes<HTMLButtonElement> & { style?: React.CSSProperties }))}
     >
       {children}
     </button>
