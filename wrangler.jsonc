@@ -68,6 +68,7 @@
     {
       "binding": "DB",
       "database_name": "sovereign-openapi-db",
+      "database_id": "497e5df9-c82a-499e-9be6-d809c992e8ce",
       "migrations_dir": "apps/sovereign-worker/migrations"
     }
   ],
