@@ -116,7 +116,11 @@
       "/faq.html",
       "/questions",
       "/how-it-works",
-      "/how-it-works.html"
+      "/how-it-works.html",
+      "/demo",
+      "/demo/*",
+      "/powder",
+      "/powder/*"
     ]
   },
   "triggers": {
