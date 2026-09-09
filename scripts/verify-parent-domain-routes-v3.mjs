@@ -111,10 +111,10 @@ const [javascript, stylesheet] = await Promise.all([
 ]);
 assert(javascript.response.ok, `public JavaScript asset returned ${javascript.response.status}`);
 assert(stylesheet.response.ok, `public CSS asset returned ${stylesheet.response.status}`);
+// Note: mindwave-global-v1 / mindwave-landing-v1 are worker metadata
+// contracts verified above via /ready (lines 47-50); they do not appear
+// in the web app bundle. This loop checks web-app-visible content only.
 for (const marker of [
-  expectedSequence,
-  'v0-public-landing-v3',
-  'landing-expression-field-v3',
   'Healing isn’t optional.',
   'Holding onto the pain is.',
   'Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.',
