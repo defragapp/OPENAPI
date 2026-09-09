@@ -1,0 +1,167 @@
+/*
+ * Sovereign.OS real static 404 composition.
+ * Loaded only by 404.html before deployed-route-cohesion.css.
+ */
+
+body.not-found-page {
+  min-height: 100svh;
+  overflow-x: hidden;
+}
+
+body.not-found-page .launch-shell {
+  min-height: 100svh;
+}
+
+body.not-found-page .not-found-main {
+  display: grid;
+  width: var(--route-shell);
+  min-height: clamp(620px, calc(100svh - 230px), 920px);
+  margin: 0 auto;
+  place-items: center;
+  padding: clamp(84px, 10vw, 148px) 0;
+}
+
+body.not-found-page .not-found-stage {
+  position: relative;
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(220px, 0.58fr) minmax(0, 1fr);
+  gap: clamp(54px, 9vw, 132px);
+  align-items: end;
+  overflow: hidden;
+  padding: clamp(52px, 7vw, 88px);
+  border-top: 1px solid var(--v0-line-strong);
+  border-bottom: 1px solid var(--v0-line-strong);
+  background:
+    radial-gradient(circle at 84% 22%, rgba(47, 147, 255, 0.13), transparent 28rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.018), transparent 46%);
+}
+
+body.not-found-page .not-found-stage::after {
+  content: '';
+  position: absolute;
+  right: -12rem;
+  bottom: -13rem;
+  width: 32rem;
+  height: 32rem;
+  border: 1px solid rgba(120, 199, 255, 0.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+body.not-found-page .not-found-code {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: rgba(241, 233, 222, 0.1);
+  font-family: var(--v0-display);
+  font-size: clamp(8rem, 15vw, 14rem);
+  font-weight: 400;
+  letter-spacing: -0.08em;
+  line-height: 0.72;
+  user-select: none;
+}
+
+body.not-found-page .not-found-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+}
+
+body.not-found-page .not-found-copy h1 {
+  max-width: 11ch;
+  margin: 0;
+  color: var(--v0-cream);
+  font-family: var(--v0-display);
+  font-size: clamp(3.6rem, 6vw, 6.4rem);
+  font-weight: 400;
+  letter-spacing: -0.055em;
+  line-height: 0.93;
+}
+
+body.not-found-page .not-found-copy > p:not(.launch-kicker) {
+  max-width: 58ch;
+  margin: 28px 0 0;
+  color: var(--v0-muted);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+body.not-found-page .not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 38px;
+}
+
+body.not-found-page .not-found-actions .launch-button {
+  min-height: 48px;
+  padding-inline: 20px;
+  border-radius: 4px;
+}
+
+body.not-found-page .not-found-actions .launch-button.primary {
+  border-color: var(--v0-cream);
+  background: var(--v0-cream);
+  color: var(--v0-page);
+}
+
+@media (max-width: 860px) {
+  body.not-found-page .not-found-stage {
+    grid-template-columns: 1fr;
+    gap: 42px;
+    align-items: start;
+  }
+
+  body.not-found-page .not-found-code {
+    font-size: clamp(7rem, 24vw, 11rem);
+  }
+}
+
+@media (max-width: 650px) {
+  body.not-found-page .not-found-main {
+    width: calc(100% - 30px);
+    min-height: calc(100svh - 150px - env(safe-area-inset-bottom));
+    padding: 54px 0 calc(62px + env(safe-area-inset-bottom));
+  }
+
+  body.not-found-page .not-found-stage {
+    gap: 34px;
+    padding: 38px 24px 44px;
+  }
+
+  body.not-found-page .not-found-code {
+    font-size: clamp(6.4rem, 34vw, 9rem);
+  }
+
+  body.not-found-page .not-found-copy h1 {
+    font-size: clamp(2.85rem, 13vw, 4.35rem);
+    line-height: 0.95;
+  }
+
+  body.not-found-page .not-found-copy > p:not(.launch-kicker) {
+    font-size: 0.94rem;
+    line-height: 1.66;
+  }
+
+  body.not-found-page .not-found-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  body.not-found-page .not-found-actions .launch-button {
+    width: 100%;
+    min-height: 50px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.not-found-page *,
+  body.not-found-page *::before,
+  body.not-found-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

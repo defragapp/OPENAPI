@@ -1,0 +1,194 @@
+.launch-wordmark::before {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: url('/brand-mark.svg') center / contain no-repeat;
+  box-shadow: none;
+  color: transparent;
+  content: '';
+}
+
+/* One public visual language: static explainers share the landing's charcoal,
+   paper and clay system instead of presenting as a separate green product. */
+:root {
+  --paper: #11100f;
+  --ink: #f4efe7;
+  --muted: #b9b0a5;
+  --forest: #d78e68;
+  --line: rgba(244, 239, 231, .14);
+}
+
+body.launch-page {
+  background: #11100f;
+  color: #f4efe7;
+}
+
+.launch-nav,
+.launch-footer,
+.launch-section,
+.launch-band {
+  border-color: var(--line);
+}
+
+.launch-kicker,
+.section-label,
+.card-label,
+.launch-summary > span,
+.launch-card > span,
+.use-case-card > span,
+.plan-guidance article > span {
+  color: #d78e68;
+}
+
+.launch-summary,
+.use-case-card,
+.price-card,
+.launch-card,
+.journey-steps article,
+.example-thread article,
+.definition-list > div {
+  border-color: var(--line);
+  background: #191715;
+  color: var(--ink);
+}
+
+.launch-page p,
+.launch-page small,
+.launch-page dd,
+.launch-footer {
+  color: var(--muted);
+}
+
+.launch-button.primary,
+.launch-cta {
+  border-color: #eee6db;
+  background: #eee6db;
+  color: #171412;
+}
+
+.launch-button:not(.primary) {
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.launch-kicker,
+.section-label,
+.card-label,
+.launch-summary > span,
+.launch-card > span,
+.use-case-card > span,
+.plan-guidance article > span {
+  font-size: .75rem;
+}
+
+.launch-summary small,
+.launch-summary > p,
+.journey-steps p,
+.billing-note p,
+.launch-footer {
+  font-size: .9rem;
+}
+
+.launch-button,
+.launch-links a,
+.launch-cta,
+.price-card .launch-button,
+.launch-callout .launch-button {
+  border-radius: 12px;
+}
+
+@media (max-width: 680px) {
+  .launch-nav {
+    align-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 12px;
+  }
+
+  .launch-links {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
+    gap: 6px;
+    padding: 4px 0 0;
+  }
+
+  .launch-links a,
+  .launch-links a:not(.launch-cta) {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: rgba(255, 253, 248, .42);
+    font-size: .84rem;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .launch-links .launch-cta {
+    grid-column: 1 / -1;
+    margin-left: 0;
+    border-color: var(--forest);
+    font-size: .9rem;
+  }
+
+  .launch-button,
+  .launch-callout .launch-button,
+  .price-card .launch-button {
+    min-height: 48px;
+    border-radius: 11px;
+  }
+
+  .launch-kicker,
+  .section-label,
+  .card-label,
+  .launch-summary > span,
+  .launch-card > span,
+  .use-case-card > span,
+  .plan-guidance article > span {
+    font-size: .82rem;
+  }
+
+  .launch-summary small,
+  .launch-summary > p,
+  .journey-steps p,
+  .billing-note p,
+  .launch-footer {
+    font-size: .94rem;
+    line-height: 1.58;
+  }
+
+  .launch-hero { padding-top: 46px; }
+
+  .launch-hero > p,
+  .launch-hero > div > p:not(.launch-kicker) { font-size: 1.04rem; }
+  .launch-section { padding-block: 60px; }
+  .launch-band { padding-block: 62px; }
+}
+
+@media (max-width: 420px) {
+  .launch-shell { width: min(100% - 20px, 1180px); }
+  .launch-links { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+  .launch-links a,
+  .launch-links a:not(.launch-cta) { padding-inline: 4px; font-size: .82rem; }
+}
+
+@media (prefers-contrast: more) {
+  .launch-links a { border-color: rgba(23, 32, 29, .35); }
+}
+
+/* Final public-surface override: earlier launch layers must not restore the light/green shell. */
+html, body.launch-page, .launch-page .launch-shell, .launch-page .launch-nav {
+  background: #11100f !important;
+  color: #f4efe7;
+}
+.launch-page .launch-nav { border-bottom: 1px solid var(--line); }
+.launch-page a:focus-visible, .launch-page summary:focus-visible {
+  outline: 2px solid #f0ad87;
+  outline-offset: 4px;
+}
+.launch-page p, .launch-page li, .launch-page dd { font-size: max(1rem, 16px); }

@@ -11,20 +11,20 @@ import { installDialogAccessibility } from './dialog-accessibility';
 import { installPrivateAnswerExportRuntime } from './PrivateAnswerExportRuntime';
 import { installProductionReadinessRuntime } from './production-readiness-runtime';
 import { installProductionRuntime } from './ProductionRuntime';
-import { PublicLanding } from './PublicLanding';
-import { PublicHowItWorks } from './PublicHowItWorks';
-import { PublicPricing } from './PublicPricing';
-import { PublicFAQ } from './PublicFAQ';
-import { installPublicLandingViewportContract } from './PublicLandingViewportContract';
+import PublicLanding from './PublicLanding';
+import PublicHowItWorks from './PublicHowItWorks';
+import PublicPricing from './PublicPricing';
+import PublicFAQ from './PublicFAQ';
 import { installPublicRouteAuthorityRuntime } from './PublicRouteAuthorityRuntime';
-import { PublicPolicy } from './PublicPolicy';
-import { PublicPolicyMetadata } from './PublicPolicyMetadata';
+import { PrivacyPolicy, TermsOfService } from './PublicPolicy';
 import { installReleaseInteractionRuntime } from './release-interaction-runtime';
 import { installSafetyResponseRuntime } from './SafetyResponseRuntime';
 import { installV0ReleaseFingerprint } from './v0-release-fingerprint';
 import { PowderDemo } from './PowderDemo';
 
-/* Canonical visual system */
+/* Template design system (MindWave-based) */
+import './template-design.css';
+/* Legacy visual system — retained for authenticated workspace */
 import './design-system.css';
 import './public.css';
 import './workspace.css';
@@ -42,6 +42,7 @@ installEmailCodeFallbackRuntime();
 installBaselineInputRuntime();
 installPublicRouteAuthorityRuntime();
 installDialogAccessibility();
+
 installPrivateAnswerExportRuntime();
 installSafetyResponseRuntime();
 
@@ -134,7 +135,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         : isPublicHome
         ? <PublicLanding />
         : publicPolicyKind
-          ? <><PublicPolicyMetadata kind={publicPolicyKind} /><PublicPolicy kind={publicPolicyKind} /></>
+          ? (publicPolicyKind === 'privacy' ? <PrivacyPolicy /> : <TermsOfService />)
           : isStaticPublicPage
             ? (location.pathname === '/how-it-works' ? <PublicHowItWorks /> : location.pathname === '/pricing' ? <PublicPricing /> : <PublicFAQ />)
             : isAuthenticatedWorkspace
@@ -143,5 +144,3 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </AppErrorBoundary>
   </React.StrictMode>
 );
-
-installPublicLandingViewportContract();

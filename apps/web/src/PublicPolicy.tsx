@@ -1,96 +1,120 @@
-import { BrandMark } from './BrandMark';
-import { POLICY_METADATA, PRIVACY_SECTIONS, TERMS_SECTIONS } from '../../../config/policies';
+import { useEffect, useState } from 'react';
+import './template-design.css';
 
-type PolicyKind = 'privacy' | 'terms';
+const NAV_LINKS = [
+  { href: '/', label: 'Home' },
+  { href: '/how-it-works', label: 'How it works' },
+  { href: '/pricing', label: 'Pricing' },
+];
 
-export function PublicPolicy({ kind }: { kind: PolicyKind }) {
-  const privacy = kind === 'privacy';
-  const sections = privacy ? PRIVACY_SECTIONS : TERMS_SECTIONS;
-  const metadata = POLICY_METADATA[kind];
+const FOOTER_LINKS = [
+  { href: '/privacy', label: 'Privacy' },
+  { href: '/terms', label: 'Terms' },
+  { href: '/', label: 'Home' },
+  { href: 'mailto:info@sovereign.defrag.app', label: 'Contact' },
+];
+
+interface PolicyProps {
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+}
+
+export function PolicyPage({ title, subtitle, children }: PolicyProps) {
+  const [releaseSha, setReleaseSha] = useState<string | null>(null);
+
+  useEffect(() => {
+    document.title = `${title} — Sovereign.OS`;
+    fetch('/ready', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => j?.sha && setReleaseSha(j.sha))
+      .catch(() => {});
+  }, [title]);
 
   return (
-    <main
-      className="sovereign-policy public-approved-v8 public-secondary-page"
-      data-secondary-visual-contract="founder-v0-locked-v1"
-      data-visual-system="framer-template"
-      data-policy-version={metadata.version}
-    >
-      <header className="v0-nav">
-        <div className="v0-shell v0-nav-inner">
-          <a className="v0-wordmark v0-wordmark--desktop" href="/" aria-label="Sovereign.OS home"><BrandMark /></a>
-          <a className="v0-wordmark v0-wordmark--mobile" href="/" aria-label="Sovereign.OS home"><BrandMark /></a>
-          <nav aria-label="Public navigation">
-            <a href="/how-it-works">How it works</a>
-            <a href="/pricing">Pricing</a>
-            <a href="/faq">FAQ</a>
-          </nav>
-          <div className="v0-nav-actions">
-            <a className="v0-sign-in" href="/login">Sign in</a>
-            <a className="landing-control landing-control--nav" href="/signup">Get started <span aria-hidden="true">→</span></a>
-            <details className="v0-mobile-menu">
-              <summary aria-label="Open navigation"><PolicyMenuIcon /></summary>
-              <nav className="v0-mobile-menu__panel" style={{ display: 'grid' }} aria-label="Mobile navigation">
-                <a href="/how-it-works">How it works</a>
-                <a href="/pricing">Pricing</a>
-                <a href="/faq">FAQ</a>
-                <a href="/login">Sign in</a>
-                <a href="/signup">Get started</a>
-              </nav>
-            </details>
+    <div data-page="policy" data-visual-system="sovereign-template" data-release-sha={releaseSha ?? ''}>
+      <nav className="td-nav">
+        <div className="td-shell td-nav-inner">
+          <a href="/" className="td-wordmark">SOVEREIGN.OS</a>
+          <div className="td-nav-links">
+            {NAV_LINKS.map((l) => (
+              <a key={l.href} href={l.href}>{l.label}</a>
+            ))}
           </div>
+          <div className="td-nav-actions">
+            <a href="https://app.defrag.app/login" className="td-nav-signin">Sign in</a>
+            <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
+          </div>
+          <details className="td-mobile-menu">
+            <summary aria-label="Open menu"><span className="td-mobile-menu-icon" /></summary>
+            <div className="td-mobile-menu-panel">
+              {NAV_LINKS.map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
+              <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Enter Sovereign.OS</a>
+            </div>
+          </details>
         </div>
+      </nav>
+
+      <header className="td-hero td-shell">
+        <p className="td-hero-kicker">Legal</p>
+        <h1 className="td-hero-title">{title}</h1>
+        <p className="td-hero-subtitle">{subtitle}</p>
       </header>
 
-      <section className="policy-hero">
-        <p className="policy-kicker"><span />{privacy ? 'PRIVACY' : 'TERMS'}</p>
-        <h1>{privacy ? 'How Sovereign.OS handles your information.' : 'Terms for using Sovereign.OS.'}</h1>
-        <p>
-          {privacy
-            ? 'This page explains what the product collects, what reaches the language model, how long information is kept, which service providers are involved, and the choices you control.'
-            : 'These terms explain the product’s interpretive limits, account and billing rules, consent requirements, and where your own judgment remains essential.'}
-        </p>
-        <p className="policy-effective">Effective {metadata.effectiveDate} · Version {metadata.version}</p>
-      </section>
-
-      <section className="policy-grid prose prose-invert max-w-none" aria-label={privacy ? 'Privacy details' : 'Terms details'}>
-        {sections.map((section, index) => (
-          <article key={section.title}>
-            <span>{String(index + 1).padStart(2, '0')}</span>
-            <div><h2>{section.title}</h2><p>{section.copy}</p></div>
-          </article>
-        ))}
-      </section>
-
-      <section className="policy-contact">
-        <div>
-          <p className="policy-kicker"><span />QUESTIONS OR REQUESTS</p>
-          <h2>Talk to a person.</h2>
-          <p>Send privacy requests, account questions, billing concerns, public inquiries, or safety feedback to <a href="mailto:info@sovereign.defrag.app">Sovereign.OS</a>.</p>
+      <section className="td-section td-shell">
+        <div style={{ maxWidth: '70ch', fontSize: '0.95rem', lineHeight: 1.7, color: 'var(--td-ink-soft)' }}>
+          {children}
         </div>
-        <a className="landing-control" href="mailto:info@sovereign.defrag.app">Email Sovereign.OS <span aria-hidden="true">→</span></a>
       </section>
 
-      <footer className="v0-footer">
-        <div className="v0-shell">
-          <a href="/" className="v0-wordmark" aria-label="Sovereign.OS home"><BrandMark /></a>
-          <nav aria-label="Footer navigation">
-            <a aria-current={privacy ? 'page' : undefined} href="/privacy">Privacy</a>
-            <a aria-current={!privacy ? 'page' : undefined} href="/terms">Terms</a>
-            <a href="/pricing">Pricing</a>
-            <a href="/faq">FAQ</a>
-            <a href="mailto:info@sovereign.defrag.app">Contact</a>
-          </nav>
-          <p>© 2026 Sovereign.OS</p>
+      <footer className="td-footer" style={{ marginTop: 'clamp(60px, 8vw, 100px)' }}>
+        <div className="td-shell td-footer-inner">
+          <a href="/" className="td-footer-wordmark">SOVEREIGN.OS</a>
+          <div className="td-footer-links">
+            {FOOTER_LINKS.map((l) => (
+              <a key={l.href} href={l.href}>{l.label}</a>
+            ))}
+          </div>
+          <p className="td-footer-copy">© {new Date().getFullYear()} Sovereign.OS</p>
         </div>
       </footer>
-    </main>
+    </div>
   );
 }
 
-function PolicyMenuIcon() {
+
+export function PrivacyPolicy() {
   return (
-    <svg className="v0-mobile-menu__icon" viewBox="0 0 32 24" aria-hidden="true" focusable="false">
-      <path d="M1 2h30M1 12h30M1 22h30" />
-    </svg>
+    <PolicyPage title="Privacy Policy" subtitle="How we handle your data.">
+      <h2 style={{ fontFamily: 'var(--td-display)', fontSize: '1.4rem', marginBottom: 16 }}>Your data is yours.</h2>
+      <p style={{ marginBottom: 16 }}>Sovereign.OS builds a private Baseline from what you choose to share. Your data is account-owned, generated on demand, and never retained as an export artifact.</p>
+      <h2 style={{ fontFamily: 'var(--td-display)', fontSize: '1.4rem', margin: '32px 0 16px' }}>What we collect</h2>
+      <p style={{ marginBottom: 16 }}>We collect only what you provide through the platform — your questions, your Baseline inputs, and your account credentials (passkey-based, no passwords).</p>
+      <h2 style={{ fontFamily: 'var(--td-display)', fontSize: '1.4rem', margin: '32px 0 16px' }}>How we use it</h2>
+      <p style={{ marginBottom: 16 }}>Your data is used solely to provide the Sovereign experience. We do not sell your data. We do not use it to train third-party models.</p>
+      <h2 style={{ fontFamily: 'var(--td-display)', fontSize: '1.4rem', margin: '32px 0 16px' }}>Your rights</h2>
+      <p style={{ marginBottom: 16 }}>You can export your Baseline at any time. You can delete your account and all associated data.</p>
+      <h2 style={{ fontFamily: 'var(--td-display)', fontSize: '1.4rem', margin: '32px 0 16px' }}>Contact</h2>
+      <p>For privacy inquiries, contact support@sovereign.defrag.app.</p>
+    </PolicyPage>
   );
 }
+
+export function TermsOfService() {
+  return (
+    <PolicyPage title="Terms of Service" subtitle="The rules for using Sovereign.OS.">
+      <h2 style={{ fontFamily: 'var(--td-display)', fontSize: '1.4rem', marginBottom: 16 }}>Use of the platform</h2>
+      <p style={{ marginBottom: 16 }}>Sovereign.OS is a private AI platform. You must be 18 or older to use it. You are responsible for maintaining the security of your account.</p>
+      <h2 style={{ fontFamily: 'var(--td-display)', fontSize: '1.4rem', margin: '32px 0 16px' }}>What Sovereign is not</h2>
+      <p style={{ marginBottom: 16 }}>Sovereign does not diagnose, assign hidden motives, claim exact emotions, or present interpretation as deterministic proof.</p>
+      <h2 style={{ fontFamily: 'var(--td-display)', fontSize: '1.4rem', margin: '32px 0 16px' }}>Your content</h2>
+      <p style={{ marginBottom: 16 }}>You retain ownership of your content. Sovereign processes it only to provide the service.</p>
+      <h2 style={{ fontFamily: 'var(--td-display)', fontSize: '1.4rem', margin: '32px 0 16px' }}>Account termination</h2>
+      <p style={{ marginBottom: 16 }}>You may delete your account at any time. We may terminate accounts that violate these terms.</p>
+      <h2 style={{ fontFamily: 'var(--td-display)', fontSize: '1.4rem', margin: '32px 0 16px' }}>Contact</h2>
+      <p>For legal inquiries, contact support@sovereign.defrag.app.</p>
+    </PolicyPage>
+  );
+}
+
+export default PolicyPage;
