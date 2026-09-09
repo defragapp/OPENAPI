@@ -353,3 +353,97 @@ body.launch-page[data-visual-system="framer-template"] .launch-footer-inner a:ho
     transition-duration: 0.01ms !important;
   }
 }
+/* ==========================================================================
+   MindWave global visual standard — standalone 404 surface (terminal)
+   Owner-approved global visual authority (docs/mindwave-global-visual-contract.md).
+   The 404 is rendered on the light MindWave system, replacing the founder
+   dark treatment, with restored founder-v0 markers preserved as provenance.
+   ========================================================================== */
+
+body.launch-page.not-found-page {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(125, 139, 122, 0.10), transparent 32rem),
+    radial-gradient(circle at 85% 92%, rgba(125, 139, 122, 0.07), transparent 30rem),
+    #f7f5f1 !important;
+  color: #1c1a17 !important;
+}
+
+body.launch-page.not-found-page .launch-nav,
+body.launch-page.not-found-page .launch-nav-inner {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-bottom: 1px solid rgba(28, 26, 23, 0.10) !important;
+}
+
+body.launch-page.not-found-page .launch-wordmark,
+body.launch-page.not-found-page .launch-footer-wordmark {
+  color: #1c1a17 !important;
+  letter-spacing: 0.14em;
+}
+
+body.launch-page.not-found-page .launch-links a,
+body.launch-page.not-found-page .launch-footer-inner a {
+  color: #6b645b !important;
+}
+
+body.launch-page.not-found-page .launch-links a:hover,
+body.launch-page.not-found-page .launch-footer-inner a:hover {
+  color: #1c1a17 !important;
+}
+
+body.launch-page.not-found-page .launch-sign-in {
+  color: #1c1a17 !important;
+  border: 1px solid rgba(28, 26, 23, 0.22) !important;
+  border-radius: 999px !important;
+  padding-inline: 18px !important;
+}
+
+body.launch-page.not-found-page .launch-cta,
+body.launch-page.not-found-page .launch-button {
+  background: #1c1a17 !important;
+  border: 1px solid #1c1a17 !important;
+  border-radius: 999px !important;
+  color: #f7f5f1 !important;
+  padding-inline: 20px !important;
+  box-shadow: 0 8px 24px rgba(28, 26, 23, 0.08) !important;
+}
+
+body.launch-page.not-found-page .launch-mobile-menu summary {
+  color: #1c1a17 !important;
+}
+
+body.launch-page.not-found-page .launch-mobile-menu-panel {
+  background: #ffffff !important;
+  border: 1px solid rgba(28, 26, 23, 0.10) !important;
+}
+
+body.launch-page.not-found-page .launch-mobile-menu-panel a {
+  color: #1c1a17 !important;
+  border-bottom-color: rgba(28, 26, 23, 0.08) !important;
+}
+
+body.launch-page.not-found-page .not-found-code {
+  color: #a39b8f !important;
+}
+
+body.launch-page.not-found-page .launch-kicker {
+  color: #7d8b7a !important;
+}
+
+body.launch-page.not-found-page h1 {
+  color: #1c1a17 !important;
+  letter-spacing: -0.02em;
+}
+
+body.launch-page.not-found-page .not-found-copy p {
+  color: #6b645b !important;
+}
+
+body.launch-page.not-found-page .launch-footer-inner {
+  border-top: 1px solid rgba(28, 26, 23, 0.10) !important;
+  background: transparent !important;
+  color: #6b645b !important;
+}
+
+body.launch-page.not-found-page .launch-footer-inner p {
+  color: #a39b8f !important;
+}
