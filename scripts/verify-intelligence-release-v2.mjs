@@ -34,9 +34,8 @@ for (const retiredRead of retiredCssReads) {
 const main = readFileSync(resolve('apps/web/src/main.tsx'), 'utf8');
 const publicCss = readFileSync(resolve('apps/web/src/public.css'), 'utf8');
 const designSystemCss = readFileSync(resolve('apps/web/src/design-system.css'), 'utf8');
+const templateDesignCss = readFileSync(resolve('apps/web/src/template-design.css'), 'utf8');
 const landing = readFileSync(resolve('apps/web/src/PublicLanding.tsx'), 'utf8');
-const stories = readFileSync(resolve('apps/web/src/LandingProductStories.tsx'), 'utf8');
-const field = readFileSync(resolve('apps/web/src/expression-field/LandingExpressionSlice.tsx'), 'utf8');
 
 const routeCohesionImport = "import './deployed-route-cohesion.css';";
 const passkeyImport = "import './passkey-auth.css';";
@@ -350,6 +349,10 @@ for (const marker of ['--font-title:', '--font-body:', ':root']) {
 
 for (const marker of ['.v0-landing-port', '.v0-hero', '.public-approved-v8']) {
   if (!publicCss.includes(marker)) throw new Error(`Public CSS is missing landing component: ${marker}`);
+}
+
+for (const marker of ['.td-shell', '.td-hero', '.td-card', '.td-nav', '.td-cta', '.td-footer']) {
+  if (!templateDesignCss.includes(marker)) throw new Error(`Template design CSS is missing component: ${marker}`);
 }
 
 console.log('Intelligence release v2: canonical CSS architecture verified.');

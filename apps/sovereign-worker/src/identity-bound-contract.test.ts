@@ -9,8 +9,8 @@ const runtimeEntry = readFileSync(new URL('./runtime-entry.ts', import.meta.url)
 const migration = readFileSync(new URL('../migrations/0008_identity_bound_invitations.sql', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../../web/src/App.tsx', import.meta.url), 'utf8');
 const workspace = readFileSync(new URL('../../web/src/SovereignIntelligenceWorkspace.tsx', import.meta.url), 'utf8');
-const consentPage = readFileSync(new URL('../../web/public/consent.html', import.meta.url), 'utf8');
-const consentRuntime = readFileSync(new URL('../../web/public/consent.js', import.meta.url), 'utf8');
+const consentPage = readFileSync(new URL('../../web/public/legacy/consent.html', import.meta.url), 'utf8');
+const consentRuntime = readFileSync(new URL('../../web/public/legacy/consent.js', import.meta.url), 'utf8');
 const wrangler = readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8');
 const conversationContext = readFileSync(new URL('./conversation-context.ts', import.meta.url), 'utf8');
 

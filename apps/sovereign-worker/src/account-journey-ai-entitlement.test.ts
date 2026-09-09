@@ -12,7 +12,7 @@ const d1Session = read('./d1-session.ts');
 const product = read('./db/product.ts');
 const index = read('./index.ts');
 const verifiedPlan = read('../../web/src/VerifiedPlanStatus.tsx');
-const publicSupport = read('../../web/src/PublicSupport.test.ts');
+const publicSupport = read('../../web/src/legacy/PublicSupport.test.ts');
 
 describe('account journey AI, Baseline, and Stripe tiering release chain', () => {
   it('uses the one supported Cloudflare Workers AI path and stable answer contract', () => {

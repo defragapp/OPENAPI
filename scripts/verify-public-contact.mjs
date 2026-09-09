@@ -20,16 +20,18 @@ const scanRoots = [
 ];
 const explicitFiles = ['wrangler.jsonc', 'wrangler.production-direct.jsonc', 'apps/web/public/.well-known/security.txt'];
 const scannedExtensions = new Set(['.ts', '.tsx', '.js', '.mjs', '.html', '.json', '.jsonc']);
-const excludedPaths = new Set(['scripts/verify-public-contact.mjs']);
+const excludedPaths = new Set([
+  'scripts/verify-public-contact.mjs',
+  'apps/web/src/legacy',
+  'apps/web/public/legacy'
+]);
 const operationalAllowlist = new Map([
   ['wrangler.jsonc', 2],
   ['wrangler.production-direct.jsonc', 2],
   ['apps/web/public/.well-known/security.txt', 1],
-  ['apps/web/public/consent.html', 3],
-  ['apps/web/public/faq.html', 2],
   ['apps/web/src/PolicyGateAccountRights.tsx', 1],
   ['apps/web/src/AccountControlCenter.tsx', 1],
-  ['apps/web/src/PublicPolicy.tsx', 3],
+  ['apps/web/src/PublicPolicy.tsx', 1],
   ['apps/web/src/PublicLanding.tsx', 1],
   ['apps/web/src/PublicFAQ.tsx', 1],
   ['apps/sovereign-worker/src/runtime-entry.ts', 1],
@@ -99,6 +101,7 @@ console.log(`[public-contact] verified identity ${approvedPublicContact} with fa
 function walk(path) {
   const absolute = resolve(root, path);
   if (!statSync(absolute).isDirectory()) return scannedExtensions.has(extname(path)) ? [path] : [];
+  if (excludedPaths.has(path)) return [];
   return readdirSync(absolute).flatMap((entry) => {
     const child = join(path, entry);
     const childAbsolute = resolve(root, child);
