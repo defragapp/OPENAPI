@@ -11,22 +11,22 @@ export function PillBadge({ children, className = '', variant = 'default', ...pr
     switch (variant) {
       case 'active':
         return {
-          backgroundColor: 'rgba(255, 255, 255, 0.15)',
-          color: '#ffffff',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
+          backgroundColor: 'var(--mw-cta, #1c1a17)',
+          color: 'var(--mw-cta-ink, #f7f5f1)',
+          border: '1px solid var(--mw-cta, #1c1a17)',
         };
       case 'powder':
         return {
-          backgroundColor: 'rgba(212, 163, 115, 0.15)',
-          color: '#ffffff',
-          border: '1px solid #d4a373',
+          backgroundColor: 'var(--mw-chip, #e9e2d6)',
+          color: 'var(--mw-ink, #1c1a17)',
+          border: '1px solid var(--mw-line, rgba(28,26,23,.10))',
         };
       case 'default':
       default:
         return {
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-          color: 'rgba(255, 255, 255, 0.7)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          backgroundColor: 'var(--mw-card-tint, #fbf9f6)',
+          color: 'var(--mw-muted, #6b645b)',
+          border: '1px solid var(--mw-line, rgba(28,26,23,.10))',
         };
     }
   };

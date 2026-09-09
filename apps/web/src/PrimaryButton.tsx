@@ -24,23 +24,22 @@ export function PrimaryButton({
     switch (variant) {
       case 'powder':
         return {
-          backgroundColor: '#d4a373',
-          color: '#0a0a0a',
-          border: '1px solid #d4a373',
+          backgroundColor: 'var(--mw-chip, #e9e2d6)',
+          color: 'var(--mw-ink, #1c1a17)',
+          border: '1px solid var(--mw-line, rgba(28,26,23,.10))',
         };
       case 'glass':
         return {
-          backgroundColor: 'rgba(255, 255, 255, 0.08)',
-          color: '#ffffff',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          backdropFilter: 'blur(8px)',
+          backgroundColor: 'transparent',
+          color: 'var(--mw-ink, #1c1a17)',
+          border: '1px solid var(--mw-line-strong, rgba(28,26,23,.18))',
         };
       case 'primary':
       default:
         return {
-          backgroundColor: '#ffffff',
-          color: '#0a0a0a',
-          border: '1px solid #ffffff',
+          backgroundColor: 'var(--mw-cta, #1c1a17)',
+          color: 'var(--mw-cta-ink, #f7f5f1)',
+          border: '1px solid var(--mw-cta, #1c1a17)',
         };
     }
   };

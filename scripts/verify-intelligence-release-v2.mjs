@@ -353,11 +353,11 @@ for (const marker of ['.v0-landing-port', '.v0-hero', '.public-approved-v8']) {
   if (!publicCss.includes(marker)) throw new Error(`Public CSS is missing landing component: ${marker}`);
 }
 
-for (const marker of ['data-visual-system="framer-template"']) {
-  if (!indexHtml.includes(marker)) throw new Error(`Intelligence release v2 is missing founder visual contract marker: ${marker}`);
+for (const marker of ['data-visual-system="mindwave"']) {
+  if (!indexHtml.includes(marker)) throw new Error(`Intelligence release v2 is missing MindWave global visual marker: ${marker}`);
 }
-for (const marker of ['data-visual-contract=\"v0-landing-selective-port\"', 'data-visual-system=\"framer-template\"']) {
-  if (!landing.includes(marker)) throw new Error(`Intelligence release v2 is missing founder visual contract marker in PublicLanding: ${marker}`);
+for (const marker of ['data-visual-contract=\"mindwave-global\"', 'data-visual-system=\"mindwave\"']) {
+  if (!landing.includes(marker)) throw new Error(`Intelligence release v2 is missing MindWave global visual marker in PublicLanding: ${marker}`);
 }
 
 console.log('Intelligence release v2: canonical CSS architecture verified.');

@@ -25,10 +25,15 @@ These instructions apply to the entire OPENAPI repository.
 - Extend canonical components and contracts in place. Do not create duplicate workspaces, alternative landing implementations, second agents, or disconnected product shells.
 
 ## Founder v0 visual-port contract
-- Read `docs/v0-visual-port-contract.md` before changing any public, workspace, account, onboarding, policy, or visual release surface.
-- The supplied founder v0 archive is the component and visual authority for the public landing and the visual language applied sitewide.
-- Preserve the exact founder hero `Healing isn’t optional. Holding onto the pain is.` and the approved self → people → systems narrative; do not introduce a competing product story.
-- Port visual components and styling only. Never import the archive’s mock auth, localStorage users, canned or random answers, dashboard state, fake billing, fake consent, or fake account behavior.
+
+- `docs/mindwave-global-visual-contract.md` (owner-approved 2026-09-09) is now
+  the active global visual authority: MindWave light/calming tokens, layout,
+  cards, nav, footer, buttons, pills, FAQ, pricing, motion — applied to every
+  page/surface. All routes set `data-visual-system="mindwave"`.
+- Historical founder v0 archive references remain provenance only; do not
+  enforce near-black/cream, warm-metal accent, or founder-hero geometry as a
+  regression against MindWave surfaces.
+- Port visual components and styling only. Never import the archive's mock auth, localStorage users, canned or random answers, dashboard state, fake billing, fake consent, or fake account behavior.
 - Preserve the real OPENAPI routes, APIs, authentication, billing, consent, Baseline contracts, one-room workspace, and `sovereign-answer.v2`.
 - The authenticated launch is text-first. The landing demo-chat visual logic may inform the real thread hierarchy, but do not introduce a required video/media-generation workflow.
 - Preserve the certified local CSS import order in `apps/web/src/main.tsx`; no local component stylesheet may load after `passkey-auth.css`.
@@ -38,7 +43,7 @@ These instructions apply to the entire OPENAPI repository.
 - Do not freeze or replace a founder visual reference while a known documentation-to-render contradiction remains unresolved. Inspect actual desktop and mobile production renders first.
 - Release, deployment, copy, verifier, navigation, and infrastructure work must not redefine the visual system as a side effect. A non-visual task may repair a visual defect only when the defect is directly evidenced and the smallest coherent visual change is made.
 - Do not replace the near-black/cream founder system with a white/light shell, generic enterprise SaaS styling, dashboard/card-grid composition, neon/glassmorphism chrome, or a new design language during release hardening.
-- Changes to `apps/web/src/design-system.css`, `apps/web/src/public.css`, `apps/web/src/workspace.css`, `apps/web/src/app-shell.css`, `apps/web/src/passkey-auth.css`, or `apps/web/public/premium-action-static-v1.css` must preserve the founder visual language, receive focused regression coverage, and remain subject to #214 desktop+iPhone human visual acceptance.
+- Changes to `apps/web/src/design-system.css`, `apps/web/src/public.css`, `apps/web/src/workspace.css`, `apps/web/src/app-shell.css`, `apps/web/src/passkey-auth.css`, or `apps/web/public/premium-action-static-v1.css` must implement the MindWave global contract (`docs/mindwave-global-visual-contract.md`), receive focused regression coverage, and remain subject to #214 desktop+iPhone human visual acceptance.
 
 ## Product definition
 - Sovereign.OS is Baseline-first. The product must be useful before the user explains an incident.

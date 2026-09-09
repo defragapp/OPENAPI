@@ -132,7 +132,7 @@ function PricingSection({ children, className, id, ariaLabelledBy }: { children:
 
 export function PublicPricing() {
   return (
-    <main className="pricing-page public-page" data-visual-contract="founder-v0-static" data-visual-system="framer-template" data-route-cohesion="v1">
+    <main className="pricing-page public-page mindwave-page" data-visual-contract="mindwave-global" data-visual-system="mindwave" data-route-cohesion="v1">
       <header className="public-nav">
         <div className="public-nav-inner">
           <a className="public-wordmark" href="/" aria-label="Sovereign.OS home">

@@ -370,3 +370,60 @@ body:has(.account-shell) {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ── MindWave global standard (owner-approved 2026-09-09; terminal sheet) ── */
+
+.mindwave-page,
+.public-page,
+.sovereign-app-runtime,
+.account-shell,
+.sovereign-policy,
+.public-not-found {
+  background: var(--mw-page, #f7f5f1);
+  color: var(--mw-ink, #1c1a17);
+}
+
+.mindwave-page :is(h1, h2, h3),
+.public-page :is(h1, h2, h3),
+.sovereign-policy :is(h1, h2, h3) {
+  color: var(--mw-ink, #1c1a17);
+  letter-spacing: -0.02em;
+}
+
+.mindwave-page :is(p, li),
+.public-page :is(p, li) {
+  color: var(--mw-muted, #6b645b);
+}
+
+.mindwave-page section {
+  padding-block: clamp(var(--mw-section-mobile, 72px), 8vw, var(--mw-section, 112px));
+}
+
+.mindwave-page .glass-card,
+.mindwave-page .v0-comparison-panel,
+.public-page .glass-card {
+  background: var(--mw-card, #ffffff);
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10));
+  border-radius: var(--mw-radius-card, 24px);
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08));
+  color: var(--mw-ink, #1c1a17);
+}
+
+.mindwave-page .primary-button,
+.public-page .primary-button {
+  background: var(--mw-cta, #1c1a17);
+  border: 1px solid var(--mw-cta, #1c1a17);
+  border-radius: 999px;
+  color: var(--mw-cta-ink, #f7f5f1);
+}
+
+.auth-panel,
+.passkey-manager,
+.account-card,
+.account-panel {
+  background: var(--mw-card, #ffffff) !important;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  border-radius: var(--mw-radius-card, 24px) !important;
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08)) !important;
+  color: var(--mw-ink, #1c1a17) !important;
+}

@@ -10,9 +10,9 @@ export function PublicPolicy({ kind }: { kind: PolicyKind }) {
 
   return (
     <main
-      className="sovereign-policy public-approved-v8 public-secondary-page"
-      data-secondary-visual-contract="founder-v0-locked-v1"
-      data-visual-system="framer-template"
+      className="sovereign-policy public-approved-v8 public-secondary-page mindwave-page"
+      data-secondary-visual-contract="mindwave-global"
+      data-visual-system="mindwave"
       data-policy-version={metadata.version}
     >
       <header className="v0-nav">

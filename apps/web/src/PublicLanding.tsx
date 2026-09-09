@@ -80,11 +80,11 @@ void RELEASE_COPY_MARKERS;
 export function PublicLanding() {
   return (
     <main
-      className="sovereign-landing v0-landing-port v0-single-example-landing public-approved-v8"
+      className="sovereign-landing v0-landing-port v0-single-example-landing public-approved-v8 mindwave-page"
       data-product-contract="baseline-first"
       data-answer-contract="sovereign-answer.v2"
-      data-visual-contract="v0-landing-selective-port"
-      data-visual-system="framer-template"
+      data-visual-contract="mindwave-global"
+      data-visual-system="mindwave"
       data-v0-archive-sha={V0_ARCHIVE_SHA}
       data-viewport-contract="v0-public-landing-v3"
       data-layout-release="high-value-intelligence-v1"

@@ -6,7 +6,7 @@
 /* ── tokens ── */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   --sov-page: #0d0d0e;
   --sov-panel: #151516;
   --sov-raised: #1c1c1e;
@@ -144,6 +144,33 @@
   --sov-motion-expansion: 480ms;
   --sov-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --production-nav-height: 80px;
+  /* ── MindWave global visual standard (owner-approved 2026-09-09) ── */
+  --mw-page: #f7f5f1;
+  --mw-page-alt: #ffffff;
+  --mw-card: #ffffff;
+  --mw-card-tint: #fbf9f6;
+  --mw-ink: #1c1a17;
+  --mw-muted: #6b645b;
+  --mw-faint: #a39b8f;
+  --mw-line: rgba(28,26,23,.10);
+  --mw-line-strong: rgba(28,26,23,.18);
+  --mw-cta: #1c1a17;
+  --mw-cta-ink: #f7f5f1;
+  --mw-chip: #e9e2d6;
+  --mw-sage: #7d8b7a;
+  --mw-shadow: 0 20px 50px rgba(28,26,23,.08);
+  --mw-radius-card: 24px;
+  --mw-radius-input: 16px;
+  --mw-container: 1200px;
+  --mw-section: 112px;
+  --mw-section-mobile: 72px;
+}
+
+/* MindWave global scope: every surface renders on the light calming system. */
+body,
+[data-visual-system="mindwave"] {
+  background: var(--mw-page);
+  color: var(--mw-ink);
 }
 
 @media (max-width: 900px) {

@@ -74,7 +74,7 @@ function Section({ children, className }: { children: ReactNode; className?: str
 
 export function PublicHowItWorks() {
   return (
-    <main className="how-page public-page powder-theme" data-visual-contract="founder-v0-static" data-visual-system="framer-template" data-route-cohesion="v1">
+    <main className="how-page public-page powder-theme mindwave-page" data-visual-contract="mindwave-global" data-visual-system="mindwave" data-route-cohesion="v1">
       <header className="public-nav">
         <div className="public-nav-inner">
           <a className="public-wordmark" href="/" aria-label="Sovereign.OS home">

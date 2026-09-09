@@ -8,14 +8,15 @@ export interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
 export function GlassCard({ children, className = '', ...props }: GlassCardProps) {
   return (
     <div
-      className={`glass-card ${className}`.trim()}
+      className={`glass-card mindwave-card ${className}`.trim()}
+      data-visual-system="mindwave"
       style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '16px',
-        padding: '24px',
+        backgroundColor: 'var(--mw-card, #ffffff)',
+        border: '1px solid var(--mw-line, rgba(28,26,23,.10))',
+        borderRadius: 'var(--mw-radius-card, 24px)',
+        padding: '32px',
+        boxShadow: 'var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08))',
+        color: 'var(--mw-ink, #1c1a17)',
         ...props.style,
       }}
       {...props}
