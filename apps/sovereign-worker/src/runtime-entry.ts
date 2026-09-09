@@ -61,7 +61,7 @@ const LATEST_MIGRATION_VERSION = '0019_deprecate_manual_capacity';
 const LATEST_MIGRATION_FILENAME = '0019_deprecate_manual_capacity.sql';
 const LEGACY_HEALTH_METADATA_COMPATIBILITY = "migrationVersion: '0015_release_evidence' · latestMigrationVersion: '0016_policy_acceptance_receipts'";
 const VISUAL_ARCHIVE_SHA256 = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
-const VISUAL_SEQUENCE_FINGERPRINT = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${VISUAL_ARCHIVE_SHA256}`;
+const VISUAL_SEQUENCE_FINGERPRINT = `mindwave-global-v1|personal-intelligence-for-real-life|why-sovereign|self-between-whole|how-sovereign-works|the-intelligence|feature-grid|testimonials|faq-accordion|archive:${VISUAL_ARCHIVE_SHA256}`;
 const PUBLIC_PATHS = new Set([
   '/privacy',
   '/terms',
@@ -488,8 +488,8 @@ async function healthResponse(pathname: string, env: Env): Promise<Response> {
       answerContract: 'sovereign-answer.v2',
       baselineContract: 'baseline-source.v1+baseline-facets.v1',
       visualRelease: {
-        contract: 'v0-public-landing-v3',
-        field: 'landing-expression-field-v3',
+        contract: 'mindwave-global-v1',
+        field: 'mindwave-landing-v1',
         archiveSha256: VISUAL_ARCHIVE_SHA256,
         sequenceFingerprint: VISUAL_SEQUENCE_FINGERPRINT,
         renderedComparisonRequired: true

@@ -1,10 +1,10 @@
-console.log("Runtime v3 parent domain check bypassed.");
-process.exit(0);
+// Runtime v3 parent domain check — active (MindWave global visual contract).
+// process.exit(0); // bypass removed: visual contract must be enforced
 const publicBase = 'https://sovereign.defrag.app';
 const appBase = 'https://app.defrag.app';
 const expectedMigration = '0019_deprecate_manual_capacity';
 const expectedArchive = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
-const expectedSequence = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${expectedArchive}`;
+const expectedSequence = `mindwave-global-v1|personal-intelligence-for-real-life|why-sovereign|self-between-whole|how-sovereign-works|the-intelligence|feature-grid|testimonials|faq-accordion|archive:${expectedArchive}`;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -44,8 +44,8 @@ function verifyRuntime(label, result, readyExpected) {
   assert(result.json?.dependencies?.privacyAccessControls === 'configured', `${label} privacy access controls are not configured`);
   assert(result.json?.dependencies?.aiCapacityReservations === 'configured', `${label} AI capacity reservations are not configured`);
   assert(result.json?.dependencies?.privateExports === 'on-demand-no-artifact', `${label} private export contract is stale`);
-  assert(result.json?.visualRelease?.contract === 'v0-public-landing-v3', `${label} visual contract is stale`);
-  assert(result.json?.visualRelease?.field === 'landing-expression-field-v3', `${label} expression field contract is stale`);
+  assert(result.json?.visualRelease?.contract === 'mindwave-global-v1', `${label} visual contract is stale`);
+  assert(result.json?.visualRelease?.field === 'mindwave-landing-v1', `${label} expression field contract is stale`);
   assert(result.json?.visualRelease?.archiveSha256 === expectedArchive, `${label} visual archive checksum is stale`);
   assert(result.json?.visualRelease?.sequenceFingerprint === expectedSequence, `${label} visual sequence is stale`);
   assert(result.json?.visualRelease?.renderedComparisonRequired === true, `${label} does not require rendered comparison`);
@@ -177,8 +177,8 @@ console.log(JSON.stringify({
     privateExports: 'on-demand-no-artifact'
   },
   visualRelease: {
-    contract: 'v0-public-landing-v3',
-    field: 'landing-expression-field-v3',
+    contract: 'mindwave-global-v1',
+    field: 'mindwave-landing-v1',
     archiveSha256: expectedArchive,
     sequenceFingerprint: expectedSequence,
     renderedComparisonRequired: true,

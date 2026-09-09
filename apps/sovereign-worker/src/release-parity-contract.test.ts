@@ -28,7 +28,7 @@ const referenceBase64 = readFileSync(
 ).trim();
 
 const archiveSha256 = '6bdea58a769943dce508270c067a4d603816db50f05ab4114a064526601657ba';
-const expectedSequence = `sovereign-founder-v0|healing-isnt-optional|holding-onto-the-pain-is|center-sliced-expression-field|ask-about-your-life|get-an-answer-built-for-you|understand-what-happens-between-you|from-one-person-to-the-whole-system|other-ai-answers-everyone-the-same|your-thoughts-deserve-a-better-place-to-live|archive:${archiveSha256}`;
+const expectedSequence = `mindwave-global-v1|personal-intelligence-for-real-life|why-sovereign|self-between-whole|how-sovereign-works|the-intelligence|feature-grid|testimonials|faq-accordion|archive:${archiveSha256}`;
 const expectedRuntimeSequence = expectedSequence.replace(archiveSha256, '${VISUAL_ARCHIVE_SHA256}');
 const expectedParentVerifierSequence = expectedSequence.replace(archiveSha256, '${expectedArchive}');
 
@@ -66,8 +66,8 @@ describe('production release parity contract', () => {
   });
 
   it('publishes the v3 runtime visual release contract', () => {
-    expect(runtime).toContain("contract: 'v0-public-landing-v3'");
-    expect(runtime).toContain("field: 'landing-expression-field-v3'");
+    expect(runtime).toContain("contract: 'mindwave-global-v1'");
+    expect(runtime).toContain("field: 'mindwave-landing-v1'");
     expect(runtime).toContain('renderedComparisonRequired: true');
     expect(runtime).toContain(expectedRuntimeSequence);
     expect(parentVerifier).toContain(`const expectedArchive = '${archiveSha256}'`);
