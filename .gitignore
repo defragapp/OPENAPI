@@ -27,3 +27,4 @@ scripts/.*.generated.mjs
 # Stakpak session files
 .stakpak/session*
 
+apps/sovereign-worker/.wrangler.production-direct.generated.jsonc
