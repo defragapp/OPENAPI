@@ -523,7 +523,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
   }
 
   return (
-    <div className={`intelligence-workspace glassmorphic-window ${contextOpen ? 'context-open' : ''} ${railCollapsed ? 'rail-collapsed' : ''}`}>
+    <div className={`intelligence-workspace glassmorphic-window mindwave-page ${contextOpen ? 'context-open' : ''} ${railCollapsed ? 'rail-collapsed' : ''}`} data-visual-contract="mindwave-global" data-visual-system="mindwave">
       <aside className="intelligence-sidebar" aria-label="Sovereign navigation">
         <div className="intelligence-sidebar-header">
           <a className="intelligence-brand" href="/app">

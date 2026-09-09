@@ -14,8 +14,8 @@
 
 .intelligence-workspace {
   min-height: 100dvh;
-  background: #080a0d;
-  color: var(--sov-ink);
+  background: var(--mw-page, #f7f5f1);
+  color: var(--mw-ink, #1c1a17);
   font-family: var(--geist-font);
 }
 
@@ -23,14 +23,38 @@
   max-width: 96rem; /* 6xl */
   height: 88vh;
   margin: 2rem auto;
-  border-radius: 1.5rem; /* rounded-3xl */
-  background: rgba(22,22,22,0.92); /* #161616/92 */
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 0 24px rgba(0,0,0,0.25);
+  border-radius: var(--mw-radius-card, 24px);
+  background: var(--mw-card, #ffffff);
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10));
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08));
   overflow: hidden;
   display: grid;
   grid-template-columns: 272px 1fr; /* sidebar + main */
+}
+
+/* MindWave global: authenticated workspace sidebar/topbar/thread on light system. */
+.mindwave-page .intelligence-workspace,
+.mindwave-page.intelligence-workspace {
+  background: var(--mw-page, #f7f5f1);
+  color: var(--mw-ink, #1c1a17);
+}
+
+.mindwave-page .intelligence-sidebar {
+  background: var(--mw-card-tint, #fbf9f6) !important;
+  border-right: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  color: var(--mw-ink, #1c1a17);
+}
+
+.mindwave-page .intelligence-main,
+.mindwave-page .intelligence-scroll {
+  background: var(--mw-page, #f7f5f1);
+  color: var(--mw-ink, #1c1a17);
+}
+
+.mindwave-page .intelligence-topbar {
+  background: var(--mw-card, #ffffff) !important;
+  border-bottom: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  color: var(--mw-ink, #1c1a17);
 }
 
 /* Bronze accent for interactive elements */
@@ -8127,19 +8151,13 @@ body:has(.public-secondary-page) {
    landing, while preserving the real email, passkey, Turnstile, and redeem flow. */
 .account-shell {
   min-height: 100svh;
-  background:
-    radial-gradient(circle at 73% 10%, rgba(47, 147, 255, 0.095), transparent 32rem),
-    linear-gradient(rgba(255, 255, 255, 0.006) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.006) 1px, transparent 1px),
-    #080a0d !important;
-  background-size: auto, 96px 96px, 96px 96px, auto !important;
+  background: var(--mw-page, #f7f5f1) !important;
 }
 
 .account-nav {
   min-height: 74px !important;
-  border-bottom: 1px solid rgba(241, 233, 222, 0.09) !important;
-  background: rgba(8, 10, 13, 0.78) !important;
-  backdrop-filter: blur(22px) saturate(118%);
+  border-bottom: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
+  background: var(--mw-card, #ffffff) !important;
 }
 
 .account-nav > a:last-child {
@@ -10318,20 +10336,15 @@ body :where(a.button, a.btn, a.cta, a[class*="button"]:not(.primary-button), a[c
    ========================================================================== */
 
 .intelligence-workspace {
-  background:
-    radial-gradient(circle at 80% -10%, rgba(221, 162, 115, 0.05), transparent 36rem),
-    radial-gradient(circle at 20% 70%, rgba(159, 186, 161, 0.03), transparent 32rem),
-    #080a0d !important;
-  color: #f1ece5 !important;
+  background: var(--mw-page, #f7f5f1) !important;
+  color: var(--mw-ink, #1c1a17) !important;
   font-family: var(--sovereign-title, "Geist Sans", sans-serif) !important;
 }
 
 /* ── Sidebar ── */
 .intelligence-sidebar {
-  background: rgba(10, 12, 15, 0.92) !important;
-  backdrop-filter: blur(24px) saturate(120%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(120%) !important;
-  border-right: 1px solid rgba(241, 233, 222, 0.08) !important;
+  background: var(--mw-card-tint, #fbf9f6) !important;
+  border-right: 1px solid var(--mw-line, rgba(28,26,23,.10)) !important;
 }
 
 .intelligence-sidebar nav button {

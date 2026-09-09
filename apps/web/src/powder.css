@@ -1,27 +1,27 @@
 .powder-wrapper {
   min-height: 100vh;
-  background-color: #080a0d;
-  color: #ffffff;
+  background: var(--mw-page, #f7f5f1);
+  color: var(--mw-ink, #1c1a17);
   font-family: var(--font-body, system-ui, -apple-system, sans-serif);
   position: relative;
   overflow-x: hidden;
 }
 
 .powder-theme {
-  background-color: #080a0d;
-  color: #ffffff;
+  background: var(--mw-page, #f7f5f1);
+  color: var(--mw-ink, #1c1a17);
   font-family: var(--font-body, system-ui, -apple-system, sans-serif);
   min-height: 100vh;
 }
 
-/* Landscape background with sunset glow */
+/* Landscape background with MindWave calm glow */
 .powder-landscape-glow {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 600px;
-  background: radial-gradient(circle at 50% -20%, rgba(190, 80, 50, 0.22), rgba(120, 40, 60, 0.12) 45%, transparent 70%);
+  background: radial-gradient(circle at 50% -20%, rgba(233, 226, 214, 0.7), transparent 70%);
   pointer-events: none;
   z-index: 1;
 }
@@ -32,7 +32,7 @@
   left: 0;
   right: 0;
   height: 500px;
-  background: radial-gradient(circle at 50% 100%, rgba(180, 75, 50, 0.18), rgba(90, 30, 50, 0.08) 50%, transparent 75%);
+  background: radial-gradient(circle at 50% 100%, rgba(233, 226, 214, 0.5), transparent 75%);
   pointer-events: none;
   z-index: 1;
 }
@@ -57,67 +57,66 @@
 }
 
 .header-nav a {
-  color: #a3a3a3;
+  color: var(--mw-muted, #6b645b);
   text-decoration: none;
   font-size: 14px;
   transition: color 0.2s;
 }
 
 .header-nav a:hover {
-  color: #fff;
+  color: var(--mw-ink, #1c1a17);
 }
 
 .header-cta {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--mw-cta, #1c1a17);
+  color: var(--mw-cta-ink, #f7f5f1);
+  border: 1px solid var(--mw-cta, #1c1a17);
   padding: 8px 16px;
-  border-radius: 20px;
+  border-radius: 999px;
   font-size: 14px;
   cursor: pointer;
 }
 
-/* GlassCard primitive styles */
+/* GlassCard primitive styles — MindWave global */
 .glass-card {
-  background-color: rgba(17, 19, 23, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+  background: var(--mw-card, #ffffff);
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10));
+  border-radius: var(--mw-radius-card, 24px);
   padding: 24px;
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08));
+  color: var(--mw-ink, #1c1a17);
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
 .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--mw-line-strong, rgba(28,26,23,.18));
 }
 
-/* Powder Interactive Interface Card */
+/* Powder Interactive Interface Card — MindWave global */
 .powder-interface-card {
   width: 100%;
-  background: rgba(18, 20, 24, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
+  background: var(--mw-card, #ffffff);
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10));
+  border-radius: var(--mw-radius-card, 24px);
   padding: 32px;
-  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.6), 0 0 40px rgba(212, 163, 115, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--mw-shadow, 0 20px 50px rgba(28,26,23,.08));
+  color: var(--mw-ink, #1c1a17);
 }
 
 .powder-prompt-box {
-  background: rgba(26, 28, 32, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  background: var(--mw-card-tint, #fbf9f6);
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10));
+  border-radius: var(--mw-radius-input, 16px);
   padding: 16px 20px;
   margin-bottom: 20px;
 }
 
 .powder-cat-btn {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #888;
+  border: 1px solid var(--mw-line, rgba(28,26,23,.10));
+  color: var(--mw-muted, #6b645b);
   padding: 6px 14px;
-  border-radius: 20px;
+  border-radius: 999px;
   font-size: 12px;
   cursor: pointer;
   white-space: nowrap;
@@ -125,8 +124,8 @@
 }
 
 .powder-cat-btn:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #ccc;
+  border-color: var(--mw-line-strong, rgba(28,26,23,.18));
+  color: var(--mw-ink, #1c1a17);
 }
 
 .powder-cat-btn.active {

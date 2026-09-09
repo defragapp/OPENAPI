@@ -3,7 +3,7 @@ import './powder-demo.css';
 
 export function PowderDemo() {
   return (
-    <div className="powder-app">
+    <div className="powder-app mindwave-page" data-visual-contract="mindwave-global" data-visual-system="mindwave">
       <header className="powder-header">
         <div className="header-logo">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 12l10 10 10-10L12 2z"/></svg>

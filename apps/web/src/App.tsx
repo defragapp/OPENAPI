@@ -45,7 +45,7 @@ export function App() {
 
 function PublicNotFound() {
   return (
-    <main className="public-not-found">
+    <main className="public-not-found mindwave-page" data-visual-contract="mindwave-global" data-visual-system="mindwave">
       <a className="private-route-brand" href="https://sovereign.defrag.app">
         <span aria-hidden="true">S</span>
         <strong>SOVEREIGN.OS</strong>
@@ -235,7 +235,7 @@ function AccountPage({ mode }: { mode: 'login' | 'signup' | 'redeem' }) {
   const buttonDisabled = submitting || linkSent || turnstileState !== 'verified';
 
   return (
-    <main className="account-shell">
+    <main className="account-shell mindwave-page" data-visual-contract="mindwave-global" data-visual-system="mindwave">
       <header className="account-nav">
         <a className="wordmark" href="/">SOVEREIGN.OS</a>
         {mode !== 'redeem' && (
@@ -424,7 +424,7 @@ function InvitationPage() {
   const statusTone = phase === 'error' ? 'error' : completed ? 'success' : 'neutral';
 
   return (
-    <main className="account-shell invitation-shell">
+    <main className="account-shell invitation-shell mindwave-page" data-visual-contract="mindwave-global" data-visual-system="mindwave">
       <a className="wordmark" href="/">SOVEREIGN.OS</a>
       <section className="auth-panel" data-invitation-state={invitationState} aria-labelledby="invitation-title">
         <p className="eyebrow">PRIVATE CONSENT</p>

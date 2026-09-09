@@ -480,7 +480,7 @@ export function PlanOnboarding() {
   const progress = progressState(phase);
 
   return (
-    <main className="plan-onboarding" data-onboarding-phase={phase}>
+    <main className="plan-onboarding mindwave-page" data-onboarding-phase={phase} data-visual-contract="mindwave-global" data-visual-system="mindwave">
       <header className="plan-nav">
         <a href="https://sovereign.defrag.app">SOVEREIGN.OS</a>
         <span>{phase === 'plan' ? 'Choose a plan' : phase === 'baseline_result' ? 'Baseline ready' : 'Build your Baseline'}</span>
