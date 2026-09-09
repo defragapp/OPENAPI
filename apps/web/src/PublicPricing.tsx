@@ -9,48 +9,35 @@ const NAV_LINKS = [
 
 const PLANS = [
   {
-    name: 'Explorer',
-    price: 'Free',
-    cadence: 'forever',
-    description: 'Get started with your Baseline and one text thread.',
+    name: 'Free',
+    price: '$0',
+    cadence: 'Permanent. No card required.',
+    description: 'Free: your personal Baseline Design.',
     features: [
-      'One text thread',
-      'Direct answer with source details',
-      'Private Baseline',
-      'Passkey authentication',
+      'Complete Baseline Design',
+      'Explore yourself — decisions, communication, creativity, connection, pressure, Shadow, Gift, Alignment',
+      'Today and what may be more relevant now',
+      '10 Sovereign AI turns each month',
+      'Review, correct, or reject any interpretation',
     ],
-    cta: 'Start free',
+    cta: 'Build your Baseline',
     primary: false,
   },
   {
-    name: 'Sovereign',
-    price: '$19',
-    cadence: '/ month',
-    description: 'Full access to Baseline, Alignment, and system intelligence.',
+    name: 'Sovereign+',
+    price: '$20',
+    cadence: 'per month — or $99 / year, one annual payment',
+    description: 'Sovereign+: your people, your systems, your Library.',
     features: [
-      'Unlimited threads',
-      'Baseline-first reasoning',
-      'Relationship intelligence',
-      'System intelligence',
-      'Priority support',
+      'Everything in Free',
+      '300 Sovereign AI turns each month',
+      'Understand another person with their permission',
+      'Family, household, friendship, workplace, and team Systems',
+      'Library and optional Covenant exploration',
+      'Private invitations and sharing controls',
     ],
     cta: 'Subscribe',
     primary: true,
-  },
-  {
-    name: 'Covenant',
-    price: '$49',
-    cadence: '/ month',
-    description: 'Everything in Sovereign, plus contextual Covenant reasoning.',
-    features: [
-      'Everything in Sovereign',
-      'Covenant reasoning lens',
-      'Advanced source inspection',
-      'Export your Baseline',
-      'Dedicated support',
-    ],
-    cta: 'Subscribe',
-    primary: false,
   },
 ];
 
@@ -99,7 +86,8 @@ export default function PublicPricing() {
         <p className="td-hero-kicker">Pricing</p>
         <h1 className="td-hero-title">Simple, transparent pricing.</h1>
         <p className="td-hero-subtitle">
-          Start free. Upgrade when you are ready to go deeper.
+          Free includes your complete Baseline Design and 10 Sovereign AI turns each month. Sovereign+ adds
+          relationship and system intelligence, Library, optional Covenant exploration, and 300 turns.
         </p>
       </header>
 
@@ -136,13 +124,17 @@ export default function PublicPricing() {
         </div>
       </section>
 
-      <section className="td-shell">
-        <div className="td-callout">
-          <h2 className="td-section-title">Need something custom?</h2>
-          <p className="td-section-lede">Reach out for team or enterprise plans.</p>
-          <div className="td-hero-actions" style={{ marginTop: 32 }}>
-            <a href="mailto:support@sovereign.defrag.app" className="td-cta">Contact us</a>
-          </div>
+      <section className="td-section td-shell">
+        <p className="td-section-kicker">Billing, simply</p>
+        <h2 className="td-section-title">Stripe securely handles checkout, invoices, payment methods, and subscription changes.</h2>
+        <p className="td-section-lede">
+          Sovereign+ stays active while your paid subscription is active. If paid access ends, your account stays
+          open and returns to Free. Support is separate from a subscription. Choose any one-time amount from $1.
+          Support does not unlock paid features or change your plan.
+        </p>
+        <div className="td-hero-actions" style={{ marginTop: 32 }}>
+          <a href="https://app.defrag.app/signup" className="td-cta td-cta--primary">Build your Baseline</a>
+          <a href="mailto:support@sovereign.defrag.app" className="td-cta">Contact support</a>
         </div>
       </section>
 

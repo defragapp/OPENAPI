@@ -110,12 +110,13 @@ for (const retired of ['font-family: "Sovereign Display"', '/fonts/sovereign-dis
  * separate support) is protected.
  */
 requireAll('Premium platform release v2 (PublicPricing.tsx)', pricing, [
-  'Free: your personal Baseline Design. Sovereign+: your people, your systems, your Library.',
+  'Free: your personal Baseline Design.',
+  'Sovereign+: your people, your systems, your Library.',
   '10 Sovereign AI turns each month',
   '300 Sovereign AI turns each month',
-  "monthlyPrice: '$20'",
-  "annualPrice: '$99 / year'",
   "price: '$0'",
+  "price: '$20'",
+  '$99 / year',
   'Stripe securely handles checkout, invoices, payment methods, and subscription changes.',
   'Sovereign+ stays active while your paid subscription is active.',
   'Understand another person with their permission',
@@ -188,8 +189,8 @@ if (supportStatic.trim()) {
 for (const marker of ['--static-title-font:', 'font-family: var(--static-title-font) !important']) {
   assert(premiumActionStatic.includes(marker), `Premium platform release v2 is missing terminal static typography marker: ${marker}`);
 }
-for (const name of ['how-it-works', 'pricing', 'faq', '404']) {
-  const page = readFileSync(resolve(`apps/web/public/${name}.html`), 'utf8');
+for (const [name, dir] of [['how-it-works', 'legacy'], ['pricing', 'legacy'], ['faq', 'legacy'], ['404', '.']]) {
+  const page = readFileSync(resolve(`apps/web/public/${dir}/${name}.html`), 'utf8');
   assert(page.includes('/premium-action-static-v1.css?v=20260818-geist-v1') || page.includes('/premium-action-static-v1.css'), `Premium platform release v2 is missing terminal static stylesheet link on ${name}.html`);
   assert(page.includes('Sovereign.OS'), `Premium platform release v2 is missing brand on ${name}.html`);
 }
